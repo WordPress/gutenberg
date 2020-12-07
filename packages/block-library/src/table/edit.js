@@ -101,6 +101,12 @@ const ALIGNMENT_CONTROLS = [
 
 const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
 
+const cellAriaLabel = {
+	head: __( 'Header cell text' ),
+	body: __( 'Body cell text' ),
+	foot: __( 'Footer cell text' ),
+};
+
 const placeholder = {
 	head: __( 'Header label' ),
 	foot: __( 'Footer label' ),
@@ -432,6 +438,7 @@ function TableEdit( {
 										type: 'cell',
 									} );
 								} }
+								aria-label={ cellAriaLabel[ name ] }
 								placeholder={ placeholder[ name ] }
 							/>
 						)
@@ -520,6 +527,7 @@ function TableEdit( {
 			{ ! isEmpty && (
 				<RichText
 					tagName="figcaption"
+					aria-label={ __( 'Table caption text' ) }
 					placeholder={ __( 'Write caption…' ) }
 					value={ caption }
 					onChange={ ( value ) =>

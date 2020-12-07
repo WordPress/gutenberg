@@ -52,7 +52,10 @@ export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
 export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';
-export { pressKeyWithModifier } from './press-key-with-modifier';
+export {
+	pressKeyWithModifier,
+	setClipboardData,
+} from './press-key-with-modifier';
 export { publishPost } from './publish-post';
 export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre-publish-checks-disabled';
 export { saveDraft } from './save-draft';
@@ -71,5 +74,6 @@ export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 export { showBlockToolbar } from './show-block-toolbar';
+export { openPreviewPage } from './preview';
 
 export * from './mocks';

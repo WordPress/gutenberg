@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
@@ -21,7 +22,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const { variations, blockAttributes } = useSelect(
 		( select ) => {
-			const { getBlockVariations } = select( 'core/blocks' );
+			const { getBlockVariations } = select( blocksStore );
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
 			);

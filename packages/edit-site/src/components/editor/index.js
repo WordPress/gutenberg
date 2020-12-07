@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -13,9 +19,8 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
-	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableEditorStyles as EditorStyles,
+	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
@@ -40,6 +45,7 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
+import URLQueryController from '../url-query-controller';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -134,22 +140,15 @@ function Editor() {
 				const {
 					__experimentalGetTemplateInfo: getTemplateInfo,
 				} = select( 'core/editor' );
-				entitiesToSave.forEach( ( { kind, name, key } ) => {
+				entitiesToSave.forEach( ( { kind, name, key, title } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
-
-					if ( 'postType' === kind && name === 'wp_template' ) {
-						const { title } = getTemplateInfo( record );
-						return editEntityRecord( kind, name, key, {
-							status: 'publish',
-							title,
-						} );
+					if ( kind === 'postType' && name === 'wp_template' ) {
+						( { title } = getTemplateInfo( record ) );
 					}
-
-					const edits = record.slug
-						? { status: 'publish', title: record.slug }
-						: { status: 'publish' };
-
-					editEntityRecord( kind, name, key, edits );
+					editEntityRecord( kind, name, key, {
+						status: 'publish',
+						title: title || record.slug,
+					} );
 				} );
 			}
 			setIsEntitiesSavedStatesOpen( false );
@@ -191,10 +190,13 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const ref = useRef();
+
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
+			<URLQueryController />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
@@ -235,6 +237,7 @@ function Editor() {
 												<KeyboardShortcuts.Register />
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
+													ref={ ref }
 													labels={ interfaceLabels }
 													drawer={
 														<NavigationSidebar />
@@ -284,7 +287,7 @@ function Editor() {
 														/>
 													}
 													content={
-														<BlockSelectionClearer
+														<div
 															className="edit-site-visual-editor"
 															style={
 																inlineStyles
@@ -300,7 +303,7 @@ function Editor() {
 																/>
 															) }
 															<KeyboardShortcuts />
-														</BlockSelectionClearer>
+														</div>
 													}
 													actions={
 														<>

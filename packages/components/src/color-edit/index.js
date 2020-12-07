@@ -53,7 +53,8 @@ function ColorOption( {
 	);
 
 	const isShowingControls =
-		isHover || isFocused || isEditingName || isShowingAdvancedPanel;
+		( isHover || isFocused || isEditingName || isShowingAdvancedPanel ) &&
+		! immutableColorSlugs.includes( slug );
 
 	return (
 		<div
@@ -119,9 +120,7 @@ function ColorOption( {
 							onChange={ ( newColorName ) =>
 								onChange( {
 									color,
-									slug: immutableColorSlugs.includes( slug )
-										? slug
-										: kebabCase( newColorName ),
+									slug: kebabCase( newColorName ),
 									name: newColorName,
 								} )
 							}

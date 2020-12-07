@@ -97,6 +97,7 @@ The settings section has the following structure and default values:
         "dropCap": true, /* false to opt-out */
         "fontFamilies": [ ... ], /* font family presets */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
+        "fontStyles": [ ... ], /* font style presets */
         "fontWeights": [ ... ], /* font weight presets */
         "textDecorations": [ ... ], /* text decoration presets */
         "textTransforms": [ ... ] /* text transform presets */
@@ -341,6 +342,7 @@ These are the current color properties supported by blocks:
 | --- | --- |
 | Cover | Yes |
 | Group | Yes |
+| Verse | Yes |
 
 #### Typography Properties
 
@@ -349,6 +351,7 @@ These are the current typography properties supported by blocks:
 | Context | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| Code | - | Yes | - | - | - | - | - |
 | Heading [1] | - | Yes | - | - | Yes | - | - |
 | List | - | Yes | - | - | - | - | - |
 | Navigation | Yes | Yes | Yes | Yes | - | Yes | Yes |
@@ -364,5 +367,6 @@ These are the current typography properties supported by blocks:
 | Post Title | Yes | Yes | - | - | Yes | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
 | Site Title | Yes | Yes | - | - | Yes | - | - |
+| Verse | Yes | - | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).

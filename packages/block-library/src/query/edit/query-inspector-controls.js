@@ -129,8 +129,12 @@ export default function QueryInspectorControls( {
 
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
-		debounce( () => setQuery( { search: querySearch } ), 250 ),
-		[ querySearch ]
+		debounce( () => {
+			if ( query.search !== querySearch ) {
+				setQuery( { search: querySearch } );
+			}
+		}, 250 ),
+		[ querySearch, query.search ]
 	);
 	useEffect( () => {
 		onChangeDebounced();

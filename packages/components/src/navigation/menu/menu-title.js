@@ -8,7 +8,7 @@ import { Icon, search as searchIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Animate from '../../animate';
+import { getAnimateClassName } from '../../animate';
 import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
 import {
@@ -82,18 +82,19 @@ export default function NavigationMenuTitle( {
 			) }
 
 			{ isSearching && (
-				<Animate type="slide-in" options={ { origin: 'left' } }>
-					{ ( { className: animateClassName } ) => (
-						<div className={ animateClassName }>
-							<MenuTitleSearch
-								onCloseSearch={ onCloseSearch }
-								onSearch={ onSearch }
-								search={ search }
-								title={ title }
-							/>
-						</div>
-					) }
-				</Animate>
+				<div
+					className={ getAnimateClassName( {
+						type: 'slide-in',
+						origin: 'left',
+					} ) }
+				>
+					<MenuTitleSearch
+						onCloseSearch={ onCloseSearch }
+						onSearch={ onSearch }
+						search={ search }
+						title={ title }
+					/>
+				</div>
 			) }
 		</MenuTitleUI>
 	);
