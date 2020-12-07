@@ -1,26 +1,29 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { Icon, withNotices } from '@wordpress/components';
 import {
-	Icon,
-	ToggleControl,
-	PanelBody,
-	withNotices,
-} from '@wordpress/components';
-import {
-	InspectorControls,
 	BlockControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	BlockIcon,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+/**
+ * Internal dependencies
+ */
+import FeaturedImageInspectorControls from './inspector-controls';
+import { ALLOWED_MEDIA_TYPES } from './constants';
+
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
 		<Icon icon={ postFeaturedImage } />
@@ -29,12 +32,13 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
-	attributes: { isLink },
+	attributes,
 	setAttributes,
 	context: { postId, postType },
 	noticeUI,
 	noticeOperations,
 } ) {
+	const { useAsCover, minHeight, minHeightUnit } = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -73,33 +77,35 @@ function PostFeaturedImageDisplay( {
 				} }
 			/>
 		);
-	} else {
-		// We have a Featured image so show a Placeholder if is loading.
-		image = ! media ? (
-			placeholderChip
-		) : (
+	} else if ( ! media ) {
+		// We have a Featured image so show a Placeholder while it's loading.
+		image = placeholderChip;
+	} else if ( ! useAsCover ) {
+		image = (
 			<img
 				src={ media.source_url }
 				alt={ media.alt_text || __( 'Featured image' ) }
 			/>
 		);
 	}
-
+	const featuredImageMinHeight = minHeightUnit
+		? `${ minHeight }${ minHeightUnit }`
+		: minHeight;
+	const blockProps = useBlockProps( {
+		className: classnames( { 'is-used-as-cover': useAsCover } ),
+		style: {
+			backgroundImage:
+				useAsCover && `url(' ${ media?.[ 'source_url' ] }' )`,
+			minHeight: useAsCover && featuredImageMinHeight,
+		},
+	} );
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ sprintf(
-							// translators: %s: Name of the post type e.g: "post".
-							__( 'Link to %s' ),
-							postType
-						) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			<FeaturedImageInspectorControls
+				attributes={ attributes }
+				postType={ postType }
+				setAttributes={ setAttributes }
+			/>
 			<BlockControls>
 				{ !! media && (
 					<MediaReplaceFlow
@@ -112,7 +118,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				) }
 			</BlockControls>
-			<div { ...useBlockProps() }>{ image }</div>
+			<div { ...blockProps }>{ image }</div>
 		</>
 	);
 }

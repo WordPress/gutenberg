@@ -6,6 +6,16 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"useAsCover": {
+			"type": "boolean",
+			"default": false
+		},
+		"minHeight": {
+			"type": "number"
+		},
+		"minHeightUnit": {
+			"type": "string"
 		}
 	},
 	"usesContext": [

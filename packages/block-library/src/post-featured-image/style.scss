@@ -6,4 +6,17 @@
 		max-width: 100%;
 		height: auto;
 	}
+	&.is-used-as-cover {
+		position: relative;
+		min-height: 300px;
+		background-position: center center;
+		background-size: cover;
+		a {
+			position: absolute;
+			height: 100%;
+			width: 100%;
+			top: 0;
+			left: 0;
+		}
+	}
 }
