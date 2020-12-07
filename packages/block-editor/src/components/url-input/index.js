@@ -22,41 +22,7 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
-<<<<<<< HEAD
-/* eslint-disable jsx-a11y/no-autofocus */
-class URLInput extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.onChange = this.onChange.bind( this );
-		this.onFocus = this.onFocus.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.selectLink = this.selectLink.bind( this );
-		this.handleOnClick = this.handleOnClick.bind( this );
-		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
-		this.autocompleteRef = props.autocompleteRef || createRef();
-		this.inputRef = createRef();
-		this.updateSuggestions = debounce(
-			this.updateSuggestions.bind( this ),
-			200
-		);
-
-		this.suggestionNodes = [];
-
-		this.isUpdatingSuggestions = false;
-
-		this.state = {
-			suggestions: [],
-			showSuggestions: false,
-			selectedSuggestion: null,
-=======
-// Since URLInput is rendered in the context of other inputs, but should be
-// considered a separate modal node, prevent keyboard events from propagating
-// as being considered from the input.
-const stopEventPropagation = ( event ) => event.stopPropagation();
-
 const REQUEST_DEBOUNCE_DELAY = 200;
->>>>>>> Refactor to functional component
 
 /* eslint-disable jsx-a11y/no-autofocus */
 function URLInput( {
@@ -382,14 +348,8 @@ function URLInput( {
 			autoFocus,
 			className: 'block-editor-url-input__input',
 			type: 'text',
-<<<<<<< HEAD
-			onChange: this.onChange,
-			onFocus: this.onFocus,
-=======
 			onChange,
 			onFocus,
-			onInput: stopEventPropagation,
->>>>>>> Refactor to functional component
 			placeholder,
 			onKeyDown,
 			role: 'combobox',
