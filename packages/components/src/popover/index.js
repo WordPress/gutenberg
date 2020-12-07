@@ -71,11 +71,17 @@ function computeAnchorRect(
 			return;
 		}
 
-		if ( anchorRef instanceof window.Range ) {
+		// Duck-type to check if `anchorRef` is an instance of Range
+		// `anchorRef instanceof window.Range` checks will break across document boundaries
+		// such as in an iframe
+		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return getRectangleFromRange( anchorRef );
 		}
 
-		if ( anchorRef instanceof window.Element ) {
+		// Duck-type to check if `anchorRef` is an instance of Element
+		// `anchorRef instanceof window.Element` checks will break across document boundaries
+		// such as in an iframe
+		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = anchorRef.getBoundingClientRect();
 
 			if ( shouldAnchorIncludePadding ) {
@@ -266,6 +272,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableObserveElement,
 	__unstableBoundaryParent,
+	__unstableForcePosition,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -355,7 +362,8 @@ const Popover = ( {
 				__unstableStickyBoundaryElement,
 				containerRef.current,
 				relativeOffsetTop,
-				boundaryElement
+				boundaryElement,
+				__unstableForcePosition
 			);
 
 			if (

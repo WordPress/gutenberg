@@ -23,7 +23,5 @@ export default function registerEditSiteStore( initialState ) {
 		initialState,
 	} );
 
-	store.dispatch( actions.showHomepage() );
-
 	return store;
 }

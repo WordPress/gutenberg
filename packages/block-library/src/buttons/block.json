@@ -5,6 +5,10 @@
 	"attributes": {
 		"contentJustification": {
 			"type": "string"
+		},
+		"orientation": {
+			"type": "string",
+			"default": "horizontal"
 		}
 	},
 	"supports": {

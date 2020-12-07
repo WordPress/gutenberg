@@ -35,6 +35,7 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -62,7 +63,6 @@
 		"react-spring": "^8.0.19",
 		"reakit": "1.1.0",
 		"redux-multi": "^0.1.12",
-		"refx": "^3.0.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"traverse": "^0.6.6"

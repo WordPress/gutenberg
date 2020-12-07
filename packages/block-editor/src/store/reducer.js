@@ -1585,6 +1585,10 @@ export function hasBlockMovingClientId( state = null, action ) {
 		return action.hasBlockMovingClientId;
 	}
 
+	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+		return null;
+	}
+
 	return state;
 }
 

@@ -256,6 +256,21 @@ const DIRECTIONAL_ORIENTATION_ANGLE_MAP = {
 	'left top': 315,
 };
 
+function hasUnsupportedLength( item ) {
+	return item.length === undefined || item.length.type !== '%';
+}
+
+function assignColorStopLengths( gradientAST ) {
+	const { colorStops } = gradientAST;
+	const step = 100 / ( colorStops.length - 1 );
+	colorStops.forEach( ( stop, index ) => {
+		stop.length = {
+			value: step * index,
+			type: '%',
+		};
+	} );
+}
+
 export function getGradientParsed( value ) {
 	let hasGradient = !! value;
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
@@ -280,6 +295,12 @@ export function getGradientParsed( value ) {
 			gradientAST.orientation.value
 		].toString();
 	}
+
+	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
+		assignColorStopLengths( gradientAST );
+		gradientValue = serializeGradient( gradientAST );
+	}
+
 	return {
 		hasGradient,
 		gradientAST,

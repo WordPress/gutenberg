@@ -125,13 +125,16 @@ export class MediaUploadProgress extends React.Component {
 			'Failed to insert media.\nPlease tap for options.'
 		);
 
+		const progressBarStyle = [
+			styles.progressBar,
+			showSpinner || styles.progressBarHidden,
+		];
+
 		return (
 			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
-				{ showSpinner && (
-					<View style={ styles.progressBar }>
-						<Spinner progress={ progress } />
-					</View>
-				) }
+				<View style={ progressBarStyle }>
+					{ showSpinner && <Spinner progress={ progress } /> }
+				</View>
 				{ renderContent( {
 					isUploadInProgress,
 					isUploadFailed,
