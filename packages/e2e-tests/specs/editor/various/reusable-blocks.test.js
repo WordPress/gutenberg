@@ -12,6 +12,7 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	toggleGlobalBlockInserter,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Reusable blocks', () => {
@@ -44,7 +45,7 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
@@ -55,24 +56,20 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Greeting block' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await canvas().$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await canvas().waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Greeting block' );
+		await canvas().waitForXPath( '//b[text()="Greeting block"]' );
 	} );
 
 	it( 'can be created with no title', async () => {
@@ -87,29 +84,25 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await canvas().$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await canvas().waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that it is untitled
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Untitled Reusable Block' );
+		await canvas().waitForXPath( '//b[text()="Untitled Reusable Block"]' );
 	} );
 
 	it( 'can be inserted and edited', async () => {
@@ -117,9 +110,10 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Greeting block' );
 
 		// Put the reusable block in edit mode
-		const editButton = await page.waitForXPath(
+		const editButton = await canvas().waitForXPath(
 			'//button[text()="Edit" and not(@disabled)]'
 		);
+
 		await editButton.click();
 
 		// Change the block's title
@@ -137,27 +131,23 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Oh! ' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await canvas().$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await canvas().waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Surprised greeting block' );
+		await canvas().waitForXPath( '//b[text()="Surprised greeting block"]' );
 
 		// Check that its content is up to date
-		const text = await page.$eval(
+		const text = await canvas().$eval(
 			'.block-editor-block-list__block[data-type="core/block"] p',
 			( element ) => element.innerText
 		);
@@ -177,7 +167,7 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
@@ -188,7 +178,7 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Awesome block' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await canvas().$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Step 2. Create new post.
@@ -200,17 +190,13 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Awesome block' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Awesome block' );
+		await canvas().waitForXPath( '//b[text()="Awesome block"]' );
 	} );
 
 	it( 'can be converted to a regular block', async () => {
@@ -221,13 +207,13 @@ describe( 'Reusable blocks', () => {
 		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
 
 		// Check that we have a paragraph block on the page
-		const block = await page.$(
+		const block = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its content is up to date
-		const text = await page.$eval(
+		const text = await canvas().$eval(
 			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
@@ -255,7 +241,7 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
@@ -266,24 +252,22 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Multi-selection reusable block' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		const [ saveButton ] = await canvas().$x( '//button[text()="Save"]' );
 		await saveButton.click();
 
 		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await canvas().waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$(
+		const block = await canvas().$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
+		await canvas().waitForXPath(
+			'//b[text()="Multi-selection reusable block"]'
 		);
-		expect( title ).toBe( 'Multi-selection reusable block' );
 	} );
 
 	it( 'multi-selection reusable block can be converted back to regular blocks', async () => {
@@ -309,10 +293,12 @@ describe( 'Reusable blocks', () => {
 
 		await page.waitForNavigation();
 
+		await page.waitForSelector( 'iframe[title="Editor canvas"]' );
+
 		// Click the block to give it focus
 		const blockSelector = 'p[data-title="Paragraph"]';
-		await page.waitForSelector( blockSelector );
-		await page.click( blockSelector );
+		await canvas().waitForSelector( blockSelector );
+		await canvas().click( blockSelector );
 
 		// Delete the block, leaving the reusable block empty
 		await clickBlockToolbarButton( 'More options' );

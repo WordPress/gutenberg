@@ -9,6 +9,7 @@ import {
 	insertBlock,
 	switchEditorModeTo,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'InnerBlocks Template Sync', () => {
@@ -99,7 +100,7 @@ describe( 'Container block without paragraph support', () => {
 		await insertBlock( 'Container without paragraph' );
 
 		// Open the specific appender used when there's no paragraph support.
-		await page.click(
+		await canvas().click(
 			'.block-editor-inner-blocks .block-list-appender .block-list-appender__toggle'
 		);
 

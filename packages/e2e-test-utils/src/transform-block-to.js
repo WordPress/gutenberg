@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { showBlockToolbar } from './show-block-toolbar';
+import { canvas } from './canvas';
 
 /**
  * Converts editor's block type.
@@ -33,5 +34,7 @@ export async function transformBlockTo( name ) {
 	// Wait for the transformed block to appear.
 	const BLOCK_SELECTOR = '.block-editor-block-list__block';
 	const BLOCK_NAME_SELECTOR = `[data-title="${ name }"]`;
-	await page.waitForSelector( `${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }` );
+	await canvas().waitForSelector(
+		`${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }`
+	);
 }

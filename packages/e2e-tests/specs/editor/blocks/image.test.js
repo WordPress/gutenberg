@@ -13,16 +13,16 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	createNewPost,
-	clickButton,
 	clickBlockToolbarButton,
 	clickMenuItem,
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+async function upload( selector, frame = canvas() ) {
+	await frame.waitForSelector( selector );
+	const inputElement = await frame.$( selector );
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -39,7 +39,7 @@ async function upload( selector ) {
 }
 
 async function waitForImage( filename ) {
-	await page.waitForSelector(
+	await canvas().waitForSelector(
 		`.wp-block-image img[src$="${ filename }.png"]`
 	);
 }
@@ -49,12 +49,12 @@ async function getSrc( elementHandle ) {
 }
 async function getDataURL( elementHandle ) {
 	return elementHandle.evaluate( ( node ) => {
-		const canvas = document.createElement( 'canvas' );
-		const context = canvas.getContext( '2d' );
-		canvas.width = node.width;
-		canvas.height = node.height;
+		const canvasElement = document.createElement( 'canvas' );
+		const context = canvasElement.getContext( '2d' );
+		canvasElement.width = node.width;
+		canvasElement.height = node.height;
 		context.drawImage( node, 0, 0 );
-		return canvas.toDataURL( 'image/jpeg' );
+		return canvasElement.toDataURL( 'image/jpeg' );
 	} );
 }
 
@@ -85,17 +85,20 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
 		await openDocumentSettingsSidebar();
-		await page.click( '[aria-label="Image size presets"] button' );
+		await page.click( '.block-editor-image-size-control__height' );
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '5' );
 
 		const regex2 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
+			`<!-- wp:image {"id":\\d+,"height":50,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" height="50"\\/><\\/figure>\\s*<!-- /wp:image -->`
 		);
 
 		expect( await getEditedPostContent() ).toMatch( regex2 );
 
-		await clickButton( 'Replace' );
+		await clickBlockToolbarButton( 'Replace', 'content' );
 		const filename2 = await upload(
-			'.block-editor-media-replace-flow__options input[type="file"]'
+			'.block-editor-media-replace-flow__options input[type="file"]',
+			page
 		);
 		await waitForImage( filename2 );
 
@@ -104,7 +107,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
-		await page.click( '.wp-block-image img' );
+		await canvas().click( '.wp-block-image img' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -120,7 +123,7 @@ describe( 'Image', () => {
 		await page.keyboard.type( '2' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await canvas().evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
 	} );
 
@@ -133,7 +136,7 @@ describe( 'Image', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await canvas().evaluate( () => document.activeElement.innerHTML )
 		).toBe( '1<br data-rich-text-line-break="true">2' );
 	} );
 
@@ -144,7 +147,7 @@ describe( 'Image', () => {
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		const image = await page.$( '[data-type="core/image"]' );
+		const image = await canvas().$( '[data-type="core/image"]' );
 
 		await image.evaluate( () => {
 			const input = document.createElement( 'input' );
@@ -186,7 +189,7 @@ describe( 'Image', () => {
 		await waitForImage( filename );
 
 		// Assert that the image is initially unscaled and unedited.
-		const initialImage = await page.$( '.wp-block-image img' );
+		const initialImage = await canvas().$( '.wp-block-image img' );
 		const initialImageSrc = await getSrc( initialImage );
 		const initialImageDataURL = await getDataURL( initialImage );
 		expect( initialImageDataURL ).toMatchSnapshot();
@@ -211,12 +214,12 @@ describe( 'Image', () => {
 		await clickBlockToolbarButton( 'Apply', 'content' );
 
 		// Wait for the cropping tools to disappear.
-		await page.waitForSelector(
+		await canvas().waitForSelector(
 			'.wp-block-image img:not( .reactEasyCrop_Image )'
 		);
 
 		// Assert that the image is edited.
-		const updatedImage = await page.$( '.wp-block-image img' );
+		const updatedImage = await canvas().$( '.wp-block-image img' );
 		const updatedImageSrc = await getSrc( updatedImage );
 		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
 		const updatedImageDataURL = await getDataURL( updatedImage );
@@ -231,7 +234,7 @@ describe( 'Image', () => {
 		await waitForImage( filename );
 
 		// Assert that the image is initially unscaled and unedited.
-		const initialImage = await page.$( '.wp-block-image img' );
+		const initialImage = await canvas().$( '.wp-block-image img' );
 		const initialImageSrc = await getSrc( initialImage );
 		const initialImageDataURL = await getDataURL( initialImage );
 		expect( initialImageDataURL ).toMatchSnapshot();
@@ -248,12 +251,12 @@ describe( 'Image', () => {
 		await clickBlockToolbarButton( 'Apply', 'content' );
 
 		// Wait for the cropping tools to disappear.
-		await page.waitForSelector(
+		await canvas().waitForSelector(
 			'.wp-block-image img:not( .reactEasyCrop_Image )'
 		);
 
 		// Assert that the image is edited.
-		const updatedImage = await page.$( '.wp-block-image img' );
+		const updatedImage = await canvas().$( '.wp-block-image img' );
 		const updatedImageSrc = await getSrc( updatedImage );
 		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
 		const updatedImageDataURL = await getDataURL( updatedImage );
@@ -268,22 +271,24 @@ describe( 'Image', () => {
 		await waitForImage( filename );
 
 		// Assert that the image is initially unscaled and unedited.
-		const initialImage = await page.$( '.wp-block-image img' );
+		const initialImage = await canvas().$( '.wp-block-image img' );
 		const initialImageDataURL = await getDataURL( initialImage );
 		expect( initialImageDataURL ).toMatchSnapshot();
 
 		// Double the image's size using the zoom input.
 		await clickBlockToolbarButton( 'Crop' );
-		await page.waitForSelector( '.wp-block-image img.reactEasyCrop_Image' );
+		await canvas().waitForSelector(
+			'.wp-block-image img.reactEasyCrop_Image'
+		);
 		await clickBlockToolbarButton( 'Rotate' );
 		await clickBlockToolbarButton( 'Apply', 'content' );
 
-		await page.waitForSelector(
+		await canvas().waitForSelector(
 			'.wp-block-image img:not( .reactEasyCrop_Image )'
 		);
 
 		// Assert that the image is edited.
-		const updatedImage = await page.$( '.wp-block-image img' );
+		const updatedImage = await canvas().$( '.wp-block-image img' );
 		const updatedImageDataURL = await getDataURL( updatedImage );
 		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
 		expect( updatedImageDataURL ).toMatchSnapshot();

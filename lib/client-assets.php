@@ -699,4 +699,6 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	echo "<script>window.__editorStyles = $editor_styles</script>";
 }
+add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );

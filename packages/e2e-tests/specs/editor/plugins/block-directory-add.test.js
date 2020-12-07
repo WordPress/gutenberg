@@ -8,6 +8,7 @@ import {
 	setUpResponseMocking,
 	getEditedPostContent,
 	createJSONResponse,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 // Urls to mock
@@ -181,7 +182,9 @@ describe( 'adding blocks from block directory', () => {
 		// Search for the block via the inserter
 		await insertBlockDirectoryBlock( MOCK_BLOCK1.title );
 
-		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
+		await canvas().waitForSelector(
+			`div[data-type="${ MOCK_BLOCK1.name }"]`
+		);
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();

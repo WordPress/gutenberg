@@ -238,18 +238,18 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
-			const [ createNewButton ] = await page.$x(
+			const [ createNewButton ] = await canvas().$x(
 				createNewButtonSelector
 			);
 			await createNewButton.click();
 
-			const newTemplatePart = await page.waitForSelector(
+			const newTemplatePart = await canvas().waitForSelector(
 				activatedTemplatePartSelector
 			);
 			expect( newTemplatePart ).toBeTruthy();
 
 			// Finish creating template part, insert some text, and save.
-			await page.click( '.block-editor-button-block-appender' );
+			await canvas().click( '.block-editor-button-block-appender' );
 			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
@@ -263,7 +263,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			const [ chooseExistingButton ] = await page.$x(
+			const [ chooseExistingButton ] = await canvas().$x(
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();
@@ -271,8 +271,8 @@ describe( 'Template Part', () => {
 			expect( preview ).toBeTruthy();
 
 			await preview.click();
-			await page.waitForSelector( activatedTemplatePartSelector );
-			const templatePartContent = await page.waitForXPath(
+			await canvas().waitForSelector( activatedTemplatePartSelector );
+			const templatePartContent = canvas().waitForXPath(
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();

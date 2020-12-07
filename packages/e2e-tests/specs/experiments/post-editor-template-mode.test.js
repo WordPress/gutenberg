@@ -9,6 +9,7 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post Editor Template mode', () => {
@@ -28,7 +29,7 @@ describe( 'Post Editor Template mode', () => {
 
 	it( 'Allow to switch to template mode, edit the template and check the result', async () => {
 		// Create a random post.
-		await page.type( '.editor-post-title__input', 'Just an FSE Post' );
+		await canvas().type( '.editor-post-title__input', 'Just an FSE Post' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Hello World' );
 

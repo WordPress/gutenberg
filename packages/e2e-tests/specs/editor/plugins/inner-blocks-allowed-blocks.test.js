@@ -9,6 +9,7 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
@@ -31,8 +32,8 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		const childParagraphSelector = `${ parentBlockSelector } ${ paragraphSelector }`;
 		await insertBlock( 'Allowed Blocks Unset' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector( childParagraphSelector );
-		await page.click( childParagraphSelector );
+		await canvas().waitForSelector( childParagraphSelector );
+		await canvas().click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		await expect(
 			( await getAllBlockInserterItemTitles() ).length
@@ -44,8 +45,8 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		const childParagraphSelector = `${ parentBlockSelector } ${ paragraphSelector }`;
 		await insertBlock( 'Allowed Blocks Set' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector( childParagraphSelector );
-		await page.click( childParagraphSelector );
+		await canvas().waitForSelector( childParagraphSelector );
+		await canvas().click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Button',
@@ -62,8 +63,8 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		const parentBlockSelector = '[data-type="test/allowed-blocks-dynamic"]';
 		const blockAppender = '.block-list-appender button';
 		const appenderSelector = `${ parentBlockSelector } ${ blockAppender }`;
-		await page.waitForSelector( appenderSelector );
-		await page.click( appenderSelector );
+		await canvas().waitForSelector( appenderSelector );
+		await canvas().click( appenderSelector );
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Image',
 			'List',
@@ -74,8 +75,10 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		await insertButton.click();
 		await insertBlock( 'Image' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector( '.product[data-number-of-children="2"]' );
-		await page.click( appenderSelector );
+		await canvas().waitForSelector(
+			'.product[data-number-of-children="2"]'
+		);
+		await canvas().click( appenderSelector );
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Gallery',
 			'Video',

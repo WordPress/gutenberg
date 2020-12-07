@@ -278,6 +278,16 @@ exports[`Writing Flow should not have a dead zone between blocks (upper) 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should not have a dead zone between blocks (upper) 2`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>23</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should not prematurely multi-select 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>

@@ -8,6 +8,7 @@ import {
 	createNewPost,
 	pressKeyWithModifier,
 	showBlockToolbar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Links', () => {
@@ -49,7 +50,7 @@ describe( 'Links', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		const actualText = await page.evaluate(
+		const actualText = await canvas().evaluate(
 			() =>
 				document.querySelector( '.block-editor-rich-text__editable a' )
 					.textContent
@@ -182,7 +183,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click somewhere else - it doesn't really matter where
-		await page.click( '.editor-post-title' );
+		await canvas().click( '.editor-post-title' );
 	} );
 
 	const createAndReselectLink = async () => {
@@ -312,7 +313,7 @@ describe( 'Links', () => {
 
 	const createPostWithTitle = async ( titleText ) => {
 		await createNewPost();
-		await page.type( '.editor-post-title__input', titleText );
+		await canvas().type( '.editor-post-title__input', titleText );
 		await page.click( '.editor-post-publish-panel__toggle' );
 
 		// Disable reason: Wait for the animation to complete, since otherwise the
@@ -510,7 +511,7 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for Gutenberg to finish the job.
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//a[contains(@href,"w.org") and @target="_blank"]'
 		);
 
@@ -551,7 +552,7 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Space' );
 
 		// Wait for Gutenberg to finish the job.
-		await page.waitForXPath(
+		await canvas().waitForXPath(
 			'//a[contains(@href,"wordpress.org") and not(@target)]'
 		);
 

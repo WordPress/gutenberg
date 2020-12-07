@@ -11,6 +11,7 @@ import {
 	findSidebarPanelWithTitle,
 	openDocumentSettingsSidebar,
 	publishPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -108,7 +109,7 @@ describe( 'Taxonomies', () => {
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
 
 		// Type something in the title so we can publish the post.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Publish the post.
 		await publishPost();
@@ -166,7 +167,7 @@ describe( 'Taxonomies', () => {
 		expect( tags[ 0 ] ).toEqual( tagName );
 
 		// Type something in the title so we can publish the post.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Publish the post.
 		await publishPost();
@@ -225,7 +226,7 @@ describe( 'Taxonomies', () => {
 		expect( tags[ 0 ] ).toEqual( tagName );
 
 		// Type something in the title so we can publish the post.
-		await page.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		// Publish the post.
 		await publishPost();

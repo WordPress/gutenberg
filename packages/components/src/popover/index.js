@@ -269,6 +269,9 @@ const Popover = ( {
 	__unstableObserveElement,
 	__unstableBoundaryParent,
 	__unstableForcePosition,
+	__unstabelOnHeightChange,
+	__unstableSpanOverAnchor,
+	__unstableTransparent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -281,6 +284,12 @@ const Popover = ( {
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
+
+	useEffect( () => {
+		if ( __unstabelOnHeightChange ) {
+			__unstabelOnHeightChange( contentSize.height );
+		}
+	}, [ contentSize.height ] );
 
 	useLayoutEffect( () => {
 		if ( isExpanded ) {
@@ -351,6 +360,7 @@ const Popover = ( {
 				yAxis,
 				contentHeight,
 				contentWidth,
+				popoverWidth,
 			} = computePopoverPosition(
 				anchor,
 				usedContentSize,
@@ -359,7 +369,8 @@ const Popover = ( {
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement,
-				__unstableForcePosition
+				__unstableForcePosition,
+				__unstableSpanOverAnchor
 			);
 
 			if (
@@ -387,6 +398,11 @@ const Popover = ( {
 				contentRef.current,
 				'maxWidth',
 				typeof contentWidth === 'number' ? contentWidth + 'px' : ''
+			);
+			setStyle(
+				contentRef.current,
+				'width',
+				typeof popoverWidth === 'number' ? popoverWidth + 'px' : ''
 			);
 
 			// Compute the animation position
@@ -580,6 +596,7 @@ const Popover = ( {
 					className,
 					animateClassName,
 					{
+						'is-spanned-over': __unstableSpanOverAnchor,
 						'is-expanded': isExpanded,
 						'is-without-arrow': noArrow,
 						'is-alternate': isAlternate,
@@ -604,7 +621,9 @@ const Popover = ( {
 				) }
 				<div
 					ref={ mergeRefs( [ contentRef, focusOnMountRef ] ) }
-					className="components-popover__content"
+					className={ classnames( 'components-popover__content', {
+						'is-transparent': __unstableTransparent,
+					} ) }
 					tabIndex="-1"
 				>
 					<div style={ { position: 'relative' } }>

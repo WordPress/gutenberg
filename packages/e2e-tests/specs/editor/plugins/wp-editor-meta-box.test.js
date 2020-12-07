@@ -6,6 +6,7 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	publishPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'WP Editor Meta Boxes', () => {
@@ -20,7 +21,7 @@ describe( 'WP Editor Meta Boxes', () => {
 
 	it( 'Should save the changes', async () => {
 		// Add title to enable valid non-empty post save.
-		await page.type( '.editor-post-title__input', 'Hello Meta' );
+		await canvas().type( '.editor-post-title__input', 'Hello Meta' );
 
 		// Type something
 		await expect( page ).toClick( '#test_tinymce_id-html' );

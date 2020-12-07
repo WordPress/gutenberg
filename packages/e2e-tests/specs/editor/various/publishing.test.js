@@ -9,6 +9,7 @@ import {
 	disablePrePublishChecks,
 	arePrePublishChecksEnabled,
 	setBrowserViewport,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Publishing', () => {
@@ -30,7 +31,7 @@ describe( 'Publishing', () => {
 		} );
 
 		it( `should publish the ${ postType } and close the panel once we start editing again.`, async () => {
-			await page.type( '.editor-post-title__input', 'E2E Test Post' );
+			await canvas().type( '.editor-post-title__input', 'E2E Test Post' );
 
 			await publishPost();
 
@@ -40,7 +41,7 @@ describe( 'Publishing', () => {
 			).not.toBeNull();
 
 			// Start editing again.
-			await page.type( '.editor-post-title__input', ' (Updated)' );
+			await canvas().type( '.editor-post-title__input', ' (Updated)' );
 
 			// The post-publishing panel is not visible anymore.
 			expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
@@ -67,7 +68,10 @@ describe( 'Publishing', () => {
 			} );
 
 			it( `should publish the ${ postType } without opening the post-publish sidebar.`, async () => {
-				await page.type( '.editor-post-title__input', 'E2E Test Post' );
+				await canvas().type(
+					'.editor-post-title__input',
+					'E2E Test Post'
+				);
 
 				// The "Publish" button should be shown instead of the "Publish..." toggle
 				expect(

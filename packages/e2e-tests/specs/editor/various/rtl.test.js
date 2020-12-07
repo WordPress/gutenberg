@@ -5,6 +5,7 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -15,7 +16,7 @@ const ARABIC_TWO = '٢';
 describe( 'RTL', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await page.evaluate( () => {
+		await canvas().evaluate( () => {
 			document.querySelector( '.is-root-container' ).dir = 'rtl';
 		} );
 	} );
@@ -102,7 +103,7 @@ describe( 'RTL', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for rich text editor to load.
-		await page.waitForSelector( '.block-editor-rich-text__editable' );
+		await canvas().waitForSelector( '.block-editor-rich-text__editable' );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );

@@ -12,6 +12,7 @@ import {
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'templates', () => {
@@ -35,7 +36,7 @@ describe( 'templates', () => {
 		it( 'Should respect user edits to not re-apply template after save (single block removal)', async () => {
 			// Remove a block from the template to verify that it's not
 			// re-added after saving and reloading the editor.
-			await page.click( '.editor-post-title__input' );
+			await canvas().click( '.editor-post-title__input' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
@@ -48,7 +49,7 @@ describe( 'templates', () => {
 		it( 'Should respect user edits to not re-apply template after save (full delete)', async () => {
 			// Remove all blocks from the template to verify that they're not
 			// re-added after saving and reloading the editor.
-			await page.type( '.editor-post-title__input', 'My Empty Book' );
+			await canvas().type( '.editor-post-title__input', 'My Empty Book' );
 			await page.keyboard.press( 'ArrowDown' );
 			await pressKeyWithModifier( 'primary', 'A' );
 			await page.keyboard.press( 'Backspace' );
@@ -99,7 +100,10 @@ describe( 'templates', () => {
 
 			// Remove the default block template to verify that it's not
 			// re-added after saving and reloading the editor.
-			await page.type( '.editor-post-title__input', 'My Image Format' );
+			await canvas().type(
+				'.editor-post-title__input',
+				'My Image Format'
+			);
 			await clickBlockAppender();
 			await page.keyboard.press( 'Backspace' );
 			await page.keyboard.press( 'Backspace' );

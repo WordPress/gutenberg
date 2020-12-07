@@ -5,6 +5,7 @@ import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Cover', () => {
@@ -19,7 +20,7 @@ describe( 'Cover', () => {
 		// Open the sidebar
 		await openDocumentSettingsSidebar();
 		// Choose the first solid color as the background of the cover.
-		await page.click(
+		await canvas().click(
 			'.components-circular-option-picker__option-wrapper:first-child button'
 		);
 
@@ -40,7 +41,7 @@ describe( 'Cover', () => {
 			await page.evaluate( ( { value } ) => value, heightInput )
 		).toBeFalsy();
 
-		const resizeButton = await page.$(
+		const resizeButton = await canvas().$(
 			'.components-resizable-box__handle-bottom'
 		);
 		const boundingBoxResizeButton = await resizeButton.boundingBox();
@@ -58,7 +59,7 @@ describe( 'Cover', () => {
 		// Trigger a mousedown event against the resize button.
 		// Using page.mouse.down does not works because it triggers a global event,
 		// not an event for that element.
-		page.evaluate( ( { x, y } ) => {
+		canvas().evaluate( ( { x, y } ) => {
 			const element = document.querySelector(
 				'.components-resizable-box__handle-bottom'
 			);

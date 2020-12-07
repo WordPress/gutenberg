@@ -5,7 +5,7 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
-	dragAndResize,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Spacer', () => {
@@ -34,13 +34,32 @@ describe( 'Spacer', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
-		const resizableHandle = await page.$(
-			'.block-library-spacer__resize-container .components-resizable-box__handle'
-		);
-		await dragAndResize( resizableHandle, { x: 0, y: 50 } );
+		const [ coord1, coord2 ] = await canvas().evaluate( () => {
+			const element = document.querySelector(
+				'.block-library-spacer__resize-container .components-resizable-box__handle'
+			);
+			const rect = element.getBoundingClientRect();
+			const winRect = window.frameElement.getBoundingClientRect();
+			return [
+				{
+					x: winRect.x + rect.x + rect.width / 2,
+					y: winRect.y + rect.y + rect.height / 2,
+				},
+				{
+					x: winRect.x + rect.x + rect.width / 2,
+					y: winRect.y + rect.y + rect.height / 2 + 50,
+				},
+			];
+		} );
+
+		await page.mouse.move( coord1.x, coord1.y );
+		await page.mouse.down();
+		await page.mouse.move( coord2.x, coord2.y );
+		await page.mouse.up();
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		const selectedSpacer = await page.$(
+		const selectedSpacer = await canvas().$(
 			'[data-type="core/spacer"].is-selected'
 		);
 		expect( selectedSpacer ).not.toBe( null );

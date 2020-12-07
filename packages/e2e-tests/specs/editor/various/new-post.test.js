@@ -5,6 +5,7 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'new editor state', () => {
@@ -25,7 +26,7 @@ describe( 'new editor state', () => {
 			expect.stringContaining( 'post-new.php' )
 		);
 		// Should display the blank title.
-		const title = await page.$( '[placeholder="Add title"]' );
+		const title = await canvas().$( '[placeholder="Add title"]' );
 		expect( title ).not.toBeNull();
 		expect( title.innerHTML ).toBeFalsy();
 		// Should display the Preview button.
@@ -51,10 +52,10 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should focus the title if the title is empty', async () => {
-		const activeElementClasses = await page.evaluate( () => {
+		const activeElementClasses = await canvas().evaluate( () => {
 			return Object.values( document.activeElement.classList );
 		} );
-		const activeElementTagName = await page.evaluate( () => {
+		const activeElementTagName = await canvas().evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
 
@@ -64,7 +65,7 @@ describe( 'new editor state', () => {
 
 	it( 'should not focus the title if the title exists', async () => {
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', 'Here is the title' );
+		await canvas().type( '.editor-post-title__input', 'Here is the title' );
 		// Save the post as a draft.
 		await page.click( '.editor-post-save-draft' );
 		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
@@ -72,10 +73,10 @@ describe( 'new editor state', () => {
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
 
-		const activeElementClasses = await page.evaluate( () => {
+		const activeElementClasses = await canvas().evaluate( () => {
 			return Object.values( document.activeElement.classList );
 		} );
-		const activeElementTagName = await page.evaluate( () => {
+		const activeElementTagName = await canvas().evaluate( () => {
 			return document.activeElement.tagName.toLowerCase();
 		} );
 

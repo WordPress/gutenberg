@@ -80,6 +80,7 @@ Clicks a button based on the text on the button.
 _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
+-   _frame_ `Object`: 
 
 <a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
 

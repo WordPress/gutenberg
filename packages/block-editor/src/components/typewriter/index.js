@@ -10,6 +10,18 @@ const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
+function computeCaretRectWithIframe( win ) {
+	const { frameElement } = win;
+	const caretRect = computeCaretRect( win );
+	const frameTop = frameElement
+		? frameElement.getBoundingClientRect().top
+		: 0;
+	return {
+		top: caretRect.top + frameTop,
+		height: caretRect.height,
+	};
+}
+
 export function useTypewriter( ref ) {
 	const hasSelectedBlock = useSelect( ( select ) =>
 		select( 'core/block-editor' ).hasSelectedBlock()
@@ -63,7 +75,7 @@ export function useTypewriter( ref ) {
 				return;
 			}
 
-			const currentCaretRect = computeCaretRect( defaultView );
+			const currentCaretRect = computeCaretRectWithIframe( defaultView );
 
 			if ( ! currentCaretRect ) {
 				return;
@@ -91,24 +103,32 @@ export function useTypewriter( ref ) {
 				return;
 			}
 
-			const scrollContainer = getScrollContainer( ref.current );
+			const { frameElement } = defaultView;
+
+			const scrollContainer = getScrollContainer(
+				frameElement || ref.current
+			);
 
 			// The page must be scrollable.
 			if ( ! scrollContainer ) {
 				return;
 			}
 
-			const windowScroll = scrollContainer === ownerDocument.body;
+			const caretTop = caretRect.top;
+
+			const scrollDocument = scrollContainer.ownerDocument;
+			const scrollWindow = scrollDocument.defaultView;
+			const windowScroll = scrollContainer === scrollDocument.body;
 			const scrollY = windowScroll
-				? defaultView.scrollY
+				? scrollWindow.scrollY
 				: scrollContainer.scrollTop;
 			const scrollContainerY = windowScroll
 				? 0
 				: scrollContainer.getBoundingClientRect().top;
 			const relativeScrollPosition = windowScroll
-				? caretRect.top / defaultView.innerHeight
-				: ( caretRect.top - scrollContainerY ) /
-				  ( defaultView.innerHeight - scrollContainerY );
+				? caretTop / scrollWindow.innerHeight
+				: ( caretTop - scrollContainerY ) /
+				  ( scrollWindow.innerHeight - scrollContainerY );
 
 			// If the scroll position is at the start, the active editable element
 			// is the last one, and the caret is positioned within the initial
@@ -134,10 +154,10 @@ export function useTypewriter( ref ) {
 			// view.
 			if (
 				// The caret is under the lower fold.
-				caretRect.top + caretRect.height >
+				caretTop + caretRect.height >
 					scrollContainerY + scrollContainerHeight ||
 				// The caret is above the upper fold.
-				caretRect.top < scrollContainerY
+				caretTop < scrollContainerY
 			) {
 				// Reset the caret position to maintain.
 				caretRect = currentCaretRect;
@@ -179,7 +199,7 @@ export function useTypewriter( ref ) {
 		 */
 		function computeCaretRectangle() {
 			if ( isSelectionEligibleForScroll() ) {
-				caretRect = computeCaretRect( defaultView );
+				caretRect = computeCaretRectWithIframe( defaultView );
 			}
 		}
 
@@ -206,7 +226,7 @@ export function useTypewriter( ref ) {
 
 		// When the user scrolls or resizes, the scroll position should be
 		// reset.
-		defaultView.addEventListener( 'scroll', onScrollResize, true );
+		defaultView.top.addEventListener( 'scroll', onScrollResize, true );
 		defaultView.addEventListener( 'resize', onScrollResize, true );
 
 		ref.current.addEventListener( 'keydown', onKeyDown );
@@ -218,7 +238,11 @@ export function useTypewriter( ref ) {
 		);
 
 		return () => {
-			defaultView.removeEventListener( 'scroll', onScrollResize, true );
+			defaultView.top.removeEventListener(
+				'scroll',
+				onScrollResize,
+				true
+			);
 			defaultView.removeEventListener( 'resize', onScrollResize, true );
 
 			ref.current.removeEventListener( 'keydown', onKeyDown );

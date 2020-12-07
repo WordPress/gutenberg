@@ -11,6 +11,7 @@ import {
 	createNewPost,
 	saveDraft,
 	insertBlock,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 function readFile( filePath ) {
@@ -106,7 +107,8 @@ describe( 'Post Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.wp-block' );
+			await page.waitForSelector( '.edit-post-layout' );
+			await canvas().waitForSelector( '.wp-block' );
 			results.load.push( new Date() - startTime );
 		}
 
@@ -154,7 +156,7 @@ describe( 'Post Editor Performance', () => {
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
 
-		const paragraphs = await page.$$( '.wp-block' );
+		const paragraphs = await canvas().$$( '.wp-block' );
 
 		await page.tracing.start( {
 			path: traceFile,

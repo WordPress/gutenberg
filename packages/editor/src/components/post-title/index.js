@@ -26,6 +26,20 @@ import PostTypeSupportCheck from '../post-type-support-check';
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
+/**
+ * Checks if the document or any parent document has focus.
+ *
+ * @param {Document} doc Document to check.
+ */
+function hasFocus( doc ) {
+	const { activeElement, body, defaultView } = doc;
+	return (
+		( activeElement && activeElement !== body ) ||
+		( defaultView.parent !== defaultView &&
+			hasFocus( defaultView.parent.document ) )
+	);
+}
+
 export default function PostTitle() {
 	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
@@ -65,13 +79,12 @@ export default function PostTitle() {
 
 	useEffect( () => {
 		const { ownerDocument } = ref.current;
-		const { activeElement, body } = ownerDocument;
 
 		// Only autofocus the title when the post is entirely empty. This should
 		// only happen for a new post, which means we focus the title on new
 		// post so the author can start typing right away, without needing to
 		// click anything.
-		if ( isCleanNewPost && ( ! activeElement || body === activeElement ) ) {
+		if ( isCleanNewPost && ! hasFocus( ownerDocument ) ) {
 			ref.current.focus();
 		}
 	}, [ isCleanNewPost ] );

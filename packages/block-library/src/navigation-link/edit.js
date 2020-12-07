@@ -376,7 +376,10 @@ function NavigationLinkEdit( {
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								ref.current.focus();
+								setIsLinkOpen( false );
+							} }
 						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"

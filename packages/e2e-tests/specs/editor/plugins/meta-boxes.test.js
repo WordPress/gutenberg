@@ -10,6 +10,7 @@ import {
 	openDocumentSettingsSidebar,
 	publishPost,
 	saveDraft,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Meta boxes', () => {
@@ -30,7 +31,7 @@ describe( 'Meta boxes', () => {
 		expect( await page.$( '.editor-post-save-draft' ) ).toBe( null );
 
 		// Add title to enable valid non-empty post save.
-		await page.type( '.editor-post-title__input', 'Hello Meta' );
+		await canvas().type( '.editor-post-title__input', 'Hello Meta' );
 		expect( await page.$( '.editor-post-save-draft' ) ).not.toBe( null );
 
 		await saveDraft();
@@ -41,14 +42,17 @@ describe( 'Meta boxes', () => {
 
 	it( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
 		// Publish a post so there's something for the latest posts dynamic block to render.
-		await page.type( '.editor-post-title__input', 'A published post' );
+		await canvas().type( '.editor-post-title__input', 'A published post' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
 
 		// Publish a post with the latest posts dynamic block.
 		await createNewPost();
-		await page.type( '.editor-post-title__input', 'Dynamic block test' );
+		await canvas().type(
+			'.editor-post-title__input',
+			'Dynamic block test'
+		);
 		await insertBlock( 'Latest Posts' );
 		await publishPost();
 
@@ -66,7 +70,7 @@ describe( 'Meta boxes', () => {
 	it( 'Should render the excerpt in meta based on post content if no explicit excerpt exists', async () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Excerpt from content.' );
-		await page.type( '.editor-post-title__input', 'A published post' );
+		await canvas().type( '.editor-post-title__input', 'A published post' );
 		await publishPost();
 
 		// View the post.
@@ -89,7 +93,7 @@ describe( 'Meta boxes', () => {
 	it( 'Should render the explicitly set excerpt in meta instead of the content based one', async () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Excerpt from content.' );
-		await page.type( '.editor-post-title__input', 'A published post' );
+		await canvas().type( '.editor-post-title__input', 'A published post' );
 
 		// Open the excerpt panel
 		await openDocumentSettingsSidebar();

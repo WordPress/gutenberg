@@ -8,6 +8,7 @@ import {
 	insertBlock,
 	saveDraft,
 	openPreviewPage,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block context', () => {
@@ -28,7 +29,7 @@ describe( 'Block context', () => {
 
 		// Inserting the context provider block should select the first inner
 		// block of the template. Verify the contents of the consumer.
-		let innerBlockText = await page.evaluate(
+		let innerBlockText = await canvas().evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( innerBlockText ).toBe( 'The record ID is: 0' );
@@ -39,7 +40,7 @@ describe( 'Block context', () => {
 
 		// Verify propagated context changes.
 		await page.keyboard.press( 'ArrowDown' );
-		innerBlockText = await page.evaluate(
+		innerBlockText = await canvas().evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( innerBlockText ).toBe( 'The record ID is: 123' );
@@ -60,7 +61,7 @@ describe( 'Block context', () => {
 
 		// Return to editor to change context value to non-default.
 		await editorPage.bringToFront();
-		await editorPage.focus(
+		await canvas().focus(
 			'[data-type="gutenberg/test-context-provider"] input'
 		);
 		await editorPage.keyboard.press( 'ArrowRight' );

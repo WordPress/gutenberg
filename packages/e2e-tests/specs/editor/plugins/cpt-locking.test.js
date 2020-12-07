@@ -12,6 +12,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	setPostContent,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'cpt locking', () => {
@@ -35,7 +36,7 @@ describe( 'cpt locking', () => {
 	};
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
-		await page.type(
+		await canvas().type(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
@@ -46,12 +47,12 @@ describe( 'cpt locking', () => {
 	};
 
 	const shouldAllowBlocksToBeMoved = async () => {
-		await page.click(
+		await canvas().click(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
-		await page.type(
+		await canvas().type(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
@@ -71,14 +72,14 @@ describe( 'cpt locking', () => {
 		);
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
 		} );
 
 		it( 'should not error when deleting the cotents of a paragraph', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			const textToType = 'Paragraph';
@@ -88,7 +89,7 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should insert line breaks when using enter and shift-enter', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'First line' );
@@ -119,8 +120,10 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'can use the global inserter in inner blocks', async () => {
-			await page.click( 'button[aria-label="Two columns; equal split"]' );
-			await page.click(
+			await canvas().click(
+				'button[aria-label="Two columns; equal split"]'
+			);
+			await canvas().click(
 				'.wp-block-column .block-editor-button-block-appender'
 			);
 			await page.type( '.block-editor-inserter__search-input', 'image' );
@@ -133,7 +136,7 @@ describe( 'cpt locking', () => {
 			);
 			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
-			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
+			expect( await canvas().$( '.wp-block-gallery' ) ).not.toBeNull();
 		} );
 	} );
 
@@ -167,7 +170,7 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should allow blocks to be removed', async () => {
-			await page.type(
+			await canvas().type(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
@@ -187,7 +190,7 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should allow blocks to be removed', async () => {
-			await page.type(
+			await canvas().type(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
@@ -213,7 +216,7 @@ describe( 'cpt locking', () => {
 		);
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
@@ -233,7 +236,7 @@ describe( 'cpt locking', () => {
 		);
 
 		it( 'should not allow blocks to be moved', async () => {
-			await page.click(
+			await canvas().click(
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();

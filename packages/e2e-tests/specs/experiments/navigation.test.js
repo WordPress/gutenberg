@@ -10,6 +10,7 @@ import {
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
 	showBlockToolbar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -199,7 +200,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 
 	if ( label ) {
 		// Wait for rich text editor input to be focused before we start typing the label
-		await page.waitForSelector( ':focus.rich-text' );
+		await canvas().waitForSelector( ':focus.rich-text' );
 
 		// With https://github.com/WordPress/gutenberg/pull/19686, we're auto-selecting the label if the label is URL-ish.
 		// In this case, it means we have to select and delete the label if it's _not_ the url.
@@ -218,11 +219,11 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 }
 
 async function selectDropDownOption( optionText ) {
-	const selectToggle = await page.waitForSelector(
+	const selectToggle = await canvas().waitForSelector(
 		'.wp-block-navigation-placeholder__select-control button'
 	);
 	await selectToggle.click();
-	const theOption = await page.waitForXPath(
+	const theOption = await canvas().waitForXPath(
 		`//li[text()="${ optionText }"]`
 	);
 	await theOption.click();
@@ -231,12 +232,12 @@ async function selectDropDownOption( optionText ) {
 async function clickCreateButton() {
 	const buttonText = 'Create';
 	// Wait for button to become available
-	await page.waitForXPath(
+	await canvas().waitForXPath(
 		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 
 	// Then locate...
-	const createNavigationButton = await page.waitForXPath(
+	const createNavigationButton = await canvas().waitForXPath(
 		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 
@@ -252,7 +253,7 @@ async function createEmptyNavBlock() {
 async function addLinkBlock() {
 	// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 	// an issue where the block appender requires two clicks.
-	await page.click( '.wp-block-navigation .block-list-appender' );
+	await canvas().click( '.wp-block-navigation .block-list-appender' );
 
 	const [ linkButton ] = await page.$x(
 		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
@@ -305,14 +306,14 @@ describe.skip( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await page.waitForSelector(
+			await canvas().waitForSelector(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
-			await page.click(
+			await canvas().click(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
 
-			const dropDownItemsLength = await page.$$eval(
+			const dropDownItemsLength = await canvas().$$eval(
 				'ul[role="listbox"] li[role="option"]',
 				( els ) => els.length
 			);
@@ -321,7 +322,9 @@ describe.skip( 'Navigation', () => {
 			// 1. Create empty menu.
 			expect( dropDownItemsLength ).toEqual( 1 );
 
-			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
+			await canvas().waitForXPath(
+				'//li[text()="Create empty Navigation"]'
+			);
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -339,12 +342,12 @@ describe.skip( 'Navigation', () => {
 
 			await clickCreateButton();
 
-			await page.waitForSelector( '.wp-block-navigation__container' );
+			await canvas().waitForSelector( '.wp-block-navigation__container' );
 
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
-			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
+			const navBlockItemsLength = await canvas().$$eval(
+				'li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
@@ -388,14 +391,14 @@ describe.skip( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await page.waitForSelector(
+			await canvas().waitForSelector(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
-			await page.click(
+			await canvas().click(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
 
-			const dropDownItemsLength = await page.$$eval(
+			const dropDownItemsLength = await canvas().$$eval(
 				'ul[role="listbox"] li[role="option"]',
 				( els ) => els.length
 			);
@@ -404,7 +407,9 @@ describe.skip( 'Navigation', () => {
 			// 1. Create empty menu.
 			expect( dropDownItemsLength ).toEqual( 1 );
 
-			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
+			await canvas().waitForXPath(
+				'//li[text()="Create empty Navigation"]'
+			);
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -416,7 +421,7 @@ describe.skip( 'Navigation', () => {
 		await insertBlock( 'Navigation' );
 
 		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
+		await canvas().waitForSelector( '.wp-block-navigation-placeholder' );
 
 		await createEmptyNavBlock();
 
@@ -450,7 +455,7 @@ describe.skip( 'Navigation', () => {
 		);
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
-		const isInLinkRichText = await page.evaluate(
+		const isInLinkRichText = await canvas().evaluate(
 			() =>
 				document.activeElement.classList.contains( 'rich-text' ) &&
 				!! document.activeElement.closest(
@@ -538,10 +543,10 @@ describe.skip( 'Navigation', () => {
 		await createPageButton.click();
 
 		// wait for the creating confirmation to go away, and we should now be focused on our text input
-		await page.waitForSelector( ':focus.rich-text' );
+		await canvas().waitForSelector( ':focus.rich-text' );
 
 		// Confirm the new link is focused.
-		const isInLinkRichText = await page.evaluate(
+		const isInLinkRichText = await canvas().evaluate(
 			() =>
 				document.activeElement.classList.contains( 'rich-text' ) &&
 				!! document.activeElement.closest(

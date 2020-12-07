@@ -5,6 +5,7 @@ import {
 	setBrowserViewport,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post visibility', () => {
@@ -40,7 +41,7 @@ describe( 'Post visibility', () => {
 		await createNewPost();
 
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', 'Title' );
+		await canvas().type( '.editor-post-title__input', 'Title' );
 
 		await openDocumentSettingsSidebar();
 
@@ -61,7 +62,7 @@ describe( 'Post visibility', () => {
 		await privateLabel.click();
 
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', ' Changed' );
+		await canvas().type( '.editor-post-title__input', ' Changed' );
 
 		// Wait for the button to be clickable before attempting to click.
 		// This could cause errors when we try to click before changes are registered.

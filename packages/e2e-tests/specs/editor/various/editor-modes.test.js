@@ -10,6 +10,7 @@ import {
 	switchEditorModeTo,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
@@ -21,7 +22,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$(
+		let visualBlock = await canvas().$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
@@ -31,7 +32,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Wait for the block to be converted to HTML editing mode.
-		const htmlBlock = await page.$$(
+		const htmlBlock = await canvas().$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
 		);
 		expect( htmlBlock ).toHaveLength( 1 );
@@ -41,7 +42,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit visually' );
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$(
+		visualBlock = await canvas().$$(
 			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
@@ -66,7 +67,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Make sure the paragraph content is rendered as expected.
-		let htmlBlockContent = await page.$eval(
+		let htmlBlockContent = await canvas().$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);
@@ -82,7 +83,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		);
 
 		// Make sure the HTML content updated.
-		htmlBlockContent = await page.$eval(
+		htmlBlockContent = await canvas().$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);

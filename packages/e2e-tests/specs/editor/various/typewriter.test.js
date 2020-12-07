@@ -1,15 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost } from '@wordpress/e2e-test-utils';
+import { createNewPost, canvas } from '@wordpress/e2e-test-utils';
 
 describe( 'TypeWriter', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
-	const getCaretPosition = async () =>
-		await page.evaluate( () => wp.dom.computeCaretRect( window ).y );
+	async function getCaretPosition() {
+		return await canvas().evaluate( () => {
+			const { frameElement } = window;
+			const caretRect = window.top.wp.dom.computeCaretRect( window );
+			const frameTop = frameElement
+				? frameElement.getBoundingClientRect().top
+				: 0;
+			return caretRect.top + frameTop;
+		} );
+	}
 
 	// Allow the scroll position to be 1px off.
 	const BUFFER = 1;
@@ -51,7 +59,7 @@ describe( 'TypeWriter', () => {
 
 		// Type until the text wraps.
 		while (
-			await page.evaluate(
+			await canvas().evaluate(
 				() =>
 					document.activeElement.clientHeight <=
 					parseInt(
@@ -104,6 +112,10 @@ describe( 'TypeWriter', () => {
 				( wp.dom.getScrollContainer(
 					document.activeElement
 				).scrollTop = 1 )
+		);
+
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
 		);
 
 		const initialPosition = await getCaretPosition();

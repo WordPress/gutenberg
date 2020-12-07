@@ -8,6 +8,8 @@ import {
 	findSidebarPanelToggleButtonWithTitle,
 	getEditedPostContent,
 	openDocumentSettingsSidebar,
+	canvas,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'new editor filtered state', () => {
@@ -25,7 +27,7 @@ describe( 'new editor filtered state', () => {
 
 	it( 'should respect default content', async () => {
 		// get the values that should have their defaults changed.
-		const title = await page.$eval(
+		const title = await canvas().$eval(
 			'.editor-post-title__input',
 			( element ) => element.innerHTML
 		);
@@ -33,6 +35,7 @@ describe( 'new editor filtered state', () => {
 
 		// open the sidebar, we want to see the excerpt.
 		await openDocumentSettingsSidebar();
+		await clickButton( 'Post' );
 		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
 			'Excerpt'
 		);
