@@ -104,7 +104,7 @@ export default function TemplatePartEdit( {
 	const inspectorAdvancedControls = (
 		<InspectorAdvancedControls>
 			<SelectControl
-				label={ __( 'Wrapping HTML element' ) }
+				label={ __( 'HTML element' ) }
 				options={ [
 					{ label: __( 'Default (<div>)' ), value: 'div' },
 					{ label: '<header>', value: 'header' },
