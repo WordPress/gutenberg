@@ -1,9 +1,7 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [
-		"."
-	],
-	"themes": [ "WordPress/theme-experiments/twentytwentyone-blocks" ],
+	"plugins": [ "." ],
+	"themes": [ "WordPress/theme-experiments" ],
 	"env": {
 		"tests": {
 			"mappings": {
