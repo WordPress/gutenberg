@@ -24,7 +24,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	GLOBAL_CONTEXT,
+	GLOBAL_CONTEXT_NAME,
+	GLOBAL_CONTEXT_SELECTOR,
+	GLOBAL_CONTEXT_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
 } from './utils';
@@ -78,7 +80,10 @@ const extractSupportKeys = ( supports ) => {
 
 const getContexts = ( blockTypes ) => {
 	const result = {
-		...GLOBAL_CONTEXT,
+		[ GLOBAL_CONTEXT_NAME ]: {
+			selector: GLOBAL_CONTEXT_SELECTOR,
+			supports: GLOBAL_CONTEXT_SUPPORTS,
+		},
 	};
 
 	// Add contexts from block metadata.

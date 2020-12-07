@@ -10,7 +10,6 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -24,16 +23,6 @@ import useBlockTypesState from './hooks/use-block-types-state';
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
 const SHOWN_BLOCK_PATTERNS = 2;
-
-const preventArrowKeysPropagation = ( event ) => {
-	if (
-		[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].includes( event.keyCode )
-	) {
-		// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-};
-const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 export default function QuickInserter( {
 	onSelect,
@@ -103,8 +92,6 @@ export default function QuickInserter( {
 				'has-search': showSearch,
 				'has-expand': setInserterIsOpened,
 			} ) }
-			onKeyPress={ stopKeyPropagation }
-			onKeyDown={ preventArrowKeysPropagation }
 		>
 			{ showSearch && (
 				<InserterSearchForm

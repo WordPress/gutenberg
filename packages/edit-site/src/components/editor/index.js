@@ -19,7 +19,6 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
-	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -46,6 +45,7 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
+import URLQueryController from '../url-query-controller';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -196,6 +196,7 @@ function Editor() {
 
 	return (
 		<>
+			<URLQueryController />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
@@ -286,7 +287,7 @@ function Editor() {
 														/>
 													}
 													content={
-														<BlockSelectionClearer
+														<div
 															className="edit-site-visual-editor"
 															style={
 																inlineStyles
@@ -302,7 +303,7 @@ function Editor() {
 																/>
 															) }
 															<KeyboardShortcuts />
-														</BlockSelectionClearer>
+														</div>
 													}
 													actions={
 														<>

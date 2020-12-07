@@ -144,7 +144,8 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						<RichText
 							className="wp-block-post-author__byline"
 							multiline={ false }
-							placeholder={ __( 'Write byline …' ) }
+							aria-label={ __( 'Post author byline text' ) }
+							placeholder={ __( 'Write byline…' ) }
 							value={ byline }
 							onChange={ ( value ) =>
 								setAttributes( { byline: value } )

@@ -59,6 +59,7 @@ export default function ReusableBlockEdit( {
 		[ ref, clientId ]
 	);
 
+	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
 	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
 	const { __experimentalSetEditingReusableBlock } = useDispatch(
 		reusableBlocksStore
@@ -118,6 +119,15 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
+	/**
+	 * Clear the selected block when focus moves to the reusable block list.
+	 * These blocks are in different stores and only one block should be
+	 * selected at a time.
+	 */
+	function onFocus() {
+		clearSelectedBlock();
+	}
+
 	let element = (
 		<BlockEditorProvider
 			value={ blocks }
@@ -125,9 +135,11 @@ export default function ReusableBlockEdit( {
 			onChange={ onChange }
 			settings={ settings }
 		>
-			<WritingFlow>
-				<BlockList />
-			</WritingFlow>
+			<div className="block-editor-block-list__block" onFocus={ onFocus }>
+				<WritingFlow>
+					<BlockList />
+				</WritingFlow>
+			</div>
 		</BlockEditorProvider>
 	);
 

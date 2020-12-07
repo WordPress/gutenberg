@@ -7,7 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useState, useMemo, useRef, useEffect } from '@wordpress/element';
+import {
+	Component,
+	useState,
+	useMemo,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
@@ -21,6 +27,19 @@ import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
 import { Flex, FlexBlock, FlexItem } from '../flex';
+import withFocusOutside from '../higher-order/with-focus-outside';
+
+const DetectOutside = withFocusOutside(
+	class extends Component {
+		handleFocusOutside( event ) {
+			this.props.onFocusOutside( event );
+		}
+
+		render() {
+			return this.props.children;
+		}
+	}
+);
 
 function ComboboxControl( {
 	value,
@@ -119,7 +138,7 @@ function ComboboxControl( {
 		setInputValue( '' );
 	};
 
-	const onBlur = () => {
+	const onFocusOutside = () => {
 		setIsExpanded( false );
 	};
 
@@ -151,7 +170,7 @@ function ComboboxControl( {
 				  )
 				: __( 'No results.' );
 
-			speak( message, 'assertive' );
+			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
@@ -160,63 +179,74 @@ function ComboboxControl( {
 	// TODO: Refactor click detection to use blur to stop propagation.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<BaseControl
-			className={ classnames( className, 'components-combobox-control' ) }
-			tabIndex="-1"
-			label={ label }
-			id={ `components-form-token-input-${ instanceId }` }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-		>
-			<div
-				className="components-combobox-control__suggestions-container"
+		<DetectOutside onFocusOutside={ onFocusOutside }>
+			<BaseControl
+				className={ classnames(
+					className,
+					'components-combobox-control'
+				) }
 				tabIndex="-1"
-				onKeyDown={ onKeyDown }
+				label={ label }
+				id={ `components-form-token-input-${ instanceId }` }
+				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
 			>
-				<Flex>
-					<FlexBlock>
-						<TokenInput
-							className="components-combobox-control__input"
+				<div
+					className="components-combobox-control__suggestions-container"
+					tabIndex="-1"
+					onKeyDown={ onKeyDown }
+				>
+					<Flex>
+						<FlexBlock>
+							<TokenInput
+								className="components-combobox-control__input"
+								instanceId={ instanceId }
+								ref={ inputContainer }
+								value={ isExpanded ? inputValue : currentLabel }
+								aria-label={
+									currentLabel
+										? `${ currentLabel }, ${ label }`
+										: null
+								}
+								onFocus={ onFocus }
+								isExpanded={ isExpanded }
+								selectedSuggestionIndex={ matchingSuggestions.indexOf(
+									selectedSuggestion
+								) }
+								onChange={ onInputChange }
+							/>
+						</FlexBlock>
+						{ allowReset && (
+							<FlexItem>
+								<Button
+									className="components-combobox-control__reset"
+									icon={ closeSmall }
+									disabled={ ! value }
+									onClick={ handleOnReset }
+									label={ __( 'Reset' ) }
+								/>
+							</FlexItem>
+						) }
+					</Flex>
+					{ isExpanded && (
+						<SuggestionsList
 							instanceId={ instanceId }
-							ref={ inputContainer }
-							value={ isExpanded ? inputValue : currentLabel }
-							onBlur={ onBlur }
-							onFocus={ onFocus }
-							isExpanded={ isExpanded }
-							selectedSuggestionIndex={ matchingSuggestions.indexOf(
+							match={ { label: inputValue } }
+							displayTransform={ ( suggestion ) =>
+								suggestion.label
+							}
+							suggestions={ matchingSuggestions }
+							selectedIndex={ matchingSuggestions.indexOf(
 								selectedSuggestion
 							) }
-							onChange={ onInputChange }
+							onHover={ setSelectedSuggestion }
+							onSelect={ onSuggestionSelected }
+							scrollIntoView
 						/>
-					</FlexBlock>
-					{ allowReset && (
-						<FlexItem>
-							<Button
-								className="components-combobox-control__reset"
-								icon={ closeSmall }
-								disabled={ ! value }
-								onClick={ handleOnReset }
-								label={ __( 'Reset' ) }
-							/>
-						</FlexItem>
 					) }
-				</Flex>
-				{ isExpanded && (
-					<SuggestionsList
-						instanceId={ instanceId }
-						match={ { label: inputValue } }
-						displayTransform={ ( suggestion ) => suggestion.label }
-						suggestions={ matchingSuggestions }
-						selectedIndex={ matchingSuggestions.indexOf(
-							selectedSuggestion
-						) }
-						onHover={ setSelectedSuggestion }
-						onSelect={ onSuggestionSelected }
-						scrollIntoView
-					/>
-				) }
-			</div>
-		</BaseControl>
+				</div>
+			</BaseControl>
+		</DetectOutside>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

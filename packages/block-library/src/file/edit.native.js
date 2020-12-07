@@ -462,8 +462,9 @@ export class FileEdit extends Component {
 									isUploadInProgress,
 									isUploadFailed
 								) }
-								<View>
+								<View style={ styles.container }>
 									<RichText
+										withoutInteractiveFormatting
 										__unstableMobileNoFocusOnMount
 										onChange={ this.onChangeFileName }
 										placeholder={ __( 'File name' ) }
@@ -483,55 +484,60 @@ export class FileEdit extends Component {
 												style={ errorIconStyle }
 											/>
 											<PlainText
+												editable={ false }
 												value={ __( 'Error' ) }
 												style={ styles.uploadFailed }
 											/>
 										</View>
 									) }
 								</View>
-								{ showDownloadButton && (
-									<View
-										style={ [
-											finalButtonStyle,
-											this.getStyleForAlignment( align ),
-										] }
-									>
-										<RichText
-											withoutInteractiveFormatting
-											__unstableMobileNoFocusOnMount
-											rootTagsToEliminate={ [ 'p' ] }
-											tagName="p"
-											textAlign="center"
-											minWidth={ minWidth }
-											maxWidth={ this.state.maxWidth }
-											deleteEnter={ true }
-											style={ styles.buttonText }
-											value={ downloadButtonText }
-											placeholder={ placeholderText }
-											unstableOnFocus={ () =>
-												this.setState( {
-													isButtonFocused: true,
-												} )
-											}
-											onBlur={ () =>
-												this.setState( {
-													isButtonFocused: false,
-												} )
-											}
-											selectionColor={
-												styles.buttonText.color
-											}
-											placeholderTextColor={
-												styles.placeholderTextColor
-													.color
-											}
-											underlineColorAndroid="transparent"
-											onChange={
-												this.onChangeDownloadButtonText
-											}
-										/>
-									</View>
-								) }
+								{ showDownloadButton &&
+									this.state.maxWidth > 0 && (
+										<View
+											style={ [
+												finalButtonStyle,
+												this.getStyleForAlignment(
+													align
+												),
+											] }
+										>
+											<RichText
+												withoutInteractiveFormatting
+												__unstableMobileNoFocusOnMount
+												rootTagsToEliminate={ [ 'p' ] }
+												tagName="p"
+												textAlign="center"
+												minWidth={ minWidth }
+												maxWidth={ this.state.maxWidth }
+												deleteEnter={ true }
+												style={ styles.buttonText }
+												value={ downloadButtonText }
+												placeholder={ placeholderText }
+												unstableOnFocus={ () =>
+													this.setState( {
+														isButtonFocused: true,
+													} )
+												}
+												onBlur={ () =>
+													this.setState( {
+														isButtonFocused: false,
+													} )
+												}
+												selectionColor={
+													styles.buttonText.color
+												}
+												placeholderTextColor={
+													styles.placeholderTextColor
+														.color
+												}
+												underlineColorAndroid="transparent"
+												onChange={
+													this
+														.onChangeDownloadButtonText
+												}
+											/>
+										</View>
+									) }
 							</View>
 						</TouchableWithoutFeedback>
 					);
@@ -575,11 +581,11 @@ export class FileEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { attributes } = props;
-		const { id } = attributes;
+		const { id, href } = attributes;
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
-			media:
-				id === undefined ? undefined : select( 'core' ).getMedia( id ),
+			media: isNotFileHref ? select( 'core' ).getMedia( id ) : undefined,
 			isSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),

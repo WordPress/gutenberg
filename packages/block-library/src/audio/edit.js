@@ -186,6 +186,7 @@ function AudioEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						aria-label={ __( 'Audio caption text' ) }
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						onChange={ ( value ) =>
