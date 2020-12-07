@@ -7,14 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	Component,
-	useState,
-	useMemo,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import { useState, useMemo, useRef, useEffect } from '@wordpress/element';
+import { useInstanceId, useFocusOutside } from '@wordpress/compose';
 import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
@@ -27,19 +21,6 @@ import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
 import { Flex, FlexBlock, FlexItem } from '../flex';
-import withFocusOutside from '../higher-order/with-focus-outside';
-
-const DetectOutside = withFocusOutside(
-	class extends Component {
-		handleFocusOutside( event ) {
-			this.props.onFocusOutside( event );
-		}
-
-		render() {
-			return this.props.children;
-		}
-	}
-);
 
 function ComboboxControl( {
 	value,
@@ -174,12 +155,14 @@ function ComboboxControl( {
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
+	const ref = useFocusOutside( onFocusOutside );
+
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
 	// TODO: Refactor click detection to use blur to stop propagation.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<DetectOutside onFocusOutside={ onFocusOutside }>
+		<div ref={ ref }>
 			<BaseControl
 				className={ classnames(
 					className,
@@ -246,7 +229,7 @@ function ComboboxControl( {
 					) }
 				</div>
 			</BaseControl>
-		</DetectOutside>
+		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

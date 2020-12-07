@@ -52,7 +52,8 @@ describe( 'withFocusOutside', () => {
 			wrapper,
 			'input'
 		);
-		TestUtils.Simulate[ event ]( element[ index ] );
+		const simulatedEvent = new window.Event( event );
+		element[ index ].dispatchEvent( simulatedEvent );
 	};
 
 	beforeEach( () => {
@@ -83,13 +84,13 @@ describe( 'withFocusOutside', () => {
 
 	it( 'should not call handler if focus transitions via click to button', () => {
 		simulateEvent( 'focus' );
-		simulateEvent( 'mouseDown', 1 );
+		simulateEvent( 'mousedown', 1 );
 		simulateEvent( 'blur' );
 
 		// In most browsers, the input at index 1 would receive a focus event
 		// at this point, but this is not guaranteed, which is the intention of
 		// the normalization behavior tested here.
-		simulateEvent( 'mouseUp', 1 );
+		simulateEvent( 'mouseup', 1 );
 
 		jest.runAllTimers();
 

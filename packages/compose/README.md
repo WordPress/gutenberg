@@ -161,6 +161,35 @@ _Returns_
 
 -   `Function`: Debounced function.
 
+<a name="useFocusOutside" href="#useFocusOutside">#</a> **useFocusOutside**
+
+A react hook that can be used to be notified when
+the focus moves out of a given container.
+
+_Usage_
+
+    import { useFocusOutside } from '@wordpress/compose';
+
+    const WithFocusOutside = () => {
+        const ref = useFocusOutside( () => {
+            console.log( 'The focus moved out of the ref container' );
+        } );
+
+        return (
+            <div ref={ref}>
+                Something
+            </div>
+        );
+    };
+
+_Parameters_
+
+-   _onFocusOutside_ `Function`: A handler to call when the container loses focus.
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
