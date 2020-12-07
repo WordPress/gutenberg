@@ -314,20 +314,9 @@ const formatMap = {
 		);
 	},
 	// Full date/time
-<<<<<<< HEAD
-	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
-	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
-	U( dateValue ) {
-		return formatTZ(
-			zonedTimeToUtc( dateValue, getActualTimezone() ),
-			't'
-		);
-	},
-=======
 	c: 'YYYY-MM-DDTHH:mm:ssZ', // .toISOString
 	r: 'ddd, D MMM YYYY HH:mm:ss ZZ',
 	U: 'X',
->>>>>>> b2ef2c1e48... Revert date changes from branch 'replace-moment'
 };
 
 /**
