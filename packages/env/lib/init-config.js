@@ -23,10 +23,14 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
- *
+ * @param {string}  options.xdebug  The Xdebug mode to set. Defaults to "off".
  * @return {WPConfig} The-env config object.
  */
-module.exports = async function initConfig( { spinner, debug } ) {
+module.exports = async function initConfig( {
+	spinner,
+	debug,
+	xdebug = 'off',
+} ) {
 	const configPath = path.resolve( '.wp-env.json' );
 	const config = await readConfig( configPath );
 	config.debug = debug;
@@ -39,12 +43,11 @@ module.exports = async function initConfig( { spinner, debug } ) {
 		yaml.dump( dockerComposeConfig )
 	);
 
-	const XdebugMode = 'debug';
 	await fs.writeFile(
 		path.resolve( config.workDirectoryPath, 'Dockerfile' ),
 		dockerFileContents(
 			dockerComposeConfig.services.wordpress.image,
-			XdebugMode
+			xdebug
 		)
 	);
 
@@ -66,7 +69,7 @@ module.exports = async function initConfig( { spinner, debug } ) {
 	return config;
 };
 
-function dockerFileContents( image, XdebugMode ) {
+function dockerFileContents( image, xdebugMode ) {
 	const isLinux = os.type() === 'Linux';
 	// Discover client host does not appear to work on macOS with Docker.
 	const clientDetectSettings = isLinux
@@ -81,7 +84,7 @@ RUN apt -qy install $PHPIZE_DEPS \\
 
 RUN touch /usr/local/etc/php/php.ini
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ XdebugMode }' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
 `;
 }
