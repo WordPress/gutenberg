@@ -49,7 +49,7 @@ jobs:
         npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
   unit-js-date:
-    name: JavaScript (Date functions)
+    name: JavaScript / Date functions
 
     runs-on: ubuntu-latest
 
