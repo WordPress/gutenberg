@@ -37,7 +37,7 @@ function gutenberg_widgets_init( $hook ) {
 		);
 		return;
 	}
-	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', 'gutenberg_customizer' ), true ) ) {
 		return;
 	}
 
@@ -53,6 +53,10 @@ function gutenberg_widgets_init( $hook ) {
 	// may be undesirable. Instead of using that filter, we simply pick just the settings that are needed.
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 	$settings = gutenberg_extend_block_editor_styles( $settings );
+
+	if ( 'gutenberg_customizer' === $hook ) {
+		$settings['isInCustomizer'] = true;
+	}
 
 	$preload_paths = array(
 		array( '/wp/v2/media', 'OPTIONS' ),

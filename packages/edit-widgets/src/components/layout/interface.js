@@ -8,7 +8,7 @@ import {
 	__experimentalLibrary as Library,
 	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, createPortal } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
@@ -61,55 +61,63 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isHugeViewport ] );
 
+	const inserter = (
+		<PopoverWrapper
+			className="edit-widgets-layout__inserter-panel-popover-wrapper"
+			onClose={ () => setIsInserterOpened( false ) }
+		>
+			<div className="edit-widgets-layout__inserter-panel">
+				<div className="edit-widgets-layout__inserter-panel-header">
+					<Button
+						icon={ close }
+						onClick={ () => setIsInserterOpened( false ) }
+					/>
+				</div>
+				<div className="edit-widgets-layout__inserter-panel-content">
+					<Library
+						showInserterHelpPanel
+						onSelect={ () => {
+							if ( isMobileViewport ) {
+								setIsInserterOpened( false );
+							}
+						} }
+						rootClientId={ rootClientId }
+						__experimentalInsertionIndex={ insertionIndex }
+					/>
+				</div>
+			</div>
+		</PopoverWrapper>
+	);
+
 	return (
-		<InterfaceSkeleton
-			ref={ ref }
-			labels={ interfaceLabels }
-			header={ <Header /> }
-			secondarySidebar={
-				isInserterOpened && (
-					<PopoverWrapper
-						className="edit-widgets-layout__inserter-panel-popover-wrapper"
-						onClose={ () => setIsInserterOpened( false ) }
-					>
-						<div className="edit-widgets-layout__inserter-panel">
-							<div className="edit-widgets-layout__inserter-panel-header">
-								<Button
-									icon={ close }
-									onClick={ () =>
-										setIsInserterOpened( false )
-									}
-								/>
-							</div>
-							<div className="edit-widgets-layout__inserter-panel-content">
-								<Library
-									showInserterHelpPanel
-									onSelect={ () => {
-										if ( isMobileViewport ) {
-											setIsInserterOpened( false );
-										}
-									} }
-									rootClientId={ rootClientId }
-									__experimentalInsertionIndex={
-										insertionIndex
-									}
-								/>
-							</div>
-						</div>
-					</PopoverWrapper>
-				)
-			}
-			sidebar={
-				hasSidebarEnabled && (
-					<ComplementaryArea.Slot scope="core/edit-widgets" />
-				)
-			}
-			content={
-				<WidgetAreasBlockEditorContent
-					blockEditorSettings={ blockEditorSettings }
-				/>
-			}
-		/>
+		<>
+			<InterfaceSkeleton
+				ref={ ref }
+				labels={ interfaceLabels }
+				header={ <Header /> }
+				secondarySidebar={
+					isInserterOpened &&
+					! blockEditorSettings.isInCustomizer &&
+					inserter
+				}
+				sidebar={
+					hasSidebarEnabled && (
+						<ComplementaryArea.Slot scope="core/edit-widgets" />
+					)
+				}
+				content={
+					<WidgetAreasBlockEditorContent
+						blockEditorSettings={ blockEditorSettings }
+					/>
+				}
+			/>
+			{ blockEditorSettings.isInCustomizer &&
+				isInserterOpened &&
+				createPortal(
+					inserter,
+					document.getElementById( 'widgets-left' )
+				) }
+		</>
 	);
 }
 

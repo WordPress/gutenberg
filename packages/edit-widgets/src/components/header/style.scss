@@ -21,6 +21,10 @@
 	font-size: 20px;
 	padding: 0;
 	margin: 0 20px 0 0;
+
+	#customize-theme-controls & {
+		display: none;
+	}
 }
 
 .edit-widgets-header__actions {

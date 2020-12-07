@@ -39,10 +39,13 @@ export function initialize( id, settings ) {
 	}
 	registerBlock( createLegacyWidget( settings ) );
 	registerBlock( widgetArea );
-	render(
-		<Layout blockEditorSettings={ settings } />,
-		document.getElementById( id )
-	);
+
+	setTimeout( () => {
+		render(
+			<Layout blockEditorSettings={ settings } />,
+			document.getElementById( id )
+		);
+	}, 500 );
 }
 
 /**
