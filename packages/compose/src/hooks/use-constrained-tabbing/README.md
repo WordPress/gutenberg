@@ -3,8 +3,6 @@
 
 In Dialogs/modals, the tabbing must be constrained to the content of the wrapper element. To achieve this behavior you can use the `useConstrainedTabbing` hook.
 
-## Input Object Properties
-
 ## Return Object Properties
 
 ### `ref`
@@ -24,15 +22,12 @@ import { useConstrainedTabbing } from '@wordpress/compose';
 
 
 const ConstrainedTabbingExample = () => {
-	const constrainedTabbingRef = useConstrainedTabbing()
+	const ref = useConstrainedTabbing()
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			ref={constrainedTabbingRef}
-        >
-            <Button />
-            <Button />
-        </div> 
+		<div ref={ ref }>
+			<Button />
+			<Button />
+		</div> 
 	);
 };
 ```
