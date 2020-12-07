@@ -1,3 +1,7 @@
+.container {
+	margin-top: 2px;
+}
+
 .defaultButton {
 	border-radius: $border-width * 4;
 	padding: $block-spacing * 2;
@@ -15,7 +19,7 @@
 }
 
 .disabledButton {
-	opacity: 0.25;
+	opacity: 0.45;
 }
 
 .uploadFailedText {

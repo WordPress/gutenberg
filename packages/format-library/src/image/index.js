@@ -10,7 +10,6 @@ import {
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -34,21 +33,6 @@ export const image = {
 	edit: Edit,
 };
 
-function stopKeyPropagation( event ) {
-	event.stopPropagation();
-}
-
-function onKeyDown( event ) {
-	if (
-		[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) >
-		-1
-	) {
-		// Stop the key event from propagating up to
-		// ObserveTyping.startTypingInTextField.
-		event.stopPropagation();
-	}
-}
-
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style } = activeObjectAttributes;
 	const [ width, setWidth ] = useState( style.replace( /\D/g, '' ) );
@@ -64,14 +48,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 		>
-			{
-				// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			 }
 			<form
 				className="block-editor-format-toolbar__image-container-content"
-				onKeyPress={ stopKeyPropagation }
-				onKeyDown={ onKeyDown }
 				onSubmit={ ( event ) => {
 					const newReplacements = value.replacements.slice();
 
@@ -105,7 +83,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					type="submit"
 				/>
 			</form>
-			{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
 		</Popover>
 	);
 }

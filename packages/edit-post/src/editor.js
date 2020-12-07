@@ -17,7 +17,7 @@ import { StrictMode, useMemo } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
 	SlotFillProvider,
-	DropZoneProvider,
+	__unstableDropZoneContextProvider as DropZoneContextProvider,
 } from '@wordpress/components';
 
 /**
@@ -160,7 +160,7 @@ function Editor( {
 		<StrictMode>
 			<EditPostSettings.Provider value={ settings }>
 				<SlotFillProvider>
-					<DropZoneProvider>
+					<DropZoneContextProvider>
 						<EditorProvider
 							settings={ editorSettings }
 							post={ post }
@@ -180,7 +180,7 @@ function Editor( {
 							</ErrorBoundary>
 							<PostLockedModal />
 						</EditorProvider>
-					</DropZoneProvider>
+					</DropZoneContextProvider>
 				</SlotFillProvider>
 			</EditPostSettings.Provider>
 		</StrictMode>

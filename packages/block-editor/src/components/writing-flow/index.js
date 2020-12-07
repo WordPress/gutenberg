@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, createContext } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -26,8 +26,6 @@ import {
 	TAB,
 	isKeyboardEvent,
 	ESCAPE,
-	ENTER,
-	SPACE,
 } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -44,6 +42,9 @@ import {
 	getBlockClientId,
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
+import useMultiSelection from './use-multi-selection';
+
+export const SelectionStart = createContext();
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -190,12 +191,6 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
@@ -205,6 +200,7 @@ function selector( select ) {
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectionStartClientId = getMultiSelectedBlocksStartClientId();
 	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+	const blocks = getBlockOrder();
 
 	return {
 		selectedBlockClientId,
@@ -218,14 +214,9 @@ function selector( select ) {
 		selectedFirstClientId: getFirstMultiSelectedBlockClientId(),
 		selectedLastClientId: getLastMultiSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
-		blocks: getBlockOrder(),
+		firstBlock: first( blocks ),
+		lastBlock: last( blocks ),
 		isNavigationMode: isNavigationMode(),
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
@@ -257,6 +248,8 @@ export default function WritingFlow( { children } ) {
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
+	const onSelectionStart = useMultiSelection( container );
+
 	const {
 		selectedBlockClientId,
 		selectionStartClientId,
@@ -265,29 +258,17 @@ export default function WritingFlow( { children } ) {
 		selectedFirstClientId,
 		selectedLastClientId,
 		hasMultiSelection,
-		blocks,
+		firstBlock,
+		lastBlock,
 		isNavigationMode,
-		hasBlockMovingClientId,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
 		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
-	const {
-		multiSelect,
-		selectBlock,
-		clearSelectedBlock,
-		setNavigationMode,
-		setBlockMovingClientId,
-		moveBlockToPosition,
-	} = useDispatch( 'core/block-editor' );
-
-	const [ canInsertMovingBlock, setCanInsertMovingBlock ] = useState( false );
+	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
+		'core/block-editor'
+	);
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
@@ -304,18 +285,6 @@ export default function WritingFlow( { children } ) {
 			)
 		) {
 			setNavigationMode( false );
-			setBlockMovingClientId( null );
-		} else if (
-			isNavigationMode &&
-			hasBlockMovingClientId() &&
-			getBlockClientId( event.target )
-		) {
-			setCanInsertMovingBlock(
-				canInsertBlockType(
-					getBlockName( hasBlockMovingClientId() ),
-					getBlockRootClientId( getBlockClientId( event.target ) )
-				)
-			);
 		}
 
 		// Multi-select blocks when Shift+clicking.
@@ -390,14 +359,25 @@ export default function WritingFlow( { children } ) {
 
 	function onKeyDown( event ) {
 		const { keyCode, target } = event;
+
+		// Handle only if the event occurred within the same DOM hierarchy as
+		// the rendered container. This is used to distinguish between events
+		// which bubble through React's virtual event system from those which
+		// strictly occur in the DOM created by the component.
+		//
+		// The implication here is: If it's not desirable for a bubbled event to
+		// be considered by WritingFlow, it can be avoided by rendering to a
+		// distinct place in the DOM (e.g. using Slot/Fill).
+		if ( ! container.current.contains( target ) ) {
+			return;
+		}
+
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
 		const isTab = keyCode === TAB;
 		const isEscape = keyCode === ESCAPE;
-		const isEnter = keyCode === ENTER;
-		const isSpace = keyCode === SPACE;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -408,100 +388,6 @@ export default function WritingFlow( { children } ) {
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 		const { ownerDocument } = container.current;
 		const { defaultView } = ownerDocument;
-
-		// In navigation mode, tab and arrows navigate from block to block.
-		if ( isNavigationMode ) {
-			const navigateUp = ( isTab && isShift ) || isUp;
-			const navigateDown = ( isTab && ! isShift ) || isDown;
-			// Move out of current nesting level (no effect if at root level).
-			const navigateOut = isLeft;
-			// Move into next nesting level (no effect if the current block has no innerBlocks).
-			const navigateIn = isRight;
-
-			let focusedBlockUid;
-			if ( navigateUp ) {
-				focusedBlockUid = selectionBeforeEndClientId;
-			} else if ( navigateDown ) {
-				focusedBlockUid = selectionAfterEndClientId;
-			} else if ( navigateOut ) {
-				focusedBlockUid =
-					getBlockRootClientId( selectedBlockClientId ) ??
-					selectedBlockClientId;
-			} else if ( navigateIn ) {
-				focusedBlockUid =
-					getClientIdsOfDescendants( [
-						selectedBlockClientId,
-					] )[ 0 ] ?? selectedBlockClientId;
-			}
-			const startingBlockClientId = hasBlockMovingClientId();
-
-			if ( startingBlockClientId && focusedBlockUid ) {
-				setCanInsertMovingBlock(
-					canInsertBlockType(
-						getBlockName( startingBlockClientId ),
-						getBlockRootClientId( focusedBlockUid )
-					)
-				);
-			}
-			if ( isEscape && startingBlockClientId ) {
-				setBlockMovingClientId( null );
-				setCanInsertMovingBlock( false );
-			}
-			if ( ( isEnter || isSpace ) && startingBlockClientId ) {
-				const sourceRoot = getBlockRootClientId(
-					startingBlockClientId
-				);
-				const destRoot = getBlockRootClientId( selectedBlockClientId );
-				const sourceBlockIndex = getBlockIndex(
-					startingBlockClientId,
-					sourceRoot
-				);
-				let destinationBlockIndex = getBlockIndex(
-					selectedBlockClientId,
-					destRoot
-				);
-				if (
-					sourceBlockIndex < destinationBlockIndex &&
-					sourceRoot === destRoot
-				) {
-					destinationBlockIndex -= 1;
-				}
-				moveBlockToPosition(
-					startingBlockClientId,
-					sourceRoot,
-					destRoot,
-					destinationBlockIndex
-				);
-				selectBlock( startingBlockClientId );
-				setBlockMovingClientId( null );
-			}
-			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
-				if ( focusedBlockUid ) {
-					event.preventDefault();
-					selectBlock( focusedBlockUid );
-				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockDOMNode(
-						selectedBlockClientId,
-						ownerDocument
-					);
-					let nextTabbable;
-
-					if ( navigateDown ) {
-						nextTabbable = focus.tabbable.findNext( wrapper );
-					} else {
-						nextTabbable = focus.tabbable.findPrevious( wrapper );
-					}
-
-					if ( nextTabbable ) {
-						event.preventDefault();
-						nextTabbable.focus();
-						clearSelectedBlock();
-					}
-				}
-			}
-
-			return;
-		}
 
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
@@ -539,21 +425,6 @@ export default function WritingFlow( { children } ) {
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
-		} else if (
-			hasMultiSelection &&
-			isTab &&
-			target === multiSelectionContainer.current
-		) {
-			// See comment above.
-			noCapture.current = true;
-
-			if ( isShift ) {
-				focusCaptureBeforeRef.current.focus();
-			} else {
-				focusCaptureAfterRef.current.focus();
-			}
-
-			return;
 		}
 
 		// When presing any key other than up or down, the initial vertical
@@ -588,7 +459,7 @@ export default function WritingFlow( { children } ) {
 						? entirelySelected.current
 						: isEntirelySelected( target )
 				) {
-					multiSelect( first( blocks ), last( blocks ) );
+					multiSelect( firstBlock, lastBlock );
 					event.preventDefault();
 				}
 
@@ -622,19 +493,14 @@ export default function WritingFlow( { children } ) {
 				// Ensure that there is a target block.
 				( ( isReverse && selectionBeforeEndClientId ) ||
 					( ! isReverse && selectionAfterEndClientId ) ) &&
-				( hasMultiSelection ||
-					( isTabbableEdge( target, isReverse ) &&
-						isNavEdge( target, isReverse ) ) )
+				isTabbableEdge( target, isReverse ) &&
+				isNavEdge( target, isReverse )
 			) {
 				// Shift key is down, and there is multi selection or we're at
 				// the end of the current block.
 				expandSelection( isReverse );
 				event.preventDefault();
 			}
-		} else if ( hasMultiSelection ) {
-			// Moving from block multi-selection to single block selection
-			moveSelection( isReverse );
-			event.preventDefault();
 		} else if (
 			isVertical &&
 			isVerticalEdge( target, isReverse ) &&
@@ -671,6 +537,35 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
+	function onMultiSelectKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
+		const isUp = keyCode === UP;
+		const isDown = keyCode === DOWN;
+		const isLeft = keyCode === LEFT;
+		const isRight = keyCode === RIGHT;
+		const isReverse = isUp || isLeft;
+		const isHorizontal = isLeft || isRight;
+		const isVertical = isUp || isDown;
+		const isNav = isHorizontal || isVertical;
+
+		if ( keyCode === TAB ) {
+			// Disable focus capturing on the focus capture element, so it
+			// doesn't refocus this element and so it allows default behaviour
+			// (moving focus to the next tabbable element).
+			noCapture.current = true;
+
+			if ( shiftKey ) {
+				focusCaptureBeforeRef.current.focus();
+			} else {
+				focusCaptureAfterRef.current.focus();
+			}
+		} else if ( isNav ) {
+			const action = shiftKey ? expandSelection : moveSelection;
+			action( isReverse );
+			event.preventDefault();
+		}
+	}
+
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
 			multiSelectionContainer.current.focus();
@@ -679,15 +574,13 @@ export default function WritingFlow( { children } ) {
 
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
-		'is-block-moving-mode': !! hasBlockMovingClientId(),
-		'can-insert-moving-block': canInsertMovingBlock,
 	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<>
+		<SelectionStart.Provider value={ onSelectionStart }>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }
@@ -697,23 +590,24 @@ export default function WritingFlow( { children } ) {
 				multiSelectionContainer={ multiSelectionContainer }
 			/>
 			<div
+				ref={ multiSelectionContainer }
+				tabIndex={ hasMultiSelection ? '0' : undefined }
+				aria-label={
+					hasMultiSelection
+						? __( 'Multiple selected blocks' )
+						: undefined
+				}
+				// Needs to be positioned within the viewport, so focus to this
+				// element does not scroll the page.
+				style={ { position: 'fixed' } }
+				onKeyDown={ onMultiSelectKeyDown }
+			/>
+			<div
 				ref={ container }
 				className={ className }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>
-				<div
-					ref={ multiSelectionContainer }
-					tabIndex={ hasMultiSelection ? '0' : undefined }
-					aria-label={
-						hasMultiSelection
-							? __( 'Multiple selected blocks' )
-							: undefined
-					}
-					// Needs to be positioned within the viewport, so focus to this
-					// element does not scroll the page.
-					style={ { position: 'fixed' } }
-				/>
 				{ children }
 			</div>
 			<FocusCapture
@@ -725,7 +619,7 @@ export default function WritingFlow( { children } ) {
 				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
 			/>
-		</>
+		</SelectionStart.Provider>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

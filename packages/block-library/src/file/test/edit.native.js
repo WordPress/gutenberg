@@ -41,6 +41,10 @@ describe( 'File block', () => {
 			id: '1',
 		} );
 
+		component
+			.getInstance()
+			.onLayout( { nativeEvent: { layout: { width: 100 } } } );
+
 		const rendered = component.toJSON();
 		expect( rendered ).toMatchSnapshot();
 	} );
@@ -54,6 +58,9 @@ describe( 'File block', () => {
 			textLinkHref: 'https://wordpress.org/latest.zip',
 			id: '1',
 		} );
+		component
+			.getInstance()
+			.onLayout( { nativeEvent: { layout: { width: 100 } } } );
 
 		const mediaUpload = component.root.findByType( MediaUploadProgress );
 		mediaUpload.instance.finishMediaUploadWithFailure( { mediaId: -1 } );

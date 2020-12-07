@@ -6,11 +6,7 @@ import { get, kebabCase, reduce, startsWith } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	PRESET_CATEGORIES,
-	PRESET_CLASSES,
-	LINK_COLOR_DECLARATION,
-} from './utils';
+import { LINK_COLOR_DECLARATION, PRESET_METADATA } from './utils';
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -35,14 +31,12 @@ function compileStyleValue( uncompiledValue ) {
  */
 function getBlockPresetsDeclarations( blockPresets = {} ) {
 	return reduce(
-		PRESET_CATEGORIES,
-		( declarations, { path, key }, category ) => {
+		PRESET_METADATA,
+		( declarations, { path, valueKey, cssVarInfix } ) => {
 			const preset = get( blockPresets, path, [] );
 			preset.forEach( ( value ) => {
 				declarations.push(
-					`--wp--preset--${ kebabCase( category ) }--${
-						value.slug
-					}: ${ value[ key ] }`
+					`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
 				);
 			} );
 			return declarations;
@@ -60,15 +54,20 @@ function getBlockPresetsDeclarations( blockPresets = {} ) {
  */
 function getBlockPresetClasses( blockSelector, blockPresets = {} ) {
 	return reduce(
-		PRESET_CLASSES,
-		( declarations, { path, key, property }, classSuffix ) => {
-			const presets = get( blockPresets, path, [] );
-			presets.forEach( ( preset ) => {
-				const slug = preset.slug;
-				const value = preset[ key ];
-				const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
-				const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-				declarations += `${ selectorToUse } {${ property }: ${ value };}`;
+		PRESET_METADATA,
+		( declarations, { path, valueKey, classes } ) => {
+			if ( ! classes ) {
+				return declarations;
+			}
+			classes.forEach( ( { classSuffix, propertyName } ) => {
+				const presets = get( blockPresets, path, [] );
+				presets.forEach( ( preset ) => {
+					const slug = preset.slug;
+					const value = preset[ valueKey ];
+					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+					declarations += `${ selectorToUse } {${ propertyName }: ${ value };}`;
+				} );
 			} );
 			return declarations;
 		},
@@ -132,9 +131,7 @@ export default ( blockData, tree, metadata, type = 'all' ) => {
 		( styles, { selector }, context ) => {
 			if ( type === 'all' || type === 'cssVariables' ) {
 				const variableDeclarations = [
-					...getBlockPresetsDeclarations(
-						tree?.[ context ]?.settings
-					),
+					...getBlockPresetsDeclarations( tree?.[ context ] ),
 					...flattenTree(
 						tree?.[ context ]?.settings?.custom,
 						'--wp--custom--',
@@ -167,7 +164,7 @@ export default ( blockData, tree, metadata, type = 'all' ) => {
 
 				const presetClasses = getBlockPresetClasses(
 					selector,
-					tree?.[ context ]?.settings
+					tree?.[ context ]
 				);
 				if ( presetClasses ) {
 					styles.push( presetClasses );

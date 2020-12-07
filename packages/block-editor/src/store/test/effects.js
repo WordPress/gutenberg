@@ -21,16 +21,13 @@ import { createRegistry } from '@wordpress/data';
 import actions, {
 	updateSettings,
 	mergeBlocks,
-	replaceBlocks,
 	resetBlocks,
 	selectBlock,
 	selectionChange,
-	setTemplateValidity,
+	validateBlocksToTemplate,
 } from '../actions';
-import effects, { validateBlocksToTemplate } from '../effects';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
-import applyMiddlewares from '../middlewares';
 import '../../';
 
 describe( 'effects', () => {
@@ -44,14 +41,10 @@ describe( 'effects', () => {
 	};
 
 	describe( '.MERGE_BLOCKS', () => {
-		const handler = effects.MERGE_BLOCKS;
-		const defaultGetBlock = selectors.getBlock;
-
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
-			selectors.getBlock = defaultGetBlock;
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
@@ -64,19 +57,21 @@ describe( 'effects', () => {
 				clientId: 'ribs',
 				name: 'core/test-block',
 			} );
-			selectors.getBlock = ( state, clientId ) => {
-				return blockA.clientId === clientId ? blockA : blockB;
-			};
 
-			const dispatch = jest.fn();
-			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-				dispatch,
-				getState,
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: {
+					type: 'MERGE_BLOCKS',
+					blocks: [ blockA.clientId, blockB.clientId ],
+				},
 			} );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
+			fulfillment.next();
+			expect( fulfillment.next( blockA ) ).toEqual( {
+				done: false,
+				value: selectBlock( 'chicken' ),
+			} );
+			expect( fulfillment.next( blockA ).done ).toEqual( true );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
@@ -108,24 +103,23 @@ describe( 'effects', () => {
 				attributes: { content: 'ribs' },
 				innerBlocks: [],
 			} );
-			selectors.getBlock = ( state, clientId ) => {
-				return blockA.clientId === clientId ? blockA : blockB;
-			};
-			const dispatch = jest.fn();
-			const getState = () => ( {
-				selectionStart: {
-					clientId: blockB.clientId,
-					attributeKey: 'content',
-					offset: 0,
-				},
-			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-				dispatch,
-				getState,
-			} );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith(
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			// MERGE_BLOCKS
+			fulfillment.next();
+			// getBlock A
+			fulfillment.next();
+			fulfillment.next( blockA );
+			// getBlock B
+			fulfillment.next( blockB );
+			// getSelectionStart
+			fulfillment.next( {
+				clientId: blockB.clientId,
+				attributeKey: 'content',
+				offset: 0,
+			} );
+			// selectionChange
+			fulfillment.next(
 				selectionChange(
 					blockA.clientId,
 					'content',
@@ -133,22 +127,19 @@ describe( 'effects', () => {
 					'chicken'.length + 1
 				)
 			);
-			const lastCall = dispatch.mock.calls[ 1 ];
-			expect( lastCall ).toHaveLength( 1 );
-			const [ lastCallArgument ] = lastCall;
-			const expectedGenerator = replaceBlocks(
-				[ 'chicken', 'ribs' ],
-				[
+			fulfillment.next();
+			fulfillment.next();
+			expect( fulfillment.next( blockA ).value ).toMatchObject( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken', 'ribs' ],
+				blocks: [
 					{
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: { content: 'chicken ribs' },
 					},
-				]
-			);
-			expect( Array.from( lastCallArgument ) ).toEqual(
-				Array.from( expectedGenerator )
-			);
+				],
+			} );
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
@@ -181,23 +172,28 @@ describe( 'effects', () => {
 				attributes: { content: 'ribs' },
 				innerBlocks: [],
 			} );
-			selectors.getBlock = ( state, clientId ) => {
-				return blockA.clientId === clientId ? blockA : blockB;
-			};
-			const dispatch = jest.fn();
-			const getState = () => ( {
-				selectionStart: {
-					clientId: blockB.clientId,
-					attributeKey: 'content',
-					offset: 0,
-				},
-			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-				dispatch,
-				getState,
-			} );
 
-			expect( dispatch ).not.toHaveBeenCalled();
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			// MERGE_BLOCKS
+			fulfillment.next();
+			// getBlock A
+			fulfillment.next();
+			fulfillment.next( blockA );
+			// getBlock B
+			expect( fulfillment.next( blockB ).value ).toEqual( {
+				args: [],
+				selectorName: 'getSelectionStart',
+				storeKey: 'core/block-editor',
+				type: '@@data/SELECT',
+			} );
+			// getSelectionStart
+			const next = fulfillment.next( {
+				clientId: blockB.clientId,
+				attributeKey: 'content',
+				offset: 0,
+			} );
+			expect( next.value ).toEqual( undefined );
+			expect( next.done ).toBe( true );
 		} );
 
 		it( 'should transform and merge the blocks', () => {
@@ -254,24 +250,27 @@ describe( 'effects', () => {
 				attributes: { content2: 'ribs' },
 				innerBlocks: [],
 			} );
-			selectors.getBlock = ( state, clientId ) => {
-				return blockA.clientId === clientId ? blockA : blockB;
-			};
-			const dispatch = jest.fn();
-			const getState = () => ( {
-				selectionStart: {
+
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			// MERGE_BLOCKS
+			fulfillment.next();
+			// getBlock A
+			fulfillment.next();
+			fulfillment.next( blockA );
+			// getBlock B
+			expect( fulfillment.next( blockB ).value ).toEqual( {
+				args: [],
+				selectorName: 'getSelectionStart',
+				storeKey: 'core/block-editor',
+				type: '@@data/SELECT',
+			} );
+			expect(
+				fulfillment.next( {
 					clientId: blockB.clientId,
 					attributeKey: 'content2',
 					offset: 0,
-				},
-			} );
-			handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-				dispatch,
-				getState,
-			} );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith(
+				} ).value
+			).toEqual(
 				selectionChange(
 					blockA.clientId,
 					'content',
@@ -279,34 +278,32 @@ describe( 'effects', () => {
 					'chicken'.length + 1
 				)
 			);
-			const expectedGenerator = replaceBlocks(
-				[ 'chicken', 'ribs' ],
-				[
+
+			fulfillment.next();
+			fulfillment.next();
+			fulfillment.next();
+			expect( fulfillment.next( blockA ).value ).toMatchObject( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken', 'ribs' ],
+				blocks: [
 					{
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: { content: 'chicken ribs' },
 					},
-				]
-			);
-			const lastCall = dispatch.mock.calls[ 1 ];
-			expect( lastCall ).toHaveLength( 1 );
-			const [ lastCallArgument ] = lastCall;
-			expect( Array.from( lastCallArgument ) ).toEqual(
-				Array.from( expectedGenerator )
-			);
+				],
+			} );
 		} );
 	} );
 
 	describe( 'validateBlocksToTemplate', () => {
 		let store;
 		beforeEach( () => {
-			store = createRegistry().registerStore( 'test', {
+			store = createRegistry().registerStore( 'core/block-editor', {
 				actions,
 				selectors,
 				reducer,
 			} );
-			applyMiddlewares( store );
 
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 		} );
@@ -317,31 +314,32 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		it( 'should return undefined if no template assigned', () => {
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
+		it( 'should return undefined if no template assigned', async () => {
+			const result = await store.dispatch(
+				validateBlocksToTemplate(
+					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+					store
+				)
 			);
 
-			expect( result ).toBe( undefined );
+			expect( result ).toEqual( undefined );
 		} );
 
-		it( 'should return undefined if invalid but unlocked', () => {
+		it( 'should return undefined if invalid but unlocked', async () => {
 			store.dispatch(
 				updateSettings( {
 					template: [ [ 'core/foo', {} ] ],
 				} )
 			);
 
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
+			const result = await store.dispatch(
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
-			expect( result ).toBe( undefined );
+			expect( result ).toEqual( undefined );
 		} );
 
-		it( 'should return undefined if locked and valid', () => {
+		it( 'should return undefined if locked and valid', async () => {
 			store.dispatch(
 				updateSettings( {
 					template: [ [ 'core/test-block' ] ],
@@ -349,15 +347,14 @@ describe( 'effects', () => {
 				} )
 			);
 
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
+			const result = await store.dispatch(
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
-			expect( result ).toBe( undefined );
+			expect( result ).toEqual( undefined );
 		} );
 
-		it( 'should return validity set action if invalid on default state', () => {
+		it( 'should return validity set action if invalid on default state', async () => {
 			store.dispatch(
 				updateSettings( {
 					template: [ [ 'core/foo' ] ],
@@ -365,12 +362,11 @@ describe( 'effects', () => {
 				} )
 			);
 
-			const result = validateBlocksToTemplate(
-				resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-				store
+			const result = await store.dispatch(
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
-			expect( result ).toEqual( setTemplateValidity( false ) );
+			expect( result ).toEqual( false );
 		} );
 	} );
 } );

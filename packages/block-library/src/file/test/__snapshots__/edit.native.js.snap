@@ -5,6 +5,14 @@ exports[`File block renders file error state without crashing 1`] = `
   pointerEvents="box-none"
 >
   <View
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  />
+  <View
     accessible={true}
     focusable={true}
     onClick={[Function]}
@@ -27,7 +35,13 @@ exports[`File block renders file error state without crashing 1`] = `
       
     </Text>
     Modal
-    <View>
+    <View
+      style={
+        Object {
+          "height": 44,
+        }
+      }
+    >
       <View>
         <RCTAztecView
           accessible={true}
@@ -85,6 +99,7 @@ exports[`File block renders file error state without crashing 1`] = `
         Svg
         <TextInput
           allowFontScaling={true}
+          editable={false}
           fontFamily="serif"
           onChange={[Function]}
           rejectResponderTermination={true}
@@ -103,7 +118,10 @@ exports[`File block renders file error state without crashing 1`] = `
       style={
         Array [
           Array [
-            undefined,
+            Object {
+              "paddingLeft": 10,
+              "paddingRight": 10,
+            },
             undefined,
           ],
           Object {
@@ -153,7 +171,7 @@ exports[`File block renders file error state without crashing 1`] = `
             Object {
               "backgroundColor": undefined,
               "color": "white",
-              "maxWidth": 0,
+              "maxWidth": 80,
               "minHeight": 0,
             }
           }
@@ -179,6 +197,14 @@ exports[`File block renders file without crashing 1`] = `
   pointerEvents="box-none"
 >
   <View
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  />
+  <View
     accessible={true}
     focusable={true}
     onClick={[Function]}
@@ -201,7 +227,13 @@ exports[`File block renders file without crashing 1`] = `
       
     </Text>
     Modal
-    <View>
+    <View
+      style={
+        Object {
+          "height": 44,
+        }
+      }
+    >
       <View>
         <RCTAztecView
           accessible={true}
@@ -260,7 +292,10 @@ exports[`File block renders file without crashing 1`] = `
       style={
         Array [
           Array [
-            undefined,
+            Object {
+              "paddingLeft": 10,
+              "paddingRight": 10,
+            },
             false,
           ],
           Object {
@@ -310,7 +345,7 @@ exports[`File block renders file without crashing 1`] = `
             Object {
               "backgroundColor": undefined,
               "color": "white",
-              "maxWidth": 0,
+              "maxWidth": 80,
               "minHeight": 0,
             }
           }
