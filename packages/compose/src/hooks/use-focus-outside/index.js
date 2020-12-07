@@ -87,37 +87,44 @@ function useFocusOutside( onFocusOutside ) {
 		};
 
 		// On click inside the container prevent the blur from triggering the handler.
-		node.addEventListener( 'mousedown', normalizeButtonFocus, true );
-		node.addEventListener( 'mouseup', normalizeButtonFocus, true );
-		node.addEventListener( 'touchstart', normalizeButtonFocus, true );
-		node.addEventListener( 'touchend', normalizeButtonFocus, true );
+		node.addEventListener( 'mousedown', normalizeButtonFocus );
+		node.addEventListener( 'mouseup', normalizeButtonFocus );
+		node.addEventListener( 'touchstart', normalizeButtonFocus );
+		node.addEventListener( 'touchend', normalizeButtonFocus );
 
-		node.addEventListener( 'focus', cancelBlur, true );
-		node.addEventListener(
-			'blur',
-			( event ) => {
-				// Skip blur check if clicking button. See `normalizeButtonFocus`.
-				if ( preventBlurCheck ) {
+		node.addEventListener( 'focusin', cancelBlur );
+		node.addEventListener( 'focusout', ( event ) => {
+			// Skip blur check if clicking button. See `normalizeButtonFocus`.
+			if ( preventBlurCheck ) {
+				return;
+			}
+			blurCheckTimeout = setTimeout( () => {
+				// If document is not focused then focus should remain
+				// inside the wrapped component and therefore we cancel
+				// this blur event thereby leaving focus in place.
+				// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+				if ( ! document.hasFocus() ) {
+					event.preventDefault();
 					return;
 				}
 
-				blurCheckTimeout = setTimeout( () => {
-					// If document is not focused then focus should remain
-					// inside the wrapped component and therefore we cancel
-					// this blur event thereby leaving focus in place.
-					// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-					if ( ! document.hasFocus() ) {
-						event.preventDefault();
-						return;
-					}
-					if ( ! node ) {
-						return;
-					}
+				// In theory, this shouldn't be needed.
+				// In fact, it changes the behavior of the hook (and its meaning)
+				// For the moment, I'm keeping it to match the previous behavior of withFocusOutside.
+				// We should consider finding an alternative to avoid unexpected focus loss.
+				const isInDocument = event.target.ownerDocument.body.contains(
+					event.target
+				);
+
+				if ( ! node || ! isInDocument ) {
+					return;
+				}
+
+				if ( ! node.contains( node.ownerDocument.activeElement ) ) {
 					currentOnFocusOutside.current( event );
-				}, 0 );
-			},
-			true
-		);
+				}
+			}, 0 );
+		} );
 	}, [] );
 
 	return ref;
