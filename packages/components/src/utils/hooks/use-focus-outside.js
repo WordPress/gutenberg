@@ -117,7 +117,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 		if ( ! onFocusOutside && ! __unstableNodeRef?.current ) {
 			cancelBlurCheck();
 		}
-	}, [ onFocusOutside, __unstableNodeRef ] );
+	}, [ onFocusOutside, cancelBlurCheck ] );
 
 	/**
 	 * Handles a mousedown or mouseup event to respectively assign and
