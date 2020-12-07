@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 9.4.2 =
+
+Bug fixes
+
+- Popover: Fix issue with undefined getBoundingClientRect (#27445)
+- Revert date changes from branch 'replace-moment' (#27550)
+
+
 = 9.4.1 =
 
 
