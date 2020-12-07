@@ -105,7 +105,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	 */
 	const cancelBlurCheck = useCallback( () => {
 		clearTimeout( blurCheckTimeoutId.current );
-	}, [ blurCheckTimeoutId ] );
+	}, [] );
 
 	// Cancel blur checks on unmount.
 	useEffect( () => {
@@ -144,7 +144,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 				preventBlurCheck.current = true;
 			}
 		},
-		[ preventBlurCheck ]
+		[]
 	);
 
 	/**
@@ -193,8 +193,6 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 			}, 0 );
 		},
 		[
-			preventBlurCheck,
-			blurCheckTimeoutId,
 			onFocusOutside,
 			__unstableNodeRef,
 		]
