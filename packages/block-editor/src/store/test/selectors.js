@@ -69,6 +69,7 @@ const {
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
+	__experimentalGetParsedReusableBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2155,20 +2156,17 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if no assigned insertion point', () => {
+		it( 'should return false if insertion point is set to not show', () => {
 			const state = {
-				insertionPoint: null,
+				insertionPointVisibility: false,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return true if insertion point is set to show', () => {
 			const state = {
-				insertionPoint: {
-					rootClientId: undefined,
-					index: 5,
-				},
+				insertionPointVisibility: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -2476,8 +2474,8 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 					],
 				},
@@ -2556,15 +2554,15 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 						{
 							id: 2,
 							isTemporary: false,
 							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
+							title: { raw: 'Reusable Block 2' },
+							content: { raw: '<!-- /wp:test-block-b -->' },
 						},
 					],
 				},
@@ -3035,5 +3033,25 @@ describe( 'selectors', () => {
 				] )
 			).toEqual( 'client-id-03' );
 		} );
+	} );
+} );
+
+describe( '__experimentalGetParsedReusableBlock', () => {
+	const state = {
+		settings: {
+			__experimentalReusableBlocks: [
+				{
+					id: 1,
+					content: { raw: '' },
+				},
+			],
+		},
+	};
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/26485. See https://github.com/WordPress/gutenberg/issues/26548.
+	it( "Should return an empty array if reusable block's content.raw is an empty string", () => {
+		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
+			[]
+		);
 	} );
 } );

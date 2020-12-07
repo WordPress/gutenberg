@@ -33,19 +33,12 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 						theme,
 					}
 				);
-				const foundPosts = posts?.filter(
-					( post ) =>
-						post.slug === cleanedSlug &&
-						post.meta &&
-						post.meta.theme === theme
-				);
+
 				// A published post might already exist if this template part was customized elsewhere
 				// or if it's part of a customized template.
 				const foundPost =
-					foundPosts?.find( ( post ) => post.status === 'publish' ) ||
-					foundPosts?.find(
-						( post ) => post.status === 'auto-draft'
-					);
+					posts?.find( ( post ) => post.status === 'publish' ) ||
+					posts?.find( ( post ) => post.status === 'auto-draft' );
 				return foundPost?.id;
 			}
 		},

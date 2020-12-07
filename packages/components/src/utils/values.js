@@ -1,31 +1,41 @@
+/* eslint-disable jsdoc/valid-types */
 /**
  * Determines if a value is null or undefined.
  *
- * @param {any} value The value to check.
- * @return {boolean} Whether value is null or undefined.
+ * @template T
+ *
+ * @param {T | null | undefined} value The value to check.
+ * @return {value is T} Whether value is not null or undefined.
  */
 export function isValueDefined( value ) {
 	return value !== undefined && value !== null;
 }
+/* eslint-enable jsdoc/valid-types */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Determines if a value is empty, null, or undefined.
  *
- * @param {any} value The value to check.
- * @return {boolean} Whether value is empty.
+ * @template T
+ *
+ * @param {T | "" | null | undefined} value The value to check.
+ * @return {value is T} Whether value is empty.
  */
 export function isValueEmpty( value ) {
 	const isEmptyString = value === '';
 
 	return ! isValueDefined( value ) || isEmptyString;
 }
+/* eslint-enable jsdoc/valid-types */
 
 /**
- * Attempts to get a defined/non-null value from a collection of arguments.
+ * Get the first defined/non-null value from an array.
  *
- * @param {Array<any>} values Values to derive from.
- * @param {any} fallbackValue Fallback value if there are no defined values.
- * @return {any} A defined value or the fallback value.
+ * @template T
+ *
+ * @param {Array<T | null | undefined>} values Values to derive from.
+ * @param {T} fallbackValue Fallback value if there are no defined values.
+ * @return {T} A defined value or the fallback value.
  */
 export function getDefinedValue( values = [], fallbackValue ) {
 	return values.find( isValueDefined ) ?? fallbackValue;

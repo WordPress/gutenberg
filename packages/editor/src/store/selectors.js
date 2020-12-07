@@ -1,7 +1,16 @@
 /**
  * External dependencies
  */
-import { find, get, has, map, pick, mapValues, includes, some } from 'lodash';
+import {
+	find,
+	get,
+	has,
+	isString,
+	pick,
+	mapValues,
+	includes,
+	some,
+} from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -145,12 +154,6 @@ export const isEditedPostDirty = createRegistrySelector(
  */
 export const hasNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
-		const enableFullSiteEditing = getEditorSettings( state )
-			.__experimentalEnableFullSiteEditing;
-		if ( ! enableFullSiteEditing ) {
-			return false;
-		}
-
 		const dirtyEntityRecords = select(
 			'core'
 		).__experimentalGetDirtyEntityRecords();
@@ -999,73 +1002,6 @@ export const getEditedPostContent = createRegistrySelector(
 );
 
 /**
- * Returns the reusable block with the given ID.
- *
- * @param {Object}        state Global application state.
- * @param {number|string} ref   The reusable block's ID.
- *
- * @return {Object} The reusable block, or null if none exists.
- */
-export const __experimentalGetReusableBlock = createSelector(
-	( state, ref ) => {
-		const block = state.reusableBlocks.data[ ref ];
-		if ( ! block ) {
-			return null;
-		}
-
-		const isTemporary = isNaN( parseInt( ref ) );
-
-		return {
-			...block,
-			id: isTemporary ? ref : +ref,
-			isTemporary,
-		};
-	},
-	( state, ref ) => [ state.reusableBlocks.data[ ref ] ]
-);
-
-/**
- * Returns whether or not the reusable block with the given ID is being saved.
- *
- * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
- *
- * @return {boolean} Whether or not the reusable block is being saved.
- */
-export function __experimentalIsSavingReusableBlock( state, ref ) {
-	return state.reusableBlocks.isSaving[ ref ] || false;
-}
-
-/**
- * Returns true if the reusable block with the given ID is being fetched, or
- * false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
- *
- * @return {boolean} Whether the reusable block is being fetched.
- */
-export function __experimentalIsFetchingReusableBlock( state, ref ) {
-	return !! state.reusableBlocks.isFetching[ ref ];
-}
-
-/**
- * Returns an array of all reusable blocks.
- *
- * @param {Object} state Global application state.
- *
- * @return {Array} An array of all reusable blocks.
- */
-export const __experimentalGetReusableBlocks = createSelector(
-	( state ) => {
-		return map( state.reusableBlocks.data, ( value, ref ) =>
-			__experimentalGetReusableBlock( state, ref )
-		);
-	},
-	( state ) => [ state.reusableBlocks.data ]
-);
-
-/**
  * Returns state object prior to a specified optimist transaction ID, or `null`
  * if the transaction corresponding to the given ID cannot be found.
  *
@@ -1331,6 +1267,20 @@ export function isPublishSidebarEnabled( state ) {
  */
 export function getEditorBlocks( state ) {
 	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
+}
+
+/**
+ * Checks whether a post is an auto-draft ignoring the optimistic transaction.
+ * This selector shouldn't be necessary. It's currently used as a workaround
+ * to avoid template resolution for auto-drafts which has a backend bug.
+ *
+ * @param {Object} state State.
+ * @return {boolean} Whether the post is "auto-draft" on the backend.
+ */
+export function __unstableIsAutodraftPost( state ) {
+	const post = getCurrentPost( state );
+	const isSaving = isSavingPost( state );
+	return isSaving || post.status === 'auto-draft';
 }
 
 /**
@@ -1724,3 +1674,59 @@ export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
 export const getBlockListSettings = getBlockEditorSelector(
 	'getBlockListSettings'
 );
+
+/**
+ * Returns the default template types.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The template types.
+ */
+export function __experimentalGetDefaultTemplateTypes( state ) {
+	return getEditorSettings( state )?.defaultTemplateTypes;
+}
+
+/**
+ * Returns a default template type searched by slug.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} slug The template type slug.
+ *
+ * @return {Object} The template type.
+ */
+export const __experimentalGetDefaultTemplateType = createSelector(
+	( state, slug ) =>
+		find( __experimentalGetDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
+);
+
+/**
+ * Given a template entity, return information about it which is ready to be
+ * rendered, such as the title and description.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} template The template for which we need information.
+ * @return {Object} Information about the template, including title and description.
+ */
+export function __experimentalGetTemplateInfo( state, template ) {
+	if ( ! template ) {
+		return {};
+	}
+
+	const { excerpt, slug, title } = template;
+	const {
+		title: defaultTitle,
+		description: defaultDescription,
+	} = __experimentalGetDefaultTemplateType( state, slug );
+
+	const templateTitle = isString( title ) ? title : title?.rendered;
+	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+
+	return {
+		title:
+			templateTitle && templateTitle !== slug
+				? templateTitle
+				: defaultTitle || slug,
+		description: templateDescription || defaultDescription,
+	};
+}

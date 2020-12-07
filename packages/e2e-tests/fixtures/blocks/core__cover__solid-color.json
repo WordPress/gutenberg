@@ -5,6 +5,7 @@
         "isValid": true,
         "attributes": {
             "hasParallax": false,
+            "isRepeated": false,
             "dimRatio": 50,
             "overlayColor": "primary",
             "backgroundType": "image"

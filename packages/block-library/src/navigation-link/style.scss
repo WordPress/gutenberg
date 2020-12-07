@@ -103,10 +103,36 @@
 	}
 }
 
+// Force links to inherit text decoration applied to navigation block.
+.wp-block-navigation[style*="text-decoration"] {
+	.wp-block-navigation__container,
+	.wp-block-navigation-link {
+		text-decoration: inherit;
+	}
+	.wp-block-navigation-link__content {
+		text-decoration: inherit;
+
+		&:focus,
+		&:active {
+			text-decoration: inherit;
+		}
+	}
+}
+
+.wp-block-navigation:not([style*="text-decoration"]) {
+	.wp-block-navigation-link__content {
+		text-decoration: none;
+
+		&:focus,
+		&:active {
+			text-decoration: none;
+		}
+	}
+}
+
 // All links
 .wp-block-navigation-link__content {
 	color: inherit;
-	text-decoration: none;
 	padding: 0.5em 1em;
 
 	+ .wp-block-navigation-link__content {

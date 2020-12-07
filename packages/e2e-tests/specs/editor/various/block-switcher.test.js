@@ -31,6 +31,7 @@ describe( 'Block Switcher', () => {
 				'Quote',
 				'Heading',
 				'Pullquote',
+				'Columns',
 			] )
 		);
 	} );
@@ -69,6 +70,7 @@ describe( 'Block Switcher', () => {
 				'core/paragraph',
 				'core/group',
 				'core/heading',
+				'core/columns',
 			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 
@@ -85,7 +87,7 @@ describe( 'Block Switcher', () => {
 
 	describe( 'Conditional tranformation options', () => {
 		describe( 'Columns tranforms', () => {
-			it( 'Should show Columns block only if selected blocks are between limits (2-6)', async () => {
+			it( 'Should show Columns block only if selected blocks are between limits (1-6)', async () => {
 				await insertBlock( 'List' );
 				await page.keyboard.type( 'List content' );
 				await insertBlock( 'Heading' );

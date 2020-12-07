@@ -56,6 +56,7 @@ export const getSettings = createSelector(
 	( state, setIsInserterOpen ) => {
 		const settings = {
 			...state.settings,
+			outlineMode: true,
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
@@ -146,5 +147,27 @@ export function getPage( state ) {
  * @return {string} Active menu.
  */
 export function getNavigationPanelActiveMenu( state ) {
-	return state.navigationPanelActiveMenu;
+	return state.navigationPanel.menu;
+}
+
+/**
+ * Returns the current opened/closed state of the navigation panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the navigation panel should be open; false if closed.
+ */
+export function isNavigationOpened( state ) {
+	return state.navigationPanel.isOpen;
+}
+
+/**
+ * Returns the current opened/closed state of the inserter panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the inserter panel should be open; false if closed.
+ */
+export function isInserterOpened( state ) {
+	return state.blockInserterPanel;
 }

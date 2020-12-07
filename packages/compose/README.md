@@ -157,6 +157,10 @@ _Parameters_
 
 -   _args_ `...any`: Arguments passed to Lodash's `debounce`.
 
+_Returns_
+
+-   `Function`: Debounced function.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
@@ -233,6 +237,21 @@ _Returns_
 
 -   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
 
+<a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
+
+Throttles a function with Lodash's `throttle`. A new throttled function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to throttle, so please wrap functions created on
+render in components in `useCallback`.
+
+_Parameters_
+
+-   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+
+_Returns_
+
+-   `Function`: Throttled function.
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
@@ -275,6 +294,8 @@ _Parameters_
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
+
+> **Deprecated** 
 
 Higher-order component creator which, given an object of DOM event types and
 values corresponding to a callback function name on the component, will

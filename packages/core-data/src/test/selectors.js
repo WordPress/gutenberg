@@ -247,6 +247,42 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'page' },
 		] );
 	} );
+
+	it( 'should return the same instance with the same arguments', () => {
+		let state = deepFreeze( {
+			entities: {
+				data: {},
+			},
+		} );
+
+		const postTypeFirstRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockFirstRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		// Simulate update states
+		state = { ...state };
+
+		const postTypeSecondRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockSecondRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		expect( postTypeFirstRecords ).toBe( postTypeSecondRecords );
+		expect( wpBlockFirstRecords ).toBe( wpBlockSecondRecords );
+	} );
 } );
 
 describe( '__experimentalGetDirtyEntityRecords', () => {

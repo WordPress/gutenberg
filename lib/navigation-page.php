@@ -32,44 +32,12 @@ function gutenberg_navigation_init( $hook ) {
 			return;
 	}
 
-	// Media settings.
-	$max_upload_size = wp_max_upload_size();
-	if ( ! $max_upload_size ) {
-		$max_upload_size = 0;
-	}
-
-	/** This filter is documented in wp-admin/includes/media.php */
-	$image_size_names = apply_filters(
-		'image_size_names_choose',
+	$settings = array_merge(
+		gutenberg_get_common_block_editor_settings(),
 		array(
-			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
-			'medium'    => __( 'Medium', 'gutenberg' ),
-			'large'     => __( 'Large', 'gutenberg' ),
-			'full'      => __( 'Full Size', 'gutenberg' ),
+			'blockNavMenus' => get_theme_support( 'block-nav-menus' ),
 		)
 	);
-
-	$available_image_sizes = array();
-	foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
-		$available_image_sizes[] = array(
-			'slug' => $image_size_slug,
-			'name' => $image_size_name,
-		);
-	}
-
-	$settings = array(
-		'imageSizes'        => $available_image_sizes,
-		'isRTL'             => is_rtl(),
-		'maxUploadFileSize' => $max_upload_size,
-		'blockNavMenus'     => get_theme_support( 'block-nav-menus' ),
-	);
-
-	list( $font_sizes, ) = (array) get_theme_support( 'editor-font-sizes' );
-
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
-
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	wp_add_inline_script(
@@ -78,7 +46,7 @@ function gutenberg_navigation_init( $hook ) {
 			'wp.domReady( function() {
 				wp.editNavigation.initialize( "navigation-editor", %s );
 			} );',
-			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
+			wp_json_encode( $settings )
 		)
 	);
 

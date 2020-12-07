@@ -138,27 +138,112 @@
 					{
 						"name": "Small",
 						"slug": "small",
-						"size": 13
+						"size": "13px"
 					},
 					{
 						"name": "Normal",
 						"slug": "normal",
-						"size": 16
+						"size": "16px"
 					},
 					{
 						"name": "Medium",
 						"slug": "medium",
-						"size": 20
+						"size": "20px"
 					},
 					{
 						"name": "Large",
 						"slug": "large",
-						"size": 36
+						"size": "36px"
 					},
 					{
 						"name": "Huge",
 						"slug": "huge",
-						"size": 42
+						"size": "42px"
+					}
+				],
+				"fontStyles": [
+					{
+						"name": "Regular",
+						"slug": "normal",
+						"value": "normal"
+					},
+					{
+						"name": "Italic",
+						"slug": "italic",
+						"value": "italic"
+					}
+				],
+				"fontWeights": [
+					{
+						"name": "Ultralight",
+						"slug": "100",
+						"value": "100"
+					},
+					{
+						"name": "Thin",
+						"slug": "200",
+						"value": "200"
+					},
+					{
+						"name": "Light",
+						"slug": "300",
+						"value": "300"
+					},
+					{
+						"name": "Regular",
+						"slug": "400",
+						"value": "400"
+					},
+					{
+						"name": "Medium",
+						"slug": "500",
+						"value": "500"
+					},
+					{
+						"name": "Semibold",
+						"slug": "600",
+						"value": "600"
+					},
+					{
+						"name": "Bold",
+						"slug": "700",
+						"value": "700"
+					},
+					{
+						"name": "Heavy",
+						"slug": "800",
+						"value": "800"
+					},
+					{
+						"name": "Black",
+						"slug": "900",
+						"value": "900"
+					}
+				],
+				"textTransforms": [
+					{
+						"name": "AB",
+						"slug": "uppercase"
+					},
+					{
+						"name": "ab",
+						"slug": "lowercase"
+					},
+					{
+						"name": "Ab",
+						"slug": "capitalize"
+					}
+				],
+				"textDecorations": [
+					{
+						"name": "Underline",
+						"slug": "underline",
+						"value": "underline"
+					},
+					{
+						"name": "Strikethrough",
+						"slug": "strikethrough",
+						"value": "line-through"
 					}
 				]
 			},

@@ -31,8 +31,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
-		"axe-puppeteer": "^1.1.0"
+		"@axe-core/puppeteer": "^4.0.0",
+		"@babel/runtime": "^7.11.2"
 	},
 	"peerDependencies": {
 		"jest": ">=24",

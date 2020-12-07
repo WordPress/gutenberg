@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle, isFunction } from 'lodash';
+import { debounce, isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -22,11 +22,6 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
-// Since URLInput is rendered in the context of other inputs, but should be
-// considered a separate modal node, prevent keyboard events from propagating
-// as being considered from the input.
-const stopEventPropagation = ( event ) => event.stopPropagation();
-
 /* eslint-disable jsx-a11y/no-autofocus */
 class URLInput extends Component {
 	constructor( props ) {
@@ -40,7 +35,7 @@ class URLInput extends Component {
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
 		this.inputRef = createRef();
-		this.updateSuggestions = throttle(
+		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
 		);
@@ -425,7 +420,6 @@ class URLInput extends Component {
 			type: 'text',
 			onChange: this.onChange,
 			onFocus: this.onFocus,
-			onInput: stopEventPropagation,
 			placeholder,
 			onKeyDown: this.onKeyDown,
 			role: 'combobox',

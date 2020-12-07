@@ -47,7 +47,13 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			'is-vertical': attributes.orientation === 'vertical',
+		} ),
+	} );
+
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
@@ -69,7 +75,6 @@ function Navigation( {
 				isSelected
 					? InnerBlocks.DefaultAppender
 					: false,
-			templateInsertUpdatesSelection: false,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
@@ -104,11 +109,6 @@ function Navigation( {
 			} );
 		};
 	}
-
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
 
 	return (
 		<>
@@ -171,13 +171,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav
-				{ ...blockProps }
-				className={ classnames(
-					blockProps.className,
-					blockClassNames
-				) }
-			>
+			<nav { ...blockProps }>
 				<ul { ...innerBlocksProps } />
 			</nav>
 		</>
@@ -214,7 +208,8 @@ export default compose( [
 				}
 				dispatch( 'core/block-editor' ).replaceInnerBlocks(
 					clientId,
-					blocks
+					blocks,
+					true
 				);
 			},
 		};

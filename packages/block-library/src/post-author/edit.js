@@ -65,21 +65,28 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
-					<SelectControl
-						label={ __( 'Author' ) }
-						value={ authorId }
-						options={ authors.map( ( { id, name } ) => {
-							return {
-								value: id,
-								label: name,
-							};
-						} ) }
-						onChange={ ( nextAuthorId ) => {
-							editEntityRecord( 'postType', postType, postId, {
-								author: nextAuthorId,
-							} );
-						} }
-					/>
+					{ !! authors?.length && (
+						<SelectControl
+							label={ __( 'Author' ) }
+							value={ authorId }
+							options={ authors.map( ( { id, name } ) => {
+								return {
+									value: id,
+									label: name,
+								};
+							} ) }
+							onChange={ ( nextAuthorId ) => {
+								editEntityRecord(
+									'postType',
+									postType,
+									postId,
+									{
+										author: nextAuthorId,
+									}
+								);
+							} }
+						/>
+					) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
@@ -137,7 +144,8 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						<RichText
 							className="wp-block-post-author__byline"
 							multiline={ false }
-							placeholder={ __( 'Write byline …' ) }
+							aria-label={ __( 'Post author byline text' ) }
+							placeholder={ __( 'Write byline…' ) }
 							value={ byline }
 							onChange={ ( value ) =>
 								setAttributes( { byline: value } )

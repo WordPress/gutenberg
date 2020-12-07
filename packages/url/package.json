@@ -26,7 +26,6 @@
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"lodash": "^4.17.19",
-		"qs": "^6.5.2",
 		"react-native-url-polyfill": "^1.1.2"
 	},
 	"publishConfig": {

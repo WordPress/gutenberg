@@ -15,6 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Site Tagline' ),
+	description: __( 'In a few words, what this site is about.' ),
 	keywords: [ __( 'description' ) ],
 	icon,
 	edit,

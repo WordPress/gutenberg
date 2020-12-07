@@ -57,6 +57,7 @@ describe( 'actions', () => {
 				id,
 				isDismissible: false,
 				context: 'foo',
+				icon: '🌮',
 			};
 
 			const result = createNotice( status, content, options );
@@ -69,9 +70,11 @@ describe( 'actions', () => {
 					status,
 					content,
 					spokenMessage: content,
+					__unstableHTML: undefined,
 					isDismissible: false,
 					actions: [],
 					type: 'default',
+					icon: '🌮',
 				},
 			} );
 		} );
@@ -100,6 +103,7 @@ describe( 'actions', () => {
 					isDismissible: false,
 					actions: [],
 					type: 'default',
+					icon: null,
 				},
 			} );
 		} );

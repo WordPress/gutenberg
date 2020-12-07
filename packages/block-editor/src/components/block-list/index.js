@@ -7,22 +7,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, forwardRef } from '@wordpress/element';
+import { useRef, createContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import BlockListAppender, {
-	AppenderNodesContext,
-} from '../block-list-appender';
-import RootContainer from './root-container';
+import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
-
-/**
- * A map to store the reference of each "Appenders" rendered with `rootClientId` as key.
- */
-const appenderNodesMap = new Map();
+import useInsertionPoint from './insertion-point';
+import BlockPopover from './block-popover';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -30,31 +24,35 @@ const appenderNodesMap = new Map();
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList( { className, rootClientId, renderAppender }, ref ) {
-	const Container = rootClientId ? 'div' : RootContainer;
-	const fallbackRef = useRef();
-	const wrapperRef = ref || fallbackRef;
+export const BlockNodes = createContext();
+export const SetBlockNodes = createContext();
+
+export default function BlockList( { className } ) {
+	const ref = useRef();
+	const [ blockNodes, setBlockNodes ] = useState( {} );
+	const insertionPoint = useInsertionPoint( ref );
 
 	return (
-		<AppenderNodesContext.Provider value={ appenderNodesMap }>
-			<Container
-				ref={ wrapperRef }
+		<BlockNodes.Provider value={ blockNodes }>
+			{ insertionPoint }
+			<BlockPopover />
+			<div
+				ref={ ref }
 				className={ classnames(
-					'block-editor-block-list__layout',
+					'block-editor-block-list__layout is-root-container',
 					className
 				) }
 			>
-				<BlockListItems
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-					wrapperRef={ wrapperRef }
-				/>
-			</Container>
-		</AppenderNodesContext.Provider>
+				<SetBlockNodes.Provider value={ setBlockNodes }>
+					<BlockListItems wrapperRef={ ref } />
+				</SetBlockNodes.Provider>
+			</div>
+		</BlockNodes.Provider>
 	);
 }
 
 function Items( {
+	placeholder,
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
@@ -70,7 +68,6 @@ function Items( {
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
-			isDraggingBlocks,
 			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
 
@@ -88,7 +85,6 @@ function Items( {
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			isDraggingBlocks: isDraggingBlocks(),
 			activeEntityBlockId,
 		};
 	}
@@ -100,7 +96,6 @@ function Items( {
 		orientation,
 		hasMultiSelection,
 		enableAnimation,
-		isDraggingBlocks,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
@@ -109,8 +104,7 @@ function Items( {
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget =
-		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
+	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<>
@@ -119,8 +113,7 @@ function Items( {
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget =
-					dropTargetIndex === index && isDraggingBlocks;
+				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -128,7 +121,6 @@ function Items( {
 						value={ ! isBlockInSelection }
 					>
 						<BlockListBlock
-							rootClientId={ rootClientId }
 							clientId={ clientId }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode
@@ -147,6 +139,7 @@ function Items( {
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ blockClientIds.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
@@ -170,5 +163,3 @@ export function BlockListItems( props ) {
 		</AsyncModeProvider>
 	);
 }
-
-export default forwardRef( BlockList );

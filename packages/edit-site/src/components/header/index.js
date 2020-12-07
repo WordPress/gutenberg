@@ -9,10 +9,7 @@ import {
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 import { _x } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
@@ -21,26 +18,20 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
-import PageSwitcher from '../page-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
-import NavigationToggle from './navigation-toggle';
+import TemplateDetails from '../template-details';
 
-export default function Header( {
-	openEntitiesSavedStates,
-	isInserterOpen,
-	onToggleInserter,
-	isNavigationOpen,
-	onToggleNavigation,
-} ) {
+export default function Header( { openEntitiesSavedStates } ) {
 	const {
 		deviceType,
+		entityTitle,
 		hasFixedToolbar,
 		template,
-		page,
-		showOnFront,
+		templateType,
+		isInserterOpen,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -48,31 +39,35 @@ export default function Header( {
 			getTemplateId,
 			getTemplatePartId,
 			getTemplateType,
-			getPage,
+			isInserterOpened,
 		} = select( 'core/edit-site' );
-
-		const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-		const { show_on_front: _showOnFront } = getEditedEntityRecord(
-			'root',
-			'site'
+		const { getEntityRecord } = select( 'core' );
+		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
+			'core/editor'
 		);
 
-		const _templateId = getTemplateId();
+		const postType = getTemplateType();
+		const postId =
+			postType === 'wp_template' ? getTemplateId() : getTemplatePartId();
+		const record = getEntityRecord( 'postType', postType, postId );
+		const _entityTitle =
+			'wp_template' === postType
+				? getTemplateInfo( record ).title
+				: record?.slug;
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
+			entityTitle: _entityTitle,
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			templateId: _templateId,
-			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
-			templatePartId: getTemplatePartId(),
-			templateType: getTemplateType(),
-			page: getPage(),
-			showOnFront: _showOnFront,
+			template: record,
+			templateType: postType,
+			isInserterOpen: isInserterOpened(),
 		};
 	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setPage,
+		setIsInserterOpened,
 	} = useDispatch( 'core/edit-site' );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -82,45 +77,56 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<MainDashboardButton.Slot>
-					<NavigationToggle
-						isOpen={ isNavigationOpen }
-						onClick={ onToggleNavigation }
-					/>
-				</MainDashboardButton.Slot>
 				<div className="edit-site-header__toolbar">
 					<Button
 						isPrimary
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
-						onClick={ onToggleInserter }
+						onClick={ () =>
+							setIsInserterOpened( ! isInserterOpen )
+						}
 						icon={ plus }
 						label={ _x(
 							'Add block',
 							'Generic label for block inserter button'
 						) }
 					/>
-					<ToolSelector />
-					<UndoButton />
-					<RedoButton />
-					<BlockNavigationDropdown />
+					{ isLargeViewport && (
+						<>
+							<ToolSelector />
+							<UndoButton />
+							<RedoButton />
+							<BlockNavigationDropdown />
+						</>
+					) }
 					{ displayBlockToolbar && (
 						<div className="edit-site-header-toolbar__block-toolbar">
 							<BlockToolbar hideDragHandle />
 						</div>
 					) }
-					<div className="edit-site-header__toolbar-switchers">
-						<PageSwitcher
-							showOnFront={ showOnFront }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					</div>
 				</div>
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions template={ template } />
+				{ 'wp_template' === templateType && (
+					<DocumentActions
+						entityTitle={ entityTitle }
+						entityLabel="template"
+					>
+						{ ( { onClose } ) => (
+							<TemplateDetails
+								template={ template }
+								onClose={ onClose }
+							/>
+						) }
+					</DocumentActions>
+				) }
+				{ 'wp_template_part' === templateType && (
+					<DocumentActions
+						entityTitle={ entityTitle }
+						entityLabel="template part"
+					/>
+				) }
 			</div>
 
 			<div className="edit-site-header_end">

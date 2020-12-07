@@ -9,7 +9,10 @@ import { isString } from 'lodash';
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -71,7 +74,7 @@ const ShortcutCategorySection = ( {
 } ) => {
 	const categoryShortcuts = useSelect(
 		( select ) => {
-			return select( 'core/keyboard-shortcuts' ).getCategoryShortcuts(
+			return select( keyboardShortcutsStore ).getCategoryShortcuts(
 				categoryName
 			);
 		},
