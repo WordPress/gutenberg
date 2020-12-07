@@ -57,10 +57,9 @@ export default function BoxControl( {
 	} );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
-
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues )
+		! hasInitialValue || ( ! isValuesMixed( inputValues ) && Object.keys(inputValues).length === 4 )
 	);
 
 	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );

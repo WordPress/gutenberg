@@ -342,6 +342,7 @@ These are the current color properties supported by blocks:
 | --- | --- |
 | Cover | Yes |
 | Group | Yes |
+| List | Yes |
 | Verse | Yes |
 
 #### Typography Properties
