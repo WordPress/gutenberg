@@ -8,8 +8,7 @@
 			"default": false
 		},
 		"useAsCover": {
-			"type": "boolean",
-			"default": false
+			"type": "boolean"
 		},
 		"minHeight": {
 			"type": "number"

@@ -26,7 +26,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		if ( $featured_image_url ) {
 			$classnames[] = 'is-used-as-cover';
 			if ( isset( $attributes['minHeight'] ) ) {
-				$min_height_unit = $attributes['minHeightUnit'] ? $attributes['minHeightUnit'] : 'px';
+				$min_height_unit = isset( $attributes['minHeightUnit'] ) ? $attributes['minHeightUnit'] : 'px';
 				$styles[]        = "min-height:{$attributes['minHeight']}{$min_height_unit}";
 			}
 			$styles[] = "background-image:url('{$featured_image_url}')";
