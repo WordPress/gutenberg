@@ -192,10 +192,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 				}
 			}, 0 );
 		},
-		[
-			onFocusOutside,
-			__unstableNodeRef,
-		]
+		[ onFocusOutside ]
 	);
 
 	return {
