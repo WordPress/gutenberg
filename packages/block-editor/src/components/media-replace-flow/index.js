@@ -205,7 +205,7 @@ const MediaReplaceFlow = ( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { createNotice, removeNotice } = dispatch( 'core/notices' );
+		const { createNotice, removeNotice } = dispatch( noticesStore );
 		return {
 			createNotice,
 			removeNotice,

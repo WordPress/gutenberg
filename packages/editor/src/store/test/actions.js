@@ -195,7 +195,7 @@ describe( 'Post generator actions', () => {
 						const { value } = fulfillment.next( postType );
 						expect( value ).toEqual(
 							controls.dispatch(
-								'core/notices',
+								noticesStore,
 								'createSuccessNotice',
 								'Updated Post',
 								{
@@ -310,7 +310,7 @@ describe( 'Post generator actions', () => {
 				const { value } = fulfillment.next( postType );
 				expect( value ).toEqual(
 					controls.dispatch(
-						'core/notices',
+						noticesStore,
 						'removeNotice',
 						TRASH_POST_NOTICE_ID
 					)
@@ -338,7 +338,7 @@ describe( 'Post generator actions', () => {
 				const { value } = fulfillment.throw( error );
 				expect( value ).toEqual(
 					controls.dispatch(
-						'core/notices',
+						noticesStore,
 						'createErrorNotice',
 						'Trashing failed',
 						{

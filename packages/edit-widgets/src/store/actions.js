@@ -57,7 +57,7 @@ export function* saveEditedWidgetAreas() {
 	try {
 		yield* saveWidgetAreas( editedWidgetAreas );
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Widgets saved.' ),
 			{
@@ -66,7 +66,7 @@ export function* saveEditedWidgetAreas() {
 		);
 	} catch ( e ) {
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			/* translators: %s: The error message. */
 			sprintf( __( 'There was an error. %s' ), e.message ),

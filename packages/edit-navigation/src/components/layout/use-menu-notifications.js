@@ -20,7 +20,7 @@ export default function useMenuNotifications( menuId ) {
 		[ menuId ]
 	);
 
-	const { createErrorNotice } = useDispatch( 'core/notices' );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const processError = ( error ) => {
 		const document = new window.DOMParser().parseFromString(

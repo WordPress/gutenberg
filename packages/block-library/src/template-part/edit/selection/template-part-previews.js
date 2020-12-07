@@ -36,7 +36,7 @@ function TemplatePartItem( {
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
 	const blocks = useMemo( () => parse( content ), [ content ] );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
 		setAttributes( { postId: id, slug, theme } );

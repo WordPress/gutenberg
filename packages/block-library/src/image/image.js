@@ -119,7 +119,7 @@ export default function Image( {
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );

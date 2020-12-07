@@ -72,7 +72,7 @@ export default function ReusableBlockConvertButton( {
 	} = useDispatch( store );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const onConvert = useCallback(
 		async function () {

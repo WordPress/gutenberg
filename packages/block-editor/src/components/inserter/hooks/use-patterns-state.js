@@ -29,7 +29,7 @@ const usePatternsState = ( onInsert ) => {
 			patternCategories: __experimentalBlockPatternCategories,
 		};
 	}, [] );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert(
 			map( blocks, ( block ) => cloneBlock( block ) ),

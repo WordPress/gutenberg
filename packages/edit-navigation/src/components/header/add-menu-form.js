@@ -17,9 +17,7 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 export default function AddMenuForm( { menus, onCreate } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 
-	const { createErrorNotice, createInfoNotice } = useDispatch(
-		'core/notices'
-	);
+	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 

@@ -281,7 +281,7 @@ describe( 'actions', () => {
 			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
-				storeKey: 'core/notices',
+				storeKey: noticesStore,
 			} );
 
 			expect( generator.next() ).toEqual( {

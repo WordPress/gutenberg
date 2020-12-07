@@ -52,9 +52,9 @@ export function EditorNotices( { notices, onRemove } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		notices: select( 'core/notices' ).getNotices(),
+		notices: select( noticesStore ).getNotices(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/notices' ).removeNotice,
+		onRemove: dispatch( noticesStore ).removeNotice,
 	} ) ),
 ] )( EditorNotices );

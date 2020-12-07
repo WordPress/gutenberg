@@ -28,7 +28,7 @@ export function useNotifyCopy() {
 		( select ) => select( blocksStore ),
 		[]
 	);
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return useCallback( ( eventType, selectedBlockClientIds ) => {
 		let notice = '';

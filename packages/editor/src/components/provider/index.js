@@ -353,7 +353,7 @@ export default compose( [
 			undo,
 			__unstableSetupTemplate,
 		} = dispatch( 'core/editor' );
-		const { createWarningNotice } = dispatch( 'core/notices' );
+		const { createWarningNotice } = dispatch( noticesStore );
 		const { __unstableCreateUndoLevel, editEntityRecord } = dispatch(
 			'core'
 		);

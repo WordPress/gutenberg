@@ -96,7 +96,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			throw new Error();
 		}
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Navigation saved.' ),
 			{
@@ -105,7 +105,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 		);
 	} catch ( e ) {
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			__( 'There was an error.' ),
 			{

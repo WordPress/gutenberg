@@ -103,7 +103,7 @@ export class AdminNotices extends Component {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const { createNotice } = dispatch( 'core/notices' );
+	const { createNotice } = dispatch( noticesStore );
 
 	return { createNotice };
 } )( AdminNotices );

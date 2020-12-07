@@ -62,7 +62,7 @@ function useAutosaveNotice() {
 		[]
 	);
 
-	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {

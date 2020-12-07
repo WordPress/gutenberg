@@ -346,7 +346,7 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: true } ).value ).toEqual(
 			dispatch(
-				'core/notices',
+				noticesStore,
 				'createSuccessNotice',
 				__( 'Navigation saved.' ),
 				{
@@ -476,7 +476,7 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: false } ).value ).toEqual(
 			dispatch(
-				'core/notices',
+				noticesStore,
 				'createErrorNotice',
 				__( 'There was an error.' ),
 				{
