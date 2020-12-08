@@ -16,13 +16,10 @@ export default createHigherOrderComponent(
 			( node ) =>
 				setHandleFocusOutside( () =>
 					node?.handleFocusOutside
-						? node.handleFocusOutside.bind(
-								node,
-								node.handleFocusOutside
-						  )
+						? node.handleFocusOutside.bind( node )
 						: undefined
 				),
-			[ setHandleFocusOutside ]
+			[]
 		);
 
 		return (
@@ -33,5 +30,6 @@ export default createHigherOrderComponent(
 				/>
 			</div>
 		);
-	}
+	},
+	'withFocusOutside'
 );
