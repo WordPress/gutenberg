@@ -27,7 +27,12 @@ import { __ } from '@wordpress/i18n';
 import { CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false, allowedBlocks },
+	attributes: {
+		verticalAlignment,
+		width,
+		templateLock = false,
+		allowedBlocks,
+	},
 	setAttributes,
 	clientId,
 } ) {
@@ -67,7 +72,7 @@ function ColumnEdit( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock,
-    allowedBlocks,
+		allowedBlocks,
 		renderAppender: hasChildBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,

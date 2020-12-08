@@ -72,7 +72,7 @@ function ColumnsEditContainer( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-    allowedChildBlocks: allowedChildBlocks,
+		allowedChildBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 	} );
