@@ -8,7 +8,7 @@
 
 ## 10.1.0 (2020-09-03)
 
-### Enhancements
+### New Feature
 
 - Add `ToolbarItem` component.
 - Support `label` prop on the `Toolbar` component.
