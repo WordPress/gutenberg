@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -11,14 +11,27 @@ import { useFocusOutside } from '../../utils/hooks';
 
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
-		const __unstableNodeRef = useRef();
-		const eventHandlers = useFocusOutside( null, __unstableNodeRef );
+		const [ handleFocusOutside, setHandleFocusOutside ] = useState();
+		const bindFocusOutsideHandler = useCallback(
+			( node ) =>
+				setHandleFocusOutside( () =>
+					node?.handleFocusOutside
+						? node.handleFocusOutside.bind(
+								node,
+								node.handleFocusOutside
+						  )
+						: undefined
+				),
+			[ setHandleFocusOutside ]
+		);
 
 		return (
-			<div { ...eventHandlers }>
-				<WrappedComponent ref={ __unstableNodeRef } { ...props } />
+			<div { ...useFocusOutside( handleFocusOutside ) }>
+				<WrappedComponent
+					ref={ bindFocusOutsideHandler }
+					{ ...props }
+				/>
 			</div>
 		);
-	},
-	'withFocusOutside'
+	}
 );

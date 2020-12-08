@@ -86,13 +86,12 @@ function isFocusNormalizedButton( eventTarget ) {
  *
  * @param {EventCallback} onFocusOutside        A callback triggered when focus moves outside
  *                                              the element the event handlers are bound to.
- * @param {FocusOutsideRef} [__unstableNodeRef]
  *
  * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers
  *                                   to a wrapping element element to capture when focus moves
  *                                   outside that element.
  */
-export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
+export default function useFocusOutside( onFocusOutside ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
@@ -114,7 +113,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 
 	// Cancel a blur check if the callback or ref is no longer provided.
 	useEffect( () => {
-		if ( ! onFocusOutside && ! __unstableNodeRef?.current ) {
+		if ( ! onFocusOutside ) {
 			cancelBlurCheck();
 		}
 	}, [ onFocusOutside, cancelBlurCheck ] );
@@ -173,16 +172,6 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 
 				if ( 'function' === typeof onFocusOutside ) {
 					onFocusOutside( event );
-				} else if (
-					'function' ===
-					typeof __unstableNodeRef?.current?.handleFocusOutside
-				) {
-					// Call the legacy `handleFocusOutside` method if defined
-					// as a fallback for the `withFocusOutside` HOC.
-					const node = __unstableNodeRef.current;
-					const callback =
-						__unstableNodeRef.current.handleFocusOutside;
-					callback.call( node, event );
 				}
 			}, 0 );
 		},
