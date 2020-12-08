@@ -1,6 +1,6 @@
 ---
 name: Bug report for Mobile Apps
-about: Create a report to help us improve the Gutenberg mobile apps version
+about: Report a bug with the mobile app version of Gutenberg
 labels: Mobile App Android/iOS
 ---
 
