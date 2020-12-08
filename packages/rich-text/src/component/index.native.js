@@ -802,6 +802,7 @@ export class RichText extends Component {
 			accessibilityLabel,
 			disableEditingMenu = false,
 			areMentionsSupported,
+			areXPostsSupported,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -975,15 +976,32 @@ export class RichText extends Component {
 						<BlockFormatControls>
 							{
 								// eslint-disable-next-line no-undef
-								areMentionsSupported && (
+								( areMentionsSupported ||
+									areXPostsSupported ) && (
 									<Toolbar>
 										<ToolbarButton
-											title={ __( 'Insert mention' ) }
-											icon={ <Icon icon={ atSymbol } /> }
+											title={
+												areMentionsSupported
+													? __( 'Insert mention' )
+													: __( 'Insert crosspost' )
+											}
+											icon={
+												<Icon
+													icon={
+														areMentionsSupported
+															? atSymbol
+															: plus
+													}
+												/>
+											}
 											onClick={
-												this.handleUserSuggestion
+												areMentionsSupported
+													? this.handleUserSuggestion
+													: this.handleXpostSuggestion
 											}
 											onLongPress={
+												areMentionsSupported &&
+												areXPostsSupported &&
 												this.handleSuggestionLongPress
 											}
 										/>
@@ -996,16 +1014,24 @@ export class RichText extends Component {
 				<Picker
 					ref={ ( instance ) => ( this.suggestionPicker = instance ) }
 					options={ [
-						{
-							value: 'mention',
-							label: __( 'Mention' ),
-							icon: atSymbol,
-						},
-						{
-							value: 'xpost',
-							label: __( 'Xpost' ),
-							icon: plus,
-						},
+						...( areMentionsSupported
+							? [
+									{
+										value: 'mention',
+										label: __( 'Mention' ),
+										icon: atSymbol,
+									},
+							  ]
+							: [] ),
+						...( areXPostsSupported
+							? [
+									{
+										value: 'xpost',
+										label: __( 'Xpost' ),
+										icon: plus,
+									},
+							  ]
+							: [] ),
 					] }
 					onChange={ onSuggestionPickerSelect }
 					hideCancelButton
