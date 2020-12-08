@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+- The bundled `@babel/core` dependency has been updated from requiring `^7.11.6` to requiring `^7.12.9`. All other Babel plugins were updated to the latest version (see [Highlights](https://babeljs.io/blog/2020/10/15/7.12.0)).
+
+## 4.19.0 (2020-10-01)
+
 ## Breaking Changes
 
 - Revert enabling the `shippedProposals` flag. That flag enables the use of stage-3 proposals, but the goal of this preset is to only support stage-4 features. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
