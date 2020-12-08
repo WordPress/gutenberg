@@ -12,6 +12,7 @@
 		}
 	},
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"fontSize": true
 	}
 }
