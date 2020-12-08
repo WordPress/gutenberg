@@ -216,7 +216,34 @@ _Returns_
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 
-Undocumented declaration.
+When opening modals/sidebars/dialogs, the focus
+must move to the opened area and return to the
+previously focused element when closed.
+The current hook implements the returning behavior.
+
+_Usage_
+
+```js
+import { useFocusReturn } from '@wordpress/compose';
+
+const WithFocusReturn = () => {
+    const ref = useFocusReturn()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _onFocusReturn_ `?Function`: Overrides the default return behavior.
+
+_Returns_
+
+-   `Function`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
