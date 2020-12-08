@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 9.5.1 =
+
+### Bug Fixes:
+
+ - Revert date changes from branch 'replace-moment.
+ - Popover: Fix issue with undefined getBoundingClientRect.
+ - Fallback to regular subscribe if the store doesn't exist in useSelect.
+
+
 = 9.5.0 =
 
 ### Features
