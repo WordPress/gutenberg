@@ -12,7 +12,6 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies

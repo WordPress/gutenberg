@@ -446,6 +446,18 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 
 Opens the global block inserter.
 
+<a name="openPreviewPage" href="#openPreviewPage">#</a> **openPreviewPage**
+
+Opens the preview page of an edited post.
+
+_Parameters_
+
+-   _editorPage_ `Page`: puppeteer editor page.
+
+_Returns_
+
+-   `Page`: preview page.
+
 <a name="openPublishPanel" href="#openPublishPanel">#</a> **openPublishPanel**
 
 Opens the publish panel.
@@ -535,6 +547,17 @@ Sets browser viewport to specified type.
 _Parameters_
 
 -   _viewport_ `WPViewport`: Viewport name or dimensions object to assign.
+
+<a name="setClipboardData" href="#setClipboardData">#</a> **setClipboardData**
+
+Sets the clipboard data that can be pasted with
+`pressKeyWithModifier( 'primary', 'v' )`.
+
+_Parameters_
+
+-   _$1_ `Object`: Options.
+-   _$1.plainText_ `string`: Plain text to set.
+-   _$1.html_ `string`: HTML to set.
 
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent**
 

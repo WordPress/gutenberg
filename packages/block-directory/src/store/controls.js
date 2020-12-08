@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Load an asset for a block.
  *
  * This function returns a Promise that will resolve once the asset is loaded,
- * or in the case of Stylesheets and Inline Javascript, will resolve immediately.
+ * or in the case of Stylesheets and Inline JavaScript, will resolve immediately.
  *
  * @param {HTMLElement} el A HTML Element asset to inject.
  *
@@ -65,10 +65,10 @@ const controls = {
 	LOAD_ASSETS() {
 		/*
 		 * Fetch the current URL (post-new.php, or post.php?post=1&action=edit) and compare the
-		 * Javascript and CSS assets loaded between the pages. This imports the required assets
+		 * JavaScript and CSS assets loaded between the pages. This imports the required assets
 		 * for the block into the current page while not requiring that we know them up-front.
 		 * In the future this can be improved by reliance upon block.json and/or a script-loader
-		 * dependancy API.
+		 * dependency API.
 		 */
 		return apiFetch( {
 			url: document.location.href,

@@ -41,7 +41,8 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 			<RichText
 				allowedFormats={ [] }
 				onChange={ setSiteTagline }
-				placeholder={ __( 'Site Tagline' ) }
+				aria-label={ __( 'Site tagline text' ) }
+				placeholder={ __( 'Write site tagline…' ) }
 				tagName="p"
 				value={ siteTagline }
 				{ ...blockProps }

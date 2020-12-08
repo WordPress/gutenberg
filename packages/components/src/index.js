@@ -14,7 +14,7 @@ export {
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export {
 	default as Animate,
-	useAnimate as __unstableUseAnimate,
+	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
@@ -45,7 +45,11 @@ export {
 	default as DropZone,
 	useDropZone as __unstableUseDropZone,
 } from './drop-zone';
-export { default as DropZoneProvider } from './drop-zone/provider';
+export {
+	default as DropZoneProvider,
+	DropZoneContextProvider as __unstableDropZoneContextProvider,
+	useDrop as __unstableUseDrop,
+} from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';

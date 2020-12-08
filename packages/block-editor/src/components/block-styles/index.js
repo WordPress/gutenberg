@@ -15,6 +15,7 @@ import {
 	getBlockType,
 	cloneBlock,
 	getBlockFromExample,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
@@ -43,7 +44,7 @@ function BlockStyles( {
 } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
+		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
 		const blockType = getBlockType( block.name );
 		return {

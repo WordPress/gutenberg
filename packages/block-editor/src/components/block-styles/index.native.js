@@ -7,6 +7,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 
@@ -20,7 +21,7 @@ import containerStyles from './style.scss';
 function BlockStyles( { clientId, url } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
+		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
 		return {
 			styles: getBlockStyles( block.name ),
