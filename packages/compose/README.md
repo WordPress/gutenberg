@@ -186,6 +186,34 @@ _Returns_
 
 -   `Function`: Debounced function.
 
+<a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
+
+Hook used to focus the first tabbable element on mount.
+
+_Usage_
+
+```js
+import { useFocusOnMount } from '@wordpress/compose';
+
+const WithFocusOnMount = () => {
+    const ref = useFocusOnMount()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
