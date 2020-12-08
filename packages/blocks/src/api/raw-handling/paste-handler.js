@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact } from 'lodash';
+import { flatMap, filter, compact, identity } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,43 @@ import emptyParagraphRemover from './empty-paragraph-remover';
  */
 const { console } = window;
 
+const difference = ( base ) => base;
+
+const getStylesEntries = ( stylesString ) =>
+	stylesString
+		.split( ';' )
+		.filter( identity )
+		.map( ( styles ) => {
+			const [ key, values ] = styles.trim().split( ':' );
+			const valuesArr =
+				values &&
+				values
+					.split( `'` )
+					.join( '' )
+					.split( '&quot;' )
+					.join( '"' )
+					.split( ', ' )
+					.map( ( w ) => w.trim() )
+					.join( '' );
+
+			return [ key, valuesArr ];
+		} );
+
+const defaultStyles =
+	"color: rgb(40, 48, 61); font-family: -apple-system, system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 20px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(209, 228, 221); text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;";
+
+const toString = ( arr ) =>
+	arr.map( ( pair ) => pair.join( ':' ) ).join( '; ' );
+
+const sanitize = ( x ) => x;
+const removeDefaultValues = ( html ) => {
+	const entriesForDefaultStyles = getStylesEntries( defaultStyles );
+	const [ htmlPart0, restHtml ] = html.split( 'style=' );
+	const [ , htmlStyles, htmlPart2 ] = restHtml.split( `"` );
+	const entriesForCurrentStyles = getStylesEntries( htmlStyles );
+	const diff = difference( entriesForDefaultStyles, entriesForCurrentStyles );
+	return htmlPart0 + 'style="' + toString( diff ) + '"' + htmlPart2;
+};
 /**
  * Filters HTML to only contain phrasing content.
  *
@@ -58,9 +95,11 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 		phrasingContentReducer,
 		commentRemover,
 	] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
-		inline: true,
-	} );
+
+	HTML = sanitize( removeDefaultValues( HTML ) );
+	// HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
+	// 	inline: true,
+	// } );
 
 	HTML = alterSpecialTags( HTML );
 
