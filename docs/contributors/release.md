@@ -312,7 +312,7 @@ Now _cherry-pick_ the commits from `master` to `wp/trunk`, use `-m 1 commithash`
 1. `git cherry-pick -m 1 cb150a2`
 2. `git push`
 
-Whilst waiting for the build for `wp/trunk`[branch to pass](https://travis-ci.com/WordPress/gutenberg/branches), identify and begin updating the `CHANGELOG.md` files:
+Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https://github.com/WordPress/gutenberg/actions?query=branch%3Awp%2Ftrunk), identify and begin updating the `CHANGELOG.md` files:
 1. `git checkout wp/trunk`
 2. `npm run publish:check`
 > Example
