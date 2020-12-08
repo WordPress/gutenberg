@@ -26,7 +26,7 @@
 		"{src,build,build-module}/index.js"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
+		"@babel/runtime": "^7.12.5",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/data": "file:../data",
