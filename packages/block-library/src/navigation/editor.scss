@@ -225,11 +225,6 @@ $color-control-label-height: 20px;
 	flex-direction: row;
 	align-items: center;
 
-	// Hide when selected.
-	.is-selected & {
-		display: none;
-	}
-
 	// Style skeleton elements.
 	// Needs specificity.
 	.wp-block-navigation-link.wp-block-navigation-link {
@@ -243,6 +238,13 @@ $color-control-label-height: 20px;
 	.wp-block-navigation-link.wp-block-navigation-link,
 	svg {
 		opacity: 0.3;
+	}
+}
+
+.wp-block-navigation-placeholder__preview_select_hide {
+	// Hide when selected.
+	.is-selected & {
+		display: none;
 	}
 }
 

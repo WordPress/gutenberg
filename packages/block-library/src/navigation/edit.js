@@ -26,6 +26,7 @@ import { __ } from '@wordpress/i18n';
 import useBlockNavigator from './use-block-navigator';
 import * as navIcons from './icons';
 import NavigationPlaceholder from './placeholder';
+import PlaceholderPreview from './placeholder-preview';
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -58,19 +59,6 @@ function Navigation( {
 		clientId
 	);
 
-	const emptyStatePlaceholder = (
-		<div
-			style={ {
-				fontSize: '13px',
-				backgroundColor: 'purple',
-				color: 'white',
-				padding: '4px',
-			} }
-		>
-			Click [+] to add links
-		</div>
-	);
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -94,7 +82,7 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
-			placeholder: emptyStatePlaceholder,
+			placeholder: <PlaceholderPreview />,
 		}
 	);
 
