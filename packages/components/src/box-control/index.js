@@ -48,6 +48,7 @@ export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	onChangeShowVisualizer = noop,
+	onReset = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
@@ -94,7 +95,7 @@ export default function BoxControl( {
 	const handleOnReset = () => {
 		const initialValues = DEFAULT_VALUES;
 
-		onChange( initialValues );
+		onReset();
 		setValues( initialValues );
 		setIsDirty( false );
 	};
