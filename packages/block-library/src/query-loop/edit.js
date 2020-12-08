@@ -41,7 +41,7 @@ export default function QueryLoopEdit( {
 			search,
 			exclude,
 			sticky,
-			isGlobalQuery,
+			inherit,
 		} = {},
 		queryContext,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -82,7 +82,7 @@ export default function QueryLoopEdit( {
 
 			// When you insert this block outside of the edit site then store
 			// does not exist therefore we check for its existence.
-			if ( isGlobalQuery && select( 'core/edit-site' ) ) {
+			if ( inherit && select( 'core/edit-site' ) ) {
 				// This should be passed from the context exposed by edit site.
 				const { getTemplateId, getTemplateType } = select(
 					'core/edit-site'
@@ -122,7 +122,7 @@ export default function QueryLoopEdit( {
 			postType,
 			exclude,
 			sticky,
-			isGlobalQuery,
+			inherit,
 		]
 	);
 

@@ -66,7 +66,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	}
 
 	// Override the custom query with the global query if needed.
-	$use_global_query = ( isset( $block->context['query']['isGlobalQuery'] ) && $block->context['query']['isGlobalQuery'] );
+	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
 		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
@@ -96,7 +96,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
-		$content .= "<li>{$block_content}</li>";
+		$content      .= "<li>{$block_content}</li>";
 	}
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',

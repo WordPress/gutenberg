@@ -45,7 +45,7 @@ export default function QueryInspectorControls( {
 		author: selectedAuthorId,
 		postType,
 		sticky,
-		isGlobalQuery,
+		inherit,
 	} = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
@@ -151,12 +151,10 @@ export default function QueryInspectorControls( {
 					help={ __(
 						'Disable the option to customize the query arguments. Leave enabled to inherit the global query depending on the URL.'
 					) }
-					checked={ !! isGlobalQuery }
-					onChange={ ( value ) =>
-						setQuery( { isGlobalQuery: !! value } )
-					}
+					checked={ !! inherit }
+					onChange={ ( value ) => setQuery( { inherit: !! value } ) }
 				/>
-				{ ! isGlobalQuery && (
+				{ ! inherit && (
 					<SelectControl
 						options={ postTypesSelectOptions }
 						value={ postType }
@@ -184,7 +182,7 @@ export default function QueryInspectorControls( {
 						) }
 					</>
 				) }
-				{ ! isGlobalQuery && (
+				{ ! inherit && (
 					<QueryControls
 						{ ...{ order, orderBy } }
 						onOrderChange={ ( value ) =>
@@ -204,7 +202,7 @@ export default function QueryInspectorControls( {
 					/>
 				) }
 			</PanelBody>
-			{ ! isGlobalQuery && (
+			{ ! inherit && (
 				<PanelBody title={ __( 'Filters' ) }>
 					{ showCategories && categories?.terms?.length > 0 && (
 						<FormTokenField

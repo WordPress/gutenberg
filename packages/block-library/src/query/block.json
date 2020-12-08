@@ -21,7 +21,7 @@
 				"search": "",
 				"exclude": [],
 				"sticky": "",
-				"isGlobalQuery": true
+				"inherit": true
 			}
 		},
 		"layout": {
