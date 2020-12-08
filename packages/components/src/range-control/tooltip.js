@@ -14,12 +14,10 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
  */
 import { Tooltip } from './styles/range-control-styles';
 
-const TOOLTIP_OFFSET_HEIGHT = 32;
-
 export default function SimpleTooltip( {
 	className,
 	inputRef,
-	position: positionProp = 'auto',
+	tooltipPosition,
 	show = false,
 	style = {},
 	value = 0,
@@ -27,7 +25,7 @@ export default function SimpleTooltip( {
 	zIndex = 100,
 	...restProps
 } ) {
-	const position = useTooltipPosition( { inputRef, position: positionProp } );
+	const position = useTooltipPosition( { inputRef, tooltipPosition } );
 	const classes = classnames( 'components-simple-tooltip', className );
 	const styles = {
 		...style,
@@ -49,33 +47,24 @@ export default function SimpleTooltip( {
 	);
 }
 
-function useTooltipPosition( { inputRef, position: positionProp } ) {
-	const [ position, setPosition ] = useState( 'bottom' );
+function useTooltipPosition( { inputRef, tooltipPosition } ) {
+	const [ position, setPosition ] = useState();
 
-	const calculatePosition = useCallback( () => {
+	const setTooltipPosition = useCallback( () => {
 		if ( inputRef && inputRef.current ) {
-			let nextPosition = positionProp;
-
-			if ( positionProp === 'auto' ) {
-				const { bottom } = inputRef.current.getBoundingClientRect();
-				const isOffscreenBottom = bottom - TOOLTIP_OFFSET_HEIGHT < 0;
-
-				nextPosition = isOffscreenBottom ? 'top' : 'bottom';
-			}
-
-			setPosition( nextPosition );
+			setPosition( tooltipPosition );
 		}
-	}, [ positionProp ] );
+	}, [ tooltipPosition ] );
 
 	useEffect( () => {
-		calculatePosition();
-	}, [ calculatePosition ] );
+		setTooltipPosition();
+	}, [ setTooltipPosition ] );
 
 	useEffect( () => {
-		window.addEventListener( 'resize', calculatePosition );
+		window.addEventListener( 'resize', setTooltipPosition );
 
 		return () => {
-			window.removeEventListener( 'resize', calculatePosition );
+			window.removeEventListener( 'resize', setTooltipPosition );
 		};
 	} );
 
