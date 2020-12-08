@@ -96,7 +96,7 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, controlledBlocks, false );
+			replaceInnerBlocks( clientId, controlledBlocks );
 		} else {
 			resetBlocks( controlledBlocks );
 		}

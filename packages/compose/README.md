@@ -132,6 +132,31 @@ _Returns_
 
 -   `Array`: Async array.
 
+<a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
+
+In Dialogs/modals, the tabbing must be constrained to the content of
+the wrapper element. This hook adds the behavior to the returned ref.
+
+_Usage_
+
+```js
+import { useConstrainedTabbing } from '@wordpress/compose';
+
+const ConstrainedTabbingExample = () => {
+    const constrainedTabbingRef = useConstrainedTabbing()
+    return (
+        <div ref={ constrainedTabbingRef }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
 Copies the text to the clipboard when the element is clicked.
@@ -156,6 +181,10 @@ render in components in `useCallback`.
 _Parameters_
 
 -   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+
+_Returns_
+
+-   `Function`: Debounced function.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -233,6 +262,21 @@ _Returns_
 
 -   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
 
+<a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
+
+Throttles a function with Lodash's `throttle`. A new throttled function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to throttle, so please wrap functions created on
+render in components in `useCallback`.
+
+_Parameters_
+
+-   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+
+_Returns_
+
+-   `Function`: Throttled function.
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
@@ -275,6 +319,8 @@ _Parameters_
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
+
+> **Deprecated** 
 
 Higher-order component creator which, given an object of DOM event types and
 values corresponding to a callback function name on the component, will

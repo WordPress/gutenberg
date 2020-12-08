@@ -25,12 +25,17 @@ import {
 	withNotices,
 	RangeControl,
 } from '@wordpress/components';
-import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
+import {
+	MediaPlaceholder,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { Platform, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withSelect } from '@wordpress/data';
+import { useDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -67,7 +72,6 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 function GalleryEdit( props ) {
 	const {
 		attributes,
-		className,
 		isSelected,
 		noticeUI,
 		noticeOperations,
@@ -85,6 +89,9 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		'core/block-editor'
+	);
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -305,6 +312,7 @@ function GalleryEdit( props ) {
 		// linkTo attribute must be saved so blocks don't break when changing
 		// image_default_link_type in options.php
 		if ( ! linkTo ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				linkTo:
 					window?.wp?.media?.view?.settings?.defaultProps?.link ||
@@ -319,7 +327,6 @@ function GalleryEdit( props ) {
 		<MediaPlaceholder
 			addToGallery={ hasImages }
 			isAppender={ hasImages }
-			className={ className }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
 			labels={ {
@@ -337,8 +344,10 @@ function GalleryEdit( props ) {
 		/>
 	);
 
+	const blockProps = useBlockProps();
+
 	if ( ! hasImages ) {
-		return mediaPlaceholder;
+		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
@@ -393,6 +402,7 @@ function GalleryEdit( props ) {
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
 				onFocusGalleryCaption={ onFocusGalleryCaption }
+				blockProps={ blockProps }
 			/>
 		</>
 	);

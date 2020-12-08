@@ -26,6 +26,7 @@ export default function MenuItemsChoice( {
 				key={ item.value }
 				role="menuitemradio"
 				icon={ isSelected && check }
+				info={ item.info }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
 				className="components-menu-items-choice"

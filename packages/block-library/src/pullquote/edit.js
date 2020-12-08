@@ -124,6 +124,7 @@ function PullQuoteEdit( {
 								value: nextValue,
 							} )
 						}
+						aria-label={ __( 'Pullquote text' ) }
 						placeholder={
 							// translators: placeholder text used for the quote
 							__( 'Write quote…' )
@@ -134,6 +135,7 @@ function PullQuoteEdit( {
 						<RichText
 							identifier="citation"
 							value={ citation }
+							aria-label={ __( 'Pullquote citation text' ) }
 							placeholder={
 								// translators: placeholder text used for the citation
 								__( 'Write citation…' )

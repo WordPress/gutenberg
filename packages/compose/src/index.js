@@ -13,6 +13,7 @@ export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 
 // Hooks
+export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbing';
 export { default as useCopyOnClick } from './hooks/use-copy-on-click';
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as useInstanceId } from './hooks/use-instance-id';
@@ -25,3 +26,4 @@ export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useAsyncList } from './hooks/use-async-list';
 export { default as useWarnOnChange } from './hooks/use-warn-on-change';
 export { default as useDebounce } from './hooks/use-debounce';
+export { default as useThrottle } from './hooks/use-throttle';

@@ -15,12 +15,13 @@ export async function clickBlockToolbarButton( label, type = 'ariaLabel' ) {
 	let button;
 
 	if ( type === 'ariaLabel' ) {
-		const BUTTON_SELECTOR = `.${ BLOCK_TOOLBAR_SELECTOR } button[aria-label="${ label }"]`;
-		button = await page.waitForSelector( BUTTON_SELECTOR );
+		button = await page.waitForSelector(
+			`.${ BLOCK_TOOLBAR_SELECTOR } button[aria-label="${ label }"]`
+		);
 	}
 
 	if ( type === 'content' ) {
-		[ button ] = await page.$x(
+		button = await page.waitForXPath(
 			`//*[@class='${ BLOCK_TOOLBAR_SELECTOR }']//button[contains(text(), '${ label }')]`
 		);
 	}

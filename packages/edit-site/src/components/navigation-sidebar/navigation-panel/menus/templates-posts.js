@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -10,39 +15,45 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TemplateNavigationItems from '../template-navigation-items';
+import TemplateNavigationItem from '../template-navigation-item';
 import {
 	MENU_TEMPLATES,
 	MENU_TEMPLATES_POSTS,
 	TEMPLATES_POSTS,
 } from '../constants';
 
-export default function TemplatePostsMenu( { templates, onActivateItem } ) {
-	const generalTemplates = templates?.find( ( { slug } ) =>
-		TEMPLATES_POSTS.includes( slug )
-	);
-	const specificTemplates = templates?.filter( ( { slug } ) =>
-		slug.startsWith( 'post-' )
-	);
+export default function TemplatesPostsMenu( { templates } ) {
+	const generalTemplates =
+		templates?.filter( ( { slug } ) => TEMPLATES_POSTS.includes( slug ) ) ??
+		[];
+	const specificTemplates =
+		templates?.filter( ( { slug } ) => slug.startsWith( 'post-' ) ) ?? [];
 
 	return (
 		<NavigationMenu
 			menu={ MENU_TEMPLATES_POSTS }
 			title={ __( 'Posts' ) }
 			parentMenu={ MENU_TEMPLATES }
+			isEmpty={
+				generalTemplates.length === 0 && specificTemplates.length === 0
+			}
 		>
 			<NavigationGroup title={ _x( 'Specific', 'specific templates' ) }>
-				<TemplateNavigationItems
-					templates={ specificTemplates }
-					onActivateItem={ onActivateItem }
-				/>
+				{ map( specificTemplates, ( template ) => (
+					<TemplateNavigationItem
+						item={ template }
+						key={ `wp_template-${ template.id }` }
+					/>
+				) ) }
 			</NavigationGroup>
 
 			<NavigationGroup title={ _x( 'General', 'general templates' ) }>
-				<TemplateNavigationItems
-					templates={ generalTemplates }
-					onActivateItem={ onActivateItem }
-				/>
+				{ map( generalTemplates, ( template ) => (
+					<TemplateNavigationItem
+						item={ template }
+						key={ `wp_template-${ template.id }` }
+					/>
+				) ) }
 			</NavigationGroup>
 		</NavigationMenu>
 	);

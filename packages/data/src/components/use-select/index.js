@@ -13,6 +13,7 @@ import {
 	useCallback,
 	useEffect,
 	useReducer,
+	useMemo,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -53,7 +54,7 @@ const renderQueue = createQueue();
  *
  * @example
  * ```js
- * const { useSelect } = wp.data;
+ * import { useSelect } from '@wordpress/data';
  *
  * function HammerPriceDisplay( { currency } ) {
  *   const price = useSelect( ( select ) => {
@@ -94,6 +95,23 @@ export default function useSelect( _mapSelect, deps ) {
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
 
+	// Keep track of the stores being selected in the mapSelect function,
+	// and only subscribe to those stores later.
+	const listeningStores = useRef( [] );
+	const trapSelect = useCallback(
+		( callback ) =>
+			registry.__experimentalMarkListeningStores(
+				callback,
+				listeningStores
+			),
+		[ registry ]
+	);
+
+	// Generate a "flag" for used in the effect dependency array.
+	// It's different than just using `mapSelect` since deps could be undefined,
+	// in that case, we would still want to memoize it.
+	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
+
 	let mapOutput;
 
 	try {
@@ -101,7 +119,9 @@ export default function useSelect( _mapSelect, deps ) {
 			latestMapSelect.current !== mapSelect ||
 			latestMapOutputError.current
 		) {
-			mapOutput = mapSelect( registry.select, registry );
+			mapOutput = trapSelect( () =>
+				mapSelect( registry.select, registry )
+			);
 		} else {
 			mapOutput = latestMapOutput.current;
 		}
@@ -140,10 +160,10 @@ export default function useSelect( _mapSelect, deps ) {
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
-					const newMapOutput = latestMapSelect.current(
-						registry.select,
-						registry
+					const newMapOutput = trapSelect( () =>
+						latestMapSelect.current( registry.select, registry )
 					);
+
 					if (
 						isShallowEqual( latestMapOutput.current, newMapOutput )
 					) {
@@ -165,20 +185,24 @@ export default function useSelect( _mapSelect, deps ) {
 			onStoreChange();
 		}
 
-		const unsubscribe = registry.subscribe( () => {
+		const onChange = () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
 			} else {
 				onStoreChange();
 			}
-		} );
+		};
+
+		const unsubscribers = listeningStores.current.map( ( storeName ) =>
+			registry.__experimentalSubscribeStore( storeName, onChange )
+		);
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
-			unsubscribe();
+			unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry ] );
+	}, [ registry, trapSelect, depsChangedFlag ] );
 
 	return mapOutput;
 }

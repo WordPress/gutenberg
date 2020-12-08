@@ -36,3 +36,11 @@
 	margin-left: $block-edge-to-content;
 	margin-right: $block-edge-to-content;
 }
+
+.hasBackgroundAppender {
+	padding-bottom: $grid-unit-30;
+}
+
+.isLastInnerBlockSelected {
+	padding-bottom: 0;
+}

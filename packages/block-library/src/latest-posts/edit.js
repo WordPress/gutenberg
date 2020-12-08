@@ -400,7 +400,15 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		</InspectorControls>
 	);
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'wp-block-latest-posts__list': true,
+			'is-grid': postLayout === 'grid',
+			'has-dates': displayPostDate,
+			'has-author': displayAuthor,
+			[ `columns-${ columns }` ]: postLayout === 'grid',
+		} ),
+	} );
 
 	const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 	if ( ! hasPosts ) {
@@ -442,20 +450,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = __experimentalGetSettings().formats.date;
 
 	return (
-		<div { ...blockProps }>
+		<>
 			{ inspectorControls }
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
-			<ul
-				className={ classnames( {
-					'wp-block-latest-posts__list': true,
-					'is-grid': postLayout === 'grid',
-					'has-dates': displayPostDate,
-					'has-author': displayAuthor,
-					[ `columns-${ columns }` ]: postLayout === 'grid',
-				} ) }
-			>
+			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
 					const titleTrimmed = invoke( post, [
 						'title',
@@ -510,11 +510,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.join( ' ' ) }
 							{ /* translators: excerpt truncation character, default …  */ }
 							{ __( ' … ' ) }
-							<a
-								href={ post.link }
-								target="_blank"
-								rel="noopener noreferrer"
-							>
+							<a href={ post.link } rel="noopener noreferrer">
 								{ __( 'Read more' ) }
 							</a>
 						</>
@@ -529,7 +525,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									{ addLinkToFeaturedImage ? (
 										<a
 											href={ post.link }
-											target="_blank"
 											rel="noreferrer noopener"
 										>
 											{ featuredImage }
@@ -539,11 +534,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									) }
 								</div>
 							) }
-							<a
-								href={ post.link }
-								target="_blank"
-								rel="noreferrer noopener"
-							>
+							<a href={ post.link } rel="noreferrer noopener">
 								{ titleTrimmed ? (
 									<RawHTML>{ titleTrimmed }</RawHTML>
 								) : (
@@ -585,6 +576,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 				} ) }
 			</ul>
-		</div>
+		</>
 	);
 }

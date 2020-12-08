@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.24.0",
+	"version": "9.24.4",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,8 @@
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"!((src|build|build-module)/(components|utils)/**)"
+		"src/**/*.scss",
+		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
@@ -53,12 +54,11 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
-		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
-		"react-autosize-textarea": "^3.0.2",
+		"react-autosize-textarea": "^7.1.0",
 		"redux-optimist": "^1.0.0",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0"

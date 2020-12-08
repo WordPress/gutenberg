@@ -2,18 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
-import { Placeholder, Dropdown, Button } from '@wordpress/components';
+import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import TemplatePartSelection from '../selection';
 
-export default function TemplatePartPlaceholder( { setAttributes } ) {
+export default function TemplatePartPlaceholder( {
+	setAttributes,
+	innerBlocks,
+} ) {
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const onCreate = useCallback( async () => {
 		const title = 'Untitled Template Part';
@@ -25,15 +29,30 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				title,
 				status: 'publish',
 				slug,
-				meta: { theme: 'custom' },
+				content: serialize( innerBlocks ),
 			}
 		);
 		setAttributes( {
 			postId: templatePart.id,
 			slug: templatePart.slug,
-			theme: templatePart.meta.theme,
+			theme: templatePart.wp_theme_slug,
 		} );
 	}, [ setAttributes ] );
+
+	// If there are inner blocks present, the content for creation is clear.
+	// Therefore immediately create the template part with the given inner blocks as its content.
+	useEffect( () => {
+		if ( innerBlocks.length ) {
+			onCreate();
+		}
+	}, [] );
+	if ( innerBlocks.length ) {
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
+	}
 
 	return (
 		<Placeholder

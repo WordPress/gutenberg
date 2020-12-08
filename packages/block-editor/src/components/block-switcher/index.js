@@ -21,6 +21,7 @@ import {
 	switchToBlockType,
 	cloneBlock,
 	getBlockFromExample,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -238,7 +239,7 @@ export default compose(
 			getBlockRootClientId,
 			getInserterItems,
 		} = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
+		const { getBlockStyles } = select( blocksStore );
 		const rootClientId = getBlockRootClientId(
 			castArray( clientIds )[ 0 ]
 		);

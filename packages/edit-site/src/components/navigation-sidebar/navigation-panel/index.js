@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,11 +15,6 @@ import ContentNavigation from './content-navigation';
 import TemplatesNavigation from './templates-navigation';
 import { useSelect } from '@wordpress/data';
 import { MENU_ROOT } from './constants';
-
-export const {
-	Fill: NavigationPanelPreviewFill,
-	Slot: NavigationPanelPreviewSlot,
-} = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
 const NavigationPanel = ( { isOpen } ) => {
 	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
@@ -41,7 +35,9 @@ const NavigationPanel = ( { isOpen } ) => {
 	// from a separate component (such as document actions in the header).
 	const panelRef = useRef();
 	useEffect( () => {
-		panelRef.current.focus();
+		if ( isOpen ) {
+			panelRef.current.focus();
+		}
 	}, [ templatesActiveMenu ] );
 
 	return (
@@ -59,20 +55,19 @@ const NavigationPanel = ( { isOpen } ) => {
 					</div>
 				</div>
 
-				{ ( contentActiveMenu === MENU_ROOT ||
-					templatesActiveMenu !== MENU_ROOT ) && (
-					<TemplatesNavigation />
-				) }
-
-				{ ( templatesActiveMenu === MENU_ROOT ||
-					contentActiveMenu !== MENU_ROOT ) && (
-					<ContentNavigation
-						onActivateMenu={ setContentActiveMenu }
-					/>
-				) }
+				<div className="edit-site-navigation-panel__scroll-container">
+					{ ( contentActiveMenu === MENU_ROOT ||
+						templatesActiveMenu !== MENU_ROOT ) && (
+						<TemplatesNavigation />
+					) }
+					{ ( templatesActiveMenu === MENU_ROOT ||
+						contentActiveMenu !== MENU_ROOT ) && (
+						<ContentNavigation
+							onActivateMenu={ setContentActiveMenu }
+						/>
+					) }
+				</div>
 			</div>
-
-			<NavigationPanelPreviewSlot />
 		</div>
 	);
 };

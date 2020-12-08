@@ -10,12 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
 		( select ) => ( {
 			shortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
 			areAdvancedSettingsOpened:
 				select( 'core/edit-post' ).getActiveGeneralSidebarName() ===

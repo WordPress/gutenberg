@@ -12,6 +12,7 @@ gutenberg.zip
 phpcs.xml
 yarn.lock
 /wordpress
+/artifacts
 
 playground/dist
 .cache
@@ -22,3 +23,5 @@ test/native/junit.xml
 
 # Local overrides
 .wp-env.override.json
+phpunit.xml
+phpunit-watcher.yml
