@@ -1,0 +1,27 @@
+on:
+  release:
+    types: [released]
+
+name: Upload Gutenberg plugin to WordPress.org plugin repo
+
+jobs:
+  upload:
+    name: Upload Gutenberg Plugin
+    if: "!github.event.release.draft"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out WP.org plugin repo
+        env:
+          PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+        run: |
+          svn checkout "$PLUGIN_REPO_URL/trunk"
+          ls -al # Remove
+
+      - name: Download and unzip Gutenberg plugin asset
+        env:
+          PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+        run: |
+          curl -s -o gutenberg.zip $PLUGIN_URL
+          unzip gutenberg.zip
+          rm gutenberg.zip
+          ls -al # Remove
