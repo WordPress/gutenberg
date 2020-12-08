@@ -108,6 +108,9 @@ describe( 'withFocusReturn()', () => {
 
 			// Should return to the activeElement saved with this component.
 			unmount();
+			render( <div></div>, {
+				container,
+			} );
 			expect( document.activeElement ).toBe( activeElement );
 		} );
 

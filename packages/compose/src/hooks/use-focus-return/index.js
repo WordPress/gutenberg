@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * When opening modals/sidebars/dialogs, the focus
@@ -28,29 +28,43 @@ import { useRef, useEffect } from '@wordpress/element';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	const ref = useRef();
-
+	const previousNode = useRef();
+	const focusedBeforeMount = useRef();
+	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
-		const ownerDocument = ref.current.ownerDocument;
-		const focusedBeforeMount = ownerDocument.activeElement;
+		onFocusReturnRef.current = onFocusReturn;
+	}, [] );
 
-		return () => {
-			if ( ! ref.current.contains( ownerDocument.activeElement ) ) {
-				return;
-			}
-
+	const ref = useCallback( ( newNode ) => {
+		// Unmounting the reference
+		if (
+			previousNode.current &&
+			focusedBeforeMount.current &&
+			previousNode.current.ownerDocument.activeElement &&
+			previousNode.current.contains(
+				previousNode.current.ownerDocument.activeElement
+			)
+		) {
 			// Defer to the component's own explicit focus return behavior,
 			// if specified. This allows for support that the `onFocusReturn` decides to allow the
 			// default behavior to occur under some conditions.
-			if ( onFocusReturn ) {
-				onFocusReturn();
+			if ( onFocusReturnRef.current ) {
+				onFocusReturnRef.current();
 				return;
 			}
 
-			if ( ownerDocument.contains( focusedBeforeMount ) ) {
-				focusedBeforeMount.focus();
+			if (
+				previousNode.current.ownerDocument.contains(
+					focusedBeforeMount.current
+				)
+			) {
+				focusedBeforeMount.current.focus();
 			}
-		};
+		}
+
+		// Mounting the new reference
+		focusedBeforeMount.current = newNode?.ownerDocument.activeElement;
+		previousNode.current = newNode;
 	}, [] );
 
 	return ref;
