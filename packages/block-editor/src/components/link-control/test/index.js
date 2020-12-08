@@ -594,11 +594,12 @@ describe( 'Default search suggestions', () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
+		const searchInput = getURLInput();
+		searchInput.focus();
+
 		await eventLoopTick();
 
 		const searchResultElements = getSearchResults();
-
-		const searchInput = getURLInput();
 
 		// search input is set to the URL value
 		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
@@ -1372,6 +1373,7 @@ describe( 'Selecting links', () => {
 
 				// Search Input UI
 				const searchInput = getURLInput();
+				searchInput.focus();
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term

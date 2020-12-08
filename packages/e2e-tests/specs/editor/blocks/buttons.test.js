@@ -25,6 +25,11 @@ describe( 'Buttons', () => {
 		await insertBlock( 'Buttons' );
 		await pressKeyWithModifier( 'primary', 'k' );
 		await page.keyboard.press( 'Escape' );
+		await page.waitForFunction(
+			() =>
+				document.activeElement ===
+				document.querySelector( '.block-editor-rich-text__editable' )
+		);
 		await page.keyboard.type( 'WordPress' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
