@@ -24,6 +24,9 @@ describe( 'Buttons', () => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await insertBlock( 'Buttons' );
 		await pressKeyWithModifier( 'primary', 'k' );
+		await page.waitForFunction(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
+		);
 		await page.keyboard.press( 'Escape' );
 		await page.waitForFunction(
 			() =>
