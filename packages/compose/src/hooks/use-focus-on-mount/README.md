@@ -9,7 +9,7 @@ Hook used to focus the first tabbable element on mount.
 
 - Type: `Function`
 
-A function reference that must be passed to the DOM element where constrained tabbing should be enabled.
+A React ref that must be passed to the DOM element where the behavior should be attached.
 
 ## Usage
 
