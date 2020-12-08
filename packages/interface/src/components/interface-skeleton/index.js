@@ -87,15 +87,6 @@ function InterfaceSkeleton(
 				regionsClassName
 			) }
 		>
-			{ !! drawer && (
-				<div
-					className="interface-interface-skeleton__drawer"
-					role="region"
-					aria-label={ mergedLabels.drawer }
-				>
-					{ drawer }
-				</div>
-			) }
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && (
 					<div
@@ -108,6 +99,15 @@ function InterfaceSkeleton(
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
+					{ !! drawer && (
+						<div
+							className="interface-interface-skeleton__drawer"
+							role="region"
+							aria-label={ mergedLabels.drawer }
+						>
+							{ drawer }
+						</div>
+					) }
 					{ !! secondarySidebar && (
 						<div
 							className="interface-interface-skeleton__secondary-sidebar"

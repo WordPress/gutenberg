@@ -23,8 +23,12 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
+import NavigationToggle from '../navigation-sidebar/navigation-toggle';
 
-export default function Header( { openEntitiesSavedStates } ) {
+export default function Header( {
+	isNavigationOpen,
+	openEntitiesSavedStates,
+} ) {
 	const {
 		deviceType,
 		entityTitle,
@@ -75,73 +79,76 @@ export default function Header( { openEntitiesSavedStates } ) {
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
 	return (
-		<div className="edit-site-header">
-			<div className="edit-site-header_start">
-				<div className="edit-site-header__toolbar">
-					<Button
-						isPrimary
-						isPressed={ isInserterOpen }
-						className="edit-site-header-toolbar__inserter-toggle"
-						onClick={ () =>
-							setIsInserterOpened( ! isInserterOpen )
-						}
-						icon={ plus }
-						label={ _x(
-							'Add block',
-							'Generic label for block inserter button'
+		<>
+			<NavigationToggle isOpen={ isNavigationOpen } />
+			<div className="edit-site-header">
+				<div className="edit-site-header_start">
+					<div className="edit-site-header__toolbar">
+						<Button
+							isPrimary
+							isPressed={ isInserterOpen }
+							className="edit-site-header-toolbar__inserter-toggle"
+							onClick={ () =>
+								setIsInserterOpened( ! isInserterOpen )
+							}
+							icon={ plus }
+							label={ _x(
+								'Add block',
+								'Generic label for block inserter button'
+							) }
+						/>
+						{ isLargeViewport && (
+							<>
+								<ToolSelector />
+								<UndoButton />
+								<RedoButton />
+								<BlockNavigationDropdown />
+							</>
 						) }
-					/>
-					{ isLargeViewport && (
-						<>
-							<ToolSelector />
-							<UndoButton />
-							<RedoButton />
-							<BlockNavigationDropdown />
-						</>
+						{ displayBlockToolbar && (
+							<div className="edit-site-header-toolbar__block-toolbar">
+								<BlockToolbar hideDragHandle />
+							</div>
+						) }
+					</div>
+				</div>
+
+				<div className="edit-site-header_center">
+					{ 'wp_template' === templateType && (
+						<DocumentActions
+							entityTitle={ entityTitle }
+							entityLabel="template"
+						>
+							{ ( { onClose } ) => (
+								<TemplateDetails
+									template={ template }
+									onClose={ onClose }
+								/>
+							) }
+						</DocumentActions>
 					) }
-					{ displayBlockToolbar && (
-						<div className="edit-site-header-toolbar__block-toolbar">
-							<BlockToolbar hideDragHandle />
-						</div>
+					{ 'wp_template_part' === templateType && (
+						<DocumentActions
+							entityTitle={ entityTitle }
+							entityLabel="template part"
+						/>
 					) }
 				</div>
-			</div>
 
-			<div className="edit-site-header_center">
-				{ 'wp_template' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template"
-					>
-						{ ( { onClose } ) => (
-							<TemplateDetails
-								template={ template }
-								onClose={ onClose }
-							/>
-						) }
-					</DocumentActions>
-				) }
-				{ 'wp_template_part' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template part"
-					/>
-				) }
-			</div>
-
-			<div className="edit-site-header_end">
-				<div className="edit-site-header__actions">
-					<PreviewOptions
-						deviceType={ deviceType }
-						setDeviceType={ setPreviewDeviceType }
-					/>
-					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
-					/>
-					<PinnedItems.Slot scope="core/edit-site" />
-					<MoreMenu />
+				<div className="edit-site-header_end">
+					<div className="edit-site-header__actions">
+						<PreviewOptions
+							deviceType={ deviceType }
+							setDeviceType={ setPreviewDeviceType }
+						/>
+						<SaveButton
+							openEntitiesSavedStates={ openEntitiesSavedStates }
+						/>
+						<PinnedItems.Slot scope="core/edit-site" />
+						<MoreMenu />
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }

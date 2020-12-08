@@ -87,6 +87,9 @@ $z-layers: (
 	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
+	// Show the skeleton drawer above the skeleton header (because of top toolbar @ < medium viewports)
+	".interface-interface-skeleton__drawer": 31,
+
 	// Show interface skeleton footer above interface skeleton drawer
 	".interface-interface-skeleton__footer": 90,
 

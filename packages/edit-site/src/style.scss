@@ -50,6 +50,10 @@ body.toplevel_page_gutenberg-edit-site {
 		display: none;
 	}
 
+	.interface-interface-skeleton__header {
+		display: flex;
+	}
+
 	.interface-interface-skeleton__content {
 		background-color: $gray-400;
 	}

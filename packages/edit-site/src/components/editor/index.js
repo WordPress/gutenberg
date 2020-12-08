@@ -255,6 +255,9 @@ function Editor() {
 												}
 												header={
 													<Header
+														isNavigationOpen={
+															isNavigationOpen
+														}
 														openEntitiesSavedStates={
 															openEntitiesSavedStates
 														}

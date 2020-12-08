@@ -3,9 +3,8 @@
 	background: $gray-900;
 	border-radius: 0;
 	display: none;
-	position: absolute;
 	z-index: z-index(".edit-site-navigation-toggle");
-	height: $header-height + $border-width; // Cover header border
+	height: $header-height;
 	width: $header-height;
 
 	@include break-medium() {
@@ -23,6 +22,7 @@
 	color: $white;
 	height: $header-height + $border-width; // Cover header border
 	width: $header-height;
+	border-radius: 0;
 	z-index: 1;
 
 	&.has-icon {

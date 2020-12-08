@@ -8,7 +8,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import NavigationPanel from './navigation-panel';
-import NavigationToggle from './navigation-toggle';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -22,7 +21,6 @@ export default function NavigationSidebar() {
 
 	return (
 		<>
-			<NavigationToggle isOpen={ isNavigationOpen } />
 			<NavigationPanel isOpen={ isNavigationOpen } />
 			<NavigationPanelPreviewSlot />
 		</>

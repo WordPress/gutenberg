@@ -54,19 +54,16 @@ const NavigationPanel = ( { isOpen } ) => {
 						{ siteTitle }
 					</div>
 				</div>
-
-				<div className="edit-site-navigation-panel__scroll-container">
-					{ ( contentActiveMenu === MENU_ROOT ||
-						templatesActiveMenu !== MENU_ROOT ) && (
-						<TemplatesNavigation />
-					) }
-					{ ( templatesActiveMenu === MENU_ROOT ||
-						contentActiveMenu !== MENU_ROOT ) && (
-						<ContentNavigation
-							onActivateMenu={ setContentActiveMenu }
-						/>
-					) }
-				</div>
+				{ ( contentActiveMenu === MENU_ROOT ||
+					templatesActiveMenu !== MENU_ROOT ) && (
+					<TemplatesNavigation />
+				) }
+				{ ( templatesActiveMenu === MENU_ROOT ||
+					contentActiveMenu !== MENU_ROOT ) && (
+					<ContentNavigation
+						onActivateMenu={ setContentActiveMenu }
+					/>
+				) }
 			</div>
 		</div>
 	);

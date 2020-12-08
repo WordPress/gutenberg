@@ -64,6 +64,10 @@ html.interface-interface-skeleton__html-container {
 	overscroll-behavior-y: none;
 }
 
+.interface-interface-skeleton__drawer {
+	z-index: z-index(".interface-interface-skeleton__drawer");
+}
+
 .interface-interface-skeleton__content {
 	flex-grow: 1;
 

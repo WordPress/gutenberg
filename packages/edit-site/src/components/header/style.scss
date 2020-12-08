@@ -1,4 +1,5 @@
 .edit-site-header {
+	position: relative;
 	align-items: center;
 	background-color: $white;
 	display: flex;
@@ -6,16 +7,6 @@
 	box-sizing: border-box;
 	width: 100%;
 	justify-content: space-between;
-
-	@include break-medium() {
-		body.is-fullscreen-mode & {
-			padding-left: 60px;
-			transition: padding-left 20ms linear;
-			transition-delay: 80ms;
-			@include reduce-motion("transition");
-		}
-
-	}
 
 	.edit-site-header_start,
 	.edit-site-header_end {
@@ -35,28 +26,6 @@
 
 	.edit-site-header_end {
 		justify-content: flex-end;
-	}
-}
-
-// Keeps the document title centered when the sidebar is open
-body.is-navigation-sidebar-open {
-	.edit-site-header {
-		padding-left: 0;
-		transition: padding-left 20ms linear;
-		transition-delay: 0ms;
-	}
-}
-
-// Centred document title on small screens with sidebar open
-@media ( max-width: #{ ($break-large - 1) } ) {
-	body.is-navigation-sidebar-open .edit-site-header {
-		.edit-site-header-toolbar__inserter-toggle ~ .components-button,
-		.edit-site-header_end .components-button:not(.is-primary) {
-			display: none;
-		}
-		.edit-site-save-button__button {
-			margin-right: 0;
-		}
 	}
 }
 
@@ -181,6 +150,12 @@ body.is-navigation-sidebar-open {
 			display: block;
 			right: $sidebar-width;
 		}
+	}
+
+	// Keep toolbar on viewport edge at medium to wide breakpoints
+	@media (min-width: #{ $break-medium }) and (max-width: #{ $break-wide - 1 }) {
+		// the Navigation toggle is as wide as the header height
+		left: - $header-height;
 	}
 
 	// Move toolbar into top Editor Bar.
