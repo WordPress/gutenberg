@@ -76,8 +76,7 @@ export default function PostSavedState( {
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
-					getCurrentPost()?.[ '_links' ]?.[ 'wp:action-publish' ] ??
-					false,
+					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 			};
 		},
 		[ forceIsDirty, forceIsSaving ]

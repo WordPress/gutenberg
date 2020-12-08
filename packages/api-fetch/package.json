@@ -23,7 +23,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
+		"@babel/runtime": "^7.12.5",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url"
 	},
