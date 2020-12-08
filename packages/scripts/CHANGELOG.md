@@ -6,6 +6,7 @@
 
 -   Autoformat TypeScript files (`*.ts` and `*.tsx`) in `format-js` script (#27138)[https://github.com/WordPress/gutenberg/pull/27138].
 -   The bundled `wp-prettier` dependency has been upgraded from `2.0.5` to `2.2.1`.
+-   The bundled Babel dependency has been upgraded from `7.11` to `7.12`.
 
 ### Internal
 
