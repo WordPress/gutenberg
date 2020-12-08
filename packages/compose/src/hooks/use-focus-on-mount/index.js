@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useCallback } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Hook used to focus the first tabbable element on mount.
@@ -26,37 +26,48 @@ import { useCallback } from '@wordpress/element';
  * ```
  */
 function useFocusOnMount( focusOnMount = 'firstElement' ) {
+	const focusOnMountRef = useRef( focusOnMount );
+	useEffect( () => {
+		focusOnMountRef.current = focusOnMount;
+	}, [ focusOnMount ] );
+
+	// Ideally we should be using a function ref (useCallback)
+	// Right now we have some issues where the link popover remounts
+	// prevents us from doing that.
+	// The downside of the current implementation is that it doesn't update if the "ref" changes.
+	const ref = useRef();
+
 	// Focus handling
-	const ref = useCallback( ( node ) => {
-		if ( ! node ) {
-			return;
-		}
+	useEffect( () => {
 		/*
 		 * Without the setTimeout, the dom node is not being focused. Related:
 		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
 		 *
 		 * TODO: Treat the cause, not the symptom.
 		 */
-		setTimeout( () => {
-			if ( focusOnMount === 'firstElement' ) {
-				// Find first tabbable node within content and shift focus, falling
-				// back to the popover panel itself.
-				const firstTabbable = focus.tabbable.find( node )[ 0 ];
+		const focusTimeout = setTimeout( () => {
+			if ( ! focusOnMountRef.current || ! ref.current ) {
+				return;
+			}
+
+			if ( focusOnMountRef.current === 'firstElement' ) {
+				const firstTabbable = focus.tabbable.find( ref.current )[ 0 ];
+
 				if ( firstTabbable ) {
 					firstTabbable.focus();
 				} else {
-					node.focus();
+					ref.current.focus();
 				}
 
 				return;
 			}
 
-			if ( focusOnMount === 'container' ) {
-				// Focus the popover panel itself so items in the popover are easily
-				// accessed via keyboard navigation.
-				node.focus();
+			if ( focusOnMountRef.current === 'container' ) {
+				ref.current.focus();
 			}
 		}, 0 );
+
+		return () => clearTimeout( focusTimeout );
 	}, [] );
 
 	return ref;
