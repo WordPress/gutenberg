@@ -37,7 +37,7 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const blockEditorStore = createReduxStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );

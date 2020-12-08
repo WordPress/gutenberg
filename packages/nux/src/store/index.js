@@ -19,7 +19,7 @@ const STORE_NAME = 'core/nux';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const nuxStore = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,

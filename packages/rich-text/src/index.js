@@ -1,4 +1,4 @@
-export { store } from './store';
+export { richTextStore } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';

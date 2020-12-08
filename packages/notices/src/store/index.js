@@ -19,10 +19,10 @@ const STORE_NAME = 'core/notices';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const noticesStore = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
 } );
 
-register( store );
+register( noticesStore );

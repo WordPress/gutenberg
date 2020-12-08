@@ -5,5 +5,5 @@ import '@wordpress/block-editor';
 import '@wordpress/core-data';
 import '@wordpress/notices';
 
-export { store } from './store';
+export { reusableBlocksStore } from './store';
 export * from './components';

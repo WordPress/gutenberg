@@ -27,7 +27,7 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const editPostStore = createReduxStore( STORE_NAME, storeConfig );
 
 // Ideally we use register instead of register store.
 registerStore( STORE_NAME, storeConfig );

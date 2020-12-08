@@ -40,6 +40,6 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const blockDirectoryStore = createReduxStore( STORE_NAME, storeConfig );
 
-register( store );
+register( blockDirectoryStore );

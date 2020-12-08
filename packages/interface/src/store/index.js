@@ -18,7 +18,7 @@ import { STORE_NAME } from './constants';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const interfaceStore = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,

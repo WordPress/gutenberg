@@ -1,2 +1,2 @@
-export { store } from './store';
+export { interfaceStore } from './store';
 export * from './components';

@@ -19,10 +19,10 @@ const STORE_NAME = 'core/keyboard-shortcuts';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const keyboardShortcutsStore = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
 } );
 
-register( store );
+register( keyboardShortcutsStore );

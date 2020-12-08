@@ -130,6 +130,18 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="blockEditorStore" href="#blockEditorStore">#</a> **blockEditorStore**
+
+Store definition for the block editor namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
+
 <a name="BlockFormatControls" href="#BlockFormatControls">#</a> **BlockFormatControls**
 
 Undocumented declaration.
@@ -503,18 +515,6 @@ _Properties_
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
 Undocumented declaration.
-
-<a name="store" href="#store">#</a> **store**
-
-Store definition for the block editor namespace.
-
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
-
-_Type_
-
--   `Object` 
 
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
