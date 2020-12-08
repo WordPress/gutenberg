@@ -132,6 +132,31 @@ _Returns_
 
 -   `Array`: Async array.
 
+<a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
+
+In Dialogs/modals, the tabbing must be constrained to the content of
+the wrapper element. This hook adds the behavior to the returned ref.
+
+_Usage_
+
+```js
+import { useConstrainedTabbing } from '@wordpress/compose';
+
+const ConstrainedTabbingExample = () => {
+    const constrainedTabbingRef = useConstrainedTabbing()
+    return (
+        <div ref={ constrainedTabbingRef }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
 Copies the text to the clipboard when the element is clicked.

@@ -242,7 +242,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					}
 				/>
 			) }
-			{ imageFill && mediaUrl && (
+			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
 					label={ __( 'Focal point picker' ) }
 					url={ mediaUrl }

@@ -6369,7 +6369,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 * `is_gutenberg_page` incorrectly assumes `get_current_screen` exists, add check.
 * Brings code inline with CSS standards by switching font weight to numeric values.
 * Wrapped component would not the most up-to-date store values if it incurred a store state change during its own mount (e.g. dispatching during its own constructor), resolved by rerunning selection.
-* Display an error message if Javascript is disabled.
+* Display an error message if JavaScript is disabled.
 * Update to React 16.6.3.
 * Adds missing components dependency for RichText.
 * Refactors list block to remove previously exposed RichText/TinyMCE logic.

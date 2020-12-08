@@ -78,10 +78,8 @@ export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
-export {
-	Block as __experimentalBlock,
-	useBlockProps,
-} from './block-list/block-wrapper';
+export { useBlockProps } from './block-list/use-block-props';
+export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';
 export {

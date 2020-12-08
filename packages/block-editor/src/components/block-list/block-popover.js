@@ -27,7 +27,7 @@ import { getScrollContainer } from '@wordpress/dom';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
-import { BlockNodes } from './root-container';
+import { BlockNodes } from './';
 import { getBlockDOMNode } from '../../utils/dom';
 
 function selector( select ) {
@@ -229,6 +229,7 @@ function BlockPopover( {
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
+					blockElement={ node }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
