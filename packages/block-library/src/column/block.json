@@ -14,7 +14,7 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
-    },
+    	},
 		"templateLock": {
 			"type": "string"
 		}
