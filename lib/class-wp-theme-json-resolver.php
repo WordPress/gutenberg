@@ -236,7 +236,7 @@ class WP_Theme_JSON_Resolver {
 	 */
 	private function get_theme_origin( $theme_support_data = array() ) {
 		$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
-		self::apply_theme_json_translations( $theme_json_data, wp_get_theme()->get_stylesheet() );
+		self::apply_theme_json_translations( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 
 		/*
 		 * We want the presets and settings declared in theme.json
