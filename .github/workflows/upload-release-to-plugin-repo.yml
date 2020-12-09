@@ -14,6 +14,12 @@ jobs:
           PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
         run: svn checkout "$PLUGIN_REPO_URL/trunk"
 
+      - name: Get previous stable tag
+        id: get_previous_stable_tag
+        env:
+          STABLE_TAG_REGEX: 'Stable tag: [0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+        run: echo ::set-output name=stable_tag::$(grep "$STABLE_TAG_REGEX" readme.txt)
+
       - name: Delete everything
         run: find ./trunk -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +
 
@@ -24,3 +30,9 @@ jobs:
           curl -L -o gutenberg.zip $PLUGIN_URL
           unzip gutenberg.zip -d trunk
           rm gutenberg.zip
+
+      - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
+        env:
+          STABLE_TAG_PLACEHOLDER: 'Stable tag: [0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+          STABLE_TAG: ${{ steps.get_previous_stable_tag.outputs.stable_tag }}
+        run: sed -i "s/${STABLE_TAG_PLACEHOLDER}/${version}/g" readme.txt
