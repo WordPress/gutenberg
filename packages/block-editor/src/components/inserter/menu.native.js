@@ -7,6 +7,7 @@ import {
 	TouchableHighlight,
 	TouchableWithoutFeedback,
 	Dimensions,
+	Platform,
 } from 'react-native';
 import { pick } from 'lodash';
 
@@ -33,6 +34,7 @@ import {
 import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
+const isIOS = Platform.OS === 'ios';
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -107,6 +109,8 @@ export class InserterMenu extends Component {
 		// re-insert default block
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock();
+		}
+		if ( isIOS ) {
 			onDismiss();
 		}
 		hideInsertionPoint();
@@ -138,8 +142,9 @@ export class InserterMenu extends Component {
 				maxWidth={ maxWidth }
 				onSelect={ () => {
 					onSelect( item );
-					onDismiss();
-
+					if ( isIOS ) {
+						onDismiss();
+					}
 					this.onHideBottomSheet();
 				} }
 			/>
