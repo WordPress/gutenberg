@@ -9,7 +9,6 @@ import { difference } from 'lodash';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { plugins } from '@wordpress/icons';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	difference( selected, allowed ).length === 0;
@@ -102,7 +101,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
-					icon={ icon || plugins }
+					icon={ icon }
 					label={ small ? label : undefined }
 					role={ role }
 				>
