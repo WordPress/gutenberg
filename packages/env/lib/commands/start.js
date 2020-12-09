@@ -48,7 +48,12 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
-	const config = await initConfig( { spinner, debug, xdebug } );
+	const config = await initConfig( {
+		spinner,
+		debug,
+		xdebug,
+		writeChanges: true,
+	} );
 
 	if ( ! config.detectedLocalConfig ) {
 		const { configDirectoryPath } = config;

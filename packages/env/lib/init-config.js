@@ -2,7 +2,8 @@
  * External dependencies
  */
 const path = require( 'path' );
-const fs = require( 'fs' ).promises;
+const { writeFile, mkdir } = require( 'fs' ).promises;
+const { existsSync } = require( 'fs' );
 const yaml = require( 'js-yaml' );
 const os = require( 'os' );
 
@@ -21,35 +22,27 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
  *
  * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
- * @param {string}  options.xdebug  The Xdebug mode to set. Defaults to "off".
+ * @param {Object}  options.spinner      A CLI spinner which indicates progress.
+ * @param {boolean} options.debug        True if debug mode is enabled.
+ * @param {string}  options.xdebug       The Xdebug mode to set. Defaults to "off".
+ * @param {boolean} options.writeChanges If true, writes the parsed config to the
+ *                                       required docker files like docker-compose
+ *                                       and Dockerfile. By default, this is false
+ *                                       and only the `start` command writes any
+ *                                       changes.
  * @return {WPConfig} The-env config object.
  */
 module.exports = async function initConfig( {
 	spinner,
 	debug,
 	xdebug = 'off',
+	writeChanges = false,
 } ) {
 	const configPath = path.resolve( '.wp-env.json' );
 	const config = await readConfig( configPath );
 	config.debug = debug;
 
-	await fs.mkdir( config.workDirectoryPath, { recursive: true } );
-
 	const dockerComposeConfig = buildDockerComposeConfig( config );
-	await fs.writeFile(
-		config.dockerComposeConfigPath,
-		yaml.dump( dockerComposeConfig )
-	);
-
-	await fs.writeFile(
-		path.resolve( config.workDirectoryPath, 'Dockerfile' ),
-		dockerFileContents(
-			dockerComposeConfig.services.wordpress.image,
-			xdebug
-		)
-	);
 
 	if ( config.debug ) {
 		spinner.info(
@@ -64,6 +57,35 @@ module.exports = async function initConfig( {
 			) }`
 		);
 		spinner.start();
+	}
+
+	/**
+	 * We avoid writing changes most of the time so that we can better pass params
+	 * to the start command. For example, say you start wp-env with Xdebug enabled.
+	 * If you then run another command, like opening bash in the wp instance, it
+	 * would turn off Xdebug in the Dockerfile because it wouldn't have the --xdebug
+	 * arg. This basically makes it such that wp-env start is the only command
+	 * which updates any of the Docker configuration.
+	 */
+	if ( writeChanges ) {
+		await mkdir( config.workDirectoryPath, { recursive: true } );
+
+		await writeFile(
+			config.dockerComposeConfigPath,
+			yaml.dump( dockerComposeConfig )
+		);
+
+		await writeFile(
+			path.resolve( config.workDirectoryPath, 'Dockerfile' ),
+			dockerFileContents(
+				dockerComposeConfig.services.wordpress.image,
+				xdebug
+			)
+		);
+	} else if ( ! existsSync( config.workDirectoryPath ) ) {
+		throw new Error(
+			'wp-env has not yet been initalized. Please run `wp-env start` to initalize the WordPress instance before using any other commands.'
+		);
 	}
 
 	return config;
