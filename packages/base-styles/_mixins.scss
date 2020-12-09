@@ -367,14 +367,18 @@
 	}
 
 	&:checked::before {
-		width: 50%;
-		height: 50%;
-		transform: translate(50%, 50%);
+		width: 8px;
+		height: 8px;
+		transform: translate(7px, 7px);
 		margin: 0;
 		background-color: $white;
 
 		// This border serves as a background color in Windows High Contrast mode.
-		border: 3px solid $white;
+		border: 4px solid $white;
+
+		@include break-small() {
+			transform: translate(5px, 5px);
+		}
 	}
 
 	&:focus {
