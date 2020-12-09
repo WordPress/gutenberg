@@ -29,9 +29,10 @@ class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
 			'/' . $this->rest_base,
 			array(
 				array(
-					'methods'  => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_items' ),
-					'args'     => $this->get_collection_params(),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'args'                => $this->get_collection_params(),
+					'permission_callback' => '__return_true',
 				),
 			)
 		);
@@ -47,9 +48,10 @@ class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
 					),
 				),
 				array(
-					'methods'  => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_item' ),
-					'args'     => $this->get_item_params(),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'args'                => $this->get_item_params(),
+					'permission_callback' => '__return_true',
 				),
 			)
 		);
