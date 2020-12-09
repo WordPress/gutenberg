@@ -5,7 +5,7 @@ about: Report a bug with the WordPress block editor or Gutenberg plugin
 ---
 
 <!--
-Please fill out ALL sections. Bug reports with missing information will be
+Please fill out ALL required sections. Bug reports with missing information will be
 closed.
 
 Before submitting a bug report:
