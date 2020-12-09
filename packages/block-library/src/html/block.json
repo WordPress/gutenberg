@@ -10,7 +10,7 @@
 	},
 	"supports": {
 		"customClassName": false,
-		"className": false,
+		"className": true,
 		"html": false
 	},
 	"editorStyle": "wp-block-html-editor"
