@@ -72,7 +72,7 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Processes a tree from i18n-theme.json into a liner array
+	 * Processes a tree from i18n-theme.json into a linear array
 	 * containing the a translatable path from theme.json and an array
 	 * of properties that are translatable.
 	 *
