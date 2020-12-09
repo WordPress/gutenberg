@@ -129,12 +129,6 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 
 *Optional.* If this property is added, a label will be generated using label property as the content.
 
-### `autoFocus: Boolean`
-
-*Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
-
-If you are not conditionally rendering this component set this property to `false`.
-
 ### `className: String`
 
 *Optional.* Adds and optional class to the parent `div` that wraps the URLInput field and popover
