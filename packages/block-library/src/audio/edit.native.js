@@ -109,7 +109,7 @@ function AudioEdit( {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Edit audio' ) }
+						title={ __( 'Replace audio' ) }
 						icon={ replace }
 						onClick={ open }
 					/>
