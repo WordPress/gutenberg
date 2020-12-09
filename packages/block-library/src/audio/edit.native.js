@@ -65,14 +65,6 @@ function AudioEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	function getAutoplayHelp( checked ) {
-		return checked
-			? __(
-					'Note: Autoplaying audio may cause usability issues for some visitors.'
-			  )
-			: null;
-	}
-
 	// const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
@@ -168,7 +160,6 @@ function AudioEdit( {
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
 						checked={ autoplay }
-						help={ getAutoplayHelp }
 					/>
 					<ToggleControl
 						label={ __( 'Loop' ) }
