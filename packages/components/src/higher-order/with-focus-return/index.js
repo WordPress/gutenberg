@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent, useFocusReturn } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns true if the given object is component-like. An object is component-
@@ -51,4 +52,11 @@ export default createHigherOrderComponent( ( options ) => {
 	return HoC( options );
 }, 'withFocusReturn' );
 
-export const Provider = ( { children } ) => children;
+export const Provider = ( { children } ) => {
+	deprecated( 'wp.components.FocusReturnProvider component', {
+		hint:
+			'This provider is not used anymore. You can just remove it from your codebase',
+	} );
+
+	return children;
+};

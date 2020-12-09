@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withFocusReturn, { Provider } from '../';
+import withFocusReturn from '../';
 
 class Test extends Component {
 	render() {
@@ -70,16 +70,11 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
-			const { unmount } = render(
-				<Provider>
-					<Composite />
-				</Provider>,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
+			const { unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			// Change activeElement.
 			switchFocusTo.focus();
@@ -91,16 +86,11 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should switch focus back when unmounted while having focus', () => {
-			const { container, unmount } = render(
-				<Provider>
-					<Composite />
-				</Provider>,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
+			const { container, unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			const textarea = container.querySelector( 'textarea' );
 			textarea.focus();
