@@ -6,6 +6,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useCopyOnClick, compose, ifCondition } from '@wordpress/compose';
 import { useRef, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 function CopyContentMenuItem( { createNotice, editedPostContent } ) {
 	const ref = useRef();

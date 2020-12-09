@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { SnackbarList } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 
 export default function Notices() {
 	const notices = useSelect(

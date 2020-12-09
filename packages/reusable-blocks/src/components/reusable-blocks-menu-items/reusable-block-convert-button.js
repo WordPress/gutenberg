@@ -8,6 +8,7 @@ import { MenuItem } from '@wordpress/components';
 import { reusableBlock } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies

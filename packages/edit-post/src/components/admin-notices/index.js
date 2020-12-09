@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Mapping of server-supported notice class names to an equivalent notices

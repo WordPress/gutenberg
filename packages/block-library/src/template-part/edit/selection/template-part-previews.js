@@ -9,6 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * External dependencies

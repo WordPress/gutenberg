@@ -20,6 +20,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies

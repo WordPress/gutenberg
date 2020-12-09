@@ -9,6 +9,7 @@ import { filter } from 'lodash';
 import { NoticeList, SnackbarList } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies

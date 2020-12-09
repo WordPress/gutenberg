@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 export default function useMenuNotifications( menuId ) {
 	const { lastSaveError, lastDeleteError } = useSelect(

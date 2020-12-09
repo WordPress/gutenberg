@@ -8,6 +8,7 @@ import { invert } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch as dataDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies

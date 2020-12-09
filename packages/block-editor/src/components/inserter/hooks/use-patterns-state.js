@@ -10,6 +10,7 @@ import { useCallback } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Retrieves the block patterns inserter state.

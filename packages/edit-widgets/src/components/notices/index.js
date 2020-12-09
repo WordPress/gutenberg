@@ -8,6 +8,7 @@ import { filter } from 'lodash';
  */
 import { SnackbarList } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 function Notices() {
 	const { notices } = useSelect( ( select ) => {
