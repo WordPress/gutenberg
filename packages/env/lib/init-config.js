@@ -42,6 +42,11 @@ module.exports = async function initConfig( {
 	const config = await readConfig( configPath );
 	config.debug = debug;
 
+	// Adding these to the config allows the start config to understand that the
+	// config has changed when only the xdebug param has changed. This is needed
+	// so that Docker will rebuild the image whenever the xdebug flag changes.
+	config.xdebug = xdebug;
+
 	const dockerComposeConfig = buildDockerComposeConfig( config );
 
 	if ( config.debug ) {
