@@ -40,6 +40,18 @@ _Returns_
 
 -   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
 
+<a name="changeSiteTimezone" href="#changeSiteTimezone">#</a> **changeSiteTimezone**
+
+Visits general settings page and changes the timezone to the given value.
+
+_Parameters_
+
+-   _timezone_ `string`: Value of the timezone to set.
+
+_Returns_
+
+-   `string`: Value of the previous timezone.
+
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
 Clears the local storage.

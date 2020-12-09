@@ -170,7 +170,7 @@ function NavigationLinkEdit( {
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
-	// This can't be done in the useState call because it cconflicts
+	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
 		if ( ! url ) {
