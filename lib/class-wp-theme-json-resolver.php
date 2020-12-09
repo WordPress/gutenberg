@@ -81,7 +81,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array An array of arrays each one containing a translatable path and an array of properties that are translatable.
 	 */
-	private static function theme_json_i18_file_structure_to_paths( $file_structure_partial, $current_path = array() ) {
+	private static function theme_json_i18_file_structure_to_preset_paths( $file_structure_partial, $current_path = array() ) {
 		$result = array();
 		foreach ( $file_structure_partial as $property => $partial_child ) {
 			if ( is_numeric( $property ) ) {
@@ -94,7 +94,7 @@ class WP_Theme_JSON_Resolver {
 			}
 			$result = array_merge(
 				$result,
-				self::theme_json_i18_file_structure_to_paths( $partial_child, array_merge( $current_path, array( $property ) ) )
+				self::theme_json_i18_file_structure_to_preset_paths( $partial_child, array_merge( $current_path, array( $property ) ) )
 			);
 		}
 		return $result;
@@ -105,11 +105,11 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
 	 */
-	private static function get_theme_json_i18n() {
+	private static function get_presets_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
-			$theme_json_i18n = self::theme_json_i18_file_structure_to_paths( $file_structure );
+			$theme_json_i18n = self::theme_json_i18_file_structure_to_preset_paths( $file_structure );
 
 		}
 		return $theme_json_i18n;
@@ -122,17 +122,16 @@ class WP_Theme_JSON_Resolver {
 	 * @param string $domain               Optional. Text domain. Unique identifier for retrieving translated strings.
 	 *                                     Default 'default'.
 	 */
-	private static function apply_theme_json_translations( &$theme_json_structure, $domain = 'default' ) {
-		$theme_json_i18n = self::get_theme_json_i18n();
+	private static function translate_presets( &$theme_json_structure, $domain = 'default' ) {
+		$preset_to_translate = self::get_presets_to_translate();
 		foreach ( $theme_json_structure as &$context_value ) {
-			if ( empty( $context_value ) || empty( $context_value['settings'] ) ) {
+			if ( empty( $context_value ) ) {
 				continue;
 			}
-			$settings = &$context_value['settings'];
-			foreach ( $theme_json_i18n as $theme_json_i18n_value ) {
-				$path               = $theme_json_i18n_value['path'];
-				$translatable_keys  = $theme_json_i18n_value['translatable_keys'];
-				$array_to_translate = gutenberg_experimental_get( $settings, $path, null );
+			foreach ( $preset_to_translate as $preset ) {
+				$path               = $preset['path'];
+				$translatable_keys  = $preset['translatable_keys'];
+				$array_to_translate = gutenberg_experimental_get( $context_value, $path, null );
 				if ( null === $array_to_translate ) {
 					continue;
 				}
@@ -146,7 +145,7 @@ class WP_Theme_JSON_Resolver {
 						// phpcs:enable
 					}
 				}
-				gutenberg_experimental_set( $settings, $path, $array_to_translate );
+				gutenberg_experimental_set( $context_value, $path, $array_to_translate );
 			}
 		}
 	}
@@ -162,7 +161,7 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$config = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
-		self::apply_theme_json_translations( $config );
+		self::translate_presets( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
 		$default_colors_i18n = array(
@@ -236,7 +235,7 @@ class WP_Theme_JSON_Resolver {
 	 */
 	private function get_theme_origin( $theme_support_data = array() ) {
 		$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
-		self::apply_theme_json_translations( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+		self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 
 		/*
 		 * We want the presets and settings declared in theme.json
