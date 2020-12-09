@@ -21,6 +21,6 @@ jobs:
           PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
         run: |
           curl -L -o gutenberg.zip $PLUGIN_URL
-          unzip gutenberg.zip
+          unzip gutenberg.zip -d gutenberg
           rm gutenberg.zip
           ls -al # Remove
