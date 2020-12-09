@@ -94,6 +94,7 @@ exports[`File block renders file error state without crashing 1`] = `
           textAlign="left"
           triggerKeyCodes={Array []}
         />
+        Modal
       </View>
       <View>
         Svg
@@ -186,6 +187,7 @@ exports[`File block renders file error state without crashing 1`] = `
           textAlign="center"
           triggerKeyCodes={Array []}
         />
+        Modal
       </View>
     </View>
   </View>
@@ -286,6 +288,7 @@ exports[`File block renders file without crashing 1`] = `
           textAlign="left"
           triggerKeyCodes={Array []}
         />
+        Modal
       </View>
     </View>
     <View
@@ -360,6 +363,7 @@ exports[`File block renders file without crashing 1`] = `
           textAlign="center"
           triggerKeyCodes={Array []}
         />
+        Modal
       </View>
     </View>
   </View>
