@@ -101,7 +101,9 @@ function EditorProvider( {
 
 	// Synchronize the template as it changes
 	useEffect( () => {
-		__unstableSetupTemplate( __unstableTemplate );
+		if ( __unstableTemplate ) {
+			__unstableSetupTemplate( __unstableTemplate );
+		}
 	}, [ __unstableTemplate ] );
 
 	if ( ! isReady ) {
