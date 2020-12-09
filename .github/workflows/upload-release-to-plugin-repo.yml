@@ -7,7 +7,6 @@ name: Upload Gutenberg plugin to WordPress.org plugin repo
 jobs:
   upload:
     name: Upload Gutenberg Plugin
-    if: "!github.event.release.draft"
     runs-on: ubuntu-latest
     steps:
       - name: Check out WP.org plugin repo
