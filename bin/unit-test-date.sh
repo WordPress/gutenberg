@@ -22,5 +22,8 @@ for i in "${!pids[@]}"; do
     pid=${pids[i]}
     timezone=${pidsTimezones[i]}
     locale=${pidsLocales[i]}
-    wait "$pid" || echo "Date tests failed with timezone = $timezone and locale = $locale"
+    wait "$pid" || (
+        echo "Date tests failed with timezone = $timezone and locale = $locale"
+        exit 1
+    )
 done
