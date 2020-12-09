@@ -97,11 +97,23 @@ export class InserterMenu extends Component {
 	}
 
 	onClose() {
+		const {
+			shouldReplaceBlock,
+			insertDefaultBlock,
+			onDismiss,
+			hideInsertionPoint,
+		} = this.props;
 		// if should replace but didn't insert any block
 		// re-insert default block
-		if ( this.props.shouldReplaceBlock ) {
-			this.props.insertDefaultBlock();
+		if ( shouldReplaceBlock ) {
+			insertDefaultBlock();
+			onDismiss();
 		}
+		hideInsertionPoint();
+		this.onHideBottomSheet();
+	}
+
+	onHideBottomSheet() {
 		this.setState( { isVisible: false } );
 	}
 
@@ -118,7 +130,7 @@ export class InserterMenu extends Component {
 
 	renderItem( { item } ) {
 		const { itemWidth, maxWidth } = this.state;
-		const { onSelect } = this.props;
+		const { onSelect, onDismiss } = this.props;
 		return (
 			<InserterButton
 				item={ item }
@@ -126,22 +138,23 @@ export class InserterMenu extends Component {
 				maxWidth={ maxWidth }
 				onSelect={ () => {
 					onSelect( item );
+					onDismiss();
 
-					this.setState( { isVisible: false } );
+					this.onHideBottomSheet();
 				} }
 			/>
 		);
 	}
 
 	render() {
-		const { items } = this.props;
+		const { items, onDismiss } = this.props;
 		const { numberOfColumns, isVisible } = this.state;
 
 		return (
 			<BottomSheet
 				isVisible={ isVisible }
 				onClose={ this.onClose }
-				onModalHide={ this.props.onDismiss }
+				onModalHide={ onDismiss }
 				hideHeader
 				hasNavigation
 			>
