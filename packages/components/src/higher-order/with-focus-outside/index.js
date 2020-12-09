@@ -2,12 +2,10 @@
  * WordPress dependencies
  */
 import { useCallback, useState } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { useFocusOutside } from '../../utils/hooks';
+import {
+	createHigherOrderComponent,
+	__experimentalUseFocusOutside as useFocusOutside,
+} from '@wordpress/compose';
 
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {

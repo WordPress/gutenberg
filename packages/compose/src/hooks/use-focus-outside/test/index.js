@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useFocusOutside } from '../';
+import useFocusOutside from '../';
 import ReactDOM from 'react-dom';
 
 let wrapper, onFocusOutside;
