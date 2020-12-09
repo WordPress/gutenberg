@@ -84,7 +84,7 @@ module.exports = async function initConfig( {
 		);
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
-			'wp-env has not yet been initalized. Please run `wp-env start` to initalize the WordPress instance before using any other commands.'
+			'wp-env has not yet been initalized. Please run `wp-env start` to install the WordPress instance before using any other commands. This is only necessary to set up the environment for the first time; it is typically not necessary for the instance to be running after that in order to use other commands.'
 		);
 		process.exit( 1 );
 	}
