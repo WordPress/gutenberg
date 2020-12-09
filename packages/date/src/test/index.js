@@ -18,6 +18,10 @@ describe( 'isInTheFuture', () => {
 		const date = new Date( Number( getDate() ) + 1000 * 60 );
 
 		expect( isInTheFuture( date ) ).toBe( true );
+
+		if ( process.env.TZ === 'EST' && process.env.LANG === 'ja_JP' ) {
+			expect( false ).toBe( true );
+		}
 	} );
 
 	it( 'should return false if the date is in the past', () => {
