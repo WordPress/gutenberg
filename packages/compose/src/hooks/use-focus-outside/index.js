@@ -169,7 +169,7 @@ export default function useFocusOutside( onFocusOutside ) {
 			// inside the wrapped component and therefore we cancel
 			// this blur event thereby leaving focus in place.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( window?.document?.hasFocus && ! document.hasFocus() ) {
+			if ( window?.document?.hasFocus && ! window.document.hasFocus() ) {
 				event.preventDefault();
 				return;
 			}
