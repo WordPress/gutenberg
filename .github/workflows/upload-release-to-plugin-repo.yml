@@ -17,10 +17,10 @@ jobs:
       - name: Delete everything
         run: find ./trunk -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +
 
-      - name: Download and unzip Gutenberg plugin asset
+      - name: Download and unzip Gutenberg plugin asset into trunk folder
         env:
           PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
         run: |
           curl -L -o gutenberg.zip $PLUGIN_URL
-          unzip gutenberg.zip -d gutenberg
+          unzip gutenberg.zip -d trunk
           rm gutenberg.zip
