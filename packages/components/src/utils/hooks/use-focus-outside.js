@@ -92,6 +92,11 @@ function isFocusNormalizedButton( eventTarget ) {
  *                                   outside that element.
  */
 export default function useFocusOutside( onFocusOutside ) {
+	const currentOnFocusOutside = useRef( onFocusOutside );
+	useEffect( () => {
+		currentOnFocusOutside.current = onFocusOutside;
+	}, [ onFocusOutside ] );
+
 	const preventBlurCheck = useRef( false );
 
 	/**
@@ -149,34 +154,31 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @param {SyntheticEvent} event Blur event.
 	 */
-	const queueBlurCheck = useCallback(
-		( event ) => {
-			// React does not allow using an event reference asynchronously
-			// due to recycling behavior, except when explicitly persisted.
-			event.persist();
+	const queueBlurCheck = useCallback( ( event ) => {
+		// React does not allow using an event reference asynchronously
+		// due to recycling behavior, except when explicitly persisted.
+		event.persist();
 
-			// Skip blur check if clicking button. See `normalizeButtonFocus`.
-			if ( preventBlurCheck.current ) {
+		// Skip blur check if clicking button. See `normalizeButtonFocus`.
+		if ( preventBlurCheck.current ) {
+			return;
+		}
+
+		blurCheckTimeoutId.current = setTimeout( () => {
+			// If document is not focused then focus should remain
+			// inside the wrapped component and therefore we cancel
+			// this blur event thereby leaving focus in place.
+			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+			if ( ! document.hasFocus() ) {
+				event.preventDefault();
 				return;
 			}
 
-			blurCheckTimeoutId.current = setTimeout( () => {
-				// If document is not focused then focus should remain
-				// inside the wrapped component and therefore we cancel
-				// this blur event thereby leaving focus in place.
-				// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-				if ( ! document.hasFocus() ) {
-					event.preventDefault();
-					return;
-				}
-
-				if ( 'function' === typeof onFocusOutside ) {
-					onFocusOutside( event );
-				}
-			}, 0 );
-		},
-		[ onFocusOutside ]
-	);
+			if ( 'function' === typeof currentOnFocusOutside.current ) {
+				currentOnFocusOutside.current( event );
+			}
+		}, 0 );
+	}, [] );
 
 	return {
 		onFocus: cancelBlurCheck,
