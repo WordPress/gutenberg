@@ -197,6 +197,15 @@ function gutenberg_register_batch_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
 
 /**
+ * Registers the Block types REST API routes.
+ */
+function gutenberg_register_wp_templates_endpoint() {
+	$wp_templates = new WP_REST_WP_Templates_Controller();
+	$wp_templates->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_wp_templates_endpoint' );
+
+/**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
  *
  * @param array  $args Current registered post type args.
