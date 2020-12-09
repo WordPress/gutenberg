@@ -113,48 +113,5 @@ describe( 'withFocusReturn()', () => {
 			} );
 			expect( document.activeElement ).toBe( activeElement );
 		} );
-
-		it( 'should switch focus to the most recent still-available focus target', () => {
-			const TestComponent = ( props ) => (
-				<Provider>
-					<input name="first" />
-					{ props.renderSecondInput && <input name="second" /> }
-					{ props.renderComposite && <Composite /> }
-				</Provider>
-			);
-
-			const { container, rerender } = render(
-				<TestComponent renderSecondInput />,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
-
-			const firstInput = container.querySelector( 'input[name="first"]' );
-			firstInput.focus();
-
-			const secondInput = container.querySelector(
-				'input[name="second"]'
-			);
-			secondInput.focus();
-
-			expect( document.activeElement ).toBe( secondInput );
-
-			rerender( <TestComponent renderSecondInput renderComposite /> );
-			const textarea = container.querySelector( 'textarea' );
-			textarea.focus();
-
-			expect( document.activeElement ).toBe( textarea );
-
-			rerender( <TestComponent renderComposite /> );
-
-			expect( document.activeElement ).toBe( textarea );
-
-			rerender( <TestComponent /> );
-
-			expect( document.activeElement ).toBe( firstInput );
-		} );
 	} );
 } );
