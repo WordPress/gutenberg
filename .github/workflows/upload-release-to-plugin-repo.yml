@@ -21,7 +21,8 @@ jobs:
         run: echo ::set-output name=stable_tag::$(grep "$STABLE_TAG_REGEX" ./trunk/readme.txt)
 
       - name: Delete everything
-        run: find ./trunk -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +
+        working-directory: ./trunk
+        run: find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +
 
       - name: Download and unzip Gutenberg plugin asset into trunk folder
         env:
@@ -38,7 +39,7 @@ jobs:
         run: sed -i "s/${STABLE_TAG_PLACEHOLDER}/${version}/g" ./trunk/readme.txt
 
       - name: Commit the content changes
+        working-directory: ./trunk
         run: |
-          cd ./trunk && \
-          svn st | grep '^?' | awk '{print $2}' | xargs svn add && \
+          svn st | grep '^?' | awk '{print $2}' | xargs svn add
           svn st | grep '^!' | awk '{print $2}' | xargs svn rm
