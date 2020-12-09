@@ -52,12 +52,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        timezone: ['EST', 'GMT', 'CET']
-        locale: ['en_US', 'ja_JP']
-
     steps:
     - uses: actions/checkout@v2
 
@@ -88,13 +82,9 @@ jobs:
         npx lerna run build
 
     - name: Running the tests
-      env:
-        TZ: ${{ matrix.timezone }}
-        LANG: ${{ matrix.locale }}
 
       run: |
-        npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache" \
-          --testPathPattern="packages/date/"
+        npm run test-unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
   unit-php:
     name: PHP
