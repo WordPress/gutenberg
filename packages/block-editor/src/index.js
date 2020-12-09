@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import '@wordpress/rich-text';
-import '@wordpress/notices';
 
 /**
  * Internal dependencies
