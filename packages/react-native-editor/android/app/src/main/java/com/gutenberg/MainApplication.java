@@ -79,11 +79,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         break;
                     case VIDEO:
                         rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                        break;
                     case ANY:
                     case OTHER:
                         rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
-
+                    case AUDIO:
+                        rnMediaList.add(new Media(4, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
