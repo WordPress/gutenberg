@@ -14,8 +14,12 @@
 
 ### New feature
 
--   Add support for setting the PHP version used for the WordPress instance via wp-env.json.
+-   Add support for setting the PHP version used for the WordPress instance. For example, test PHP 8 with `"phpVersion": 8.0` in wp-env.json.
 -   Add Xdebug 3 to the development environment. You can enable Xdebug with `wp-env start --xdebug` (for debug mode) or `wp-env start --xdebug=develop,coverage` for custom modes.
+
+### Bug Fixes
+
+-   ZIP-based plugin sources are now downloaded to a directory using the basename of the URL instead of the full URL path. This prevents HTML encoded characters in the URL (like "/") from being improperly encoded into the filesystem. This fixes the issue where many .zip sources broke because files with these badly formatted characters were not loaded as assets.
 
 ## 2.0.0 (2020-09-03)
 
