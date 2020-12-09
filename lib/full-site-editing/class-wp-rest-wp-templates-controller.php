@@ -79,7 +79,7 @@ class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
 		$template_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template',
-				'posts_per_page' => 2,
+				'posts_per_page' => -1,
 				'no_found_rows'  => true,
 				'tax_query'      => array(
 					array(
