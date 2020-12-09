@@ -62,6 +62,7 @@ export { default as PostVisibilityCheck } from './post-visibility/check';
 export { default as TableOfContents } from './table-of-contents';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
+export { default as ConvertToGroupButtons } from './convert-to-group-buttons';
 
 // State Related Components
 export { default as EditorProvider } from './provider';

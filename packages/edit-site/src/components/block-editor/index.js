@@ -19,6 +19,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { DropZoneProvider, Popover } from '@wordpress/components';
+import { ConvertToGroupButtons } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -87,6 +88,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		>
 			<BlockEditorKeyboardShortcuts />
 			<TemplatePartConverter />
+			<ConvertToGroupButtons />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
 					( fillProps ) => (
