@@ -34,7 +34,10 @@ export function PaddingEdit( props ) {
 	} = props;
 
 	const customUnits = useEditorFeature( 'spacing.units' );
-	const units = customUnits?.map( ( unit ) => ( { value: unit, label: unit } ) );
+	const units = customUnits?.map( ( unit ) => ( {
+		value: unit,
+		label: unit,
+	} ) );
 
 	if ( ! hasPaddingSupport( blockName ) ) {
 		return null;
