@@ -83,9 +83,10 @@ module.exports = async function initConfig( {
 			)
 		);
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
-		throw new Error(
+		spinner.fail(
 			'wp-env has not yet been initalized. Please run `wp-env start` to initalize the WordPress instance before using any other commands.'
 		);
+		process.exit( 1 );
 	}
 
 	return config;
