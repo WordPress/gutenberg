@@ -35,7 +35,9 @@ const NavigationPanel = ( { isOpen } ) => {
 	// from a separate component (such as document actions in the header).
 	const panelRef = useRef();
 	useEffect( () => {
-		panelRef.current.focus();
+		if ( isOpen ) {
+			panelRef.current.focus();
+		}
 	}, [ templatesActiveMenu ] );
 
 	return (

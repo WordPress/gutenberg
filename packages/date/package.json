@@ -22,9 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
-		"date-fns": "^2.16.1",
-		"date-fns-tz": "^1.0.12",
+		"@babel/runtime": "^7.12.5",
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.31"
 	},
