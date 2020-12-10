@@ -45,6 +45,7 @@ function InserterListItem( {
 					onClick();
 				} }
 				disabled={ isDisabled }
+				__experimentalIsFocusable
 				{ ...props }
 			>
 				<span
