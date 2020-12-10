@@ -413,12 +413,29 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
 
 /**
+ * Determine if the current theme needs to load separate block styles or not.
+ *
+ * @return bool
+ */
+function gutenberg_should_load_separate_block_styles() {
+	$load_separate_styles = current_theme_supports( 'split-block-styles' ) || gutenberg_is_fse_theme();
+	/**
+	 * Determine if separate styles will be loaded for blocks on-render or not.
+	 *
+	 * @param bool $load_separate_styles Whether separate styles will be loaded or not.
+	 *
+	 * @return bool
+	 */
+	return apply_filters( 'load_separate_block_styles', $load_separate_styles );
+}
+
+/**
  * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.
  *
  * @return void
  */
 function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
-	if ( current_theme_supports( 'split-block-styles' ) ) {
+	if ( gutenberg_should_load_separate_block_styles() ) {
 		/**
 		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
 		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only

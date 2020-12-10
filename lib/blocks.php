@@ -158,7 +158,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_styles( $block_name ) {
-	if ( ! current_theme_supports( 'split-block-styles' ) ) {
+	if ( ! gutenberg_should_load_separate_block_styles() ) {
 		return;
 	}
 
