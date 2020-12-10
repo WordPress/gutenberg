@@ -73,15 +73,24 @@ export class BlockListItem extends Component {
 			return marginHorizontal;
 		}
 
-		if ( isParentFullWidth && blockWidth <= medium ) {
-			const isContainerRelated = innerContainers.includes( blockName );
-			const isParentContainerRelated = innerContainers.includes(
-				parentBlockName
-			);
+		const isContainerRelated = innerContainers.includes( blockName );
 
-			if ( isContainerRelated || isParentContainerRelated ) {
+		if ( isParentFullWidth && blockWidth <= medium ) {
+			if ( isContainerRelated ) {
 				return marginHorizontal;
 			}
+			return marginHorizontal * 2;
+		}
+
+		const isParentContainerRelated = innerContainers.includes(
+			parentBlockName
+		);
+
+		if (
+			! isParentFullWidth &&
+			isParentContainerRelated &&
+			! isContainerRelated
+		) {
 			return marginHorizontal * 2;
 		}
 
