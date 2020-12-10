@@ -148,20 +148,21 @@ module.exports = {
 
 The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
 
+-   `apiVersion` (default: `2`)
 -   `slug` (no default)
--   `namespace` (default: `create-block`)
+-   `namespace` (default: `'create-block'`)
 -   `title` (no default)
 -   `description` (no default)
 -   `dashicon` (no default)
--   `category` (default: `widgets`)
--   `author` (default: `The WordPress Contributors`)
--   `license` (default: `GPL-2.0-or-later`)
--   `licenseURI` (default: `https://www.gnu.org/licenses/gpl-2.0.html`)
--   `version` (default: `0.1.0`)
+-   `category` (default: `'widgets'`)
+-   `author` (default: `'The WordPress Contributors'`)
+-   `license` (default: `'GPL-2.0-or-later'`)
+-   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`)
+-   `version` (default: `'0.1.0'`)
 -   `wpScripts` (default: `true`)
--   `editorScript` (default: `file:./build/index.js`)
--   `editorStyle` (default: `file:./build/index.css`)
--   `style` (default: `file:./build/style-index.css`)
+-   `editorScript` (default: `'file:./build/index.js'`)
+-   `editorStyle` (default: `'file:./build/index.css'`)
+-   `style` (default: `'file:./build/style-index.css'`)
 
 ## WP-CLI
 

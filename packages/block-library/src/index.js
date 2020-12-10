@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
