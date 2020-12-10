@@ -74,6 +74,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_WP_Templates_Controller' ) ) {
 		require_once __DIR__ . '/full-site-editing/class-wp-rest-wp-templates-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
+		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/

@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_WP_Templates_Controller class
+ * REST API: WP_REST_Templates_Controller class
  *
  * @package gutenberg
  */
@@ -10,69 +10,7 @@
  *
  * @see   WP_REST_Controller
  */
-class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = 'wp-templates';
-	}
-
-	/**
-	 * Registers the routes for the objects of the controller.
-	 */
-	public function register_routes() {
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'args'                => $this->get_collection_params(),
-					'permission_callback' => '__return_true',
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
-			array(
-				'args' => array(
-					'id' => array(
-						'description' => __( 'Unique identifier for the template object.' ),
-						'type'        => 'integer',
-					),
-				),
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'args'                => $this->get_item_params(),
-					'permission_callback' => '__return_true',
-				),
-			)
-		);
-	}
-
-	public function get_collection_params() {
-		$query_params = array(
-			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
-		);
-
-		return $query_params;
-	}
-
-	public function get_item_params() {
-		$query_params = array(
-			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
-		);
-
-		return $query_params;
-	}
-
+class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 	public function get_items( $request ) {
 		$template_files = $this->get_template_files();
 
@@ -90,14 +28,26 @@ class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
 				),
 			)
 		);
-		$templates      = $template_query->get_posts();
+		$query_result   = $template_query->get_posts();
 
 		$fake_id = 0;
 		foreach( $template_files as $template_file ) {
-			$is_custom = array_search( $template_file['slug'], array_column( $templates, 'post_name' ) );
+			$is_custom = array_search( $template_file['slug'], array_column( $query_result, 'post_name' ) );
 			if ( false === $is_custom ) {
-				$templates[] = $this->get_fake_template_post( --$fake_id, $template_file );
+				$query_result[] = $this->get_fake_template_post( --$fake_id, $template_file );
 			}
+		}
+
+		$templates = array();
+
+		foreach( $query_result as $template ) {
+			$data = $this->prepare_item_for_response( $template, $request );
+
+			if ( $data->data['id'] < 0 ) {
+				$data->data['title'] = $this->fix_fake_post_title( $data->data, $request );
+			}
+
+			$templates[] = $this->prepare_response_for_collection( $data );
 		}
 
 		$response = rest_ensure_response( $templates );
@@ -143,7 +93,7 @@ class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
 		$fake_post->post_date     = current_time( 'mysql' );
 		$fake_post->post_date_gmt = current_time( 'mysql', 1 );
 		$fake_post->post_name     = $template_file['slug'];
-		$fake_post->post_status   = 'auto-draft';
+		$fake_post->post_status   = 'draft';
 		$fake_post->post_type     = 'wp_template';
 
 		if ( isset( $default_template_types[ $template_file['slug'] ] ) ) {
@@ -154,5 +104,24 @@ class WP_REST_WP_Templates_Controller extends WP_REST_Controller {
 		$template_post = new WP_Post( $fake_post );
 
 		return $template_post;
+	}
+
+	public function fix_fake_post_title( $fake_post, $request ) {
+		$default_template_types = gutenberg_get_default_template_types();
+		$fields                 = $this->get_fields_for_response( $request );
+
+		if ( ! isset( $default_template_types[ $fake_post['slug'] ] ) || ! rest_is_field_included( 'title', $fields ) ) {
+			return $fake_post['title'];
+		}
+
+		$title = array();
+		if ( rest_is_field_included( 'title.raw', $fields ) ) {
+			$title['raw'] = $default_template_types[ $fake_post['slug'] ]['title'];
+		}
+		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
+			$title['rendered'] = apply_filters( 'the_content', $default_template_types[ $fake_post['slug'] ]['title'] );
+		}
+
+		return $title;
 	}
 }

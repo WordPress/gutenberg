@@ -55,18 +55,19 @@ function gutenberg_register_template_post_type() {
 	);
 
 	$args = array(
-		'labels'            => $labels,
-		'description'       => __( 'Templates to include in your theme.', 'gutenberg' ),
-		'public'            => false,
-		'has_archive'       => false,
-		'show_ui'           => true,
-		'show_in_menu'      => 'themes.php',
-		'show_in_admin_bar' => false,
-		'show_in_rest'      => true,
-		'rest_base'         => 'templates',
-		'capability_type'   => array( 'template', 'templates' ),
-		'map_meta_cap'      => true,
-		'supports'          => array(
+		'labels'                => $labels,
+		'description'           => __( 'Templates to include in your theme.', 'gutenberg' ),
+		'public'                => false,
+		'has_archive'           => false,
+		'show_ui'               => true,
+		'show_in_menu'          => 'themes.php',
+		'show_in_admin_bar'     => false,
+		'show_in_rest'          => true,
+		'rest_base'             => 'templates',
+		'rest_controller_class' => 'WP_REST_Templates_Controller',
+		'capability_type'       => array( 'template', 'templates' ),
+		'map_meta_cap'          => true,
+		'supports'              => array(
 			'title',
 			'slug',
 			'excerpt',
