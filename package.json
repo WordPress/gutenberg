@@ -251,6 +251,7 @@
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-php:watch": "wp-env run composer run-script test:watch",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
+		"test-unit:date": "./bin/unit-test-date.sh",
 		"test-unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
