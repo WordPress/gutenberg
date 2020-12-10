@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Picker, Toolbar, ToolbarButton } from '@wordpress/components';
+import { Picker, ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
 
@@ -35,14 +35,14 @@ function ToolbarButtonWithOptions( { options } ) {
 
 	return (
 		<>
-			<Toolbar>
+			<ToolbarGroup>
 				<ToolbarButton
 					title={ firstOption.title }
 					icon={ <Icon icon={ firstOption.icon } /> }
 					onClick={ firstOption.onClick }
 					onLongPress={ enablePicker && presentPicker }
 				/>
-			</Toolbar>
+			</ToolbarGroup>
 			{ enablePicker && (
 				<Picker
 					ref={ picker }
