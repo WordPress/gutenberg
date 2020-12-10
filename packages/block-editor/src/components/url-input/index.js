@@ -351,7 +351,7 @@ function URLInput( {
 			onKeyDown,
 			role: 'combobox',
 			'aria-label': __( 'URL' ),
-			'aria-expanded': showSuggestions,
+			'aria-expanded': !! showSuggestions,
 			'aria-autocomplete': 'list',
 			'aria-owns': suggestionsListboxId,
 			'aria-activedescendant':
