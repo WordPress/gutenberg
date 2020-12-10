@@ -41,6 +41,29 @@ const gutenbergPackages = Object.keys( dependencies )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
+const stylesTransform = ( content ) => {
+	if ( mode === 'production' ) {
+		return postcss( [
+			require( 'cssnano' )( {
+				preset: [
+					'default',
+					{
+						discardComments: {
+							removeAll: true,
+						},
+					},
+				],
+			} ),
+		] )
+			.process( content, {
+				from: 'src/app.css',
+				to: 'dest/app.css',
+			} )
+			.then( ( result ) => result.css );
+	}
+	return content;
+};
+
 module.exports = {
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -140,28 +163,7 @@ module.exports = {
 				from: `./packages/${ packageName }/build-style/*.css`,
 				to: `./build/${ packageName }/`,
 				flatten: true,
-				transform: ( content ) => {
-					if ( mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
-									},
-								],
-							} ),
-						] )
-							.process( content, {
-								from: 'src/app.css',
-								to: 'dest/app.css',
-							} )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
+				transform: stylesTransform,
 			} ) )
 		),
 		new CopyWebpackPlugin( [
@@ -171,28 +173,7 @@ module.exports = {
 					`([\\w-]+)${ escapeRegExp( sep ) }style\\.css$`
 				),
 				to: 'build/block-library/blocks/[1]/style.css',
-				transform: ( content ) => {
-					if ( mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
-									},
-								],
-							} ),
-						] )
-							.process( content, {
-								from: 'src/app.css',
-								to: 'dest/app.css',
-							} )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
+				transform: stylesTransform,
 			},
 			{
 				from: './packages/block-library/build-style/*/style-rtl.css',
@@ -200,28 +181,7 @@ module.exports = {
 					`([\\w-]+)${ escapeRegExp( sep ) }style-rtl\\.css$`
 				),
 				to: 'build/block-library/blocks/[1]/style-rtl.css',
-				transform: ( content ) => {
-					if ( mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
-									},
-								],
-							} ),
-						] )
-							.process( content, {
-								from: 'src/app.css',
-								to: 'dest/app.css',
-							} )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
+				transform: stylesTransform,
 			},
 			{
 				from: './packages/block-library/build-style/*/editor.css',
@@ -229,28 +189,7 @@ module.exports = {
 					`([\\w-]+)${ escapeRegExp( sep ) }editor\\.css$`
 				),
 				to: 'build/block-library/blocks/[1]/editor.css',
-				transform: ( content ) => {
-					if ( mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
-									},
-								],
-							} ),
-						] )
-							.process( content, {
-								from: 'src/app.css',
-								to: 'dest/app.css',
-							} )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
+				transform: stylesTransform,
 			},
 			{
 				from: './packages/block-library/build-style/*/editor-rtl.css',
@@ -258,28 +197,7 @@ module.exports = {
 					`([\\w-]+)${ escapeRegExp( sep ) }editor-rtl\\.css$`
 				),
 				to: 'build/block-library/blocks/[1]/editor-rtl.css',
-				transform: ( content ) => {
-					if ( mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
-									},
-								],
-							} ),
-						] )
-							.process( content, {
-								from: 'src/app.css',
-								to: 'dest/app.css',
-							} )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
+				transform: stylesTransform,
 			},
 		] ),
 		new CopyWebpackPlugin(
