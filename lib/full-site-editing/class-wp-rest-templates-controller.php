@@ -30,11 +30,10 @@ class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 		);
 		$query_result   = $template_query->get_posts();
 
-		$fake_id = 0;
 		foreach( $template_files as $template_file ) {
 			$is_custom = array_search( $template_file['slug'], array_column( $query_result, 'post_name' ) );
 			if ( false === $is_custom ) {
-				$query_result[] = $this->get_fake_template_post( --$fake_id, $template_file );
+				$query_result[] = $this->get_fake_template_post( $template_file );
 			}
 		}
 
@@ -43,7 +42,7 @@ class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 		foreach( $query_result as $template ) {
 			$data = $this->prepare_item_for_response( $template, $request );
 
-			if ( $data->data['id'] < 0 ) {
+			if ( 0 === strpos( $data->data['id'], 'file-template-' ) ) {
 				$data->data['title'] = $this->fix_fake_post_title( $data->data, $request );
 			}
 
@@ -82,12 +81,12 @@ class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 		return $template_files;
 	}
 
-	public function get_fake_template_post( $fake_id, $template_file ) {
+	public function get_fake_template_post( $template_file ) {
 		$default_template_types = gutenberg_get_default_template_types();
 
 		$fake_post                = new stdClass();
 		$fake_post->filter        = 'raw';
-		$fake_post->ID            = $fake_id;
+		$fake_post->ID            = 'file-template-' . $template_file['slug'];
 		$fake_post->post_author   = 0;
 		$fake_post->post_content  = file_get_contents( $template_file['path'] );
 		$fake_post->post_date     = current_time( 'mysql' );

@@ -254,6 +254,12 @@ add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
  */
 function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
+		if ( 0 === strpos( $response->data['id'], 'file-template-' ) ) {
+			$response->data['wp_theme_slug'] = wp_get_theme()->get_stylesheet();
+			$response->data['file_based'] = true;
+			return $response;
+		}
+
 		$response->data['wp_theme_slug'] = false;
 
 		// Get the wp_theme terms.
@@ -284,3 +290,9 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 }
 add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
 add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+
+function gutenberg_filter_wp_template_item_schema( $schema ) {
+	$schema['properties']['status']['enum'][] = 'auto-draft';
+	return $schema;
+}
+add_filter( 'rest_wp_template_item_schema', 'gutenberg_filter_wp_template_item_schema' );

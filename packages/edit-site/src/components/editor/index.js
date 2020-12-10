@@ -46,6 +46,7 @@ import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import PopoverWrapper from './popover-wrapper';
+import TemplateProvider from './template-provider';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -181,11 +182,7 @@ function Editor() {
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<EntityProvider kind="root" type="site">
-						<EntityProvider
-							kind="postType"
-							type={ templateType }
-							id={ entityId }
-						>
+						<TemplateProvider type={ templateType } id={ entityId }>
 							<EntityProvider
 								kind="postType"
 								type="wp_global_styles"
@@ -312,7 +309,7 @@ function Editor() {
 									</GlobalStylesProvider>
 								</BlockContextProvider>
 							</EntityProvider>
-						</EntityProvider>
+						</TemplateProvider>
 					</EntityProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
