@@ -104,7 +104,7 @@ function EditorProvider( {
 		if ( __unstableTemplate ) {
 			__unstableSetupTemplate( __unstableTemplate );
 		}
-	}, [ __unstableTemplate ] );
+	}, [ __unstableTemplate?.id ] );
 
 	if ( ! isReady ) {
 		return null;

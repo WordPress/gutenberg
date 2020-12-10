@@ -19,13 +19,10 @@ import serializeBlocks from '../../store/utils/serialize-blocks';
  * @return {Object} BlockEditorProvider props.
  */
 function usePostContentEditor( postType, postId ) {
-	const { blocks } = useSelect(
+	const blocks = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( coreStore );
-			return {
-				blocks: getEditedEntityRecord( 'postType', postType, postId )
-					.blocks,
-			};
+			return getEditedEntityRecord( 'postType', postType, postId ).blocks;
 		},
 		[ postType, postId ]
 	);
@@ -64,12 +61,15 @@ function usePostContentEditor( postType, postId ) {
 		[ blocks, postId, postType ]
 	);
 
-	const onInput = useCallback( ( newBlocks, options ) => {
-		onChange( newBlocks, {
-			...options,
-			__unstableShouldCreateUndoLevel: false,
-		} );
-	}, onChange );
+	const onInput = useCallback(
+		( newBlocks, options ) => {
+			onChange( newBlocks, {
+				...options,
+				__unstableShouldCreateUndoLevel: false,
+			} );
+		},
+		[ onChange ]
+	);
 
 	return { value: blocks, onChange, onInput };
 }

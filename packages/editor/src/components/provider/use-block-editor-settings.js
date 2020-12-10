@@ -139,7 +139,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			// This selector is only defined on mobile.
 			isTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
-	} );
+	}, [] );
 
 	const { undo } = useDispatch( editorStore );
 
