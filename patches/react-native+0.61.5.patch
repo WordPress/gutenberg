@@ -35,23 +35,6 @@ index 01aa75f..572572c 100644
    if (_currentFrame) {
      layer.contentsScale = self.animatedImageScale;
      layer.contents = (__bridge id)_currentFrame.CGImage;
-diff --git a/node_modules/react-native/Libraries/Lists/VirtualizedList.js b/node_modules/react-native/Libraries/Lists/VirtualizedList.js
-index 7dffc17..20be410 100644
---- a/node_modules/react-native/Libraries/Lists/VirtualizedList.js
-+++ b/node_modules/react-native/Libraries/Lists/VirtualizedList.js
-@@ -1286,7 +1286,11 @@ class VirtualizedList extends React.PureComponent<Props, State> {
-       );
-     }
-     this.props.onLayout && this.props.onLayout(e);
--    this._scheduleCellsToRenderUpdate();
-+
-+    if(!this._isVirtualizationDisabled()) {
-+      this._scheduleCellsToRenderUpdate();
-+    }
-+
-     this._maybeCallOnEndReached();
-   };
- 
 diff --git a/node_modules/react-native/React/Views/RCTShadowView.m b/node_modules/react-native/React/Views/RCTShadowView.m
 index 40c0cda..646f137 100644
 --- a/node_modules/react-native/React/Views/RCTShadowView.m

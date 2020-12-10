@@ -234,7 +234,6 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
-					disableVirtualization
 				/>
 				{ this.shouldShowInnerBlockAppender() && (
 					<View

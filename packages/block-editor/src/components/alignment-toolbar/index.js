@@ -9,7 +9,7 @@ import { find } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
-import { useRef, useEffect, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{

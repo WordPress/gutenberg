@@ -278,6 +278,8 @@ class EditorProvider extends Component {
 							value={ blocks }
 							onInput={ resetEditorBlocksWithoutUndoLevel }
 							onChange={ resetEditorBlocks }
+							selectionStart={ selectionStart }
+							selectionEnd={ selectionEnd }
 							settings={ editorSettings }
 							useSubRegistry={ false }
 						>
