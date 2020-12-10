@@ -3,7 +3,6 @@
  */
 import {
 	DropZoneProvider,
-	FocusReturnProvider,
 	Popover,
 	SlotFillProvider,
 } from '@wordpress/components';
@@ -45,47 +44,45 @@ export default function Layout( { blockEditorSettings } ) {
 		<ErrorBoundary>
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<FocusReturnProvider>
-						<BlockEditorKeyboardShortcuts.Register />
-						<NavigationEditorShortcuts.Register />
+					<BlockEditorKeyboardShortcuts.Register />
+					<NavigationEditorShortcuts.Register />
 
-						<Notices />
+					<Notices />
 
-						<div className="edit-navigation-layout">
-							<Header
+					<div className="edit-navigation-layout">
+						<Header
+							isPending={ ! navigationPost }
+							menus={ menus }
+							selectedMenuId={ selectedMenuId }
+							onSelectMenu={ selectMenu }
+						/>
+
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ onInput }
+							onChange={ onChange }
+							settings={ {
+								...blockEditorSettings,
+								templateLock: 'all',
+								hasFixedToolbar: true,
+							} }
+						>
+							<Toolbar
 								isPending={ ! navigationPost }
-								menus={ menus }
-								selectedMenuId={ selectedMenuId }
-								onSelectMenu={ selectMenu }
+								navigationPost={ navigationPost }
 							/>
+							<Editor
+								isPending={ ! navigationPost }
+								blocks={ blocks }
+							/>
+							<InspectorAdditions
+								menuId={ selectedMenuId }
+								onDeleteMenu={ deleteMenu }
+							/>
+						</BlockEditorProvider>
+					</div>
 
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ onInput }
-								onChange={ onChange }
-								settings={ {
-									...blockEditorSettings,
-									templateLock: 'all',
-									hasFixedToolbar: true,
-								} }
-							>
-								<Toolbar
-									isPending={ ! navigationPost }
-									navigationPost={ navigationPost }
-								/>
-								<Editor
-									isPending={ ! navigationPost }
-									blocks={ blocks }
-								/>
-								<InspectorAdditions
-									menuId={ selectedMenuId }
-									onDeleteMenu={ deleteMenu }
-								/>
-							</BlockEditorProvider>
-						</div>
-
-						<Popover.Slot />
-					</FocusReturnProvider>
+					<Popover.Slot />
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</ErrorBoundary>
