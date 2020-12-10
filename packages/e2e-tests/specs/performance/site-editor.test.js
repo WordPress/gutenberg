@@ -50,7 +50,7 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.edit-site-visual-editor iframe', {
+			await page.waitForSelector( '.edit-site-visual-editor', {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
