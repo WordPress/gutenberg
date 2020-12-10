@@ -7,7 +7,7 @@ In Dialogs/modals, the tabbing must be constrained to the content of the wrapper
 
 ### `ref`
 
-- Type: `Function`
+- Type: `Object|Function`
 
 A function reference that must be passed to the DOM element where constrained tabbing should be enabled.
 

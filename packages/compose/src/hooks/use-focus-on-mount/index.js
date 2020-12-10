@@ -8,7 +8,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean|string} focusOnMount Focus on mount mode.
- * @return {Function} Element Ref.
+ * @return {Function|Object} Element Ref.
  *
  * @example
  * ```js

@@ -155,7 +155,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `(Object|Function)`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -212,7 +212,7 @@ _Parameters_
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `(Function|Object)`: Element Ref.
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 
