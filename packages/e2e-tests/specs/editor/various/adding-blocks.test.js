@@ -351,6 +351,7 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/27586
 	it( 'closes the main inserter after inserting a single-use block, like the More block', async () => {
 		await insertBlock( 'More' );
 		await page.waitForSelector(
