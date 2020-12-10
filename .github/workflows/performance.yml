@@ -38,10 +38,3 @@ jobs:
 
     - name: Run the performance tests
       run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA master --tests-branch $GITHUB_SHA
-
-    - name: Archive debug artifacts (screenshots, HTML snapshots)
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: failures-artifacts
-        path: artifacts
