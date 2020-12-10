@@ -108,10 +108,13 @@ export function computePopoverXAxisPosition(
 					? leftAlignment.contentWidth
 					: rightAlignment.contentWidth;
 
+			// Limit width of the content to the viewport width
 			if ( width > window.innerWidth ) {
 				contentWidth = window.innerWidth;
 			}
 
+			// If we can't find any alignment options that could fit
+			// our content, then let's fallback to the center of the viewport.
 			if ( chosenWidth !== width ) {
 				chosenXAxis = 'center';
 				centerAlignment.popoverLeft = window.innerWidth / 2;
