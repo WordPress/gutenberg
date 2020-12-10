@@ -27,7 +27,7 @@ When creating a new package, you need to provide at least the following:
     	"module": "build-module/index.js",
     	"react-native": "src/index",
     	"dependencies": {
-    		"@babel/runtime": "^7.11.2"
+    		"@babel/runtime": "^7.12.5"
     	},
     	"publishConfig": {
     		"access": "public"

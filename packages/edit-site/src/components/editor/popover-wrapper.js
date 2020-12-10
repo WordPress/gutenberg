@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
+import { useFocusOnMount } from '@wordpress/compose';
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -39,11 +40,14 @@ export default function PopoverWrapper( { onClose, children, className } ) {
 		}
 	};
 
+	const ref = useFocusOnMount();
+
 	// Disable reason: this stops certain events from propagating outside of the component.
 	//   - onMouseDown is disabled as this can cause interactions with other DOM elements
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div
+			ref={ ref }
 			className={ className }
 			onKeyDown={ maybeClose }
 			onMouseDown={ stopPropagation }

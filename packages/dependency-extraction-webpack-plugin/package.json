@@ -24,11 +24,13 @@
 		"build-types"
 	],
 	"main": "lib/index.js",
-	"types": "build-types",
+	"types": "lib/types.d.ts",
 	"dependencies": {
 		"json2php": "^0.0.4",
-		"webpack": "^4.8.3",
 		"webpack-sources": "^1.3.0"
+	},
+	"peerDependencies": {
+		"webpack": "^4.8.3 || ^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

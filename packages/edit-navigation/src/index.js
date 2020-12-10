@@ -6,7 +6,6 @@ import { map, set, flatten, omit, partialRight } from 'lodash';
 /**
  * WordPress dependencies
  */
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,

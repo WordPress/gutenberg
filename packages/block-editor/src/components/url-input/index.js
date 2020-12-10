@@ -24,7 +24,6 @@ import { isURL } from '@wordpress/url';
 
 const REQUEST_DEBOUNCE_DELAY = 200;
 
-/* eslint-disable jsx-a11y/no-autofocus */
 function URLInput( {
 	value,
 	onChange: parentOnChange,
@@ -33,7 +32,6 @@ function URLInput( {
 	isFullWidth,
 	instanceId,
 	placeholder = __( 'Paste URL or type to search' ),
-	autoFocus = true,
 	disableSuggestions,
 	speak,
 	debouncedSpeak,
@@ -345,7 +343,6 @@ function URLInput( {
 		const inputProps = {
 			value,
 			required: true,
-			autoFocus,
 			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange,
@@ -450,7 +447,6 @@ function URLInput( {
 		</>
 	);
 }
-/* eslint-enable jsx-a11y/no-autofocus */
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md

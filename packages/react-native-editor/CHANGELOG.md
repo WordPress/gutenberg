@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 * [**] Button block - Add link picker to the block settings [#26206]
 * [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
 * [*] Fix theme colors syncing with the editor [#26821]
+* [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 
 ## 1.41.0
 

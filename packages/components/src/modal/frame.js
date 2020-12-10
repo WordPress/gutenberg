@@ -2,40 +2,84 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
 
-import { Component, createRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
-import { compose } from '@wordpress/compose';
+import {
+	useFocusReturn,
+	useFocusOnMount,
+	useConstrainedTabbing,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import IsolatedEventContainer from '../isolated-event-container';
 import withFocusOutside from '../higher-order/with-focus-outside';
-import withFocusReturn from '../higher-order/with-focus-return';
-import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
+
+function ModalFrameContent( {
+	overlayClassName,
+	contentLabel,
+	aria: { describedby, labelledby },
+	children,
+	className,
+	role,
+	style,
+	focusOnMount,
+	shouldCloseOnEsc,
+	onRequestClose,
+} ) {
+	function handleEscapeKeyDown( event ) {
+		if ( shouldCloseOnEsc && event.keyCode === ESCAPE ) {
+			event.stopPropagation();
+			if ( onRequestClose ) {
+				onRequestClose( event );
+			}
+		}
+	}
+	const focusOnMountRef = useFocusOnMount(
+		focusOnMount ? 'container' : false
+	);
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusReturnRef = useFocusReturn();
+
+	return (
+		<IsolatedEventContainer
+			className={ classnames(
+				'components-modal__screen-overlay',
+				overlayClassName
+			) }
+			onKeyDown={ handleEscapeKeyDown }
+		>
+			<div
+				className={ classnames( 'components-modal__frame', className ) }
+				style={ style }
+				ref={ mergeRefs( [
+					focusOnMountRef,
+					constrainedTabbingRef,
+					focusReturnRef,
+				] ) }
+				role={ role }
+				aria-label={ contentLabel }
+				aria-labelledby={ contentLabel ? null : labelledby }
+				aria-describedby={ describedby }
+				tabIndex="-1"
+			>
+				{ children }
+			</div>
+		</IsolatedEventContainer>
+	);
+}
 
 class ModalFrame extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.containerRef = createRef();
-		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleFocusOutside = this.handleFocusOutside.bind( this );
-	}
-
-	/**
-	 * Focuses the first tabbable element when props.focusOnMount is true.
-	 */
-	componentDidMount() {
-		// Focus on mount
-		if ( this.props.focusOnMount ) {
-			this.containerRef.current.focus();
-		}
 	}
 
 	/**
@@ -44,45 +88,11 @@ class ModalFrame extends Component {
 	 * @param {Object} event Mouse click event.
 	 */
 	handleFocusOutside( event ) {
-		if ( this.props.shouldCloseOnClickOutside ) {
-			this.onRequestClose( event );
-		}
-	}
-
-	/**
-	 * Callback function called when a key is pressed.
-	 *
-	 * @param {KeyboardEvent} event Key down event.
-	 */
-	handleKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			this.handleEscapeKeyDown( event );
-		}
-	}
-
-	/**
-	 * Handles a escape key down event.
-	 *
-	 * Calls onRequestClose and prevents propagation of the event outside the modal.
-	 *
-	 * @param {Object} event Key down event.
-	 */
-	handleEscapeKeyDown( event ) {
-		if ( this.props.shouldCloseOnEsc ) {
-			event.stopPropagation();
-			this.onRequestClose( event );
-		}
-	}
-
-	/**
-	 * Calls the onRequestClose callback props when it is available.
-	 *
-	 * @param {Object} event Event object.
-	 */
-	onRequestClose( event ) {
-		const { onRequestClose } = this.props;
-		if ( onRequestClose ) {
-			onRequestClose( event );
+		if (
+			this.props.shouldCloseOnClickOutside &&
+			this.props.onRequestClose
+		) {
+			this.props.onRequestClose( event );
 		}
 	}
 
@@ -92,46 +102,8 @@ class ModalFrame extends Component {
 	 * @return {WPElement} The modal frame element.
 	 */
 	render() {
-		const {
-			overlayClassName,
-			contentLabel,
-			aria: { describedby, labelledby },
-			children,
-			className,
-			role,
-			style,
-		} = this.props;
-
-		return (
-			<IsolatedEventContainer
-				className={ classnames(
-					'components-modal__screen-overlay',
-					overlayClassName
-				) }
-				onKeyDown={ this.handleKeyDown }
-			>
-				<div
-					className={ classnames(
-						'components-modal__frame',
-						className
-					) }
-					style={ style }
-					ref={ this.containerRef }
-					role={ role }
-					aria-label={ contentLabel }
-					aria-labelledby={ contentLabel ? null : labelledby }
-					aria-describedby={ describedby }
-					tabIndex="-1"
-				>
-					{ children }
-				</div>
-			</IsolatedEventContainer>
-		);
+		return <ModalFrameContent { ...this.props } />;
 	}
 }
 
-export default compose( [
-	withFocusReturn,
-	withConstrainedTabbing,
-	withFocusOutside,
-] )( ModalFrame );
+export default withFocusOutside( ModalFrame );

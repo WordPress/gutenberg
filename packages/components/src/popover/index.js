@@ -2,20 +2,20 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useState,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
-import { focus, getRectangleFromRange } from '@wordpress/dom';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
-import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	useResizeObserver,
+	useFocusOnMount,
+} from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
 /**
@@ -148,53 +148,6 @@ function withoutPadding( rect, element ) {
 		top: rect.top + top,
 		bottom: rect.bottom - bottom,
 	};
-}
-
-/**
- * Hook used to focus the first tabbable element on mount.
- *
- * @param {boolean|string} focusOnMount Focus on mount mode.
- * @param {Object}         contentRef   Reference to the popover content element.
- */
-function useFocusContentOnMount( focusOnMount, contentRef ) {
-	// Focus handling
-	useEffect( () => {
-		/*
-		 * Without the setTimeout, the dom node is not being focused. Related:
-		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		 *
-		 * TODO: Treat the cause, not the symptom.
-		 */
-		const focusTimeout = setTimeout( () => {
-			if ( ! focusOnMount || ! contentRef.current ) {
-				return;
-			}
-
-			if ( focusOnMount === 'firstElement' ) {
-				// Find first tabbable node within content and shift focus, falling
-				// back to the popover panel itself.
-				const firstTabbable = focus.tabbable.find(
-					contentRef.current
-				)[ 0 ];
-
-				if ( firstTabbable ) {
-					firstTabbable.focus();
-				} else {
-					contentRef.current.focus();
-				}
-
-				return;
-			}
-
-			if ( focusOnMount === 'container' ) {
-				// Focus the popover panel itself so items in the popover are easily
-				// accessed via keyboard navigation.
-				contentRef.current.focus();
-			}
-		}, 0 );
-
-		return () => clearTimeout( focusTimeout );
-	}, [] );
 }
 
 /**
@@ -464,7 +417,7 @@ const Popover = ( {
 		__unstableBoundaryParent,
 	] );
 
-	useFocusContentOnMount( focusOnMount, contentRef );
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -579,7 +532,7 @@ const Popover = ( {
 					</div>
 				) }
 				<div
-					ref={ contentRef }
+					ref={ mergeRefs( [ contentRef, focusOnMountRef ] ) }
 					className="components-popover__content"
 					tabIndex="-1"
 				>
