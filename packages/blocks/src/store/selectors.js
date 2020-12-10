@@ -12,18 +12,7 @@ import {
 	includes,
 	map,
 	some,
-	truncate,
 } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { __experimentalGetBlockLabel as getBlockLabel } from '../api';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -129,44 +118,6 @@ export const getBlockDisplayInformation = ( state, name, attributes ) => {
 		description: match.description || blockType.description,
 	};
 };
-
-// TODO remove
-export const getBlockTypeWithVariationInfo = createRegistrySelector(
-	( select ) => ( state, clientId ) => {
-		const {
-			__unstableGetBlockWithoutInnerBlocks,
-			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
-		const _clientId = clientId || getSelectedBlockClientId();
-		const { name, attributes } =
-			__unstableGetBlockWithoutInnerBlocks( _clientId ) || {};
-
-		if ( ! name ) return null;
-		const variations = state.blockVariations[ name ];
-		const blockType = getBlockType( state, name );
-
-		const label = getBlockLabel( blockType, attributes );
-		// Label will often fall back to the title if no label is defined for the
-		// current label context. We do not want "Paragraph: Paragraph".
-		if ( label !== blockType.title ) {
-			blockType.title = `${ blockType.title }: ${ truncate( label, {
-				length: 15,
-			} ) }`;
-		}
-
-		if ( ! variations || ! blockType?.variationMatcher ) return blockType;
-		const match = variations.find( ( variation ) =>
-			blockType.variationMatcher( attributes, variation )
-		);
-		if ( ! match ) return blockType;
-		return {
-			...blockType,
-			title: match.title || blockType.title,
-			icon: match.icon || blockType.icon,
-			description: match.description || blockType.description,
-		};
-	}
-);
 
 /**
  * Returns the default block variation for the given block type.
