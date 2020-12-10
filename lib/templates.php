@@ -123,6 +123,56 @@ add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_p
 add_action( 'save_post_wp_template_part', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
 
 /**
+ * Gets the fallback templates for a given template type.
+ *
+ * @param string $type The template type.
+ * @return array Fallback templates
+ */
+function gutenberg_get_fallback_templates( $type ) {
+	$all = array(
+		'archive' => 'index',
+		'archive-$posttype' => 'archive',
+		'attachment' => 'single',
+		'author' => 'archive',
+		'author-$id' => 'author',
+		'author-$nicename' => 'author-$id',
+		'category' => 'archive',
+		'category-$id' => 'category',
+		'category-$slug' => 'category-$id',
+		'date' => 'archive',
+		'home' => 'index',
+		'$mimetype' => 'attachment',
+		'$mimetype-$subtype' => '$subtype',
+		'page' => 'singular',
+		'page-$id' => 'page',
+		'page-$slug' => 'page-$id',
+		'search' => 'index',
+		'single' => 'singular',
+		'singular' => 'index',
+		'single-post' => 'single',
+		'single-$posttype' => 'single',
+		'single-$posttype-$slug' => 'single-$posttype',
+		'$subtype' => '$mimetype',
+		'tag' => 'archive',
+		'tag-$id' => 'tag',
+		'tag-$slug' => 'tag-$id',
+		'taxonomy' => 'archive',
+		'taxonomy-$taxonomy' => 'taxonomy',
+		'taxonomy-$taxonomy-$term' => 'taxonomy-$taxonomy',
+		'404' => 'index'
+	);
+
+	$hierarchy = array();
+
+	do {
+		$hierarchy[] = $type;
+	}
+	while ( isset( $all[ $type ] ) && ( $type = $all[ $type ] ) );
+
+	return $hierarchy;
+}
+
+/**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
  *
  * Any user who can 'edit_theme_options' will have access.
@@ -154,9 +204,7 @@ function gutenberg_grant_template_caps( $caps, $cap, $user, $args ) {
 		$pattern = '/^(?>(edit(_(others|published|private))?|delete(_(others|published|private))?|publish|read_private)_)(.+)_templates$/';
 		if ( ( $type = preg_filter( $pattern, '$6', $capability ) ) ) {
 
-			// To do: build out complete template hierarchy array
-			$array = $type == 'index' ? array( 'index' ) : array( $type, 'index' );
-			$hierarchy = array_reverse( array_slice( $array, 1 ) );
+			$hierarchy = array_reverse( array_slice( gutenberg_get_fallback_templates( $type ), 1 ) );
 
 			if ( empty( $hierarchy ) ) {
 				if ( user_can( $user, 'edit_theme_options' ) ) {
