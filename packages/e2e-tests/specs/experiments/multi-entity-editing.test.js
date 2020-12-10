@@ -43,8 +43,8 @@ const createTemplatePart = async (
 	await createNewButton.click();
 	await page.waitForSelector(
 		isNested
-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
-			: '.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
+			: '.wp-block-template-part .block-editor-block-list__layout'
 	);
 	await page.focus( '.wp-block-template-part__name-panel input' );
 	await page.keyboard.type( templatePartName );
@@ -54,8 +54,8 @@ const editTemplatePart = async ( textToAdd, isNested = false ) => {
 	await page.click(
 		`${
 			isNested
-				? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
-				: '.wp-block[data-type="core/template-part"]'
+				? '.wp-block-template-part .wp-block-template-part'
+				: '.wp-block-template-part'
 		} .block-editor-button-block-appender`
 	);
 	await page.click( '.editor-block-list-item-paragraph' );
@@ -97,17 +97,6 @@ const openEntitySavePanel = async () => {
 	}
 	// If we made it this far, the panel is opened.
 
-	// Expand to view savable entities if necessary.
-	const reviewChangesButton = await page.$(
-		'.entities-saved-states__review-changes-button'
-	);
-	const [ needsToOpen ] = await reviewChangesButton.$x(
-		'//*[contains(text(),"Review changes.")]'
-	);
-	if ( needsToOpen ) {
-		await reviewChangesButton.click();
-	}
-
 	return true;
 };
 
@@ -137,11 +126,6 @@ const removeErrorMocks = () => {
 };
 
 describe( 'Multi-entity editor states', () => {
-	// Setup & Teardown.
-	const templateName = 'Front Page';
-	const templatePartName = 'Test Template Part Name Edit';
-	const nestedTPName = 'Test Nested Template Part Name Edit';
-
 	beforeAll( async () => {
 		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
@@ -167,7 +151,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', templateName );
+		await clickTemplateItem( 'Templates', 'Front Page' );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
@@ -176,6 +160,10 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	describe( 'Multi-entity edit', () => {
+		const templatePartName = 'Test Template Part Name Edit';
+		const nestedTPName = 'Test Nested Template Part Name Edit';
+		const templateName = 'Custom Template';
+
 		beforeAll( async () => {
 			await trashAllPosts( 'wp_template' );
 			await trashAllPosts( 'wp_template_part' );
@@ -196,10 +184,18 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await visitSiteEditor();
-			// Waits for the template part to load...
+
+			// Wait for site editor to load.
 			await page.waitForSelector(
-				'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+				'.wp-block-template-part .block-editor-block-list__layout'
 			);
+
+			// Our custom template shows up in the " templates > all" menu; let's use it.
+			clickTemplateItem( [ 'Templates', 'All' ], templateName );
+			await page.waitForXPath(
+				`//p[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
+			);
+
 			removeErrorMocks();
 		} );
 
@@ -222,7 +218,7 @@ describe( 'Multi-entity editor states', () => {
 
 		it( 'should only dirty the child when editing the child', async () => {
 			await page.click(
-				'.wp-block[data-type="core/template-part"] .wp-block[data-type="core/paragraph"]'
+				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Some more test words!' );
 
@@ -233,7 +229,7 @@ describe( 'Multi-entity editor states', () => {
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
 			await page.click(
-				'.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .wp-block[data-type="core/paragraph"]'
+				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Nested test words!' );
 

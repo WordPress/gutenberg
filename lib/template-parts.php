@@ -49,45 +49,15 @@ function gutenberg_register_template_part_post_type() {
 		'supports'          => array(
 			'title',
 			'slug',
+			'excerpt',
 			'editor',
 			'revisions',
-			'custom-fields',
 		),
 	);
 
-	$meta_args = array(
-		'object_subtype' => 'wp_template_part',
-		'type'           => 'string',
-		'description'    => 'The theme that provided the template part, if any.',
-		'single'         => true,
-		'show_in_rest'   => true,
-	);
-
 	register_post_type( 'wp_template_part', $args );
-	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
-
-/**
- * Automatically set the theme meta for template parts.
- *
- * @param array $post_id Template Part ID.
- * @param array $post    Template Part Post.
- * @param bool  $update  Is update.
- */
-function gutenberg_set_template_part_post_theme( $post_id, $post, $update ) {
-	if ( 'wp_template_part' !== $post->post_type || $update || 'trash' === $post->post_status ) {
-		return;
-	}
-
-	$theme = get_post_meta( $post_id, 'theme', true );
-
-	if ( ! $theme ) {
-		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
-	}
-}
-
-add_action( 'save_post', 'gutenberg_set_template_part_post_theme', 10, 3 );
 
 /**
  * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
@@ -134,36 +104,10 @@ function gutenberg_fix_template_part_admin_menu_entry() {
 }
 add_action( 'admin_menu', 'gutenberg_fix_template_part_admin_menu_entry' );
 
-/**
- * Filters the 'wp_template_part' post type columns in the admin list table.
- *
- * @param array $columns Columns to display.
- * @return array Filtered $columns.
- */
-function gutenberg_filter_template_part_list_table_columns( array $columns ) {
-	$columns['slug'] = __( 'Slug', 'gutenberg' );
-	if ( isset( $columns['date'] ) ) {
-		unset( $columns['date'] );
-	}
-	return $columns;
-}
-add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_filter_template_part_list_table_columns' );
-
-/**
- * Renders column content for the 'wp_template_part' post type list table.
- *
- * @param string $column_name Column name to render.
- * @param int    $post_id     Post ID.
- */
-function gutenberg_render_template_part_list_table_column( $column_name, $post_id ) {
-	if ( 'slug' !== $column_name ) {
-		return;
-	}
-	$post = get_post( $post_id );
-	echo esc_html( $post->post_name );
-}
-add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_template_part_list_table_column', 10, 2 );
-
+// Customize the `wp_template` admin list.
+add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_templates_lists_custom_columns' );
+add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
+add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Filter for adding and a `theme` parameter to `wp_template_part` queries.
@@ -191,37 +135,16 @@ add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
 	if ( $request['theme'] ) {
-		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
-		$meta_query[] = array(
-			'key'   => 'theme',
-			'value' => $request['theme'],
+		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$tax_query[] = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $request['theme'],
 		);
 
-		$args['meta_query'] = $meta_query;
+		$args['tax_query'] = $tax_query;
 	}
 
 	return $args;
 }
 add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
-
-/**
- * Run synchrnonization for template part API requests
- *
- * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
- * @param WP_REST_Request $request         Request used to generate the response.
- * @param string          $route           Route matched for the request.
- * @return mixed Dispatch result.
- */
-function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $request, $route ) {
-	if ( null !== $dispatch_result ) {
-		return $dispatch_result;
-	}
-
-	if ( 0 === strpos( $route, '/wp/v2/template-parts' ) && 'GET' === $request->get_method() ) {
-		_gutenberg_synchronize_theme_templates( 'template-part' );
-	}
-
-	return null;
-}
-
-add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_part_dispatch', 10, 3 );

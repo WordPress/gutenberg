@@ -302,6 +302,18 @@ _Returns_
 
 -   `Array<RichTextValue>`: An array of new values.
 
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the rich-text namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
+
 <a name="toggleFormat" href="#toggleFormat">#</a> **toggleFormat**
 
 Toggles a format object to a Rich Text value at the current selection.

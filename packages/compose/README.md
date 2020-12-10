@@ -132,6 +132,31 @@ _Returns_
 
 -   `Array`: Async array.
 
+<a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
+
+In Dialogs/modals, the tabbing must be constrained to the content of
+the wrapper element. This hook adds the behavior to the returned ref.
+
+_Usage_
+
+```js
+import { useConstrainedTabbing } from '@wordpress/compose';
+
+const ConstrainedTabbingExample = () => {
+    const constrainedTabbingRef = useConstrainedTabbing()
+    return (
+        <div ref={ constrainedTabbingRef }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
 Copies the text to the clipboard when the element is clicked.
@@ -160,6 +185,34 @@ _Parameters_
 _Returns_
 
 -   `Function`: Debounced function.
+
+<a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
+
+Hook used to focus the first tabbable element on mount.
+
+_Usage_
+
+```js
+import { useFocusOnMount } from '@wordpress/compose';
+
+const WithFocusOnMount = () => {
+    const ref = useFocusOnMount()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+
+_Returns_
+
+-   `Function`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -294,6 +347,8 @@ _Parameters_
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
+
+> **Deprecated** 
 
 Higher-order component creator which, given an object of DOM event types and
 values corresponding to a callback function name on the component, will

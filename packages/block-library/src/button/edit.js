@@ -241,6 +241,7 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
+					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }

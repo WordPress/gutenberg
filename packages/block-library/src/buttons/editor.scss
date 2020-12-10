@@ -1,11 +1,28 @@
-.wp-block-buttons > .wp-block {
-	// Override editor auto block margins.
-	margin-left: 0;
-}
-
 .wp-block > .wp-block-buttons {
 	display: flex;
 	flex-wrap: wrap;
+}
+
+.wp-block-buttons {
+	> .wp-block {
+		// Override editor auto block margins.
+		margin-left: 0;
+		margin-top: $button-margin;
+	}
+	> .block-list-appender {
+		display: inline-flex;
+		align-items: center;
+	}
+	&.is-vertical {
+		> .block-list-appender .block-list-appender__toggle {
+			justify-content: flex-start;
+		}
+	}
+	> .wp-block-button {
+		&:focus {
+			box-shadow: none;
+		}
+	}
 }
 
 .wp-block[data-align="center"] > .wp-block-buttons {
@@ -15,9 +32,4 @@
 
 .wp-block[data-align="right"] > .wp-block-buttons {
 	justify-content: flex-end;
-}
-
-.wp-block-buttons > .block-list-appender {
-	display: inline-flex;
-	align-items: center;
 }

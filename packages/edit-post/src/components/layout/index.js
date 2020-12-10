@@ -17,12 +17,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
+	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
 	Popover,
 	FocusReturnProvider,
+	__unstableUseDrop as useDrop,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -32,8 +34,9 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { close } from '@wordpress/icons';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -66,7 +69,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout() {
+function Layout( { settings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
@@ -110,12 +113,12 @@ function Layout() {
 				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			previousShortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations(
 				'core/edit-post/previous-region'
 			),
 			nextShortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
@@ -163,6 +166,10 @@ function Layout() {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+	const ref = useRef();
+
+	useDrop( ref );
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
@@ -176,6 +183,7 @@ function Layout() {
 			<SettingsSidebar />
 			<FocusReturnProvider>
 				<InterfaceSkeleton
+					ref={ ref }
 					className={ className }
 					labels={ interfaceLabels }
 					header={

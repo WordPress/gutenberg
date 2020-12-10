@@ -13,8 +13,8 @@ describe( 'Query block utils', () => {
 			expect( getTermsInfo( terms ) ).toEqual(
 				expect.objectContaining( {
 					mapById: expect.objectContaining( {
-						'4': expect.objectContaining( { name: 'nba' } ),
-						'11': expect.objectContaining( {
+						4: expect.objectContaining( { name: 'nba' } ),
+						11: expect.objectContaining( {
 							name: 'featured',
 						} ),
 					} ),

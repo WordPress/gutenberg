@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get, startsWith } from 'lodash';
+import { has, get, startsWith, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,7 +52,8 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	Object.entries( STYLE_PROPERTY ).forEach(
+	const styleProperties = mapValues( STYLE_PROPERTY, ( prop ) => prop.value );
+	Object.entries( styleProperties ).forEach(
 		( [ styleKey, ...otherObjectKeys ] ) => {
 			const [ objectKeys ] = otherObjectKeys;
 

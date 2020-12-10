@@ -526,15 +526,25 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 		// Determine whether we can write to this file.  If not, don't waste
 		// time doing a network request.
 		// @codingStandardsIgnoreStart
-		$f = @fopen( $full_path, 'a' );
+
+		$is_writable = is_writable( $full_path );
+		if ( $is_writable ) {
+			$f = @fopen( $full_path, 'a' );
+			if ( ! $f ) {
+				$is_writable = false;
+			} else {
+				fclose( $f );
+			}
+		}
+
 		// @codingStandardsIgnoreEnd
-		if ( ! $f ) {
+		if ( ! $is_writable ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
 			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
 			return;
 		}
-		fclose( $f );
+
 		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
 			$f = fopen( $full_path, 'w' );
@@ -639,3 +649,16 @@ function gutenberg_extend_block_editor_settings_with_default_editor_styles( $set
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );
+
+/**
+ * Adds a flag to the editor settings to know whether we're in FSE theme or not.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
+	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );

@@ -10,7 +10,12 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize, rawHandler } from '@wordpress/blocks';
+import {
+	parse,
+	serialize,
+	rawHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
@@ -43,9 +48,7 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hiddenBlockTypes,
-		blockTypes,
-		colors,
-		gradients
+		blockTypes
 	) {
 		settings = {
 			...settings,
@@ -73,14 +76,6 @@ class Editor extends Component {
 				defaultAllowedBlockTypes,
 				...hiddenBlockTypes
 			);
-		}
-
-		if ( colors !== undefined ) {
-			settings.colors = colors;
-		}
-
-		if ( gradients !== undefined ) {
-			settings.gradients = gradients;
 		}
 
 		return settings;
@@ -124,8 +119,6 @@ class Editor extends Component {
 			post,
 			postId,
 			postType,
-			colors,
-			gradients,
 			initialHtml,
 			editorMode,
 			...props
@@ -136,9 +129,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes,
-			colors,
-			gradients
+			blockTypes
 		);
 
 		const normalizedPost = post || {
@@ -181,7 +172,7 @@ export default compose( [
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 		} = select( 'core/edit-post' );
-		const { getBlockTypes } = select( 'core/blocks' );
+		const { getBlockTypes } = select( blocksStore );
 
 		return {
 			hasFixedToolbar:

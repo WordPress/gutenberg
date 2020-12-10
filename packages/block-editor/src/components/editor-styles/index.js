@@ -13,26 +13,23 @@ import { useEffect } from '@wordpress/element';
  */
 import transformStyles from '../../utils/transform-styles';
 
-function EditorStyles( { styles } ) {
+export default function useEditorStyles( ref, styles ) {
 	useEffect( () => {
 		const updatedStyles = transformStyles(
 			styles,
 			'.editor-styles-wrapper'
 		);
 
+		const { ownerDocument } = ref.current;
 		const nodes = map( compact( updatedStyles ), ( updatedCSS ) => {
-			const node = document.createElement( 'style' );
+			const node = ownerDocument.createElement( 'style' );
 			node.innerHTML = updatedCSS;
-			document.body.appendChild( node );
+			ownerDocument.body.appendChild( node );
 
 			return node;
 		} );
 
 		return () =>
-			nodes.forEach( ( node ) => document.body.removeChild( node ) );
-	}, [ styles ] );
-
-	return null;
+			nodes.forEach( ( node ) => ownerDocument.body.removeChild( node ) );
+	}, [ ref, styles ] );
 }
-
-export default EditorStyles;

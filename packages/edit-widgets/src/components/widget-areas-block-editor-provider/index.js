@@ -17,7 +17,6 @@ import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
@@ -86,7 +85,6 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>

@@ -15,6 +15,7 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
  *                                        position.
  * @param {string}  chosenYAxis           yAxis to be used.
  * @param {Element} boundaryElement       Boundary element.
+ * @param {boolean} forcePosition         Don't adjust position based on anchor.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -25,7 +26,8 @@ export function computePopoverXAxisPosition(
 	corner,
 	stickyBoundaryElement,
 	chosenYAxis,
-	boundaryElement
+	boundaryElement,
+	forcePosition
 ) {
 	const { width } = contentSize;
 	const isRTL = document.documentElement.dir === 'rtl';
@@ -86,7 +88,7 @@ export function computePopoverXAxisPosition(
 	let chosenXAxis = xAxis;
 	let contentWidth = null;
 
-	if ( ! stickyBoundaryElement ) {
+	if ( ! stickyBoundaryElement && ! forcePosition ) {
 		if ( xAxis === 'center' && centerAlignment.contentWidth === width ) {
 			chosenXAxis = 'center';
 		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
@@ -143,6 +145,7 @@ export function computePopoverXAxisPosition(
  * @param {Element} anchorRef             The anchor element.
  * @param {Element} relativeOffsetTop     If applicable, top offset of the
  *                                        relative positioned parent container.
+ * @param {boolean} forcePosition         Don't adjust position based on anchor.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -153,7 +156,8 @@ export function computePopoverYAxisPosition(
 	corner,
 	stickyBoundaryElement,
 	anchorRef,
-	relativeOffsetTop
+	relativeOffsetTop,
+	forcePosition
 ) {
 	const { height } = contentSize;
 
@@ -206,7 +210,7 @@ export function computePopoverYAxisPosition(
 	let chosenYAxis = yAxis;
 	let contentHeight = null;
 
-	if ( ! stickyBoundaryElement ) {
+	if ( ! stickyBoundaryElement && ! forcePosition ) {
 		if ( yAxis === 'middle' && middleAlignment.contentHeight === height ) {
 			chosenYAxis = 'middle';
 		} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
@@ -259,6 +263,7 @@ export function computePopoverYAxisPosition(
  * @param {number}  relativeOffsetTop     If applicable, top offset of the
  *                                        relative positioned parent container.
  * @param {Element} boundaryElement       Boundary element.
+ * @param {boolean} forcePosition         Don't adjust position based on anchor.
  *
  * @return {Object} Popover position and constraints.
  */
@@ -269,7 +274,8 @@ export function computePopoverPosition(
 	stickyBoundaryElement,
 	anchorRef,
 	relativeOffsetTop,
-	boundaryElement
+	boundaryElement,
+	forcePosition
 ) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
@@ -280,7 +286,8 @@ export function computePopoverPosition(
 		corner,
 		stickyBoundaryElement,
 		anchorRef,
-		relativeOffsetTop
+		relativeOffsetTop,
+		forcePosition
 	);
 	const xAxisPosition = computePopoverXAxisPosition(
 		anchorRect,
@@ -289,7 +296,8 @@ export function computePopoverPosition(
 		corner,
 		stickyBoundaryElement,
 		yAxisPosition.yAxis,
-		boundaryElement
+		boundaryElement,
+		forcePosition
 	);
 
 	return {

@@ -2,20 +2,20 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useState,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
-import { focus, getRectangleFromRange } from '@wordpress/dom';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
-import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	useResizeObserver,
+	useFocusOnMount,
+} from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
 /**
@@ -29,7 +29,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { useAnimate } from '../animate';
+import { getAnimateClassName } from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
 	withFocusReturn( ( { children } ) => children )
@@ -71,11 +71,17 @@ function computeAnchorRect(
 			return;
 		}
 
-		if ( anchorRef instanceof window.Range ) {
+		// Duck-type to check if `anchorRef` is an instance of Range
+		// `anchorRef instanceof window.Range` checks will break across document boundaries
+		// such as in an iframe
+		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return getRectangleFromRange( anchorRef );
 		}
 
-		if ( anchorRef instanceof window.Element ) {
+		// Duck-type to check if `anchorRef` is an instance of Element
+		// `anchorRef instanceof window.Element` checks will break across document boundaries
+		// such as in an iframe
+		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = anchorRef.getBoundingClientRect();
 
 			if ( shouldAnchorIncludePadding ) {
@@ -142,53 +148,6 @@ function withoutPadding( rect, element ) {
 		top: rect.top + top,
 		bottom: rect.bottom - bottom,
 	};
-}
-
-/**
- * Hook used to focus the first tabbable element on mount.
- *
- * @param {boolean|string} focusOnMount Focus on mount mode.
- * @param {Object}         contentRef   Reference to the popover content element.
- */
-function useFocusContentOnMount( focusOnMount, contentRef ) {
-	// Focus handling
-	useEffect( () => {
-		/*
-		 * Without the setTimeout, the dom node is not being focused. Related:
-		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		 *
-		 * TODO: Treat the cause, not the symptom.
-		 */
-		const focusTimeout = setTimeout( () => {
-			if ( ! focusOnMount || ! contentRef.current ) {
-				return;
-			}
-
-			if ( focusOnMount === 'firstElement' ) {
-				// Find first tabbable node within content and shift focus, falling
-				// back to the popover panel itself.
-				const firstTabbable = focus.tabbable.find(
-					contentRef.current
-				)[ 0 ];
-
-				if ( firstTabbable ) {
-					firstTabbable.focus();
-				} else {
-					contentRef.current.focus();
-				}
-
-				return;
-			}
-
-			if ( focusOnMount === 'container' ) {
-				// Focus the popover panel itself so items in the popover are easily
-				// accessed via keyboard navigation.
-				contentRef.current.focus();
-			}
-		}, 0 );
-
-		return () => clearTimeout( focusTimeout );
-	}, [] );
 }
 
 /**
@@ -266,6 +225,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableObserveElement,
 	__unstableBoundaryParent,
+	__unstableForcePosition,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -355,7 +315,8 @@ const Popover = ( {
 				__unstableStickyBoundaryElement,
 				containerRef.current,
 				relativeOffsetTop,
-				boundaryElement
+				boundaryElement,
+				__unstableForcePosition
 			);
 
 			if (
@@ -456,7 +417,7 @@ const Popover = ( {
 		__unstableBoundaryParent,
 	] );
 
-	useFocusContentOnMount( focusOnMount, contentRef );
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -529,10 +490,13 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
-	const animateClassName = useAnimate( {
-		type: animate && animateOrigin ? 'appear' : null,
-		origin: animateOrigin,
-	} );
+	/** @type {false | string} */
+	const animateClassName =
+		Boolean( animate && animateOrigin ) &&
+		getAnimateClassName( {
+			type: 'appear',
+			origin: animateOrigin,
+		} );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
@@ -568,7 +532,7 @@ const Popover = ( {
 					</div>
 				) }
 				<div
-					ref={ contentRef }
+					ref={ mergeRefs( [ contentRef, focusOnMountRef ] ) }
 					className="components-popover__content"
 					tabIndex="-1"
 				>

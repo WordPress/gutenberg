@@ -5,11 +5,13 @@
 		"declarationDir": "build-types"
 	},
 	"references": [
+		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../primitives" }
 	],
 	"include": [
+		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/tip/**/*",

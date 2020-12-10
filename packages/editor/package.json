@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.24.3",
+	"version": "9.24.4",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
+		"@babel/runtime": "^7.12.5",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
@@ -54,7 +54,6 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
-		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
