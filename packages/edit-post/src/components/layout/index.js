@@ -23,7 +23,6 @@ import {
 	Button,
 	ScrollLock,
 	Popover,
-	FocusReturnProvider,
 	__unstableUseDrop as useDrop,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -181,129 +180,121 @@ function Layout( { settings } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
-			<FocusReturnProvider>
-				<InterfaceSkeleton
-					ref={ ref }
-					className={ className }
-					labels={ interfaceLabels }
-					header={
-						<Header
-							setEntitiesSavedStatesCallback={
-								setEntitiesSavedStatesCallback
-							}
-						/>
-					}
-					secondarySidebar={
-						mode === 'visual' &&
-						isInserterOpened && (
-							<PopoverWrapper
-								className="edit-post-layout__inserter-panel-popover-wrapper"
-								onClose={ () => setIsInserterOpened( false ) }
-							>
-								<div className="edit-post-layout__inserter-panel">
-									<div className="edit-post-layout__inserter-panel-header">
-										<Button
-											icon={ close }
-											onClick={ () =>
-												setIsInserterOpened( false )
-											}
-										/>
-									</div>
-									<div className="edit-post-layout__inserter-panel-content">
-										<Library
-											showMostUsedBlocks={
-												showMostUsedBlocks
-											}
-											showInserterHelpPanel
-											onSelect={ () => {
-												if ( isMobileViewport ) {
-													setIsInserterOpened(
-														false
-													);
-												}
-											} }
-										/>
-									</div>
+			<InterfaceSkeleton
+				ref={ ref }
+				className={ className }
+				labels={ interfaceLabels }
+				header={
+					<Header
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+					/>
+				}
+				secondarySidebar={
+					mode === 'visual' &&
+					isInserterOpened && (
+						<PopoverWrapper
+							className="edit-post-layout__inserter-panel-popover-wrapper"
+							onClose={ () => setIsInserterOpened( false ) }
+						>
+							<div className="edit-post-layout__inserter-panel">
+								<div className="edit-post-layout__inserter-panel-header">
+									<Button
+										icon={ close }
+										onClick={ () =>
+											setIsInserterOpened( false )
+										}
+									/>
 								</div>
-							</PopoverWrapper>
-						)
-					}
-					sidebar={
-						( ! isMobileViewport || sidebarIsOpened ) && (
-							<>
-								{ ! isMobileViewport && ! sidebarIsOpened && (
-									<div className="edit-post-layout__toogle-sidebar-panel">
-										<Button
-											isSecondary
-											className="edit-post-layout__toogle-sidebar-panel-button"
-											onClick={ openSidebarPanel }
-											aria-expanded={ false }
-										>
-											{ hasBlockSelected
-												? __( 'Open block settings' )
-												: __(
-														'Open document settings'
-												  ) }
-										</Button>
-									</div>
-								) }
-								<ComplementaryArea.Slot scope="core/edit-post" />
-							</>
-						)
-					}
-					content={
+								<div className="edit-post-layout__inserter-panel-content">
+									<Library
+										showMostUsedBlocks={
+											showMostUsedBlocks
+										}
+										showInserterHelpPanel
+										onSelect={ () => {
+											if ( isMobileViewport ) {
+												setIsInserterOpened( false );
+											}
+										} }
+									/>
+								</div>
+							</div>
+						</PopoverWrapper>
+					)
+				}
+				sidebar={
+					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
-							<EditorNotices />
-							{ ( mode === 'text' || ! isRichEditingEnabled ) && (
-								<TextEditor />
+							{ ! isMobileViewport && ! sidebarIsOpened && (
+								<div className="edit-post-layout__toogle-sidebar-panel">
+									<Button
+										isSecondary
+										className="edit-post-layout__toogle-sidebar-panel-button"
+										onClick={ openSidebarPanel }
+										aria-expanded={ false }
+									>
+										{ hasBlockSelected
+											? __( 'Open block settings' )
+											: __( 'Open document settings' ) }
+									</Button>
+								</div>
 							) }
-							{ isRichEditingEnabled && mode === 'visual' && (
-								<VisualEditor />
-							) }
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
-							{ isMobileViewport && sidebarIsOpened && (
-								<ScrollLock />
-							) }
+							<ComplementaryArea.Slot scope="core/edit-post" />
 						</>
-					}
-					footer={
-						! hasReducedUI &&
-						! isMobileViewport &&
-						isRichEditingEnabled &&
-						mode === 'visual' && (
-							<div className="edit-post-layout__footer">
-								<BlockBreadcrumb />
-							</div>
-						)
-					}
-					actions={
-						<ActionsPanel
-							closeEntitiesSavedStates={
-								closeEntitiesSavedStates
-							}
-							isEntitiesSavedStatesOpen={
-								entitiesSavedStatesCallback
-							}
-							setEntitiesSavedStatesCallback={
-								setEntitiesSavedStatesCallback
-							}
-						/>
-					}
-					shortcuts={ {
-						previous: previousShortcut,
-						next: nextShortcut,
-					} }
-				/>
-				<ManageBlocksModal />
-				<PreferencesModal />
-				<KeyboardShortcutHelpModal />
-				<WelcomeGuide />
-				<Popover.Slot />
-				<PluginArea />
-			</FocusReturnProvider>
+					)
+				}
+				content={
+					<>
+						<EditorNotices />
+						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
+							<TextEditor />
+						) }
+						{ isRichEditingEnabled && mode === 'visual' && (
+							<VisualEditor />
+						) }
+						<div className="edit-post-layout__metaboxes">
+							<MetaBoxes location="normal" />
+							<MetaBoxes location="advanced" />
+						</div>
+						{ isMobileViewport && sidebarIsOpened && (
+							<ScrollLock />
+						) }
+					</>
+				}
+				footer={
+					! hasReducedUI &&
+					! isMobileViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual' && (
+						<div className="edit-post-layout__footer">
+							<BlockBreadcrumb />
+						</div>
+					)
+				}
+				actions={
+					<ActionsPanel
+						closeEntitiesSavedStates={ closeEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={
+							entitiesSavedStatesCallback
+						}
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+					/>
+				}
+				shortcuts={ {
+					previous: previousShortcut,
+					next: nextShortcut,
+				} }
+			/>
+			<ManageBlocksModal />
+			<PreferencesModal />
+			<KeyboardShortcutHelpModal />
+			<WelcomeGuide />
+			<Popover.Slot />
+			<PluginArea />
 		</>
 	);
 }
