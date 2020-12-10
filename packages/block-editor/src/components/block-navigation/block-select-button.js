@@ -6,6 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import {
+	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockType,
+} from '@wordpress/blocks';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
@@ -15,13 +19,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import BlockTitle from '../block-title';
+import useMatchingVariationInformation from '../use-matching-variation-information';
 import { getBlockPositionDescription } from './utils';
 
 function BlockNavigationBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block: { clientId, name, attributes },
 		isSelected,
 		onClick,
 		position,
@@ -35,8 +39,15 @@ function BlockNavigationBlockSelectButton(
 	},
 	ref
 ) {
+	const blockInformation = useMatchingVariationInformation( clientId );
 	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
+	const blockType = getBlockType( name );
+	const blockLabel = getBlockLabel( blockType, attributes );
+	// If label is defined we prioritize it over possible possible
+	// block variation match title.
+	const blockDisplayName =
+		blockLabel !== blockType.title ? blockLabel : blockInformation.title;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
@@ -59,8 +70,8 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
-				<BlockIcon clientId={ clientId } showColors />
-				<BlockTitle clientId={ clientId } />
+				<BlockIcon icon={ blockInformation.icon } showColors />
+				{ blockDisplayName }
 				{ isSelected && (
 					<VisuallyHidden>
 						{ __( '(selected block)' ) }
