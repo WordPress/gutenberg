@@ -28,7 +28,6 @@ import { useRef, useCallback, useEffect } from '@wordpress/element';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	const previousNode = useRef();
 	const focusedBeforeMount = useRef();
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
@@ -37,14 +36,7 @@ function useFocusReturn( onFocusReturn ) {
 
 	const ref = useCallback( ( newNode ) => {
 		// Unmounting the reference
-		if (
-			previousNode.current &&
-			focusedBeforeMount.current &&
-			previousNode.current.ownerDocument.activeElement &&
-			previousNode.current.contains(
-				previousNode.current.ownerDocument.activeElement
-			)
-		) {
+		if ( ! newNode && focusedBeforeMount.current ) {
 			// Defer to the component's own explicit focus return behavior,
 			// if specified. This allows for support that the `onFocusReturn` decides to allow the
 			// default behavior to occur under some conditions.
@@ -53,18 +45,11 @@ function useFocusReturn( onFocusReturn ) {
 				return;
 			}
 
-			if (
-				previousNode.current.ownerDocument.contains(
-					focusedBeforeMount.current
-				)
-			) {
-				focusedBeforeMount.current.focus();
-			}
+			focusedBeforeMount.current.focus();
 		}
 
 		// Mounting the new reference
 		focusedBeforeMount.current = newNode?.ownerDocument.activeElement;
-		previousNode.current = newNode;
 	}, [] );
 
 	return ref;
