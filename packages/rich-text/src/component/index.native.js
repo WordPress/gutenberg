@@ -26,6 +26,8 @@ import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
+import { atSymbol, plus } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -43,7 +45,7 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
-import SuggestionToolbarButton from './suggestions.native';
+import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -109,7 +111,7 @@ export class RichText extends Component {
 			showXpostSuggestions,
 			'+'
 		).bind( this );
-		this.triggerKeyCodeHandlers = this.triggerKeyCodeHandlers.bind( this );
+		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
@@ -410,14 +412,13 @@ export class RichText extends Component {
 	}
 
 	handleTriggerKeyCodes( event ) {
-		const keyCodeHandlers = this.triggerKeyCodeHandlers();
-
 		const { keyCode } = event;
-		const triggeredKeyCodeChar = Object.keys( keyCodeHandlers ).find(
-			( charKey ) => charKey.charCodeAt( 0 ) === keyCode
-		);
+		const triggeredOption = this.suggestionOptions().find( ( option ) => {
+			const triggeredKeyCode = option.triggerChar.charCodeAt( 0 );
+			return triggeredKeyCode === keyCode;
+		} );
 
-		if ( triggeredKeyCodeChar ) {
+		if ( triggeredOption ) {
 			const record = this.getRecord();
 			const text = getTextContent( record );
 			// Only respond to the trigger if the selection is on the start of text or line
@@ -428,27 +429,37 @@ export class RichText extends Component {
 				text.charAt( record.start - 1 ) === '\n' ||
 				text.charAt( record.start - 1 ) === ' ';
 
-			if ( useTrigger ) {
-				keyCodeHandlers[ triggeredKeyCodeChar ]();
+			if ( useTrigger && triggeredOption.onClick ) {
+				triggeredOption.onClick();
 			} else {
-				this.insertString( record, triggeredKeyCodeChar );
+				this.insertString( record, triggeredOption.triggerChar );
 			}
 		}
 	}
 
-	triggerKeyCodeHandlers() {
-		if ( this.props.disableEditingMenu ) {
-			return {};
-		}
-
-		return {
-			...( this.props.areXPostsSupported && {
-				'+': this.handleXpostSuggestion,
-			} ),
-			...( this.props.areMentionsSupported && {
-				'@': this.handleUserSuggestion,
-			} ),
-		};
+	suggestionOptions() {
+		const { areMentionsSupported, areXPostsSupported } = this.props;
+		const allOptions = [
+			{
+				supported: areMentionsSupported,
+				title: __( 'Insert mention' ),
+				onClick: this.handleUserSuggestion,
+				triggerChar: '@',
+				value: 'mention',
+				label: __( 'Mention' ),
+				icon: atSymbol,
+			},
+			{
+				supported: areXPostsSupported,
+				title: __( 'Insert crosspost' ),
+				onClick: this.handleXpostSuggestion,
+				triggerChar: '+',
+				value: 'crosspost',
+				label: __( 'Crosspost' ),
+				icon: plus,
+			},
+		];
+		return allOptions.filter( ( op ) => op.supported );
 	}
 
 	handleSuggestionFunc( suggestionFunction, prefix ) {
@@ -790,8 +801,6 @@ export class RichText extends Component {
 			withoutInteractiveFormatting,
 			accessibilityLabel,
 			disableEditingMenu = false,
-			areMentionsSupported,
-			areXPostsSupported,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -907,8 +916,8 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ Object.keys(
-						this.triggerKeyCodeHandlers()
+					triggerKeyCodes={ this.suggestionOptions().map(
+						( op ) => op.triggerChar
 					) }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
@@ -950,13 +959,8 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							<SuggestionToolbarButton
-								areMentionsSupported={ areMentionsSupported }
-								areXPostsSupported={ areXPostsSupported }
-								onUserSuggestionsTriggered={
-									this.handleUserSuggestion
-								}
-								onXPostsTriggered={ this.handleXpostSuggestion }
+							<ToolbarButtonWithOptions
+								options={ this.suggestionOptions() }
 							/>
 						</BlockFormatControls>
 					</>
