@@ -118,31 +118,6 @@ _Parameters_
 
 Undocumented declaration.
 
-<a name="BlockDescription" href="#BlockDescription">#</a> **BlockDescription**
-
-Renders the block's configured description as a string, or empty if the description
-cannot be determined.
-
-_Usage_
-
-```jsx
-<BlockDescription clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
-```
-
-```jsx
-<BlockDescription description="Override description" />
-```
-
-_Parameters_
-
--   _props_ `Object`: 
--   _props.clientId_ `string`: Client ID of block.
--   _props.description_ `string`: Description override.
-
-_Returns_
-
--   `?string`: Block Description.
-
 <a name="BlockEdit" href="#BlockEdit">#</a> **BlockEdit**
 
 Undocumented declaration.
