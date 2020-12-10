@@ -418,7 +418,7 @@ add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_cont
  * @return bool
  */
 function gutenberg_should_load_separate_block_styles() {
-	$load_separate_styles = current_theme_supports( 'split-block-styles' ) || gutenberg_is_fse_theme();
+	$load_separate_styles = gutenberg_is_fse_theme();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
