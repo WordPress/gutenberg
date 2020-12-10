@@ -10,6 +10,7 @@ import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -299,7 +300,7 @@ export function* savePost( options = {} ) {
 		} );
 		if ( args.length ) {
 			yield controls.dispatch(
-				'core/notices',
+				noticesStore,
 				'createErrorNotice',
 				...args
 			);
@@ -321,7 +322,7 @@ export function* savePost( options = {} ) {
 		} );
 		if ( args.length ) {
 			yield controls.dispatch(
-				'core/notices',
+				noticesStore,
 				'createSuccessNotice',
 				...args
 			);
@@ -375,7 +376,7 @@ export function* trashPost() {
 		postTypeSlug
 	);
 	yield controls.dispatch(
-		'core/notices',
+		noticesStore,
 		'removeNotice',
 		TRASH_POST_NOTICE_ID
 	);
@@ -389,7 +390,7 @@ export function* trashPost() {
 		yield controls.dispatch( STORE_NAME, 'savePost' );
 	} catch ( error ) {
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			...getNotificationArgumentsForTrashFail( { error } )
 		);

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -346,7 +347,7 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: true } ).value ).toEqual(
 			dispatch(
-				'core/notices',
+				noticesStore,
 				'createSuccessNotice',
 				__( 'Navigation saved.' ),
 				{
@@ -476,7 +477,7 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: false } ).value ).toEqual(
 			dispatch(
-				'core/notices',
+				noticesStore,
 				'createErrorNotice',
 				__( 'There was an error.' ),
 				{
