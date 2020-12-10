@@ -7,7 +7,12 @@ import mergeRefs from 'react-merge-refs';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useLayoutEffect,
+	useEffect,
+} from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
