@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Hook used to focus the first tabbable element on mount.
@@ -27,18 +27,21 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 function useFocusOnMount( focusOnMount = 'firstElement' ) {
 	const focusOnMountRef = useRef( focusOnMount );
+	const [ node, setNode ] = useState();
 	useEffect( () => {
 		focusOnMountRef.current = focusOnMount;
 	}, [ focusOnMount ] );
 
-	// Ideally we should be using a function ref (useCallback)
+	// Ideally we should be running the focus behavior in the useCallback directly
 	// Right now we have some issues where the link popover remounts
 	// prevents us from doing that.
-	// The downside of the current implementation is that it doesn't update if the "ref" changes.
-	const ref = useRef();
+	const ref = useCallback( setNode, [] );
 
 	// Focus handling
 	useEffect( () => {
+		if ( ! node ) {
+			return;
+		}
 		/*
 		 * Without the setTimeout, the dom node is not being focused. Related:
 		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
@@ -46,29 +49,32 @@ function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		 * TODO: Treat the cause, not the symptom.
 		 */
 		const focusTimeout = setTimeout( () => {
-			if ( ! focusOnMountRef.current || ! ref.current ) {
+			if ( focusOnMountRef.current === false || ! node ) {
 				return;
 			}
 
 			if ( focusOnMountRef.current === 'firstElement' ) {
-				const firstTabbable = focus.tabbable.find( ref.current )[ 0 ];
+				const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 				if ( firstTabbable ) {
 					firstTabbable.focus();
 				} else {
-					ref.current.focus();
+					node.focus();
 				}
 
 				return;
 			}
 
-			if ( focusOnMountRef.current === 'container' ) {
-				ref.current.focus();
+			if (
+				focusOnMountRef.current === 'container' ||
+				focusOnMountRef.current === true
+			) {
+				node.focus();
 			}
 		}, 0 );
 
 		return () => clearTimeout( focusTimeout );
-	}, [] );
+	}, [ node ] );
 
 	return ref;
 }
