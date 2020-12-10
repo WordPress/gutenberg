@@ -18,10 +18,10 @@ If this is a security issue, please report it in HackerOne instead:
 https://hackerone.com/wordpress
 -->
 
-**Description**
+## Description
 <!-- Please write a brief description of the bug. -->
 
-**Step-by-step reproduction instructions**
+## Step-by-step reproduction instructions
 <!--
 Please list the steps needed to reproduce the bug. For example:
 1. Go to '...'
@@ -29,20 +29,20 @@ Please list the steps needed to reproduce the bug. For example:
 3. Scroll down to '...'
 -->
 
-**Expected behaviour**
+## Expected behaviour
 <!-- Please describe what you expected to happen. -->
 
-**Actual behaviour**
+## Actual behaviour
 <!-- Please describe what actually happened. -->
 
-**Screenshots or screen recording (optional)**
+## Screenshots or screen recording (optional)
 <!--
 If possible, please upload a screenshot or screen recording which demonstrates
 the bug. You can use LIEcap to create a GIF screen recording:
 https://www.cockos.com/licecap/
 -->
 
-**Plugin code (optional)**
+## Plugin code (optional)
 <!--
 If this bug is to do with a developer API, please share a code snippet or plugin
 code that demonstrates the issue. You can use GitHub Gist to share multiple code
@@ -50,13 +50,13 @@ files:
 https://gist.github.com
 -->
 
-**WordPress information**
+## WordPress information
 - WordPress version: <!-- e.g. "5.6.0" -->
 - Gutenberg version: <!-- e.g. "9.4.0" or "Not installed" -->
 - Are all plugins except Gutenberg deactivated? <!-- "Yes" or "No" -->
 - Are you using a default theme (e.g. Twenty Twenty)? <!-- "Yes" or "No" -->
 
-**Device information**
+## Device information
 - Device: <!-- e.g. "Desktop" or "iPhone 11" -->
 - Operating system: <!-- e.g. "Windows 10" or "iOS 14" -->
 - Browser: <!-- e.g. "Chrome 86.0" or "Mobile Safari" -->
