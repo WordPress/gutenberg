@@ -423,9 +423,6 @@ export class ImageEdit extends React.Component {
 						<BlockStyles clientId={ clientId } url={ url } />
 					) }
 				</PanelBody>
-				<PanelBody title={ __( 'Link Settings' ) }>
-					{ this.getLinkSettings( true ) }
-				</PanelBody>
 				<PanelBody>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
@@ -445,6 +442,9 @@ export class ImageEdit extends React.Component {
 						valuePlaceholder={ __( 'None' ) }
 						onChangeValue={ this.updateAlt }
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					{ this.getLinkSettings( true ) }
 				</PanelBody>
 			</InspectorControls>
 		);
