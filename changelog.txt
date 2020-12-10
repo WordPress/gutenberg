@@ -2,6 +2,8 @@
 
 = 9.5.2 =
 
+### Bug Fixes:
+
 - Fix uncaught error with a custom generic store without a unsubscribe function in useSelect.
 
 
