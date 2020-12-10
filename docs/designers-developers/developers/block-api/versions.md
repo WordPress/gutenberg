@@ -4,8 +4,8 @@ This document lists the changes made between the different API versions.
 
 ## Version 2 (>= WordPress 5.6)
 
-- Moves the responsibility to render the block element wrapper in the editor to the block author using the `useBlockProps()` hook.
-- Generates classnames and styles are not added automatically to the saved markup for static blocks, block authors are required to explicitely use `useBlockProps.save()` in their `save` functions to retrieve the generated classes and styles to apply on the block wrapper.
+- To render the block element wrapper for the block's `edit` implementation, the block author must use the `useBlockProps()` hook.
+- The generated class names and styles are no longer added automatically to the saved markup for static blocks when `save` is processed. To include them, the block author must explicitly use `useBlockProps.save()` and add to their block wrapper.
 
 ## Version 1
 
