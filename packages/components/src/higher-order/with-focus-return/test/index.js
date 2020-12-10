@@ -2,7 +2,7 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -93,6 +93,7 @@ describe( 'withFocusReturn()', () => {
 			} );
 
 			const textarea = container.querySelector( 'textarea' );
+			fireEvent.focusIn( textarea, { target: textarea } );
 			textarea.focus();
 			expect( document.activeElement ).toBe( textarea );
 
