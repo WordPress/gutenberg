@@ -28,26 +28,21 @@ import { useSelect } from '@wordpress/data';
 // TODO write jsdoc example
 // TODO write tests
 export default function useMatchingVariationInformation( clientId ) {
-	const { attributes, name } = useSelect(
+	return useSelect(
 		( select ) => {
-			if ( ! clientId ) return {};
+			if ( ! clientId ) return null;
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
 			);
-			return {
-				attributes: getBlockAttributes( clientId ),
-				name: getBlockName( clientId ),
-			};
+			const { getBlockDisplayInformation } = select( 'core/blocks' );
+			const attributes = getBlockAttributes( clientId );
+			const name = getBlockName( clientId );
+			return (
+				name &&
+				attributes &&
+				getBlockDisplayInformation( name, attributes )
+			);
 		},
 		[ clientId ]
 	);
-	const displayInformation = useSelect(
-		( select ) => {
-			if ( ! ( name && attributes ) ) return null;
-			const { getBlockDisplayInformation } = select( 'core/blocks' );
-			return getBlockDisplayInformation( name, attributes );
-		},
-		[ name, attributes ]
-	);
-	return displayInformation;
 }

@@ -47,7 +47,7 @@ function BlockNavigationBlockSelectButton(
 	// If label is defined we prioritize it over possible possible
 	// block variation match title.
 	const blockDisplayName =
-		blockLabel !== blockType.title ? blockLabel : blockInformation.title;
+		blockLabel !== blockType.title ? blockLabel : blockInformation?.title;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
