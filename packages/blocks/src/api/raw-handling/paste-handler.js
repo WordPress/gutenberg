@@ -90,17 +90,20 @@ const fromObjToString = ( obj ) =>
 
 const sanitize = ( x ) => x;
 const removeDefaultStyles = ( html ) => {
+	const container = document.createElement( 'div' );
+	container.innerHTML = html;
+	const elementStyles = container.firstElementChild.style.cssText;
 	const defaultStylesEntries = getStylesEntries( defaultStyles );
-	const [ htmlPart0, restHtml ] = html.split( 'style="' );
-	const [ htmlStyles, htmlPart2 ] = restHtml.split( `"` );
-	const stylesEntries = getStylesEntries( htmlStyles );
+	const stylesEntries = getStylesEntries( elementStyles );
 	const diff = getNonDefaultStyles( {
 		defaultStylesEntries,
 		stylesEntries,
 	} );
-	const styles =
-		htmlPart0 + 'style="' + fromObjToString( diff ) + '"' + htmlPart2;
-	return styles;
+	const nonDefaultStyles = fromObjToString( diff );
+	for ( const child of container.children ) {
+		child.style = nonDefaultStyles;
+	}
+	return container.children.map( ( child ) => child.value );
 };
 /**
  * Filters HTML to only contain phrasing content.
