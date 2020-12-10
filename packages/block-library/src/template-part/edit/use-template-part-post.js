@@ -24,13 +24,14 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 			// relevant file.
 			if ( slug && theme ) {
 				const cleanedSlug = cleanForSlug( slug );
+				const themeSlug = `pub-${ theme }`;
 				const posts = select( 'core' ).getEntityRecords(
 					'postType',
 					'wp_template_part',
 					{
 						status: [ 'publish', 'auto-draft' ],
 						slug: cleanedSlug,
-						theme,
+						themeSlug,
 					}
 				);
 
