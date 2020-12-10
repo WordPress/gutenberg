@@ -107,7 +107,15 @@ export function computePopoverXAxisPosition(
 				chosenXAxis === 'left'
 					? leftAlignment.contentWidth
 					: rightAlignment.contentWidth;
-			contentWidth = chosenWidth !== width ? chosenWidth : null;
+
+			if ( width > window.innerWidth ) {
+				contentWidth = window.innerWidth;
+			}
+
+			if ( chosenWidth !== width ) {
+				chosenXAxis = 'center';
+				centerAlignment.popoverLeft = window.innerWidth / 2;
+			}
 		}
 	}
 
