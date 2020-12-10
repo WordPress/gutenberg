@@ -24,9 +24,9 @@ const MAX_COLUMNS_NUM_IN_ROW = 3;
  *
  * @type {number}
  */
-const MIN_WIDTH = styles.columnsContainer.minWidth;
+const MIN_WIDTH = styles.columnsContainer?.minWidth;
 
-const MARGIN = styles.columnsContainer.marginLeft;
+const MARGIN = styles.columnsContainer?.marginLeft;
 
 export const getColumnsInRow = ( width, columnCount ) => {
 	if ( width ) {
