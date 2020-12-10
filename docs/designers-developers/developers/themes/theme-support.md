@@ -22,22 +22,22 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'editor-color-palette', array(
 		array(
-			'name' => __( 'strong magenta', 'themeLangDomain' ),
+			'name' => esc_attr__( 'strong magenta', 'themeLangDomain' ),
 			'slug' => 'strong-magenta',
 			'color' => '#a156b4',
 		),
 		array(
-			'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+			'name' => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
 			'slug' => 'light-grayish-magenta',
 			'color' => '#d0a5db',
 		),
 		array(
-			'name' => __( 'very light gray', 'themeLangDomain' ),
+			'name' => esc_attr__( 'very light gray', 'themeLangDomain' ),
 			'slug' => 'very-light-gray',
 			'color' => '#eee',
 		),
 		array(
-			'name' => __( 'very dark gray', 'themeLangDomain' ),
+			'name' => esc_attr__( 'very dark gray', 'themeLangDomain' ),
 			'slug' => 'very-dark-gray',
 			'color' => '#444',
 		),
@@ -104,22 +104,22 @@ Different blocks have the possibility of customizing colors. The block editor pr
 ```php
 add_theme_support( 'editor-color-palette', array(
 	array(
-		'name' => __( 'strong magenta', 'themeLangDomain' ),
+		'name' => esc_attr__( 'strong magenta', 'themeLangDomain' ),
 		'slug' => 'strong-magenta',
 		'color' => '#a156b4',
 	),
 	array(
-		'name' => __( 'light grayish magenta', 'themeLangDomain' ),
+		'name' => esc_attr__( 'light grayish magenta', 'themeLangDomain' ),
 		'slug' => 'light-grayish-magenta',
 		'color' => '#d0a5db',
 	),
 	array(
-		'name' => __( 'very light gray', 'themeLangDomain' ),
+		'name' => esc_attr__( 'very light gray', 'themeLangDomain' ),
 		'slug' => 'very-light-gray',
 		'color' => '#eee',
 	),
 	array(
-		'name' => __( 'very dark gray', 'themeLangDomain' ),
+		'name' => esc_attr__( 'very dark gray', 'themeLangDomain' ),
 		'slug' => 'very-dark-gray',
 		'color' => '#444',
 	),
@@ -155,27 +155,27 @@ add_theme_support(
 	'editor-gradient-presets',
 	array(
 		array(
-			'name'     => __( 'Vivid cyan blue to vivid purple', 'themeLangDomain' ),
+			'name'     => esc_attr__( 'Vivid cyan blue to vivid purple', 'themeLangDomain' ),
 			'gradient' => 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
 			'slug'     => 'vivid-cyan-blue-to-vivid-purple'
 		),
 		array(
-			'name'     => __( 'Vivid green cyan to vivid cyan blue', 'themeLangDomain' ),
+			'name'     => esc_attr__( 'Vivid green cyan to vivid cyan blue', 'themeLangDomain' ),
 			'gradient' => 'linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%)',
 			'slug'     =>  'vivid-green-cyan-to-vivid-cyan-blue',
 		),
 		array(
-			'name'     => __( 'Light green cyan to vivid green cyan', 'themeLangDomain' ),
+			'name'     => esc_attr__( 'Light green cyan to vivid green cyan', 'themeLangDomain' ),
 			'gradient' => 'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
 			'slug'     => 'light-green-cyan-to-vivid-green-cyan',
 		),
 		array(
-			'name'     => __( 'Luminous vivid amber to luminous vivid orange', 'themeLangDomain' ),
+			'name'     => esc_attr__( 'Luminous vivid amber to luminous vivid orange', 'themeLangDomain' ),
 			'gradient' => 'linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%)',
 			'slug'     => 'luminous-vivid-amber-to-luminous-vivid-orange',
 		),
 		array(
-			'name'     => __( 'Luminous vivid orange to vivid red', 'themeLangDomain' ),
+			'name'     => esc_attr__( 'Luminous vivid orange to vivid red', 'themeLangDomain' ),
 			'gradient' => 'linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%)',
 			'slug'     => 'luminous-vivid-orange-to-vivid-red',
 		),
@@ -201,22 +201,22 @@ Blocks may allow the user to configure the font sizes they use, e.g., the paragr
 ```php
 add_theme_support( 'editor-font-sizes', array(
 	array(
-		'name' => __( 'Small', 'themeLangDomain' ),
+		'name' => esc_attr__( 'Small', 'themeLangDomain' ),
 		'size' => 12,
 		'slug' => 'small'
 	),
 	array(
-		'name' => __( 'Regular', 'themeLangDomain' ),
+		'name' => esc_attr__( 'Regular', 'themeLangDomain' ),
 		'size' => 16,
 		'slug' => 'regular'
 	),
 	array(
-		'name' => __( 'Large', 'themeLangDomain' ),
+		'name' => esc_attr__( 'Large', 'themeLangDomain' ),
 		'size' => 36,
 		'slug' => 'large'
 	),
 	array(
-		'name' => __( 'Huge', 'themeLangDomain' ),
+		'name' => esc_attr__( 'Huge', 'themeLangDomain' ),
 		'size' => 50,
 		'slug' => 'huge'
 	)
