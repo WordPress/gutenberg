@@ -3,7 +3,7 @@
  */
 import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 /**
@@ -11,6 +11,10 @@ import { useCallback } from '@wordpress/element';
  */
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+
+const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
+
+export const ActionsPanelFill = Fill;
 
 export default function ActionsPanel( {
 	setEntitiesSavedStatesCallback,
@@ -92,6 +96,7 @@ export default function ActionsPanel( {
 				isOpen={ isEntitiesSavedStatesOpen }
 				close={ closeEntitiesSavedStates }
 			/>
+			<Slot bubblesVirtually />
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }
 		</>
 	);

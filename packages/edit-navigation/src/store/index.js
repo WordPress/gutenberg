@@ -11,11 +11,7 @@ import * as resolvers from './resolvers';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-
-/**
- * Module Constants
- */
-const STORE_NAME = 'core/edit-navigation';
+import { STORE_NAME } from './constants';
 
 /**
  * Block editor data store configuration.

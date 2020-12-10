@@ -33,7 +33,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.11.2"
+		"@babel/runtime": "^7.12.5"
 	},
 	"publishConfig": {
 		"access": "public"

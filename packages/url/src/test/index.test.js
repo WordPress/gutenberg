@@ -16,6 +16,7 @@ import {
 	getPath,
 	isValidPath,
 	getQueryString,
+	buildQueryString,
 	isValidQueryString,
 	getFragment,
 	isValidFragment,
@@ -27,6 +28,7 @@ import {
 	safeDecodeURI,
 	filterURLForDisplay,
 	cleanForSlug,
+	getQueryArgs,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -288,6 +290,14 @@ describe( 'getQueryString', () => {
 		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
+	it( 'returns the query string of a path', () => {
+		expect( getQueryString( '/wp-json/wp/v2/posts?type=page' ) ).toBe(
+			'type=page'
+		);
+
+		expect( getQueryString( '/wp-json/wp/v2/posts' ) ).toBeUndefined();
+	} );
+
 	it( 'returns undefined when the provided does not contain a url query string', () => {
 		expect( getQueryString( '' ) ).toBeUndefined();
 		expect(
@@ -310,6 +320,56 @@ describe( 'getQueryString', () => {
 		expect(
 			getQueryString( 'https://example.com/empty?' )
 		).toBeUndefined();
+	} );
+} );
+
+describe( 'buildQueryString', () => {
+	it( 'builds simple strings', () => {
+		const data = {
+			foo: 'bar',
+			baz: 'boom',
+			cow: 'milk',
+			php: 'hypertext processor',
+		};
+
+		expect( buildQueryString( data ) ).toBe(
+			'foo=bar&baz=boom&cow=milk&php=hypertext%20processor'
+		);
+	} );
+
+	it( 'builds complex data', () => {
+		const data = {
+			user: {
+				name: 'Bob Smith',
+				age: 47,
+				sex: 'M',
+				dob: '5/12/1956',
+			},
+			pastimes: [ 'golf', 'opera', 'poker', 'rap' ],
+			children: {
+				bobby: { age: 12, sex: 'M' },
+				sally: { age: 8, sex: 'F' },
+			},
+		};
+
+		expect( buildQueryString( data ) ).toBe(
+			'user%5Bname%5D=Bob%20Smith&user%5Bage%5D=47&user%5Bsex%5D=M&user%5Bdob%5D=5%2F12%2F1956&pastimes%5B0%5D=golf&pastimes%5B1%5D=opera&pastimes%5B2%5D=poker&pastimes%5B3%5D=rap&children%5Bbobby%5D%5Bage%5D=12&children%5Bbobby%5D%5Bsex%5D=M&children%5Bsally%5D%5Bage%5D=8&children%5Bsally%5D%5Bsex%5D=F'
+		);
+	} );
+
+	it( 'builds falsey values', () => {
+		const data = {
+			empty: '',
+			null: null,
+			undefined,
+			zero: 0,
+		};
+
+		expect( buildQueryString( data ) ).toBe( 'empty=&null=&zero=0' );
+	} );
+
+	it( 'builds an empty object as an empty string', () => {
+		expect( buildQueryString( {} ) ).toBe( '' );
 	} );
 } );
 
@@ -520,6 +580,116 @@ describe( 'addQueryArgs', () => {
 	} );
 } );
 
+describe( 'getQueryArgs', () => {
+	it( 'should parse simple query arguments', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&baz=quux';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: 'bar',
+			baz: 'quux',
+		} );
+	} );
+
+	it( 'should accumulate array of values', () => {
+		const url =
+			'https://andalouses.example/beach?foo[]=zero&foo[]=one&foo[]=two';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: [ 'zero', 'one', 'two' ],
+		} );
+	} );
+
+	it( 'should accumulate keyed array of values', () => {
+		const url =
+			'https://andalouses.example/beach?foo[1]=one&foo[0]=zero&foo[]=two';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: [ 'zero', 'one', 'two' ],
+		} );
+	} );
+
+	it( 'should accumulate object of values', () => {
+		const url =
+			'https://andalouses.example/beach?foo[zero]=0&foo[one]=1&foo[]=empty';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: {
+				'': 'empty',
+				zero: '0',
+				one: '1',
+			},
+		} );
+	} );
+
+	it( 'normalizes mixed numeric and named keys', () => {
+		const url = 'https://andalouses.example/beach?foo[0]=0&foo[one]=1';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: {
+				0: '0',
+				one: '1',
+			},
+		} );
+	} );
+
+	it( 'should return empty object for URL without querystring', () => {
+		const urlWithoutQuerystring = 'https://andalouses.example/beach';
+		const urlWithEmptyQuerystring = 'https://andalouses.example/beach?';
+		const invalidURL = 'example';
+
+		expect( getQueryArgs( invalidURL ) ).toEqual( {} );
+		expect( getQueryArgs( urlWithoutQuerystring ) ).toEqual( {} );
+		expect( getQueryArgs( urlWithEmptyQuerystring ) ).toEqual( {} );
+	} );
+
+	it( 'should gracefully handle empty keys and values', () => {
+		const url = 'https://andalouses.example/beach?&foo';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: '',
+		} );
+	} );
+
+	describe( 'reverses buildQueryString', () => {
+		it( 'unbuilds simple strings', () => {
+			const data = {
+				foo: 'bar',
+				baz: 'boom',
+				cow: 'milk',
+				php: 'hypertext processor',
+			};
+
+			expect(
+				getQueryArgs(
+					'https://example.com/?foo=bar&baz=boom&cow=milk&php=hypertext%20processor'
+				)
+			).toEqual( data );
+		} );
+
+		it( 'unbuilds complex data, with stringified values', () => {
+			const data = {
+				user: {
+					name: 'Bob Smith',
+					age: '47',
+					sex: 'M',
+					dob: '5/12/1956',
+				},
+				pastimes: [ 'golf', 'opera', 'poker', 'rap' ],
+				children: {
+					bobby: { age: '12', sex: 'M' },
+					sally: { age: '8', sex: 'F' },
+				},
+			};
+
+			expect(
+				getQueryArgs(
+					'https://example.com/?user%5Bname%5D=Bob%20Smith&user%5Bage%5D=47&user%5Bsex%5D=M&user%5Bdob%5D=5%2F12%2F1956&pastimes%5B0%5D=golf&pastimes%5B1%5D=opera&pastimes%5B2%5D=poker&pastimes%5B3%5D=rap&children%5Bbobby%5D%5Bage%5D=12&children%5Bbobby%5D%5Bsex%5D=M&children%5Bsally%5D%5Bage%5D=8&children%5Bsally%5D%5Bsex%5D=F'
+				)
+			).toEqual( data );
+		} );
+	} );
+} );
+
 describe( 'getQueryArg', () => {
 	it( 'should get the value of an existing query arg', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
@@ -543,6 +713,7 @@ describe( 'getQueryArg', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz#foo';
 
 		expect( getQueryArg( url, 'foo' ) ).toEqual( 'bar' );
+		expect( getQueryArg( url, 'bar' ) ).toEqual( 'baz' );
 	} );
 } );
 
@@ -567,6 +738,12 @@ describe( 'hasQueryArg', () => {
 } );
 
 describe( 'removeQueryArgs', () => {
+	it( 'should not change URL without a querystring', () => {
+		const url = 'https://andalouses.example/beach';
+
+		expect( removeQueryArgs( url, 'baz', 'test' ) ).toEqual( url );
+	} );
+
 	it( 'should not change URL not containing query args', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
 

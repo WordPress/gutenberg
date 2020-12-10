@@ -13,7 +13,7 @@ import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 const thumbSize = 20;
 
-export const Root = styled.span`
+export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
 	align-items: flex-start;
@@ -31,7 +31,7 @@ const wrapperColor = ( { color: colorProp = color( 'ui.borderFocus' ) } ) => {
 const wrapperMargin = ( { marks } ) =>
 	css( { marginBottom: marks ? 16 : null } );
 
-export const Wrapper = styled.span`
+export const Wrapper = styled.div`
 	box-sizing: border-box;
 	color: ${ color( 'blue.medium.focus' ) };
 	display: block;

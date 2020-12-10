@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -31,7 +34,7 @@ function KeyboardShortcuts() {
 }
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/edit-site/undo',

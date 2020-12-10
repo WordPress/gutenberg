@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New feature
+
+- Make the plugin compatible with webpack 5.
+
 ## 2.7.0 (2020-06-15)
 
 ### New feature

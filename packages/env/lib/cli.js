@@ -11,6 +11,7 @@ const terminalLink = require( 'terminal-link' );
  * Internal dependencies
  */
 const env = require( './env' );
+const parseXdebugMode = require( './parse-xdebug-mode' );
 
 // Colors
 const boldWhite = chalk.bold.white;
@@ -98,6 +99,12 @@ module.exports = function cli() {
 				describe:
 					'Download source updates and apply WordPress configuration.',
 				default: false,
+			} );
+			args.option( 'xdebug', {
+				describe:
+					'Enables Xdebug. If not passed, Xdebug is turned off. If no modes are set, uses "debug". You may set multiple Xdebug modes by passing them in a comma-separated list: `--xdebug=develop,coverage`. See https://xdebug.org/docs/all_settings#mode for information about Xdebug modes.',
+				coerce: parseXdebugMode,
+				type: 'string',
 			} );
 		},
 		withSpinner( env.start )

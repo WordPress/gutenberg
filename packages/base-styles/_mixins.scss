@@ -358,20 +358,26 @@
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;
+	width: $radio-input-size-sm;
+	height: $radio-input-size-sm;
+
+	@include break-small() {
+		height: $radio-input-size;
+		width: $radio-input-size;
+	}
 
 	&:checked::before {
-		width: 7px;
-		height: 7px;
-		margin: 8px 0 0 8px;
+		width: 8px;
+		height: 8px;
+		transform: translate(7px, 7px);
+		margin: 0;
 		background-color: $white;
 
 		// This border serves as a background color in Windows High Contrast mode.
-		border: 3px solid $white;
+		border: 4px solid $white;
 
-		@include break-medium() {
-			width: 6px;
-			height: 6px;
-			margin: 4px 0 0 4px;
+		@include break-small() {
+			transform: translate(5px, 5px);
 		}
 	}
 

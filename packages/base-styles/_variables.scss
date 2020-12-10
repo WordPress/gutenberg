@@ -19,6 +19,8 @@ $border-width: 1px;
 $border-width-focus: 1.5px;
 $border-width-tab: 4px;
 $helptext-font-size: 12px;
+$radio-input-size: 20px;
+$radio-input-size-sm: 24px; // Width & height for small viewports.
 
 /**
  * Grid System.
@@ -57,7 +59,6 @@ $mobile-header-toolbar-height: 44px;
 $mobile-floating-toolbar-height: 44px;
 $mobile-floating-toolbar-margin: 8px;
 $mobile-color-swatch: 48px;
-$header-toolbar-min-width: 335px;
 
 /**
  * Shadows.

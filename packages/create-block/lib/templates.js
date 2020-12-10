@@ -118,6 +118,7 @@ const getBlockTemplate = async ( templateName ) => {
 
 const getDefaultValues = ( blockTemplate ) => {
 	return {
+		apiVersion: 2,
 		namespace: 'create-block',
 		category: 'widgets',
 		author: 'The WordPress Contributors',
