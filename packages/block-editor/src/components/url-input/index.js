@@ -22,12 +22,6 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
-// Since URLInput is rendered in the context of other inputs, but should be
-// considered a separate modal node, prevent keyboard events from propagating
-// as being considered from the input.
-const stopEventPropagation = ( event ) => event.stopPropagation();
-
-/* eslint-disable jsx-a11y/no-autofocus */
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -398,7 +392,6 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
-			autoFocus = true,
 		} = this.props;
 
 		const {
@@ -420,12 +413,10 @@ class URLInput extends Component {
 		const inputProps = {
 			value,
 			required: true,
-			autoFocus,
 			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
 			onFocus: this.onFocus,
-			onInput: stopEventPropagation,
 			placeholder,
 			onKeyDown: this.onKeyDown,
 			role: 'combobox',
@@ -545,7 +536,6 @@ class URLInput extends Component {
 		return null;
 	}
 }
-/* eslint-enable jsx-a11y/no-autofocus */
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md

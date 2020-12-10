@@ -501,20 +501,15 @@ export function* saveEntityRecord(
 					yield receiveAutosaves( persistedRecord.id, updatedRecord );
 				}
 			} else {
-				// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
-				// but some plugins break with this behavior so we can't filter it on the server.
-				let data = record;
-				if (
-					kind === 'postType' &&
-					persistedRecord &&
-					persistedRecord.status === 'auto-draft'
-				) {
-					if ( ! data.status ) {
-						data = { ...data, status: 'draft' };
-					}
-					if ( ! data.title || data.title === 'Auto Draft' ) {
-						data = { ...data, title: '' };
-					}
+				let edits = record;
+				if ( entity.__unstablePrePersist ) {
+					edits = {
+						...edits,
+						...entity.__unstablePrePersist(
+							persistedRecord,
+							edits
+						),
+					};
 				}
 
 				// Get the full local version of the record before the update,
@@ -536,7 +531,7 @@ export function* saveEntityRecord(
 				yield receiveEntityRecords(
 					kind,
 					name,
-					{ ...persistedEntity, ...data },
+					{ ...persistedEntity, ...edits },
 					undefined,
 					// This must be false or it will trigger a GET request in parallel to the PUT/POST below
 					false
@@ -545,7 +540,7 @@ export function* saveEntityRecord(
 				updatedRecord = yield apiFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
-					data,
+					data: edits,
 				} );
 				yield receiveEntityRecords(
 					kind,

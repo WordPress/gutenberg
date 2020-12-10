@@ -41,7 +41,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
 	'TEXTAREA',
 ];
 
-function Disabled( { className, children, ...props } ) {
+function Disabled( { className, children, isDisabled = true, ...props } ) {
 	const node = useRef();
 
 	const disable = () => {
@@ -75,6 +75,10 @@ function Disabled( { className, children, ...props } ) {
 	);
 
 	useLayoutEffect( () => {
+		if ( ! isDisabled ) {
+			return;
+		}
+
 		disable();
 
 		const observer = new window.MutationObserver( debouncedDisable );
@@ -89,6 +93,10 @@ function Disabled( { className, children, ...props } ) {
 			debouncedDisable.cancel();
 		};
 	}, [] );
+
+	if ( ! isDisabled ) {
+		return <Provider value={ false }>{ children }</Provider>;
+	}
 
 	return (
 		<Provider value={ true }>

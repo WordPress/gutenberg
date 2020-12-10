@@ -77,6 +77,27 @@ export function* setupEditor( post, edits, template ) {
 }
 
 /**
+ * Initiliazes an FSE template into the core-data store.
+ * We could avoid this action entirely by having a fallback if the edit is undefined.
+ *
+ * @param {Object} template  Template object.
+ */
+export function* __unstableSetupTemplate( template ) {
+	const blocks = parse( template.content.raw );
+	yield controls.dispatch(
+		'core',
+		'editEntityRecord',
+		'postType',
+		template.type,
+		template.id,
+		{
+			blocks,
+		},
+		{ __unstableShouldCreateUndoLevel: false }
+	);
+}
+
+/**
  * Returns an action object signalling that the editor is being destroyed and
  * that any necessary state or side-effect cleanup should occur.
  *
