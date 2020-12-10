@@ -7,7 +7,6 @@ import {
 	TouchableHighlight,
 	TouchableWithoutFeedback,
 	Dimensions,
-	Platform,
 } from 'react-native';
 import { pick } from 'lodash';
 
@@ -34,7 +33,6 @@ import {
 import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
-const isIOS = Platform.OS === 'ios';
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -43,6 +41,7 @@ export class InserterMenu extends Component {
 		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.renderItem = this.renderItem.bind( this );
+		this.onItemSelect = this.onItemSelect.bind( this );
 		this.state = {
 			numberOfColumns: MIN_COL_NUM,
 			isVisible: true,
@@ -109,8 +108,6 @@ export class InserterMenu extends Component {
 		// re-insert default block
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock();
-		}
-		if ( isIOS ) {
 			onDismiss();
 		}
 		hideInsertionPoint();
@@ -132,21 +129,21 @@ export class InserterMenu extends Component {
 		this.setState( { numberOfColumns, itemWidth, maxWidth } );
 	}
 
+	onItemSelect( item ) {
+		const { onSelect } = this.props;
+
+		onSelect( item );
+		this.onHideBottomSheet();
+	}
+
 	renderItem( { item } ) {
 		const { itemWidth, maxWidth } = this.state;
-		const { onSelect, onDismiss } = this.props;
 		return (
 			<InserterButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }
-				onSelect={ () => {
-					onSelect( item );
-					if ( isIOS ) {
-						onDismiss();
-					}
-					this.onHideBottomSheet();
-				} }
+				onSelect={ this.onItemSelect }
 			/>
 		);
 	}
@@ -208,6 +205,7 @@ export default compose(
 			getBlockSelectionEnd,
 			getSettings,
 			canInsertBlockType,
+			getSelectedBlock,
 		} = select( 'core/block-editor' );
 		const { getChildBlockNames, getBlockType } = select( blocksStore );
 		const { getClipboard } = select( 'core/editor' );
@@ -252,6 +250,7 @@ export default compose(
 				: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
 			shouldInsertAtTheTop,
+			selectedBlock: getSelectedBlock(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -295,6 +294,14 @@ export default compose(
 			hideInsertionPoint,
 			onSelect( item ) {
 				const { name, initialAttributes, innerBlocks } = item;
+				const { getBlockType } = select( blocksStore );
+
+				const { category } = getBlockType( name ) || {};
+				const { category: selectedBlockCategory } =
+					getBlockType( ownProps.selectedBlock?.name ) || {};
+
+				const isTextBlock =
+					category === 'text' || selectedBlockCategory === 'text';
 
 				const insertedBlock = createBlock(
 					name,
@@ -307,6 +314,10 @@ export default compose(
 					ownProps.insertionIndex,
 					ownProps.destinationRootClientId
 				);
+
+				if ( isTextBlock ) {
+					ownProps.onSelect();
+				}
 			},
 			insertDefaultBlock() {
 				insertDefaultBlock(
