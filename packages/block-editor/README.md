@@ -201,7 +201,6 @@ _Parameters_
 
 -   _props_ `Object`: 
 -   _props.clientId_ `string`: Client ID of block.
--   _props.title_ `string`: Title override.
 
 _Returns_
 

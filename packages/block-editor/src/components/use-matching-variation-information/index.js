@@ -49,6 +49,5 @@ export default function useMatchingVariationInformation( clientId ) {
 		},
 		[ name, attributes ]
 	);
-
 	return displayInformation;
 }

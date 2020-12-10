@@ -6,37 +6,24 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 
-export default function BlockIcon( {
-	clientId,
-	icon,
-	showColors = false,
-	className,
-} ) {
+export default function BlockIcon( { icon, showColors = false, className } ) {
 	if ( icon?.src === 'block-default' ) {
 		icon = {
 			src: blockDefault,
 		};
 	}
-	const { icon: blockIcon } = useSelect(
-		( select ) =>
-			select( 'core/blocks' ).getBlockTypeWithVariationInfo( clientId ) ||
-			{},
-		[ clientId ]
-	);
-	if ( blockIcon && ! icon ) {
-		icon = blockIcon;
-	}
-	const renderedIcon = <Icon icon={ icon?.src || icon } />;
+
+	const renderedIcon = <Icon icon={ icon && icon.src ? icon.src : icon } />;
 	const style = showColors
 		? {
-				backgroundColor: icon?.background,
-				color: icon?.foreground,
+				backgroundColor: icon && icon.background,
+				color: icon && icon.foreground,
 		  }
 		: {};
+
 	return (
 		<span
 			style={ style }
