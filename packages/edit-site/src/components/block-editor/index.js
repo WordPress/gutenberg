@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -65,6 +65,13 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { setPage } = useDispatch( 'core/edit-site' );
 
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
+	const contentRef = useRef();
+
+	// Allow scrolling "through" popovers over the canvas. This is only called
+	// for as long as the pointer is over a popover.
+	function onWheel( { deltaX, deltaY } ) {
+		contentRef.current.scrollBy( deltaX, deltaY );
+	}
 
 	return (
 		<BlockEditorProvider
@@ -91,15 +98,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor">
+			<div className="edit-site-visual-editor" onWheel={ onWheel }>
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
 					head={ window.__editorStyles.html }
+					contentRef={ contentRef }
 				>
-					{ ( body ) => (
-						<Canvas body={ body } styles={ settings.styles } />
-					) }
+					<Canvas body={ contentRef } styles={ settings.styles } />
 				</Iframe>
 			</div>
 		</BlockEditorProvider>
