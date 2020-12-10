@@ -49,7 +49,7 @@ const getNonDefaultStyles = ( { defaultStylesEntries, stylesEntries } ) =>
 		const defaultValues = ( defaultStylesEntries.find(
 			( [ defaultKey ] ) => defaultKey === key
 		) || [] )[ 1 ];
-		const diff = difference( defaultValues, values );
+		const diff = difference( values, defaultValues );
 		const nonDefaultStyles = diff.length
 			? {
 					[ key ]: diff,
@@ -61,27 +61,25 @@ const getNonDefaultStyles = ( { defaultStylesEntries, stylesEntries } ) =>
 		};
 	}, {} );
 
-const getStylesEntries = ( stylesString ) =>
-	stylesString
+const getStylesEntries = ( stylesString ) => {
+	const stylesArr = stylesString
+		.replace( /\(.*?\)/g, ( match ) => match.replace( / /g, '_' ) )
+		.split( '&quot;' )
+		.join( `'` )
 		.split( ';' )
-		.filter( identity )
+		.filter( ( x ) => x );
+
+	console.log( stylesArr );
+	return stylesArr
 		.map( ( styles ) => {
-			const [ key, values ] = styles.trim().split( ':' );
-			if ( key === 'color' ) return [ key, values ];
-			const valuesArr =
-				values &&
-				values
-					.split( `'` )
-					.join( '' )
-					.split( '&quot;' )
-					.join( '"' )
-					.split( ', ' )
-					.map( ( w ) => w.trim() )
-					.join( '' );
-
+			const [ key, values = [] ] = styles.trim().split( ':' );
+			console.log( values );
+			if ( key === 'color' ) return [ key, [ values ] ];
+			const valuesArr = values.split( ', ' ).map( ( w ) => w.trim() );
 			return [ key, valuesArr ];
-		} );
-
+		} )
+		.replace( /\(.*?\)/g, ( match ) => match.replace( /_/g, '' ) );
+};
 const defaultStyles =
 	"color: rgb(40, 48, 61); font-family: -apple-system, system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 20px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(209, 228, 221); text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;";
 
@@ -100,7 +98,8 @@ const removeDefaultStyles = ( html ) => {
 		defaultStylesEntries,
 		stylesEntries,
 	} );
-	return htmlPart0 + 'style="' + fromObjToString( diff ) + '"' + htmlPart2;
+	const styles = htmlPart0 + 'style="' + fromObjToString( diff ) + '"' + htmlPart2;
+	return styles;
 };
 /**
  * Filters HTML to only contain phrasing content.
