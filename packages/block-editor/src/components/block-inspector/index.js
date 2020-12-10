@@ -25,6 +25,8 @@ import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
+import useMatchingVariationInformation from '../use-matching-variation-information';
+
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -64,22 +66,36 @@ const BlockInspector = ( {
 		}
 		return null;
 	}
+	return (
+		<BlockInspectorSingleBlock
+			clientId={ selectedBlockClientId }
+			blockName={ blockType.name }
+			hasBlockStyles={ hasBlockStyles }
+			bubblesVirtually={ bubblesVirtually }
+		/>
+	);
+};
 
+const BlockInspectorSingleBlock = ( {
+	clientId,
+	blockName,
+	hasBlockStyles,
+	bubblesVirtually,
+} ) => {
+	const blockInformation = useMatchingVariationInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard blockType={ blockType } />
-			<BlockVariationTransforms blockClientId={ selectedBlockClientId } />
+			<BlockCard { ...blockInformation } />
+			<BlockVariationTransforms blockClientId={ clientId } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ selectedBlockClientId } />
+						<BlockStyles clientId={ clientId } />
 						{ hasBlockSupport(
-							blockType.name,
+							blockName,
 							'defaultStylePicker',
 							true
-						) && (
-							<DefaultStylePicker blockName={ blockType.name } />
-						) }
+						) && <DefaultStylePicker blockName={ blockName } /> }
 					</PanelBody>
 				</div>
 			) }
