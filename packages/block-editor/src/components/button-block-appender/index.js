@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
@@ -28,6 +23,7 @@ function ButtonBlockAppender(
 ) {
 	return (
 		<Inserter
+			className="block-editor-button-block-appender"
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
@@ -59,15 +55,12 @@ function ButtonBlockAppender(
 						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
-						className={ classnames(
-							className,
-							'block-editor-button-block-appender'
-						) }
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
 						disabled={ disabled }
 						label={ label }
+						className={ className }
 					>
 						{ ! hasSingleBlockType && (
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>

@@ -66,17 +66,3 @@
 		width: calc(100% + 60px);
 	}
 }
-
-// Place block list appender in the same place content will appear.
-[data-type="core/group"].is-selected {
-
-	.block-list-appender {
-		margin-left: 0;
-		margin-right: 0;
-	}
-
-	.has-background .block-list-appender {
-		margin-top: $block-padding + $grid-unit-05;
-		margin-bottom: $block-padding + $grid-unit-05;
-	}
-}

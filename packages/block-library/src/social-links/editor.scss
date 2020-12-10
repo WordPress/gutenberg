@@ -1,8 +1,13 @@
 // Editor specific styles for Social Links.
 .wp-block-social-links {
+	list-style: none !important;
 	div.block-editor-url-input {
 		display: inline-block;
 		margin-left: $grid-unit-10;
+	}
+
+	> .wp-block {
+		margin: 0;
 	}
 }
 
@@ -43,7 +48,6 @@
 		position: absolute;
 	}
 
-	& + .block-list-appender,
 	.wp-social-link {
 		padding: 0.25em;
 
@@ -65,34 +69,6 @@
 		}
 	}
 }
-
-// Polish the Appender.
-.wp-block-social-links .block-list-appender {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin: 0;
-
-	&::before {
-		content: "";
-		display: block;
-		width: 1em;
-		height: 1em;
-	}
-
-	.block-editor-inserter {
-		position: absolute;
-	}
-
-	.block-editor-button-block-appender.block-list-appender__toggle {
-		margin: 0;
-	}
-}
-
-.wp-block-social-links.is-style-logos-only .block-list-appender {
-	padding: 4px;
-}
-
 
 // Center flex items. This has an equivalent in style.scss.
 .wp-block[data-align="center"] > .wp-block-social-links {

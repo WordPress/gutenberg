@@ -1,4 +1,8 @@
 .block-editor-button-block-appender {
+	width: 100%;
+}
+
+.block-editor-button-block-appender > .components-button {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

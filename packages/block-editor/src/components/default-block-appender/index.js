@@ -12,11 +12,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import Inserter from '../inserter';
-
 export function DefaultBlockAppender( {
 	isLocked,
 	isVisible,
@@ -60,12 +55,6 @@ export function DefaultBlockAppender( {
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
-			/>
-			<Inserter
-				rootClientId={ rootClientId }
-				position="bottom right"
-				isAppender
-				__experimentalIsQuick
 			/>
 		</div>
 	);

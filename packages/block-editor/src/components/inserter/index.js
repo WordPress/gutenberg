@@ -168,6 +168,7 @@ class Inserter extends Component {
 			hasSingleBlockType,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
+			className,
 		} = this.props;
 
 		if ( hasSingleBlockType ) {
@@ -176,7 +177,7 @@ class Inserter extends Component {
 
 		return (
 			<Dropdown
-				className="block-editor-inserter"
+				className={ classnames( className, 'block-editor-inserter' ) }
 				contentClassName={ classnames(
 					'block-editor-inserter__popover',
 					{ 'is-quick': isQuick }

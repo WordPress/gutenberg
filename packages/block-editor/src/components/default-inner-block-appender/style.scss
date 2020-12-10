@@ -1,0 +1,11 @@
+.block-editor-default-inner-block-appender {
+	position: absolute;
+	display: flex;
+	bottom: 100%;
+	margin: 0;
+	padding: 0;
+	top: $grid-unit-10;
+	border: 1px solid $white;
+	border-radius: $radius-block-ui;
+	height: ($button-size-small + 2px);
+}

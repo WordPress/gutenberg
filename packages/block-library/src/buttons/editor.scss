@@ -9,15 +9,6 @@
 		margin-left: 0;
 		margin-top: $button-margin;
 	}
-	> .block-list-appender {
-		display: inline-flex;
-		align-items: center;
-	}
-	&.is-vertical {
-		> .block-list-appender .block-list-appender__toggle {
-			justify-content: flex-start;
-		}
-	}
 	> .wp-block-button {
 		&:focus {
 			box-shadow: none;

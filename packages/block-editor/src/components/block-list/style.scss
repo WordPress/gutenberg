@@ -427,7 +427,8 @@
 .block-editor-block-list__empty-block-inserter,
 .block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter,
-.block-editor-block-list__block-popover-inserter {
+.block-editor-block-list__block-popover-inserter,
+.block-editor-default-inner-block-appender {
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
 		background: $gray-900;
