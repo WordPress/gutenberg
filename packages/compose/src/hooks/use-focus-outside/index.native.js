@@ -33,9 +33,6 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @return {eventTarget is FocusNormalizedButton} Whether element is a button.
  */
 function isFocusNormalizedButton( eventTarget ) {
-	if ( ! ( eventTarget instanceof window.HTMLElement ) ) {
-		return false;
-	}
 	switch ( eventTarget.nodeName ) {
 		case 'A':
 		case 'BUTTON':
@@ -165,15 +162,6 @@ export default function useFocusOutside( onFocusOutside ) {
 		}
 
 		blurCheckTimeoutId.current = setTimeout( () => {
-			// If document is not focused then focus should remain
-			// inside the wrapped component and therefore we cancel
-			// this blur event thereby leaving focus in place.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( ! document.hasFocus() ) {
-				event.preventDefault();
-				return;
-			}
-
 			if ( 'function' === typeof currentOnFocusOutside.current ) {
 				currentOnFocusOutside.current( event );
 			}
