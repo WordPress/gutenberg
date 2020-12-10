@@ -17,7 +17,7 @@ function gutenberg_reregister_core_block_types() {
 				'audio',
 				'button',
 				'buttons',
-				'classic',
+				'freeform',
 				'code',
 				'column',
 				'columns',
@@ -163,9 +163,6 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	}
 
 	$block_name = str_replace( 'core/', '', $block_name );
-
-	// Transform "freeform" to "classic due to folder-name inconsistency.
-	$block_name = 'freeform' === $block_name ? 'classic' : $block_name;
 
 	$style_path        = is_rtl()
 		? "build/block-library/blocks/$block_name/style-rtl.css"
