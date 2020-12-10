@@ -127,26 +127,90 @@ add_action( 'save_post_wp_template_part', 'gutenberg_set_template_and_template_p
  *
  * Any user who can 'edit_theme_options' will have access.
  *
- * @param array $allcaps A user's capabilities.
- * @return array Filtered $allcaps.
+ * @param array $caps The capabilities being mapped to.
+ * @param string $cap The capability to be mapped.
+ * @param int|WP_User $user The user being queried.
+ * @param array $args Additional arguments.
+ * @return array Filtered $caps.
  */
-function gutenberg_grant_template_caps( array $allcaps ) {
-	if ( isset( $allcaps['edit_theme_options'] ) ) {
-		$allcaps['edit_templates']             = $allcaps['edit_theme_options'];
-		$allcaps['edit_others_templates']      = $allcaps['edit_theme_options'];
-		$allcaps['edit_published_templates']   = $allcaps['edit_theme_options'];
-		$allcaps['edit_private_templates']     = $allcaps['edit_theme_options'];
-		$allcaps['delete_templates']           = $allcaps['edit_theme_options'];
-		$allcaps['delete_others_templates']    = $allcaps['edit_theme_options'];
-		$allcaps['delete_published_templates'] = $allcaps['edit_theme_options'];
-		$allcaps['delete_private_templates']   = $allcaps['edit_theme_options'];
-		$allcaps['publish_templates']          = $allcaps['edit_theme_options'];
-		$allcaps['read_private_templates']     = $allcaps['edit_theme_options'];
+function gutenberg_grant_template_caps( $caps, $cap, $user, $args ) {
+	foreach ( $caps as &$capability ) {
+		if ( in_array( $capability, array(
+			'edit_templates',
+			'edit_others_templates',
+			'edit_published_templates',
+			'edit_private_templates',
+			'delete_templates',
+			'delete_others_templates',
+			'delete_published_templates',
+			'delete_private_templates',
+			'publish_templates',
+			'read_private_templates'
+		) ) ) {
+			$type = isset( $args[0] ) && ( $post = get_post( $args[0] ) ) && !empty( $post->post_name ) ? $post->post_name : 'index';
+			$capability = str_replace( 'templates', $type . '_templates', $capability );
+		}
+
+		$pattern = '/^(?>(edit(_(others|published|private))?|delete(_(others|published|private))?|publish|read_private)_)(.+)_templates$/';
+		if ( ( $type = preg_filter( $pattern, '$6', $capability ) ) ) {
+
+			// To do: build out complete template hierarchy array
+			$array = $type == 'index' ? array( 'index' ) : array( $type, 'index' );
+			$hierarchy = array_reverse( array_slice( $array, 1 ) );
+
+			if ( empty( $hierarchy ) ) {
+				if ( user_can( $user, 'edit_theme_options' ) ) {
+					$capability = 'exist';
+				} else {
+					$capability = preg_replace( $pattern, '$1_templates', $capability );
+				}
+			} else {
+				foreach ( $hierarchy as $next ) {
+					if ( user_can( $user, str_replace( $type, $next, $capability ) ) ) {
+						$capability = 'exist';
+						break;
+					}
+				}
+			}
+		}
 	}
 
-	return $allcaps;
+	return $caps;	
 }
-add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
+// Hook to priority 9 to get ahead of plugins.
+add_filter( 'map_meta_cap', 'gutenberg_grant_template_caps', 9, 4 );
+
+/**
+ * Prevents users losing edit access to templates when changing the slug
+ *
+ * @param array $data The post data to be saved.
+ * @return array Filtered $data.
+ */
+function gutenberg_prevent_unauthorized_edits_to_templates( $data ) {
+	if ( $data['post_type'] != 'wp_template' ) {
+		return $data;
+	}
+
+	if ( $data['post_author'] != get_current_user_id() && !current_user_can( 'edit_others_' . $data['post_name'] . '_templates' ) ) {
+		wp_die( 'You can\'t edit templates of this type.' );
+	}
+
+	if ( $data['post_status'] == 'publish' && !current_user_can( 'edit_published_' . $data['post_name'] . '_templates' ) ) {
+		wp_die( 'You can\'t edit templates of this type.' );
+	}
+
+	if ( $data['post_status'] == 'private' && !current_user_can( 'edit_private_' . $data['post_name'] . '_templates' ) ) {
+		wp_die( 'You can\'t edit templates of this type.' );
+	}
+
+	if ( !current_user_can( 'edit_' . $data['post_name'] . '_templates' ) ) {
+		wp_die( 'You can\'t edit templates of this type.' );
+	}
+
+	return $data;
+}
+// Hook to priority 9 to get ahead of plugins.
+add_filter( 'wp_insert_post_data', 'gutenberg_prevent_unauthorized_edits_to_templates' );
 
 /**
  * Filters `wp_template` posts slug resolution to bypass deduplication logic as
