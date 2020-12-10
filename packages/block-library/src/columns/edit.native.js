@@ -101,7 +101,9 @@ function ColumnsEditContainer( {
 	const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
 
 	useEffect( () => {
-		updateColumns( columnCount, newColumnCount );
+		if ( columnCount !== newColumnCount ) {
+			updateColumns( columnCount, newColumnCount );
+		}
 	}, [] );
 
 	useEffect( () => {
