@@ -98,7 +98,8 @@ const removeDefaultStyles = ( html ) => {
 		defaultStylesEntries,
 		stylesEntries,
 	} );
-	const styles = htmlPart0 + 'style="' + fromObjToString( diff ) + '"' + htmlPart2;
+	const styles =
+		htmlPart0 + 'style="' + fromObjToString( diff ) + '"' + htmlPart2;
 	return styles;
 };
 /**
