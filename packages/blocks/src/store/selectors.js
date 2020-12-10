@@ -106,7 +106,31 @@ export function getBlockVariations( state, blockName, scope ) {
 	} );
 }
 
-// TODO jsdoc and experimental and tests
+// TODO check createSelector
+// TODOjsdoc
+// TODO tests
+// TODO check performance
+export const getBlockDisplayInformation = ( state, name, attributes ) => {
+	const variations = state.blockVariations[ name ];
+	const blockType = getBlockType( state, name );
+	const blockTypeInfo = {
+		title: blockType.title,
+		icon: blockType.icon,
+		description: blockType.description,
+	};
+	if ( ! variations || ! blockType?.variationMatcher ) return blockTypeInfo;
+	const match = variations.find( ( variation ) =>
+		blockType.variationMatcher( attributes, variation )
+	);
+	if ( ! match ) return blockTypeInfo;
+	return {
+		title: match.title || blockType.title,
+		icon: match.icon || blockType.icon,
+		description: match.description || blockType.description,
+	};
+};
+
+// TODO remove
 export const getBlockTypeWithVariationInfo = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
 		const {
