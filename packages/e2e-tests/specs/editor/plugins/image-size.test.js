@@ -13,6 +13,7 @@ import {
 	activatePlugin,
 	createNewPost,
 	clickButton,
+	deactivatePlugin,
 	insertBlock,
 	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
@@ -23,10 +24,11 @@ describe( 'changing image size', () => {
 		await createNewPost();
 	} );
 
-	it( 'should insert and change my image size', async () => {
-		const expectedImageWidth = 499;
+	afterEach( async () => {
+		await deactivatePlugin( 'gutenberg-test-image-size' );
+	} );
 
-		// Create a paragraph.
+	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
 		await clickButton( 'Media Library' );
 
@@ -56,20 +58,22 @@ describe( 'changing image size', () => {
 
 		// Select the new size updated with the plugin.
 		await openDocumentSettingsSidebar();
-
-		const [ imageSizeLabel ] = await page.$x(
+		const imageSizeLabel = await page.waitForXPath(
 			'//label[text()="Image size"]'
 		);
 		await imageSizeLabel.click();
 		const imageSizeSelect = await page.evaluateHandle(
 			() => document.activeElement
 		);
-		imageSizeSelect.select( 'custom-size-one' );
+		await imageSizeSelect.select( 'custom-size-one' );
 
-		const imageWidth = await page.$eval(
-			'.block-editor-image-size-control__width input',
-			( el ) => parseInt( el.value, 10 )
+		// Verify that the custom size was applied to the image.
+		await page.waitForSelector( '.wp-block-image.size-custom-size-one' );
+		await page.waitForFunction(
+			() =>
+				document.querySelector(
+					'.block-editor-image-size-control__width input'
+				).value === '499'
 		);
-		expect( imageWidth ).toBe( expectedImageWidth );
 	} );
 } );

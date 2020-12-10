@@ -56,6 +56,7 @@ export const getSettings = createSelector(
 	( state, setIsInserterOpen ) => {
 		const settings = {
 			...state.settings,
+			outlineMode: true,
 			focusMode: isFeatureActive( state, 'focusMode' ),
 			hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,

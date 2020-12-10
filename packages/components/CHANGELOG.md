@@ -6,6 +6,17 @@
 
 - Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
 
+## 10.1.0 (2020-09-03)
+
+### New Feature
+
+- Add `ToolbarItem` component.
+- Support `label` prop on the `Toolbar` component.
+
+### Deprecations
+
+- Deprecate the `Toolbar` component when used without the `label` prop. `ToolbarGroup` should be used instead.
+
 ## 10.0.0 (2020-07-07)
 
 ### Breaking Change

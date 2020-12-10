@@ -170,7 +170,7 @@ function ComboboxControl( {
 				  )
 				: __( 'No results.' );
 
-			speak( message, 'assertive' );
+			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
@@ -203,6 +203,11 @@ function ComboboxControl( {
 								instanceId={ instanceId }
 								ref={ inputContainer }
 								value={ isExpanded ? inputValue : currentLabel }
+								aria-label={
+									currentLabel
+										? `${ currentLabel }, ${ label }`
+										: null
+								}
 								onFocus={ onFocus }
 								isExpanded={ isExpanded }
 								selectedSuggestionIndex={ matchingSuggestions.indexOf(

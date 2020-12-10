@@ -42,7 +42,8 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 			$query['post__not_in'] = array_merge( $query['post__not_in'], $block->context['query']['exclude'] );
 		}
 		if ( isset( $block->context['query']['perPage'] ) ) {
-			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
+			$query['offset']         = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
+			$query['posts_per_page'] = $block->context['query']['perPage'];
 		}
 		if ( isset( $block->context['query']['categoryIds'] ) ) {
 			$query['category__in'] = $block->context['query']['categoryIds'];
@@ -56,14 +57,20 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['orderBy'] ) ) {
 			$query['orderby'] = $block->context['query']['orderBy'];
 		}
-		if ( isset( $block->context['query']['perPage'] ) ) {
-			$query['posts_per_page'] = $block->context['query']['perPage'];
-		}
 		if ( isset( $block->context['query']['author'] ) ) {
 			$query['author'] = $block->context['query']['author'];
 		}
 		if ( isset( $block->context['query']['search'] ) ) {
 			$query['s'] = $block->context['query']['search'];
+		}
+	}
+
+	// Override the custom query with the global query if needed.
+	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
+	if ( $use_global_query ) {
+		global $wp_query;
+		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+			$query = wp_parse_args( $wp_query->query_vars, $query );
 		}
 	}
 
@@ -89,7 +96,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
-		$content .= "<li>{$block_content}</li>";
+		$content      .= "<li>{$block_content}</li>";
 	}
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -25,6 +30,11 @@ import {
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import TemplateTitle from '../template-title';
+
 function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
@@ -36,6 +46,7 @@ function HeaderToolbar() {
 		previewDeviceType,
 		showIconLabels,
 		isNavigationTool,
+		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -64,6 +75,7 @@ function HeaderToolbar() {
 				'showIconLabels'
 			),
 			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
+			isTemplateMode: select( 'core/edit-post' ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -206,8 +218,17 @@ characters. */
 				) }
 			</div>
 
+			<TemplateTitle />
+
 			{ displayBlockToolbar && (
-				<div className="edit-post-header-toolbar__block-toolbar">
+				<div
+					className={ classnames(
+						'edit-post-header-toolbar__block-toolbar',
+						{
+							'is-pushed-down': isTemplateMode,
+						}
+					) }
+				>
 					<BlockToolbar hideDragHandle />
 				</div>
 			) }

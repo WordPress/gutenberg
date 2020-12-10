@@ -4,7 +4,6 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,

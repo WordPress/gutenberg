@@ -5,7 +5,6 @@ import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
-import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,

@@ -18,7 +18,6 @@
 	}
 
 	@include break-medium() {
-		z-index: z-index(".entities-saved-states__panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;

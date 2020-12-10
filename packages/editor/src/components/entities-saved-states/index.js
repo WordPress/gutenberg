@@ -6,7 +6,7 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, withFocusReturn } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
@@ -47,7 +47,7 @@ const PLACEHOLDER_PHRASES = {
 	),
 };
 
-export default function EntitiesSavedStates( { isOpen, close } ) {
+function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
 			dirtyEntityRecords: select(
@@ -165,3 +165,5 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 		</div>
 	) : null;
 }
+
+export default withFocusReturn( EntitiesSavedStates );
