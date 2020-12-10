@@ -9,12 +9,7 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import {
-	BottomSheetSettings,
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	FloatingToolbar,
-} from '@wordpress/block-editor';
+import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
@@ -98,12 +93,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			isTemplatePickerAvailable,
-			isTemplatePickerVisible,
-			mode,
-		} = this.props;
+		const { getStylesFromColorScheme, mode } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -154,11 +144,6 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
-						{ isTemplatePickerAvailable && (
-							<__experimentalPageTemplatePicker
-								visible={ isTemplatePickerVisible }
-							/>
-						) }
 						{ Platform.OS === 'ios' && <FloatingToolbar /> }
 						<Header />
 						<BottomSheetSettings />
@@ -183,5 +168,4 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
-	__experimentalWithPageTemplatePicker,
 ] )( Layout );
