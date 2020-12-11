@@ -34,11 +34,11 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/title',
+			'/' . $this->rest_base,
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_title' ),
+					'callback'            => array( $this, 'parse_url_details' ),
 					'args'                => array(
 						'url' => array(
 							'required'          => true,
@@ -49,7 +49,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 							'format'            => 'uri',
 						),
 					),
-					'permission_callback' => array( $this, 'get_remote_url_permissions_check' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
 		);
@@ -63,11 +63,40 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @param WP_REST_REQUEST $request Full details about the request.
 	 * @return String|WP_Error The title text or an error.
 	 */
-	public function get_title( $request ) {
-		$url   = $request->get_param( 'url' );
-		$title = $this->get_remote_url_title( $url );
+	public function parse_url_details( $request ) {
 
-		return rest_ensure_response( $title );
+		$url = untrailingslashit( $request->get_param( 'url' ) );
+
+		if ( empty( $url ) ) {
+			return new WP_Error( 'rest_invalid_url', __( 'Invalid URL', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
+		// Transient per URL.
+		$cache_key = 'g_url_details_response_' . hash( 'crc32b', $url );
+
+		// Attempt to retrieve cached response.
+		$data = get_transient( $cache_key );
+
+		// Return cache if valid data.
+		if ( ! is_wp_error( $data ) && ! empty( $data ) ) {
+			return json_decode( $data, true );
+		}
+
+		$response_body = $this->get_remote_url( $url );
+
+		// Exit if we don't have a valid body or it's empty.
+		if ( is_wp_error( $response_body ) || empty( $response_body ) ) {
+			return $response_body;
+		}
+
+		$data = array(
+			'title' => $this->get_title( $response_body ),
+		);
+
+		// Only cache valid responses.
+		set_transient( $cache_key, wp_json_encode( $data ), HOUR_IN_SECONDS );
+
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -75,7 +104,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|bool True if the request has access, WP_Error object otherwise.
 	 */
-	public function get_remote_url_permissions_check() {
+	public function permissions_check() {
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
@@ -99,23 +128,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @param string $url The website url whose HTML we want to access.
 	 * @return string|WP_Error The URL's document title on success, WP_Error on failure.
 	 */
-	private function get_remote_url_title( $url ) {
-
-		$url = untrailingslashit( $url );
-
-		if ( empty( $url ) ) {
-			return new WP_Error( 'rest_invalid_url', __( 'Invalid URL', 'gutenberg' ), array( 'status' => 404 ) );
-		}
-
-		// Transient per URL.
-		$cache_key = 'g_url_details_response_' . hash( 'crc32b', $url );
-
-		// Attempt to retrieve cached response.
-		$title = get_transient( $cache_key );
-
-		if ( ! empty( $title ) ) {
-			return $title;
-		}
+	private function get_remote_url( $url ) {
 
 		$response = wp_safe_remote_get(
 			$url,
@@ -133,18 +146,22 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$remote_body = wp_remote_retrieve_body( $response );
 
 		if ( ! $remote_body ) {
-			return new WP_Error( 'no_response', __( 'The URL does not exist.', 'gutenberg' ), array( 'status' => 404 ) );
+			return new WP_Error( 'no_response', __( 'Unable to retrieve body from response at this URL.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
-		preg_match( '|<title>([^<]*?)</title>|is', $remote_body, $match_title );
+		return $remote_body;
+	}
+
+	/**
+	 * Parses the <title> contents from the provided HTML
+	 *
+	 * @param string $html the HTML from the remote website at URL.
+	 * @return string the title tag contents (maybe empty).
+	 */
+	private function get_title( $html ) {
+		preg_match( '|<title>([^<]*?)</title>|is', $html, $match_title );
+
 		$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
-
-		if ( empty( $title ) ) {
-			return new WP_Error( 'no_title', __( 'No document title at remote url.', 'gutenberg' ), array( 'status' => 404 ) );
-		}
-
-		// Only cache valid responses.
-		set_transient( $cache_key, $title, HOUR_IN_SECONDS );
 
 		return $title;
 	}
