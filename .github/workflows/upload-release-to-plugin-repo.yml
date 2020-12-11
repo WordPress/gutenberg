@@ -41,9 +41,12 @@ jobs:
       - name: Commit the content changes
         working-directory: ./trunk
         env:
+          SVN_USERNAME: ${{ secrets.svn_username }}
+          SVN_PASSWORD: ${{ secrets.svn_password }}
           VERSION: ${{ github.event.release.name }}
         run: |
           svn st | grep '^?' | awk '{print $2}' | xargs svn add
           svn st | grep '^!' | awk '{print $2}' | xargs svn rm
           echo "Committing version ${VERSION}"
-          # svn commit -m "Committing version ${VERSION}"
+          # svn commit -m "Committing version ${VERSION}" \
+          #  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
