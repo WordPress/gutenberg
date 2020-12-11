@@ -36,17 +36,18 @@ function gutenberg_register_template_part_post_type() {
 	);
 
 	$args = array(
-		'labels'            => $labels,
-		'description'       => __( 'Template parts to include in your templates.', 'gutenberg' ),
-		'public'            => false,
-		'has_archive'       => false,
-		'show_ui'           => true,
-		'show_in_menu'      => 'themes.php',
-		'show_in_admin_bar' => false,
-		'show_in_rest'      => true,
-		'rest_base'         => 'template-parts',
-		'map_meta_cap'      => true,
-		'supports'          => array(
+		'labels'                => $labels,
+		'description'           => __( 'Template parts to include in your templates.', 'gutenberg' ),
+		'public'                => false,
+		'has_archive'           => false,
+		'show_ui'               => true,
+		'show_in_menu'          => 'themes.php',
+		'show_in_admin_bar'     => false,
+		'show_in_rest'          => true,
+		'rest_base'             => 'template-parts',
+		'rest_controller_class' => 'WP_REST_Template_Parts_Controller',
+		'map_meta_cap'          => true,
+		'supports'              => array(
 			'title',
 			'slug',
 			'excerpt',
@@ -148,3 +149,9 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
+
+function gutenberg_filter_wp_template_part_item_schema( $schema ) {
+	$schema['properties']['status']['enum'][] = 'auto-draft';
+	return $schema;
+}
+add_filter( 'rest_wp_template_part_item_schema', 'gutenberg_filter_wp_template_part_item_schema' );

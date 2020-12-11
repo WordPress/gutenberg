@@ -28,7 +28,7 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 					'postType',
 					'wp_template_part',
 					{
-						status: [ 'publish', 'auto-draft' ],
+						status: [ 'publish', 'draft', 'auto-draft' ],
 						slug: cleanedSlug,
 						theme,
 					}
@@ -38,7 +38,8 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 				// or if it's part of a customized template.
 				const foundPost =
 					posts?.find( ( post ) => post.status === 'publish' ) ||
-					posts?.find( ( post ) => post.status === 'auto-draft' );
+					posts?.find( ( post ) => post.status === 'auto-draft' ) ||
+					posts?.find( ( post ) => post.status === 'draft' );
 				return foundPost?.id;
 			}
 		},
