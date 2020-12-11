@@ -7,10 +7,11 @@ import { debounce, includes } from 'lodash';
  * WordPress dependencies
  */
 import {
-	Component,
 	Children,
 	cloneElement,
 	concatChildren,
+	useEffect,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -24,60 +25,69 @@ import Shortcut from '../shortcut';
  *
  * @type {number}
  */
-const TOOLTIP_DELAY = 700;
+export const TOOLTIP_DELAY = 700;
 
-class Tooltip extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.delayedSetIsOver = debounce(
-			( isOver ) => this.setState( { isOver } ),
-			TOOLTIP_DELAY
-		);
-
-		/**
-		 * Prebound `isInMouseDown` handler, created as a constant reference to
-		 * assure ability to remove in component unmount.
-		 *
-		 * @type {Function}
-		 */
-		this.cancelIsMouseDown = this.createSetIsMouseDown( false );
-
-		/**
-		 * Whether a the mouse is currently pressed, used in determining whether
-		 * to handle a focus event as displaying the tooltip immediately.
-		 *
-		 * @type {boolean}
-		 */
-		this.isInMouseDown = false;
-
-		this.state = {
-			isOver: false,
-		};
+const emitToChild = ( children, eventName, event ) => {
+	if ( Children.count( children ) !== 1 ) {
+		return;
 	}
 
-	componentWillUnmount() {
-		this.delayedSetIsOver.cancel();
-
-		document.removeEventListener( 'mouseup', this.cancelIsMouseDown );
+	const child = Children.only( children );
+	if ( typeof child.props[ eventName ] === 'function' ) {
+		child.props[ eventName ]( event );
 	}
+};
 
-	emitToChild( eventName, event ) {
-		const { children } = this.props;
-		if ( Children.count( children ) !== 1 ) {
-			return;
-		}
+function Tooltip( { children, position, text, shortcut } ) {
+	/**
+	 * Whether a mouse is currently pressed, used in determining whether
+	 * to handle a focus event as displaying the tooltip immediately.
+	 *
+	 * @type {boolean}
+	 */
+	const [ isMouseDown, setIsMouseDown ] = useState( false );
+	const [ isOver, setIsOver ] = useState( false );
+	const delayedSetIsOver = debounce( setIsOver, TOOLTIP_DELAY );
 
-		const child = Children.only( children );
-		if ( typeof child.props[ eventName ] === 'function' ) {
-			child.props[ eventName ]( event );
-		}
-	}
-
-	createToggleIsOver( eventName, isDelayed ) {
+	/**
+	 * Creates an event callback to handle assignment of the `isInMouseDown`
+	 * instance property in response to a `mousedown` or `mouseup` event.
+	 *
+	 * @param {boolean} isForMouseDown Whether handler is to be created for the
+	 *                              `mousedown` event, as opposed to `mouseup`.
+	 *
+	 * @return {Function} Event callback handler.
+	 */
+	const createSetIsMouseDown = ( isForMouseDown ) => {
+		const eventType = isForMouseDown ? 'onMouseDown' : 'onMouseUp';
+		const eventListenerAction =
+			( isForMouseDown ? 'add' : 'remove' ) + 'EventListener';
 		return ( event ) => {
 			// Preserve original child callback behavior
-			this.emitToChild( eventName, event );
+			emitToChild( children, eventType, event );
+
+			// On mouse down, the next `mouseup` should revert the value of the
+			// instance property and remove its own event handler. The bind is
+			// made on the document since the `mouseup` might not occur within
+			// the bounds of the element.
+			document[ eventListenerAction ]( 'mouseup', cancelIsMouseDown );
+
+			setIsMouseDown( isForMouseDown );
+		};
+	};
+
+	/**
+	 * Prebound `isInMouseDown` handler, created as a constant reference to
+	 * assure ability to remove in component unmount.
+	 *
+	 * @type {Function}
+	 */
+	const cancelIsMouseDown = createSetIsMouseDown( false );
+
+	const createToggleIsOver = ( eventName, isDelayed ) => {
+		return ( event ) => {
+			// Preserve original child callback behavior
+			emitToChild( children, eventName, event );
 
 			// Mouse events behave unreliably in React for disabled elements,
 			// firing on mouseenter but not mouseleave.  Further, the default
@@ -92,99 +102,72 @@ class Tooltip extends Component {
 			// A focus event will occur as a result of a mouse click, but it
 			// should be disambiguated between interacting with the button and
 			// using an explicit focus shift as a cue to display the tooltip.
-			if ( 'focus' === event.type && this.isInMouseDown ) {
+			if ( 'focus' === event.type && isMouseDown ) {
 				return;
 			}
 
 			// Needed in case unsetting is over while delayed set pending, i.e.
 			// quickly blur/mouseleave before delayedSetIsOver is called
-			this.delayedSetIsOver.cancel();
+			delayedSetIsOver.cancel();
 
-			const isOver = includes( [ 'focus', 'mouseenter' ], event.type );
-			if ( isOver === this.state.isOver ) {
+			const _isOver = includes( [ 'focus', 'mouseenter' ], event.type );
+			if ( _isOver === isOver ) {
 				return;
 			}
 
 			if ( isDelayed ) {
-				this.delayedSetIsOver( isOver );
+				delayedSetIsOver( _isOver );
 			} else {
-				this.setState( { isOver } );
+				setIsOver( _isOver );
 			}
 		};
-	}
+	};
+	const clearOnUnmount = () => {
+		delayedSetIsOver.cancel();
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
+	};
 
-	/**
-	 * Creates an event callback to handle assignment of the `isInMouseDown`
-	 * instance property in response to a `mousedown` or `mouseup` event.
-	 *
-	 * @param {boolean} isMouseDown Whether handler is to be created for the
-	 *                              `mousedown` event, as opposed to `mouseup`.
-	 *
-	 * @return {Function} Event callback handler.
-	 */
-	createSetIsMouseDown( isMouseDown ) {
-		return ( event ) => {
-			// Preserve original child callback behavior
-			this.emitToChild(
-				isMouseDown ? 'onMouseDown' : 'onMouseUp',
-				event
+	useEffect( () => clearOnUnmount, [] );
+
+	if ( Children.count( children ) !== 1 ) {
+		if ( 'development' === process.env.NODE_ENV ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				'Tooltip should be called with only a single child element.'
 			);
-
-			// On mouse down, the next `mouseup` should revert the value of the
-			// instance property and remove its own event handler. The bind is
-			// made on the document since the `mouseup` might not occur within
-			// the bounds of the element.
-			document[
-				isMouseDown ? 'addEventListener' : 'removeEventListener'
-			]( 'mouseup', this.cancelIsMouseDown );
-
-			this.isInMouseDown = isMouseDown;
-		};
-	}
-
-	render() {
-		const { children, position, text, shortcut } = this.props;
-		if ( Children.count( children ) !== 1 ) {
-			if ( 'development' === process.env.NODE_ENV ) {
-				// eslint-disable-next-line no-console
-				console.error(
-					'Tooltip should be called with only a single child element.'
-				);
-			}
-
-			return children;
 		}
 
-		const child = Children.only( children );
-		const { isOver } = this.state;
-		return cloneElement( child, {
-			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
-			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
-			onClick: this.createToggleIsOver( 'onClick' ),
-			onFocus: this.createToggleIsOver( 'onFocus' ),
-			onBlur: this.createToggleIsOver( 'onBlur' ),
-			onMouseDown: this.createSetIsMouseDown( true ),
-			children: concatChildren(
-				child.props.children,
-				isOver && (
-					<Popover
-						focusOnMount={ false }
-						position={ position }
-						className="components-tooltip"
-						aria-hidden="true"
-						animate={ false }
-						noArrow={ true }
-					>
-						{ text }
-						<Shortcut
-							className="components-tooltip__shortcut"
-							shortcut={ shortcut }
-						/>
-					</Popover>
-				)
-			),
-		} );
+		return children;
 	}
+
+	const child = Children.only( children );
+	return cloneElement( child, {
+		onMouseEnter: createToggleIsOver( 'onMouseEnter', true ),
+		onMouseLeave: createToggleIsOver( 'onMouseLeave' ),
+		onClick: createToggleIsOver( 'onClick' ),
+		onFocus: createToggleIsOver( 'onFocus' ),
+		onBlur: createToggleIsOver( 'onBlur' ),
+		onMouseDown: createSetIsMouseDown( true ),
+		children: concatChildren(
+			child.props.children,
+			isOver && (
+				<Popover
+					focusOnMount={ false }
+					position={ position }
+					className="components-tooltip"
+					aria-hidden="true"
+					animate={ false }
+					noArrow={ true }
+				>
+					{ text }
+					<Shortcut
+						className="components-tooltip__shortcut"
+						shortcut={ shortcut }
+					/>
+				</Popover>
+			)
+		),
+	} );
 }
 
 export default Tooltip;
