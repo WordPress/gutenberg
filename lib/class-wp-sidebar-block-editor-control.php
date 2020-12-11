@@ -17,9 +17,10 @@ class WP_Sidebar_Block_Editor_Control extends WP_Customize_Control {
 	}
 
 	public function enqueue() {
-		// If there ends up being more than just this control in
-		// wp-widgets-customize then we should enqueue it in
+		// TODO: If there ends up being more than just this control in
+		// wp-widgets-customize then we should enqueue these assets in
 		// lib/widgets-customize.php.
 		wp_enqueue_script( 'wp-widgets-customize' );
+		wp_enqueue_style( 'wp-widgets-customize' );
 	}
 }

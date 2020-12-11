@@ -18,7 +18,13 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.11.2"
+		"@babel/runtime": "^7.11.2",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/element": "file:../element",
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"
