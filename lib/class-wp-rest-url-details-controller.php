@@ -72,7 +72,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		}
 
 		// Transient per URL.
-		$cache_key = 'g_url_details_response_' . hash( 'crc32b', $url );
+		$cache_key = 'g_url_details_response_' . md5( $url );
 
 		// Attempt to retrieve cached response.
 		$data = get_transient( $cache_key );
