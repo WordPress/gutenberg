@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,7 @@ import {
 	useFocusReturn,
 	useFocusOnMount,
 	useConstrainedTabbing,
+	useMergeRefs,
 } from '@wordpress/compose';
 
 /**
@@ -47,6 +47,11 @@ function ModalFrameContent( {
 	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
+	const mergedRefs = useMergeRefs(
+		focusOnMountRef,
+		constrainedTabbingRef,
+		focusReturnRef
+	);
 
 	return (
 		<IsolatedEventContainer
@@ -59,11 +64,7 @@ function ModalFrameContent( {
 			<div
 				className={ classnames( 'components-modal__frame', className ) }
 				style={ style }
-				ref={ mergeRefs( [
-					focusOnMountRef,
-					constrainedTabbingRef,
-					focusReturnRef,
-				] ) }
+				ref={ mergedRefs }
 				role={ role }
 				aria-label={ contentLabel }
 				aria-labelledby={ contentLabel ? null : labelledby }

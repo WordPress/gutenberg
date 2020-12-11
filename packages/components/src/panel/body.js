@@ -3,12 +3,11 @@
  */
 import classnames from 'classnames';
 import { noop } from 'lodash';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -36,6 +35,7 @@ export function PanelBody(
 		initial: initialOpen === undefined ? true : initialOpen,
 	} );
 	const nodeRef = useRef();
+	const mergedRefs = useMergeRefs( nodeRef, ref );
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
@@ -76,7 +76,7 @@ export function PanelBody(
 	} );
 
 	return (
-		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
+		<div className={ classes } ref={ mergedRefs }>
 			<PanelBodyTitle
 				icon={ icon }
 				isOpened={ isOpened }

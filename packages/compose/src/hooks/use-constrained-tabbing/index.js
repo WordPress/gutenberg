@@ -27,10 +27,11 @@ import { focus } from '@wordpress/dom';
  * ```
  */
 function useConstrainedTabbing() {
-	const ref = useCallback( ( node ) => {
+	return useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
 		}
+
 		node.addEventListener( 'keydown', ( event ) => {
 			if ( event.keyCode !== TAB ) {
 				return;
@@ -59,8 +60,6 @@ function useConstrainedTabbing() {
 			}
 		} );
 	}, [] );
-
-	return ref;
 }
 
 export default useConstrainedTabbing;

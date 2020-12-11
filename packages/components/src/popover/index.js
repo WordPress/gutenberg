@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
@@ -15,6 +14,7 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 	useFocusOnMount,
+	useMergeRefs,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -418,6 +418,7 @@ const Popover = ( {
 	] );
 
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const mergedRefs = useMergeRefs( contentRef, focusOnMountRef );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -532,7 +533,7 @@ const Popover = ( {
 					</div>
 				) }
 				<div
-					ref={ mergeRefs( [ contentRef, focusOnMountRef ] ) }
+					ref={ mergedRefs }
 					className="components-popover__content"
 					tabIndex="-1"
 				>

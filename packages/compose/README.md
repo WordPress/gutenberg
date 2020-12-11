@@ -276,6 +276,19 @@ _Returns_
 
 -   `boolean`: return value of the media query.
 
+<a name="useMergeRefs" href="#useMergeRefs">#</a> **useMergeRefs**
+
+Merges the given refs into a new ref, which will persist for the full
+lifetime of the component, as a ref should be.
+
+_Parameters_
+
+-   _refs_ `...(RefObject|Function)`: Ref objects or callbacks to merge.
+
+_Returns_
+
+-   `Function`: A new ref callback.
+
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
 Use something's value from the previous render.
