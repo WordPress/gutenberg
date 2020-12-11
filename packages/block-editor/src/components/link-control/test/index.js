@@ -126,8 +126,10 @@ describe( 'Basic rendering', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		await act( async () => {
+			Simulate.change( searchInput, {
+				target: { value: searchTerm },
+			} );
 		} );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
@@ -231,10 +233,9 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
-
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
 		await eventLoopTick();
 
@@ -246,7 +247,7 @@ describe( 'Searching for a link', () => {
 
 		expect( loadingUI ).not.toBeNull();
 
-		act( () => {
+		await act( async () => {
 			resolver( fauxEntitySuggestions );
 		} );
 
@@ -269,7 +270,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
@@ -316,7 +317,7 @@ describe( 'Searching for a link', () => {
 		);
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
@@ -366,7 +367,7 @@ describe( 'Searching for a link', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term
-			act( () => {
+			await act( async () => {
 				Simulate.change( searchInput, {
 					target: { value: searchTerm },
 				} );
@@ -411,7 +412,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, {
 				target: { value: 'couldbeurlorentitysearchterm' },
 			} );
@@ -446,7 +447,7 @@ describe( 'Manual link entry', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term
-			act( () => {
+			await act( async () => {
 				Simulate.change( searchInput, {
 					target: { value: searchTerm },
 				} );
@@ -492,7 +493,7 @@ describe( 'Manual link entry', () => {
 				const searchInput = getURLInput();
 
 				// Simulate searching for a term
-				act( () => {
+				await act( async () => {
 					Simulate.change( searchInput, {
 						target: { value: searchTerm },
 					} );
@@ -528,7 +529,7 @@ describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
 		const expectedResultsLength = 3; // set within `LinkControl`
 
-		act( () => {
+		await act( async () => {
 			render( <LinkControl showInitialSuggestions />, container );
 		} );
 
@@ -569,7 +570,7 @@ describe( 'Default search suggestions', () => {
 		// Render with an initial value an ensure that no initial suggestions
 		// are shown.
 		//
-		act( () => {
+		await act( async () => {
 			render(
 				<LinkControl
 					showInitialSuggestions
@@ -590,12 +591,14 @@ describe( 'Default search suggestions', () => {
 		const currentLinkUI = getCurrentLink();
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
-		act( () => {
+		await act( async () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
 		const searchInput = getURLInput();
-		searchInput.focus();
+		await act( async () => {
+			searchInput.focus();
+		} );
 
 		await eventLoopTick();
 
@@ -615,7 +618,7 @@ describe( 'Default search suggestions', () => {
 	it( 'should display initial suggestions when input value is manually deleted', async () => {
 		const searchTerm = 'Hello world';
 
-		act( () => {
+		await act( async () => {
 			render( <LinkControl showInitialSuggestions />, container );
 		} );
 
@@ -626,7 +629,7 @@ describe( 'Default search suggestions', () => {
 		searchInput = getURLInput();
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
@@ -638,7 +641,7 @@ describe( 'Default search suggestions', () => {
 		searchResultElements = getSearchResults();
 
 		// delete the text
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, { target: { value: '' } } );
 		} );
 
@@ -667,7 +670,7 @@ describe( 'Default search suggestions', () => {
 			Promise.resolve( noResults )
 		);
 
-		act( () => {
+		await act( async () => {
 			render( <LinkControl showInitialSuggestions />, container );
 		} );
 
@@ -745,7 +748,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 
 			// Simulate searching for a term
-			act( () => {
+			await act( async () => {
 				Simulate.change( searchInput, {
 					target: { value: entityNameText },
 				} );
@@ -842,7 +845,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, {
 				target: { value: 'Some new page to create' },
 			} );
@@ -915,7 +918,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, {
 				target: { value: entityNameText },
 			} );
@@ -935,11 +938,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 
 		// Step down into the search results, highlighting the first result item
-		act( () => {
+		await act( async () => {
 			Simulate.keyDown( searchInput, { keyCode: DOWN } );
 		} );
 
-		act( () => {
+		await act( async () => {
 			Simulate.keyDown( createButton, { keyCode: ENTER } );
 		} );
 
@@ -982,7 +985,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, {
 				target: { value: entityNameText },
 			} );
@@ -1039,7 +1042,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 
 		it( 'should not show not show an option to create an entity when input is empty', async () => {
-			act( () => {
+			await act( async () => {
 				render(
 					<LinkControl
 						showInitialSuggestions={ true } // should show even if we're not showing initial suggestions
@@ -1093,7 +1096,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 
 				// Simulate searching for a term
-				act( () => {
+				await act( async () => {
 					Simulate.change( searchInput, {
 						target: { value: inputText },
 					} );
@@ -1139,7 +1142,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			searchInput = container.querySelector( 'input[aria-label="URL"]' );
 
 			// Simulate searching for a term
-			act( () => {
+			await act( async () => {
 				Simulate.change( searchInput, {
 					target: { value: searchText },
 				} );
@@ -1302,7 +1305,7 @@ describe( 'Selecting links', () => {
 				const searchInput = getURLInput();
 
 				// Simulate searching for a term
-				act( () => {
+				await act( async () => {
 					Simulate.change( searchInput, {
 						target: { value: searchTerm },
 					} );
@@ -1377,7 +1380,7 @@ describe( 'Selecting links', () => {
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
-				act( () => {
+				await act( async () => {
 					Simulate.change( searchInput, {
 						target: { value: searchTerm },
 					} );
@@ -1408,7 +1411,7 @@ describe( 'Selecting links', () => {
 				// Only entity searches contain more than 1 suggestion
 				if ( type === 'entity' ) {
 					// Check we can go down again using the down arrow
-					act( () => {
+					await act( async () => {
 						Simulate.keyDown( searchInput, { keyCode: DOWN } );
 					} );
 
@@ -1422,7 +1425,7 @@ describe( 'Selecting links', () => {
 					);
 
 					// Check we can go back up via up arrow
-					act( () => {
+					await act( async () => {
 						Simulate.keyDown( searchInput, { keyCode: UP } );
 					} );
 
@@ -1437,10 +1440,10 @@ describe( 'Selecting links', () => {
 				}
 
 				// Commit the selected item as the current link
-				act( () => {
+				await act( async () => {
 					Simulate.keyDown( searchInput, { keyCode: ENTER } );
 				} );
-				act( () => {
+				await act( async () => {
 					Simulate.submit( form );
 				} );
 
@@ -1469,7 +1472,7 @@ describe( 'Selecting links', () => {
 		);
 
 		it( 'should allow selection of initial search results via the keyboard', async () => {
-			act( () => {
+			await act( async () => {
 				render( <LinkControl showInitialSuggestions />, container );
 			} );
 
@@ -1491,7 +1494,7 @@ describe( 'Selecting links', () => {
 			const searchInput = getURLInput();
 
 			// Step down into the search results, highlighting the first result item
-			act( () => {
+			await act( async () => {
 				Simulate.keyDown( searchInput, { keyCode: DOWN } );
 			} );
 
@@ -1512,7 +1515,7 @@ describe( 'Selecting links', () => {
 			);
 
 			// Check we can go down again using the down arrow
-			act( () => {
+			await act( async () => {
 				Simulate.keyDown( searchInput, { keyCode: DOWN } );
 			} );
 
@@ -1526,7 +1529,7 @@ describe( 'Selecting links', () => {
 			);
 
 			// Check we can go back up via up arrow
-			act( () => {
+			await act( async () => {
 				Simulate.keyDown( searchInput, { keyCode: UP } );
 			} );
 
@@ -1659,7 +1662,7 @@ describe( 'Post types', () => {
 		const searchInput = getURLInput();
 
 		// Simulate searching for a term
-		act( () => {
+		await act( async () => {
 			Simulate.change( searchInput, { target: { value: searchTerm } } );
 		} );
 
@@ -1691,7 +1694,7 @@ describe( 'Post types', () => {
 			const searchInput = getURLInput();
 
 			// Simulate searching for a term
-			act( () => {
+			await act( async () => {
 				Simulate.change( searchInput, {
 					target: { value: searchTerm },
 				} );
