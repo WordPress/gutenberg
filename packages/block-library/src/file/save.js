@@ -14,6 +14,7 @@ export default function save( { attributes } ) {
 		downloadButtonText,
 		displayPreview,
 		previewHeight,
+		fileId,
 	} = attributes;
 
 	const pdfEmbedLabel = RichText.isEmpty( fileName )
