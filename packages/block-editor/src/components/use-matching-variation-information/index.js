@@ -3,12 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 
-/**
- * @typedef {Object} BlockDisplayInformation Contains block's information for display reasons.
- * @property {string} title Block's title or block variation match's title, if found.
- * @property {JSX.Element} icon Block's icon or block variation match's icon, if found.
- * @property {string} description Block's description or block variation match's description, if found.
- */
+/** @typedef {import('@wordpress/blocks').WPBlockDisplayInformation} WPBlockDisplayInformation */
 
 /**
  * Hook used to try to find a matching block variation and return
@@ -21,7 +16,7 @@ import { useSelect } from '@wordpress/data';
  * the returned information come from the Block Type.
  *
  * @param {string} clientId Block's client id.
- * @return {BlockDisplayInformation} Block's display information.
+ * @return {WPBlockDisplayInformation} Block's display information.
  *
  */
 
