@@ -4,7 +4,7 @@
 
 > Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats where the latest progress of this effort will be shared and discussed, or async via Github issues.
 
-**Note:** In order to use these features, make sure to use a block-based theme.
+**Note:** To use these features, activate a theme that includes a `block-templates/index.html` file. This will signal to the block editor that the theme should use full-site editing features.
 
 ## What is a block-based theme?
 
