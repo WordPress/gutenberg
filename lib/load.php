@@ -72,7 +72,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	*/
 
 	if ( ! class_exists( 'WP_REST_URL_Details_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-url-details-controller.php';
+		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
 	}
 
 	require __DIR__ . '/rest-api.php';
