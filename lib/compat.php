@@ -413,6 +413,48 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
 
 /**
+ * Determine if the current theme needs to load separate block styles or not.
+ *
+ * @return bool
+ */
+function gutenberg_should_load_separate_block_styles() {
+	$load_separate_styles = gutenberg_is_fse_theme();
+	/**
+	 * Determine if separate styles will be loaded for blocks on-render or not.
+	 *
+	 * @param bool $load_separate_styles Whether separate styles will be loaded or not.
+	 *
+	 * @return bool
+	 */
+	return apply_filters( 'load_separate_block_styles', $load_separate_styles );
+}
+
+/**
+ * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.
+ *
+ * @return void
+ */
+function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
+	if ( gutenberg_should_load_separate_block_styles() ) {
+		/**
+		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
+		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
+		 * blocks of the content have their assets enqueued.
+		 *
+		 * This can be removed once minimum support for the plugin is outside the range
+		 * of the version associated with closure of the following ticket.
+		 *
+		 * @see https://core.trac.wordpress.org/ticket/50328
+		 *
+		 * @see WP_Block::render
+		 */
+		remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+	}
+}
+
+add_action( 'init', 'gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles' );
+
+/**
  * Callback hooked to the register_block_type_args filter.
  *
  * This hooks into block registration to inject the default context into the block object.
