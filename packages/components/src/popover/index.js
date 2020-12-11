@@ -13,17 +13,12 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import {
 	useViewportMatch,
 	useResizeObserver,
-	useFocusOnMount,
-	__experimentalUseFocusOutside as useFocusOutside,
-	useConstrainedTabbing,
-	useFocusReturn,
 	useMergeRefs,
-	useRefEffect,
+	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -485,97 +480,58 @@ const Popover = (
 		__unstableBoundaryParent,
 	] );
 
-	// Event handlers for closing the popover.
-	const closeEventRef = useRefEffect(
-		( node ) => {
-			function maybeClose( event ) {
-				// Close on escape.
-				if ( event.keyCode === ESCAPE && onClose ) {
-					event.stopPropagation();
-					onClose();
-				}
-			}
-
-			node.addEventListener( 'keydown', maybeClose );
-
-			return () => {
-				node.removeEventListener( 'keydown', maybeClose );
-			};
-		},
-		[ onClose ]
-	);
-
-	const constrainedTabbingRef = useConstrainedTabbing();
-	const focusReturnRef = useFocusReturn();
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
-	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
-	const mergedRefs = useMergeRefs( [
-		ref,
-		containerRef,
-		// Don't register the event at all if there's no onClose callback.
-		onClose ? closeEventRef : null,
-		focusOnMount ? constrainedTabbingRef : null,
-		focusOnMount ? focusReturnRef : null,
-		focusOnMount ? focusOnMountRef : null,
-	] );
-
-	/**
-	 * Shims an onFocusOutside callback to be compatible with a deprecated
-	 * onClickOutside prop function, if provided.
-	 *
-	 * @param {FocusEvent} event Focus event from onFocusOutside.
-	 */
-	function handleOnFocusOutside( event ) {
-		// Defer to given `onFocusOutside` if specified. Call `onClose` only if
-		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
-		// assures backwards-compatibility for prior `onClickOutside` default.
-		if ( onFocusOutside ) {
+	const onDialogClose = ( type, event ) => {
+		// Ideally the popover should have just a single onClose prop and
+		// not three props that potentially do the same thing.
+		if ( onClose ) {
+			onClose();
+		} else if ( type === 'focusoutside' && onFocusOutside ) {
 			onFocusOutside( event );
-			return;
-		} else if ( ! onClickOutside ) {
-			if ( onClose ) {
-				onClose();
+		} else if ( type === 'focusoutside' && onClickOutside ) {
+			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
+			// target. MouseEvent constructor is unsupported in Internet Explorer.
+			let clickEvent;
+			try {
+				clickEvent = new window.MouseEvent( 'click' );
+			} catch ( error ) {
+				clickEvent = document.createEvent( 'MouseEvent' );
+				clickEvent.initMouseEvent(
+					'click',
+					true,
+					true,
+					window,
+					0,
+					0,
+					0,
+					0,
+					0,
+					false,
+					false,
+					false,
+					false,
+					0,
+					null
+				);
 			}
-			return;
+
+			Object.defineProperty( clickEvent, 'target', {
+				get: () => event.relatedTarget,
+			} );
+
+			deprecated( 'Popover onClickOutside prop', {
+				since: '5.3',
+				alternative: 'onFocusOutside',
+			} );
 		}
+	};
 
-		// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
-		// target. MouseEvent constructor is unsupported in Internet Explorer.
-		let clickEvent;
-		try {
-			clickEvent = new window.MouseEvent( 'click' );
-		} catch ( error ) {
-			clickEvent = document.createEvent( 'MouseEvent' );
-			clickEvent.initMouseEvent(
-				'click',
-				true,
-				true,
-				window,
-				0,
-				0,
-				0,
-				0,
-				0,
-				false,
-				false,
-				false,
-				false,
-				0,
-				null
-			);
-		}
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount,
+		__unstableOnClose: onDialogClose,
+		onClose: onDialogClose,
+	} );
 
-		Object.defineProperty( clickEvent, 'target', {
-			get: () => event.relatedTarget,
-		} );
-
-		deprecated( 'Popover onClickOutside prop', {
-			since: '5.3',
-			alternative: 'onFocusOutside',
-		} );
-
-		onClickOutside( clickEvent );
-	}
+	const mergedRefs = useMergeRefs( [ containerRef, dialogRef, ref ] );
 
 	/** @type {false | string} */
 	const animateClassName =
@@ -603,8 +559,8 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			{ ...focusOutsideProps }
 			ref={ mergedRefs }
+			{ ...dialogProps }
 			tabIndex="-1"
 		>
 			{ isExpanded && <ScrollLock /> }
