@@ -9,14 +9,19 @@ import classnames from 'classnames';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment } = attributes;
-
-	const className = classnames( {
-		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-	} );
+	const { gutterSize, verticalAlignment } = attributes;
+	const blockProps = {
+		className: classnames( {
+			[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		} ),
+		style: {
+			'--gutter-size':
+				gutterSize !== undefined ? `${ gutterSize }px` : undefined,
+		},
+	};
 
 	return (
-		<div { ...useBlockProps.save( { className } ) }>
+		<div { ...useBlockProps.save( blockProps ) }>
 			<InnerBlocks.Content />
 		</div>
 	);

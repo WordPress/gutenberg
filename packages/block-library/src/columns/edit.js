@@ -46,13 +46,19 @@ import {
  */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
+// Values to constrain the customizable gutter size.
+const MIN_GUTTER_VALUE = 0;
+const MAX_GUTTER_VALUE = 100;
+const INITIAL_GUTTER_POSITION = 32;
+
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { gutterSize, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -69,6 +75,10 @@ function ColumnsEditContainer( {
 
 	const blockProps = useBlockProps( {
 		className: classes,
+		style: {
+			'--gutter-size':
+				gutterSize !== undefined ? `${ gutterSize }px` : undefined,
+		},
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
@@ -85,7 +95,7 @@ function ColumnsEditContainer( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody>
+				<PanelBody title={ __( 'Display settings' ) }>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ count }
@@ -100,6 +110,17 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
+					<RangeControl
+						label={ __( 'Gutter size' ) }
+						value={ gutterSize }
+						onChange={ ( value ) => {
+							setAttributes( { gutterSize: value } );
+						} }
+						min={ MIN_GUTTER_VALUE }
+						max={ MAX_GUTTER_VALUE }
+						initialPosition={ INITIAL_GUTTER_POSITION }
+						allowReset
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
@@ -112,7 +133,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		/**
 		 * Update all child Column blocks with a new vertical alignment setting
 		 * based on whatever alignment is passed in. This allows change to parent
-		 * to overide anything set on a individual column basis.
+		 * to override anything set on a individual column basis.
 		 *
 		 * @param {string} verticalAlignment the vertical alignment setting
 		 */

@@ -3,6 +3,9 @@
 	"name": "core/columns",
 	"category": "design",
 	"attributes": {
+		"gutterSize": {
+			"type": "number"
+		},
 		"verticalAlignment": {
 			"type": "string"
 		}
