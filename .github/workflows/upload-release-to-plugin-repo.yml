@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+      SVN_USERNAME: ${{ secrets.svn_username }}
+      SVN_PASSWORD: ${{ secrets.svn_password }}
+      VERSION: ${{ github.event.release.name }}
     steps:
       - name: Check out Gutenberg trunk from WP.org plugin repo
         run: svn checkout "$PLUGIN_REPO_URL/trunk"
@@ -40,10 +43,6 @@ jobs:
 
       - name: Commit the content changes
         working-directory: ./trunk
-        env:
-          SVN_USERNAME: ${{ secrets.svn_username }}
-          SVN_PASSWORD: ${{ secrets.svn_password }}
-          VERSION: ${{ github.event.release.name }}
         run: |
           svn st | grep '^?' | awk '{print $2}' | xargs svn add
           svn st | grep '^!' | awk '{print $2}' | xargs svn rm
