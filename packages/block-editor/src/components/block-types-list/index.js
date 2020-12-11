@@ -45,18 +45,10 @@ function BlockTypesList( {
 				return (
 					<InserterListItem
 						key={ item.id }
+						item={ item }
 						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
-						onClick={ () => {
-							onSelect( item );
-							onHover( null );
-						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
+						onSelect={ onSelect }
+						onHover={ onHover }
 						composite={ composite }
 					/>
 				);
