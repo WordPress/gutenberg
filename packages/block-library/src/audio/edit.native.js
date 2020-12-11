@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Text } from 'react-native';
+import { Text, TouchableWithoutFeedback } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,17 +17,17 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import {
+	BlockCaption,
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
-	RichText,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { useState } from '@wordpress/element';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -38,8 +39,12 @@ function AudioEdit( {
 	noticeUI,
 	insertBlocksAfter,
 	onFocus,
+	onBlur,
+	clientId,
 } ) {
-	const { id, autoplay, caption, loop, preload, src } = attributes;
+	const { id, autoplay, loop, preload, src } = attributes;
+
+	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 
 	const onFileChange = ( { mediaId, mediaUrl } ) => {
 		setAttributes( { id: mediaId, src: mediaUrl } );
@@ -78,6 +83,16 @@ function AudioEdit( {
 		setAttributes( { src: media.url, id: media.id } );
 	}
 
+	function onAudioPress() {
+		setIsCaptionSelected( false );
+	}
+
+	function onFocusCaption() {
+		if ( ! isCaptionSelected ) {
+			setIsCaptionSelected( true );
+		}
+	}
+
 	if ( ! src ) {
 		return (
 			<View>
@@ -97,6 +112,9 @@ function AudioEdit( {
 	}
 
 	function getBlockControls( open ) {
+		if ( isCaptionSelected ) {
+			return null;
+		}
 		return (
 			<BlockControls>
 				<ToolbarGroup>
@@ -128,23 +146,6 @@ function AudioEdit( {
 								{ isUploadInProgress && 'Uploading...' }
 								{ isUploadFailed && 'ERROR' }
 							</Text>
-							{ ( ! RichText.isEmpty( caption ) ||
-								isSelected ) && (
-								<RichText
-									tagName="figcaption"
-									placeholder={ __( 'Write caption…' ) }
-									value={ caption }
-									onChange={ ( value ) =>
-										setAttributes( { caption: value } )
-									}
-									inlineToolbar
-									__unstableOnSplitAtEnd={ () =>
-										insertBlocksAfter(
-											createBlock( 'core/paragraph' )
-										)
-									}
-								/>
-							) }
 						</View>
 					);
 				} }
@@ -153,46 +154,70 @@ function AudioEdit( {
 	}
 
 	return (
-		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Audio settings' ) }>
-					<ToggleControl
-						label={ __( 'Autoplay' ) }
-						onChange={ toggleAttribute( 'autoplay' ) }
-						checked={ autoplay }
-					/>
-					<ToggleControl
-						label={ __( 'Loop' ) }
-						onChange={ toggleAttribute( 'loop' ) }
-						checked={ loop }
-					/>
-					<SelectControl
-						label={ __( 'Preload' ) }
-						value={ preload || '' }
-						// `undefined` is required for the preload attribute to be unset.
-						onChange={ ( value ) =>
-							setAttributes( {
-								preload: value || undefined,
-							} )
-						}
-						options={ [
-							{ value: '', label: __( 'Browser default' ) },
-							{ value: 'auto', label: __( 'Auto' ) },
-							{ value: 'metadata', label: __( 'Metadata' ) },
-							{ value: 'none', label: __( 'None' ) },
-						] }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<MediaUpload
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				isReplacingMedia={ true }
-				onSelect={ onSelectAudio }
-				render={ ( { open, getMediaOptions } ) => {
-					return getBlockUI( open, getMediaOptions );
-				} }
-			/>
-		</>
+		<TouchableWithoutFeedback
+			accessible={ ! isSelected }
+			onPress={ onAudioPress }
+			disabled={ ! isSelected }
+		>
+			<View style={ { flex: 1 } }>
+				<InspectorControls>
+					<PanelBody title={ __( 'Audio settings' ) }>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ toggleAttribute( 'loop' ) }
+							checked={ loop }
+						/>
+						<SelectControl
+							label={ __( 'Preload' ) }
+							value={ preload || '' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) =>
+								setAttributes( {
+									preload: value || undefined,
+								} )
+							}
+							options={ [
+								{ value: '', label: __( 'Browser default' ) },
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{ value: 'none', label: __( 'None' ) },
+							] }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<MediaUpload
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					isReplacingMedia={ true }
+					onSelect={ onSelectAudio }
+					render={ ( { open, getMediaOptions } ) => {
+						return getBlockUI( open, getMediaOptions );
+					} }
+				/>
+				<BlockCaption
+					accessible={ true }
+					accessibilityLabelCreator={ ( caption ) =>
+						isEmpty( caption )
+							? /* translators: accessibility text. Empty Audio caption. */
+							  __( 'Audio caption. Empty' )
+							: sprintf(
+									/* translators: accessibility text. %s: Audio caption. */
+									__( 'Audio caption. %s' ),
+									caption
+							  )
+					}
+					clientId={ clientId }
+					isSelected={ isCaptionSelected }
+					onFocus={ onFocusCaption }
+					onBlur={ onBlur }
+					insertBlocksAfter={ insertBlocksAfter }
+				/>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 }
 export default withNotices( AudioEdit );
