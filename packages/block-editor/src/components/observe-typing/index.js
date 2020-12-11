@@ -15,6 +15,8 @@ import {
 	TAB,
 } from '@wordpress/keycodes';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.
  *
@@ -43,6 +45,12 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && KEY_DOWN_ELIGIBLE_KEY_CODES.has( keyCode );
 }
 
+/**
+ * Removes the `isTyping` flag when the mouse moves in the document of the given
+ * element.
+ *
+ * @param {RefObject} ref React ref containing an element.
+ */
 export function useMouseMoveTypingReset( ref ) {
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
@@ -92,6 +100,15 @@ export function useMouseMoveTypingReset( ref ) {
 	}, [ isTyping, stopTyping ] );
 }
 
+/**
+ * Sets and removes the `isTyping` flag based on user actions:
+ *
+ * - Sets the flag if the user types within the given element.
+ * - Removes the flag when the user selects some text, focusses a non-text
+ *   field, presses ESC or TAB, or moves the mouse in the document.
+ *
+ * @param {RefObject} ref React ref containing an element.
+ */
 export function useTypingObserver( ref ) {
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
