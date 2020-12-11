@@ -106,7 +106,7 @@ export default function VisualEditor( { settings } ) {
 				style={ resizedCanvasStyles }
 				head={ window.__editorStyles.html }
 			>
-				{ () => <Canvas settings={ settings } /> }
+				<Canvas settings={ settings } />
 			</Iframe>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (

@@ -1,5 +1,12 @@
 .edit-post-visual-editor {
 	position: relative;
+	height: 100%;
+
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
