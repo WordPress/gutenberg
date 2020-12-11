@@ -20,5 +20,5 @@
 		"fontSize": true,
 		"lineHeight": true
 	},
-	"style": "wp-block-button"
+	"style": "wp-block-post-comments-form"
 }
