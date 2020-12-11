@@ -13,7 +13,6 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.43.0
 * [***] New Block: File [#27228]
-* [**] Fix issue where removing blocks some blocks would crash the editor.[#27683]
 * [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 
 ## 1.42.0
