@@ -122,10 +122,14 @@ function GalleryEdit( props ) {
 		}
 	}, [ currentImageOptions, imageSettings ] );
 
-	const { getBlock, getSettings } = useSelect( ( select ) => {
+	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
+			const settings = select( 'core/block-editor' ).getSettings();
+			const preferredStyleVariations =
+				settings.__experimentalPreferredStyleVariations;
 		return {
 			getBlock: select( 'core/block-editor' ).getBlock,
-			getSettings: select( 'core/block-editor' ).getSettings,
+			getSettings: select('core/block-editor').getSettings,
+			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
 		};
 	}, [] );
 
@@ -209,12 +213,13 @@ function GalleryEdit( props ) {
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
-			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+			...getUpdatedLinkTargetSettings(linkTarget, attributes),
+			className: preferredStyle ? `is-style-${ preferredStyle }` : undefined,
 			sizeSlug,
 		};
 	}
 
-	function onSelectImages( selectedImages, replace = false ) {
+	function onSelectImages(selectedImages, replace = false) {
 		const imageArray =
 			Object.prototype.toString.call( selectedImages ) ===
 			'[object FileList]'
