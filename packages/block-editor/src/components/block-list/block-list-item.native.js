@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -54,6 +54,7 @@ export class BlockListItem extends Component {
 			hasParents,
 			blockName,
 			parentBlockName,
+			parentWidth,
 		} = this.props;
 		const { blockWidth } = this.state;
 		const { medium } = ALIGNMENT_BREAKPOINTS;
@@ -86,19 +87,23 @@ export class BlockListItem extends Component {
 			parentBlockName
 		);
 
-		if (
-			! isParentFullWidth &&
-			isParentContainerRelated &&
-			! isContainerRelated
-		) {
-			return marginHorizontal * 2;
+		if ( isParentContainerRelated && ! isContainerRelated ) {
+			const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+			if ( parentWidth === screenWidth ) {
+				return marginHorizontal * 2;
+			}
 		}
 
 		return marginHorizontal;
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const { blockAlignment, hasParents, parentBlockName } = this.props;
+		const {
+			blockAlignment,
+			blockName,
+			hasParents,
+			parentBlockName,
+		} = this.props;
 		const { alignments, innerContainers } = WIDE_ALIGNMENTS;
 
 		const isFullWidth = blockAlignment === alignments.full;
@@ -106,6 +111,8 @@ export class BlockListItem extends Component {
 		const isParentContainerRelated = innerContainers.includes(
 			parentBlockName
 		);
+
+		const isContainerRelated = innerContainers.includes( blockName );
 
 		return [
 			readableContentViewStyle,
@@ -115,7 +122,8 @@ export class BlockListItem extends Component {
 				},
 			! blockAlignment &&
 				hasParents &&
-				! isParentContainerRelated && {
+				! isParentContainerRelated &&
+				isContainerRelated && {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
