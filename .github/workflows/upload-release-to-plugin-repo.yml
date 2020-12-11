@@ -40,6 +40,10 @@ jobs:
 
       - name: Commit the content changes
         working-directory: ./trunk
+        env:
+          VERSION: ${{ github.event.release.tag_name }}
         run: |
           svn st | grep '^?' | awk '{print $2}' | xargs svn add
           svn st | grep '^!' | awk '{print $2}' | xargs svn rm
+          echo "Committing version ${VERSION}"
+          # svn commit -m "Committing version ${VERSION}"
