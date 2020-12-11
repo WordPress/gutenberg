@@ -105,14 +105,13 @@ function block_core_navigation_link_render_submenu_icon() {
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Don't render the block's subtree if it is a draft.
-	if( is_numeric( $attributes['id'] ) ) {
+	if ( is_numeric( $attributes['id'] ) ) {
 		$post = get_post( $attributes['id'] );
-		if( 'publish' !== $post->post_status ) {
+		if ( 'publish' !== $post->post_status ) {
 			return '';
 		}
 	}
-	
-	
+
 	// Don't render the block's subtree if it has no label.
 	if ( empty( $attributes['label'] ) ) {
 		return '';
