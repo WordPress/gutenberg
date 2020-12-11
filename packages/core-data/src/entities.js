@@ -152,10 +152,14 @@ export const getPostTypePrePersistHandler = ( postTypeName ) => (
 			: edits.slug;
 	}
 
-	// Templates and template parts can only be published.
-	/*if ( [ 'wp_template', 'wp_template_part' ].includes( postTypeName ) ) {
+	// Templates and template parts can only be published,
+	// except when they are auto-generated from template files by the site editor.
+	if (
+		[ 'wp_template', 'wp_template_part' ].includes( postTypeName ) &&
+		!! persistedRecord
+	) {
 		newEdits.status = 'publish';
-	}*/
+	}
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
