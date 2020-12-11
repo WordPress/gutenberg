@@ -719,5 +719,71 @@ describe( 'useSelect', () => {
 			// Test if the unsubscribers get called correctly.
 			renderer.unmount();
 		} );
+
+		it( 'handles custom generic stores without a unsubscribe function', () => {
+			let renderer;
+
+			function createCustomStore() {
+				let storeChanged = () => {};
+				let counter = 0;
+
+				const selectors = {
+					getCounter: () => counter,
+				};
+
+				const actions = {
+					increment: () => {
+						counter += 1;
+						storeChanged();
+					},
+				};
+
+				return {
+					getSelectors() {
+						return selectors;
+					},
+					getActions() {
+						return actions;
+					},
+					subscribe( listener ) {
+						storeChanged = listener;
+					},
+				};
+			}
+
+			registry.registerGenericStore(
+				'generic-store',
+				createCustomStore()
+			);
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) => select( 'generic-store' ).getCounter(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+
+			act( () => {
+				registry.dispatch( 'generic-store' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			expect( () => renderer.unmount() ).not.toThrow();
+		} );
 	} );
 } );

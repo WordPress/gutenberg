@@ -56,5 +56,7 @@
 		"color": true,
 		"__experimentalFontFamily": true,
 		"__experimentalTextDecoration": true
-	}
+	},
+	"editorStyle": "wp-block-navigation-editor",
+	"style": "wp-block-navigation"
 }

@@ -25,6 +25,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color' ],
 	},
+	borderRadius: {
+		value: [ 'border', 'radius' ],
+		support: [ '__experimentalBorder', 'radius' ],
+	},
 	color: {
 		value: [ 'color', 'text' ],
 		support: [ 'color' ],

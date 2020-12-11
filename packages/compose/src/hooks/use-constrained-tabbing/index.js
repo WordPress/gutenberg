@@ -9,7 +9,7 @@ import { focus } from '@wordpress/dom';
  * In Dialogs/modals, the tabbing must be constrained to the content of
  * the wrapper element. This hook adds the behavior to the returned ref.
  *
- * @return {Function} Element Ref.
+ * @return {Object|Function} Element Ref.
  *
  * @example
  * ```js

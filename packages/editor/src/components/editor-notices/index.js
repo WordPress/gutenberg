@@ -9,6 +9,7 @@ import { filter } from 'lodash';
 import { NoticeList, SnackbarList } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -52,9 +53,9 @@ export function EditorNotices( { notices, onRemove } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		notices: select( 'core/notices' ).getNotices(),
+		notices: select( noticesStore ).getNotices(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/notices' ).removeNotice,
+		onRemove: dispatch( noticesStore ).removeNotice,
 	} ) ),
 ] )( EditorNotices );

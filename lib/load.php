@@ -135,3 +135,4 @@ require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/align.php';
 require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
+require __DIR__ . '/block-supports/border.php';
