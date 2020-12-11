@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, filter, mapKeys, orderBy, uniq } from 'lodash';
+import { castArray, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,6 @@ import {
 } from '@wordpress/components';
 import {
 	getBlockType,
-	getPossibleBlockTransformations,
 	switchToBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -31,12 +30,12 @@ import BlockStylesMenu from './block-styles-menu';
 
 const BlockSwitcher = ( { clientIds } ) => {
 	const { replaceBlocks } = useDispatch( 'core/block-editor' );
-	const { blocks, inserterItems, hasBlockStyles } = useSelect(
+	const { blocks, possibleBlockTransformations, hasBlockStyles } = useSelect(
 		( select ) => {
 			const {
 				getBlocksByClientId,
 				getBlockRootClientId,
-				getInserterItems,
+				getBlockTransformItems,
 			} = select( 'core/block-editor' );
 			const { getBlockStyles } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
@@ -47,7 +46,8 @@ const BlockSwitcher = ( { clientIds } ) => {
 			const styles = firstBlock && getBlockStyles( firstBlock.name );
 			return {
 				blocks: _blocks,
-				inserterItems: getInserterItems( rootClientId ),
+				possibleBlockTransformations:
+					_blocks && getBlockTransformItems( _blocks, rootClientId ),
 				hasBlockStyles: !! styles?.length,
 			};
 		},
@@ -72,15 +72,6 @@ const BlockSwitcher = ( { clientIds } ) => {
 	} else {
 		icon = stack;
 	}
-	const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
-	const possibleBlockTransformations = orderBy(
-		filter(
-			getPossibleBlockTransformations( blocks ),
-			( block ) => block && !! itemsByName[ block.name ]
-		),
-		( block ) => itemsByName[ block.name ].frecency,
-		'desc'
-	);
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
