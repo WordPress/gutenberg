@@ -14,6 +14,7 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableUseEditorStyles as useEditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
@@ -65,7 +66,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { setPage } = useDispatch( 'core/edit-site' );
 
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
+	const ref = useRef();
 	const contentRef = useRef();
+
+	useMouseMoveTypingReset( ref );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
@@ -103,6 +107,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<Iframe
 					style={ resizedCanvasStyles }
 					head={ window.__editorStyles.html }
+					ref={ ref }
 					contentRef={ contentRef }
 				>
 					<Canvas body={ contentRef } styles={ settings.styles } />

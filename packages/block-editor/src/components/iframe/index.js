@@ -1,7 +1,17 @@
 /**
+ * External dependencies
+ */
+import mergeRefs from 'react-merge-refs';
+
+/**
  * WordPress dependencies
  */
-import { useState, createPortal, useCallback } from '@wordpress/element';
+import {
+	useState,
+	createPortal,
+	useCallback,
+	forwardRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
@@ -126,7 +136,7 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-export default function Iframe( { contentRef, children, head, ...props } ) {
+function Iframe( { contentRef, children, head, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
 	const setRef = useCallback( ( node ) => {
@@ -158,7 +168,7 @@ export default function Iframe( { contentRef, children, head, ...props } ) {
 	return (
 		<iframe
 			{ ...props }
-			ref={ setRef }
+			ref={ mergeRefs( [ ref, setRef ] ) }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"
@@ -167,3 +177,5 @@ export default function Iframe( { contentRef, children, head, ...props } ) {
 		</iframe>
 	);
 }
+
+export default forwardRef( Iframe );

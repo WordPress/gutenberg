@@ -434,6 +434,8 @@ const Popover = ( {
 
 		const anchorDocument = getAnchorDocument( anchorRef );
 
+		// If the anchor is within an iframe, the popover position also needs
+		// to refrest when the iframe content is scrolled or resized.
 		if ( anchorDocument && anchorDocument !== ownerDocument ) {
 			anchorDocument.defaultView.addEventListener( 'resize', refresh );
 			anchorDocument.defaultView.addEventListener(

@@ -51,8 +51,8 @@ const createTemplatePart = async (
 	await page.keyboard.type( templatePartName );
 };
 
-const editTemplatePart = async ( textToAdd, isNested = false, p = page ) => {
-	await p.click(
+const editTemplatePart = async ( textToAdd, isNested = false ) => {
+	await page.click(
 		`${
 			isNested
 				? '.wp-block-template-part .wp-block-template-part'

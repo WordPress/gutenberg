@@ -43,12 +43,62 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && KEY_DOWN_ELIGIBLE_KEY_CODES.has( keyCode );
 }
 
+export function useMouseMoveTypingReset( ref ) {
+	const isTyping = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isTyping()
+	);
+	const { stopTyping } = useDispatch( 'core/block-editor' );
+
+	useEffect( () => {
+		if ( ! isTyping ) {
+			return;
+		}
+
+		const element = ref.current;
+		const { ownerDocument } = element;
+		let lastClientX;
+		let lastClientY;
+
+		/**
+		 * On mouse move, unset typing flag if user has moved cursor.
+		 *
+		 * @param {MouseEvent} event Mousemove event.
+		 */
+		function stopTypingOnMouseMove( event ) {
+			const { clientX, clientY } = event;
+
+			// We need to check that the mouse really moved because Safari
+			// triggers mousemove events when shift or ctrl are pressed.
+			if (
+				lastClientX &&
+				lastClientY &&
+				( lastClientX !== clientX || lastClientY !== clientY )
+			) {
+				stopTyping();
+			}
+
+			lastClientX = clientX;
+			lastClientY = clientY;
+		}
+
+		ownerDocument.addEventListener( 'mousemove', stopTypingOnMouseMove );
+
+		return () => {
+			ownerDocument.removeEventListener(
+				'mousemove',
+				stopTypingOnMouseMove
+			);
+		};
+	}, [ isTyping, stopTyping ] );
+}
+
 export function useTypingObserver( ref ) {
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
 	);
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
 
+	useMouseMoveTypingReset( ref );
 	useEffect( () => {
 		const element = ref.current;
 		const { ownerDocument } = element;
@@ -108,40 +158,11 @@ export function useTypingObserver( ref ) {
 				}
 			}
 
-			let lastClientX;
-			let lastClientY;
-
-			/**
-			 * On mouse move, unset typing flag if user has moved cursor.
-			 *
-			 * @param {MouseEvent} event Mousemove event.
-			 */
-			function stopTypingOnMouseMove( event ) {
-				const { clientX, clientY } = event;
-
-				// We need to check that the mouse really moved because Safari
-				// triggers mousemove events when shift or ctrl are pressed.
-				if (
-					lastClientX &&
-					lastClientY &&
-					( lastClientX !== clientX || lastClientY !== clientY )
-				) {
-					stopTyping();
-				}
-
-				lastClientX = clientX;
-				lastClientY = clientY;
-			}
-
 			element.addEventListener( 'focus', stopTypingOnNonTextField );
 			element.addEventListener( 'keydown', stopTypingOnEscapeKey );
 			ownerDocument.addEventListener(
 				'selectionchange',
 				stopTypingOnSelectionUncollapse
-			);
-			ownerDocument.addEventListener(
-				'mousemove',
-				stopTypingOnMouseMove
 			);
 
 			return () => {
@@ -154,10 +175,6 @@ export function useTypingObserver( ref ) {
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					stopTypingOnSelectionUncollapse
-				);
-				ownerDocument.removeEventListener(
-					'mousemove',
-					stopTypingOnMouseMove
 				);
 			};
 		}
