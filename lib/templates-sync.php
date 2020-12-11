@@ -86,6 +86,64 @@ function _gutenberg_get_template_paths( $base_directory ) {
 	return $path_list;
 }
 
+function _gutenberg_get_template_files( $template_type ) {
+	$template_base_paths = array(
+		'wp_template'      => 'block-templates',
+		'wp_template_part' => 'block-template-parts',
+	);
+	$themes              = array(
+		get_stylesheet() => get_stylesheet_directory(),
+		get_template()   => get_template_directory(),
+	);
+
+	$template_files = array();
+	foreach ( $themes as $theme_slug => $theme_dir ) {
+		$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
+		foreach ( $theme_template_files as $template_file ) {
+			$template_base_path = $template_base_paths[ $template_type ];
+			$template_slug = substr(
+				$template_file,
+				// Starting position of slug.
+				strpos( $template_file, $template_base_path . DIRECTORY_SEPARATOR ) + 1 + strlen( $template_base_path ),
+				// Subtract ending '.html'.
+				-5
+			);
+			$template_files[] = array(
+				'slug'  => $template_slug,
+				'path'  => $template_file,
+				'theme' => $theme_slug,
+				'type'  => $template_type,
+			);
+		}
+	}
+
+	return $template_files;
+}
+
+function _gutenberg_build_fake_template_post( $template_file, $template_type ) {
+	$default_template_types = gutenberg_get_default_template_types();
+
+	$fake_post                = new stdClass();
+	$fake_post->filter        = 'raw';
+	$fake_post->ID            = 'file-template-' . $template_file['slug'];
+	$fake_post->post_author   = 0;
+	$fake_post->post_content  = file_get_contents( $template_file['path'] );
+	$fake_post->post_date     = current_time( 'mysql' );
+	$fake_post->post_date_gmt = current_time( 'mysql', 1 );
+	$fake_post->post_name     = $template_file['slug'];
+	$fake_post->post_status   = 'draft';
+	$fake_post->post_type     = $template_type;
+
+	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
+		$fake_post->post_excerpt = $default_template_types[ $template_file['slug'] ]['description'];
+		$fake_post->post_title   = $default_template_types[ $template_file['slug'] ]['title'];
+	}
+
+	$template_post = new WP_Post( $fake_post );
+
+	return $template_post;
+}
+
 /**
  * Create the template parts auto-drafts for the current theme.
  *
@@ -160,7 +218,7 @@ function gutenberg_synchronize_theme_templates_on_load() {
 	_gutenberg_synchronize_theme_templates( 'template-part' );
 	_gutenberg_synchronize_theme_templates( 'template' );
 }
-add_action( 'wp_loaded', 'gutenberg_synchronize_theme_templates_on_load' );
+//add_action( 'wp_loaded', 'gutenberg_synchronize_theme_templates_on_load' );
 
 /**
  * Clears synchronization last check timestamps.

@@ -128,7 +128,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	$template_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template',
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => 'publish',
 			'post_name__in'  => $slugs,
 			'orderby'        => 'post_name__in',
 			'posts_per_page' => -1,
@@ -143,6 +143,17 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 		)
 	);
 	$templates      = $template_query->get_posts();
+
+	$template_files = _gutenberg_get_template_files( 'wp_template' );
+	foreach( $template_files as $template_file ) {
+		if (
+			in_array( $template_file['slug'], $slugs ) &&
+			false === array_search( $template_file['slug'], array_column( $templates, 'post_name' ) )
+		) {
+			$templates[] = _gutenberg_build_fake_template_post( $template_file, 'wp_template' );
+		}
+	}
+
 
 	// Order these templates per slug priority.
 	// Build map of template slugs to their priority in the current hierarchy.

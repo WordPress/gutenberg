@@ -12,11 +12,12 @@
  */
 class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 	public function get_items( $request ) {
-		$template_files = $this->get_template_files();
+		$template_files = _gutenberg_get_template_files( 'wp_template' );
 
 		$template_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template',
+				'post_status'    => 'publish',
 				'posts_per_page' => -1,
 				'no_found_rows'  => true,
 				'tax_query'      => array(
@@ -33,7 +34,7 @@ class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 		foreach( $template_files as $template_file ) {
 			$is_custom = array_search( $template_file['slug'], array_column( $query_result, 'post_name' ) );
 			if ( false === $is_custom ) {
-				$query_result[] = $this->get_fake_template_post( $template_file );
+				$query_result[] = _gutenberg_build_fake_template_post( $template_file, 'wp_template' );
 			}
 		}
 
@@ -51,58 +52,6 @@ class WP_REST_Templates_Controller extends WP_REST_Posts_Controller {
 
 		$response = rest_ensure_response( $templates );
 		return $response;
-	}
-
-	public function get_template_files() {
-		$themes              = array(
-			get_stylesheet() => get_stylesheet_directory(),
-			get_template()   => get_template_directory(),
-		);
-
-		$template_files = array();
-		foreach ( $themes as $theme_slug => $theme_dir ) {
-			$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/block-templates' );
-			foreach ( $theme_template_files as $template_file ) {
-				$template_slug = substr(
-					$template_file,
-					// Starting position of slug.
-					strpos( $template_file, 'block-templates' . DIRECTORY_SEPARATOR ) + 1 + strlen( 'block-templates' ),
-					// Subtract ending '.html'.
-					-5
-				);
-				$template_files[] = array(
-					'slug'  => $template_slug,
-					'path'  => $template_file,
-					'theme' => $theme_slug,
-				);
-			}
-		}
-
-		return $template_files;
-	}
-
-	public function get_fake_template_post( $template_file ) {
-		$default_template_types = gutenberg_get_default_template_types();
-
-		$fake_post                = new stdClass();
-		$fake_post->filter        = 'raw';
-		$fake_post->ID            = 'file-template-' . $template_file['slug'];
-		$fake_post->post_author   = 0;
-		$fake_post->post_content  = file_get_contents( $template_file['path'] );
-		$fake_post->post_date     = current_time( 'mysql' );
-		$fake_post->post_date_gmt = current_time( 'mysql', 1 );
-		$fake_post->post_name     = $template_file['slug'];
-		$fake_post->post_status   = 'draft';
-		$fake_post->post_type     = 'wp_template';
-
-		if ( isset( $default_template_types[ $template_file['slug'] ] ) ) {
-			$fake_post->post_excerpt = $default_template_types[ $template_file['slug'] ]['description'];
-			$fake_post->post_title   = $default_template_types[ $template_file['slug'] ]['title'];
-		}
-
-		$template_post = new WP_Post( $fake_post );
-
-		return $template_post;
 	}
 
 	public function fix_fake_post_title( $fake_post, $request ) {
