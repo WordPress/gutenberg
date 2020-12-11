@@ -53,6 +53,12 @@ const CSS_UNITS = [
 	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
 ];
 
+// Used to calculate adjustment to inner button border radius.
+const DEFAULT_INPUT_PADDING = 4;
+
+// Minimum inner radius of 1px as having none when there is an outer radius jars.
+const MIN_INNER_RADIUS = 1;
+
 export default function SearchEdit( {
 	className,
 	attributes,
@@ -70,8 +76,10 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		style,
 	} = attributes;
 
+	const borderRadius = style?.border?.radius;
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
@@ -123,10 +131,33 @@ export default function SearchEdit( {
 		};
 	};
 
+	const getInnerBorderRadiusStyle = () => {
+		if ( ! borderRadius ) {
+			return undefined;
+		}
+
+		if ( 'button-inside' === buttonPosition ) {
+			const radius = Math.max(
+				borderRadius - DEFAULT_INPUT_PADDING,
+				MIN_INNER_RADIUS
+			);
+			return radius ? `${ radius }px` : undefined;
+		}
+
+		return `${ borderRadius }px`;
+	};
+
+	const sharedStyles = {
+		borderRadius: getInnerBorderRadiusStyle(),
+	};
+
 	const renderTextField = () => {
+		const textFieldStyles = { ...sharedStyles };
+
 		return (
 			<input
 				className="wp-block-search__input"
+				style={ textFieldStyles }
 				aria-label={ __( 'Optional placeholder text' ) }
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
@@ -143,18 +174,22 @@ export default function SearchEdit( {
 	};
 
 	const renderButton = () => {
+		const buttonStyles = { ...sharedStyles };
+
 		return (
 			<>
 				{ buttonUseIcon && (
 					<Button
 						icon={ search }
 						className="wp-block-search__button"
+						style={ buttonStyles }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting
@@ -165,6 +200,52 @@ export default function SearchEdit( {
 					/>
 				) }
 			</>
+		);
+	};
+
+	const renderInputs = () => {
+		const wrapperStyles =
+			'button-inside' === buttonPosition
+				? {
+						borderRadius: borderRadius
+							? `${ borderRadius }px`
+							: undefined,
+				  }
+				: {};
+
+		return (
+			<ResizableBox
+				size={ { width: `${ width }${ widthUnit }` } }
+				className="wp-block-search__inside-wrapper"
+				style={ wrapperStyles }
+				minWidth={ MIN_WIDTH }
+				enable={ getResizableSides() }
+				onResizeStart={ ( event, direction, elt ) => {
+					setAttributes( {
+						width: parseInt( elt.offsetWidth, 10 ),
+						widthUnit: 'px',
+					} );
+					toggleSelection( false );
+				} }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					setAttributes( {
+						width: parseInt( width + delta.width, 10 ),
+					} );
+					toggleSelection( true );
+				} }
+				showHandle={ isSelected }
+			>
+				{ ( 'button-inside' === buttonPosition ||
+					'button-outside' === buttonPosition ) && (
+					<>
+						{ renderTextField() }
+						{ renderButton() }
+					</>
+				) }
+
+				{ 'button-only' === buttonPosition && renderButton() }
+				{ 'no-button' === buttonPosition && renderTextField() }
+			</ResizableBox>
 		);
 	};
 
@@ -243,7 +324,7 @@ export default function SearchEdit( {
 			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Display Settings' ) }>
+				<PanelBody title={ __( 'Display settings' ) }>
 					<BaseControl
 						label={ __( 'Width' ) }
 						id={ unitControlInputId }
@@ -327,39 +408,7 @@ export default function SearchEdit( {
 				/>
 			) }
 
-			<ResizableBox
-				size={ {
-					width: `${ width }${ widthUnit }`,
-				} }
-				className="wp-block-search__inside-wrapper"
-				minWidth={ MIN_WIDTH }
-				enable={ getResizableSides() }
-				onResizeStart={ ( event, direction, elt ) => {
-					setAttributes( {
-						width: parseInt( elt.offsetWidth, 10 ),
-						widthUnit: 'px',
-					} );
-					toggleSelection( false );
-				} }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						width: parseInt( width + delta.width, 10 ),
-					} );
-					toggleSelection( true );
-				} }
-				showHandle={ isSelected }
-			>
-				{ ( 'button-inside' === buttonPosition ||
-					'button-outside' === buttonPosition ) && (
-					<>
-						{ renderTextField() }
-						{ renderButton() }
-					</>
-				) }
-
-				{ 'button-only' === buttonPosition && renderButton() }
-				{ 'no-button' === buttonPosition && renderTextField() }
-			</ResizableBox>
+			{ renderInputs() }
 		</div>
 	);
 }

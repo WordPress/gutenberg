@@ -34,6 +34,9 @@
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
-		"html": false
+		"html": false,
+		"__experimentalBorder": {
+			"radius": true
+		}
 	}
 }

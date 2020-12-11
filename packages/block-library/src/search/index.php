@@ -36,7 +36,8 @@ function render_block_core_search( $attributes ) {
 	$label_markup    = '';
 	$input_markup    = '';
 	$button_markup   = '';
-	$width_styles    = '';
+
+	$border_radius_css = block_core_search_build_css_border_radius( $attributes );
 
 	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
@@ -55,9 +56,14 @@ function render_block_core_search( $attributes ) {
 	}
 
 	if ( $show_input ) {
+		$input_styles = ! empty( $border_radius_css['style'] )
+			? sprintf( ' style="%s"', esc_attr( $border_radius_css['style'] ) )
+			: '';
+
 		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
+			'<input type="search" id="%s" class="wp-block-search__input"%s name="s" value="%s" placeholder="%s" required />',
 			$input_id,
+			$input_styles,
 			esc_attr( get_search_query() ),
 			esc_attr( $attributes['placeholder'] )
 		);
@@ -66,6 +72,9 @@ function render_block_core_search( $attributes ) {
 	if ( $show_button ) {
 		$button_internal_markup = '';
 		$button_classes         = '';
+		$button_styles          = ! empty( $border_radius_css['style'] )
+			? sprintf( ' style="%s"', esc_attr( $border_radius_css['style'] ) )
+			: '';
 
 		if ( ! $use_icon_button ) {
 			if ( ! empty( $attributes['buttonText'] ) ) {
@@ -80,22 +89,29 @@ function render_block_core_search( $attributes ) {
 		}
 
 		$button_markup = sprintf(
-			'<button type="submit"class="wp-block-search__button ' . $button_classes . '">%s</button>',
+			'<button type="submit" class="wp-block-search__button %s"%s>%s</button>',
+			$button_classes,
+			$button_styles,
 			$button_internal_markup
 		);
 	}
 
+	$field_styles = ( array_key_exists( 'buttonPosition', $attributes ) && 'button-inside' === $attributes['buttonPosition'] )
+		? $border_radius_css['wrapper_style']
+		: '';
+
 	if ( ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] ) ) {
 		if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
-			$width_styles = ' style="width: ' . $attributes['width'] . $attributes['widthUnit'] . ';"';
+			$field_styles .= ' width: ' . $attributes['width'] . $attributes['widthUnit'] . ';"';
 		}
 	}
 
-	$field_markup       = sprintf(
+	$field_markup = sprintf(
 		'<div class="wp-block-search__inside-wrapper"%s>%s</div>',
-		$width_styles,
+		( ! empty( $field_styles ) ) ? sprintf( ' style="%s"', esc_attr( $field_styles ) ) : '',
 		$input_markup . $button_markup
 	);
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 	return sprintf(
@@ -118,6 +134,39 @@ function register_block_core_search() {
 	);
 }
 add_action( 'init', 'register_block_core_search' );
+
+/**
+ * Build an array with inline styles defining the border radius
+ * which will be applied to the inner elements and wrapper of the search block
+ * on the frontend.
+ *
+ * @param  array $attributes Search block attributes.
+ * @return array Border radius inline styles.
+ */
+function block_core_search_build_css_border_radius( $attributes ) {
+	$padding       = 4;
+	$border_radius = array(
+		'style'         => '',
+		'wrapper_style' => '',
+	);
+
+	$has_border_radius = isset( $attributes['style']['border']['radius'] );
+	if ( ! $has_border_radius ) {
+		return $border_radius;
+	}
+
+	$radius_value  = $attributes['style']['border']['radius'];
+	$button_inside = array_key_exists( 'buttonPosition', $attributes )
+		&& 'button-inside' === $attributes['buttonPosition'];
+
+	// Uses min value of 1 as having no radius when the outer does is jarring.
+	$radius = $button_inside ? max( $radius_value - $padding, 1 ) : $radius_value;
+
+	$border_radius['style']         = sprintf( 'border-radius: %spx;', esc_attr( $radius ) );
+	$border_radius['wrapper_style'] = sprintf( 'border-radius: %spx;', esc_attr( $radius_value ) );
+
+	return $border_radius;
+}
 
 /**
  * Builds the correct top level classnames for the 'core/search' block.
