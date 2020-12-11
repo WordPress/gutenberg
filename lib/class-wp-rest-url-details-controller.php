@@ -72,10 +72,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		}
 
 		// Transient per URL.
-		$cache_key = 'g_url_details_response_' . md5( $url );
+		$cache_key = $this->build_cache_key_for_url( $url );
 
 		// Attempt to retrieve cached response.
-		$data = get_transient( $cache_key );
+		$data = $this->get_cache( $cache_key );
 
 		// Return cache if valid data.
 		if ( ! is_wp_error( $data ) && ! empty( $data ) ) {
@@ -93,8 +93,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			'title' => $this->get_title( $response_body ),
 		);
 
-		// Only cache valid responses.
-		set_transient( $cache_key, wp_json_encode( $data ), HOUR_IN_SECONDS );
+		// Cache the valid response.
+		$this->set_cache( $cache_key, $data );
 
 		return rest_ensure_response( $data );
 	}
@@ -164,5 +164,39 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
 		return $title;
+	}
+
+	/**
+	 * Utility function to build cache key for a given URL.
+	 *
+	 * @param string $url the URL for which to build a cache key.
+	 * @return string the cache key.
+	 */
+	private function build_cache_key_for_url( $url ) {
+		return 'g_url_details_response_' . md5( $url );
+	}
+
+	/**
+	 * Utility function to retrieve a value from the cache at a given key.
+	 *
+	 * @param string $key the cache key.
+	 * @return string the value from the cache.
+	 */
+	private function get_cache( $key ) {
+		return get_transient( $key );
+	}
+
+	/**
+	 * Utility function to cache a given data set at a given cache key.
+	 *
+	 * @param string $key the cache key under which to store the value
+	 * @param array  $data the data to be stored at the given cache key.
+	 * @return void
+	 */
+	private function set_cache( $key, $data = array() ) {
+		if ( ! is_array( $data ) ) {
+			return;
+		}
+		return set_transient( $key, wp_json_encode( $data ), HOUR_IN_SECONDS );
 	}
 }
