@@ -39,7 +39,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_title' ),
-					'args' => array(
+					'args'                => array(
 						'url' => array(
 							'validate_callback' => 'wp_http_validate_url',
 							'sanitize_callback' => 'esc_url_raw',
@@ -72,14 +72,21 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has access, WP_Error object otherwise.
 	 */
 	public function get_remote_url_permissions_check() {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error(
-				'rest_user_cannot_view',
-				__( 'Sorry, you are not allowed to access remote urls.', 'gutenberg' )
-			);
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
 		}
 
-		return true;
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
+		}
+
+		return new WP_Error(
+			'rest_user_cannot_view',
+			__( 'Sorry, you are not allowed to access remote urls.', 'gutenberg' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
 	}
 
 	/**
@@ -96,10 +103,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$title = get_transient( $cache_key );
 
 		if ( empty( $title ) ) {
-			$request                = wp_safe_remote_get( $url, array(
-				'timeout'             => 10,
-				'limit_response_size' => 153600, // 150 KB.
-			) );
+			$request       = wp_safe_remote_get(
+				$url,
+				array(
+					'timeout'             => 10,
+					'limit_response_size' => 153600, // 150 KB.
+				)
+			);
 			$remote_source = wp_remote_retrieve_body( $request );
 
 			if ( ! $remote_source ) {
