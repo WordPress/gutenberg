@@ -41,8 +41,12 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_title' ),
 					'args'                => array(
 						'url' => array(
+							'required'          => true,
+							'description'       => __( 'The URL to process.', 'gutenberg' ),
 							'validate_callback' => 'wp_http_validate_url',
 							'sanitize_callback' => 'esc_url_raw',
+							'type'              => 'string',
+							'format'            => 'uri',
 						),
 					),
 					'permission_callback' => array( $this, 'get_remote_url_permissions_check' ),
@@ -84,7 +88,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			'rest_user_cannot_view',
-			__( 'Sorry, you are not allowed to access remote urls.', 'gutenberg' ),
+			__( 'Sorry, you are not allowed to process remote urls.', 'gutenberg' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
@@ -100,7 +104,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$url = untrailingslashit( $url );
 
 		if ( empty( $url ) ) {
-			return new WP_Error( 'rest_invalid_url', __( 'Invalid URL', 'gutenberg' ), [ 'status' => 404 ] );
+			return new WP_Error( 'rest_invalid_url', __( 'Invalid URL', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		// Transient per URL.
@@ -123,7 +127,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		if ( WP_Http::OK !== wp_remote_retrieve_response_code( $response ) ) {
 			// Not saving the error response to cache since the error might be temporary.
-			return new WP_Error( 'rest_invalid_url', get_status_header_desc( 404 ), [ 'status' => 404 ] );
+			return new WP_Error( 'rest_invalid_url', get_status_header_desc( 404 ), array( 'status' => 404 ) );
 		}
 
 		$remote_body = wp_remote_retrieve_body( $response );
