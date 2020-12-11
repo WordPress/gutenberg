@@ -183,11 +183,9 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
-
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
-
 		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
 			name
 		);
@@ -341,7 +339,6 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
-
 		return {
 			icon,
 			name: name || 'core/missing',

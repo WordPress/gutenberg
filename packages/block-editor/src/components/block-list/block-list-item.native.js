@@ -89,7 +89,8 @@ export class BlockListItem extends Component {
 
 		if ( isParentContainerRelated && ! isContainerRelated ) {
 			const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-			if ( parentWidth === screenWidth ) {
+			const isScreenWidthEqual = parentWidth === screenWidth;
+			if ( isScreenWidthEqual ) {
 				return marginHorizontal * 2;
 			}
 		}
