@@ -24,7 +24,10 @@
 		},
 		"spacing": {
 			"padding": true
-		}
+		},
+		"__experimentalBorder": {
+            "radius": true
+        }
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"
