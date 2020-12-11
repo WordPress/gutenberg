@@ -71,9 +71,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-batch-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_WP_Templates_Controller' ) ) {
-		require_once __DIR__ . '/full-site-editing/class-wp-rest-wp-templates-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
 		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
 	}
