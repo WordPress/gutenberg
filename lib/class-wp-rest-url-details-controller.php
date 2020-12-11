@@ -1,9 +1,8 @@
 <?php
 /**
+ * REST API: WP_REST_URL_Details_Controller class
  *
- *
- * @package gutenberg
- * @since 5.?.0
+ * @package Gutenberg
  */
 
 /**
@@ -189,7 +188,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Utility function to cache a given data set at a given cache key.
 	 *
-	 * @param string $key the cache key under which to store the value
+	 * @param string $key the cache key under which to store the value.
 	 * @param array  $data the data to be stored at the given cache key.
 	 * @return void
 	 */
