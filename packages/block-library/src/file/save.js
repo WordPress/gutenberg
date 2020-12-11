@@ -11,6 +11,7 @@ export default function save( { attributes } ) {
 		textLinkTarget,
 		showDownloadButton,
 		downloadButtonText,
+		fileId,
 	} = attributes;
 
 	return (
