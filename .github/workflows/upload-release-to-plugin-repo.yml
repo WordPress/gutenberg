@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+      STABLE_TAG_REGEX: 'Stable tag: [0-9]\+\.[0-9]\+\.[0-9]\+\s*'
       SVN_USERNAME: ${{ secrets.svn_username }}
       SVN_PASSWORD: ${{ secrets.svn_password }}
       VERSION: ${{ github.event.release.name }}
@@ -19,8 +20,6 @@ jobs:
 
       - name: Get previous stable tag
         id: get_previous_stable_tag
-        env:
-          STABLE_TAG_REGEX: 'Stable tag: [0-9]\+\.[0-9]\+\.[0-9]\+\s*'
         run: echo ::set-output name=stable_tag::$(grep "$STABLE_TAG_REGEX" ./trunk/readme.txt)
 
       - name: Delete everything
@@ -55,4 +54,12 @@ jobs:
         run: |
           echo "Tagging version $VERSION"
           # svn copy "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Tagging version $VERSION" \
+          #  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+      - name: Update the plugin's stable version
+        working-directory: ./trunk
+        run: |
+          sed -i "s/${STABLE_TAG_REGEX}/Stable tag: ${VERSION}/g" ./readme.txt
+          echo "Releasing version $VERSION"
+          # svn commit -m "Releasing version $VERSION" \
           #  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
