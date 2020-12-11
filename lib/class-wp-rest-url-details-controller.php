@@ -96,36 +96,51 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string|WP_Error The URL's document title on success, WP_Error on failure.
 	 */
 	private function get_remote_url_title( $url ) {
+
+		$url = untrailingslashit( $url );
+
+		if ( empty( $url ) ) {
+			return new WP_Error( 'rest_invalid_url', __( 'Invalid URL', 'gutenberg' ), [ 'status' => 404 ] );
+		}
+
 		// Transient per URL.
 		$cache_key = 'g_url_details_response_' . hash( 'crc32b', $url );
 
 		// Attempt to retrieve cached response.
 		$title = get_transient( $cache_key );
 
-		if ( empty( $title ) ) {
-			$request       = wp_safe_remote_get(
-				$url,
-				array(
-					'timeout'             => 10,
-					'limit_response_size' => 153600, // 150 KB.
-				)
-			);
-			$remote_source = wp_remote_retrieve_body( $request );
-
-			if ( ! $remote_source ) {
-				return new WP_Error( 'no_response', __( 'The source URL does not exist.', 'gutenberg' ), array( 'status' => 404 ) );
-			}
-
-			preg_match( '|<title>([^<]*?)</title>|is', $remote_source, $match_title );
-			$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
-
-			if ( empty( $title ) ) {
-				return new WP_Error( 'no_title', __( 'No document title at remote url.', 'gutenberg' ), array( 'status' => 404 ) );
-			}
-
-			// Only cache valid responses.
-			set_transient( $cache_key, $title, HOUR_IN_SECONDS );
+		if ( ! empty( $title ) ) {
+			return $title;
 		}
+
+		$response = wp_safe_remote_get(
+			$url,
+			array(
+				'timeout'             => 10,
+				'limit_response_size' => 153600, // 150 KB.
+			)
+		);
+
+		if ( WP_Http::OK !== wp_remote_retrieve_response_code( $response ) ) {
+			// Not saving the error response to cache since the error might be temporary.
+			return new WP_Error( 'rest_invalid_url', get_status_header_desc( 404 ), [ 'status' => 404 ] );
+		}
+
+		$remote_body = wp_remote_retrieve_body( $response );
+
+		if ( ! $remote_body ) {
+			return new WP_Error( 'no_response', __( 'The URL does not exist.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
+		preg_match( '|<title>([^<]*?)</title>|is', $remote_body, $match_title );
+		$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
+
+		if ( empty( $title ) ) {
+			return new WP_Error( 'no_title', __( 'No document title at remote url.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
+		// Only cache valid responses.
+		set_transient( $cache_key, $title, HOUR_IN_SECONDS );
 
 		return $title;
 	}
