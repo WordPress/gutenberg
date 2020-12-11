@@ -109,10 +109,11 @@ export function replace( tag, text, callback ) {
 		// Create the match object and pass it through the callback.
 		const result = callback( fromMatch( arguments ) );
 
-		// Make sure to return any of the extra brackets if they weren't used to
-		// escape the shortcode.
-		return result ? left + result + right : match;
-	} );
+			// Make sure to return any of the extra brackets if they weren't used to
+			// escape the shortcode.
+			return result || result === '' ? left + result + right : match;
+		}
+	);
 }
 
 /**
