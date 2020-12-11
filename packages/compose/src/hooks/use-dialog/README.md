@@ -8,7 +8,9 @@ React hook to be used on a dialog wrapper to enable the following behaviors:
  - return focus on unmount.
  - focus outside.
 
-## Return Object Properties
+## Returned value
+
+The hooks returns an array composed of the two following values:
 
 ### `ref`
 
