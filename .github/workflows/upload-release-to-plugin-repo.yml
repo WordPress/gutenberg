@@ -46,6 +46,13 @@ jobs:
         run: |
           svn st | grep '^?' | awk '{print $2}' | xargs svn add
           svn st | grep '^!' | awk '{print $2}' | xargs svn rm
-          echo "Committing version ${VERSION}"
-          # svn commit -m "Committing version ${VERSION}" \
+          echo "Committing version $VERSION"
+          # svn commit -m "Committing version $VERSION" \
+          #  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+      - name: Create the SVN tag
+        working-directory: ./trunk
+        run: |
+          echo "Tagging version $VERSION"
+          # svn copy "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Tagging version $VERSION" \
           #  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
