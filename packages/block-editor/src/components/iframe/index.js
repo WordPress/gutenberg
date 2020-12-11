@@ -148,27 +148,35 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			const { contentDocument } = node;
 			const { readyState } = contentDocument;
 
-			if ( readyState === 'interactive' || readyState === 'complete' ) {
-				setIframeDocument( contentDocument );
-				setHead( contentDocument, head );
-				setBodyClassName( contentDocument );
-				styleSheetsCompat( contentDocument );
-				bubbleEvents( contentDocument );
-				setBodyClassName( contentDocument );
-				contentRef.current = contentDocument.body;
+			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
+				return false;
 			}
+
+			setIframeDocument( contentDocument );
+			setHead( contentDocument, head );
+			setBodyClassName( contentDocument );
+			styleSheetsCompat( contentDocument );
+			bubbleEvents( contentDocument );
+			setBodyClassName( contentDocument );
+			contentRef.current = contentDocument.body;
+
+			return true;
 		}
 
-		setDocumentIfReady();
+		if ( setDocumentIfReady() ) {
+			return;
+		}
 
 		// Document is not immediately loaded in Firefox.
-		node.addEventListener( 'load', setDocumentIfReady );
+		node.addEventListener( 'load', () => {
+			setDocumentIfReady();
+		} );
 	}, [] );
 
 	return (
 		<iframe
 			{ ...props }
-			ref={ mergeRefs( [ ref, setRef ] ) }
+			ref={ useCallback( mergeRefs( [ ref, setRef ] ), [] ) }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"
