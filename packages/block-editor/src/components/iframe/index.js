@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, createPortal } from '@wordpress/element';
+import { useState, createPortal, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
@@ -126,16 +126,10 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-export default function Iframe( {
-	contentRef,
-	children,
-	head,
-	style = {},
-	...props
-} ) {
+export default function Iframe( { contentRef, children, head, ...props } ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
-	function setRef( node ) {
+	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
 		}
@@ -159,17 +153,11 @@ export default function Iframe( {
 
 		// Document is not immediately loaded in Firefox.
 		node.addEventListener( 'load', setDocumentIfReady );
-	}
+	}, [] );
 
 	return (
 		<iframe
 			{ ...props }
-			style={ {
-				display: 'block',
-				width: '100%',
-				height: '100%',
-				...style,
-			} }
 			ref={ setRef }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }

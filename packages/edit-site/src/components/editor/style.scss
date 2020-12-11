@@ -20,17 +20,14 @@
 	}
 }
 
-.interface-interface-skeleton__content {
-	// The iframe is scrollable, so no need for the content area to be
-	// scrollable too.
-	overflow: visible;
-}
-
 .edit-site-visual-editor {
 	position: relative;
 	height: 100%;
 
 	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
 		background-color: $white;
 	}
 }

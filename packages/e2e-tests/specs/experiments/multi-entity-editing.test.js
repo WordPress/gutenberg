@@ -145,6 +145,11 @@ describe( 'Multi-entity editor states', () => {
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await visitSiteEditor();
 		await clickTemplateItem( 'Template Parts', 'header' );
+		await page.waitForFunction( () =>
+			Array.from( window.frames ).find(
+				( { name } ) => name === 'editor-canvas'
+			)
+		);
 
 		// Wait for blocks to load.
 		await canvas().waitForSelector( '.wp-block' );
@@ -153,6 +158,11 @@ describe( 'Multi-entity editor states', () => {
 
 		// Switch back and make sure it is still clean.
 		await clickTemplateItem( 'Templates', 'Front Page' );
+		await page.waitForFunction( () =>
+			Array.from( window.frames ).find(
+				( { name } ) => name === 'editor-canvas'
+			)
+		);
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
