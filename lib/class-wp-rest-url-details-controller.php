@@ -77,7 +77,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$data = $this->get_cache( $cache_key );
 
 		// Return cache if valid data.
-		if ( ! is_wp_error( $data ) && ! empty( $data ) ) {
+		if ( false && ! is_wp_error( $data ) && ! empty( $data ) ) {
 			return json_decode( $data, true );
 		}
 
