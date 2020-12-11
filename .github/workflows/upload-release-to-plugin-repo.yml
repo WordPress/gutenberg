@@ -8,10 +8,10 @@ jobs:
   upload:
     name: Upload Gutenberg Plugin
     runs-on: ubuntu-latest
+    env:
+      PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
     steps:
       - name: Check out Gutenberg trunk from WP.org plugin repo
-        env:
-          PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
         run: svn checkout "$PLUGIN_REPO_URL/trunk"
 
       - name: Get previous stable tag
