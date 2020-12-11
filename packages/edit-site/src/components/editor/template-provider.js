@@ -15,14 +15,8 @@ export default function TemplateProvider( { children, id, type } ) {
 		select( 'core' ).getEntityRecord( 'postType', type, id )
 	);
 	const { saveEntityRecord } = useDispatch( 'core' );
+	const { setTemplate } = useDispatch( 'core/edit-site' );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const [ entityId, setEntityId ] = useState();
-
-	useEffect( () => {
-		if ( id !== entityId ) {
-			setEntityId( id );
-		}
-	}, [ id ] );
 
 	const saveTemplateAutoDraft = useCallback( async () => {
 		setIsSaving( true );
@@ -38,7 +32,7 @@ export default function TemplateProvider( { children, id, type } ) {
 			'wp_template',
 			templateData
 		);
-		setEntityId( templateAutoDraft.id );
+		setTemplate( templateAutoDraft.id );
 		setIsSaving( false );
 	}, [ template ] );
 
@@ -47,16 +41,16 @@ export default function TemplateProvider( { children, id, type } ) {
 			isSaving ||
 			! template ||
 			'wp_template' !== type ||
-			! startsWith( entityId, 'file-template-' )
+			! startsWith( id, 'file-template-' )
 		) {
 			return;
 		}
 
 		saveTemplateAutoDraft();
-	}, [ entityId, isSaving, saveTemplateAutoDraft, template, type ] );
+	}, [ id, isSaving, saveTemplateAutoDraft, template, type ] );
 
 	return (
-		<EntityProvider kind="postType" id={ entityId } type={ type }>
+		<EntityProvider kind="postType" id={ id } type={ type }>
 			{ children }
 		</EntityProvider>
 	);
