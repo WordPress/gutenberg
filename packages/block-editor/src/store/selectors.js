@@ -1404,22 +1404,23 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 } );
 
 /**
- * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
+ * Returns the calculated frecency.
+ *
+ * 'frecency' is a heuristic (https://en.wikipedia.org/wiki/Frecency)
  * that combines block usage frequenty and recency.
  *
- * @param {*} time
- * @param {*} count
+ * @param {number} time When the last insert occurred as a UNIX epoch
+ * @param {number} count The number of inserts that have occurred.
+ *
+ * @return {number} The calculated frecency.
  */
-// TODO jsdoc
 const calculateFrecency = ( time, count ) => {
 	if ( ! time ) {
 		return count;
 	}
-
 	// The selector is cached, which means Date.now() is the last time that the
 	// relevant state changed. This suits our needs.
 	const duration = Date.now() - time;
-
 	switch ( true ) {
 		case duration < MILLISECONDS_PER_HOUR:
 			return count * 4;
@@ -1432,7 +1433,16 @@ const calculateFrecency = ( time, count ) => {
 	}
 };
 
-// TODO jsdoc
+/**
+ * Returns a function that accepts a block type and builds an item to be shown
+ * in a specific context. It's used for building items for Inserter and available
+ * block Transfroms list.
+ *
+ * @param {Object} state Editor state.
+ * @param {Object} options Options object for handling the building of a block type.
+ * @param {string} options.buildScope The scope for which the item is going to be used.
+ * @return {Function} Function returns an item to be shown in a specific context (Inserter|Transforms list).
+ */
 const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
 	blockType
 ) => {
@@ -1589,13 +1599,36 @@ export const getInserterItems = createSelector(
 	]
 );
 
-// TODO  jsdoc test etc..
+/**
+ * Determines the items that appear in the available block transforms list.
+ *
+ * Each item object contains what's necessary to display a menu item in the
+ * transform list and handle its selection.
+ *
+ * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
+ * that combines block usage frequenty and recency.
+ *
+ * Items are returned ordered descendingly by their 'frecency'.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {WPEditorTransformItem[]} Items that appear in inserter.
+ *
+ * @typedef {Object} WPEditorTransformItem
+ * @property {string}   id                Unique identifier for the item.
+ * @property {string}   name              The type of block to create.
+ * @property {string}   title             Title of the item, as it appears in the inserter.
+ * @property {string}   icon              Dashicon for the item, as it appears in the inserter.
+ * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting
+ *                                        this item.
+ * @property {number}   frecency          Heuristic that combines frequency and recency.
+ */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
-
 		const blockTypeTransformItems = getBlockTypes()
 			.filter( ( blockType ) =>
 				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
@@ -1624,7 +1657,6 @@ export const getBlockTransformItems = createSelector(
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
-		state.blocks.order,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
