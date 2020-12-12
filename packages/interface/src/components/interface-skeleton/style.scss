@@ -37,6 +37,7 @@ html.interface-interface-skeleton__html-container {
 	display: flex;
 	flex-direction: column;
 	flex: 0 1 100%;
+	overflow: hidden;
 }
 
 @include editor-left(".interface-interface-skeleton");
