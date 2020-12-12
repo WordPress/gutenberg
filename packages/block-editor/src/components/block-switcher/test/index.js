@@ -105,7 +105,7 @@ describe( 'BlockSwitcher', () => {
 	test( 'should render switcher with blocks', () => {
 		useSelect.mockImplementation( () => ( {
 			blocks: [ headingBlock1 ],
-			inserterItems: [
+			possibleBlockTransformations: [
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
@@ -117,10 +117,7 @@ describe( 'BlockSwitcher', () => {
 	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
 		useSelect.mockImplementation( () => ( {
 			blocks: [ headingBlock1, textBlock ],
-			inserterItems: [
-				{ name: 'core/heading', frecency: 1 },
-				{ name: 'core/paragraph', frecency: 1 },
-			],
+			possibleBlockTransformations: [],
 		} ) );
 		const wrapper = shallow( <BlockSwitcher /> );
 		expect( wrapper ).toMatchSnapshot();
@@ -129,7 +126,7 @@ describe( 'BlockSwitcher', () => {
 	test( 'should render enabled block switcher with multi block when transforms exist', () => {
 		useSelect.mockImplementation( () => ( {
 			blocks: [ headingBlock1, headingBlock2 ],
-			inserterItems: [
+			possibleBlockTransformations: [
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
@@ -142,12 +139,8 @@ describe( 'BlockSwitcher', () => {
 		beforeAll( () => {
 			useSelect.mockImplementation( () => ( {
 				blocks: [ headingBlock1 ],
-				inserterItems: [
-					{ name: 'core/quote', frecency: 1 },
-					{ name: 'core/cover-image', frecency: 2 },
+				possibleBlockTransformations: [
 					{ name: 'core/paragraph', frecency: 3 },
-					{ name: 'core/heading', frecency: 4 },
-					{ name: 'core/text', frecency: 5 },
 				],
 			} ) );
 		} );
