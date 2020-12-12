@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 
 /**
- * Hook used to focus the first tabbable element on mount.
+ * Hook used to focus the element on mount.
  *
- * @param {boolean|string} focusOnMount Focus on mount mode.
- * @return {Function|Object} Element Ref.
+ * @param {boolean} focusOnMount Whether to set focus on mount.
+ *
+ * @return {Function|undefined} Ref callback.
  *
  * @example
  * ```js
@@ -17,66 +17,32 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  * const WithFocusOnMount = () => {
  *     const ref = useFocusOnMount()
  *     return (
- *         <div ref={ ref }>
- *             <Button />
- *             <Button />
- *         </div>
+ *         <div tabIndex="-1" ref={ ref }></div>
  *     );
  * }
  * ```
  */
-function useFocusOnMount( focusOnMount = 'firstElement' ) {
-	const focusOnMountRef = useRef( focusOnMount );
-	const [ node, setNode ] = useState();
-	useEffect( () => {
-		focusOnMountRef.current = focusOnMount;
-	}, [ focusOnMount ] );
-
-	// Ideally we should be running the focus behavior in the useCallback directly
-	// Right now we have some issues where the link popover remounts
-	// prevents us from doing that.
-	const ref = useCallback( setNode, [] );
-
-	// Focus handling
-	useEffect( () => {
-		if ( ! node ) {
+export default function useFocusOnMount( focusOnMount = true ) {
+	const didMount = useRef( false );
+	const ref = useCallback( ( node ) => {
+		if ( ! node || didMount.current === true ) {
 			return;
 		}
-		/*
-		 * Without the setTimeout, the dom node is not being focused. Related:
-		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		 *
-		 * TODO: Treat the cause, not the symptom.
-		 */
-		const focusTimeout = setTimeout( () => {
-			if ( focusOnMountRef.current === false || ! node ) {
-				return;
-			}
 
-			if ( focusOnMountRef.current === 'firstElement' ) {
-				const firstTabbable = focus.tabbable.find( node )[ 0 ];
+		didMount.current = true;
 
-				if ( firstTabbable ) {
-					firstTabbable.focus();
-				} else {
-					node.focus();
-				}
+		if ( node.contains( node.ownerDocument.activeElement ) ) {
+			return;
+		}
 
-				return;
-			}
+		node.focus();
+	}, [] );
 
-			if (
-				focusOnMountRef.current === 'container' ||
-				focusOnMountRef.current === true
-			) {
-				node.focus();
-			}
-		}, 0 );
-
-		return () => clearTimeout( focusTimeout );
-	}, [ node ] );
+	// If focus doesn't need to be set on mount, no need to return a ref
+	// callback.
+	if ( ! focusOnMount ) {
+		return;
+	}
 
 	return ref;
 }
-
-export default useFocusOnMount;

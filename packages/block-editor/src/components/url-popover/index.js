@@ -17,7 +17,7 @@ function URLPopover( {
 	children,
 	renderSettings,
 	position = 'bottom center',
-	focusOnMount = 'firstElement',
+	focusOnMount,
 	...popoverProps
 } ) {
 	const [ isSettingsExpanded, setIsSettingsExpanded ] = useState( false );

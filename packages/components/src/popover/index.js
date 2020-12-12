@@ -212,7 +212,7 @@ const Popover = ( {
 	/* eslint-disable no-unused-vars */
 	position = 'bottom right',
 	range,
-	focusOnMount = 'firstElement',
+	focusOnMount = true,
 	anchorRef,
 	shouldAnchorIncludePadding,
 	anchorRect,

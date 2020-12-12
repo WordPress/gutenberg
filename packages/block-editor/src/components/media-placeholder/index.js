@@ -19,6 +19,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { keyboardReturn } from '@wordpress/icons';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,6 +35,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 			onSubmit={ onSubmit }
 		>
 			<input
+				ref={ useFocusOnMount() }
 				className="block-editor-media-placeholder__url-input-field"
 				type="url"
 				aria-label={ __( 'URL' ) }

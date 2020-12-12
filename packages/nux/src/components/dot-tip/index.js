@@ -44,7 +44,6 @@ export function DotTip( {
 			className="nux-dot-tip"
 			position={ position }
 			noArrow
-			focusOnMount="container"
 			shouldAnchorIncludePadding
 			role="dialog"
 			aria-label={ __( 'Editor tips' ) }

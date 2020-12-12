@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, select, text } from '@storybook/addon-knobs';
+import { boolean, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -21,21 +21,12 @@ export const _default = () => {
 	const show = boolean( 'Example: Show', true );
 	const children = text( 'children', 'Popover Content' );
 	const animate = boolean( 'animate', false );
-	const focusOnMount = select(
-		'focusOnMount',
-		{
-			firstElement: 'firstElement',
-			container: 'container',
-		},
-		'firstElement'
-	);
 	const noArrow = boolean( 'noArrow', false );
 	const isAlternate = boolean( 'isAlternate', false );
 
 	const props = {
 		animate,
 		children,
-		focusOnMount,
 		noArrow,
 		isAlternate,
 	};

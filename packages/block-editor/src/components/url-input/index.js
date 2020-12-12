@@ -4,6 +4,7 @@
 import { debounce, isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
@@ -18,7 +19,12 @@ import {
 	withSpokenMessages,
 	Popover,
 } from '@wordpress/components';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import {
+	withInstanceId,
+	withSafeTimeout,
+	compose,
+	useFocusOnMount,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
@@ -392,6 +398,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
+			forwardedRef,
 		} = this.props;
 
 		const {
@@ -428,7 +435,7 @@ class URLInput extends Component {
 				selectedSuggestion !== null
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
-			ref: this.inputRef,
+			ref: mergeRefs( [ this.inputRef, forwardedRef ] ),
 		};
 
 		if ( renderControl ) {
@@ -537,10 +544,7 @@ class URLInput extends Component {
 	}
 }
 
-/**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
- */
-export default compose(
+const ComposedURLInput = compose(
 	withSafeTimeout,
 	withSpokenMessages,
 	withInstanceId,
@@ -557,3 +561,13 @@ export default compose(
 		};
 	} )
 )( URLInput );
+
+function URLInputWithFocusOnMount( props ) {
+	const ref = useFocusOnMount();
+	return <ComposedURLInput { ...props } forwardedRef={ ref } />;
+}
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
+ */
+export default URLInputWithFocusOnMount;

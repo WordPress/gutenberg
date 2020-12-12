@@ -42,9 +42,7 @@ function ModalFrameContent( {
 			}
 		}
 	}
-	const focusOnMountRef = useFocusOnMount(
-		focusOnMount ? 'container' : false
-	);
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 

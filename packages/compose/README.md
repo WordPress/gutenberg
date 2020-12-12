@@ -188,7 +188,7 @@ _Returns_
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
-Hook used to focus the first tabbable element on mount.
+Hook used to focus the element on mount.
 
 _Usage_
 
@@ -198,21 +198,18 @@ import { useFocusOnMount } from '@wordpress/compose';
 const WithFocusOnMount = () => {
     const ref = useFocusOnMount()
     return (
-        <div ref={ ref }>
-            <Button />
-            <Button />
-        </div>
+        <div tabIndex="-1" ref={ ref }></div>
     );
 }
 ```
 
 _Parameters_
 
--   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+-   _focusOnMount_ `boolean`: Whether to set focus on mount.
 
 _Returns_
 
--   `(Function|Object)`: Element Ref.
+-   `(Function|undefined)`: Ref callback.
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 

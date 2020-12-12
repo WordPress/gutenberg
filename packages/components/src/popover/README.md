@@ -56,13 +56,13 @@ The component accepts the following props. Props not included in this set will b
 
 ### focusOnMount
 
-By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
+By default, the the popover container will receive focus when it mounts. 
 
 Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
 
-- Type: `String` or `Boolean`
+- Type: `Boolean`
 - Required: No
-- Default: `"firstElement"`
+- Default: `true`
 
 ### position
 

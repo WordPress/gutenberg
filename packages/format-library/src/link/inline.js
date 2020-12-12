@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
@@ -125,14 +125,9 @@ function InlineLinkUI( {
 
 	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 
-	// The focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
-
 	return (
 		<Popover
 			anchorRef={ anchorRef }
-			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			position="bottom center"
 		>
