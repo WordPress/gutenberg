@@ -418,7 +418,7 @@ const Popover = ( {
 	] );
 
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
-	const focusOutsideRef = useFocusOutside( handleOnFocusOutside );
+	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -516,11 +516,8 @@ const Popover = ( {
 			) }
 			{ ...contentProps }
 			onKeyDown={ maybeClose }
-			ref={ mergeRefs( [
-				containerRef,
-				focusOutsideRef,
-				focusOnMountRef,
-			] ) }
+			{ ...focusOutsideProps }
+			ref={ mergeRefs( [ containerRef, focusOnMountRef ] ) }
 			tabIndex="-1"
 		>
 			{ isExpanded && <ScrollLock /> }
