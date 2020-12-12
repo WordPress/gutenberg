@@ -15,6 +15,7 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 	useFocusOnMount,
+	__experimentalUseFocusOutside as useFocusOutside,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -24,7 +25,6 @@ import { close } from '@wordpress/icons';
 import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
-import PopoverDetectOutside from './detect-outside';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
@@ -418,6 +418,7 @@ const Popover = ( {
 	] );
 
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -502,47 +503,43 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
-			<IsolatedEventContainer
-				className={ classnames(
-					'components-popover',
-					className,
-					animateClassName,
-					{
-						'is-expanded': isExpanded,
-						'is-without-arrow': noArrow,
-						'is-alternate': isAlternate,
-					}
-				) }
-				{ ...contentProps }
-				onKeyDown={ maybeClose }
-				ref={ containerRef }
-			>
-				{ isExpanded && <ScrollLock /> }
-				{ isExpanded && (
-					<div className="components-popover__header">
-						<span className="components-popover__header-title">
-							{ headerTitle }
-						</span>
-						<Button
-							className="components-popover__close"
-							icon={ close }
-							onClick={ onClose }
-						/>
-					</div>
-				) }
-				<div
-					ref={ mergeRefs( [ contentRef, focusOnMountRef ] ) }
-					className="components-popover__content"
-					tabIndex="-1"
-				>
-					<div style={ { position: 'relative' } }>
-						{ containerResizeListener }
-						{ children }
-					</div>
+		<IsolatedEventContainer
+			className={ classnames(
+				'components-popover',
+				className,
+				animateClassName,
+				{
+					'is-expanded': isExpanded,
+					'is-without-arrow': noArrow,
+					'is-alternate': isAlternate,
+				}
+			) }
+			{ ...contentProps }
+			onKeyDown={ maybeClose }
+			{ ...focusOutsideProps }
+			ref={ mergeRefs( [ containerRef, focusOnMountRef ] ) }
+			tabIndex="-1"
+		>
+			{ isExpanded && <ScrollLock /> }
+			{ isExpanded && (
+				<div className="components-popover__header">
+					<span className="components-popover__header-title">
+						{ headerTitle }
+					</span>
+					<Button
+						className="components-popover__close"
+						icon={ close }
+						onClick={ onClose }
+					/>
 				</div>
-			</IsolatedEventContainer>
-		</PopoverDetectOutside>
+			) }
+			<div ref={ contentRef } className="components-popover__content">
+				<div style={ { position: 'relative' } }>
+					{ containerResizeListener }
+					{ children }
+				</div>
+			</div>
+		</IsolatedEventContainer>
 	);
 
 	// Apply focus to element as long as focusOnMount is truthy; false is
