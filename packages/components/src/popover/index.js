@@ -516,7 +516,12 @@ const Popover = ( {
 			) }
 			{ ...contentProps }
 			onKeyDown={ maybeClose }
-			ref={ containerRef }
+			ref={ mergeRefs( [
+				containerRef,
+				focusOutsideRef,
+				focusOnMountRef,
+			] ) }
+			tabIndex="-1"
 		>
 			{ isExpanded && <ScrollLock /> }
 			{ isExpanded && (
@@ -531,15 +536,7 @@ const Popover = ( {
 					/>
 				</div>
 			) }
-			<div
-				ref={ mergeRefs( [
-					contentRef,
-					focusOutsideRef,
-					focusOnMountRef,
-				] ) }
-				className="components-popover__content"
-				tabIndex="-1"
-			>
+			<div ref={ contentRef } className="components-popover__content">
 				<div style={ { position: 'relative' } }>
 					{ containerResizeListener }
 					{ children }
