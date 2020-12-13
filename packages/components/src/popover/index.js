@@ -27,7 +27,6 @@ import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
-import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
 
@@ -503,7 +502,9 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<IsolatedEventContainer
+		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
 			className={ classnames(
 				'components-popover',
 				className,
@@ -539,7 +540,7 @@ const Popover = ( {
 					{ children }
 				</div>
 			</div>
-		</IsolatedEventContainer>
+		</div>
 	);
 
 	// Apply focus to element as long as focusOnMount is truthy; false is
