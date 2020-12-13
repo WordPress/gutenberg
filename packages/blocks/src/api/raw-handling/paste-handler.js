@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact } from 'lodash';
-
+import { flatMap, filter, compact, difference, identity } from 'lodash';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import sanitizeHtml from 'sanitize-html';
 /**
  * WordPress dependencies
  */
-import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
-
+import {
+	getPhrasingContentSchema,
+	removeInvalidHTML,
+	unwrap,
+} from '@wordpress/dom';
 /**
  * Internal dependencies
  */
@@ -40,6 +44,107 @@ import emptyParagraphRemover from './empty-paragraph-remover';
  */
 const { console } = window;
 
+const stylesToSkip = [
+	'box-sizing',
+	'background-color',
+	'font-family',
+	'border-radius',
+];
+const getNonDefaultStyles = ( { defaultStylesEntries, stylesEntries } ) =>
+	stylesEntries.reduce( ( acc, [ key, values ] ) => {
+		const defaultValues =
+			( defaultStylesEntries.find(
+				( [ defaultKey ] ) => defaultKey === key
+			) || [] )[ 1 ] || [];
+		const diff = difference( values, defaultValues );
+		const nonDefaultStyles = diff.length
+			? {
+					[ key ]: diff,
+			  }
+			: {};
+		return {
+			...acc,
+			...nonDefaultStyles,
+		};
+	}, {} );
+
+const getStylesEntries = ( stylesString ) => {
+	const stylesArr = stylesString
+		.replace( /\(.*?\)/g, ( match ) => match.replace( / /g, '_' ) )
+		.split( ';' )
+		.filter( identity );
+
+	return stylesArr.map( ( styles ) => {
+		const [ key, values = [] ] = styles.trim().split( ':' );
+		if ( key === 'color' ) return [ key, [ values ] ];
+		const valuesArr = values.split( ', ' ).map( ( w ) => w.trim() );
+		return [ key, valuesArr ];
+	} );
+};
+
+const defaultStyles =
+	"color: rgb(40, 48, 61); font-family: -apple-system, system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 20px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(209, 228, 221); text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;";
+
+const fromObjToString = ( obj ) =>
+	Object.entries( obj )
+		.map( ( pair ) => pair.join( ':' ) )
+		.join( '; ' );
+
+export const applyToAllSuccessors = ( { head, fn } ) => {
+	if ( ! head ) return;
+	for ( const child of head.children ) {
+		fn( child );
+		applyToAllSuccessors( { head: child, fn } );
+	}
+};
+const removeDefaultStyles = ( element ) => {
+	const elementStyles = element.style.cssText;
+	const defaultStylesEntries = getStylesEntries( defaultStyles );
+	const stylesEntries = getStylesEntries( elementStyles );
+
+	const diff = getNonDefaultStyles( {
+		defaultStylesEntries,
+		stylesEntries,
+	} );
+	const withoutUnimportantProps = Object.fromEntries(
+		Object.entries( diff ).filter(
+			( [ key ] ) => ! stylesToSkip.includes( key )
+		)
+	);
+	const nonDefaultStyles = fromObjToString(
+		withoutUnimportantProps
+	).replace( /\(.*?\)/g, ( match ) => match.replace( /_/g, '' ) );
+
+	element.style = nonDefaultStyles;
+};
+
+const removeDefaultStylesFromAllElements = ( html ) => {
+	const container = document.createElement( 'div' );
+	container.innerHTML = html;
+	applyToAllSuccessors( {
+		head: container.firstElementChild,
+		fn: removeDefaultStyles,
+	} );
+	return container.innerHTML;
+};
+
+const unwrapSpansWithNoStylesAndAtrrs = ( HTML ) => {
+	const container = document.createElement( 'div' );
+	container.innerHTML = HTML;
+	applyToAllSuccessors( {
+		head: container,
+		fn: ( element ) => {
+			const { style, attributes } = element;
+			const hasNoStylesOrAttrs =
+				! style.cssText &&
+				! [ ...attributes ].filter( ( attr ) => attr.name !== 'style' )
+					.length;
+			if ( hasNoStylesOrAttrs ) unwrap( element );
+		},
+	} );
+	return container.innerHTML;
+};
+
 /**
  * Filters HTML to only contain phrasing content.
  *
@@ -49,23 +154,25 @@ const { console } = window;
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML, preserveWhiteSpace ) {
+	HTML = removeDefaultStylesFromAllElements( HTML );
 	HTML = deepFilterHTML( HTML, [
 		googleDocsUIDRemover,
 		phrasingContentReducer,
 		commentRemover,
 	] );
-	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
-		inline: true,
-	} );
+	// HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
+	// 	inline: true,
+	// } );
 
 	if ( ! preserveWhiteSpace ) {
 		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 	}
 
+	HTML = unwrapSpansWithNoStylesAndAtrrs( HTML );
 	// Allows us to ask for this information when we get a report.
 	console.log( 'Processed inline HTML:\n\n', HTML );
 
-	return HTML;
+	return sanitizeHtml( HTML );
 }
 
 function getRawTransformations() {
@@ -117,7 +224,6 @@ function htmlToBlocks( { html, rawTransforms } ) {
 		if ( transform ) {
 			return transform( node );
 		}
-
 		return createBlock(
 			blockName,
 			getBlockAttributes( blockName, node.outerHTML )
