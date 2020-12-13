@@ -307,7 +307,6 @@ export function ImageEdit( {
 		'is-resized': !! width || !! height,
 		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
-		'list-image': isListItem,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -334,8 +333,8 @@ export function ImageEdit( {
 		return (
 			<>
 				{ controls }
-				<li { ...blockProps }>
-					<figure>
+				<li className="list-image">
+					<figure { ...blockProps }>
 						{ image }
 						{ mediaPlaceholder }
 					</figure>
