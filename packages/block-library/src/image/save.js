@@ -33,6 +33,7 @@ export default function save( { attributes } ) {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		'list-image': isListItem,
 	} );
 
 	const image = (
@@ -69,8 +70,8 @@ export default function save( { attributes } ) {
 	const blockProps = useBlockProps.save( { className: classes } );
 	if ( isListItem ) {
 		return (
-			<li className="list-image">
-				<figure { ...blockProps }>{ figure }</figure>
+			<li { ...blockProps }>
+				<figure>{ figure }</figure>
 			</li>
 		);
 	}
