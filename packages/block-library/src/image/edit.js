@@ -284,7 +284,6 @@ export function ImageEdit( {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
-		'list-image': isListItem,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -311,8 +310,8 @@ export function ImageEdit( {
 		return (
 			<>
 				{ controls }
-				<li { ...blockProps }>
-					<figure>
+				<li className="list-image">
+					<figure { ...blockProps }>
 						{ image }
 						{ mediaPlaceholder }
 					</figure>
