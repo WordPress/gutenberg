@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { flatMap, filter, compact, difference, identity } from 'lodash';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import sanitizeHtml from 'sanitize-html';
 /**
  * WordPress dependencies
  */
@@ -114,7 +112,6 @@ const removeDefaultStyles = ( element ) => {
 	const nonDefaultStyles = fromObjToString(
 		withoutUnimportantProps
 	).replace( /\(.*?\)/g, ( match ) => match.replace( /_/g, '' ) );
-
 	element.style = nonDefaultStyles;
 };
 
@@ -122,7 +119,7 @@ const removeDefaultStylesFromAllElements = ( html ) => {
 	const container = document.createElement( 'div' );
 	container.innerHTML = html;
 	applyToAllSuccessors( {
-		head: container.firstElementChild,
+		head: container,
 		fn: removeDefaultStyles,
 	} );
 	return container.innerHTML;
@@ -172,7 +169,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	// Allows us to ask for this information when we get a report.
 	console.log( 'Processed inline HTML:\n\n', HTML );
 
-	return sanitizeHtml( HTML );
+	return HTML;
 }
 
 function getRawTransformations() {

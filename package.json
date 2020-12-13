@@ -77,8 +77,7 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount",
-		"sanitize-html": "2.2.0"
+		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
 		"@actions/core": "1.2.6",
