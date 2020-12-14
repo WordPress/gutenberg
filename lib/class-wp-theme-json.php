@@ -275,7 +275,7 @@ class WP_Theme_JSON {
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
 			'support'    => array( 'spacing', 'padding' ),
-			'properties' => array( 'top', 'right', 'bottom', 'left' )
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'textDecoration'           => array(
 			'value'   => array( 'typography', 'textDecoration' ),
@@ -614,6 +614,13 @@ class WP_Theme_JSON {
 		return $value;
 	}
 
+	/**
+	 * Whether the medatata contains a key named properties.
+	 *
+	 * @param array $metadata Description of the style property.
+	 *
+	 * @return boolean True if properties exists, false otherwise.
+	 */
 	private static function has_properties( $metadata ) {
 		if ( array_key_exists( 'properties', $metadata ) ) {
 			return true;
@@ -656,7 +663,7 @@ class WP_Theme_JSON {
 				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
 						'name'  => $name . ucfirst( $property ),
-						'value' => array_merge( $metadata['value'], array( $property ) )
+						'value' => array_merge( $metadata['value'], array( $property ) ),
 					);
 				}
 			} else {
@@ -667,7 +674,7 @@ class WP_Theme_JSON {
 			}
 		}
 
-		foreach( $properties as $prop ) {
+		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $context['styles'], $prop['value'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $prop['name'] ) );
