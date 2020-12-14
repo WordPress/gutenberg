@@ -41,6 +41,7 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import ImageEditor from './image-editor';
 import { isExternalImage } from './edit';
+import useParentAttributes from './use-parent-attributes';
 
 /**
  * Module constants
@@ -70,6 +71,7 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
+		inheritedAttributes,
 	},
 	setAttributes,
 	isSelected,
@@ -79,16 +81,16 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
-	allowResize,
+	context,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
 	const image = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
-			return id && isSelected ? getMedia( id ) : null;
+			return id && ( isSelected || isListItem ) ? getMedia( id ) : null;
 		},
-		[ id, isSelected ]
+		[ id, isSelected, isListItem ]
 	);
 	const {
 		imageEditing,
@@ -125,11 +127,14 @@ export default function Image( {
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 
+	const { allowResize = true, isListItem = false } = context;
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setCaptionFocused( false );
 		}
 	}, [ isSelected ] );
+
+	useParentAttributes( image, context, inheritedAttributes, setAttributes );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -172,6 +177,22 @@ export default function Image( {
 	}
 
 	function onSetHref( props ) {
+		if (
+			inheritedAttributes.linkDestination ||
+			inheritedAttributes.linkTarget
+		) {
+			setAttributes( {
+				inheritedAttributes: {
+					...inheritedAttributes,
+					linkDestination: props.linkDestination
+						? false
+						: inheritedAttributes.linkDestination,
+					linkTarget: props.linkTarget
+						? false
+						: inheritedAttributes.linkTarget,
+				},
+			} );
+		}
 		setAttributes( props );
 	}
 
@@ -198,6 +219,14 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
+		if ( inheritedAttributes.sizeSlug ) {
+			setAttributes( {
+				inheritedAttributes: {
+					...inheritedAttributes,
+					sizeSlug: false,
+				},
+			} );
+		}
 		const newUrl = get( image, [
 			'media_details',
 			'sizes',

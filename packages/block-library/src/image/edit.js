@@ -80,7 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	context: { allowResize = true, isListItem = false },
+	context,
 } ) {
 	const {
 		url = '',
@@ -91,8 +91,9 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
+		inhertedAttributes,
 	} = attributes;
-
+	const { isListItem } = context;
 	const [ tempUrl, setTempUrl ] = useState();
 	const altRef = useRef();
 	useEffect( () => {
@@ -124,6 +125,7 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 			} );
+
 			return;
 		}
 
@@ -158,7 +160,8 @@ export function ImageEdit( {
 		}
 
 		// Check if default link setting should be used.
-		let linkDestination = attributes.linkDestination;
+		let linkDestination =
+			attributes.linkDestination || context.containerLinkTarget;
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
@@ -195,6 +198,16 @@ export function ImageEdit( {
 				break;
 		}
 		mediaAttributes.href = href;
+
+		if ( isListItem ) {
+			setAttributes( {
+				inheritedAttributes: {
+					linkDestination: true,
+					linkTarget: true,
+					sizeSlug: true,
+				},
+			} );
+		}
 
 		setAttributes( {
 			...mediaAttributes,
@@ -326,7 +339,8 @@ export function ImageEdit( {
 			onSelectURL={ onSelectURL }
 			onUploadError={ onUploadError }
 			containerRef={ ref }
-			allowResize={ allowResize }
+			context={ context }
+			inhertedAttributes={ inhertedAttributes }
 		/>
 	);
 
