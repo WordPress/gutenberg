@@ -12,6 +12,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -30,7 +31,6 @@ import { useSelect } from '@wordpress/data';
 
 function Canvas( { settings } ) {
 	const ref = useRef();
-	const html = useRef();
 	const body = useRef();
 
 	useScrollMultiSelectionIntoView( ref );
@@ -38,7 +38,6 @@ function Canvas( { settings } ) {
 	useTypewriter( ref );
 	useClipboardHandler( ref );
 	useTypingObserver( ref );
-	useCanvasClickRedirect( html );
 	useCanvasClickRedirect( body );
 	useEditorStyles( ref, settings.styles );
 
@@ -68,11 +67,9 @@ function Canvas( { settings } ) {
 		if ( newRef ) {
 			ref.current = newRef;
 			body.current = newRef.ownerDocument.body;
-			html.current = newRef.ownerDocument.documentElement;
 		} else {
 			ref.current = null;
 			body.current = null;
-			html.current = null;
 		}
 	}
 
@@ -97,12 +94,16 @@ export default function VisualEditor( { settings } ) {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
+	const ref = useRef();
+
+	useMouseMoveTypingReset( ref );
 
 	return (
 		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<Iframe
+				ref={ ref }
 				style={ resizedCanvasStyles }
 				head={ window.__editorStyles.html }
 			>
