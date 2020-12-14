@@ -58,8 +58,8 @@ function useDialog( options ) {
 	return [
 		mergeRefs( [
 			constrainedTabbingRef,
-			focusOnMountRef,
 			focusReturnRef,
+			focusOnMountRef,
 			closeOnEscapeRef,
 		] ),
 		focusOutsideProps,
