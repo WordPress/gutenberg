@@ -24,9 +24,9 @@ import { __ } from '@wordpress/i18n';
  */
 import { isAppleOS } from './platform';
 
-/** @typedef {'alt'|'ctrl'|'meta'|'shift'} WPModifierPart */
+/** @typedef {'alt' | 'ctrl' | 'meta' | 'shift'} WPModifierPart */
 
-/** @typedef {'primary'|'primaryShift'|'primaryAlt'|'secondary'|'access'|'ctrl'|'alt'|'ctrlShift'|'shift'|'shiftAlt'} WPKeycodeModifier */
+/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt'} WPKeycodeModifier */
 
 /**
  * An object of handler functions for each of the possible modifier
@@ -34,20 +34,20 @@ import { isAppleOS } from './platform';
  *
  * @template T
  *
- * @typedef {Record<WPKeycodeModifier,T>} WPModifierHandler
+ * @typedef {Record<WPKeycodeModifier, T>} WPModifierHandler
  */
 
 /* eslint-disable jsdoc/valid-types */
 /**
  * @template T
  *
- * @typedef {(character:string,isApple?:()=>boolean)=>T} WPKeyHandler
+ * @typedef {(character: string, isApple?: () => boolean) => T} WPKeyHandler
  */
 
 /**
  * @template T
  *
- * @typedef {(event:KeyboardEvent,character:string,isApple?:()=>boolean)=>T} WPEventKeyHandler
+ * @typedef {(event: KeyboardEvent, character: string, isApple?: () => boolean) => T} WPEventKeyHandler
  */
 /* eslint-enable jsdoc/valid-types */
 
@@ -300,7 +300,7 @@ function getEventModifiers( event ) {
 	] ).filter(
 		( key ) =>
 			event[
-				/** @type {'altKey'|'ctrlKey'|'metaKey'|'shiftKey'} */ ( `${ key }Key` )
+				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ ( `${ key }Key` )
 			]
 	);
 }
