@@ -7,6 +7,7 @@ import {
 	deactivatePlugin,
 	publishPost,
 	findSidebarPanelWithTitle,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const openPageAttributesPanel = async () => {
@@ -40,7 +41,7 @@ describe( 'Test Custom Post Types', () => {
 
 		// Create a parent post.
 		await createNewPost( { postType: 'hierar-no-title' } );
-		await page.click( '.block-editor-writing-flow' );
+		await canvas().click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Parent Post' );
 		await publishPost();
 		// Create a post that is a child of the previously created post.
@@ -55,7 +56,7 @@ describe( 'Test Custom Post Types', () => {
 			( element ) => element.textContent
 		);
 		await optionToSelect.click();
-		await page.click( '.block-editor-writing-flow' );
+		await canvas().click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Child Post' );
 		await publishPost();
 		// Reload the child post and verify it is still correctly selected as a child post.
@@ -71,11 +72,12 @@ describe( 'Test Custom Post Types', () => {
 			[ valueToSelect, PARENT_PAGE_INPUT ]
 		);
 	} );
+
 	it( 'should create a cpt with a legacy block in its template without WSOD', async () => {
 		await createNewPost( { postType: 'leg_block_in_tpl' } );
-		await page.click( '.block-editor-writing-flow' );
+		await canvas().click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Hello there' );
-		await page.waitForSelector( '[data-type="core/embed"]' );
+		await canvas().waitForSelector( '[data-type="core/embed"]' );
 		await publishPost();
 	} );
 } );

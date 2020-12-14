@@ -14,11 +14,12 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+	await canvas().waitForSelector( selector );
+	const inputElement = await canvas().$( selector );
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -31,7 +32,7 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector(
+	await canvas().waitForSelector(
 		`.wp-block-gallery img[src$="${ filename }.png"]`
 	);
 	return filename;

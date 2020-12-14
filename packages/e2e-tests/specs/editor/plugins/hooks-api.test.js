@@ -7,6 +7,7 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Using Hooks API', () => {
@@ -33,7 +34,7 @@ describe( 'Using Hooks API', () => {
 	it( 'Pressing reset block button resets the block', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
-		const paragraphContent = await page.$eval(
+		const paragraphContent = await canvas().$eval(
 			'p[data-type="core/paragraph"]',
 			( element ) => element.textContent
 		);

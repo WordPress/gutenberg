@@ -8,13 +8,24 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	showBlockToolbar,
+	canvas,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
 	return await page.evaluate( () => {
+		function getActiveElement( { activeElement } ) {
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveElement( activeElement.contentDocument );
+			}
+			return activeElement;
+		}
+
+		const activeElement = getActiveElement( document );
+
 		return (
-			document.activeElement.getAttribute( 'aria-label' ) ||
-			document.activeElement.innerHTML
+			activeElement.getAttribute( 'aria-label' ) ||
+			activeElement.innerHTML
 		);
 	} );
 }
@@ -23,6 +34,7 @@ const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
+	await expect( await getActiveLabel() ).toBe( 'Editor content' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
@@ -34,7 +46,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
 	await expect(
-		await page.evaluate( () => document.activeElement.innerHTML )
+		await canvas().evaluate( () => document.activeElement.innerHTML )
 	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
@@ -109,13 +121,18 @@ describe( 'Order of block keyboard navigation', () => {
 		}
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
+		await clickButton( 'Document' );
+
+		// Put focus in front of the block list.
+		await page.evaluate( () => {
+			document
+				.querySelector( '.interface-interface-skeleton__content' )
+				.focus();
+		} );
 
 		await page.keyboard.press( 'Tab' );
 		await expect(
-			await page.evaluate( () => {
+			await canvas().evaluate( () => {
 				return document.activeElement.placeholder;
 			} )
 		).toBe( 'Add title' );
@@ -144,9 +161,7 @@ describe( 'Order of block keyboard navigation', () => {
 		}
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
+		await clickButton( 'Document' );
 
 		// Put focus behind the block list.
 		await page.evaluate( () => {
@@ -167,10 +182,13 @@ describe( 'Order of block keyboard navigation', () => {
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect(
-			await page.evaluate( () => {
+			await canvas().evaluate( () => {
 				return document.activeElement.placeholder;
 			} )
 		).toBe( 'Add title' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Options' );
 	} );
 
 	it( 'should navigate correctly with multi selection', async () => {

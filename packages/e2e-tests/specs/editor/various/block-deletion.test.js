@@ -10,6 +10,7 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	insertBlock,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -110,10 +111,10 @@ describe( 'block deletion -', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Click on something that's not a block.
-			await page.click( '.editor-post-title' );
+			await canvas().click( '.editor-post-title' );
 
 			// Click on the image block so that its wrapper is selected and backspace to delete it.
-			await page.click(
+			await canvas().click(
 				'.wp-block[data-type="core/image"] .components-placeholder__label'
 			);
 			await page.keyboard.press( 'Backspace' );
@@ -158,7 +159,7 @@ describe( 'deleting all blocks', () => {
 
 		// There is a default block:
 		expect(
-			await page.$$( '.block-editor-block-list__block' )
+			await canvas().$$( '.block-editor-block-list__block' )
 		).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:
@@ -189,7 +190,7 @@ describe( 'deleting all blocks', () => {
 
 		// Add and remove a block.
 		await insertBlock( 'Image' );
-		await page.waitForSelector( 'figure[data-type="core/image"]' );
+		await canvas().waitForSelector( 'figure[data-type="core/image"]' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.

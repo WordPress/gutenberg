@@ -11,6 +11,7 @@ import {
 	publishPost,
 	saveDraft,
 	openPreviewPage,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -95,7 +96,7 @@ describe( 'Preview', () => {
 		);
 		expect( isPreviewDisabled ).toBe( true );
 
-		await editorPage.type( '.editor-post-title__input', 'Hello World' );
+		await canvas().type( '.editor-post-title__input', 'Hello World' );
 
 		const previewPage = await openPreviewPage( editorPage );
 		await previewPage.waitForSelector( '.entry-title' );
@@ -123,7 +124,7 @@ describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( '.editor-post-title__input', '!' );
+		await canvas().type( '.editor-post-title__input', '!' );
 		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
@@ -150,7 +151,7 @@ describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( '.editor-post-title__input', ' And more.' );
+		await canvas().type( '.editor-post-title__input', ' And more.' );
 		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
@@ -189,7 +190,7 @@ describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type aaaaa in the title filed.
-		await editorPage.type( '.editor-post-title__input', 'aaaaa' );
+		await canvas().type( '.editor-post-title__input', 'aaaaa' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
@@ -211,7 +212,7 @@ describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editorPage.type( '.editor-post-title__input', 'bbbbb' );
+		await canvas().type( '.editor-post-title__input', 'bbbbb' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
@@ -246,9 +247,9 @@ describe( 'Preview with Custom Fields enabled', () => {
 		const editorPage = page;
 
 		// Make sure input is mounted in editor before adding content.
-		await editorPage.waitForSelector( '.editor-post-title__input' );
+		await canvas().waitForSelector( '.editor-post-title__input' );
 		// Add an initial title and content.
-		await editorPage.type( '.editor-post-title__input', 'title 1' );
+		await canvas().type( '.editor-post-title__input', 'title 1' );
 		await editorPage.keyboard.press( 'Tab' );
 		await editorPage.keyboard.type( 'content 1' );
 
@@ -275,7 +276,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
-		await editorPage.click( '.editor-post-title__input' );
+		await canvas().click( '.editor-post-title__input' );
 		await editorPage.keyboard.press( 'End' );
 		await editorPage.keyboard.press( 'Backspace' );
 		await editorPage.keyboard.type( '2' );
@@ -318,7 +319,7 @@ describe( 'Preview with private custom post type', () => {
 		await createNewPost( { postType: 'not_public' } );
 
 		// Type in the title filed.
-		await page.type( '.editor-post-title__input', 'aaaaa' );
+		await canvas().type( '.editor-post-title__input', 'aaaaa' );
 		await page.keyboard.press( 'Tab' );
 
 		// Open the preview menu.

@@ -7,6 +7,7 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	saveDraft,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post Title block', () => {
@@ -35,7 +36,7 @@ describe( 'Post Title block', () => {
 		await saveDraft();
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
-		const title = await page.$eval(
+		const title = await canvas().$eval(
 			'.editor-post-title__input',
 			( element ) => element.value
 		);

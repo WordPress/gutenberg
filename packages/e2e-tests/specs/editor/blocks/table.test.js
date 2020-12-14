@@ -8,6 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const createButtonLabel = 'Create Table';
@@ -31,14 +32,14 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Check for existence of the column count field.
-		const columnCountLabel = await page.$x(
+		const columnCountLabel = await canvas().$x(
 			"//figure[@data-type='core/table']//label[text()='Column count']"
 		);
 		expect( columnCountLabel ).toHaveLength( 1 );
 
 		// Modify the column count.
 		await columnCountLabel[ 0 ].click();
-		const currentColumnCount = await page.evaluate(
+		const currentColumnCount = await canvas().evaluate(
 			() => document.activeElement.value
 		);
 		expect( currentColumnCount ).toBe( '2' );
@@ -46,14 +47,14 @@ describe( 'Table', () => {
 		await page.keyboard.type( '5' );
 
 		// Check for existence of the row count field.
-		const rowCountLabel = await page.$x(
+		const rowCountLabel = await canvas().$x(
 			"//figure[@data-type='core/table']//label[text()='Row count']"
 		);
 		expect( rowCountLabel ).toHaveLength( 1 );
 
 		// Modify the row count.
 		await rowCountLabel[ 0 ].click();
-		const currentRowCount = await page.evaluate(
+		const currentRowCount = await canvas().evaluate(
 			() => document.activeElement.value
 		);
 		expect( currentRowCount ).toBe( '2' );
@@ -61,7 +62,7 @@ describe( 'Table', () => {
 		await page.keyboard.type( '10' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		// Expect the post content to have a correctly sized table.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -71,10 +72,10 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
-		// Click the first cell and add some text.
-		await page.click( 'td' );
+		// Tab to the first cell and add some text.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'This' );
 
 		// Tab to the next cell and add some text.
@@ -107,7 +108,7 @@ describe( 'Table', () => {
 		expect( footerSwitch ).toHaveLength( 0 );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		// Expect the header and footer switches to be present now that the table has been created.
 		headerSwitch = await page.$x( headerSwitchSelector );
@@ -119,13 +120,13 @@ describe( 'Table', () => {
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 
-		await page.click( 'thead th' );
+		await canvas().click( 'thead th' );
 		await page.keyboard.type( 'header' );
 
-		await page.click( 'tbody td' );
+		await canvas().click( 'tbody td' );
 		await page.keyboard.type( 'body' );
 
-		await page.click( 'tfoot td' );
+		await canvas().click( 'tfoot td' );
 		await page.keyboard.type( 'footer' );
 
 		// Expect the table to have a header, body and footer with written content.
@@ -144,7 +145,7 @@ describe( 'Table', () => {
 		await openDocumentSettingsSidebar();
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		// Toggle on the switches and add some content.
 		const headerSwitch = await page.$x(
@@ -156,7 +157,7 @@ describe( 'Table', () => {
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 
-		await page.click( 'td' );
+		await canvas().click( 'td' );
 
 		// Add a column.
 		await clickBlockToolbarButton( 'Edit table' );
@@ -165,7 +166,7 @@ describe( 'Table', () => {
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await page.click( 'td' );
+		await canvas().click( 'td' );
 
 		// Delete a column.
 		await clickBlockToolbarButton( 'Edit table' );
@@ -178,7 +179,7 @@ describe( 'Table', () => {
 	it( 'allows columns to be aligned', async () => {
 		await insertBlock( 'Table' );
 
-		const [ columnCountLabel ] = await page.$x(
+		const [ columnCountLabel ] = await canvas().$x(
 			"//figure[@data-type='core/table']//label[text()='Column count']"
 		);
 		await columnCountLabel.click();
@@ -186,10 +187,10 @@ describe( 'Table', () => {
 		await page.keyboard.type( '4' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		// Click the first cell and add some text. Don't align.
-		const cells = await page.$$( 'td,th' );
+		const cells = await canvas().$$( 'td,th' );
 		await cells[ 0 ].click();
 		await page.keyboard.type( 'None' );
 
@@ -218,7 +219,7 @@ describe( 'Table', () => {
 		await openDocumentSettingsSidebar();
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
 		const [ fixedWidthSwitch ] = await page.$x(
@@ -227,20 +228,23 @@ describe( 'Table', () => {
 		await fixedWidthSwitch.click();
 
 		// Add multiple new lines to the first cell to make it taller.
-		await page.click( 'td' );
+		await canvas().click( 'td' );
 		await page.keyboard.type( '\n\n\n\n' );
 
 		// Get the bounding client rect for the second cell.
-		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
-			const secondCell = document.querySelectorAll(
-				'.wp-block-table td'
-			)[ 1 ];
-			// Page.evaluate can only return a serializable value to the
-			// parent process, so destructure and restructure the result
-			// into an object.
-			const { x, y } = secondCell.getBoundingClientRect();
-			return { x, y };
-		} );
+		const { x: secondCellX, y: secondCellY } = await canvas().evaluate(
+			() => {
+				const secondCell = document.querySelectorAll(
+					'.wp-block-table td'
+				)[ 1 ];
+				// Page.evaluate can only return a serializable value to the
+				// parent process, so destructure and restructure the result
+				// into an object.
+				const { x, y } = secondCell.getBoundingClientRect();
+				const winRect = window.frameElement.getBoundingClientRect();
+				return { x: x + winRect.x, y: y + winRect.y };
+			}
+		);
 
 		// Click in the top left corner of the second cell and type some text.
 		await page.mouse.click( secondCellX, secondCellY );
@@ -254,10 +258,10 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		// Click the first cell and add some text.
-		await page.click( '.wp-block-table figcaption' );
+		await canvas().click( '.wp-block-table figcaption' );
 		await page.keyboard.type( 'Caption!' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -267,7 +271,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		await clickButton( createButtonLabel );
+		await clickButton( createButtonLabel, canvas() );
 
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( '1' );

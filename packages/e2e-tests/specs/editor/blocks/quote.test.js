@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	transformBlockTo,
 	insertBlock,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Quote', () => {
@@ -64,7 +65,7 @@ describe( 'Quote', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		await canvas().click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'Quote' );
 
@@ -161,10 +162,10 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'cite' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
+		await canvas().click( '[data-type="core/quote"]' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		await page.click( '[data-type="core/quote"]' );
+		await canvas().click( '[data-type="core/quote"]' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

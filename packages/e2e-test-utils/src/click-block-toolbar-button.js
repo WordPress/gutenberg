@@ -26,6 +26,12 @@ export async function clickBlockToolbarButton( label, type = 'ariaLabel' ) {
 		);
 	}
 
+	if ( type === 'label' ) {
+		button = await page.waitForXPath(
+			`//*[@class='${ BLOCK_TOOLBAR_SELECTOR }']//label[contains(text(), '${ label }')]`
+		);
+	}
+
 	await button.evaluate( ( element ) => element.scrollIntoView() );
 	await button.click();
 }

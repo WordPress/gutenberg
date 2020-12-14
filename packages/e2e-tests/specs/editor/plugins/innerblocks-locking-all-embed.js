@@ -9,6 +9,7 @@ import {
 	createEmbeddingMatcher,
 	createJSONResponse,
 	setUpResponseMocking,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_RESPONSES = [
@@ -45,12 +46,12 @@ describe( 'Embed block inside a locked all parent', () => {
 		await insertBlock( 'Test Inner Blocks Locking All Embed' );
 		const embedInputSelector =
 			'.components-placeholder__input[aria-label="Embed URL"]';
-		await page.waitForSelector( embedInputSelector );
-		await page.click( embedInputSelector );
+		await canvas().waitForSelector( embedInputSelector );
+		await canvas().click( embedInputSelector );
 		// This URL should not have a trailing slash.
 		await page.keyboard.type( 'https://twitter.com/wordpress' );
 		await page.keyboard.press( 'Enter' );
 		// The twitter block should appear correctly.
-		await page.waitForSelector( 'figure.wp-block-embed' );
+		await canvas().waitForSelector( 'figure.wp-block-embed' );
 	} );
 } );

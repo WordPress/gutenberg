@@ -25,7 +25,24 @@ async function emulateSelectAll() {
 	await page.evaluate( () => {
 		const isMac = /Mac|iPod|iPhone|iPad/.test( window.navigator.platform );
 
-		document.activeElement.dispatchEvent(
+		function getActiveElement( { activeElement } ) {
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveElement( activeElement.contentDocument );
+			}
+			return activeElement;
+		}
+
+		function getActiveDocument( doc ) {
+			const { activeElement } = doc;
+
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveDocument( activeElement.contentDocument );
+			}
+
+			return doc;
+		}
+
+		getActiveElement( document ).dispatchEvent(
 			new KeyboardEvent( 'keydown', {
 				bubbles: true,
 				cancelable: true,
@@ -58,14 +75,18 @@ async function emulateSelectAll() {
 		} );
 
 		const wasPrevented =
-			! document.activeElement.dispatchEvent( preventableEvent ) ||
+			! getActiveElement( document ).dispatchEvent( preventableEvent ) ||
 			preventableEvent.defaultPrevented;
 
 		if ( ! wasPrevented ) {
-			document.execCommand( 'selectall', false, null );
+			getActiveDocument( document ).execCommand(
+				'selectall',
+				false,
+				null
+			);
 		}
 
-		document.activeElement.dispatchEvent(
+		getActiveElement( document ).dispatchEvent(
 			new KeyboardEvent( 'keyup', {
 				bubbles: true,
 				cancelable: true,
@@ -92,6 +113,18 @@ async function emulateSelectAll() {
 export async function setClipboardData( { plainText = '', html = '' } ) {
 	await page.evaluate(
 		( _plainText, _html ) => {
+			function getActiveWindow( doc ) {
+				const { activeElement } = doc;
+
+				if ( activeElement.nodeName === 'IFRAME' ) {
+					return getActiveWindow( activeElement.contentDocument );
+				}
+
+				return doc.defaultView;
+			}
+
+			const window = getActiveWindow( document );
+
 			window._clipboardData = new DataTransfer();
 			window._clipboardData.setData( 'text/plain', _plainText );
 			window._clipboardData.setData( 'text/html', _html );
@@ -103,6 +136,25 @@ export async function setClipboardData( { plainText = '', html = '' } ) {
 
 async function emulateClipboard( type ) {
 	await page.evaluate( ( _type ) => {
+		function getActiveElement( { activeElement } ) {
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveElement( activeElement.contentDocument );
+			}
+			return activeElement;
+		}
+
+		function getActiveWindow( doc ) {
+			const { activeElement } = doc;
+
+			if ( activeElement.nodeName === 'IFRAME' ) {
+				return getActiveWindow( activeElement.contentDocument );
+			}
+
+			return doc.defaultView;
+		}
+
+		const window = getActiveWindow( document );
+
 		if ( _type !== 'paste' ) {
 			window._clipboardData = new DataTransfer();
 
@@ -123,7 +175,7 @@ async function emulateClipboard( type ) {
 			window._clipboardData.setData( 'text/html', html );
 		}
 
-		document.activeElement.dispatchEvent(
+		getActiveElement( document ).dispatchEvent(
 			new ClipboardEvent( _type, {
 				bubbles: true,
 				clipboardData: window._clipboardData,

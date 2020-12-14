@@ -8,7 +8,6 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -42,21 +41,14 @@ export function useScrollMultiSelectionIntoView( ref ) {
 		}
 
 		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
 		const extentNode = getBlockDOMNode( selectionEnd, ownerDocument );
 
 		if ( ! extentNode ) {
 			return;
 		}
 
-		const scrollContainer = getScrollContainer( extentNode );
-
-		// If there's no scroll container, it follows that there's no scrollbar
-		// and thus there's no need to try to scroll into view.
-		if ( ! scrollContainer ) {
-			return;
-		}
-
-		scrollIntoView( extentNode, scrollContainer, {
+		scrollIntoView( extentNode, defaultView, {
 			onlyScrollIfNeeded: true,
 		} );
 	}, [ selectionEnd ] );

@@ -11,6 +11,7 @@
 	"supports": {
 		"className": false,
 		"customClassName": false,
+		"iframe": false,
 		"reusable": false
 	},
 	"editorStyle": "wp-block-freeform-editor"

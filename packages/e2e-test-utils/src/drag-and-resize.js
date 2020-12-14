@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { canvas } from './canvas';
+
+/**
  * Clicks an element, drags a particular distance and releases the mouse button.
  *
  * @param {Object} element The puppeteer element handle.
@@ -16,8 +21,20 @@ export async function dragAndResize( element, delta ) {
 		height: elementHeight,
 	} = await element.boundingBox();
 
-	const originX = elementX + elementWidth / 2;
-	const originY = elementY + elementHeight / 2;
+	const windowRect = await canvas().evaluate( () => {
+		if ( window.frameElement ) {
+			return { x: 0, y: 0 };
+		}
+
+		const winRect = window.frameElement.getBoundingClientRect();
+		return {
+			x: winRect.x,
+			y: winRect.y,
+		};
+	} );
+
+	const originX = windowRect.x + elementX + elementWidth / 2;
+	const originY = windowRect.y + elementY + elementHeight / 2;
 
 	await page.mouse.move( originX, originY );
 	await page.mouse.down();

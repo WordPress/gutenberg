@@ -6,6 +6,7 @@ import {
 	createNewPost,
 	clickBlockAppender,
 	clickBlockToolbarButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -24,7 +25,7 @@ describe( 'invalid blocks', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Focus on the textarea and enter an invalid paragraph
-		await page.click(
+		await canvas().click(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
 		);
 		await page.keyboard.type( '<p>invalid paragraph' );
@@ -35,7 +36,7 @@ describe( 'invalid blocks', () => {
 		expect( console ).toHaveWarned();
 
 		// Click on the 'three-dots' menu toggle
-		await page.click(
+		await canvas().click(
 			'.block-editor-warning__actions button[aria-label="More options"]'
 		);
 

@@ -6,15 +6,16 @@ import {
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
 	insertBlock,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 async function focusBlockToolbar() {
 	await pressKeyWithModifier( 'alt', 'F10' );
 }
 
-async function expectLabelToHaveFocus( label ) {
+async function expectLabelToHaveFocus( label, p = page ) {
 	await expect(
-		await page.evaluate( () =>
+		await p.evaluate( () =>
 			document.activeElement.getAttribute( 'aria-label' )
 		)
 	).toBe( label );
@@ -26,7 +27,7 @@ async function testBlockToolbarKeyboardNavigation( currentBlockLabel ) {
 	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( 'Move up' );
 	await page.keyboard.press( 'Tab' );
-	await expectLabelToHaveFocus( currentBlockLabel );
+	await expectLabelToHaveFocus( currentBlockLabel, canvas() );
 	await pressKeyWithModifier( 'shift', 'Tab' );
 	await expectLabelToHaveFocus( 'Move up' );
 }
@@ -39,9 +40,9 @@ async function wrapCurrentBlockWithGroup() {
 }
 
 async function testGroupKeyboardNavigation( currentBlockLabel ) {
-	await expectLabelToHaveFocus( 'Block: Group' );
+	await expectLabelToHaveFocus( 'Block: Group', canvas() );
 	await page.keyboard.press( 'Tab' );
-	await expectLabelToHaveFocus( currentBlockLabel );
+	await expectLabelToHaveFocus( currentBlockLabel, canvas() );
 	await pressKeyWithModifier( 'shift', 'Tab' );
 	await expectLabelToHaveFocus( 'Select parent (Group)' );
 	await page.keyboard.press( 'ArrowRight' );
@@ -92,7 +93,7 @@ describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Change block type or style' );
-		await page.click( '.blocks-table__placeholder-button' );
+		await canvas().click( '.blocks-table__placeholder-button' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Table' );
 		await wrapCurrentBlockWithGroup();
 		await testGroupKeyboardNavigation( 'Block: Table' );

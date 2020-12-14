@@ -16,6 +16,7 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'changing image size', () => {
@@ -30,7 +31,7 @@ describe( 'changing image size', () => {
 
 	it( 'should insert and change my image size', async () => {
 		await insertBlock( 'Image' );
-		await clickButton( 'Media Library' );
+		await clickButton( 'Media Library', canvas() );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
@@ -68,7 +69,9 @@ describe( 'changing image size', () => {
 		await imageSizeSelect.select( 'custom-size-one' );
 
 		// Verify that the custom size was applied to the image.
-		await page.waitForSelector( '.wp-block-image.size-custom-size-one' );
+		await canvas().waitForSelector(
+			'.wp-block-image.size-custom-size-one'
+		);
 		await page.waitForFunction(
 			() =>
 				document.querySelector(

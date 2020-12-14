@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
@@ -39,7 +40,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate using the block hierarchy dropdown menu', async () => {
 		await insertBlock( 'Columns' );
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await canvas().click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
@@ -91,7 +92,7 @@ describe( 'Navigating the block hierarchy', () => {
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
 		await openDocumentSettingsSidebar();
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		await canvas().click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
@@ -118,7 +119,9 @@ describe( 'Navigating the block hierarchy', () => {
 		await openBlockNavigator();
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
+		await canvas().waitForSelector(
+			'.is-selected[data-type="core/column"]'
+		);
 
 		// Insert text in the last column block
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
@@ -160,7 +163,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.
-		await page.click( '.block-list-appender .block-editor-inserter' );
+		await canvas().click( '.block-list-appender .block-editor-inserter' );
 		const paragraphMenuItem = (
 			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
 		 )[ 0 ];
@@ -172,7 +175,7 @@ describe( 'Navigating the block hierarchy', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Unselect the blocks
-		await page.click( '.editor-post-title' );
+		await canvas().click( '.editor-post-title' );
 
 		// Try selecting the group block using the Outline
 		await page.click( '[aria-label="Outline"]' );
@@ -184,7 +187,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await groupMenuItem.click();
 
 		// The group block's wrapper should be selected.
-		const isGroupBlockSelected = await page.evaluate(
+		const isGroupBlockSelected = await canvas().evaluate(
 			() =>
 				document.activeElement.getAttribute( 'data-type' ) ===
 				'core/group'

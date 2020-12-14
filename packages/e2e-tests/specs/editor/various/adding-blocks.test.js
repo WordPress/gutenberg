@@ -10,6 +10,7 @@ import {
 	closeGlobalBlockInserter,
 	searchForBlock,
 	showBlockToolbar,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -71,7 +72,7 @@ describe( 'adding blocks', () => {
 			await page.$( '.interface-interface-skeleton__content' )
 		);
 		expect(
-			await page.waitForSelector( '[data-type="core/paragraph"]' )
+			await canvas().waitForSelector( '[data-type="core/paragraph"]' )
 		).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
@@ -125,11 +126,11 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'lines preserved[/myshortcode]' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
-		await page.click( '.editor-post-title__input' );
+		await canvas().click( '.editor-post-title__input' );
 		await closeGlobalBlockInserter();
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"]' );
+		const insertionPoint = await canvas().$( '[data-type="core/quote"]' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,
@@ -225,13 +226,13 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( '1.1' );
 
 		// After inserting the Buttons block the inner button block should be selected.
-		const selectedButtonBlocks = await page.$$(
+		const selectedButtonBlocks = await canvas().$$(
 			'.wp-block-button.is-selected'
 		);
 		expect( selectedButtonBlocks.length ).toBe( 1 );
 
 		// Specifically click the root container appender.
-		await page.click(
+		await canvas().click(
 			'.block-editor-block-list__layout.is-root-container > .block-list-appender .block-editor-inserter__toggle'
 		);
 
@@ -268,7 +269,7 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/heading"]' );
+		const insertionPoint = await canvas().$( '[data-type="core/heading"]' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,
@@ -308,10 +309,10 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'First paragraph' );
 		await insertBlock( 'Image' );
 		await showBlockToolbar();
-		const paragraphBlock = await page.$(
+		const paragraphBlock = await canvas().$(
 			'p[aria-label="Paragraph block"]'
 		);
-		paragraphBlock.click();
+		await paragraphBlock.click();
 		await showBlockToolbar();
 
 		// Open the global inserter and search for the Heading block.
@@ -341,7 +342,9 @@ describe( 'adding blocks', () => {
 		await insertBlock( 'Group' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph after group' );
-		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
+		await canvas().click(
+			'[data-type="core/group"] [aria-label="Add block"]'
+		);
 		const browseAll = await page.waitForXPath(
 			'//button[text()="Browse all"]'
 		);

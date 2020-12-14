@@ -7,6 +7,7 @@ import {
 	deactivatePlugin,
 	findSidebarPanelWithTitle,
 	publishPost,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const permalinkPanelXPath = `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"Permalink")]`;
@@ -38,7 +39,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await canvas().type( '.editor-post-title__input', ' (Updated)' );
 		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
@@ -47,7 +48,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await canvas().type( '.editor-post-title__input', ' (Updated)' );
 		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
@@ -56,7 +57,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await canvas().type( '.editor-post-title__input', ' (Updated)' );
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeDefined();
 	} );
 } );

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -107,6 +107,7 @@ function URLPicker( {
 	setAttributes,
 	opensInNewTab,
 	onToggleOpenInNewTab,
+	buttonRef,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
@@ -126,7 +127,10 @@ function URLPicker( {
 	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
+			onClose={ () => {
+				buttonRef.current.focus();
+				setIsURLPickerOpen( false );
+			} }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -230,6 +234,7 @@ function ButtonEdit( props ) {
 
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const blockProps = useBlockProps();
+	const ref = useRef();
 
 	return (
 		<>
@@ -241,6 +246,7 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
+					ref={ ref }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -277,6 +283,7 @@ function ButtonEdit( props ) {
 				isSelected={ isSelected }
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+				buttonRef={ ref }
 			/>
 			<InspectorControls>
 				<BorderPanel

@@ -8,6 +8,7 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'splitting and merging blocks', () => {
@@ -195,7 +196,7 @@ describe( 'splitting and merging blocks', () => {
 
 		// There is a default block:
 		expect(
-			await page.$$( '.block-editor-block-list__block' )
+			await canvas().$$( '.block-editor-block-list__block' )
 		).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:

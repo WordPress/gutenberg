@@ -12,6 +12,7 @@ $arrow-size: 8px;
 	// position depends on the size of the popover.
 	opacity: 0;
 
+	&.is-spanned-over,
 	&.is-expanded,
 	&[data-x-axis][data-y-axis] {
 		opacity: 1;
@@ -161,19 +162,26 @@ $arrow-size: 8px;
 	&.is-from-right:not(.is-from-top):not(.is-from-bottom) {
 		margin-right: $grid-unit-15;
 	}
+
+	&.is-spanned-over .wp-block {
+		margin: 0;
+	}
 }
 
 .components-popover__content {
 	height: 100%;
-	background: $white;
-	border: $border-width solid $gray-400;
-	box-shadow: $shadow-popover;
-	border-radius: $radius-block-ui;
 
-	// Alternate treatment for popovers that put them at elevation zero with high contrast.
-	.is-alternate & {
-		border: $border-width solid $gray-900;
-		box-shadow: none;
+	&:not(.is-transparent) {
+		background: $white;
+		border: $border-width solid $gray-400;
+		box-shadow: $shadow-popover;
+		border-radius: $radius-block-ui;
+
+		// Alternate treatment for popovers that put them at elevation zero with high contrast.
+		.is-alternate & {
+			border: $border-width solid $gray-900;
+			box-shadow: none;
+		}
 	}
 
 	.components-popover & {

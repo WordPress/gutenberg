@@ -6,6 +6,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Buttons', () => {
@@ -28,7 +29,7 @@ describe( 'Buttons', () => {
 			() => !! document.activeElement.closest( '.block-editor-url-input' )
 		);
 		await page.keyboard.press( 'Escape' );
-		await page.waitForFunction(
+		await canvas().waitForFunction(
 			() =>
 				document.activeElement ===
 				document.querySelector( '.block-editor-rich-text__editable' )

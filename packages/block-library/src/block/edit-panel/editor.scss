@@ -34,7 +34,7 @@
 		flex-shrink: 0;
 	}
 
-	@include break-large() {
+	@include break-medium() {
 		flex-wrap: nowrap;
 
 		.reusable-block-edit-panel__title {

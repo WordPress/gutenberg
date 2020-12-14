@@ -9,6 +9,7 @@ import {
 	trashAllPosts,
 	activateTheme,
 	canvas,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -38,21 +39,21 @@ const createTemplatePart = async (
 ) => {
 	// Create new template part.
 	await insertBlock( 'Template Part' );
-	const [ createNewButton ] = await page.$x(
+	const [ createNewButton ] = await canvas().$x(
 		'//button[contains(text(), "New template part")]'
 	);
 	await createNewButton.click();
-	await page.waitForSelector(
+	await canvas().waitForSelector(
 		isNested
 			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
 			: '.wp-block-template-part .block-editor-block-list__layout'
 	);
-	await page.focus( '.wp-block-template-part__name-panel input' );
+	await clickBlockToolbarButton( 'Name', 'label' );
 	await page.keyboard.type( templatePartName );
 };
 
 const editTemplatePart = async ( textToAdd, isNested = false ) => {
-	await page.click(
+	await canvas().click(
 		`${
 			isNested
 				? '.wp-block-template-part .wp-block-template-part'
