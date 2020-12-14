@@ -139,7 +139,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		if ( WP_Http::OK !== wp_remote_retrieve_response_code( $response ) ) {
 			// Not saving the error response to cache since the error might be temporary.
-			return new WP_Error( 'rest_invalid_url', get_status_header_desc( 404 ), array( 'status' => 404 ) );
+			return new WP_Error( 'no_response', get_status_header_desc( 404 ), array( 'status' => 404 ) );
 		}
 
 		$remote_body = wp_remote_retrieve_body( $response );
