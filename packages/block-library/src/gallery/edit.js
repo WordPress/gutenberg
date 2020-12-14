@@ -30,7 +30,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState } from '@wordpress/element';
+import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { useDispatch, withSelect } from '@wordpress/data';
@@ -414,45 +414,47 @@ export default compose( [
 		const { getSettings } = select( 'core/block-editor' );
 		const { imageSizes, mediaUpload } = getSettings();
 
-		let resizedImages = {};
-
-		if ( isSelected ) {
-			resizedImages = reduce(
-				ids,
-				( currentResizedImages, id ) => {
-					if ( ! id ) {
-						return currentResizedImages;
-					}
-					const image = getMedia( id );
-					const sizes = reduce(
-						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
-								'sizes',
-								size.slug,
-								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
-								'media_details',
-								'sizes',
-								size.slug,
-								'source_url',
-							] );
-							return {
-								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
-							};
-						},
-						{}
-					);
-					return {
-						...currentResizedImages,
-						[ parseInt( id, 10 ) ]: sizes,
-					};
-				},
-				{}
-			);
-		}
+		const resizedImages = useMemo( () => {
+			if ( isSelected ) {
+				return reduce(
+					ids,
+					( currentResizedImages, id ) => {
+						if ( ! id ) {
+							return currentResizedImages;
+						}
+						const image = getMedia( id );
+						const sizes = reduce(
+							imageSizes,
+							( currentSizes, size ) => {
+								const defaultUrl = get( image, [
+									'sizes',
+									size.slug,
+									'url',
+								] );
+								const mediaDetailsUrl = get( image, [
+									'media_details',
+									'sizes',
+									size.slug,
+									'source_url',
+								] );
+								return {
+									...currentSizes,
+									[ size.slug ]:
+										defaultUrl || mediaDetailsUrl,
+								};
+							},
+							{}
+						);
+						return {
+							...currentResizedImages,
+							[ parseInt( id, 10 ) ]: sizes,
+						};
+					},
+					{}
+				);
+			}
+			return {};
+		}, [ isSelected, ids, imageSizes ] );
 
 		return {
 			imageSizes,

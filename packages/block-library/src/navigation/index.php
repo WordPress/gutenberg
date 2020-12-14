@@ -171,3 +171,34 @@ function register_block_core_navigation() {
 }
 
 add_action( 'init', 'register_block_core_navigation' );
+
+/**
+ * Filter that changes the parsed attribute values of navigation blocks contain typographic presets to contain the values directly.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block being rendered without typographic presets.
+ */
+function block_core_navigation_typographic_presets_backcompatibility( $parsed_block ) {
+	if ( 'core/navigation' === $parsed_block['blockName'] ) {
+		$attribute_to_prefix_map = array(
+			'fontStyle'      => 'var:preset|font-style|',
+			'fontWeight'     => 'var:preset|font-weight|',
+			'textDecoration' => 'var:preset|text-decoration|',
+			'textTransform'  => 'var:preset|text-transform|',
+		);
+		foreach ( $attribute_to_prefix_map as $style_attribute => $prefix ) {
+			if ( ! empty( $parsed_block['attrs']['style']['typography'][ $style_attribute ] ) ) {
+				$prefix_len      = strlen( $prefix );
+				$attribute_value = &$parsed_block['attrs']['style']['typography'][ $style_attribute ];
+				if ( 0 === strncmp( $attribute_value, $prefix, $prefix_len ) ) {
+					$attribute_value = substr( $attribute_value, $prefix_len );
+				}
+				if ( 'textDecoration' === $style_attribute && 'strikethrough' === $attribute_value ) {
+					$attribute_value = 'line-through';
+				}
+			}
+		}
+	}
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );

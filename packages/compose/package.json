@@ -34,6 +34,7 @@
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"clipboard": "^2.0.1",
 		"lodash": "^4.17.19",
+		"memize": "^1.1.0",
 		"mousetrap": "^1.6.5",
 		"react-merge-refs": "^1.0.0",
 		"react-resize-aware": "^3.0.1",
