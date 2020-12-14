@@ -663,3 +663,72 @@ function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings )
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+
+/**
+ * Filters the block being rendered in render_block(), before it's processed.
+ *
+ * @param array $parsed_block The block being rendered.
+ *
+ * @return array
+ */
+function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
+	static $processed;
+	if ( ! $processed ) {
+		$processed = array();
+	}
+
+	// Early exit if this block-type has already been processed, or is null.
+	if ( isset( $parsed_block['blockName'] ) && ( ! $parsed_block['blockName'] || in_array( $parsed_block['blockName'], $processed, true ) ) ) {
+		return $parsed_block;
+	}
+
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+
+	/**
+	 * The load method.
+	 *
+	 * @param string        $param      The loading method.
+	 * @param WP_Block_Type $block_type The block-type.
+	 *
+	 * @return string
+	 */
+	$method = 'enqueue';
+	$method = apply_filters( 'gutenberg_block_type_assets_load_method', $method, $block_type );
+
+	switch ( $method ) {
+		case 'inline':
+			if ( ! empty( $block_type->style ) ) {
+
+				add_action(
+					'wp_footer',
+					function() use ( $block_type ) {
+						global $wp_styles;
+
+						$style = $wp_styles->registered[ $block_type->style ];
+						$path  = str_replace( trailingslashit( site_url() ), trailingslashit( ABSPATH ), $style->src );
+
+						if ( isset( $wp_styles->registered[ $block_type->style ] ) && file_exists( $path ) ) {
+							echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
+							include $path;
+
+							if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
+								echo implode( '', $style->extra['after'] );
+							}
+
+							echo '</style>';
+						}
+					},
+					1
+				);
+			}
+			break;
+
+		default: // No need to do anything.
+			return $parsed_block;
+	}
+
+	$processed[] = $parsed_block['blockName'];
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_modify_render_block_data_assets_loading' );
