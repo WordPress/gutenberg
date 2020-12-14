@@ -325,6 +325,7 @@ class WP_Theme_JSON {
 			$this->process_key( 'styles', $context, self::SCHEMA );
 			if ( isset( $context['styles'] ) ) {
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'] );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
 
 				if ( empty( $context['styles'] ) ) {
