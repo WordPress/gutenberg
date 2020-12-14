@@ -1,20 +1,11 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Icon, search } from '@wordpress/icons';
 
-const PlaceholderPreview = ( { hideSelected } ) => {
-	const classes = classNames( 'wp-block-navigation-placeholder__preview', {
-		'wp-block-navigation-placeholder__preview_select_hide': hideSelected,
-	} );
-
+const PlaceholderPreview = () => {
 	return (
-		<div className={ classes }>
+		<div className="wp-block-navigation-placeholder__preview">
 			<span className="wp-block-navigation-link"></span>
 			<span className="wp-block-navigation-link"></span>
 			<span className="wp-block-navigation-link"></span>

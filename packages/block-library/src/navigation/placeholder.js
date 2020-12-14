@@ -236,7 +236,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	return (
 		<div className="wp-block-navigation-placeholder">
-			<PlaceholderPreview hideSelected={ true } />
+			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
 				{ isLoading && (

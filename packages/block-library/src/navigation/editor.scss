@@ -239,10 +239,7 @@ $color-control-label-height: 20px;
 	svg {
 		opacity: 0.3;
 	}
-}
 
-.wp-block-navigation-placeholder__preview_select_hide {
-	// Hide when selected.
 	.is-selected & {
 		display: none;
 	}
