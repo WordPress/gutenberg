@@ -18,11 +18,11 @@ const FONT_STYLES = [
 
 const FONT_WEIGHTS = [
 	{
-		name: __( 'Ultralight' ),
+		name: __( 'Thin' ),
 		value: '100',
 	},
 	{
-		name: __( 'Thin' ),
+		name: __( 'Extra Light' ),
 		value: '200',
 	},
 	{
@@ -38,7 +38,7 @@ const FONT_WEIGHTS = [
 		value: '500',
 	},
 	{
-		name: __( 'Semibold' ),
+		name: __( 'Semi Bold' ),
 		value: '600',
 	},
 	{
@@ -46,7 +46,7 @@ const FONT_WEIGHTS = [
 		value: '700',
 	},
 	{
-		name: __( 'Heavy' ),
+		name: __( 'Extra Bold' ),
 		value: '800',
 	},
 	{
