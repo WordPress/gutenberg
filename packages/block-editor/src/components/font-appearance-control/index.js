@@ -5,6 +5,56 @@ import { CustomSelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
+const FONT_STYLES = [
+	{
+		name: __( 'Regular' ),
+		value: 'normal',
+	},
+	{
+		name: __( 'Italic' ),
+		value: 'italic',
+	},
+];
+
+const FONT_WEIGHTS = [
+	{
+		name: __( 'Ultralight' ),
+		value: '100',
+	},
+	{
+		name: __( 'Thin' ),
+		value: '200',
+	},
+	{
+		name: __( 'Light' ),
+		value: '300',
+	},
+	{
+		name: __( 'Regular' ),
+		value: '400',
+	},
+	{
+		name: __( 'Medium' ),
+		value: '500',
+	},
+	{
+		name: __( 'Semibold' ),
+		value: '600',
+	},
+	{
+		name: __( 'Bold' ),
+		value: '700',
+	},
+	{
+		name: __( 'Heavy' ),
+		value: '800',
+	},
+	{
+		name: __( 'Black' ),
+		value: '900',
+	},
+];
+
 /**
  * Control to display unified font style and weight options.
  *
@@ -14,12 +64,11 @@ import { __, sprintf } from '@wordpress/i18n';
 export default function FontAppearanceControl( props ) {
 	const {
 		onChange,
-		options: { fontStyles = [], fontWeights = [] },
+		hasFontStyles = true,
+		hasFontWeights = true,
 		value: { fontStyle, fontWeight },
 	} = props;
-	const hasStyles = !! fontStyles.length;
-	const hasWeights = !! fontWeights.length;
-	const hasStylesOrWeights = hasStyles || hasWeights;
+	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
 	const defaultOption = {
 		key: 'default',
 		name: __( 'Default' ),
@@ -30,24 +79,29 @@ export default function FontAppearanceControl( props ) {
 	const combineOptions = () => {
 		const combinedOptions = [ defaultOption ];
 
-		fontStyles.forEach( ( { name: styleName, slug: styleSlug } ) => {
-			fontWeights.forEach( ( { name: weightName, slug: weightSlug } ) => {
-				const optionName =
-					styleSlug === 'normal'
-						? weightName
-						: sprintf(
-								/* translators: 1: Font weight name. 2: Font style name. */
-								__( '%1$s %2$s' ),
-								weightName,
-								styleName
-						  );
+		FONT_STYLES.forEach( ( { name: styleName, value: styleValue } ) => {
+			FONT_WEIGHTS.forEach(
+				( { name: weightName, value: weightValue } ) => {
+					const optionName =
+						styleValue === 'normal'
+							? weightName
+							: sprintf(
+									/* translators: 1: Font weight name. 2: Font style name. */
+									__( '%1$s %2$s' ),
+									weightName,
+									styleName
+							  );
 
-				combinedOptions.push( {
-					key: `${ weightSlug }-${ styleSlug }`,
-					name: optionName,
-					style: { fontStyle: styleSlug, fontWeight: weightSlug },
-				} );
-			} );
+					combinedOptions.push( {
+						key: `${ styleValue }-${ weightValue }`,
+						name: optionName,
+						style: {
+							fontStyle: styleValue,
+							fontWeight: weightValue,
+						},
+					} );
+				}
+			);
 		} );
 
 		return combinedOptions;
@@ -56,11 +110,11 @@ export default function FontAppearanceControl( props ) {
 	// Generates select options for font styles only.
 	const styleOptions = () => {
 		const combinedOptions = [ defaultOption ];
-		fontStyles.forEach( ( { name, slug } ) => {
+		FONT_STYLES.forEach( ( { name, value } ) => {
 			combinedOptions.push( {
-				key: slug,
+				key: value,
 				name,
-				style: { fontStyle: slug, fontWeight: undefined },
+				style: { fontStyle: value, fontWeight: undefined },
 			} );
 		} );
 		return combinedOptions;
@@ -69,11 +123,11 @@ export default function FontAppearanceControl( props ) {
 	// Generates select options for font weights only.
 	const weightOptions = () => {
 		const combinedOptions = [ defaultOption ];
-		fontWeights.forEach( ( { name, slug } ) => {
+		FONT_WEIGHTS.forEach( ( { name, value } ) => {
 			combinedOptions.push( {
-				key: slug,
+				key: value,
 				name,
-				style: { fontStyle: undefined, fontWeight: slug },
+				style: { fontStyle: undefined, fontWeight: value },
 			} );
 		} );
 		return combinedOptions;
@@ -81,11 +135,11 @@ export default function FontAppearanceControl( props ) {
 
 	// Map font styles and weights to select options.
 	const selectOptions = useMemo( () => {
-		if ( hasStyles && hasWeights ) {
+		if ( hasFontStyles && hasFontWeights ) {
 			return combineOptions();
 		}
 
-		return hasStyles ? styleOptions() : weightOptions();
+		return hasFontStyles ? styleOptions() : weightOptions();
 	}, [ props.options ] );
 
 	// Find current selection by comparing font style & weight against options.
@@ -97,11 +151,11 @@ export default function FontAppearanceControl( props ) {
 
 	// Adjusts field label in case either styles or weights are disabled.
 	const getLabel = () => {
-		if ( ! hasStyles ) {
+		if ( ! hasFontStyles ) {
 			return __( 'Font weight' );
 		}
 
-		if ( ! hasWeights ) {
+		if ( ! hasFontWeights ) {
 			return __( 'Font style' );
 		}
 
