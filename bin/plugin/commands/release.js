@@ -392,7 +392,9 @@ async function runGithubReleaseStep(
 	abortMessage
 ) {
 	let octokit;
+	let releaseDraft;
 	let release;
+
 	await runStep(
 		'Creating the GitHub release draft',
 		abortMessage,
@@ -421,7 +423,7 @@ async function runGithubReleaseStep(
 				auth: token,
 			} );
 
-			const releaseData = await octokit.repos.createRelease( {
+			const releaseDraftData = await octokit.repos.createRelease( {
 				owner: config.githubRepositoryOwner,
 				repo: config.githubRepositoryName,
 				tag_name: 'v' + version,
@@ -430,7 +432,7 @@ async function runGithubReleaseStep(
 				prerelease: isPrerelease,
 				draft: true,
 			} );
-			release = releaseData.data;
+			releaseDraft = releaseDraftData.data;
 
 			log( '>> The GitHub release draft has been created.' );
 		}
@@ -443,7 +445,7 @@ async function runGithubReleaseStep(
 	await runStep( 'Uploading the plugin ZIP', abortMessage, async () => {
 		const filestats = fs.statSync( zipPath );
 		await octokit.repos.uploadReleaseAsset( {
-			url: release.upload_url,
+			url: releaseDraft.upload_url,
 			headers: {
 				'content-length': filestats.size,
 				'content-type': 'application/zip',
@@ -456,12 +458,14 @@ async function runGithubReleaseStep(
 
 	// Remove draft status from the Github release
 	await runStep( 'Publishing the Github release', abortMessage, async () => {
-		await octokit.repos.updateRelease( {
+		const releaseData = await octokit.repos.updateRelease( {
 			owner: config.githubRepositoryOwner,
 			repo: config.githubRepositoryName,
-			release_id: release.id,
+			release_id: releaseDraft.id,
 			draft: false,
 		} );
+		release = releaseData.data;
+
 		log( '>> The GitHub release has been published.' );
 	} );
 
