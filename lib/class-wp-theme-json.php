@@ -351,6 +351,18 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Returns the metadata for the properties that we support
+	 * after having called the filter for 3rd party to hook into.
+	 *
+	 * @return array Properties metadata.
+	 */
+	private static function get_properties_metadata() {
+		$result = apply_filters( 'theme_json_properties_metadata', self::PROPERTIES_METADATA );
+		error_log( 'result is ' . print_r( $result, true ) );
+		return $result;
+	}
+
+	/**
 	 * Returns the metadata for each block.
 	 *
 	 * Example:
@@ -398,8 +410,9 @@ class WP_Theme_JSON {
 			/*
 			 * Extract block support keys that are related to the style properties.
 			 */
-			$block_supports = array();
-			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
+			$block_supports      = array();
+			$properties_metadata = self::get_properties_metadata();
+			foreach ( $properties_metadata as $key => $metadata ) {
 				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
 					$block_supports[] = $key;
 				}
@@ -628,7 +641,8 @@ class WP_Theme_JSON {
 			return;
 		}
 
-		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
+		$properties_metadata = self::get_properties_metadata();
+		foreach ( $properties_metadata as $name => $metadata ) {
 			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
 			}
