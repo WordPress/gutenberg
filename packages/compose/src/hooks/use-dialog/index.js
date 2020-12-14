@@ -48,11 +48,6 @@ function useDialog( options ) {
 				onClose.current();
 			}
 		} );
-
-		node.addEventListener( 'mousedown', ( event ) => {
-			// I'm not really certain what this is for but it matches the previous behavior.
-			event.stopPropagation();
-		} );
 	}, [] );
 
 	return [
