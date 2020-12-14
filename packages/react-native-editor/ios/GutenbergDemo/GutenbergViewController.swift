@@ -302,6 +302,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
