@@ -7,24 +7,30 @@ import { useSelect } from '@wordpress/data';
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
- * Returns true when the block is hovered and in navigation mode, false if not.
+ * Returns true when the block is hovered and in navigation or outline mode, false if not.
  *
  * @param {RefObject} ref React ref with the block element.
  *
  * @return {boolean} Hovered state.
  */
-export function useIsHovered( ref ) {
+export function useIsHovered( ref, clientId ) {
 	const [ isHovered, setHovered ] = useState( false );
 	const isNavigationMode = useSelect(
 		( select ) => select( 'core/block-editor' ).isNavigationMode(),
 		[]
 	);
 
-	useEffect( () => {
-		if ( ! isNavigationMode ) {
-			return;
-		}
+	const { isOutlineMode } = useSelect(
+		( select ) => {
+			const { getSettings } = select( 'core/block-editor' );
+			return {
+				isOutlineMode: getSettings().outlineMode,
+			};
+		},
+		[ clientId ]
+	);
 
+	useEffect( () => {
 		function addListener( eventType, value ) {
 			function listener( event ) {
 				if ( event.defaultPrevented ) {
@@ -45,8 +51,10 @@ export function useIsHovered( ref ) {
 			return addListener( 'mouseout', false );
 		}
 
-		return addListener( 'mouseover', true );
-	}, [ isNavigationMode, isHovered, setHovered ] );
+		if ( isOutlineMode || isNavigationMode ) {
+			return addListener( 'mouseover', true );
+		}
+	}, [ isNavigationMode, isOutlineMode, isHovered, setHovered ] );
 
 	return isHovered;
 }
