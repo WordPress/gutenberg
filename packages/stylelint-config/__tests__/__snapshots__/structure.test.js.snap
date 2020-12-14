@@ -24,6 +24,20 @@ Array [
     "text": "Expected newline after \\";\\" (declaration-block-semicolon-newline-after)",
   },
   Object {
+    "column": 12,
+    "line": 1,
+    "rule": "selector-list-comma-newline-after",
+    "severity": "error",
+    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
+  },
+  Object {
+    "column": 25,
+    "line": 1,
+    "rule": "selector-list-comma-newline-after",
+    "severity": "error",
+    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
+  },
+  Object {
     "column": 3,
     "line": 4,
     "rule": "indentation",
@@ -43,20 +57,6 @@ Array [
     "rule": "indentation",
     "severity": "error",
     "text": "Expected indentation of 1 tab (indentation)",
-  },
-  Object {
-    "column": 12,
-    "line": 1,
-    "rule": "selector-list-comma-newline-after",
-    "severity": "error",
-    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
-  },
-  Object {
-    "column": 25,
-    "line": 1,
-    "rule": "selector-list-comma-newline-after",
-    "severity": "error",
-    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
   },
 ]
 `;
