@@ -393,45 +393,51 @@ async function runGithubReleaseStep(
 ) {
 	let octokit;
 	let release;
-	await runStep( 'Creating the GitHub release', abortMessage, async () => {
-		await askForConfirmation(
-			'Proceed with the creation of the GitHub release?',
-			true,
-			abortMessage
-		);
+	await runStep(
+		'Creating the GitHub release draft',
+		abortMessage,
+		async () => {
+			await askForConfirmation(
+				'Proceed with the creation of the GitHub release draft?',
+				true,
+				abortMessage
+			);
 
-		const { token } = await inquirer.prompt( [
-			{
-				type: 'input',
-				name: 'token',
-				message:
-					'Please enter a GitHub personal authentication token.\n' +
-					'You can create one by navigating to ' +
-					formats.success(
-						'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages'
-					) +
-					'.\nToken:',
-			},
-		] );
+			const { token } = await inquirer.prompt( [
+				{
+					type: 'input',
+					name: 'token',
+					message:
+						'Please enter a GitHub personal authentication token.\n' +
+						'You can create one by navigating to ' +
+						formats.success(
+							'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages'
+						) +
+						'.\nToken:',
+				},
+			] );
 
-		octokit = new Octokit( {
-			auth: token,
-		} );
+			octokit = new Octokit( {
+				auth: token,
+			} );
 
-		const releaseData = await octokit.repos.createRelease( {
-			owner: config.githubRepositoryOwner,
-			repo: config.githubRepositoryName,
-			tag_name: 'v' + version,
-			name: versionLabel,
-			body: changelog,
-			prerelease: isPrerelease,
-		} );
-		release = releaseData.data;
+			const releaseData = await octokit.repos.createRelease( {
+				owner: config.githubRepositoryOwner,
+				repo: config.githubRepositoryName,
+				tag_name: 'v' + version,
+				name: versionLabel,
+				body: changelog,
+				prerelease: isPrerelease,
+				draft: true,
+			} );
+			release = releaseData.data;
 
-		log( '>> The GitHub release has been created.' );
-	} );
+			log( '>> The GitHub release draft has been created.' );
+		}
+	);
 	abortMessage =
-		abortMessage + ' Make sure to remove the the GitHub release as well.';
+		abortMessage +
+		' Make sure to remove the the GitHub release draft as well.';
 
 	// Uploading the Zip to the Github release
 	await runStep( 'Uploading the plugin ZIP', abortMessage, async () => {
@@ -446,6 +452,17 @@ async function runGithubReleaseStep(
 			file: fs.createReadStream( zipPath ),
 		} );
 		log( '>> The plugin ZIP has been successfully uploaded.' );
+	} );
+
+	// Remove draft status from the Github release
+	await runStep( 'Publishing the Github release', abortMessage, async () => {
+		await octokit.repos.updateRelease( {
+			owner: config.githubRepositoryOwner,
+			repo: config.githubRepositoryName,
+			release_id: release.id,
+			draft: false,
+		} );
+		log( '>> The GitHub release has been published.' );
 	} );
 
 	log(
