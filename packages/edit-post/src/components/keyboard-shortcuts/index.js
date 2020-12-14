@@ -3,7 +3,10 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
@@ -32,7 +35,7 @@ function KeyboardShortcuts() {
 		closeGeneralSidebar,
 		toggleFeature,
 	} = useDispatch( 'core/edit-post' );
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -58,7 +61,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-block-navigation',
 			category: 'global',
-			description: __( 'Open the block navigation menu.' ),
+			description: __( 'Open the block list view.' ),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',

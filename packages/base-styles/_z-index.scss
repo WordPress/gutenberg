@@ -6,14 +6,15 @@ $z-layers: (
 	".block-editor-block-list__block::before": 0,
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
-	".block-library-classic__toolbar": 10,
+	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
 	".block-editor-block-list__layout .reusable-block-indicator": 1,
-	".block-editor-block-list__breadcrumb": 22,
+	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".components-panel__header.edit-post-sidebar__panel-tabs": -1,
 	".edit-post-sidebar .components-panel": -2,
 	".edit-post-text-editor__toolbar": 1,
 	".block-editor-inserter__tabs": 1,
+	".edit-post-sidebar__panel-tab.is-active": 1,
 	".block-editor-inserter__tab.is-active": 1,
 	".components-panel__header": 1,
 	".components-modal__header": 10,
@@ -32,6 +33,7 @@ $z-layers: (
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
+	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
@@ -39,8 +41,6 @@ $z-layers: (
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
-	// Should have higher index than the inset/underlay used for dragging
-	".components-placeholder__fieldset": 1,
 	".block-editor-block-list__block .reusable-block-edit-panel *": 1,
 
 	// Show drop zone above most standard content, but below any overlays
@@ -49,6 +49,9 @@ $z-layers: (
 
 	// The floated blocks should be above the other blocks to allow selection.
 	"{core/image aligned left or right} .wp-block": 21,
+
+	// Needs to be bellow media library that has a z-index of 160000.
+	"{core/video track editor popover}": 160000 - 10,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
@@ -84,6 +87,15 @@ $z-layers: (
 	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
+	// Show interface skeleton footer above interface skeleton drawer
+	".interface-interface-skeleton__footer": 90,
+
+	// Show the navigation toggle above the skeleton header
+	".edit-site-navigation-toggle": 31,
+
+	// Show the FSE template previews above the editor (same z-index as the skeleton header)
+	".edit-site-navigation-panel__preview": 30,
+
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
@@ -105,12 +117,13 @@ $z-layers: (
 	".components-popover": 1000000,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
-	".components-popover.block-editor-inserter__popover": 99998,
+	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
 	".components-popover.block-editor-block-navigation__popover": 99998,
 	".components-popover.edit-post-more-menu__content": 99998,
 	".components-popover.edit-site-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
+	".components-popover.block-editor-warning__dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 

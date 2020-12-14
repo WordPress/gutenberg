@@ -1,27 +1,29 @@
 /**
  * WordPress dependencies
  */
+import { InspectorControls } from '@wordpress/block-editor';
 import {
 	BottomSheet,
-	BottomSheetConsumer,
 	ColorSettings,
-	colorsUtils,
+	LinkPickerScreen,
 } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import {
-	InspectorControls,
-	SETTINGS_DEFAULTS as defaultSettings,
-} from '@wordpress/block-editor';
-
+import { withDispatch, withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
 
+export const blockSettingsScreens = {
+	settings: 'Settings',
+	color: 'Color',
+	linkPicker: 'linkPicker',
+};
+
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
+	settings,
 	...props
 } ) {
 	return (
@@ -30,25 +32,30 @@ function BottomSheetSettings( {
 			onClose={ closeGeneralSidebar }
 			hideHeader
 			contentStyle={ styles.content }
+			hasNavigation
 			{ ...props }
 		>
-			<BottomSheetConsumer>
-				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
-					switch ( currentScreen ) {
-						case colorsUtils.subsheets.color:
-							return (
-								<ColorSettings
-									defaultSettings={ defaultSettings }
-									{ ...bottomSheetProps }
-									{ ...extraProps }
-								/>
-							);
-						case colorsUtils.subsheets.settings:
-						default:
-							return <InspectorControls.Slot />;
-					}
-				} }
-			</BottomSheetConsumer>
+			<BottomSheet.NavigationContainer animate main>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.settings }
+				>
+					<InspectorControls.Slot />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.color }
+				>
+					<ColorSettings defaultSettings={ settings } />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.linkPicker }
+					fullScreen
+					isScrollable
+				>
+					<LinkPickerScreen
+						returnScreenName={ blockSettingsScreens.settings }
+					/>
+				</BottomSheet.NavigationScreen>
+			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
 }
@@ -56,8 +63,9 @@ function BottomSheetSettings( {
 export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-
+		const { getSettings } = select( 'core/block-editor' );
 		return {
+			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),

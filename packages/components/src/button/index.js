@@ -23,7 +23,6 @@ export function Button( props, ref ) {
 		href,
 		target,
 		isPrimary,
-		isLarge,
 		isSmall,
 		isTertiary,
 		isPressed,
@@ -35,12 +34,14 @@ export function Button( props, ref ) {
 		className,
 		disabled,
 		icon,
+		iconPosition = 'left',
 		iconSize,
 		showTooltip,
 		tooltipPosition,
 		shortcut,
 		label,
 		children,
+		text,
 		__experimentalIsFocusable: isFocusable,
 		...additionalProps
 	} = props;
@@ -54,7 +55,6 @@ export function Button( props, ref ) {
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': isDefault || isSecondary,
 		'is-primary': isPrimary,
-		'is-large': isLarge,
 		'is-small': isSmall,
 		'is-tertiary': isTertiary,
 		'is-pressed': isPressed,
@@ -112,7 +112,13 @@ export function Button( props, ref ) {
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			ref={ ref }
 		>
-			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+			{ icon && iconPosition === 'left' && (
+				<Icon icon={ icon } size={ iconSize } />
+			) }
+			{ text && <>{ text }</> }
+			{ icon && iconPosition === 'right' && (
+				<Icon icon={ icon } size={ iconSize } />
+			) }
 			{ children }
 		</Tag>
 	);

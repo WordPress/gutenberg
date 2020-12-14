@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/image",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -60,8 +61,7 @@
 			"type": "string"
 		},
 		"linkDestination": {
-			"type": "string",
-			"default": "none"
+			"type": "string"
 		},
 		"linkTarget": {
 			"type": "string",
@@ -71,6 +71,8 @@
 		}
 	},
 	"supports": {
-		"lightBlockWrapper": true
-	}
+		"anchor": true
+	},
+	"editorStyle": "wp-block-image-editor",
+	"style": "wp-block-image"
 }

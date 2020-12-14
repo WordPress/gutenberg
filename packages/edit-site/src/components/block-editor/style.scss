@@ -1,13 +1,13 @@
-.edit-site-block-editor__block-list {
-	padding-bottom: $grid-unit-30;
-	padding-top: $grid-unit-30 + 5;
+// The button element easily inherits styles that are meant for the editor style.
+// These rules enhance the specificity to reduce that inheritance.
+// This is duplicated in visual-editor.
+.edit-site-block-editor__editor-styles-wrapper  .components-button {
+	font-family: $default-font;
+	font-size: $default-font-size;
+	padding: 6px 12px;
 
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	// Full-wide. (to account for the padddings added above)
-	.wp-block[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
+	&.is-tertiary,
+	&.has-icon {
+		padding: 6px;
 	}
 }

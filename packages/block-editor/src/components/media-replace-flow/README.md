@@ -38,6 +38,10 @@ Comma delimited list of MIME types accepted for upload.
 - Type: `string`
 - Required: Yes
 
+### onFilesUpload
+
+Callback called before to start to upload the files. It receives an array with the files to upload before to the final process. 
+
 ### onSelect
 
 Callback used when media is replaced from the Media Library or when a new media is uploaded. It is called with one argument `media` which is an object with all the media details.
@@ -66,7 +70,7 @@ Creates a media replace notice.
 - Type: `func`
 - Required: No
 
-### remvovedNotice
+### removeNotice
 
 Removes a media replace notice.
 

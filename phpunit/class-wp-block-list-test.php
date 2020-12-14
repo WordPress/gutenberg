@@ -5,6 +5,12 @@
  * @package Gutenberg
  */
 
+/**
+ * This test file can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49926
+ * @see https://core.trac.wordpress.org/changeset/48159
+ */
 class WP_Block_List_Test extends WP_UnitTestCase {
 
 	/**

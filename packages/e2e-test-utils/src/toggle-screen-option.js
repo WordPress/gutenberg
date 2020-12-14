@@ -12,7 +12,7 @@ import { clickOnMoreMenuItem } from './click-on-more-menu-item';
  *                                   undefined, the option will be toggled.
  */
 export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
-	await clickOnMoreMenuItem( 'Options' );
+	await clickOnMoreMenuItem( 'Preferences' );
 	const [ handle ] = await page.$x(
 		`//label[contains(text(), "${ label }")]`
 	);

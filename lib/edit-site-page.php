@@ -40,7 +40,6 @@ function gutenberg_is_edit_site_page( $page ) {
 function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
-	//
 	// Ideally the code is extracted into a reusable function.
 	$styles = array(
 		array(
@@ -88,7 +87,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen;
+	global $current_screen, $post;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -102,95 +101,27 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	// Get editor settings.
-	$max_upload_size = wp_max_upload_size();
-	if ( ! $max_upload_size ) {
-		$max_upload_size = 0;
-	}
-
-	// This filter is documented in wp-admin/includes/media.php.
-	$image_size_names      = apply_filters(
-		'image_size_names_choose',
+	$settings = array_merge(
+		gutenberg_get_common_block_editor_settings(),
 		array(
-			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
-			'medium'    => __( 'Medium', 'gutenberg' ),
-			'large'     => __( 'Large', 'gutenberg' ),
-			'full'      => __( 'Full Size', 'gutenberg' ),
+			'alignWide'            => get_theme_support( 'align-wide' ),
+			'siteUrl'              => site_url(),
+			'postsPerPage'         => get_option( 'posts_per_page' ),
+			'styles'               => gutenberg_get_editor_styles(),
+			'defaultTemplateTypes' => gutenberg_get_indexed_default_template_types(),
 		)
 	);
-	$available_image_sizes = array();
-	foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
-		$available_image_sizes[] = array(
-			'slug' => $image_size_slug,
-			'name' => $image_size_name,
-		);
-	}
-
-	$settings = array(
-		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
-	);
-
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
-
-	$template_ids      = array();
-	$template_part_ids = array();
-	foreach ( get_template_types() as $template_type ) {
-		// Skip 'embed' for now because it is not a regular template type.
-		// Skip 'index' because it's a fallback that we handle differently.
-		if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
-			continue;
-		}
-
-		$current_template = gutenberg_find_template_post_and_parts( $template_type );
-		if ( isset( $current_template ) ) {
-			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
-			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
-		}
-	}
-
-	$current_template_id = $template_ids['front-page'];
-
-	$settings['templateId']      = $current_template_id;
-	$settings['homeTemplateId']  = $current_template_id;
-	$settings['templateType']    = 'wp_template';
-	$settings['templateIds']     = array_values( $template_ids );
-	$settings['templatePartIds'] = array_values( $template_part_ids );
-	$settings['styles']          = gutenberg_get_editor_styles();
-
-	$settings['showOnFront'] = get_option( 'show_on_front' );
-	$settings['page']        = array(
-		'path'    => '/',
-		'context' => 'page' === $settings['showOnFront'] ? array(
-			'postType' => 'page',
-			'postId'   => get_option( 'page_on_front' ),
-		) : array(),
-	);
-
-	// This is so other parts of the code can hook their own settings.
-	// Example: Global Styles.
-	global $post;
-	$settings = apply_filters( 'block_editor_settings', $settings, $post );
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_extend_settings_block_patterns( $settings );
 
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
 	$preload_paths = array(
-		'/',
+		'/?context=edit',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=100&context=edit',
-		'/wp/v2/pages?per_page=100&context=edit',
+		'/wp/v2/taxonomies?context=edit',
+		'/wp/v2/pages?context=edit',
 		'/wp/v2/themes?status=active',
-		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_id ),
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 	$preload_data  = array_reduce(
@@ -211,7 +142,7 @@ function gutenberg_edit_site_init( $hook ) {
 			'wp.domReady( function() {
 				wp.editSite.initialize( "edit-site-editor", %s );
 			} );',
-			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
+			wp_json_encode( $settings )
 		)
 	);
 
@@ -246,3 +177,29 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
+
+/**
+ * Register a core site setting for front page information.
+ */
+function register_site_editor_homepage_settings() {
+	register_setting(
+		'reading',
+		'show_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'reading',
+		'page_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'init', 'register_site_editor_homepage_settings', 10 );

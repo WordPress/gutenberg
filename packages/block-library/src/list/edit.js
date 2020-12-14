@@ -7,7 +7,7 @@ import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import {
@@ -154,17 +154,20 @@ export default function ListEdit( {
 		</>
 	);
 
+	const blockProps = useBlockProps();
+
 	return (
 		<>
 			<RichText
 				identifier="values"
 				multiline="li"
 				__unstableMultilineRootTag={ tagName }
-				tagName={ Block[ tagName ] }
+				tagName={ tagName }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )
 				}
 				value={ values }
+				aria-label={ __( 'List text' ) }
 				placeholder={ __( 'Write list…' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>
@@ -178,6 +181,7 @@ export default function ListEdit( {
 				start={ start }
 				reversed={ reversed }
 				type={ type }
+				{ ...blockProps }
 			>
 				{ controls }
 			</RichText>

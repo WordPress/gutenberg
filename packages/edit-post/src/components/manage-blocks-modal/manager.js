@@ -6,6 +6,7 @@ import { filter, includes, isArray } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
 import { compose, withState } from '@wordpress/compose';
 import { TextControl } from '@wordpress/components';
@@ -102,7 +103,7 @@ export default compose( [
 			getCategories,
 			hasBlockSupport,
 			isMatchingSearchTerm,
-		} = select( 'core/blocks' );
+		} = select( blocksStore );
 		const { getPreference } = select( 'core/edit-post' );
 		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
 		const numberOfHiddenBlocks =

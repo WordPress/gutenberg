@@ -3,21 +3,20 @@
 exports[`Popover should pass additional props to portaled element 1`] = `
 <span>
   <div
+    class="components-popover components-animate__appear is-from-top is-from-left is-without-arrow"
+    data-x-axis="right"
+    data-y-axis="bottom"
+    role="tooltip"
+    style="top: 0px; left: 0px;"
     tabindex="-1"
   >
-    <div>
-      <div>
-        <div
-          class="components-popover is-without-arrow"
-          role="tooltip"
-        >
-          <div
-            class="components-popover__content"
-            tabindex="-1"
-          >
-            Hello
-          </div>
-        </div>
+    <div
+      class="components-popover__content"
+    >
+      <div
+        style="position: relative;"
+      >
+        Hello
       </div>
     </div>
   </div>
@@ -27,20 +26,19 @@ exports[`Popover should pass additional props to portaled element 1`] = `
 exports[`Popover should render content 1`] = `
 <span>
   <div
+    class="components-popover components-animate__appear is-from-top is-from-left is-without-arrow"
+    data-x-axis="right"
+    data-y-axis="bottom"
+    style="top: 0px; left: 0px;"
     tabindex="-1"
   >
-    <div>
-      <div>
-        <div
-          class="components-popover is-without-arrow"
-        >
-          <div
-            class="components-popover__content"
-            tabindex="-1"
-          >
-            Hello
-          </div>
-        </div>
+    <div
+      class="components-popover__content"
+    >
+      <div
+        style="position: relative;"
+      >
+        Hello
       </div>
     </div>
   </div>

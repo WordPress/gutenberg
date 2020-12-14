@@ -3,6 +3,7 @@
  */
 import { get } from 'lodash';
 import tinycolor from 'tinycolor2';
+
 /**
  * Internal dependencies
  */
@@ -27,7 +28,7 @@ export function rgba( hexValue = '', alpha = 1 ) {
 /**
  * Retrieves a color from the color palette.
  *
- * @param {string} value The value to retrieve.
+ * @param {import('lodash').PropertyPath} value The value to retrieve.
  * @return {string} The color (or fallback, if not found).
  *
  * @example

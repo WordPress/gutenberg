@@ -7,14 +7,15 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color, reduceMotion, rtl } from '../../utils/style-mixins';
+import NumberControl from '../../number-control';
+import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
+const thumbSize = 20;
 
-export const Root = styled.span`
+export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
-	cursor: pointer;
 	align-items: flex-start;
 	display: inline-flex;
 	justify-content: flex-start;
@@ -24,17 +25,22 @@ export const Root = styled.span`
 	width: 100%;
 `;
 
+const wrapperColor = ( { color: colorProp = color( 'ui.borderFocus' ) } ) => {
+	return css( { color: colorProp } );
+};
 const wrapperMargin = ( { marks } ) =>
 	css( { marginBottom: marks ? 16 : null } );
 
-export const Wrapper = styled.span`
+export const Wrapper = styled.div`
 	box-sizing: border-box;
 	color: ${ color( 'blue.medium.focus' ) };
 	display: block;
+	flex: 1;
 	padding-top: 15px;
 	position: relative;
 	width: 100%;
 
+	${ wrapperColor };
 	${ rangeHeight };
 	${ wrapperMargin };
 
@@ -53,10 +59,15 @@ export const AfterIconWrapper = styled.span`
 	${ rtl( { marginLeft: 16 } ) }
 `;
 
-const disabledRailBackgroundColor = ( { disabled } ) => {
-	if ( ! disabled ) return '';
+const railBackgroundColor = ( { disabled, railColor } ) => {
+	let background = railColor || null;
+
+	if ( disabled ) {
+		background = color( 'lightGray.400' );
+	}
+
 	return css( {
-		backgroundColor: color( 'lightGray.400' ),
+		background,
 	} );
 };
 
@@ -72,13 +83,18 @@ export const Rail = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${ disabledRailBackgroundColor };
+	${ railBackgroundColor };
 `;
 
-const disabledBackgroundColor = ( { disabled } ) => {
-	if ( ! disabled ) return '';
+const trackBackgroundColor = ( { disabled, trackColor } ) => {
+	let background = trackColor || 'currentColor';
+
+	if ( disabled ) {
+		background = color( 'lightGray.800' );
+	}
+
 	return css( {
-		backgroundColor: color( 'lightGray.800' ),
+		background,
 	} );
 };
 
@@ -93,20 +109,27 @@ export const Track = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${ disabledBackgroundColor };
+	${ trackBackgroundColor };
 `;
 
 export const MarksWrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
+	pointer-events: none;
 	position: relative;
 	width: 100%;
 	user-select: none;
 `;
 
-const markFill = ( { isFilled } ) => {
+const markFill = ( { disabled, isFilled } ) => {
+	let backgroundColor = isFilled ? 'currentColor' : color( 'lightGray.600' );
+
+	if ( disabled ) {
+		backgroundColor = color( 'lightGray.800' );
+	}
+
 	return css( {
-		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
+		backgroundColor,
 	} );
 };
 
@@ -119,7 +142,6 @@ export const Mark = styled.span`
 	width: 1px;
 
 	${ markFill };
-	${ disabledBackgroundColor };
 `;
 
 const markLabelFill = ( { isFilled } ) => {
@@ -145,7 +167,7 @@ export const ThumbWrapper = styled.span`
 	align-items: center;
 	box-sizing: border-box;
 	display: flex;
-	height: 20px;
+	height: ${ thumbSize }px;
 	justify-content: center;
 	margin-top: 5px;
 	outline: 0;
@@ -153,7 +175,7 @@ export const ThumbWrapper = styled.span`
 	position: absolute;
 	top: 0;
 	user-select: none;
-	width: 20px;
+	width: ${ thumbSize }px;
 
 	${ rtl( { marginLeft: -10 } ) }
 `;
@@ -161,11 +183,11 @@ export const ThumbWrapper = styled.span`
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
 		borderColor: isFocused
-			? color( 'blue.medium.focus' )
+			? color( 'ui.borderFocus' )
 			: color( 'darkGray.200' ),
 		boxShadow: isFocused
 			? `
-				0 0 0 1px ${ color( 'blue.medium.focus' ) }
+				0 0 0 1px ${ color( 'ui.borderFocus' ) }
 			`
 			: `
 				0 0 0 rgba(0, 0, 0, 0)
@@ -181,7 +203,6 @@ export const Thumb = styled.span`
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
-	pointer-events: none;
 	position: absolute;
 	user-select: none;
 	width: 100%;
@@ -195,13 +216,13 @@ export const InputRange = styled.input`
 	display: block;
 	height: 100%;
 	left: 0;
-	margin: 0;
+	margin: 0 -${ thumbSize / 2 }px;
 	opacity: 0;
 	outline: none;
 	position: absolute;
 	right: 0;
 	top: 0;
-	width: 100%;
+	width: calc( 100% + ${ thumbSize }px );
 `;
 
 const tooltipShow = ( { show } ) => {
@@ -215,59 +236,31 @@ const tooltipPosition = ( { position } ) => {
 
 	if ( isTop ) {
 		return css`
-			margin-top: -4px;
-			top: -100%;
-
-			&::after {
-				border-bottom: none;
-				border-top-style: solid;
-				bottom: -6px;
-			}
+			top: -80%;
 		`;
 	}
 
 	return css`
-		margin-bottom: -4px;
-		bottom: -100%;
-
-		&::after {
-			border-bottom-style: solid;
-			border-top: none;
-			top: -6px;
-		}
+		bottom: -80%;
 	`;
 };
 
 export const Tooltip = styled.span`
-	background: ${ color( 'darkGray.800' ) };
-	border-radius: 3px;
+	background: ${ color( 'ui.border' ) };
+	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;
 	display: inline-block;
-	font-size: 11px;
+	font-size: 12px;
 	min-width: 32px;
 	opacity: 0;
-	padding: 8px;
+	padding: 4px 8px;
 	pointer-events: none;
 	position: absolute;
 	text-align: center;
 	transition: opacity 120ms ease;
 	user-select: none;
-
-	&::after {
-		border: 6px solid ${ color( 'darkGray.800' ) };
-		border-left-color: transparent;
-		border-right-color: transparent;
-		bottom: -6px;
-		box-sizing: border-box;
-		content: '';
-		height: 0;
-		left: 50%;
-		line-height: 0;
-		margin-left: -6px;
-		position: absolute;
-		width: 0;
-	}
+	line-height: 1.4;
 
 	${ tooltipShow };
 	${ tooltipPosition };
@@ -278,18 +271,18 @@ export const Tooltip = styled.span`
 	) }
 `;
 
-export const InputNumber = styled.input`
+export const InputNumber = styled( NumberControl )`
 	box-sizing: border-box;
 	display: inline-block;
+	font-size: 13px;
 	margin-top: 0;
-	min-width: 54px;
-	max-width: 120px;
+	width: ${ space( 8 ) };
 
 	input[type='number']& {
 		${ rangeHeight };
 	}
 
-	${ rtl( { marginLeft: 16 } ) }
+	${ rtl( { marginLeft: space( 2 ) } ) }
 `;
 
 export const ActionRightWrapper = styled.span`

@@ -3,7 +3,7 @@
  */
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -11,29 +11,40 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockNavigationBranch from './branch';
 import { BlockNavigationContext } from './context';
+import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
 
 /**
  * Wrap `BlockNavigationRows` with `TreeGrid`. BlockNavigationRows is a
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object} props
+ * @param {Object} props                        Components props.
+ * @param {Object} props.__experimentalFeatures Object used in context provider.
  */
 export default function BlockNavigationTree( {
 	__experimentalFeatures,
 	...props
 } ) {
+	const treeGridRef = useRef();
+	let blockDropTarget = useBlockNavigationDropZone( treeGridRef );
+
+	if ( ! __experimentalFeatures ) {
+		blockDropTarget = undefined;
+	}
+
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
+			blockDropTarget,
 		} ),
-		[ __experimentalFeatures ]
+		[ __experimentalFeatures, blockDropTarget ]
 	);
 
 	return (
 		<TreeGrid
 			className="block-editor-block-navigation-tree"
 			aria-label={ __( 'Block navigation structure' ) }
+			ref={ treeGridRef }
 		>
 			<BlockNavigationContext.Provider value={ contextValue }>
 				<BlockNavigationBranch { ...props } />

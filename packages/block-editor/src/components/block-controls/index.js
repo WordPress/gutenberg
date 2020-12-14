@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import useDisplayBlockControls from '../use-display-block-controls';
 
 const { Fill, Slot } = createSlotFill( 'BlockControls' );
 
@@ -26,6 +26,10 @@ function BlockControlsSlot( props ) {
 }
 
 function BlockControlsFill( { controls, children } ) {
+	if ( ! useDisplayBlockControls() ) {
+		return null;
+	}
+
 	return (
 		<Fill>
 			{ ( fillProps ) => {
@@ -44,7 +48,7 @@ function BlockControlsFill( { controls, children } ) {
 	);
 }
 
-const BlockControls = ifBlockEditSelected( BlockControlsFill );
+const BlockControls = BlockControlsFill;
 
 BlockControls.Slot = BlockControlsSlot;
 

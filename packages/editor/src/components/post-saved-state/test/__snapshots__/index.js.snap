@@ -9,6 +9,6 @@ exports[`PostSavedState should return Save button if edits to be saved 1`] = `
   onClick={[Function]}
   shortcut="Ctrl+S"
 >
-  Save Draft
+  Save draft
 </ForwardRef(Button)>
 `;

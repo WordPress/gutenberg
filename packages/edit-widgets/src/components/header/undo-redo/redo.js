@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { redo as redoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 
-export default function RedoButton() {
+function RedoButton( props, ref ) {
 	const hasRedo = useSelect( ( select ) => select( 'core' ).hasRedo() );
 	const { redo } = useDispatch( 'core' );
 	return (
@@ -20,6 +21,10 @@ export default function RedoButton() {
 			// See: https://github.com/WordPress/gutenberg/issues/3486
 			aria-disabled={ ! hasRedo }
 			onClick={ hasRedo ? redo : undefined }
+			ref={ ref }
+			{ ...props }
 		/>
 	);
 }
+
+export default forwardRef( RedoButton );

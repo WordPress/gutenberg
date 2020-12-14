@@ -178,6 +178,66 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
+	 * Test that title.raw contains the verbatim title and that title.rendered
+	 * has been passed through the_title which escapes & characters.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/pull/24673
+	 */
+	public function test_get_item_escapes_title() {
+		wp_set_current_user( self::$admin_id );
+
+		$menu_item_id = wp_update_nav_menu_item(
+			$this->menu_id,
+			0,
+			array(
+				'menu-item-type'      => 'taxonomy',
+				'menu-item-object'    => 'post_tag',
+				'menu-item-object-id' => $this->tag_id,
+				'menu-item-status'    => 'publish',
+				'menu-item-title'     => '<strong>Foo</strong> & bar',
+			)
+		);
+
+		$request = new WP_REST_Request(
+			'GET',
+			"/__experimental/menu-items/$menu_item_id"
+		);
+		$request->set_query_params(
+			array(
+				'context' => 'edit',
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( ! is_multisite() ) {
+			// Check that title.raw is the unescaped title and that
+			// title.rendered has been run through the_title.
+			$this->assertEquals(
+				array(
+					'rendered' => '<strong>Foo</strong> &#038; bar',
+					'raw'      => '<strong>Foo</strong> & bar',
+				),
+				$response->get_data()['title']
+			);
+		} else {
+			// In a multisite, administrators do not have unfiltered_html and
+			// post_title is ran through wp_kses before being saved in the
+			// database. Running the title through the_title does nothing in
+			// this case.
+			$this->assertEquals(
+				array(
+					'rendered' => '<strong>Foo</strong> &amp; bar',
+					'raw'      => '<strong>Foo</strong> &amp; bar',
+				),
+				$response->get_data()['title']
+			);
+		}
+
+		wp_delete_post( $menu_item_id );
+	}
+
+	/**
 	 *
 	 */
 	public function test_create_item() {
@@ -451,6 +511,41 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 	}
 
 	/**
+	 * Tests that a block menu item can be created.
+	 */
+	public function test_create_item_block() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = $this->set_menu_item_data(
+			array(
+				'type'    => 'block',
+				'content' => '<!-- wp:paragraph --><p>Block content</p><!-- /wp:paragraph -->',
+			)
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$this->check_create_menu_item_response( $response );
+	}
+
+	/**
+	 * Tests that a block menu item can be created.
+	 */
+	public function test_create_item_invalid_block_content() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/__experimental/menu-items' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$params = $this->set_menu_item_data(
+			array(
+				'type' => 'block',
+			)
+		);
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_content_required', $response, 400 );
+	}
+
+	/**
 	 *
 	 */
 	public function test_update_item() {
@@ -571,11 +666,12 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 18, count( $properties ) );
+		$this->assertEquals( 19, count( $properties ) );
 		$this->assertArrayHasKey( 'type_label', $properties );
 		$this->assertArrayHasKey( 'attr_title', $properties );
 		$this->assertArrayHasKey( 'classes', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'content', $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'url', $properties );
 		$this->assertArrayHasKey( 'meta', $properties );
@@ -690,12 +786,26 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			$this->assertEquals( $post->title, $data['title']['rendered'] );
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 			if ( 'edit' === $context ) {
-				$this->assertEquals( $post->post_title, $data['title']['raw'] );
+				$this->assertEquals( $post->title, $data['title']['raw'] );
 			} else {
 				$this->assertFalse( isset( $data['title']['raw'] ) );
 			}
 		} else {
 			$this->assertFalse( isset( $data['title'] ) );
+		}
+
+		// Check content.
+		if ( 'block' === $data['type'] ) {
+			$menu_item_content = get_post_meta( $post->ID, '_menu_item_content', true );
+			$this->assertEquals( apply_filters( 'the_content', $menu_item_content ), $data['content']['rendered'] );
+			if ( 'edit' === $context ) {
+				$this->assertEquals( $menu_item_content, $data['content']['raw'] );
+			} else {
+				$this->assertFalse( isset( $data['title']['raw'] ) );
+			}
+			$this->assertEquals( 1, $data['content']['block_version'] );
+		} else {
+			$this->assertEmpty( $data['content']['rendered'] );
 		}
 
 		// post_parent.
@@ -732,7 +842,7 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			$this->assertEquals( $links['about'][0]['href'], rest_url( 'wp/v2/types/' . self::POST_TYPE ) );
 
 			$num = 0;
-			foreach ( $taxonomies as $key => $taxonomy ) {
+			foreach ( $taxonomies as $taxonomy ) {
 				$this->assertEquals( $taxonomy->name, $links['https://api.w.org/term'][ $num ]['attributes']['taxonomy'] );
 				$this->assertEquals( add_query_arg( 'post', $data['id'], rest_url( 'wp/v2/' . $taxonomy->rest_base ) ), $links['https://api.w.org/term'][ $num ]['href'] );
 				$num ++;

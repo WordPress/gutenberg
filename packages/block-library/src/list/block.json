@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/list",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
@@ -11,10 +12,7 @@
 			"source": "html",
 			"selector": "ol,ul",
 			"multiline": "li",
-			"__unstableMultilineWrapperTags": [
-				"ol",
-				"ul"
-			],
+			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": ""
 		},
 		"type": {
@@ -28,8 +26,14 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"className": false,
-		"__unstablePasteTextInline": true,
-		"lightBlockWrapper": true
-	}
+		"fontSize": true,
+		"color": {
+			"gradients": true
+		},
+		"__unstablePasteTextInline": true
+	},
+	"editorStyle": "wp-block-list-editor",
+	"style": "wp-block-list"
 }

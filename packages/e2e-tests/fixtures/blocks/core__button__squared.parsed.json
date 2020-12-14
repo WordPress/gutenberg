@@ -3,7 +3,6 @@
         "blockName": "core/button",
         "attrs": {
             "borderRadius": 0,
-            "align": "none",
             "style": {
                 "color": {
                     "text": "#1b9b6c",

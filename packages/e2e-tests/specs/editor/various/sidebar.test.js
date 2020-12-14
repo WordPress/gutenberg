@@ -14,7 +14,7 @@ import {
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
-const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
+const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Post';
 
 describe( 'Sidebar', () => {
 	afterEach( () => {
@@ -99,11 +99,11 @@ describe( 'Sidebar', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 
-		// Tab lands at first (presumed selected) option "Document".
+		// Tab lands at first (presumed selected) option "Post".
 		await page.keyboard.press( 'Tab' );
 		const isActiveDocumentTab = await page.evaluate(
 			() =>
-				document.activeElement.textContent === 'Document' &&
+				document.activeElement.textContent === 'Post' &&
 				document.activeElement.classList.contains( 'is-active' )
 		);
 		expect( isActiveDocumentTab ).toBe( true );
@@ -122,7 +122,6 @@ describe( 'Sidebar', () => {
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
 		await createNewPost();
 		await enableFocusLossObservation();
-
 		await openDocumentSettingsSidebar();
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
@@ -147,19 +146,27 @@ describe( 'Sidebar', () => {
 			removeEditorPanel( 'post-status' );
 		} );
 
+		const getPanelToggleSelector = ( panelTitle ) => {
+			return `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"${ panelTitle }")]`;
+		};
+
 		expect(
-			await findSidebarPanelWithTitle( 'Categories' )
-		).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Categories' ) )
+		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Tags' ) ) ).toEqual(
+			[]
+		);
 		expect(
-			await findSidebarPanelWithTitle( 'Featured image' )
-		).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Featured image' ) )
+		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Excerpt' ) ) ).toEqual(
+			[]
+		);
 		expect(
-			await findSidebarPanelWithTitle( 'Discussion' )
-		).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Discussion' ) )
+		).toEqual( [] );
 		expect(
-			await findSidebarPanelWithTitle( 'Status & visibility' )
-		).toBeUndefined();
+			await page.$x( getPanelToggleSelector( 'Status & visibility' ) )
+		).toEqual( [] );
 	} );
 } );

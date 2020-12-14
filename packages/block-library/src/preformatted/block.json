@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/preformatted",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"content": {
 			"type": "string",
@@ -11,6 +12,6 @@
 		}
 	},
 	"supports": {
-		"lightBlockWrapper": true
+		"anchor": true
 	}
 }

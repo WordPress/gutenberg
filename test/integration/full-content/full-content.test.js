@@ -65,15 +65,11 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		const settings = {
-			__experimentalEnableLegacyWidgetBlock: true,
-			__experimentalEnableFullSiteEditing: true,
-		};
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( settings );
+			__experimentalRegisterExperimentalCoreBlocks( true );
 		}
 	} );
 
@@ -217,9 +213,7 @@ describe( 'full post content fixture', () => {
 			// `save` functions and attributes.
 			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
 			.filter(
-				( name ) =>
-					name.indexOf( 'core-embed' ) !== 0 &&
-					name !== 'core/template'
+				( name ) => ! [ 'core/embed', 'core/template' ].includes( name )
 			)
 			.forEach( ( name ) => {
 				const nameToFilename = blockNameToFixtureBasename( name );

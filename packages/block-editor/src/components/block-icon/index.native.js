@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -9,15 +8,33 @@ import { View } from 'react-native';
  */
 import { Icon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
-export default function BlockIcon( { icon, showColors = false } ) {
-	if ( get( icon, [ 'src' ] ) === 'block-default' ) {
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
+export function BlockIcon( {
+	icon,
+	showColors = false,
+	getStylesFromColorScheme,
+} ) {
+	if ( icon?.src === 'block-default' ) {
 		icon = {
 			src: blockDefault,
 		};
 	}
 
-	const renderedIcon = <Icon icon={ icon && icon.src ? icon.src : icon } />;
+	const renderedIcon = (
+		<Icon
+			icon={ icon && icon.src ? icon.src : icon }
+			{ ...getStylesFromColorScheme(
+				styles.iconPlaceholder,
+				styles.iconPlaceholderDark
+			) }
+		/>
+	);
 	const style = showColors
 		? {
 				backgroundColor: icon && icon.background,
@@ -27,3 +44,5 @@ export default function BlockIcon( { icon, showColors = false } ) {
 
 	return <View style={ style }>{ renderedIcon }</View>;
 }
+
+export default withPreferredColorScheme( BlockIcon );

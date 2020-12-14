@@ -6,6 +6,7 @@ import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -23,6 +24,7 @@ import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
+import BlockVariationTransforms from '../block-variation-transforms';
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -30,9 +32,15 @@ const BlockInspector = ( {
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
+	bubblesVirtually = true,
 } ) => {
 	if ( count > 1 ) {
-		return <MultiSelectionInspector />;
+		return (
+			<div className="block-editor-block-inspector">
+				<MultiSelectionInspector />
+				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			</div>
+		);
 	}
 
 	const isSelectedBlockUnregistered =
@@ -60,6 +68,7 @@ const BlockInspector = ( {
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
+			<BlockVariationTransforms blockClientId={ selectedBlockClientId } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
@@ -74,10 +83,11 @@ const BlockInspector = ( {
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot bubblesVirtually />
+			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
 				<AdvancedControls
 					slotName={ InspectorAdvancedControls.slotName }
+					bubblesVirtually={ bubblesVirtually }
 				/>
 			</div>
 			<SkipToSelectedBlock key="back" />
@@ -85,7 +95,7 @@ const BlockInspector = ( {
 	);
 };
 
-const AdvancedControls = ( { slotName } ) => {
+const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 	const slot = useSlot( slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
@@ -99,7 +109,9 @@ const AdvancedControls = ( { slotName } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot bubblesVirtually />
+			<InspectorAdvancedControls.Slot
+				bubblesVirtually={ bubblesVirtually }
+			/>
 		</PanelBody>
 	);
 };
@@ -110,7 +122,7 @@ export default withSelect( ( select ) => {
 		getSelectedBlockCount,
 		getBlockName,
 	} = select( 'core/block-editor' );
-	const { getBlockStyles } = select( 'core/blocks' );
+	const { getBlockStyles } = select( blocksStore );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =
 		selectedBlockClientId && getBlockName( selectedBlockClientId );

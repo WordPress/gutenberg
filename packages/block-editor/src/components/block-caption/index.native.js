@@ -24,6 +24,7 @@ const BlockCaption = ( {
 	isSelected,
 	shouldDisplay,
 	text,
+	insertBlocksAfter,
 } ) => (
 	<View style={ [ styles.container, shouldDisplay && styles.padding ] }>
 		<Caption
@@ -35,6 +36,7 @@ const BlockCaption = ( {
 			onFocus={ onFocus }
 			shouldDisplay={ shouldDisplay }
 			value={ text }
+			insertBlocksAfter={ insertBlocksAfter }
 		/>
 	</View>
 );
@@ -44,7 +46,7 @@ export default compose( [
 		const { getBlockAttributes, getSelectedBlockClientId } = select(
 			'core/block-editor'
 		);
-		const { caption } = getBlockAttributes( clientId );
+		const { caption } = getBlockAttributes( clientId ) || {};
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
 
 		// We'll render the caption so that the soft keyboard is not forced to close on Android

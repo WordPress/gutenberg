@@ -9,6 +9,53 @@ The hook `useEntityProp` can be used by the blocks to get or change meta values.
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
 {% codetabs %}
+{% ESNext %}
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { TextControl } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
+import { useBlockProps } from '@wordpress/block-editor';
+
+registerBlockType( 'myguten/meta-block', {
+	title: 'Meta Block',
+	icon: 'smiley',
+	category: 'text',
+
+	edit( { setAttributes, attributes } ) {
+		const blockProps = useBlockProps();
+		const postType = useSelect(
+			( select ) => select( 'core/editor' ).getCurrentPostType(),
+			[]
+		);
+		const [ meta, setMeta ] = useEntityProp(
+			'postType',
+			postType,
+			'meta'
+		);
+		const metaFieldValue = meta['myguten_meta_block_field'];
+		function updateMetaValue( newValue ) {
+			setMeta( { ...meta, 'myguten_meta_block_field': newValue } );
+		}
+
+		return (
+			<div { ...blockProps }>
+				<TextControl
+					label="Meta Block Field"
+					value={ metaFieldValue }
+					onChange={ updateMetaValue }
+				/>
+			</div>
+		);
+	},
+
+	// No information saved to the block
+	// Data is saved to post meta via the hook
+	save() {
+		return null;
+	},
+} );
+```
 {% ES5 %}
 ```js
 ( function( wp ) {
@@ -17,15 +64,15 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 	var TextControl = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 	var useEntityProp = wp.coreData.useEntityProp;
+	var useBlockProps = wp.blockEditor.useBlockProps;
 
 	registerBlockType( 'myguten/meta-block', {
 		title: 'Meta Block',
 		icon: 'smiley',
-		category: 'common',
+		category: 'text',
 
 		edit: function( props ) {
-			var className = props.className;
-
+			var blockProps = useBlockProps();
 			var postType = useSelect(
 				function( select ) {
 					return select( 'core/editor' ).getCurrentPostType();
@@ -55,7 +102,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 
 			return el(
 				'div',
-				{ className: className },
+				blockProps,
 				el( TextControl, {
 					label: 'Meta Block Field',
 					value: metaFieldValue,
@@ -71,51 +118,6 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 		},
 	} );
 } )( window.wp );
-```
-{% ESNext %}
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import { TextControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
-
-registerBlockType( 'myguten/meta-block', {
-	title: 'Meta Block',
-	icon: 'smiley',
-	category: 'common',
-
-	edit( { className, setAttributes, attributes } ) {
-		const postType = useSelect(
-			( select ) => select( 'core/editor' ).getCurrentPostType(),
-			[]
-		);
-		const [ meta, setMeta ] = useEntityProp(
-			'postType',
-			postType,
-			'meta'
-		);
-		const metaFieldValue = meta['myguten_meta_block_field'];
-		function updateMetaValue( newValue ) {
-			setMeta( { ...meta, 'myguten_meta_block_field': newValue } );
-		}
-
-		return (
-			<div className={ className }>
-				<TextControl
-					label="Meta Block Field"
-					value={ metaFieldValue }
-					onChange={ updateMetaValue }
-				/>
-			</div>
-		);
-	},
-
-	// No information saved to the block
-	// Data is saved to post meta via the hook
-	save() {
-		return null;
-	},
-} );
 ```
 {% end %}
 

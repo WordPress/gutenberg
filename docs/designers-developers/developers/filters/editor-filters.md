@@ -1,4 +1,5 @@
-# Editor Filters (Experimental)
+# Editor Filters
+
 To modify the behavior of the editor experience, the following Filters are exposed:
 
 ### `editor.PostFeaturedImage.imageSize`
@@ -36,7 +37,7 @@ This is a PHP filter which is applied before sending settings to the WordPress b
 
 You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings/).
 
-The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialisation can be filtered by a PHP WordPress plugin before being sent. 
+The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialisation can be filtered by a PHP WordPress plugin before being sent.
 
 ### Available default editor settings
 
@@ -49,4 +50,18 @@ It is set by default to the return value of the [`user_can_richedit`](https://de
 #### `codeEditingEnabled`
 Default `true`. Indicates whether the user can access the code editor **in addition** to the visual editor.
 
-If set to false the user will not be able to switch between visual and code editor. The option in the settings menu will not be available and the keyboard shortcut for switching editor types will not fire.  
+If set to false the user will not be able to switch between visual and code editor. The option in the settings menu will not be available and the keyboard shortcut for switching editor types will not fire.
+
+### Block Directory
+
+The Block Directory enables installing new block plugins from [WordPress.org.](https://wordpress.org/plugins/browse/block/) It can be disabled by removing the actions that enqueue it. In WordPress core, the function is `wp_enqueue_editor_block_directory_assets`, and Gutenberg uses `gutenberg_enqueue_block_editor_assets_block_directory`. To remove the feature, use [`remove_action`,](https://developer.wordpress.org/reference/functions/remove_action/) like this:
+
+```php
+add_action(
+	'plugins_loaded',
+	function() {
+		remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
+		remove_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets_block_directory' );
+	}
+);
+```

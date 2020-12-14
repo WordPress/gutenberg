@@ -34,7 +34,7 @@ describe( 'Popover', () => {
 		} );
 
 		expect( document.activeElement ).toBe(
-			result.container.querySelector( '.components-popover__content' )
+			result.container.querySelector( '.components-popover' )
 		);
 	} );
 

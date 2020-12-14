@@ -1,11 +1,11 @@
 .block-editor-color-gradient-control {
-	&__color-indicator {
-		margin-bottom: $grid-unit-10;
+	.block-editor-color-gradient-control__color-indicator {
+		margin-bottom: $grid-unit-15;
 	}
 
-	&__button-tabs {
+	.block-editor-color-gradient-control__button-tabs {
 		display: block;
-		margin-bottom: $grid-unit-10;
+		margin-bottom: $grid-unit-15;
 	}
 }
 
@@ -22,5 +22,27 @@
 
 	&.is-opened &__panel-title .component-color-indicator {
 		display: none;
+	}
+
+	// Must equal $color-palette-circle-size from:
+	// @wordpress/components/src/circular-option-picker/style.scss
+	$swatch-size: 28px;
+
+	// Optimize fit of six swatches per line using calc() to create variable
+	// spacing that mimics a "justified/space-between" layout and works with
+	// or without scrollbars
+	@media screen and (min-width: $break-medium) {
+		// Overrides the default negative margin
+		.components-circular-option-picker__swatches {
+			margin-right: 0;
+		}
+		// Figures the spacing
+		.components-circular-option-picker__option-wrapper {
+			margin-right: calc((100% - (#{$swatch-size} * 6)) / 5);
+		}
+		// Removes the right margin on every sixth swatch
+		.components-circular-option-picker__option-wrapper:nth-child(6n + 6) {
+			margin-right: 0;
+		}
 	}
 }

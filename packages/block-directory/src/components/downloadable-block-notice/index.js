@@ -5,10 +5,15 @@ import { __ } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockDirectoryStore } from '../../store';
+
 export const DownloadableBlockNotice = ( { block, onClick } ) => {
 	const errorNotice = useSelect(
 		( select ) =>
-			select( 'core/block-directory' ).getErrorNoticeForBlock( block.id ),
+			select( blockDirectoryStore ).getErrorNoticeForBlock( block.id ),
 		[ block ]
 	);
 
@@ -23,16 +28,21 @@ export const DownloadableBlockNotice = ( { block, onClick } ) => {
 			className="block-directory-downloadable-block-notice"
 		>
 			<div className="block-directory-downloadable-block-notice__content">
-				{ errorNotice }
+				{ errorNotice.message }
 			</div>
 			<Button
 				isSmall
 				isPrimary
 				onClick={ () => {
+					if ( errorNotice.isFatal ) {
+						window.location.reload();
+						return false;
+					}
+
 					onClick( block );
 				} }
 			>
-				{ __( 'Retry' ) }
+				{ errorNotice.isFatal ? __( 'Reload' ) : __( 'Retry' ) }
 			</Button>
 		</Notice>
 	);

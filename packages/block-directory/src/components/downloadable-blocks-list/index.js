@@ -12,9 +12,11 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
+import { store as blockDirectoryStore } from '../../store';
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
-	const { installBlockType } = useDispatch( 'core/block-directory' );
+	const { installBlockType } = useDispatch( blockDirectoryStore );
+	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 
 	if ( ! items.length ) {
 		return null;
@@ -35,6 +37,7 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 							installBlockType( item ).then( ( success ) => {
 								if ( success ) {
 									onSelect( item );
+									setIsInserterOpened( false );
 								}
 							} );
 							onHover( null );

@@ -3,6 +3,8 @@
  */
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -21,6 +23,11 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../../sidebar/plugin-sidebar';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+
+const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+	web: true,
+	native: false,
+} );
 
 const SettingsSidebar = () => {
 	const { sidebarName, keyboardShortcut } = useSelect( ( select ) => {
@@ -43,7 +50,7 @@ const SettingsSidebar = () => {
 			sidebar = 'edit-post/document';
 		}
 		const shortcut = select(
-			'core/keyboard-shortcuts'
+			keyboardShortcutsStore
 		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 		return { sidebarName: sidebar, keyboardShortcut: shortcut };
 	}, [] );
@@ -54,9 +61,11 @@ const SettingsSidebar = () => {
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }
 			headerClassName="edit-post-sidebar__panel-tabs"
+			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
 			toggleShortcut={ keyboardShortcut }
 			icon={ cog }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ sidebarName === 'edit-post/document' && (
 				<>

@@ -313,3 +313,25 @@ export function isSavingMetaBoxes( state ) {
 export function __experimentalGetPreviewDeviceType( state ) {
 	return state.deviceType;
 }
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return state.isInserterOpened;
+}
+
+/**
+ * Returns true if the template editing mode is enabled.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether we're editing the template.
+ */
+export function isEditingTemplate( state ) {
+	return state.isEditingTemplate;
+}

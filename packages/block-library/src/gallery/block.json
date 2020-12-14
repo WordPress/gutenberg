@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/gallery",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"images": {
 			"type": "array",
@@ -68,8 +69,7 @@
 			"default": true
 		},
 		"linkTo": {
-			"type": "string",
-			"default": "none"
+			"type": "string"
 		},
 		"sizeSlug": {
 			"type": "string",
@@ -77,6 +77,9 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true
-	}
+	},
+	"editorStyle": "wp-block-gallery-editor",
+	"style": "wp-block-gallery"
 }

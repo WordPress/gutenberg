@@ -26,7 +26,7 @@ export default function BlockNavigationList( {
 
 	return (
 		<__experimentalBlockNavigationTree
-			blocks={ [ block ] }
+			blocks={ block.innerBlocks }
 			selectedBlockClientId={ selectedBlockClientId }
 			selectBlock={ selectBlock }
 			__experimentalFeatures={ __experimentalFeatures }

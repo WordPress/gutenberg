@@ -34,7 +34,7 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'block template type name, allowed values: "es5", "esnext"',
+		'block template type name, allowed values: "es5", "esnext", or the name of an external npm package',
 		'esnext'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
@@ -42,6 +42,14 @@ program
 	// The name "description" is used internally so it couldn't be used.
 	.option( '--short-description <value>', 'short description for the block' )
 	.option( '--category <name>', 'category name for the block' )
+	.option(
+		'--wp-scripts',
+		'enable integration with `@wordpress/scripts` package'
+	)
+	.option(
+		'--no-wp-scripts',
+		'disable integration with `@wordpress/scripts` package'
+	)
 	.action(
 		async (
 			slug,
@@ -51,18 +59,24 @@ program
 				shortDescription: description,
 				template: templateName,
 				title,
+				wpScripts,
 			}
 		) => {
 			await checkSystemRequirements( engines );
 			try {
 				const blockTemplate = await getBlockTemplate( templateName );
 				const defaultValues = getDefaultValues( blockTemplate );
-				const optionsValues = pickBy( {
-					category,
-					description,
-					namespace,
-					title,
-				} );
+				const optionsValues = pickBy(
+					{
+						category,
+						description,
+						namespace,
+						title,
+						wpScripts,
+					},
+					( value ) => value !== undefined
+				);
+
 				if ( slug ) {
 					const answers = {
 						...defaultValues,
@@ -77,6 +91,8 @@ program
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
+					log.info( '' );
+					log.info( "Let's customize your block:" );
 					const answers = await inquirer.prompt( prompts );
 					await scaffold( blockTemplate, {
 						...defaultValues,

@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useReducer, useState } from '@wordpress/element';
-import { plusCircle } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ import ControlPoints from './control-points';
 import {
 	INSERT_POINT_WIDTH,
 	COLOR_POPOVER_PROPS,
-	MINIMUM_DISTANCE_BETWEEN_POINTS,
+	MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT,
 } from './constants';
 import { serializeGradient } from './serializer';
 import {
@@ -50,6 +50,7 @@ function InsertPoint( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ () => {
 						if ( isOpen ) {
 							onCloseInserter();
@@ -60,7 +61,7 @@ function InsertPoint( {
 						onToggle();
 					} }
 					className="components-custom-gradient-picker__insert-point"
-					icon={ plusCircle }
+					icon={ plus }
 					style={ {
 						left:
 							insertPosition !== null
@@ -175,7 +176,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 			some( markerPoints, ( { positionValue } ) => {
 				return (
 					Math.abs( insertPosition - positionValue ) <
-					MINIMUM_DISTANCE_BETWEEN_POINTS
+					MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT
 				);
 			} )
 		) {

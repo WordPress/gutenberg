@@ -18,19 +18,21 @@ function InserterLibrary( {
 	clientId,
 	isAppender,
 	showInserterHelpPanel,
-	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+	showMostUsedBlocks = false,
+	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect = noop,
 } ) {
-	const { destinationRootClientId } = useSelect( ( select ) => {
-		const { getBlockRootClientId } = select( 'core/block-editor' );
+	const destinationRootClientId = useSelect(
+		( select ) => {
+			const { getBlockRootClientId } = select( 'core/block-editor' );
 
-		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
-
-		return {
-			rootClientId,
-		};
-	} );
+			return (
+				rootClientId || getBlockRootClientId( clientId ) || undefined
+			);
+		},
+		[ clientId, rootClientId ]
+	);
 
 	return (
 		<InserterMenu
@@ -39,7 +41,11 @@ function InserterLibrary( {
 			clientId={ clientId }
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
-			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+			showMostUsedBlocks={ showMostUsedBlocks }
+			__experimentalSelectBlockOnInsert={
+				__experimentalSelectBlockOnInsert
+			}
+			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 		/>
 	);
 }

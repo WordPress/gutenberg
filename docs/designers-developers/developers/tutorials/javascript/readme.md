@@ -8,7 +8,6 @@ JavaScript is a programming language which is loaded and executed in your web br
 
 The block editor introduced in WordPress 5.0 is written in JavaScript, with the code run in the browser, and not on the server, this allows for a richer and more dynamic user experience. It also requires you to learn how to use JavaScript to extend and enhance the block editor.
 
-
 ### Table of Contents
 
 1. [Plugins Background](/docs/designers-developers/developers/tutorials/javascript/plugins-background.md)
@@ -18,4 +17,4 @@ The block editor introduced in WordPress 5.0 is written in JavaScript, with the 
 5. [JavaScript Versions and Building](/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md)
 6. [Scope your code](/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md)
 7. [JavaScript Build Step](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md)
-
+8. [ESNext Syntax](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md)

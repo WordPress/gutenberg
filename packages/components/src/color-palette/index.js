@@ -58,15 +58,12 @@ export default function ColorPalette( {
 			/>
 		) );
 	}, [ colors, value, onChange, clearColor ] );
-	const renderCustomColorPicker = useCallback(
-		() => (
-			<ColorPicker
-				color={ value }
-				onChangeComplete={ ( color ) => onChange( color.hex ) }
-				disableAlpha
-			/>
-		),
-		[ value ]
+	const renderCustomColorPicker = () => (
+		<ColorPicker
+			color={ value }
+			onChangeComplete={ ( color ) => onChange( color.hex ) }
+			disableAlpha
+		/>
 	);
 
 	return (

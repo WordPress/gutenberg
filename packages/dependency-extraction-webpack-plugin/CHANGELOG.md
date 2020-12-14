@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New feature
+
+- Make the plugin compatible with webpack 5.
+
+## 2.7.0 (2020-06-15)
+
+### New feature
+
+- Include TypeScript type declarations ([#22498](https://github.com/WordPress/gutenberg/pull/22498))
+
 ## 2.5.0 (2020-04-01)
 
 ### New Features

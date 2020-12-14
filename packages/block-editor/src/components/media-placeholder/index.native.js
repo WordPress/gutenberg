@@ -43,6 +43,10 @@ function MediaPlaceholder( props ) {
 		getStylesFromColorScheme,
 		multiple,
 		value = [],
+		children,
+		height,
+		backgroundColor,
+		hideContent,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -107,6 +111,7 @@ function MediaPlaceholder( props ) {
 					<Text style={ emptyStateTitleStyle }>
 						{ placeholderTitle }
 					</Text>
+					{ children }
 					<Text style={ styles.emptyStateDescription }>
 						{ instructions }
 					</Text>
@@ -146,6 +151,7 @@ function MediaPlaceholder( props ) {
 					__experimentalOnlyMediaLibrary
 				}
 				multiple={ multiple }
+				isReplacingMedia={ false }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback
@@ -163,12 +169,16 @@ function MediaPlaceholder( props ) {
 						>
 							<View
 								style={ [
-									emptyStateContainerStyle,
+									[
+										emptyStateContainerStyle,
+										height && { height },
+										backgroundColor && { backgroundColor },
+									],
 									isAppender && appenderStyle,
 								] }
 							>
 								{ getMediaOptions() }
-								{ renderContent() }
+								{ ! hideContent && renderContent() }
 							</View>
 						</TouchableWithoutFeedback>
 					);

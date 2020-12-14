@@ -61,7 +61,7 @@ module.exports = {
 			unnecessaryDefault: 'Unnecessary default text domain',
 			missing: 'Missing text domain',
 			useAllowedValue:
-				'Use one of the whitelisted text domains: {{ textDomains }}',
+				'Use one of the allowed text domains: {{ textDomains }}',
 		},
 		fixable: 'code',
 	},

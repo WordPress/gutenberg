@@ -6,17 +6,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button, Panel, Slot, Fill } from '@wordpress/components';
+import { Button, Panel, Slot, Fill } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { withPluginContext } from '@wordpress/plugins';
-import { starEmpty, starFilled } from '@wordpress/icons';
+import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
  */
 import ComplementaryAreaHeader from '../complementary-area-header';
+import ComplementaryAreaToggle from '../complementary-area-toggle';
+import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
@@ -26,9 +28,7 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 function ComplementaryAreaFill( { scope, children, className } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<Animate type="slide-in" options={ { origin: 'left' } }>
-				{ () => <div className={ className }>{ children }</div> }
-			</Animate>
+			<div className={ className }>{ children }</div>
 		</Fill>
 	);
 }
@@ -92,8 +92,10 @@ function ComplementaryArea( {
 	smallScreenTitle,
 	title,
 	toggleShortcut,
+	isActiveByDefault,
+	showIconLabels = false,
 } ) {
-	const { isActive, isPinned, activeArea, isSmall } = useSelect(
+	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
 				'core/interface'
@@ -103,9 +105,8 @@ function ComplementaryArea( {
 				isActive: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
 				activeArea: _activeArea,
-				isSmall: select( 'core/viewport' ).isViewportMatch(
-					'< medium'
-				),
+				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
 			};
 		},
 		[ identifier, scope ]
@@ -117,25 +118,34 @@ function ComplementaryArea( {
 		isActive,
 		isSmall
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
-	);
-	const { pinItem, unpinItem } = useDispatch( 'core/interface' );
+	const {
+		enableComplementaryArea,
+		disableComplementaryArea,
+		pinItem,
+		unpinItem,
+	} = useDispatch( 'core/interface' );
+
+	useEffect( () => {
+		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
+			enableComplementaryArea( scope, identifier );
+		}
+	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
+
 	return (
 		<>
 			{ isPinned && isPinnable && (
 				<PinnedItems scope={ scope }>
-					<Button
-						icon={ icon }
-						label={ title }
-						onClick={ () =>
-							isActive
-								? disableComplementaryArea( scope )
-								: enableComplementaryArea( scope, identifier )
+					<ComplementaryAreaToggle
+						scope={ scope }
+						identifier={ identifier }
+						isPressed={
+							isActive && ( ! showIconLabels || isLarge )
 						}
-						isPressed={ isActive }
 						aria-expanded={ isActive }
-						shortcut={ toggleShortcut }
+						label={ title }
+						icon={ showIconLabels ? check : icon }
+						showTooltip={ ! showIconLabels }
+						isTertiary={ showIconLabels }
 					/>
 				</PinnedItems>
 			) }
@@ -152,7 +162,12 @@ function ComplementaryArea( {
 						closeLabel={ closeLabel }
 						onClose={ () => disableComplementaryArea( scope ) }
 						smallScreenTitle={ smallScreenTitle }
-						toggleShortcut={ toggleShortcut }
+						toggleButtonProps={ {
+							label: closeLabel,
+							shortcut: toggleShortcut,
+							scope,
+							identifier,
+						} }
 					>
 						{ header || (
 							<>
@@ -188,13 +203,9 @@ function ComplementaryArea( {
 	);
 }
 
-const ComplementaryAreaWrapped = withPluginContext( ( context, ownProps ) => {
-	return {
-		icon: ownProps.icon || context.icon,
-		identifier:
-			ownProps.identifier || `${ context.name }/${ ownProps.name }`,
-	};
-} )( ComplementaryArea );
+const ComplementaryAreaWrapped = withComplementaryAreaContext(
+	ComplementaryArea
+);
 
 ComplementaryAreaWrapped.Slot = ComplementaryAreaSlot;
 

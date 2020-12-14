@@ -4,11 +4,13 @@
 import {
 	activatePlugin,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
 	insertBlock,
 	pressKeyTimes,
+	pressKeyWithModifier,
 	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
@@ -39,17 +41,13 @@ describe( 'cpt locking', () => {
 		);
 		await clickBlockToolbarButton( 'More options' );
 		expect(
-			await page.$x( '//button[contains(text(), "Remove Block")]' )
+			await page.$x( '//button/span[contains(text(), "Remove block")]' )
 		).toHaveLength( 0 );
 	};
 
 	const shouldAllowBlocksToBeMoved = async () => {
 		await page.click(
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
-		);
-		// Hover the block switcher to show the movers
-		await page.hover(
-			'.block-editor-block-toolbar .block-editor-block-toolbar__block-switcher-wrapper'
 		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
@@ -89,6 +87,18 @@ describe( 'cpt locking', () => {
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
+		it( 'should insert line breaks when using enter and shift-enter', async () => {
+			await page.click(
+				'.block-editor-block-list__block[data-type="core/paragraph"]'
+			);
+			await page.keyboard.type( 'First line' );
+			await pressKeyTimes( 'Enter', 1 );
+			await page.keyboard.type( 'Second line' );
+			await pressKeyWithModifier( 'shift', 'Enter' );
+			await page.keyboard.type( 'Third line' );
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
 		it( 'should show invalid template notice if the blocks do not match the templte', async () => {
 			const content = await getEditedPostContent();
 			const [ , contentWithoutImage ] = content.split(
@@ -114,14 +124,14 @@ describe( 'cpt locking', () => {
 				'.wp-block-column .block-editor-button-block-appender'
 			);
 			await page.type( '.block-editor-inserter__search-input', 'image' );
-			await page.keyboard.press( 'Tab' );
+			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
 			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
 			await page.type(
 				'.block-editor-inserter__search-input',
 				'gallery'
 			);
-			await page.keyboard.press( 'Tab' );
+			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
 			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
 		} );
@@ -162,13 +172,71 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'More options' );
-			const [ removeBlock ] = await page.$x(
-				'//button[contains(text(), "Remove Block")]'
-			);
-			await removeBlock.click();
+			await clickMenuItem( 'Remove block' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'should allow blocks to be moved', shouldAllowBlocksToBeMoved );
+	} );
+
+	describe( 'template_lock all unlocked group', () => {
+		beforeEach( async () => {
+			await createNewPost( {
+				postType: 'l-post-ul-group',
+			} );
+		} );
+
+		it( 'should allow blocks to be removed', async () => {
+			await page.type(
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
+				'p1'
+			);
+			await clickBlockToolbarButton( 'More options' );
+			await clickMenuItem( 'Remove block' );
+
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'should allow blocks to be moved', shouldAllowBlocksToBeMoved );
+	} );
+
+	describe( 'template_lock all locked group', () => {
+		beforeEach( async () => {
+			await createNewPost( {
+				postType: 'l-post-l-group',
+			} );
+		} );
+
+		it(
+			'should not allow blocks to be removed',
+			shouldNotAllowBlocksToBeRemoved
+		);
+
+		it( 'should not allow blocks to be moved', async () => {
+			await page.click(
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+			);
+			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'template_lock all inherited group', () => {
+		beforeEach( async () => {
+			await createNewPost( {
+				postType: 'l-post-i-group',
+			} );
+		} );
+
+		it(
+			'should not allow blocks to be removed',
+			shouldNotAllowBlocksToBeRemoved
+		);
+
+		it( 'should not allow blocks to be moved', async () => {
+			await page.click(
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+			);
+			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
+		} );
 	} );
 } );

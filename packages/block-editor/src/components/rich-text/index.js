@@ -106,7 +106,6 @@ function RichTextWrapper(
 		multiline,
 		inlineToolbar,
 		wrapperClassName,
-		className,
 		autocompleters,
 		onReplace,
 		placeholder,
@@ -120,14 +119,31 @@ function RichTextWrapper(
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
-		// To do: find a better way to implicitly inherit props.
-		start: startAttr,
-		reversed,
-		style,
 		preserveWhiteSpace,
+		__unstablePastePlainText: pastePlainText,
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
+		unstableOnFocus,
+		__unstableAllowPrefixTransformations,
+		__unstableMultilineRootTag,
+		// Native props.
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		onBlur,
+		setRef,
 		...props
 	},
 	forwardedRef
@@ -365,18 +381,20 @@ function RichTextWrapper(
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
-			} else if ( shiftKey || ( ! canSplit && ! onSplitAtEnd ) ) {
-				if ( ! disableLineBreaks ) {
-					onChange( insert( value, '\n' ) );
-				}
-			} else if ( onSplitAtEnd && ! canSplit ) {
+			} else {
 				const { text, start, end } = value;
+				const canSplitAtEnd =
+					onSplitAtEnd && start === end && end === text.length;
 
-				if ( start === end && end === text.length ) {
+				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
+				} else if ( ! canSplit && canSplitAtEnd ) {
 					onSplitAtEnd();
+				} else if ( canSplit ) {
+					splitValue( value );
 				}
-			} else if ( canSplit ) {
-				splitValue( value );
 			}
 		},
 		[
@@ -385,11 +403,17 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange,
 			multiline,
 			splitValue,
+			onSplitAtEnd,
 		]
 	);
 
 	const onPaste = useCallback(
 		( { value, onChange, html, plainText, files, activeFormats } ) => {
+			if ( pastePlainText ) {
+				onChange( insert( value, create( { text: plainText } ) ) );
+				return;
+			}
+
 			// Only process file if no HTML is present.
 			// Note: a pasted file may have the URL as plain text.
 			if ( files && files.length && ! html ) {
@@ -397,6 +421,7 @@ function RichTextWrapper(
 					HTML: filePasteHandler( files ),
 					mode: 'BLOCKS',
 					tagName,
+					preserveWhiteSpace,
 				} );
 
 				// Allows us to ask for this information when we get a report.
@@ -439,6 +464,7 @@ function RichTextWrapper(
 				plainText,
 				mode,
 				tagName,
+				preserveWhiteSpace,
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -482,6 +508,8 @@ function RichTextWrapper(
 			splitValue,
 			__unstableEmbedURLOnPaste,
 			multiline,
+			preserveWhiteSpace,
+			pastePlainText,
 		]
 	);
 
@@ -525,7 +553,6 @@ function RichTextWrapper(
 
 	const content = (
 		<RichText
-			{ ...props }
 			clientId={ clientId }
 			identifier={ identifier }
 			ref={ ref }
@@ -535,9 +562,6 @@ function RichTextWrapper(
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
 			tagName={ tagName }
-			className={ classnames( classes, className, {
-				'keep-placeholder-on-focus': keepPlaceholderOnFocus,
-			} ) }
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
@@ -555,11 +579,13 @@ function RichTextWrapper(
 			__unstableDidAutomaticChange={ didAutomaticChange }
 			__unstableUndo={ undo }
 			__unstableDisableFormats={ disableFormats }
-			style={ style }
 			preserveWhiteSpace={ preserveWhiteSpace }
 			disabled={ disabled }
-			start={ startAttr }
-			reversed={ reversed }
+			unstableOnFocus={ unstableOnFocus }
+			__unstableAllowPrefixTransformations={
+				__unstableAllowPrefixTransformations
+			}
+			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
 			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
 			blockIsSelected={
@@ -568,13 +594,35 @@ function RichTextWrapper(
 					: blockIsSelected
 			}
 			shouldBlurOnUnmount={ shouldBlurOnUnmount }
+			__unstableMobileNoFocusOnMount={ __unstableMobileNoFocusOnMount }
+			deleteEnter={ deleteEnter }
+			placeholderTextColor={ placeholderTextColor }
+			textAlign={ textAlign }
+			selectionColor={ selectionColor }
+			tagsToEliminate={ tagsToEliminate }
+			rootTagsToEliminate={ rootTagsToEliminate }
+			disableEditingMenu={ disableEditingMenu }
+			fontSize={ fontSize }
+			fontFamily={ fontFamily }
+			fontWeight={ fontWeight }
+			fontStyle={ fontStyle }
+			minWidth={ minWidth }
+			maxWidth={ maxWidth }
+			onBlur={ onBlur }
+			setRef={ setRef }
+			// Props to be set on the editable container are destructured on the
+			// element itself for web (see below), but passed through rich text
+			// for native.
+			id={ props.id }
+			style={ props.style }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
 				value,
 				onChange,
 				onFocus,
-				Editable,
+				editableProps,
+				editableTagName: TagName,
 			} ) => (
 				<>
 					{ children && children( { value, onChange, onFocus } ) }
@@ -591,17 +639,37 @@ function RichTextWrapper(
 						record={ value }
 						onChange={ onChange }
 						isSelected={ nestedIsSelected }
+						contentRef={ ref }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<Editable
+							<TagName
+								{ ...editableProps }
+								{ ...props }
+								style={
+									props.style
+										? {
+												...props.style,
+												...editableProps.style,
+										  }
+										: editableProps.style
+								}
+								className={ classnames(
+									classes,
+									props.className,
+									editableProps.className,
+									{
+										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+									}
+								) }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
 								}
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
-								start={ startAttr }
-								reversed={ reversed }
-								onKeyDown={ onKeyDown }
+								onKeyDown={ ( event ) => {
+									onKeyDown( event );
+									editableProps.onKeyDown( event );
+								} }
 							/>
 						) }
 					</Autocomplete>

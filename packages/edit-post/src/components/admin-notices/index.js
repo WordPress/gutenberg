@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Mapping of server-supported notice class names to an equivalent notices
@@ -43,7 +44,7 @@ function getNoticeHTML( element ) {
 	const fragments = [];
 
 	for ( const child of element.childNodes ) {
-		if ( child.nodeType !== window.Node.ELEMENT_NODE ) {
+		if ( child.nodeType !== child.ELEMENT_NODE ) {
 			const value = child.nodeValue.trim();
 			if ( value ) {
 				fragments.push( child.nodeValue );
@@ -103,7 +104,7 @@ export class AdminNotices extends Component {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const { createNotice } = dispatch( 'core/notices' );
+	const { createNotice } = dispatch( noticesStore );
 
 	return { createNotice };
 } )( AdminNotices );

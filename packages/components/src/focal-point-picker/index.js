@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -9,35 +10,48 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { Path, SVG } from '@wordpress/primitives';
+import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
-
-const TEXTCONTROL_MIN = 0;
-const TEXTCONTROL_MAX = 100;
+import BaseControl from '../base-control';
+import Controls from './controls';
+import FocalPoint from './focal-point';
+import Grid from './grid';
+import Media from './media';
+import {
+	MediaWrapper,
+	MediaContainer,
+} from './styles/focal-point-picker-style';
+import { roundClamp } from '../utils/math';
+import { INITIAL_BOUNDS } from './utils';
 
 export class FocalPointPicker extends Component {
 	constructor( props ) {
-		super( props );
-		this.onMouseMove = this.onMouseMove.bind( this );
+		super( ...arguments );
+
 		this.state = {
 			isDragging: false,
-			bounds: {},
+			bounds: INITIAL_BOUNDS,
 			percentages: props.value,
 		};
+
 		this.containerRef = createRef();
-		this.imageRef = createRef();
-		this.horizontalPositionChanged = this.horizontalPositionChanged.bind(
-			this
-		);
-		this.verticalPositionChanged = this.verticalPositionChanged.bind(
-			this
-		);
-		this.onLoad = this.onLoad.bind( this );
+		this.mediaRef = createRef();
+
+		this.handleOnClick = this.handleOnClick.bind( this );
+		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
+		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
+		this.onMouseMove = this.onMouseMove.bind( this );
+
+		this.updateBounds = this.updateBounds.bind( this );
+		this.updateValue = this.updateValue.bind( this );
+	}
+	componentDidMount() {
+		document.addEventListener( 'mouseup', this.handleOnMouseUp );
+		window.addEventListener( 'resize', this.updateBounds );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
@@ -45,26 +59,37 @@ export class FocalPointPicker extends Component {
 				isDragging: false,
 			} );
 		}
+		/**
+		 * Handles cases where the incoming value changes.
+		 * An example is the values resetting based on an UNDO action.
+		 */
+		if (
+			this.props.value.x !== this.state.percentages.x ||
+			this.props.value.y !== this.state.percentages.y
+		) {
+			this.setState( { percentages: this.props.value } );
+		}
+	}
+	componentWillUnmount() {
+		document.removeEventListener( 'mouseup', this.handleOnMouseUp );
+		window.removeEventListener( 'resize', this.updateBounds );
 	}
 	calculateBounds() {
-		const bounds = {
-			top: 0,
-			left: 0,
-			bottom: 0,
-			right: 0,
-			width: 0,
-			height: 0,
-		};
-		if ( ! this.imageRef.current ) {
+		const bounds = INITIAL_BOUNDS;
+
+		if ( ! this.mediaRef.current ) {
 			return bounds;
 		}
+
 		const dimensions = {
-			width: this.imageRef.current.clientWidth,
-			height: this.imageRef.current.clientHeight,
+			width: this.mediaRef.current.clientWidth,
+			height: this.mediaRef.current.clientHeight,
 		};
 		const pickerDimensions = this.pickerDimensions();
+
 		const widthRatio = pickerDimensions.width / dimensions.width;
 		const heightRatio = pickerDimensions.height / dimensions.height;
+
 		if ( heightRatio >= widthRatio ) {
 			bounds.width = bounds.right = pickerDimensions.width;
 			bounds.height = dimensions.height * widthRatio;
@@ -78,96 +103,144 @@ export class FocalPointPicker extends Component {
 		}
 		return bounds;
 	}
-	onLoad() {
+	updateValue( nextValue = {} ) {
+		const { onChange } = this.props;
+		const { x, y } = nextValue;
+
+		const nextPercentage = {
+			x: parseFloat( x ).toFixed( 2 ),
+			y: parseFloat( y ).toFixed( 2 ),
+		};
+
+		this.setState( { percentages: nextPercentage }, () => {
+			onChange( nextPercentage );
+		} );
+	}
+	updateBounds() {
 		this.setState( {
 			bounds: this.calculateBounds(),
 		} );
 	}
+	handleOnClick( event ) {
+		event.persist();
+		this.setState( { isDragging: true }, () => {
+			this.onMouseMove( event );
+		} );
+	}
+	handleOnMouseUp() {
+		this.setState( { isDragging: false } );
+	}
+	handleOnKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
+		if ( ! [ UP, DOWN, LEFT, RIGHT ].includes( keyCode ) ) return;
+
+		const { x, y } = this.state.percentages;
+
+		event.preventDefault();
+
+		// Normalizing values for incrementing/decrementing based on arrow keys
+		let nextX = parseFloat( x );
+		let nextY = parseFloat( y );
+		const step = shiftKey ? 0.1 : 0.01;
+
+		switch ( event.keyCode ) {
+			case UP:
+				nextY = nextY - step;
+				break;
+			case DOWN:
+				nextY = nextY + step;
+				break;
+			case LEFT:
+				nextX = nextX - step;
+				break;
+			case RIGHT:
+				nextX = nextX + step;
+				break;
+		}
+
+		nextX = roundClamp( nextX, 0, 1, step );
+		nextY = roundClamp( nextY, 0, 1, step );
+
+		const percentages = {
+			x: nextX,
+			y: nextY,
+		};
+
+		this.updateValue( percentages );
+	}
 	onMouseMove( event ) {
 		const { isDragging, bounds } = this.state;
-		const { onChange } = this.props;
 
-		if ( isDragging ) {
-			const pickerDimensions = this.pickerDimensions();
-			const cursorPosition = {
-				left: event.pageX - pickerDimensions.left,
-				top: event.pageY - pickerDimensions.top,
-			};
-			const left = Math.max(
-				bounds.left,
-				Math.min( cursorPosition.left, bounds.right )
-			);
-			const top = Math.max(
-				bounds.top,
-				Math.min( cursorPosition.top, bounds.bottom )
-			);
-			const percentages = {
-				x: (
-					( left - bounds.left ) /
-					( pickerDimensions.width - bounds.left * 2 )
-				).toFixed( 2 ),
-				y: (
-					( top - bounds.top ) /
-					( pickerDimensions.height - bounds.top * 2 )
-				).toFixed( 2 ),
-			};
-			this.setState( { percentages }, function () {
-				onChange( {
-					x: this.state.percentages.x,
-					y: this.state.percentages.y,
-				} );
-			} );
-		}
-	}
-	fractionToPercentage( fraction ) {
-		return Math.round( fraction * 100 );
-	}
-	horizontalPositionChanged( event ) {
-		this.positionChangeFromTextControl( 'x', event.target.value );
-	}
-	verticalPositionChanged( event ) {
-		this.positionChangeFromTextControl( 'y', event.target.value );
-	}
-	positionChangeFromTextControl( axis, value ) {
-		const { onChange } = this.props;
-		const { percentages } = this.state;
-		const cleanValue = Math.max( Math.min( parseInt( value ), 100 ), 0 );
-		percentages[ axis ] = ( cleanValue ? cleanValue / 100 : 0 ).toFixed(
-			2
+		if ( ! isDragging ) return;
+
+		const { shiftKey } = event;
+		const pickerDimensions = this.pickerDimensions();
+		const cursorPosition = {
+			left: event.pageX - pickerDimensions.left,
+			top: event.pageY - pickerDimensions.top,
+		};
+
+		const left = Math.max(
+			bounds.left,
+			Math.min( cursorPosition.left, bounds.right )
 		);
-		this.setState( { percentages }, function () {
-			onChange( {
-				x: this.state.percentages.x,
-				y: this.state.percentages.y,
-			} );
-		} );
+		const top = Math.max(
+			bounds.top,
+			Math.min( cursorPosition.top, bounds.bottom )
+		);
+
+		let nextX =
+			( left - bounds.left ) /
+			( pickerDimensions.width - bounds.left * 2 );
+		let nextY =
+			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
+
+		// Enables holding shift to jump values by 10%
+		const step = shiftKey ? 0.1 : 0.01;
+
+		nextX = roundClamp( nextX, 0, 1, step );
+		nextY = roundClamp( nextY, 0, 1, step );
+
+		const nextPercentage = {
+			x: nextX,
+			y: nextY,
+		};
+
+		this.updateValue( nextPercentage );
 	}
 	pickerDimensions() {
-		if ( this.containerRef.current ) {
+		const containerNode = this.containerRef.current;
+
+		if ( ! containerNode ) {
 			return {
-				width: this.containerRef.current.clientWidth,
-				height: this.containerRef.current.clientHeight,
-				top:
-					this.containerRef.current.getBoundingClientRect().top +
-					document.body.scrollTop,
-				left: this.containerRef.current.getBoundingClientRect().left,
+				width: 0,
+				height: 0,
+				left: 0,
+				top: 0,
 			};
 		}
+
+		const { clientHeight, clientWidth } = containerNode;
+		const { top, left } = containerNode.getBoundingClientRect();
+
 		return {
-			width: 0,
-			height: 0,
-			left: 0,
-			top: 0,
+			width: clientWidth,
+			height: clientHeight,
+			top: top + document.body.scrollTop,
+			left,
 		};
 	}
-	handleFocusOutside() {
-		this.setState( {
-			isDragging: false,
-		} );
-	}
-	render() {
-		const { instanceId, url, value, label, help, className } = this.props;
-		const { bounds, isDragging, percentages } = this.state;
+	iconCoordinates() {
+		const { value } = this.props;
+		const { bounds } = this.state;
+
+		if ( bounds.left === undefined || bounds.top === undefined ) {
+			return {
+				left: '50%',
+				top: '50%',
+			};
+		}
+
 		const pickerDimensions = this.pickerDimensions();
 		const iconCoordinates = {
 			left:
@@ -177,114 +250,98 @@ export class FocalPointPicker extends Component {
 				value.y * ( pickerDimensions.height - bounds.top * 2 ) +
 				bounds.top,
 		};
-		const iconContainerStyle = {
-			left: `${ iconCoordinates.left }px`,
-			top: `${ iconCoordinates.top }px`,
-		};
-		const iconContainerClasses = classnames(
-			'components-focal-point-picker__icon_container',
-			isDragging ? 'is-dragging' : null
+
+		return iconCoordinates;
+	}
+	// Callback method for the withFocusOutside higher-order component
+	handleFocusOutside() {
+		this.setState( {
+			isDragging: false,
+		} );
+	}
+	render() {
+		const {
+			autoPlay,
+			className,
+			help,
+			instanceId,
+			label,
+			onDragStart,
+			onDragEnd,
+			url,
+		} = this.props;
+		const { bounds, isDragging, percentages } = this.state;
+		const iconCoordinates = this.iconCoordinates();
+
+		const classes = classnames(
+			'components-focal-point-picker-control',
+			className
 		);
+
 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
-		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
-		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
+
 		return (
 			<BaseControl
 				label={ label }
 				id={ id }
 				help={ help }
-				className={ className }
+				className={ classes }
 			>
-				<div className="components-focal-point-picker-wrapper">
-					<div
+				<MediaWrapper className="components-focal-point-picker-wrapper">
+					<MediaContainer
 						className="components-focal-point-picker"
-						onMouseDown={ () =>
-							this.setState( { isDragging: true } )
-						}
-						onDragStart={ () =>
-							this.setState( { isDragging: true } )
-						}
-						onMouseUp={ () =>
-							this.setState( { isDragging: false } )
-						}
-						onDrop={ () => this.setState( { isDragging: false } ) }
+						onDragStart={ ( event ) => {
+							this.setState( { isDragging: true } );
+							onDragStart( event );
+						} }
+						onDrop={ ( event ) => {
+							this.setState( { isDragging: false } );
+							onDragEnd( event );
+						} }
+						onKeyDown={ this.handleOnKeyDown }
+						onMouseDown={ this.handleOnClick }
 						onMouseMove={ this.onMouseMove }
+						onMouseUp={ this.handleOnMouseUp }
 						ref={ this.containerRef }
 						role="button"
 						tabIndex="-1"
 					>
-						<img
-							alt="Dimensions helper"
-							onLoad={ this.onLoad }
-							ref={ this.imageRef }
+						<Grid
+							bounds={ bounds }
+							value={ percentages.x + percentages.y }
+						/>
+						<Media
+							alt={ __( 'Media preview' ) }
+							autoPlay={ autoPlay }
+							mediaRef={ this.mediaRef }
+							onLoad={ this.updateBounds }
 							src={ url }
-							draggable="false"
 						/>
-						<div
-							className={ iconContainerClasses }
-							style={ iconContainerStyle }
-						>
-							<SVG
-								className="components-focal-point-picker__icon"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 30 30"
-							>
-								<Path
-									className="components-focal-point-picker__icon-outline"
-									d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"
-								/>
-								<Path
-									className="components-focal-point-picker__icon-fill"
-									d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z"
-								/>
-							</SVG>
-						</div>
-					</div>
-				</div>
-				<div className="components-focal-point-picker_position-display-container">
-					<BaseControl
-						label={ __( 'Horizontal pos.' ) }
-						id={ horizontalPositionId }
-					>
-						<input
-							className="components-text-control__input"
-							id={ horizontalPositionId }
-							max={ TEXTCONTROL_MAX }
-							min={ TEXTCONTROL_MIN }
-							onChange={ this.horizontalPositionChanged }
-							type="number"
-							value={ this.fractionToPercentage( percentages.x ) }
+						<FocalPoint
+							coordinates={ iconCoordinates }
+							isDragging={ isDragging }
 						/>
-						<span>%</span>
-					</BaseControl>
-					<BaseControl
-						label={ __( 'Vertical pos.' ) }
-						id={ verticalPositionId }
-					>
-						<input
-							className="components-text-control__input"
-							id={ verticalPositionId }
-							max={ TEXTCONTROL_MAX }
-							min={ TEXTCONTROL_MIN }
-							onChange={ this.verticalPositionChanged }
-							type="number"
-							value={ this.fractionToPercentage( percentages.y ) }
-						/>
-						<span>%</span>
-					</BaseControl>
-				</div>
+					</MediaContainer>
+				</MediaWrapper>
+				<Controls
+					percentages={ percentages }
+					onChange={ this.updateValue }
+				/>
 			</BaseControl>
 		);
 	}
 }
 
 FocalPointPicker.defaultProps = {
-	url: null,
+	autoPlay: true,
+	onDragStart: noop,
+	onDragEnd: noop,
+	onChange: noop,
 	value: {
 		x: 0.5,
 		y: 0.5,
 	},
-	onChange: () => {},
+	url: null,
 };
 
 export default compose( [ withInstanceId, withFocusOutside ] )(

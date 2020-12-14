@@ -19,12 +19,13 @@ import AutoHeightBlockPreview from './auto';
 export function BlockPreview( {
 	blocks,
 	__experimentalPadding = 0,
-	viewportWidth = 700,
+	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
 } ) {
-	const settings = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
+	const settings = useSelect(
+		( select ) => select( 'core/block-editor' ).getSettings(),
+		[]
 	);
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {

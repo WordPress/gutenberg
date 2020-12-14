@@ -2,6 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
+const { pickBy, mapValues } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -17,10 +18,16 @@ const git = require( '../lib/git' );
 const config = require( '../config' );
 
 /**
+ * @typedef WPPerformanceCommandOptions
+ *
+ * @property {boolean=} ci          Run on CI.
+ * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
+ */
+
+/**
  * @typedef WPRawPerformanceResults
  *
  * @property {number[]} load             Load Time.
- * @property {number[]} domcontentloaded DOM Contentloaded time.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
  */
@@ -29,7 +36,6 @@ const config = require( '../config' );
  * @typedef WPPerformanceResults
  *
  * @property {number} load             Load Time.
- * @property {number} domcontentloaded DOM Contentloaded time.
  * @property {number} type             Average type time.
  * @property {number} minType          Minium type time.
  * @property {number} maxType          Maximum type time.
@@ -40,14 +46,13 @@ const config = require( '../config' );
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string} load             Load Time.
- * @property {string} domcontentloaded DOM Contentloaded time.
- * @property {string} type             Average type time.
- * @property {string} minType          Minium type time.
- * @property {string} maxType          Maximum type time.
- * @property {string} focus            Average block selection time.
- * @property {string} minFocus         Min block selection time.
- * @property {string} maxFocus         Max block selection time.
+ * @property {string=} load             Load Time.
+ * @property {string=} type             Average type time.
+ * @property {string=} minType          Minium type time.
+ * @property {string=} maxType          Maximum type time.
+ * @property {string=} focus            Average block selection time.
+ * @property {string=} minFocus         Min block selection time.
+ * @property {string=} maxFocus         Max block selection time.
  */
 
 /**
@@ -58,7 +63,7 @@ const config = require( '../config' );
  * @return {number} Average.
  */
 function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
+	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
 }
 
 /**
@@ -98,7 +103,6 @@ function formatTime( number ) {
 function curateResults( results ) {
 	return {
 		load: average( results.load ),
-		domcontentloaded: average( results.domcontentloaded ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
@@ -109,19 +113,12 @@ function curateResults( results ) {
 }
 
 /**
- * Runs the performance tests on a given branch.
+ * Set up the given branch for testing.
  *
- * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} environmentDirectory     Path to the plugin environment's clone.
  * @param {string} branch                   Branch name.
- *
- * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
+ * @param {string} environmentDirectory     Path to the plugin environment's clone.
  */
-async function getPerformanceResultsForBranch(
-	performanceTestDirectory,
-	environmentDirectory,
-	branch
-) {
+async function setUpGitBranch( branch, environmentDirectory ) {
 	// Restore clean working directory (e.g. if `package-lock.json` has local
 	// changes after install).
 	await git.discardLocalChanges( environmentDirectory );
@@ -134,45 +131,58 @@ async function getPerformanceResultsForBranch(
 		'rm -rf node_modules && npm install && npm run build',
 		environmentDirectory
 	);
+}
 
-	log(
-		'>> Running the test on the ' + formats.success( branch ) + ' branch'
-	);
+/**
+ * Runs the performance tests on the current branch.
+ *
+ * @param {string} testSuite                Name of the tests set.
+ * @param {string} performanceTestDirectory Path to the performance tests' clone.
+ *
+ * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
+ */
+async function runTestSuite( testSuite, performanceTestDirectory ) {
 	const results = [];
 	for ( let i = 0; i < 3; i++ ) {
 		await runShellScript(
-			'npm run test-performance',
+			`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 			performanceTestDirectory
 		);
 		const rawResults = await readJSONFile(
 			path.join(
 				performanceTestDirectory,
-				'packages/e2e-tests/specs/performance/results.json'
+				`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 			)
 		);
 		results.push( curateResults( rawResults ) );
 	}
 
-	return {
-		load: formatTime( median( results.map( ( r ) => r.load ) ) ),
-		domcontentloaded: formatTime(
-			median( results.map( ( r ) => r.domcontentloaded ) )
-		),
-		type: formatTime( median( results.map( ( r ) => r.type ) ) ),
-		minType: formatTime( median( results.map( ( r ) => r.minType ) ) ),
-		maxType: formatTime( median( results.map( ( r ) => r.maxType ) ) ),
-		focus: formatTime( median( results.map( ( r ) => r.focus ) ) ),
-		minFocus: formatTime( median( results.map( ( r ) => r.minFocus ) ) ),
-		maxFocus: formatTime( median( results.map( ( r ) => r.maxFocus ) ) ),
-	};
+	const medians = mapValues(
+		{
+			load: results.map( ( r ) => r.load ),
+			type: results.map( ( r ) => r.type ),
+			minType: results.map( ( r ) => r.minType ),
+			maxType: results.map( ( r ) => r.maxType ),
+			focus: results.map( ( r ) => r.focus ),
+			minFocus: results.map( ( r ) => r.minFocus ),
+			maxFocus: results.map( ( r ) => r.maxFocus ),
+		},
+		median
+	);
+
+	// Remove results for which we don't have data (and where the statistical functions thus returned NaN or Infinity etc).
+	const finiteMedians = pickBy( medians, isFinite );
+	// Format results as times.
+	return mapValues( finiteMedians, formatTime );
 }
 
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {string[]} branches Branches to compare
+ * @param {WPPerformanceCommandOptions} options Command options.
+ * @param {string[]}                    branches Branches to compare
  */
-async function runPerformanceTests( branches ) {
+async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
 		branches = [ 'master' ];
@@ -185,10 +195,25 @@ async function runPerformanceTests( branches ) {
 			'Make sure these ports are not used before continuing.\n'
 	);
 
-	await askForConfirmation( 'Ready to go? ' );
+	if ( ! options.ci ) {
+		await askForConfirmation( 'Ready to go? ' );
+	}
 
 	log( '>> Cloning the repository' );
 	const performanceTestDirectory = await git.clone( config.gitRepositoryURL );
+
+	if ( !! options.testsBranch ) {
+		log(
+			'>> Fetching the ' +
+				formats.success( options.testsBranch ) +
+				' branch'
+		);
+		await git.checkoutRemoteBranch(
+			performanceTestDirectory,
+			options.testsBranch
+		);
+	}
+
 	const environmentDirectory = getRandomTemporaryPath();
 	log(
 		'>> Perf Tests Directory : ' +
@@ -211,21 +236,40 @@ async function runPerformanceTests( branches ) {
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
-	/** @type {Record<string, WPFormattedPerformanceResults>} */
-	const results = {};
+	const testSuites = [ 'post-editor', 'site-editor' ];
+
+	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
+	let results = {};
 	for ( const branch of branches ) {
-		results[ branch ] = await getPerformanceResultsForBranch(
-			performanceTestDirectory,
-			environmentDirectory,
-			branch
+		await setUpGitBranch( branch, environmentDirectory );
+		log(
+			'>> Running the test on the ' +
+				formats.success( branch ) +
+				' branch'
 		);
+
+		for ( const testSuite of testSuites ) {
+			results = {
+				...results,
+				[ testSuite ]: {
+					...results[ testSuite ],
+					[ branch ]: await runTestSuite(
+						testSuite,
+						performanceTestDirectory
+					),
+				},
+			};
+		}
 	}
 
 	log( '>> Stopping the WordPress environment' );
 	await runShellScript( 'npm run wp-env stop', environmentDirectory );
 
 	log( '\n>> 🎉 Results.\n' );
-	console.table( results );
+	for ( const testSuite of testSuites ) {
+		log( `\n>> ${ testSuite }\n` );
+		console.table( results[ testSuite ] );
+	}
 }
 
 module.exports = {

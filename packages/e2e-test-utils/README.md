@@ -24,13 +24,33 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
+
+Activates an installed theme.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled**
 
 Verifies if publish checks are enabled.
 
 _Returns_
 
--   `boolean`: Boolean which represents the state of prepublish checks.
+-   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
+
+<a name="changeSiteTimezone" href="#changeSiteTimezone">#</a> **changeSiteTimezone**
+
+Visits general settings page and changes the timezone to the given value.
+
+_Parameters_
+
+-   _timezone_ `string`: Value of the timezone to set.
+
+_Returns_
+
+-   `string`: Value of the previous timezone.
 
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
@@ -46,7 +66,8 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   _buttonAriaLabel_ `string`: The aria label of the button to click.
+-   _label_ `string`: The text string of the button label.
+-   _type_ `[string]`: The type of button label: 'ariaLabel' or 'content'.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 
@@ -55,6 +76,14 @@ Clicks a button based on the text on the button.
 _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
+
+<a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
+
+Searches for an item in the menu with the text provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
 
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton**
 
@@ -106,7 +135,12 @@ Creates new post.
 
 _Parameters_
 
--   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _object_ `Object`: Object to create new post, along with tips enabling option.
+-   _object.postType_ `[string]`: Post type of the new post.
+-   _object.title_ `[string]`: Title of the new post.
+-   _object.content_ `[string]`: Content of the new post.
+-   _object.excerpt_ `[string]`: Excerpt of the new post.
+-   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
@@ -140,6 +174,17 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
+
+Deletes a theme from the site, activating another theme if necessary.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _settings.newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
@@ -248,6 +293,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
+<a name="getCurrentPostContent" href="#getCurrentPostContent">#</a> **getCurrentPostContent**
+
+Returns a promise which resolves with the current post content (HTML string).
+
+_Returns_
+
+-   `Promise`: Promise resolving with current post content markup.
+
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -288,10 +341,30 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="insertBlockDirectoryBlock" href="#insertBlockDirectoryBlock">#</a> **insertBlockDirectoryBlock**
+
+Opens the inserter, searches for the given block, then selects the
+first result that appears from the block directory. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
 
 Opens the inserter, searches for the given pattern, then selects the first
 result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertReusableBlock" href="#insertReusableBlock">#</a> **insertReusableBlock**
+
+Opens the inserter, searches for the given reusable block, then selects the
+first result that appears. It then waits briefly for the block list to
+update.
 
 _Parameters_
 
@@ -305,6 +378,16 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 -   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
+
+<a name="installTheme" href="#installTheme">#</a> **installTheme**
+
+Installs a theme from the WP.org repository.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
 
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 
@@ -330,6 +413,18 @@ _Returns_
 <a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
 
 Undocumented declaration.
+
+<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
+
+Checks whether a theme exists on the site.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug to check.
+
+_Returns_
+
+-   `boolean`: Whether the theme exists.
 
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
@@ -362,6 +457,18 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 <a name="openGlobalBlockInserter" href="#openGlobalBlockInserter">#</a> **openGlobalBlockInserter**
 
 Opens the global block inserter.
+
+<a name="openPreviewPage" href="#openPreviewPage">#</a> **openPreviewPage**
+
+Opens the preview page of an edited post.
+
+_Parameters_
+
+-   _editorPage_ `Page`: puppeteer editor page.
+
+_Returns_
+
+-   `Page`: preview page.
 
 <a name="openPublishPanel" href="#openPublishPanel">#</a> **openPublishPanel**
 
@@ -429,6 +536,14 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="searchForReusableBlock" href="#searchForReusableBlock">#</a> **searchForReusableBlock**
+
+Search for reusable block in the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="selectBlockByClientId" href="#selectBlockByClientId">#</a> **selectBlockByClientId**
 
 Given the clientId of a block, selects the block on the editor.
@@ -444,6 +559,17 @@ Sets browser viewport to specified type.
 _Parameters_
 
 -   _viewport_ `WPViewport`: Viewport name or dimensions object to assign.
+
+<a name="setClipboardData" href="#setClipboardData">#</a> **setClipboardData**
+
+Sets the clipboard data that can be pasted with
+`pressKeyWithModifier( 'primary', 'v' )`.
+
+_Parameters_
+
+-   _$1_ `Object`: Options.
+-   _$1.plainText_ `string`: Plain text to set.
+-   _$1.html_ `string`: HTML to set.
 
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent**
 
@@ -486,6 +612,11 @@ _Parameters_
 
 -   _mocks_ `Array`: Array of mock settings.
 
+<a name="showBlockToolbar" href="#showBlockToolbar">#</a> **showBlockToolbar**
+
+The block toolbar is not always visible while typing.
+Call this function to reveal it.
+
 <a name="switchEditorModeTo" href="#switchEditorModeTo">#</a> **switchEditorModeTo**
 
 Switches editor mode.
@@ -503,6 +634,10 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
+
+<a name="toggleGlobalBlockInserter" href="#toggleGlobalBlockInserter">#</a> **toggleGlobalBlockInserter**
+
+Toggles the global inserter.
 
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 
@@ -528,6 +663,19 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+<a name="trashAllPosts" href="#trashAllPosts">#</a> **trashAllPosts**
+
+Navigates to the post listing screen and bulk-trashes any posts which exist.
+
+_Parameters_
+
+-   _postType_ `string`: String slug for type of post to trash.
+-   _postStatus_ `string`: String status of posts to trash.
+
+_Returns_
+
+-   `Promise`: Promise resolving once posts have been trashed.
 
 <a name="uninstallPlugin" href="#uninstallPlugin">#</a> **uninstallPlugin**
 

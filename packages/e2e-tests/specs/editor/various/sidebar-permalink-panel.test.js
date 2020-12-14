@@ -9,6 +9,8 @@ import {
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
+const permalinkPanelXPath = `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"Permalink")]`;
+
 // This tests are not together with the remaining sidebar tests,
 // because we need to publish/save a post, to correctly test the permalink panel.
 // The sidebar test suit enforces that focus is never lost, but during save operations
@@ -28,9 +30,7 @@ describe( 'Sidebar Permalink Panel', () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 			removeEditorPanel( 'post-link' );
 		} );
-		expect(
-			await findSidebarPanelWithTitle( 'Permalink' )
-		).toBeUndefined();
+		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
 	it( 'should not render link panel when post is publicly queryable but not public', async () => {
@@ -39,9 +39,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect(
-			await findSidebarPanelWithTitle( 'Permalink' )
-		).toBeUndefined();
+		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
 	it( 'should not render link panel when post is public but not publicly queryable', async () => {
@@ -50,9 +48,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect(
-			await findSidebarPanelWithTitle( 'Permalink' )
-		).toBeUndefined();
+		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
 	it( 'should render link panel when post is public and publicly queryable', async () => {

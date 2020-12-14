@@ -28,7 +28,7 @@ import {
 describe( 'align', () => {
 	const blockSettings = {
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
@@ -74,6 +74,18 @@ describe( 'align', () => {
 			] );
 		} );
 
+		it( 'should return all aligns sorted when provided in the random order', () => {
+			expect(
+				getValidAlignments( [
+					'full',
+					'right',
+					'center',
+					'wide',
+					'left',
+				] )
+			).toEqual( [ 'left', 'center', 'right', 'wide', 'full' ] );
+		} );
+
 		it( 'should return all aligns if block defines align support as true', () => {
 			expect( getValidAlignments( true ) ).toEqual( [
 				'left',
@@ -83,7 +95,6 @@ describe( 'align', () => {
 				'full',
 			] );
 		} );
-
 		it( 'should return all aligns except wide if wide align explicitly false on the block', () => {
 			expect( getValidAlignments( true, false, true ) ).toEqual( [
 				'left',

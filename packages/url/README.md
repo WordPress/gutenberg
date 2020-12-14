@@ -37,6 +37,36 @@ _Returns_
 
 -   `string`: URL with arguments applied.
 
+<a name="buildQueryString" href="#buildQueryString">#</a> **buildQueryString**
+
+Generates URL-encoded query string using input query data.
+
+It is intended to behave equivalent as PHP's `http_build_query`, configured
+with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
+
+_Usage_
+
+```js
+const queryString = buildQueryString( {
+   simple: 'is ok',
+   arrays: [ 'are', 'fine', 'too' ],
+   objects: {
+      evenNested: {
+         ok: 'yes',
+      },
+   },
+} );
+// "simple=is%20ok&arrays%5B0%5D=are&arrays%5B1%5D=fine&arrays%5B2%5D=too&objects%5BevenNested%5D%5Bok%5D=yes"
+```
+
+_Parameters_
+
+-   _data_ `Record<string,*>`: Data to encode.
+
+_Returns_
+
+-   `string`: Query string.
+
 <a name="cleanForSlug" href="#cleanForSlug">#</a> **cleanForSlug**
 
 Performs some basic cleanup of a string for use as a post slug.
@@ -133,6 +163,25 @@ _Returns_
 
 -   `(string|void)`: The path part of the URL.
 
+<a name="getPathAndQueryString" href="#getPathAndQueryString">#</a> **getPathAndQueryString**
+
+Returns the path part and query string part of the URL.
+
+_Usage_
+
+```js
+const pathAndQueryString1 = getPathAndQueryString( 'http://localhost:8080/this/is/a/test?query=true' ); // '/this/is/a/test?query=true'
+const pathAndQueryString2 = getPathAndQueryString( 'https://wordpress.org/help/faq/' ); // '/help/faq'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string`: The path part and query string part of the URL.
+
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 
 Returns the protocol part of the URL.
@@ -169,7 +218,27 @@ _Parameters_
 
 _Returns_
 
--   `(QueryArgParsed|undefined)`: Query arg value.
+-   `(QueryArgParsed|void)`: Query arg value.
+
+<a name="getQueryArgs" href="#getQueryArgs">#</a> **getQueryArgs**
+
+Returns an object of query arguments of the given URL. If the given URL is
+invalid or has no querystring, an empty object is returned.
+
+_Usage_
+
+```js
+const foo = getQueryArgs( 'https://wordpress.org?foo=bar&bar=baz' );
+// { "foo": "bar", "bar": "baz" }
+```
+
+_Parameters_
+
+-   _url_ `string`: URL.
+
+_Returns_
+
+-   `QueryArgs`: Query args object.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 

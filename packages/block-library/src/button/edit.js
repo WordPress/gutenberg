@@ -9,6 +9,8 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import {
+	Button,
+	ButtonGroup,
 	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
@@ -22,11 +24,12 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
 	__experimentalLinkControl as LinkControl,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { link } from '@wordpress/icons';
+import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -40,10 +43,17 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
 
+const EMPTY_ARRAY = [];
+
 function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const initialBorderRadius = borderRadius;
 	const setBorderRadius = useCallback(
 		( newBorderRadius ) => {
-			setAttributes( { borderRadius: newBorderRadius } );
+			if ( newBorderRadius === undefined )
+				setAttributes( {
+					borderRadius: initialBorderRadius,
+				} );
+			else setAttributes( { borderRadius: newBorderRadius } );
 		},
 		[ setAttributes ]
 	);
@@ -62,6 +72,35 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
+
+		// Update attributes
+		setAttributes( { width } );
+	}
+
+	return (
+		<PanelBody title={ __( 'Width settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button width' ) }>
+				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+					return (
+						<Button
+							key={ widthValue }
+							isSmall
+							isPrimary={ widthValue === selectedWidth }
+							onClick={ () => handleChange( widthValue ) }
+						>
+							{ widthValue }%
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
+		</PanelBody>
+	);
+}
+
 function URLPicker( {
 	isSelected,
 	url,
@@ -70,13 +109,21 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	const urlIsSet = !! url;
+	const urlIsSetandSelected = urlIsSet && isSelected;
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
-
-		// prevents default behaviour for event
-		return false;
+		return false; // prevents default behaviour for event
 	};
-	const linkControl = isURLPickerOpen && (
+	const unlinkButton = () => {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsURLPickerOpen( false );
+	};
+	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
@@ -101,13 +148,25 @@ function URLPicker( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
-					/>
+					{ ! urlIsSet && (
+						<ToolbarButton
+							name="link"
+							icon={ link }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ openLinkControl }
+						/>
+					) }
+					{ urlIsSetandSelected && (
+						<ToolbarButton
+							name="link"
+							icon={ linkOff }
+							title={ __( 'Unlink' ) }
+							shortcut={ displayShortcut.primaryShift( 'k' ) }
+							onClick={ unlinkButton }
+							isActive={ true }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			{ isSelected && (
@@ -115,6 +174,7 @@ function URLPicker( {
 					bindGlobal
 					shortcuts={ {
 						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
 			) }
@@ -139,6 +199,7 @@ function ButtonEdit( props ) {
 		rel,
 		text,
 		url,
+		width,
 	} = attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
@@ -146,6 +207,7 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -166,13 +228,20 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const blockProps = useBlockProps();
 
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<Block.div>
+			<div
+				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+				} ) }
+			>
 				<RichText
+					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
@@ -201,7 +270,7 @@ function ButtonEdit( props ) {
 					onMerge={ mergeBlocks }
 					identifier="text"
 				/>
-			</Block.div>
+			</div>
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }
@@ -212,6 +281,10 @@ function ButtonEdit( props ) {
 			<InspectorControls>
 				<BorderPanel
 					borderRadius={ borderRadius }
+					setAttributes={ setAttributes }
+				/>
+				<WidthPanel
+					selectedWidth={ width }
 					setAttributes={ setAttributes }
 				/>
 				<PanelBody title={ __( 'Link settings' ) }>

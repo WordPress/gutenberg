@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/cover",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"url": {
 			"type": "string"
@@ -9,6 +10,10 @@
 			"type": "number"
 		},
 		"hasParallax": {
+			"type": "boolean",
+			"default": false
+		},
+		"isRepeated": {
 			"type": "boolean",
 			"default": false
 		},
@@ -46,8 +51,13 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"html": false,
-		"lightBlockWrapper": true
-	}
+		"spacing": {
+			"padding": true
+		}
+	},
+	"editorStyle": "wp-block-cover-editor",
+	"style": "wp-block-cover"
 }

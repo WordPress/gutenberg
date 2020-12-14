@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import { isNumber, isString } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,18 +21,20 @@ import VisuallyHidden from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
+const MAX_FONT_SIZE_DISPLAY = '25px';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
-		const fontSizeValue = fontSizes.find(
-			( font ) => font.size === Number( value )
-		);
+		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
 		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
 	}
 	return DEFAULT_FONT_SIZE;
 }
 
 function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+	if ( disableCustomFontSizes && ! optionsArray.length ) {
+		return null;
+	}
 	optionsArray = [
 		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
 		...optionsArray,
@@ -37,7 +45,10 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,
 		name: option.name,
-		style: { fontSize: option.size },
+		size: option.size,
+		style: {
+			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+		},
 	} ) );
 }
 
@@ -49,13 +60,30 @@ export default function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
-	const instanceId = useInstanceId( FontSizePicker );
+	const hasUnits =
+		isString( value ) ||
+		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
 
-	if ( disableCustomFontSizes && ! fontSizes.length ) {
-		return null;
+	let noUnitsValue;
+	if ( ! hasUnits ) {
+		noUnitsValue = value;
+	} else {
+		noUnitsValue = parseInt( value );
 	}
 
-	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
+	const isPixelValue =
+		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
+
+	const instanceId = useInstanceId( FontSizePicker );
+
+	const options = useMemo(
+		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
+		[ fontSizes, disableCustomFontSizes ]
+	);
+
+	if ( ! options ) {
+		return null;
+	}
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
 
@@ -68,16 +96,17 @@ export default function FontSizePicker( {
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
-						label={ __( 'Preset size' ) }
+						label={ __( 'Font size' ) }
 						options={ options }
 						value={ options.find(
 							( option ) => option.key === selectedFontSizeSlug
 						) }
 						onChange={ ( { selectedItem } ) => {
-							const selectedValue =
-								selectedItem.style &&
-								selectedItem.style.fontSize;
-							onChange( Number( selectedValue ) );
+							if ( hasUnits ) {
+								onChange( selectedItem.size );
+							} else {
+								onChange( Number( selectedItem.size ) );
+							}
 						} }
 					/>
 				) }
@@ -92,10 +121,21 @@ export default function FontSizePicker( {
 							type="number"
 							min={ 1 }
 							onChange={ ( event ) => {
-								onChange( Number( event.target.value ) );
+								if (
+									! event.target.value &&
+									event.target.value !== 0
+								) {
+									onChange( undefined );
+									return;
+								}
+								if ( hasUnits ) {
+									onChange( event.target.value + 'px' );
+								} else {
+									onChange( Number( event.target.value ) );
+								}
 							} }
 							aria-label={ __( 'Custom' ) }
-							value={ value || '' }
+							value={ ( isPixelValue && noUnitsValue ) || '' }
 						/>
 					</div>
 				) }
@@ -115,10 +155,10 @@ export default function FontSizePicker( {
 				<RangeControl
 					className="components-font-size-picker__custom-input"
 					label={ __( 'Custom Size' ) }
-					value={ value || '' }
+					value={ ( isPixelValue && noUnitsValue ) || '' }
 					initialPosition={ fallbackFontSize }
 					onChange={ ( newValue ) => {
-						onChange( newValue );
+						onChange( hasUnits ? newValue + 'px' : newValue );
 					} }
 					min={ 12 }
 					max={ 100 }

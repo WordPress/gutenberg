@@ -34,8 +34,8 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 					mode: 'production',
 					optimization: {
 						minimize: false,
-						namedChunks: true,
-						namedModules: true,
+						chunkIds: 'named',
+						moduleIds: 'named',
 					},
 					output: {},
 				},
@@ -66,10 +66,18 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 					).toMatchSnapshot( 'Asset file should match snapshot' );
 				} );
 
+				const compareByModuleIdentifier = ( m1, m2 ) => {
+					const i1 = m1.identifier();
+					const i2 = m2.identifier();
+					if ( i1 < i2 ) return -1;
+					if ( i1 > i2 ) return 1;
+					return 0;
+				};
+
 				// Webpack stats external modules should match.
 				const externalModules = stats.compilation.modules
-					.filter( ( { external } ) => external )
-					.sort()
+					.filter( ( { externalType } ) => externalType )
+					.sort( compareByModuleIdentifier )
 					.map( ( module ) => ( {
 						externalType: module.externalType,
 						request: module.request,

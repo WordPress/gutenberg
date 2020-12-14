@@ -186,7 +186,7 @@ describe( 'Tooltip', () => {
 				target: wrapper.find( 'button > span' ).getDOMNode(),
 			} );
 
-			expect( originalMouseEnter ).toHaveBeenCalled();
+			expect( originalMouseEnter ).not.toHaveBeenCalled();
 
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();

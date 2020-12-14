@@ -34,9 +34,9 @@
 		padding: 0 #{ $block-padding + $button-size } 0 0;
 
 		// Use opacity to work in various editor styles.
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 		.is-dark-theme & {
-			color: $light-opacity-300;
+			color: $light-gray-placeholder;
 		}
 	}
 

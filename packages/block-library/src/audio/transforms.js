@@ -32,8 +32,10 @@ const transforms = {
 			attributes: {
 				src: {
 					type: 'string',
-					shortcode: ( { named: { src } } ) => {
-						return src;
+					shortcode: ( {
+						named: { src, mp3, m4a, ogg, wav, wma },
+					} ) => {
+						return src || mp3 || m4a || ogg || wav || wma;
 					},
 				},
 				loop: {

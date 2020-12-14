@@ -6,159 +6,279 @@ import {
 	insertBlock,
 	disablePrePublishChecks,
 	visitAdminPage,
+	trashAllPosts,
+	activateTheme,
+	getAllBlocks,
+	selectBlockByClientId,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Template Part', () => {
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
-
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone-blocks' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	describe( 'Template part block', () => {
-		beforeEach( () =>
-			visitAdminPage(
+		beforeEach( async () => {
+			await visitAdminPage(
 				'admin.php',
 				addQueryArgs( '', {
 					page: 'gutenberg-edit-site',
 				} ).slice( 1 )
-			)
-		);
+			);
+			await page.waitForSelector( '.edit-site-visual-editor' );
+		} );
 
-		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+		async function updateHeader( content ) {
 			// Switch to editing the header template part.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
-			const [ switchToHeaderTemplatePartButton ] = await page.$x(
-				'//button[contains(text(), "header")]'
-			);
-			await switchToHeaderTemplatePartButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Template Parts' );
+			await navigationPanel.clickItemByText( 'header' );
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Header Template Part 123' );
+			await page.keyboard.type( content );
 
-			// Save it, without saving the front page template.
+			// Save it.
 			await page.click( '.edit-site-save-button__button' );
-			const reviewChangesButton = await page.waitForSelector(
-				'.entities-saved-states__review-changes-button'
-			);
-			await reviewChangesButton.click();
-			const [ frontPageCheckbox ] = await page.$x(
-				'//strong[contains(text(),"Front Page")]/../preceding-sibling::span/input'
-			);
-			await frontPageCheckbox.click();
 			await page.click( '.editor-entities-saved-states__save-button' );
 			await page.waitForSelector(
 				'.edit-site-save-button__button:not(.is-busy)'
 			);
 
 			// Switch back to the front page template.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Templates' );
+			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.close();
+		}
+
+		async function triggerEllipsisMenuItem( textPrompt ) {
+			await clickBlockToolbarButton( 'More options' );
+			const button = await page.waitForXPath(
+				`//span[contains(text(), "${ textPrompt }")]`
 			);
-			const [ switchToFrontPageTemplateButton ] = await page.$x(
-				'//button[contains(text(), "front-page")]'
+			await button.click();
+		}
+
+		async function createParagraphAndGetClientId( content ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( content );
+			const allBlocks = await getAllBlocks();
+			const paragraphBlock = allBlocks.find(
+				( block ) =>
+					block.name === 'core/paragraph' &&
+					block.attributes.content === content
 			);
-			await switchToFrontPageTemplateButton.click();
+			return paragraphBlock.clientId;
+		}
+
+		async function assertParagraphInTemplatePart( content ) {
+			const paragraphInTemplatePart = await page.waitForXPath(
+				`//*[@data-type="core/template-part"][//p[text()="${ content }"]]`
+			);
+			expect( paragraphInTemplatePart ).not.toBeNull();
+		}
+
+		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+			await updateHeader( 'Header Template Part 123' );
 
 			// Verify that the header template part is updated.
-			const [ headerTemplatePart ] = await page.$x(
-				'//*[@data-type="core/template-part"][//p[text()="Header Template Part123"]]'
+			await assertParagraphInTemplatePart( 'Header Template Part 123' );
+		} );
+
+		it( 'Should detach blocks from template part', async () => {
+			await updateHeader( 'Header Template Part 456' );
+
+			const initialTemplateParts = await page.$$(
+				'.wp-block-template-part'
 			);
-			expect( headerTemplatePart ).not.toBeNull();
+
+			// Select the header template part block.
+			const allBlocks = await getAllBlocks();
+			const headerBlock = allBlocks.find(
+				( block ) => block.name === 'core/template-part'
+			);
+			await selectBlockByClientId( headerBlock.clientId );
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
+
+			// Detach blocks from template part using ellipsis menu.
+			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
+
+			// Verify there is one less template part on the page.
+			const finalTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				initialTemplateParts.length - finalTemplateParts.length
+			).toBe( 1 );
+
+			// Verify content of the template part is still present.
+			const [ expectedContent ] = await page.$x(
+				'//p[contains(text(), "Header Template Part 456")]'
+			);
+			expect( expectedContent ).not.toBeUndefined();
+		} );
+
+		it( 'Should convert selected block to template part', async () => {
+			await page.waitForSelector( '.wp-block-template-part' );
+			const initialTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+
+			// Add some block and select it.
+			const clientId = await createParagraphAndGetClientId(
+				'Some block...'
+			);
+			await selectBlockByClientId( clientId );
+
+			// Convert block to a template part.
+			await triggerEllipsisMenuItem( 'Make template part' );
+
+			// Verify new template part is created with expected content.
+			await assertParagraphInTemplatePart( 'Some block...' );
+
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
+
+			// Verify there is 1 more template part on the page than previously.
+			const finalTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				finalTemplateParts.length - initialTemplateParts.length
+			).toBe( 1 );
+		} );
+
+		it( 'Should convert multiple selected blocks to template part', async () => {
+			await page.waitForSelector( '.wp-block-template-part' );
+			const initialTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+
+			// Add two blocks and select them.
+			const block1Id = await createParagraphAndGetClientId(
+				'Some block #1'
+			);
+			const block2Id = await createParagraphAndGetClientId(
+				'Some block #2'
+			);
+			await page.evaluate(
+				( id1, id2 ) => {
+					wp.data
+						.dispatch( 'core/block-editor' )
+						.multiSelect( id1, id2 );
+				},
+				block1Id,
+				block2Id
+			);
+
+			// Convert block to a template part.
+			await triggerEllipsisMenuItem( 'Make template part' );
+
+			// Verify new template part is created with expected content.
+			await assertParagraphInTemplatePart( 'Some block #1' );
+			await assertParagraphInTemplatePart( 'Some block #2' );
+
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
+
+			// Verify there is 1 more template part on the page than previously.
+			const finalTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				finalTemplateParts.length - initialTemplateParts.length
+			).toBe( 1 );
 		} );
 	} );
 
 	describe( 'Template part placeholder', () => {
 		// Test constants for template part.
-		const testSlug = 'test-template-part';
-		const testTheme = 'test-theme';
 		const testContent = 'some words...';
 
 		// Selectors
-		const chooseButtonSelector =
-			'//div[contains(@class,"is-selected")]//button[text()="Choose"]';
 		const entitiesSaveSelector =
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
-		const templatePartButtonSelector = `${ templatePartSelector } button`;
+		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
+		const createNewButtonSelector =
+			'//button[contains(text(), "New template part")]';
+		const chooseExistingButtonSelector =
+			'//button[contains(text(), "Choose existing")]';
 
-		it( 'Should prompt to create when no match found', async () => {
+		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Create'
-			const placeholderButton = await page.$(
-				templatePartButtonSelector
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
 			);
-			const text = await page.evaluate(
-				( element ) => element.textContent,
-				placeholderButton
+			await createNewButton.click();
+
+			const newTemplatePart = await page.waitForSelector(
+				activatedTemplatePartSelector
 			);
-			expect( text ).toBe( 'Create' );
+			expect( newTemplatePart ).toBeTruthy();
 
 			// Finish creating template part, insert some text, and save.
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Enter' );
-			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.click( templatePartSelector );
+			await page.click( '.block-editor-button-block-appender' );
+			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
-		} );
 
-		it( 'Should prompt to Choose when match found', async () => {
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
+
 			await createNewPost();
-			await disablePrePublishChecks();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Choose'
-			const placeholderButton = await page.waitForXPath(
-				chooseButtonSelector
+			const [ chooseExistingButton ] = await page.$x(
+				chooseExistingButtonSelector
 			);
-			expect( placeholderButton ).not.toBeNull();
-		} );
-
-		it( 'Should dispaly a preview when match is found', async () => {
-			const [ preview ] = await page.$x( testContentSelector );
+			await chooseExistingButton.click();
+			const preview = await page.waitForXPath( testContentSelector );
 			expect( preview ).toBeTruthy();
-		} );
 
-		it( 'Should insert the desired template part', async () => {
-			const [ placeholderButton ] = await page.$x( chooseButtonSelector );
-			await placeholderButton.click();
+			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();
+
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
 		} );
 	} );
 } );

@@ -22,7 +22,7 @@ export default function createElement( type ) {
 			} while (
 				! isHidden &&
 				node &&
-				node.nodeType === window.Node.ELEMENT_NODE
+				node.nodeType === node.ELEMENT_NODE
 			);
 
 			return isHidden ? elseValue : value;

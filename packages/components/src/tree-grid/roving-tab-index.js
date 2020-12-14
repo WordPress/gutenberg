@@ -9,7 +9,12 @@ import { useState, useMemo } from '@wordpress/element';
 import { RovingTabIndexProvider } from './roving-tab-index-context';
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/roving-tab-index/README.md
+ * Provider for adding roving tab index behaviors to tree grid structures.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
+ *
+ * @param {Object}    props          Component props.
+ * @param {WPElement} props.children Children to be rendered
  */
 export default function RovingTabIndex( { children } ) {
 	const [ lastFocusedElement, setLastFocusedElement ] = useState();

@@ -7,10 +7,12 @@ import { button as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import transforms from './transforms';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -23,7 +25,21 @@ export const settings = {
 	),
 	icon,
 	keywords: [ __( 'link' ) ],
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/button',
+				attributes: { text: __( 'Find out more' ) },
+			},
+			{
+				name: 'core/button',
+				attributes: { text: __( 'Contact us' ) },
+			},
+		],
+	},
+	deprecated,
 	transforms,
 	edit,
 	save,
+	variations,
 };

@@ -23,26 +23,30 @@ function PostLink( {
 	onTogglePanel,
 	isEditable,
 	postLink,
-	permalinkParts,
+	permalinkPrefix,
+	permalinkSuffix,
 	editPermalink,
 	forceEmptyField,
 	setState,
 	postSlug,
 	postTypeLabel,
 } ) {
-	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
 	if ( isEditable ) {
-		prefixElement = prefix && (
-			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
+		prefixElement = permalinkPrefix && (
+			<span className="edit-post-post-link__link-prefix">
+				{ permalinkPrefix }
+			</span>
 		);
 		postNameElement = postSlug && (
 			<span className="edit-post-post-link__link-post-name">
 				{ postSlug }
 			</span>
 		);
-		suffixElement = suffix && (
-			<span className="edit-post-post-link__link-suffix">{ suffix }</span>
+		suffixElement = permalinkSuffix && (
+			<span className="edit-post-post-link__link-suffix">
+				{ permalinkSuffix }
+			</span>
 		);
 	}
 
@@ -137,21 +141,24 @@ export default compose( [
 
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
+		const permalinkParts = getPermalinkParts();
 
 		return {
 			postLink: link,
 			isEditable: isPermalinkEditable(),
 			isPublished: isCurrentPostPublished(),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
-			permalinkParts: getPermalinkParts(),
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
 			postSlug: safeDecodeURIComponent( getEditedPostSlug() ),
 			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
+			hasPermalinkParts: !! permalinkParts,
+			permalinkPrefix: permalinkParts?.prefix,
+			permalinkSuffix: permalinkParts?.suffix,
 		};
 	} ),
-	ifCondition( ( { isEnabled, postLink, isViewable, permalinkParts } ) => {
-		return isEnabled && postLink && isViewable && permalinkParts;
+	ifCondition( ( { isEnabled, postLink, isViewable, hasPermalinkParts } ) => {
+		return isEnabled && postLink && isViewable && hasPermalinkParts;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -16,7 +16,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 		const { getBlockName, getSelectedBlockClientIds } = select(
 			'core/block-editor'
 		);
-		const { getBlockType } = select( 'core/blocks' );
+		const { getBlockType } = select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		return {
@@ -24,7 +24,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 		};
-	} );
+	}, [] );
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;

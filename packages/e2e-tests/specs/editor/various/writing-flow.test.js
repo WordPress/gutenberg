@@ -8,6 +8,8 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	insertBlock,
+	clickBlockToolbarButton,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -21,12 +23,15 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( '/columns' );
+	await page.waitForXPath(
+		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
+	);
 	await page.keyboard.press( 'Enter' );
 	await page.click( ':focus [aria-label="Two columns; equal split"]' );
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
 	await page.keyboard.type( 'Paragraph' );
-	await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
@@ -37,7 +42,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.click( ':focus .block-editor-button-block-appender' );
 	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
 	await page.keyboard.type( 'Paragraph' );
-	await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
 	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
@@ -392,6 +397,18 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should navigate contenteditable with normal line height', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => {
+			document.activeElement.style.lineHeight = 'normal';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should not prematurely multi-select', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
@@ -402,6 +419,17 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressKeyTimes( 'ArrowLeft', '<<\n<<<'.length );
 		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should merge paragraphs', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -550,5 +578,45 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not have a dead zone above an aligned block', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/image' );
+		await page.keyboard.press( 'Enter' );
+		await clickBlockToolbarButton( 'Change alignment' );
+		await clickButton( 'Wide width' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Confirm correct setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraphRect = await paragraph.boundingBox();
+		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
+		const y = paragraphRect.y + paragraphRect.height + 1;
+
+		await page.mouse.move( x, y );
+		await page.waitForSelector(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
+
+		const inserter = await page.$(
+			'.block-editor-block-list__insertion-point-inserter'
+		);
+		const inserterRect = await inserter.boundingBox();
+		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
+
+		await page.mouse.click( x, lowerInserterY );
+
+		const type = await page.evaluate( () =>
+			document.activeElement.getAttribute( 'data-type' )
+		);
+
+		expect( type ).toBe( 'core/image' );
 	} );
 } );

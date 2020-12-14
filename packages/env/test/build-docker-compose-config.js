@@ -9,7 +9,6 @@ const CONFIG = {
 	pluginSources: [],
 	themeSources: [],
 	port: 8888,
-	testsPort: 8889,
 	configDirectoryPath: '/path/to/config',
 };
 
@@ -26,7 +25,9 @@ describe( 'buildDockerComposeConfig', () => {
 				{ path: '/path/to/local/plugin', basename: 'test-name' },
 			],
 		};
-		const dockerConfig = buildDockerComposeConfig( envConfig );
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
 		const { volumes } = dockerConfig.services.wordpress;
 		expect( volumes ).toEqual( [
 			'wordpress:/var/www/html', // WordPress root
@@ -50,7 +51,9 @@ describe( 'buildDockerComposeConfig', () => {
 				{ path: '/path/to/local/theme', basename: 'test-theme' },
 			],
 		};
-		const dockerConfig = buildDockerComposeConfig( envConfig );
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
 		const devVolumes = dockerConfig.services.wordpress.volumes;
 		const cliVolumes = dockerConfig.services.cli.volumes;
 		expect( devVolumes ).toEqual( cliVolumes );

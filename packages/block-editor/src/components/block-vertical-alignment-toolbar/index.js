@@ -12,26 +12,24 @@ import { alignTop, alignCenter, alignBottom } from './icons';
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
 		icon: alignTop,
-		title: _x( 'Vertically Align Top', 'Block vertical alignment setting' ),
+		title: _x( 'Align top', 'Block vertical alignment setting' ),
 	},
 	center: {
 		icon: alignCenter,
-		title: _x(
-			'Vertically Align Middle',
-			'Block vertical alignment setting'
-		),
+		title: _x( 'Align middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
 		icon: alignBottom,
-		title: _x(
-			'Vertically Align Bottom',
-			'Block vertical alignment setting'
-		),
+		title: _x( 'Align bottom', 'Block vertical alignment setting' ),
 	},
 };
 
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
+
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
 
 export function BlockVerticalAlignmentToolbar( {
 	value,
@@ -49,6 +47,7 @@ export function BlockVerticalAlignmentToolbar( {
 
 	return (
 		<ToolbarGroup
+			popoverProps={ POPOVER_PROPS }
 			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignment

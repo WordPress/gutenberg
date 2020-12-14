@@ -6,17 +6,24 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { apiFetch, select } from './controls';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
+	{
+		label: __( 'Base' ),
+		name: '__unstableBase',
+		kind: 'root',
+		baseURL: '',
+	},
 	{
 		label: __( 'Site' ),
 		name: 'site',
@@ -49,12 +56,20 @@ export const defaultEntities = [
 		label: __( 'Taxonomy' ),
 	},
 	{
-		name: 'widgetArea',
+		name: 'sidebar',
 		kind: 'root',
-		baseURL: '/__experimental/widget-areas',
-		plural: 'widgetAreas',
+		baseURL: '/wp/v2/sidebars',
+		plural: 'sidebars',
 		transientEdits: { blocks: true },
-		label: __( 'Widget area' ),
+		label: __( 'Widget areas' ),
+	},
+	{
+		name: 'widget',
+		kind: 'root',
+		baseURL: '/wp/v2/widgets',
+		plural: 'widgets',
+		transientEdits: { blocks: true },
+		label: __( 'Widgets' ),
 	},
 	{
 		label: __( 'User' ),
@@ -100,6 +115,69 @@ export const kinds = [
 ];
 
 /**
+ * Returns a function to be used to retrieve the title of a given post type record.
+ *
+ * @param {string} postTypeName PostType name.
+ * @return {Function} getTitle.
+ */
+export const getPostTypeTitle = ( postTypeName ) => ( record ) => {
+	if ( [ 'wp_template_part', 'wp_template' ].includes( postTypeName ) ) {
+		return (
+			record?.title?.rendered || record?.title || startCase( record.slug )
+		);
+	}
+	return record?.title?.rendered || record?.title || String( record.id );
+};
+
+/**
+ * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
+ *
+ * @param {string} postTypeName PostType name.
+ * @return {Function} prePersistHandler.
+ */
+export const getPostTypePrePersistHandler = ( postTypeName ) => (
+	persistedRecord,
+	edits
+) => {
+	const newEdits = {};
+
+	// Fix template titles.
+	if (
+		[ 'wp_template', 'wp_template_part' ].includes( postTypeName ) &&
+		! edits.title &&
+		! persistedRecord.title
+	) {
+		newEdits.title = persistedRecord
+			? getPostTypeTitle( postTypeName )( persistedRecord )
+			: edits.slug;
+	}
+
+	// Templates and template parts can only be published.
+	if ( [ 'wp_template', 'wp_template_part' ].includes( postTypeName ) ) {
+		newEdits.status = 'publish';
+	}
+
+	if ( persistedRecord?.status === 'auto-draft' ) {
+		// Saving an auto-draft should create a draft by default.
+		if ( ! edits.status && ! newEdits.status ) {
+			newEdits.status = 'draft';
+		}
+
+		// Fix the auto-draft default title.
+		if (
+			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			! newEdits.title &&
+			( ! persistedRecord?.title ||
+				persistedRecord?.title === 'Auto Draft' )
+		) {
+			newEdits.title = '';
+		}
+	}
+
+	return newEdits;
+};
+
+/**
  * Returns the list of post type entities.
  *
  * @return {Promise} Entities promise
@@ -118,12 +196,8 @@ function* loadPostTypeEntities() {
 				selectionEnd: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle( record ) {
-				if ( name === 'wp_template_part' || name === 'wp_template' ) {
-					return startCase( record.slug );
-				}
-				return get( record, [ 'title', 'rendered' ], record.id );
-			},
+			getTitle: getPostTypeTitle( name ),
+			__unstablePrePersist: getPostTypePrePersistHandler( name ),
 		};
 	} );
 }
@@ -182,7 +256,7 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield select( 'getEntitiesByKind', kind );
+	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

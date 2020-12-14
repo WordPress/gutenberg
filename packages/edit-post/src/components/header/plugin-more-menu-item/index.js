@@ -1,30 +1,9 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { ActionItem } from '@wordpress/interface';
 import { compose } from '@wordpress/compose';
-import { MenuItem } from '@wordpress/components';
 import { withPluginContext } from '@wordpress/plugins';
-
-/**
- * Internal dependencies
- */
-import PluginsMoreMenuGroup from '../plugins-more-menu-group';
-
-const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
-	<PluginsMoreMenuGroup>
-		{ ( fillProps ) => (
-			<MenuItem
-				{ ...props }
-				onClick={ compose( onClick, fillProps.onClose ) }
-			/>
-		) }
-	</PluginsMoreMenuGroup>
-);
 
 /**
  * Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.
@@ -88,6 +67,7 @@ export default compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
+			name: 'core/edit-post/plugin-more-menu',
 		};
 	} )
-)( PluginMoreMenuItem );
+)( ActionItem );

@@ -1,25 +1,21 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { __experimentalGradientPicker } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { __experimentalGradientPicker as GradientPicker } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import useEditorFeature from '../use-editor-feature';
+
+const EMPTY_ARRAY = [];
 
 function GradientPickerWithGradients( props ) {
-	const { gradients, disableCustomGradients } = useSelect(
-		( select ) =>
-			pick( select( 'core/block-editor' ).getSettings(), [
-				'gradients',
-				'disableCustomGradients',
-			] ),
-		[]
-	);
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
+
 	return (
-		<__experimentalGradientPicker
+		<GradientPicker
 			gradients={
 				props.gradients !== undefined ? props.gradient : gradients
 			}
@@ -37,7 +33,7 @@ export default function ( props ) {
 	const ComponentToUse =
 		props.gradients !== undefined &&
 		props.disableCustomGradients !== undefined
-			? __experimentalGradientPicker
+			? GradientPicker
 			: GradientPickerWithGradients;
 	return <ComponentToUse { ...props } />;
 }

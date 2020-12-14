@@ -11,8 +11,7 @@
                     "text": "#1b9b6c",
                     "background": "#aa5a20"
                 }
-            },
-            "align": "none"
+            }
         },
         "innerBlocks": [],
         "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link no-border-radius has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a></div>"

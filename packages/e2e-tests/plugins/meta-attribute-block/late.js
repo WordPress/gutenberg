@@ -5,7 +5,7 @@
 	registerBlockType( 'test/test-meta-attribute-block-late', {
 		title: 'Test Meta Attribute Block (Late Registration)',
 		icon: 'star',
-		category: 'common',
+		category: 'text',
 
 		attributes: {
 			content: {

@@ -20,6 +20,7 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
+import { defaultLayout, LayoutProvider } from './layout';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -36,7 +37,7 @@ function UncontrolledInnerBlocks( props ) {
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
-		__experimentalMoverDirection,
+		orientation,
 		renderAppender,
 		renderFooterAppender,
 		parentWidth,
@@ -48,10 +49,13 @@ function UncontrolledInnerBlocks( props ) {
 		marginVertical,
 		marginHorizontal,
 		horizontalAlignment,
+		filterInnerBlocks,
+		__experimentalLayout: layout = defaultLayout,
 	} = props;
 
-	const block = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getBlock( clientId )
+	const block = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		[ clientId ]
 	) || { innerBlocks: [] };
 
 	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
@@ -71,7 +75,7 @@ function UncontrolledInnerBlocks( props ) {
 			renderAppender={ renderAppender }
 			renderFooterAppender={ renderFooterAppender }
 			withFooter={ false }
-			__experimentalMoverDirection={ __experimentalMoverDirection }
+			orientation={ orientation }
 			parentWidth={ parentWidth }
 			horizontalAlignment={ horizontalAlignment }
 			horizontal={ horizontal }
@@ -79,6 +83,7 @@ function UncontrolledInnerBlocks( props ) {
 			contentStyle={ contentStyle }
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
+			filterInnerBlocks={ filterInnerBlocks }
 		/>
 	);
 
@@ -88,9 +93,11 @@ function UncontrolledInnerBlocks( props ) {
 		const context = getBlockContext( block.attributes, blockType );
 
 		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
+			<LayoutProvider value={ layout }>
+				<BlockContextProvider value={ context }>
+					{ blockList }
+				</BlockContextProvider>
+			</LayoutProvider>
 		);
 	}
 

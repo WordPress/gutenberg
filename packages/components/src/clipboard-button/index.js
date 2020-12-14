@@ -33,7 +33,7 @@ export default function ClipboardButton( {
 
 		if ( hasCopied ) {
 			onCopy();
-		} else {
+		} else if ( onFinishCopy ) {
 			onFinishCopy();
 		}
 

@@ -15,6 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Author' ),
+	description: __( 'Add the author of this post.' ),
 	icon,
 	edit,
 };

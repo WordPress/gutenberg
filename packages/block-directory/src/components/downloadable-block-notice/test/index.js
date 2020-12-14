@@ -35,7 +35,9 @@ describe( 'DownloadableBlockNotice', () => {
 		} );
 
 		it( 'should return something when there are error notices', () => {
-			useSelect.mockImplementation( () => 'Plugin not found.' );
+			useSelect.mockImplementation( () => {
+				return { message: 'Plugin not found.', isFatal: false };
+			} );
 			const wrapper = shallow(
 				<DownloadableBlockNotice
 					block={ plugin }

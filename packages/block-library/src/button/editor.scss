@@ -20,7 +20,7 @@
 
 	// Add outline to button on focus to indicate focus-state
 	&:focus {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px var(--wp-admin-theme-color);
 
 		// Windows' High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
@@ -34,7 +34,7 @@
 }
 
 .wp-block-button__inline-link {
-	color: $dark-gray-500;
+	color: $gray-700;
 	height: 0;
 	overflow: hidden;
 	max-width: 290px;
@@ -64,6 +64,16 @@
 		height: auto;
 		overflow: visible;
 		margin-top: $grid-unit-20;
+	}
+}
+
+.wp-button-label__width {
+	.components-button-group {
+		display: block;
+	}
+
+	.components-base-control__field {
+		margin-bottom: 12px;
 	}
 }
 

@@ -13,17 +13,13 @@ import {
 	MediaUploadProgress,
 } from '@wordpress/block-editor';
 
-function MediaProgress( { height, width, url, id } ) {
+function MediaProgress( { url, id } ) {
 	return (
 		<MediaUploadProgress
-			height={ height }
-			width={ width }
-			coverUrl={ url }
 			mediaId={ id }
-			renderContent={ ( { isUploadFailed, finalWidth, finalHeight, retryMessage } ) => {
+			renderContent={ ( { isUploadFailed, retryMessage } ) => {
 				return (
 					<ImageBackground
-						style={ { width: finalWidth, height: finalHeight } }
 						resizeMethod="scale"
 						source={ { uri: url } }
 					>
@@ -50,14 +46,6 @@ A media ID that identifies the current upload.
 - Required: Yes
 - Platform: Mobile
 
-### coverUrl
-
-By passing an image url, it'll calculate the right size depending on the container of the component maintaining its aspect ratio, it'll pass these values through `renderContent`.
-
-- Type: `String`
-- Required: No
-- Platform: Mobile
-
 ### renderContent
 
 Content to be rendered along with the progress bar, usually the thumbnail of the media being uploaded.
@@ -68,30 +56,7 @@ Content to be rendered along with the progress bar, usually the thumbnail of the
 
 It passes an object containing the following properties:
 
-**With** `coverUrl` as a parameter:
-
-`{ isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage }`
-
-**Without** `coverUrl` as a parameter:
-
 `{ isUploadInProgress, isUploadFailed, retryMessage }`
-
-
-### width
-
-Forces the final width to be returned in `finalWidth`
-
-- Type: `Number`
-- Required: No
-- Platform: Mobile
-
-### height
-
-Forces the final height to be returned in `finalHeight`
-
-- Type: `Number`
-- Required: No
-- Platform: Mobile
 
 ### onUpdateMediaProgress
 

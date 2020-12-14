@@ -48,6 +48,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -60,6 +61,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -72,6 +74,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.url,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -93,6 +96,7 @@ const transforms = {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -112,6 +116,7 @@ const transforms = {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -131,6 +136,7 @@ const transforms = {
 					url: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},

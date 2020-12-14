@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, includes, without } from 'lodash';
+import { has, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
@@ -59,7 +58,9 @@ export function getValidAlignments(
 ) {
 	let validAlignments;
 	if ( Array.isArray( blockAlign ) ) {
-		validAlignments = blockAlign;
+		validAlignments = ALL_ALIGNMENTS.filter( ( value ) =>
+			blockAlign.includes( value )
+		);
 	} else if ( blockAlign === true ) {
 		// `true` includes all alignments...
 		validAlignments = ALL_ALIGNMENTS;
@@ -94,19 +95,15 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			align: {
 				type: 'string',
+				// Allow for '' since it is used by updateAlignment function
+				// in withToolbarControls for special cases with defined default values.
+				enum: [ ...ALL_ALIGNMENTS, '' ],
 			},
 		};
 	}
 
 	return settings;
 }
-
-const AlignmentHookSettings = createContext( {} );
-
-/**
- * Allows to pass additional settings to the alignment hook.
- */
-export const AlignmentHookSettingsProvider = AlignmentHookSettings.Provider;
 
 /**
  * Override the default edit UI to include new toolbar controls for block
@@ -117,26 +114,20 @@ export const AlignmentHookSettingsProvider = AlignmentHookSettings.Provider;
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { isEmbedButton } = useContext( AlignmentHookSettings );
 		const { name: blockName } = props;
 		// Compute valid alignments without taking into account,
-		// if the theme supports wide alignments or not.
-		// BlockAlignmentToolbar takes into account the theme support.
-		const validAlignments = isEmbedButton
-			? []
-			: getValidAlignments(
-					getBlockSupport( blockName, 'align' ),
-					hasBlockSupport( blockName, 'alignWide', true )
-			  );
+		// if the theme supports wide alignments or not
+		// and without checking the layout for availble alignments.
+		// BlockAlignmentToolbar takes both of these into account.
+		const validAlignments = getValidAlignments(
+			getBlockSupport( blockName, 'align' ),
+			hasBlockSupport( blockName, 'alignWide', true )
+		);
 
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = get( blockType, [
-					'attributes',
-					'align',
-					'default',
-				] );
+				const blockDefaultAlign = blockType.attributes?.align?.default;
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}
@@ -189,7 +180,7 @@ export const withDataAlign = createHigherOrderComponent(
 		);
 
 		let wrapperProps = props.wrapperProps;
-		if ( includes( validAlignments, align ) ) {
+		if ( validAlignments.includes( align ) ) {
 			wrapperProps = { ...wrapperProps, 'data-align': align };
 		}
 
@@ -210,13 +201,14 @@ export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;
 	const blockAlign = getBlockSupport( blockType, 'align' );
 	const hasWideBlockSupport = hasBlockSupport( blockType, 'alignWide', true );
-	const isAlignValid = includes(
-		// Compute valid alignments without taking into account,
-		// if the theme supports wide alignments or not.
-		// This way changing themes does not impacts the block save.
-		getValidAlignments( blockAlign, hasWideBlockSupport ),
-		align
-	);
+
+	// Compute valid alignments without taking into account if
+	// the theme supports wide alignments or not.
+	// This way changing themes does not impact the block save.
+	const isAlignValid = getValidAlignments(
+		blockAlign,
+		hasWideBlockSupport
+	).includes( align );
 	if ( isAlignValid ) {
 		props.className = classnames( `align${ align }`, props.className );
 	}

@@ -4,6 +4,7 @@
 import { ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -72,14 +73,17 @@ import { __ } from '@wordpress/i18n';
  * ```
  */
 export default function PluginSidebarEditPost( { className, ...props } ) {
-	const { postTitle, shortcut } = useSelect( ( select ) => {
+	const { postTitle, shortcut, showIconLabels } = useSelect( ( select ) => {
 		return {
 			postTitle: select( 'core/editor' ).getEditedPostAttribute(
 				'title'
 			),
 			shortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		};
 	} );
 	return (
@@ -89,6 +93,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="core/edit-post"
 			toggleShortcut={ shortcut }
+			showIconLabels={ showIconLabels }
 			{ ...props }
 		/>
 	);

@@ -4,7 +4,19 @@
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 
-function ResizableBox( { className, showHandle = true, ...props } ) {
+/**
+ * Internal dependencies
+ */
+import ResizeTooltip from './resize-tooltip';
+
+function ResizableBox( {
+	className,
+	children,
+	showHandle = true,
+	__experimentalShowTooltip: showTooltip = false,
+	__experimentalTooltipProps: tooltipProps = {},
+	...props
+} ) {
 	// Removes the inline styles in the drag handles.
 	const handleStylesOverrides = {
 		width: null,
@@ -83,7 +95,10 @@ function ResizableBox( { className, showHandle = true, ...props } ) {
 				bottomLeft: handleStylesOverrides,
 			} }
 			{ ...props }
-		/>
+		>
+			{ children }
+			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
+		</Resizable>
 	);
 }
 

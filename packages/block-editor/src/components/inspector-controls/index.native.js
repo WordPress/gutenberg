@@ -10,12 +10,17 @@ import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import { useBlockEditContext } from '../block-edit/context';
 import { BlockSettingsButton } from '../block-settings';
 
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
 const FillWithSettingsButton = ( { children, ...props } ) => {
+	const { isSelected } = useBlockEditContext();
+	if ( ! isSelected ) {
+		return null;
+	}
+
 	return (
 		<>
 			<Fill { ...props }>
@@ -30,7 +35,7 @@ const FillWithSettingsButton = ( { children, ...props } ) => {
 	);
 };
 
-const InspectorControls = ifBlockEditSelected( FillWithSettingsButton );
+const InspectorControls = FillWithSettingsButton;
 
 InspectorControls.Slot = Slot;
 

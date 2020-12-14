@@ -18,6 +18,7 @@ import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
+import PostTemplate from '../post-template';
 
 /**
  * Module Constants
@@ -35,6 +36,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
+						<PostTemplate />
 						<PostVisibility />
 						<PostSchedule />
 						<PostFormat />
