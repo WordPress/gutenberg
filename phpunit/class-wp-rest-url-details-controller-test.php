@@ -318,7 +318,23 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	public function test_get_item_schema() {
+		wp_set_current_user( self::$admin_id );
 
+		$request  = new WP_REST_Request( 'OPTIONS', static::$route );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$endpoint = $data['endpoints'][0];
+
+		$this->assertArrayHasKey( 'url', $endpoint['args'] );
+		$this->assertArraySubset(
+			array(
+				'type'     => 'string',
+				'required' => true,
+				'format'   => 'uri',
+			),
+			$endpoint['args']['url']
+		);
 	}
 
 	public function provide_invalid_url_data() {
