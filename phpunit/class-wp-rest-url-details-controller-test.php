@@ -39,6 +39,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	protected static $route = '/__experimental/url-details';
 
+
+	protected static $url_placeholder = 'https://dummysite.com';
+
 	/**
 	 * Create fake data before our tests run.
 	 *
@@ -69,6 +72,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function setUp() {
 		parent::setUp();
+		add_filter( 'apply_filters', '__return_false' );
 		add_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10, 3 );
 	}
 
@@ -76,20 +80,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 * Tear down.
 	 */
 	public function tearDown() {
+		remove_filter( 'apply_filters', '__return_false' );
 		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
 		parent::tearDown();
-	}
-
-	public function mock_success_request_to_remote_url() {
-		return array(
-			'response'    => array( 'code' => 200 ),
-			'headers'     => array(),
-			'cookies'     => array(),
-			'filename'    => null,
-			'status_code' => 200,
-			'success'     => 1,
-			'body'        => file_get_contents( __DIR__ . '/fixtures/example-website.html' ),
-		);
 	}
 
 	public function test_register_routes() {
@@ -106,7 +99,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$request = new WP_REST_Request( 'GET', static::$route );
 		$request->set_query_params(
 			array(
-				'url' => 'https://examplewebsitedoesnotexist.org',
+				'url' => static::$url_placeholder,
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
@@ -126,7 +119,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$request = new WP_REST_Request( 'GET', static::$route );
 		$request->set_query_params(
 			array(
-				'url' => 'https://wordpress.org',
+				'url' => static::$url_placeholder,
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
@@ -164,8 +157,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 
-	public function test_get_items_fails_for_invalid_url() {
-		$this->markTestSkipped( 'must be revisited.' );
+	/**
+	 * @dataProvider provide_invalid_url_data
+	 */
+	public function test_get_items_fails_for_invalid_url( $expected, $invalid_url ) {
+
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', static::$route );
@@ -190,16 +186,14 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-	/**
-	 * @dataProvider provide_invalid_url_data
-	 */
-	public function test_get_items_fails_for_url_which_returns_non_200_status_code() {
+	public function test_get_items_fails_for_url_which_returns_a_non_200_status_code() {
+		$this->markTestSkipped( 'must be revisited.' );
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', static::$route );
 		$request->set_query_params(
 			array(
-				'url' => $invalid_url,
+				'url' => static::$url_placeholder,
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
@@ -241,5 +235,23 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	public function test_get_item_schema() {
 
+	}
+
+	/**
+	 * Mocks the HTTP response for the the `wp_safe_remote_get()` which
+	 * would otherwise make a call to a real website.
+	 *
+	 * @return array faux/mocked response.
+	 */
+	public function mock_success_request_to_remote_url() {
+		return array(
+			'response'    => array( 'code' => 200 ),
+			'headers'     => array(),
+			'cookies'     => array(),
+			'filename'    => null,
+			'status_code' => 200,
+			'success'     => 1,
+			'body'        => file_get_contents( __DIR__ . '/fixtures/example-website.html' ),
+		);
 	}
 }
