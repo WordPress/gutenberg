@@ -357,9 +357,19 @@ describe( 'adding blocks', () => {
 		await page.waitForSelector(
 			'.edit-post-header-toolbar__inserter-toggle:not(.is-pressed)'
 		);
+
+		// The inserter panel should've closed.
 		const inserterPanels = await page.$$(
 			'.edit-post-layout__inserter-panel'
 		);
 		expect( inserterPanels.length ).toBe( 0 );
+
+		// The editable 'Read More' text should be focused.
+		const isFocusInBlock = await page.evaluate( () =>
+			document
+				.querySelector( '[data-type="core/more"]' )
+				.contains( document.activeElement )
+		);
+		expect( isFocusInBlock ).toBe( true );
 	} );
 } );
