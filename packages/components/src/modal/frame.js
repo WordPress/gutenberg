@@ -19,7 +19,6 @@ import {
 /**
  * Internal dependencies
  */
-import IsolatedEventContainer from '../isolated-event-container';
 import withFocusOutside from '../higher-order/with-focus-outside';
 
 function ModalFrameContent( {
@@ -49,7 +48,8 @@ function ModalFrameContent( {
 	const focusReturnRef = useFocusReturn();
 
 	return (
-		<IsolatedEventContainer
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
 			className={ classnames(
 				'components-modal__screen-overlay',
 				overlayClassName
@@ -72,7 +72,7 @@ function ModalFrameContent( {
 			>
 				{ children }
 			</div>
-		</IsolatedEventContainer>
+		</div>
 	);
 }
 

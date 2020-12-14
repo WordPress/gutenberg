@@ -32,7 +32,6 @@ import { close } from '@wordpress/icons';
 import { computePopoverPosition } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
-import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
 
@@ -513,7 +512,9 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<IsolatedEventContainer
+		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
 			className={ classnames(
 				'components-popover',
 				className,
@@ -549,7 +550,7 @@ const Popover = ( {
 					{ children }
 				</div>
 			</div>
-		</IsolatedEventContainer>
+		</div>
 	);
 
 	if ( slot.ref ) {
