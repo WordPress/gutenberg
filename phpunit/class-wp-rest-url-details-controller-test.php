@@ -105,6 +105,8 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
+		// Note the <title> comes from the fixture HTML returned by
+		// the filter `pre_http_request`.
 		$this->assertEquals(
 			array(
 				'title' => 'Example Website &mdash; - with encoded content.',
@@ -133,8 +135,8 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 
 		$this->assertContains(
-			'you are not allowed to process remote urls',
-			$data['message']
+			strtolower( 'you are not allowed to process remote urls' ),
+			strtolower( $data['message'] )
 		);
 	}
 
@@ -181,34 +183,37 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 
 		$this->assertContains(
-			'Invalid parameter(s): url',
-			$data['message']
+			strtolower( 'Invalid parameter(s): url' ),
+			strtolower( $data['message'] )
 		);
 	}
 
 	public function test_get_items_fails_for_url_which_returns_a_non_200_status_code() {
-		$this->markTestSkipped( 'must be revisited.' );
+		// Force HTTP request to remote site to fail.
+		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
+		add_filter( 'pre_http_request', array( $this, 'mock_failed_request_to_remote_url' ), 10, 3 );
+
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', static::$route );
 		$request->set_query_params(
 			array(
-				'url' => static::$url_placeholder,
+				'url' => static::$url_placeholder, // note: `pre_http_request` causes request to 404.
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 400, $response->get_status() );
+		$this->assertEquals( 404, $response->get_status() );
 
 		$this->assertEquals(
-			'rest_invalid_param',
+			'no_response',
 			$data['code']
 		);
 
 		$this->assertContains(
-			'Invalid parameter(s): url',
-			$data['message']
+			strtolower( 'Not found' ),
+			strtolower( $data['message'] )
 		);
 	}
 
@@ -244,14 +249,30 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 * @return array faux/mocked response.
 	 */
 	public function mock_success_request_to_remote_url() {
+		return $this->mock_request_to_remote_url( 'success' );
+	}
+
+	public function mock_failed_request_to_remote_url() {
+		return $this->mock_request_to_remote_url( 'failure' );
+	}
+
+	public function mock_request_to_remote_url( $result_type = 'success' ) {
+
+		$types = array( 'success', 'failure' );
+
+		// Default to success.
+		if ( ! in_array( $result_type, $types, true ) ) {
+			$result_type = $types[0];
+		}
+
 		return array(
-			'response'    => array( 'code' => 200 ),
 			'headers'     => array(),
 			'cookies'     => array(),
 			'filename'    => null,
-			'status_code' => 200,
-			'success'     => 1,
-			'body'        => file_get_contents( __DIR__ . '/fixtures/example-website.html' ),
+			'response'    => array( 'code' => ( 'success' === $result_type ? 200 : 404 ) ),
+			'status_code' => 'success' === $result_type ? 200 : 404,
+			'success'     => 'success' === $result_type ? 1 : 0,
+			'body'        => 'success' === $result_type ? file_get_contents( __DIR__ . '/fixtures/example-website.html' ) : '',
 		);
 	}
 }
