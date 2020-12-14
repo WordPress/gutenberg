@@ -177,7 +177,7 @@
 	},
 	"core/group": {
 		"styles": {
-			"spacing": {
+			"box": {
 				"boxShadow": "10px 5px 5px red"
 			}
 		}
