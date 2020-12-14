@@ -41,10 +41,20 @@ function useFocusReturn( onFocusReturn ) {
 	}, [ onFocusReturn ] );
 
 	return useCallbackRef( ( node ) => {
-		if ( ! node ) {
-			const isFocused =
-				ref.current &&
-				ref.current.contains( ref.current.ownerDocument.activeElement );
+		if ( node ) {
+			// Set ref to be used when unmounting.
+			ref.current = node;
+
+			// Only set when the node mounts.
+			if ( focusedBeforeMount.current ) {
+				return;
+			}
+
+			focusedBeforeMount.current = node.ownerDocument.activeElement;
+		} else if ( focusedBeforeMount.current ) {
+			const isFocused = ref.current.contains(
+				ref.current.ownerDocument.activeElement
+			);
 
 			if ( ! isFocused ) {
 				return;
@@ -59,17 +69,7 @@ function useFocusReturn( onFocusReturn ) {
 			} else {
 				focusedBeforeMount.current.focus();
 			}
-
-			return;
 		}
-
-		ref.current = node;
-
-		if ( focusedBeforeMount.current ) {
-			return;
-		}
-
-		focusedBeforeMount.current = node.ownerDocument.activeElement;
 	}, [] );
 }
 
