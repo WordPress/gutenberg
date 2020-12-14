@@ -677,12 +677,17 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 		$processed = array();
 	}
 
-	// Early exit if this block-type has already been processed, or is null.
+	// Early return if this block-type has already been processed, or is null.
 	if ( isset( $parsed_block['blockName'] ) && ( ! $parsed_block['blockName'] || in_array( $parsed_block['blockName'], $processed, true ) ) ) {
 		return $parsed_block;
 	}
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+
+	// Early return if there is no style defined.
+	if ( empty( $block_type->style ) ) {
+		return $parsed_block;
+	}
 
 	/**
 	 * The load method.
@@ -696,35 +701,54 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 	$method = apply_filters( 'gutenberg_block_type_assets_load_method', $method, $block_type );
 
 	switch ( $method ) {
-		case 'inline':
-			if ( ! empty( $block_type->style ) ) {
+		case 'inline-footer':
+			add_action(
+				'wp_footer',
+				function() use ( $block_type ) {
+					global $wp_styles;
 
-				add_action(
-					'wp_footer',
-					function() use ( $block_type ) {
-						global $wp_styles;
+					$style = $wp_styles->registered[ $block_type->style ];
+					$path  = str_replace( trailingslashit( site_url() ), trailingslashit( ABSPATH ), $style->src );
 
-						$style = $wp_styles->registered[ $block_type->style ];
-						$path  = str_replace( trailingslashit( site_url() ), trailingslashit( ABSPATH ), $style->src );
+					if ( isset( $wp_styles->registered[ $block_type->style ] ) && file_exists( $path ) ) {
+						echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
+						include $path;
 
-						if ( isset( $wp_styles->registered[ $block_type->style ] ) && file_exists( $path ) ) {
-							echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
-							include $path;
-
-							if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
-								echo implode( '', $style->extra['after'] );
-							}
-
-							echo '</style>';
+						if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
+							echo implode( '', $style->extra['after'] );
 						}
-					},
-					1
-				);
-			}
+
+						echo '</style>';
+
+						unset( $wp_styles->registered[ $block_type->style ] );
+					}
+				},
+				1
+			);
+			break;
+
+		case 'async-head':
+			add_action(
+				'wp_footer',
+				function() use ( $block_type ) {
+					global $wp_styles;
+					$style = $wp_styles->registered[ $block_type->style ];
+
+					gutenberg_print_block_styles_injection_script();
+					echo "<script>wpEnqueueStyle('{$style->handle}', '{$style->src}', [], '{$style->ver}', '{$style->args}')</script>";
+
+					echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
+					if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
+						echo implode( '', $style->extra['after'] );
+					}
+					echo '</style>';
+				},
+				1
+			);
 			break;
 
 		default: // No need to do anything.
-			return $parsed_block;
+			break;
 	}
 
 	$processed[] = $parsed_block['blockName'];
@@ -732,3 +756,45 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 	return $parsed_block;
 }
 add_filter( 'render_block_data', 'gutenberg_modify_render_block_data_assets_loading' );
+
+/**
+ * Prints the JS script that allows us to enqueue/inject scripts directly.
+ *
+ * @return void
+ */
+function gutenberg_print_block_styles_injection_script() {
+	static $script_added;
+	if ( true === $script_added ) {
+		return;
+	}
+	?>
+	<script id="wp-enqueue-style-script">
+	function wpEnqueueStyle( handle, src, deps, ver, media ) {
+
+		// Create the element.
+		var style = document.createElement( 'link' ),
+			isFirst = ! window.wpEnqueueStyleLastInjectedEl,
+			injectEl = isFirst ? document.head : document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
+			injectPos = isFirst ? 'afterbegin' : 'afterend';
+
+		// Add element props for the stylesheet.
+		style.id = handle + '-css';
+		style.rel = 'stylesheet';
+		style.href = src;
+		if ( ver ) {
+			style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
+		}
+		style.media = media ? media : 'all';
+
+		// Set the global var so we know where to add the next style.
+		// This helps us preserve priorities and inject styles one after the other instead of reversed.
+		window.wpEnqueueStyleLastInjectedEl = handle + '-css';
+
+		// Inject the element.
+		injectEl.insertAdjacentElement( injectPos, style );
+	}
+	</script>
+	<?php
+
+	$script_added = true;
+}
