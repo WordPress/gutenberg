@@ -160,8 +160,7 @@ export function ImageEdit( {
 		}
 
 		// Check if default link setting should be used.
-		let linkDestination =
-			attributes.linkDestination || context.containerLinkTarget;
+		let linkDestination = attributes.linkDestination || context.linkTarget;
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
