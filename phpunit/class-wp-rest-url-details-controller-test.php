@@ -140,25 +140,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-
-	public function provide_invalid_url_data() {
-		return array(
-			'empty_url'          => array(
-				null,
-				'',
-			), // empty!
-			'not_a_string'       => array(
-				null,
-				1234456,
-			),
-			'string_but_invalid' => array(
-				null,
-				'invalid.proto://wordpress.org',
-			),
-		);
-	}
-
-
 	/**
 	 * @dataProvider provide_invalid_url_data
 	 */
@@ -217,6 +198,35 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+	public function test_get_items_fails_for_url_which_returns_empty_body_for_success() {
+		// Force HTTP request to remote site to return an empty body in response.
+		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
+		add_filter( 'pre_http_request', array( $this, 'mock_request_to_remote_url_with_empty_body_response' ), 10, 3 );
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder, // note: `pre_http_request` causes request to 404.
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 404, $response->get_status() );
+
+		$this->assertEquals(
+			'no_content',
+			$data['code']
+		);
+
+		$this->assertContains(
+			strtolower( 'Unable to retrieve body from response at this URL' ),
+			strtolower( $data['message'] )
+		);
+	}
+
 
 
 	public function test_get_item() {
@@ -242,6 +252,23 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	}
 
+	public function provide_invalid_url_data() {
+		return array(
+			'empty_url'          => array(
+				null,
+				'',
+			), // empty!
+			'not_a_string'       => array(
+				null,
+				1234456,
+			),
+			'string_but_invalid' => array(
+				null,
+				'invalid.proto://wordpress.org',
+			),
+		);
+	}
+
 	/**
 	 * Mocks the HTTP response for the the `wp_safe_remote_get()` which
 	 * would otherwise make a call to a real website.
@@ -256,22 +283,33 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		return $this->mock_request_to_remote_url( 'failure' );
 	}
 
+	public function mock_request_to_remote_url_with_empty_body_response() {
+		return $this->mock_request_to_remote_url( 'empty_body' );
+	}
+
 	public function mock_request_to_remote_url( $result_type = 'success' ) {
 
-		$types = array( 'success', 'failure' );
+		$types = array(
+			'success',
+			'failure',
+			'empty_body',
+		);
 
 		// Default to success.
 		if ( ! in_array( $result_type, $types, true ) ) {
 			$result_type = $types[0];
 		}
 
+		// Both should return 200 for the HTTP response.
+		$should_200 = 'success' === $result_type || 'empty_body' === $result_type;
+
 		return array(
 			'headers'     => array(),
 			'cookies'     => array(),
 			'filename'    => null,
-			'response'    => array( 'code' => ( 'success' === $result_type ? 200 : 404 ) ),
-			'status_code' => 'success' === $result_type ? 200 : 404,
-			'success'     => 'success' === $result_type ? 1 : 0,
+			'response'    => array( 'code' => ( $should_200 ? 200 : 404 ) ),
+			'status_code' => $should_200 ? 200 : 404,
+			'success'     => $should_200 ? 1 : 0,
 			'body'        => 'success' === $result_type ? file_get_contents( __DIR__ . '/fixtures/example-website.html' ) : '',
 		);
 	}
