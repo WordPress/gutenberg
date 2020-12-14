@@ -7,13 +7,14 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import * as wp from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import PostTextEditor from '../';
+import PostTextEditor, { THROTTLE_TIME } from '../';
 
+const useSelect = wp.useSelect;
 // "Downgrade" ReactAutosizeTextarea to a regular textarea. Assumes aligned
 // props interface.
 jest.mock( 'react-autosize-textarea', () => ( props ) => (
@@ -174,5 +175,29 @@ describe( 'PostTextEditor', () => {
 		act( () => textarea.props.onBlur() );
 
 		expect( textarea.props.value ).toBe( 'Goodbye World' );
+	} );
+	it( 'throttle value update after given time', () => {
+		let wrapper;
+		act( () => {
+			wrapper = create( <PostTextEditor /> );
+		} );
+		const mockDispatchFn = jest.fn();
+		const useDispatchSpy = new Proxy( wp, {
+			get( target, prop ) {
+				if ( prop === 'useDispatch' ) {
+					return {
+						editPost: jest.fn(),
+						resetEditorBlocks: mockDispatchFn,
+					};
+				}
+			},
+		} );
+
+		const textarea = wrapper.root.findByType( Textarea );
+		act( () => textarea.props.onChange( { target: { value: 'text' } } ) );
+		setTimeout( () => {
+			expect( mockDispatchFn ).toHaveBeenCalled();
+			useDispatchSpy.mockClear();
+		}, THROTTLE_TIME );
 	} );
 } );
