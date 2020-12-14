@@ -100,30 +100,6 @@ export default function useFocusOutside( onFocusOutside ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
-	 * @type {import('react').MutableRefObject<number | undefined>}
-	 */
-	const blurCheckTimeoutId = useRef();
-
-	/**
-	 * Cancel a blur check timeout.
-	 */
-	const cancelBlurCheck = useCallback( () => {
-		clearTimeout( blurCheckTimeoutId.current );
-	}, [] );
-
-	// Cancel blur checks on unmount.
-	useEffect( () => {
-		return () => cancelBlurCheck();
-	}, [] );
-
-	// Cancel a blur check if the callback or ref is no longer provided.
-	useEffect( () => {
-		if ( ! onFocusOutside ) {
-			cancelBlurCheck();
-		}
-	}, [ onFocusOutside, cancelBlurCheck ] );
-
-	/**
 	 * Handles a mousedown or mouseup event to respectively assign and
 	 * unassign a flag for preventing blur check on button elements. Some
 	 * browsers, namely Firefox and Safari, do not emit a focus event on
@@ -154,38 +130,31 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @param {SyntheticEvent} event Blur event.
 	 */
-	const queueBlurCheck = useCallback( ( event ) => {
-		// React does not allow using an event reference asynchronously
-		// due to recycling behavior, except when explicitly persisted.
-		event.persist();
+	const onBlur = useCallback( ( event ) => {
+		// Only consider the component blurred if the element receiving focus is
+		// outside the component.
+		// The current target is the element to which the event listener is
+		// attached. The related target is the element receiving focus.
+		// See https://w3c.github.io/uievents/#idl-focusevent.
+		if ( event.currentTarget.contains( event.relatedTarget ) ) {
+			return;
+		}
 
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
 		if ( preventBlurCheck.current ) {
 			return;
 		}
 
-		blurCheckTimeoutId.current = setTimeout( () => {
-			// If document is not focused then focus should remain
-			// inside the wrapped component and therefore we cancel
-			// this blur event thereby leaving focus in place.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( ! document.hasFocus() ) {
-				event.preventDefault();
-				return;
-			}
-
-			if ( 'function' === typeof currentOnFocusOutside.current ) {
-				currentOnFocusOutside.current( event );
-			}
-		}, 0 );
+		if ( 'function' === typeof currentOnFocusOutside.current ) {
+			currentOnFocusOutside.current( event );
+		}
 	}, [] );
 
 	return {
-		onFocus: cancelBlurCheck,
 		onMouseDown: normalizeButtonFocus,
 		onMouseUp: normalizeButtonFocus,
 		onTouchStart: normalizeButtonFocus,
 		onTouchEnd: normalizeButtonFocus,
-		onBlur: queueBlurCheck,
+		onBlur,
 	};
 }
