@@ -45,7 +45,10 @@ function InserterListItem( {
 					onClick();
 				} }
 				disabled={ isDisabled }
-				__experimentalIsFocusable
+				// Use the CompositeItem `focusable` prop over Button's
+				// isFocusable. The latter was shown to cause an issue
+				// with tab order in the inserter list.
+				focusable
 				{ ...props }
 			>
 				<span
