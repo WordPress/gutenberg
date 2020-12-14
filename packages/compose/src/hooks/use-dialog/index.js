@@ -6,7 +6,7 @@ import mergeRefs from 'react-merge-refs';
 /**
  * WordPress dependencies
  */
-import { useRef, useCallback, useEffect } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
@@ -16,6 +16,7 @@ import useConstrainedTabbing from '../use-constrained-tabbing';
 import useFocusOnMount from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
+import useCallbackRef from '../use-callback-ref';
 
 /**
  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
@@ -35,7 +36,7 @@ function useDialog( options ) {
 	const focusOnMountRef = useFocusOnMount();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( options.onClose );
-	const closeOnEscapeRef = useCallback( ( node ) => {
+	const closeOnEscapeRef = useCallbackRef( ( node ) => {
 		if ( ! node ) {
 			return;
 		}
