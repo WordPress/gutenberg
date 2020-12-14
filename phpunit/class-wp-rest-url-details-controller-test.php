@@ -118,6 +118,32 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+
+	public function test_get_items_fails_for_unauthenticated_user() {
+		wp_set_current_user( 0 );
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( WP_Http::UNAUTHORIZED, $response->get_status() );
+
+		$this->assertEquals(
+			'rest_user_cannot_view',
+			$data['code']
+		);
+
+		$this->assertContains(
+			strtolower( 'you are not allowed to process remote urls' ),
+			strtolower( $data['message'] )
+		);
+	}
+
 	public function test_get_items_fails_for_user_with_insufficient_permissions() {
 		wp_set_current_user( self::$subscriber_id );
 
@@ -130,7 +156,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 403, $response->get_status() );
+		$this->assertEquals( WP_Http::FORBIDDEN, $response->get_status() );
 
 		$this->assertEquals(
 			'rest_user_cannot_view',
@@ -159,7 +185,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 400, $response->get_status() );
+		$this->assertEquals( WP_Http::BAD_REQUEST, $response->get_status() );
 
 		$this->assertEquals(
 			'rest_invalid_param',
@@ -254,9 +280,10 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'url' => static::$url_placeholder,
 			)
 		);
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
 
+		rest_get_server()->dispatch( $request );
+
+		// Check the args were filtered as expected.
 		$this->assertArraySubset(
 			array(
 				'timeout'             => 27,
