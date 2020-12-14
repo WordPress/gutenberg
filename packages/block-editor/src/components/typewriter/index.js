@@ -2,25 +2,13 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
+import { computeCaretRect } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
-
-function computeCaretRectWithIframe( win ) {
-	const { frameElement } = win;
-	const caretRect = computeCaretRect( win );
-	const frameTop = frameElement
-		? frameElement.getBoundingClientRect().top
-		: 0;
-	return {
-		top: caretRect.top + frameTop,
-		height: caretRect.height,
-	};
-}
 
 export function useTypewriter( ref ) {
 	const hasSelectedBlock = useSelect( ( select ) =>
@@ -75,22 +63,22 @@ export function useTypewriter( ref ) {
 				return;
 			}
 
-			const currentCaretRect = computeCaretRectWithIframe( defaultView );
+			const currentCaretRect = computeCaretRect( defaultView );
 
 			if ( ! currentCaretRect ) {
 				return;
 			}
 
-			// If for some reason there is no position set to be scrolled to, let
-			// this be the position to be scrolled to in the future.
+			// If for some reason there is no position set to be scrolled to,
+			// let this be the position to be scrolled to in the future.
 			if ( ! caretRect ) {
 				caretRect = currentCaretRect;
 				return;
 			}
 
-			// Even though enabling the typewriter effect for arrow keys results in
-			// a pleasant experience, it may not be the case for everyone, so, for
-			// now, let's disable it.
+			// Even though enabling the typewriter effect for arrow keys results
+			// in a pleasant experience, it may not be the case for everyone,
+			// so, for now, let's disable it.
 			if ( arrowKeyCodes.has( keyCode ) ) {
 				// Reset the caret position to maintain.
 				caretRect = currentCaretRect;
@@ -103,39 +91,16 @@ export function useTypewriter( ref ) {
 				return;
 			}
 
-			const { frameElement } = defaultView;
+			const { scrollY, innerHeight } = defaultView;
+			const { top, height } = caretRect;
+			const relativeScrollPosition = top / innerHeight;
 
-			const scrollContainer = getScrollContainer(
-				frameElement || ref.current
-			);
-
-			// The page must be scrollable.
-			if ( ! scrollContainer ) {
-				return;
-			}
-
-			const caretTop = caretRect.top;
-
-			const scrollDocument = scrollContainer.ownerDocument;
-			const scrollWindow = scrollDocument.defaultView;
-			const windowScroll = scrollContainer === scrollDocument.body;
-			const scrollY = windowScroll
-				? scrollWindow.scrollY
-				: scrollContainer.scrollTop;
-			const scrollContainerY = windowScroll
-				? 0
-				: scrollContainer.getBoundingClientRect().top;
-			const relativeScrollPosition = windowScroll
-				? caretTop / scrollWindow.innerHeight
-				: ( caretTop - scrollContainerY ) /
-				  ( scrollWindow.innerHeight - scrollContainerY );
-
-			// If the scroll position is at the start, the active editable element
-			// is the last one, and the caret is positioned within the initial
-			// trigger percentage of the page, do not scroll the page.
-			// The typewriter effect should not kick in until an empty page has been
-			// filled with the initial trigger percentage or the user scrolls
-			// intentionally down.
+			// If the scroll position is at the start, the active editable
+			// element is the last one, and the caret is positioned within the
+			// initial trigger percentage of the page, do not scroll the page.
+			// The typewriter effect should not kick in until an empty page has
+			// been filled with the initial trigger percentage or the user
+			// scrolls intentionally down.
 			if (
 				scrollY === 0 &&
 				relativeScrollPosition < initialTriggerPercentage &&
@@ -146,29 +111,20 @@ export function useTypewriter( ref ) {
 				return;
 			}
 
-			const scrollContainerHeight = windowScroll
-				? defaultView.innerHeight
-				: scrollContainer.clientHeight;
-
 			// Abort if the target scroll position would scroll the caret out of
 			// view.
 			if (
 				// The caret is under the lower fold.
-				caretTop + caretRect.height >
-					scrollContainerY + scrollContainerHeight ||
+				top + height > innerHeight ||
 				// The caret is above the upper fold.
-				caretTop < scrollContainerY
+				top < 0
 			) {
 				// Reset the caret position to maintain.
 				caretRect = currentCaretRect;
 				return;
 			}
 
-			if ( windowScroll ) {
-				defaultView.scrollBy( 0, diff );
-			} else {
-				scrollContainer.scrollTop += diff;
-			}
+			defaultView.scrollBy( 0, diff );
 		}
 
 		/**
@@ -183,8 +139,9 @@ export function useTypewriter( ref ) {
 		}
 
 		/**
-		 * Resets the scroll position to be maintained during a `selectionchange`
-		 * event. Also removes the listener, so it acts as a one-time listener.
+		 * Resets the scroll position to be maintained during a
+		 * `selectionchange` event. Also removes the listener, so it acts as a
+		 * one-time listener.
 		 */
 		function computeCaretRectOnSelectionChange() {
 			ownerDocument.removeEventListener(
@@ -199,7 +156,7 @@ export function useTypewriter( ref ) {
 		 */
 		function computeCaretRectangle() {
 			if ( isSelectionEligibleForScroll() ) {
-				caretRect = computeCaretRectWithIframe( defaultView );
+				caretRect = computeCaretRect( defaultView );
 			}
 		}
 
@@ -226,7 +183,7 @@ export function useTypewriter( ref ) {
 
 		// When the user scrolls or resizes, the scroll position should be
 		// reset.
-		defaultView.top.addEventListener( 'scroll', onScrollResize, true );
+		defaultView.addEventListener( 'scroll', onScrollResize, true );
 		defaultView.addEventListener( 'resize', onScrollResize, true );
 
 		ref.current.addEventListener( 'keydown', onKeyDown );
@@ -238,11 +195,7 @@ export function useTypewriter( ref ) {
 		);
 
 		return () => {
-			defaultView.top.removeEventListener(
-				'scroll',
-				onScrollResize,
-				true
-			);
+			defaultView.removeEventListener( 'scroll', onScrollResize, true );
 			defaultView.removeEventListener( 'resize', onScrollResize, true );
 
 			ref.current.removeEventListener( 'keydown', onKeyDown );

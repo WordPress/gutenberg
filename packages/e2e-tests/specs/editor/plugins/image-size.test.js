@@ -69,7 +69,9 @@ describe( 'changing image size', () => {
 		await imageSizeSelect.select( 'custom-size-one' );
 
 		// Verify that the custom size was applied to the image.
-		await page.waitForSelector( '.wp-block-image.size-custom-size-one' );
+		await canvas().waitForSelector(
+			'.wp-block-image.size-custom-size-one'
+		);
 		await page.waitForFunction(
 			() =>
 				document.querySelector(
