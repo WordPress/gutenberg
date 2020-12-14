@@ -425,7 +425,7 @@ const Popover = ( {
 	const allRefs = [
 		containerRef,
 		focusOnMount ? constrainedTabbingRef : null,
-		focusReturnRef,
+		focusOnMount ? focusReturnRef : null,
 		focusOnMountRef,
 	];
 	const mergedRefs = useCallback( mergeRefs( allRefs ), allRefs );
