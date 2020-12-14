@@ -310,6 +310,7 @@ class WP_Theme_JSON {
 			return;
 		}
 
+		$schema   = self::get_schema();
 		$metadata = $this->get_blocks_metadata();
 		foreach ( $contexts as $key => $context ) {
 			if ( ! isset( $metadata[ $key ] ) ) {
@@ -319,14 +320,14 @@ class WP_Theme_JSON {
 			}
 
 			// Filter out top-level keys that aren't valid according to the schema.
-			$context = array_intersect_key( $context, self::SCHEMA );
+			$context = array_intersect_key( $context, $schema );
 
 			// Process styles subtree.
-			$this->process_key( 'styles', $context, self::SCHEMA );
+			$this->process_key( 'styles', $context, $schema );
 			if ( isset( $context['styles'] ) ) {
-				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
-				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'] );
-				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'color', $context['styles'], $schema['styles'] );
+				$this->process_key( 'spacing', $context['styles'], $schema['styles'] );
+				$this->process_key( 'typography', $context['styles'], $schema['styles'] );
 
 				if ( empty( $context['styles'] ) ) {
 					unset( $context['styles'] );
@@ -336,11 +337,11 @@ class WP_Theme_JSON {
 			}
 
 			// Process settings subtree.
-			$this->process_key( 'settings', $context, self::SCHEMA );
+			$this->process_key( 'settings', $context, $schema );
 			if ( isset( $context['settings'] ) ) {
-				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
-				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
-				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
+				$this->process_key( 'color', $context['settings'], $schema['settings'] );
+				$this->process_key( 'spacing', $context['settings'], $schema['settings'] );
+				$this->process_key( 'typography', $context['settings'], $schema['settings'] );
 
 				if ( empty( $context['settings'] ) ) {
 					unset( $context['settings'] );
@@ -358,9 +359,17 @@ class WP_Theme_JSON {
 	 * @return array Properties metadata.
 	 */
 	private static function get_properties_metadata() {
-		$result = apply_filters( 'theme_json_properties_metadata', self::PROPERTIES_METADATA );
-		error_log( 'result is ' . print_r( $result, true ) );
-		return $result;
+		return apply_filters( 'theme_json_properties_metadata', self::PROPERTIES_METADATA );
+	}
+
+	/**
+	 * Returns the schema to be used to validate the contexts
+	 * after having called the filter for 3rd party to hook into.
+	 *
+	 * @return array Schema.
+	 */
+	private static function get_schema() {
+		return apply_filters( 'theme_json_schema', self::SCHEMA );
 	}
 
 	/**
@@ -938,6 +947,7 @@ class WP_Theme_JSON {
 	 */
 	public function merge( $theme_json ) {
 		$incoming_data = $theme_json->get_raw_data();
+		$schema        = self::get_schema();
 
 		foreach ( array_keys( $incoming_data ) as $context ) {
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
@@ -950,7 +960,7 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $leaf ) {
+				foreach ( array_keys( $schema[ $subtree ] ) as $leaf ) {
 					if ( ! isset( $incoming_data[ $context ][ $subtree ][ $leaf ] ) ) {
 						continue;
 					}
