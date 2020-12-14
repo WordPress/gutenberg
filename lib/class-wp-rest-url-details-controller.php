@@ -49,15 +49,20 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 						),
 					),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'schema'              => array( $this, 'get_schema' ),
+					'schema'              => array( $this, 'get_public_item_schema' ),
 				),
 			)
 		);
 	}
 
-	public function get_schema() {
+	/**
+	 * Get the schema for the endpoint.
+	 *
+	 * @return array the schema.
+	 */
+	public function get_item_schema() {
 		return array(
-			'$schema'    => 'http://json-schema.org/draft-07/schema#',
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'url-details',
 			'type'       => 'object',
 			'properties' => array(
@@ -93,7 +98,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		// Attempt to retrieve cached response.
 		$data = $this->get_cache( $cache_key );
 
-		// Return cache if valid data.
+		$use_cache = true;
 
 		/**
 		 * Filters whether to check for previously cached
@@ -104,7 +109,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 * @param string $url the attempted URL.
 		 * @param string $cache_key the generated cache key for the given URL.
 		 */
-		if ( apply_filters( 'rest_url_details_use_cache', $use_cache = true, $url, $cache_key ) && ! is_wp_error( $data ) && ! empty( $data ) ) {
+		if ( apply_filters( 'rest_url_details_use_cache', $use_cache, $url, $cache_key ) && ! is_wp_error( $data ) && ! empty( $data ) ) {
 			return json_decode( $data, true );
 		}
 
