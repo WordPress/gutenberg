@@ -176,6 +176,7 @@ class BlockListBlock extends Component {
 
 		const { blockWidth } = this.state;
 		const { align } = attributes;
+		const { innerContainers, alignments } = WIDE_ALIGNMENTS;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
@@ -183,12 +184,10 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
-		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const isFullWidth = align === alignments.full;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
-		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
-			name
-		);
+		const isContainerRelated = innerContainers.includes( name );
 
 		return (
 			<TouchableWithoutFeedback
