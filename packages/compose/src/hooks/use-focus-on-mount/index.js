@@ -25,9 +25,9 @@ import { focus } from '@wordpress/dom';
  * }
  * ```
  */
-export default function useFocusOnMount( focusOnMount = true ) {
+export default function useFocusOnMount( focusOnMount ) {
 	const didMount = useRef( false );
-	const ref = useCallback( ( node ) => {
+	return useCallback( ( node ) => {
 		if ( ! node || didMount.current === true ) {
 			return;
 		}
@@ -50,12 +50,4 @@ export default function useFocusOnMount( focusOnMount = true ) {
 
 		target.focus();
 	}, [] );
-
-	// If focus doesn't need to be set on mount, no need to return a ref
-	// callback.
-	if ( ! focusOnMount ) {
-		return;
-	}
-
-	return ref;
 }
