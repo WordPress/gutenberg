@@ -212,7 +212,7 @@ _Parameters_
 
 _Returns_
 
--   `(Function|undefined)`: Ref callback.
+-   `Function`: Ref callback.
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 

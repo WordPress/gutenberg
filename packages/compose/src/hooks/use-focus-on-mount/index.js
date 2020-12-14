@@ -8,7 +8,7 @@ import { focus } from '@wordpress/dom';
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean|string} focusOnMount Focus on mount mode.
- * @return {Function|undefined} Ref callback.
+ * @return {Function} Ref callback.
  *
  * @example
  * ```js
