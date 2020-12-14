@@ -77,7 +77,17 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$data = $this->get_cache( $cache_key );
 
 		// Return cache if valid data.
-		if ( apply_filters( 'rest_url_details_use_cache', true ) && ! is_wp_error( $data ) && ! empty( $data ) ) {
+
+		/**
+		 * Filters whether to check for previously cached
+		 * data for a given URL. Filtering for `false` will
+		 * mean that the cache is bypassed.
+		 *
+		 * @param bool $use_cache whether or not to use the cache
+		 * @param string $url the attempted URL.
+		 * @param string $cache_key the generated cache key for the given URL.
+		 */
+		if ( apply_filters( 'rest_url_details_use_cache', $use_cache = true, $url, $cache_key ) && ! is_wp_error( $data ) && ! empty( $data ) ) {
 			return json_decode( $data, true );
 		}
 
