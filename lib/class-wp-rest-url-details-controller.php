@@ -49,8 +49,25 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 						),
 					),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'schema'              => array( $this, 'get_schema' ),
 				),
 			)
+		);
+	}
+
+	public function get_schema() {
+		return array(
+			'$schema'    => 'http://json-schema.org/draft-07/schema#',
+			'title'      => 'url-details',
+			'type'       => 'object',
+			'properties' => array(
+				'title' => array(
+					'description' => esc_html__( 'The contents of the <title> tag from the URL.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+			),
 		);
 	}
 
