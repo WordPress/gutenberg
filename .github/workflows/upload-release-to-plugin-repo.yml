@@ -8,6 +8,7 @@ jobs:
   upload:
     name: Upload Gutenberg Plugin
     runs-on: ubuntu-latest
+    if: ! github.event.release.assets[0]
     env:
       PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
       STABLE_TAG_REGEX: 'Stable tag: [0-9]\+\.[0-9]\+\.[0-9]\+\s*'
