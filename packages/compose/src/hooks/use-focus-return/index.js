@@ -33,53 +33,44 @@ import useCallbackRef from '../use-callback-ref';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
+	const ref = useRef();
 	const focusedBeforeMount = useRef();
-	const isFocused = useRef( false );
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
 		onFocusReturnRef.current = onFocusReturn;
-	}, [] );
+	}, [ onFocusReturn ] );
 
-	const ref = useCallbackRef( ( newNode ) => {
-		const updateLastFocusedRef = ( { target } ) => {
-			isFocused.current = newNode && newNode.contains( target );
-		};
+	return useCallbackRef( ( node ) => {
+		if ( ! node ) {
+			const isFocused =
+				ref.current &&
+				ref.current.contains( ref.current.ownerDocument.activeElement );
 
-		// Unmounting the reference
-		if ( ! newNode && focusedBeforeMount.current ) {
-			if ( newNode?.ownerDocument ) {
-				newNode.ownerDocument.removeEventListener(
-					'focusin',
-					updateLastFocusedRef
-				);
-			}
-
-			if ( ! isFocused.current ) {
+			if ( ! isFocused ) {
 				return;
 			}
 
-			// Defer to the component's own explicit focus return behavior,
-			// if specified. This allows for support that the `onFocusReturn` decides to allow the
-			// default behavior to occur under some conditions.
+			// Defer to the component's own explicit focus return behavior, if
+			// specified. This allows for support that the `onFocusReturn`
+			// decides to allow the default behavior to occur under some
+			// conditions.
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
-				return;
+			} else {
+				focusedBeforeMount.current.focus();
 			}
 
-			focusedBeforeMount.current.focus();
+			return;
 		}
 
-		// Mounting the new reference
-		focusedBeforeMount.current = newNode?.ownerDocument.activeElement;
-		if ( newNode?.ownerDocument ) {
-			newNode.ownerDocument.addEventListener(
-				'focusin',
-				updateLastFocusedRef
-			);
+		ref.current = node;
+
+		if ( focusedBeforeMount.current ) {
+			return;
 		}
+
+		focusedBeforeMount.current = node.ownerDocument.activeElement;
 	}, [] );
-
-	return ref;
 }
 
 export default useFocusReturn;
