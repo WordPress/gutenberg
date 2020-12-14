@@ -174,5 +174,12 @@
 				"customRadius": true
 			}
 		}
+	},
+	"core/group": {
+		"styles": {
+			"spacing": {
+				"boxShadow": "10px 5px 5px red"
+			}
+		}
 	}
 }
