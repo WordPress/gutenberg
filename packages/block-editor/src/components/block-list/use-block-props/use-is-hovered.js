@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
  *
  * @return {boolean} Hovered state.
  */
-export function useIsHovered( ref, clientId ) {
+export function useIsHovered( ref ) {
 	const [ isHovered, setHovered ] = useState( false );
 	const isNavigationMode = useSelect(
 		( select ) => select( 'core/block-editor' ).isNavigationMode(),
@@ -27,7 +27,7 @@ export function useIsHovered( ref, clientId ) {
 				isOutlineMode: getSettings().outlineMode,
 			};
 		},
-		[ clientId ]
+		[]
 	);
 
 	useEffect( () => {
