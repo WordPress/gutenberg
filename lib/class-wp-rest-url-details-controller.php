@@ -129,12 +129,24 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 */
 	private function get_remote_url( $url ) {
 
+		$args = array(
+			'timeout'             => 10,
+			'limit_response_size' => 153600, // 150 KB.
+		);
+
+		/**
+		 * Filters the HTTP request args for URL data retrieval.
+		 *
+		 * Can be used to adjust timeout and response size limit.
+		 *
+		 * @param array $args Arguments used for the HTTP request
+		 * @param string $url The attempted URL.
+		 */
+		$args = apply_filters( 'rest_url_details_http_request_args', $args, $url );
+
 		$response = wp_safe_remote_get(
 			$url,
-			array(
-				'timeout'             => 10,
-				'limit_response_size' => 153600, // 150 KB.
-			)
+			$args
 		);
 
 		if ( WP_Http::OK !== wp_remote_retrieve_response_code( $response ) ) {

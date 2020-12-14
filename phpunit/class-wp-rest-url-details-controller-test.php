@@ -42,6 +42,8 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	protected static $url_placeholder = 'https://dummysite.com';
 
+	protected static $request_args = array();
+
 	/**
 	 * Create fake data before our tests run.
 	 *
@@ -82,6 +84,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function tearDown() {
 		remove_filter( 'apply_filters', '__return_false' );
 		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
+		static::$request_args = array();
 		parent::tearDown();
 	}
 
@@ -227,6 +230,45 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+	public function test_can_filter_http_request_args_via_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter(
+			'rest_url_details_http_request_args',
+			function( $args, $url ) {
+				return array_merge(
+					$args,
+					array(
+						'timeout' => 27, // modify default timeout.
+						'body'    => $url, // add new and allow to assert on $url arg passed.
+					)
+				);
+			},
+			10,
+			2
+		);
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArraySubset(
+			array(
+				'timeout'             => 27,
+				'limit_response_size' => 153600,
+				'body'                => static::$url_placeholder,
+			),
+			static::$request_args
+		);
+
+		remove_all_filters( 'rest_url_details_http_request_args' );
+	}
+
 
 
 	public function test_get_item() {
@@ -275,19 +317,21 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 *
 	 * @return array faux/mocked response.
 	 */
-	public function mock_success_request_to_remote_url() {
-		return $this->mock_request_to_remote_url( 'success' );
+	public function mock_success_request_to_remote_url( $response, $args ) {
+		return $this->mock_request_to_remote_url( 'success', $args );
 	}
 
-	public function mock_failed_request_to_remote_url() {
-		return $this->mock_request_to_remote_url( 'failure' );
+	public function mock_failed_request_to_remote_url( $response, $args ) {
+		return $this->mock_request_to_remote_url( 'failure', $args );
 	}
 
-	public function mock_request_to_remote_url_with_empty_body_response() {
-		return $this->mock_request_to_remote_url( 'empty_body' );
+	public function mock_request_to_remote_url_with_empty_body_response( $response, $args ) {
+		return $this->mock_request_to_remote_url( 'empty_body', $args );
 	}
 
-	public function mock_request_to_remote_url( $result_type = 'success' ) {
+	private function mock_request_to_remote_url( $result_type = 'success', $args ) {
+
+		static::$request_args = $args;
 
 		$types = array(
 			'success',
