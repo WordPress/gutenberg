@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
+import {
+	createNewPost,
+	pressKeyWithModifier,
+	canvas,
+} from '@wordpress/e2e-test-utils';
 
 describe.each( [
 	[ 'unified', true ],
@@ -49,32 +53,21 @@ describe.each( [
 
 	if ( ! isUnifiedToolbar ) {
 		it( 'should not scroll page', async () => {
-			while (
-				await page.evaluate( () => {
-					const scrollable = wp.dom.getScrollContainer(
-						document.activeElement
-					);
-					return ! scrollable || scrollable.scrollTop === 0;
-				} )
-			) {
+			while ( await canvas().evaluate( () => window.scrollY === 0 ) ) {
 				await page.keyboard.press( 'Enter' );
 			}
 
 			await page.keyboard.type( 'a' );
 
-			const scrollTopBefore = await page.evaluate(
-				() =>
-					wp.dom.getScrollContainer( document.activeElement )
-						.scrollTop
+			const scrollTopBefore = await canvas().evaluate(
+				() => window.scrollY
 			);
 
 			await pressKeyWithModifier( 'alt', 'F10' );
 			expect( await isInBlockToolbar() ).toBe( true );
 
-			const scrollTopAfter = await page.evaluate(
-				() =>
-					wp.dom.getScrollContainer( document.activeElement )
-						.scrollTop
+			const scrollTopAfter = await canvas().evaluate(
+				() => window.scrollY
 			);
 
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
