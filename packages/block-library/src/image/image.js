@@ -85,6 +85,7 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { allowResize = true, isListItem = false } = context;
 	const image = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
@@ -127,7 +128,6 @@ export default function Image( {
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 
-	const { allowResize = true, isListItem = false } = context;
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setCaptionFocused( false );
