@@ -424,7 +424,7 @@ const Popover = ( {
 	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 	const allRefs = [
 		containerRef,
-		constrainedTabbingRef,
+		focusOnMount ? constrainedTabbingRef : null,
 		focusReturnRef,
 		focusOnMountRef,
 	];
