@@ -90,7 +90,6 @@ const LABEL_MAPPING = {
 	'[Type] Experimental': 'Experiments',
 	'[Type] Performance': 'Performance',
 	'Accessibility (a11y)': 'Accessibility',
-	'[Type] Task': 'Various',
 	'[Type] Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
