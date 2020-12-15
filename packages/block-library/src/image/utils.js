@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, each } from 'lodash';
+import { isEmpty, each, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -78,6 +78,22 @@ export function getUrl( image, destination ) {
 			return image?.link;
 		case LINK_DESTINATION_NONE:
 			return undefined;
+	}
+
+	return {};
+}
+
+/**
+ * Determines new Image block attributes size selection.
+ *
+ * @param {Object} image Media file object for gallery image.
+ * @param {string} size  Selected size slug to apply.
+ */
+export function getImageSizeAttributes( image, size ) {
+	const url = get( image, [ 'media_details', 'sizes', size, 'source_url' ] );
+
+	if ( url ) {
+		return { url, width: undefined, height: undefined, sizeSlug: size };
 	}
 
 	return {};

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -11,7 +6,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getUrl } from './utils';
+import { getUrl, getImageSizeAttributes } from './utils';
 
 /**
  * Determines new linkDestination, linkTarget and sizeSlug values for an image block
@@ -63,23 +58,15 @@ export default function useParentAttributes(
 		if ( ! isListItem ) {
 			return;
 		}
-		if ( inheritedAttributes.sizeSlug ) {
-			const newUrl = get( image, [
-				'media_details',
-				'sizes',
-				parentSizeSlug,
-				'source_url',
-			] );
 
-			if ( ! newUrl ) {
-				return;
-			}
+		if ( inheritedAttributes.sizeSlug ) {
+			const sizeAttributes = getImageSizeAttributes(
+				image,
+				parentSizeSlug
+			);
 
 			setAttributes( {
-				url: newUrl,
-				width: undefined,
-				height: undefined,
-				sizeSlug: parentSizeSlug,
+				...sizeAttributes,
 			} );
 		}
 	}, [ parentSizeSlug, isListItem ] );
