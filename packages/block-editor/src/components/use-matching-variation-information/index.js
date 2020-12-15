@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { getBlockType, getBlockVariations } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockDisplayInformation} WPBlockDisplayInformation */
 
@@ -23,21 +24,36 @@ import { useSelect } from '@wordpress/data';
 // TODO write jsdoc example
 // TODO write tests
 export default function useMatchingVariationInformation( clientId ) {
-	return useSelect(
+	const { name, attributes } = useSelect(
 		( select ) => {
-			if ( ! clientId ) return null;
+			if ( ! clientId ) return {};
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
 			);
-			const { getBlockDisplayInformation } = select( 'core/blocks' );
-			const attributes = getBlockAttributes( clientId );
-			const name = getBlockName( clientId );
-			return (
-				name &&
-				attributes &&
-				getBlockDisplayInformation( name, attributes )
-			);
+			return {
+				name: getBlockName( clientId ),
+				attributes: getBlockAttributes( clientId ),
+			};
 		},
 		[ clientId ]
 	);
+	const blockType = getBlockType( name );
+	if ( ! blockType ) return null;
+
+	const blockTypeInfo = {
+		title: blockType.title,
+		icon: blockType.icon,
+		description: blockType.description,
+	};
+	const variations = getBlockVariations( name );
+	if ( ! variations || ! blockType.variationMatcher ) return blockTypeInfo;
+	const match = variations.find( ( variation ) =>
+		blockType.variationMatcher( attributes, variation )
+	);
+	if ( ! match ) return blockTypeInfo;
+	return {
+		title: match.title || blockType.title,
+		icon: match.icon || blockType.icon,
+		description: match.description || blockType.description,
+	};
 }

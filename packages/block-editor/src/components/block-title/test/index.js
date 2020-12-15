@@ -42,6 +42,7 @@ jest.mock( '@wordpress/blocks', () => {
 					return title;
 			}
 		},
+		getBlockVariations() {},
 	};
 } );
 

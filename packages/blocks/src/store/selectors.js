@@ -97,41 +97,6 @@ export function getBlockVariations( state, blockName, scope ) {
 }
 
 /**
- * Returns an array with the child blocks of a given block.
- *
- * @param {Object} state Data state.
- * @param {string} name Block type name.
- * @param {Object} attributes Block's attributes
- *
- * @return {WPBlockDisplayInformation} Block's display information.
- */
-// TODO tests
-// TODO check performance
-export const getBlockDisplayInformation = createSelector(
-	( state, name, attributes ) => {
-		const variations = state.blockVariations[ name ];
-		const blockType = getBlockType( state, name );
-		const blockTypeInfo = {
-			title: blockType.title,
-			icon: blockType.icon,
-			description: blockType.description,
-		};
-		if ( ! variations || ! blockType?.variationMatcher )
-			return blockTypeInfo;
-		const match = variations.find( ( variation ) =>
-			blockType.variationMatcher( attributes, variation )
-		);
-		if ( ! match ) return blockTypeInfo;
-		return {
-			title: match.title || blockType.title,
-			icon: match.icon || blockType.icon,
-			description: match.description || blockType.description,
-		};
-	},
-	( state ) => [ state.blockTypes, state.blockVariations ]
-);
-
-/**
  * Returns the default block variation for the given block type.
  * When there are multiple variations annotated as the default one,
  * the last added item is picked. This simplifies registering overrides.

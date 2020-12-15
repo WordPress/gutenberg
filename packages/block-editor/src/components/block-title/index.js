@@ -13,6 +13,11 @@ import {
 } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import useMatchingVariationInformation from '../use-matching-variation-information';
+
+/**
  * Renders the block's configured title as a string, or empty if the title
  * cannot be determined.
  *
@@ -44,14 +49,7 @@ export default function BlockTitle( { clientId } ) {
 		[ clientId ]
 	);
 
-	const blockInformation = useSelect(
-		( select ) => {
-			if ( ! ( name && attributes ) ) return null;
-			const { getBlockDisplayInformation } = select( 'core/blocks' );
-			return getBlockDisplayInformation( name, attributes );
-		},
-		[ name, attributes ]
-	);
+	const blockInformation = useMatchingVariationInformation( clientId );
 	if ( ! blockInformation ) return null;
 	const blockType = getBlockType( name );
 	const label = getBlockLabel( blockType, attributes );
