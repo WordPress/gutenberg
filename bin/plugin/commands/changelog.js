@@ -109,6 +109,7 @@ const GROUP_TITLE_ORDER = [
 	'New APIs',
 	'Bug Fixes',
 	'Performance',
+	'Accessibility',
 	'Experiments',
 	'FSE: Block Navigation',
 	'FSE: Block Query',
