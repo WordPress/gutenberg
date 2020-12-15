@@ -21,6 +21,7 @@ import {
 	BlockSettingsMenu as RootBlockSettingsMenu,
 	BlockTitle as RootBlockTitle,
 	BlockToolbar as RootBlockToolbar,
+	ButtonBlockAppender as ButtonBlockerAppender,
 	ColorPalette as RootColorPalette,
 	ContrastChecker as RootContrastChecker,
 	CopyHandler as RootCopyHandler,
@@ -148,6 +149,10 @@ export const BlockTitle = deprecateComponent( 'BlockTitle', RootBlockTitle );
 export const BlockToolbar = deprecateComponent(
 	'BlockToolbar',
 	RootBlockToolbar
+);
+export const ButtonBlockAppender = deprecateComponent(
+	'ButtonBlockAppender',
+	ButtonBlockerAppender
 );
 export const ColorPalette = deprecateComponent(
 	'ColorPalette',

@@ -216,7 +216,7 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
 
-<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+<a name="ButtonBlockAppender" href="#ButtonBlockAppender">#</a> **ButtonBlockAppender**
 
 _Related_
 
