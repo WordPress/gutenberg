@@ -21,7 +21,13 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -151,8 +157,11 @@ export default function QueryInspectorControls( {
 		} );
 		return (
 			<div className="wp-block-query__create-new-link">
-				<a href={ newPostUrl }> { __( 'Create a new post' ) }</a>{ ' ' }
-				{ __( 'for this feed.' ) }
+				{ createInterpolateElement(
+					__( '<a>Create a new post</a> for this feed.' ),
+					// eslint-disable-next-line jsx-a11y/anchor-has-content
+					{ a: <a href={ newPostUrl } /> }
+				) }
 			</div>
 		);
 	};
