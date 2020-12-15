@@ -417,7 +417,7 @@ export default compose( [
 	withInstanceId,
 	withGradient,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	withSelect( ( select, { clientId } ) => {
+	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getBlockCount, getBlockRootClientId } = select(
 			'core/block-editor'
@@ -427,7 +427,7 @@ export default compose( [
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
-			editorSidebarOpened: isEditorSidebarOpened(),
+			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			numOfButtons,
 		};
 	} ),
