@@ -330,7 +330,6 @@ These are the current color properties supported by blocks:
 | Post Hierarchical Terms | Yes | Yes | Yes | Yes |
 | Post Tags | Yes | Yes | Yes | Yes |
 | Post Title | Yes | Yes | - | Yes |
-| Preformatted | - | - | Yes | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
 | Site Title | Yes | Yes | - | Yes |
 | Template Part | Yes | Yes | Yes | Yes |
@@ -365,6 +364,7 @@ These are the current typography properties supported by blocks:
 | Post Hierarchical Terms | - | Yes | - | - | Yes | - | - |
 | Post Tags | - | Yes | - | - | Yes | - | - |
 | Post Title | Yes | Yes | - | - | Yes | - | - |
+| Preformatted | - | Yes | - | - | - | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
 | Site Title | Yes | Yes | - | - | Yes | - | - |
 | Verse | Yes | - | - | - | - | - | - |
