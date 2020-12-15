@@ -76,6 +76,7 @@ const GROUP_TITLE_ORDER = [
 	'Bug Fixes',
 	'Performance',
 	'Experiments',
+	'Global Styles',
 	'Documentation',
 	'Code Quality',
 	undefined,
@@ -103,6 +104,19 @@ const REWORD_TERMS = {
 	config: 'configuration',
 	docs: 'documentation',
 };
+
+/**
+ * Returns type candidates based on whether the given labels
+ * are part of the allowed list.
+ *
+ * @param {string[]} labels
+ *
+ * @return {string[]} Type candidates.
+ */
+function getTypesByLabelAllowedList( labels ) {
+	const allowedList = [ 'Global Styles' ];
+	return uniq( labels.filter( ( label ) => allowedList.includes( label ) ) );
+}
 
 /**
  * Returns type candidates based on given issue label names.
@@ -151,8 +165,10 @@ function getTypesByTitle( title ) {
  * @return {string} Type label.
  */
 function getIssueType( issue ) {
+	const labels = issue.labels.map( ( { name } ) => name );
 	const candidates = [
-		...getTypesByLabelType( issue.labels.map( ( { name } ) => name ) ),
+		...getTypesByLabelAllowedList( labels ),
+		...getTypesByLabelType( labels ),
 		...getTypesByTitle( issue.title ),
 	];
 
