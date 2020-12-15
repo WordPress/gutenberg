@@ -37,8 +37,8 @@
 		"**/*.ios.js",
 		"**/*.native.js",
 		"**/benchmark",
-		"**/build-*/**",
-		"**/build/**",
+		"packages/*/build-*/**",
+		"packages/*/build/**",
 		"**/test/**",
 		"packages/**/react-native-*/**"
 	]

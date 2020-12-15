@@ -90,5 +90,7 @@
 			"link": true
 		},
 		"duotone": "img"
-	}
+	},
+	"editorStyle": "wp-block-media-text-editor",
+	"style": "wp-block-media-text"
 }

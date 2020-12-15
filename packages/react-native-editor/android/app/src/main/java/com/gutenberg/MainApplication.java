@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.util.Consumer;
 
@@ -36,6 +37,7 @@ import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,10 +72,18 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 List<RNMedia> rnMediaList = new ArrayList<>();
-                if (mediaType == MediaType.IMAGE) {
-                    rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain" ));
-                } else if (mediaType == MediaType.VIDEO) {
-                    rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup" ));
+
+                switch (mediaType) {
+                    case IMAGE:
+                        rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", ""));
+                        break;
+                    case VIDEO:
+                        rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                    case ANY:
+                    case OTHER:
+                        rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
+                        break;
+
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
@@ -81,6 +91,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
+            }
+
+            @Override
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
             }
 
             @Override
@@ -105,12 +119,20 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType) {
-
+                if (mediaType == MediaType.ANY) {
+                    ArrayList<MediaOption> mediaOptions = new ArrayList<>();
+                    mediaOptions.add(new MediaOption("1", "Choose from device"));
+                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(mediaOptions);
+                }
             }
 
             @Override
             public void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection) {
-
+                if (mediaSource.equals("1")) {
+                    List<RNMedia> rnMediaList = new ArrayList<>();
+                    rnMediaList.add(new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
+                    mediaSelectedCallback.onMediaFileSelected(rnMediaList);
+                }
             }
 
             @Override
@@ -172,10 +194,34 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestMediaFilesEditorLoad(
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesFailedRetryDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesUploadCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }
-            
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

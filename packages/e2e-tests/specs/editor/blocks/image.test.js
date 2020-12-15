@@ -14,7 +14,10 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	clickBlockToolbarButton,
+	clickMenuItem,
 	openDocumentSettingsSidebar,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -32,10 +35,27 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
+	return filename;
+}
+
+async function waitForImage( filename ) {
 	await page.waitForSelector(
 		`.wp-block-image img[src$="${ filename }.png"]`
 	);
-	return filename;
+}
+
+async function getSrc( elementHandle ) {
+	return elementHandle.evaluate( ( node ) => node.src );
+}
+async function getDataURL( elementHandle ) {
+	return elementHandle.evaluate( ( node ) => {
+		const canvas = document.createElement( 'canvas' );
+		const context = canvas.getContext( '2d' );
+		canvas.width = node.width;
+		canvas.height = node.height;
+		context.drawImage( node, 0, 0 );
+		return canvas.toDataURL( 'image/jpeg' );
+	} );
 }
 
 describe( 'Image', () => {
@@ -46,6 +66,7 @@ describe( 'Image', () => {
 	it( 'can be inserted', async () => {
 		await insertBlock( 'Image' );
 		const filename = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( filename );
 
 		const regex = new RegExp(
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
@@ -56,6 +77,7 @@ describe( 'Image', () => {
 	it( 'should replace, reset size, and keep selection', async () => {
 		await insertBlock( 'Image' );
 		const filename1 = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( filename1 );
 
 		const regex1 = new RegExp(
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
@@ -75,6 +97,7 @@ describe( 'Image', () => {
 		const filename2 = await upload(
 			'.block-editor-media-replace-flow__options input[type="file"]'
 		);
+		await waitForImage( filename2 );
 
 		const regex3 = new RegExp(
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
@@ -89,7 +112,8 @@ describe( 'Image', () => {
 
 	it( 'should place caret at end of caption after merging empty paragraph', async () => {
 		await insertBlock( 'Image' );
-		await upload( '.wp-block-image input[type="file"]' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
 		await page.keyboard.type( '1' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.press( 'Backspace' );
@@ -102,7 +126,8 @@ describe( 'Image', () => {
 
 	it( 'should allow soft line breaks in caption', async () => {
 		await insertBlock( 'Image' );
-		await upload( '.wp-block-image input[type="file"]' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );
@@ -110,5 +135,157 @@ describe( 'Image', () => {
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '1<br data-rich-text-line-break="true">2' );
+	} );
+
+	it( 'should drag and drop files into media placeholder', async () => {
+		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'Image' );
+
+		// Confirm correct setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const image = await page.$( '[data-type="core/image"]' );
+
+		await image.evaluate( () => {
+			const input = document.createElement( 'input' );
+			input.type = 'file';
+			input.id = 'wp-temp-test-input';
+			document.body.appendChild( input );
+		} );
+
+		const fileName = await upload( '#wp-temp-test-input' );
+
+		const paragraphRect = await image.boundingBox();
+		const pX = paragraphRect.x + paragraphRect.width / 2;
+		const pY = paragraphRect.y + paragraphRect.height / 3;
+
+		await image.evaluate(
+			( element, clientX, clientY ) => {
+				const input = document.getElementById( 'wp-temp-test-input' );
+				const dataTransfer = new DataTransfer();
+				dataTransfer.items.add( input.files[ 0 ] );
+				const event = new DragEvent( 'drop', {
+					bubbles: true,
+					clientX,
+					clientY,
+					dataTransfer,
+				} );
+				element.dispatchEvent( event );
+			},
+			pX,
+			pY
+		);
+
+		await waitForImage( fileName );
+	} );
+
+	it( 'allows zooming using the crop tools', async () => {
+		// Insert the block, upload a file and crop.
+		await insertBlock( 'Image' );
+		const filename = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( filename );
+
+		// Assert that the image is initially unscaled and unedited.
+		const initialImage = await page.$( '.wp-block-image img' );
+		const initialImageSrc = await getSrc( initialImage );
+		const initialImageDataURL = await getDataURL( initialImage );
+		expect( initialImageDataURL ).toMatchSnapshot();
+
+		// Zoom in to twice the amount using the zoom input.
+		await clickBlockToolbarButton( 'Crop' );
+		await clickBlockToolbarButton( 'Zoom' );
+		await page.waitForFunction( () =>
+			document.activeElement.classList.contains(
+				'components-range-control__slider'
+			)
+		);
+		await page.keyboard.press( 'Tab' );
+		await page.waitForFunction( () =>
+			document.activeElement.classList.contains(
+				'components-input-control__input'
+			)
+		);
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.type( '200' );
+		await page.keyboard.press( 'Escape' );
+		await clickBlockToolbarButton( 'Apply', 'content' );
+
+		// Wait for the cropping tools to disappear.
+		await page.waitForSelector(
+			'.wp-block-image img:not( .reactEasyCrop_Image )'
+		);
+
+		// Assert that the image is edited.
+		const updatedImage = await page.$( '.wp-block-image img' );
+		const updatedImageSrc = await getSrc( updatedImage );
+		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
+		const updatedImageDataURL = await getDataURL( updatedImage );
+		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		expect( updatedImageDataURL ).toMatchSnapshot();
+	} );
+
+	it( 'allows changing aspect ratio using the crop tools', async () => {
+		// Insert the block, upload a file and crop.
+		await insertBlock( 'Image' );
+		const filename = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( filename );
+
+		// Assert that the image is initially unscaled and unedited.
+		const initialImage = await page.$( '.wp-block-image img' );
+		const initialImageSrc = await getSrc( initialImage );
+		const initialImageDataURL = await getDataURL( initialImage );
+		expect( initialImageDataURL ).toMatchSnapshot();
+
+		// Zoom in to twice the amount using the zoom input.
+		await clickBlockToolbarButton( 'Crop' );
+		await clickBlockToolbarButton( 'Aspect Ratio' );
+		await page.waitForFunction( () =>
+			document.activeElement.classList.contains(
+				'components-menu-item__button'
+			)
+		);
+		await clickMenuItem( '16:10' );
+		await clickBlockToolbarButton( 'Apply', 'content' );
+
+		// Wait for the cropping tools to disappear.
+		await page.waitForSelector(
+			'.wp-block-image img:not( .reactEasyCrop_Image )'
+		);
+
+		// Assert that the image is edited.
+		const updatedImage = await page.$( '.wp-block-image img' );
+		const updatedImageSrc = await getSrc( updatedImage );
+		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
+		const updatedImageDataURL = await getDataURL( updatedImage );
+		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		expect( updatedImageDataURL ).toMatchSnapshot();
+	} );
+
+	it( 'allows rotating using the crop tools', async () => {
+		// Insert the block, upload a file and crop.
+		await insertBlock( 'Image' );
+		const filename = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( filename );
+
+		// Assert that the image is initially unscaled and unedited.
+		const initialImage = await page.$( '.wp-block-image img' );
+		const initialImageDataURL = await getDataURL( initialImage );
+		expect( initialImageDataURL ).toMatchSnapshot();
+
+		// Double the image's size using the zoom input.
+		await clickBlockToolbarButton( 'Crop' );
+		await page.waitForSelector( '.wp-block-image img.reactEasyCrop_Image' );
+		await clickBlockToolbarButton( 'Rotate' );
+		await clickBlockToolbarButton( 'Apply', 'content' );
+
+		await page.waitForSelector(
+			'.wp-block-image img:not( .reactEasyCrop_Image )'
+		);
+
+		// Assert that the image is edited.
+		const updatedImage = await page.$( '.wp-block-image img' );
+		const updatedImageDataURL = await getDataURL( updatedImage );
+		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		expect( updatedImageDataURL ).toMatchSnapshot();
 	} );
 } );

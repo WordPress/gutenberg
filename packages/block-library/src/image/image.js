@@ -36,13 +36,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
 import { crop, upload } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor from './image-editor';
+import ImageEditor, { ImageEditingProvider } from './image-editing';
 import { isExternalImage } from './edit';
 
 /**
@@ -86,10 +87,22 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const image = useSelect(
+	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
-			return id && isSelected ? getMedia( id ) : null;
+			const { getMultiSelectedBlockClientIds, getBlockName } = select(
+				'core/block-editor'
+			);
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+			return {
+				image: id && isSelected ? getMedia( id ) : null,
+				multiImageSelection:
+					multiSelectedClientIds.length &&
+					multiSelectedClientIds.every(
+						( clientId ) =>
+							getBlockName( clientId ) === 'core/image'
+					),
+			};
 		},
 		[ id, isSelected ]
 	);
@@ -111,7 +124,7 @@ export default function Image( {
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
@@ -252,6 +265,7 @@ export default function Image( {
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
+	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
 	const duotonePalette = useEditorFeature( 'color.duotone' );
 
@@ -260,7 +274,7 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls>
-				{ ! isEditingImage && (
+				{ ! multiImageSelection && ! isEditingImage && (
 					<ToolbarGroup>
 						<ImageURLInputUI
 							url={ href || '' }
@@ -274,7 +288,7 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ canEditImage && ! isEditingImage && (
+				{ allowCrop && (
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => setIsEditingImage( true ) }
@@ -300,7 +314,7 @@ export default function Image( {
 						onChange={ onDuotoneChange }
 					/>
 				) }
-				{ ! isEditingImage && (
+				{ ! multiImageSelection && ! isEditingImage && (
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -314,23 +328,25 @@ export default function Image( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
-					<TextareaControl
-						label={ __( 'Alt text (alternative text)' ) }
-						value={ alt }
-						onChange={ updateAlt }
-						help={
-							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+					{ ! multiImageSelection && (
+						<TextareaControl
+							label={ __( 'Alt text (alternative text)' ) }
+							value={ alt }
+							onChange={ updateAlt }
+							help={
+								<>
+									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+										{ __(
+											'Describe the purpose of the image'
+										) }
+									</ExternalLink>
 									{ __(
-										'Describe the purpose of the image'
+										'Leave empty if the image is purely decorative.'
 									) }
-								</ExternalLink>
-								{ __(
-									'Leave empty if the image is purely decorative.'
-								) }
-							</>
-						}
-					/>
+								</>
+							}
+						/>
+					) }
 					<ImageSizeControl
 						onChangeImage={ updateImage }
 						onChange={ ( value ) => setAttributes( value ) }
@@ -420,15 +436,12 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
-				id={ id }
 				url={ url }
-				setAttributes={ setAttributes }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
-				setIsEditingImage={ setIsEditingImage }
+				naturalHeight={ naturalHeight }
+				naturalWidth={ naturalWidth }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -513,7 +526,18 @@ export default function Image( {
 	}
 
 	return (
-		<>
+		<ImageEditingProvider
+			id={ id }
+			url={ url }
+			naturalWidth={ naturalWidth }
+			naturalHeight={ naturalHeight }
+			clientWidth={ clientWidth }
+			onSaveImage={ ( imageAttributes ) =>
+				setAttributes( imageAttributes )
+			}
+			isEditing={ isEditingImage }
+			onFinishEditing={ () => setIsEditingImage( false ) }
+		>
 			{ controls }
 			{ img }
 			{ duotone && (
@@ -527,6 +551,7 @@ export default function Image( {
 				<RichText
 					ref={ captionRef }
 					tagName="figcaption"
+					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Write caption…' ) }
 					value={ caption }
 					unstableOnFocus={ onFocusCaption }
@@ -540,6 +565,6 @@ export default function Image( {
 					}
 				/>
 			) }
-		</>
+		</ImageEditingProvider>
 	);
 }

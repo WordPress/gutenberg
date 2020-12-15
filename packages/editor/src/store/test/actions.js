@@ -3,13 +3,14 @@
  */
 import { apiFetch } from '@wordpress/data-controls';
 import { controls } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import * as actions from '../actions';
 import {
-	STORE_KEY,
+	STORE_NAME,
 	TRASH_POST_NOTICE_ID,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../constants';
@@ -47,7 +48,7 @@ describe( 'Post generator actions', () => {
 					reset( isAutosave );
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'isEditedPostSaveable' )
+						controls.select( STORE_NAME, 'isEditedPostSaveable' )
 					);
 				},
 			],
@@ -57,7 +58,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( true );
 					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'getEditedPostContent' )
+						controls.select( STORE_NAME, 'getEditedPostContent' )
 					);
 				},
 			],
@@ -69,7 +70,7 @@ describe( 'Post generator actions', () => {
 						const edits = { content: currentPost().content };
 						const { value } = fulfillment.next( edits.content );
 						expect( value ).toEqual(
-							controls.dispatch( STORE_KEY, 'editPost', edits, {
+							controls.dispatch( STORE_NAME, 'editPost', edits, {
 								undoIgnore: true,
 							} )
 						);
@@ -93,7 +94,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'getCurrentPost' )
+						controls.select( STORE_NAME, 'getCurrentPost' )
 					);
 				},
 			],
@@ -168,7 +169,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'getCurrentPost' )
+						controls.select( STORE_NAME, 'getCurrentPost' )
 					);
 				},
 			],
@@ -195,7 +196,7 @@ describe( 'Post generator actions', () => {
 						const { value } = fulfillment.next( postType );
 						expect( value ).toEqual(
 							controls.dispatch(
-								'core/notices',
+								noticesStore,
 								'createSuccessNotice',
 								'Updated Post',
 								{
@@ -294,7 +295,7 @@ describe( 'Post generator actions', () => {
 			reset();
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPostType' )
+				controls.select( STORE_NAME, 'getCurrentPostType' )
 			);
 		} );
 		it( 'yields expected action for selecting the post type object', () => {
@@ -310,7 +311,7 @@ describe( 'Post generator actions', () => {
 				const { value } = fulfillment.next( postType );
 				expect( value ).toEqual(
 					controls.dispatch(
-						'core/notices',
+						noticesStore,
 						'removeNotice',
 						TRASH_POST_NOTICE_ID
 					)
@@ -320,7 +321,7 @@ describe( 'Post generator actions', () => {
 		it( 'yields expected action for selecting the currentPost', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPost' )
+				controls.select( STORE_NAME, 'getCurrentPost' )
 			);
 		} );
 		it( 'yields expected action object for the api fetch', () => {
@@ -338,7 +339,7 @@ describe( 'Post generator actions', () => {
 				const { value } = fulfillment.throw( error );
 				expect( value ).toEqual(
 					controls.dispatch(
-						'core/notices',
+						noticesStore,
 						'createErrorNotice',
 						'Trashing failed',
 						{
@@ -353,7 +354,7 @@ describe( 'Post generator actions', () => {
 				rewind();
 				const { value } = fulfillment.next();
 				expect( value ).toEqual(
-					controls.dispatch( STORE_KEY, 'savePost' )
+					controls.dispatch( STORE_NAME, 'savePost' )
 				);
 			} );
 		} );
@@ -366,13 +367,13 @@ describe( 'Post generator actions', () => {
 			reset();
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPost' )
+				controls.select( STORE_NAME, 'getCurrentPost' )
 			);
 		} );
 		it( 'yields expected action for selecting the current post type', () => {
 			const { value } = fulfillment.next( currentPost );
 			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPostType' )
+				controls.select( STORE_NAME, 'getCurrentPostType' )
 			);
 		} );
 		it( 'yields expected action for selecting the post type object', () => {
@@ -394,7 +395,7 @@ describe( 'Post generator actions', () => {
 		it( 'yields expected action for dispatching the reset of the post', () => {
 			const { value } = fulfillment.next( currentPost );
 			expect( value ).toEqual(
-				controls.dispatch( STORE_KEY, 'resetPost', currentPost )
+				controls.dispatch( STORE_NAME, 'resetPost', currentPost )
 			);
 		} );
 	} );
@@ -475,7 +476,7 @@ describe( 'Editor actions', () => {
 			const fulfillment = actions.editPost( edits );
 			expect( fulfillment.next() ).toEqual( {
 				done: false,
-				value: controls.select( STORE_KEY, 'getCurrentPost' ),
+				value: controls.select( STORE_NAME, 'getCurrentPost' ),
 			} );
 			const post = { id: 1, type: 'post' };
 			expect( fulfillment.next( post ) ).toEqual( {

@@ -8,16 +8,11 @@ import {
 	createNewPost,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
-	searchForReusableBlock,
 	getEditedPostContent,
 	trashAllPosts,
+	visitAdminPage,
+	toggleGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
-
-function waitForAndAcceptDialog() {
-	return new Promise( ( resolve ) => {
-		page.once( 'dialog', () => resolve() );
-	} );
-}
 
 describe( 'Reusable blocks', () => {
 	beforeAll( async () => {
@@ -239,35 +234,6 @@ describe( 'Reusable blocks', () => {
 		expect( text ).toMatch( 'Oh! Hello there!' );
 	} );
 
-	it( 'can be deleted', async () => {
-		// Insert the reusable block we edited above
-		await insertReusableBlock( 'Surprised greeting block' );
-
-		// Delete the block and accept the confirmation dialog
-		await clickBlockToolbarButton( 'More options' );
-		const deleteButton = await page.waitForXPath(
-			'//button/span[text()="Remove from Reusable blocks"]'
-		);
-		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
-
-		// Wait for deletion to finish
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Block deleted."]'
-		);
-
-		// Check that we have an empty post again
-		expect( await getEditedPostContent() ).toBe( '' );
-
-		// Search for the block in the inserter
-		await searchForReusableBlock( 'Surprised greeting block' );
-
-		// Check that we couldn't find it
-		const items = await page.$$(
-			'.block-editor-block-types-list__item[aria-label="Surprised greeting block"]'
-		);
-		expect( items ).toHaveLength( 0 );
-	} );
-
 	it( 'can be created from multiselection', async () => {
 		await createNewPost();
 
@@ -329,5 +295,48 @@ describe( 'Reusable blocks', () => {
 
 		// Check that we have two paragraph blocks on the page
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'will not break the editor if empty', async () => {
+		await insertReusableBlock( 'Awesome block' );
+
+		await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
+
+		const [ editButton ] = await page.$x(
+			`//a[contains(@aria-label, 'Awesome block')]`
+		);
+		await editButton.click();
+
+		await page.waitForNavigation();
+
+		// Click the block to give it focus
+		const blockSelector = 'p[data-title="Paragraph"]';
+		await page.waitForSelector( blockSelector );
+		await page.click( blockSelector );
+
+		// Delete the block, leaving the reusable block empty
+		await clickBlockToolbarButton( 'More options' );
+		const deleteButton = await page.waitForXPath(
+			'//button/span[text()="Remove block"]'
+		);
+		deleteButton.click();
+
+		// Wait for the Update button to become enabled
+		const publishButtonSelector = '.editor-post-publish-button__button';
+		await page.waitForSelector(
+			publishButtonSelector + '[aria-disabled="false"]'
+		);
+
+		// Save the reusable block
+		await page.click( publishButtonSelector );
+		await page.waitForXPath(
+			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable Block updated."]'
+		);
+
+		await createNewPost();
+
+		await toggleGlobalBlockInserter();
+
+		expect( console ).not.toHaveErrored();
 	} );
 } );

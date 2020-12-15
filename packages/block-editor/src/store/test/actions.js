@@ -24,6 +24,7 @@ import {
 	resetBlocks,
 	selectBlock,
 	selectPreviousBlock,
+	__unstableSetInsertionPoint,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -40,10 +41,10 @@ import {
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
-		it( 'should return the RESET_BLOCKS actions', () => {
+		it( 'should yield the RESET_BLOCKS actions', () => {
 			const blocks = [];
-			const result = resetBlocks( blocks );
-			expect( result ).toEqual( {
+			const fulfillment = resetBlocks( blocks );
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'RESET_BLOCKS',
 				blocks,
 			} );
@@ -118,7 +119,8 @@ describe( 'actions', () => {
 		it( 'should return MULTI_SELECT action', () => {
 			const start = 'start';
 			const end = 'end';
-			expect( multiSelect( start, end ) ).toEqual( {
+			const fulfillment = multiSelect( start, end );
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'MULTI_SELECT',
 				start,
 				end,
@@ -699,10 +701,30 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( '__unstableSetInsertionPoint', () => {
+		it( 'should return the SET_INSERTION_POINT action', () => {
+			expect( __unstableSetInsertionPoint() ).toEqual( {
+				type: 'SET_INSERTION_POINT',
+			} );
+			expect( __unstableSetInsertionPoint( 'rootClientId', 2 ) ).toEqual(
+				{
+					type: 'SET_INSERTION_POINT',
+					rootClientId: 'rootClientId',
+					index: 2,
+				}
+			);
+		} );
+	} );
+
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
 			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
+			} );
+			expect( showInsertionPoint( 'rootClientId', 2 ) ).toEqual( {
+				type: 'SHOW_INSERTION_POINT',
+				rootClientId: 'rootClientId',
+				index: 2,
 			} );
 		} );
 	} );
@@ -719,9 +741,11 @@ describe( 'actions', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
 			const firstBlockClientId = 'blockA';
 			const secondBlockClientId = 'blockB';
-			expect(
-				mergeBlocks( firstBlockClientId, secondBlockClientId )
-			).toEqual( {
+			const fulfillment = mergeBlocks(
+				firstBlockClientId,
+				secondBlockClientId
+			);
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ firstBlockClientId, secondBlockClientId ],
 			} );

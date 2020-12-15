@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -25,11 +30,15 @@ import {
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import TemplateTitle from '../template-title';
+
 function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 	const {
-		hasReducedUI,
 		hasFixedToolbar,
 		isInserterEnabled,
 		isInserterOpened,
@@ -37,6 +46,7 @@ function HeaderToolbar() {
 		previewDeviceType,
 		showIconLabels,
 		isNavigationTool,
+		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -65,9 +75,7 @@ function HeaderToolbar() {
 				'showIconLabels'
 			),
 			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
-			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
-				'reducedUI'
-			),
+			isTemplateMode: select( 'core/edit-post' ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -141,7 +149,7 @@ function HeaderToolbar() {
 				>
 					{ showIconLabels && __( 'Add' ) }
 				</ToolbarItem>
-				{ ! hasReducedUI && ( isWideViewport || ! showIconLabels ) && (
+				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && (
 							<ToolbarItem
@@ -164,59 +172,63 @@ function HeaderToolbar() {
 						{ overflowItems }
 					</>
 				) }
-				{ ! hasReducedUI &&
-					! isWideViewport &&
-					! isSmallViewport &&
-					showIconLabels && (
-						<DropdownMenu
-							position="bottom right"
-							label={
-								/* translators: button label text should, if possible, be under 16
-	characters. */
-								__( 'Tools' )
-							}
-						>
-							{ () => (
-								<div className="edit-post-header__dropdown">
-									<MenuGroup label={ __( 'Modes' ) }>
-										<MenuItemsChoice
-											value={
-												isNavigationTool
-													? 'select'
-													: 'edit'
-											}
-											onSelect={ onSwitchMode }
-											choices={ [
-												{
-													value: 'edit',
-													label: __( 'Edit' ),
-												},
-												{
-													value: 'select',
-													label: __( 'Select' ),
-												},
-											] }
-										/>
-									</MenuGroup>
-									<MenuGroup label={ __( 'Edit' ) }>
-										<EditorHistoryUndo
-											showTooltip={ ! showIconLabels }
-											isTertiary={ showIconLabels }
-										/>
-										<EditorHistoryRedo
-											showTooltip={ ! showIconLabels }
-											isTertiary={ showIconLabels }
-										/>
-									</MenuGroup>
-									<MenuGroup>{ overflowItems }</MenuGroup>
-								</div>
-							) }
-						</DropdownMenu>
-					) }
+				{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
+					<DropdownMenu
+						position="bottom right"
+						label={
+							/* translators: button label text should, if possible, be under 16
+characters. */
+							__( 'Tools' )
+						}
+					>
+						{ () => (
+							<div className="edit-post-header__dropdown">
+								<MenuGroup label={ __( 'Modes' ) }>
+									<MenuItemsChoice
+										value={
+											isNavigationTool ? 'select' : 'edit'
+										}
+										onSelect={ onSwitchMode }
+										choices={ [
+											{
+												value: 'edit',
+												label: __( 'Edit' ),
+											},
+											{
+												value: 'select',
+												label: __( 'Select' ),
+											},
+										] }
+									/>
+								</MenuGroup>
+								<MenuGroup label={ __( 'Edit' ) }>
+									<EditorHistoryUndo
+										showTooltip={ ! showIconLabels }
+										isTertiary={ showIconLabels }
+									/>
+									<EditorHistoryRedo
+										showTooltip={ ! showIconLabels }
+										isTertiary={ showIconLabels }
+									/>
+								</MenuGroup>
+								<MenuGroup>{ overflowItems }</MenuGroup>
+							</div>
+						) }
+					</DropdownMenu>
+				) }
 			</div>
 
+			<TemplateTitle />
+
 			{ displayBlockToolbar && (
-				<div className="edit-post-header-toolbar__block-toolbar">
+				<div
+					className={ classnames(
+						'edit-post-header-toolbar__block-toolbar',
+						{
+							'is-pushed-down': isTemplateMode,
+						}
+					) }
+				>
 					<BlockToolbar hideDragHandle />
 				</div>
 			) }

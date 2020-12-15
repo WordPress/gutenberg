@@ -167,6 +167,7 @@ export default function ListEdit( {
 					setAttributes( { values: nextValues } )
 				}
 				value={ values }
+				aria-label={ __( 'List text' ) }
 				placeholder={ __( 'Write list…' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>

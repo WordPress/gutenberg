@@ -53,6 +53,18 @@ lines preserved[/myshortcode]
 <!-- /wp:shortcode -->"
 `;
 
+exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph -->
+<p>Paragraph inside group</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p>Paragraph after group</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 1`] = `
 "<!-- wp:paragraph -->
 <p>First paragraph</p>

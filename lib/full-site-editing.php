@@ -11,7 +11,7 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( STYLESHEETPATH . '/block-templates/index.html' );
+	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
 }
 
 /**
@@ -56,6 +56,38 @@ function gutenberg_remove_legacy_pages() {
 }
 
 add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
+
+/**
+ * Removes legacy adminbar items from FSE themes.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar The admin-bar instance.
+ */
+function gutenberg_adminbar_items( $wp_admin_bar ) {
+
+	// Early exit if not an FSE theme.
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	// Remove customizer link.
+	$wp_admin_bar->remove_node( 'customize' );
+	$wp_admin_bar->remove_node( 'customize-background' );
+	$wp_admin_bar->remove_node( 'customize-header' );
+	$wp_admin_bar->remove_node( 'widgets' );
+
+	// Add site-editor link.
+	if ( ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
+		$wp_admin_bar->add_node(
+			array(
+				'id'    => 'site-editor',
+				'title' => __( 'Edit site', 'gutenberg' ),
+				'href'  => admin_url( 'admin.php?page=gutenberg-edit-site' ),
+			)
+		);
+	}
+}
+
+add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
 
 /**
  * Activates the 'menu_order' filter and then hooks into 'menu_order'

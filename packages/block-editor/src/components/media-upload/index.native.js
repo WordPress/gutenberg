@@ -17,12 +17,13 @@ import {
 	capturePhoto,
 	captureVideo,
 	image,
-	video,
 	wordpress,
+	mobile,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_TYPE_ANY = 'any';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
@@ -86,7 +87,7 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_ANY ],
 			icon: wordpress,
 			mediaLibrary: true,
 		};
@@ -124,17 +125,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getChooseFromDeviceIcon() {
-		const { allowedTypes = [] } = this.props;
-
-		const isOneType = allowedTypes.length === 1;
-		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
-		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
-
-		if ( isImage || ! isOneType ) {
-			return image;
-		} else if ( isVideo ) {
-			return video;
-		}
+		return mobile;
 	}
 
 	onPickerPresent() {
@@ -164,6 +155,8 @@ export class MediaUpload extends React.Component {
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
+
 		const isImageOrVideo =
 			allowedTypes.length === 2 &&
 			allowedTypes.includes( MEDIA_TYPE_IMAGE ) &&
@@ -190,6 +183,8 @@ export class MediaUpload extends React.Component {
 			} else {
 				pickerTitle = __( 'Choose image or video' );
 			}
+		} else if ( isAnyType ) {
+			pickerTitle = __( 'Choose file' );
 		}
 
 		const getMediaOptions = () => (

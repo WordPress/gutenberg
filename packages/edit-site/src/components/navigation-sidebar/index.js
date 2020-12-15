@@ -3,7 +3,6 @@
  */
 import { createSlotFill } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,22 +20,11 @@ export default function NavigationSidebar() {
 		return select( 'core/edit-site' ).isNavigationOpened();
 	} );
 
-	// Don't mount navigation panel until it is triggered.
-	// This prevents bugs as noted in #26613.
-	// We can revert this once the underlying bugs are fixed.
-	const [ hasOpened, setHasOpened ] = useState( false );
 	return (
 		<>
-			<NavigationToggle
-				isOpen={ isNavigationOpen }
-				setHasOpened={ setHasOpened }
-			/>
-			{ hasOpened && (
-				<>
-					<NavigationPanel isOpen={ isNavigationOpen } />
-					<NavigationPanelPreviewSlot />
-				</>
-			) }
+			<NavigationToggle isOpen={ isNavigationOpen } />
+			<NavigationPanel isOpen={ isNavigationOpen } />
+			<NavigationPanelPreviewSlot />
 		</>
 	);
 }

@@ -171,7 +171,23 @@ const {
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
+	__experimentalGetDefaultTemplateType,
+	__experimentalGetDefaultTemplateTypes,
+	__experimentalGetTemplateInfo,
 } = selectors;
+
+const defaultTemplateTypes = [
+	{
+		title: 'Default (Index)',
+		description: 'Main template',
+		slug: 'index',
+	},
+	{
+		title: '404 (Not Found)',
+		description: 'Applied when content cannot be found',
+		slug: '404',
+	},
+];
 
 describe( 'selectors', () => {
 	let cachedSelectors;
@@ -2910,6 +2926,155 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultTemplateTypes', () => {
+		const state = { editorSettings: { defaultTemplateTypes } };
+
+		it( 'returns undefined if there are no default template types', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplateTypes( emptyState )
+			).toBeUndefined();
+		} );
+
+		it( 'returns a list of default template types if present in state', () => {
+			expect(
+				__experimentalGetDefaultTemplateTypes( state )
+			).toHaveLength( 2 );
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultTemplateType', () => {
+		const state = { editorSettings: { defaultTemplateTypes } };
+
+		it( 'returns an empty object if there are no default template types', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplateType( emptyState, 'slug' )
+			).toEqual( {} );
+		} );
+
+		it( 'returns an empty object if the requested slug is not found', () => {
+			expect(
+				__experimentalGetDefaultTemplateType( state, 'foobar' )
+			).toEqual( {} );
+		} );
+
+		it( 'returns the requested default template type ', () => {
+			expect(
+				__experimentalGetDefaultTemplateType( state, 'index' )
+			).toEqual( {
+				title: 'Default (Index)',
+				description: 'Main template',
+				slug: 'index',
+			} );
+		} );
+
+		it( 'returns the requested default template type even when the slug is numeric', () => {
+			expect(
+				__experimentalGetDefaultTemplateType( state, '404' )
+			).toEqual( {
+				title: '404 (Not Found)',
+				description: 'Applied when content cannot be found',
+				slug: '404',
+			} );
+		} );
+	} );
+
+	describe( '__experimentalGetTemplateInfo', () => {
+		const state = { editorSettings: { defaultTemplateTypes } };
+
+		it( 'should return an empty object if no template is passed', () => {
+			expect( __experimentalGetTemplateInfo( state, null ) ).toEqual(
+				{}
+			);
+			expect( __experimentalGetTemplateInfo( state, undefined ) ).toEqual(
+				{}
+			);
+			expect( __experimentalGetTemplateInfo( state, false ) ).toEqual(
+				{}
+			);
+		} );
+
+		it( 'should return the default title if none is defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, { slug: 'index' } ).title
+			).toEqual( 'Default (Index)' );
+		} );
+
+		it( 'should return the rendered title if defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					title: { rendered: 'test title' },
+				} ).title
+			).toEqual( 'test title' );
+		} );
+
+		it( 'should return the slug if no title is found', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'not a real template',
+				} ).title
+			).toEqual( 'not a real template' );
+		} );
+
+		it( 'should return the default description if none is defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, { slug: 'index' } )
+					.description
+			).toEqual( 'Main template' );
+		} );
+
+		it( 'should return the raw excerpt as description if defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					excerpt: { raw: 'test description' },
+				} ).description
+			).toEqual( 'test description' );
+		} );
+
+		it( 'should return both a title and a description', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, { slug: 'index' } )
+			).toEqual( {
+				title: 'Default (Index)',
+				description: 'Main template',
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					title: { rendered: 'test title' },
+				} )
+			).toEqual( {
+				title: 'test title',
+				description: 'Main template',
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					excerpt: { raw: 'test description' },
+				} )
+			).toEqual( {
+				title: 'Default (Index)',
+				description: 'test description',
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					title: { rendered: 'test title' },
+					excerpt: { raw: 'test description' },
+				} )
+			).toEqual( {
+				title: 'test title',
+				description: 'test description',
+			} );
 		} );
 	} );
 } );
