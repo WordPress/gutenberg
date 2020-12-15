@@ -59,8 +59,10 @@ export class BlockListItem extends Component {
 			parentWidth,
 		} = this.props;
 		const { blockWidth } = this.state;
-		const { medium } = ALIGNMENT_BREAKPOINTS;
+		const { medium, mobile } = ALIGNMENT_BREAKPOINTS;
 		const { innerContainers } = WIDE_ALIGNMENTS;
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const isScreenWiderThanMobile = screenWidth > mobile;
 
 		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
@@ -68,7 +70,6 @@ export class BlockListItem extends Component {
 			}
 			return marginHorizontal;
 		}
-
 		if ( isWideWidth( blockAlignment ) ) {
 			return marginHorizontal;
 		}
@@ -76,7 +77,7 @@ export class BlockListItem extends Component {
 		const isContainerRelated = innerContainers.includes( blockName );
 
 		if ( isFullWidth( parentBlockAlignment ) && blockWidth <= medium ) {
-			if ( isContainerRelated ) {
+			if ( isContainerRelated || isScreenWiderThanMobile ) {
 				return marginHorizontal;
 			}
 			return marginHorizontal * 2;
@@ -87,9 +88,8 @@ export class BlockListItem extends Component {
 		);
 
 		if ( isParentContainerRelated && ! isContainerRelated ) {
-			const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 			const isScreenWidthEqual = parentWidth === screenWidth;
-			if ( isScreenWidthEqual ) {
+			if ( isScreenWidthEqual || isScreenWiderThanMobile ) {
 				return marginHorizontal * 2;
 			}
 		}
