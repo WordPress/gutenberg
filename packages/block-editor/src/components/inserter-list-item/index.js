@@ -26,6 +26,7 @@ function InserterListItem( {
 	item,
 	onSelect,
 	onHover,
+	isDraggable,
 	...props
 } ) {
 	const isDragging = useRef( false );
@@ -47,7 +48,7 @@ function InserterListItem( {
 
 	return (
 		<InserterListItemDraggable
-			isEnabled={ ! item.disabled }
+			isEnabled={ isDraggable && ! item.disabled }
 			blocks={ blocks }
 			icon={ item.icon }
 		>

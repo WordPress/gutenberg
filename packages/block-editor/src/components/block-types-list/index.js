@@ -20,6 +20,7 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 	label,
+	isDraggable = true,
 } ) {
 	const composite = useCompositeState();
 	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
@@ -50,6 +51,7 @@ function BlockTypesList( {
 						onSelect={ onSelect }
 						onHover={ onHover }
 						composite={ composite }
+						isDraggable={ isDraggable }
 					/>
 				);
 			} ) }
