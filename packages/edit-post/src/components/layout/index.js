@@ -25,7 +25,10 @@ import {
 	Popover,
 	__unstableUseDrop as useDrop,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
 import {
@@ -52,7 +55,6 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
-import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block library' ),
@@ -169,6 +171,9 @@ function Layout( { settings } ) {
 
 	useDrop( ref );
 	useEditorStyles( ref, settings.styles );
+	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
+		onClose: () => setIsInserterOpened( false ),
+	} );
 
 	return (
 		<>
@@ -194,34 +199,31 @@ function Layout( { settings } ) {
 				secondarySidebar={
 					mode === 'visual' &&
 					isInserterOpened && (
-						<PopoverWrapper
-							className="edit-post-layout__inserter-panel-popover-wrapper"
-							onClose={ () => setIsInserterOpened( false ) }
+						<div
+							ref={ inserterDialogRef }
+							{ ...inserterDialogProps }
+							className="edit-post-layout__inserter-panel"
 						>
-							<div className="edit-post-layout__inserter-panel">
-								<div className="edit-post-layout__inserter-panel-header">
-									<Button
-										icon={ close }
-										onClick={ () =>
-											setIsInserterOpened( false )
-										}
-									/>
-								</div>
-								<div className="edit-post-layout__inserter-panel-content">
-									<Library
-										showMostUsedBlocks={
-											showMostUsedBlocks
-										}
-										showInserterHelpPanel
-										onSelect={ () => {
-											if ( isMobileViewport ) {
-												setIsInserterOpened( false );
-											}
-										} }
-									/>
-								</div>
+							<div className="edit-post-layout__inserter-panel-header">
+								<Button
+									icon={ close }
+									onClick={ () =>
+										setIsInserterOpened( false )
+									}
+								/>
 							</div>
-						</PopoverWrapper>
+							<div className="edit-post-layout__inserter-panel-content">
+								<Library
+									showMostUsedBlocks={ showMostUsedBlocks }
+									showInserterHelpPanel
+									onSelect={ () => {
+										if ( isMobileViewport ) {
+											setIsInserterOpened( false );
+										}
+									} }
+								/>
+							</div>
+						</div>
 					)
 				}
 				sidebar={

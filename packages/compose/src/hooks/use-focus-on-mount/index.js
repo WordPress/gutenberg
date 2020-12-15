@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { useCallback, useRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
-import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean|string} focusOnMount Focus on mount mode.
- * @return {Function|Object} Element Ref.
+ * @return {Function} Ref callback.
  *
  * @example
  * ```js
@@ -25,52 +25,29 @@ import { useEffect, useRef } from '@wordpress/element';
  * }
  * ```
  */
-function useFocusOnMount( focusOnMount = 'firstElement' ) {
-	const focusOnMountRef = useRef( focusOnMount );
-	useEffect( () => {
-		focusOnMountRef.current = focusOnMount;
-	}, [ focusOnMount ] );
+export default function useFocusOnMount( focusOnMount ) {
+	const didMount = useRef( false );
+	return useCallback( ( node ) => {
+		if ( ! node || didMount.current === true ) {
+			return;
+		}
 
-	// Ideally we should be using a function ref (useCallback)
-	// Right now we have some issues where the link popover remounts
-	// prevents us from doing that.
-	// The downside of the current implementation is that it doesn't update if the "ref" changes.
-	const ref = useRef();
+		didMount.current = true;
 
-	// Focus handling
-	useEffect( () => {
-		/*
-		 * Without the setTimeout, the dom node is not being focused. Related:
-		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		 *
-		 * TODO: Treat the cause, not the symptom.
-		 */
-		const focusTimeout = setTimeout( () => {
-			if ( ! focusOnMountRef.current || ! ref.current ) {
-				return;
+		if ( node.contains( node.ownerDocument.activeElement ) ) {
+			return;
+		}
+
+		let target = node;
+
+		if ( focusOnMount === 'firstElement' ) {
+			const firstTabbable = focus.tabbable.find( node )[ 0 ];
+
+			if ( firstTabbable ) {
+				target = firstTabbable;
 			}
+		}
 
-			if ( focusOnMountRef.current === 'firstElement' ) {
-				const firstTabbable = focus.tabbable.find( ref.current )[ 0 ];
-
-				if ( firstTabbable ) {
-					firstTabbable.focus();
-				} else {
-					ref.current.focus();
-				}
-
-				return;
-			}
-
-			if ( focusOnMountRef.current === 'container' ) {
-				ref.current.focus();
-			}
-		}, 0 );
-
-		return () => clearTimeout( focusTimeout );
+		target.focus();
 	}, [] );
-
-	return ref;
 }
-
-export default useFocusOnMount;

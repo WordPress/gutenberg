@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useCallback, useEffect } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import useCallbackRef from '../use-callback-ref';
 
 /**
  * When opening modals/sidebars/dialogs, the focus
@@ -28,53 +33,44 @@ import { useRef, useCallback, useEffect } from '@wordpress/element';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
+	const ref = useRef();
 	const focusedBeforeMount = useRef();
-	const isFocused = useRef( false );
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
 		onFocusReturnRef.current = onFocusReturn;
-	}, [] );
+	}, [ onFocusReturn ] );
 
-	const ref = useCallback( ( newNode ) => {
-		const updateLastFocusedRef = ( { target } ) => {
-			isFocused.current = newNode && newNode.contains( target );
-		};
+	return useCallbackRef( ( node ) => {
+		if ( node ) {
+			// Set ref to be used when unmounting.
+			ref.current = node;
 
-		// Unmounting the reference
-		if ( ! newNode && focusedBeforeMount.current ) {
-			if ( newNode?.ownerDocument ) {
-				newNode.ownerDocument.removeEventListener(
-					'focusin',
-					updateLastFocusedRef
-				);
-			}
-
-			if ( ! isFocused.current ) {
+			// Only set when the node mounts.
+			if ( focusedBeforeMount.current ) {
 				return;
 			}
 
-			// Defer to the component's own explicit focus return behavior,
-			// if specified. This allows for support that the `onFocusReturn` decides to allow the
-			// default behavior to occur under some conditions.
+			focusedBeforeMount.current = node.ownerDocument.activeElement;
+		} else if ( focusedBeforeMount.current ) {
+			const isFocused = ref.current.contains(
+				ref.current.ownerDocument.activeElement
+			);
+
+			if ( ! isFocused ) {
+				return;
+			}
+
+			// Defer to the component's own explicit focus return behavior, if
+			// specified. This allows for support that the `onFocusReturn`
+			// decides to allow the default behavior to occur under some
+			// conditions.
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
-				return;
+			} else {
+				focusedBeforeMount.current.focus();
 			}
-
-			focusedBeforeMount.current.focus();
-		}
-
-		// Mounting the new reference
-		focusedBeforeMount.current = newNode?.ownerDocument.activeElement;
-		if ( newNode?.ownerDocument ) {
-			newNode.ownerDocument.addEventListener(
-				'focusin',
-				updateLastFocusedRef
-			);
 		}
 	}, [] );
-
-	return ref;
 }
 
 export default useFocusReturn;

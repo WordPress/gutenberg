@@ -32,7 +32,10 @@ import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 import { close } from '@wordpress/icons';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,7 +48,6 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
-import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -173,6 +175,10 @@ function Editor() {
 
 	useEditorStyles( ref, settings.styles );
 
+	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
+		onClose: () => setIsInserterOpened( false ),
+	} );
+
 	return (
 		<>
 			<URLQueryController />
@@ -207,43 +213,38 @@ function Editor() {
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={
 												isInserterOpen ? (
-													<PopoverWrapper
-														className="edit-site-editor__inserter-panel-popover-wrapper"
-														onClose={ () =>
-															setIsInserterOpened(
-																false
-															)
+													<div
+														ref={
+															inserterDialogRef
 														}
+														{ ...inserterDialogProps }
+														className="edit-site-editor__inserter-panel"
 													>
-														<div className="edit-site-editor__inserter-panel">
-															<div className="edit-site-editor__inserter-panel-header">
-																<Button
-																	icon={
-																		close
-																	}
-																	onClick={ () =>
+														<div className="edit-site-editor__inserter-panel-header">
+															<Button
+																icon={ close }
+																onClick={ () =>
+																	setIsInserterOpened(
+																		false
+																	)
+																}
+															/>
+														</div>
+														<div className="edit-site-editor__inserter-panel-content">
+															<Library
+																showInserterHelpPanel
+																onSelect={ () => {
+																	if (
+																		isMobile
+																	) {
 																		setIsInserterOpened(
 																			false
-																		)
+																		);
 																	}
-																/>
-															</div>
-															<div className="edit-site-editor__inserter-panel-content">
-																<Library
-																	showInserterHelpPanel
-																	onSelect={ () => {
-																		if (
-																			isMobile
-																		) {
-																			setIsInserterOpened(
-																				false
-																			);
-																		}
-																	} }
-																/>
-															</div>
+																} }
+															/>
 														</div>
-													</PopoverWrapper>
+													</div>
 												) : null
 											}
 											sidebar={

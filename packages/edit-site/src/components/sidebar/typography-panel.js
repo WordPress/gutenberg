@@ -30,12 +30,13 @@ function useHasLineHeightControl( { supports, name } ) {
 }
 
 function useHasAppearenceControl( { supports, name } ) {
-	const fontStyles = useEditorFeature( 'typography.fontStyles', name );
-	const fontWeights = useEditorFeature( 'typography.fontWeights', name );
-	return (
-		( supports.includes( 'fontStyle' ) && !! fontStyles?.length ) ||
-		( supports.includes( 'fontWeight' ) && !! fontWeights?.length )
-	);
+	const hasFontStyles =
+		useEditorFeature( 'typography.customFontStyle', name ) &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useEditorFeature( 'typography.customFontWeight', name ) &&
+		supports.includes( 'fontWeight' );
+	return hasFontStyles || hasFontWeights;
 }
 
 export default function TypographyPanel( {
@@ -49,12 +50,14 @@ export default function TypographyPanel( {
 		name
 	);
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
-	const fontStyles = useEditorFeature( 'typography.fontStyles', name );
-	const fontWeights = useEditorFeature( 'typography.fontWeights', name );
+	const hasFontStyles =
+		useEditorFeature( 'typography.customFontStyle', name ) &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useEditorFeature( 'typography.customFontWeight', name ) &&
+		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearenceControl = useHasAppearenceControl( { supports, name } );
-	const hasFontStyleSupport = supports.includes( 'fontStyle' );
-	const hasFontWeightSupport = supports.includes( 'fontWeight' );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -91,18 +94,12 @@ export default function TypographyPanel( {
 						fontStyle: getStyleProperty( name, 'fontStyle' ),
 						fontWeight: getStyleProperty( name, 'fontWeight' ),
 					} }
-					options={ {
-						fontStyles: hasFontStyleSupport
-							? fontStyles
-							: undefined,
-						fontWeights: hasFontWeightSupport
-							? fontWeights
-							: undefined,
-					} }
 					onChange={ ( { fontStyle, fontWeight } ) => {
 						setStyleProperty( name, 'fontStyle', fontStyle );
 						setStyleProperty( name, 'fontWeight', fontWeight );
 					} }
+					hasFontStyles={ hasFontStyles }
+					hasFontWeights={ hasFontWeights }
 				/>
 			) }
 		</PanelBody>
