@@ -14,10 +14,10 @@
 			"default": {
 				"spacing": {
 					"padding": {
-						"top": 20,
-						"right": 20,
-						"bottom": 20,
-						"left": 20
+						"top": "1em",
+						"right": "1em",
+						"bottom": "1em",
+						"left": "1em"
 					}
 				}
 			}
@@ -29,7 +29,10 @@
 	"supports": {
 		"anchor": true,
 		"__experimentalFontFamily": true,
-		"fontSize": true
+		"fontSize": true,
+		"spacing": {
+			"padding": true
+		}
 	},
 	"style": "wp-block-verse",
 	"editorStyle": "wp-block-verse-editor"
