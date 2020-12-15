@@ -23,15 +23,17 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 			// load the auto-draft created from the
 			// relevant file.
 			if ( slug && theme ) {
+				const currentTheme = select( 'core' ).getCurrentTheme()
+					?.stylesheet;
 				const cleanedSlug = cleanForSlug( slug );
-				const themeSlug = `pub-${ theme }`;
+				const themeSlug = currentTheme.replace( '/', '-' );
 				const posts = select( 'core' ).getEntityRecords(
 					'postType',
 					'wp_template_part',
 					{
 						status: [ 'publish', 'auto-draft' ],
 						slug: cleanedSlug,
-						themeSlug,
+						theme: themeSlug,
 					}
 				);
 
