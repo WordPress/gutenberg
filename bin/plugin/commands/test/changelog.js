@@ -10,7 +10,7 @@ import {
 	capitalizeAfterColonSeparatedPrefix,
 	getIssueType,
 	sortGroup,
-	getTypesByLabels,
+	getTypesByLabelType,
 	getTypesByTitle,
 } from '../changelog';
 
@@ -203,9 +203,9 @@ describe( 'sortGroup', () => {
 	} );
 } );
 
-describe( 'getTypesByLabels', () => {
+describe( 'getTypesByLabelType', () => {
 	it( 'returns all normalized type candidates by type prefix', () => {
-		const result = getTypesByLabels( [
+		const result = getTypesByLabelType( [
 			'[Type] Regression',
 			'[Type] Bug',
 			'[Package] Blocks',

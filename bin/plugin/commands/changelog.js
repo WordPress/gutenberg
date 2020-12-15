@@ -111,7 +111,7 @@ const REWORD_TERMS = {
  *
  * @return {string[]} Type candidates.
  */
-function getTypesByLabels( labels ) {
+function getTypesByLabelType( labels ) {
 	return uniq(
 		labels
 			.filter( ( label ) => label.startsWith( '[Type] ' ) )
@@ -152,7 +152,7 @@ function getTypesByTitle( title ) {
  */
 function getIssueType( issue ) {
 	const candidates = [
-		...getTypesByLabels( issue.labels.map( ( { name } ) => name ) ),
+		...getTypesByLabelType( issue.labels.map( ( { name } ) => name ) ),
 		...getTypesByTitle( issue.title ),
 	];
 
@@ -471,6 +471,6 @@ async function getReleaseChangelog( options ) {
 	getReleaseChangelog,
 	getIssueType,
 	sortGroup,
-	getTypesByLabels,
+	getTypesByLabelType,
 	getTypesByTitle,
 };
