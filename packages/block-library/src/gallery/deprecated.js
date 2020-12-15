@@ -721,8 +721,11 @@ const v5 = {
 	supports: {
 		align: true,
 	},
-	isEligible( { linkTo } ) {
-		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
+	isEligible( { linkTo, imageCount } ) {
+		return (
+			! imageCount &&
+			( ! linkTo || linkTo === 'attachment' || linkTo === 'media' )
+		);
 	},
 	migrate( attributes ) {
 		let linkTo = attributes.linkTo;
