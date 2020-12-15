@@ -2,7 +2,7 @@
 	"name": "@wordpress/stylelint-config",
 	"version": "17.0.0",
 	"description": "stylelint config for WordPress development.",
-	"author": "stylelint",
+	"author": "The WordPress Contributors",
 	"license": "MIT",
 	"keywords": [
 		"stylelint",
