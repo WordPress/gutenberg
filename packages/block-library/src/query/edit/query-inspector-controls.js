@@ -20,6 +20,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -143,8 +144,21 @@ export default function QueryInspectorControls( {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+
+	const CreateNewPostLink = ( { type } ) => {
+		const newPostUrl = addQueryArgs( 'post-new.php', {
+			post_type: type,
+		} );
+		return (
+			<div className="wp-block-query__create-new-link">
+				<a href={ newPostUrl }> { __( 'Create a new post' ) }</a>{ ' ' }
+				{ __( 'for this feed.' ) }
+			</div>
+		);
+	};
 	return (
 		<InspectorControls>
+			<CreateNewPostLink type={ postType } />
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					label={ __( 'Inherit query from URL' ) }
