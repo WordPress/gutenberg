@@ -14,5 +14,6 @@
 	"supports": {
 		"anchor": true,
 		"fontSize": true
-	}
+	},
+	"style": "wp-block-preformatted"
 }
