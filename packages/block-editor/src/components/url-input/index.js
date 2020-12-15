@@ -64,8 +64,12 @@ function URLInput( {
 	const suggestionNodes = useRef( [] );
 
 	useEffect( () => {
+		if ( prevValue.current !== value && shouldShowInitialSuggestions() ) {
+			updateSuggestions();
+		}
+
 		prevValue.current = value;
-	} );
+	}, [ value ] );
 
 	useEffect( () => {
 		// Only have to worry about scrolling selected suggestion into view when already expanded.
@@ -84,10 +88,6 @@ function URLInput( {
 			setTimeout( () => {
 				scrollingIntoView.current = false;
 			}, 100 );
-		}
-
-		if ( prevValue.current !== value && shouldShowInitialSuggestions() ) {
-			updateSuggestions();
 		}
 	}, [ showSuggestions, value ] );
 
