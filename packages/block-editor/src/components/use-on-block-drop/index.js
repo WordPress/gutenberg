@@ -45,12 +45,13 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
+ * @param {string} targetRootClientId        The root client id where the block(s) will be inserted.
+ * @param {number} targetBlockIndex          The index where the block(s) will be inserted.
  * @param {Function} getBlockIndex             A function that gets the index of a block.
  * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
  * @param {Function} moveBlocksToPosition      A function that moves blocks.
  * @param {Function} insertBlocks              A function that inserts blocks.
+ * @param {Function} clearSelectedBlock        A function that clears block selection.
  * @return {Function} The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -59,7 +60,8 @@ export function onBlockDrop(
 	getBlockIndex,
 	getClientIdsOfDescendants,
 	moveBlocksToPosition,
-	insertBlocks
+	insertBlocks,
+	clearSelectedBlock
 ) {
 	return ( event ) => {
 		const {
@@ -71,6 +73,7 @@ export function onBlockDrop(
 
 		// If the user is inserting a block
 		if ( dropType === 'inserter' ) {
+			clearSelectedBlock();
 			insertBlocks( blocks, targetBlockIndex, targetRootClientId, false );
 		}
 
@@ -215,6 +218,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		insertBlocks,
 		moveBlocksToPosition,
 		updateBlockAttributes,
+		clearSelectedBlock,
 	} = useDispatch( 'core/block-editor' );
 
 	return {
@@ -224,7 +228,8 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 			getBlockIndex,
 			getClientIdsOfDescendants,
 			moveBlocksToPosition,
-			insertBlocks
+			insertBlocks,
+			clearSelectedBlock
 		),
 		onFilesDrop: onFilesDrop(
 			targetRootClientId,
