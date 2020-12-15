@@ -60,6 +60,16 @@ export function getHrefAndDestination( image, destination ) {
 				href: image?.link,
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
 			};
+		case LINK_DESTINATION_MEDIA:
+			return {
+				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				linkDestination: LINK_DESTINATION_MEDIA,
+			};
+		case LINK_DESTINATION_ATTACHMENT:
+			return {
+				href: image?.link,
+				linkDestination: LINK_DESTINATION_ATTACHMENT,
+			};
 		case LINK_DESTINATION_NONE:
 			return {
 				href: undefined,
@@ -731,10 +741,6 @@ const v5 = {
 		let linkTo = attributes.linkTo;
 		if ( ! attributes.linkTo ) {
 			linkTo = 'none';
-		} else if ( attributes.linkTo === 'attachment' ) {
-			linkTo = 'post';
-		} else if ( attributes.linkTo === 'media' ) {
-			linkTo = 'file';
 		}
 		const imageBlocks = attributes.images.map( ( image ) => {
 			return createBlock( 'core/image', {
@@ -934,10 +940,10 @@ const v6 = {
 						let href;
 
 						switch ( linkTo ) {
-							case LINK_DESTINATION_MEDIA:
+							case DEPRECATED_LINK_DESTINATION_MEDIA:
 								href = image.fullUrl || image.url;
 								break;
-							case LINK_DESTINATION_ATTACHMENT:
+							case DEPRECATED_LINK_DESTINATION_ATTACHMENT:
 								href = image.link;
 								break;
 						}
@@ -992,6 +998,11 @@ const v6 = {
 		return ! imageCount;
 	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
+		if ( linkTo === 'post' ) {
+			linkTo = 'attachment';
+		} else if ( linkTo === 'file' ) {
+			linkTo = 'media';
+		}
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: parseInt( image.id ),
