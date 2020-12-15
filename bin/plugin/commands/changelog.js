@@ -61,7 +61,31 @@ const LABEL_TYPE_MAPPING = {
 	'New API': 'New APIs',
 	Experimental: 'Experiments',
 	Task: 'Various',
+	'Global Styles': 'FSE: Style System',
 };
+
+/**
+ * Order in which to match labels.
+ *
+ * A value of `undefined` is used as slot
+ * in which unrecognized labels
+ * are to be matched.
+ *
+ * @type {Array<string|undefined>}
+ */
+const LABEL_MATCHING_ORDER = [
+	'FSE: Style System',
+	'Features',
+	'Enhancements',
+	'New APIs',
+	'Bug Fixes',
+	'Performance',
+	'Experiments',
+	'Documentation',
+	'Code Quality',
+	'Various',
+	undefined,
+];
 
 /**
  * Order in which to print group titles. A value of `undefined` is used as slot
@@ -76,7 +100,7 @@ const GROUP_TITLE_ORDER = [
 	'Bug Fixes',
 	'Performance',
 	'Experiments',
-	'Global Styles',
+	'FSE: Style System',
 	'Documentation',
 	'Code Quality',
 	undefined,
@@ -115,7 +139,15 @@ const REWORD_TERMS = {
  */
 function getTypesByLabelAllowedList( labels ) {
 	const allowedList = [ 'Global Styles' ];
-	return uniq( labels.filter( ( label ) => allowedList.includes( label ) ) );
+	return uniq(
+		labels
+			.filter( ( label ) => allowedList.includes( label ) )
+			.map( ( label ) =>
+				LABEL_TYPE_MAPPING.hasOwnProperty( label )
+					? LABEL_TYPE_MAPPING[ label ]
+					: label
+			)
+	);
 }
 
 /**
@@ -172,7 +204,24 @@ function getIssueType( issue ) {
 		...getTypesByTitle( issue.title ),
 	];
 
-	return candidates.length ? candidates.sort( sortGroup )[ 0 ] : 'Various';
+	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
+}
+
+/**
+ * Sort comparator, comparing two group titles.
+ *
+ * @param {string} a First group title.
+ * @param {string} b Second group title.
+ *
+ * @return {number} Sort result.
+ */
+function sortType( a, b ) {
+	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
+		const index = LABEL_MATCHING_ORDER.indexOf( title );
+		return index === -1 ? LABEL_MATCHING_ORDER.indexOf( undefined ) : index;
+	} );
+
+	return aIndex - bIndex;
 }
 
 /**
