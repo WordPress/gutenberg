@@ -1,3 +1,10 @@
+/**
+ * SCSS Variables.
+ *
+ * Please use variables from this sheet to ensure consistency across the UI.
+ * Don't add to this sheet unless you're pretty sure the value will be reused in many places.
+ */
+
 @import "./colors";
 
 /**
@@ -10,17 +17,11 @@ $default-line-height: 1.4;
 $editor-font: "Noto Serif", serif;
 $editor-html-font: Menlo, Consolas, monaco, monospace;
 $editor-font-size: 16px;
-$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
+$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks.
 $text-editor-font-size: 15px;
 $editor-line-height: 1.8;
-$big-font-size: 18px;
-$mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
-$border-width: 1px;
-$border-width-focus: 1.5px;
-$border-width-tab: 4px;
-$helptext-font-size: 12px;
-$radio-input-size: 20px;
-$radio-input-size-sm: 24px; // Width & height for small viewports.
+$mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in".
+
 
 /**
  * Grid System.
@@ -36,6 +37,7 @@ $grid-unit-30: 3 * $grid-unit;		// 24px
 $grid-unit-40: 4 * $grid-unit;		// 32px
 $grid-unit-50: 5 * $grid-unit;		// 40px
 $grid-unit-60: 6 * $grid-unit;		// 48px
+
 
 /**
  * Dimensions.
@@ -55,10 +57,7 @@ $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
 $modal-min-width: 360px;
 $spinner-size: 18px;
-$mobile-header-toolbar-height: 44px;
-$mobile-floating-toolbar-height: 44px;
-$mobile-floating-toolbar-margin: 8px;
-$mobile-color-swatch: 48px;
+
 
 /**
  * Shadows.
@@ -77,18 +76,48 @@ $content-width: 840px;
 $wide-content-width: 1100px;
 $widget-area-width: 700px;
 
+
 /**
- * Block UI.
+ * Block & Editor UI.
  */
 
 $block-toolbar-height: $grid-unit-60;
-$mobile-block-toolbar-height: 44px;
-$block-padding: 14px; // Space between block footprint and focus boundaries. These are drawn outside the block footprint, and do not affect the size.
-$block-spacing: 4px; // Vertical space between blocks.
-$block-side-ui-width: $button-size; // Width of the movers/drag handle UI.
-$block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
-$dimmed-opacity: 1;
+$border-width: 1px;
+$border-width-focus: 1.5px;
+$border-width-tab: 4px;
+$helptext-font-size: 12px;
+$radius-round: 50%;
+$radius-block-ui: 2px;
+$radio-input-size: 20px;
+$radio-input-size-sm: 24px; // Width & height for small viewports.
 
+// Deprecated, please avoid using these.
+$block-padding: 14px; // Used to define space between block footprint and surrouding borders.
+
+
+/**
+ * Block paddings.
+ */
+
+// Padding for blocks with a background color (e.g. paragraph or group).
+$block-bg-padding--v: 1.25em;
+$block-bg-padding--h: 2.375em;
+
+
+/**
+ * React Native specific.
+ * These variables do not appear to be used anywhere else.
+ */
+
+// Dimensions.
+$mobile-header-toolbar-height: 44px;
+$mobile-floating-toolbar-height: 44px;
+$mobile-floating-toolbar-margin: 8px;
+$mobile-color-swatch: 48px;
+
+// Block UI.
+$mobile-block-toolbar-height: 44px;
+$dimmed-opacity: 1;
 $block-edge-to-content: 16px;
 $solid-border-space: 12px;
 $dashed-border-space: 6px;
@@ -97,17 +126,3 @@ $block-selected-border-width: 1px;
 $block-selected-padding: 0;
 $block-selected-child-margin: 5px;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
-
-/**
- * Border radii.
- */
-
-$radius-round: 50%;
-$radius-block-ui: 2px;
-
-/**
- * Block paddings.
- */
-// Padding for blocks with a background color (e.g. paragraph or group).
-$block-bg-padding--v: 1.25em;
-$block-bg-padding--h: 2.375em;

@@ -158,10 +158,10 @@ function LinkSettings( {
 	function onChangeOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
 
-		let updatedRel = rel;
-		if ( newLinkTarget && ! rel ) {
+		let updatedRel = linkRelInputValue;
+		if ( newLinkTarget && ! linkRelInputValue ) {
 			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
+		} else if ( ! newLinkTarget && linkRelInputValue === NEW_TAB_REL ) {
 			updatedRel = undefined;
 		}
 
