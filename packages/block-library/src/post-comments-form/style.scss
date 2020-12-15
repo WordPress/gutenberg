@@ -1,0 +1,30 @@
+.wp-block-post-comments-form {
+
+	h3#reply-title {
+		margin-top: $grid-unit-20;
+    }
+
+    p.logged-in-as {
+        margin-top: $grid-unit-10;
+        font-size: $editor-font-size;
+    }
+
+    p.comment-form-comment label {
+        font-weight: bold;
+        font-size: $big-font-size;
+    }
+
+    .comment-form-comment #comment {
+        margin-top: $grid-unit-20;
+        width: 100%;
+    }
+
+    #submit{
+        background: transparent;
+        border-color: var(--wp-admin-theme-color);
+        border-radius: $radius-block-ui;
+        color: $gray-900;
+        font-size: $editor-font-size;
+        padding: $grid-unit-10 $grid-unit-20;
+    }
+}
