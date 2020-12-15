@@ -47,45 +47,38 @@ const manifest = require( '../../../package.json' );
  */
 
 /**
- * Mapping of label names to grouping heading text to be used in release notes,
- * intended to be more readable in the context of release notes. Also used in
- * merging multiple related groupings to a single heading.
+ * Mapping of label names to groups to be used in release notes,
+ * intended to be more readable in the context of release notes.
+ *
+ * It's also used in:
+ *
+ * - merging multiple related groupings to a single heading
+ * - prioritize which group is assigned if there are several candidates
  *
  * @type {Record<string,string>}
  */
-const LABEL_TYPE_MAPPING = {
-	Bug: 'Bug Fixes',
-	Regression: 'Bug Fixes',
-	Feature: 'Features',
-	Enhancement: 'Enhancements',
-	'New API': 'New APIs',
-	Experimental: 'Experiments',
-	Task: 'Various',
+const LABEL_MAPPING = {
+	'Mobile App Android/iOS': 'Mobile',
+	'[Block] Navigation': 'FSE: Block Navigation',
+	'[Block] Query': 'FSE: Block Query',
+	'[Block] Post Title': 'FSE: Blocks',
+	'[Block] Post Comments': 'FSE: Blocks',
+	'[Block] Post Featured Image': 'FSE: Blocks',
+	'[Feature] Full Site Editing': 'FSE: Infrastructure',
 	'Global Styles': 'FSE: Style System',
+	'[Feature] Navigation Screen': 'Screen: Navigation',
+	'[Feature] Widgets Screen': 'Screen: Wigdets',
+	'[Type] Bug': 'Bug Fixes',
+	'[Type] Regression': 'Bug Fixes',
+	'[Type] Feature': 'Features',
+	'[Type] Enhancement': 'Enhancements',
+	'[Type] New API': 'New APIs',
+	'[Type] Experimental': 'Experiments',
+	'[Type] Performance': 'Performance',
+	'[Type] Task': 'Various',
+	'[Type] Documentation': 'Documentation',
+	'[Type] Code Quality': 'Code Quality',
 };
-
-/**
- * Order in which to match labels.
- *
- * A value of `undefined` is used as slot
- * in which unrecognized labels
- * are to be matched.
- *
- * @type {Array<string|undefined>}
- */
-const LABEL_MATCHING_ORDER = [
-	'FSE: Style System',
-	'Features',
-	'Enhancements',
-	'New APIs',
-	'Bug Fixes',
-	'Performance',
-	'Experiments',
-	'Documentation',
-	'Code Quality',
-	'Various',
-	undefined,
-];
 
 /**
  * Order in which to print group titles. A value of `undefined` is used as slot
@@ -100,11 +93,18 @@ const GROUP_TITLE_ORDER = [
 	'Bug Fixes',
 	'Performance',
 	'Experiments',
+	'FSE: Block Navigation',
+	'FSE: Block Query',
+	'FSE: Blocks',
+	'FSE: Infrastructure',
 	'FSE: Style System',
+	'Screen: Navigation',
+	'Screen: Wigdets',
 	'Documentation',
 	'Code Quality',
 	undefined,
 	'Various',
+	'Mobile'
 ];
 
 /**
@@ -137,36 +137,13 @@ const REWORD_TERMS = {
  *
  * @return {string[]} Type candidates.
  */
-function getTypesByLabelAllowedList( labels ) {
-	const allowedList = [ 'Global Styles' ];
+function getTypesByLabels( labels ) {
 	return uniq(
 		labels
-			.filter( ( label ) => allowedList.includes( label ) )
-			.map( ( label ) =>
-				LABEL_TYPE_MAPPING.hasOwnProperty( label )
-					? LABEL_TYPE_MAPPING[ label ]
-					: label
+			.filter( ( label ) =>
+				Object.keys( LABEL_MAPPING ).includes( label )
 			)
-	);
-}
-
-/**
- * Returns type candidates based on given issue label names.
- *
- * @param {string[]} labels Label names.
- *
- * @return {string[]} Type candidates.
- */
-function getTypesByLabelType( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) => label.startsWith( '[Type] ' ) )
-			.map( ( label ) => label.slice( '[Type] '.length ) )
-			.map( ( label ) =>
-				LABEL_TYPE_MAPPING.hasOwnProperty( label )
-					? LABEL_TYPE_MAPPING[ label ]
-					: label
-			)
+			.map( ( label ) => LABEL_MAPPING[ label ] )
 	);
 }
 
@@ -199,8 +176,7 @@ function getTypesByTitle( title ) {
 function getIssueType( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
 	const candidates = [
-		...getTypesByLabelAllowedList( labels ),
-		...getTypesByLabelType( labels ),
+		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
 
@@ -217,8 +193,7 @@ function getIssueType( issue ) {
  */
 function sortType( a, b ) {
 	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		const index = LABEL_MATCHING_ORDER.indexOf( title );
-		return index === -1 ? LABEL_MATCHING_ORDER.indexOf( undefined ) : index;
+		return Object.keys( LABEL_MAPPING ).indexOf( title );
 	} );
 
 	return aIndex - bIndex;
@@ -536,6 +511,6 @@ async function getReleaseChangelog( options ) {
 	getReleaseChangelog,
 	getIssueType,
 	sortGroup,
-	getTypesByLabelType,
+	getTypesByLabels,
 	getTypesByTitle,
 };
