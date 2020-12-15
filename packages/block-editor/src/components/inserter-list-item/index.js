@@ -101,7 +101,7 @@ function InserterListItem( {
 						// Use the CompositeItem `focusable` prop over Button's
 						// isFocusable. The latter was shown to cause an issue
 						// with tab order in the inserter list.
-						focusables
+						focusable
 						{ ...props }
 					>
 						<span
