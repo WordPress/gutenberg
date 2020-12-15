@@ -366,6 +366,7 @@ These are the current typography properties supported by blocks:
 | Post Hierarchical Terms | - | Yes | - | - | Yes | - | - |
 | Post Tags | - | Yes | - | - | Yes | - | - |
 | Post Title | Yes | Yes | - | - | Yes | - | - |
+| Preformatted | - | Yes | - | - | - | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
 | Site Title | Yes | Yes | - | - | Yes | - | - |
 | Verse | Yes | Yes | - | - | - | - | - |
