@@ -48,7 +48,7 @@
 
 	// Override external DatePicker styles.
 	.DayPickerNavigation_leftButton__horizontalDefault {
-		left: 0;
+		left: 13px;
 	}
 
 	.CalendarMonth_caption {
@@ -98,7 +98,7 @@
 	.DayPicker_weekHeader {
 		top: 50px;
 		.DayPicker_weekHeader_ul {
-			margin: 1px 0;
+			margin: 1px;
 			padding-left: 0;
 			padding-right: 0;
 		}
