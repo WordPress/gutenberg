@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce, includes } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,7 @@ import {
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Time over children to wait before showing tooltip
@@ -47,33 +48,29 @@ function Tooltip( { children, position, text, shortcut } ) {
 	 */
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
-	const delayedSetIsOver = debounce( setIsOver, TOOLTIP_DELAY );
+	const delayedSetIsOver = useDebounce( setIsOver, TOOLTIP_DELAY );
 
-	/**
-	 * Creates an event callback to handle assignment of the `isInMouseDown`
-	 * instance property in response to a `mousedown` or `mouseup` event.
-	 *
-	 * @param {boolean} isForMouseDown Whether handler is to be created for the
-	 *                              `mousedown` event, as opposed to `mouseup`.
-	 *
-	 * @return {Function} Event callback handler.
-	 */
-	const createSetIsMouseDown = ( isForMouseDown ) => {
-		const eventType = isForMouseDown ? 'onMouseDown' : 'onMouseUp';
-		const eventListenerAction =
-			( isForMouseDown ? 'add' : 'remove' ) + 'EventListener';
-		return ( event ) => {
-			// Preserve original child callback behavior
-			emitToChild( children, eventType, event );
+	const createMouseDown = ( event ) => {
+		// Preserve original child callback behavior
+		emitToChild( children, 'onMouseDown', event );
 
-			// On mouse down, the next `mouseup` should revert the value of the
-			// instance property and remove its own event handler. The bind is
-			// made on the document since the `mouseup` might not occur within
-			// the bounds of the element.
-			document[ eventListenerAction ]( 'mouseup', cancelIsMouseDown );
+		// On mouse down, the next `mouseup` should revert the value of the
+		// instance property and remove its own event handler. The bind is
+		// made on the document since the `mouseup` might not occur within
+		// the bounds of the element.
+		document.addEventListener( 'mouseup', cancelIsMouseDown );
+		setIsMouseDown( true );
+	};
 
-			setIsMouseDown( isForMouseDown );
-		};
+	const createMouseUp = ( event ) => {
+		emitToChild( children, 'onMouseUp', event );
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
+		setIsMouseDown( false );
+	};
+
+	const createMouseEvent = ( type ) => {
+		if ( type === 'mouseUp' ) return createMouseUp;
+		if ( type === 'mouseDown' ) return createMouseDown;
 	};
 
 	/**
@@ -82,7 +79,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	 *
 	 * @type {Function}
 	 */
-	const cancelIsMouseDown = createSetIsMouseDown( false );
+	const cancelIsMouseDown = createMouseEvent( 'mouseUp' );
 
 	const createToggleIsOver = ( eventName, isDelayed ) => {
 		return ( event ) => {
@@ -124,7 +121,6 @@ function Tooltip( { children, position, text, shortcut } ) {
 	};
 	const clearOnUnmount = () => {
 		delayedSetIsOver.cancel();
-		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
 	useEffect( () => clearOnUnmount, [] );
@@ -147,7 +143,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 		onClick: createToggleIsOver( 'onClick' ),
 		onFocus: createToggleIsOver( 'onFocus' ),
 		onBlur: createToggleIsOver( 'onBlur' ),
-		onMouseDown: createSetIsMouseDown( true ),
+		onMouseDown: createMouseEvent( 'mouseDown' ),
 		children: concatChildren(
 			child.props.children,
 			isOver && (
