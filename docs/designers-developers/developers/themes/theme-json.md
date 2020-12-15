@@ -368,6 +368,6 @@ These are the current typography properties supported by blocks:
 | Post Title | Yes | Yes | - | - | Yes | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
 | Site Title | Yes | Yes | - | - | Yes | - | - |
-| Verse | Yes | - | - | - | - | - | - |
+| Verse | Yes | Yes | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
