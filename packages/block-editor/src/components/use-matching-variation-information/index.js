@@ -46,9 +46,9 @@ export default function useMatchingVariationInformation( clientId ) {
 		description: blockType.description,
 	};
 	const variations = getBlockVariations( name );
-	if ( ! variations || ! blockType.variationMatcher ) return blockTypeInfo;
+	if ( ! variations ) return blockTypeInfo;
 	const match = variations.find( ( variation ) =>
-		blockType.variationMatcher( attributes, variation )
+		variation.isActive?.( attributes )
 	);
 	if ( ! match ) return blockTypeInfo;
 	return {

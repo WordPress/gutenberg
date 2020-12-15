@@ -28,8 +28,4 @@ export const settings = {
 	transforms,
 	variations,
 	deprecated,
-	variationMatcher: ( blockAttributes, variation ) => {
-		const { providerNameSlug } = blockAttributes || {};
-		return variation.name === providerNameSlug;
-	},
 };

@@ -23,8 +23,4 @@ export const settings = {
 		'Display an icon linking to a social media profile or website.'
 	),
 	variations,
-	variationMatcher: ( blockAttributes, variation ) => {
-		const { service } = blockAttributes || {};
-		return variation.name === service;
-	},
 };
