@@ -54,7 +54,7 @@ https://gist.github.com
 - WordPress version: <!-- e.g. "5.6.0" -->
 - Gutenberg version: <!-- e.g. "9.4.0" or "Not installed" -->
 - Are all plugins except Gutenberg deactivated? <!-- "Yes" or "No" -->
-- Are you using a default theme (e.g. Twenty Twenty)? <!-- "Yes" or "No" -->
+- Are you using a default theme (e.g. Twenty Twenty-One)? <!-- "Yes" or "No" -->
 
 ## Device information
 - Device: <!-- e.g. "Desktop" or "iPhone 11" -->
