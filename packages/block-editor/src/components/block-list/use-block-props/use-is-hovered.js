@@ -15,14 +15,15 @@ import { useSelect } from '@wordpress/data';
  */
 export function useIsHovered( ref ) {
 	const [ isHovered, setHovered ] = useState( false );
-	const isNavigationMode = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
-		[]
-	);
 
-	const { isOutlineMode } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+	const { isNavigationMode, isOutlineMode } = useSelect( ( select ) => {
+		const {
+			isNavigationMode: selectIsNavigationMode,
+			getSettings,
+		} = select( 'core/block-editor' );
+
 		return {
+			isNavigationMode: selectIsNavigationMode(),
 			isOutlineMode: getSettings().outlineMode,
 		};
 	}, [] );
