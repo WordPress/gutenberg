@@ -104,7 +104,7 @@ const GROUP_TITLE_ORDER = [
 	'Code Quality',
 	undefined,
 	'Various',
-	'Mobile'
+	'Mobile',
 ];
 
 /**
