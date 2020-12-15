@@ -20,15 +20,12 @@ export function useIsHovered( ref ) {
 		[]
 	);
 
-	const { isOutlineMode } = useSelect(
-		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
-			return {
-				isOutlineMode: getSettings().outlineMode,
-			};
-		},
-		[]
-	);
+	const { isOutlineMode } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			isOutlineMode: getSettings().outlineMode,
+		};
+	}, [] );
 
 	useEffect( () => {
 		function addListener( eventType, value ) {
