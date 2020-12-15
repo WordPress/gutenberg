@@ -69,13 +69,18 @@ export function PaddingEdit( props ) {
 		} );
 	};
 
-	const onReset = () => {
+	const onReset = ( initialValues ) => {
 		const blockType = getBlockType( blockName );
-		const defaultSettings = blockType?.attributes?.style?.default;
+		let defaultSettings = blockType?.attributes?.style?.default;
+		if ( ! defaultSettings ) {
+			defaultSettings = initialValues;
+		}
 
 		setAttributes( {
 			style: cleanEmptyObject( defaultSettings ),
 		} );
+
+		return true;
 	};
 
 	return Platform.select( {

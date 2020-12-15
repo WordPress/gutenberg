@@ -94,8 +94,10 @@ export default function BoxControl( {
 
 	const handleOnReset = () => {
 		const initialValues = DEFAULT_VALUES;
-
-		onReset();
+		const success = onReset( initialValues );
+		if ( ! success ) {
+			onChange( initialValues );
+		}
 		setValues( initialValues );
 		setIsDirty( false );
 	};
