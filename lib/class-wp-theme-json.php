@@ -124,6 +124,7 @@ class WP_Theme_JSON {
 				'gradients'      => null,
 				'link'           => null,
 				'palette'        => null,
+				'duotone'        => null,
 			),
 			'spacing'    => array(
 				'customPadding' => null,
