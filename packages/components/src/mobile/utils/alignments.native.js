@@ -14,3 +14,9 @@ export const ALIGNMENT_BREAKPOINTS = {
 	small: 680,
 	mobile: 480,
 };
+
+export const isFullWidth = ( align ) =>
+	align === WIDE_ALIGNMENTS.alignments.full;
+
+export const isWideWidth = ( align ) =>
+	align === WIDE_ALIGNMENTS.alignments.wide;

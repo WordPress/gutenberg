@@ -13,6 +13,8 @@ import {
 	ReadableContentView,
 	WIDE_ALIGNMENTS,
 	ALIGNMENT_BREAKPOINTS,
+	isFullWidth,
+	isWideWidth,
 } from '@wordpress/components';
 
 /**
@@ -58,25 +60,22 @@ export class BlockListItem extends Component {
 		} = this.props;
 		const { blockWidth } = this.state;
 		const { medium } = ALIGNMENT_BREAKPOINTS;
-		const { alignments, innerContainers } = WIDE_ALIGNMENTS;
-		const isFullWidth = blockAlignment === alignments.full;
-		const isWideWidth = blockAlignment === alignments.wide;
-		const isParentFullWidth = parentBlockAlignment === alignments.full;
+		const { innerContainers } = WIDE_ALIGNMENTS;
 
-		if ( isFullWidth ) {
+		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
 				return 0;
 			}
 			return marginHorizontal;
 		}
 
-		if ( isWideWidth ) {
+		if ( isWideWidth( blockAlignment ) ) {
 			return marginHorizontal;
 		}
 
 		const isContainerRelated = innerContainers.includes( blockName );
 
-		if ( isParentFullWidth && blockWidth <= medium ) {
+		if ( isFullWidth( parentBlockAlignment ) && blockWidth <= medium ) {
 			if ( isContainerRelated ) {
 				return marginHorizontal;
 			}
@@ -105,9 +104,7 @@ export class BlockListItem extends Component {
 			hasParents,
 			parentBlockName,
 		} = this.props;
-		const { alignments, innerContainers } = WIDE_ALIGNMENTS;
-
-		const isFullWidth = blockAlignment === alignments.full;
+		const { innerContainers } = WIDE_ALIGNMENTS;
 
 		const isParentContainerRelated = innerContainers.includes(
 			parentBlockName
@@ -117,7 +114,7 @@ export class BlockListItem extends Component {
 
 		return [
 			readableContentViewStyle,
-			isFullWidth &&
+			isFullWidth( blockAlignment ) &&
 				! hasParents && {
 					width: styles.fullAlignment.width,
 				},

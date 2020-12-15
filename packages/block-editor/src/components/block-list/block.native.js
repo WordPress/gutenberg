@@ -11,6 +11,7 @@ import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	WIDE_ALIGNMENTS,
+	isFullWidth,
 } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -176,7 +177,7 @@ class BlockListBlock extends Component {
 
 		const { blockWidth } = this.state;
 		const { align } = attributes;
-		const { innerContainers, alignments } = WIDE_ALIGNMENTS;
+		const { innerContainers } = WIDE_ALIGNMENTS;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
@@ -184,7 +185,6 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
-		const isFullWidth = align === alignments.full;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
 		const isContainerRelated = innerContainers.includes( name );
@@ -212,10 +212,10 @@ class BlockListBlock extends Component {
 								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
-									isFullWidth &&
+									isFullWidth( align ) &&
 										blockWidth < screenWidth &&
 										styles.borderFullWidth,
-									isFullWidth &&
+									isFullWidth( align ) &&
 										isContainerRelated &&
 										blockWidth < screenWidth &&
 										styles.containerBorderFullWidth,
@@ -259,7 +259,8 @@ class BlockListBlock extends Component {
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={
-										isFullWidth || isScreenWidthEqual
+										isFullWidth( align ) ||
+										isScreenWidthEqual
 									}
 								/>
 							) }

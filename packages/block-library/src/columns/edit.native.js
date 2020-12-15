@@ -11,10 +11,10 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
-	WIDE_ALIGNMENTS,
 	UnitControl,
 	getValueAndUnit,
 	GlobalStylesContext,
+	isFullWidth,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -51,7 +51,7 @@ import {
 } from './utils';
 import {
 	getColumnsInRow,
-	getContainerWidth,
+	calculateContainerWidth,
 	getContentWidths,
 } from './columnCalculations.native';
 import ColumnsPreview from '../column/column-preview';
@@ -102,8 +102,6 @@ function ColumnsEditContainer( {
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
-	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-
 	useEffect( () => {
 		if ( columnCount === 0 ) {
 			const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
@@ -121,17 +119,17 @@ function ColumnsEditContainer( {
 	}, [ width, columnCount ] );
 
 	const renderAppender = () => {
-		const isParentFullWidth =
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		const isEqualWidth = width === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
-					style={ [
-						( isFullWidth || isParentFullWidth || isEqualWidth ) &&
-							styles.columnAppender,
-					] }
+					style={
+						( isFullWidth( align ) ||
+							isFullWidth( parentBlockAlignment ) ||
+							isEqualWidth ) &&
+						styles.columnAppender
+					}
 				>
 					<InnerBlocks.ButtonBlockAppender
 						onAddBlock={ onAddBlock }
@@ -273,9 +271,9 @@ function ColumnsEditContainer( {
 						blockWidth={ width }
 						contentStyle={ contentWidths }
 						parentWidth={
-							isFullWidth && columnCount === 0
+							isFullWidth( align ) && columnCount === 0
 								? screenWidth
-								: getContainerWidth( width, columnsInRow )
+								: calculateContainerWidth( width, columnsInRow )
 						}
 					/>
 				) }

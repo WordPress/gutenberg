@@ -26,6 +26,11 @@ const MAX_COLUMNS_NUM_IN_ROW = 3;
  */
 const MIN_WIDTH = styles.columnsContainer?.minWidth;
 
+/**
+ * Container margin value
+ *
+ * @type {number}
+ */
 const MARGIN = styles.columnsContainer?.marginLeft;
 
 export const getColumnsInRow = ( width, columnCount ) => {
@@ -45,7 +50,7 @@ export const getColumnsInRow = ( width, columnCount ) => {
 	}
 };
 
-export const getContainerWidth = ( containerWidth, columnsInRow ) =>
+export const calculateContainerWidth = ( containerWidth, columnsInRow ) =>
 	2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN;
 
 export const getContentWidths = (
@@ -78,7 +83,7 @@ export const getContentWidths = (
 	// Array of calculated column width for its ratio
 	const columnWidthsPerRatio = columnRatios.map(
 		( columnRatio ) =>
-			columnRatio * getContainerWidth( width, columnsInRow )
+			columnRatio * calculateContainerWidth( width, columnsInRow )
 	);
 
 	//  Array of columns whose calculated width is lower than minimum width value
@@ -94,7 +99,7 @@ export const getContentWidths = (
 
 	// The minimum percentage ratio for which column width is equal minimum width value
 	const minPercentageRatio =
-		MIN_WIDTH / getContainerWidth( width, columnsInRow );
+		MIN_WIDTH / calculateContainerWidth( width, columnsInRow );
 
 	// The sum of column widths which ratio is higher than `minPercentageRatio`
 	const largeColumnsWidthsSum = columnRatios
@@ -106,12 +111,13 @@ export const getContentWidths = (
 		} )
 		.reduce( ( acc, curr ) => acc + curr, 0 );
 
-	const containerWidth = getContainerWidth(
+	const containerWidth = calculateContainerWidth(
 		baseContainerWidth,
 		columnsInRow
 	);
 
-	let columnWidth = getContainerWidth( width, columnsInRow ) / columnsInRow;
+	let columnWidth =
+		calculateContainerWidth( width, columnsInRow ) / columnsInRow;
 	let maxColumnWidth = columnWidth;
 
 	innerColumns.forEach(
@@ -158,7 +164,8 @@ export const getContentWidths = (
 					// On the breakpoint lower than medium each column inside columns
 					// has to take equal part of container width
 					columnWidth =
-						getContainerWidth( width, columnsInRow ) / columnsInRow;
+						calculateContainerWidth( width, columnsInRow ) /
+						columnsInRow;
 				}
 			}
 			widths[ clientId ] = {

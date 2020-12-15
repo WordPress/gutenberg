@@ -14,7 +14,7 @@ import {
 } from '@wordpress/compose';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
-import { WIDE_ALIGNMENTS } from '@wordpress/components';
+import { isFullWidth } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -33,21 +33,20 @@ function GroupEdit( {
 	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { width } = sizes || { width: 0 };
-	const { alignments } = WIDE_ALIGNMENTS;
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-	const isFullWidth = align === alignments.full;
-	const isParentFullWidth = parentBlockAlignment === alignments.full;
 	const isEqualWidth = width === screenWidth;
 
 	const renderAppender = useCallback(
 		() => (
 			<View
-				style={ [
-					( isEqualWidth || isFullWidth || isParentFullWidth ) &&
-						( hasInnerBlocks
-							? styles.groupAppender
-							: styles.wideGroupAppender ),
-				] }
+				style={
+					( isEqualWidth ||
+						isFullWidth( align ) ||
+						isFullWidth( parentBlockAlignment ) ) &&
+					( hasInnerBlocks
+						? styles.groupAppender
+						: styles.wideGroupAppender )
+				}
 			>
 				<InnerBlocks.ButtonBlockAppender />
 			</View>
