@@ -43,7 +43,6 @@ import {
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { getProtocol } from '@wordpress/url';
 
@@ -583,7 +582,7 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { attributes } = props;
 		const { id, href } = attributes;
-		const { isEditorSidebarOpened } = select( editPostStore );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
 			media: isNotFileHref ? select( 'core' ).getMedia( id ) : undefined,
@@ -591,7 +590,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { openGeneralSidebar } = dispatch( editPostStore );
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 		return {
 			openSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 		};
