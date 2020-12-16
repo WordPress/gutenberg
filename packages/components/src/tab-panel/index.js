@@ -7,7 +7,7 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -61,10 +61,7 @@ export default function TabPanel( {
 		}
 	}, [ tabs ] );
 
-	const childrenResult = useMemo(
-		() => selectedTab && children( selectedTab ),
-		[ selectedTab, children ]
-	);
+	const childrenResult = selectedTab && children( selectedTab );
 
 	return (
 		<div className={ className }>

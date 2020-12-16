@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 
 function InserterPanel( { title, icon, children } ) {
@@ -20,4 +19,4 @@ function InserterPanel( { title, icon, children } ) {
 	);
 }
 
-export default memo( InserterPanel );
+export default InserterPanel;
