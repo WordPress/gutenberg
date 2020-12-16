@@ -76,7 +76,7 @@ function ColumnsEditContainer( {
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
-			'--gutter-size':
+			'--columns-block-gutter-size':
 				gutterSize !== undefined ? `${ gutterSize }px` : undefined,
 		},
 	} );
