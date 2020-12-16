@@ -182,22 +182,17 @@ describe( 'PostTextEditor', () => {
 			wrapper = create( <PostTextEditor /> );
 		} );
 		const mockDispatchFn = jest.fn();
-		const useDispatchSpy = new Proxy( wp, {
-			get( target, prop ) {
-				if ( prop === 'useDispatch' ) {
-					return {
-						editPost: jest.fn(),
-						resetEditorBlocks: mockDispatchFn,
-					};
-				}
-			},
-		} );
+		jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+			useDispatch: () => ( {
+				editPost: jest.fn(),
+				resetEditorBlocks: mockDispatchFn,
+			} ),
+		} ) );
 
 		const textarea = wrapper.root.findByType( Textarea );
 		act( () => textarea.props.onChange( { target: { value: 'text' } } ) );
 		setTimeout( () => {
 			expect( mockDispatchFn ).toHaveBeenCalled();
-			useDispatchSpy.mockClear();
 		}, THROTTLE_TIME );
 	} );
 } );
