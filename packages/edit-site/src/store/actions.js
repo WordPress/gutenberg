@@ -114,7 +114,8 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page and displays both.
+ * Resolves the template for a page and displays both. If no path is given, attempts
+ * to use the postId to generate a path like `?p=${ postId }`.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -125,6 +126,9 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
+	if ( ! page.path && page.context?.postId ) {
+		page.path = `?p=${ page.context.postId }`;
+	}
 	const templateId = yield findTemplate( page.path );
 	yield {
 		type: 'SET_PAGE',

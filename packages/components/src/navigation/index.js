@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useAnimate } from '../animate';
+import { getAnimateClassName } from '../animate';
 import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
@@ -63,7 +63,7 @@ export default function Navigation( {
 	};
 
 	const classes = classnames( 'components-navigation', className );
-	const animateClassName = useAnimate( {
+	const animateClassName = getAnimateClassName( {
 		type: 'slide-in',
 		origin: slideOrigin,
 	} );

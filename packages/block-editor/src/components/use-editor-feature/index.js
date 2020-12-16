@@ -6,6 +6,7 @@ import { get, isObject } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -78,7 +79,7 @@ export default function useEditorFeature( featurePath ) {
 				'core/block-editor'
 			);
 			const settings = getSettings();
-			const blockType = select( 'core/blocks' ).getBlockType( blockName );
+			const blockType = select( blocksStore ).getBlockType( blockName );
 
 			let context = blockName;
 			const selectors = get( blockType, [
@@ -86,7 +87,7 @@ export default function useEditorFeature( featurePath ) {
 				'__experimentalSelector',
 			] );
 			if ( isObject( selectors ) ) {
-				const blockAttributes = getBlockAttributes( clientId );
+				const blockAttributes = getBlockAttributes( clientId ) || {};
 				for ( const contextSelector in selectors ) {
 					const { attributes } = selectors[ contextSelector ];
 					if ( blockAttributesMatch( blockAttributes, attributes ) ) {

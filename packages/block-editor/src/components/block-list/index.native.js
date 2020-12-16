@@ -351,7 +351,8 @@ export default compose( [
 			return {
 				blockClientIds,
 				blockCount,
-				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+				isBlockInsertionPointVisible:
+					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
 				isReadOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,

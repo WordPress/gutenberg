@@ -6,6 +6,7 @@ import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -121,7 +122,7 @@ export default withSelect( ( select ) => {
 		getSelectedBlockCount,
 		getBlockName,
 	} = select( 'core/block-editor' );
-	const { getBlockStyles } = select( 'core/blocks' );
+	const { getBlockStyles } = select( blocksStore );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =
 		selectedBlockClientId && getBlockName( selectedBlockClientId );

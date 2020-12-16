@@ -2,19 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	useState,
-	useRef,
-	useMemo,
-	useContext,
-	useEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 
@@ -24,7 +18,6 @@ import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 import Inserter from '../inserter';
 import { getClosestTabbable } from '../writing-flow';
 import { getBlockDOMNode } from '../../utils/dom';
-import { AppenderNodesContext } from '../block-list-appender';
 
 function InsertionPointInserter( {
 	clientId,
@@ -114,31 +107,36 @@ function InsertionPointPopover( {
 	containerRef,
 	showInsertionPoint,
 } ) {
-	const appenderNodesMap = useContext( AppenderNodesContext );
-	const element = useMemo( () => {
-		if ( clientId ) {
+	const element = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( 'core/block-editor' );
 			const { ownerDocument } = containerRef.current;
-			return getBlockDOMNode( clientId, ownerDocument );
-		}
+			const targetClientId =
+				clientId || last( getBlockOrder( rootClientId ) );
 
-		// Can't find the element, might be at the end of the block list, or inside an empty block list.
-		// We instead try to find the "Appender" and place the indicator above it.
-		// `rootClientId` could be null or undefined when there's no parent block, we normalize it to an empty string.
-		return appenderNodesMap.get( rootClientId || '' );
-	}, [ clientId, rootClientId, appenderNodesMap ] );
+			return getBlockDOMNode( targetClientId, ownerDocument );
+		},
+		[ clientId, rootClientId ]
+	);
+
+	const position = clientId ? 'top' : 'bottom';
+	const className = classnames( 'block-editor-block-list__insertion-point', {
+		'is-insert-after': ! clientId,
+	} );
 
 	return (
 		<Popover
 			noArrow
 			animate={ false }
 			anchorRef={ element }
-			position="top right left"
+			position={ `${ position } right left` }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
+			__unstableForcePosition={ true }
 		>
 			<div
-				className="block-editor-block-list__insertion-point"
+				className={ className }
 				style={ { width: element?.offsetWidth } }
 			>
 				{ showInsertionPoint && (
