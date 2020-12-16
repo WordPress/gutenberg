@@ -13,11 +13,14 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getHrefAndDestination } from './utils';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 } from './constants';
+
+const DEPRECATED_LINK_DESTINATION_MEDIA = 'file';
+const DEPRECATED_LINK_DESTINATION_ATTACHMENT = 'post';
 
 /**
  * Original function to determine default number of columns from a block's
@@ -30,6 +33,51 @@ import {
  */
 export function defaultColumnsNumberV1( attributes ) {
 	return Math.min( 3, attributes.images.length );
+}
+
+/**
+ * Original function to determines new href and linkDestination values for an image block from the
+ * supplied Gallery link destination.
+ *
+ * Used in deprecations: v1-6.
+ *
+ * @param {Object} image       Gallery image.
+ * @param {string} destination Gallery's selected link destination.
+ * @return {Object}            New attributes to assign to image block.
+ */
+export function getHrefAndDestination( image, destination ) {
+	// Need to determine the URL that the selected destination maps to.
+	// Gutenberg and WordPress use different constants so the new link
+	// destination also needs to be tweaked.
+	switch ( destination ) {
+		case DEPRECATED_LINK_DESTINATION_MEDIA:
+			return {
+				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				linkDestination: LINK_DESTINATION_MEDIA,
+			};
+		case DEPRECATED_LINK_DESTINATION_ATTACHMENT:
+			return {
+				href: image?.link,
+				linkDestination: LINK_DESTINATION_ATTACHMENT,
+			};
+		case LINK_DESTINATION_MEDIA:
+			return {
+				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				linkDestination: LINK_DESTINATION_MEDIA,
+			};
+		case LINK_DESTINATION_ATTACHMENT:
+			return {
+				href: image?.link,
+				linkDestination: LINK_DESTINATION_ATTACHMENT,
+			};
+		case LINK_DESTINATION_NONE:
+			return {
+				href: undefined,
+				linkDestination: LINK_DESTINATION_NONE,
+			};
+	}
+
+	return {};
 }
 
 const v1 = {
@@ -683,17 +731,16 @@ const v5 = {
 	supports: {
 		align: true,
 	},
-	isEligible( { linkTo } ) {
-		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
+	isEligible( { linkTo, imageCount } ) {
+		return (
+			! imageCount &&
+			( ! linkTo || linkTo === 'attachment' || linkTo === 'media' )
+		);
 	},
 	migrate( attributes ) {
 		let linkTo = attributes.linkTo;
 		if ( ! attributes.linkTo ) {
 			linkTo = 'none';
-		} else if ( attributes.linkTo === 'attachment' ) {
-			linkTo = 'post';
-		} else if ( attributes.linkTo === 'media' ) {
-			linkTo = 'file';
 		}
 		const imageBlocks = attributes.images.map( ( image ) => {
 			return createBlock( 'core/image', {
@@ -893,10 +940,10 @@ const v6 = {
 						let href;
 
 						switch ( linkTo ) {
-							case LINK_DESTINATION_MEDIA:
+							case DEPRECATED_LINK_DESTINATION_MEDIA:
 								href = image.fullUrl || image.url;
 								break;
-							case LINK_DESTINATION_ATTACHMENT:
+							case DEPRECATED_LINK_DESTINATION_ATTACHMENT:
 								href = image.link;
 								break;
 						}
@@ -951,6 +998,11 @@ const v6 = {
 		return ! imageCount;
 	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
+		if ( linkTo === 'post' ) {
+			linkTo = 'attachment';
+		} else if ( linkTo === 'file' ) {
+			linkTo = 'media';
+		}
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: parseInt( image.id ),
