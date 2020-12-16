@@ -138,7 +138,6 @@ function useInsertionPoint( {
 		[
 			isAppender,
 			selectedBlock,
-			isUnmodifiedDefaultBlock,
 			replaceBlocks,
 			insertBlocks,
 			destinationRootClientId,
