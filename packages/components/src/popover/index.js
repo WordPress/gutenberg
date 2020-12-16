@@ -483,9 +483,7 @@ const Popover = (
 	const onDialogClose = ( type, event ) => {
 		// Ideally the popover should have just a single onClose prop and
 		// not three props that potentially do the same thing.
-		if ( onClose ) {
-			onClose();
-		} else if ( type === 'focusoutside' && onFocusOutside ) {
+		if ( type === 'focusoutside' && onFocusOutside ) {
 			onFocusOutside( event );
 		} else if ( type === 'focusoutside' && onClickOutside ) {
 			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
@@ -522,6 +520,8 @@ const Popover = (
 				since: '5.3',
 				alternative: 'onFocusOutside',
 			} );
+		} else if ( onClose ) {
+			onClose();
 		}
 	};
 
