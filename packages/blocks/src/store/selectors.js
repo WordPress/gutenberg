@@ -16,7 +16,6 @@ import {
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
-/** @typedef {import('../api/registration').WPBlockDisplayInformation} WPBlockDisplayInformation */
 /** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 /**

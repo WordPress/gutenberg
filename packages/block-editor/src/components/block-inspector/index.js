@@ -25,7 +25,7 @@ import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
-import useMatchingVariationInformation from '../use-matching-variation-information';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 const BlockInspector = ( {
 	blockType,
@@ -82,7 +82,7 @@ const BlockInspectorSingleBlock = ( {
 	hasBlockStyles,
 	bubblesVirtually,
 } ) => {
-	const blockInformation = useMatchingVariationInformation( clientId );
+	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard { ...blockInformation } />

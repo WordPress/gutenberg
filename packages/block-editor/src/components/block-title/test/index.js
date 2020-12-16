@@ -45,7 +45,7 @@ jest.mock( '@wordpress/blocks', () => {
 	};
 } );
 
-jest.mock( '../../use-matching-variation-information', () => {
+jest.mock( '../../use-block-display-information', () => {
 	const resultsMap = {
 		'id-name-exists': { title: 'Block Title' },
 		'id-name-with-label': { title: 'Block With Label' },

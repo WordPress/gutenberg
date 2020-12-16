@@ -118,7 +118,7 @@ export {
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
-export { useMatchingVariationInformation as __experimentalUseMatchingVariationInformation } from './use-matching-variation-information';
+export { useBlockDisplayInformation as __experimentalUseBlockDisplayInformation } from './use-block-display-information';
 
 /*
  * State Related Components

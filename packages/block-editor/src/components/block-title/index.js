@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import useMatchingVariationInformation from '../use-matching-variation-information';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -49,7 +49,7 @@ export default function BlockTitle( { clientId } ) {
 		[ clientId ]
 	);
 
-	const blockInformation = useMatchingVariationInformation( clientId );
+	const blockInformation = useBlockDisplayInformation( clientId );
 	if ( ! blockInformation ) return null;
 	const blockType = getBlockType( name );
 	const label = getBlockLabel( blockType, attributes );

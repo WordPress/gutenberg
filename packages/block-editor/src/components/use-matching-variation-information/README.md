@@ -1,6 +1,0 @@
-`useMatchingVariationInformation`
-===========
-
-`useMatchingVariationInformation` 
-
-# TODO

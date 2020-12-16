@@ -135,16 +135,6 @@ import { store as blocksStore } from '../store';
  */
 
 /**
- * A subset of `WPBlock` type. Contains basic block's information for display reasons.
- *
- * @typedef {Object} WPBlockDisplayInformation
- *
- * @property {string} title Human-readable block type label.
- * @property {WPIcon} icon Block type icon.
- * @property {string} description A detailed block type description.
- */
-
-/**
  * Mapping of legacy category slugs to their latest normal values, used to
  * accommodate updates of the default set of block categories.
  *

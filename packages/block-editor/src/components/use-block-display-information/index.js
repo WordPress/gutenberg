@@ -4,7 +4,17 @@
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
-/** @typedef {import('@wordpress/blocks').WPBlockDisplayInformation} WPBlockDisplayInformation */
+/** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
+
+/**
+ * Contains basic block's information for display reasons.
+ *
+ * @typedef {Object} WPBlockDisplayInformation
+ *
+ * @property {string} title Human-readable block type label.
+ * @property {WPIcon} icon Block type icon.
+ * @property {string} description A detailed block type description.
+ */
 
 /**
  * Hook used to try to find a matching block variation and return
@@ -22,7 +32,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 
 // TODO write tests
-export default function useMatchingVariationInformation( clientId ) {
+export default function useBlockDisplayInformation( clientId ) {
 	const { attributes, blockType, variations } = useSelect(
 		( select ) => {
 			if ( ! clientId ) return {};

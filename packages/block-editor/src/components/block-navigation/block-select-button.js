@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import useMatchingVariationInformation from '../use-matching-variation-information';
+import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 
 function BlockNavigationBlockSelectButton(
@@ -39,7 +39,7 @@ function BlockNavigationBlockSelectButton(
 	},
 	ref
 ) {
-	const blockInformation = useMatchingVariationInformation( clientId );
+	const blockInformation = useBlockDisplayInformation( clientId );
 	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
 	const blockType = getBlockType( name );
