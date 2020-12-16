@@ -17,25 +17,23 @@ import { plus } from '@wordpress/icons';
 import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
+
 import ControlPoints from './control-points';
 import {
-	INSERT_POINT_WIDTH,
-	COLOR_POPOVER_PROPS,
-	MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT,
-} from './constants';
-import { serializeGradient } from './serializer';
-import {
-	getGradientWithColorAtPositionChanged,
-	getGradientWithColorStopAdded,
 	getHorizontalRelativeGradientPosition,
 	getMarkerPoints,
-	getGradientParsed,
 	getLinearGradientRepresentationOfARadial,
 } from './utils';
 
+const INSERT_POINT_WIDTH = 23;
+const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT = 10;
+const COLOR_POPOVER_PROPS = {
+	className: 'components-custom-gradient-picker__color-picker-popover',
+	position: 'top',
+};
+
 function InsertPoint( {
 	onChange,
-	gradientAST,
 	onOpenInserter,
 	onCloseInserter,
 	insertPosition,
@@ -73,22 +71,13 @@ function InsertPoint( {
 			renderContent={ () => (
 				<ColorPicker
 					onChangeComplete={ ( { rgb } ) => {
-						let newGradient;
-						if ( alreadyInsertedPoint ) {
-							newGradient = getGradientWithColorAtPositionChanged(
-								gradientAST,
-								insertPosition,
-								rgb
-							);
-						} else {
-							newGradient = getGradientWithColorStopAdded(
-								gradientAST,
-								insertPosition,
-								rgb
-							);
-							setAlreadyInsertedPoint( true );
-						}
-						onChange( newGradient );
+						onChange( {
+							type: alreadyInsertedPoint
+								? 'UPDATE_COLOR_BY_POSITION'
+								: 'ADD_BY_POSITION',
+							insertPosition,
+							rgb,
+						} );
 					} }
 				/>
 			) }
@@ -149,13 +138,7 @@ function customGradientBarReducer( state, action ) {
 const customGradientBarReducerInitialState = { id: 'IDLE' };
 
 export default function CustomGradientBar( { value, onChange } ) {
-	const { gradientAST, gradientValue, hasGradient } = getGradientParsed(
-		value
-	);
-
-	const onGradientStructureChange = ( newGradientStructure ) => {
-		onChange( serializeGradient( newGradientStructure ) );
-	};
+	const { gradientAST, gradientValue, hasGradient } = value;
 
 	const gradientPickerDomRef = useRef();
 	const markerPoints = getMarkerPoints( gradientAST );
@@ -222,7 +205,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 				{ ( isMovingInserter || isInsertingControlPoint ) && (
 					<InsertPoint
 						insertPosition={ gradientBarState.insertPosition }
-						onChange={ onGradientStructureChange }
+						onChange={ onChange }
 						gradientAST={ gradientAST }
 						onOpenInserter={ () => {
 							gradientBarStateDispatch( {
@@ -244,7 +227,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 							: undefined
 					}
 					markerPoints={ markerPoints }
-					onChange={ onGradientStructureChange }
+					onChange={ onChange }
 					gradientAST={ gradientAST }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {
