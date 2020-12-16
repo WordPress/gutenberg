@@ -672,6 +672,14 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_wit
  * @return array
  */
 function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
+
+	// Don't run while in the editor or wp-admin.
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return $parsed_block;
+	}
+
+	// Performance improvement:
+	// Static var to avoid printing the same style multiple times.
 	static $processed;
 	if ( ! $processed ) {
 		$processed = array();
@@ -682,13 +690,15 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 		return $parsed_block;
 	}
 
+	// Get the registered block-type.
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
 
 	// Early return if there is no style defined.
-	if ( empty( $block_type->style ) ) {
+	if ( ! $block_type || empty( $block_type->style ) ) {
 		return $parsed_block;
 	}
 
+	$method = 'enqueue';
 	/**
 	 * The load method.
 	 *
@@ -697,15 +707,67 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 	 *
 	 * @return string
 	 */
-	$method = 'enqueue';
 	$method = apply_filters( 'gutenberg_block_type_assets_load_method', $method, $block_type );
 
 	switch ( $method ) {
 		case 'inline':
-			add_filter( 'render_block', 'gutenberg_inline_styles_render_block', 10, 2 );
+			/**
+			 * Inline styles on render_block.
+			 */
+			add_filter(
+				'render_block',
+				/**
+				 * Print inline styles for blocks that need it.
+				 *
+				 * @param string $html  The block HTML contents.
+				 *
+				 * @return string Returns the HTML.
+				 */
+				function( $html ) use ( $block_type ) {
+					global $wp_styles;
+
+					// Early return if we can't locate the style.
+					if ( ! isset( $wp_styles->registered[ $block_type->style ] ) ) {
+						return $html;
+					}
+
+					$block_style = $wp_styles->registered[ $block_type->style ];
+					$path        = str_replace( trailingslashit( site_url() ), trailingslashit( ABSPATH ), $block_style->src );
+					if ( file_exists( $path ) ) {
+						$block_css = file_get_contents( $path );
+						// Add styles that were added via wp_add_inline_style().
+						if ( is_array( $block_style->extra ) && isset( $block_style->extra['after'] ) ) {
+							$block_css .= implode( '', $block_style->extra['after'] );
+						}
+
+						// If SCRIPT_DEBUG is not enabled, then minify styles.
+						if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+							$block_css = gutenberg_minify_styles( $block_css );
+						}
+
+						$block_style_el = '<style id="' . $block_type->style . '-css">' . $block_css . '</style>';
+
+						// If the block doesn't have any html then echo the style directly,
+						// otherwise append the styles to the block-contents.
+						if ( empty( trim( $html ) ) ) {
+							echo $block_style_el;
+						} else {
+							$html .= $block_style_el;
+						}
+
+						// Remove the stylesheet from $wp_styles.
+						unset( $wp_styles->registered[ $block_type->style ] );
+					}
+					return $html;
+				},
+				10
+			);
 			break;
 
 		case 'inline-footer':
+			/**
+			 * Inline styles in the footer.
+			 */
 			add_action(
 				'wp_footer',
 				function() use ( $block_type ) {
@@ -718,12 +780,14 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 						echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
 						include $path;
 
+						// Add styles that were added via wp_add_inline_style().
 						if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
 							echo implode( '', $style->extra['after'] );
 						}
 
 						echo '</style>';
 
+						// Remove the stylesheet from $wp_styles.
 						unset( $wp_styles->registered[ $block_type->style ] );
 					}
 				},
@@ -732,20 +796,62 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 			break;
 
 		case 'async-head':
+			/**
+			 * Injects the styles in <head> via JS.
+			 * Styles get added as <link> elements.
+			 */
 			add_action(
 				'wp_footer',
 				function() use ( $block_type ) {
 					global $wp_styles;
 					$style = $wp_styles->registered[ $block_type->style ];
 
-					gutenberg_print_block_styles_injection_script();
+					// Inline a small script to help inject styles in <head>.
+					static $script_added;
+					if ( ! $script_added ) {
+						?>
+						<script id="wp-enqueue-style-script">
+						function wpEnqueueStyle( handle, src, deps, ver, media ) {
+
+							// Create the element.
+							var style = document.createElement( 'link' ),
+								isFirst = ! window.wpEnqueueStyleLastInjectedEl,
+								injectEl = isFirst ? document.head : document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
+								injectPos = isFirst ? 'afterbegin' : 'afterend';
+
+							// Add element props for the stylesheet.
+							style.id = handle + '-css';
+							style.rel = 'stylesheet';
+							style.href = src;
+							if ( ver ) {
+								style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
+							}
+							style.media = media ? media : 'all';
+
+							// Set the global var so we know where to add the next style.
+							// This helps us preserve priorities and inject styles one after the other instead of reversed.
+							window.wpEnqueueStyleLastInjectedEl = handle + '-css';
+
+							// Inject the element.
+							injectEl.insertAdjacentElement( injectPos, style );
+						}
+						</script>
+						<?php
+						$script_added = true;
+					}
+
+					// Call wpEnqueueStyle() to inject style in <head>.
 					echo "<script>wpEnqueueStyle('{$style->handle}', '{$style->src}', [], '{$style->ver}', '{$style->args}')</script>";
 
-					echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
+					// Add styles that were added via wp_add_inline_style().
 					if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
+						echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
 						echo implode( '', $style->extra['after'] );
+						echo '</style>';
 					}
-					echo '</style>';
+
+					// Remove the stylesheet from $wp_styles.
+					unset( $wp_styles->registered[ $block_type->style ] );
 				},
 				1
 			);
@@ -755,98 +861,13 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 			break;
 	}
 
+	// Add this block-type to the $processed array
+	// to avoid re-processing it next time we encounter the same block-type.
 	$processed[] = $parsed_block['blockName'];
 
 	return $parsed_block;
 }
 add_filter( 'render_block_data', 'gutenberg_modify_render_block_data_assets_loading' );
-
-/**
- * Prints the JS script that allows us to enqueue/inject scripts directly.
- *
- * @return void
- */
-function gutenberg_print_block_styles_injection_script() {
-	static $script_added;
-	if ( true === $script_added ) {
-		return;
-	}
-	?>
-	<script id="wp-enqueue-style-script">
-	function wpEnqueueStyle( handle, src, deps, ver, media ) {
-
-		// Create the element.
-		var style = document.createElement( 'link' ),
-			isFirst = ! window.wpEnqueueStyleLastInjectedEl,
-			injectEl = isFirst ? document.head : document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
-			injectPos = isFirst ? 'afterbegin' : 'afterend';
-
-		// Add element props for the stylesheet.
-		style.id = handle + '-css';
-		style.rel = 'stylesheet';
-		style.href = src;
-		if ( ver ) {
-			style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
-		}
-		style.media = media ? media : 'all';
-
-		// Set the global var so we know where to add the next style.
-		// This helps us preserve priorities and inject styles one after the other instead of reversed.
-		window.wpEnqueueStyleLastInjectedEl = handle + '-css';
-
-		// Inject the element.
-		injectEl.insertAdjacentElement( injectPos, style );
-	}
-	</script>
-	<?php
-
-	$script_added = true;
-}
-
-/**
- * Print inline styles for blocks that need it.
- *
- * @param string $html  The block HTML contents.
- * @param array  $block The block.
- *
- * @return string Returns the HTML.
- */
-function gutenberg_inline_styles_render_block( $html, $block ) {
-	global $wp_styles;
-	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-		return '';
-	}
-
-	static $block_styles_inlined;
-	if ( ! $block_styles_inlined ) {
-		$block_styles_inlined = array();
-	}
-
-	if ( ! in_array( $block['blockName'], $block_styles_inlined, true ) ) {
-		$block_type  = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-		if ( ! $block_type ) {
-			return $html;
-		}
-		$block_style = isset( $wp_styles->registered[ $block_type->style ] )
-			? $wp_styles->registered[ $block_type->style ]
-			: null;
-
-		if ( $block_style ) {
-			$path = str_replace( trailingslashit( site_url() ), trailingslashit( ABSPATH ), $block_style->src );
-			if ( file_exists( $path ) ) {
-				echo '<style id="' . $block_type->style . '-css">';
-				if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-					include $path;
-				} else {
-					echo gutenberg_minify_styles( file_get_contents( $path ) );
-				}
-				echo '</style>';
-			}
-		}
-		$block_styles_inlined[] = $block['blockName'];
-	}
-	return $html;
-}
 
 /**
  * Removes whitespace and comments from CSS.
