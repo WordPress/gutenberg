@@ -7,10 +7,10 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useInstanceId, useThrottle } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
 export const THROTTLE_TIME = 300;
@@ -35,7 +35,12 @@ export default function PostTextEditor() {
 		resetEditorBlocks( blocks );
 	};
 
-	useThrottle( saveText, THROTTLE_TIME );
+	useEffect( () => {
+		const timeoutId = setTimeout( saveText, THROTTLE_TIME );
+		return () => {
+			clearTimeout( timeoutId );
+		};
+	}, [ value ] );
 
 	/**
 	 * Handles a textarea change event to notify the onChange prop callback and
