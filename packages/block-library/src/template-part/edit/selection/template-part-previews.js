@@ -9,6 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * External dependencies
@@ -36,7 +37,7 @@ function TemplatePartItem( {
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
 	const blocks = useMemo( () => parse( content ), [ content ] );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
 		setAttributes( { postId: id, slug, theme } );

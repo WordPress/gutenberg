@@ -89,12 +89,11 @@ export function getRedistributedColumnWidths(
 	totalBlockCount = blocks.length
 ) {
 	const totalWidth = getTotalColumnsWidth( blocks, totalBlockCount );
-	const difference = availableWidth - totalWidth;
-	const adjustment = difference / blocks.length;
 
-	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) =>
-		toWidthPrecision( width + adjustment )
-	);
+	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) => {
+		const newWidth = ( availableWidth * width ) / totalWidth;
+		return toWidthPrecision( newWidth );
+	} );
 }
 
 /**

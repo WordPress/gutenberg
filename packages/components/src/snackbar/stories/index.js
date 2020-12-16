@@ -53,3 +53,31 @@ export const withIcon = () => {
 		</Snackbar>
 	);
 };
+
+export const withExplicitDismiss = () => {
+	const content = text(
+		'Content',
+		'Add a cross to explicitly close the snackbar, and do not hide it automatically'
+	);
+
+	return <Snackbar explicitDismiss={ true }>{ content }</Snackbar>;
+};
+
+export const withActionAndExpicitDismiss = () => {
+	const content = text(
+		'Content',
+		'Add an action and a cross to explicitly close the snackbar, and do not hide it automatically'
+	);
+	const actions = [
+		{
+			label: text( 'Label', 'Open WP.org' ),
+			url: text( 'URL', 'https://wordpress.org' ),
+		},
+	];
+
+	return (
+		<Snackbar actions={ actions } explicitDismiss={ true }>
+			{ content }
+		</Snackbar>
+	);
+};

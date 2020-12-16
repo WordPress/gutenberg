@@ -199,7 +199,8 @@ export default function useSelect( _mapSelect, deps ) {
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
-			unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
+			// The return value of the subscribe function could be undefined if the store is a custom generic store.
+			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
 	}, [ registry, trapSelect, depsChangedFlag ] );

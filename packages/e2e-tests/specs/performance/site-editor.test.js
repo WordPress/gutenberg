@@ -34,6 +34,8 @@ describe( 'Site Editor Performance', () => {
 			load: [],
 			type: [],
 			focus: [],
+			inserterOpen: [],
+			inserterHover: [],
 		};
 
 		await visitAdminPage(
