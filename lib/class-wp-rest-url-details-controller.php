@@ -69,7 +69,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				'title' => array(
 					'description' => __( 'The contents of the <title> tag from the URL.', 'gutenberg' ),
 					'type'        => 'string',
-					'default'     => '',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
