@@ -19,11 +19,7 @@ import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
 
 import ControlPoints from './control-points';
-import {
-	getHorizontalRelativeGradientPosition,
-	getMarkerPoints,
-	getLinearGradientRepresentationOfARadial,
-} from './utils';
+import { getHorizontalRelativeGradientPosition } from './utils';
 
 const INSERT_POINT_WIDTH = 23;
 const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT = 10;
@@ -71,13 +67,20 @@ function InsertPoint( {
 			renderContent={ () => (
 				<ColorPicker
 					onChangeComplete={ ( { rgb } ) => {
-						onChange( {
-							type: alreadyInsertedPoint
-								? 'UPDATE_COLOR_BY_POSITION'
-								: 'ADD_BY_POSITION',
-							insertPosition,
-							rgb,
-						} );
+						if ( ! alreadyInsertedPoint ) {
+							onChange( {
+								type: 'ADD_BY_POSITION',
+								insertPosition,
+								rgb,
+							} );
+							setAlreadyInsertedPoint( true );
+						} else {
+							onChange( {
+								type: 'UPDATE_COLOR_BY_POSITION',
+								insertPosition,
+								rgb,
+							} );
+						}
 					} }
 				/>
 			) }
@@ -138,10 +141,9 @@ function customGradientBarReducer( state, action ) {
 const customGradientBarReducerInitialState = { id: 'IDLE' };
 
 export default function CustomGradientBar( { value, onChange } ) {
-	const { gradientAST, gradientValue, hasGradient } = value;
+	const { background, hasGradient, markerPoints, initialPositions } = value;
 
 	const gradientPickerDomRef = useRef();
-	const markerPoints = getMarkerPoints( gradientAST );
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
@@ -189,16 +191,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 			) }
 			onMouseEnter={ onMouseEnterAndMove }
 			onMouseMove={ onMouseEnterAndMove }
-			// On radial gradients the bar should display a linear gradient.
-			// On radial gradients the bar represents a slice of the gradient from the center until the outside.
-			style={ {
-				background:
-					gradientAST.type === 'radial-gradient'
-						? getLinearGradientRepresentationOfARadial(
-								gradientAST
-						  )
-						: gradientValue,
-			} }
+			style={ { background } }
 			onMouseLeave={ onMouseLeave }
 		>
 			<div className="components-custom-gradient-picker__markers-container">
@@ -206,7 +199,6 @@ export default function CustomGradientBar( { value, onChange } ) {
 					<InsertPoint
 						insertPosition={ gradientBarState.insertPosition }
 						onChange={ onChange }
-						gradientAST={ gradientAST }
 						onOpenInserter={ () => {
 							gradientBarStateDispatch( {
 								type: 'OPEN_INSERTER',
@@ -227,8 +219,8 @@ export default function CustomGradientBar( { value, onChange } ) {
 							: undefined
 					}
 					markerPoints={ markerPoints }
+					initialPositions={ initialPositions }
 					onChange={ onChange }
-					gradientAST={ gradientAST }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {
 							type: 'START_CONTROL_CHANGE',

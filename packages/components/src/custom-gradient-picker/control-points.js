@@ -72,7 +72,6 @@ function ControlPointButton( {
 	color,
 	onChange,
 	gradientIndex,
-	gradientAST,
 	...additionalProps
 } ) {
 	const instanceId = useInstanceId( ControlPointButton );
@@ -81,7 +80,6 @@ function ControlPointButton( {
 		<ControlPointKeyboardMove
 			onChange={ onChange }
 			gradientIndex={ gradientIndex }
-			gradientAST={ gradientAST }
 		>
 			<Button
 				aria-label={ sprintf(
@@ -119,8 +117,8 @@ export default function ControlPoints( {
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	markerPoints,
+	initialPositions,
 	onChange,
-	gradientAST,
 	onStartControlPointChange,
 	onStopControlPointChange,
 } ) {
@@ -202,8 +200,7 @@ export default function ControlPoints( {
 								if ( window && window.addEventListener ) {
 									controlPointMoveState.current = {
 										initialPosition:
-											gradientAST.colorStops[ index ]
-												.length.value,
+											initialPositions[ index ],
 										position: index,
 										significantMoveHappened: false,
 										listenersActivated: true,
@@ -223,7 +220,6 @@ export default function ControlPoints( {
 							position={ point.position }
 							color={ point.color }
 							onChange={ onChange }
-							gradientAST={ gradientAST }
 							gradientIndex={ index }
 						/>
 					) }
