@@ -168,7 +168,7 @@ function Edit( {
 					} }
 				/>
 			) }
-			{ isObjectActive && (
+			{ ! isModalOpen && isObjectActive && (
 				<InlineUI
 					value={ value }
 					onChange={ onChange }
