@@ -152,7 +152,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	private function get_remote_url( $url ) {
 
 		$args = array(
-			'timeout'             => 10,
 			'limit_response_size' => 153600, // 150 KB.
 		);
 
