@@ -42,8 +42,16 @@ jest.mock( '@wordpress/blocks', () => {
 					return title;
 			}
 		},
-		getBlockVariations() {},
 	};
+} );
+
+jest.mock( '../../use-matching-variation-information', () => {
+	const resultsMap = {
+		'id-name-exists': { title: 'Block Title' },
+		'id-name-with-label': { title: 'Block With Label' },
+		'id-name-with-long-label': { title: 'Block With Long Label' },
+	};
+	return jest.fn( ( clientId ) => resultsMap[ clientId ] );
 } );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
@@ -82,9 +90,7 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow(
-			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
-		);
+		const wrapper = shallow( <BlockTitle clientId="id-name-exists" /> );
 
 		expect( wrapper.text() ).toBe( 'Block Title' );
 	} );
@@ -95,9 +101,7 @@ describe( 'BlockTitle', () => {
 			attributes: null,
 		} ) );
 
-		const wrapper = shallow(
-			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
-		);
+		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
 
 		expect( wrapper.text() ).toBe( 'Block With Label: Test Label' );
 	} );
@@ -109,7 +113,7 @@ describe( 'BlockTitle', () => {
 		} ) );
 
 		const wrapper = shallow(
-			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+			<BlockTitle clientId="id-name-with-long-label" />
 		);
 
 		expect( wrapper.text() ).toBe(
