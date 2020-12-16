@@ -30,9 +30,9 @@ If you do want to just stick to working with Sass, skip this section and go stra
 
 ## Add CSS Style for Block
 
-Create two files in the main folder of your plugin: `style.css` and `editor.css. 
+Create two files in the main folder of your plugin: `style.css` and `editor.css`. 
 
-We only need to add the style to `style.css` since it will show while editing and viewing the post. Edit the style.css to add the following.
+We only need to add the style to `style.css` since it will show while editing and viewing the post. Edit `style.css` to add the following.
 
 Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpride` is converted to the classname `.wp-block-create-block-gutenpride`.
 
@@ -49,7 +49,7 @@ Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpr
 }
 ```
 
-Since these files are not the ones currently enqueued in `gutenpride.php`, be sure to edit the `$editor_css` and `style_css` variables in that file with the correct paths to your new css files in the main folder. The variables should look like this: 
+Since these files are not the ones currently enqueued in `gutenpride.php`, be sure to edit the `$editor_css` and `$style_css` variables in that file with the correct paths to your new css files in the main folder. The variables should look like this: 
 
 ```php
 $editor_css = 'editor.css';
