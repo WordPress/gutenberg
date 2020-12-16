@@ -24,7 +24,8 @@ import {
 	getGradientWithPositionAtIndexChanged,
 	getGradientWithPositionAtIndexDecreased,
 	getGradientWithPositionAtIndexIncreased,
-	getHorizontalRelativeGradientPosition,
+	getLinearGradientRepresentationOfARadial,
+	getMarkerPoints,
 	isControlPointOverlapping,
 } from './utils';
 import { serializeGradient } from './serializer';
@@ -166,12 +167,28 @@ function reducer( state, action ) {
 }
 
 export default function CustomGradientPicker( { value, onChange } ) {
-	const { gradientAST, hasGradient } = getGradientParsed( value );
+	const parsedGradient = getGradientParsed( value );
+	const { gradientAST, gradientValue, hasGradient } = parsedGradient;
 	const { type } = gradientAST;
+	const markerPoints = getMarkerPoints( gradientAST );
+	const initialPositions = gradientAST.colorStops.map(
+		( colorStop ) => colorStop.length.value
+	);
+	// On radial gradients the bar should display a linear gradient.
+	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+	const background =
+		gradientAST.type === 'radial-gradient'
+			? getLinearGradientRepresentationOfARadial( gradientAST )
+			: gradientValue;
 	return (
 		<div className="components-custom-gradient-picker">
 			<CustomGradientBar
-				value={ getGradientParsed( value ) }
+				value={ {
+					hasGradient,
+					markerPoints,
+					initialPositions,
+					background,
+				} }
 				onChange={ ( nextAction ) => {
 					const nextAST = reducer( gradientAST, nextAction );
 					onChange( serializeGradient( nextAST ) );
