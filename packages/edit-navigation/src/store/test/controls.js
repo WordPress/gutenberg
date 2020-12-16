@@ -17,6 +17,7 @@ import controls, {
 	dispatch,
 } from '../controls';
 import { menuItemsQuery } from '../utils';
+import { STORE_NAME } from '../constants';
 
 // Mock it to prevent calling window.fetch in test environment
 jest.mock( '@wordpress/api-fetch', () => jest.fn( ( request ) => request ) );
@@ -63,7 +64,7 @@ describe( 'getNavigationPostForMenu', () => {
 	it( 'has the correct type and payload', () => {
 		expect( getNavigationPostForMenu( 123 ) ).toEqual( {
 			type: 'SELECT',
-			registryName: 'core/edit-navigation',
+			registryName: STORE_NAME,
 			selectorName: 'getNavigationPostForMenu',
 			args: [ 123 ],
 		} );
@@ -144,7 +145,7 @@ describe( 'controls', () => {
 		};
 		const registry = {
 			stores: {
-				'core/edit-navigation': {
+				[ STORE_NAME ]: {
 					store: {
 						getState: jest.fn( () => state ),
 					},
@@ -157,7 +158,7 @@ describe( 'controls', () => {
 		).toEqual( [ 'action1', 'action2' ] );
 
 		expect(
-			registry.stores[ 'core/edit-navigation' ].store.getState
+			registry.stores[ STORE_NAME ].store.getState
 		).toHaveBeenCalledTimes( 1 );
 
 		expect(
@@ -167,7 +168,7 @@ describe( 'controls', () => {
 		).toEqual( [] );
 
 		expect(
-			registry.stores[ 'core/edit-navigation' ].store.getState
+			registry.stores[ STORE_NAME ].store.getState
 		).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -181,7 +182,7 @@ describe( 'controls', () => {
 		};
 		const registry = {
 			stores: {
-				'core/edit-navigation': {
+				[ STORE_NAME ]: {
 					store: {
 						getState: jest.fn( () => state ),
 					},
@@ -194,7 +195,7 @@ describe( 'controls', () => {
 		).toBe( true );
 
 		expect(
-			registry.stores[ 'core/edit-navigation' ].store.getState
+			registry.stores[ STORE_NAME ].store.getState
 		).toHaveBeenCalledTimes( 1 );
 
 		expect(
@@ -204,7 +205,7 @@ describe( 'controls', () => {
 		).toBe( false );
 
 		expect(
-			registry.stores[ 'core/edit-navigation' ].store.getState
+			registry.stores[ STORE_NAME ].store.getState
 		).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -218,7 +219,7 @@ describe( 'controls', () => {
 		};
 		const registry = {
 			stores: {
-				'core/edit-navigation': {
+				[ STORE_NAME ]: {
 					store: {
 						getState: jest.fn( () => state ),
 					},
@@ -235,7 +236,7 @@ describe( 'controls', () => {
 		} );
 
 		expect(
-			registry.stores[ 'core/edit-navigation' ].store.getState
+			registry.stores[ STORE_NAME ].store.getState
 		).toHaveBeenCalledTimes( 1 );
 
 		expect(
@@ -245,7 +246,7 @@ describe( 'controls', () => {
 		).toEqual( {} );
 
 		expect(
-			registry.stores[ 'core/edit-navigation' ].store.getState
+			registry.stores[ STORE_NAME ].store.getState
 		).toHaveBeenCalledTimes( 2 );
 	} );
 

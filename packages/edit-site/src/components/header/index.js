@@ -46,29 +46,21 @@ export default function Header( { openEntitiesSavedStates } ) {
 			'core/editor'
 		);
 
-		const _templateType = getTemplateType();
-		const _template = getEntityRecord(
-			'postType',
-			'wp_template',
-			getTemplateId()
-		);
-		const _templatePart = getEntityRecord(
-			'postType',
-			'wp_template_part',
-			getTemplatePartId()
-		);
-
+		const postType = getTemplateType();
+		const postId =
+			postType === 'wp_template' ? getTemplateId() : getTemplatePartId();
+		const record = getEntityRecord( 'postType', postType, postId );
 		const _entityTitle =
-			'wp_template' === _templateType
-				? getTemplateInfo( _template ).title
-				: _templatePart?.slug;
+			'wp_template' === postType
+				? getTemplateInfo( record ).title
+				: record?.slug;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			entityTitle: _entityTitle,
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			template: _template,
-			templateType: _templateType,
+			template: record,
+			templateType: postType,
 			isInserterOpen: isInserterOpened(),
 		};
 	}, [] );

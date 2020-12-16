@@ -83,6 +83,7 @@ describe( 'selectors', () => {
 			const state = { settings: {}, preferences: {} };
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				outlineMode: true,
 				focusMode: false,
 				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
@@ -101,6 +102,7 @@ describe( 'selectors', () => {
 			};
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				outlineMode: true,
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,

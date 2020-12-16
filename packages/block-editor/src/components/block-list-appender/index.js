@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
+import { createContext } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -34,8 +34,6 @@ function BlockListAppender( {
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	const appenderNodesMap = useContext( AppenderNodesContext );
-
 	if ( isLocked || CustomAppender === false ) {
 		return null;
 	}
@@ -100,15 +98,6 @@ function BlockListAppender( {
 				'wp-block',
 				className
 			) }
-			ref={ ( ref ) => {
-				if ( ref ) {
-					// Set the reference of the "Appender" with `rootClientId` as key.
-					appenderNodesMap.set( rootClientId || '', ref );
-				} else {
-					// If it un-mounts, cleanup the map.
-					appenderNodesMap.delete( rootClientId || '' );
-				}
-			} }
 		>
 			{ appender }
 		</TagName>

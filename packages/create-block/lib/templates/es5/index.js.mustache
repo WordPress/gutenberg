@@ -21,11 +21,23 @@
 	var __ = wp.i18n.__;
 
 	/**
+	 * This hook is used to mark the block wrapper element.
+	 *
+	 * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
+	 */
+	var useBlockProps = wp.blockEditor.useBlockProps;
+
+	/**
 	 * Every block starts by registering a new block type definition.
 	 *
 	 * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
 	 */
 	registerBlockType( '{{namespace}}/{{slug}}', {
+		/**
+		 * @see https://make.wordpress.org/core/2020/11/18/block-api-version-2/
+		 */
+		apiVersion: {{apiVersion}},
+
 		/**
 		 * This is the display title for your block, which can be translated with `i18n` functions.
 		 * The block inserter will show this name.
@@ -74,14 +86,12 @@
 		 *
 		 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#edit
 		 *
-		 * @param {Object} [props] Properties passed from the editor.
-		 *
 		 * @return {WPElement} Element to render.
 		 */
-		edit: function( props ) {
+		edit: function() {
 			return el(
 				'p',
-				{ className: props.className },
+				useBlockProps(),
 				__( '{{title}} – hello from the editor!', '{{textdomain}}' )
 			);
 		},

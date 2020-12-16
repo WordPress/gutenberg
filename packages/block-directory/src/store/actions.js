@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -85,7 +87,7 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield controls.select(
-			'core/blocks',
+			blocksStore.name,
 			'getBlockTypes'
 		);
 		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {
@@ -143,7 +145,7 @@ export function* uninstallBlockType( block ) {
 		yield removeInstalledBlockType( block );
 	} catch ( error ) {
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			error.message || __( 'An error occurred.' )
 		);

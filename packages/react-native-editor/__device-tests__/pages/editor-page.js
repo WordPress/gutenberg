@@ -585,6 +585,7 @@ const blockNames = {
 	separator: 'Separator',
 	spacer: 'Spacer',
 	verse: 'Verse',
+	file: 'File',
 };
 
 module.exports = { initializeEditorPage, blockNames };

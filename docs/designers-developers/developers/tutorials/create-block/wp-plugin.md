@@ -127,6 +127,7 @@ function create_block_gutenpride_block_init() {
 	);
 
 	register_block_type( 'create-block/gutenpride', array(
+		'apiVersion' => 2,
 		'editor_script' => 'create-block-gutenpride-block-editor',
 		'editor_style'  => 'create-block-gutenpride-block-editor',
 		'style'         => 'create-block-gutenpride-block',

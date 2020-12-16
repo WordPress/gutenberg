@@ -33,13 +33,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
 import { crop, upload } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor from './image-editor';
+import ImageEditor, { ImageEditingProvider } from './image-editing';
 import { isExternalImage } from './edit';
 
 /**
@@ -119,7 +120,7 @@ export default function Image( {
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
@@ -415,15 +416,12 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
-				id={ id }
 				url={ url }
-				setAttributes={ setAttributes }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
-				setIsEditingImage={ setIsEditingImage }
+				naturalHeight={ naturalHeight }
+				naturalWidth={ naturalWidth }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -508,13 +506,25 @@ export default function Image( {
 	}
 
 	return (
-		<>
+		<ImageEditingProvider
+			id={ id }
+			url={ url }
+			naturalWidth={ naturalWidth }
+			naturalHeight={ naturalHeight }
+			clientWidth={ clientWidth }
+			onSaveImage={ ( imageAttributes ) =>
+				setAttributes( imageAttributes )
+			}
+			isEditing={ isEditingImage }
+			onFinishEditing={ () => setIsEditingImage( false ) }
+		>
 			{ controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }
 					tagName="figcaption"
+					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Write caption…' ) }
 					value={ caption }
 					unstableOnFocus={ onFocusCaption }
@@ -528,6 +538,6 @@ export default function Image( {
 					}
 				/>
 			) }
-		</>
+		</ImageEditingProvider>
 	);
 }

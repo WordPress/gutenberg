@@ -8,8 +8,10 @@ Here is the complete code for registering a block:
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'create-block/gutenpride', {
+	apiVersion: 2,
 	title: 'Gutenpride',
 	description: 'Example block.',
 	category: 'widgets',
@@ -20,11 +22,13 @@ registerBlockType( 'create-block/gutenpride', {
 	},
 
 	edit: () => {
-		return <div> Hello in Editor. </div>;
+		const blockProps = useBlockProps();
+		return <div { ...blockProps }> Hello in Editor. </div>;
 	},
 
 	save: () => {
-		return <div> Hello in Save.</div>;
+		const blockProps = useBlockProps.save();
+		return <div { ...blockProps }> Hello in Save.</div>;
 	},
 } );
 ```

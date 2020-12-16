@@ -91,7 +91,7 @@ const BlockNavigationBlockContents = forwardRef(
 				clientIds={ [ block.clientId ] }
 				elementId={ `block-navigation-block-${ block.clientId }` }
 			>
-				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) =>
+				{ ( { draggable, onDragStart, onDragEnd } ) =>
 					__experimentalFeatures ? (
 						<BlockNavigationBlockSlot
 							ref={ ref }
@@ -102,9 +102,9 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
+							draggable={ draggable && __experimentalFeatures }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
 							{ ...props }
 						/>
 					) : (
@@ -117,9 +117,9 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
+							draggable={ draggable && __experimentalFeatures }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
 							{ ...props }
 						/>
 					)

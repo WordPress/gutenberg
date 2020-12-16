@@ -22,6 +22,7 @@ import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
@@ -209,7 +210,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),

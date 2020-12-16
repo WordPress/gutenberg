@@ -40,6 +40,18 @@ _Returns_
 
 -   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
 
+<a name="changeSiteTimezone" href="#changeSiteTimezone">#</a> **changeSiteTimezone**
+
+Visits general settings page and changes the timezone to the given value.
+
+_Parameters_
+
+-   _timezone_ `string`: Value of the timezone to set.
+
+_Returns_
+
+-   `string`: Value of the previous timezone.
+
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
 Clears the local storage.
@@ -445,6 +457,18 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 <a name="openGlobalBlockInserter" href="#openGlobalBlockInserter">#</a> **openGlobalBlockInserter**
 
 Opens the global block inserter.
+
+<a name="openPreviewPage" href="#openPreviewPage">#</a> **openPreviewPage**
+
+Opens the preview page of an edited post.
+
+_Parameters_
+
+-   _editorPage_ `Page`: puppeteer editor page.
+
+_Returns_
+
+-   `Page`: preview page.
 
 <a name="openPublishPanel" href="#openPublishPanel">#</a> **openPublishPanel**
 
