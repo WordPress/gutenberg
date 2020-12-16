@@ -6,9 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,14 +17,15 @@ import { useInstanceId } from '@wordpress/compose';
 import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 import VisuallyHidden from '../visually-hidden';
+
 import { getHorizontalRelativeGradientPosition } from './utils';
 import {
 	COLOR_POPOVER_PROPS,
 	GRADIENT_MARKERS_WIDTH,
 	MINIMUM_SIGNIFICANT_MOVE,
 } from './constants';
-import KeyboardShortcuts from '../keyboard-shortcuts';
 
 function ControlPointKeyboardMove( { gradientIndex, onChange, children } ) {
 	const shortcuts = {
@@ -101,7 +103,7 @@ function ControlPointButton( {
 	);
 }
 
-export default function ControlPoints( {
+function ControlPoints( {
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	markerPoints,
@@ -240,3 +242,67 @@ export default function ControlPoints( {
 			)
 	);
 }
+
+function InsertPoint( {
+	onChange,
+	onOpenInserter,
+	onCloseInserter,
+	insertPosition,
+} ) {
+	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+	return (
+		<Dropdown
+			className="components-custom-gradient-picker__inserter"
+			onClose={ () => {
+				onCloseInserter();
+			} }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<Button
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ () => {
+						if ( isOpen ) {
+							onCloseInserter();
+						} else {
+							setAlreadyInsertedPoint( false );
+							onOpenInserter();
+						}
+						onToggle();
+					} }
+					className="components-custom-gradient-picker__insert-point"
+					icon={ plus }
+					style={ {
+						left:
+							insertPosition !== null
+								? `${ insertPosition }%`
+								: undefined,
+					} }
+				/>
+			) }
+			renderContent={ () => (
+				<ColorPicker
+					onChangeComplete={ ( { rgb } ) => {
+						if ( ! alreadyInsertedPoint ) {
+							onChange( {
+								type: 'ADD_BY_POSITION',
+								insertPosition,
+								rgb,
+							} );
+							setAlreadyInsertedPoint( true );
+						} else {
+							onChange( {
+								type: 'UPDATE_COLOR_BY_POSITION',
+								insertPosition,
+								rgb,
+							} );
+						}
+					} }
+				/>
+			) }
+			popoverProps={ COLOR_POPOVER_PROPS }
+		/>
+	);
+}
+ControlPoints.InsertPoint = InsertPoint;
+
+export default ControlPoints;

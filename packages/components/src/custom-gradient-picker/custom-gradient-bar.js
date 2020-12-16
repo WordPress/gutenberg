@@ -8,86 +8,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useReducer, useState } from '@wordpress/element';
-import { plus } from '@wordpress/icons';
+import { useRef, useReducer } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import ColorPicker from '../color-picker';
-import Dropdown from '../dropdown';
-
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
 
 const INSERT_POINT_WIDTH = 23;
 const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT = 10;
-const COLOR_POPOVER_PROPS = {
-	className: 'components-custom-gradient-picker__color-picker-popover',
-	position: 'top',
-};
-
-function InsertPoint( {
-	onChange,
-	onOpenInserter,
-	onCloseInserter,
-	insertPosition,
-} ) {
-	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
-	return (
-		<Dropdown
-			className="components-custom-gradient-picker__inserter"
-			onClose={ () => {
-				onCloseInserter();
-			} }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ () => {
-						if ( isOpen ) {
-							onCloseInserter();
-						} else {
-							setAlreadyInsertedPoint( false );
-							onOpenInserter();
-						}
-						onToggle();
-					} }
-					className="components-custom-gradient-picker__insert-point"
-					icon={ plus }
-					style={ {
-						left:
-							insertPosition !== null
-								? `${ insertPosition }%`
-								: undefined,
-					} }
-				/>
-			) }
-			renderContent={ () => (
-				<ColorPicker
-					onChangeComplete={ ( { rgb } ) => {
-						if ( ! alreadyInsertedPoint ) {
-							onChange( {
-								type: 'ADD_BY_POSITION',
-								insertPosition,
-								rgb,
-							} );
-							setAlreadyInsertedPoint( true );
-						} else {
-							onChange( {
-								type: 'UPDATE_COLOR_BY_POSITION',
-								insertPosition,
-								rgb,
-							} );
-						}
-					} }
-				/>
-			) }
-			popoverProps={ COLOR_POPOVER_PROPS }
-		/>
-	);
-}
 
 function customGradientBarReducer( state, action ) {
 	switch ( action.type ) {
@@ -196,7 +126,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 		>
 			<div className="components-custom-gradient-picker__markers-container">
 				{ ( isMovingInserter || isInsertingControlPoint ) && (
-					<InsertPoint
+					<ControlPoints.InsertPoint
 						insertPosition={ gradientBarState.insertPosition }
 						onChange={ onChange }
 						onOpenInserter={ () => {
