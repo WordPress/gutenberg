@@ -116,7 +116,7 @@ add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
 function gutenberg_set_template_and_template_part_post_theme( $post_id ) {
 	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
 	if ( ! $themes ) {
-		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
+		wp_set_post_terms( $post_id, array( basename( wp_get_theme()->get_stylesheet() ) ), 'wp_theme', true );
 	}
 }
 add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );

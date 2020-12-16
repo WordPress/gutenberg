@@ -139,7 +139,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 		$tax_query[] = array(
 			'taxonomy' => 'wp_theme',
 			'field'    => 'slug',
-			'terms'    => $request['theme'],
+			'terms'    => basename( $request['theme'] ),
 		);
 
 		$args['tax_query'] = $tax_query;

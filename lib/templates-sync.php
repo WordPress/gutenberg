@@ -31,7 +31,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'slug',
-					'terms'    => $theme,
+					'terms'    => basename( $theme ),
 				),
 			),
 			'posts_per_page' => 1,
@@ -46,7 +46,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 			'post_status'  => 'auto-draft',
 			'post_type'    => $post_type,
 			'post_name'    => $slug,
-			'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
+			'tax_input'    => array( 'wp_theme' => array( basename( $theme ), '_wp_file_based' ) ),
 		);
 
 		if ( 'wp_template' === $post_type ) {

@@ -137,7 +137,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'slug',
-					'terms'    => wp_get_theme()->get_stylesheet(),
+					'terms'    => basename( wp_get_theme()->get_stylesheet() ),
 				),
 			),
 		)
