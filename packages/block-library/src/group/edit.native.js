@@ -40,9 +40,9 @@ function GroupEdit( {
 			<View
 				style={
 					( isWiderThanMobile( screenWidth ) || isEqualWidth ) &&
-					hasInnerBlocks
+					( hasInnerBlocks
 						? styles.groupAppender
-						: styles.wideGroupAppender
+						: styles.wideGroupAppender )
 				}
 			>
 				<InnerBlocks.ButtonBlockAppender />

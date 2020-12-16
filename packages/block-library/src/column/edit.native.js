@@ -105,9 +105,9 @@ function ColumnEdit( {
 					style={
 						( isWiderThanMobile( screenWidth ) ||
 							isScreenWidthEqual ) &&
-						hasChildren
+						( hasChildren
 							? styles.columnAppender
-							: styles.wideColumnAppender
+							: styles.wideColumnAppender )
 					}
 				>
 					<InnerBlocks.ButtonBlockAppender />

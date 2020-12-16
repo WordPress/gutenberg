@@ -3,6 +3,8 @@ export const WIDE_ALIGNMENTS = {
 		wide: 'wide',
 		full: 'full',
 	},
+	// `innerContainers`: Group of blocks based on `InnerBlocks` component,
+	// used to nest other blocks inside
 	innerContainers: [ 'core/group', 'core/columns', 'core/column' ],
 	excludeBlocks: [ 'core/heading' ],
 };
@@ -21,4 +23,5 @@ export const isFullWidth = ( align ) =>
 export const isWideWidth = ( align ) =>
 	align === WIDE_ALIGNMENTS.alignments.wide;
 
-export const isWiderThanMobile = ( width ) => width > 480;
+export const isWiderThanMobile = ( width ) =>
+	width > ALIGNMENT_BREAKPOINTS.mobile;
