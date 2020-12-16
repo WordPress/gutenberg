@@ -48,8 +48,20 @@ export const BlockMover = ( {
 		pickerRef.current.presentPicker();
 	};
 
+	const {
+		description: {
+			backwardButtonHint,
+			forwardButtonHint,
+			firstBlockTitle,
+			lastBlockTitle,
+		},
+		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+		title: { backward: backwardButtonTitle, forward: forwardButtonTitle },
+	} = getMoversSetup( isStackedHorizontally, { firstIndex } );
+
 	const blockPageMoverOptions = [
 		{
+			icon: backwardButtonIcon,
 			label: __( 'Move to top' ),
 			value: BLOCK_MOVER_DIRECTION_TOP,
 			onSelect: () => {
@@ -57,6 +69,7 @@ export const BlockMover = ( {
 			},
 		},
 		{
+			icon: forwardButtonIcon,
 			label: __( 'Move to bottom' ),
 			value: BLOCK_MOVER_DIRECTION_BOTTOM,
 			onSelect: () => {
@@ -71,17 +84,6 @@ export const BlockMover = ( {
 		);
 		if ( option && option.onSelect ) option.onSelect();
 	};
-
-	const {
-		description: {
-			backwardButtonHint,
-			forwardButtonHint,
-			firstBlockTitle,
-			lastBlockTitle,
-		},
-		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
-		title: { backward: backwardButtonTitle, forward: forwardButtonTitle },
-	} = getMoversSetup( isStackedHorizontally, { firstIndex } );
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
@@ -115,6 +117,7 @@ export const BlockMover = ( {
 				ref={ pickerRef }
 				options={ blockPageMoverOptions }
 				onChange={ onPickerSelect }
+				title={ __( 'Move block position' ) }
 				leftAlign={ true }
 				hideCancelButton={ Platform.OS !== 'ios' }
 			/>
