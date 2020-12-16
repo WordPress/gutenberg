@@ -346,8 +346,9 @@ const variations = [
  */
 variations.forEach( ( variation ) => {
 	if ( variation.isActive ) return;
-	variation.isActive = ( { providerNameSlug } ) =>
-		providerNameSlug === variation.attributes.providerNameSlug;
+	variation.isActive = ( blockAttributes, variationAttributes ) =>
+		blockAttributes.providerNameSlug ===
+		variationAttributes.providerNameSlug;
 } );
 
 export default variations;

@@ -311,8 +311,8 @@ const variations = [
  */
 variations.forEach( ( variation ) => {
 	if ( variation.isActive ) return;
-	variation.isActive = ( { service } ) =>
-		service === variation.attributes.service;
+	variation.isActive = ( blockAttributes, variationAttributes ) =>
+		blockAttributes.service === variationAttributes.service;
 } );
 
 export default variations;
