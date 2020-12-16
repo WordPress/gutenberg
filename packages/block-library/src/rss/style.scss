@@ -1,4 +1,6 @@
 .wp-block-rss {
+	box-sizing: border-box;
+
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 2em;
