@@ -136,7 +136,7 @@ function AudioEdit( {
 				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
 					return (
 						<View>
-							{ !isCaptionSelected && getBlockControls( open ) }
+							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
 							<Text>
 								⏯ Audio Player goes here.{ ' ' }
