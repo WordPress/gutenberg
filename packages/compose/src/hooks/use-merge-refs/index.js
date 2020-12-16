@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */
@@ -20,29 +20,53 @@ import { useRef, useCallback } from '@wordpress/element';
  * @return {RefCallback} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
-	const lastValue = useRef( null );
-	const lastRefs = useRef( refs );
+	const element = useRef( null );
+	const didElementChange = useRef( false );
+	const previousRefs = useRef( refs );
+	const currentRefs = useRef( refs );
 
-	return useCallback( ( value ) => {
+	// Update on render before the ref callback is called, so the ref callback
+	// always has access to the current refs.
+	currentRefs.current = refs;
+
+	// If any of the refs change, call the previous ref with `null` and the new
+	// ref with the node, except when the element changes in the same cycle, in
+	// which case the ref callbacks will already have been called.
+	useLayoutEffect( () => {
 		refs.forEach( ( ref, index ) => {
+			if (
+				typeof ref === 'function' &&
+				ref !== previousRefs.current[ index ] &&
+				didElementChange.current === false
+			) {
+				previousRefs.current[ index ]( null );
+				ref( element.current );
+			}
+		} );
+
+		previousRefs.current = refs;
+		didElementChange.current = false;
+	}, refs );
+
+	// There should be no dependencies so that `callback` is only called when
+	// the node changes.
+	return useCallback( ( value ) => {
+		// Update the element so it can be used when calling ref callbacks on a
+		// dependency change.
+		element.current = value;
+		didElementChange.current = true;
+
+		// When an element changes, the current ref callback should be called
+		// with the new element and the previous one with `null`.
+		const refsToUpdate = value ? currentRefs.current : previousRefs.current;
+
+		// Update the latest refs.
+		refsToUpdate.forEach( ( ref ) => {
 			if ( typeof ref === 'function' ) {
-				// Only call a ref callback if it has changes, e.g. a dependency
-				// change in `useCallback`, EXCEPT if the value changes, then
-				// the ref callback must always be called.
-				// Any other ref callbacks WON'T be called if it doesn't change,
-				// e.g. if no `useCallback` dependencies change.
-				if (
-					lastRefs[ index ] !== ref ||
-					value !== lastValue.current
-				) {
-					ref( value );
-				}
+				ref( value );
 			} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
 				ref.current = value;
 			}
 		} );
-
-		lastValue.current = value;
-		lastRefs.current = refs;
-	}, refs );
+	}, [] );
 }
