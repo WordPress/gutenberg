@@ -41,6 +41,21 @@ const stickyOptions = [
 	{ label: __( 'Only' ), value: 'only' },
 ];
 
+const CreateNewPostLink = ( { type } ) => {
+	const newPostUrl = addQueryArgs( 'post-new.php', {
+		post_type: type,
+	} );
+	return (
+		<div className="wp-block-query__create-new-link">
+			{ createInterpolateElement(
+				__( '<a>Create a new post</a> for this feed.' ),
+				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				{ a: <a href={ newPostUrl } /> }
+			) }
+		</div>
+	);
+};
+
 export default function QueryInspectorControls( {
 	attributes: { query, layout },
 	setQuery,
@@ -151,20 +166,6 @@ export default function QueryInspectorControls( {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 
-	const CreateNewPostLink = ( { type } ) => {
-		const newPostUrl = addQueryArgs( 'post-new.php', {
-			post_type: type,
-		} );
-		return (
-			<div className="wp-block-query__create-new-link">
-				{ createInterpolateElement(
-					__( '<a>Create a new post</a> for this feed.' ),
-					// eslint-disable-next-line jsx-a11y/anchor-has-content
-					{ a: <a href={ newPostUrl } /> }
-				) }
-			</div>
-		);
-	};
 	return (
 		<InspectorControls>
 			<CreateNewPostLink type={ postType } />
