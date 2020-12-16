@@ -701,6 +701,10 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 	$method = apply_filters( 'gutenberg_block_type_assets_load_method', $method, $block_type );
 
 	switch ( $method ) {
+		case 'inline':
+			add_filter( 'render_block', 'gutenberg_inline_styles_render_block', 10, 2 );
+			break;
+
 		case 'inline-footer':
 			add_action(
 				'wp_footer',
@@ -797,4 +801,63 @@ function gutenberg_print_block_styles_injection_script() {
 	<?php
 
 	$script_added = true;
+}
+
+/**
+ * Print inline styles for blocks that need it.
+ *
+ * @param string $html  The block HTML contents.
+ * @param array  $block The block.
+ *
+ * @return string Returns the HTML.
+ */
+function gutenberg_inline_styles_render_block( $html, $block ) {
+	global $wp_styles;
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return '';
+	}
+
+	static $block_styles_inlined;
+	if ( ! $block_styles_inlined ) {
+		$block_styles_inlined = array();
+	}
+
+	if ( ! in_array( $block['blockName'], $block_styles_inlined, true ) ) {
+		$block_type  = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+		if ( ! $block_type ) {
+			return $html;
+		}
+		$block_style = isset( $wp_styles->registered[ $block_type->style ] )
+			? $wp_styles->registered[ $block_type->style ]
+			: null;
+
+		if ( $block_style ) {
+			$path = str_replace( trailingslashit( site_url() ), trailingslashit( ABSPATH ), $block_style->src );
+			if ( file_exists( $path ) ) {
+				echo '<style id="' . $block_type->style . '-css">';
+				if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+					include $path;
+				} else {
+					echo gutenberg_minify_styles( file_get_contents( $path ) );
+				}
+				echo '</style>';
+			}
+		}
+		$block_styles_inlined[] = $block['blockName'];
+	}
+	return $html;
+}
+
+/**
+ * Removes whitespace and comments from CSS.
+ *
+ * @param string $css The CSS to be minified.
+ * @return string The minified CSS.
+ */
+function gutenberg_minify_styles( $css ) {
+	$re1 = '(?sx)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|/\\* (?> .*? \\*/ )';
+	$re2 = '(?six)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|\\s*+ ; \\s*+ ( } ) \\s*+|\\s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\\b ) \\s*+|( [[(:] ) \\s++|\\s++ ( [])] )|\\s++ ( : ) \\s*+(?!(?>[^{}"\']++|"(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')*+{)|^ \\s++ | \\s++ \\z|(\\s)\\s+';
+	$css = preg_replace( "%$re1%", '$1', $css );
+
+	return preg_replace( "%$re2%", '$1$2$3$4$5$6$7', $css );
 }
