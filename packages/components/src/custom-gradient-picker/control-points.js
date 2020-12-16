@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -25,45 +25,33 @@ import {
 } from './constants';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-class ControlPointKeyboardMove extends Component {
-	constructor() {
-		super( ...arguments );
-		this.increase = this.increase.bind( this );
-		this.decrease = this.decrease.bind( this );
-		this.shortcuts = {
-			right: this.increase,
-			left: this.decrease,
-		};
-	}
-	increase( event ) {
-		// Stop propagation of the key press event to avoid focus moving
-		// to another editor area.
-		event.stopPropagation();
-		const { gradientIndex, onChange } = this.props;
-		onChange( {
-			type: 'INCREASE_POSITION',
-			gradientIndex,
-		} );
-	}
+function ControlPointKeyboardMove( { gradientIndex, onChange, children } ) {
+	const shortcuts = {
+		right( event ) {
+			// Stop propagation of the key press event to avoid focus moving
+			// to another editor area.
+			event.stopPropagation();
+			onChange( {
+				type: 'INCREASE_POSITION_BY_INDEX',
+				gradientIndex,
+			} );
+		},
+		left( event ) {
+			// Stop propagation of the key press event to avoid focus moving
+			// to another editor area.
+			event.stopPropagation();
+			onChange( {
+				type: 'DECREASE_POSITION_BY_INDEX',
+				gradientIndex,
+			} );
+		},
+	};
 
-	decrease( event ) {
-		// Stop propagation of the key press event to avoid focus moving
-		// to another editor area.
-		event.stopPropagation();
-		const { gradientIndex, onChange } = this.props;
-		onChange( {
-			type: 'DECREASE_POSITION_BY_INDEX',
-			gradientIndex,
-		} );
-	}
-	render() {
-		const { children } = this.props;
-		return (
-			<KeyboardShortcuts shortcuts={ this.shortcuts }>
-				{ children }
-			</KeyboardShortcuts>
-		);
-	}
+	return (
+		<KeyboardShortcuts shortcuts={ shortcuts }>
+			{ children }
+		</KeyboardShortcuts>
+	);
 }
 
 function ControlPointButton( {
