@@ -70,9 +70,12 @@ function customGradientBarReducer( state, action ) {
 }
 const customGradientBarReducerInitialState = { id: 'IDLE' };
 
-export default function CustomGradientBar( { value, onChange } ) {
-	const { background, hasGradient, markerPoints } = value;
-
+export default function CustomGradientBar( {
+	background,
+	hasGradient,
+	value: controlPoints,
+	onChange,
+} ) {
 	const gradientPickerDomRef = useRef();
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
@@ -88,7 +91,8 @@ export default function CustomGradientBar( { value, onChange } ) {
 
 		// If the insert point is close to an existing control point don't show it.
 		if (
-			some( markerPoints, ( { positionValue } ) => {
+			some( controlPoints, ( { position } ) => {
+				const positionValue = parseInt( position );
 				return (
 					Math.abs( insertPosition - positionValue ) <
 					MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT
@@ -128,6 +132,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 				{ ( isMovingInserter || isInsertingControlPoint ) && (
 					<ControlPoints.InsertPoint
 						insertPosition={ gradientBarState.insertPosition }
+						value={ controlPoints }
 						onChange={ onChange }
 						onOpenInserter={ () => {
 							gradientBarStateDispatch( {
@@ -148,7 +153,7 @@ export default function CustomGradientBar( { value, onChange } ) {
 							? gradientBarState.insertPosition
 							: undefined
 					}
-					markerPoints={ markerPoints }
+					value={ controlPoints }
 					onChange={ onChange }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {

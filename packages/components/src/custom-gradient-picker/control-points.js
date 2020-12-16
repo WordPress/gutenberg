@@ -22,30 +22,41 @@ import VisuallyHidden from '../visually-hidden';
 
 import { getHorizontalRelativeGradientPosition } from './utils';
 import {
+	addControlPoint,
+	addPositionClamped,
+	removeControlPoint,
+	updateControlPointColor,
+	updateControlPointColorByPosition,
+	updateControlPointPosition,
+} from './control-point-utils';
+import {
 	COLOR_POPOVER_PROPS,
 	GRADIENT_MARKERS_WIDTH,
 	MINIMUM_SIGNIFICANT_MOVE,
+	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
 
-function ControlPointKeyboardMove( { gradientIndex, onChange, children } ) {
+function ControlPointKeyboardMove( { value: position, onChange, children } ) {
 	const shortcuts = {
 		right( event ) {
 			// Stop propagation of the key press event to avoid focus moving
 			// to another editor area.
 			event.stopPropagation();
-			onChange( {
-				type: 'INCREASE_POSITION_BY_INDEX',
-				gradientIndex,
-			} );
+			const newPosition = addPositionClamped(
+				position,
+				KEYBOARD_CONTROL_POINT_VARIATION
+			);
+			onChange( newPosition );
 		},
 		left( event ) {
 			// Stop propagation of the key press event to avoid focus moving
 			// to another editor area.
 			event.stopPropagation();
-			onChange( {
-				type: 'DECREASE_POSITION_BY_INDEX',
-				gradientIndex,
-			} );
+			const newPosition = addPositionClamped(
+				position,
+				-KEYBOARD_CONTROL_POINT_VARIATION
+			);
+			onChange( newPosition );
 		},
 	};
 
@@ -61,16 +72,12 @@ function ControlPointButton( {
 	position,
 	color,
 	onChange,
-	gradientIndex,
 	...additionalProps
 } ) {
 	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
-		<ControlPointKeyboardMove
-			onChange={ onChange }
-			gradientIndex={ gradientIndex }
-		>
+		<ControlPointKeyboardMove value={ position } onChange={ onChange }>
 			<Button
 				aria-label={ sprintf(
 					// translators: %1$s: gradient position e.g: 70%, %2$s: gradient color code e.g: rgb(52,121,151).
@@ -106,7 +113,7 @@ function ControlPointButton( {
 function ControlPoints( {
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
-	markerPoints,
+	value: controlPoints,
 	onChange,
 	onStartControlPointChange,
 	onStopControlPointChange,
@@ -121,7 +128,7 @@ function ControlPoints( {
 		);
 		const {
 			initialPosition,
-			position,
+			index,
 			significantMoveHappened,
 		} = controlPointMoveState.current;
 		if (
@@ -132,11 +139,9 @@ function ControlPoints( {
 			controlPointMoveState.current.significantMoveHappened = true;
 		}
 
-		onChange( {
-			type: 'UPDATE_POSITION_BY_MOUSE',
-			relativePosition,
-			position,
-		} );
+		onChange(
+			updateControlPointPosition( controlPoints, index, relativePosition )
+		);
 	};
 
 	const cleanEventListeners = () => {
@@ -159,10 +164,10 @@ function ControlPoints( {
 		};
 	}, [] );
 
-	return markerPoints.map(
-		( point, index ) =>
-			point &&
-			ignoreMarkerPosition !== point.positionValue && (
+	return controlPoints.map( ( point, index ) => {
+		const initialPosition = parseInt( point?.position );
+		return (
+			ignoreMarkerPosition !== initialPosition && (
 				<Dropdown
 					key={ index }
 					onClose={ onStopControlPointChange }
@@ -187,8 +192,8 @@ function ControlPoints( {
 							onMouseDown={ () => {
 								if ( window && window.addEventListener ) {
 									controlPointMoveState.current = {
-										initialPosition: point.positionValue,
-										position: index,
+										initialPosition,
+										index,
 										significantMoveHappened: false,
 										listenersActivated: true,
 									};
@@ -206,8 +211,15 @@ function ControlPoints( {
 							isOpen={ isOpen }
 							position={ point.position }
 							color={ point.color }
-							onChange={ onChange }
-							gradientIndex={ index }
+							onChange={ ( newPosition ) => {
+								onChange(
+									updateControlPointPosition(
+										controlPoints,
+										index,
+										newPosition
+									)
+								);
+							} }
 						/>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -215,20 +227,24 @@ function ControlPoints( {
 							<ColorPicker
 								color={ point.color }
 								onChangeComplete={ ( { rgb } ) => {
-									onChange( {
-										type: 'UPDATE_COLOR_BY_INDEX',
-										index,
-										rgb,
-									} );
+									onChange(
+										updateControlPointColor(
+											controlPoints,
+											index,
+											rgb
+										)
+									);
 								} }
 							/>
 							<Button
 								className="components-custom-gradient-picker__remove-control-point"
 								onClick={ () => {
-									onChange( {
-										type: 'REMOVE_BY_INDEX',
-										index,
-									} );
+									onChange(
+										removeControlPoint(
+											controlPoints,
+											index
+										)
+									);
 									onClose();
 								} }
 								isLink
@@ -240,10 +256,12 @@ function ControlPoints( {
 					popoverProps={ COLOR_POPOVER_PROPS }
 				/>
 			)
-	);
+		);
+	} );
 }
 
 function InsertPoint( {
+	value: controlPoints,
 	onChange,
 	onOpenInserter,
 	onCloseInserter,
@@ -283,18 +301,22 @@ function InsertPoint( {
 				<ColorPicker
 					onChangeComplete={ ( { rgb } ) => {
 						if ( ! alreadyInsertedPoint ) {
-							onChange( {
-								type: 'ADD_BY_POSITION',
-								insertPosition,
-								rgb,
-							} );
+							onChange(
+								addControlPoint(
+									controlPoints,
+									insertPosition,
+									rgb
+								)
+							);
 							setAlreadyInsertedPoint( true );
 						} else {
-							onChange( {
-								type: 'UPDATE_COLOR_BY_POSITION',
-								insertPosition,
-								rgb,
-							} );
+							onChange(
+								updateControlPointColorByPosition(
+									controlPoints,
+									insertPosition,
+									rgb
+								)
+							);
 						}
 					} }
 				/>
