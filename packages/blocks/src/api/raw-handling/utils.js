@@ -6,7 +6,7 @@ import { mapValues, mergeWith, isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { isPhrasingContent } from '@wordpress/dom';
+import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -14,22 +14,13 @@ import { isPhrasingContent } from '@wordpress/dom';
 import { hasBlockSupport } from '..';
 import { getRawTransforms } from './get-raw-transforms';
 
-/**
- * Given raw transforms from blocks, merges all schemas into one.
- *
- * @param {Object} phrasingContentSchema The phrasing content schema.
- * @param {Object} isPaste               Whether the context is pasting or not.
- *
- * @return {Object} A complete block content schema.
- */
-export function getBlockContentSchema( phrasingContentSchema, isPaste ) {
-	const transforms = getRawTransforms();
+export function getBlockContentSchemaFromTransforms( transforms, context ) {
+	const phrasingContentSchema = getPhrasingContentSchema( context );
+	const schemaArgs = { phrasingContentSchema, isPaste: context === 'paste' };
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
 
-		schema = isFunction( schema )
-			? schema( { phrasingContentSchema, isPaste } )
-			: schema;
+		schema = isFunction( schema ) ? schema( schemaArgs ) : schema;
 
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.
@@ -78,6 +69,19 @@ export function getBlockContentSchema( phrasingContentSchema, isPaste ) {
 			}
 		}
 	} );
+}
+
+/**
+ * Gets the block content schema, which is extracted and merged from all
+ * registered blocks with raw transfroms.
+ *
+ * @param {string} context Set to "paste" when in paste context, where the
+ *                         schema is more strict.
+ *
+ * @return {Object} A complete block content schema.
+ */
+export function getBlockContentSchema( context ) {
+	return getBlockContentSchemaFromTransforms( getRawTransforms(), context );
 }
 
 /**

@@ -48,8 +48,7 @@ export function rawHandler( { HTML = '' } ) {
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
-	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema( phrasingContentSchema );
+	const blockContentSchema = getBlockContentSchema();
 
 	return compact(
 		flatMap( pieces, ( piece ) => {

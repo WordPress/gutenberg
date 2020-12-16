@@ -166,10 +166,7 @@ export function pasteHandler( {
 	}
 
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema(
-		phrasingContentSchema,
-		true
-	);
+	const blockContentSchema = getBlockContentSchema( 'paste' );
 
 	const blocks = compact(
 		flatMap( pieces, ( piece ) => {
