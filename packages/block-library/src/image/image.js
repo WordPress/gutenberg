@@ -187,9 +187,10 @@ export default function Image( {
 					linkDestination: props.linkDestination
 						? false
 						: inheritedAttributes.linkDestination,
-					linkTarget: props.linkTarget
-						? false
-						: inheritedAttributes.linkTarget,
+					linkTarget:
+						props.linkTarget || props.linkTarget !== linkTarget
+							? false
+							: inheritedAttributes.linkTarget,
 				},
 			} );
 		}
