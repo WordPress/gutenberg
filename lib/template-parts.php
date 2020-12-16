@@ -135,7 +135,7 @@ add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
 	if ( isset( $request['theme'] ) ) {
-		$theme = empty( $request['theme'] ) ? get_current_theme()->get_stylesheet() : $request['theme'];
+		$theme = empty( $request['theme'] ) ? wp_get_theme()->get_stylesheet() : $request['theme'];
 
 		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
 		$tax_query[] = array(
