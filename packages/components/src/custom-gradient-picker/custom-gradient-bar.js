@@ -141,7 +141,7 @@ function customGradientBarReducer( state, action ) {
 const customGradientBarReducerInitialState = { id: 'IDLE' };
 
 export default function CustomGradientBar( { value, onChange } ) {
-	const { background, hasGradient, markerPoints, initialPositions } = value;
+	const { background, hasGradient, markerPoints } = value;
 
 	const gradientPickerDomRef = useRef();
 
@@ -219,7 +219,6 @@ export default function CustomGradientBar( { value, onChange } ) {
 							: undefined
 					}
 					markerPoints={ markerPoints }
-					initialPositions={ initialPositions }
 					onChange={ onChange }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {
