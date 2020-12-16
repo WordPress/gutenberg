@@ -58,7 +58,6 @@ const manifest = require( '../../../package.json' );
  * @type {Record<string,string>}
  */
 const LABEL_MAPPING = {
-	'Mobile App Android/iOS': 'Mobile',
 	'[Block] Navigation': 'FSE: Block Navigation',
 	'[Block] Query': 'FSE: Block Query',
 	'[Block] Post Comments Count': 'FSE: Blocks',
@@ -79,6 +78,7 @@ const LABEL_MAPPING = {
 	'[Package] Env': 'Tools',
 	'[Package] ESLint plugin': 'Tools',
 	'[Package] Project management automation': 'Tools',
+	'[Type] Project Management': 'Tools',
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
 	'Automated Testing': 'Tools',
@@ -120,7 +120,6 @@ const GROUP_TITLE_ORDER = [
 	'Tools',
 	undefined,
 	'Various',
-	'Mobile',
 ];
 
 /**
@@ -343,11 +342,8 @@ function removeRedundantTypePrefix( title, issue ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByTitlePrefix( [ '[rnmobile]' ] ),
-	createOmitByLabel( [
-		'Mobile App Compatibility',
-		'[Type] Project Management',
-	] ),
+	createOmitByLabel( [ 'Mobile App Android/iOS' ] ),
+	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
