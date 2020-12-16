@@ -112,9 +112,6 @@ function AudioEdit( {
 	}
 
 	function getBlockControls( open ) {
-		if ( isCaptionSelected ) {
-			return null;
-		}
 		return (
 			<BlockControls>
 				<ToolbarGroup>
@@ -139,7 +136,7 @@ function AudioEdit( {
 				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
 					return (
 						<View>
-							{ getBlockControls( open ) }
+							{ !isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
 							<Text>
 								⏯ Audio Player goes here.{ ' ' }
