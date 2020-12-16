@@ -156,7 +156,7 @@ function AudioEdit( {
 			onPress={ onAudioPress }
 			disabled={ ! isSelected }
 		>
-			<View style={ { flex: 1 } }>
+			<View>
 				<InspectorControls>
 					<PanelBody title={ __( 'Audio settings' ) }>
 						<ToggleControl
