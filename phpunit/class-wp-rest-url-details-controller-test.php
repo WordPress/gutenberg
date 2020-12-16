@@ -69,23 +69,79 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		self::delete_user( self::$subscriber_id );
 	}
 
+
+
 	/**
 	 * Setup.
 	 */
 	public function setUp() {
 		parent::setUp();
-		add_filter( 'apply_filters', '__return_false' );
+
 		add_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10, 3 );
+
+		// Disables usage of cache during major of tests.
+		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
+		add_filter(
+			"pre_transient_$transient_name",
+			'__return_null'
+		);
 	}
 
 	/**
 	 * Tear down.
 	 */
 	public function tearDown() {
-		remove_filter( 'apply_filters', '__return_false' );
 		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
+		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
+
+		remove_filter(
+			"pre_transient_$transient_name",
+			'__return_null'
+		);
 		static::$request_args = array();
 		parent::tearDown();
+	}
+
+	public function test_will_return_from_cache_if_populated() {
+		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
+
+		remove_filter(
+			"pre_transient_$transient_name",
+			'__return_null'
+		);
+
+		// Force cache to return a known value.
+		add_filter(
+			"pre_transient_$transient_name",
+			function() {
+				return wp_json_encode(
+					array(
+						'title' => 'This value from cache',
+					)
+				);
+			}
+		);
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		// Data should be that from cache not from mocked network response.
+		$this->assertContains(
+			'This value from cache',
+			$data['title']
+		);
+
+		remove_all_filters(
+			"pre_transient_$transient_name"
+		);
 	}
 
 	public function test_register_routes() {
