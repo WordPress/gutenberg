@@ -116,10 +116,6 @@ function InserterMenu( {
 		/>
 	);
 
-	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
-	// is always visible, and one which already incurs this behavior of autoFocus via
-	// Popover's focusOnMount.
-	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
 		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
@@ -173,7 +169,6 @@ function InserterMenu( {
 			) }
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-autofocus */
 }
 
 export default InserterMenu;

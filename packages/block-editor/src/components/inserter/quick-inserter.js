@@ -80,12 +80,6 @@ export default function QuickInserter( {
 		setInserterIsOpened( true );
 	};
 
-	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
-	// is always visible, and one which already incurs this behavior of autoFocus via
-	// Popover's focusOnMount.
-	// Disable reason (no-static-element-interactions): Navigational key-presses within
-	// the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
-	/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	return (
 		<div
 			className={ classnames( 'block-editor-inserter__quick-inserter', {
@@ -129,5 +123,4 @@ export default function QuickInserter( {
 			) }
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 }

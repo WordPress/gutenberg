@@ -310,28 +310,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 								'fontFamily' => 'fontFamily',
 							),
 						),
-						'fontStyles'      => array(
-							array(
-								'slug' => 'fontStyle',
-							),
-						),
-						'fontWeights'     => array(
-							array(
-								'slug' => 'fontWeight',
-							),
-						),
-						'textDecorations' => array(
-							array(
-								'slug'  => 'textDecoration',
-								'value' => 'textDecoration',
-							),
-						),
-						'textTransforms'  => array(
-							array(
-								'slug'  => 'textTransform',
-								'value' => 'textTransform',
-							),
-						),
 					),
 				),
 			),
@@ -367,28 +345,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							array(
 								'slug'       => 'fontFamily',
 								'fontFamily' => 'fontFamily',
-							),
-						),
-						'fontStyles'      => array(
-							array(
-								'slug' => 'fontStyle',
-							),
-						),
-						'fontWeights'     => array(
-							array(
-								'slug' => 'fontWeight',
-							),
-						),
-						'textDecorations' => array(
-							array(
-								'slug'  => 'textDecoration',
-								'value' => 'textDecoration',
-							),
-						),
-						'textTransforms'  => array(
-							array(
-								'slug'  => 'textTransform',
-								'value' => 'textTransform',
 							),
 						),
 					),

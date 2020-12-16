@@ -2,9 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `wp-env start` is now the only command which writes to the docker configuration files. Previously, running any command would also parse the config and then write it to the correct location. Now, other commands still parse the config, but they will not overwrite the confugiration which was set by wp-env start. This allows parameters to be passed to wp-env start which can affect the configuration.
+
 ### Enhancement
 
-- Update nodegit dependency to 0.27.0, the earlier version does not have pre-built binaries for Node 14.15.0 LTS. Upgrading provides support without requiring building nodegit locally.
+-   Update nodegit dependency to 0.27.0, the earlier version does not have pre-built binaries for Node 14.15.0 LTS. Upgrading provides support without requiring building nodegit locally.
+-   Allow WP_HOME wp-config value to be set to a custom port other than the default for the docker instance.
+-   Append the instance URL to output of `wp-env start`.
+
+### New feature
+
+-   Add support for setting the PHP version used for the WordPress instance. For example, test PHP 8 with `"phpVersion": 8.0` in wp-env.json.
+-   Add Xdebug 3 to the development environment. You can enable Xdebug with `wp-env start --xdebug` (for debug mode) or `wp-env start --xdebug=develop,coverage` for custom modes.
+
+### Bug Fixes
+
+-   ZIP-based plugin sources are now downloaded to a directory using the basename of the URL instead of the full URL path. This prevents HTML encoded characters in the URL (like "/") from being improperly encoded into the filesystem. This fixes the issue where many .zip sources broke because files with these badly formatted characters were not loaded as assets.
 
 ## 2.0.0 (2020-09-03)
 

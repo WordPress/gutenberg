@@ -5,6 +5,7 @@
         "isValid": true,
         "attributes": {
             "query": {
+                "inherit": true,
                 "perPage": null,
                 "pages": 1,
                 "offset": 0,

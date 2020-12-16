@@ -233,7 +233,7 @@ If you don't have access to [make.wordpress.org/core](https://make.wordpress.org
 The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wordpress.org/core/handbook/about/release-cycle/) in terms of branching for each SVN branch, a corresponding Gutenberg `wp/*` branch is created:
 
 - The `wp/trunk` branch contains all the packages that are published and used in the `trunk` branch of WordPress.
-- A Gutenberg branch targeting a specific WordPress major release (including its further minor increments) is created (example `wp/5.2`) based on the `wp/trunk` Gutenberg branch when the WordPress `trunk` branch is marked as "feature-freezed". (This usually happens when the first `beta` of the next WordPress major version is released).
+- A Gutenberg branch targeting a specific WordPress major release (including its further minor increments) is created (example `wp/5.2`) based on the `wp/trunk` Gutenberg branch when the corresponding WordPress release branch is created. (This usually happens when the first `RC` of the next WordPress major version is released). 
 
 ### Synchronizing WordPress Trunk
 
@@ -249,7 +249,7 @@ The first step is automated via `./bin/plugin/cli.js npm-stable` command. You on
 4. Remove all files from the current branch: `git rm -r .`.
 5. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 6. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
-7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
+7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 
 Once the command is finished, you can start the second part: publishing the npm packages.
 
@@ -270,15 +270,16 @@ The following workflow is needed when bug fixes or security releases need to be 
 - During the `beta` and the `RC` period of the WordPress release cycle.
 - For WordPress minor releases and WordPress security releases (example `5.1.1`).
 
-1. Cherry-pick
-2. Check out the last published Gutenberg release branch `git checkout release/x.x`
-3. Create a Pull Request from this branch targeting the WordPress related major branch (Example `wp/5.2`).
+1. Check out the relevant WordPress major branch (If the minor release is 5.2.1, check out `wp/5.2`).
+2. Create a feature branch from that branch, and cherry-pick the merge commits for the needed bug fixes onto it.
+3. Create a Pull Request from this branch targeting the WordPress major branch used above.
 4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 
 Now, the branch is ready to be used to publish the npm packages.
 
 1. Check out the WordPress branch used before (Example `wp/5.2`).
-2. Run the [package release process] but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
+2. `git pull`.
+3. Run the [package release process] but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
 
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
@@ -311,7 +312,7 @@ Now _cherry-pick_ the commits from `master` to `wp/trunk`, use `-m 1 commithash`
 1. `git cherry-pick -m 1 cb150a2`
 2. `git push`
 
-Whilst waiting for the Travis CI build for  `wp/trunk` [branch to pass](https://travis-ci.com/WordPress/gutenberg/branches) identify and begin updating the `CHANGELOG.md` files:
+Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https://github.com/WordPress/gutenberg/actions?query=branch%3Awp%2Ftrunk), identify and begin updating the `CHANGELOG.md` files:
 1. `git checkout wp/trunk`
 2. `npm run publish:check`
 > Example

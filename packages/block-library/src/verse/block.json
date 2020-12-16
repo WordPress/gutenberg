@@ -10,18 +10,6 @@
 			"default": "",
 			"__unstablePreserveWhiteSpace": true
 		},
-		"style": {
-			"default": {
-				"spacing": {
-					"padding": {
-						"top": 20,
-						"right": 20,
-						"bottom": 20,
-						"left": 20
-					}
-				}
-			}
-		},
 		"textAlign": {
 			"type": "string"
 		}
@@ -29,8 +17,8 @@
 	"supports": {
 		"anchor": true,
 		"__experimentalFontFamily": true,
-		"spacing": {
-			"padding": true
-		}
-	}
+		"fontSize": true
+	},
+	"style": "wp-block-verse",
+	"editorStyle": "wp-block-verse-editor"
 }

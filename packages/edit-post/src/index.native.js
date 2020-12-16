@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/notices';
 import '@wordpress/format-library';
 import { render } from '@wordpress/element';
 

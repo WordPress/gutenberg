@@ -15,7 +15,7 @@ import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { SetBlockNodes } from '../root-container';
+import { SetBlockNodes } from '../';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
