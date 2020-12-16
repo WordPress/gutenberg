@@ -156,7 +156,12 @@ function useInsertionPoint( {
 				hideInsertionPoint();
 			}
 		},
-		[ showInsertionPoint, hideInsertionPoint, destinationRootClientId ]
+		[
+			showInsertionPoint,
+			hideInsertionPoint,
+			destinationRootClientId,
+			destinationIndex,
+		]
 	);
 
 	return [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ];
