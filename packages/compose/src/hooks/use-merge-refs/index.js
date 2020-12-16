@@ -8,12 +8,16 @@ import { useRef, useCallback } from '@wordpress/element';
 
 /**
  * Merges refs into one ref callback. Ensures the merged ref callbacks are only
- * called when it changes or when the ref value changes. If you don't wish a ref
- * callback to be called on every render, wrap it with `useCallback( ref, [] )`.
- * Dependencies can be added, but when a dependency changes, the ref callback
- * will be called with the same node.
+ * called when it changes (as a result of a `useCallback` dependency update) or
+ * when the ref value changes. If you don't wish a ref callback to be called on
+ * every render, wrap it with `useCallback( ref, [] )`.
+ * Dependencies can be added, but when a dependency changes, the old ref
+ * callback will be called with `null` and the new ref callback will be called
+ * with the same node.
  *
  * @param {Array<RefObject|RefCallback>} refs The refs to be merged.
+ *
+ * @return {RefCallback} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
 	const lastValue = useRef( null );
@@ -22,12 +26,14 @@ export default function useMergeRefs( refs ) {
 	return useCallback( ( value ) => {
 		refs.forEach( ( ref, index ) => {
 			if ( typeof ref === 'function' ) {
-				// Only call a ref when it wants to be called:
-				// - The value changes.
-				// - The ref callback has changed (e.g. an updated dependency).
+				// Only call a ref callback if it has changes, e.g. a dependency
+				// change in `useCallback`, EXCEPT if the value changes, then
+				// the ref callback must always be called.
+				// Any other ref callbacks WON'T be called if it doesn't change,
+				// e.g. if no `useCallback` dependencies change.
 				if (
-					value !== lastValue.current ||
-					lastRefs[ index ] !== ref
+					lastRefs[ index ] !== ref ||
+					value !== lastValue.current
 				) {
 					ref( value );
 				}

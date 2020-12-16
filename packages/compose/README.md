@@ -285,14 +285,20 @@ _Returns_
 <a name="useMergeRefs" href="#useMergeRefs">#</a> **useMergeRefs**
 
 Merges refs into one ref callback. Ensures the merged ref callbacks are only
-called when it changes or when the ref value changes. If you don't wish a ref
-callback to be called on every render, wrap it with `useCallback( ref, [] )`.
-Dependencies can be added, but when a dependency changes, the ref callback
-will be called with the same node.
+called when it changes (as a result of a `useCallback` dependency update) or
+when the ref value changes. If you don't wish a ref callback to be called on
+every render, wrap it with `useCallback( ref, [] )`.
+Dependencies can be added, but when a dependency changes, the old ref
+callback will be called with `null` and the new ref callback will be called
+with the same node.
 
 _Parameters_
 
 -   _refs_ `Array<(RefObject|RefCallback)>`: The refs to be merged.
+
+_Returns_
+
+-   `RefCallback`: The merged ref callback.
 
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
