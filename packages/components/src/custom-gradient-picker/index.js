@@ -15,12 +15,8 @@ import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './custom-gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
-import {
-	getGradientAstWithDefault,
-	getGradientBarValue,
-	gradientAstReducer,
-} from './utils';
-import { serializeGradient } from './serializer';
+import { getGradientAstWithDefault, getGradientBarValue } from './utils';
+import { serializeControlPoints, serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	HORIZONTAL_GRADIENT_ORIENTATION,
@@ -104,16 +100,20 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 export default function CustomGradientPicker( { value, onChange } ) {
 	const gradientAST = getGradientAstWithDefault( value );
 	const barValue = getGradientBarValue( gradientAST );
+	const controlPoints = gradientAST.colorStops.map( ( p ) => ( {
+		color: `${ p.type }(${ p.value.join( ',' ) })`,
+		position: `${ p.length.value }${ p.length.type }`,
+	} ) );
 
 	return (
 		<div className="components-custom-gradient-picker">
 			<CustomGradientBar
-				value={ barValue }
-				onChange={ ( nextAction ) => {
+				background={ barValue.background }
+				hasGradient={ barValue.hasGradient }
+				value={ controlPoints }
+				onChange={ ( newControlPoints ) => {
 					onChange(
-						serializeGradient(
-							gradientAstReducer( gradientAST, nextAction )
-						)
+						serializeControlPoints( gradientAST, newControlPoints )
 					);
 				} }
 			/>
