@@ -7,7 +7,7 @@ Hook used to focus the first tabbable element on mount.
 
 ### `ref`
 
-- Type: `Function`
+- Type: `Object|Function`
 
 A React ref that must be passed to the DOM element where the behavior should be attached.
 

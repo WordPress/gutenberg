@@ -24,5 +24,6 @@
 			"gradients": true,
 			"link": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-template-part-editor"
 }

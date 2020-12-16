@@ -335,12 +335,13 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
+	$block_library_filename = gutenberg_should_load_separate_block_styles() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
-		gutenberg_url( 'build/block-library/style.css' ),
+		gutenberg_url( 'build/block-library/' . $block_library_filename . '.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' )
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
 

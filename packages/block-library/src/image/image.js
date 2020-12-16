@@ -33,6 +33,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
 import { crop, upload } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -119,7 +120,7 @@ export default function Image( {
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );

@@ -19,6 +19,7 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
@@ -76,7 +77,7 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( reusableBlocksStore );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const save = useCallback( async function () {
 		try {

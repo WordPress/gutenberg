@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,6 +17,14 @@ export const settings = {
 	title: __( 'Site Logo' ),
 	description: __( 'Show a site logo' ),
 	icon,
+	styles: [
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
+		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
+	],
 	supports: {
 		align: true,
 		alignWide: false,

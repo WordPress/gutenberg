@@ -30,29 +30,43 @@ const config = require( '../config' );
  * @property {number[]} load             Load Time.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
+ * @property {number[]} inserterOpen     Average time to open global inserter.
+ * @property {number[]} inserterHover    Average time to move mouse between two block item in the inserter.
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load             Load Time.
- * @property {number} type             Average type time.
- * @property {number} minType          Minium type time.
- * @property {number} maxType          Maximum type time.
- * @property {number} focus            Average block selection time.
- * @property {number} minFocus         Min block selection time.
- * @property {number} maxFocus         Max block selection time.
+ * @property {number} load              Load Time.
+ * @property {number} type              Average type time.
+ * @property {number} minType           Minium type time.
+ * @property {number} maxType           Maximum type time.
+ * @property {number} focus             Average block selection time.
+ * @property {number} minFocus          Min block selection time.
+ * @property {number} maxFocus          Max block selection time.
+ * @property {number} inserterOpen      Average time to open global inserter.
+ * @property {number} minInserterOpen   Min time to open global inserter.
+ * @property {number} maxInserterOpen   Max time to open global inserter.
+ * @property {number} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {number} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {number} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string=} load             Load Time.
- * @property {string=} type             Average type time.
- * @property {string=} minType          Minium type time.
- * @property {string=} maxType          Maximum type time.
- * @property {string=} focus            Average block selection time.
- * @property {string=} minFocus         Min block selection time.
- * @property {string=} maxFocus         Max block selection time.
+ * @property {string=} load              Load Time.
+ * @property {string=} type              Average type time.
+ * @property {string=} minType           Minium type time.
+ * @property {string=} maxType           Maximum type time.
+ * @property {string=} focus             Average block selection time.
+ * @property {string=} minFocus          Min block selection time.
+ * @property {string=} maxFocus          Max block selection time.
+ * @property {string=} inserterOpen      Average time to open global inserter.
+ * @property {string=} minInserterOpen   Min time to open global inserter.
+ * @property {string=} maxInserterOpen   Max time to open global inserter.
+ * @property {string=} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {string=} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {string=} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -109,6 +123,12 @@ function curateResults( results ) {
 		focus: average( results.focus ),
 		minFocus: Math.min( ...results.focus ),
 		maxFocus: Math.max( ...results.focus ),
+		inserterOpen: average( results.inserterOpen ),
+		minInserterOpen: Math.min( ...results.inserterOpen ),
+		maxInserterOpen: Math.max( ...results.inserterOpen ),
+		inserterHover: average( results.inserterHover ),
+		minInserterHover: Math.min( ...results.inserterHover ),
+		maxInserterHover: Math.max( ...results.inserterHover ),
 	};
 }
 
@@ -166,6 +186,12 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 			focus: results.map( ( r ) => r.focus ),
 			minFocus: results.map( ( r ) => r.minFocus ),
 			maxFocus: results.map( ( r ) => r.maxFocus ),
+			inserterOpen: results.map( ( r ) => r.inserterOpen ),
+			minInserterOpen: results.map( ( r ) => r.minInserterOpen ),
+			maxInserterOpen: results.map( ( r ) => r.maxInserterOpen ),
+			inserterHover: results.map( ( r ) => r.inserterHover ),
+			minInserterHover: results.map( ( r ) => r.minInserterHover ),
+			maxInserterHover: results.map( ( r ) => r.maxInserterHover ),
 		},
 		median
 	);
@@ -268,7 +294,21 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> 🎉 Results.\n' );
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
-		console.table( results[ testSuite ] );
+
+		/** @type {Record<string, Record<string, string>>} */
+		const invertedResult = {};
+		Object.entries( results[ testSuite ] ).reduce(
+			( acc, [ key, val ] ) => {
+				for ( const entry of Object.keys( val ) ) {
+					if ( ! acc[ entry ] ) acc[ entry ] = {};
+					// @ts-ignore
+					acc[ entry ][ key ] = val[ entry ];
+				}
+				return acc;
+			},
+			invertedResult
+		);
+		console.table( invertedResult );
 	}
 }
 
