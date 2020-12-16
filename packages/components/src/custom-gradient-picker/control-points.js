@@ -117,7 +117,6 @@ export default function ControlPoints( {
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	markerPoints,
-	initialPositions,
 	onChange,
 	onStartControlPointChange,
 	onStopControlPointChange,
@@ -135,13 +134,12 @@ export default function ControlPoints( {
 			position,
 			significantMoveHappened,
 		} = controlPointMoveState.current;
-		if ( ! significantMoveHappened ) {
-			if (
-				Math.abs( initialPosition - relativePosition ) >=
+		if (
+			! significantMoveHappened &&
+			Math.abs( initialPosition - relativePosition ) >=
 				MINIMUM_SIGNIFICANT_MOVE
-			) {
-				controlPointMoveState.current.significantMoveHappened = true;
-			}
+		) {
+			controlPointMoveState.current.significantMoveHappened = true;
 		}
 
 		onChange( {
@@ -199,8 +197,7 @@ export default function ControlPoints( {
 							onMouseDown={ () => {
 								if ( window && window.addEventListener ) {
 									controlPointMoveState.current = {
-										initialPosition:
-											initialPositions[ index ],
+										initialPosition: point.positionValue,
 										position: index,
 										significantMoveHappened: false,
 										listenersActivated: true,
