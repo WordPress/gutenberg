@@ -692,11 +692,12 @@ export class RichText extends Component {
 	componentWillUnmount() {
 		// `isNewRichTextAdded` flag is used to distinguish whether RichText was unmounted
 		// because of adding new RichText via pressing `enter`. If `false` it indicates
-		// block is removed and RichText should be blurred.
-		if (
-			this._editor.isFocused() &&
-			( this.props.shouldBlurOnUnmount || ! this.isNewRichTextAdded )
-		) {
+		// block is removed and RichText should be blurred. Otherwise `blur()` is omitted
+		// for newly created RichText to avoid keyboard jumpiness.
+		if ( this.isNewRichTextAdded ) {
+			return false;
+		}
+		if ( this._editor.isFocused() || this.props.shouldBlurOnUnmount ) {
 			this._editor.blur();
 		}
 	}
