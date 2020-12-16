@@ -26,7 +26,7 @@ Note: the `editor_style` loads only within the editor, and after the `style`. Th
 
 Below we will explore two ways of working with CSS in your block plugin. First, let's take things back to basics and ignore the scss files and just use css files directly so we don't need to worry about compiling anything. 
 
-If you do want to just stick to working with Sass, skip this section and go straight to [Use Sass for Style](#Use Sass for Style)  
+If you do want to just stick to working with Sass, skip this section and go straight to [Use Sass for Style](#use-sass-for-style)  
 
 ## Add CSS Style for Block
 
