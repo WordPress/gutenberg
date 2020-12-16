@@ -112,9 +112,9 @@ With that in place, rebuild and reload and when you are not editing the message 
 
 The switching between a Placeholder and input control works well with a visual element like an image or video, but for the text example in this block we can do better.
 
-The simpler and better solution is to modify the `editor.css` to include the proper stylized text while typing.
+The simpler and better solution is to modify the `editor.css` if you're using plain CSS or the `editor.scss` file if you're using Sass, to include the proper stylized text while typing.
 
-Update `editor.css` to:
+Update `editor.css` or `editor.scss` to:
 
 ```css
 .wp-block-create-block-gutenpride input[type='text'] {
