@@ -46,7 +46,6 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
@@ -596,12 +595,12 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { openGeneralSidebar } = dispatch( editPostStore );
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
-				dispatch( editPostStore ).closeGeneralSidebar();
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
 		};
 	} ),
