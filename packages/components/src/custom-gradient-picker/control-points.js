@@ -17,15 +17,7 @@ import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
 import VisuallyHidden from '../visually-hidden';
-import {
-	getGradientWithColorAtIndexChanged,
-	getGradientWithControlPointRemoved,
-	getGradientWithPositionAtIndexChanged,
-	getGradientWithPositionAtIndexDecreased,
-	getGradientWithPositionAtIndexIncreased,
-	getHorizontalRelativeGradientPosition,
-	isControlPointOverlapping,
-} from './utils';
+import { getHorizontalRelativeGradientPosition } from './utils';
 import {
 	COLOR_POPOVER_PROPS,
 	GRADIENT_MARKERS_WIDTH,
@@ -47,26 +39,22 @@ class ControlPointKeyboardMove extends Component {
 		// Stop propagation of the key press event to avoid focus moving
 		// to another editor area.
 		event.stopPropagation();
-		const { gradientIndex, onChange, gradientAST } = this.props;
-		onChange(
-			getGradientWithPositionAtIndexIncreased(
-				gradientAST,
-				gradientIndex
-			)
-		);
+		const { gradientIndex, onChange } = this.props;
+		onChange( {
+			type: 'INCREASE_POSITION',
+			gradientIndex,
+		} );
 	}
 
 	decrease( event ) {
 		// Stop propagation of the key press event to avoid focus moving
 		// to another editor area.
 		event.stopPropagation();
-		const { gradientIndex, onChange, gradientAST } = this.props;
-		onChange(
-			getGradientWithPositionAtIndexDecreased(
-				gradientAST,
-				gradientIndex
-			)
-		);
+		const { gradientIndex, onChange } = this.props;
+		onChange( {
+			type: 'DECREASE_POSITION_BY_INDEX',
+			gradientIndex,
+		} );
 	}
 	render() {
 		const { children } = this.props;
@@ -145,13 +133,11 @@ export default function ControlPoints( {
 			GRADIENT_MARKERS_WIDTH
 		);
 		const {
-			gradientAST: referenceGradientAST,
+			initialPosition,
 			position,
 			significantMoveHappened,
 		} = controlPointMoveState.current;
 		if ( ! significantMoveHappened ) {
-			const initialPosition =
-				referenceGradientAST.colorStops[ position ].length.value;
 			if (
 				Math.abs( initialPosition - relativePosition ) >=
 				MINIMUM_SIGNIFICANT_MOVE
@@ -160,21 +146,11 @@ export default function ControlPoints( {
 			}
 		}
 
-		if (
-			! isControlPointOverlapping(
-				referenceGradientAST,
-				relativePosition,
-				position
-			)
-		) {
-			onChange(
-				getGradientWithPositionAtIndexChanged(
-					referenceGradientAST,
-					position,
-					relativePosition
-				)
-			);
-		}
+		onChange( {
+			type: 'UPDATE_POSITION_BY_MOUSE',
+			relativePosition,
+			position,
+		} );
 	};
 
 	const cleanEventListeners = () => {
@@ -225,7 +201,9 @@ export default function ControlPoints( {
 							onMouseDown={ () => {
 								if ( window && window.addEventListener ) {
 									controlPointMoveState.current = {
-										gradientAST,
+										initialPosition:
+											gradientAST.colorStops[ index ]
+												.length.value,
 										position: index,
 										significantMoveHappened: false,
 										listenersActivated: true,
@@ -254,24 +232,20 @@ export default function ControlPoints( {
 							<ColorPicker
 								color={ point.color }
 								onChangeComplete={ ( { rgb } ) => {
-									onChange(
-										getGradientWithColorAtIndexChanged(
-											gradientAST,
-											index,
-											rgb
-										)
-									);
+									onChange( {
+										type: 'UPDATE_COLOR_BY_INDEX',
+										index,
+										rgb,
+									} );
 								} }
 							/>
 							<Button
 								className="components-custom-gradient-picker__remove-control-point"
 								onClick={ () => {
-									onChange(
-										getGradientWithControlPointRemoved(
-											gradientAST,
-											index
-										)
-									);
+									onChange( {
+										type: 'REMOVE_BY_INDEX',
+										index,
+									} );
 									onClose();
 								} }
 								isLink

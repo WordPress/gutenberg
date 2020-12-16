@@ -15,7 +15,18 @@ import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './custom-gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
-import { getGradientParsed } from './utils';
+import {
+	getGradientParsed,
+	getGradientWithColorAtIndexChanged,
+	getGradientWithColorAtPositionChanged,
+	getGradientWithColorStopAdded,
+	getGradientWithControlPointRemoved,
+	getGradientWithPositionAtIndexChanged,
+	getGradientWithPositionAtIndexDecreased,
+	getGradientWithPositionAtIndexIncreased,
+	getHorizontalRelativeGradientPosition,
+	isControlPointOverlapping,
+} from './utils';
 import { serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
@@ -97,12 +108,75 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	);
 };
 
+function reducer( state, action ) {
+	const gradientAST = state;
+	switch ( action.type ) {
+		case 'ADD_BY_POSITION':
+			return getGradientWithColorStopAdded(
+				gradientAST,
+				action.insertPosition,
+				action.rgb
+			);
+
+		case 'REMOVE_BY_INDEX':
+			return getGradientWithControlPointRemoved(
+				gradientAST,
+				action.index
+			);
+
+		case 'UPDATE_COLOR_BY_POSITION':
+			return getGradientWithColorAtPositionChanged(
+				gradientAST,
+				action.insertPosition,
+				action.rgb
+			);
+
+		case 'UPDATE_COLOR_BY_INDEX':
+			return getGradientWithColorAtIndexChanged(
+				gradientAST,
+				action.index,
+				action.rgb
+			);
+
+		case 'INCREASE_POSITION_BY_INDEX':
+			return getGradientWithPositionAtIndexIncreased(
+				gradientAST,
+				action.gradientIndex
+			);
+
+		case 'DECREASE_POSITION_BY_INDEX':
+			return getGradientWithPositionAtIndexDecreased(
+				gradientAST,
+				action.gradientIndex
+			);
+
+		case 'UPDATE_POSITION_BY_MOUSE':
+			return ! isControlPointOverlapping(
+				gradientAST,
+				action.relativePosition,
+				action.position
+			)
+				? getGradientWithPositionAtIndexChanged(
+						gradientAST,
+						action.position,
+						action.relativePosition
+				  )
+				: gradientAST;
+	}
+}
+
 export default function CustomGradientPicker( { value, onChange } ) {
 	const { gradientAST, hasGradient } = getGradientParsed( value );
 	const { type } = gradientAST;
 	return (
 		<div className="components-custom-gradient-picker">
-			<CustomGradientBar value={ value } onChange={ onChange } />
+			<CustomGradientBar
+				value={ getGradientParsed( value ) }
+				onChange={ ( nextAction ) => {
+					const nextAST = reducer( gradientAST, nextAction );
+					onChange( serializeGradient( nextAST ) );
+				} }
+			/>
 			<Flex
 				gap={ 3 }
 				className="components-custom-gradient-picker__ui-line"
