@@ -25,9 +25,10 @@ import { store as blocksStore } from '@wordpress/blocks';
  *
  * If for any reason a block variaton match cannot be found,
  * the returned information come from the Block Type.
+ * If no blockType is found with the provided clientId, returns null.
  *
  * @param {string} clientId Block's client id.
- * @return {WPBlockDisplayInformation} Block's display information.
+ * @return {?WPBlockDisplayInformation} Block's display information.
  *
  */
 
