@@ -41,7 +41,7 @@ function ModalFrameContent( {
 			}
 		}
 	}
-	const focusOnMountRef = useFocusOnMount();
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 
@@ -60,7 +60,7 @@ function ModalFrameContent( {
 				ref={ mergeRefs( [
 					constrainedTabbingRef,
 					focusReturnRef,
-					focusOnMount ? focusOnMountRef : null,
+					focusOnMountRef,
 				] ) }
 				role={ role }
 				aria-label={ contentLabel }

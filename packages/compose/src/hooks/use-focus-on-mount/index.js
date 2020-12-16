@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+
+/**
+ * Internal dependencies
+ */
+import useCallbackRef from '../use-callback-ref';
 
 /**
  * Hook used to focus the first tabbable element on mount.
@@ -25,14 +30,16 @@ import { focus } from '@wordpress/dom';
  * }
  * ```
  */
-export default function useFocusOnMount( focusOnMount ) {
-	const didMount = useRef( false );
-	return useCallback( ( node ) => {
-		if ( ! node || didMount.current === true ) {
+export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+	const focusOnMountRef = useRef( focusOnMount );
+	useEffect( () => {
+		focusOnMountRef.current = focusOnMount;
+	}, [ focusOnMount ] );
+
+	return useCallbackRef( ( node ) => {
+		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}
-
-		didMount.current = true;
 
 		if ( node.contains( node.ownerDocument.activeElement ) ) {
 			return;
@@ -40,7 +47,7 @@ export default function useFocusOnMount( focusOnMount ) {
 
 		let target = node;
 
-		if ( focusOnMount === 'firstElement' ) {
+		if ( focusOnMountRef.current === 'firstElement' ) {
 			const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 			if ( firstTabbable ) {
