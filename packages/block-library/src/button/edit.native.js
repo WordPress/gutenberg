@@ -21,7 +21,6 @@ import {
 	ToolbarButton,
 	LinkSettingsNavigation,
 } from '@wordpress/components';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { link } from '@wordpress/icons';
@@ -423,7 +422,7 @@ export default compose( [
 	withGradient,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { isEditorSidebarOpened } = select( editPostStore );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const {
 			getSelectedBlockClientId,
 			getBlockCount,
@@ -443,7 +442,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			closeSettingsBottomSheet() {
-				dispatch( editPostStore ).closeGeneralSidebar();
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
 		};
 	} ),
