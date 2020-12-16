@@ -10,7 +10,6 @@ import { isEmpty } from 'lodash';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { coreBlocks } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
@@ -236,7 +235,7 @@ class LatestPostsEdit extends Component {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { openGeneralSidebar } = dispatch( editPostStore );
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
