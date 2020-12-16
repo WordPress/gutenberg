@@ -282,6 +282,14 @@ _Returns_
 
 -   `boolean`: return value of the media query.
 
+<a name="useMergeRefs" href="#useMergeRefs">#</a> **useMergeRefs**
+
+Merges refs.
+
+_Parameters_
+
+-   _refs_ `Array`: 
+
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
 Use something's value from the previous render.
