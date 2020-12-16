@@ -1,48 +1,15 @@
 /**
  * Internal dependencies
  */
-import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-	isAndroid,
-} from './helpers/utils';
+import { blockNames } from './pages/editor-page';
+import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
-
 describe( 'Gutenberg Editor tests @canary', () => {
-	let driver;
-	let editorPage;
-	let allPassed = true;
-	const paragraphBlockName = 'Paragraph';
-	const headingBlockName = 'Heading';
-
-	// Use reporter for setting status for saucelabs Job
-	if ( ! isLocalEnvironment() ) {
-		const reporter = {
-			specDone: async ( result ) => {
-				allPassed = allPassed && result.status !== 'failed';
-			},
-		};
-
-		jasmine.getEnv().addReporter( reporter );
-	}
-
-	beforeAll( async () => {
-		driver = await setupDriver();
-		editorPage = new EditorPage( driver );
-	} );
-
-	it( 'should be able to see visual editor', async () => {
-		await expect( editorPage.getBlockList() ).resolves.toBe( true );
-	} );
-
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
-		await editorPage.addNewBlock( headingBlockName );
+		await editorPage.addNewBlock( blockNames.heading );
 		let headingBlockElement = await editorPage.getBlockAtPosition(
-			headingBlockName
+			blockNames.heading
 		);
 		if ( isAndroid() ) {
 			await headingBlockElement.click();
@@ -53,9 +20,9 @@ describe( 'Gutenberg Editor tests @canary', () => {
 			false
 		);
 
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName,
+			blockNames.paragraph,
 			2
 		);
 		await editorPage.typeTextToParagraphBlock(
@@ -63,9 +30,9 @@ describe( 'Gutenberg Editor tests @canary', () => {
 			testData.mediumText
 		);
 
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName,
+			blockNames.paragraph,
 			3
 		);
 		await editorPage.typeTextToParagraphBlock(
@@ -73,9 +40,9 @@ describe( 'Gutenberg Editor tests @canary', () => {
 			testData.mediumText
 		);
 
-		await editorPage.addNewBlock( headingBlockName );
+		await editorPage.addNewBlock( blockNames.heading );
 		headingBlockElement = await editorPage.getBlockAtPosition(
-			headingBlockName,
+			blockNames.heading,
 			4
 		);
 		await editorPage.typeTextToParagraphBlock(
@@ -83,21 +50,14 @@ describe( 'Gutenberg Editor tests @canary', () => {
 			testData.heading
 		);
 
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName,
+			blockNames.paragraph,
 			5
 		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
-	} );
-
-	afterAll( async () => {
-		if ( ! isLocalEnvironment() ) {
-			driver.sauceJobStatus( allPassed );
-		}
-		await stopDriver( driver );
 	} );
 } );
