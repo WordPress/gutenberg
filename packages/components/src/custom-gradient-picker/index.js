@@ -171,9 +171,6 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	const { gradientAST, gradientValue, hasGradient } = parsedGradient;
 	const { type } = gradientAST;
 	const markerPoints = getMarkerPoints( gradientAST );
-	const initialPositions = gradientAST.colorStops.map(
-		( colorStop ) => colorStop.length.value
-	);
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
 	const background =
@@ -186,7 +183,6 @@ export default function CustomGradientPicker( { value, onChange } ) {
 				value={ {
 					hasGradient,
 					markerPoints,
-					initialPositions,
 					background,
 				} }
 				onChange={ ( nextAction ) => {
