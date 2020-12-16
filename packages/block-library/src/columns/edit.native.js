@@ -23,7 +23,6 @@ import {
 	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -423,7 +422,7 @@ const ColumnsEdit = ( props ) => {
 				getBlockParents,
 				getBlockAttributes,
 			} = select( 'core/block-editor' );
-			const { isEditorSidebarOpened } = select( editPostStore );
+			const { isEditorSidebarOpened } = select( 'core/edit-post' );
 			const block = getBlock( clientId );
 			const innerBlocks = block?.innerBlocks;
 			const isContentEmpty = map(
