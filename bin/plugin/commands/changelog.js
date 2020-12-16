@@ -89,11 +89,9 @@ const LABEL_MAPPING = {
 	'[Type] New API': 'New APIs',
 	'[Type] Experimental': 'Experiments',
 	'[Type] Performance': 'Performance',
-	'Accessibility (a11y)': 'Accessibility',
 	'[Type] Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
-	'[Type] Breaking Change': 'Breaking Change',
 };
 
 /**
