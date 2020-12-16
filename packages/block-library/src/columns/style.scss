@@ -1,6 +1,7 @@
 .wp-block-columns {
 	display: flex;
 	margin-bottom: 1.75em;
+	--gutter-size: #{ $grid-unit-20 * 2 };
 
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap;
