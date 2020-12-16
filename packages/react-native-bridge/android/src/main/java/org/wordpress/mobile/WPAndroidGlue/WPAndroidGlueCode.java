@@ -150,6 +150,7 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         ArrayList<MediaOption> onGetOtherMediaFileOptions();
+        ArrayList<MediaOption> onGetOtherMediaAudioFileOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
@@ -364,12 +365,21 @@ public class WPAndroidGlueCode {
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback,
                                                    MediaType mediaType) {
-                if (mediaType == MediaType.IMAGE || mediaType == MediaType.MEDIA) {
-                    ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
-                } else if (mediaType == MediaType.ANY) {
-                    ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
+                switch (mediaType){
+                    case IMAGE:
+                    case MEDIA:
+                        ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
+                        break;
+                    case ANY:
+                        ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
+                        break;
+                    case AUDIO:
+                        ArrayList<MediaOption> otherMediaAudioFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaAudioFileOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaAudioFileOptions);
+                        break;
+
                 }
             }
 
