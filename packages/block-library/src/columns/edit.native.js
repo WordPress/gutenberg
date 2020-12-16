@@ -15,6 +15,7 @@ import {
 	getValueAndUnit,
 	GlobalStylesContext,
 	isFullWidth,
+	isWiderThanMobile,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -91,7 +92,6 @@ function ColumnsEditContainer( {
 	onDeleteBlock,
 	innerColumns,
 	updateInnerColumnWidth,
-	parentBlockAlignment,
 	editorSidebarOpened,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
@@ -125,9 +125,7 @@ function ColumnsEditContainer( {
 			return (
 				<View
 					style={
-						( isFullWidth( align ) ||
-							isFullWidth( parentBlockAlignment ) ||
-							isEqualWidth ) &&
+						( isWiderThanMobile( screenWidth ) || isEqualWidth ) &&
 						styles.columnAppender
 					}
 				>

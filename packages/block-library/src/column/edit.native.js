@@ -20,6 +20,7 @@ import {
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
+	isWiderThanMobile,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -102,10 +103,11 @@ function ColumnEdit( {
 			return (
 				<View
 					style={
-						isScreenWidthEqual &&
-						( hasChildren
+						( isWiderThanMobile( screenWidth ) ||
+							isScreenWidthEqual ) &&
+						hasChildren
 							? styles.columnAppender
-							: styles.wideColumnAppender )
+							: styles.wideColumnAppender
 					}
 				>
 					<InnerBlocks.ButtonBlockAppender />

@@ -12,6 +12,7 @@ import {
 	getMergedGlobalStyles,
 	WIDE_ALIGNMENTS,
 	isFullWidth,
+	isWiderThanMobile,
 } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -260,6 +261,10 @@ class BlockListBlock extends Component {
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={
 										isFullWidth( align ) ||
+										( isContainerRelated &&
+											isWiderThanMobile(
+												screenWidth
+											) ) ||
 										isScreenWidthEqual
 									}
 								/>

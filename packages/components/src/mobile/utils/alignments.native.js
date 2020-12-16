@@ -20,3 +20,5 @@ export const isFullWidth = ( align ) =>
 
 export const isWideWidth = ( align ) =>
 	align === WIDE_ALIGNMENTS.alignments.wide;
+
+export const isWiderThanMobile = ( width ) => width > 480;

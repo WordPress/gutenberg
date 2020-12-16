@@ -14,7 +14,7 @@ import {
 } from '@wordpress/compose';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
-import { isFullWidth } from '@wordpress/components';
+import { isWiderThanMobile } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,7 +27,6 @@ function GroupEdit( {
 	isSelected,
 	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
-	parentBlockAlignment,
 	mergedStyle,
 } ) {
 	const { align } = attributes;
@@ -40,12 +39,10 @@ function GroupEdit( {
 		() => (
 			<View
 				style={
-					( isEqualWidth ||
-						isFullWidth( align ) ||
-						isFullWidth( parentBlockAlignment ) ) &&
-					( hasInnerBlocks
+					( isWiderThanMobile( screenWidth ) || isEqualWidth ) &&
+					hasInnerBlocks
 						? styles.groupAppender
-						: styles.wideGroupAppender )
+						: styles.wideGroupAppender
 				}
 			>
 				<InnerBlocks.ButtonBlockAppender />

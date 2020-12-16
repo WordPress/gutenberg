@@ -89,6 +89,7 @@ export {
 	ALIGNMENT_BREAKPOINTS,
 	isFullWidth,
 	isWideWidth,
+	isWiderThanMobile,
 } from './mobile/utils/alignments';
 
 // Hooks
