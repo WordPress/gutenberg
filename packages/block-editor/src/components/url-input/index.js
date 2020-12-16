@@ -26,7 +26,7 @@ const REQUEST_DEBOUNCE_DELAY = 200;
 
 function URLInput( {
 	value,
-	onChange: parentOnChange,
+	onChange,
 	label = '',
 	className = '',
 	isFullWidth,
@@ -200,15 +200,6 @@ function URLInput( {
 		}
 	}, REQUEST_DEBOUNCE_DELAY );
 
-	function onChange( event ) {
-		const inputValue = event.target.value;
-
-		parentOnChange( inputValue );
-		if ( ! disableSuggestions ) {
-			updateSuggestions( inputValue.trim() );
-		}
-	}
-
 	function onFocus() {
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
@@ -305,7 +296,7 @@ function URLInput( {
 	}
 
 	function selectLink( suggestion ) {
-		parentOnChange( suggestion.url, suggestion );
+		onChange( suggestion.url, suggestion );
 		setSelectedSuggestion( null );
 		setShowSuggestions( false );
 	}
@@ -345,7 +336,14 @@ function URLInput( {
 			required: true,
 			className: 'block-editor-url-input__input',
 			type: 'text',
-			onChange,
+			onChange( event ) {
+				const inputValue = event.target.value;
+
+				onChange( inputValue );
+				if ( ! disableSuggestions ) {
+					updateSuggestions( inputValue.trim() );
+				}
+			},
 			onFocus,
 			placeholder,
 			onKeyDown,
