@@ -55,9 +55,9 @@ function useDialog( options ) {
 
 	return [
 		useMergeRefs( [
-			constrainedTabbingRef,
-			focusReturnRef,
-			focusOnMountRef,
+			options.focusOnMount !== false ? constrainedTabbingRef : null,
+			options.focusOnMount !== false ? focusReturnRef : null,
+			options.focusOnMount !== false ? focusOnMountRef : null,
 			closeOnEscapeRef,
 		] ),
 		{
