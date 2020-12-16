@@ -260,36 +260,20 @@ function hasUnsupportedLength( item ) {
 	return item.length === undefined || item.length.type !== '%';
 }
 
-function assignColorStopLengths( gradientAST ) {
-	const { colorStops } = gradientAST;
-	const step = 100 / ( colorStops.length - 1 );
-	colorStops.forEach( ( stop, index ) => {
-		stop.length = {
-			value: step * index,
-			type: '%',
-		};
-	} );
-}
-
-export function getGradientParsed( value ) {
-	let hasGradient = !! value;
+export function getGradientAstWithDefault( value ) {
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
 	let gradientAST;
-	let gradientValue;
+
 	try {
-		gradientAST = gradientParser.parse( value || DEFAULT_GRADIENT )[ 0 ];
-		gradientValue = value || DEFAULT_GRADIENT;
+		gradientAST = gradientParser.parse( value )[ 0 ];
+		gradientAST.value = value;
 	} catch ( error ) {
-		hasGradient = false;
 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
-		gradientValue = DEFAULT_GRADIENT;
+		gradientAST.value = DEFAULT_GRADIENT;
 	}
 
-	if (
-		gradientAST.orientation &&
-		gradientAST.orientation.type === 'directional'
-	) {
+	if ( gradientAST.orientation?.type === 'directional' ) {
 		gradientAST.orientation.type = 'angular';
 		gradientAST.orientation.value = DIRECTIONAL_ORIENTATION_ANGLE_MAP[
 			gradientAST.orientation.value
@@ -297,13 +281,92 @@ export function getGradientParsed( value ) {
 	}
 
 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
-		assignColorStopLengths( gradientAST );
-		gradientValue = serializeGradient( gradientAST );
+		const { colorStops } = gradientAST;
+		const step = 100 / ( colorStops.length - 1 );
+		colorStops.forEach( ( stop, index ) => {
+			stop.length = {
+				value: step * index,
+				type: '%',
+			};
+		} );
+		gradientAST.value = serializeGradient( gradientAST );
 	}
+
+	return gradientAST;
+}
+
+export function getGradientBarValue( gradientAST ) {
+	// On radial gradients the bar should display a linear gradient.
+	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+	const background =
+		gradientAST.type === 'radial-gradient'
+			? getLinearGradientRepresentationOfARadial( gradientAST )
+			: gradientAST.value;
+
+	const markerPoints = getMarkerPoints( gradientAST );
+
+	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 
 	return {
 		hasGradient,
-		gradientAST,
-		gradientValue,
+		markerPoints,
+		background,
 	};
+}
+
+export function gradientAstReducer( state, action ) {
+	const gradientAST = state;
+	switch ( action.type ) {
+		case 'ADD_BY_POSITION':
+			return getGradientWithColorStopAdded(
+				gradientAST,
+				action.insertPosition,
+				action.rgb
+			);
+
+		case 'REMOVE_BY_INDEX':
+			return getGradientWithControlPointRemoved(
+				gradientAST,
+				action.index
+			);
+
+		case 'UPDATE_COLOR_BY_POSITION':
+			return getGradientWithColorAtPositionChanged(
+				gradientAST,
+				action.insertPosition,
+				action.rgb
+			);
+
+		case 'UPDATE_COLOR_BY_INDEX':
+			return getGradientWithColorAtIndexChanged(
+				gradientAST,
+				action.index,
+				action.rgb
+			);
+
+		case 'INCREASE_POSITION_BY_INDEX':
+			return getGradientWithPositionAtIndexIncreased(
+				gradientAST,
+				action.gradientIndex
+			);
+
+		case 'DECREASE_POSITION_BY_INDEX':
+			return getGradientWithPositionAtIndexDecreased(
+				gradientAST,
+				action.gradientIndex
+			);
+
+		case 'UPDATE_POSITION_BY_MOUSE':
+			return ! isControlPointOverlapping(
+				gradientAST,
+				action.relativePosition,
+				action.position
+			)
+				? getGradientWithPositionAtIndexChanged(
+						gradientAST,
+						action.position,
+						action.relativePosition
+				  )
+				: gradientAST;
+	}
 }
