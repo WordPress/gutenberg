@@ -7,13 +7,12 @@ import { CompositeItem } from 'reakit';
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+import { useMemo, useRef, memo } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
