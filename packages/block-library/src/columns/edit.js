@@ -22,6 +22,7 @@ import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
@@ -197,7 +198,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				}
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks, false );
+			replaceInnerBlocks( clientId, innerBlocks );
 		},
 	} )
 )( ColumnsEditContainer );
@@ -209,7 +210,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),
@@ -237,7 +238,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
 								nextVariation.innerBlocks
-							)
+							),
+							true
 						);
 					}
 				} }

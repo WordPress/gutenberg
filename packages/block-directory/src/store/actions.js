@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { apiFetch, dispatch, select } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -83,11 +86,11 @@ export function* installBlockType( block ) {
 		} );
 
 		yield loadAssets( assets );
-		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
-		if (
-			! registeredBlocks.length ||
-			! registeredBlocks.filter( ( i ) => i.name === block.name ).length
-		) {
+		const registeredBlocks = yield controls.select(
+			blocksStore.name,
+			'getBlockTypes'
+		);
+		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {
 			throw new Error(
 				__( 'Error registering block. Try reloading the page.' )
 			);
@@ -141,8 +144,8 @@ export function* uninstallBlockType( block ) {
 		} );
 		yield removeInstalledBlockType( block );
 	} catch ( error ) {
-		yield dispatch(
-			'core/notices',
+		yield controls.dispatch(
+			noticesStore,
 			'createErrorNotice',
 			error.message || __( 'An error occurred.' )
 		);

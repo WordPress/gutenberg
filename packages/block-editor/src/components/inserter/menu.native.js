@@ -14,7 +14,11 @@ import { pick } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { createBlock, rawHandler } from '@wordpress/blocks';
+import {
+	createBlock,
+	rawHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
@@ -133,11 +137,11 @@ export class InserterMenu extends Component {
 				isVisible={ true }
 				onClose={ this.onClose }
 				hideHeader
-				isChildrenScrollable
+				hasNavigation
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( { listProps } ) => (
+						{ ( { listProps, safeAreaBottomInset } ) => (
 							<FlatList
 								onLayout={ this.onLayout }
 								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
@@ -154,6 +158,14 @@ export class InserterMenu extends Component {
 								keyExtractor={ ( item ) => item.name }
 								renderItem={ this.renderItem }
 								{ ...listProps }
+								contentContainerStyle={ [
+									...listProps.contentContainerStyle,
+									{
+										paddingBottom:
+											safeAreaBottomInset ||
+											styles.list.paddingBottom,
+									},
+								] }
 							/>
 						) }
 					</BottomSheetConsumer>
@@ -173,7 +185,7 @@ export default compose(
 			getSettings,
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
-		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
+		const { getChildBlockNames, getBlockType } = select( blocksStore );
 		const { getClipboard } = select( 'core/editor' );
 
 		let destinationRootClientId = rootClientId;

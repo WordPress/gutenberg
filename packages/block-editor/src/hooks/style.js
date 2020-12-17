@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get, startsWith } from 'lodash';
+import { has, get, startsWith, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
@@ -23,6 +24,7 @@ import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
@@ -52,7 +54,8 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	Object.entries( STYLE_PROPERTY ).forEach(
+	const styleProperties = mapValues( STYLE_PROPERTY, ( prop ) => prop.value );
+	Object.entries( styleProperties ).forEach(
 		( [ styleKey, ...otherObjectKeys ] ) => {
 			const [ objectKeys ] = otherObjectKeys;
 
@@ -155,6 +158,7 @@ export const withBlockControls = createHigherOrderComponent(
 
 		return [
 			<TypographyPanel key="typography" { ...props } />,
+			<BorderPanel key="border" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 			hasSpacingSupport && (

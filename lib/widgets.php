@@ -200,7 +200,7 @@ function gutenberg_get_legacy_widget_settings() {
 
 	$settings['availableLegacyWidgets'] = $available_legacy_widgets;
 
-	return gutenberg_experiments_editor_settings( $settings );
+	return $settings;
 }
 
 /**
@@ -278,7 +278,7 @@ function gutenberg_load_widget_preview_if_requested() {
 		current_user_can( 'edit_theme_options' )
 	) {
 		define( 'IFRAME_REQUEST', true );
-		require_once dirname( __FILE__ ) . '/widget-preview-template.php';
+		require_once __DIR__ . '/widget-preview-template.php';
 		exit;
 	}
 }

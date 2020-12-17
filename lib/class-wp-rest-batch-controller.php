@@ -110,7 +110,7 @@ class WP_REST_Batch_Controller {
 			$requests[] = $single_request;
 		}
 
-		if ( ! method_exists( rest_get_server(), 'match_request_to_handler' ) ) {
+		if ( ! is_callable( array( rest_get_server(), 'match_request_to_handler' ) ) ) {
 			return $this->polyfill_batching( $requests );
 		}
 

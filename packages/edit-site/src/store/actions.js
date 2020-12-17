@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ export function setTemplate( templateId ) {
  * @return {Object} Action object used to set the current template.
  */
 export function* addTemplate( template ) {
-	const newTemplate = yield dispatch(
+	const newTemplate = yield controls.dispatch(
 		'core',
 		'saveEntityRecord',
 		'postType',
@@ -81,11 +82,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	yield dispatch(
-		'core/edit-site',
-		'setPage',
-		yield select( 'core/edit-site', 'getPage' )
-	);
+	const page = yield controls.select( 'core/edit-site', 'getPage' );
+	yield controls.dispatch( 'core/edit-site', 'setPage', page );
 }
 
 /**
@@ -116,7 +114,8 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page and displays both.
+ * Resolves the template for a page and displays both. If no path is given, attempts
+ * to use the postId to generate a path like `?p=${ postId }`.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -127,6 +126,9 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
+	if ( ! page.path && page.context?.postId ) {
+		page.path = `?p=${ page.context.postId }`;
+	}
 	const templateId = yield findTemplate( page.path );
 	yield {
 		type: 'SET_PAGE',
@@ -143,7 +145,12 @@ export function* showHomepage() {
 	const {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
-	} = yield select( 'core', 'getEntityRecord', 'root', 'site' );
+	} = yield controls.resolveSelect(
+		'core',
+		'getEntityRecord',
+		'root',
+		'site'
+	);
 
 	const page = {
 		path: '/',

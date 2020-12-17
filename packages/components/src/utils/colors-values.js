@@ -169,6 +169,7 @@ export const COLORS = {
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
 	mediumGray: G2.mediumGray,
+	gray: G2.gray,
 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
 	blue: merge( {}, BLUE, G2.blue ),

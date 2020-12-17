@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/notices';
 import '@wordpress/block-editor';
-import '@wordpress/reusable-blocks';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -59,7 +57,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-import * as classic from './classic';
+import * as classic from './freeform';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
 
@@ -192,8 +190,7 @@ export const registerCoreBlocks = (
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings Editor settings.
- *
+ * @param {boolean} enableFSEBlocks Whether to enable the full site editing blocks.
  * @example
  * ```js
  * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
@@ -203,15 +200,13 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( settings ) => {
-				const { __experimentalEnableFullSiteEditing } = settings;
-
+		? ( enableFSEBlocks ) => {
 				[
 					navigation,
 					navigationLink,
 
 					// Register Full Site Editing Blocks.
-					...( __experimentalEnableFullSiteEditing
+					...( enableFSEBlocks
 						? [
 								siteLogo,
 								siteTagline,

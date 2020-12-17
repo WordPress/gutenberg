@@ -26,6 +26,7 @@ import { blockDefault } from '@wordpress/icons';
  */
 import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
+import { store as blocksStore } from '../store';
 
 /**
  * An icon type definition. One of a Dashicon slug, an element,
@@ -70,7 +71,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * Named block variation scopes.
  *
- * @typedef {'block'|'inserter'} WPBlockVariationScope
+ * @typedef {'block'|'inserter'|'transform'} WPBlockVariationScope
  */
 
 /**
@@ -191,7 +192,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( select( 'core/blocks' ).getBlockType( name ) ) {
+	if ( select( blocksStore ).getBlockType( name ) ) {
 		console.error( 'Block "' + name + '" is already registered.' );
 		return;
 	}
@@ -242,7 +243,7 @@ export function registerBlockType( name, settings ) {
 
 	if (
 		'category' in settings &&
-		! some( select( 'core/blocks' ).getCategories(), {
+		! some( select( blocksStore ).getCategories(), {
 			slug: settings.category,
 		} )
 	) {
@@ -274,7 +275,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	dispatch( 'core/blocks' ).addBlockTypes( settings );
+	dispatch( blocksStore ).addBlockTypes( settings );
 
 	return settings;
 }
@@ -288,7 +289,7 @@ export function registerBlockType( name, settings ) {
  * @param {Object} [settings.icon] The icon to display in the block inserter.
  */
 export function registerBlockCollection( namespace, { title, icon } ) {
-	dispatch( 'core/blocks' ).addBlockCollection( namespace, title, icon );
+	dispatch( blocksStore ).addBlockCollection( namespace, title, icon );
 }
 
 /**
@@ -298,7 +299,7 @@ export function registerBlockCollection( namespace, { title, icon } ) {
  *
  */
 export function unregisterBlockCollection( namespace ) {
-	dispatch( 'core/blocks' ).removeBlockCollection( namespace );
+	dispatch( blocksStore ).removeBlockCollection( namespace );
 }
 
 /**
@@ -310,12 +311,12 @@ export function unregisterBlockCollection( namespace ) {
  *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
-	const oldBlock = select( 'core/blocks' ).getBlockType( name );
+	const oldBlock = select( blocksStore ).getBlockType( name );
 	if ( ! oldBlock ) {
 		console.error( 'Block "' + name + '" is not registered.' );
 		return;
 	}
-	dispatch( 'core/blocks' ).removeBlockTypes( name );
+	dispatch( blocksStore ).removeBlockTypes( name );
 	return oldBlock;
 }
 
@@ -325,7 +326,7 @@ export function unregisterBlockType( name ) {
  * @param {string} blockName Block name.
  */
 export function setFreeformContentHandlerName( blockName ) {
-	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( blockName );
+	dispatch( blocksStore ).setFreeformFallbackBlockName( blockName );
 }
 
 /**
@@ -335,7 +336,7 @@ export function setFreeformContentHandlerName( blockName ) {
  * @return {?string} Block name.
  */
 export function getFreeformContentHandlerName() {
-	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+	return select( blocksStore ).getFreeformFallbackBlockName();
 }
 
 /**
@@ -344,7 +345,7 @@ export function getFreeformContentHandlerName() {
  * @return {?string} Block name.
  */
 export function getGroupingBlockName() {
-	return select( 'core/blocks' ).getGroupingBlockName();
+	return select( blocksStore ).getGroupingBlockName();
 }
 
 /**
@@ -353,7 +354,7 @@ export function getGroupingBlockName() {
  * @param {string} blockName Block name.
  */
 export function setUnregisteredTypeHandlerName( blockName ) {
-	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( blockName );
+	dispatch( blocksStore ).setUnregisteredFallbackBlockName( blockName );
 }
 
 /**
@@ -363,7 +364,7 @@ export function setUnregisteredTypeHandlerName( blockName ) {
  * @return {?string} Block name.
  */
 export function getUnregisteredTypeHandlerName() {
-	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
+	return select( blocksStore ).getUnregisteredFallbackBlockName();
 }
 
 /**
@@ -372,7 +373,7 @@ export function getUnregisteredTypeHandlerName() {
  * @param {string} name Block name.
  */
 export function setDefaultBlockName( name ) {
-	dispatch( 'core/blocks' ).setDefaultBlockName( name );
+	dispatch( blocksStore ).setDefaultBlockName( name );
 }
 
 /**
@@ -381,7 +382,7 @@ export function setDefaultBlockName( name ) {
  * @param {string} name Block name.
  */
 export function setGroupingBlockName( name ) {
-	dispatch( 'core/blocks' ).setGroupingBlockName( name );
+	dispatch( blocksStore ).setGroupingBlockName( name );
 }
 
 /**
@@ -390,7 +391,7 @@ export function setGroupingBlockName( name ) {
  * @return {?string} Block name.
  */
 export function getDefaultBlockName() {
-	return select( 'core/blocks' ).getDefaultBlockName();
+	return select( blocksStore ).getDefaultBlockName();
 }
 
 /**
@@ -401,7 +402,7 @@ export function getDefaultBlockName() {
  * @return {?Object} Block type.
  */
 export function getBlockType( name ) {
-	return select( 'core/blocks' ).getBlockType( name );
+	return select( blocksStore ).getBlockType( name );
 }
 
 /**
@@ -410,7 +411,7 @@ export function getBlockType( name ) {
  * @return {Array} Block settings.
  */
 export function getBlockTypes() {
-	return select( 'core/blocks' ).getBlockTypes();
+	return select( blocksStore ).getBlockTypes();
 }
 
 /**
@@ -424,7 +425,7 @@ export function getBlockTypes() {
  * @return {?*} Block support value
  */
 export function getBlockSupport( nameOrType, feature, defaultSupports ) {
-	return select( 'core/blocks' ).getBlockSupport(
+	return select( blocksStore ).getBlockSupport(
 		nameOrType,
 		feature,
 		defaultSupports
@@ -442,7 +443,7 @@ export function getBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
-	return select( 'core/blocks' ).hasBlockSupport(
+	return select( blocksStore ).hasBlockSupport(
 		nameOrType,
 		feature,
 		defaultSupports
@@ -470,7 +471,7 @@ export function isReusableBlock( blockOrType ) {
  * @return {Array} Array of child block names.
  */
 export const getChildBlockNames = ( blockName ) => {
-	return select( 'core/blocks' ).getChildBlockNames( blockName );
+	return select( blocksStore ).getChildBlockNames( blockName );
 };
 
 /**
@@ -481,7 +482,7 @@ export const getChildBlockNames = ( blockName ) => {
  * @return {boolean} True if a block contains child blocks and false otherwise.
  */
 export const hasChildBlocks = ( blockName ) => {
-	return select( 'core/blocks' ).hasChildBlocks( blockName );
+	return select( blocksStore ).hasChildBlocks( blockName );
 };
 
 /**
@@ -493,9 +494,7 @@ export const hasChildBlocks = ( blockName ) => {
  *                   and false otherwise.
  */
 export const hasChildBlocksWithInserterSupport = ( blockName ) => {
-	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport(
-		blockName
-	);
+	return select( blocksStore ).hasChildBlocksWithInserterSupport( blockName );
 };
 
 /**
@@ -505,7 +504,7 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
-	dispatch( 'core/blocks' ).addBlockStyles( blockName, styleVariation );
+	dispatch( blocksStore ).addBlockStyles( blockName, styleVariation );
 };
 
 /**
@@ -515,10 +514,7 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
  * @param {string} styleVariationName Name of class applied to the block.
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
-	dispatch( 'core/blocks' ).removeBlockStyles(
-		blockName,
-		styleVariationName
-	);
+	dispatch( blocksStore ).removeBlockStyles( blockName, styleVariationName );
 };
 
 /**
@@ -530,7 +526,7 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
 export const getBlockVariations = ( blockName, scope ) => {
-	return select( 'core/blocks' ).getBlockVariations( blockName, scope );
+	return select( blocksStore ).getBlockVariations( blockName, scope );
 };
 
 /**
@@ -540,7 +536,7 @@ export const getBlockVariations = ( blockName, scope ) => {
  * @param {WPBlockVariation} variation Object describing a block variation.
  */
 export const registerBlockVariation = ( blockName, variation ) => {
-	dispatch( 'core/blocks' ).addBlockVariations( blockName, variation );
+	dispatch( blocksStore ).addBlockVariations( blockName, variation );
 };
 
 /**
@@ -550,5 +546,5 @@ export const registerBlockVariation = ( blockName, variation ) => {
  * @param {string} variationName Name of the variation defined for the block.
  */
 export const unregisterBlockVariation = ( blockName, variationName ) => {
-	dispatch( 'core/blocks' ).removeBlockVariations( blockName, variationName );
+	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
 };

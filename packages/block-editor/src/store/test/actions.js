@@ -41,10 +41,10 @@ import {
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
-		it( 'should return the RESET_BLOCKS actions', () => {
+		it( 'should yield the RESET_BLOCKS actions', () => {
 			const blocks = [];
-			const result = resetBlocks( blocks );
-			expect( result ).toEqual( {
+			const fulfillment = resetBlocks( blocks );
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'RESET_BLOCKS',
 				blocks,
 			} );
@@ -119,7 +119,8 @@ describe( 'actions', () => {
 		it( 'should return MULTI_SELECT action', () => {
 			const start = 'start';
 			const end = 'end';
-			expect( multiSelect( start, end ) ).toEqual( {
+			const fulfillment = multiSelect( start, end );
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'MULTI_SELECT',
 				start,
 				end,
@@ -740,9 +741,11 @@ describe( 'actions', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
 			const firstBlockClientId = 'blockA';
 			const secondBlockClientId = 'blockB';
-			expect(
-				mergeBlocks( firstBlockClientId, secondBlockClientId )
-			).toEqual( {
+			const fulfillment = mergeBlocks(
+				firstBlockClientId,
+				secondBlockClientId
+			);
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ firstBlockClientId, secondBlockClientId ],
 			} );
@@ -1121,17 +1124,17 @@ describe( 'actions', () => {
 				blocks: [ block ],
 				rootClientId: 'root',
 				time: expect.any( Number ),
-				updateSelection: true,
+				updateSelection: false,
 			} );
 		} );
 
-		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection false', () => {
-			expect( replaceInnerBlocks( 'root', [ block ], false ) ).toEqual( {
+		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection true', () => {
+			expect( replaceInnerBlocks( 'root', [ block ], true ) ).toEqual( {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ block ],
 				rootClientId: 'root',
 				time: expect.any( Number ),
-				updateSelection: false,
+				updateSelection: true,
 			} );
 		} );
 	} );

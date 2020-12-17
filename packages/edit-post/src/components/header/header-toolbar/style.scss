@@ -1,5 +1,6 @@
 .edit-post-header-toolbar {
 	display: inline-flex;
+	flex-grow: 1;
 	align-items: center;
 	border: none;
 
@@ -44,6 +45,24 @@
 
 		&::before {
 			display: none;
+		}
+	}
+}
+
+// Reduced UI.
+.edit-post-header.has-reduced-ui {
+	@include break-small () {
+		// Apply transition to every button but the first one.
+		.edit-post-header-toolbar__left > * + .components-button,
+		.edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		// Zero out opacity unless hovered.
+		&:not(:hover) .edit-post-header-toolbar__left > * + .components-button,
+		&:not(:hover) .edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
+			opacity: 0;
 		}
 	}
 }
@@ -99,25 +118,27 @@
 
 	// Move toolbar into top Editor Bar.
 	@include break-wide {
-		position: static;
-		left: auto;
-		right: auto;
-		background: none;
-		border-bottom: none;
-
-		.is-sidebar-opened & {
+		&:not(.is-pushed-down) {
+			position: static;
+			left: auto;
 			right: auto;
-		}
+			background: none;
+			border-bottom: none;
 
-		.block-editor-block-toolbar {
-			border-left: $border-width solid $gray-300;
-		}
+			.is-sidebar-opened & {
+				right: auto;
+			}
 
-		.block-editor-block-toolbar .components-toolbar-group,
-		.block-editor-block-toolbar .components-toolbar {
-			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
-			height: $header-height;
-			padding: $top-toolbar-padding 0;
+			.block-editor-block-toolbar {
+				border-left: $border-width solid $gray-300;
+			}
+
+			.block-editor-block-toolbar .components-toolbar-group,
+			.block-editor-block-toolbar .components-toolbar {
+				$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
+				height: $header-height;
+				padding: $top-toolbar-padding 0;
+			}
 		}
 	}
 }

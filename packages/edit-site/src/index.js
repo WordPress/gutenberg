@@ -4,7 +4,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -61,11 +60,11 @@ export function initialize( id, settings ) {
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( true );
 	}
 
 	render( <Editor />, document.getElementById( id ) );
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

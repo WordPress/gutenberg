@@ -44,8 +44,10 @@ async function isGlobalInserterOpen() {
 		);
 	} );
 }
-
-async function toggleGlobalBlockInserter() {
+/**
+ * Toggles the global inserter.
+ */
+export async function toggleGlobalBlockInserter() {
 	await page.click(
 		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"]'
 	);
@@ -57,7 +59,9 @@ async function toggleGlobalBlockInserter() {
 async function waitForInserterCloseAndContentFocus() {
 	await page.waitForFunction( () =>
 		document.body
-			.querySelector( '.block-editor-block-list__layout' )
+			.querySelector(
+				'.interface-interface-skeleton__content .block-editor-block-list__layout'
+			)
 			.contains( document.activeElement )
 	);
 }
@@ -143,11 +147,9 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await searchForPattern( searchTerm );
-	const insertButton = (
-		await page.$x(
-			`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
-		)
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();

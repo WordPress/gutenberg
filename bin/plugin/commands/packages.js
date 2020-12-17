@@ -6,6 +6,7 @@ const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
 const semver = require( 'semver' );
 const readline = require( 'readline' );
+const { prompt } = require( 'inquirer' );
 
 /**
  * Internal dependencies
@@ -13,11 +14,18 @@ const readline = require( 'readline' );
 const { log, formats } = require( '../lib/logger' );
 const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const {
+	calculateVersionBumpFromChangelog,
+	findReleaseBranchName,
 	runGitRepositoryCloneStep,
 	runCleanLocalFoldersStep,
-	findReleaseBranchName,
 } = require( './common' );
 const git = require( '../lib/git' );
+
+/**
+ * Semantic Versioning labels.
+ *
+ * @typedef {('major'|'minor'|'patch')} SemVer
+ */
 
 /**
  * Checks out the WordPress release branch and syncs it with the changes from
@@ -87,7 +95,7 @@ async function runWordPressReleaseBranchSyncStep(
  * contain new entries.
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {string} minimumVersionBump      Minimum version bump for the packages.
+ * @param {SemVer} minimumVersionBump      Minimum version bump for the packages.
  * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
  * @param {string} abortMessage            Abort Message.
  */
@@ -104,55 +112,18 @@ async function updatePackages(
 		changelogFiles.map( async ( changelogPath ) => {
 			const fileStream = fs.createReadStream( changelogPath );
 
-			const lines = readline.createInterface( {
+			const rl = readline.createInterface( {
 				input: fileStream,
 			} );
-
-			let changesDetected = false;
-			let versionBump = null;
-			for await ( const line of lines ) {
-				const lineNormalized = line.toLowerCase();
-				// Detect unpublished changes first.
-				if ( lineNormalized.startsWith( '## unreleased' ) ) {
-					changesDetected = true;
-					continue;
-				}
-
-				// Skip all lines until unpublished changes found.
-				if ( ! changesDetected ) {
-					continue;
-				}
-
-				// A previous published version detected. Stop processing.
-				if ( lineNormalized.startsWith( '## ' ) ) {
-					break;
-				}
-
-				// A major version bump required. Stop processing.
-				if ( lineNormalized.startsWith( '### breaking change' ) ) {
-					versionBump = 'major';
-					break;
-				}
-
-				// A minor version bump required. Proceed to the next line.
-				if (
-					lineNormalized.startsWith( '### deprecation' ) ||
-					lineNormalized.startsWith( '### enhancement' ) ||
-					lineNormalized.startsWith( '### new feature' )
-				) {
-					versionBump = 'minor';
-					continue;
-				}
-
-				// A version bump required. Found new changelog section.
-				if (
-					versionBump !== 'minor' &&
-					( lineNormalized.startsWith( '### ' ) ||
-						lineNormalized.startsWith( '- initial release' ) )
-				) {
-					versionBump = minimumVersionBump;
-				}
+			const lines = [];
+			for await ( const line of rl ) {
+				lines.push( line );
 			}
+
+			const versionBump = calculateVersionBumpFromChangelog(
+				lines,
+				minimumVersionBump
+			);
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
@@ -274,12 +245,11 @@ async function runPushGitChangesStep(
 /**
  * Prepare everything to publish WordPress packages to npm.
  *
- * @param {string} minimumVersionBump Minimum version bump for the packages.
- * @param {boolean} isPrerelease Whether the package version to publish is a prerelease.
+ * @param {boolean} [isPrerelease] Whether the package version to publish is a prerelease.
  *
  * @return {Promise<Object>} Github release object.
  */
-async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
+async function prepareForPackageRelease( isPrerelease ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
 	const temporaryFolders = [];
@@ -296,6 +266,16 @@ async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
 		gitWorkingDirectoryPath,
 		abortMessage
 	);
+
+	const { minimumVersionBump } = await prompt( [
+		{
+			type: 'list',
+			name: 'minimumVersionBump',
+			message: 'Select the minimum version bump for packages:',
+			default: 'patch',
+			choices: [ 'patch', 'minor', 'major' ],
+		},
+	] );
 
 	await updatePackages(
 		gitWorkingDirectoryPath,
@@ -316,6 +296,9 @@ async function prepareForPackageRelease( minimumVersionBump, isPrerelease ) {
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 }
 
+/**
+ * Prepares everything for publishing a new stable version of WordPress packages.
+ */
 async function prepareLatestDistTag() {
 	log(
 		formats.title(
@@ -325,7 +308,7 @@ async function prepareLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepareForPackageRelease( 'patch' );
+	await prepareForPackageRelease();
 
 	log(
 		'\n>> 🎉 WordPress packages are ready to publish!\n',
@@ -334,6 +317,9 @@ async function prepareLatestDistTag() {
 	);
 }
 
+/**
+ * Prepares everything for publishing a new RC version of WordPress packages.
+ */
 async function prepareNextDistTag() {
 	log(
 		formats.title(
@@ -343,7 +329,7 @@ async function prepareNextDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepareForPackageRelease( 'minor', true );
+	await prepareForPackageRelease( true );
 
 	log(
 		'\n>> 🎉 WordPress packages are ready to publish!\n',

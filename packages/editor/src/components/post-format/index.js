@@ -16,18 +16,30 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import PostFormatCheck from './check';
 
+// All WP post formats, sorted alphabetically by translated name.
 export const POST_FORMATS = [
 	{ id: 'aside', caption: __( 'Aside' ) },
+	{ id: 'audio', caption: __( 'Audio' ) },
+	{ id: 'chat', caption: __( 'Chat' ) },
 	{ id: 'gallery', caption: __( 'Gallery' ) },
-	{ id: 'link', caption: __( 'Link' ) },
 	{ id: 'image', caption: __( 'Image' ) },
+	{ id: 'link', caption: __( 'Link' ) },
 	{ id: 'quote', caption: __( 'Quote' ) },
 	{ id: 'standard', caption: __( 'Standard' ) },
 	{ id: 'status', caption: __( 'Status' ) },
 	{ id: 'video', caption: __( 'Video' ) },
-	{ id: 'audio', caption: __( 'Audio' ) },
-	{ id: 'chat', caption: __( 'Chat' ) },
-];
+].sort( ( a, b ) => {
+	const normalizedA = a.caption.toUpperCase();
+	const normalizedB = b.caption.toUpperCase();
+
+	if ( normalizedA < normalizedB ) {
+		return -1;
+	}
+	if ( normalizedA > normalizedB ) {
+		return 1;
+	}
+	return 0;
+} );
 
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
