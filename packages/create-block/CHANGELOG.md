@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.0.2 (2020-12-17)
+
+### Bug Fix
+
+-   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
+
 ## 1.0.1 (2020-12-17)
 
 ### Bug Fix
