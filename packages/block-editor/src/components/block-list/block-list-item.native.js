@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, findNodeHandle } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -31,6 +31,10 @@ export class BlockListItem extends Component {
 		super( ...arguments );
 
 		this.onLayout = this.onLayout.bind( this );
+		this.blockRef = createRef();
+		this.scrollToSelectedBlockIfItsNotVisible = this.scrollToSelectedBlockIfItsNotVisible.bind(
+			this
+		);
 
 		this.state = {
 			blockWidth: 0,
@@ -89,6 +93,112 @@ export class BlockListItem extends Component {
 		];
 	}
 
+	componentDidUpdate() {
+		this.scrollToSelectedBlockIfItsNotVisible();
+	}
+
+	scrollToSelectedBlockIfItsNotVisible() {
+		const { isSelected } = this.props;
+
+		if ( this.props.listContainerRef.current ) {
+			this.props.listContainerRef.current.measure(
+				( _x, _y, _containerWidth, containerHeight ) => {
+					// first we are measuring the layout to determine where {x,y} within the List Component the current Block based View is located.
+					this.blockRef.current.measureLayout(
+						findNodeHandle( this.props.listRef.current ),
+						( x, y ) => {
+							// once we have the {x,y} of that View we can then determine if it is currently visible.
+							this.blockRef.current.measure(
+								(
+									_blockMeasureX,
+									_blockMeasureY,
+									_blockWidth,
+									blockHeight,
+									px,
+									py
+								) => {
+									if ( isSelected ) {
+										const {
+											scrollToBlockListOffset,
+										} = this.props;
+
+										// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
+										//any of these bounds then the scrolling action is triggered.
+										const scrollAdjustmentYOffset =
+											0.2 * containerHeight;
+
+										// if the view has gone beyond the top of the screen we scroll to that location.
+										if (
+											py - scrollAdjustmentYOffset <
+											0
+										) {
+											const yOffset = this.calculateYOffsetInsideVisibleScreenBounds(
+												containerHeight,
+												scrollAdjustmentYOffset,
+												y,
+												blockHeight,
+												false
+											);
+											scrollToBlockListOffset( yOffset );
+										} // if the view has gone below the bottom of the screen we scroll to that location.
+										else if (
+											py +
+												blockHeight +
+												scrollAdjustmentYOffset >
+												containerHeight &&
+											blockHeight < containerHeight * 0.6
+										) {
+											const yOffset = this.calculateYOffsetInsideVisibleScreenBounds(
+												containerHeight,
+												scrollAdjustmentYOffset,
+												y,
+												blockHeight,
+												true
+											);
+											scrollToBlockListOffset( yOffset );
+										}
+									}
+								}
+							);
+						}
+					);
+				}
+			);
+		}
+	}
+
+	calculateYOffsetInsideVisibleScreenBounds(
+		listContainerHeight,
+		scrollAdjustmentYOffset,
+		blockYOffset,
+		blockHeight,
+		scrollDown = true
+	) {
+		const targetBlockYOffset = () => {
+			if ( scrollDown ) {
+				return blockYOffset;
+			}
+			return blockYOffset - blockHeight - scrollAdjustmentYOffset;
+		};
+
+		const topOfScreenBoundsYOffset = scrollAdjustmentYOffset;
+		const bottomOfScreenBoundsYOffset =
+			listContainerHeight - scrollAdjustmentYOffset;
+
+		if ( targetBlockYOffset < topOfScreenBoundsYOffset ) {
+			const yOffsetChange = topOfScreenBoundsYOffset - targetBlockYOffset;
+
+			return targetBlockYOffset + yOffsetChange;
+		}
+
+		if ( targetBlockYOffset > bottomOfScreenBoundsYOffset ) {
+			const yOffsetChange =
+				targetBlockYOffset - bottomOfScreenBoundsYOffset;
+
+			return targetBlockYOffset - yOffsetChange;
+		}
+	}
+
 	render() {
 		const {
 			blockAlignment,
@@ -109,6 +219,7 @@ export class BlockListItem extends Component {
 				style={ readableContentViewStyle }
 			>
 				<View
+					ref={ this.blockRef }
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 					onLayout={ this.onLayout }
@@ -143,6 +254,7 @@ export default compose( [
 				getSettings,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
+				isBlockSelected,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -171,6 +283,7 @@ export default compose( [
 			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 			const { attributes } = block || {};
 			const { align } = attributes || {};
+			const isSelected = isBlockSelected( clientId );
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
 			const parentBlock = hasParents
@@ -180,6 +293,7 @@ export default compose( [
 				parentBlock?.attributes || {};
 
 			return {
+				isSelected,
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
 				isReadOnly,

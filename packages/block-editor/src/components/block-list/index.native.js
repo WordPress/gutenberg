@@ -7,7 +7,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component, createContext, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -73,10 +73,31 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+		this.setListRef = this.setListRef.bind( this );
+		this.scrollToBlockListOffset = this.scrollToBlockListOffset.bind(
+			this
+		);
+		this.listRef = createRef();
+		this.listContainerRef = createRef();
 	}
 
 	addBlockToEndOfPost( newBlock ) {
 		this.props.insertBlock( newBlock, this.props.blockCount );
+	}
+
+	// scrolls to the Block at the offset Y that's passed.
+	scrollToBlockListOffset( offset ) {
+		const isIOS = Platform.OS === 'ios';
+		if ( isIOS ) {
+			// utilizes the ScrollView of the Keyboard Aware Flat List to scroll on iOS.
+			this.scrollViewRef.props.scrollToPosition( 0, offset, true );
+		} else {
+			// utilizes the FlatList of the Keyboard Aware Flat List to scroll on Android.
+			this.listRef.current.scrollToOffset( {
+				offset,
+				animated: true,
+			} );
+		}
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -90,6 +111,10 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
+	}
+
+	setListRef( ref ) {
+		this.listRef = ref;
 	}
 
 	shouldFlatListPreventAutomaticScroll() {
@@ -181,12 +206,13 @@ export class BlockList extends Component {
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
-			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
+			// We set negative margin in the parent to remove the edge spacing between parent block and child block in inner blocks
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
 		return (
 			<View
+				ref={ this.listContainerRef }
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
@@ -199,6 +225,7 @@ export class BlockList extends Component {
 					innerRef={ ( ref ) => {
 						this.scrollViewInnerRef( parentScrollRef || ref );
 					} }
+					listRef={ this.listRef }
 					extraScrollHeight={
 						blockToolbar.height + blockBorder.width
 					}
@@ -266,11 +293,14 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
+
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
+				listRef={ this.listRef }
+				listContainerRef={ this.listContainerRef }
 				parentWidth={ parentWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }
@@ -278,6 +308,7 @@ export class BlockList extends Component {
 				marginVertical={ marginVertical }
 				marginHorizontal={ marginHorizontal }
 				onDeleteBlock={ onDeleteBlock }
+				scrollToBlockListOffset={ this.scrollToBlockListOffset }
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
 				}
