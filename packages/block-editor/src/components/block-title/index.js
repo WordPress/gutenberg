@@ -50,7 +50,7 @@ export default function BlockTitle( { clientId } ) {
 	);
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	if ( ! blockInformation ) return null;
+	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
 	const label = getBlockLabel( blockType, attributes );
 	// Label will fallback to the title if no label is defined for the
