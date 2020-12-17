@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 import BlockStyles from '../block-styles';
 import PreviewBlockPopover from './preview-block-popover';
 
-const BlockStylesMenu = ( { hoveredBlock, onSwitch } ) => {
+export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
 	const [ hoveredClassName, setHoveredClassName ] = useState();
 	return (
 		<MenuGroup
@@ -32,5 +32,4 @@ const BlockStylesMenu = ( { hoveredBlock, onSwitch } ) => {
 			/>
 		</MenuGroup>
 	);
-};
-export default BlockStylesMenu;
+}
