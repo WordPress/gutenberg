@@ -19,7 +19,7 @@ import {
 	Popover,
 } from '@wordpress/components';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
 const REQUEST_DEBOUNCE_DELAY = 200;
@@ -27,8 +27,8 @@ const REQUEST_DEBOUNCE_DELAY = 200;
 function URLInput( {
 	value,
 	onChange,
-	label = '',
-	className = '',
+	label,
+	className,
 	isFullWidth,
 	instanceId,
 	placeholder = __( 'Paste URL or type to search' ),
@@ -37,7 +37,7 @@ function URLInput( {
 	debouncedSpeak,
 	__experimentalRenderControl: experimentalRenderControl,
 	__experimentalRenderSuggestions: experimentalRenderSuggestions,
-	__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+	__experimentalFetchLinkSuggestions,
 	__experimentalHandleURLSuggestions: handleURLSuggestions = false,
 	__experimentalShowInitialSuggestions: showInitialSuggestions = false,
 	setTimeout,
@@ -62,6 +62,19 @@ function URLInput( {
 	const pendingRequest = useRef( null );
 	const scrollingIntoView = useRef( false );
 	const suggestionNodes = useRef( [] );
+
+	const { fetchLinkSuggestions = false } = useSelect( ( select ) => {
+		if ( isFunction( __experimentalFetchLinkSuggestions ) ) {
+			return {
+				fetchLinkSuggestions: __experimentalFetchLinkSuggestions,
+			};
+		}
+		const { getSettings } = select( 'core/block-editor' );
+		const settings = getSettings();
+		return {
+			fetchLinkSuggestions: settings.__experimentalFetchLinkSuggestions,
+		};
+	} );
 
 	useEffect( () => {
 		if ( prevValue.current !== value && shouldShowInitialSuggestions() ) {
@@ -452,17 +465,5 @@ function URLInput( {
 export default compose(
 	withSafeTimeout,
 	withSpokenMessages,
-	withInstanceId,
-	withSelect( ( select, props ) => {
-		// If a link suggestions handler is already provided then
-		// bail
-		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
-			return;
-		}
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			__experimentalFetchLinkSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
-		};
-	} )
+	withInstanceId
 )( URLInput );
