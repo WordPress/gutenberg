@@ -180,6 +180,10 @@ class WP_Theme_JSON_Resolver {
 	 * @return array Custom Post Type for the user's origin config.
 	 */
 	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
+		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+			return array();
+		}
+
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
