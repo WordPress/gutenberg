@@ -61,8 +61,6 @@ export default function TabPanel( {
 		}
 	}, [ tabs ] );
 
-	const childrenResult = selectedTab && children( selectedTab );
-
 	return (
 		<div className={ className }>
 			<NavigableMenu
@@ -97,7 +95,7 @@ export default function TabPanel( {
 					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
 				>
-					{ childrenResult }
+					{ children( selectedTab ) }
 				</div>
 			) }
 		</div>
