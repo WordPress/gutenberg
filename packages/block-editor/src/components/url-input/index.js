@@ -24,6 +24,52 @@ import { isURL } from '@wordpress/url';
 
 const REQUEST_DEBOUNCE_DELAY = 200;
 
+function defaultRenderControl( { controlProps, inputProps, loading } ) {
+	return (
+		<BaseControl { ...controlProps }>
+			<input { ...inputProps } />
+			{ loading && <Spinner /> }
+		</BaseControl>
+	);
+}
+
+function defaultRenderSuggestions( {
+	suggestions,
+	suggestionsListProps,
+	handleSuggestionClick,
+	buildSuggestionItemProps,
+	className,
+	selectedSuggestion,
+} ) {
+	return (
+		<Popover position="bottom" noArrow focusOnMount={ false }>
+			<div
+				{ ...suggestionsListProps }
+				className={ classnames(
+					'block-editor-url-input__suggestions',
+					`${ className }__suggestions`
+				) }
+			>
+				{ suggestions.map( ( suggestion, index ) => (
+					<Button
+						{ ...buildSuggestionItemProps( suggestion, index ) }
+						key={ suggestion.id }
+						className={ classnames(
+							'block-editor-url-input__suggestion',
+							{
+								'is-selected': index === selectedSuggestion,
+							}
+						) }
+						onClick={ () => handleSuggestionClick( suggestion ) }
+					>
+						{ suggestion.title }
+					</Button>
+				) ) }
+			</div>
+		</Popover>
+	);
+}
+
 function URLInput( {
 	value,
 	onChange,
@@ -35,8 +81,8 @@ function URLInput( {
 	disableSuggestions,
 	speak,
 	debouncedSpeak,
-	__experimentalRenderControl: experimentalRenderControl,
-	__experimentalRenderSuggestions: experimentalRenderSuggestions,
+	__experimentalRenderControl: renderControl = defaultRenderControl,
+	__experimentalRenderSuggestions: renderSuggestions = defaultRenderSuggestions,
 	__experimentalFetchLinkSuggestions,
 	__experimentalHandleURLSuggestions: handleURLSuggestions = false,
 	__experimentalShowInitialSuggestions: showInitialSuggestions = false,
@@ -126,12 +172,6 @@ function URLInput( {
 
 	function clearSuggestionsRequest() {
 		pendingRequest.current = null;
-	}
-
-	function bindSuggestionNode( index ) {
-		return ( ref ) => {
-			suggestionNodes.current[ index ] = ref;
-		};
 	}
 
 	function isUpdatingSuggestions() {
@@ -314,12 +354,6 @@ function URLInput( {
 		setShowSuggestions( false );
 	}
 
-	function handleOnClick( suggestion ) {
-		selectLink( suggestion );
-		// Move focus to the input field when a link suggestion is clicked.
-		inputRef.current.focus();
-	}
-
 	if ( prevInstanceId !== instanceId ) {
 		setSuggestionsListboxId(
 			`block-editor-url-input-suggestions-${ instanceId }`
@@ -335,7 +369,7 @@ function URLInput( {
 		setShowSuggestions( disableSuggestions );
 	}
 
-	function renderControl() {
+	function buildControlProps() {
 		const controlProps = {
 			id: `url-input-control-${ instanceId }`,
 			label,
@@ -371,90 +405,56 @@ function URLInput( {
 					: undefined,
 			ref: inputRef,
 		};
-
-		if ( experimentalRenderControl ) {
-			return experimentalRenderControl(
-				controlProps,
-				inputProps,
-				loading
-			);
-		}
-
-		return (
-			<BaseControl { ...controlProps }>
-				<input { ...inputProps } />
-				{ loading && <Spinner /> }
-			</BaseControl>
-		);
+		return {
+			controlProps,
+			inputProps,
+			loading,
+		};
 	}
 
-	function renderSuggestions() {
-		if ( ! showSuggestions || ! suggestions.length ) {
-			return null;
-		}
-
-		const suggestionsListProps = {
-			id: suggestionsListboxId,
-			ref: autocompleteRef,
-			role: 'listbox',
-		};
-
-		const buildSuggestionItemProps = ( suggestion, index ) => {
+	function buildSuggestionsProps() {
+		function buildSuggestionItemProps( _, index ) {
 			return {
 				role: 'option',
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
-				ref: bindSuggestionNode( index ),
+				ref: ( ref ) => {
+					suggestionNodes.current[ index ] = ref;
+				},
 				'aria-selected': index === selectedSuggestion,
 			};
-		};
-
-		if ( isFunction( experimentalRenderSuggestions ) ) {
-			return experimentalRenderSuggestions( {
-				suggestions,
-				selectedSuggestion,
-				suggestionsListProps,
-				buildSuggestionItemProps,
-				isLoading: loading,
-				handleSuggestionClick: handleOnClick,
-				isInitialSuggestions:
-					showInitialSuggestions && ! ( value && value.length ),
-			} );
 		}
 
-		return (
-			<Popover position="bottom" noArrow focusOnMount={ false }>
-				<div
-					{ ...suggestionsListProps }
-					className={ classnames(
-						'block-editor-url-input__suggestions',
-						`${ className }__suggestions`
-					) }
-				>
-					{ suggestions.map( ( suggestion, index ) => (
-						<Button
-							{ ...buildSuggestionItemProps( suggestion, index ) }
-							key={ suggestion.id }
-							className={ classnames(
-								'block-editor-url-input__suggestion',
-								{
-									'is-selected': index === selectedSuggestion,
-								}
-							) }
-							onClick={ () => handleOnClick( suggestion ) }
-						>
-							{ suggestion.title }
-						</Button>
-					) ) }
-				</div>
-			</Popover>
-		);
+		return {
+			suggestions,
+			selectedSuggestion,
+			suggestionsListProps: {
+				id: suggestionsListboxId,
+				ref: autocompleteRef,
+				role: 'listbox',
+			},
+			buildSuggestionItemProps,
+			isLoading: loading,
+			handleSuggestionClick: ( suggestion ) => {
+				selectLink( suggestion );
+				// Move focus to the input field when a link suggestion is clicked.
+				inputRef.current.focus();
+			},
+			isInitialSuggestions:
+				shouldShowInitialSuggestions && ! value?.length,
+			className,
+		};
 	}
+
+	const controlProps = buildControlProps();
+	const suggestionProps = buildSuggestionsProps();
 
 	return (
 		<>
-			{ renderControl() }
-			{ renderSuggestions() }
+			{ renderControl( controlProps ) }
+			{ showSuggestions &&
+				suggestions?.length &&
+				renderSuggestions( suggestionProps ) }
 		</>
 	);
 }
