@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.1 (2020-12-17)
+
 ### Bug Fix
 
 -   Fix support for external templates hosted on npm.
