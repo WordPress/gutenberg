@@ -136,37 +136,6 @@ class WP_Theme_JSON_Resolver {
 				$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 			}
 		}
-
-		$default_font_styles_i18n = array(
-			'normal'  => __( 'Regular', 'gutenberg' ),
-			'italic'  => __( 'Italic', 'gutenberg' ),
-			'initial' => __( 'Initial', 'gutenberg' ),
-			'inherit' => __( 'Inherit', 'gutenberg' ),
-		);
-		if ( ! empty( $config['global']['settings']['typography']['fontStyles'] ) ) {
-			foreach ( $config['global']['settings']['typography']['fontStyles'] as &$font_style ) {
-				$font_style['name'] = $default_font_styles_i18n[ $font_style['slug'] ];
-			}
-		}
-
-		$default_font_weights_i18n = array(
-			'100'     => __( 'Ultralight', 'gutenberg' ),
-			'200'     => __( 'Thin', 'gutenberg' ),
-			'300'     => __( 'Light', 'gutenberg' ),
-			'400'     => __( 'Regular', 'gutenberg' ),
-			'500'     => __( 'Medium', 'gutenberg' ),
-			'600'     => __( 'Semibold', 'gutenberg' ),
-			'700'     => __( 'Bold', 'gutenberg' ),
-			'800'     => __( 'Heavy', 'gutenberg' ),
-			'900'     => __( 'Black', 'gutenberg' ),
-			'initial' => __( 'Initial', 'gutenberg' ),
-			'inherit' => __( 'Inherit', 'gutenberg' ),
-		);
-		if ( ! empty( $config['global']['settings']['typography']['fontWeights'] ) ) {
-			foreach ( $config['global']['settings']['typography']['fontWeights'] as &$font_weight ) {
-				$font_weight['name'] = $default_font_weights_i18n[ $font_weight['slug'] ];
-			}
-		}
 		// End i18n logic to remove when JSON i18 strings are extracted.
 
 		self::$core = new WP_Theme_JSON( $config );

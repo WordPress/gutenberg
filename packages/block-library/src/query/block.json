@@ -20,7 +20,8 @@
 				"author": "",
 				"search": "",
 				"exclude": [],
-				"sticky": ""
+				"sticky": "",
+				"inherit": true
 			}
 		},
 		"layout": {
@@ -40,5 +41,6 @@
 	],
 	"supports": {
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-query-editor"
 }

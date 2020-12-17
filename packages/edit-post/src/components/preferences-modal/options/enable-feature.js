@@ -8,16 +8,16 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BaseOption from './base';
+import { store as editPostStore } from '../../../store';
 
 export default compose(
 	withSelect( ( select, { featureName } ) => {
-		const { isFeatureActive } = select( 'core/edit-post' );
+		const { isFeatureActive } = select( editPostStore );
 		return {
 			isChecked: isFeatureActive( featureName ),
 		};
 	} ),
 	withDispatch( ( dispatch, { featureName } ) => ( {
-		onChange: () =>
-			dispatch( 'core/edit-post' ).toggleFeature( featureName ),
+		onChange: () => dispatch( editPostStore ).toggleFeature( featureName ),
 	} ) )
 )( BaseOption );

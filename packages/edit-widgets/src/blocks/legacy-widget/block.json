@@ -28,5 +28,6 @@
 	},
 	"parent": [
 		"core/widget-area"
-	]
+	],
+	"editorStyle": "wp-block-legacy-widget-editor"
 }

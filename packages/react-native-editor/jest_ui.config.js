@@ -10,7 +10,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 module.exports = {
 	verbose: true,
-	rootDir: '../../',
+	rootDir: './',
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
@@ -19,6 +19,8 @@ module.exports = {
 		'^.+\\.(js|ts|tsx)$': 'babel-jest',
 	},
 	timers: 'real',
-	setupFiles: [],
+	setupFilesAfterEnv: [ './jest_ui_setup_after_env.js' ],
+	testEnvironment: './jest_ui_test_environment.js',
 	testMatch: [ '**/__device-tests__/**/*.test.[jt]s?(x)' ],
+	reporters: [ 'default', 'jest-junit' ],
 };

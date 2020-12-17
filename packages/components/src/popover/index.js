@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
@@ -9,31 +10,30 @@ import classnames from 'classnames';
 import {
 	useRef,
 	useState,
-	useEffect,
 	useLayoutEffect,
+	useCallback,
 } from '@wordpress/element';
-import { focus, getRectangleFromRange } from '@wordpress/dom';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
-import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	useResizeObserver,
+	useFocusOnMount,
+	__experimentalUseFocusOutside as useFocusOutside,
+	useConstrainedTabbing,
+	useFocusReturn,
+} from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { computePopoverPosition } from './utils';
-import withFocusReturn from '../higher-order/with-focus-return';
-import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
-import PopoverDetectOutside from './detect-outside';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
-import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
-
-const FocusManaged = withConstrainedTabbing(
-	withFocusReturn( ( { children } ) => children )
-);
 
 /**
  * Name of slot in which popover should fill.
@@ -148,53 +148,6 @@ function withoutPadding( rect, element ) {
 		top: rect.top + top,
 		bottom: rect.bottom - bottom,
 	};
-}
-
-/**
- * Hook used to focus the first tabbable element on mount.
- *
- * @param {boolean|string} focusOnMount Focus on mount mode.
- * @param {Object}         contentRef   Reference to the popover content element.
- */
-function useFocusContentOnMount( focusOnMount, contentRef ) {
-	// Focus handling
-	useEffect( () => {
-		/*
-		 * Without the setTimeout, the dom node is not being focused. Related:
-		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		 *
-		 * TODO: Treat the cause, not the symptom.
-		 */
-		const focusTimeout = setTimeout( () => {
-			if ( ! focusOnMount || ! contentRef.current ) {
-				return;
-			}
-
-			if ( focusOnMount === 'firstElement' ) {
-				// Find first tabbable node within content and shift focus, falling
-				// back to the popover panel itself.
-				const firstTabbable = focus.tabbable.find(
-					contentRef.current
-				)[ 0 ];
-
-				if ( firstTabbable ) {
-					firstTabbable.focus();
-				} else {
-					contentRef.current.focus();
-				}
-
-				return;
-			}
-
-			if ( focusOnMount === 'container' ) {
-				// Focus the popover panel itself so items in the popover are easily
-				// accessed via keyboard navigation.
-				contentRef.current.focus();
-			}
-		}, 0 );
-
-		return () => clearTimeout( focusTimeout );
-	}, [] );
 }
 
 /**
@@ -464,7 +417,17 @@ const Popover = ( {
 		__unstableBoundaryParent,
 	] );
 
-	useFocusContentOnMount( focusOnMount, contentRef );
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusReturnRef = useFocusReturn();
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
+	const allRefs = [
+		containerRef,
+		focusOnMount ? constrainedTabbingRef : null,
+		focusOnMount ? focusReturnRef : null,
+		focusOnMount ? focusOnMountRef : null,
+	];
+	const mergedRefs = useCallback( mergeRefs( allRefs ), allRefs );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -549,54 +512,46 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
-			<IsolatedEventContainer
-				className={ classnames(
-					'components-popover',
-					className,
-					animateClassName,
-					{
-						'is-expanded': isExpanded,
-						'is-without-arrow': noArrow,
-						'is-alternate': isAlternate,
-					}
-				) }
-				{ ...contentProps }
-				onKeyDown={ maybeClose }
-				ref={ containerRef }
-			>
-				{ isExpanded && <ScrollLock /> }
-				{ isExpanded && (
-					<div className="components-popover__header">
-						<span className="components-popover__header-title">
-							{ headerTitle }
-						</span>
-						<Button
-							className="components-popover__close"
-							icon={ close }
-							onClick={ onClose }
-						/>
-					</div>
-				) }
-				<div
-					ref={ contentRef }
-					className="components-popover__content"
-					tabIndex="-1"
-				>
-					<div style={ { position: 'relative' } }>
-						{ containerResizeListener }
-						{ children }
-					</div>
+		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			className={ classnames(
+				'components-popover',
+				className,
+				animateClassName,
+				{
+					'is-expanded': isExpanded,
+					'is-without-arrow': noArrow,
+					'is-alternate': isAlternate,
+				}
+			) }
+			{ ...contentProps }
+			onKeyDown={ maybeClose }
+			{ ...focusOutsideProps }
+			ref={ mergedRefs }
+			tabIndex="-1"
+		>
+			{ isExpanded && <ScrollLock /> }
+			{ isExpanded && (
+				<div className="components-popover__header">
+					<span className="components-popover__header-title">
+						{ headerTitle }
+					</span>
+					<Button
+						className="components-popover__close"
+						icon={ close }
+						onClick={ onClose }
+					/>
 				</div>
-			</IsolatedEventContainer>
-		</PopoverDetectOutside>
+			) }
+			<div ref={ contentRef } className="components-popover__content">
+				<div style={ { position: 'relative' } }>
+					{ containerResizeListener }
+					{ children }
+				</div>
+			</div>
+		</div>
 	);
-
-	// Apply focus to element as long as focusOnMount is truthy; false is
-	// the only "disabled" value.
-	if ( focusOnMount ) {
-		content = <FocusManaged>{ content }</FocusManaged>;
-	}
 
 	if ( slot.ref ) {
 		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;

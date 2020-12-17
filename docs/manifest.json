@@ -156,6 +156,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block API Versions",
+		"slug": "versions",
+		"markdown_source": "../docs/designers-developers/developers/block-api/versions.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/designers-developers/developers/filters/README.md",

@@ -91,10 +91,10 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				var(--wp-admin-theme-color) 28%,
-				var(--wp-admin-theme-color-darker-20) 28%,
-				var(--wp-admin-theme-color-darker-20) 72%,
-				var(--wp-admin-theme-color)  72%
+				var(--wp-admin-theme-color) 33%,
+				var(--wp-admin-theme-color-darker-20) 33%,
+				var(--wp-admin-theme-color-darker-20) 70%,
+				var(--wp-admin-theme-color) 70%
 			);
 			/* stylelint-enable */
 			border-color: var(--wp-admin-theme-color);
@@ -255,10 +255,10 @@
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
-			darken($white, 2%) 28%,
-			darken($white, 12%) 28%,
-			darken($white, 12%) 72%,
-			darken($white, 2%) 72%
+			darken($white, 2%) 33%,
+			darken($white, 12%) 33%,
+			darken($white, 12%) 70%,
+			darken($white, 2%) 70%
 		);
 		/* stylelint-enable */
 	}
