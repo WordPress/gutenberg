@@ -195,9 +195,17 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 
-	$resolver = new WP_Theme_JSON_Resolver();
-	$all      = $resolver->get_origin( $theme_support_data );
-	$base     = $resolver->get_origin( $theme_support_data, 'theme' );
+	$resolver    = new WP_Theme_JSON_Resolver();
+	$all_origin  = 'user';
+	$base_origin = 'theme';
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		// This makes sure we don't consume resources looking up for
+		// the theme.json file (theme) or the CPT for user.
+		$all_origin  = 'core';
+		$base_origin = 'core';
+	}
+	$all      = $resolver->get_origin( $theme_support_data, $all_origin );
+	$base     = $resolver->get_origin( $theme_support_data, $base_origin );
 
 	// STEP 1: ADD FEATURES
 	// These need to be added to settings always.
