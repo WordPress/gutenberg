@@ -183,6 +183,19 @@
 		}
 	}
 
+	&.is-destructive.is-primary {
+		color: #fff;
+		background: $alert-red;
+		box-shadow: inset 0 0 0 $border-width $alert-red;
+
+		&:hover:not(:disabled) {
+			color: #fff;
+			background: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+	}
+
+
 	/**
 	 * Link buttons.
 	 */
