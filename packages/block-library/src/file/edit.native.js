@@ -98,14 +98,7 @@ export class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
-		const { downloadButtonText } = attributes;
-
-		if ( downloadButtonText === undefined || downloadButtonText === '' ) {
-			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
-			} );
-		}
+		const { attributes } = this.props;
 
 		if (
 			attributes.id &&
@@ -131,11 +124,15 @@ export class FileEdit extends Component {
 	}
 
 	onSelectFile( media ) {
-		this.props.setAttributes( {
+		const { attributes, setAttributes } = this.props;
+		const { downloadButtonText } = attributes;
+		setAttributes( {
 			href: media.url,
 			fileName: media.title,
 			textLinkHref: media.url,
 			id: media.id,
+			downloadButtonText:
+				downloadButtonText || _x( 'Download', 'button label' ),
 		} );
 	}
 
