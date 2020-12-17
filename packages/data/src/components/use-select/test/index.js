@@ -283,6 +283,9 @@ describe( 'useSelect', () => {
 			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
 		} );
 
 		it( 'can subscribe to multiple stores at once', () => {
@@ -564,6 +567,223 @@ describe( 'useSelect', () => {
 				parentCount: 1,
 				childCount: 0,
 			} );
+		} );
+
+		it( 'handles non-existing stores', () => {
+			registry.registerStore( 'store-1', counterStore );
+
+			let renderer;
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) => ( {
+						count1: select( 'store-1' ).getCounter(),
+						blank: select( 'non-existing-store' )?.getCounter(),
+					} ),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				blank: undefined,
+			} );
+
+			act( () => {
+				registry.dispatch( 'store-1' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 1,
+				blank: undefined,
+			} );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
+		} );
+
+		it( 'handles registration of a non-existing store during rendering', () => {
+			let renderer;
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) =>
+						select( 'not-yet-registered-store' )?.getCounter(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry.registerStore(
+					'not-yet-registered-store',
+					counterStore
+				);
+			} );
+
+			// This is not ideal, but is the way it's working before and we want to prevent breaking changes.
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry.dispatch( 'not-yet-registered-store' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
+		} );
+
+		it( 'handles registration of a non-existing store of sub-registry during rendering', () => {
+			let renderer;
+
+			const subRegistry = createRegistry( {}, registry );
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) =>
+						select(
+							'not-yet-registered-child-store'
+						)?.getCounter(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<RegistryProvider value={ subRegistry }>
+							<TestComponent />
+						</RegistryProvider>
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry.registerStore(
+					'not-yet-registered-child-store',
+					counterStore
+				);
+			} );
+
+			// This is not ideal, but is the way it's working before and we want to prevent breaking changes.
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry
+					.dispatch( 'not-yet-registered-child-store' )
+					.increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
+		} );
+
+		it( 'handles custom generic stores without a unsubscribe function', () => {
+			let renderer;
+
+			function createCustomStore() {
+				let storeChanged = () => {};
+				let counter = 0;
+
+				const selectors = {
+					getCounter: () => counter,
+				};
+
+				const actions = {
+					increment: () => {
+						counter += 1;
+						storeChanged();
+					},
+				};
+
+				return {
+					getSelectors() {
+						return selectors;
+					},
+					getActions() {
+						return actions;
+					},
+					subscribe( listener ) {
+						storeChanged = listener;
+					},
+				};
+			}
+
+			registry.registerGenericStore(
+				'generic-store',
+				createCustomStore()
+			);
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) => select( 'generic-store' ).getCounter(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+
+			act( () => {
+				registry.dispatch( 'generic-store' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			expect( () => renderer.unmount() ).not.toThrow();
 		} );
 	} );
 } );

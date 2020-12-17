@@ -19,6 +19,7 @@ import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostTemplate from '../post-template';
+import { store as editPostStore } from '../../../store';
 
 /**
  * Module Constants
@@ -58,7 +59,7 @@ export default compose( [
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 		const { isEditorPanelRemoved, isEditorPanelOpened } = select(
-			'core/edit-post'
+			editPostStore
 		);
 		return {
 			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
@@ -68,7 +69,7 @@ export default compose( [
 	ifCondition( ( { isRemoved } ) => ! isRemoved ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+			return dispatch( editPostStore ).toggleEditorPanelOpened(
 				PANEL_NAME
 			);
 		},

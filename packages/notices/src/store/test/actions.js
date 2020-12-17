@@ -75,6 +75,8 @@ describe( 'actions', () => {
 					actions: [],
 					type: 'default',
 					icon: '🌮',
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 			} );
 		} );
@@ -104,6 +106,8 @@ describe( 'actions', () => {
 					actions: [],
 					type: 'default',
 					icon: null,
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 			} );
 		} );

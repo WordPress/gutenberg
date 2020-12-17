@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2020-12-17)
+
 ### Breaking Change
 
 - Re-write using ES Modules causing CJS default import to change from `require('@wordpress/is-shallow-equal)` to `require('@wordpress/is-shallow-equal).default`. ([#26833](https://github.com/WordPress/gutenberg/pull/26833))

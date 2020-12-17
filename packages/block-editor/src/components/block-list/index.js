@@ -7,15 +7,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, forwardRef } from '@wordpress/element';
+import { useRef, createContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import RootContainer from './root-container';
 import useBlockDropZone from '../use-block-drop-zone';
+import useInsertionPoint from './insertion-point';
+import BlockPopover from './block-popover';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -23,29 +24,30 @@ import useBlockDropZone from '../use-block-drop-zone';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList(
-	{ className, placeholder, rootClientId, renderAppender },
-	ref
-) {
-	const Container = rootClientId ? 'div' : RootContainer;
-	const fallbackRef = useRef();
-	const wrapperRef = ref || fallbackRef;
+export const BlockNodes = createContext();
+export const SetBlockNodes = createContext();
+
+export default function BlockList( { className } ) {
+	const ref = useRef();
+	const [ blockNodes, setBlockNodes ] = useState( {} );
+	const insertionPoint = useInsertionPoint( ref );
 
 	return (
-		<Container
-			ref={ wrapperRef }
-			className={ classnames(
-				'block-editor-block-list__layout',
-				className
-			) }
-		>
-			<BlockListItems
-				placeholder={ placeholder }
-				rootClientId={ rootClientId }
-				renderAppender={ renderAppender }
-				wrapperRef={ wrapperRef }
-			/>
-		</Container>
+		<BlockNodes.Provider value={ blockNodes }>
+			{ insertionPoint }
+			<BlockPopover />
+			<div
+				ref={ ref }
+				className={ classnames(
+					'block-editor-block-list__layout is-root-container',
+					className
+				) }
+			>
+				<SetBlockNodes.Provider value={ setBlockNodes }>
+					<BlockListItems wrapperRef={ ref } />
+				</SetBlockNodes.Provider>
+			</div>
+		</BlockNodes.Provider>
 	);
 }
 
@@ -161,5 +163,3 @@ export function BlockListItems( props ) {
 		</AsyncModeProvider>
 	);
 }
-
-export default forwardRef( BlockList );

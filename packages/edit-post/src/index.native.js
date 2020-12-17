@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/notices';
 import '@wordpress/format-library';
 import { render } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
 let editorInitialized = false;
