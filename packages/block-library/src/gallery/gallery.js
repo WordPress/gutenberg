@@ -68,7 +68,6 @@ export const Gallery = ( props ) => {
 		>
 			<figure { ...innerBlocksProps }>
 				{ children }
-				{ mediaPlaceholder }
 				<RichTextVisibilityHelper
 					isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 					tagName="figcaption"
@@ -85,6 +84,7 @@ export const Gallery = ( props ) => {
 					}
 				/>
 			</figure>
+			{ mediaPlaceholder }
 		</div>
 	);
 };
