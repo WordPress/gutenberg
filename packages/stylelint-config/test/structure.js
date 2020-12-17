@@ -7,22 +7,22 @@ const fs = require( 'fs' ),
 /**
  * Internal dependencies
  */
-const config = require( '../scss' ),
-	validScss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/selectors-valid.scss',
+const config = require( '../' ),
+	validCss = fs.readFileSync(
+		'./packages/stylelint-config/test/structure-valid.css',
 		'utf-8'
 	),
-	invalidScss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/selectors-invalid.scss',
+	invalidCss = fs.readFileSync(
+		'./packages/stylelint-config/test/structure-invalid.css',
 		'utf-8'
 	);
 
-describe( 'flags no warnings with valid selectors scss', () => {
+describe( 'flags no warnings with valid structure css', () => {
 	let result;
 
 	beforeEach( () => {
 		result = stylelint.lint( {
-			code: validScss,
+			code: validCss,
 			config,
 		} );
 	} );
@@ -38,12 +38,12 @@ describe( 'flags no warnings with valid selectors scss', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid selectors scss', () => {
+describe( 'flags warnings with invalid structure css', () => {
 	let result;
 
 	beforeEach( () => {
 		result = stylelint.lint( {
-			code: invalidScss,
+			code: invalidCss,
 			config,
 		} );
 	} );
@@ -54,7 +54,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 6 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
 		);
 	} );
 

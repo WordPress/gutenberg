@@ -9,11 +9,11 @@ const fs = require( 'fs' ),
  */
 const config = require( '../' ),
 	validCss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/vendor-prefixes-valid.css',
+		'./packages/stylelint-config/test/themes-valid.css',
 		'utf-8'
 	);
 
-describe( 'flags no warnings with valid vendor prefixes css', () => {
+describe( 'flags no warnings with valid css', () => {
 	let result;
 
 	beforeEach( () => {

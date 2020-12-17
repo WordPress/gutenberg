@@ -9,15 +9,15 @@ const fs = require( 'fs' ),
  */
 const config = require( '../' ),
 	validCss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/css-valid.css',
+		'./packages/stylelint-config/test/properties-valid.css',
 		'utf-8'
 	),
 	invalidCss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/css-invalid.css',
+		'./packages/stylelint-config/test/properties-invalid.css',
 		'utf-8'
 	);
 
-describe( 'flags no warnings with valid css', () => {
+describe( 'flags no warnings with valid properties css', () => {
 	let result;
 
 	beforeEach( () => {
@@ -38,7 +38,7 @@ describe( 'flags no warnings with valid css', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid css', () => {
+describe( 'flags warnings with invalid properties css', () => {
 	let result;
 
 	beforeEach( () => {
@@ -54,7 +54,7 @@ describe( 'flags warnings with invalid css', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 1 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 7 )
 		);
 	} );
 

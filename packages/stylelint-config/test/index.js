@@ -7,22 +7,22 @@ const fs = require( 'fs' ),
 /**
  * Internal dependencies
  */
-const config = require( '../scss' ),
-	validScss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/scss-valid.scss',
+const config = require( '../' ),
+	validCss = fs.readFileSync(
+		'./packages/stylelint-config/test/css-valid.css',
 		'utf-8'
 	),
-	invalidScss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/scss-invalid.scss',
+	invalidCss = fs.readFileSync(
+		'./packages/stylelint-config/test/css-invalid.css',
 		'utf-8'
 	);
 
-describe( 'flags no warnings with valid scss', () => {
+describe( 'flags no warnings with valid css', () => {
 	let result;
 
 	beforeEach( () => {
 		result = stylelint.lint( {
-			code: validScss,
+			code: validCss,
 			config,
 		} );
 	} );
@@ -38,12 +38,12 @@ describe( 'flags no warnings with valid scss', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid scss', () => {
+describe( 'flags warnings with invalid css', () => {
 	let result;
 
 	beforeEach( () => {
 		result = stylelint.lint( {
-			code: invalidScss,
+			code: invalidCss,
 			config,
 		} );
 	} );
@@ -54,14 +54,13 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 1 )
 		);
 	} );
 
-	// ToDo: Fix snapshot, as results differ between Node.js v10 & v12
-	// it( 'snapshot matches warnings', () => {
-	// 	return result.then( ( data ) => (
-	// 		expect( data.results[ 0 ].warnings ).toMatchSnapshot()
-	// 	) );
-	// } );
+	it( 'snapshot matches warnings', () => {
+		return result.then( ( data ) =>
+			expect( data.results[ 0 ].warnings ).toMatchSnapshot()
+		);
+	} );
 } );

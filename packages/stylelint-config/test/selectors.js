@@ -9,15 +9,15 @@ const fs = require( 'fs' ),
  */
 const config = require( '../' ),
 	validCss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/commenting-valid.css',
+		'./packages/stylelint-config/test/selectors-valid.css',
 		'utf-8'
 	),
 	invalidCss = fs.readFileSync(
-		'./packages/stylelint-config/__tests__/commenting-invalid.css',
+		'./packages/stylelint-config/test/selectors-invalid.css',
 		'utf-8'
 	);
 
-describe( 'flags no warnings with valid commenting css', () => {
+describe( 'flags no warnings with valid selectors css', () => {
 	let result;
 
 	beforeEach( () => {
@@ -38,7 +38,7 @@ describe( 'flags no warnings with valid commenting css', () => {
 	} );
 } );
 
-describe( 'flags warnings with invalid commenting css', () => {
+describe( 'flags warnings with invalid selectors css', () => {
 	let result;
 
 	beforeEach( () => {
@@ -54,7 +54,7 @@ describe( 'flags warnings with invalid commenting css', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 3 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
 		);
 	} );
 
