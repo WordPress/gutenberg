@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -91,51 +91,70 @@ function InserterMenu( {
 		[ setSelectedPatternCategory ]
 	);
 
-	const blocksTab = (
-		<>
-			<div className="block-editor-inserter__block-list">
-				<BlockTypesTab
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsert }
-					onHover={ onHover }
-					showMostUsedBlocks={ showMostUsedBlocks }
-				/>
-			</div>
-			{ showInserterHelpPanel && (
-				<div className="block-editor-inserter__tips">
-					<VisuallyHidden as="h2">
-						{ __( 'A tip for using the block editor' ) }
-					</VisuallyHidden>
-					<Tips />
+	const blocksTab = useMemo(
+		() => (
+			<>
+				<div className="block-editor-inserter__block-list">
+					<BlockTypesTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						showMostUsedBlocks={ showMostUsedBlocks }
+					/>
 				</div>
-			) }
-		</>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__tips">
+						<VisuallyHidden as="h2">
+							{ __( 'A tip for using the block editor' ) }
+						</VisuallyHidden>
+						<Tips />
+					</div>
+				) }
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			onHover,
+			filterValue,
+			showMostUsedBlocks,
+			showInserterHelpPanel,
+		]
 	);
 
-	const patternsTab = (
-		<BlockPatternsTabs
-			onInsert={ onInsertPattern }
-			onClickCategory={ onClickPatternCategory }
-			selectedCategory={ selectedPatternCategory }
-		/>
+	const patternsTab = useMemo(
+		() => (
+			<BlockPatternsTabs
+				onInsert={ onInsertPattern }
+				onClickCategory={ onClickPatternCategory }
+				selectedCategory={ selectedPatternCategory }
+			/>
+		),
+		[ onInsertPattern, onClickPatternCategory, selectedPatternCategory ]
 	);
 
-	const reusableBlocksTab = (
-		<ReusableBlocksTab
-			rootClientId={ destinationRootClientId }
-			onInsert={ onInsert }
-			onHover={ onHover }
-		/>
+	const reusableBlocksTab = useMemo(
+		() => (
+			<ReusableBlocksTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsert }
+				onHover={ onHover }
+			/>
+		),
+		[ destinationRootClientId, onInsert, onHover ]
 	);
 
-	const getCurrentTab = ( tab ) => {
-		if ( tab.name === 'blocks' ) {
-			return blocksTab;
-		} else if ( tab.name === 'patterns' ) {
-			return patternsTab;
-		}
-		return reusableBlocksTab;
-	};
+	const getCurrentTab = useCallback(
+		( tab ) => {
+			if ( tab.name === 'blocks' ) {
+				return blocksTab;
+			} else if ( tab.name === 'patterns' ) {
+				return patternsTab;
+			}
+			return reusableBlocksTab;
+		},
+		[ blocksTab, patternsTab, reusableBlocksTab ]
+	);
 
 	return (
 		<div className="block-editor-inserter__menu">
