@@ -226,11 +226,10 @@ export class BlockList extends Component {
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
 						horizontal && styles.horizontalContentContainer,
-						isContentStretch &&
 						isWider( blockWidth, 'medium' ) &&
-						isMultiBlocks
-							? styles.horizontalContentContainerStretch
-							: styles.horizontalContentContainerCenter,
+							( isContentStretch && isMultiBlocks
+								? styles.horizontalContentContainerStretch
+								: styles.horizontalContentContainerCenter ),
 					] }
 					style={ getStyles(
 						isRootList,
