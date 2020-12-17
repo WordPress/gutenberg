@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Removed stylelint `^10.1.0`, `^11.0.0`, and `^12.0.0` as peer dependency.
+
 ### Internal
 
 -   Imported from `WordPress-Coding-Standards/stylelint-config-wordpress` repository to `WordPress/gutenberg` ([#22777](https://github.com/WordPress/gutenberg/pull/22777))
