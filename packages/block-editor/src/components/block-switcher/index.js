@@ -13,11 +13,7 @@ import {
 	ToolbarGroup,
 	ToolbarItem,
 } from '@wordpress/components';
-import {
-	getBlockType,
-	switchToBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
 
@@ -30,25 +26,40 @@ import BlockStylesMenu from './block-styles-menu';
 
 const BlockSwitcher = ( { clientIds } ) => {
 	const { replaceBlocks } = useDispatch( 'core/block-editor' );
-	const { blocks, possibleBlockTransformations, hasBlockStyles } = useSelect(
+	const {
+		blocks,
+		possibleBlockTransformations,
+		hasBlockStyles,
+		icon,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlocksByClientId,
 				getBlockRootClientId,
 				getBlockTransformItems,
 			} = select( 'core/block-editor' );
-			const { getBlockStyles } = select( blocksStore );
+			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
 			);
 			const _blocks = getBlocksByClientId( clientIds );
-			const firstBlock = _blocks?.length === 1 ? _blocks[ 0 ] : null;
-			const styles = firstBlock && getBlockStyles( firstBlock.name );
+			const isSingleBlockSelected = _blocks?.length === 1;
+			const firstBlock = !! _blocks?.length ? _blocks[ 0 ] : null;
+			const styles =
+				isSingleBlockSelected && getBlockStyles( firstBlock.name );
+			// When selection consists of blocks of multiple types, display an
+			// appropriate icon to communicate the non-uniformity.
+			const isSelectionOfSameType =
+				uniq( ( _blocks || [] ).map( ( { name } ) => name ) ).length ===
+				1;
 			return {
 				blocks: _blocks,
 				possibleBlockTransformations:
 					_blocks && getBlockTransformItems( _blocks, rootClientId ),
 				hasBlockStyles: !! styles?.length,
+				icon: isSelectionOfSameType
+					? getBlockType( firstBlock.name )?.icon
+					: stack,
 			};
 		},
 		[ clientIds ]
@@ -59,19 +70,6 @@ const BlockSwitcher = ( { clientIds } ) => {
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
 
-	const [ hoveredBlock ] = blocks;
-	// When selection consists of blocks of multiple types, display an
-	// appropriate icon to communicate the non-uniformity.
-	const isSelectionOfSameType =
-		uniq( blocks.map( ( { name } ) => name ) ).length === 1;
-	let icon;
-	if ( isSelectionOfSameType ) {
-		const sourceBlockName = hoveredBlock.name;
-		const blockType = getBlockType( sourceBlockName );
-		icon = blockType.icon;
-	} else {
-		icon = stack;
-	}
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
@@ -139,7 +137,7 @@ const BlockSwitcher = ( { clientIds } ) => {
 									) }
 									{ hasBlockStyles && (
 										<BlockStylesMenu
-											hoveredBlock={ hoveredBlock }
+											hoveredBlock={ blocks[ 0 ] }
 											onSwitch={ onClose }
 										/>
 									) }
