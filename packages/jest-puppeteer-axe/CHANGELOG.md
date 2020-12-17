@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2020-12-17)
+
 ### Breaking Changes
 
 -   Migrated `axe-puppeteer` to its new package [@axe-core/puppeteer](https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer) that contains breaking changes.

@@ -31,6 +31,7 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
+import { store as editPostStore } from '../../store';
 
 class Layout extends Component {
 	constructor() {
@@ -174,7 +175,7 @@ export default compose( [
 		const { __unstableIsEditorReady: isEditorReady } = select(
 			'core/editor'
 		);
-		const { getEditorMode } = select( 'core/edit-post' );
+		const { getEditorMode } = select( editPostStore );
 		const { getSettings } = select( 'core/block-editor' );
 		return {
 			isReady: isEditorReady(),
