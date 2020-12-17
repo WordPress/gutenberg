@@ -85,13 +85,13 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { allowResize = true, isListItem = false } = context;
+	const { allowResize = true, isGrouped = false } = context;
 	const image = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
-			return id && ( isSelected || isListItem ) ? getMedia( id ) : null;
+			return id && ( isSelected || isGrouped ) ? getMedia( id ) : null;
 		},
-		[ id, isSelected, isListItem ]
+		[ id, isSelected, isGrouped ]
 	);
 	const {
 		imageEditing,

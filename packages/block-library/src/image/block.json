@@ -4,7 +4,7 @@
 	"category": "media",
 	"usesContext": [
 		"allowResize",
-		"isListItem",
+		"isGrouped",
 		"linkTo",
 		"linkTarget",
 		"sizeSlug"
@@ -75,10 +75,6 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
-		},
-		"isListItem": {
-			"type": "boolean",
-			"default": false
 		},
 		"inheritedAttributes": {
 			"type": "object",
