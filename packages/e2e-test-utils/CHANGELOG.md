@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.16.0 (2020-12-17)
+
 ### Nee Features
 
 -   Added `clickMenuItem` - clicks the item that matches the label in the opened menu.
