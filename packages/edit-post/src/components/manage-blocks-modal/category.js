@@ -16,6 +16,7 @@ import { CheckboxControl } from '@wordpress/components';
  */
 import BlockTypesChecklist from './checklist';
 import EditPostSettings from '../edit-post-settings';
+import { store as editPostStore } from '../../store';
 
 function BlockManagerCategory( {
 	instanceId,
@@ -84,14 +85,14 @@ function BlockManagerCategory( {
 export default compose( [
 	withInstanceId,
 	withSelect( ( select ) => {
-		const { getPreference } = select( 'core/edit-post' );
+		const { getPreference } = select( editPostStore );
 
 		return {
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { showBlockTypes, hideBlockTypes } = dispatch( 'core/edit-post' );
+		const { showBlockTypes, hideBlockTypes } = dispatch( editPostStore );
 
 		return {
 			toggleVisible( blockName, nextIsChecked ) {
