@@ -29,6 +29,7 @@ import {
 	EnableFeature,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
+import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/preferences';
 
@@ -154,15 +155,13 @@ export default compose(
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			isModalActive: select( 'core/edit-post' ).isModalActive(
-				MODAL_NAME
-			),
+			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		return {
-			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
+			closeModal: () => dispatch( editPostStore ).closeModal(),
 		};
 	} )
 )( PreferencesModal );
