@@ -34,38 +34,34 @@ import { store as blocksStore } from '@wordpress/blocks';
 
 // TODO write tests
 export default function useBlockDisplayInformation( clientId ) {
-	const { attributes, blockType, variations } = useSelect(
+	return useSelect(
 		( select ) => {
-			if ( ! clientId ) return {};
+			if ( ! clientId ) return null;
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
 			);
 			const { getBlockType, getBlockVariations } = select( blocksStore );
 			const blockName = getBlockName( clientId );
+			const blockType = getBlockType( blockName );
+			if ( ! blockType ) return null;
+			const variations = getBlockVariations( blockName );
+			const blockTypeInfo = {
+				title: blockType.title,
+				icon: blockType.icon,
+				description: blockType.description,
+			};
+			if ( ! variations ) return blockTypeInfo;
+			const attributes = getBlockAttributes( clientId );
+			const match = variations.find( ( variation ) =>
+				variation.isActive?.( attributes, variation.attributes )
+			);
+			if ( ! match ) return blockTypeInfo;
 			return {
-				name: getBlockName( clientId ),
-				attributes: getBlockAttributes( clientId ),
-				blockType: getBlockType( blockName ),
-				variations: getBlockVariations( blockName ),
+				title: match.title || blockType.title,
+				icon: match.icon || blockType.icon,
+				description: match.description || blockType.description,
 			};
 		},
 		[ clientId ]
 	);
-	if ( ! blockType ) return null;
-
-	const blockTypeInfo = {
-		title: blockType.title,
-		icon: blockType.icon,
-		description: blockType.description,
-	};
-	if ( ! variations ) return blockTypeInfo;
-	const match = variations.find( ( variation ) =>
-		variation.isActive?.( attributes, variation.attributes )
-	);
-	if ( ! match ) return blockTypeInfo;
-	return {
-		title: match.title || blockType.title,
-		icon: match.icon || blockType.icon,
-		description: match.description || blockType.description,
-	};
 }
