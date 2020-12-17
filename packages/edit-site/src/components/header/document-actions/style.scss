@@ -20,9 +20,16 @@
 		// See comment above about min-width
 		min-width: 0;
 
-		// Since part of the dropdown button width is blank space, visually,
-		// it looks off-center. This offsets that blank space.
-		margin-left: 12px;
+		.components-dropdown {
+			display: inline-flex;
+
+			.components-button {
+				width: 24px;
+				height: 24px;
+				min-width: 24px;
+				padding: 0;
+			}
+		}
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
@@ -48,6 +55,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		text-align: center;
+		color: $gray-700;
 		@include reduce-motion(transition);
 	}
 
@@ -55,12 +63,12 @@
 		transform: translateY(10px);
 
 		.edit-site-document-actions__title-wrapper {
-			transform: translateY(-12px);
+			transform: translateY(-10px);
 		}
 
 		.edit-site-document-actions__secondary-item {
 			opacity: 1;
-			transform: translateY(-16px);
+			transform: translateY(-12px);
 		}
 	}
 }
