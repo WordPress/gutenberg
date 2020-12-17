@@ -10,6 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { DOWN } from '@wordpress/keycodes';
 import { Button } from '@wordpress/components';
+import { stack } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -118,6 +119,7 @@ describe( 'BlockSwitcher', () => {
 		useSelect.mockImplementation( () => ( {
 			blocks: [ headingBlock1, textBlock ],
 			possibleBlockTransformations: [],
+			icon: stack,
 		} ) );
 		const wrapper = shallow( <BlockSwitcher /> );
 		expect( wrapper ).toMatchSnapshot();
