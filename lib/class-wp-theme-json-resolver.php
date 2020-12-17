@@ -270,6 +270,10 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON
 	 */
 	public function get_origin( $theme_support_data = array(), $origin = 'user', $merged = true ) {
+		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+			$result = new WP_Theme_JSON();
+			$result->merge( self::get_core_origin() );
+		}
 
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
@@ -337,6 +341,10 @@ class WP_Theme_JSON_Resolver {
 	 * @return integer
 	 */
 	public static function get_user_custom_post_type_id() {
+		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+			return null;
+		}
+
 		if ( null !== self::$user_custom_post_type_id ) {
 			return self::$user_custom_post_type_id;
 		}
