@@ -111,7 +111,7 @@ export class RichText extends Component {
 		this.savedContent = '';
 		this.isTouched = false;
 		this.lastAztecEventType = null;
-		this.isNewRichTextAdded = null;
+		this.isNewRichTextAdded = false;
 
 		this.lastHistoryValue = value;
 
@@ -695,7 +695,7 @@ export class RichText extends Component {
 		// block is removed and RichText should be blurred. Otherwise `blur()` is omitted
 		// for newly created RichText to avoid keyboard jumpiness.
 		if ( this.isNewRichTextAdded ) {
-			return false;
+			return;
 		}
 		if ( this._editor.isFocused() || this.props.shouldBlurOnUnmount ) {
 			this._editor.blur();
