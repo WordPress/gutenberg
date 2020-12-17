@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.18.0 (2020-12-17)
+
 ### New Feature
 
 -   Added a store definition `store` for the block directory namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.26.0 (2020-12-17)
+
 ### New Features
 
 -   Added new `register` function for registering a standard `@wordpress/data` store definition ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
