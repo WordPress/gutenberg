@@ -8,7 +8,7 @@ module.exports = {
 	plugins: [ 'stylelint-scss' ],
 
 	rules: {
-		// stylelint-config-wordpress css overrides
+		// @wordpress/stylelint-config CSS overrides.
 		'at-rule-empty-line-before': [
 			'always',
 			{
