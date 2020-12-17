@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce, isFunction, isEmpty } from 'lodash';
+import { debounce } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -110,7 +110,7 @@ function URLInput( {
 	const suggestionNodes = useRef( [] );
 
 	const { fetchLinkSuggestions = false } = useSelect( ( select ) => {
-		if ( isFunction( __experimentalFetchLinkSuggestions ) ) {
+		if ( typeof __experimentalFetchLinkSuggestions === 'function' ) {
 			return {
 				fetchLinkSuggestions: __experimentalFetchLinkSuggestions,
 			};
@@ -165,8 +165,8 @@ function URLInput( {
 		return (
 			! isUpdatingSuggestions() &&
 			showInitialSuggestions &&
-			isEmpty( value ) &&
-			isEmpty( suggestions )
+			! value?.length &&
+			! suggestions.length
 		);
 	}
 
@@ -194,7 +194,7 @@ function URLInput( {
 		}
 
 		// Allow if this is a manual search where serach input length is not required.
-		if ( isEmpty( search ) ) {
+		if ( ! search.length ) {
 			return true;
 		}
 
@@ -203,7 +203,7 @@ function URLInput( {
 	}
 
 	function speakUpdateResult() {
-		if ( isEmpty( suggestions ) ) {
+		if ( ! suggestions.length ) {
 			debouncedSpeak( __( 'No results' ), 'assertive' );
 			return;
 		}
@@ -233,7 +233,7 @@ function URLInput( {
 		setLoading( true );
 
 		const request = fetchLinkSuggestions( search, {
-			isInitialSuggestions: isEmpty( search ),
+			isInitialSuggestions: ! search.length,
 		} );
 		pendingRequest.current = request;
 
@@ -260,7 +260,7 @@ function URLInput( {
 			value &&
 			! disableSuggestions &&
 			! isUpdatingSuggestions() &&
-			isEmpty( suggestions )
+			! suggestions.length
 		) {
 			// Ensure the suggestions are updated with the current input value
 			updateSuggestions( value.trim() );
@@ -270,7 +270,7 @@ function URLInput( {
 	function onKeyDown( event ) {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if ( ! showSuggestions || isEmpty( suggestions ) || loading ) {
+		if ( ! showSuggestions || ! suggestions.length || loading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
 			// a form of focus trapping that is disruptive to the user experience. This disruption
@@ -292,14 +292,14 @@ function URLInput( {
 				// When DOWN is pressed, if the caret is not at the end of the text, move it to the
 				// last position.
 				case DOWN: {
-					if ( value.length !== event.target.selectionStart ) {
+					if ( value?.length !== event.target.selectionStart ) {
 						event.stopPropagation();
 						event.preventDefault();
 
 						// Set the input caret to the last position
 						event.target.setSelectionRange(
-							value.length,
-							value.length
+							value?.length,
+							value?.length
 						);
 					}
 					break;
