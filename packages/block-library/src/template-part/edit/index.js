@@ -14,6 +14,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
@@ -42,7 +43,7 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { innerBlocks, expectedContent } = useSelect(
+	const { innerBlocks, expectedContent, title } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
 			const entityRecord = select( 'core' ).getEntityRecord(
@@ -54,6 +55,7 @@ export default function TemplatePartEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				expectedContent: entityRecord?.content.raw,
+				title: entityRecord?.title.raw,
 			};
 		},
 		[ clientId, postId ]
@@ -171,6 +173,13 @@ export default function TemplatePartEdit( {
 					/>
 				) }
 				{ isUnresolvedTemplateFile && <Spinner /> }
+				<Text
+					variant="body.small"
+					className="wp-block-template-part__title-chip"
+					as="div"
+				>
+					{ title }
+				</Text>
 			</TagName>
 		</>
 	);
