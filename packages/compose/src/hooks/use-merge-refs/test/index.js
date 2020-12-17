@@ -246,4 +246,46 @@ describe( 'useMergeRefs', () => {
 			],
 		] );
 	} );
+
+	it( 'should unmount', () => {
+		function renderCallback( args ) {
+			renderCallback.history.push( args );
+		}
+
+		renderCallback.history = [];
+
+		function MergedRefs() {
+			function refCallback1( value ) {
+				refCallback1.history.push( value );
+			}
+
+			refCallback1.history = [];
+
+			renderCallback( [ refCallback1.history ] );
+
+			return (
+				<div
+					ref={ useMergeRefs( [ useCallback( refCallback1, [] ) ] ) }
+				/>
+			);
+		}
+
+		const rootElement = document.getElementById( 'root' );
+
+		ReactDOM.render( <MergedRefs />, rootElement );
+
+		const originalElement = rootElement.firstElementChild;
+
+		expect( renderCallback.history ).toEqual( [ [ [ originalElement ] ] ] );
+
+		ReactDOM.render( null, rootElement );
+
+		expect( renderCallback.history ).toEqual( [
+			[
+				// Expect the "old" callback 1 to be called with the node,
+				// then null and then the new node.
+				[ originalElement, null ],
+			],
+		] );
+	} );
 } );
