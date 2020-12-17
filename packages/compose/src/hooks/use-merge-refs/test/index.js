@@ -14,141 +14,135 @@ import { useCallback } from '@wordpress/element';
 import useMergeRefs from '../';
 
 describe( 'useMergeRefs', () => {
-	beforeAll( () => {
+	// Setup
+	// =====
+	//
+	// A component with two merged ref callbacks. The second has a dependency,
+	// the first does not. We expect the one with the dependency to be called
+	// with null in the old function and the node in the new function. We don't
+	// expect the first ref callback to be called **unless** the node changes.
+	// There's a prop controlling the tag name, which can be used to trigger a
+	// node change. In that case we expect both ref callbacks to be called with
+	// null in the old function and the **new** node in the new function.
+	//
+	// The history of all functions is recorded. Note that a new function is
+	// created on every render, which will all be tracked. Some functions are
+	// never expected to be called on subsequent renders if no callback
+	// dependency updates!
+
+	function renderCallback( args ) {
+		renderCallback.history.push( args );
+	}
+
+	renderCallback.history = [];
+
+	function MergedRefs( { count, tagName: TagName = 'div' } ) {
+		function refCallback1( value ) {
+			refCallback1.history.push( value );
+		}
+
+		refCallback1.history = [];
+
+		function refCallback2( value ) {
+			refCallback2.history.push( value );
+		}
+
+		refCallback2.history = [];
+
+		renderCallback( [ refCallback1.history, refCallback2.history ] );
+
+		return (
+			<TagName
+				ref={ useMergeRefs( [
+					useCallback( refCallback1, [] ),
+					useCallback( refCallback2, [ count ] ),
+				] ) }
+			/>
+		);
+	}
+
+	beforeEach( () => {
 		const rootElement = document.createElement( 'div' );
 		rootElement.id = 'root';
 		document.body.appendChild( rootElement );
 	} );
 
+	afterEach( () => {
+		// Reset all history and DOM.
+		renderCallback.history = [];
+		document.body.innerHTML = '';
+	} );
+
 	it( 'should work', () => {
-		const renderCallback = jest.fn();
-		const refCallback1 = jest.fn();
-
-		function MergedRefs() {
-			renderCallback();
-			return (
-				<div
-					ref={ useMergeRefs( [ useCallback( refCallback1, [] ) ] ) }
-				/>
-			);
-		}
-
-		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs />, rootElement );
-
-		expect( renderCallback ).toHaveBeenCalledTimes( 1 );
-		expect( refCallback1 ).toHaveBeenCalledTimes( 1 );
-		expect( refCallback1 ).toHaveBeenCalledWith(
-			rootElement.firstElementChild
-		);
-
-		ReactDOM.render( <MergedRefs />, rootElement );
-
-		expect( renderCallback ).toHaveBeenCalledTimes( 2 );
-		expect( refCallback1 ).toHaveBeenCalledTimes( 1 );
-		expect( refCallback1 ).toHaveBeenCalledWith(
-			rootElement.firstElementChild
-		);
-	} );
-
-	it( 'should work with 2', () => {
-		const refCallback1 = jest.fn();
-		const refCallback2 = jest.fn();
-
-		function MergedRefs() {
-			return (
-				<div
-					ref={ useMergeRefs( [
-						useCallback( refCallback1, [] ),
-						useCallback( refCallback2, [] ),
-					] ) }
-				/>
-			);
-		}
-
-		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs />, rootElement );
-
-		expect( refCallback1 ).toHaveBeenCalledTimes( 1 );
-		expect( refCallback1 ).toHaveBeenCalledWith(
-			rootElement.firstElementChild
-		);
-		expect( refCallback2 ).toHaveBeenCalledTimes( 1 );
-		expect( refCallback2 ).toHaveBeenCalledWith(
-			rootElement.firstElementChild
-		);
-	} );
-
-	it( 'should work for node change', () => {
-		const renderCallback = jest.fn();
-
-		function refCallback1( value ) {
-			refCallback1.history = refCallback1.history || [];
-			refCallback1.history.push( value );
-		}
-
-		function MergedRefs( { tagName: TagName = 'div' } ) {
-			renderCallback();
-			return (
-				<TagName
-					ref={ useMergeRefs( [ useCallback( refCallback1, [] ) ] ) }
-				/>
-			);
-		}
-
 		const rootElement = document.getElementById( 'root' );
 
 		ReactDOM.render( <MergedRefs />, rootElement );
 
 		const originalElement = rootElement.firstElementChild;
 
-		expect( renderCallback ).toHaveBeenCalledTimes( 1 );
-		expect( refCallback1.history ).toEqual( [ originalElement ] );
+		// Render 1: both initial callback functions should be called with node.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement ] ],
+		] );
 
-		ReactDOM.render( <MergedRefs tagName="button" />, rootElement );
+		ReactDOM.render( <MergedRefs />, rootElement );
 
-		expect( renderCallback ).toHaveBeenCalledTimes( 2 );
-		expect( refCallback1.history ).toEqual( [
-			originalElement,
-			null,
-			rootElement.firstElementChild,
+		// Render 2: the new callback functions should not be called! There has
+		// been no dependency change.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement ] ],
+			[ [], [] ],
+		] );
+
+		ReactDOM.render( null, rootElement );
+
+		// Unmount: the initial callback functions should receive null.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null ],
+				[ originalElement, null ],
+			],
+			[ [], [] ],
 		] );
 	} );
 
-	it( 'should work with 2 different deps', () => {
-		function renderCallback( args ) {
-			renderCallback.history.push( args );
-		}
+	it( 'should work for node change', () => {
+		const rootElement = document.getElementById( 'root' );
 
-		renderCallback.history = [];
+		ReactDOM.render( <MergedRefs />, rootElement );
 
-		function MergedRefs( { count } ) {
-			function refCallback1( value ) {
-				refCallback1.history.push( value );
-			}
+		const originalElement = rootElement.firstElementChild;
 
-			refCallback1.history = [];
+		ReactDOM.render( <MergedRefs tagName="button" />, rootElement );
 
-			function refCallback2( value ) {
-				refCallback2.history.push( value );
-			}
+		const newElement = rootElement.firstElementChild;
 
-			refCallback2.history = [];
+		// After a render with the original element and a second render with the
+		// new element, expect the initial callback functions to be called with
+		// the original element, then null, then the new element.
+		// Again, the new callback functions should not be called! There has
+		// been no dependency change.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement ],
+				[ originalElement, null, newElement ],
+			],
+			[ [], [] ],
+		] );
 
-			renderCallback( [ refCallback1.history, refCallback2.history ] );
+		ReactDOM.render( null, rootElement );
 
-			return (
-				<div
-					ref={ useMergeRefs( [
-						useCallback( refCallback1, [] ),
-						useCallback( refCallback2, [ count ] ),
-					] ) }
-				/>
-			);
-		}
+		// Unmount: the initial callback functions should receive null.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement, null ],
+				[ originalElement, null, newElement, null ],
+			],
+			[ [], [] ],
+		] );
+	} );
 
+	it( 'should work with dependencies', () => {
 		const rootElement = document.getElementById( 'root' );
 
 		ReactDOM.render( <MergedRefs count={ 1 } />, rootElement );
@@ -161,57 +155,28 @@ describe( 'useMergeRefs', () => {
 
 		ReactDOM.render( <MergedRefs count={ 2 } />, rootElement );
 
+		// After a second render with a dependency change, expect the inital
+		// callback function to be called with null and the new callback
+		// function to be called with the original node. Note that for callback
+		// one no dependencies have changed.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement, null ] ],
+			[ [], [ originalElement ] ],
+		] );
+
+		ReactDOM.render( null, rootElement );
+
+		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
 			[
-				// Expect the "old" callback 1 to be called with the node.
-				[ originalElement ],
-				// Expect the "old" callback 2 to be called with the node, then
-				// `null`.
+				[ originalElement, null ],
 				[ originalElement, null ],
 			],
-			[
-				// Don't expect the "new" callback 1 to be called.
-				// No dependencies or node have changed.
-				[],
-				// Expect the "new" callback 2 to be called with the node since
-				// a dependency has updated.
-				[ originalElement ],
-			],
+			[ [], [ originalElement, null ] ],
 		] );
 	} );
 
 	it( 'should simultaneously update node and dependencies', () => {
-		function renderCallback( args ) {
-			renderCallback.history.push( args );
-		}
-
-		renderCallback.history = [];
-
-		function MergedRefs( { count, tagName: TagName = 'div' } ) {
-			function refCallback1( value ) {
-				refCallback1.history.push( value );
-			}
-
-			refCallback1.history = [];
-
-			function refCallback2( value ) {
-				refCallback2.history.push( value );
-			}
-
-			refCallback2.history = [];
-
-			renderCallback( [ refCallback1.history, refCallback2.history ] );
-
-			return (
-				<TagName
-					ref={ useMergeRefs( [
-						useCallback( refCallback1, [] ),
-						useCallback( refCallback2, [ count ] ),
-					] ) }
-				/>
-			);
-		}
-
 		const rootElement = document.getElementById( 'root' );
 
 		ReactDOM.render( <MergedRefs count={ 1 } />, rootElement );
@@ -227,65 +192,30 @@ describe( 'useMergeRefs', () => {
 			rootElement
 		);
 
+		const newElement = rootElement.firstElementChild;
+
+		// Both the node changes and the dependencies update for the second
+		// callback, so expect the old callback function to be called with null
+		// and the new callback function to be called with the **new** node.
+		// For the first callback, we expect the initial function to be called
+		// with null and then the new node since no dependencies have changed.
 		expect( renderCallback.history ).toEqual( [
 			[
-				// Expect the "old" callback 1 to be called with the node,
-				// then null and then the new node.
-				[ originalElement, null, rootElement.firstElementChild ],
-				// Expect the "old" callback 2 to be called with the node, then
-				// `null`.
+				[ originalElement, null, newElement ],
 				[ originalElement, null ],
 			],
-			[
-				// Don't expect the "new" callback 1 to be called since
-				// No dependencies or node have changed.
-				[],
-				// Expect the "new" callback 2 to be called with the node since
-				// a dependency has updated.
-				[ rootElement.firstElementChild ],
-			],
+			[ [], [ newElement ] ],
 		] );
-	} );
-
-	it( 'should unmount', () => {
-		function renderCallback( args ) {
-			renderCallback.history.push( args );
-		}
-
-		renderCallback.history = [];
-
-		function MergedRefs() {
-			function refCallback1( value ) {
-				refCallback1.history.push( value );
-			}
-
-			refCallback1.history = [];
-
-			renderCallback( [ refCallback1.history ] );
-
-			return (
-				<div
-					ref={ useMergeRefs( [ useCallback( refCallback1, [] ) ] ) }
-				/>
-			);
-		}
-
-		const rootElement = document.getElementById( 'root' );
-
-		ReactDOM.render( <MergedRefs />, rootElement );
-
-		const originalElement = rootElement.firstElementChild;
-
-		expect( renderCallback.history ).toEqual( [ [ [ originalElement ] ] ] );
 
 		ReactDOM.render( null, rootElement );
 
+		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
 			[
-				// Expect the "old" callback 1 to be called with the node,
-				// then null and then the new node.
+				[ originalElement, null, newElement, null ],
 				[ originalElement, null ],
 			],
+			[ [], [ newElement, null ] ],
 		] );
 	} );
 } );
