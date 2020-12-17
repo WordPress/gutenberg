@@ -235,6 +235,54 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	return $settings;
 }
 
+
+/**
+ * Tell kses to allow certain values for the properties
+ * the block editor may add.
+ *
+ * @param boolean $allow_css Whether or not this rule should be allowed.
+ * @param string  $css_test_string The CSS rule to process.
+ * @return boolean Filtered result.
+ */
+function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $css_test_string ) {
+	$parts          = explode( ':', $css_test_string, 2 );
+	$property_name  = trim( $parts[0] );
+	$property_value = trim( $parts[1] );
+
+	// Pass through if we're not processing the link color property.
+	if ( '--wp--style--color--link' !== $property_name ) {
+		return $allow_css;
+	}
+
+	// Pass through if $allow_css true. This means the link color has a valid color value
+	// (the user selected a custom color).
+	if ( $allow_css ) {
+		return $allow_css;
+	}
+
+	// We want to be specific in testing that the value for link color
+	// matches this: var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>).
+	return preg_match( '/^var\(--wp--preset--color--[A-Za-z0-9-]*\)$/', $property_value );
+}
+
+/**
+ * Tell kses not to remove from the block markup (from style attribute)
+ * the CSS variables the block editor may add.
+ *
+ * @param array $allowed_attr List of allowed attributes.
+ * @return array Filtered result.
+ */
+function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr ) {
+	return array_merge(
+		$allowed_attr,
+		array(
+			'--wp--style--color--link',
+		)
+	);
+}
+
 add_action( 'init', array( 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type' ) );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_filter( 'safe_style_css', 'gutenberg_experimental_global_styles_allow_css_var_name' );
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_experimental_global_styles_allow_css_var_value', 10, 2 );
