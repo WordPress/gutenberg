@@ -85,13 +85,20 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { allowResize = true, isGrouped = false } = context;
+	const {
+		allowResize = true,
+		linkTo: parentLinkDestination,
+		sizeSlug: parentSizeSlug,
+	} = context;
 	const image = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
-			return id && ( isSelected || isGrouped ) ? getMedia( id ) : null;
+			return id &&
+				( isSelected || parentLinkDestination || parentSizeSlug )
+				? getMedia( id )
+				: null;
 		},
-		[ id, isSelected, isGrouped ]
+		[ id, isSelected, parentLinkDestination ]
 	);
 	const {
 		imageEditing,
