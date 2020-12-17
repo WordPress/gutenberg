@@ -237,8 +237,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 
 /**
- * Tell kses to allow certain values for the properties
- * the block editor may add.
+ * Tell kses to allow the kind of CSS Custom Properties we'd add.
  *
  * @param boolean $allow_css Whether or not this rule should be allowed.
  * @param string  $css_test_string The CSS rule to process.
@@ -249,20 +248,15 @@ function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $
 	$property_name  = trim( $parts[0] );
 	$property_value = trim( $parts[1] );
 
-	// Pass through if we're not processing the link color property.
-	if ( '--wp--style--color--link' !== $property_name ) {
-		return $allow_css;
-	}
-
-	// Pass through if $allow_css true. This means the link color has a valid color value
-	// (the user selected a custom color).
+	// Pass through if $allow_css true.
+	// This means kses is ok with the value.
 	if ( $allow_css ) {
 		return $allow_css;
 	}
 
-	// We want to be specific in testing that the value for link color
-	// matches this: var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>).
-	return preg_match( '/^var\(--wp--preset--color--[A-Za-z0-9-]*\)$/', $property_value );
+	// We want to be specific in testing that the value matches:
+	// var(--wp--<value-with-alphanumeric-chars-or-hyphen>)
+	return preg_match( '/^var\(--wp--[A-Za-z0-9-]*\)$/', $property_value );
 }
 
 /**
