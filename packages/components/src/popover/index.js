@@ -520,6 +520,8 @@ const Popover = (
 				since: '5.3',
 				alternative: 'onFocusOutside',
 			} );
+
+			onClickOutside( clickEvent );
 		} else if ( onClose ) {
 			onClose();
 		}
