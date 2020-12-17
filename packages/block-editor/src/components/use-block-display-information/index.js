@@ -32,7 +32,6 @@ import { store as blocksStore } from '@wordpress/blocks';
  *
  */
 
-// TODO write tests
 export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
