@@ -187,6 +187,7 @@ class BlockListBlock extends Component {
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
 		const isScreenWidthWider = blockWidth < screenWidth;
+		const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 
 		return (
 			<TouchableWithoutFeedback
@@ -245,7 +246,13 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<View
-							style={ styles.neutralToolbar }
+							style={ [
+								styles.neutralToolbar,
+								! isFullWidthToolbar &&
+									isContainerRelated( name ) &&
+									isWider( screenWidth, 'mobile' ) &&
+									styles.containerToolbar,
+							] }
 							ref={ this.anchorNodeRef }
 						>
 							{ isSelected && (
@@ -257,15 +264,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={
-										isFullWidth( align ) ||
-										( isContainerRelated &&
-											isWider(
-												screenWidth,
-												'mobile'
-											) ) ||
-										isScreenWidthEqual
-									}
+									isFullWidth={ isFullWidthToolbar }
 								/>
 							) }
 						</View>

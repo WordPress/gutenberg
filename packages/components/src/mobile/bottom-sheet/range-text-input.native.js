@@ -39,8 +39,11 @@ class RangeTextInput extends Component {
 		this.onSubmitEditing = this.onSubmitEditing.bind( this );
 		this.onChangeText = this.onChangeText.bind( this );
 
-		const { value, defaultValue, min } = props;
-		const initialValue = value || defaultValue || min;
+		const { value, defaultValue, min, decimalNum } = props;
+		const initialValue = toFixed(
+			value || defaultValue || min,
+			decimalNum
+		);
 
 		const fontScale = this.getFontScale();
 
