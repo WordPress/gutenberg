@@ -51,6 +51,7 @@ export default function VerseEdit( {
 				onMerge={ mergeBlocks }
 				textAlign={ textAlign }
 				{ ...blockProps }
+				__unstablePastePlainText
 			/>
 		</>
 	);
