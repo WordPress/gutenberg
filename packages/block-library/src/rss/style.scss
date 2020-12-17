@@ -1,5 +1,5 @@
 .wp-block-rss {
-	box-sizing: border-box;
+	box-sizing: border-box !important; // The important is needed because of the reset mixin on the parent: https://github.com/WordPress/gutenberg/blob/a250e9e5fe00dd5195624f96a3d924e7078951c3/packages/edit-post/src/style.scss#L54
 
 	&.alignleft {
 		/*rtl:ignore*/
