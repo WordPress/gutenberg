@@ -19,14 +19,15 @@ const md5 = require( '../md5' );
  * wp-env configuration.
  *
  * @typedef WPConfig
- * @property {string}                           name                    Name of the environment.
- * @property {string}                           configDirectoryPath     Path to the .wp-env.json file.
- * @property {string}                           workDirectoryPath       Path to the work directory located in ~/.wp-env.
- * @property {string}                           dockerComposeConfigPath Path to the docker-compose.yml file.
- * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
- * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
- * @property {boolean}                          debug                   True if debug mode is enabled.
- * @property {string}                           phpVersion              Version of PHP to use in the environments, of the format 0.0.
+ * @property {string}                           name                            Name of the environment.
+ * @property {string}                           configDirectoryPath             Path to the .wp-env.json file.
+ * @property {string}                           workDirectoryPath               Path to the work directory located in ~/.wp-env.
+ * @property {string}                           dockerComposeConfigPath         Path to the docker-compose.yml file.
+ * @property {string}                           dockerComposeOverrideConfigPath Path to the docker-compose.override.yml file.
+ * @property {boolean}                          detectedLocalConfig             If true, wp-env detected local config and used it.
+ * @property {Object.<string, WPServiceConfig>} env                             Specific config for different environments.
+ * @property {boolean}                          debug                           True if debug mode is enabled.
+ * @property {string}                           phpVersion                      Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -71,6 +72,7 @@ module.exports = async function readConfig( configPath ) {
 	const defaultConfiguration = {
 		core: null,
 		phpVersion: null,
+		dockerComposeOverrideConfigPath: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
@@ -169,6 +171,10 @@ module.exports = async function readConfig( configPath ) {
 		dockerComposeConfigPath: path.resolve(
 			workDirectoryPath,
 			'docker-compose.yml'
+		),
+		dockerComposeOverrideConfigPath: path.resolve(
+			workDirectoryPath,
+			'docker-compose.override.yml'
 		),
 		configDirectoryPath,
 		workDirectoryPath,

@@ -27,9 +27,11 @@ const { readConfig } = require( '../../lib/config' );
  */
 module.exports = async function destroy( { spinner, debug } ) {
 	const configPath = path.resolve( '.wp-env.json' );
-	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig(
-		configPath
-	);
+	const {
+		dockerComposeConfigPath,
+		dockerComposeOverrideConfigPath,
+		workDirectoryPath,
+	} = await readConfig( configPath );
 
 	try {
 		await fs.readdir( workDirectoryPath );
@@ -61,7 +63,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	spinner.text = 'Removing WordPress docker containers.';
 
 	await dockerCompose.rm( {
-		config: dockerComposeConfigPath,
+		config: [ dockerComposeConfigPath, dockerComposeOverrideConfigPath ],
 		commandOptions: [ '--stop', '-v' ],
 		log: debug,
 	} );

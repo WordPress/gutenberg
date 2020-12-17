@@ -35,7 +35,10 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 	// Start the database first to avoid race conditions where all tasks create
 	// different docker networks with the same name.
 	await dockerCompose.upOne( 'mysql', {
-		config: config.dockerComposeConfigPath,
+		config: [
+			config.dockerComposeConfigPath,
+			config.dockerComposeOverridePath,
+		],
 		log: config.debug,
 	} );
 
