@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback } from 'react-native';
+import { Text, TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -32,6 +32,17 @@ import { useState } from '@wordpress/element';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
+function AudioUploading( { fileName } ) {
+	const [ title, extension ] = fileName.split( '.' );
+	return (
+		<Text>{ `Uploading "${ title }" an ${ extension.toUpperCase() } audio file ...` }</Text>
+	);
+}
+
+function AudioError( { retryMessage } ) {
+	return <Text>{ `ERROR: ${ retryMessage }` }</Text>;
+}
+
 function AudioEdit( {
 	attributes,
 	noticeOperations,
@@ -46,6 +57,7 @@ function AudioEdit( {
 	const { id, autoplay, loop, preload, src } = attributes;
 
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const [ fileName, setFileName ] = useState( false );
 
 	const onFileChange = ( { mediaId, mediaUrl } ) => {
 		setAttributes( { id: mediaId, src: mediaUrl } );
@@ -71,7 +83,6 @@ function AudioEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	// const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
 			// in this case there was an error and we should continue in the editing state
@@ -82,6 +93,8 @@ function AudioEdit( {
 		// sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI
 		setAttributes( { src: media.url, id: media.id } );
+
+		setFileName( media.title );
 	}
 
 	function onAudioPress() {
@@ -134,12 +147,22 @@ function AudioEdit( {
 				onFinishMediaUploadWithSuccess={ onFileChange }
 				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
-				renderContent={ () => {
+				renderContent={ (
+					isUploadInProgress,
+					isUploadFailed,
+					retryMessage
+				) => {
 					return (
 						<View>
 							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
 							<AudioPlayer />
+							{ isUploadInProgress && fileName && (
+								<AudioUploading fileName={ fileName } />
+							) }
+							{ isUploadFailed && (
+								<AudioError retryMessage={ retryMessage } />
+							) }
 						</View>
 					);
 				} }
