@@ -20,7 +20,7 @@ import {
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
-	isWiderThanMobile,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -34,6 +34,8 @@ import {
 	isPercentageUnit,
 	CSS_UNITS,
 } from '../columns/utils';
+
+const { isWider } = alignmentHelpers;
 
 function ColumnEdit( {
 	attributes,
@@ -103,7 +105,7 @@ function ColumnEdit( {
 			return (
 				<View
 					style={
-						( isWiderThanMobile( screenWidth ) ||
+						( isWider( screenWidth, 'mobile' ) ||
 							isScreenWidthEqual ) &&
 						( hasChildren
 							? styles.columnAppender

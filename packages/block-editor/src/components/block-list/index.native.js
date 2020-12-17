@@ -15,7 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -48,6 +48,7 @@ const getStyles = (
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
 };
+const { isWider } = alignmentHelpers;
 
 export class BlockList extends Component {
 	constructor() {
@@ -191,8 +192,6 @@ export class BlockList extends Component {
 
 		const isContentStretch = contentResizeMode === 'stretch';
 		const isMultiBlocks = blockClientIds.length > 1;
-		const isBlockWiderThanMedium =
-			blockWidth > ALIGNMENT_BREAKPOINTS.medium;
 
 		return (
 			<View
@@ -228,7 +227,7 @@ export class BlockList extends Component {
 					contentContainerStyle={ [
 						horizontal && styles.horizontalContentContainer,
 						isContentStretch &&
-						isBlockWiderThanMedium &&
+						isWider( blockWidth, 'medium' ) &&
 						isMultiBlocks
 							? styles.horizontalContentContainerStretch
 							: styles.horizontalContentContainerCenter,

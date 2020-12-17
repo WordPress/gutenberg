@@ -10,9 +10,7 @@ import { Component, createRef } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
-	WIDE_ALIGNMENTS,
-	isFullWidth,
-	isWiderThanMobile,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -29,6 +27,8 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+
+const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
 
 function BlockForType( {
 	attributes,
@@ -175,10 +175,8 @@ class BlockListBlock extends Component {
 		if ( ! attributes || ! blockType ) {
 			return null;
 		}
-
 		const { blockWidth } = this.state;
 		const { align } = attributes;
-		const { innerContainers } = WIDE_ALIGNMENTS;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
@@ -188,7 +186,7 @@ class BlockListBlock extends Component {
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
-		const isContainerRelated = innerContainers.includes( name );
+		const isScreenWidthWider = blockWidth < screenWidth;
 
 		return (
 			<TouchableWithoutFeedback
@@ -214,11 +212,11 @@ class BlockListBlock extends Component {
 								style={ [
 									styles.solidBorder,
 									isFullWidth( align ) &&
-										blockWidth < screenWidth &&
+										isScreenWidthWider &&
 										styles.borderFullWidth,
 									isFullWidth( align ) &&
-										isContainerRelated &&
-										blockWidth < screenWidth &&
+										isContainerRelated( name ) &&
+										isScreenWidthWider &&
 										styles.containerBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
@@ -262,8 +260,9 @@ class BlockListBlock extends Component {
 									isFullWidth={
 										isFullWidth( align ) ||
 										( isContainerRelated &&
-											isWiderThanMobile(
-												screenWidth
+											isWider(
+												screenWidth,
+												'mobile'
 											) ) ||
 										isScreenWidthEqual
 									}

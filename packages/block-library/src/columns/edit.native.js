@@ -14,8 +14,7 @@ import {
 	UnitControl,
 	getValueAndUnit,
 	GlobalStylesContext,
-	isFullWidth,
-	isWiderThanMobile,
+	alignmentHelpers,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -83,6 +82,8 @@ const DEFAULT_COLUMNS_NUM = 2;
  */
 const MIN_COLUMNS_NUM = 1;
 
+const { isWider, isFullWidth } = alignmentHelpers;
+
 function ColumnsEditContainer( {
 	attributes,
 	updateAlignment,
@@ -125,7 +126,7 @@ function ColumnsEditContainer( {
 			return (
 				<View
 					style={
-						( isWiderThanMobile( screenWidth ) || isEqualWidth ) &&
+						( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
 						styles.columnAppender
 					}
 				>

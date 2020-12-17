@@ -17,11 +17,19 @@ export const ALIGNMENT_BREAKPOINTS = {
 	mobile: 480,
 };
 
-export const isFullWidth = ( align ) =>
-	align === WIDE_ALIGNMENTS.alignments.full;
+const isFullWidth = ( align ) => align === WIDE_ALIGNMENTS.alignments.full;
 
-export const isWideWidth = ( align ) =>
-	align === WIDE_ALIGNMENTS.alignments.wide;
+const isWideWidth = ( align ) => align === WIDE_ALIGNMENTS.alignments.wide;
 
-export const isWiderThanMobile = ( width ) =>
-	width > ALIGNMENT_BREAKPOINTS.mobile;
+const isWider = ( width, breakpoint ) =>
+	width > ALIGNMENT_BREAKPOINTS[ breakpoint ];
+
+const isContainerRelated = ( blockName ) =>
+	WIDE_ALIGNMENTS.innerContainers.includes( blockName );
+
+export const alignmentHelpers = {
+	isFullWidth,
+	isWideWidth,
+	isWider,
+	isContainerRelated,
+};

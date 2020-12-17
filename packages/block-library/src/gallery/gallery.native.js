@@ -20,13 +20,15 @@ import { BlockCaption } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
-import { isFullWidth } from '@wordpress/components';
+import { alignmentHelpers } from '@wordpress/components';
 
 const TILE_SPACING = 15;
 
 // we must limit displayed columns since readable content max-width is 580px
 const MAX_DISPLAYED_COLUMNS = 4;
 const MAX_DISPLAYED_COLUMNS_NARROW = 2;
+
+const { isFullWidth } = alignmentHelpers;
 
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );

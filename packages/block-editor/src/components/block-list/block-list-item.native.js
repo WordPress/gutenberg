@@ -9,13 +9,7 @@ import { View, Dimensions } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import {
-	ReadableContentView,
-	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
-	isFullWidth,
-	isWideWidth,
-} from '@wordpress/components';
+import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,6 +21,13 @@ import styles from './block-list-item.native.scss';
 const stretchStyle = {
 	flex: 1,
 };
+
+const {
+	isFullWidth,
+	isWideWidth,
+	isWider,
+	isContainerRelated,
+} = alignmentHelpers;
 
 export class BlockListItem extends Component {
 	constructor() {
@@ -59,10 +60,6 @@ export class BlockListItem extends Component {
 			parentWidth,
 		} = this.props;
 		const { blockWidth } = this.state;
-		const { medium, mobile } = ALIGNMENT_BREAKPOINTS;
-		const { innerContainers } = WIDE_ALIGNMENTS;
-		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-		const isScreenWiderThanMobile = screenWidth > mobile;
 
 		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
@@ -74,22 +71,27 @@ export class BlockListItem extends Component {
 			return marginHorizontal;
 		}
 
-		const isContainerRelated = innerContainers.includes( blockName );
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
-		if ( isFullWidth( parentBlockAlignment ) && blockWidth <= medium ) {
-			if ( isContainerRelated || isScreenWiderThanMobile ) {
+		if (
+			isFullWidth( parentBlockAlignment ) &&
+			! isWider( blockWidth, 'medium' )
+		) {
+			if (
+				isContainerRelated( blockName ) ||
+				isWider( screenWidth, 'mobile' )
+			) {
 				return marginHorizontal;
 			}
 			return marginHorizontal * 2;
 		}
 
-		const isParentContainerRelated = innerContainers.includes(
-			parentBlockName
-		);
-
-		if ( isParentContainerRelated && ! isContainerRelated ) {
+		if (
+			isContainerRelated( parentBlockName ) &&
+			! isContainerRelated( blockName )
+		) {
 			const isScreenWidthEqual = parentWidth === screenWidth;
-			if ( isScreenWidthEqual || isScreenWiderThanMobile ) {
+			if ( isScreenWidthEqual || isWider( screenWidth, 'mobile' ) ) {
 				return marginHorizontal * 2;
 			}
 		}
@@ -104,13 +106,6 @@ export class BlockListItem extends Component {
 			hasParents,
 			parentBlockName,
 		} = this.props;
-		const { innerContainers } = WIDE_ALIGNMENTS;
-
-		const isParentContainerRelated = innerContainers.includes(
-			parentBlockName
-		);
-
-		const isContainerRelated = innerContainers.includes( blockName );
 
 		return [
 			readableContentViewStyle,
@@ -120,8 +115,8 @@ export class BlockListItem extends Component {
 				},
 			! blockAlignment &&
 				hasParents &&
-				! isParentContainerRelated &&
-				isContainerRelated && {
+				! isContainerRelated( parentBlockName ) &&
+				isContainerRelated( blockName ) && {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
@@ -143,15 +138,12 @@ export class BlockListItem extends Component {
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
-		const { innerContainers } = WIDE_ALIGNMENTS;
-		const isContainerRelated = innerContainers.includes( blockName );
-
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
 				style={ [
 					readableContentViewStyle,
-					isContainerRelated &&
+					isContainerRelated( blockName ) &&
 						parentWidth && {
 							maxWidth: parentWidth + 2 * marginHorizontal,
 						},

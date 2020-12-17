@@ -14,12 +14,14 @@ import {
 } from '@wordpress/compose';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
-import { isWiderThanMobile } from '@wordpress/components';
+import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
+
+const { isWider } = alignmentHelpers;
 
 function GroupEdit( {
 	attributes,
@@ -39,10 +41,10 @@ function GroupEdit( {
 		() => (
 			<View
 				style={
-					( isWiderThanMobile( screenWidth ) || isEqualWidth ) &&
-					( hasInnerBlocks
+					( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
+					hasInnerBlocks
 						? styles.groupAppender
-						: styles.wideGroupAppender )
+						: styles.wideGroupAppender
 				}
 			>
 				<InnerBlocks.ButtonBlockAppender />

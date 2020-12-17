@@ -87,9 +87,7 @@ export { colorsUtils } from './mobile/color-settings/utils';
 export {
 	WIDE_ALIGNMENTS,
 	ALIGNMENT_BREAKPOINTS,
-	isFullWidth,
-	isWideWidth,
-	isWiderThanMobile,
+	alignmentHelpers,
 } from './mobile/utils/alignments';
 
 // Hooks
