@@ -761,6 +761,7 @@ class WP_Theme_JSON {
 					return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n"; },
 				''
 			);
+			$declaration_block = safecss_filter_attr( $declaration_block );
 			$ruleset          .= $selector . " {\n" . $declaration_block . "}\n";
 		} else {
 			$declaration_block = array_reduce(
@@ -769,6 +770,7 @@ class WP_Theme_JSON {
 					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
 				''
 			);
+			$declaration_block = safecss_filter_attr( $declaration_block );
 			$ruleset          .= $selector . '{' . $declaration_block . '}';
 		}
 
