@@ -55,6 +55,7 @@ function gutenberg_register_block_patterns() {
 		register_block_pattern( 'core/three-buttons', gutenberg_load_block_pattern( 'three-buttons' ) );
 		register_block_pattern( 'core/heading-paragraph', gutenberg_load_block_pattern( 'heading-paragraph' ) );
 		register_block_pattern( 'core/quote', gutenberg_load_block_pattern( 'quote' ) );
+		register_block_pattern( 'core/list-with-image', gutenberg_load_block_pattern( 'list-with-image' ) );
 	}
 
 	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
