@@ -8,11 +8,6 @@ const { fromPairs, isObject } = require( 'lodash' );
 const { join } = require( 'path' );
 
 /**
- * WordPress dependencies
- */
-const lazyImport = require( '@wordpress/lazy-import' );
-
-/**
  * Internal dependencies
  */
 const CLIError = require( './cli-error' );
@@ -98,9 +93,9 @@ const getBlockTemplate = async ( templateName ) => {
 		info( '' );
 		info( 'Downloading template files. It might take some time...' );
 
-		const { defaultValues = {}, templatesPath } = await lazyImport(
-			templateName
-		);
+		await command( `npm install ${ templateName } --no-save` );
+
+		const { defaultValues = {}, templatesPath } = require( templateName );
 		if ( ! isObject( defaultValues ) || ! templatesPath ) {
 			throw new Error();
 		}
