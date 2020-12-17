@@ -111,22 +111,6 @@
 			&::after {
 				outline: none;
 			}
-
-			.wp-block-template-part__title-chip {
-				display: inline-flex;
-				background: var(--wp-admin-theme-color);
-			}
 		}
 	}
-}
-
-.wp-block-template-part__title-chip {
-	background: var(--wp-admin-theme-color);
-	color: $white;
-	padding: $grid-unit-05 $grid-unit-10;
-	border-radius: 2px;
-	position: absolute;
-	top: calc(100% + 4px);
-	right: 4px;
-	display: none;
 }
