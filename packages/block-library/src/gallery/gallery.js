@@ -14,6 +14,7 @@ import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { useRef, useEffect } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -57,7 +58,7 @@ export const Gallery = ( props ) => {
 	}, [ isSelected ] );
 
 	return (
-		<div
+		<View
 			ref={ galleryRef }
 			{ ...blockProps }
 			className={ classnames( blockProps.className, {
@@ -85,7 +86,7 @@ export const Gallery = ( props ) => {
 				/>
 			</figure>
 			{ mediaPlaceholder }
-		</div>
+		</View>
 	);
 };
 
