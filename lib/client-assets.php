@@ -809,6 +809,11 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 				<script id="wp-enqueue-style-script">
 				function wpEnqueueStyle( handle, src, deps, ver, media ) {
 
+					// Early exit if element already exists.
+					if ( document.getElementById( handle + '-css' ) ) {
+						return;
+					}
+
 					// Create the element.
 					var style = document.createElement( 'link' ),
 						isFirst = ! window.wpEnqueueStyleLastInjectedEl,
