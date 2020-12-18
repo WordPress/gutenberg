@@ -92,9 +92,8 @@ export default function CustomGradientBar( {
 		// If the insert point is close to an existing control point don't show it.
 		if (
 			some( controlPoints, ( { position } ) => {
-				const positionValue = parseInt( position );
 				return (
-					Math.abs( insertPosition - positionValue ) <
+					Math.abs( insertPosition - position ) <
 					MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT
 				);
 			} )
