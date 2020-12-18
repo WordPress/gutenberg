@@ -109,12 +109,13 @@ function URLInput( {
 	const scrollingIntoView = useRef( false );
 	const suggestionNodes = useRef( [] );
 
-	const { fetchLinkSuggestions = false } = useSelect( ( select ) => {
+	const {
+		fetchLinkSuggestions = __experimentalFetchLinkSuggestions,
+	} = useSelect( ( select ) => {
 		if ( typeof __experimentalFetchLinkSuggestions === 'function' ) {
-			return {
-				fetchLinkSuggestions: __experimentalFetchLinkSuggestions,
-			};
+			return;
 		}
+
 		const { getSettings } = select( 'core/block-editor' );
 		const settings = getSettings();
 		return {
