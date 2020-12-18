@@ -70,10 +70,7 @@ export function addControlPoint( points, position, color ) {
 	const nextIndex = points.findIndex(
 		( point ) => point.position > position
 	);
-	const newPoint = {
-		color: getCssColorString( color ),
-		position,
-	};
+	const newPoint = { color, position };
 	const newPoints = points.slice();
 	newPoints.splice( nextIndex - 1, 0, newPoint );
 	return newPoints;
@@ -140,7 +137,7 @@ export function updateControlPointPosition( points, index, newPosition ) {
 export function updateControlPointColor( points, index, newColor ) {
 	const newPoint = {
 		...points[ index ],
-		color: getCssColorString( newColor ),
+		color: newColor,
 	};
 	return updateControlPoint( points, index, newPoint );
 }
@@ -161,17 +158,4 @@ export function updateControlPointColorByPosition(
 ) {
 	const index = points.findIndex( ( point ) => point.position === position );
 	return updateControlPointColor( points, index, newColor );
-}
-
-/**
- * Converts the color from gradient-parser to a string.
- *
- * @param {Color} color RGBA color object.
- *
- * @return {string} CSS color string.
- */
-export function getCssColorString( { r, g, b, a } ) {
-	return a < 1
-		? `rgba(${ r },${ g },${ b },${ a })`
-		: `rgb(${ r },${ g },${ b })`;
 }
