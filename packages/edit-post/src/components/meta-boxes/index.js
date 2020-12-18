@@ -13,6 +13,7 @@ import { withSelect } from '@wordpress/data';
  */
 import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxVisibility from './meta-box-visibility';
+import { store as editPostStore } from '../../store';
 
 function MetaBoxes( { location, isVisible, metaBoxes } ) {
 	return (
@@ -27,7 +28,7 @@ function MetaBoxes( { location, isVisible, metaBoxes } ) {
 
 export default withSelect( ( select, { location } ) => {
 	const { isMetaBoxLocationVisible, getMetaBoxesPerLocation } = select(
-		'core/edit-post'
+		editPostStore
 	);
 
 	return {

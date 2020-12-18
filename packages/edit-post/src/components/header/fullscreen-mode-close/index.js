@@ -12,11 +12,16 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
 function FullscreenModeClose( { showTooltip, icon, href } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
 			const { getCurrentPostType } = select( 'core/editor' );
-			const { isFeatureActive } = select( 'core/edit-post' );
+			const { isFeatureActive } = select( editPostStore );
 			const { isResolving } = select( 'core/data' );
 			const { getEntityRecord, getPostType } = select( 'core' );
 			const siteData =

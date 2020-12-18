@@ -15,7 +15,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-
+import { store as editPostStore } from '.';
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
@@ -27,7 +27,7 @@ export function* openGeneralSidebar( name ) {
 	yield controls.dispatch(
 		'core/interface',
 		'enableComplementaryArea',
-		'core/edit-post',
+		editPostStore.name,
 		name
 	);
 }
@@ -41,7 +41,7 @@ export function* closeGeneralSidebar() {
 	yield controls.dispatch(
 		'core/interface',
 		'disableComplementaryArea',
-		'core/edit-post'
+		editPostStore.name
 	);
 }
 
@@ -288,7 +288,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	//
 	// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
 	const hasActiveMetaBoxes = yield controls.select(
-		'core/edit-post',
+		editPostStore.name,
 		'hasMetaBoxes'
 	);
 
@@ -314,7 +314,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 		wasAutosavingPost = isAutosavingPost;
 
 		if ( shouldTriggerMetaboxesSave ) {
-			dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
+			dispatch( editPostStore.name ).requestMetaBoxUpdates();
 		}
 	} );
 }
@@ -349,7 +349,7 @@ export function* requestMetaBoxUpdates() {
 		document.querySelector( '.metabox-base-form' )
 	);
 	const activeMetaBoxLocations = yield controls.select(
-		'core/edit-post',
+		editPostStore.name,
 		'getActiveMetaBoxLocations'
 	);
 	const formDataToMerge = [
@@ -382,7 +382,7 @@ export function* requestMetaBoxUpdates() {
 		body: formData,
 		parse: false,
 	} );
-	yield controls.dispatch( 'core/edit-post', 'metaBoxUpdatesSuccess' );
+	yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
 }
 
 /**
