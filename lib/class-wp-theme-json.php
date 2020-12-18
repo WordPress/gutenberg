@@ -302,8 +302,9 @@ class WP_Theme_JSON {
 	 * Constructor.
 	 *
 	 * @param array $contexts A structure that follows the theme.json schema.
+	 * @param boolean $should_escape_styles Whether the incoming styles should be escaped using kses.
 	 */
-	public function __construct( $contexts = array() ) {
+	public function __construct( $contexts = array(), $should_escape_styles = false ) {
 		$this->contexts = array();
 
 		if ( ! is_array( $contexts ) ) {
@@ -324,8 +325,9 @@ class WP_Theme_JSON {
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
 			if ( isset( $context['styles'] ) ) {
-				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
-				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
+				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
+				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 
 				if ( empty( $context['styles'] ) ) {
 					unset( $context['styles'] );
@@ -472,8 +474,9 @@ class WP_Theme_JSON {
 	 * @param string $key Key of the subtree to normalize.
 	 * @param array  $input Whole tree to normalize.
 	 * @param array  $schema Schema to use for normalization.
+	 * @param boolean $should_escape Whether the subproperties should be escaped with kses.
 	 */
-	private static function process_key( $key, &$input, $schema ) {
+	private static function process_key( $key, &$input, $schema, $should_escape = false ) {
 		if ( ! isset( $input[ $key ] ) ) {
 			return;
 		}
@@ -492,6 +495,35 @@ class WP_Theme_JSON {
 			$input[ $key ],
 			$schema[ $key ]
 		);
+
+		// Use kses to escape invalid values.
+		//
+		// kses maintains an allowed list of properties.
+		// "background-color" is one of them,
+		// so we use it for testing the property's value.
+		//
+		// For a subset of the above properties,
+		// kses is more permissive and also allows
+		// using some CSS functions such as linear-gradient or rgba.
+		// "background" is one of these gradient-enabled properties.
+		// So, when we're processing gradients,
+		// we tell kses to allow gradient CSS functions
+		// by testing its value with "background" as the property name.
+		if ( $should_escape ) {
+			$subtree = $input[ $key ];
+			foreach( $subtree as $property => $value ) {
+				$name = 'background-color';
+				if ( 'gradient' === $property ) {
+					$name = 'background';
+				}
+				$result = safecss_filter_attr( "$name: $value" );
+
+				// If kses didn't like it, we neither.
+				if ( '' === $result ) {
+					unset( $input[ $key ][ $property ] );
+				}
+			}
+		}
 
 		if ( 0 === count( $input[ $key ] ) ) {
 			unset( $input[ $key ] );
