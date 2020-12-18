@@ -50,21 +50,3 @@ export function serializeGradient( { type, orientation, colorStops } ) {
 		...serializedColorStops,
 	] ).join( ',' ) })`;
 }
-
-export function serializeControlPoints( gradientAST, newControlPoints ) {
-	const serializedOrientation = serializeGradientOrientation(
-		gradientAST.orientation
-	);
-	const serializedColorStops = newControlPoints
-		.sort( ( colorStop1, colorStop2 ) => {
-			return (
-				get( colorStop1, [ 'position' ], 0 ) -
-				get( colorStop2, [ 'position' ], 0 )
-			);
-		} )
-		.map( ( { position, color } ) => `${ color } ${ position }%` );
-	return `${ gradientAST.type }(${ compact( [
-		serializedOrientation,
-		...serializedColorStops,
-	] ).join( ',' ) })`;
-}
