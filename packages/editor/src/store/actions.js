@@ -175,6 +175,7 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
  * latest version of the post have been received.
  *
  * @return {Object} Action object.
+ * @deprecated since Gutenberg 9.7.0.
  */
 export function updatePost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {

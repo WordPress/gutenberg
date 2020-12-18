@@ -1265,6 +1265,8 @@ export function getEditorSettings( state ) {
 /**
  * Returns state object prior to a specified optimist transaction ID, or `null`
  * if the transaction corresponding to the given ID cannot be found.
+ *
+ * @deprecated since Gutenberg 9.7.0.
  */
 export function getStateBeforeOptimisticTransaction() {
 	deprecated( "select('core/editor').getStateBeforeOptimisticTransaction", {
@@ -1276,6 +1278,8 @@ export function getStateBeforeOptimisticTransaction() {
 /**
  * Returns true if an optimistic transaction is pending commit, for which the
  * before state satisfies the given predicate function.
+ *
+ * @deprecated since Gutenberg 9.7.0.
  */
 export function inSomeHistory() {
 	deprecated( "select('core/editor').inSomeHistory", {
