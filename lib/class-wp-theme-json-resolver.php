@@ -180,10 +180,6 @@ class WP_Theme_JSON_Resolver {
 	 * @return array Custom Post Type for the user's origin config.
 	 */
 	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
-		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-			return array();
-		}
-
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
@@ -274,11 +270,6 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON
 	 */
 	public function get_origin( $theme_support_data = array(), $origin = 'user', $merged = true ) {
-		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_origin() );
-		}
-
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
@@ -309,10 +300,6 @@ class WP_Theme_JSON_Resolver {
 	 * Registers a Custom Post Type to store the user's origin config.
 	 */
 	public static function register_user_custom_post_type() {
-		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-			return;
-		}
-
 		$args = array(
 			'label'        => __( 'Global Styles', 'gutenberg' ),
 			'description'  => 'CPT to store user design tokens',
@@ -345,10 +332,6 @@ class WP_Theme_JSON_Resolver {
 	 * @return integer
 	 */
 	public static function get_user_custom_post_type_id() {
-		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-			return null;
-		}
-
 		if ( null !== self::$user_custom_post_type_id ) {
 			return self::$user_custom_post_type_id;
 		}
