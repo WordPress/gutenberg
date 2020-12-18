@@ -83,7 +83,7 @@ describe( 'Multi-entity save flow', () => {
 		};
 
 		it( 'Save flow should work as expected.', async () => {
-			expect.assertions( 27 );
+			expect.assertions( 26 );
 			await createNewPost();
 			// Edit the page some.
 			await page.click( '.editor-post-title' );
