@@ -113,7 +113,7 @@ function URLInput( {
 		fetchLinkSuggestions = __experimentalFetchLinkSuggestions,
 	} = useSelect( ( select ) => {
 		if ( typeof __experimentalFetchLinkSuggestions === 'function' ) {
-			return;
+			return {};
 		}
 
 		const { getSettings } = select( 'core/block-editor' );
