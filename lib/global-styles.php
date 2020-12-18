@@ -255,8 +255,8 @@ function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $
 	}
 
 	// We want to be specific in testing that the value matches:
-	// var(--wp--<value-with-alphanumeric-chars-or-hyphen>)
-	return preg_match( '/^var\(--wp--[A-Za-z0-9-]*\)$/', $property_value );
+	// var(--<value-with-alphanumeric-chars-or-hyphen>)
+	return 1 === preg_match( '/^var\(--[A-Za-z0-9-]*\)$/', $property_value );
 }
 
 /**
