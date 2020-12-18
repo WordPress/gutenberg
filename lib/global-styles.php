@@ -200,16 +200,17 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['gradients'] );
 
 	$resolver    = new WP_Theme_JSON_Resolver();
-	$all_origin  = 'user';
-	$base_origin = 'theme';
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		// This makes sure we don't consume resources looking up for
-		// the theme.json file (theme) or the CPT for user.
-		$all_origin  = 'core';
-		$base_origin = 'core';
+	$all_origin  = 'core';
+	$base_origin = 'core';
+	// Do not lookup for the theme.json file (theme)
+	// or the user's CPT unless we need it.
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		$all_origin  = 'user';
+		$base_origin = 'theme';
+		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
 	}
-	$all      = $resolver->get_origin( $theme_support_data, $all_origin );
-	$base     = $resolver->get_origin( $theme_support_data, $base_origin );
+	$all  = $resolver->get_origin( $theme_support_data, $all_origin );
+	$base = $resolver->get_origin( $theme_support_data, $base_origin );
 
 	// STEP 1: ADD FEATURES
 	// These need to be added to settings always.
@@ -226,7 +227,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_is_edit_site_page( $screen->id ) &&
 		gutenberg_experimental_global_styles_has_theme_json_support()
 	) {
-		$settings['__experimentalGlobalStylesUserEntityId'] = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
+		$settings['__experimentalGlobalStylesUserEntityId'] = $custom_post_type_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base->get_raw_data();
 	} else {
 		// STEP 3 - OTHERWISE, ADD STYLES
