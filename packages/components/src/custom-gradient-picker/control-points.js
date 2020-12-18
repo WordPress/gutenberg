@@ -226,12 +226,12 @@ function ControlPoints( {
 						<>
 							<ColorPicker
 								color={ point.color }
-								onChangeComplete={ ( { rgb } ) => {
+								onChangeComplete={ ( { color } ) => {
 									onChange(
 										updateControlPointColor(
 											controlPoints,
 											index,
-											rgb
+											color.toRgbString()
 										)
 									);
 								} }
@@ -299,13 +299,13 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
-					onChangeComplete={ ( { rgb } ) => {
+					onChangeComplete={ ( { color } ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									rgb
+									color.toRgbString()
 								)
 							);
 							setAlreadyInsertedPoint( true );
@@ -314,7 +314,7 @@ function InsertPoint( {
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									rgb
+									color.toRgbString()
 								)
 							);
 						}
