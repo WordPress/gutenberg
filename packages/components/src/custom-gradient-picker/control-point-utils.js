@@ -12,6 +12,16 @@ import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
  */
 
 /**
+ * Color as parsed from the gradient by gradient-parser.
+ *
+ * @typedef {Object} Color
+ * @property {string} r   Red component.
+ * @property {string} g   Green component.
+ * @property {string} b   Green component.
+ * @property {string} [a] Optional alpha component.
+ */
+
+/**
  * Adds an amount to a percentage, clamped to [0,100].
  *
  * @param {string} position Integer followed by a percentage sign.
@@ -58,7 +68,7 @@ export function isOverlapping(
  *
  * @param {ControlPoint[]} points   Array of control points.
  * @param {number}         position Position to insert the new point.
- * @param {string}         color    Color to update the control point at index.
+ * @param {Color}          color    Color to update the control point at index.
  *
  * @return {ControlPoint[]} New array of control points.
  */
@@ -129,7 +139,7 @@ export function updateControlPointPosition( points, index, newPosition ) {
  *
  * @param {ControlPoint[]} points   Array of control points.
  * @param {number}         index    Index to update.
- * @param {string}         newColor Color to update the control point at index.
+ * @param {Color}          newColor Color to update the control point at index.
  *
  * @return {ControlPoint[]} New array of control points.
  */
@@ -161,6 +171,13 @@ export function updateControlPointColorByPosition(
 	return updateControlPointColor( points, index, newColor );
 }
 
+/**
+ * Converts the color from gradient-parser to a string.
+ *
+ * @param {Color} color RGBA color object.
+ *
+ * @return {string} CSS color string.
+ */
 export function getCssColorString( { r, g, b, a } ) {
 	return a < 1
 		? `rgba(${ r },${ g },${ b },${ a })`
