@@ -27,6 +27,7 @@ import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
+import { store as editPostStore } from './store';
 
 function Editor( {
 	postId,
@@ -55,7 +56,7 @@ function Editor( {
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
-		} = select( 'core/edit-post' );
+		} = select( editPostStore );
 		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
 			'core'
 		);
@@ -95,7 +96,7 @@ function Editor( {
 	} );
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		'core/edit-post'
+		editPostStore
 	);
 
 	const editorSettings = useMemo( () => {

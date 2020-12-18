@@ -14,6 +14,11 @@ import { cleanForSlug } from '@wordpress/editor';
 import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+/**
  * Module Constants
  */
 const PANEL_NAME = 'post-link';
@@ -133,7 +138,7 @@ export default compose( [
 			getEditedPostSlug,
 		} = select( 'core/editor' );
 		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-			'core/edit-post'
+			editPostStore
 		);
 		const { getPostType } = select( 'core' );
 
@@ -161,7 +166,7 @@ export default compose( [
 		return isEnabled && postLink && isViewable && hasPermalinkParts;
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
+		const { toggleEditorPanelOpened } = dispatch( editPostStore );
 		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onTogglePanel: () => toggleEditorPanelOpened( PANEL_NAME ),

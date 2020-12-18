@@ -7,6 +7,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+/**
  * Set of available mode options.
  *
  * @type {Array}
@@ -37,11 +42,11 @@ function ModeSwitcher() {
 				.richEditingEnabled,
 			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.codeEditingEnabled,
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( 'core/edit-post' );
+	const { switchEditorMode } = useDispatch( editPostStore );
 
 	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
 		return null;
