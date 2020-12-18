@@ -796,19 +796,19 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 			break;
 
 		case 'async-head':
-			/**
-			 * Injects the styles in <head> via JS.
-			 * Styles get added as <link> elements.
-			 */
-			add_action(
-				'wp_footer',
-				function() use ( $block_type ) {
-					global $wp_styles;
-					$style = $wp_styles->registered[ $block_type->style ];
+			// Avoid adding the script more than once.
+			static $script_added;
+			global $wp_styles;
 
-					// Inline a small script to help inject styles in <head>.
-					static $script_added;
-					if ( ! $script_added ) {
+			if ( ! $script_added ) {
+				/**
+				 * Injects the styles in <head> via JS.
+				 * Styles get added as <link> elements.
+				 */
+				add_action(
+					'wp_footer',
+					function() {
+						// Inline a small script to help inject styles in <head>.
 						?>
 						<script id="wp-enqueue-style-script">
 						function wpEnqueueStyle( handle, src, deps, ver, media ) {
@@ -837,24 +837,24 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 						}
 						</script>
 						<?php
-						$script_added = true;
 					}
+				);
+				$script_added = true;
+			}
 
-					// Call wpEnqueueStyle() to inject style in <head>.
-					echo "<script>wpEnqueueStyle('{$style->handle}', '{$style->src}', [], '{$style->ver}', '{$style->args}')</script>";
+			$style = $wp_styles->registered[ $block_type->style ];
+			// Call wpEnqueueStyle() to inject style in <head>.
+			echo "<script>wpEnqueueStyle('{$style->handle}', '{$style->src}', [], '{$style->ver}', '{$style->args}')</script>";
 
-					// Add styles that were added via wp_add_inline_style().
-					if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
-						echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
-						echo implode( '', $style->extra['after'] );
-						echo '</style>';
-					}
+			// Add styles that were added via wp_add_inline_style().
+			if ( is_array( $style->extra ) && isset( $style->extra['after'] ) ) {
+				echo '<style id="' . esc_attr( $block_type->style ) . '-css">';
+				echo implode( '', $style->extra['after'] );
+				echo '</style>';
+			}
 
-					// Remove the stylesheet from $wp_styles.
-					unset( $wp_styles->registered[ $block_type->style ] );
-				},
-				1
-			);
+			// Remove the stylesheet from $wp_styles.
+			unset( $wp_styles->registered[ $block_type->style ] );
 			break;
 
 		default: // No need to do anything.
