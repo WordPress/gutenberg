@@ -11,7 +11,7 @@ import {
 
 describe( 'Post Title block', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 
 	afterAll( async () => {
