@@ -571,15 +571,6 @@ _Related_
 Returns state object prior to a specified optimist transaction ID, or `null`
 if the transaction corresponding to the given ID cannot be found.
 
-_Parameters_
-
--   _state_ `Object`: Current global application state.
--   _transactionId_ `Object`: Optimist transaction ID.
-
-_Returns_
-
--   `Object`: Global application state prior to transaction.
-
 <a name="getSuggestedPostFormat" href="#getSuggestedPostFormat">#</a> **getSuggestedPostFormat**
 
 Returns a suggested post format for the current post, inferred only if there
@@ -698,15 +689,6 @@ _Related_
 
 Returns true if an optimistic transaction is pending commit, for which the
 before state satisfies the given predicate function.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _predicate_ `Function`: Function given state, returning true if match.
-
-_Returns_
-
--   `boolean`: Whether predicate matches for some history.
 
 <a name="isAncestorMultiSelected" href="#isAncestorMultiSelected">#</a> **isAncestorMultiSelected**
 
@@ -1492,10 +1474,6 @@ Undocumented declaration.
 
 Returns an action object used in signalling that a patch of updates for the
 latest version of the post have been received.
-
-_Parameters_
-
--   _edits_ `Object`: Updated post fields.
 
 _Returns_
 
