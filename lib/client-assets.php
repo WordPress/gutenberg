@@ -817,9 +817,7 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 					// Create the element.
 					var style = document.createElement( 'link' ),
 						isFirst = ! window.wpEnqueueStyleLastInjectedEl,
-						injectEl = isFirst
-							? document.getElementById( 'wp-enqueue-style-script' )
-							: document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
+						injectEl = isFirst ? document.head : document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
 						injectPos = isFirst ? 'afterbegin' : 'afterend';
 
 					// Add element props for the stylesheet.
