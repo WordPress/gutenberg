@@ -61,8 +61,10 @@ function AudioEdit( {
 		};
 	}
 
-	function onSelectURL() {
-		// TODO: Set up add audio from URL flow
+	function onSelectURL( newSrc ) {
+		if ( newSrc !== src ) {
+			setAttributes( { src: newSrc, id: undefined } );
+		}
 	}
 
 	function onUploadError( message ) {
