@@ -3,6 +3,13 @@
 exports[`flags warnings with invalid values css snapshot matches warnings 1`] = `
 Array [
   Object {
+    "column": 1,
+    "line": 1,
+    "rule": "declaration-property-unit-allowed-list",
+    "severity": "error",
+    "text": "Unknown rule declaration-property-unit-allowed-list.",
+  },
+  Object {
     "column": 16,
     "line": 2,
     "rule": "declaration-block-trailing-semicolon",
@@ -15,13 +22,6 @@ Array [
     "rule": "declaration-colon-space-after",
     "severity": "error",
     "text": "Expected single space after \\":\\" with a single-line declaration (declaration-colon-space-after)",
-  },
-  Object {
-    "column": 15,
-    "line": 12,
-    "rule": "declaration-property-unit-whitelist",
-    "severity": "error",
-    "text": "Unexpected unit \\"em\\" for property \\"line-height\\" (declaration-property-unit-whitelist)",
   },
   Object {
     "column": 15,

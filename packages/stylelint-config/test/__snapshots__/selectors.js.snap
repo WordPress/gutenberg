@@ -3,11 +3,11 @@
 exports[`flags warnings with invalid selectors css snapshot matches warnings 1`] = `
 Array [
   Object {
-    "column": 15,
-    "line": 18,
-    "rule": "declaration-property-unit-whitelist",
+    "column": 1,
+    "line": 1,
+    "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit \\"%\\" for property \\"line-height\\" (declaration-property-unit-whitelist)",
+    "text": "Unknown rule declaration-property-unit-allowed-list.",
   },
   Object {
     "column": 1,
