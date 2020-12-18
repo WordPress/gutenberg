@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
+const {
 	setupDriver,
 	stopDriver,
 	isAndroid,
@@ -10,12 +10,12 @@ import {
 	typeString,
 	toggleHtmlMode,
 	swipeFromTo,
-} from '../helpers/utils';
+} = require( '../helpers/utils' );
 /**
  * External dependencies
  */
 // eslint-disable-next-line import/no-extraneous-dependencies
-import wd from 'wd';
+const wd = require( 'wd' );
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
