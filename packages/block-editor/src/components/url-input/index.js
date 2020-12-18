@@ -18,7 +18,7 @@ import {
 	withSpokenMessages,
 	Popover,
 } from '@wordpress/components';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import { useInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
@@ -76,7 +76,6 @@ function URLInput( {
 	label,
 	className,
 	isFullWidth,
-	instanceId,
 	placeholder = __( 'Paste URL or type to search' ),
 	disableSuggestions,
 	speak,
@@ -108,6 +107,7 @@ function URLInput( {
 	const pendingRequest = useRef( null );
 	const scrollingIntoView = useRef( false );
 	const suggestionNodes = useRef( [] );
+	const instanceId = useInstanceId( URLInput );
 
 	const {
 		fetchLinkSuggestions = __experimentalFetchLinkSuggestions,
@@ -463,8 +463,4 @@ function URLInput( {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
  */
-export default compose(
-	withSafeTimeout,
-	withSpokenMessages,
-	withInstanceId
-)( URLInput );
+export default compose( withSafeTimeout, withSpokenMessages )( URLInput );
