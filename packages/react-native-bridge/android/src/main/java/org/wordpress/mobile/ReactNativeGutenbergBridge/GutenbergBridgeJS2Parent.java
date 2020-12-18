@@ -31,7 +31,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onUploadMediaFileClear(int mediaId);
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
-        void onMediaFileUploadFailed(int mediaId);
+        void onMediaFileUploadFailed(int mediaId, String errorMessage);
     }
 
     interface MediaSaveEventEmitter {

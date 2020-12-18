@@ -56,6 +56,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_ERROR_MESSAGE = "errorMessage";
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
     public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
