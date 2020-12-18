@@ -191,6 +191,7 @@ export const registerCoreBlocks = (
  * Function to register experimental core blocks depending on editor settings.
  *
  * @param {boolean} enableFSEBlocks Whether to enable the full site editing blocks.
+ * @param {boolean} enablePostBlocks Whether to enable the post blocks.
  * @example
  * ```js
  * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
@@ -200,38 +201,37 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( enableFSEBlocks ) => {
+		? ( enableFSEBlocks, enablePostBlocks ) => {
+				const postBlocks = [
+					siteLogo,
+					siteTagline,
+					siteTitle,
+					query,
+					queryLoop,
+					queryPagination,
+					postTitle,
+					postContent,
+					postAuthor,
+					postComment,
+					postCommentAuthor,
+					postCommentContent,
+					postCommentDate,
+					postComments,
+					postCommentsCount,
+					postCommentsForm,
+					postDate,
+					postExcerpt,
+					postFeaturedImage,
+					postHierarchicalTerms,
+					postTags,
+				];
 				[
 					navigation,
 					navigationLink,
-
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
-						? [
-								siteLogo,
-								siteTagline,
-								siteTitle,
-								templatePart,
-								query,
-								queryLoop,
-								queryPagination,
-								postTitle,
-								postContent,
-								postAuthor,
-								postComment,
-								postCommentAuthor,
-								postCommentContent,
-								postCommentDate,
-								postComments,
-								postCommentsCount,
-								postCommentsForm,
-								postDate,
-								postExcerpt,
-								postFeaturedImage,
-								postHierarchicalTerms,
-								postTags,
-						  ]
-						: [] ),
+						? [ templatePart, ...postBlocks ]
+						: ( enablePostBlocks && postBlocks ) || [] ),
 				].forEach( registerBlock );
 		  }
 		: undefined;

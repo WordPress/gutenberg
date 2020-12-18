@@ -41,6 +41,17 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments'
 	);
 	add_settings_field(
+		'gutenberg-post-blocks',
+		__( 'Post Blocks', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Post Blocks in block editor', 'gutenberg' ),
+			'id'    => 'gutenberg-post-blocks',
+		)
+	);
+	add_settings_field(
 		'gutenberg-navigation',
 		__( 'Navigation', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

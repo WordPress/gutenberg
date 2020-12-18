@@ -93,8 +93,13 @@ export function initializeEditor(
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		const {
+			__unstableEnableFullSiteEditingBlocks,
+			__unstableEnablePostBlocks,
+		} = settings;
 		__experimentalRegisterExperimentalCoreBlocks(
-			settings.__unstableEnableFullSiteEditingBlocks
+			__unstableEnableFullSiteEditingBlocks,
+			__unstableEnablePostBlocks
 		);
 	}
 
