@@ -2,6 +2,7 @@
  * External dependencies
  */
 import React from 'react';
+import { Alert } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -98,11 +99,19 @@ export class MediaUpload extends React.Component {
 			mediaLibrary: true,
 		};
 
+		const urlSource = {
+			id: 'URL',
+			value: 'URL',
+			label: __( 'Insert from URL' ),
+			types: [ MEDIA_TYPE_AUDIO ],
+		};
+
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
+			urlSource,
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
@@ -142,6 +151,28 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+
+		if ( value === 'URL' ) {
+			Alert.prompt(
+				__( 'Type a URL' ), // title
+				undefined, // message
+				[
+					{
+						text: __( 'Cancel' ),
+						style: 'cancel',
+					},
+					{
+						text: __( 'Apply' ),
+						onPress: ( url ) => onSelect( { url } ),
+					},
+				], // buttons
+				'plain-text', // type
+				undefined, // defaultValue
+				'url' // keyboardType
+			);
+			return;
+		}
+
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
 			.shift();
