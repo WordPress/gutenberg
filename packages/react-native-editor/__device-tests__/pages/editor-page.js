@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const {
+import {
 	setupDriver,
 	stopDriver,
 	isAndroid,
@@ -578,7 +578,7 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
-	
+
 	// =============================
 	// Misc functions
 	// =============================
