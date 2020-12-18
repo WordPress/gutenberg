@@ -111,7 +111,6 @@ export class RichText extends Component {
 		this.savedContent = '';
 		this.isTouched = false;
 		this.lastAztecEventType = null;
-		this.isNewRichTextAdded = false;
 
 		this.lastHistoryValue = value;
 
@@ -341,7 +340,6 @@ export class RichText extends Component {
 			shiftKey: event.shiftKey,
 		} );
 		this.lastAztecEventType = 'input';
-		this.isNewRichTextAdded = true;
 	}
 
 	handleDelete( event ) {
@@ -690,14 +688,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		// `isNewRichTextAdded` flag is used to distinguish whether RichText was unmounted
-		// because of adding new RichText via pressing `enter`. If `false` it indicates
-		// block is removed and RichText should be blurred. Otherwise `blur()` is omitted
-		// for newly created RichText to avoid keyboard jumpiness.
-		if ( this.isNewRichTextAdded ) {
-			return;
-		}
-		if ( this._editor.isFocused() || this.props.shouldBlurOnUnmount ) {
+		if ( this._editor.isFocused() ) {
 			this._editor.blur();
 		}
 	}
