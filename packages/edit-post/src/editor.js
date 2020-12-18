@@ -85,7 +85,7 @@ function Editor( {
 			template:
 				isFSETheme &&
 				postObject &&
-				! getCurrentPost().status === 'auto-draft' &&
+				getCurrentPost().status !== 'auto-draft' &&
 				postType !== 'wp_template'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,

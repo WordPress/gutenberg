@@ -30,7 +30,7 @@ function PostTemplate() {
 			template:
 				isFSEEnabled &&
 				link &&
-				! getCurrentPost().status !== 'auto-draft' &&
+				getCurrentPost().status !== 'auto-draft' &&
 				getCurrentPostType() !== 'wp_template'
 					? __experimentalGetTemplateForLink( link )
 					: null,
