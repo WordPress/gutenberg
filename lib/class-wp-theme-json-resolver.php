@@ -361,7 +361,6 @@ class WP_Theme_JSON_Resolver {
 		$result->merge( self::get_user_origin() );
 
 		$props = $result->get_css_custom_properties( $theme_support_data );
-		error_log( 'props ' . print_r( $props, true ) );
 		return $props;
 	}
 }
