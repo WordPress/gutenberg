@@ -7,7 +7,7 @@
 
 /**
  * Load the page templates in Gutenberg.
- * 
+ *
  * @param array    $templates Page templates.
  * @param WP_Theme $theme     WP_Theme instance.
  * @param WP_Post  $post      The post being edited, provided for context, or null.
