@@ -805,40 +805,34 @@ function gutenberg_modify_render_block_data_assets_loading( $parsed_block ) {
 				 * Injects the styles in <head> via JS.
 				 * Styles get added as <link> elements.
 				 */
-				add_action(
-					'wp_footer',
-					function() {
-						// Inline a small script to help inject styles in <head>.
-						?>
-						<script id="wp-enqueue-style-script">
-						function wpEnqueueStyle( handle, src, deps, ver, media ) {
+				?>
+				<script id="wp-enqueue-style-script">
+				function wpEnqueueStyle( handle, src, deps, ver, media ) {
 
-							// Create the element.
-							var style = document.createElement( 'link' ),
-								isFirst = ! window.wpEnqueueStyleLastInjectedEl,
-								injectEl = isFirst ? document.head : document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
-								injectPos = isFirst ? 'afterbegin' : 'afterend';
+					// Create the element.
+					var style = document.createElement( 'link' ),
+						isFirst = ! window.wpEnqueueStyleLastInjectedEl,
+						injectEl = isFirst ? document.head : document.getElementById( window.wpEnqueueStyleLastInjectedEl ),
+						injectPos = isFirst ? 'afterbegin' : 'afterend';
 
-							// Add element props for the stylesheet.
-							style.id = handle + '-css';
-							style.rel = 'stylesheet';
-							style.href = src;
-							if ( ver ) {
-								style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
-							}
-							style.media = media ? media : 'all';
-
-							// Set the global var so we know where to add the next style.
-							// This helps us preserve priorities and inject styles one after the other instead of reversed.
-							window.wpEnqueueStyleLastInjectedEl = handle + '-css';
-
-							// Inject the element.
-							injectEl.insertAdjacentElement( injectPos, style );
-						}
-						</script>
-						<?php
+					// Add element props for the stylesheet.
+					style.id = handle + '-css';
+					style.rel = 'stylesheet';
+					style.href = src;
+					if ( ver ) {
+						style.href += 0 < style.href.indexOf( '?' ) ? '&ver=' + ver : '?ver=' + ver;
 					}
-				);
+					style.media = media ? media : 'all';
+
+					// Set the global var so we know where to add the next style.
+					// This helps us preserve priorities and inject styles one after the other instead of reversed.
+					window.wpEnqueueStyleLastInjectedEl = handle + '-css';
+
+					// Inject the element.
+					injectEl.insertAdjacentElement( injectPos, style );
+				}
+				</script>
+				<?php
 				$script_added = true;
 			}
 
