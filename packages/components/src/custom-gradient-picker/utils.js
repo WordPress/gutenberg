@@ -2,6 +2,7 @@
  * External dependencies
  */
 import gradientParser from 'gradient-parser';
+import tinycolor from 'tinycolor2';
 
 /**
  * Internal dependencies
@@ -98,4 +99,24 @@ export function getGradientAstWithDefault( value ) {
 	}
 
 	return gradientAST;
+}
+
+export function getGradientAstWithControlPoints(
+	gradientAST,
+	newControlPoints
+) {
+	return {
+		...gradientAST,
+		colorStops: newControlPoints.map( ( { position, color } ) => {
+			const { r, g, b, a } = tinycolor( color ).toRgb();
+			return {
+				length: {
+					type: '%',
+					value: position.toString(),
+				},
+				type: a < 1 ? 'rgba' : 'rgb',
+				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],
+			};
+		} ),
+	};
 }
