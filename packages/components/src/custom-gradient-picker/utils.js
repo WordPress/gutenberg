@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { findIndex, map, some } from 'lodash';
 import gradientParser from 'gradient-parser';
 
 /**
@@ -11,172 +10,9 @@ import {
 	DEFAULT_GRADIENT,
 	INSERT_POINT_WIDTH,
 	MINIMUM_ABSOLUTE_LEFT_POSITION,
-	MINIMUM_DISTANCE_BETWEEN_POINTS,
-	KEYBOARD_CONTROL_POINT_VARIATION,
 	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
-import {
-	serializeGradientColor,
-	serializeGradientPosition,
-	serializeGradient,
-} from './serializer';
-
-function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
-	if ( a === 1 ) {
-		return {
-			type: 'rgb',
-			value: [ r, g, b ],
-		};
-	}
-	return {
-		type: 'rgba',
-		value: [ r, g, b, a ],
-	};
-}
-
-export function getGradientWithColorStopAdded(
-	gradientAST,
-	relativePosition,
-	rgbaColor
-) {
-	const colorStop = tinyColorRgbToGradientColorStop( rgbaColor );
-	colorStop.length = {
-		type: '%',
-		value: relativePosition,
-	};
-	return {
-		...gradientAST,
-		colorStops: [ ...gradientAST.colorStops, colorStop ],
-	};
-}
-
-export function getGradientWithPositionAtIndexChanged(
-	gradientAST,
-	index,
-	relativePosition
-) {
-	return {
-		...gradientAST,
-		colorStops: gradientAST.colorStops.map(
-			( colorStop, colorStopIndex ) => {
-				if ( colorStopIndex !== index ) {
-					return colorStop;
-				}
-				return {
-					...colorStop,
-					length: {
-						...colorStop.length,
-						value: relativePosition,
-					},
-				};
-			}
-		),
-	};
-}
-
-export function isControlPointOverlapping(
-	gradientAST,
-	position,
-	initialIndex
-) {
-	const initialPosition = parseInt(
-		gradientAST.colorStops[ initialIndex ].length.value
-	);
-	const minPosition = Math.min( initialPosition, position );
-	const maxPosition = Math.max( initialPosition, position );
-
-	return some( gradientAST.colorStops, ( { length }, index ) => {
-		const itemPosition = parseInt( length.value );
-		return (
-			index !== initialIndex &&
-			( Math.abs( itemPosition - position ) <
-				MINIMUM_DISTANCE_BETWEEN_POINTS ||
-				( minPosition < itemPosition && itemPosition < maxPosition ) )
-		);
-	} );
-}
-
-function getGradientWithPositionAtIndexSummed(
-	gradientAST,
-	index,
-	valueToSum
-) {
-	const currentPosition = gradientAST.colorStops[ index ].length.value;
-	const newPosition = Math.max(
-		0,
-		Math.min( 100, parseInt( currentPosition ) + valueToSum )
-	);
-	if ( isControlPointOverlapping( gradientAST, newPosition, index ) ) {
-		return gradientAST;
-	}
-	return getGradientWithPositionAtIndexChanged(
-		gradientAST,
-		index,
-		newPosition
-	);
-}
-
-export function getGradientWithPositionAtIndexIncreased( gradientAST, index ) {
-	return getGradientWithPositionAtIndexSummed(
-		gradientAST,
-		index,
-		KEYBOARD_CONTROL_POINT_VARIATION
-	);
-}
-
-export function getGradientWithPositionAtIndexDecreased( gradientAST, index ) {
-	return getGradientWithPositionAtIndexSummed(
-		gradientAST,
-		index,
-		-KEYBOARD_CONTROL_POINT_VARIATION
-	);
-}
-
-export function getGradientWithColorAtIndexChanged(
-	gradientAST,
-	index,
-	rgbaColor
-) {
-	return {
-		...gradientAST,
-		colorStops: gradientAST.colorStops.map(
-			( colorStop, colorStopIndex ) => {
-				if ( colorStopIndex !== index ) {
-					return colorStop;
-				}
-				return {
-					...colorStop,
-					...tinyColorRgbToGradientColorStop( rgbaColor ),
-				};
-			}
-		),
-	};
-}
-
-export function getGradientWithColorAtPositionChanged(
-	gradientAST,
-	relativePositionValue,
-	rgbaColor
-) {
-	const index = findIndex( gradientAST.colorStops, ( colorStop ) => {
-		return (
-			colorStop &&
-			colorStop.length &&
-			colorStop.length.type === '%' &&
-			colorStop.length.value === relativePositionValue.toString()
-		);
-	} );
-	return getGradientWithColorAtIndexChanged( gradientAST, index, rgbaColor );
-}
-
-export function getGradientWithControlPointRemoved( gradientAST, index ) {
-	return {
-		...gradientAST,
-		colorStops: gradientAST.colorStops.filter( ( elem, elemIndex ) => {
-			return elemIndex !== index;
-		} ),
-	};
-}
+import { serializeGradient } from './serializer';
 
 export function getHorizontalRelativeGradientPosition(
 	mouseXCoordinate,
@@ -200,37 +36,6 @@ export function getHorizontalRelativeGradientPosition(
 			100
 		)
 	);
-}
-
-/**
- * Returns the marker points from a gradient AST.
- *
- * @param {Object} gradientAST An object representing the gradient AST.
- *
- * @return {Array.<{color: string, position: string, positionValue: number}>}
- *         An array of markerPoint objects.
- *         color:         A string with the color code ready to be used in css style e.g: "rgba( 1, 2 , 3, 0.5)".
- *         position:      A string with the position ready to be used in css style e.g: "70%".
- *         positionValue: A number with the relative position value e.g: 70.
- */
-export function getMarkerPoints( gradientAST ) {
-	if ( ! gradientAST ) {
-		return [];
-	}
-	return map( gradientAST.colorStops, ( colorStop ) => {
-		if (
-			! colorStop ||
-			! colorStop.length ||
-			colorStop.length.type !== '%'
-		) {
-			return null;
-		}
-		return {
-			color: serializeGradientColor( colorStop ),
-			position: serializeGradientPosition( colorStop.length ),
-			positionValue: parseInt( colorStop.length.value ),
-		};
-	} );
 }
 
 export function getLinearGradientRepresentationOfARadial( gradientAST ) {
@@ -293,23 +98,4 @@ export function getGradientAstWithDefault( value ) {
 	}
 
 	return gradientAST;
-}
-
-export function getGradientBarValue( gradientAST ) {
-	// On radial gradients the bar should display a linear gradient.
-	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
-	const background =
-		gradientAST.type === 'radial-gradient'
-			? getLinearGradientRepresentationOfARadial( gradientAST )
-			: gradientAST.value;
-
-	const markerPoints = getMarkerPoints( gradientAST );
-
-	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
-
-	return {
-		hasGradient,
-		markerPoints,
-		background,
-	};
 }

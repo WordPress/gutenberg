@@ -15,12 +15,16 @@ import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './custom-gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
-import { getGradientAstWithDefault, getGradientBarValue } from './utils';
+import {
+	getGradientAstWithDefault,
+	getLinearGradientRepresentationOfARadial,
+} from './utils';
 import { serializeControlPoints, serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	HORIZONTAL_GRADIENT_ORIENTATION,
 	GRADIENT_OPTIONS,
+	DEFAULT_GRADIENT,
 } from './constants';
 import {
 	AccessoryWrapper,
@@ -99,7 +103,13 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 
 export default function CustomGradientPicker( { value, onChange } ) {
 	const gradientAST = getGradientAstWithDefault( value );
-	const barValue = getGradientBarValue( gradientAST );
+	// On radial gradients the bar should display a linear gradient.
+	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+	const background =
+		gradientAST.type === 'radial-gradient'
+			? getLinearGradientRepresentationOfARadial( gradientAST )
+			: gradientAST.value;
+	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 	const controlPoints = gradientAST.colorStops.map( ( p ) => ( {
 		color: `${ p.type }(${ p.value.join( ',' ) })`,
 		position: `${ p.length.value }${ p.length.type }`,
@@ -108,8 +118,8 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	return (
 		<div className="components-custom-gradient-picker">
 			<CustomGradientBar
-				background={ barValue.background }
-				hasGradient={ barValue.hasGradient }
+				background={ background }
+				hasGradient={ hasGradient }
 				value={ controlPoints }
 				onChange={ ( newControlPoints ) => {
 					onChange(
@@ -124,7 +134,7 @@ export default function CustomGradientPicker( { value, onChange } ) {
 				<SelectWrapper>
 					<GradientTypePicker
 						gradientAST={ gradientAST }
-						hasGradient={ barValue.hasGradient }
+						hasGradient={ hasGradient }
 						onChange={ onChange }
 					/>
 				</SelectWrapper>
@@ -132,7 +142,7 @@ export default function CustomGradientPicker( { value, onChange } ) {
 					{ gradientAST.type === 'linear-gradient' && (
 						<GradientAnglePicker
 							gradientAST={ gradientAST }
-							hasGradient={ barValue.hasGradient }
+							hasGradient={ hasGradient }
 							onChange={ onChange }
 						/>
 					) }
