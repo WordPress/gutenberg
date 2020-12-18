@@ -21,7 +21,7 @@ import { alignmentHelpers } from '@wordpress/components';
  */
 import styles from './editor.scss';
 
-const { isWider } = alignmentHelpers;
+const { isWider, isFullWidth } = alignmentHelpers;
 
 function GroupEdit( {
 	attributes,
@@ -41,10 +41,12 @@ function GroupEdit( {
 		() => (
 			<View
 				style={
-					( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
-					hasInnerBlocks
+					( isWider( screenWidth, 'mobile' ) ||
+						isEqualWidth ||
+						isFullWidth( align ) ) &&
+					( hasInnerBlocks
 						? styles.groupAppender
-						: styles.wideGroupAppender
+						: styles.wideGroupAppender )
 				}
 			>
 				<InnerBlocks.ButtonBlockAppender />
