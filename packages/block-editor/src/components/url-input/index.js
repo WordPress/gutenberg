@@ -24,11 +24,11 @@ import { isURL } from '@wordpress/url';
 
 const REQUEST_DEBOUNCE_DELAY = 200;
 
-function defaultRenderControl( { controlProps, inputProps, loading } ) {
+function defaultRenderControl( { controlProps, inputProps, isLoading } ) {
 	return (
 		<BaseControl { ...controlProps }>
 			<input { ...inputProps } />
-			{ loading && <Spinner /> }
+			{ isLoading && <Spinner /> }
 		</BaseControl>
 	);
 }
@@ -89,7 +89,7 @@ function URLInput( {
 	setTimeout,
 	parentAutocompleteRef,
 } ) {
-	const [ loading, setLoading ] = useState( false );
+	const [ isLoading, setLoading ] = useState( false );
 	const [ suggestions, setSuggestions ] = useState( [] );
 	const [ showSuggestions, setShowSuggestions ] = useState( false );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
@@ -271,7 +271,7 @@ function URLInput( {
 	function onKeyDown( event ) {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if ( ! showSuggestions || ! suggestions.length || loading ) {
+		if ( ! showSuggestions || ! suggestions.length || isLoading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
 			// a form of focus trapping that is disruptive to the user experience. This disruption
@@ -409,7 +409,7 @@ function URLInput( {
 		return {
 			controlProps,
 			inputProps,
-			loading,
+			isLoading,
 		};
 	}
 
@@ -435,7 +435,6 @@ function URLInput( {
 				role: 'listbox',
 			},
 			buildSuggestionItemProps,
-			isLoading: loading,
 			handleSuggestionClick: ( suggestion ) => {
 				selectLink( suggestion );
 				// Move focus to the input field when a link suggestion is clicked.
@@ -443,6 +442,7 @@ function URLInput( {
 			},
 			isInitialSuggestions:
 				shouldShowInitialSuggestions && ! value?.length,
+			isLoading,
 			className,
 		};
 	}
