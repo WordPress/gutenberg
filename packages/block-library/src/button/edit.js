@@ -107,6 +107,7 @@ function URLPicker( {
 	setAttributes,
 	opensInNewTab,
 	onToggleOpenInNewTab,
+	anchorRef,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
@@ -127,6 +128,7 @@ function URLPicker( {
 		<Popover
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
+			anchorRef={ anchorRef?.current }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -277,6 +279,7 @@ function ButtonEdit( props ) {
 				isSelected={ isSelected }
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+				anchorRef={ blockProps.ref }
 			/>
 			<InspectorControls>
 				<BorderPanel
