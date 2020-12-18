@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [***] Full-width and wide alignment support for Columns
+
 ## 1.43.0 (2020-12-17)
 
 * [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
