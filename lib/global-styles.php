@@ -227,7 +227,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_is_edit_site_page( $screen->id ) &&
 		gutenberg_experimental_global_styles_has_theme_json_support()
 	) {
-		$settings['__experimentalGlobalStylesUserEntityId'] = $custom_post_type_id;
+		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base->get_raw_data();
 	} else {
 		// STEP 3 - OTHERWISE, ADD STYLES
