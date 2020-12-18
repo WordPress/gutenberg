@@ -1270,20 +1270,6 @@ export function getEditorBlocks( state ) {
 }
 
 /**
- * Checks whether a post is an auto-draft ignoring the optimistic transaction.
- * This selector shouldn't be necessary. It's currently used as a workaround
- * to avoid template resolution for auto-drafts which has a backend bug.
- *
- * @param {Object} state State.
- * @return {boolean} Whether the post is "auto-draft" on the backend.
- */
-export function __unstableIsAutodraftPost( state ) {
-	const post = getCurrentPost( state );
-	const isSaving = isSavingPost( state );
-	return isSaving || post.status === 'auto-draft';
-}
-
-/**
  * A block selection object.
  *
  * @typedef {Object} WPBlockSelection
