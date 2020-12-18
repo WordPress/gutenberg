@@ -18,8 +18,9 @@ import SelectControl from '../select-control';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentationOfARadial,
+	getGradientAstWithControlPoints,
 } from './utils';
-import { serializeControlPoints, serializeGradient } from './serializer';
+import { serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	HORIZONTAL_GRADIENT_ORIENTATION,
@@ -123,7 +124,12 @@ export default function CustomGradientPicker( { value, onChange } ) {
 				value={ controlPoints }
 				onChange={ ( newControlPoints ) => {
 					onChange(
-						serializeControlPoints( gradientAST, newControlPoints )
+						serializeGradient(
+							getGradientAstWithControlPoints(
+								gradientAST,
+								newControlPoints
+							)
+						)
 					);
 				} }
 			/>
