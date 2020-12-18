@@ -26,14 +26,13 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 				const currentTheme = select( 'core' ).getCurrentTheme()
 					?.stylesheet;
 				const cleanedSlug = cleanForSlug( slug );
-				const themeSlug = currentTheme?.replace( '/', '-' );
 				const posts = select( 'core' ).getEntityRecords(
 					'postType',
 					'wp_template_part',
 					{
 						status: [ 'publish', 'auto-draft' ],
 						slug: cleanedSlug,
-						theme: themeSlug,
+						theme: currentTheme,
 					}
 				);
 
