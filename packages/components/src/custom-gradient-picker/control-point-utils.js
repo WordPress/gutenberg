@@ -3,7 +3,7 @@
  *
  * @typedef {Object} ControlPoint
  * @property {string} color    Color of the control point.
- * @property {string} position Position of the control point as a percentage ('90%').
+ * @property {number} position Integer position of the control point as a percentage.
  */
 
 /**
@@ -19,13 +19,13 @@
 /**
  * Adds an amount to a percentage, clamped to [0,100].
  *
- * @param {string} position Integer followed by a percentage sign.
- * @param {number} amount   Amount to add to that percentave
+ * @param {number} position Integer representing the percentage.
+ * @param {number} amount   Integer amount to add to that percentage.
  *
  * @return {number} Clamped percentage.
  */
 export function addPositionClamped( position, amount ) {
-	return Math.max( 0, Math.min( 100, parseInt( position ) + amount ) );
+	return Math.max( 0, Math.min( 100, position + amount ) );
 }
 
 /**
@@ -44,16 +44,15 @@ export function isOverlapping(
 	newPosition,
 	minDistance = 0
 ) {
-	const initialPosition = parseInt( value[ initialIndex ].position );
+	const initialPosition = value[ initialIndex ].position;
 	const minPosition = Math.min( initialPosition, newPosition );
 	const maxPosition = Math.max( initialPosition, newPosition );
 
 	return value.some( ( { position }, index ) => {
-		const itemPosition = parseInt( position );
 		return (
 			index !== initialIndex &&
-			( Math.abs( itemPosition - newPosition ) < minDistance ||
-				( minPosition < itemPosition && itemPosition < maxPosition ) )
+			( Math.abs( position - newPosition ) < minDistance ||
+				( minPosition < position && position < maxPosition ) )
 		);
 	} );
 }
@@ -69,11 +68,11 @@ export function isOverlapping(
  */
 export function addControlPoint( points, position, color ) {
 	const nextIndex = points.findIndex(
-		( point ) => parseInt( point.position ) > position
+		( point ) => point.position > position
 	);
 	const newPoint = {
 		color: getCssColorString( color ),
-		position: `${ position }%`,
+		position,
 	};
 	const newPoints = points.slice();
 	newPoints.splice( nextIndex - 1, 0, newPoint );
@@ -124,7 +123,7 @@ export function updateControlPointPosition( points, index, newPosition ) {
 	}
 	const newPoint = {
 		...points[ index ],
-		position: `${ newPosition }%`,
+		position: newPosition,
 	};
 	return updateControlPoint( points, index, newPoint );
 }
@@ -160,9 +159,7 @@ export function updateControlPointColorByPosition(
 	position,
 	newColor
 ) {
-	const index = points.findIndex(
-		( point ) => parseInt( point.position ) === position
-	);
+	const index = points.findIndex( ( point ) => point.position === position );
 	return updateControlPointColor( points, index, newColor );
 }
 
