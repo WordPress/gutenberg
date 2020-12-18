@@ -740,9 +740,6 @@ class WP_Theme_JSON {
 	 * Given a selector and a declaration list,
 	 * creates the corresponding ruleset.
 	 *
-	 * To help debugging, will add some space
-	 * if SCRIPT_DEBUG is defined and true.
-	 *
 	 * @param string $selector CSS selector.
 	 * @param array  $declarations List of declarations.
 	 *
@@ -754,25 +751,14 @@ class WP_Theme_JSON {
 		}
 		$ruleset = '';
 
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$declaration_block = array_reduce(
-				$declarations,
-				function ( $carry, $element ) {
-					return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n"; },
-				''
-			);
-			$declaration_block = safecss_filter_attr( $declaration_block );
-			$ruleset          .= $selector . " {\n" . $declaration_block . "}\n";
-		} else {
-			$declaration_block = array_reduce(
-				$declarations,
-				function ( $carry, $element ) {
-					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
-				''
-			);
-			$declaration_block = safecss_filter_attr( $declaration_block );
-			$ruleset          .= $selector . '{' . $declaration_block . '}';
-		}
+		$declaration_block = array_reduce(
+			$declarations,
+			function ( $carry, $element ) {
+				return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
+			''
+		);
+		$declaration_block = safecss_filter_attr( $declaration_block );
+		$ruleset          .= $selector . '{' . $declaration_block . '}';
 
 		return $ruleset;
 	}
