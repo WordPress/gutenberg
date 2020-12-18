@@ -29,7 +29,7 @@ export class MediaUploadProgress extends React.Component {
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
-			uploadErrorMessage: "",
+			uploadErrorMessage: '',
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
