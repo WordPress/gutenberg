@@ -427,7 +427,11 @@ export class FileEdit extends Component {
 					this.finishMediaUploadWithFailure
 				}
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+				renderContent={ ( {
+					isUploadInProgress,
+					isUploadFailed,
+					uploadErrorMessage,
+				} ) => {
 					const dimmedStyle =
 						( this.state.isUploadInProgress || isUploadFailed ) &&
 						styles.disabledButton;
@@ -485,7 +489,12 @@ export class FileEdit extends Component {
 											/>
 											<PlainText
 												editable={ false }
-												value={ __( 'Error' ) }
+												value={
+													uploadErrorMessage !==
+													undefined
+														? uploadErrorMessage
+														: __( 'Error' )
+												}
 												style={ styles.uploadFailed }
 											/>
 										</View>
