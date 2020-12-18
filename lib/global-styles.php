@@ -162,6 +162,10 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		return;
+	}
+
 	$settings           = gutenberg_get_common_block_editor_settings();
 	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
 
@@ -243,9 +247,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	return $settings;
 }
 
-if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
-	add_action( 'init', array( 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type' ) );
-	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-}
-
+add_action( 'init', array( 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type' ) );
+add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
