@@ -13,6 +13,24 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { navigationPanel } from '../../experimental-features';
 
+async function getDocumentSettingsTitle() {
+	await page.waitForSelector( '.edit-site-document-actions__title' );
+
+	return page.$eval(
+		'.edit-site-document-actions__title',
+		( el ) => el.innerText
+	);
+}
+
+async function getDocumentSettingsSecondaryTitle() {
+	await page.waitForSelector( '.edit-site-document-actions__secondary-item' );
+
+	return page.$eval(
+		'.edit-site-document-actions__secondary-item',
+		( el ) => el.innerText
+	);
+}
+
 describe( 'Document Settings', () => {
 	beforeAll( async () => {
 		await activateTheme( 'twentytwentyone-blocks' );
@@ -45,10 +63,7 @@ describe( 'Document Settings', () => {
 
 			// Evaluate the document settings title
 			await page.waitForSelector( '.edit-site-document-actions__title' );
-			const actual = await page.$eval(
-				'.edit-site-document-actions__title',
-				( el ) => el.innerText
-			);
+			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'Index' );
 		} );
@@ -67,10 +82,7 @@ describe( 'Document Settings', () => {
 				await page.waitForSelector(
 					'.edit-site-document-actions__secondary-item'
 				);
-				const actual = await page.$eval(
-					'.edit-site-document-actions__secondary-item',
-					( el ) => el.innerText
-				);
+				const actual = await getDocumentSettingsSecondaryTitle();
 
 				expect( actual ).toEqual( 'Header' );
 			} );
