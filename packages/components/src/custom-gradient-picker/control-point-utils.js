@@ -1,9 +1,4 @@
 /**
- * Internal dependencies
- */
-import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
-
-/**
  * Control point for the gradient bar.
  *
  * @typedef {Object} ControlPoint
@@ -47,7 +42,7 @@ export function isOverlapping(
 	value,
 	initialIndex,
 	newPosition,
-	minDistance = MINIMUM_DISTANCE_BETWEEN_POINTS
+	minDistance = 0
 ) {
 	const initialPosition = parseInt( value[ initialIndex ].position );
 	const minPosition = Math.min( initialPosition, newPosition );
