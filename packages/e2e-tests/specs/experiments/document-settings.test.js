@@ -62,7 +62,6 @@ describe( 'Document Settings', () => {
 			await navigationPanel.clickItemByText( 'Index' );
 
 			// Evaluate the document settings title
-			await page.waitForSelector( '.edit-site-document-actions__title' );
 			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'Index' );
@@ -79,9 +78,6 @@ describe( 'Document Settings', () => {
 				);
 
 				// Evaluate the document settings secondary title
-				await page.waitForSelector(
-					'.edit-site-document-actions__secondary-item'
-				);
 				const actual = await getDocumentSettingsSecondaryTitle();
 
 				expect( actual ).toEqual( 'Header' );
