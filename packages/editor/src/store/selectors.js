@@ -1007,10 +1007,12 @@ export const getEditedPostContent = createRegistrySelector(
  *
  * @return {boolean} Whether post is being published.
  */
-export function isPublishingPost() {
-	// TODO: this selector always returns false
-	// After the removal of the optimistic saving, we will be able to fix it.
-	return false;
+export function isPublishingPost( state ) {
+	return (
+		isSavingPost( state ) &&
+		! isCurrentPostPublished( state ) &&
+		getEditedPostAttribute( state, 'status' ) === 'publish'
+	);
 }
 
 /**
