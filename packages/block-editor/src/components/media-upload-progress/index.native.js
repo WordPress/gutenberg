@@ -29,6 +29,7 @@ export class MediaUploadProgress extends React.Component {
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
+			uploadErrorMessage: "",
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -84,7 +85,11 @@ export class MediaUploadProgress extends React.Component {
 	}
 
 	finishMediaUploadWithFailure( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
+		this.setState( {
+			isUploadInProgress: false,
+			isUploadFailed: true,
+			uploadErrorMessage: payload.errorMessage,
+		} );
 		if ( this.props.onFinishMediaUploadWithFailure ) {
 			this.props.onFinishMediaUploadWithFailure( payload );
 		}
@@ -117,7 +122,11 @@ export class MediaUploadProgress extends React.Component {
 
 	render() {
 		const { renderContent = () => null } = this.props;
-		const { isUploadInProgress, isUploadFailed } = this.state;
+		const {
+			isUploadInProgress,
+			isUploadFailed,
+			uploadErrorMessage,
+		} = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
@@ -139,6 +148,7 @@ export class MediaUploadProgress extends React.Component {
 					isUploadInProgress,
 					isUploadFailed,
 					retryMessage,
+					uploadErrorMessage,
 				} ) }
 			</View>
 		);
