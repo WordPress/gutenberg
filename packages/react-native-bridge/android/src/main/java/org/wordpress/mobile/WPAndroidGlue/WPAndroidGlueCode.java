@@ -907,8 +907,8 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadProgress(mediaId, progress);
     }
 
-    public void mediaFileUploadFailed(final int mediaId) {
-        mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
+    public void mediaFileUploadFailed(final int mediaId, final String errorMessage) {
+        mDeferredEventEmitter.onMediaFileUploadFailed(mediaId, errorMessage);
     }
 
     public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
