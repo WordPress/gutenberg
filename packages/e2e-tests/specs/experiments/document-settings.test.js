@@ -99,11 +99,7 @@ describe( 'Document Settings', () => {
 			);
 
 			// Evaluate the document settings title
-			await page.waitForSelector( '.edit-site-document-actions__title' );
-			const actual = await page.$eval(
-				'.edit-site-document-actions__title',
-				( el ) => el.innerText
-			);
+			const actual = await getDocumentSettingsTitle();
 
 			expect( actual ).toEqual( 'header' );
 		} );
