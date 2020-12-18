@@ -943,6 +943,34 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Returns the CSS Custom Properties defined by this document.
+	 *
+	 * @return array
+	 */
+	public function get_css_custom_properties( $theme_support_data ) {
+		$properties = array(
+			'--wp--style--color--link'
+		);
+
+		foreach ( $this->contexts as $context_name => $context ) {
+			foreach ( self::PRESETS_METADATA as $preset ) {
+				$values = gutenberg_experimental_get( $context, $preset['path'], array() );
+				foreach ( $values as $value ) {
+					$properties[] ='--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'];
+				}
+			}
+
+			$custom_values = gutenberg_experimental_get( $context, array( 'settings', 'custom' ) );
+			$css_vars      = self::flatten_tree( $custom_values );
+			foreach ( $css_vars as $key => $value ) {
+				$properties[] = '--wp--custom--' . $key;
+			}
+		}
+
+		return $properties;
+	}
+
+	/**
 	 * Retuns the raw data.
 	 *
 	 * @return array Raw data.

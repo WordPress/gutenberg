@@ -349,4 +349,19 @@ class WP_Theme_JSON_Resolver {
 		return self::$user_custom_post_type_id;
 	}
 
+	/**
+	 * Returns the CSS Custom Properties in use by core, theme, and user.
+	 *
+	 * @return array
+	 */
+	public function get_css_custom_properties( $theme_support_data ) {
+		$result = new WP_Theme_JSON();
+		$result->merge( self::get_core_origin() );
+		$result->merge( $this->get_theme_origin( $theme_support_data ) );
+		$result->merge( self::get_user_origin() );
+
+		$props = $result->get_css_custom_properties( $theme_support_data );
+		error_log( 'props ' . print_r( $props, true ) );
+		return $props;
+	}
 }

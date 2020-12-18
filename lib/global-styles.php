@@ -260,44 +260,19 @@ function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $
 }
 
 /**
- * Tell kses not to remove from the block markup (from style attribute)
- * the CSS variables the block editor may add.
+ * Tell kses to accept the CSS variables in use by the theme & user.
  *
  * @param array $allowed_attr List of allowed attributes.
  * @return array Filtered result.
  */
 function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr ) {
+	$resolver = new WP_Theme_JSON_Resolver();
+	$settings           = gutenberg_get_common_block_editor_settings();
+	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+
 	return array_merge(
 		$allowed_attr,
-		array(
-			'--wp--style--color--link',
-			'--wp--preset--font-size--extra-small',
-			'--wp--preset--font-size--small',
-			'--wp--preset--font-size--normal',
-			'--wp--preset--font-size--large',
-			'--wp--preset--font-size--extra-large',
-			'--wp--preset--font-size--huge',
-			'--wp--preset--font-size--gigantic',
-			'--wp--preset--color--black',
-			'--wp--preset--color--dark-gray',
-			'--wp--preset--color--gray',
-			'--wp--preset--color--green',
-			'--wp--preset--color--blue',
-			'--wp--preset--color--purple',
-			'--wp--preset--color--red',
-			'--wp--preset--color--orange',
-			'--wp--preset--color--yellow',
-			'--wp--preset--color--white',
-			'--wp--custom--font-primary',
-			'--wp--custom--line-height--body',
-			'--wp--custom--line-height--heading',
-			'--wp--custom--line-height--page-title',
-			'--wp--custom--responsive--aligndefault-width',
-			'--wp--custom--responsive--alignwide-width',
-			'--wp--custom--spacing--unit',
-			'--wp--custom--spacing--horizontal',
-			'--wp--custom--spacing--vertical',
-		)
+		$resolver->get_css_custom_properties( $theme_support_data )
 	);
 }
 
