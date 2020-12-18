@@ -58,11 +58,11 @@ export function serializeControlPoints( gradientAST, newControlPoints ) {
 	const serializedColorStops = newControlPoints
 		.sort( ( colorStop1, colorStop2 ) => {
 			return (
-				parseInt( get( colorStop1, [ 'position' ], 0 ) ) -
-				parseInt( get( colorStop2, [ 'position' ], 0 ) )
+				get( colorStop1, [ 'position' ], 0 ) -
+				get( colorStop2, [ 'position' ], 0 )
 			);
 		} )
-		.map( ( { position, color } ) => `${ color } ${ position }` );
+		.map( ( { position, color } ) => `${ color } ${ position }%` );
 	return `${ gradientAST.type }(${ compact( [
 		serializedOrientation,
 		...serializedColorStops,

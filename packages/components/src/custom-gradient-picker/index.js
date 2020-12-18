@@ -112,7 +112,7 @@ export default function CustomGradientPicker( { value, onChange } ) {
 	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 	const controlPoints = gradientAST.colorStops.map( ( p ) => ( {
 		color: `${ p.type }(${ p.value.join( ',' ) })`,
-		position: `${ p.length.value }${ p.length.type }`,
+		position: parseInt( p.length.value ), // Should always be a percentage.
 	} ) );
 
 	return (
