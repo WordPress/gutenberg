@@ -4,13 +4,6 @@ exports[`flags warnings with invalid media queries css snapshot matches warnings
 Array [
   Object {
     "column": 1,
-    "line": 1,
-    "rule": "declaration-property-unit-allowed-list",
-    "severity": "error",
-    "text": "Unknown rule declaration-property-unit-allowed-list.",
-  },
-  Object {
-    "column": 1,
     "line": 31,
     "rule": "at-rule-no-unknown",
     "severity": "error",

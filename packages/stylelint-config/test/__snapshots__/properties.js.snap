@@ -3,13 +3,6 @@
 exports[`flags warnings with invalid properties css snapshot matches warnings 1`] = `
 Array [
   Object {
-    "column": 1,
-    "line": 1,
-    "rule": "declaration-property-unit-allowed-list",
-    "severity": "error",
-    "text": "Unknown rule declaration-property-unit-allowed-list.",
-  },
-  Object {
     "column": 13,
     "line": 2,
     "rule": "color-hex-case",
