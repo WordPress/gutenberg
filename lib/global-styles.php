@@ -256,5 +256,5 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
-add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
