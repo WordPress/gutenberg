@@ -396,9 +396,6 @@ export class RichText extends Component {
 
 		onDelete( { isReverse, value } );
 
-		// Blur the removed RichText
-		this._editor.blur();
-
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
 	}
