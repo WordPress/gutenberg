@@ -59,9 +59,7 @@ function Editor( {
 		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
 			'core'
 		);
-		const { getEditorSettings, __unstableIsAutodraftPost } = select(
-			'core/editor'
-		);
+		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const postObject = getEntityRecord( 'postType', postType, postId );
 		const isFSETheme = getEditorSettings().isFSETheme;
@@ -86,7 +84,7 @@ function Editor( {
 			template:
 				isFSETheme &&
 				postObject &&
-				! __unstableIsAutodraftPost() &&
+				getCurrentPost().status !== 'auto-draft' &&
 				postType !== 'wp_template'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
