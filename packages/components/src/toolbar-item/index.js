@@ -6,7 +6,13 @@ import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useContext } from '@wordpress/element';
+import {
+	forwardRef,
+	useContext,
+	useEffect,
+	useState,
+} from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -15,7 +21,22 @@ import warning from '@wordpress/warning';
 import ToolbarContext from '../toolbar-context';
 
 function ToolbarItem( { children, as: Component, ...props }, ref ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const initialState = useContext( ToolbarContext );
+	const [ state, setState ] = useState( initialState );
+	const id = useInstanceId( ToolbarItem, 'toolbar-item' );
+
+	useEffect( () => {
+		if ( ! initialState?.subscribe ) return;
+		return initialState?.subscribe( ( nextState ) => {
+			if (
+				! state.currentId ||
+				id === state.currentId ||
+				id === nextState.currentId
+			) {
+				setState( nextState );
+			}
+		} );
+	}, [ initialState?.subscribe, state?.currentId, id ] );
 
 	if ( typeof children !== 'function' && ! Component ) {
 		warning(
@@ -27,18 +48,22 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 
 	const allProps = { ...props, ref, 'data-toolbar-item': true };
 
-	if ( ! accessibleToolbarState ) {
+	if ( ! initialState ) {
 		if ( Component ) {
 			return <Component { ...allProps }>{ children }</Component>;
 		}
 		return children( allProps );
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	const { subscribe, ...toolbarState } = state;
+
 	return (
 		<BaseToolbarItem
-			{ ...accessibleToolbarState }
+			{ ...toolbarState }
 			{ ...allProps }
 			as={ Component }
+			id={ id }
 		>
 			{ children }
 		</BaseToolbarItem>
