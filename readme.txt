@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Requires at least: 5.4.0
+Requires at least: 5.5.0
 Tested up to: 5.5
 Requires PHP: 5.6
 Stable tag: V.V.V

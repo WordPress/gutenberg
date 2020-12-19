@@ -26,6 +26,7 @@ import { Preview } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Layout from './components/layout';
+import { store as editPostStore } from './store';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -171,7 +172,7 @@ export default compose( [
 			getEditorMode,
 			getPreference,
 			__experimentalGetPreviewDeviceType,
-		} = select( 'core/edit-post' );
+		} = select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
 
 		return {
@@ -185,7 +186,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
+		const { switchEditorMode } = dispatch( editPostStore );
 		return {
 			switchEditorMode,
 		};

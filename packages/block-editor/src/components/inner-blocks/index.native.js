@@ -50,6 +50,7 @@ function UncontrolledInnerBlocks( props ) {
 		marginHorizontal,
 		horizontalAlignment,
 		filterInnerBlocks,
+		blockWidth,
 		__experimentalLayout: layout = defaultLayout,
 	} = props;
 
@@ -84,6 +85,7 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
+			blockWidth={ blockWidth }
 		/>
 	);
 

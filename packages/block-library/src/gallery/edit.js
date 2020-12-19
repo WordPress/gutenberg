@@ -281,7 +281,7 @@ function GalleryEdit( props ) {
 			};
 		} );
 
-		setAttributes( { images: updatedImages, newSizeSlug } );
+		setAttributes( { images: updatedImages, sizeSlug: newSizeSlug } );
 	}
 
 	useEffect( () => {

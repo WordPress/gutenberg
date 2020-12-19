@@ -685,7 +685,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
+		if ( this._editor.isFocused() ) {
 			this._editor.blur();
 		}
 	}

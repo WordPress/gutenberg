@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 1.0.2 (2020-12-17)
+
+### Bug Fix
+
+-   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
+
+## 1.0.1 (2020-12-17)
+
+### Bug Fix
+
+-   Fix support for external templates hosted on npm.
+
+## 1.0.0 (2020-12-17)
+
 ### Breaking Changes
 
 -   Set the minimum required version of WordPress to 5.6.0 to ensure that block is correctly registered with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
