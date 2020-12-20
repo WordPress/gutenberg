@@ -38,12 +38,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Widgets_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
-		require __DIR__ . '/class-wp-rest-block-directory-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Block_Types_Controller' ) ) {
-		require __DIR__ . '/class-wp-rest-block-types-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
 	}
@@ -55,12 +49,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/class-wp-rest-customizer-nonces.php';
-	}
-	if ( ! class_exists( 'WP_REST_Image_Editor_Controller' ) ) {
-		require __DIR__ . '/class-wp-rest-image-editor-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Plugins_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-plugins-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Post_Format_Search_Handler' ) ) {
 		require_once __DIR__ . '/class-wp-rest-post-format-search-handler.php';
@@ -76,22 +64,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	*/
 
 	require __DIR__ . '/rest-api.php';
-}
-
-if ( ! class_exists( 'WP_Block_Patterns_Registry' ) ) {
-	require __DIR__ . '/class-wp-block-patterns-registry.php';
-}
-
-if ( ! class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
-	require __DIR__ . '/class-wp-block-pattern-categories-registry.php';
-}
-
-if ( ! class_exists( 'WP_Block' ) ) {
-	require __DIR__ . '/class-wp-block.php';
-}
-
-if ( ! class_exists( 'WP_Block_List' ) ) {
-	require __DIR__ . '/class-wp-block-list.php';
 }
 
 if ( ! class_exists( 'WP_Widget_Block' ) ) {
@@ -114,10 +86,8 @@ require __DIR__ . '/template-loader.php';
 require __DIR__ . '/edit-site-page.php';
 require __DIR__ . '/edit-site-export.php';
 
-require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
-require __DIR__ . '/block-directory.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
 require __DIR__ . '/navigation.php';

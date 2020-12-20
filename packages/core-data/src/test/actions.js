@@ -115,16 +115,7 @@ describe( 'saveEntityRecord', () => {
 			'SAVE_ENTITY_RECORD_START'
 		);
 
-		// Should select __experimentalGetEntityRecordNoResolver selector (as opposed to getEntityRecord)
-		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318.
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.selectorName ).toBe(
-			'__experimentalGetEntityRecordNoResolver'
-		);
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		const receiveItems = fulfillment.next().value;
-		expect( receiveItems.type ).toBe( 'RECEIVE_ITEMS' );
-		expect( receiveItems.invalidateCache ).toBe( false );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts',
@@ -173,11 +164,6 @@ describe( 'saveEntityRecord', () => {
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		const receiveItems = fulfillment.next().value;
-		expect( receiveItems.type ).toBe( 'RECEIVE_ITEMS' );
-		expect( receiveItems.invalidateCache ).toBe( false );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
@@ -222,9 +208,6 @@ describe( 'saveEntityRecord', () => {
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/page',

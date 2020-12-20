@@ -389,8 +389,6 @@ export function* saveEntityRecord(
 		};
 		let updatedRecord;
 		let error;
-		let persistedEntity;
-		let currentEdits;
 		try {
 			const path = `${ entity.baseURL }${
 				recordId ? '/' + recordId : ''
@@ -512,31 +510,6 @@ export function* saveEntityRecord(
 					};
 				}
 
-				// Get the full local version of the record before the update,
-				// to merge it with the edits and then propagate it to subscribers
-				persistedEntity = yield controls.select(
-					'core',
-					'__experimentalGetEntityRecordNoResolver',
-					kind,
-					name,
-					recordId
-				);
-				currentEdits = yield controls.select(
-					'core',
-					'getEntityRecordEdits',
-					kind,
-					name,
-					recordId
-				);
-				yield receiveEntityRecords(
-					kind,
-					name,
-					{ ...persistedEntity, ...edits },
-					undefined,
-					// This must be false or it will trigger a GET request in parallel to the PUT/POST below
-					false
-				);
-
 				updatedRecord = yield apiFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
@@ -552,34 +525,6 @@ export function* saveEntityRecord(
 			}
 		} catch ( _error ) {
 			error = _error;
-
-			// If we got to the point in the try block where we made an optimistic update,
-			// we need to roll it back here.
-			if ( persistedEntity && currentEdits ) {
-				yield receiveEntityRecords(
-					kind,
-					name,
-					persistedEntity,
-					undefined,
-					true
-				);
-				yield editEntityRecord(
-					kind,
-					name,
-					recordId,
-					{
-						...currentEdits,
-						...( yield controls.select(
-							'core',
-							'getEntityRecordEdits',
-							kind,
-							name,
-							recordId
-						) ),
-					},
-					{ undoIgnore: true }
-				);
-			}
 		}
 		yield {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
