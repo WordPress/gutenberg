@@ -56,5 +56,12 @@ export default function phrasingContentReducer( node, doc ) {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
 		}
+		
+		// Save anchor elements' name attribute as id
+		if ( node.name && !node.id ) {
+			node.id = node.name;
+		}
+		// Remove name attribute in any case: the use of the name attribute in a elements is obsolete: https://html.spec.whatwg.org/multipage/obsolete.html#obsolete-but-conforming-features
+		node.removeAttribute( 'name' );
 	}
 }
