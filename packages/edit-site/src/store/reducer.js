@@ -77,7 +77,7 @@ export function settings( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function editedPost( state, action ) {
+export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
