@@ -13,7 +13,7 @@
  * @param WP_Post  $post      The post being edited, provided for context, or null.
  * @return array (Maybe) modified page templates array.
  */
-function gutenberg_load_fse_page_templates( $templates, $theme, $post ) {
+function gutenberg_load_block_page_templates( $templates, $theme, $post ) {
 	if ( ! gutenberg_is_fse_theme() ) {
 		return $templates;
 	}
@@ -38,5 +38,5 @@ function gutenberg_load_fse_page_templates( $templates, $theme, $post ) {
 
 	return $page_templates;
 }
-add_filter( 'theme_post_templates', 'gutenberg_load_fse_page_templates', 10, 3 );
-add_filter( 'theme_page_templates', 'gutenberg_load_fse_page_templates', 10, 3 );
+add_filter( 'theme_post_templates', 'gutenberg_load_block_page_templates', 10, 3 );
+add_filter( 'theme_page_templates', 'gutenberg_load_block_page_templates', 10, 3 );
