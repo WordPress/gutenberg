@@ -6,7 +6,7 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { wrap, replaceTag } from '@wordpress/dom';
+import { wrap, unwrap, replaceTag } from '@wordpress/dom';
 
 export default function phrasingContentReducer( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
@@ -56,17 +56,25 @@ export default function phrasingContentReducer( node, doc ) {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
 		}
-		
+
 		// Save anchor elements' name attribute as id
-		if ( node.name && !node.id ) {
+		if ( node.name && ! node.id ) {
 			node.id = node.name;
 		}
 		// Remove name attribute in any case: the use of the name attribute in a elements is obsolete: https://html.spec.whatwg.org/multipage/obsolete.html#obsolete-but-conforming-features
 		node.removeAttribute( 'name' );
 
 		// Search for common footnote and endnote ID structure (Word, LibreOffice). If doesn't match, remove ID parameter.
-		if ( node.id && !/^_?(?:ftn|edn|sdfootnote|sdendnote)/i.test( node.id ) ) {
+		if (
+			node.id &&
+			! /^_?(?:ftn|edn|sdfootnote|sdendnote)/i.test( node.id )
+		) {
 			node.removeAttribute( 'id' );
+		}
+
+		// Remove a tag if no link nor id
+		if ( ! node.id && ! node.href ) {
+			unwrap( node );
 		}
 	}
 }
