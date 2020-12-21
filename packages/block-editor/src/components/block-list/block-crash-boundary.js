@@ -21,7 +21,7 @@ class BlockCrashBoundary extends Component {
 		} );
 
 		if ( typeof this.props.errorActionName === 'string' ) {
-			doAction( this.props.errorActionName );
+			doAction( this.props.errorActionName, error );
 		}
 	}
 

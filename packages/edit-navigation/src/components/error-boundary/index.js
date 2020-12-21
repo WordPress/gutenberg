@@ -22,7 +22,7 @@ class ErrorBoundary extends Component {
 		this.setState( { error } );
 
 		if ( typeof this.props.errorActionName === 'string' ) {
-			doAction( this.props.errorActionName );
+			doAction( this.props.errorActionName, error );
 		}
 	}
 
