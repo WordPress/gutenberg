@@ -18,11 +18,11 @@ class ErrorBoundary extends Component {
 		};
 	}
 
-	componentDidCatch( error ) {
+	componentDidCatch( error, errorInfo ) {
 		this.setState( { error } );
 
 		if ( typeof this.props.errorActionName === 'string' ) {
-			doAction( this.props.errorActionName, error );
+			doAction( this.props.errorActionName, error, errorInfo );
 		}
 	}
 

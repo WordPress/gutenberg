@@ -13,7 +13,7 @@ class BlockCrashBoundary extends Component {
 		};
 	}
 
-	componentDidCatch( error ) {
+	componentDidCatch( error, errorInfo ) {
 		this.props.onError( error );
 
 		this.setState( {
@@ -21,7 +21,7 @@ class BlockCrashBoundary extends Component {
 		} );
 
 		if ( typeof this.props.errorActionName === 'string' ) {
-			doAction( this.props.errorActionName, error );
+			doAction( this.props.errorActionName, error, errorInfo );
 		}
 	}
 
