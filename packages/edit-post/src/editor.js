@@ -170,7 +170,10 @@ function Editor( {
 							}
 							{ ...props }
 						>
-							<ErrorBoundary onError={ onError }>
+							<ErrorBoundary
+								onError={ onError }
+								errorActionName="editPost.editorError"
+							>
 								<EditorInitialization postId={ postId } />
 								<Layout settings={ settings } />
 								<KeyboardShortcuts

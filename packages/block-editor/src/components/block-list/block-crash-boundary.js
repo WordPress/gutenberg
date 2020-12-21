@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { doAction } from '@wordpress/hooks';
 
 class BlockCrashBoundary extends Component {
 	constructor() {
@@ -18,6 +19,10 @@ class BlockCrashBoundary extends Component {
 		this.setState( {
 			hasError: true,
 		} );
+
+		if ( typeof this.props.errorActionName === 'string' ) {
+			doAction( this.props.errorActionName );
+		}
 	}
 
 	render() {

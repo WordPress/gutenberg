@@ -41,7 +41,7 @@ export default function Layout( { blockEditorSettings } ) {
 	useMenuNotifications( selectedMenuId );
 
 	return (
-		<ErrorBoundary>
+		<ErrorBoundary errorActionName="editNavigation.error">
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<BlockEditorKeyboardShortcuts.Register />

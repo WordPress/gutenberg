@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { Button, ClipboardButton } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
+import { doAction } from '@wordpress/hooks';
 
 class ErrorBoundary extends Component {
 	constructor() {
@@ -21,6 +22,10 @@ class ErrorBoundary extends Component {
 
 	componentDidCatch( error ) {
 		this.setState( { error } );
+
+		if ( typeof this.props.errorActionName === 'string' ) {
+			doAction( this.props.errorActionName );
+		}
 	}
 
 	reboot() {
