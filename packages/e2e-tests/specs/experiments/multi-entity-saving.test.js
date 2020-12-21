@@ -45,7 +45,7 @@ describe( 'Multi-entity save flow', () => {
 	};
 
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentyone-blocks' );
+		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -83,7 +83,6 @@ describe( 'Multi-entity save flow', () => {
 		};
 
 		it( 'Save flow should work as expected.', async () => {
-			expect.assertions( 27 );
 			await createNewPost();
 			// Edit the page some.
 			await page.click( '.editor-post-title' );
@@ -185,7 +184,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Save flow should work as expected', async () => {
-			expect.assertions( 5 );
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
 				page: 'gutenberg-edit-site',

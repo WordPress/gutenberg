@@ -27,6 +27,7 @@ import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
+import { store as editPostStore } from './store';
 
 function Editor( {
 	postId,
@@ -55,13 +56,11 @@ function Editor( {
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
-		} = select( 'core/edit-post' );
+		} = select( editPostStore );
 		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
 			'core'
 		);
-		const { getEditorSettings, __unstableIsAutodraftPost } = select(
-			'core/editor'
-		);
+		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const postObject = getEntityRecord( 'postType', postType, postId );
 		const isFSETheme = getEditorSettings().isFSETheme;
@@ -86,7 +85,7 @@ function Editor( {
 			template:
 				isFSETheme &&
 				postObject &&
-				! __unstableIsAutodraftPost() &&
+				getCurrentPost().status !== 'auto-draft' &&
 				postType !== 'wp_template'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
@@ -95,7 +94,7 @@ function Editor( {
 	} );
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		'core/edit-post'
+		editPostStore
 	);
 
 	const editorSettings = useMemo( () => {

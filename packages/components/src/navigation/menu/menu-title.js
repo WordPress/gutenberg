@@ -18,7 +18,6 @@ import {
 } from '../styles/navigation-styles';
 import { useNavigationMenuContext } from './context';
 import { SEARCH_FOCUS_DELAY } from '../constants';
-import { useRTL } from '../../utils/rtl';
 
 export default function NavigationMenuTitle( {
 	hasSearch,
@@ -30,7 +29,6 @@ export default function NavigationMenuTitle( {
 	const [ isSearching, setIsSearching ] = useState( false );
 	const { menu } = useNavigationMenuContext();
 	const searchButtonRef = useRef();
-	const isRTL = useRTL();
 
 	if ( ! title ) {
 		return null;
@@ -57,7 +55,6 @@ export default function NavigationMenuTitle( {
 					as="h2"
 					className="components-navigation__menu-title-heading"
 					variant="title.small"
-					isRTL={ isRTL }
 				>
 					<span id={ menuTitleId }>{ title }</span>
 

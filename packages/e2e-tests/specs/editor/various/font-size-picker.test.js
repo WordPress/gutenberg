@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,6 +14,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Font Size Picker', () => {
+	const FONT_SIZE_LABEL_SELECTOR = "//label[contains(text(), 'Font size')]";
+	const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
+		"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
+	const FONT_SIZE_RESET_BUTTON_SELECTOR =
+		"//fieldset[legend[contains(text(),'Font size')]]//button[//span[contains(text(), 'Reset')] or contains(text(), 'Reset')]";
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -17,13 +27,24 @@ describe( 'Font Size Picker', () => {
 		// Create a paragraph block with some content.
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(5)'
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 4 );
+		await page.keyboard.press( 'Enter' );
+		const selectedFontSize = await page.evaluate(
+			( selector ) =>
+				document
+					.evaluate(
+						selector,
+						document,
+						null,
+						XPathResult.ANY_TYPE,
+						null
+					)
+					.iterateNext().control.textContent,
+			FONT_SIZE_LABEL_SELECTOR
 		);
-		await page.waitForXPath(
-			`//button[contains(@class, "components-custom-select-control__button") and contains(text(), 'Large')]`
-		);
+
+		expect( selectedFontSize ).toBe( 'Large' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -35,9 +56,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		await page.click(
-			'.components-font-size-picker__controls .components-font-size-picker__number'
-		);
+		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		// This should be the "small" font-size of the editor defaults.
 		await page.keyboard.type( '13' );
 
@@ -51,9 +70,7 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		await page.click(
-			'.components-font-size-picker__controls .components-font-size-picker__number'
-		);
+		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await page.keyboard.type( '23' );
 
 		// Ensure content matches snapshot.
@@ -68,17 +85,11 @@ describe( 'Font Size Picker', () => {
 			'Paragraph with font size reset using button'
 		);
 
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(2)'
-		);
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 2 );
+		await page.keyboard.press( 'Enter' );
 
-		const resetButton = (
-			await page.$x(
-				'//*[contains(concat(" ", @class, " "), " components-font-size-picker__controls ")]//*[text()=\'Reset\']'
-			)
-		 )[ 0 ];
-		await resetButton.click();
+		await first( await page.$x( FONT_SIZE_RESET_BUTTON_SELECTOR ) ).click();
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -92,15 +103,11 @@ describe( 'Font Size Picker', () => {
 			'Paragraph with font size reset using input field'
 		);
 
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(3)'
-		);
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 2 );
+		await page.keyboard.press( 'Enter' );
 
-		// Clear the custom font size input.
-		await page.click(
-			'.components-font-size-picker__controls .components-font-size-picker__number'
-		);
+		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await pressKeyTimes( 'ArrowRight', 5 );
 		await pressKeyTimes( 'Backspace', 5 );
 
@@ -114,16 +121,12 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
-		await page.click(
-			'.components-font-size-picker__controls .components-font-size-picker__number'
-		);
+		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await page.keyboard.type( '23' );
 
 		await page.keyboard.press( 'Backspace' );
 
-		await page.click(
-			'.components-font-size-picker__controls .components-font-size-picker__number'
-		);
+		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 

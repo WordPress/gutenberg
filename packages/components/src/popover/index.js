@@ -7,7 +7,12 @@ import mergeRefs from 'react-merge-refs';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useLayoutEffect,
+	useCallback,
+} from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -15,6 +20,9 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 	useFocusOnMount,
+	__experimentalUseFocusOutside as useFocusOutside,
+	useConstrainedTabbing,
+	useFocusReturn,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -22,18 +30,10 @@ import { close } from '@wordpress/icons';
  * Internal dependencies
  */
 import { computePopoverPosition } from './utils';
-import withFocusReturn from '../higher-order/with-focus-return';
-import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
-import PopoverDetectOutside from './detect-outside';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
-import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
-
-const FocusManaged = withConstrainedTabbing(
-	withFocusReturn( ( { children } ) => children )
-);
 
 /**
  * Name of slot in which popover should fill.
@@ -417,7 +417,17 @@ const Popover = ( {
 		__unstableBoundaryParent,
 	] );
 
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
+	const allRefs = [
+		containerRef,
+		focusOnMount ? constrainedTabbingRef : null,
+		focusOnMount ? focusReturnRef : null,
+		focusOnMount ? focusOnMountRef : null,
+	];
+	const mergedRefs = useCallback( mergeRefs( allRefs ), allRefs );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -502,54 +512,46 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
-			<IsolatedEventContainer
-				className={ classnames(
-					'components-popover',
-					className,
-					animateClassName,
-					{
-						'is-expanded': isExpanded,
-						'is-without-arrow': noArrow,
-						'is-alternate': isAlternate,
-					}
-				) }
-				{ ...contentProps }
-				onKeyDown={ maybeClose }
-				ref={ containerRef }
-			>
-				{ isExpanded && <ScrollLock /> }
-				{ isExpanded && (
-					<div className="components-popover__header">
-						<span className="components-popover__header-title">
-							{ headerTitle }
-						</span>
-						<Button
-							className="components-popover__close"
-							icon={ close }
-							onClick={ onClose }
-						/>
-					</div>
-				) }
-				<div
-					ref={ mergeRefs( [ contentRef, focusOnMountRef ] ) }
-					className="components-popover__content"
-					tabIndex="-1"
-				>
-					<div style={ { position: 'relative' } }>
-						{ containerResizeListener }
-						{ children }
-					</div>
+		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			className={ classnames(
+				'components-popover',
+				className,
+				animateClassName,
+				{
+					'is-expanded': isExpanded,
+					'is-without-arrow': noArrow,
+					'is-alternate': isAlternate,
+				}
+			) }
+			{ ...contentProps }
+			onKeyDown={ maybeClose }
+			{ ...focusOutsideProps }
+			ref={ mergedRefs }
+			tabIndex="-1"
+		>
+			{ isExpanded && <ScrollLock /> }
+			{ isExpanded && (
+				<div className="components-popover__header">
+					<span className="components-popover__header-title">
+						{ headerTitle }
+					</span>
+					<Button
+						className="components-popover__close"
+						icon={ close }
+						onClick={ onClose }
+					/>
 				</div>
-			</IsolatedEventContainer>
-		</PopoverDetectOutside>
+			) }
+			<div ref={ contentRef } className="components-popover__content">
+				<div style={ { position: 'relative' } }>
+					{ containerResizeListener }
+					{ children }
+				</div>
+			</div>
+		</div>
 	);
-
-	// Apply focus to element as long as focusOnMount is truthy; false is
-	// the only "disabled" value.
-	if ( focusOnMount ) {
-		content = <FocusManaged>{ content }</FocusManaged>;
-	}
 
 	if ( slot.ref ) {
 		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;

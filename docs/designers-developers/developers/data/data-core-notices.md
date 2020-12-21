@@ -78,6 +78,8 @@ _Parameters_
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
 -   _options.icon_ `[Object]`: An icon displayed with the notice.
+-   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explict dismiss button and can't be dismissed by clicking the body of the notice.
+-   _options.onDismiss_ `[Function]`: Called when the notice is dismissed.
 
 _Returns_
 

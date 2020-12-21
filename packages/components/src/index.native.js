@@ -87,10 +87,12 @@ export { colorsUtils } from './mobile/color-settings/utils';
 export {
 	WIDE_ALIGNMENTS,
 	ALIGNMENT_BREAKPOINTS,
+	alignmentHelpers,
 } from './mobile/utils/alignments';
 
 // Hooks
 export {
+	convertUnitToMobile,
 	useConvertUnitToMobile,
 	getValueAndUnit,
 } from './mobile/utils/use-unit-converter-to-mobile';
