@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 
@@ -31,10 +32,14 @@ function InsertionPointInserter( {
 				getMultiSelectedBlockClientIds,
 				getSelectedBlockClientId,
 				hasMultiSelection,
+				getSettings,
 			} = select( 'core/block-editor' );
+			const { hasReducedUI } = getSettings();
+			if ( hasReducedUI ) {
+				return true;
+			}
 			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
 			const selectedBlockClientId = getSelectedBlockClientId();
-
 			return hasMultiSelection()
 				? multiSelectedBlockClientIds.includes( clientId )
 				: clientId === selectedBlockClientId;
@@ -51,9 +56,10 @@ function InsertionPointInserter( {
 			return;
 		}
 
+		const { ownerDocument } = containerRef.current;
 		const targetRect = target.getBoundingClientRect();
 		const isReverse = clientY < targetRect.top + targetRect.height / 2;
-		const blockNode = getBlockDOMNode( clientId );
+		const blockNode = getBlockDOMNode( clientId, ownerDocument );
 		const container = isReverse ? containerRef.current : blockNode;
 		const closest =
 			getClosestTabbable( blockNode, true, container ) || blockNode;
@@ -94,26 +100,43 @@ function InsertionPointInserter( {
 
 function InsertionPointPopover( {
 	clientId,
+	rootClientId,
 	isInserterShown,
 	isInserterForced,
 	setIsInserterForced,
 	containerRef,
 	showInsertionPoint,
 } ) {
-	const element = getBlockDOMNode( clientId );
+	const element = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( 'core/block-editor' );
+			const { ownerDocument } = containerRef.current;
+			const targetClientId =
+				clientId || last( getBlockOrder( rootClientId ) );
+
+			return getBlockDOMNode( targetClientId, ownerDocument );
+		},
+		[ clientId, rootClientId ]
+	);
+
+	const position = clientId ? 'top' : 'bottom';
+	const className = classnames( 'block-editor-block-list__insertion-point', {
+		'is-insert-after': ! clientId,
+	} );
 
 	return (
 		<Popover
 			noArrow
 			animate={ false }
 			anchorRef={ element }
-			position="top right left"
+			position={ `${ position } right left` }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
+			__unstableForcePosition={ true }
 		>
 			<div
-				className="block-editor-block-list__insertion-point"
+				className={ className }
 				style={ { width: element?.offsetWidth } }
 			>
 				{ showInsertionPoint && (
@@ -131,102 +154,123 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( { children, containerRef } ) {
+export default function InsertionPoint( ref ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
-	const { isMultiSelecting, isInserterVisible, selectedClientId } = useSelect(
-		( select ) => {
-			const {
-				isMultiSelecting: _isMultiSelecting,
-				isBlockInsertionPointVisible,
-				getBlockInsertionPoint,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
+	const {
+		isMultiSelecting,
+		isInserterVisible,
+		selectedClientId,
+		selectedRootClientId,
+	} = useSelect( ( select ) => {
+		const {
+			isMultiSelecting: _isMultiSelecting,
+			isBlockInsertionPointVisible,
+			getBlockInsertionPoint,
+			getBlockOrder,
+		} = select( 'core/block-editor' );
 
-			const insertionPoint = getBlockInsertionPoint();
-			const order = getBlockOrder( insertionPoint.rootClientId );
+		const insertionPoint = getBlockInsertionPoint();
+		const order = getBlockOrder( insertionPoint.rootClientId );
 
-			return {
-				isMultiSelecting: _isMultiSelecting(),
-				isInserterVisible: isBlockInsertionPointVisible(),
-				selectedClientId: order[ insertionPoint.index ],
-			};
+		return {
+			isMultiSelecting: _isMultiSelecting(),
+			isInserterVisible: isBlockInsertionPointVisible(),
+			selectedClientId: order[ insertionPoint.index ],
+			selectedRootClientId: insertionPoint.rootClientId,
+		};
+	}, [] );
+
+	const onMouseMove = useCallback(
+		( event ) => {
+			if (
+				! event.target.classList.contains(
+					'block-editor-block-list__layout'
+				)
+			) {
+				if ( isInserterShown ) {
+					setIsInserterShown( false );
+				}
+				return;
+			}
+
+			const rect = event.target.getBoundingClientRect();
+			const offset = event.clientY - rect.top;
+			let element = Array.from( event.target.children ).find(
+				( blockEl ) => {
+					return blockEl.offsetTop > offset;
+				}
+			);
+
+			if ( ! element ) {
+				return;
+			}
+
+			// The block may be in an alignment wrapper, so check the first direct
+			// child if the element has no ID.
+			if ( ! element.id ) {
+				element = element.firstElementChild;
+
+				if ( ! element ) {
+					return;
+				}
+			}
+
+			const clientId = element.id.slice( 'block-'.length );
+
+			if ( ! clientId ) {
+				return;
+			}
+
+			const elementRect = element.getBoundingClientRect();
+
+			if (
+				event.clientX > elementRect.right ||
+				event.clientX < elementRect.left
+			) {
+				if ( isInserterShown ) {
+					setIsInserterShown( false );
+				}
+				return;
+			}
+
+			setIsInserterShown( true );
+			setInserterClientId( clientId );
 		},
-		[]
+		[ isInserterShown, setIsInserterShown, setInserterClientId ]
 	);
 
-	function onMouseMove( event ) {
-		if (
-			! event.target.classList.contains(
-				'block-editor-block-list__layout'
-			)
-		) {
-			if ( isInserterShown ) {
-				setIsInserterShown( false );
-			}
+	const enableMouseMove = ! isInserterForced && ! isMultiSelecting;
+
+	useEffect( () => {
+		if ( ! enableMouseMove ) {
 			return;
 		}
 
-		const rect = event.target.getBoundingClientRect();
-		const offset = event.clientY - rect.top;
-		const element = Array.from( event.target.children ).find(
-			( blockEl ) => {
-				return blockEl.offsetTop > offset;
-			}
-		);
+		ref.current.addEventListener( 'mousemove', onMouseMove );
 
-		if ( ! element ) {
-			return;
-		}
-
-		const clientId = element.id.slice( 'block-'.length );
-
-		if ( ! clientId ) {
-			return;
-		}
-
-		const elementRect = element.getBoundingClientRect();
-
-		if (
-			event.clientX > elementRect.right ||
-			event.clientX < elementRect.left
-		) {
-			if ( isInserterShown ) {
-				setIsInserterShown( false );
-			}
-			return;
-		}
-
-		setIsInserterShown( true );
-		setInserterClientId( clientId );
-	}
+		return () => {
+			ref.current.removeEventListener( 'mousemove', onMouseMove );
+		};
+	}, [ enableMouseMove, onMouseMove ] );
 
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
 
 	return (
-		<>
-			{ ! isMultiSelecting && isVisible && (
-				<InsertionPointPopover
-					clientId={
-						isInserterVisible ? selectedClientId : inserterClientId
-					}
-					isInserterShown={ isInserterShown }
-					isInserterForced={ isInserterForced }
-					setIsInserterForced={ setIsInserterForced }
-					containerRef={ containerRef }
-					showInsertionPoint={ isInserterVisible }
-				/>
-			) }
-			<div
-				onMouseMove={
-					! isInserterForced && ! isMultiSelecting
-						? onMouseMove
-						: undefined
+		! isMultiSelecting &&
+		isVisible && (
+			<InsertionPointPopover
+				clientId={
+					isInserterVisible ? selectedClientId : inserterClientId
 				}
-			>
-				{ children }
-			</div>
-		</>
+				rootClientId={ selectedRootClientId }
+				isInserterShown={ isInserterShown }
+				isInserterForced={ isInserterForced }
+				setIsInserterForced={ setIsInserterForced }
+				containerRef={ ref }
+				showInsertionPoint={ isInserterVisible }
+			/>
+		)
 	);
 }

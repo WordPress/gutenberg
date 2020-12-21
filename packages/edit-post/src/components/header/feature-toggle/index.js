@@ -8,9 +8,15 @@ import { flow } from 'lodash';
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
 
 function FeatureToggle( {
 	onToggle,
@@ -19,7 +25,6 @@ function FeatureToggle( {
 	info,
 	messageActivated,
 	messageDeactivated,
-	speak,
 	shortcut,
 } ) {
 	const speakMessage = () => {
@@ -46,12 +51,11 @@ function FeatureToggle( {
 
 export default compose( [
 	withSelect( ( select, { feature } ) => ( {
-		isActive: select( 'core/edit-post' ).isFeatureActive( feature ),
+		isActive: select( editPostStore ).isFeatureActive( feature ),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
-			dispatch( 'core/edit-post' ).toggleFeature( ownProps.feature );
+			dispatch( editPostStore ).toggleFeature( ownProps.feature );
 		},
 	} ) ),
-	withSpokenMessages,
 ] )( FeatureToggle );

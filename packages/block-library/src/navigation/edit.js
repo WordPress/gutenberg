@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import {
 	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
@@ -46,9 +47,41 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			'is-vertical': attributes.orientation === 'vertical',
+		} ),
+	} );
+
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
+		},
+		{
+			allowedBlocks: [
+				'core/navigation-link',
+				'core/search',
+				'core/social-links',
+			],
+			orientation: attributes.orientation || 'horizontal',
+			renderAppender:
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				isSelected
+					? InnerBlocks.DefaultAppender
+					: false,
+			__experimentalAppenderTagName: 'li',
+			__experimentalCaptureToolbars: true,
+			// Template lock set to false here so that the Nav
+			// Block on the experimental menus screen does not
+			// inherit templateLock={ 'all' }.
+			templateLock: false,
+		}
 	);
 
 	if ( isPlaceholderShown ) {
@@ -76,11 +109,6 @@ function Navigation( {
 			} );
 		};
 	}
-
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
 
 	return (
 		<>
@@ -143,39 +171,8 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav
-				{ ...blockProps }
-				className={ classnames(
-					blockProps.className,
-					blockClassNames
-				) }
-			>
-				<InnerBlocks
-					allowedBlocks={ [
-						'core/navigation-link',
-						'core/search',
-						'core/social-links',
-					] }
-					renderAppender={
-						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants ) ||
-						isSelected
-							? InnerBlocks.DefaultAppender
-							: false
-					}
-					templateInsertUpdatesSelection={ false }
-					orientation={ attributes.orientation || 'horizontal' }
-					__experimentalTagName="ul"
-					__experimentalAppenderTagName="li"
-					__experimentalPassedProps={ {
-						className: 'wp-block-navigation__container',
-					} }
-					__experimentalCaptureToolbars={ true }
-					// Template lock set to false here so that the Nav
-					// Block on the experimental menus screen does not
-					// inherit templateLock={ 'all' }.
-					templateLock={ false }
-				/>
+			<nav { ...blockProps }>
+				<ul { ...innerBlocksProps } />
 			</nav>
 		</>
 	);
@@ -211,7 +208,8 @@ export default compose( [
 				}
 				dispatch( 'core/block-editor' ).replaceInnerBlocks(
 					clientId,
-					blocks
+					blocks,
+					true
 				);
 			},
 		};

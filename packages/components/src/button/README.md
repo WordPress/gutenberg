@@ -239,6 +239,14 @@ If provided with `icon`, sets the icon size.
 -   Required: No
 -   Default: `20 when a Dashicon is rendered, 24 for all other icons.`
 
+#### iconPosition
+
+If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
+
+-   Type: `string`
+-   Required: No
+-   Default: `left`
+
 #### showTooltip
 
 If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.

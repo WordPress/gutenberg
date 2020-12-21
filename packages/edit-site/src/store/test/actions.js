@@ -56,7 +56,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'removeTemplate', () => {
-		it( 'should yield the API_FETCH control and yield the SELECT control to set the page by yielding the DISPATCH control for the SET_PAGE action', () => {
+		it( 'should issue a REST request to delete the template, then read the current page and then set the page with an updated template list', () => {
 			const templateId = 1;
 			const page = { path: '/' };
 
@@ -69,7 +69,7 @@ describe( 'actions', () => {
 				},
 			} );
 			expect( it.next().value ).toEqual( {
-				type: '@@data/RESOLVE_SELECT',
+				type: '@@data/SELECT',
 				storeKey: 'core/edit-site',
 				selectorName: 'getPage',
 				args: [],

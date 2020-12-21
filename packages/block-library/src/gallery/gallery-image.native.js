@@ -5,7 +5,6 @@ import {
 	StyleSheet,
 	View,
 	ScrollView,
-	Text,
 	TouchableWithoutFeedback,
 } from 'react-native';
 import { isEmpty } from 'lodash';
@@ -19,7 +18,7 @@ import {
 	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
-import { Icon, Image } from '@wordpress/components';
+import { Image } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { getProtocol } from '@wordpress/url';
@@ -233,21 +232,9 @@ class GalleryImage extends Component {
 					onSelectMediaUploadOption={ this.onSelectMedia }
 					resizeMode={ resizeMode }
 					url={ url }
+					retryMessage={ retryMessage }
+					retryIcon={ warning }
 				/>
-
-				{ isUploadFailed && (
-					<View style={ style.uploadFailedContainer }>
-						<View style={ style.uploadFailed }>
-							<Icon
-								icon={ warning }
-								{ ...style.uploadFailedIcon }
-							/>
-						</View>
-						<Text style={ style.uploadFailedText }>
-							{ retryMessage }
-						</Text>
-					</View>
-				) }
 
 				{ ! isUploadInProgress && isSelected && (
 					<View style={ style.toolbarContainer }>

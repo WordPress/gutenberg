@@ -13,6 +13,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"isRepeated": {
+			"type": "boolean",
+			"default": false
+		},
 		"dimRatio": {
 			"type": "number",
 			"default": 50
@@ -50,6 +54,10 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
-		"__experimentalPadding": true
-	}
+		"spacing": {
+			"padding": true
+		}
+	},
+	"editorStyle": "wp-block-cover-editor",
+	"style": "wp-block-cover"
 }

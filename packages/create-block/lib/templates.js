@@ -1,15 +1,19 @@
 /**
  * External dependencies
  */
+const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
-const { readFile } = require( 'fs' ).promises;
-const { fromPairs } = require( 'lodash' );
+const { mkdtemp, readFile } = require( 'fs' ).promises;
+const { fromPairs, isObject } = require( 'lodash' );
+const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
+const rimraf = require( 'rimraf' ).sync;
 
 /**
  * Internal dependencies
  */
 const CLIError = require( './cli-error' );
+const { info } = require( './log' );
 const prompts = require( './prompts' );
 
 const predefinedBlockTemplates = {
@@ -19,6 +23,7 @@ const predefinedBlockTemplates = {
 			title: 'ES5 Example',
 			description:
 				'Example block written with ES5 standard and no JSX – no build step required.',
+			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
 			editorStyle: 'file:./editor.css',
@@ -31,12 +36,12 @@ const predefinedBlockTemplates = {
 			title: 'ESNext Example',
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
+			dashicon: 'smiley',
 		},
 	},
 };
 
-const getOutputTemplates = async ( name ) => {
-	const outputTemplatesPath = join( __dirname, 'templates', name );
+const getOutputTemplates = async ( outputTemplatesPath ) => {
 	const outputTemplatesFiles = await glob( '**/*.mustache', {
 		cwd: outputTemplatesPath,
 		dot: true,
@@ -58,24 +63,75 @@ const getOutputTemplates = async ( name ) => {
 	);
 };
 
+const externalTemplateExists = async ( templateName ) => {
+	try {
+		await command( `npm view ${ templateName }` );
+	} catch ( error ) {
+		return false;
+	}
+	return true;
+};
+
 const getBlockTemplate = async ( templateName ) => {
-	if ( ! predefinedBlockTemplates[ templateName ] ) {
+	if ( predefinedBlockTemplates[ templateName ] ) {
+		return {
+			...predefinedBlockTemplates[ templateName ],
+			outputTemplates: await getOutputTemplates(
+				join( __dirname, 'templates', templateName )
+			),
+		};
+	}
+	if ( ! ( await externalTemplateExists( templateName ) ) ) {
 		throw new CLIError(
-			`Invalid block template type name. Allowed values: ${ Object.keys(
-				predefinedBlockTemplates
-			).join( ', ' ) }.`
+			`Invalid block template type name: "${ templateName }". Allowed values: ` +
+				Object.keys( predefinedBlockTemplates )
+					.map( ( name ) => `"${ name }"` )
+					.join( ', ' ) +
+				', or an existing npm package name.'
 		);
 	}
-	return {
-		...predefinedBlockTemplates[ templateName ],
-		outputTemplates: await getOutputTemplates( templateName ),
-	};
+
+	let tempCwd;
+
+	try {
+		info( '' );
+		info( 'Downloading template files. It might take some time...' );
+
+		tempCwd = await mkdtemp( join( tmpdir(), 'wp-create-block-' ) );
+
+		await command( `npm install ${ templateName } --no-save`, {
+			cwd: tempCwd,
+		} );
+
+		const { defaultValues = {}, templatesPath } = require( require.resolve(
+			templateName,
+			{
+				paths: [ tempCwd ],
+			}
+		) );
+		if ( ! isObject( defaultValues ) || ! templatesPath ) {
+			throw new Error();
+		}
+
+		return {
+			defaultValues,
+			outputTemplates: await getOutputTemplates( templatesPath ),
+		};
+	} catch ( error ) {
+		throw new CLIError(
+			`Invalid template definition provided in "${ templateName }" package.`
+		);
+	} finally {
+		if ( tempCwd ) {
+			rimraf( tempCwd );
+		}
+	}
 };
 
 const getDefaultValues = ( blockTemplate ) => {
 	return {
+		apiVersion: 2,
 		namespace: 'create-block',
-		dashicon: 'smiley',
 		category: 'widgets',
 		author: 'The WordPress Contributors',
 		license: 'GPL-2.0-or-later',

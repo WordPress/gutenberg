@@ -92,7 +92,7 @@ To load the built script, so it is run within the editor, you need to tell WordP
 
 ```php
 function create_block_gutenpride_block_init() {
-	$dir = dirname( __FILE__ );
+	$dir = __DIR__;
 
 	$script_asset_path = "$dir/build/index.asset.php";
 	if ( ! file_exists( $script_asset_path ) ) {
@@ -127,6 +127,7 @@ function create_block_gutenpride_block_init() {
 	);
 
 	register_block_type( 'create-block/gutenpride', array(
+		'apiVersion' => 2,
 		'editor_script' => 'create-block-gutenpride-block-editor',
 		'editor_style'  => 'create-block-gutenpride-block-editor',
 		'style'         => 'create-block-gutenpride-block',

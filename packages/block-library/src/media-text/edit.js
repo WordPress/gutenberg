@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
-	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
@@ -242,7 +242,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					}
 				/>
 			) }
-			{ imageFill && (
+			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
 					label={ __( 'Focal point picker' ) }
 					url={ mediaUrl }
@@ -284,6 +284,11 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		className: classNames,
 		style,
 	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{ className: 'wp-block-media-text__content' },
+		{ template: TEMPLATE }
+	);
 
 	return (
 		<>
@@ -329,14 +334,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaWidth,
 					} }
 				/>
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-media-text__content',
-					} }
-					template={ TEMPLATE }
-					templateInsertUpdatesSelection={ false }
-				/>
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);

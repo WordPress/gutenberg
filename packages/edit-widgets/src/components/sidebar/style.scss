@@ -74,41 +74,10 @@
 	}
 }
 
-.edit-widgets-block-areas__top-container {
+.edit-widgets-widget-areas__top-container {
 	display: flex;
 	padding: $grid-unit-20;
 	.block-editor-block-icon {
 		margin-right: $grid-unit-20;
 	}
-}
-
-.edit-widgets-block-areas {
-	ul {
-		list-style: none;
-		margin-bottom: -$border-width;
-	}
-
-	li {
-		margin: 0;
-		border-bottom: $border-width solid $gray-300;
-		&:first-child {
-			border-top: $border-width solid $gray-300;
-		}
-
-		button {
-			display: block;
-			width: 100%;
-			font-weight: 600;
-			padding: $grid-unit-20;
-			height: auto;
-			text-align: left;
-		}
-	}
-}
-
-.edit-widgets-block-areas__edit {
-	float: right;
-	/* Mimics the default link style in common.css */
-	color: #0073aa;
-	font-weight: 400;
 }

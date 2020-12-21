@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { createContext } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -15,6 +16,9 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+
+// A Context to store the map of the appender map.
+export const AppenderNodesContext = createContext();
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -89,7 +93,11 @@ function BlockListAppender( {
 			// Prevent the block from being selected when the appender is
 			// clicked.
 			onFocus={ stopPropagation }
-			className={ classnames( 'block-list-appender', className ) }
+			className={ classnames(
+				'block-list-appender',
+				'wp-block',
+				className
+			) }
 		>
 			{ appender }
 		</TagName>

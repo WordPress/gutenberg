@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+## 1.0.2 (2020-12-17)
+
+### Bug Fix
+
+-   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
+
+## 1.0.1 (2020-12-17)
+
+### Bug Fix
+
+-   Fix support for external templates hosted on npm.
+
+## 1.0.0 (2020-12-17)
+
+### Breaking Changes
+
+-   Set the minimum required version of WordPress to 5.6.0 to ensure that block is correctly registered with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
+
+### New Features
+
+-   Added basic support for external templates hosted on npm ([#23712](https://github.com/WordPress/gutenberg/pull/23712)).
+-   Update templates to work with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
+
+## 0.18.0 (2020-10-30)
+
+### Breaking Changes
+
+-   Update the list of available block categories to align with changes introduced in WordPress 5.5.0 (https://make.wordpress.org/core/2020/07/30/block-api-updates-in-5-5/).
+-   Set the minimum required version of WordPress to 5.5.0 to ensure that block is correctly registered with new block categories.
+
 ## 0.16.0 (2020-06-25)
 
 ### New Feature

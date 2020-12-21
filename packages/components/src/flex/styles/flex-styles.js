@@ -60,11 +60,12 @@ const reversedStyles = ( { isReversed } ) => {
 export const Flex = styled.div`
 	box-sizing: border-box;
 	display: flex;
+	width: 100%;
 
-	${ alignStyle };
-	${ justifyStyle };
-	${ gapStyle };
-	${ reversedStyles };
+	${ alignStyle }
+	${ justifyStyle }
+	${ gapStyle }
+	${ reversedStyles }
 `;
 
 export const Item = styled.div`

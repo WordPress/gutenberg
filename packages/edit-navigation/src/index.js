@@ -6,7 +6,6 @@ import { map, set, flatten, omit, partialRight } from 'lodash';
 /**
  * WordPress dependencies
  */
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -168,7 +167,7 @@ export function initialize( id, settings ) {
 	registerCoreBlocks();
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 
 	settings.__experimentalFetchLinkSuggestions = partialRight(

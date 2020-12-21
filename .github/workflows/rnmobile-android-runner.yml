@@ -4,6 +4,10 @@ on:
   pull_request:
     paths-ignore:
     - '**.md'
+  push:
+    branches: [master]
+    paths-ignore:
+    - '**.md'
 
 jobs:
   test:
@@ -23,6 +27,8 @@ jobs:
       with:
         path: ~/.npm
         key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
 
     - run: npm ci
 

@@ -61,6 +61,7 @@ const {
 	canInsertBlockType,
 	canInsertBlocks,
 	getInserterItems,
+	getBlockTransformItems,
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
@@ -68,6 +69,8 @@ const {
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
+	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
+	__experimentalGetParsedReusableBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -458,49 +461,48 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockParentsByBlockName', () => {
-		it( 'should return parent blocks', () => {
-			const state = {
-				blocks: {
-					parents: {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-						'client-id-05': 'client-id-04',
-					},
-					byClientId: {
-						'client-id-01': {
-							clientId: 'client-id-01',
-							name: 'core/navigation',
-						},
-						'client-id-02': {
-							clientId: 'client-id-02',
-							name: 'core/columns',
-						},
-						'client-id-03': {
-							clientId: 'client-id-03',
-							name: 'core/navigation',
-						},
-						'client-id-04': {
-							clientId: 'client-id-04',
-							name: 'core/navigation-link',
-						},
-						'client-id-05': {
-							clientId: 'client-id-05',
-							name: 'core/navigation-link',
-						},
-					},
-					cache: {
-						'client-id-01': {},
-						'client-id-02': {},
-						'client-id-03': {},
-						'client-id-04': {},
-						'client-id-05': {},
-					},
-					controlledInnerBlocks: {},
+		const state = {
+			blocks: {
+				parents: {
+					'client-id-01': '',
+					'client-id-02': 'client-id-01',
+					'client-id-03': 'client-id-02',
+					'client-id-04': 'client-id-03',
+					'client-id-05': 'client-id-04',
 				},
-			};
-
+				byClientId: {
+					'client-id-01': {
+						clientId: 'client-id-01',
+						name: 'core/navigation',
+					},
+					'client-id-02': {
+						clientId: 'client-id-02',
+						name: 'core/columns',
+					},
+					'client-id-03': {
+						clientId: 'client-id-03',
+						name: 'core/navigation',
+					},
+					'client-id-04': {
+						clientId: 'client-id-04',
+						name: 'core/navigation-link',
+					},
+					'client-id-05': {
+						clientId: 'client-id-05',
+						name: 'core/navigation-link',
+					},
+				},
+				cache: {
+					'client-id-01': {},
+					'client-id-02': {},
+					'client-id-03': {},
+					'client-id-04': {},
+					'client-id-05': {},
+				},
+				controlledInnerBlocks: {},
+			},
+		};
+		it( 'should return parent blocks', () => {
 			expect(
 				getBlockParentsByBlockName(
 					state,
@@ -524,6 +526,20 @@ describe( 'selectors', () => {
 					'core/unknown-block'
 				)
 			).toEqual( [] );
+		} );
+		it( 'Should optionally accept an array of parent types and return parents of multiple types', () => {
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-03' ] );
+
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-02', 'client-id-03' ] );
 		} );
 	} );
 
@@ -2141,20 +2157,17 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if no assigned insertion point', () => {
+		it( 'should return false if insertion point is set to not show', () => {
 			const state = {
-				insertionPoint: null,
+				insertionPointVisibility: false,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return true if insertion point is set to show', () => {
 			const state = {
-				insertionPoint: {
-					rootClientId: undefined,
-					index: 5,
-				},
+				insertionPointVisibility: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -2462,8 +2475,8 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 					],
 				},
@@ -2542,15 +2555,15 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 						{
 							id: 2,
 							isTemporary: false,
 							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
+							title: { raw: 'Reusable Block 2' },
+							content: { raw: '<!-- /wp:test-block-b -->' },
 						},
 					],
 				},
@@ -2660,6 +2673,222 @@ describe( 'selectors', () => {
 				( item ) => item.id === 'core/test-block-b'
 			);
 			expect( reusableBlock2Item.frecency ).toBe( 2.5 );
+		} );
+	} );
+
+	describe( 'getBlockTransformItems', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/with-tranforms-a', {
+				category: 'text',
+				title: 'Tranforms a',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-b' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-c' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
+							blocks: [
+								'core/with-tranforms-b',
+								'core/with-tranforms-c',
+							],
+							transform: () => {},
+							isMultiBlock: true,
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/with-tranforms-b', {
+				category: 'text',
+				title: 'Tranforms b',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-a' ],
+							transform: () => {},
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/with-tranforms-c', {
+				category: 'text',
+				title: 'Tranforms c',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-a' ],
+							transform: () => {},
+						},
+					],
+				},
+				supports: { multiple: false },
+			} );
+		} );
+		afterAll( () => {
+			[
+				'core/with-tranforms-a',
+				'core/with-tranforms-b',
+				'core/with-tranforms-c',
+			].forEach( unregisterBlockType );
+		} );
+		it( 'should properly return block type items', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 2 );
+			const returnedProps = Object.keys( items[ 0 ] );
+			// Verify we have only the wanted props.
+			expect( returnedProps ).toHaveLength( 6 );
+			expect( returnedProps ).toEqual(
+				expect.arrayContaining( [
+					'id',
+					'name',
+					'title',
+					'icon',
+					'frecency',
+					'isDisabled',
+				] )
+			);
+			expect( items ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-c',
+					} ),
+				] )
+			);
+		} );
+		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/with-tranforms-b' },
+						block2: { name: 'core/with-tranforms-a' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					order: {},
+					parents: {
+						block1: '',
+						block2: 'block1',
+					},
+					cache: {},
+					controlledInnerBlocks: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [ 'core/with-tranforms-c' ],
+					},
+					block2: {},
+				},
+			};
+			const blocks = [
+				{ clientId: 'block2', name: 'core/with-tranforms-a' },
+			];
+			const items = getBlockTransformItems( state, blocks, 'block1' );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ].name ).toEqual( 'core/with-tranforms-c' );
+		} );
+		it( 'should take into account the usage of blocks settings `multiple` - if multiple blocks of the same type are allowed', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/with-tranforms-c',
+						},
+					},
+					attributes: {
+						block1: { attribute: {} },
+					},
+					order: {
+						'': [ 'block1' ],
+					},
+					cache: {
+						block1: {},
+					},
+					controlledInnerBlocks: {},
+				},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 2 );
+			expect( items ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+						isDisabled: false,
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-c',
+						isDisabled: true,
+					} ),
+				] )
+			);
+		} );
+		it( 'should set frecency', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				preferences: {
+					insertUsage: {
+						'core/with-tranforms-a': { count: 10, time: 1000 },
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-c' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					name: 'core/with-tranforms-a',
+					frecency: 2.5,
+				} )
+			);
 		} );
 	} );
 
@@ -2945,5 +3174,101 @@ describe( 'selectors', () => {
 				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
 			).toBe( 'a' );
 		} );
+	} );
+
+	describe( 'getActiveBlockIdByBlockName', () => {
+		const state = {
+			selectionStart: {
+				clientId: 'client-id-04',
+			},
+			selectionEnd: {
+				clientId: 'client-id-04',
+			},
+			blocks: {
+				parents: {
+					'client-id-01': '',
+					'client-id-02': 'client-id-01',
+					'client-id-03': 'client-id-02',
+					'client-id-04': 'client-id-03',
+					'client-id-05': 'client-id-03',
+				},
+				byClientId: {
+					'client-id-01': {
+						clientId: 'client-id-01',
+						name: 'core/columns',
+					},
+					'client-id-02': {
+						clientId: 'client-id-02',
+						name: 'core/navigation',
+					},
+					'client-id-03': {
+						clientId: 'client-id-03',
+						name: 'core/navigation-link',
+					},
+					'client-id-04': {
+						clientId: 'client-id-04',
+						name: 'core/navigation-link',
+					},
+					'client-id-05': {
+						clientId: 'client-id-05',
+						name: 'core/navigation-link',
+					},
+				},
+				cache: {
+					'client-id-01': {},
+					'client-id-02': {},
+					'client-id-03': {},
+					'client-id-04': {},
+					'client-id-05': {},
+				},
+				order: {
+					'client-id-03': [ 'client-id-04', 'client-id-05' ],
+				},
+				controlledInnerBlocks: {},
+			},
+		};
+		it( 'Should return first active matching block (including self) when single block selected', () => {
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/navigation-link',
+				] )
+			).toEqual( 'client-id-04' );
+
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( 'client-id-02' );
+		} );
+		it( 'Should return first active matching block with (excluding self) when multi selected', () => {
+			state.selectionEnd.clientId = 'client-id-05';
+
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/navigation-link',
+				] )
+			).toEqual( 'client-id-03' );
+		} );
+	} );
+} );
+
+describe( '__experimentalGetParsedReusableBlock', () => {
+	const state = {
+		settings: {
+			__experimentalReusableBlocks: [
+				{
+					id: 1,
+					content: { raw: '' },
+				},
+			],
+		},
+	};
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/26485. See https://github.com/WordPress/gutenberg/issues/26548.
+	it( "Should return an empty array if reusable block's content.raw is an empty string", () => {
+		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
+			[]
+		);
 	} );
 } );

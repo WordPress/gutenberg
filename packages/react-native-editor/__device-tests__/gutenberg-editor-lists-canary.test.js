@@ -1,47 +1,15 @@
 /**
  * Internal dependencies
  */
-import EditorPage from './pages/editor-page';
-import {
-	isAndroid,
-	isLocalEnvironment,
-	setupDriver,
-	stopDriver,
-} from './helpers/utils';
+import { blockNames } from './pages/editor-page';
+import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
-
 describe( 'Gutenberg Editor tests for List block @canary', () => {
-	let driver;
-	let editorPage;
-	let allPassed = true;
-	const listBlockName = 'List';
-
-	// Use reporter for setting status for saucelabs Job
-	if ( ! isLocalEnvironment() ) {
-		const reporter = {
-			specDone: async ( result ) => {
-				allPassed = allPassed && result.status !== 'failed';
-			},
-		};
-
-		jasmine.getEnv().addReporter( reporter );
-	}
-
-	beforeAll( async () => {
-		driver = await setupDriver();
-		editorPage = new EditorPage( driver );
-	} );
-
-	it( 'should be able to see visual editor', async () => {
-		await expect( editorPage.getBlockList() ).resolves.toBe( true );
-	} );
-
 	it( 'should be able to add a new List block', async () => {
-		await editorPage.addNewBlock( listBlockName );
+		await editorPage.addNewBlock( blockNames.list );
 		const listBlockElement = await editorPage.getBlockAtPosition(
-			listBlockName
+			blockNames.list
 		);
 		// Click List block on Android to force EditText focus
 		if ( isAndroid() ) {
@@ -64,13 +32,14 @@ describe( 'Gutenberg Editor tests for List block @canary', () => {
 		);
 
 		// switch to html and verify html
-		await editorPage.verifyHtmlContent( testData.listHtml );
+		const html = await editorPage.getHtmlContent();
+		expect( testData.listHtml.toLowerCase() ).toBe( html.toLowerCase() );
 	} );
 
 	// This test depends on being run immediately after 'should be able to add a new List block'
 	it( 'should update format to ordered list, using toolbar button', async () => {
 		let listBlockElement = await editorPage.getBlockAtPosition(
-			listBlockName
+			blockNames.list
 		);
 
 		// Click List block to force EditText focus
@@ -80,18 +49,15 @@ describe( 'Gutenberg Editor tests for List block @canary', () => {
 		await editorPage.clickOrderedListToolBarButton();
 
 		// switch to html and verify html
-		await editorPage.verifyHtmlContent( testData.listHtmlOrdered );
-
+		const html = await editorPage.getHtmlContent();
+		expect( testData.listHtmlOrdered.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 		// Remove list block to return editor to empty state
-		listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
+		listBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.list
+		);
 		await listBlockElement.click();
-		await editorPage.removeBlockAtPosition( listBlockName );
-	} );
-
-	afterAll( async () => {
-		if ( ! isLocalEnvironment() ) {
-			driver.sauceJobStatus( allPassed );
-		}
-		await stopDriver( driver );
+		await editorPage.removeBlockAtPosition( blockNames.list );
 	} );
 } );

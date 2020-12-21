@@ -92,6 +92,36 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 }
 
 /**
+ * Given an array of InnerBlocks templates or Block Objects,
+ * returns an array of created Blocks from them.
+ * It handles the case of having InnerBlocks as Blocks by
+ * converting them to the proper format to continue recursively.
+ *
+ * @param {Array} innerBlocksOrTemplate Nested blocks or InnerBlocks templates.
+ *
+ * @return {Object[]} Array of Block objects.
+ */
+export function createBlocksFromInnerBlocksTemplate(
+	innerBlocksOrTemplate = []
+) {
+	return innerBlocksOrTemplate.map( ( innerBlock ) => {
+		const innerBlockTemplate = Array.isArray( innerBlock )
+			? innerBlock
+			: [
+					innerBlock.name,
+					innerBlock.attributes,
+					innerBlock.innerBlocks,
+			  ];
+		const [ name, attributes, innerBlocks = [] ] = innerBlockTemplate;
+		return createBlock(
+			name,
+			attributes,
+			createBlocksFromInnerBlocksTemplate( innerBlocks )
+		);
+	} );
+}
+
+/**
  * Given a block object, returns a copy of the block object, optionally merging
  * new attributes and/or replacing its inner blocks.
  *

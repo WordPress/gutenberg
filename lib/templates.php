@@ -6,9 +6,32 @@
  */
 
 /**
+ * Returns all block template file path of the current theme and its parent theme.
+ * Includes demo block template files if demo experiment is enabled.
+ *
+ * @return array $block_template_files A list of paths to all template files.
+ */
+function gutenberg_get_template_paths() {
+	$block_template_files = glob( get_stylesheet_directory() . '/block-templates/*.html' );
+	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
+
+	if ( is_child_theme() ) {
+		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
+		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
+		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
+	}
+
+	return $block_template_files;
+}
+
+/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
 	$labels = array(
 		'name'                  => __( 'Templates', 'gutenberg' ),
 		'singular_name'         => __( 'Template', 'gutenberg' ),
@@ -46,6 +69,7 @@ function gutenberg_register_template_post_type() {
 		'supports'          => array(
 			'title',
 			'slug',
+			'excerpt',
 			'editor',
 			'revisions',
 		),
@@ -54,6 +78,49 @@ function gutenberg_register_template_post_type() {
 	register_post_type( 'wp_template', $args );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
+
+/**
+ * Registers block editor 'wp_theme' taxonomy.
+ */
+function gutenberg_register_wp_theme_taxonomy() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	register_taxonomy(
+		'wp_theme',
+		array( 'wp_template', 'wp_template_part' ),
+		array(
+			'public'            => false,
+			'hierarchical'      => false,
+			'labels'            => array(
+				'name'          => __( 'Themes', 'gutenberg' ),
+				'singular_name' => __( 'Theme', 'gutenberg' ),
+			),
+			'query_var'         => false,
+			'rewrite'           => false,
+			'show_ui'           => false,
+			'_builtin'          => true,
+			'show_in_nav_menus' => false,
+			'show_in_rest'      => true,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
+
+/**
+ * Automatically set the theme meta for templates.
+ *
+ * @param array $post_id Template ID.
+ */
+function gutenberg_set_template_and_template_part_post_theme( $post_id ) {
+	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
+	if ( ! $themes ) {
+		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
+	}
+}
+add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
+add_action( 'save_post_wp_template_part', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
 
 /**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
@@ -105,6 +172,9 @@ add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_wp_unique_post_
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;
@@ -122,35 +192,10 @@ function gutenberg_fix_template_admin_menu_entry() {
 }
 add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
 
-/**
- * Filters the 'wp_template' post type columns in the admin list table.
- *
- * @param array $columns Columns to display.
- * @return array Filtered $columns.
- */
-function gutenberg_filter_template_list_table_columns( array $columns ) {
-	$columns['slug'] = __( 'Slug', 'gutenberg' );
-	if ( isset( $columns['date'] ) ) {
-		unset( $columns['date'] );
-	}
-	return $columns;
-}
-add_filter( 'manage_wp_template_posts_columns', 'gutenberg_filter_template_list_table_columns' );
-
-/**
- * Renders column content for the 'wp_template' post type list table.
- *
- * @param string $column_name Column name to render.
- * @param int    $post_id     Post ID.
- */
-function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
-	if ( 'slug' !== $column_name ) {
-		return;
-	}
-	$post = get_post( $post_id );
-	echo esc_html( $post->post_name );
-}
-add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
+// Customize the `wp_template` admin list.
+add_filter( 'manage_wp_template_posts_columns', 'gutenberg_templates_lists_custom_columns' );
+add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
+add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Filter for adding a `resolved` parameter to `wp_template` queries.
@@ -179,7 +224,7 @@ apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_co
 function filter_rest_wp_template_query( $args, $request ) {
 	if ( $request['resolved'] ) {
 		$template_ids   = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
-		$template_types = $request['slug'] ? $request['slug'] : get_template_types();
+		$template_types = $request['slug'] ? $request['slug'] : gutenberg_get_template_type_slugs();
 
 		foreach ( $template_types as $template_type ) {
 			// Skip 'embed' for now because it is not a regular template type.
@@ -187,9 +232,9 @@ function filter_rest_wp_template_query( $args, $request ) {
 				continue;
 			}
 
-			$current_template = gutenberg_find_template_post_and_parts( $template_type );
-			if ( isset( $current_template ) ) {
-				$template_ids[] = $current_template['template_post']->ID;
+			$current_template = gutenberg_resolve_template( $template_type );
+			if ( $current_template ) {
+				$template_ids[] = $current_template->ID;
 			}
 		}
 		$args['post__in']    = $template_ids;
@@ -199,3 +244,42 @@ function filter_rest_wp_template_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
+
+/**
+ * Filters the post data for a response.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @return WP_REST_Response
+ */
+function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
+	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
+		$response->data['wp_theme_slug'] = false;
+
+		// Get the wp_theme terms.
+		$wp_themes = wp_get_post_terms( $response->data['id'], 'wp_theme' );
+
+		// If a theme is assigned, add it to the REST response.
+		if ( $wp_themes && is_array( $wp_themes ) ) {
+			$wp_theme_slugs = array_column( $wp_themes, 'slug' );
+
+			$file_based                   = in_array( '_wp_file_based', $wp_theme_slugs, true );
+			$response->data['file_based'] = $file_based;
+
+			$theme_slug = array_values(
+				array_filter(
+					$wp_theme_slugs,
+					function( $slug ) {
+						return '_wp_file_based' !== $slug;
+					}
+				)
+			);
+			if ( $theme_slug ) {
+				$response->data['wp_theme_slug'] = $theme_slug[0];
+			}
+		}
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );

@@ -45,7 +45,7 @@
 		}
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		.is-focusing-regions & {
+		[role="region"]:focus & {
 			transform: translateX(0%);
 		}
 	}
@@ -85,8 +85,6 @@
 	justify-content: center;
 
 	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within &,
-	.interface-interface-skeleton__actions:focus &,
 	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
 		bottom: 0;
@@ -95,17 +93,6 @@
 
 .edit-post-layout .interface-interface-skeleton__content {
 	background-color: $gray-400;
-}
-
-// Ideally  we don't need all these nested divs.
-// Removing these requires a refactoring of the different a11y HoCs.
-.edit-post-layout__inserter-panel-popover-wrapper {
-	&,
-	& > div,
-	& > div > div,
-	& > div > div > div {
-		height: 100%;
-	}
 }
 
 .edit-post-layout__inserter-panel {

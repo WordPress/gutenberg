@@ -13,6 +13,9 @@
 		"html": false,
 		"inserter": false,
 		"customClassName": false,
+		"reusable": false,
 		"__experimentalToolbar": false
-	}
+	},
+	"editorStyle": "wp-block-widget-area-editor",
+	"style": "wp-block-widget-area"
 }

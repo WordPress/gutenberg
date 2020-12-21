@@ -88,7 +88,9 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 
 	// Reset the state when currentTime changed.
 	useEffect( () => {
-		setDate( moment( currentTime ).startOf( 'minutes' ) );
+		setDate(
+			currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+		);
 	}, [ currentTime ] );
 
 	const { day, month, year, minutes, hours, am } = useMemo(

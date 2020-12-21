@@ -2,10 +2,17 @@
 
 ## Unreleased
 
+## 5.2.0 (2020-12-17)
+
+### New Feature
+
+-   Added a store definition `store` for the block editor namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
+
+## 5.0.0 (2020-10-06)
+
 ### Breaking Changes
 
-- The block editor does not contain default colors, gradients, and font sizes anymore. If one wants to take advantage of these features, please explicitly pass colors, gradients, and/or settings or use the new __experimentalFeatures setting that is available.
-
+-   The block editor does not contain default colors, gradients, and font sizes anymore. If one wants to take advantage of these features, please explicitly pass colors, gradients, and/or settings or use the new \_\_experimentalFeatures setting that is available.
 
 ## 4.0.0 (2020-05-28)
 

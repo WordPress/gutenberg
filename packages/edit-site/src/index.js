@@ -4,7 +4,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -55,16 +54,17 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 export function initialize( id, settings ) {
 	findTemplate.siteUrl = settings.siteUrl;
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	registerEditSiteStore( { settings } );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( true );
 	}
 
 	render( <Editor />, document.getElementById( id ) );
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalNavigationToggle } from './components/header/navigation-toggle';
+export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
+export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

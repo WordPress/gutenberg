@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
 	AlignmentToolbar,
@@ -19,25 +19,18 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
 
 function getComputedStyle( node, pseudo ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node, pseudo );
 }
 
-const querySelector = window.document.querySelector.bind( document );
-
 const name = 'core/paragraph';
-const PARAGRAPH_DROP_CAP_SELECTOR = 'p.has-drop-cap';
 
 function ParagraphRTLToolbar( { direction, setDirection } ) {
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
-
 	return (
-		isRTL && (
+		isRTL() && (
 			<ToolbarGroup
 				controls={ [
 					{
@@ -56,38 +49,21 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	);
 }
 
-function useDropCap( isDropCap, fontSize, styleFontSize ) {
-	const isDisabled = ! useEditorFeature( 'typography.dropCap' );
+function useDropCapMinHeight( ref, isDisabled, dependencies ) {
+	const [ minHeight, setMinHeight ] = useState();
 
-	const [ minimumHeight, setMinimumHeight ] = useState();
-
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
-
-	const fontSizeObject = getFontSize( fontSizes, fontSize, styleFontSize );
 	useEffect( () => {
 		if ( isDisabled ) {
+			setMinHeight();
 			return;
 		}
 
-		const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
-		if ( isDropCap && element ) {
-			setMinimumHeight(
-				getComputedStyle( element, 'first-letter' ).lineHeight
-			);
-		} else if ( minimumHeight ) {
-			setMinimumHeight( undefined );
-		}
-	}, [
-		isDisabled,
-		isDropCap,
-		minimumHeight,
-		setMinimumHeight,
-		fontSizeObject.size,
-	] );
+		setMinHeight(
+			getComputedStyle( ref.current, 'first-letter' ).lineHeight
+		);
+	}, [ isDisabled, ...dependencies ] );
 
-	return [ ! isDisabled, minimumHeight ];
+	return minHeight;
 }
 
 function ParagraphBlock( {
@@ -106,23 +82,25 @@ function ParagraphBlock( {
 		fontSize,
 		style,
 	} = attributes;
-	const [ isDropCapEnabled, dropCapMinimumHeight ] = useDropCap(
-		dropCap,
-		fontSize,
-		style?.fontSize
+	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
+	const ref = useRef();
+	const inlineFontSize = style?.fontSize;
+	const size = useSelect(
+		( select ) => {
+			const { fontSizes } = select( 'core/block-editor' ).getSettings();
+			return getFontSize( fontSizes, fontSize, inlineFontSize ).size;
+		},
+		[ fontSize, inlineFontSize ]
 	);
-
-	const styles = {
-		direction,
-		minHeight: dropCapMinimumHeight,
-	};
-
+	const hasDropCap = isDropCapFeatureEnabled && dropCap;
+	const minHeight = useDropCapMinHeight( ref, ! hasDropCap, [ size ] );
 	const blockProps = useBlockProps( {
+		ref,
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
-		style: styles,
+		style: { direction, minHeight },
 	} );
 
 	return (
@@ -141,8 +119,8 @@ function ParagraphBlock( {
 					}
 				/>
 			</BlockControls>
-			<InspectorControls>
-				{ isDropCapEnabled && (
+			{ isDropCapFeatureEnabled && (
+				<InspectorControls>
 					<PanelBody title={ __( 'Text settings' ) }>
 						<ToggleControl
 							label={ __( 'Drop cap' ) }
@@ -159,8 +137,8 @@ function ParagraphBlock( {
 							}
 						/>
 					</PanelBody>
-				) }
-			</InspectorControls>
+				</InspectorControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName="p"

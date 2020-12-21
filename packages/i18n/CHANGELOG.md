@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.17.0 (2020-12-17)
+
+### Enhancements
+
+- Improve type declarations for translation functions ([#26171](https://github.com/WordPress/gutenberg/pull/26171))
+
 ## 3.12.0 (2020-04-30)
 
 ### Bug Fix

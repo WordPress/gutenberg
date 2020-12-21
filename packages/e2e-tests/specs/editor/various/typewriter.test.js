@@ -152,23 +152,26 @@ describe( 'TypeWriter', () => {
 
 		let count = 0;
 
-		// Create blocks until the the typewriter effect kicks in.
+		// Create blocks until the the typewriter effect kicks in, create at
+		// least 10 blocks to properly test the .
 		while (
-			await page.evaluate(
+			( await page.evaluate(
 				() =>
 					wp.dom.getScrollContainer( document.activeElement )
 						.scrollTop === 0
-			)
+			) ) ||
+			count < 10
 		) {
 			await page.keyboard.press( 'Enter' );
 			count++;
 		}
 
 		// Scroll the active element to the very bottom of the scroll container,
-		// then scroll 20px down, so the caret is partially hidden.
+		// then scroll up, so the caret is partially hidden.
 		await page.evaluate( () => {
 			document.activeElement.scrollIntoView( false );
-			wp.dom.getScrollContainer( document.activeElement ).scrollTop -= 20;
+			wp.dom.getScrollContainer( document.activeElement ).scrollTop -=
+				document.activeElement.offsetHeight + 10;
 		} );
 
 		const bottomPostition = await getCaretPosition();
@@ -194,10 +197,11 @@ describe( 'TypeWriter', () => {
 		}
 
 		// Scroll the active element to the very top of the scroll container,
-		// then scroll 10px down, so the caret is partially hidden.
+		// then scroll down, so the caret is partially hidden.
 		await page.evaluate( () => {
 			document.activeElement.scrollIntoView();
-			wp.dom.getScrollContainer( document.activeElement ).scrollTop += 20;
+			wp.dom.getScrollContainer( document.activeElement ).scrollTop +=
+				document.activeElement.offsetHeight + 10;
 		} );
 
 		const topPostition = await getCaretPosition();

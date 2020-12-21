@@ -81,6 +81,26 @@ async function emulateSelectAll() {
 	} );
 }
 
+/**
+ * Sets the clipboard data that can be pasted with
+ * `pressKeyWithModifier( 'primary', 'v' )`.
+ *
+ * @param {Object} $1           Options.
+ * @param {string} $1.plainText Plain text to set.
+ * @param {string} $1.html      HTML to set.
+ */
+export async function setClipboardData( { plainText = '', html = '' } ) {
+	await page.evaluate(
+		( _plainText, _html ) => {
+			window._clipboardData = new DataTransfer();
+			window._clipboardData.setData( 'text/plain', _plainText );
+			window._clipboardData.setData( 'text/html', _html );
+		},
+		plainText,
+		html
+	);
+}
+
 async function emulateClipboard( type ) {
 	await page.evaluate( ( _type ) => {
 		if ( _type !== 'paste' ) {

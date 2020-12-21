@@ -1,5 +1,6 @@
 export {
 	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,

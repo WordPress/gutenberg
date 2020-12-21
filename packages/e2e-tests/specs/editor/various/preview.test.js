@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,30 +10,10 @@ import {
 	deactivatePlugin,
 	publishPost,
 	saveDraft,
+	openPreviewPage,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
-
-async function openPreviewPage( editorPage ) {
-	let openTabs = await browser.pages();
-	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.block-editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
-	await editorPage.click( '.edit-post-header-preview__button-external' );
-
-	// Wait for the new tab to open.
-	while ( openTabs.length < expectedTabsCount ) {
-		await editorPage.waitFor( 1 );
-		openTabs = await browser.pages();
-	}
-
-	const previewPage = last( openTabs );
-	// Wait for the preview to load. We can't do interstitial detection here,
-	// because it might load too quickly for us to pick up, so we wait for
-	// the preview to load by waiting for the title to appear.
-	await previewPage.waitForSelector( '.entry-title' );
-	return previewPage;
-}
 
 /**
  * Given the Page instance for the editor, opens preview drodpdown, and
@@ -79,8 +54,8 @@ async function waitForPreviewNavigation( previewPage ) {
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
 	const checkboxXPath =
-		'//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom fields")]';
-	await clickOnMoreMenuItem( 'Options' );
+		'//*[contains(@class, "edit-post-preferences-modal")]//label[contains(text(), "Custom fields")]';
+	await clickOnMoreMenuItem( 'Preferences' );
 	await page.waitForXPath( checkboxXPath );
 	const [ checkboxHandle ] = await page.$x( checkboxXPath );
 
@@ -102,7 +77,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 		return;
 	}
 
-	await clickOnCloseModalButton( '.edit-post-options-modal' );
+	await clickOnCloseModalButton( '.edit-post-preferences-modal' );
 }
 
 describe( 'Preview', () => {
@@ -123,6 +98,7 @@ describe( 'Preview', () => {
 		await editorPage.type( '.editor-post-title__input', 'Hello World' );
 
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
@@ -222,6 +198,7 @@ describe( 'Preview', () => {
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
 
 		// Title in preview should match input.
 		let previewTitle = await previewPage.$eval(
@@ -268,6 +245,8 @@ describe( 'Preview with Custom Fields enabled', () => {
 	it( 'displays edits to the post title and content in the preview', async () => {
 		const editorPage = page;
 
+		// Make sure input is mounted in editor before adding content.
+		await editorPage.waitForSelector( '.editor-post-title__input' );
 		// Add an initial title and content.
 		await editorPage.type( '.editor-post-title__input', 'title 1' );
 		await editorPage.keyboard.press( 'Tab' );
@@ -280,6 +259,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
 
 		// Check the title and preview match.
 		let previewTitle = await previewPage.$eval(

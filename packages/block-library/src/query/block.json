@@ -12,20 +12,35 @@
 				"perPage": null,
 				"pages": 1,
 				"offset": 0,
+				"postType": "post",
 				"categoryIds": [],
 				"tagIds": [],
 				"order": "desc",
 				"orderBy": "date",
 				"author": "",
-				"search": ""
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true
+			}
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "list"
 			}
 		}
 	},
 	"providesContext": {
 		"queryId": "queryId",
-		"query": "query"
+		"query": "query",
+		"layout": "layout"
 	},
+	"usesContext": [
+		"postId"
+	],
 	"supports": {
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-query-editor"
 }

@@ -6,13 +6,16 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getBlockContentSchema, isPlain } from '../utils';
+import { getBlockContentSchemaFromTransforms, isPlain } from '../utils';
+import { store as mockStore } from '../../../store';
+import { STORE_NAME as mockStoreName } from '../../../store/constants';
 
 jest.mock( '@wordpress/data', () => {
 	return {
 		select: jest.fn( ( store ) => {
 			switch ( store ) {
-				case 'core/blocks': {
+				case [ mockStoreName ]:
+				case mockStore: {
 					return {
 						hasBlockSupport: ( blockName, supports ) => {
 							return (
@@ -24,6 +27,18 @@ jest.mock( '@wordpress/data', () => {
 				}
 			}
 		} ),
+		combineReducers: () => {
+			const mock = jest.fn();
+			return mock;
+		},
+		createReduxStore: () => {
+			const mock = jest.fn();
+			return mock;
+		},
+		register: () => {
+			const mock = jest.fn();
+			return mock;
+		},
 	};
 } );
 
@@ -72,7 +87,9 @@ describe( 'getBlockContentSchema', () => {
 				isMatch: undefined,
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 
 	it( 'should handle multiple raw transforms', () => {
@@ -112,7 +129,9 @@ describe( 'getBlockContentSchema', () => {
 				isMatch: preformattedIsMatch,
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 
 	it( 'should correctly merge the children', () => {
@@ -150,7 +169,9 @@ describe( 'getBlockContentSchema', () => {
 				},
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 
 	it( 'should correctly merge the attributes', () => {
@@ -182,6 +203,8 @@ describe( 'getBlockContentSchema', () => {
 				attributes: [ 'data-chicken', 'data-ribs' ],
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 } );

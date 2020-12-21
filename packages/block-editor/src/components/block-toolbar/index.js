@@ -22,17 +22,14 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import { useShowMoversGestures } from './utils';
-import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
-export default function BlockToolbar( {
-	hideDragHandle,
-	__experimentalExpandedControl = false,
-} ) {
+export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
 		blockClientId,
 		blockType,
 		hasFixedToolbar,
+		hasReducedUI,
 		isValid,
 		isVisual,
 	} = useSelect( ( select ) => {
@@ -47,6 +44,7 @@ export default function BlockToolbar( {
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
+		const settings = getSettings();
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -54,7 +52,8 @@ export default function BlockToolbar( {
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
-			hasFixedToolbar: getSettings().hasFixedToolbar,
+			hasFixedToolbar: settings.hasFixedToolbar,
+			hasReducedUI: settings.hasReducedUI,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -72,6 +71,9 @@ export default function BlockToolbar( {
 		{
 			ref: nodeRef,
 			onChange( isFocused ) {
+				if ( isFocused && hasReducedUI ) {
+					return;
+				}
 				toggleBlockHighlight( blockClientId, isFocused );
 			},
 		}
@@ -100,12 +102,8 @@ export default function BlockToolbar( {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
-	const Wrapper = __experimentalExpandedControl
-		? ExpandedBlockControlsContainer
-		: 'div';
-
 	return (
-		<Wrapper className={ classes }>
+		<div className={ classes }>
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
@@ -117,7 +115,7 @@ export default function BlockToolbar( {
 						<BlockSwitcher clientIds={ blockClientIds } />
 						<BlockMover
 							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle }
+							hideDragHandle={ hideDragHandle || hasReducedUI }
 						/>
 					</ToolbarGroup>
 				) }
@@ -135,6 +133,6 @@ export default function BlockToolbar( {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</Wrapper>
+		</div>
 	);
 }

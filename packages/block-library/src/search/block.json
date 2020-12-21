@@ -7,7 +7,7 @@
 			"type": "string"
 		},
 		"showLabel": {
-			"type": "bool",
+			"type": "boolean",
 			"default": true
 		},
 		"placeholder": {
@@ -28,12 +28,14 @@
 			"default": "button-outside"
 		},
 		"buttonUseIcon": {
-			"type": "bool",
+			"type": "boolean",
 			"default": false
 		}
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-search-editor",
+	"style": "wp-block-search"
 }

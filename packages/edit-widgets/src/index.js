@@ -5,10 +5,10 @@ import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
-import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
+	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 
@@ -19,7 +19,7 @@ import './store';
 import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
-import EditWidgetsInitializer from './components/edit-widgets-initializer';
+import Layout from './components/layout';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -28,14 +28,18 @@ import EditWidgetsInitializer from './components/edit-widgets-initializer';
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	registerCoreBlocks();
+	const coreBlocks = __experimentalGetCoreBlocks().filter(
+		( block ) => ! [ 'core/more' ].includes( block.name )
+	);
+	registerCoreBlocks( coreBlocks );
+
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
-		registerBlock( widgetArea );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
+	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
 	render(
-		<EditWidgetsInitializer settings={ settings } />,
+		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);
 }

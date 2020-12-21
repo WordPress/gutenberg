@@ -12,6 +12,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -20,8 +21,13 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { CSS_UNITS } from '../columns/utils';
+
 function ColumnEdit( {
-	attributes: { verticalAlignment, width },
+	attributes: { verticalAlignment, width, templateLock = false },
 	setAttributes,
 	clientId,
 } ) {
@@ -54,9 +60,16 @@ function ColumnEdit( {
 		} );
 	};
 
+	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: width ? { flexBasis: width } : undefined,
+		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock,
+		renderAppender: hasChildBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	return (
@@ -79,24 +92,11 @@ function ColumnEdit( {
 								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
-						units={ [
-							{ value: '%', label: '%', default: '' },
-							{ value: 'px', label: 'px', default: '' },
-							{ value: 'em', label: 'em', default: '' },
-							{ value: 'rem', label: 'rem', default: '' },
-							{ value: 'vw', label: 'vw', default: '' },
-						] }
+						units={ CSS_UNITS }
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InnerBlocks
-				templateLock={ false }
-				renderAppender={
-					hasChildBlocks ? undefined : InnerBlocks.ButtonBlockAppender
-				}
-				__experimentalTagName="div"
-				__experimentalPassedProps={ blockProps }
-			/>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
