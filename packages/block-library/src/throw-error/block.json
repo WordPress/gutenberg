@@ -1,0 +1,17 @@
+{
+	"apiVersion": 2,
+	"name": "core/throw-error",
+	"category": "widgets",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "html"
+		}
+	},
+	"supports": {
+		"customClassName": false,
+		"className": false,
+		"html": false
+	},
+	"editorStyle": "wp-block-html-editor"
+}

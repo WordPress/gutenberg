@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	DropZoneProvider,
 	Popover,
 	SlotFillProvider,
@@ -10,6 +11,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -47,6 +49,7 @@ export default function Layout( { blockEditorSettings } ) {
 					<BlockEditorKeyboardShortcuts.Register />
 					<NavigationEditorShortcuts.Register />
 
+					<ThrowAnError />
 					<Notices />
 
 					<div className="edit-navigation-layout">
@@ -71,6 +74,7 @@ export default function Layout( { blockEditorSettings } ) {
 								isPending={ ! navigationPost }
 								navigationPost={ navigationPost }
 							/>
+
 							<Editor
 								isPending={ ! navigationPost }
 								blocks={ blocks }
@@ -88,3 +92,20 @@ export default function Layout( { blockEditorSettings } ) {
 		</ErrorBoundary>
 	);
 }
+
+const ThrowAnError = () => {
+	const [ err, setError ] = useState( false );
+	return (
+		<>
+			<p>
+				<Button isDestructive onClick={ () => setError( true ) }>
+					Trigger a render error!
+				</Button>
+			</p>
+			{ err &&
+				( () => {
+					throw new Error( 'Error in navigation render!' );
+				} )() }
+		</>
+	);
+};

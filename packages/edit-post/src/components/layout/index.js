@@ -176,8 +176,14 @@ function Layout( { settings } ) {
 		onClose: () => setIsInserterOpened( false ),
 	} );
 
+	const [ err, setError ] = useState( false );
+
 	return (
 		<>
+			{ err &&
+				( () => {
+					throw new Error( 'Error in editor render!' );
+				} )() }
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
@@ -250,6 +256,18 @@ function Layout( { settings } ) {
 				}
 				content={
 					<>
+						{ err &&
+							( () => {
+								throw new Error( 'Error in editor render!' );
+							} )() }
+						<p>
+							<Button
+								isDestructive
+								onClick={ () => setError( true ) }
+							>
+								Trigger a render error!
+							</Button>
+						</p>
 						<EditorNotices />
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
