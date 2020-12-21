@@ -172,7 +172,7 @@ function Editor( {
 						>
 							<ErrorBoundary
 								onError={ onError }
-								errorActionName="editPost.editorError"
+								errorActionName="editPost.error"
 							>
 								<EditorInitialization postId={ postId } />
 								<Layout settings={ settings } />

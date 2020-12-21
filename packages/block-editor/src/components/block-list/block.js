@@ -262,7 +262,7 @@ function BlockListBlock( {
 		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary
 				onError={ onBlockError }
-				errorActionName="blockList.blockError"
+				errorActionName="blockList.error"
 			>
 				{ block }
 			</BlockCrashBoundary>
