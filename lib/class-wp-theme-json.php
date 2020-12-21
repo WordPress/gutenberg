@@ -135,8 +135,8 @@ class WP_Theme_JSON {
 				'dropCap'               => null,
 				'fontFamilies'          => null,
 				'fontSizes'             => null,
-				'customFontStyle'      => null,
-				'customFontWeight'     => null,
+				'customFontStyle'       => null,
+				'customFontWeight'      => null,
 				'customTextDecorations' => null,
 				'customTextTransforms'  => null,
 			),
@@ -511,7 +511,7 @@ class WP_Theme_JSON {
 		// by testing its value with "background" as the property name.
 		if ( $should_escape ) {
 			$subtree = $input[ $key ];
-			foreach( $subtree as $property => $value ) {
+			foreach ( $subtree as $property => $value ) {
 				$name = 'background-color';
 				if ( 'gradient' === $property ) {
 					$name = 'background';
