@@ -14,8 +14,6 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		transition: transform 0.2s;
-		@include reduce-motion(transition);
 
 		// See comment above about min-width
 		min-width: 0;
@@ -24,17 +22,13 @@
 			display: inline-flex;
 
 			.components-button {
-				width: 24px;
-				height: 24px;
-				min-width: 24px;
+				min-width: 0;
 				padding: 0;
 			}
 		}
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
-		display: flex;
-		justify-content: center;
 		margin: 0;
 
 		// See comment above about min-width
@@ -45,30 +39,68 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		max-width: 100px;
+
+		@include break-medium() {
+			max-width: 75px;
+		}
+
+		@include break-xlarge() {
+			max-width: 160px;
+		}
 	}
 
 	.edit-site-document-actions__secondary-item {
-		opacity: 0;
-		transform: translateY(0);
-		transition: transform 0.2s;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		text-align: center;
-		color: $gray-700;
+		max-width: 100px;
+		width: 0;
+		transform: translateX(8px);
+		opacity: 0;
+		transition: all ease 0.2s;
 		@include reduce-motion(transition);
+
+		@include break-medium() {
+			max-width: 75px;
+		}
+
+		@include break-xlarge() {
+			max-width: 160px;
+		}
+
+		&::before {
+			content: "/" /*rtl:"\"*/;
+			color: $gray-700;
+			padding: 0 $grid-unit-05;
+		}
+	}
+
+	.edit-site-document-actions__title-prefix {
+		color: $gray-700;
+		margin-right: $grid-unit-05;
+		text-transform: capitalize;
 	}
 
 	&.has-secondary-label {
-		transform: translateY(10px);
+		.edit-site-document-actions__secondary-item {
+			width: auto;
+			opacity: 1;
+			transform: translateX(0);
 
-		.edit-site-document-actions__title-wrapper {
-			transform: translateY(-10px);
+			&::before {
+				color: $gray-700;
+			}
 		}
 
-		.edit-site-document-actions__secondary-item {
-			opacity: 1;
-			transform: translateY(-12px);
+		.edit-site-document-actions__title-prefix {
+			@include break-medium() {
+				display: none;
+			}
+
+			@include break-xlarge() {
+				display: block;
+			}
 		}
 	}
 }
