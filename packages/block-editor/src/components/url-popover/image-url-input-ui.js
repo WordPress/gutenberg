@@ -142,6 +142,8 @@ const ImageURLInputUI = ( {
 	const onSubmitLinkChange = useCallback( () => {
 		return ( event ) => {
 			if ( urlInput ) {
+				// It is possible the entered URL actually matches a named link destination.
+				// This check will ensure our link destination is correct.
 				const selectedDestination =
 					getLinkDestinations().find(
 						( destination ) => destination.url === urlInput
