@@ -7,12 +7,12 @@ import { useToolbarState, Toolbar } from 'reakit/Toolbar';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import ToolbarContext from '../toolbar-context';
-import { getRTL } from '../utils/rtl';
 
 function ToolbarContainer( { label, ...props }, ref ) {
 	// https://reakit.io/docs/basic-concepts/#state-hooks
@@ -21,7 +21,7 @@ function ToolbarContainer( { label, ...props }, ref ) {
 	const toolbarState = useToolbarState( {
 		loop: true,
 		baseId: props.id,
-		rtl: getRTL(),
+		rtl: isRTL(),
 	} );
 
 	return (
