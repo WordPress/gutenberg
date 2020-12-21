@@ -25,12 +25,12 @@ import { SidebarInspectorFill } from '../sidebar';
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page } = useSelect(
 		( select ) => {
-			const { getSettings, getTemplateType, getPage } = select(
+			const { getSettings, getEditedPostType, getPage } = select(
 				'core/edit-site'
 			);
 			return {
 				settings: getSettings( setIsInserterOpen ),
-				templateType: getTemplateType(),
+				templateType: getEditedPostType(),
 				page: getPage(),
 			};
 		},
