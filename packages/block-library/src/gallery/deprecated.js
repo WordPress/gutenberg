@@ -174,7 +174,8 @@ const v1 = {
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
+				...( image.id &&
+					image.id !== null && { id: parseInt( image.id ) } ),
 				url: image.url,
 				alt: image.alt,
 				caption: image.caption,
@@ -457,7 +458,8 @@ const v3 = {
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
+				...( image.id &&
+					image.id !== null && { id: parseInt( image.id ) } ),
 				url: image.url,
 				alt: image.alt,
 				caption: image.caption,
@@ -553,7 +555,8 @@ const v4 = {
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
+				...( image.id &&
+					image.id !== null && { id: parseInt( image.id ) } ),
 				url: image.url,
 				alt: image.alt,
 				caption: image.caption,
@@ -744,7 +747,8 @@ const v5 = {
 		}
 		const imageBlocks = attributes.images.map( ( image ) => {
 			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
+				...( image.id &&
+					image.id !== null && { id: parseInt( image.id ) } ),
 				url: image.url,
 				alt: image.alt,
 				caption: image.caption,
@@ -1005,7 +1009,8 @@ const v6 = {
 		}
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
+				...( image.id &&
+					image.id !== null && { id: parseInt( image.id ) } ),
 				url: image.url,
 				alt: image.alt,
 				caption: image.caption,
