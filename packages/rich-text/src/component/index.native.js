@@ -43,6 +43,7 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
+import { store as richTextStore } from '../store';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -955,7 +956,7 @@ export default compose( [
 			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
 
 		return {
-			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			formatTypes: select( richTextStore ).getFormatTypes(),
 			isMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			...{ parentBlockStyles },

@@ -6,7 +6,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
@@ -40,7 +40,6 @@ export function AlignmentToolbar( props ) {
 		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
 		label = __( 'Change text alignment' ),
 		isCollapsed = true,
-		isRTL,
 	} = props;
 
 	function applyOrUnset( align ) {
@@ -54,7 +53,7 @@ export function AlignmentToolbar( props ) {
 
 	function setIcon() {
 		if ( activeAlignment ) return activeAlignment.icon;
-		return isRTL ? alignRight : alignLeft;
+		return isRTL() ? alignRight : alignLeft;
 	}
 
 	return (

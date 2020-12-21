@@ -2,9 +2,13 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import { store as richTextStore } from '../store';
 
 function formatTypesSelector( select ) {
-	return select( 'core/rich-text' ).getFormatTypes();
+	return select( richTextStore ).getFormatTypes();
 }
 
 /**
