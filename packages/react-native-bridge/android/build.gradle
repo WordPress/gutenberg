@@ -143,7 +143,24 @@ repositories {
 }
 
 dependencies {
-    implementation project(':@wordpress_react-native-aztec')
+    // Embedding Aztec seems to break the build from source when running from
+    // the WordPress Android project. That shouldn't be the case. While we
+    // investigate, embed only when making a binary build.
+    //
+    // Note that this also means that we cannot run an `assemble` task for
+    // WordPress Android while building from source, because that would result
+    // in an unsupported "direct local AAR file dependency". That shouldn't be
+    // a blocker becuase CI runs `assemble` tasks and should always do so
+    // without building dependencies from source, for performance and
+    // correctness reasons (as building from source should only be used while
+    // developing changes, right?)
+    if (rootProject.ext.buildGutenbergFromSource) {
+        implementation project(':@wordpress_react-native-aztec')
+    } else {
+        // embed is a method from the fat-aar plugin that will the Aztec project
+        // dependency into the generated AAR
+        embed project(':@wordpress_react-native-aztec')
+    }
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
