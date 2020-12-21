@@ -364,3 +364,64 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         delete nodeModulesFolders
     }
 }
+
+// Allows to override the artifact version by passing a -PbintrayVersion
+// parameter when calling Gradle
+def getBintrayVersion() {
+  return project.properties['bintrayVersion'] ?: android.defaultConfig.versionName
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : System.getenv('BINTRAY_KEY')
+    publications = ['GutenbergMobilePublication']
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'react-native-gutenberg-bridge'
+        licenses = ['GPL-2.0']
+        // FIXME: Once this works properly poit to 'wordpress-mobile'
+        userOrg = 'mokagio'
+        // FIXME: Once this works properly poit to the original gutenberg (or gutenberg-mobile) repo. See also: https://github.com/oguzkocer/gutenberg/commit/0ca71b1abe3ea22b77abb3f390534e66e39161d5#diff-320e7dacc9e9a83ac8128d299319f82cf6dfa2609e0ebbc043d13de33ea92773R350-R353
+        vcsUrl = 'https://github.com/wordpress-mobile/gutenberg-mobile.git'
+        version {
+            name = getBintrayVersion()
+            released  = new Date()
+        }
+    }
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            GutenbergMobilePublication(MavenPublication) {
+                artifact bundleReleaseAar
+
+                groupId 'com.github.wordpress-mobile.gutenberg-mobile'
+                artifactId 'react-native-gutenberg-bridge'
+                version getBintrayVersion()
+
+                addDependenciesToPom(pom)
+            }
+        }
+    }
+}
+
+// This is a workaround for adding the dependencies of the library. It's brought from the
+// plugin's README file: https://github.com/bintray/gradle-bintray-plugin/blob/1.8.5/README.md
+def addDependenciesToPom(pom) {
+    pom.withXml {
+        def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
+
+        // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
+        configurations.implementation.allDependencies.each {
+            // Ensure dependencies such as fileTree are not included.
+            if (it.name != 'unspecified') {
+                def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+            }
+        }
+    }
+}
