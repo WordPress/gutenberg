@@ -104,7 +104,7 @@ describe( 'actions', () => {
 				type: 'FIND_TEMPLATE',
 				path: page.path,
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( { id: templateId } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
 				templateId,
@@ -134,7 +134,7 @@ describe( 'actions', () => {
 				type: 'FIND_TEMPLATE',
 				path: page.path,
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( { id: templateId } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
 				templateId,
@@ -173,7 +173,7 @@ describe( 'actions', () => {
 				type: 'FIND_TEMPLATE',
 				path: page.path,
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( { id: templateId } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
 				templateId,

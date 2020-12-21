@@ -9,12 +9,18 @@ import { addQueryArgs } from '@wordpress/url';
 const { fetch } = window;
 
 /**
+ * @typedef {Object} TemplateInfo
+ * @property {number} id The template's id.
+ * @property {string} slug The template's slug.
+ */
+
+/**
  * Find the template for a given page path.
  *
  * @param {string}   path The page path.
  * @param {Function} getEntityRecords The promise-returning `getEntityRecords` selector to use.
  *
- * @return {number} The found template ID.
+ * @return {TemplateInfo} The found template information.
  */
 export default async function findTemplate( path, getEntityRecords ) {
 	const { data } = await fetch(
@@ -23,17 +29,17 @@ export default async function findTemplate( path, getEntityRecords ) {
 		} )
 	).then( ( res ) => res.json() );
 
-	let newTemplateId = data.ID;
+	const { ID: newTemplateId, post_name: slug } = data;
+	const templateInfo = { id: newTemplateId, slug };
 	if ( newTemplateId === null ) {
-		newTemplateId = (
-			await getEntityRecords( 'postType', 'wp_template', {
-				resolved: true,
-				slug: data.post_name,
-			} )
-		 )[ 0 ].id;
+		const [ newTemplate ] = await getEntityRecords(
+			'postType',
+			'wp_template',
+			{ resolved: true, slug }
+		);
+		templateInfo.id = newTemplate.id;
 	}
-
-	return newTemplateId;
+	return templateInfo;
 }
 
 findTemplate.siteUrl = '';

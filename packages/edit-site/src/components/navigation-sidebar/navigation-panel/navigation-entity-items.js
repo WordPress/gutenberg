@@ -21,9 +21,14 @@ export default function NavigationEntityItems( { kind, name, query = {} } ) {
 	}
 
 	const onActivateItem = ( { type, slug, link, id, taxonomy } ) => {
-		const context = taxonomy
-			? { taxonomy, termId: id }
-			: { postType: type, postId: id };
+		let context = { postType: type, postId: id };
+		if ( taxonomy ) {
+			context = { taxonomy, termId: id };
+			if ( taxonomy === 'category' ) {
+				context.queryContext = { categoryIds: [ id ] };
+			}
+		}
+
 		setPage( {
 			type,
 			slug,

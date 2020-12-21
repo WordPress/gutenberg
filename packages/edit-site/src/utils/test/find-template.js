@@ -18,7 +18,7 @@ describe( 'findTemplate()', () => {
 		const mockFetch = createMockFetch( { data: { ID: 1 } } );
 		expect(
 			await require( '../find-template' ).default( '/path?query=true' )
-		).toBe( 1 );
+		).toEqual( { id: 1, slug: undefined } );
 		expect( mockFetch ).toHaveBeenCalledWith(
 			'/path?query=true&_wp-find-template=true'
 		);
@@ -36,7 +36,7 @@ describe( 'findTemplate()', () => {
 				'/path?query=true',
 				getEntityRecords
 			)
-		).toBe( 2 );
+		).toEqual( { id: 2, slug: 'post-name' } );
 		expect( getEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'wp_template',

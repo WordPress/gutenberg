@@ -6,6 +6,7 @@
 		"queryId",
 		"query",
 		"queryContext",
+		"templateContext",
 		"layout"
 	],
 	"supports": {

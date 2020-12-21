@@ -22,7 +22,11 @@ export default function URLQueryController() {
 		if ( [ 'page', 'post' ].includes( postType ) ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
 		} else if ( taxonomy && termId ) {
-			setPage( { context: { taxonomy, termId } } );
+			const context = { taxonomy, termId };
+			if ( taxonomy === 'category' ) {
+				context.queryContext = { categoryIds: [ termId ] };
+			}
+			setPage( { context } );
 		} else if ( 'wp_template' === postType ) {
 			setTemplate( postId );
 		} else if ( 'wp_template_part' === postType ) {

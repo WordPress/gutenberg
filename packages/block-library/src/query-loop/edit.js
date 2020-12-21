@@ -43,16 +43,17 @@ export default function QueryLoopEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryContext,
+		queryContext = [ {} ],
+		templateContext,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
-	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
+	const [ { page } ] = useQueryContext() || queryContext;
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEntityRecords } = select( 'core' );
+			const { getEntityRecords } = select( 'core' );
 			const { getBlocks } = select( 'core/block-editor' );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
@@ -80,34 +81,20 @@ export default function QueryLoopEdit( {
 				query.sticky = sticky === 'only';
 			}
 
-			// When you insert this block outside of the edit site then store
-			// does not exist therefore we check for its existence.
-			// TODO: remove this code, edit-site shouldn't be called in block-library.
-			// This creates a cycle dependency.
-			if ( inherit && select( 'core/edit-site' ) ) {
-				// This should be passed from the context exposed by edit site.
-
-				const { getEditedPostType, getEditedPostId, getPage } = select(
-					'core/edit-site'
-				);
-
-				if ( 'wp_template' === getEditedPostType() ) {
-					const { slug } = getEntityRecord(
-						'postType',
-						'wp_template',
-						getEditedPostId()
-					);
-
-					// Change the post-type if needed.
-					if ( slug?.startsWith( 'archive-' ) ) {
-						query.postType = slug.replace( 'archive-', '' );
-						postType = query.postType;
-					}
+			// If `inherit` is truthy search for queryContext information provided
+			// to match preview better.
+			if ( inherit ) {
+				const [ inheritedContext = {} ] = queryContext;
+				if ( inheritedContext.categoryIds?.length ) {
+					query.categories = inheritedContext.categoryIds;
 				}
-				const { context: { taxonomy, termId } = {} } = getPage() || {};
-				// Handle categories previews.
-				if ( taxonomy === 'category' && termId ) {
-					query.categories = [ termId ];
+				// Change the post-type if needed.
+				if ( templateContext?.slug?.startsWith( 'archive-' ) ) {
+					query.postType = templateContext.slug.replace(
+						'archive-',
+						''
+					);
+					postType = query.postType;
 				}
 			}
 
@@ -131,6 +118,8 @@ export default function QueryLoopEdit( {
 			exclude,
 			sticky,
 			inherit,
+			queryContext[ 0 ].categoryIds,
+			templateContext?.slug,
 		]
 	);
 

@@ -36,7 +36,7 @@ export default function NavigateToLink( {
 				pageEntity.link,
 				registry.__experimentalResolveSelect( 'core' ).getEntityRecords
 			).then(
-				( newTemplateId ) => setTemplateId( newTemplateId ),
+				( { id: newTemplateId } ) => setTemplateId( newTemplateId ),
 				() => setTemplateId( null )
 			);
 	}, [ pageEntity?.link, registry ] );

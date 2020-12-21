@@ -115,7 +115,8 @@ export function setHomeTemplateId( homeTemplateId ) {
 
 /**
  * Resolves the template for a page and displays both. If no path is given, attempts
- * to use the postId to generate a path like `?p=${ postId }`.
+ * to use the postId to generate a path like `?p=${ postId }` or the `category` for
+ * a path like `?cat=${ termId }.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -134,10 +135,23 @@ export function* setPage( page ) {
 			page.path = `?cat=${ termId }`;
 		}
 	}
-	const templateId = yield findTemplate( page.path );
+	const { id: templateId, slug: templateSlug } = yield findTemplate(
+		page.path
+	);
 	yield {
 		type: 'SET_PAGE',
-		page,
+		page: ! templateSlug
+			? page
+			: {
+					...page,
+					context: {
+						...page.context,
+						templateContext: {
+							...page.context?.templateContext,
+							slug: templateSlug,
+						},
+					},
+			  },
 		templateId,
 	};
 	return templateId;
