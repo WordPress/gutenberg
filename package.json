@@ -19,7 +19,8 @@
 		"npm": ">=6.9.0"
 	},
 	"config": {
-		"GUTENBERG_PHASE": 2
+		"GUTENBERG_PHASE": 2,
+		"COMPONENT_SYSTEM_PHASE": 0
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",

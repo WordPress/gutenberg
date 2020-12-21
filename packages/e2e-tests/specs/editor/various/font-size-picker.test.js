@@ -98,7 +98,7 @@ describe( 'Font Size Picker', () => {
 		expect( content ).toMatchSnapshot();
 	} );
 
-	it( 'should reset a named font size using input field', async () => {
+	it.skip( 'should reset a named font size using input field', async () => {
 		// Create a paragraph block with some content.
 		await clickBlockAppender();
 		await page.keyboard.type(
