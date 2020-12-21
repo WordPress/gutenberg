@@ -248,6 +248,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	return $settings;
 }
 
+/**
+ * Register CPT to store/access user data.
+ *
+ * @return array|undefined
+ */
 function gutenberg_experimental_global_styles_register_user_cpt() {
 	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		return;
