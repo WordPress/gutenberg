@@ -3,7 +3,7 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { getQueryArg, addQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { getQueryArgs, addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 export default function URLQueryController() {
 	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
@@ -13,16 +13,16 @@ export default function URLQueryController() {
 	// Set correct entity on load.
 	useEffect( () => {
 		const url = window.location.href;
-		const postId = getQueryArg( url, 'postId' );
-
-		if ( ! postId ) {
+		const { postId, postType, termId, taxonomy } = getQueryArgs( url );
+		if ( ! ( postId || termId ) ) {
 			showHomepage();
 			return;
 		}
 
-		const postType = getQueryArg( url, 'postType' );
-		if ( 'page' === postType || 'post' === postType ) {
+		if ( [ 'page', 'post' ].includes( postType ) ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
+		} else if ( taxonomy && termId ) {
+			setPage( { context: { taxonomy, termId } } );
 		} else if ( 'wp_template' === postType ) {
 			setTemplate( postId );
 		} else if ( 'wp_template_part' === postType ) {
@@ -35,9 +35,16 @@ export default function URLQueryController() {
 	// Update page URL when context changes.
 	const pageContext = useCurrentPageContext();
 	useEffect( () => {
+		const cleanUrl = removeQueryArgs(
+			window.location.href,
+			'postType',
+			'postId',
+			'taxonomy',
+			'termId'
+		);
 		const newUrl = pageContext
-			? addQueryArgs( window.location.href, pageContext )
-			: removeQueryArgs( window.location.href, 'postType', 'postId' );
+			? addQueryArgs( cleanUrl, pageContext )
+			: cleanUrl;
 
 		window.history.replaceState( {}, '', newUrl );
 	}, [ pageContext ] );
@@ -51,21 +58,24 @@ function useCurrentPageContext() {
 			'core/edit-site'
 		);
 
-		const page = getPage();
+		const { context: { postId, postType, taxonomy, termId } = {} } =
+			getPage() || {};
+		if ( taxonomy && termId ) {
+			return { taxonomy, termId };
+		}
 		let _postId = getEditedPostId(),
 			_postType = getEditedPostType();
 		// This doesn't seem right to me,
 		// we shouldn't be using the "page" and the "template" in the same way.
 		// This need to be investigated.
-		if ( page?.context?.postId && page?.context?.postType ) {
-			_postId = page.context.postId;
-			_postType = page.context.postType;
+		if ( postId && postType ) {
+			_postId = postId;
+			_postType = postType;
 		}
-
-		if ( _postId && _postType ) {
-			return { postId: _postId, postType: _postType };
-		}
-
-		return null;
+		if ( ! ( _postId && _postType ) ) return null;
+		return {
+			postId: _postId,
+			postType: _postType,
+		};
 	} );
 }

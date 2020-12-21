@@ -126,8 +126,13 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
-	if ( ! page.path && page.context?.postId ) {
-		page.path = `?p=${ page.context.postId }`;
+	if ( ! page.path ) {
+		const { context: { postId, termId, taxonomy } = {} } = page;
+		if ( postId ) {
+			page.path = `?p=${ postId }`;
+		} else if ( termId && taxonomy === 'category' ) {
+			page.path = `?cat=${ termId }`;
+		}
 	}
 	const templateId = yield findTemplate( page.path );
 	yield {

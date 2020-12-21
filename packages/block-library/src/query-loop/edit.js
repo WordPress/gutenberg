@@ -52,7 +52,7 @@ export default function QueryLoopEdit( {
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( 'core' );
+			const { getEntityRecord, getEntityRecords } = select( 'core' );
 			const { getBlocks } = select( 'core/block-editor' );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
@@ -86,12 +86,13 @@ export default function QueryLoopEdit( {
 			// This creates a cycle dependency.
 			if ( inherit && select( 'core/edit-site' ) ) {
 				// This should be passed from the context exposed by edit site.
-				const { getEditedPostType, getEditedPostId } = select(
+
+				const { getEditedPostType, getEditedPostId, getPage } = select(
 					'core/edit-site'
 				);
 
 				if ( 'wp_template' === getEditedPostType() ) {
-					const { slug } = select( 'core' ).getEntityRecord(
+					const { slug } = getEntityRecord(
 						'postType',
 						'wp_template',
 						getEditedPostId()
@@ -102,6 +103,11 @@ export default function QueryLoopEdit( {
 						query.postType = slug.replace( 'archive-', '' );
 						postType = query.postType;
 					}
+				}
+				const { context: { taxonomy, termId } = {} } = getPage() || {};
+				// Handle categories previews.
+				if ( taxonomy === 'category' && termId ) {
+					query.categories = [ termId ];
 				}
 			}
 

@@ -20,15 +20,15 @@ export default function NavigationEntityItems( { kind, name, query = {} } ) {
 		return null;
 	}
 
-	const onActivateItem = ( { type, slug, link, id } ) => {
+	const onActivateItem = ( { type, slug, link, id, taxonomy } ) => {
+		const context = taxonomy
+			? { taxonomy, termId: id }
+			: { postType: type, postId: id };
 		setPage( {
 			type,
 			slug,
 			path: getPathAndQueryString( link ),
-			context: {
-				postType: type,
-				postId: id,
-			},
+			context,
 		} );
 	};
 
