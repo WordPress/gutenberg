@@ -107,42 +107,76 @@ function InsertionPointPopover( {
 	containerRef,
 	showInsertionPoint,
 } ) {
-	const element = useSelect(
+	const { element, orientation } = useSelect(
 		( select ) => {
-			const { getBlockOrder } = select( 'core/block-editor' );
+			const {
+				getBlockOrder,
+				getBlockRootClientId,
+				getBlockListSettings,
+			} = select( 'core/block-editor' );
 			const { ownerDocument } = containerRef.current;
 			const targetClientId =
 				clientId || last( getBlockOrder( rootClientId ) );
 
-			return getBlockDOMNode( targetClientId, ownerDocument );
+			return {
+				element: getBlockDOMNode( targetClientId, ownerDocument ),
+				orientation:
+					getBlockListSettings( getBlockRootClientId( clientId ) )
+						?.orientation || 'vertical',
+			};
 		},
 		[ clientId, rootClientId ]
 	);
 
-	const position = clientId ? 'top' : 'bottom';
-	const className = classnames( 'block-editor-block-list__insertion-point', {
-		'is-insert-after': ! clientId,
-	} );
+	const className = classnames(
+		'block-editor-block-list__insertion-point',
+		'is-' + orientation,
+		{
+			'is-insert-after': ! clientId,
+		}
+	);
 
 	return (
 		<Popover
 			noArrow
 			animate={ false }
-			anchorRef={ element }
-			position={ `${ position } right left` }
+			getAnchorRect={ useCallback( () => {
+				const rect = element.getBoundingClientRect();
+				if ( orientation === 'vertical' ) {
+					return {
+						top: clientId ? rect.top : rect.bottom,
+						left: rect.left,
+						right: rect.right,
+						bottom: clientId ? rect.top : rect.bottom,
+					};
+				}
+				return {
+					top: rect.top,
+					left: clientId ? rect.left : rect.right,
+					right: clientId ? rect.left : rect.right,
+					bottom: rect.top,
+				};
+			}, [ element ] ) }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
-			__unstableForcePosition={ true }
 		>
 			<div
 				className={ className }
-				style={ { width: element?.offsetWidth } }
+				style={
+					orientation === 'vertical'
+						? { width: element?.offsetWidth }
+						: { height: element?.offsetHeight }
+				}
 			>
 				{ ( showInsertionPoint ||
 					isInserterShown ||
 					isInserterForced ) && (
-					<div className="block-editor-block-list__insertion-point-indicator" />
+					<div
+						className={
+							'block-editor-block-list__insertion-point-indicator'
+						}
+					/>
 				) }
 				{ ( isInserterShown || isInserterForced ) && (
 					<InsertionPointInserter
@@ -156,7 +190,7 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( ref ) {
+export default function useInsertionPoint( ref ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
@@ -165,18 +199,21 @@ export default function InsertionPoint( ref ) {
 		isInserterVisible,
 		selectedClientId,
 		selectedRootClientId,
+		getBlockListSettings,
 	} = useSelect( ( select ) => {
 		const {
 			isMultiSelecting: _isMultiSelecting,
 			isBlockInsertionPointVisible,
 			getBlockInsertionPoint,
 			getBlockOrder,
+			getBlockListSettings: _getBlockListSettings,
 		} = select( 'core/block-editor' );
 
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
 		return {
+			getBlockListSettings: _getBlockListSettings,
 			isMultiSelecting: _isMultiSelecting(),
 			isInserterVisible: isBlockInsertionPointVisible(),
 			selectedClientId: order[ insertionPoint.index ],
@@ -186,6 +223,7 @@ export default function InsertionPoint( ref ) {
 
 	const onMouseMove = useCallback(
 		( event ) => {
+			event.stopPropagation();
 			if (
 				! event.target.classList.contains(
 					'block-editor-block-list__layout'
@@ -197,11 +235,20 @@ export default function InsertionPoint( ref ) {
 				return;
 			}
 
+			const rootClientId = event.target.getAttribute( 'data-block' );
+			const orientation =
+				getBlockListSettings( rootClientId )?.orientation || 'vertical';
 			const rect = event.target.getBoundingClientRect();
-			const offset = event.clientY - rect.top;
+			const offsetTop = event.clientY - rect.top;
+			const offsetLeft = event.clientX - rect.left;
 			let element = Array.from( event.target.children ).find(
 				( blockEl ) => {
-					return blockEl.offsetTop > offset;
+					return (
+						( orientation === 'vertical' &&
+							blockEl.offsetTop > offsetTop ) ||
+						( orientation === 'horizontal' &&
+							blockEl.offsetLeft > offsetLeft )
+					);
 				}
 			);
 
@@ -228,8 +275,12 @@ export default function InsertionPoint( ref ) {
 			const elementRect = element.getBoundingClientRect();
 
 			if (
-				event.clientX > elementRect.right ||
-				event.clientX < elementRect.left
+				( orientation === 'horizontal' &&
+					( event.clientY > elementRect.bottom ||
+						event.clientY < elementRect.top ) ) ||
+				( orientation === 'vertical' &&
+					( event.clientX > elementRect.right ||
+						event.clientX < elementRect.left ) )
 			) {
 				if ( isInserterShown ) {
 					setIsInserterShown( false );
