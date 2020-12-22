@@ -1,11 +1,10 @@
+const originalURL = global.URL;
 describe( 'core URL.prototype.search', () => {
-	const originalURL = global.URL;
-
-	beforeEach( () => {
+	beforeAll( () => {
 		global.URL = require( 'react-native/Libraries/Blob/URL' ).URL;
 	} );
 
-	afterEach( () => {
+	afterAll( () => {
 		global.URL = originalURL;
 	} );
 
@@ -15,14 +14,12 @@ describe( 'core URL.prototype.search', () => {
 	} );
 } );
 describe( 'globals URL.prototype.search', () => {
-	const originalURL = global.URL;
-
-	beforeEach( () => {
+	beforeAll( () => {
 		global.URL = require( 'react-native/Libraries/Blob/URL' ).URL;
 		require( '../url-patches' );
 	} );
 
-	afterEach( () => {
+	afterAll( () => {
 		global.URL = originalURL;
 	} );
 
