@@ -19,7 +19,7 @@ describe( 'globals URL.prototype.search', () => {
 
 	beforeEach( () => {
 		global.URL = require( 'react-native/Libraries/Blob/URL' ).URL;
-		require( '../globals' );
+		require( '../url-patches' );
 	} );
 
 	afterEach( () => {
