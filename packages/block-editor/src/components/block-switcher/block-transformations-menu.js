@@ -18,7 +18,7 @@ const BlockTransformationsMenu = ( {
 	return (
 		<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 			{ possibleBlockTransformations.map( ( item ) => {
-				const { name, icon, title } = item;
+				const { name, icon, title, isDisabled } = item;
 				return (
 					<MenuItem
 						key={ name }
@@ -27,6 +27,7 @@ const BlockTransformationsMenu = ( {
 							event.preventDefault();
 							onSelect( name );
 						} }
+						disabled={ isDisabled }
 					>
 						<BlockIcon icon={ icon } showColors />
 						{ title }

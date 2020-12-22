@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [***] Full-width and wide alignment support for Columns
+
 ## 1.43.0
 * [***] New Block: File [#27228]
 * [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
