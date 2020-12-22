@@ -71,7 +71,7 @@ const BlockInspector = ( {
 			<BlockVariationTransforms blockClientId={ selectedBlockClientId } />
 			{ hasBlockStyles && (
 				<div>
-					<PanelBody title={ __( 'Styles' ) }>
+					<PanelBody title={ __( 'Styles' ) } initialOpen={ false }>
 						<BlockStyles clientId={ selectedBlockClientId } />
 						{ hasBlockSupport(
 							blockType.name,
