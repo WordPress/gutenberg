@@ -339,6 +339,7 @@ class WP_Theme_JSON {
 			// Process settings subtree.
 			$this->process_key( 'settings', $context, self::SCHEMA );
 			if ( isset( $context['settings'] ) ) {
+				$this->process_key( 'border', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
