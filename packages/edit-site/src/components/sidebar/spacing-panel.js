@@ -44,10 +44,10 @@ export default function SpacingPanel( {
 	const paddingValues = getStyle( name, 'padding' );
 	const setPaddingValues = ( { top, right, bottom, left } ) => {
 		setStyle( name, 'padding', {
-			top: top || paddingValues.top,
-			right: right || paddingValues.right,
-			bottom: bottom || paddingValues.bottom,
-			left: left || paddingValues.left,
+			top: top || paddingValues?.top,
+			right: right || paddingValues?.right,
+			bottom: bottom || paddingValues?.bottom,
+			left: left || paddingValues?.left,
 		} );
 	};
 	return (
