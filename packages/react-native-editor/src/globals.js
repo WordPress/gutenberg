@@ -71,7 +71,7 @@ Object.defineProperties( global.URL.prototype, {
 				.split( '?' )
 				.slice( 1 )
 				.join( '?' );
-			return `?${ queryParameters }`;
+			return queryParameters ? `?${ queryParameters }` : '';
 		},
 	},
 } );
