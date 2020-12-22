@@ -245,7 +245,7 @@ class EditorPage {
 			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
-		const height = size.height - 5;
+		const height = size.height - 50;
 
 		while ( ! ( await blockButton.isDisplayed() ) ) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
