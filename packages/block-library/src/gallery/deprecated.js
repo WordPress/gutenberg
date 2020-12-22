@@ -80,6 +80,26 @@ export function getHrefAndDestination( image, destination ) {
 	return {};
 }
 
+/**
+ * Gets an Image block from gallery image data
+ *
+ * Used to migrate Galleries to nested Image InnerBlocks.
+ *
+ * @param  {Object} image    Image properties.
+ * @param  {string} sizeSlug Gallery sizeSlug attribute.
+ * @param  {string} linkTo   Gallery linkTo attribute.
+ * @return {Object}          Image block.
+ */
+export function getImageBlock( image, sizeSlug, linkTo ) {
+	return createBlock( 'core/image', {
+		...( image.id && { id: parseInt( image.id ) } ),
+		url: image.url,
+		alt: image.alt,
+		caption: image.caption,
+		sizeSlug,
+		...getHrefAndDestination( image, linkTo ),
+	} );
+}
 const v1 = {
 	attributes: {
 		images: {
@@ -173,14 +193,7 @@ const v1 = {
 	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
-			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
-				url: image.url,
-				alt: image.alt,
-				caption: image.caption,
-				sizeSlug,
-				...getHrefAndDestination( image, linkTo ),
-			} );
+			return getImageBlock( image, sizeSlug, linkTo );
 		} );
 		return [
 			{
@@ -456,14 +469,7 @@ const v3 = {
 	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
-			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
-				url: image.url,
-				alt: image.alt,
-				caption: image.caption,
-				sizeSlug,
-				...getHrefAndDestination( image, linkTo ),
-			} );
+			return getImageBlock( image, sizeSlug, linkTo );
 		} );
 
 		return [
@@ -552,14 +558,7 @@ const v4 = {
 	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
-			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
-				url: image.url,
-				alt: image.alt,
-				caption: image.caption,
-				sizeSlug,
-				...getHrefAndDestination( image, linkTo ),
-			} );
+			return getImageBlock( image, sizeSlug, linkTo );
 		} );
 
 		return [
@@ -743,14 +742,7 @@ const v5 = {
 			linkTo = 'none';
 		}
 		const imageBlocks = attributes.images.map( ( image ) => {
-			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
-				url: image.url,
-				alt: image.alt,
-				caption: image.caption,
-				sizeSlug: attributes.sizeSlug,
-				...getHrefAndDestination( image, linkTo ),
-			} );
+			return getImageBlock( image, attributes.sizeSlug, linkTo );
 		} );
 		return [
 			{
@@ -1004,14 +996,7 @@ const v6 = {
 			linkTo = 'media';
 		}
 		const imageBlocks = images.map( ( image ) => {
-			return createBlock( 'core/image', {
-				id: parseInt( image.id ),
-				url: image.url,
-				alt: image.alt,
-				caption: image.caption,
-				sizeSlug,
-				...getHrefAndDestination( image, linkTo ),
-			} );
+			return getImageBlock( image, sizeSlug, linkTo );
 		} );
 		return [
 			{
