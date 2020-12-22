@@ -1,15 +1,29 @@
 describe( 'core URL.prototype.search', () => {
+	const originalURL = global.URL;
+
 	beforeEach( () => {
-		URL = global.URL = require( 'react-native/Libraries/Blob/URL' ).URL;
+		global.URL = require( 'react-native/Libraries/Blob/URL' ).URL;
 	} );
+
+	afterEach( () => {
+		global.URL = originalURL;
+	} );
+
 	it( 'throws not implemented error', () => {
 		const url = new URL( '/', 'http://example.com' );
 		expect( () => url.search ).toThrow( 'not implemented' );
 	} );
 } );
 describe( 'globals URL.prototype.search', () => {
+	const originalURL = global.URL;
+
 	beforeEach( () => {
+		global.URL = require( 'react-native/Libraries/Blob/URL' ).URL;
 		require( '../globals' );
+	} );
+
+	afterEach( () => {
+		global.URL = originalURL;
 	} );
 
 	it( 'works without parameters', () => {
