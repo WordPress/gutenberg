@@ -1,38 +1,17 @@
 /**
  * Internal dependencies
  */
-import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-	isAndroid,
-} from './helpers/utils';
+import { isAndroid } from './helpers/utils';
 
 jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor Block Mover tests', () => {
-	let driver;
-	let editorPage;
-	let allPassed = true;
 	const paragraphBlockName = 'Paragraph';
 	const headerBlockName = 'Heading';
 	const cancelButtonName = 'Cancel';
 	const buttonIosType = 'Button';
 	const moveTopButtonName = 'Move to top';
 	const moveBottomButtonName = 'Move to bottom';
-
-	// Use reporter for setting status for saucelabs Job
-	if ( ! isLocalEnvironment() ) {
-		const reporter = {
-			specDone: async ( result ) => {
-				allPassed = allPassed && result.status !== 'failed';
-			},
-		};
-
-		// eslint-disable-next-line jest/no-jasmine-globals
-		jasmine.getEnv().addReporter( reporter );
-	}
 
 	async function setupBlocks( text = 'p1' ) {
 		await editorPage.addNewBlock( paragraphBlockName );
@@ -62,11 +41,6 @@ describe( 'Gutenberg Editor Block Mover tests', () => {
 			await ePage.selectElement( cancelButtonName, buttonIosType );
 		}
 	}
-
-	beforeAll( async () => {
-		driver = await setupDriver();
-		editorPage = new EditorPage( driver );
-	} );
 
 	it( 'should be able to see visual editor', async () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
@@ -187,12 +161,5 @@ describe( 'Gutenberg Editor Block Mover tests', () => {
 		expect( moveDownAction ).toBe( undefined );
 
 		await removeBlocks( [ paragraphBlockName, headerBlockName ] );
-	} );
-
-	afterAll( async () => {
-		if ( ! isLocalEnvironment() ) {
-			driver.sauceJobStatus( allPassed );
-		}
-		await stopDriver( driver );
 	} );
 } );
