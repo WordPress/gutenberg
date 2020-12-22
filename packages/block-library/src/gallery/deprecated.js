@@ -92,7 +92,7 @@ export function getHrefAndDestination( image, destination ) {
  */
 export function getImageBlock( image, sizeSlug, linkTo ) {
 	return createBlock( 'core/image', {
-		...( image.id && image.id !== null && { id: parseInt( image.id ) } ),
+		...( image.id && { id: parseInt( image.id ) } ),
 		url: image.url,
 		alt: image.alt,
 		caption: image.caption,
