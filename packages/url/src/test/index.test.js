@@ -876,6 +876,42 @@ describe( 'filterURLForDisplay', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org/something' );
 		expect( url ).toBe( 'wordpress.org/something' );
 	} );
+	it( 'should truncate image URLs in the middle', () => {
+		const url = filterURLForDisplay( 'https://www.example.com/hello.jpg' );
+		expect( url ).toBe( 'example...hello.jpg' );
+	} );
+	it( 'should truncate image URLs hosted on localhost', () => {
+		const url = filterURLForDisplay(
+			'http://localhost:8888/wp-content/uploads/2020/03/hello.jpg'
+		);
+		expect( url ).toBe( 'localhost...hello.jpg' );
+	} );
+	it( 'should truncate complex image URLs', () => {
+		const url = filterURLForDisplay(
+			'https://gallery.google.co.uk:80/hello.jpg'
+		);
+		expect( url ).toBe( 'gallery...hello.jpg' );
+	} );
+	it( 'should truncate image URLs from CDN', () => {
+		const url = filterURLForDisplay(
+			'https://i1.wp.com/example.com/wp-content/uploads/2020/03/prague.jpg'
+		);
+		expect( url ).toBe( 'i1...prague.jpg' );
+	} );
+	it( 'should truncate query from image URL', () => {
+		const url = filterURLForDisplay(
+			'https://www.example.com/prague.jpg?w=1200&ssl=1'
+		);
+		expect( url ).toBe( 'example...prague.jpg' );
+	} );
+	it( 'should not truncate images URLs with no extension', () => {
+		const url = filterURLForDisplay(
+			'https://images.unsplash.com/photo-123-auto=format&fit=crop&w=1650&q=80'
+		);
+		expect( url ).toBe(
+			'images.unsplash.com/photo-123-auto=format&fit=crop&w=1650&q=80'
+		);
+	} );
 } );
 
 describe( 'cleanForSlug', () => {
