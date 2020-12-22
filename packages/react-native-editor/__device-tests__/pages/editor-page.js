@@ -245,6 +245,8 @@ class EditorPage {
 			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
+		// The virtual home button covers the bottom 34 in portrait and 21 on landscape on iOS.
+		// We start dragging a bit above it to not trigger home button.
 		const height = size.height - 50;
 
 		while ( ! ( await blockButton.isDisplayed() ) ) {
