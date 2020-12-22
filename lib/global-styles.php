@@ -206,9 +206,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_is_fse_theme()
 	) {
 		// Only lookup for the user data if we need it.
-		$origin  = 'user';
+		$origin = 'user';
 	}
-	$tree     = $resolver->get_origin( $theme_support_data, $origin );
+	$tree = $resolver->get_origin( $theme_support_data, $origin );
 
 	// STEP 1: ADD FEATURES
 	//
@@ -233,9 +233,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
 		$base_styles = $resolver->get_origin( $theme_support_data, 'theme' )->get_raw_data();
+
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
-	} else if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	} elseif ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		// STEP 3 - ADD STYLES IF THEME HAS SUPPORT
 		//
 		// If we are in a block editor context, but not in edit-site,
