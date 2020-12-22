@@ -66,11 +66,12 @@ global.nativeLoggingHook = nativeLoggingHook;
 Object.defineProperties( global.URL.prototype, {
 	search: {
 		get() {
-			return this._url
+			const queryParameters = this._url
 				.split( '#' )[ 0 ]
 				.split( '?' )
 				.slice( 1 )
 				.join( '?' );
+			return `?${ queryParameters }`;
 		},
 	},
 } );
