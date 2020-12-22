@@ -15,6 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { reducer as locksReducer } from './locks';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -567,4 +568,5 @@ export default combineReducers( {
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	locks: locksReducer,
 } );

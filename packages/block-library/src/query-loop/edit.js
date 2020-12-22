@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
@@ -6,9 +11,9 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
-	InnerBlocks,
 	BlockPreview,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -35,8 +40,11 @@ export default function QueryLoopEdit( {
 			author,
 			search,
 			exclude,
+			sticky,
+			inherit,
 		} = {},
 		queryContext,
+		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
@@ -65,6 +73,38 @@ export default function QueryLoopEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			// If sticky is not set, it will return all posts in the results.
+			// If sticky is set to `only`, it will limit the results to sticky posts only.
+			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
+			if ( sticky ) {
+				query.sticky = sticky === 'only';
+			}
+
+			// When you insert this block outside of the edit site then store
+			// does not exist therefore we check for its existence.
+			// TODO: remove this code, edit-site shouldn't be called in block-library.
+			// This creates a cycle dependency.
+			if ( inherit && select( 'core/edit-site' ) ) {
+				// This should be passed from the context exposed by edit site.
+				const { getEditedPostType, getEditedPostId } = select(
+					'core/edit-site'
+				);
+
+				if ( 'wp_template' === getEditedPostType() ) {
+					const { slug } = select( 'core' ).getEntityRecord(
+						'postType',
+						'wp_template',
+						getEditedPostId()
+					);
+
+					// Change the post-type if needed.
+					if ( slug?.startsWith( 'archive-' ) ) {
+						query.postType = slug.replace( 'archive-', '' );
+						postType = query.postType;
+					}
+				}
+			}
+
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),
@@ -83,6 +123,8 @@ export default function QueryLoopEdit( {
 			search,
 			postType,
 			exclude,
+			sticky,
+			inherit,
 		]
 	);
 
@@ -94,7 +136,14 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const blockProps = useBlockProps();
+	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'is-flex-container': hasLayoutFlex,
+			[ `columns-${ columns }` ]: hasLayoutFlex,
+		} ),
+	} );
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
 		return <p { ...blockProps }>{ __( 'Loading…' ) }</p>;
@@ -105,7 +154,7 @@ export default function QueryLoopEdit( {
 	}
 
 	return (
-		<div { ...blockProps }>
+		<ul { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider
@@ -114,21 +163,20 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<InnerBlocks
-								template={ TEMPLATE }
-								templateInsertUpdatesSelection={ false }
-							/>
+							<li { ...innerBlocksProps } />
 						) : (
-							<BlockPreview
-								blocks={ blocks }
-								__experimentalLive
-								__experimentalOnClick={ () =>
-									setActiveBlockContext( blockContext )
-								}
-							/>
+							<li>
+								<BlockPreview
+									blocks={ blocks }
+									__experimentalLive
+									__experimentalOnClick={ () =>
+										setActiveBlockContext( blockContext )
+									}
+								/>
+							</li>
 						) }
 					</BlockContextProvider>
 				) ) }
-		</div>
+		</ul>
 	);
 }

@@ -134,37 +134,44 @@
 				"dropCap": true,
 				"customFontSize": true,
 				"customLineHeight": false,
+				"customFontStyle": true,
+				"customFontWeight": true,
+				"customTextTransforms": true,
+				"customTextDecorations": true,
 				"fontSizes": [
 					{
 						"name": "Small",
 						"slug": "small",
-						"size": 13
+						"size": "13px"
 					},
 					{
 						"name": "Normal",
 						"slug": "normal",
-						"size": 16
+						"size": "16px"
 					},
 					{
 						"name": "Medium",
 						"slug": "medium",
-						"size": 20
+						"size": "20px"
 					},
 					{
 						"name": "Large",
 						"slug": "large",
-						"size": 36
+						"size": "36px"
 					},
 					{
 						"name": "Huge",
 						"slug": "huge",
-						"size": 42
+						"size": "42px"
 					}
 				]
 			},
 			"spacing": {
 				"customPadding": false,
 				"units": [ "px", "em", "rem", "vh", "vw" ]
+			},
+			"border": {
+				"customRadius": true
 			}
 		}
 	}

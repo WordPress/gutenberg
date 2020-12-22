@@ -7,16 +7,14 @@ import {
 	publishPost,
 	visitAdminPage,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -33,17 +31,6 @@ describe( 'Multi-entity save flow', () => {
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
-		// Expand to view savable entities if necessary.
-		const reviewChangesButton = await page.$(
-			'.entities-saved-states__review-changes-button'
-		);
-		const [ needsToOpen ] = await reviewChangesButton.$x(
-			'//*[contains(text(),"Review changes.")]'
-		);
-		if ( needsToOpen ) {
-			await reviewChangesButton.click();
-		}
-
 		const checkedBoxes = await page.$$( checkedBoxSelector );
 		const checkboxInputs = await page.$$( checkboxInputSelector );
 		expect( checkedBoxes.length - checkboxInputs.length ).toBe( 0 );
@@ -57,14 +44,14 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
-
 	beforeAll( async () => {
+		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+	} );
+
+	afterAll( async () => {
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -88,12 +75,14 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).not.toBeNull();
 		};
 		const assertMultiSaveDisabled = async () => {
-			const multiSaveButton = await page.$( multiSaveSelector );
+			const multiSaveButton = await page.waitForSelector(
+				multiSaveSelector,
+				{ hidden: true }
+			);
 			expect( multiSaveButton ).toBeNull();
 		};
 
 		it( 'Save flow should work as expected.', async () => {
-			expect.assertions( 27 );
 			await createNewPost();
 			// Edit the page some.
 			await page.click( '.editor-post-title' );
@@ -195,7 +184,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Save flow should work as expected', async () => {
-			expect.assertions( 5 );
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
 				page: 'gutenberg-edit-site',
@@ -206,7 +194,7 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.

@@ -12,6 +12,7 @@ import { Warning } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import InstallButton from './install-button';
+import { store as blockDirectoryStore } from '../../store';
 
 const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 	const { originalName, originalUndelimitedContent } = props.attributes;
@@ -19,7 +20,7 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { block, hasPermission } = useSelect(
 		( select ) => {
-			const { getDownloadableBlocks } = select( 'core/block-directory' );
+			const { getDownloadableBlocks } = select( blockDirectoryStore );
 			const blocks = getDownloadableBlocks(
 				'block:' + originalName
 			).filter( ( { name } ) => originalName === name );

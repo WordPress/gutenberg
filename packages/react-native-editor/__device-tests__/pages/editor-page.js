@@ -1,16 +1,23 @@
 /**
  * Internal dependencies
  */
-import {
+const {
+	setupDriver,
+	stopDriver,
 	isAndroid,
 	swipeUp,
 	swipeDown,
 	typeString,
 	toggleHtmlMode,
 	swipeFromTo,
-} from '../helpers/utils';
+} = require( '../helpers/utils' );
 
-export default class EditorPage {
+const initializeEditorPage = async () => {
+	const driver = await setupDriver();
+	return new EditorPage( driver );
+};
+
+class EditorPage {
 	driver;
 	accessibilityIdKey;
 	accessibilityIdXPathAttrib;
@@ -130,16 +137,16 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	// Converts to lower case and checks for a match to lowercased html content
+	// Returns html content
 	// Ensure to take additional steps to handle text being changed by auto correct
-	async verifyHtmlContent( html ) {
+	async getHtmlContent() {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 		const text = await htmlContentView.text();
-		expect( text.toLowerCase() ).toBe( html.toLowerCase() );
 
 		await toggleHtmlMode( this.driver, false );
+		return text;
 	}
 
 	// set html editor content explicitly
@@ -165,6 +172,20 @@ export default class EditorPage {
 			'//XCUIElementTypeButton[@name="Hide keyboard"]'
 		);
 		await hideKeyboardToolbarButton.click();
+	}
+
+	async dismissAndroidClipboardSmartSuggestion() {
+		if ( ! isAndroid() ) {
+			return;
+		}
+
+		const dismissClipboardSmartSuggestionLocator = `//*[@${ this.accessibilityIdXPathAttrib }="Dismiss Smart Suggestion"]`;
+		const smartSuggestions = await this.driver.elementsByXPath(
+			dismissClipboardSmartSuggestionLocator
+		);
+		if ( smartSuggestions.length !== 0 ) {
+			smartSuggestions[ 0 ].click();
+		}
 	}
 
 	// =========================
@@ -224,7 +245,9 @@ export default class EditorPage {
 			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
-		const height = size.height - 5;
+		// The virtual home button covers the bottom 34 in portrait and 21 on landscape on iOS.
+		// We start dragging a bit above it to not trigger home button.
+		const height = size.height - 50;
 
 		while ( ! ( await blockButton.isDisplayed() ) ) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
@@ -522,4 +545,30 @@ export default class EditorPage {
 		this.driver.setImplicitWaitTimeout( 5000 );
 		return element;
 	}
+
+	async stopDriver() {
+		await stopDriver( this.driver );
+	}
+
+	async sauceJobStatus( allPassed ) {
+		await this.driver.sauceJobStatus( allPassed );
+	}
 }
+
+const blockNames = {
+	paragraph: 'Paragraph',
+	gallery: 'Gallery',
+	columns: 'Columns',
+	cover: 'Cover',
+	heading: 'Heading',
+	image: 'Image',
+	latestPosts: 'Latest Posts',
+	list: 'List',
+	more: 'More',
+	separator: 'Separator',
+	spacer: 'Spacer',
+	verse: 'Verse',
+	file: 'File',
+};
+
+module.exports = { initializeEditorPage, blockNames };

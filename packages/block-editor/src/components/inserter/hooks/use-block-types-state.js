@@ -4,6 +4,7 @@
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
@@ -18,7 +19,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 	const { categories, collections, items } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( 'core/block-editor' );
-			const { getCategories, getCollections } = select( 'core/blocks' );
+			const { getCategories, getCollections } = select( blocksStore );
 
 			return {
 				categories: getCategories(),

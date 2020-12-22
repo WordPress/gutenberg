@@ -11,6 +11,27 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [***] Full-width and wide alignment support for Columns
+
+## 1.43.0 (2020-12-17)
+
+* [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
+* [**] Button block - Add link picker to the block settings [#26206]
+* [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
+* [*] Fix theme colors syncing with the editor [#26821]
+* [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
+
+## 1.41.0
+
+* [***] Faster editor start and overall operation on Android [#26732]
+* [*] [Android] Enable multiple upload support for Image block
+
+## 1.40.0
+
+## 1.39.1
+
+* [*] Heading block - Disable full-width/wide alignment [#26308]
+
 ## 1.39.0
 
 * [***] Full-width and wide alignment support for Video, Latest-posts, Gallery, Media & text, and Pullquote block

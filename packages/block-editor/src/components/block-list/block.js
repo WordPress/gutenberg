@@ -44,7 +44,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { useBlockProps } from './block-wrapper';
+import { useBlockProps } from './use-block-props';
 
 export const BlockListBlockContext = createContext();
 
@@ -84,7 +84,6 @@ function BlockListBlock( {
 	mode,
 	isLocked,
 	clientId,
-	rootClientId,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -111,7 +110,7 @@ function BlockListBlock( {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted, isFocusMode } = useSelect(
+	const { isDragging, isHighlighted, isFocusMode, isOutlineMode } = useSelect(
 		( select ) => {
 			const {
 				isBlockBeingDragged,
@@ -122,6 +121,7 @@ function BlockListBlock( {
 				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
 				isFocusMode: getSettings().focusMode,
+				isOutlineMode: getSettings().outlineMode,
 			};
 		},
 		[ clientId ]
@@ -175,6 +175,7 @@ function BlockListBlock( {
 				isLargeViewport &&
 				( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode && isLargeViewport,
+			'is-outline-mode': isOutlineMode,
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 			'is-active-entity': activeEntityBlockId === clientId,
 		},
@@ -216,7 +217,6 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		rootClientId,
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,

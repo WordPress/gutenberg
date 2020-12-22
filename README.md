@@ -9,7 +9,7 @@
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
-![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/73433964-2540d900-4346-11ea-94f3-5df2e9d876bc.png)
+![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/100067796-fc3e8700-2e36-11eb-993b-6b80b4310b87.png)
 
 Welcome to the development hub for the WordPress Gutenberg project!
 
@@ -39,7 +39,7 @@ Review the [Create a Block tutorial](/docs/designers-developers/developers/tutor
 
 ### Contribute to Gutenberg
 
-Gutenberg is an open-source project and welcomes all contributors from code to design, from documentation to triage. The project is built by many [contributors and volunteers](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTORS.md) and we'd love your help building it.
+Gutenberg is an open-source project and welcomes all contributors from code to design, from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
 
 See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. See [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) for the contributing guidelines.
 

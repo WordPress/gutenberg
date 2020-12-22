@@ -34,6 +34,20 @@
 		background-size: auto;
 	}
 
+	/**
+	 * Set a default background color for has-background-dim _unless_ it includes another
+	 * background-color class (e.g. has-green-background-color). The presence of another
+	 * background-color class implies that another style will provide the background color
+	 * for the overlay.
+	 *
+	 * See:
+	 *   - Issue with background color specificity: https://github.com/WordPress/gutenberg/issues/26545
+	 *   - Issue with alternative fix: https://github.com/WordPress/gutenberg/issues/26545
+	 */
+	&.has-background-dim:not([class*="-background-color"]) {
+		background-color: $black;
+	}
+
 	&.has-background-dim::before {
 		content: "";
 		background-color: inherit;

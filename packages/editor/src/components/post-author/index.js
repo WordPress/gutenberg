@@ -18,16 +18,18 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import PostAuthorCheck from './check';
 
-const minimumUsersForCombobox = 20;
-
 function PostAuthor( { instanceId } ) {
 	const [ fieldValue, setFieldValue ] = useState();
 	const [ isCombobox, setIsCombobox ] = useState( false );
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { getUser, getUsers, isResolving } = select( 'core' );
+			const { __unstableGetAuthor, getAuthors, isResolving } = select(
+				'core'
+			);
 			const { getEditedPostAttribute } = select( 'core/editor' );
-			const author = getUser( getEditedPostAttribute( 'author' ) );
+			const author = __unstableGetAuthor(
+				getEditedPostAttribute( 'author' )
+			);
 			const isSearching =
 				isCombobox &&
 				( postAuthor
@@ -39,10 +41,8 @@ function PostAuthor( { instanceId } ) {
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
-				authors: getUsers( { who: 'authors', ...query } ),
-				isLoading: isResolving( 'core', 'getUsers', [
-					{ search: fieldValue, who: 'authors' },
-				] ),
+				authors: getAuthors( query ),
+				isLoading: isResolving( 'core', 'getAuthors', [ query ] ),
 			};
 		},
 		[ fieldValue ]

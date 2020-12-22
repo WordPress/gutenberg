@@ -1,12 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -17,6 +19,9 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import MainDashboardButton from './main-dashboard-button';
+import TemplateSaveButton from './template-save-button';
+import { store as editPostStore } from '../../store';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -25,27 +30,33 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isSaving,
 		showIconLabels,
 		hasReducedUI,
+		isEditingTemplate,
 	} = useSelect(
 		( select ) => ( {
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isPublishSidebarOpened: select(
-				'core/edit-post'
+				editPostStore
 			).isPublishSidebarOpened(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+			isSaving: select( editPostStore ).isSavingMetaBoxes(),
+			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
 			),
+			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
 		} ),
 		[]
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
+	const classes = classnames( 'edit-post-header', {
+		'has-reduced-ui': hasReducedUI,
+	} );
+
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
 			</MainDashboardButton.Slot>
@@ -53,7 +64,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
-				{ ! hasReducedUI && (
+				{ ! isEditingTemplate && (
 					<>
 						{ ! isPublishSidebarOpened && (
 							// This button isn't completely hidden by the publish sidebar.
@@ -72,15 +83,16 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							forceIsAutosaveable={ hasActiveMetaboxes }
 							forcePreviewLink={ isSaving ? null : undefined }
 						/>
+						<PostPublishButtonOrToggle
+							forceIsDirty={ hasActiveMetaboxes }
+							forceIsSaving={ isSaving }
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
 					</>
 				) }
-				<PostPublishButtonOrToggle
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-				/>
+				{ isEditingTemplate && <TemplateSaveButton /> }
 				{ ( isLargeViewport || ! showIconLabels ) && (
 					<>
 						<PinnedItems.Slot scope="core/edit-post" />

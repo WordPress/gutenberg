@@ -1,15 +1,19 @@
 # MainDashboardButton
 
-This slot allows replacing the default main dashboard button that's used for closing
-the editor in fullscreen mode.
+This slot allows replacing the default main dashboard button in the post editor and site editor. 
+It's used for returning back to main wp-admin dashboard when editor is in fullscreen mode.
 
-## Example
+## Examples
+
+### Post editor example
+
+This will override the W icon button in the header.
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+} from '@wordpress/edit-post';
 
 const MainDashboardButtonTest = () => (
     <MainDashboardButton>
@@ -22,23 +26,49 @@ registerPlugin( 'main-dashboard-button-test', {
 } );
 ```
 
-If your goal is just to replace the icon of the existing button, that can be achieved
-in the following way:
+If your goal is just to replace the icon of the existing button in
+the post editor, that can be achieved in the following way:
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	__experimentalFullscreenModeClose as FullscreenModeClose,
-} from '@wordpress/edit-site';
-import {
 	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+} from '@wordpress/edit-post';
 import { close } from '@wordpress/icons';
 
 
 const MainDashboardButtonIconTest = () => (
     <MainDashboardButton>
-        <FullscreenModeClose icon={ close } />
+        <FullscreenModeClose icon={ close } href="http://wordpress.org" />
+    </MainDashboardButton>
+);
+
+registerPlugin( 'main-dashboard-button-icon-test', {
+	render: MainDashboardButtonIconTest,
+} );
+```
+
+### Site editor example
+
+In the site editor this slot refers to the "back to dashboard" button in the navigation sidebar.
+
+```js
+import { registerPlugin } from '@wordpress/plugins';
+import {
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/edit-site';
+import {
+	__experimentalNavigationBackButton as NavigationBackButton,
+} from '@wordpress/components';
+
+const MainDashboardButtonIconTest = () => (
+    <MainDashboardButton>
+        <NavigationBackButton
+            backButtonLabel={ __( 'Back to dashboard' ) }
+            className="edit-site-navigation-panel__back-to-dashboard"
+            href="index.php"
+        />
     </MainDashboardButton>
 );
 

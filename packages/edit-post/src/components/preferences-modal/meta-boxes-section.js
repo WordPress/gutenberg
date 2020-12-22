@@ -14,6 +14,7 @@ import { withSelect } from '@wordpress/data';
  */
 import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
+import { store as editPostStore } from '../../store';
 
 export function MetaBoxesSection( {
 	areCustomFieldsRegistered,
@@ -48,7 +49,7 @@ export function MetaBoxesSection( {
 
 export default withSelect( ( select ) => {
 	const { getEditorSettings } = select( 'core/editor' );
-	const { getAllMetaBoxes } = select( 'core/edit-post' );
+	const { getAllMetaBoxes } = select( editPostStore );
 
 	return {
 		// This setting should not live in the block editor's store.

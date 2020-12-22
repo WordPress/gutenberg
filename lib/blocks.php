@@ -12,12 +12,12 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		dirname( __FILE__ ) . '/../build/block-library/blocks/' => array(
+		__DIR__ . '/../build/block-library/blocks/' => array(
 			'block_folders' => array(
 				'audio',
 				'button',
 				'buttons',
-				'classic',
+				'freeform',
 				'code',
 				'column',
 				'columns',
@@ -49,25 +49,20 @@ function gutenberg_reregister_core_block_types() {
 			),
 			'block_names'   => array_merge(
 				array(
-					'archives.php'        => 'core/archives',
-					'block.php'           => 'core/block',
-					'calendar.php'        => 'core/calendar',
-					'categories.php'      => 'core/categories',
-					'cover.php'           => 'core/cover',
-					'latest-comments.php' => 'core/latest-comments',
-					'latest-posts.php'    => 'core/latest-posts',
-					'navigation.php'      => 'core/navigation',
-					'navigation-link.php' => 'core/navigation-link',
-					'rss.php'             => 'core/rss',
-					'search.php'          => 'core/search',
-					'shortcode.php'       => 'core/shortcode',
-					'social-link.php'     => 'core/social-link',
-					'tag-cloud.php'       => 'core/tag-cloud',
-				),
-				! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' )
-				? array()
-				:
-				array(
+					'archives.php'                => 'core/archives',
+					'block.php'                   => 'core/block',
+					'calendar.php'                => 'core/calendar',
+					'categories.php'              => 'core/categories',
+					'cover.php'                   => 'core/cover',
+					'latest-comments.php'         => 'core/latest-comments',
+					'latest-posts.php'            => 'core/latest-posts',
+					'navigation.php'              => 'core/navigation',
+					'navigation-link.php'         => 'core/navigation-link',
+					'rss.php'                     => 'core/rss',
+					'search.php'                  => 'core/search',
+					'shortcode.php'               => 'core/shortcode',
+					'social-link.php'             => 'core/social-link',
+					'tag-cloud.php'               => 'core/tag-cloud',
 					'post-author.php'             => 'core/post-author',
 					'post-comment.php'            => 'core/post-comment',
 					'post-comment-author.php'     => 'core/post-comment-author',
@@ -93,7 +88,7 @@ function gutenberg_reregister_core_block_types() {
 				)
 			),
 		),
-		dirname( __FILE__ ) . '/../build/edit-widgets/blocks/'  => array(
+		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
 				'legacy-widget',
 				'widget-area',
@@ -105,9 +100,6 @@ function gutenberg_reregister_core_block_types() {
 		),
 	);
 	foreach ( $blocks_dirs as $blocks_dir => $details ) {
-		if ( ! file_exists( $blocks_dir ) ) {
-			return;
-		}
 		$block_folders = $details['block_folders'];
 		$block_names   = $details['block_names'];
 
@@ -115,9 +107,6 @@ function gutenberg_reregister_core_block_types() {
 
 		foreach ( $block_folders as $folder_name ) {
 			$block_json_file = $blocks_dir . $folder_name . '/block.json';
-			if ( ! file_exists( $block_json_file ) ) {
-				return;
-			}
 
 			// Ideally, all paths to block metadata files should be listed in
 			// WordPress core. In this place we should rather use filter
@@ -131,6 +120,7 @@ function gutenberg_reregister_core_block_types() {
 				$registry->unregister( $metadata['name'] );
 			}
 
+			gutenberg_register_core_block_styles( $folder_name );
 			register_block_type_from_metadata( $block_json_file );
 		}
 
@@ -143,11 +133,13 @@ function gutenberg_reregister_core_block_types() {
 				if ( $registry->is_registered( $block_names ) ) {
 					$registry->unregister( $block_names );
 				}
+				gutenberg_register_core_block_styles( $block_names );
 			} elseif ( is_array( $block_names ) ) {
 				foreach ( $block_names as $block_name ) {
 					if ( $registry->is_registered( $block_name ) ) {
 						$registry->unregister( $block_name );
 					}
+					gutenberg_register_core_block_styles( $block_name );
 				}
 			}
 
@@ -157,6 +149,46 @@ function gutenberg_reregister_core_block_types() {
 }
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Registers block styles for a core block.
+ *
+ * @param string $block_name The block-name.
+ *
+ * @return void
+ */
+function gutenberg_register_core_block_styles( $block_name ) {
+	if ( ! gutenberg_should_load_separate_block_styles() ) {
+		return;
+	}
+
+	$block_name = str_replace( 'core/', '', $block_name );
+
+	$style_path        = is_rtl()
+		? "build/block-library/blocks/$block_name/style-rtl.css"
+		: "build/block-library/blocks/$block_name/style.css";
+	$editor_style_path = is_rtl()
+		? "build/block-library/blocks/$block_name/style-editor-rtl.css"
+		: "build/block-library/blocks/$block_name/style-editor.css";
+
+	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_register_style(
+			'wp-block-' . $block_name,
+			gutenberg_url( $style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $style_path )
+		);
+	}
+
+	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_register_style(
+			'wp-block-' . $block_name . '-editor',
+			gutenberg_url( $editor_style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $editor_style_path )
+		);
+	}
+}
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it

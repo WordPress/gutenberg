@@ -22,6 +22,7 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
+	useAnchorRef,
 } from '@wordpress/rich-text';
 
 /**
@@ -136,11 +137,6 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-function getRange() {
-	const selection = window.getSelection();
-	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-}
-
 const getAutoCompleterUI = ( autocompleter ) => {
 	const useItems = autocompleter.useItems
 		? autocompleter.useItems
@@ -227,8 +223,12 @@ const getAutoCompleterUI = ( autocompleter ) => {
 		onChangeOptions,
 		onSelect,
 		onReset,
+		value,
+		contentRef,
 	} ) {
 		const [ items ] = useItems( filterValue );
+		const anchorRef = useAnchorRef( { ref: contentRef, value } );
+
 		useLayoutEffect( () => {
 			onChangeOptions( items );
 		}, [ items ] );
@@ -243,7 +243,7 @@ const getAutoCompleterUI = ( autocompleter ) => {
 				onClose={ onReset }
 				position="top right"
 				className="components-autocomplete__popover"
-				anchorRef={ getRange() }
+				anchorRef={ anchorRef }
 			>
 				<div
 					id={ listBoxId }
@@ -285,6 +285,7 @@ function Autocomplete( {
 	onReplace,
 	completers,
 	debouncedSpeak,
+	contentRef,
 } ) {
 	const instanceId = useInstanceId( Autocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
@@ -501,6 +502,8 @@ function Autocomplete( {
 					selectedIndex={ selectedIndex }
 					onChangeOptions={ onChangeOptions }
 					onSelect={ select }
+					value={ record }
+					contentRef={ contentRef }
 				/>
 			) }
 		</>

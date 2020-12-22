@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -10,6 +15,7 @@ import {
 	saveDraft,
 	openDocumentSettingsSidebar,
 	isCurrentURL,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -356,6 +362,8 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
+		const FONT_SIZE_LABEL_SELECTOR =
+			"//label[contains(text(), 'Font size')]";
 		// Open the sidebar block settings.
 		await openDocumentSettingsSidebar();
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
@@ -372,10 +380,9 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(3)'
-		);
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 2 );
+		await page.keyboard.press( 'Enter' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -389,10 +396,9 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(4)'
-		);
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 3 );
+		await page.keyboard.press( 'Enter' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.

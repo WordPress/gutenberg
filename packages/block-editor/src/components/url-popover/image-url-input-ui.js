@@ -18,7 +18,6 @@ import {
 	SVG,
 	Path,
 } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { link as linkIcon, close } from '@wordpress/icons';
 
 /**
@@ -60,21 +59,6 @@ const ImageURLInputUI = ( {
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
-
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const stopPropagationRelevantKeys = ( event ) => {
-		if (
-			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
-				event.keyCode
-			) > -1
-		) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
 
 	const startEditLink = useCallback( () => {
 		if (
@@ -240,14 +224,10 @@ const ImageURLInputUI = ( {
 				label={ __( 'Link Rel' ) }
 				value={ removeNewTabRel( rel ) || '' }
 				onChange={ onSetLinkRel }
-				onKeyPress={ stopPropagation }
-				onKeyDown={ stopPropagationRelevantKeys }
 			/>
 			<TextControl
 				label={ __( 'Link CSS Class' ) }
 				value={ linkClass || '' }
-				onKeyPress={ stopPropagation }
-				onKeyDown={ stopPropagationRelevantKeys }
 				onChange={ onSetLinkClass }
 			/>
 		</>
@@ -299,8 +279,6 @@ const ImageURLInputUI = ( {
 							className="block-editor-format-toolbar__link-container-content"
 							value={ linkEditorValue }
 							onChangeInputValue={ setUrlInput }
-							onKeyDown={ stopPropagationRelevantKeys }
-							onKeyPress={ stopPropagation }
 							onSubmit={ onSubmitLinkChange() }
 							autocompleteRef={ autocompleteRef }
 						/>
@@ -309,7 +287,6 @@ const ImageURLInputUI = ( {
 						<>
 							<URLPopover.LinkViewer
 								className="block-editor-format-toolbar__link-container-content"
-								onKeyPress={ stopPropagation }
 								url={ url }
 								onEditLinkClick={ startEditLink }
 								urlLabel={ urlLabel }

@@ -5,14 +5,12 @@ import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
-import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -36,7 +34,7 @@ export function initialize( id, settings ) {
 	registerCoreBlocks( coreBlocks );
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 	registerBlock( createLegacyWidget( settings ) );
 	registerBlock( widgetArea );

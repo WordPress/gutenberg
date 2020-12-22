@@ -4,4 +4,4 @@
  *
  * @type {string}
  */
-export const REDUCER_KEY = 'core';
+export const STORE_NAME = 'core';
