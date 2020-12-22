@@ -4,10 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import {
-	registerCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+import { __experimentalRegisterAllBlocks } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
 
 /**
@@ -58,10 +55,7 @@ export function initialize( id, settings ) {
 
 	registerEditSiteStore( { settings } );
 
-	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( true );
-	}
+	__experimentalRegisterAllBlocks( { enableFSEBlocks: true } );
 
 	render( <Editor />, document.getElementById( id ) );
 }

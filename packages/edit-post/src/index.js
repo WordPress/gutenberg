@@ -4,10 +4,7 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
-import {
-	registerCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+import { __experimentalRegisterAllBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 
 /**
@@ -91,17 +88,8 @@ export function initializeEditor(
 		settings,
 		initialEdits
 	);
-	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		const {
-			__unstableEnableFullSiteEditingBlocks,
-			__unstableEnablePostBlocks,
-		} = settings;
-		__experimentalRegisterExperimentalCoreBlocks(
-			__unstableEnableFullSiteEditingBlocks,
-			__unstableEnablePostBlocks
-		);
-	}
+
+	__experimentalRegisterAllBlocks( settings );
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =

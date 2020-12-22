@@ -15,10 +15,7 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
-import {
-	registerCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+import { __experimentalRegisterAllBlocks } from '@wordpress/block-library';
 //eslint-disable-next-line no-restricted-syntax
 import {
 	blockNameToFixtureBasename,
@@ -67,10 +64,7 @@ describe( 'full post content fixture', () => {
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
-		registerCoreBlocks();
-		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( true );
-		}
+		__experimentalRegisterAllBlocks( { enableFSEBlocks: true } );
 	} );
 
 	blockBasenames.forEach( ( basename ) => {

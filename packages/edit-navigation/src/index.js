@@ -6,10 +6,7 @@ import { map, set, flatten, omit, partialRight } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	registerCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+import { __experimentalRegisterAllBlocks } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -164,11 +161,7 @@ export function initialize( id, settings ) {
 		removeNavigationBlockEditUnsupportedFeatures
 	);
 
-	registerCoreBlocks();
-
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
-	}
+	__experimentalRegisterAllBlocks();
 
 	settings.__experimentalFetchLinkSuggestions = partialRight(
 		fetchLinkSuggestions,

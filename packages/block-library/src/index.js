@@ -112,6 +112,8 @@ const registerBlock = ( block ) => {
  * const coreBlocks = __experimentalGetCoreBlocks();
  * ```
  */
+// TODO this doesn't need to be a function and check how to remove,
+// since `registerCoreBlocks` API has the blocks param...
 export const __experimentalGetCoreBlocks = () => [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
@@ -162,6 +164,123 @@ export const __experimentalGetCoreBlocks = () => [
 	video,
 ];
 
+const CORE_BLOCKS = [
+	// Common blocks are grouped at the top to prioritize their display
+	// in various contexts — like the inserter and auto-complete components.
+	paragraph,
+	image,
+	heading,
+	gallery,
+	list,
+	quote,
+	// Register all remaining core blocks.
+	audio,
+	button,
+	buttons,
+	code,
+	columns,
+	column,
+	cover,
+	embed,
+	file,
+	group,
+	html,
+	mediaText,
+	missing,
+	preformatted,
+	pullquote,
+	separator,
+	socialLinks,
+	socialLink,
+	spacer,
+	subhead,
+	table,
+	textColumns,
+	verse,
+	video,
+];
+
+/**
+ * Function to register core blocks provided by the block editor.
+ */
+export const __experimentalRegisterCoreBlocks = () => {
+	CORE_BLOCKS.forEach( registerBlock );
+	setDefaultBlockName( paragraph.name );
+	setUnregisteredTypeHandlerName( missing.name );
+	setGroupingBlockName( group.name );
+};
+
+/**
+ * Registers WordPress Post Editor specific blocks.
+ */
+export const __experimentalRegisterWordPressPostEditorBlocks = () => {
+	const wpPostEditorBlocks = [
+		archives,
+		calendar,
+		categories,
+		latestComments,
+		latestPosts,
+		more,
+		nextpage,
+		reusableBlock,
+		rss,
+		search,
+		shortcode,
+		tagCloud,
+	];
+	wpPostEditorBlocks.forEach( registerBlock );
+};
+
+/**
+ * Register classic block only if in WP context.
+ */
+export const __experimentalRegisterClassicBlock = () => {
+	if ( ! window.wp?.oldEditor ) return;
+	registerBlock( classic );
+	setFreeformContentHandlerName( classic.name );
+};
+
+/**
+ * Register WordPress Full Site Editing blocks.
+ *
+ * @param {Object} settings Editor settings object.
+ * @param {boolean} settings.enableFSEBlocks Whether to enable the full site editing blocks.
+ * @param {boolean} settings.enablePostBlocks Whether to enable the post blocks.
+ */
+export const __experimentalRegisterWordPressFullSiteEditingBocks = ( {
+	enableFSEBlocks,
+	enablePostBlocks,
+} = {} ) => {
+	if ( process.env.GUTENBERG_PHASE !== 2 ) return;
+	const postBlocks = [
+		siteLogo,
+		siteTagline,
+		siteTitle,
+		query,
+		queryLoop,
+		queryPagination,
+		postTitle,
+		postContent,
+		postAuthor,
+		postComment,
+		postCommentAuthor,
+		postCommentContent,
+		postCommentDate,
+		postComments,
+		postCommentsCount,
+		postCommentsForm,
+		postDate,
+		postExcerpt,
+		postFeaturedImage,
+		postHierarchicalTerms,
+		postTags,
+	];
+	( enableFSEBlocks
+		? [ templatePart, ...postBlocks ]
+		: ( enablePostBlocks && postBlocks ) || []
+	).forEach( registerBlockType );
+};
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -186,52 +305,30 @@ export const registerCoreBlocks = (
 	setUnregisteredTypeHandlerName( missing.name );
 	setGroupingBlockName( group.name );
 };
+/**
+ * Function to register experimental core blocks.
+ */
+// TODO check all usages of this...
+export const __experimentalRegisterExperimentalCoreBlocks = () => {
+	if ( process.env.GUTENBERG_PHASE !== 2 ) return;
+	[ navigation, navigationLink ].forEach( registerBlock );
+};
 
 /**
- * Function to register experimental core blocks depending on editor settings.
+ * Register all blocks according to editor's settings and
+ * takes into account `process.env.GUTENBERG_PHASE`.
+ * - core blocks
+ * - classic block
+ * - WP post editor blocks
+ * - experimental core blocks
+ * - WP FSE blocks conditionally based on settings.
  *
- * @param {boolean} enableFSEBlocks Whether to enable the full site editing blocks.
- * @param {boolean} enablePostBlocks Whether to enable the post blocks.
- * @example
- * ```js
- * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
- *
- * __experimentalRegisterExperimentalCoreBlocks( settings );
- * ```
+ * @param {Object} settings Editor settings object.
  */
-export const __experimentalRegisterExperimentalCoreBlocks =
-	process.env.GUTENBERG_PHASE === 2
-		? ( enableFSEBlocks, enablePostBlocks ) => {
-				const postBlocks = [
-					siteLogo,
-					siteTagline,
-					siteTitle,
-					query,
-					queryLoop,
-					queryPagination,
-					postTitle,
-					postContent,
-					postAuthor,
-					postComment,
-					postCommentAuthor,
-					postCommentContent,
-					postCommentDate,
-					postComments,
-					postCommentsCount,
-					postCommentsForm,
-					postDate,
-					postExcerpt,
-					postFeaturedImage,
-					postHierarchicalTerms,
-					postTags,
-				];
-				[
-					navigation,
-					navigationLink,
-					// Register Full Site Editing Blocks.
-					...( enableFSEBlocks
-						? [ templatePart, ...postBlocks ]
-						: ( enablePostBlocks && postBlocks ) || [] ),
-				].forEach( registerBlock );
-		  }
-		: undefined;
+export const __experimentalRegisterAllBlocks = ( settings ) => {
+	__experimentalRegisterCoreBlocks();
+	__experimentalRegisterClassicBlock();
+	__experimentalRegisterWordPressPostEditorBlocks();
+	__experimentalRegisterExperimentalCoreBlocks();
+	__experimentalRegisterWordPressFullSiteEditingBocks( settings );
+};

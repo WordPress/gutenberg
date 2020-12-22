@@ -3,14 +3,11 @@
  */
 import {
 	registerBlockType,
+	unregisterBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 import { render } from '@wordpress/element';
-import {
-	registerCoreBlocks,
-	__experimentalGetCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+import { __experimentalRegisterAllBlocks } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -28,14 +25,8 @@ import Layout from './components/layout';
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
-	);
-	registerCoreBlocks( coreBlocks );
-
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
-	}
+	__experimentalRegisterAllBlocks();
+	unregisterBlockType( 'core/more' );
 	registerBlock( createLegacyWidget( settings ) );
 	registerBlock( widgetArea );
 	render(
