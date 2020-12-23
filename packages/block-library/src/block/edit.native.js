@@ -87,6 +87,7 @@ export default function ReusableBlockEdit( {
 
 	useEffect( () => {
 		return () => {
+			clearTimeout( timeoutId.current );
 			/**
 			 * Invalidate entity record upon unmount to keep the reusable block udpated
 			 * in case it's modified through UBE
