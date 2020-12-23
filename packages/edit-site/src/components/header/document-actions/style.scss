@@ -39,14 +39,14 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 100px;
+		max-width: 120px;
 
 		@include break-medium() {
 			max-width: 75px;
 		}
 
 		@include break-xlarge() {
-			max-width: 160px;
+			max-width: 180px;
 		}
 	}
 
@@ -54,7 +54,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 100px;
+		max-width: 120px;
 		width: 0;
 		transform: translateX(8px);
 		opacity: 0;
@@ -66,7 +66,7 @@
 		}
 
 		@include break-xlarge() {
-			max-width: 160px;
+			max-width: 180px;
 		}
 
 		&::before {
@@ -74,12 +74,6 @@
 			color: $gray-700;
 			padding: 0 $grid-unit-05;
 		}
-	}
-
-	.edit-site-document-actions__title-prefix {
-		color: $gray-700;
-		margin-right: $grid-unit-05;
-		text-transform: capitalize;
 	}
 
 	&.has-secondary-label {
@@ -90,16 +84,6 @@
 
 			&::before {
 				color: $gray-700;
-			}
-		}
-
-		.edit-site-document-actions__title-prefix {
-			@include break-medium() {
-				display: none;
-			}
-
-			@include break-xlarge() {
-				display: block;
 			}
 		}
 	}

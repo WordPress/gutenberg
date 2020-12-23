@@ -95,13 +95,13 @@ export default function DocumentActions( {
 					className="edit-site-document-actions__title-prefix"
 				>
 					<VisuallyHidden as="span">
-						{ __( 'Editing ' ) }
+						{ sprintf(
+							/* translators: %s: the entity being edited, like "template"*/
+							__( 'Editing %s:' ),
+							entityLabel
+						) }
 					</VisuallyHidden>
-					{ sprintf(
-						/* translators: %s: the entity being edited, like "template"*/
-						__( '%s:' ),
-						entityLabel
-					) }
+
 				</Text>
 
 				<Text
