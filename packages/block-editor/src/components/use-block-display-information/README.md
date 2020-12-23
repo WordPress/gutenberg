@@ -2,7 +2,7 @@
 
 A React Hook that tries to find a matching block variation and returns the appropriate information for display reasons. In order to try to find a match we need two things:
 
-1. Block's client id to extract it's current attributes.
+1. Block's client id to extract its current attributes.
 2. A block variation should have set `isActive` prop to a proper function.
 
 If for any reason a block variaton match cannot be found, the returned information come from the Block Type.
