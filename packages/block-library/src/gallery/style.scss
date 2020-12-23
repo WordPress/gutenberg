@@ -24,7 +24,8 @@
 			flex-grow: 1;
 			justify-content: center;
 			position: relative;
-
+			margin-top: auto;
+			margin-bottom: auto;
 			// IE11 doesn't like the "flex-direction: column;" here.
 			@supports ( position: sticky ) {
 				flex-direction: column;
@@ -99,6 +100,23 @@
 
 	figcaption {
 		flex-grow: 1;
+	}
+
+	// Non cropped images.
+	&:not(.is-cropped) {
+		figure.blocks-gallery-grid {
+			figure.wp-block-image:not(#individual-image) {
+				margin-top: auto;
+				margin-bottom: auto;
+				img {
+					margin-bottom: $grid-unit-20;
+				}
+
+				figcaption {
+					bottom: $grid-unit-20;
+				}
+			}
+		}
 	}
 
 	// Cropped Images.
