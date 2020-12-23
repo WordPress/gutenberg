@@ -82,7 +82,7 @@ The settings section has the following structure and default values:
   "some/context": {
     "settings": {
       "border": {
-        "customRadius": true /* false to opt-out */
+        "customRadius": false /* true to opt-in */
       },
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
