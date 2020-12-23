@@ -101,7 +101,6 @@ export default function DocumentActions( {
 							entityLabel
 						) }
 					</VisuallyHidden>
-
 				</Text>
 
 				<Text
