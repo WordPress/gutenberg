@@ -3,6 +3,13 @@
  */
 import './index.test';
 
+/**
+ * External dependencies
+ */
+import { URL as CoreURL } from 'react-native/Libraries/Blob/URL';
+
+global.URL = CoreURL;
+
 jest.mock( './fixtures/wpt-data.json', () => {
 	const data = jest.requireActual( './fixtures/wpt-data.json' );
 
