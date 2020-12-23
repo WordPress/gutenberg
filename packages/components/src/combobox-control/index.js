@@ -47,7 +47,7 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = inputValue.toLocaleLowerCase();
+		const match = deburr( inputValue.toLocaleLowerCase() );
 		options.forEach( ( option ) => {
 			const index = deburr( option.label )
 				.toLocaleLowerCase()
