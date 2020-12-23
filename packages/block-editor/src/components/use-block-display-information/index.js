@@ -28,8 +28,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  * If no blockType is found with the provided clientId, returns null.
  *
  * @param {string} clientId Block's client id.
- * @return {?WPBlockDisplayInformation} Block's display information.
- *
+ * @return {?WPBlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
  */
 
 export default function useBlockDisplayInformation( clientId ) {

@@ -11,7 +11,7 @@ Note that this is currently experimental, and is available as `__experimentalUse
 
 ### Usage
 
-The hook returns an object which contains block's title, icon and description. If no blockType is found with the provided `clientId`, returns `null`.
+The hook returns an object which contains the block's title, icon, and description. If no block type is found for the provided `clientId`, it returns `null`.
 
 ```jsx
 import {
