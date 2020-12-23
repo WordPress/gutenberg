@@ -3,6 +3,11 @@
  */
 import './index.test';
 
+/**
+ * External dependencies
+ */
+import 'react-native-url-polyfill/auto';
+
 jest.mock( './fixtures/wpt-data.json', () => {
 	const data = jest.requireActual( './fixtures/wpt-data.json' );
 
