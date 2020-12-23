@@ -72,6 +72,27 @@
 					display: inline;
 				}
 			}
+
+			&.is-style-rounded {
+				// Apply to IE in this context as using flex: 1 1 auto makes it a happy camper.
+				flex-direction: column;
+				> div,
+				> a {
+					flex: 1 1 auto;
+				}
+				figcaption {
+					flex: initial;
+					background: none;
+					bottom: initial;
+					color: inherit;
+					font-size: $default-font-size;
+					margin: 0;
+					padding: 10px 10px 9px;
+					position: relative;
+					text-align: center;
+					width: 100%;
+				}
+			}
 		}
 	}
 
