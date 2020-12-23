@@ -46,14 +46,8 @@ import {
  */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
-// Values to constrain the customizable gutter size.
-const MIN_GUTTER_VALUE = 0;
-const MAX_GUTTER_VALUE = 100;
-const INITIAL_GUTTER_POSITION = 32;
-
 function ColumnsEditContainer( {
 	attributes,
-	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -110,17 +104,6 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
-					<RangeControl
-						label={ __( 'Gutter size' ) }
-						value={ gutterSize }
-						onChange={ ( value ) => {
-							setAttributes( { gutterSize: value } );
-						} }
-						min={ MIN_GUTTER_VALUE }
-						max={ MAX_GUTTER_VALUE }
-						initialPosition={ INITIAL_GUTTER_POSITION }
-						allowReset
-					/>
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
