@@ -7,8 +7,6 @@ A React Hook that tries to find a matching block variation and returns the appro
 
 If for any reason a block variaton match cannot be found, the returned information come from the Block Type.
 
-Note that this is currently experimental, and is available as `__experimentalUseBlockDisplayInformation`.
-
 ### Usage
 
 The hook returns an object which contains the block's title, icon, and description. If no block type is found for the provided `clientId`, it returns `null`.
@@ -16,7 +14,7 @@ The hook returns an object which contains the block's title, icon, and descripti
 ```jsx
 import {
 	BlockIcon,
-	__experimentalUseBlockDisplayInformation as useBlockDisplayInformation,
+	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
 
 function DemoBlockCard( { clientId } ) {
