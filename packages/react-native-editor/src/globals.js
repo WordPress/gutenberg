@@ -5,6 +5,7 @@
 import 'react-native-get-random-values';
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
+import { URL as CoreURL } from 'react-native/Libraries/Blob/URL';
 
 /**
  * WordPress dependencies
@@ -15,6 +16,7 @@ import { createElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import patchURL from './patch-url';
 
 /**
  * Import for side-effects: Patches for jsdom-jscore, mostly to implement
@@ -26,13 +28,16 @@ import { createElement } from '@wordpress/element';
 import './jsdom-patches';
 
 /**
- * Import for side-effects: Patches for URL, functions that are called from
- * Gutenberg code paths, where a more full implementation is expected (in the
- * browser environment).
+ * Patch URL to add prototype.search getter for Gutenberg code paths, where a
+ * more full implementation is expected (in the browser environment). We patch
+ * conditionally, since the patch is only compatible with the URL implementation
+ * provided by react-native.
  *
- * More details are available within the comments in the file.
+ * More details are available in the comments within the file.
  */
-import './url-patches';
+if ( global.URL === CoreURL ) {
+	patchURL( global.URL );
+}
 
 global.wp = {
 	element: {
