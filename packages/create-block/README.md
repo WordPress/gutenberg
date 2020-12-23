@@ -160,6 +160,7 @@ The following configurable variables are used with the template files. Template 
 -   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`)
 -   `version` (default: `'0.1.0'`)
 -   `wpScripts` (default: `true`)
+-   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v6/commands/npm-install).
 -   `editorScript` (default: `'file:./build/index.js'`)
 -   `editorStyle` (default: `'file:./build/index.css'`)
 -   `style` (default: `'file:./build/style-index.css'`)
