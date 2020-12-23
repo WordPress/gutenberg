@@ -14,7 +14,10 @@ export function getQueryString( url ) {
 	let query;
 	try {
 		query = new URL( url, 'http://example.com' ).search.substring( 1 );
-	} catch ( error ) {}
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.log( error );
+	}
 
 	if ( query ) {
 		return query;
