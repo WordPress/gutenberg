@@ -11,11 +11,6 @@ const {
 	toggleHtmlMode,
 	swipeFromTo,
 } = require( '../helpers/utils' );
-/**
- * External dependencies
- */
-// eslint-disable-next-line import/no-extraneous-dependencies
-const wd = require( 'wd' );
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
@@ -272,24 +267,6 @@ class EditorPage {
 		await toolBarButton.click();
 	}
 
-	async longPressToolBarButton( buttonName ) {
-		let toolBarButton;
-		if ( isAndroid() ) {
-			const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonName }")]`;
-			toolBarButton = await this.driver.elementByXPath( blockLocator );
-		} else {
-			toolBarButton = await this.driver.elementByAccessibilityId(
-				buttonName
-			);
-		}
-
-		const action = new wd.TouchAction( this.driver );
-		action.press( { el: toolBarButton } );
-		action.wait( 1000 );
-		action.release();
-		await action.perform();
-	}
-
 	// =========================
 	// Inline toolbar functions
 	// =========================
@@ -386,15 +363,11 @@ class EditorPage {
 	}
 
 	async typeTextToParagraphBlock( block, text, clear ) {
-		if ( ! isAndroid() ) {
-			block.type( text );
-		} else {
-			const textViewElement = await this.getTextViewForParagraphBlock(
-				block
-			);
-			await typeString( this.driver, textViewElement, text, clear );
-			await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
-		}
+		const textViewElement = await this.getTextViewForParagraphBlock(
+			block
+		);
+		await typeString( this.driver, textViewElement, text, clear );
+		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
 	async sendTextToParagraphBlock( position, text, clear ) {
@@ -577,46 +550,6 @@ class EditorPage {
 
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
-	}
-
-	// =============================
-	// Misc functions
-	// =============================
-	async findElement( name, iosElementType ) {
-		const elementName = isAndroid()
-			? '//*'
-			: `//XCUIElementType${ iosElementType }`;
-		const blockLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ name }")]`;
-		const elements = await this.driver.elementsByXPath( blockLocator );
-		return elements[ 0 ];
-	}
-
-	async selectElement( name, iosElementType ) {
-		const el = await this.findElement( name, iosElementType );
-		el.click();
-	}
-
-	async selectBlock(
-		blockName,
-		position = 1,
-		options = { autoscroll: false }
-	) {
-		const block = await this.getBlockAtPosition(
-			blockName,
-			position,
-			options
-		);
-		block.click();
-	}
-
-	async tapCoordinates( x, y, longPress = false ) {
-		const action = new wd.TouchAction( this.driver );
-		action.press( { x, y } );
-		if ( longPress ) {
-			action.wait( 1000 );
-		}
-		action.release();
-		await action.perform();
 	}
 }
 
