@@ -237,7 +237,7 @@ class WP_Theme_JSON_Resolver {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON( $config );
+		self::$user = new WP_Theme_JSON( $config, true );
 
 		return self::$user;
 	}
@@ -270,7 +270,6 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON
 	 */
 	public function get_origin( $theme_support_data = array(), $origin = 'user', $merged = true ) {
-
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
@@ -301,10 +300,6 @@ class WP_Theme_JSON_Resolver {
 	 * Registers a Custom Post Type to store the user's origin config.
 	 */
 	public static function register_user_custom_post_type() {
-		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-			return;
-		}
-
 		$args = array(
 			'label'        => __( 'Global Styles', 'gutenberg' ),
 			'description'  => 'CPT to store user design tokens',
