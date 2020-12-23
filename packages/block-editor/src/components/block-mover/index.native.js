@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { first, last, partial, castArray } from 'lodash';
-import React, { useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
 /**
@@ -12,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Picker, ToolbarButton } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
