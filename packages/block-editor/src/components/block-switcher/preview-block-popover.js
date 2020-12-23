@@ -3,21 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Popover } from '@wordpress/components';
-import {
-	getBlockType,
-	cloneBlock,
-	getBlockFromExample,
-} from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 
-export default function PreviewBlockPopover( {
-	hoveredBlock,
-	hoveredClassName,
-} ) {
-	const hoveredBlockType = getBlockType( hoveredBlock.name );
+export default function PreviewBlockPopover( { blocks } ) {
 	return (
 		<div className="block-editor-block-switcher__popover__preview__parent">
 			<div className="block-editor-block-switcher__popover__preview__container">
@@ -30,25 +22,7 @@ export default function PreviewBlockPopover( {
 						<div className="block-editor-block-switcher__preview-title">
 							{ __( 'Preview' ) }
 						</div>
-						<BlockPreview
-							viewportWidth={ 500 }
-							blocks={
-								hoveredBlockType.example
-									? getBlockFromExample( hoveredBlock.name, {
-											attributes: {
-												...hoveredBlockType.example
-													.attributes,
-												className: hoveredClassName,
-											},
-											innerBlocks:
-												hoveredBlockType.example
-													.innerBlocks,
-									  } )
-									: cloneBlock( hoveredBlock, {
-											className: hoveredClassName,
-									  } )
-							}
-						/>
+						<BlockPreview viewportWidth={ 500 } blocks={ blocks } />
 					</div>
 				</Popover>
 			</div>
