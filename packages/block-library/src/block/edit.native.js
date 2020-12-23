@@ -96,8 +96,8 @@ export default function ReusableBlockEdit( {
 		};
 	}, [] );
 
-	function toggleSheet() {
-		setShowHelp( ! showHelp );
+	function openSheet() {
+		setShowHelp( true );
 	}
 
 	function closeSheet() {
@@ -105,7 +105,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	function requestFallback() {
-		toggleSheet();
+		closeSheet();
 		setSendFallbackMessage( true );
 	}
 
@@ -162,7 +162,7 @@ export default function ReusableBlockEdit( {
 					<BottomSheet.Cell
 						label={ __( 'Dismiss' ) }
 						separatorType="topFullWidth"
-						onPress={ toggleSheet }
+						onPress={ closeSheet }
 						labelStyle={ actionButtonStyle }
 					/>
 				</>
@@ -202,7 +202,7 @@ export default function ReusableBlockEdit( {
 			accessibilityLabel={ __( 'Help button' ) }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ __( 'Tap here to show help' ) }
-			onPress={ toggleSheet }
+			onPress={ openSheet }
 		>
 			<View>
 				{ isSelected && <EditTitle title={ title } /> }
