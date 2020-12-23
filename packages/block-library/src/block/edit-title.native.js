@@ -44,7 +44,9 @@ function EditTitle( { getStylesFromColorScheme, title } ) {
 					style={ lockIconStyle }
 				/>
 			</View>
-			<Text style={ titleStyle }>{ title }</Text>
+			<Text numberOfLines={ 1 } style={ titleStyle }>
+				{ title }
+			</Text>
 			<View style={ styles.helpIconContainer }>
 				<Icon
 					label={ __( 'Help icon' ) }
