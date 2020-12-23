@@ -79,6 +79,7 @@ require __DIR__ . '/editor-settings.php';
 require __DIR__ . '/full-site-editing.php';
 require __DIR__ . '/full-site-editing/default-template-types.php';
 require __DIR__ . '/full-site-editing/templates-utils.php';
+require __DIR__ . '/full-site-editing/page-templates.php';
 require __DIR__ . '/templates-sync.php';
 require __DIR__ . '/templates.php';
 require __DIR__ . '/template-parts.php';

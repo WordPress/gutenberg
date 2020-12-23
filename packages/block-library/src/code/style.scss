@@ -1,10 +1,6 @@
 // Provide a minimum of overflow handling.
-.wp-block-code {
-	font-size: 0.9em;
-
-	code {
-		display: block;
-		white-space: pre-wrap;
-		overflow-wrap: break-word;
-	}
+.wp-block-code code {
+	display: block;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
 }

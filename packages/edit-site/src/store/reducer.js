@@ -69,79 +69,28 @@ export function settings( state = {}, action ) {
 }
 
 /**
- * Reducer returning the template ID.
+ * Reducer keeping track of the currently edited Post Type,
+ * Post Id and the context provided to fill the content of the block editor.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function templateId( state, action ) {
+export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
-			return action.templateId;
+			return {
+				type: 'wp_template',
+				id: action.templateId,
+				page: action.page,
+			};
 		case 'SET_TEMPLATE_PART':
-			return undefined;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the template part ID.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templatePartId( state, action ) {
-	switch ( action.type ) {
-		case 'SET_TEMPLATE_PART':
-			return action.templatePartId;
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
-			return undefined;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the template type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templateType( state = 'wp_template', action ) {
-	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
-			return 'wp_template';
-		case 'SET_TEMPLATE_PART':
-			return 'wp_template_part';
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the page being edited.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function page( state, action ) {
-	switch ( action.type ) {
-		case 'SET_PAGE':
-			return action.page;
-		case 'SET_TEMPLATE_PART':
-			return undefined;
+			return {
+				type: 'wp_template_part',
+				id: action.templatePartId,
+			};
 	}
 
 	return state;
@@ -231,10 +180,7 @@ export default combineReducers( {
 	preferences,
 	deviceType,
 	settings,
-	templateId,
-	templatePartId,
-	templateType,
-	page,
+	editedPost,
 	homeTemplateId,
 	navigationPanel,
 	blockInserterPanel,

@@ -129,6 +129,7 @@ const BlockSwitcher = ( { clientIds } ) => {
 											possibleBlockTransformations={
 												possibleBlockTransformations
 											}
+											blocks={ blocks }
 											onSelect={ ( name ) => {
 												onTransform( name );
 												onClose();
