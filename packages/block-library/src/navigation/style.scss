@@ -1,9 +1,7 @@
 // Default background and font color
 .wp-block-navigation:not(.has-background) .wp-block-navigation__container {
-	.wp-block-navigation-link:not(.has-text-color) {
-		color: $gray-900;
-	}
 	.wp-block-navigation__container {
+		color: $gray-900;
 		background-color: $white;
 	}
 }
