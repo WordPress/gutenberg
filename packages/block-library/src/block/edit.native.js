@@ -2,20 +2,20 @@
  * External dependencies
  */
 import { Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
-import { partial } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import { BottomSheet, Icon, Disabled } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { parse } from '@wordpress/blocks';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -23,94 +23,92 @@ import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge'
 import styles from './editor.scss';
 import EditTitle from './edit-title';
 
-class ReusableBlockEdit extends Component {
-	constructor( { reusableBlock } ) {
-		super( ...arguments );
+export default function ReusableBlockEdit( {
+	attributes: { ref },
+	clientId,
+	isSelected,
+} ) {
+	const recordArgs = [ 'postType', 'wp_block', ref ];
 
-		this.setBlocks = this.setBlocks.bind( this );
-		this.toggleSheet = this.toggleSheet.bind( this );
-		this.closeSheet = this.closeSheet.bind( this );
-		this.requestFallback = this.requestFallback.bind( this );
+	const [ showHelp, setShowHelp ] = useState( false );
+	const [ sendFallbackMessage, setSendFallbackMessage ] = useState( false );
+	const timeoutId = useRef();
+	const infoTextStyle = usePreferredColorSchemeStyle(
+		styles.infoText,
+		styles.infoTextDark
+	);
+	const infoTitleStyle = usePreferredColorSchemeStyle(
+		styles.infoTitle,
+		styles.infoTitleDark
+	);
+	const infoSheetIconStyle = usePreferredColorSchemeStyle(
+		styles.infoSheetIcon,
+		styles.infoSheetIconDark
+	);
+	const actionButtonStyle = usePreferredColorSchemeStyle(
+		styles.actionButton,
+		styles.actionButtonDark
+	);
 
-		if ( reusableBlock ) {
-			// Start in edit mode when we're working with a newly created reusable block
-			this.state = {
-				// Since edition is not supported yet isEditing is always false
-				isEditing: false,
-				blocks: parse( reusableBlock.content ),
-				showHelp: false,
-				sendFallbackMessage: false,
+	const { reusableBlock, hasResolved, isEditing, settings } = useSelect(
+		( select ) => {
+			return {
+				reusableBlock: select( 'core' ).getEditedEntityRecord(
+					...recordArgs
+				),
+				hasResolved: select( 'core' ).hasFinishedResolution(
+					'getEditedEntityRecord',
+					recordArgs
+				),
+				isSaving: select( 'core' ).isSavingEntityRecord(
+					...recordArgs
+				),
+				canUserUpdate: select( 'core' ).canUser(
+					'update',
+					'blocks',
+					ref
+				),
+				isEditing: select(
+					reusableBlocksStore
+				).__experimentalIsEditingReusableBlock( clientId ),
+				settings: select( 'core/block-editor' ).getSettings(),
 			};
-		} else {
-			// Start in preview mode when we're working with an existing reusable block
-			this.state = {
-				isEditing: false,
-				blocks: [],
-				showHelp: false,
-				sendFallbackMessage: false,
-			};
-		}
+		},
+		[ ref, clientId ]
+	);
+
+	const { invalidateResolution } = useDispatch( 'core' );
+
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_block',
+		{ id: ref }
+	);
+
+	useEffect( () => {
+		return () => {
+			/**
+			 * Invalidate entity record upon unmount to keep the reusable block udpated
+			 * in case it's modified through UBE
+			 */
+			invalidateResolution( 'getEntityRecord', recordArgs );
+		};
+	}, [] );
+
+	function toggleSheet() {
+		setShowHelp( ! showHelp );
 	}
 
-	componentDidMount() {
-		this.props.fetchReusableBlock();
+	function closeSheet() {
+		setShowHelp( false );
 	}
 
-	componentDidUpdate( prevProps ) {
-		const hasBlockFetchCompleted =
-			! prevProps.reusableBlock && this.props.reusableBlock;
-		const hasBlockContentChanged =
-			prevProps.reusableBlock?.content !==
-			this.props.reusableBlock?.content;
-
-		if ( hasBlockFetchCompleted || hasBlockContentChanged ) {
-			this.setState( {
-				blocks: parse( this.props.reusableBlock.content ),
-			} );
-		}
+	function requestFallback() {
+		toggleSheet();
+		setSendFallbackMessage( true );
 	}
 
-	toggleSheet() {
-		this.setState( {
-			showHelp: ! this.state.showHelp,
-		} );
-	}
-
-	closeSheet() {
-		this.setState( { showHelp: false } );
-	}
-
-	requestFallback() {
-		this.toggleSheet();
-		this.setState( { sendFallbackMessage: true } );
-	}
-
-	setBlocks( blocks ) {
-		this.setState( { blocks } );
-	}
-
-	renderSheet() {
-		const { reusableBlock } = this.props;
-		const { showHelp } = this.state;
-
-		const { getStylesFromColorScheme, clientId } = this.props;
-		const infoTextStyle = getStylesFromColorScheme(
-			styles.infoText,
-			styles.infoTextDark
-		);
-		const infoTitleStyle = getStylesFromColorScheme(
-			styles.infoTitle,
-			styles.infoTitleDark
-		);
-		const infoSheetIconStyle = getStylesFromColorScheme(
-			styles.infoSheetIcon,
-			styles.infoSheetIconDark
-		);
-		const actionButtonStyle = getStylesFromColorScheme(
-			styles.actionButton,
-			styles.actionButtonDark
-		);
-
+	function renderSheet() {
 		const infoTitle =
 			Platform.OS === 'android'
 				? __(
@@ -122,20 +120,24 @@ class ReusableBlockEdit extends Component {
 			<BottomSheet
 				isVisible={ showHelp }
 				hideHeader
-				onClose={ this.closeSheet }
+				onClose={ closeSheet }
 				onModalHide={ () => {
-					if ( this.state.sendFallbackMessage ) {
+					if ( sendFallbackMessage ) {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
 						// A small delay will ensure that the controller has already been removed.
-						this.timeout = setTimeout( () => {
+						timeoutId.current = setTimeout( () => {
 							requestUnsupportedBlockFallback(
 								`<!-- wp:block {"ref":${ reusableBlock.id }} /-->`,
 								clientId,
 								reusableBlock.name,
 								reusableBlock.title
 							);
+							invalidateResolution(
+								'getEntityRecord',
+								recordArgs
+							);
 						}, 100 );
-						this.setState( { sendFallbackMessage: false } );
+						setSendFallbackMessage( false );
 					}
 				} }
 			>
@@ -153,13 +155,13 @@ class ReusableBlockEdit extends Component {
 					<BottomSheet.Cell
 						label={ __( 'Edit block in web browser' ) }
 						separatorType="topFullWidth"
-						onPress={ this.requestFallback }
+						onPress={ requestFallback }
 						labelStyle={ actionButtonStyle }
 					/>
 					<BottomSheet.Cell
 						label={ __( 'Dismiss' ) }
 						separatorType="topFullWidth"
-						onPress={ this.toggleSheet }
+						onPress={ toggleSheet }
 						labelStyle={ actionButtonStyle }
 					/>
 				</>
@@ -167,101 +169,45 @@ class ReusableBlockEdit extends Component {
 		);
 	}
 
-	render() {
-		const { isSelected, reusableBlock, isFetching, settings } = this.props;
-		const { isEditing, blocks } = this.state;
+	if ( ! hasResolved ) {
+		return null;
+	}
 
-		if ( ! reusableBlock && isFetching ) {
-			return null;
-		}
-
-		if ( ! reusableBlock ) {
-			return (
-				<Text>
-					{ __( 'Block has been deleted or is unavailable.' ) }
-				</Text>
-			);
-		}
-
-		const { title } = reusableBlock;
-		let element = (
-			<BlockEditorProvider
-				settings={ settings }
-				value={ blocks }
-				onChange={ this.setBlocks }
-				onInput={ this.setBlocks }
-			>
-				<BlockList withFooter={ false } marginHorizontal={ 0 } />
-			</BlockEditorProvider>
-		);
-
-		if ( ! isEditing ) {
-			element = <Disabled>{ element }</Disabled>;
-		}
-
+	if ( ! reusableBlock ) {
 		return (
-			<TouchableWithoutFeedback
-				disabled={ ! isSelected }
-				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Tap here to show help' ) }
-				onPress={ this.toggleSheet }
-			>
-				<View>
-					{ isSelected && <EditTitle title={ title } /> }
-					{ element }
-					{ this.renderSheet( title ) }
-				</View>
-			</TouchableWithoutFeedback>
+			<Text>{ __( 'Block has been deleted or is unavailable.' ) }</Text>
 		);
 	}
+
+	const { title } = reusableBlock;
+	let element = (
+		<BlockEditorProvider
+			settings={ settings }
+			value={ blocks }
+			onChange={ onChange }
+			onInput={ onInput }
+		>
+			<BlockList withFooter={ false } marginHorizontal={ 0 } />
+		</BlockEditorProvider>
+	);
+
+	if ( ! isEditing ) {
+		element = <Disabled>{ element }</Disabled>;
+	}
+
+	return (
+		<TouchableWithoutFeedback
+			disabled={ ! isSelected }
+			accessibilityLabel={ __( 'Help button' ) }
+			accessibilityRole={ 'button' }
+			accessibilityHint={ __( 'Tap here to show help' ) }
+			onPress={ toggleSheet }
+		>
+			<View>
+				{ isSelected && <EditTitle title={ title } /> }
+				{ element }
+				{ renderSheet() }
+			</View>
+		</TouchableWithoutFeedback>
+	);
 }
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const {
-			__experimentalGetReusableBlock: getReusableBlock,
-			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
-			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-		} = select( 'core/editor' );
-		const { canUser } = select( 'core' );
-		const { __experimentalGetParsedReusableBlock, getSettings } = select(
-			'core/block-editor'
-		);
-		const { ref } = ownProps.attributes;
-		const reusableBlock = getReusableBlock( ref );
-
-		return {
-			reusableBlock,
-			isFetching: isFetchingReusableBlock( ref ),
-			isSaving: isSavingReusableBlock( ref ),
-			blocks: reusableBlock
-				? __experimentalGetParsedReusableBlock( reusableBlock.id )
-				: null,
-			canUpdateBlock:
-				!! reusableBlock &&
-				! reusableBlock.isTemporary &&
-				!! canUser( 'update', 'blocks', ref ),
-			settings: getSettings(),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			__experimentalConvertBlockToStatic: convertBlockToStatic,
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			__experimentalUpdateReusableBlock: updateReusableBlock,
-			__experimentalSaveReusableBlock: saveReusableBlock,
-		} = dispatch( 'core/editor' );
-		const { ref } = ownProps.attributes;
-
-		return {
-			fetchReusableBlock: partial( fetchReusableBlocks, ref ),
-			onChange: partial( updateReusableBlock, ref ),
-			onSave: partial( saveReusableBlock, ref ),
-			convertToStatic() {
-				convertBlockToStatic( ownProps.clientId );
-			},
-		};
-	} ),
-	withPreferredColorScheme,
-] )( ReusableBlockEdit );
