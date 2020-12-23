@@ -30,6 +30,10 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import { getTreeIdFromUIClientId } from './utils';
 
 /**
  * A block selection object.
@@ -205,11 +209,16 @@ export const getBlocks = createSelector(
 			getBlock( state, clientId )
 		);
 	},
-	( state, rootClientId ) =>
-		map(
-			state.blocks.order[ rootClientId || '' ],
-			( id ) => state.blocks.cache[ id ]
-		)
+	( state, rootClientId ) => {
+		const treeId = getTreeIdFromUIClientId( rootClientId );
+
+		return (
+			map(
+				state.blocks.order[ treeId ][ rootClientId || '' ],
+				( id ) => state.blocks.cache[ id ]
+			) || []
+		);
+	}
 );
 
 /**
@@ -640,7 +649,8 @@ export function getAdjacentBlockClientId( state, startClientId, modifier = 1 ) {
 	}
 
 	const { order } = state.blocks;
-	const orderSet = order[ rootClientId ];
+	const treeId = getTreeIdFromUIClientId( rootClientId );
+	const orderSet = order[ treeId ][ rootClientId ];
 	const index = orderSet.indexOf( startClientId );
 	const nextIndex = index + 1 * modifier;
 
@@ -929,7 +939,8 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return state.blocks.order[ rootClientId || '' ] || EMPTY_ARRAY;
+	const treeId = getTreeIdFromUIClientId( rootClientId );
+	return state.blocks.order[ treeId ][ rootClientId || '' ] || EMPTY_ARRAY;
 }
 
 /**

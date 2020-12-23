@@ -25,6 +25,12 @@ import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import { __unstableMarkAutomaticChangeFinalControl } from '../store/controls';
+import {
+	dropTreeIdFromBlocks,
+	dropTreeIdFromClientId,
+	dropTreeIdFromClientIds,
+	splitUIClientId,
+} from './utils';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -47,12 +53,14 @@ function* ensureDefaultBlock() {
  * reset to the specified array of blocks, taking precedence over any other
  * content reflected as an edit in state.
  *
- * @param {Array} blocks Array of blocks.
+ * @param {Array}   blocks Array of blocks.
+ * @param {string?} treeId Tree Id.
  */
-export function* resetBlocks( blocks ) {
+export function* resetBlocks( blocks, treeId = 'default' ) {
 	yield {
 		type: 'RESET_BLOCKS',
 		blocks,
+		treeId,
 	};
 	return yield* validateBlocksToTemplate( blocks );
 }
@@ -128,13 +136,18 @@ export function resetSelection( selectionStart, selectionEnd ) {
  * replacing.
  *
  * @param {Object[]} blocks Array of block objects.
- *
- * @return {Object} Action object.
  */
-export function receiveBlocks( blocks ) {
-	return {
+export function* receiveBlocks( blocks ) {
+	if ( ! blocks.length ) {
+		return;
+	}
+
+	const [ treeId ] = splitUIClientId( blocks[ 0 ].clientId );
+
+	yield {
 		type: 'RECEIVE_BLOCKS',
-		blocks,
+		blocks: dropTreeIdFromBlocks( blocks ),
+		treeId,
 	};
 }
 
@@ -144,13 +157,15 @@ export function receiveBlocks( blocks ) {
  *
  * @param {string|string[]} clientIds  Block client IDs.
  * @param {Object}          attributes Block attributes to be merged.
- *
- * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientIds, attributes ) {
+export function* updateBlockAttributes( clientIds, attributes ) {
+	if ( ! clientIds.length ) {
+		return;
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
-		clientIds: castArray( clientIds ),
+		clientIds: dropTreeIdFromClientIds( castArray( clientIds ) ),
 		attributes,
 	};
 }
@@ -167,7 +182,7 @@ export function updateBlockAttributes( clientIds, attributes ) {
 export function updateBlock( clientId, updates ) {
 	return {
 		type: 'UPDATE_BLOCK',
-		clientId,
+		clientId: splitUIClientId( clientId )[ 1 ],
 		updates,
 	};
 }
@@ -185,10 +200,12 @@ export function updateBlock( clientId, updates ) {
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = null ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( clientId );
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
-		clientId,
+		treeId,
+		clientId: canonicalClientId,
 	};
 }
 
@@ -259,8 +276,18 @@ export function stopMultiSelect() {
  * @param {string} end   Last block of the multiselection.
  */
 export function* multiSelect( start, end ) {
+	let treeId;
+	if ( start?.clientId ) {
+		treeId = splitUIClientId( start.clientId )[ 0 ];
+		start.clientId = splitUIClientId( start.clientId )[ 1 ];
+	}
+	if ( end?.clientId ) {
+		end.clientId = splitUIClientId( end.clientId )[ 1 ];
+	}
+
 	yield {
 		type: 'MULTI_SELECT',
+		treeId,
 		start,
 		end,
 	};
@@ -356,6 +383,9 @@ export function* replaceBlocks(
 	meta
 ) {
 	clientIds = castArray( clientIds );
+	if ( ! clientIds ) {
+		return;
+	}
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
 		yield controls.select( 'core/block-editor', 'getSettings' )
@@ -380,8 +410,9 @@ export function* replaceBlocks(
 	}
 	yield {
 		type: 'REPLACE_BLOCKS',
-		clientIds,
-		blocks,
+		treeId: splitUIClientId( clientIds[ 0 ] )[ 0 ],
+		clientIds: dropTreeIdFromClientIds( clientIds ),
+		blocks: dropTreeIdFromBlocks( blocks ),
 		time: Date.now(),
 		indexToSelect,
 		initialPosition,
@@ -412,11 +443,16 @@ export function replaceBlock( clientId, block ) {
  * @return {Function} Action creator.
  */
 function createOnMove( type ) {
-	return ( clientIds, rootClientId ) => {
-		return {
-			clientIds: castArray( clientIds ),
+	return function* ( clientIds, rootClientId ) {
+		clientIds = castArray( clientIds );
+		if ( ! clientIds.length ) {
+			return;
+		}
+		yield {
+			clientIds: dropTreeIdFromClientIds( clientIds ),
 			type,
-			rootClientId,
+			treeId: splitUIClientId( clientIds[ 0 ] )[ 0 ],
+			rootClientId: dropTreeIdFromClientId( rootClientId ),
 		};
 	};
 }
@@ -449,15 +485,19 @@ export function* moveBlocksToPosition(
 
 	// If locking is equal to all on the original clientId (fromRootClientId),
 	// it is not possible to move the block to any other position.
-	if ( templateLock === 'all' ) {
+	if ( templateLock === 'all' || ! clientIds.length ) {
 		return;
 	}
 
 	const action = {
 		type: 'MOVE_BLOCKS_TO_POSITION',
-		fromRootClientId,
-		toRootClientId,
-		clientIds,
+		fromTreeId: splitUIClientId( clientIds[ 0 ] )[ 0 ],
+		toTreeId: toRootClientId
+			? splitUIClientId( toRootClientId )[ 0 ]
+			: 'default',
+		fromRootClientId: dropTreeIdFromClientId( fromRootClientId ),
+		toRootClientId: dropTreeIdFromClientId( toRootClientId ),
+		clientIds: dropTreeIdFromClientIds( clientIds ),
 		index,
 	};
 
@@ -540,7 +580,7 @@ export function insertBlock(
  * @param {?number}    index           Index at which block should be inserted.
  * @param {?string}    rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean}   updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta             Optional Meta values to be passed to the action object.
+ * @param {?Object}    meta            Optional Meta values to be passed to the action object.
  *
  *  @return {Object} Action object.
  */
@@ -570,9 +610,10 @@ export function* insertBlocks(
 	if ( allowedBlocks.length ) {
 		return {
 			type: 'INSERT_BLOCKS',
-			blocks: allowedBlocks,
+			treeId: splitUIClientId( allowedBlocks[ 0 ].clientId )[ 0 ],
+			blocks: dropTreeIdFromBlocks( allowedBlocks ),
 			index,
-			rootClientId,
+			rootClientId: dropTreeIdFromClientId( rootClientId ),
 			time: Date.now(),
 			updateSelection,
 			meta,
@@ -593,9 +634,11 @@ export function* insertBlocks(
  * @return {Object} Action object.
  */
 export function __unstableSetInsertionPoint( rootClientId, index ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( rootClientId );
 	return {
 		type: 'SET_INSERTION_POINT',
-		rootClientId,
+		rootClientId: canonicalClientId,
+		treeId,
 		index,
 	};
 }
@@ -613,9 +656,11 @@ export function __unstableSetInsertionPoint( rootClientId, index ) {
  * @return {Object} Action object.
  */
 export function showInsertionPoint( rootClientId, index ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( rootClientId );
 	return {
 		type: 'SHOW_INSERTION_POINT',
-		rootClientId,
+		rootClientId: canonicalClientId,
+		treeId,
 		index,
 	};
 }
@@ -674,7 +719,8 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
 	yield {
 		type: 'MERGE_BLOCKS',
-		blocks,
+		blocks: dropTreeIdFromClientIds( blocks ),
+		treeId: splitUIClientId( firstBlockClientId )[ 0 ],
 	};
 
 	const [ clientIdA, clientIdB ] = blocks;
@@ -871,7 +917,8 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 
 	yield {
 		type: 'REMOVE_BLOCKS',
-		clientIds,
+		clientIds: dropTreeIdFromClientIds( clientIds ),
+		treeId: splitUIClientId( clientIds[ 0 ] ),
 	};
 
 	// To avoid a focus loss when removing the last block, assure there is
@@ -911,8 +958,9 @@ export function replaceInnerBlocks(
 ) {
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
-		rootClientId,
-		blocks,
+		rootClientId: dropTreeIdFromClientId( rootClientId ),
+		treeId: splitUIClientId( rootClientId )[ 0 ],
+		blocks: dropTreeIdFromBlocks( blocks ),
 		updateSelection,
 		time: Date.now(),
 	};
@@ -927,9 +975,11 @@ export function replaceInnerBlocks(
  * @return {Object} Action object.
  */
 export function toggleBlockMode( clientId ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( clientId );
 	return {
 		type: 'TOGGLE_BLOCK_MODE',
-		clientId,
+		clientId: canonicalClientId,
+		treeId,
 	};
 }
 
@@ -962,10 +1012,12 @@ export function stopTyping() {
  *
  * @return {Object} Action object.
  */
-export function startDraggingBlocks( clientIds = [] ) {
+export function* startDraggingBlocks( clientIds = [] ) {
+	const [ treeId ] = splitUIClientId( clientIds[ 0 ] );
 	return {
 		type: 'START_DRAGGING_BLOCKS',
-		clientIds,
+		clientIds: dropTreeIdFromClientIds( clientIds ),
+		treeId,
 	};
 }
 
@@ -1019,9 +1071,11 @@ export function selectionChange(
 	startOffset,
 	endOffset
 ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( clientId );
 	return {
 		type: 'SELECTION_CHANGE',
-		clientId,
+		clientId: canonicalClientId,
+		treeId,
 		attributeKey,
 		startOffset,
 		endOffset,
@@ -1061,9 +1115,11 @@ export function insertDefaultBlock( attributes, rootClientId, index ) {
  * @return {Object} Action object
  */
 export function updateBlockListSettings( clientId, settings ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( clientId );
 	return {
 		type: 'UPDATE_BLOCK_LIST_SETTINGS',
-		clientId,
+		clientId: canonicalClientId,
+		treeId,
 		settings,
 	};
 }
@@ -1310,9 +1366,11 @@ export function* insertAfterBlock( clientId ) {
  * @param {boolean} isHighlighted The highlight state.
  */
 export function toggleBlockHighlight( clientId, isHighlighted ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( clientId );
 	return {
 		type: 'TOGGLE_BLOCK_HIGHLIGHT',
-		clientId,
+		clientId: canonicalClientId,
+		treeId,
 		isHighlighted,
 	};
 }
@@ -1342,9 +1400,11 @@ export function setHasControlledInnerBlocks(
 	clientId,
 	hasControlledInnerBlocks
 ) {
+	const [ treeId, canonicalClientId ] = splitUIClientId( clientId );
 	return {
 		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+		clientId: canonicalClientId,
+		treeId,
 		hasControlledInnerBlocks,
-		clientId,
 	};
 }

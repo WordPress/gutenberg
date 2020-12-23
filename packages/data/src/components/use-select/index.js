@@ -114,18 +114,16 @@ export default function useSelect( _mapSelect, deps ) {
 
 	let mapOutput;
 
-	try {
-		if (
-			latestMapSelect.current !== mapSelect ||
-			latestMapOutputError.current
-		) {
-			mapOutput = trapSelect( () =>
-				mapSelect( registry.select, registry )
-			);
-		} else {
-			mapOutput = latestMapOutput.current;
-		}
-	} catch ( error ) {
+	//try {
+	if (
+		latestMapSelect.current !== mapSelect ||
+		latestMapOutputError.current
+	) {
+		mapOutput = trapSelect( () => mapSelect( registry.select, registry ) );
+	} else {
+		mapOutput = latestMapOutput.current;
+	}
+	/*} catch ( error ) {
 		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
 		if ( latestMapOutputError.current ) {
@@ -138,7 +136,7 @@ export default function useSelect( _mapSelect, deps ) {
 			// eslint-disable-next-line no-console
 			console.error( errorMessage );
 		}
-	}
+	}*/
 
 	useIsomorphicLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
@@ -159,20 +157,18 @@ export default function useSelect( _mapSelect, deps ) {
 	useIsomorphicLayoutEffect( () => {
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
-				try {
-					const newMapOutput = trapSelect( () =>
-						latestMapSelect.current( registry.select, registry )
-					);
+				//	try {
+				const newMapOutput = trapSelect( () =>
+					latestMapSelect.current( registry.select, registry )
+				);
 
-					if (
-						isShallowEqual( latestMapOutput.current, newMapOutput )
-					) {
-						return;
-					}
-					latestMapOutput.current = newMapOutput;
-				} catch ( error ) {
-					latestMapOutputError.current = error;
+				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
+					return;
 				}
+				latestMapOutput.current = newMapOutput;
+				/*	} catch ( error ) {
+					latestMapOutputError.current = error;
+				}*/
 				forceRender();
 			}
 		};
