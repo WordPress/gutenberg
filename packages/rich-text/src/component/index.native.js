@@ -46,6 +46,7 @@ import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
+import { store as richTextStore } from '../store';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -729,7 +730,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
+		if ( this._editor.isFocused() ) {
 			this._editor.blur();
 		}
 	}
@@ -987,7 +988,7 @@ export default compose( [
 			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
 
 		return {
-			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			formatTypes: select( richTextStore ).getFormatTypes(),
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,

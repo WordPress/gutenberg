@@ -18,8 +18,8 @@ function PostTemplate() {
 	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
-			__unstableIsAutodraftPost,
 			getCurrentPostType,
+			getCurrentPost,
 		} = select( editorStore );
 		const { __experimentalGetTemplateForLink } = select( coreStore );
 		const { isEditingTemplate } = select( editPostStore );
@@ -30,7 +30,7 @@ function PostTemplate() {
 			template:
 				isFSEEnabled &&
 				link &&
-				! __unstableIsAutodraftPost() &&
+				getCurrentPost().status !== 'auto-draft' &&
 				getCurrentPostType() !== 'wp_template'
 					? __experimentalGetTemplateForLink( link )
 					: null,
