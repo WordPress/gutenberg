@@ -4,6 +4,11 @@
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
 /**
@@ -36,7 +41,7 @@ export default function useBlockDisplayInformation( clientId ) {
 		( select ) => {
 			if ( ! clientId ) return null;
 			const { getBlockName, getBlockAttributes } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const { getBlockType, getBlockVariations } = select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -48,7 +53,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: blockType.icon,
 				description: blockType.description,
 			};
-			if ( ! variations ) return blockTypeInfo;
+			if ( ! variations?.length ) return blockTypeInfo;
 			const attributes = getBlockAttributes( clientId );
 			const match = variations.find( ( variation ) =>
 				variation.isActive?.( attributes, variation.attributes )
