@@ -74,19 +74,24 @@
 			}
 
 			&.is-style-rounded {
-				// Apply to IE in this context as using flex: 1 1 auto makes it a happy camper.
-				flex-direction: column;
 				> div,
 				> a {
-					flex: 1 1 auto;
+					// Not supported in IE11.
+					@supports ( position: sticky ) {
+						flex: 1 1 auto;
+					}
 				}
 				figcaption {
-					flex: initial;
 					background: none;
-					color: inherit;
-					margin: 0;
-					padding: 10px 10px 9px;
-					position: relative;
+					// Not supported in IE11.
+					@supports ( position: sticky ) {
+						flex: initial;
+						background: none;
+						color: inherit;
+						margin: 0;
+						padding: 10px 10px 9px;
+						position: relative;
+					}
 				}
 			}
 		}
