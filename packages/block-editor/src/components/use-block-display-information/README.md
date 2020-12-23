@@ -23,7 +23,7 @@ function DemoBlockCard( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const { title, icon, description } = blockInformation;
 	return (
-		<div style={ resizeStyles }>
+		<div>
 			<BlockIcon icon={ icon } showColors />
 			<h1>{ title }</h1>
 			<p>{ description }</p>
