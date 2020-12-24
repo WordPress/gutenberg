@@ -17,8 +17,6 @@ describe( 'Font Size Picker', () => {
 	const FONT_SIZE_LABEL_SELECTOR = "//label[contains(text(), 'Font size')]";
 	const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
 		"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
-	const FONT_SIZE_RESET_BUTTON_SELECTOR =
-		"//fieldset[legend[contains(text(),'Font size')]]//button[//span[contains(text(), 'Reset')] or contains(text(), 'Reset')]";
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -59,6 +57,7 @@ describe( 'Font Size Picker', () => {
 		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		// This should be the "small" font-size of the editor defaults.
 		await page.keyboard.type( '13' );
+		await page.keyboard.press( 'Enter' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -72,6 +71,7 @@ describe( 'Font Size Picker', () => {
 
 		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await page.keyboard.type( '23' );
+		await page.keyboard.press( 'Enter' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -88,8 +88,10 @@ describe( 'Font Size Picker', () => {
 		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await pressKeyTimes( 'ArrowDown', 2 );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 
-		await first( await page.$x( FONT_SIZE_RESET_BUTTON_SELECTOR ) ).click();
+		await page.keyboard.press( 'Enter' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -110,6 +112,7 @@ describe( 'Font Size Picker', () => {
 		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await pressKeyTimes( 'ArrowRight', 5 );
 		await pressKeyTimes( 'Backspace', 5 );
+		await page.keyboard.press( 'Enter' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -123,12 +126,12 @@ describe( 'Font Size Picker', () => {
 
 		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await page.keyboard.type( '23' );
-
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Enter' );
 
 		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Enter' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
