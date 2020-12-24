@@ -4,6 +4,9 @@
 
 ## 12.0.0 (2020-12-17)
 
+### Enhancements
+- ComboboxControl: Deburr option labels before filter
+
 ### Breaking Change
 
 - Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
