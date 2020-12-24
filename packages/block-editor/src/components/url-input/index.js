@@ -100,10 +100,12 @@ function URLInput( {
 	const [ prevDisableSuggestions, setPrevDisableSuggestions ] = useState(
 		null
 	);
+	const [ prevShowInitalSuggestions, setShowInitialSuggestions ] = useState(
+		null
+	);
 
 	const autocompleteRef = useRef( parentAutocompleteRef );
 	const inputRef = useRef( null );
-	const prevValue = useRef( value );
 	const pendingRequest = useRef( null );
 	const scrollingIntoView = useRef( false );
 	const suggestionNodes = useRef( [] );
@@ -122,14 +124,6 @@ function URLInput( {
 			fetchLinkSuggestions: settings.__experimentalFetchLinkSuggestions,
 		};
 	} );
-
-	useEffect( () => {
-		if ( prevValue.current !== value && shouldShowInitialSuggestions() ) {
-			updateSuggestions();
-		}
-
-		prevValue.current = value;
-	}, [ value ] );
 
 	useEffect( () => {
 		// Only have to worry about scrolling selected suggestion into view when already expanded.
@@ -152,36 +146,68 @@ function URLInput( {
 	}, [ showSuggestions, value ] );
 
 	useEffect( () => {
-		if ( shouldShowInitialSuggestions() ) {
-			updateSuggestions();
-		}
-
-		// cleanup
-		return () => {
-			clearSuggestionsRequest();
-		};
-	}, [] );
-
-	function shouldShowInitialSuggestions() {
-		return (
+		const shouldShowInitialSuggestions =
 			! isUpdatingSuggestions() &&
 			showInitialSuggestions &&
 			! value?.length &&
-			! suggestions.length
+			! suggestions.length;
+
+		if ( shouldShowInitialSuggestions ) {
+			updateSuggestions();
+		}
+	}, [ value, showInitialSuggestions ] );
+
+	useEffect(
+		() =>
+			function cleanup() {
+				pendingRequest.current = null;
+			},
+		[]
+	);
+
+	if ( prevInstanceId !== instanceId ) {
+		setSuggestionsListboxId(
+			`block-editor-url-input-suggestions-${ instanceId }`
 		);
+		setSuggestionOptionIdPrefix(
+			`block-editor-url-input-suggestion-${ instanceId }`
+		);
+		setPrevInstanceId( instanceId );
 	}
 
-	function clearSuggestionsRequest() {
-		pendingRequest.current = null;
+	const disableSuggestionsChanged =
+		prevDisableSuggestions !== disableSuggestions;
+	const showInitialSuggestionsChanged =
+		prevShowInitalSuggestions !== showInitialSuggestions;
+
+	if ( disableSuggestionsChanged || showInitialSuggestionsChanged ) {
+		if ( disableSuggestionsChanged ) {
+			setPrevDisableSuggestions( disableSuggestions );
+		}
+
+		if ( showInitialSuggestionsChanged ) {
+			setShowInitialSuggestions( showInitialSuggestions );
+		}
+
+		let shouldShowSuggestions = showSuggestions;
+
+		if (
+			! ( showInitialSuggestions || value?.length ) ||
+			disableSuggestions
+		) {
+			shouldShowSuggestions = false;
+		}
+
+		setShowSuggestions( shouldShowSuggestions );
 	}
 
 	function isUpdatingSuggestions() {
-		return pendingRequest.current;
+		return !! pendingRequest.current;
 	}
 
 	function clearUpdateSuggestions() {
 		setLoading( false );
-		clearSuggestionsRequest();
+		pendingRequest.current = null;
 	}
 
 	function allowSuggestionsRequest( search = '' ) {
@@ -355,21 +381,6 @@ function URLInput( {
 		setShowSuggestions( false );
 	}
 
-	if ( prevInstanceId !== instanceId ) {
-		setSuggestionsListboxId(
-			`block-editor-url-input-suggestions-${ instanceId }`
-		);
-		setSuggestionOptionIdPrefix(
-			`block-editor-url-input-suggestion-${ instanceId }`
-		);
-		setPrevInstanceId( instanceId );
-	}
-
-	if ( prevDisableSuggestions !== disableSuggestions ) {
-		setPrevDisableSuggestions( disableSuggestions );
-		setShowSuggestions( disableSuggestions );
-	}
-
 	function buildControlProps() {
 		const controlProps = {
 			id: `url-input-control-${ instanceId }`,
@@ -440,8 +451,7 @@ function URLInput( {
 				// Move focus to the input field when a link suggestion is clicked.
 				inputRef.current.focus();
 			},
-			isInitialSuggestions:
-				shouldShowInitialSuggestions && ! value?.length,
+			isInitialSuggestions: ! value?.length && showInitialSuggestions,
 			isLoading,
 			className,
 		};
