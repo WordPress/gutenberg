@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 9.6.1 =
+
+### Bugfixes
+
+- Include block's CSS in the release for FSE themes ([27884](https://github.com/WordPress/gutenberg/pull/27884))
+
+
 = 9.6.0 =
 
 
