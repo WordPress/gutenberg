@@ -84,6 +84,7 @@ export default function useBlockSync( {
 	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
+	const subscribed = useRef( false );
 
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
@@ -97,14 +98,18 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			// This needs to be calledd after the setHasControlledInnerBlocks call
+			// This needs to be called after the setHasControlledInnerBlocks call
 			const storeBlocks = controlledBlocks.map( ( block ) =>
 				cloneBlock( block )
 			);
-			pendingChanges.current.incoming = storeBlocks;
+			if ( subscribed.current ) {
+				pendingChanges.current.incoming = storeBlocks;
+			}
 			replaceInnerBlocks( clientId, storeBlocks );
 		} else {
-			pendingChanges.current.incoming = controlledBlocks;
+			if ( subscribed.current ) {
+				pendingChanges.current.incoming = controlledBlocks;
+			}
 			resetBlocks( controlledBlocks );
 		}
 	};
@@ -163,6 +168,7 @@ export default function useBlockSync( {
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 
+		subscribed.current = true;
 		const unsubscribe = registry.subscribe( () => {
 			// Sometimes, when changing block lists, lingering subscriptions
 			// might trigger before they are cleaned up. If the block for which
