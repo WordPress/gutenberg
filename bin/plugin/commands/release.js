@@ -520,11 +520,11 @@ async function runUpdateTrunkContentStep(
 
 		// Commit the content changes
 		runShellScript(
-			"svn st | grep '^?' | awk '{print $2}' | xargs svn add",
+			"svn st | grep '^?' | awk '{print $2}' | xargs -r svn add",
 			svnWorkingDirectoryPath
 		);
 		runShellScript(
-			"svn st | grep '^!' | awk '{print $2}' | xargs svn rm",
+			"svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm",
 			svnWorkingDirectoryPath
 		);
 		await askForConfirmation(
