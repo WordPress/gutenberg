@@ -2,24 +2,25 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useCallback } from '@wordpress/element';
+import {
+	useEntityBlockEditor,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	Disabled,
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	BlockEditorProvider,
-	WritingFlow,
-	BlockList,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	InnerBlocks,
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
@@ -34,68 +35,48 @@ export default function ReusableBlockEdit( {
 } ) {
 	const recordArgs = [ 'postType', 'wp_block', ref ];
 
-	const {
-		reusableBlock,
-		hasResolved,
-		isEditing,
-		isSaving,
-		canUserUpdate,
-		settings,
-	} = useSelect(
+	const { reusableBlock, hasResolved, hasInnerBlockSelected } = useSelect(
 		( select ) => ( {
-			reusableBlock: select( 'core' ).getEditedEntityRecord(
+			reusableBlock: select( coreStore ).getEditedEntityRecord(
 				...recordArgs
 			),
-			hasResolved: select( 'core' ).hasFinishedResolution(
+			hasResolved: select( coreStore ).hasFinishedResolution(
 				'getEditedEntityRecord',
 				recordArgs
 			),
-			isSaving: select( 'core' ).isSavingEntityRecord( ...recordArgs ),
-			canUserUpdate: select( 'core' ).canUser( 'update', 'blocks', ref ),
-			isEditing: select(
-				reusableBlocksStore
-			).__experimentalIsEditingReusableBlock( clientId ),
-			settings: select( 'core/block-editor' ).getSettings(),
+			hasInnerBlockSelected: select(
+				blockEditorStore
+			).hasSelectedInnerBlock( clientId, true ),
 		} ),
 		[ ref, clientId ]
-	);
-
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
-	const { __experimentalSetEditingReusableBlock } = useDispatch(
-		reusableBlocksStore
-	);
-	const setIsEditing = useCallback(
-		( value ) => {
-			__experimentalSetEditingReusableBlock( clientId, value );
-		},
-		[ clientId ]
 	);
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
 	} = useDispatch( reusableBlocksStore );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
-	const save = useCallback( async function () {
-		try {
-			await saveEditedEntityRecord( ...recordArgs );
-			createSuccessNotice( __( 'Block updated.' ), {
-				type: 'snackbar',
-			} );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-		}
-	}, recordArgs );
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
+	);
+	const [ title, setTitle ] = useEntityProp(
+		'postType',
+		'wp_block',
+		'title',
+		ref
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			renderAppender: blocks?.length
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
 	);
 
 	const blockProps = useBlockProps();
@@ -120,34 +101,6 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	/**
-	 * Clear the selected block when focus moves to the reusable block list.
-	 * These blocks are in different stores and only one block should be
-	 * selected at a time.
-	 */
-	function onFocus() {
-		clearSelectedBlock();
-	}
-
-	let element = (
-		<BlockEditorProvider
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
-			settings={ settings }
-		>
-			<div className="block-editor-block-list__block" onFocus={ onFocus }>
-				<WritingFlow>
-					<BlockList />
-				</WritingFlow>
-			</div>
-		</BlockEditorProvider>
-	);
-
-	if ( ! isEditing ) {
-		element = <Disabled>{ element }</Disabled>;
-	}
-
 	return (
 		<div { ...blockProps }>
 			<BlockControls>
@@ -161,23 +114,15 @@ export default function ReusableBlockEdit( {
 			</BlockControls>
 
 			<div className="block-library-block__reusable-block-container">
-				{ ( isSelected || isEditing ) && (
-					<ReusableBlockEditPanel
-						isEditing={ isEditing }
-						title={ reusableBlock.title }
-						isSaving={ isSaving }
-						isEditDisabled={ ! canUserUpdate }
-						onEdit={ () => setIsEditing( true ) }
-						onChangeTitle={ ( title ) =>
-							editEntityRecord( ...recordArgs, { title } )
-						}
-						onSave={ () => {
-							save();
-							setIsEditing( false );
-						} }
-					/>
-				) }
-				{ element }
+				{ isSelected ||
+					( hasInnerBlockSelected && (
+						<ReusableBlockEditPanel
+							title={ title }
+							onChange={ setTitle }
+						/>
+					) ) }
+
+				{ <div { ...innerBlocksProps } /> }
 			</div>
 		</div>
 	);
