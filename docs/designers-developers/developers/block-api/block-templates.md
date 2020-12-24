@@ -110,7 +110,7 @@ add_action( 'init', 'myplugin_register_template' );
 - `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
 - `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
-Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in an InnerBlocks area: the locking of the parent InnerBlocks area is used. If the block is a top level block: the locking of the Custom Post Type is used.
+Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in an InnerBlocks area, the locking of the parent InnerBlocks area is used. If the block is a top level block, the locking configuration of the current post type is used.
 
 ## Nested Templates
 
