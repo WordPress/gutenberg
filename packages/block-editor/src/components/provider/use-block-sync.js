@@ -98,7 +98,6 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			// This needs to be called after the setHasControlledInnerBlocks call
 			const storeBlocks = controlledBlocks.map( ( block ) =>
 				cloneBlock( block )
 			);
