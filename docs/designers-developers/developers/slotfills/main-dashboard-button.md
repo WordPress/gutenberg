@@ -57,7 +57,7 @@ In the site editor this slot refers to the "back to dashboard" button in the nav
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/edit-site';
+} from '@wordpress/edit-post';
 import {
 	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
