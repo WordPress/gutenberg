@@ -24,6 +24,7 @@ function PostPublishPanelPrepublish( {
 	hasPublishAction,
 	isBeingScheduled,
 	children,
+	publishActionText,
 } ) {
 	let prePublishTitle, prePublishBodyText;
 
@@ -69,7 +70,7 @@ function PostPublishPanelPrepublish( {
 					<PanelBody
 						initialOpen={ false }
 						title={ [
-							__( 'Publish:' ),
+							`${ publishActionText }:`,
 							<span
 								className="editor-post-publish-panel__link"
 								key="label"
@@ -93,6 +94,8 @@ export default withSelect( ( select ) => {
 	const { getCurrentPost, isEditedPostBeingScheduled } = select(
 		'core/editor'
 	);
+	const { getSettings } = select( 'core/block-editor' );
+	const { publishActionText } = getSettings();
 	return {
 		hasPublishAction: get(
 			getCurrentPost(),
@@ -100,5 +103,6 @@ export default withSelect( ( select ) => {
 			false
 		),
 		isBeingScheduled: isEditedPostBeingScheduled(),
+		publishActionText,
 	};
 } )( PostPublishPanelPrepublish );

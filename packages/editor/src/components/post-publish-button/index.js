@@ -101,6 +101,7 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
+			publishActionText,
 		} = this.props;
 
 		const isButtonDisabled =
@@ -163,7 +164,7 @@ export class PostPublishButton extends Component {
 
 		const toggleChildren = isBeingScheduled
 			? __( 'Schedule…' )
-			: __( 'Publish' );
+			: publishActionText;
 		const buttonChildren = (
 			<PublishButtonLabel
 				forceIsSaving={ forceIsSaving }
@@ -208,6 +209,8 @@ export default compose( [
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 		} = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { publishActionText } = getSettings();
 		return {
 			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
@@ -224,6 +227,7 @@ export default compose( [
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
+			publishActionText,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
