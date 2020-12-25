@@ -108,10 +108,10 @@ describe( 'Order of block keyboard navigation', () => {
 			await page.keyboard.type( paragraphBlock );
 		}
 
-		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
+		// Clear the selected block and put focus in front of the block list.
+		await page.evaluate( () => {
+			document.querySelector( '.editor-styles-wrapper' ).focus();
+		} );
 
 		await page.keyboard.press( 'Tab' );
 		await expect(
@@ -143,13 +143,9 @@ describe( 'Order of block keyboard navigation', () => {
 			await page.keyboard.type( paragraphBlock );
 		}
 
-		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
-
-		// Put focus behind the block list.
+		// Clear the selected block and put focus behind the block list.
 		await page.evaluate( () => {
+			document.querySelector( '.editor-styles-wrapper' ).focus();
 			document
 				.querySelector( '.interface-interface-skeleton__sidebar' )
 				.focus();
