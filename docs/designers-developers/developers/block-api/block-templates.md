@@ -1,6 +1,6 @@
 # Templates
 
-A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow to specify a default initial state for an editor session.
+A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session.
 
 The scope of templates include:
 
@@ -109,6 +109,8 @@ add_action( 'init', 'myplugin_register_template' );
 
 - `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
 - `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
+
+Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in an InnerBlocks area, the locking of the parent InnerBlocks area is used. If the block is a top level block, the locking configuration of the current post type is used.
 
 ## Nested Templates
 

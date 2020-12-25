@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 9.6.2 =
+
+### Bug Fixes
+
+ - Fix toolbar controls in the widgets screen.
+ - Fix the slash inserter in the widgets screen.
+
+
 = 9.6.1 =
 
 ### Bugfixes
