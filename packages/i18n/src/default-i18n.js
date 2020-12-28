@@ -26,6 +26,18 @@ const i18n = createI18n();
 export const setLocaleData = i18n.setLocaleData.bind( i18n );
 
 /**
+ * Returns the current locale data by domain in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {string} [domain] Domain for which configuration is wanted.
+ *
+ * @return {LocaleData} Locale data.
+ */
+export const getLocaleData = i18n.getLocaleData.bind( i18n );
+
+/**
  * Retrieve the translation of text.
  *
  * @see https://developer.wordpress.org/reference/functions/__/

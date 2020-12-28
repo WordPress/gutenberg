@@ -6,7 +6,7 @@ import { get, partial } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { PanelBody } from '@wordpress/components';
 import { PostFeaturedImage, PostFeaturedImageCheck } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
@@ -23,6 +23,8 @@ import { store as editPostStore } from '../../../store';
 const PANEL_NAME = 'featured-image';
 
 function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
+	const { __ } = useTranslate();
+
 	if ( ! isEnabled ) {
 		return null;
 	}

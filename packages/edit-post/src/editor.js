@@ -19,6 +19,7 @@ import {
 	SlotFillProvider,
 	__unstableDropZoneContextProvider as DropZoneContextProvider,
 } from '@wordpress/components';
+import { LocaleProvider } from '@wordpress/react-i18n';
 
 /**
  * Internal dependencies
@@ -160,25 +161,27 @@ function Editor( {
 			<EditPostSettings.Provider value={ settings }>
 				<SlotFillProvider>
 					<DropZoneContextProvider>
-						<EditorProvider
-							settings={ editorSettings }
-							post={ post }
-							initialEdits={ initialEdits }
-							useSubRegistry={ false }
-							__unstableTemplate={
-								isTemplateMode ? template : undefined
-							}
-							{ ...props }
-						>
-							<ErrorBoundary onError={ onError }>
-								<EditorInitialization postId={ postId } />
-								<Layout settings={ settings } />
-								<KeyboardShortcuts
-									shortcuts={ preventEventDiscovery }
-								/>
-							</ErrorBoundary>
-							<PostLockedModal />
-						</EditorProvider>
+						<LocaleProvider domain="default" locale="en_US">
+							<EditorProvider
+								settings={ editorSettings }
+								post={ post }
+								initialEdits={ initialEdits }
+								useSubRegistry={ false }
+								__unstableTemplate={
+									isTemplateMode ? template : undefined
+								}
+								{ ...props }
+							>
+								<ErrorBoundary onError={ onError }>
+									<EditorInitialization postId={ postId } />
+									<Layout settings={ settings } />
+									<KeyboardShortcuts
+										shortcuts={ preventEventDiscovery }
+									/>
+								</ErrorBoundary>
+								<PostLockedModal />
+							</EditorProvider>
+						</LocaleProvider>
 					</DropZoneContextProvider>
 				</SlotFillProvider>
 			</EditPostSettings.Provider>

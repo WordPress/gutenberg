@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { PanelBody } from '@wordpress/components';
 import {
 	PostExcerpt as PostExcerptForm,
@@ -21,6 +21,8 @@ import { store as editPostStore } from '../../../store';
 const PANEL_NAME = 'post-excerpt';
 
 function PostExcerpt( { isEnabled, isOpened, onTogglePanel } ) {
+	const { __ } = useTranslate();
+
 	if ( ! isEnabled ) {
 		return null;
 	}

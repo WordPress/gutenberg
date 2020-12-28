@@ -1752,6 +1752,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/react-i18n",
+		"slug": "packages-react-i18n",
+		"markdown_source": "../packages/react-i18n/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/react-native-aztec",
 		"slug": "packages-react-native-aztec",
 		"markdown_source": "../packages/react-native-aztec/README.md",

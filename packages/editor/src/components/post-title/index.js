@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
@@ -27,6 +27,7 @@ import PostTypeSupportCheck from '../post-type-support-check';
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
 export default function PostTitle() {
+	const { __ } = useTranslate();
 	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );

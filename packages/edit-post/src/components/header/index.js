@@ -10,6 +10,8 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { SelectControl } from '@wordpress/components';
+import { useTranslate } from '@wordpress/react-i18n';
 
 /**
  * Internal dependencies
@@ -22,6 +24,31 @@ import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import TemplateSaveButton from './template-save-button';
 import { store as editPostStore } from '../../store';
+
+function DemoButton() {
+	const { locale, switchToLocale } = useTranslate();
+
+	return (
+		<SelectControl
+			value={ locale }
+			onChange={ switchToLocale }
+			options={ [
+				{
+					label: 'English (US)',
+					value: 'en_US',
+				},
+				{
+					label: 'Deutsch (Deutschland)',
+					value: 'de_DE',
+				},
+				{
+					label: 'Español',
+					value: 'es_ES',
+				},
+			] }
+		/>
+	);
+}
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -64,6 +91,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
+				<DemoButton />
 				{ ! isEditingTemplate && (
 					<>
 						{ ! isPublishSidebarOpened && (

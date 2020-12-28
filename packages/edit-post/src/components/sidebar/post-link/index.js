@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
@@ -36,6 +36,8 @@ function PostLink( {
 	postSlug,
 	postTypeLabel,
 } ) {
+	const { __ } = useTranslate();
+
 	let prefixElement, postNameElement, suffixElement;
 	if ( isEditable ) {
 		prefixElement = permalinkPrefix && (

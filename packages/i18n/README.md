@@ -40,6 +40,23 @@ _Returns_
 
 -   `I18n`: I18n instance
 
+<a name="getLocaleData" href="#getLocaleData">#</a> **getLocaleData**
+
+Returns the current locale data by domain in a
+Jed-formatted JSON object shape.
+
+_Related_
+
+-   <http://messageformat.github.io/Jed/>
+
+_Parameters_
+
+-   _domain_ `[string]`: Domain for which configuration is wanted.
+
+_Returns_
+
+-   `LocaleData`: Locale data.
+
 <a name="isRTL" href="#isRTL">#</a> **isRTL**
 
 Check if current locale is RTL.

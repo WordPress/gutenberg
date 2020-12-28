@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, includes } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,14 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { POST_FORMATS } from '../post-format';
-
-const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
-	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
-	);
-	return find( formats, ( format ) => format.id === suggestedPostFormat );
-};
+import { usePostFormats } from '../post-format';
 
 const PostFormatSuggestion = ( {
 	suggestedPostFormat,
@@ -33,25 +26,24 @@ const PostFormatSuggestion = ( {
 );
 
 export default function PostFormatPanel() {
-	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
+	const { currentPostFormat, getSuggestedFormat } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
 			'core/editor'
 		);
-		const supportedFormats = get(
-			select( 'core' ).getThemeSupports(),
-			[ 'formats' ],
-			[]
-		);
 		return {
 			currentPostFormat: getEditedPostAttribute( 'format' ),
-			suggestion: getSuggestion(
-				supportedFormats,
-				getSuggestedPostFormat()
-			),
+			getSuggestedFormat: getSuggestedPostFormat,
 		};
 	}, [] );
 
 	const { editPost } = useDispatch( 'core/editor' );
+
+	const formats = usePostFormats();
+
+	const suggestion = find(
+		formats,
+		( format ) => format.id === getSuggestedFormat()
+	);
 
 	const onUpdatePostFormat = ( format ) => editPost( { format } );
 

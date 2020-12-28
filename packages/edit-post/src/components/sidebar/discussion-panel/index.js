@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import {
 	PostComments,
@@ -22,6 +22,8 @@ import { store as editPostStore } from '../../../store';
 const PANEL_NAME = 'discussion-panel';
 
 function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
+	const { __ } = useTranslate();
+
 	if ( ! isEnabled ) {
 		return null;
 	}

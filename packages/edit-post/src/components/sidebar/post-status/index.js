@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { PanelBody } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
@@ -27,6 +27,8 @@ import { store as editPostStore } from '../../../store';
 const PANEL_NAME = 'post-status';
 
 function PostStatus( { isOpened, onTogglePanel } ) {
+	const { __ } = useTranslate();
+
 	return (
 		<PanelBody
 			className="edit-post-post-status"

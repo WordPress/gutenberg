@@ -31,6 +31,13 @@ const DEFAULT_LOCALE_DATA = {
  * @see http://messageformat.github.io/Jed/
  */
 /**
+ * @typedef {(domain?: string) => LocaleData} GetLocaleData
+ * Returns locale data by domain in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
  * @typedef {(text: string, domain?: string) => string} __
  *
  * Retrieve the translation of text.
@@ -78,6 +85,7 @@ const DEFAULT_LOCALE_DATA = {
  * @typedef I18n
  * @property {SetLocaleData} setLocaleData Merges locale data into the Tannin instance by domain. Accepts data in a
  *                                         Jed-formatted JSON object shape.
+ * @property {GetLocaleData} getLocaleData Returns locale data by domain in a Jed-formatted JSON object shape.
  * @property {__} __                       Retrieve the translation of text.
  * @property {_x} _x                       Retrieve translated string with gettext context.
  * @property {_n} _n                       Translates and retrieves the singular or plural form based on the supplied
@@ -117,6 +125,9 @@ export const createI18n = ( initialData, initialDomain ) => {
 			...tannin.data[ domain ][ '' ],
 		};
 	};
+
+	/** @type {GetLocaleData} */
+	const getLocaleData = ( domain = 'default' ) => tannin.data[ domain ];
 
 	/**
 	 * Wrapper for Tannin's `dcnpgettext`. Populates default locale data if not
@@ -178,6 +189,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 
 	return {
 		setLocaleData,
+		getLocaleData,
 		__,
 		_x,
 		_n,

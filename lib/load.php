@@ -59,6 +59,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-batch-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Translations_Controller' ) ) {
+		require_once __DIR__ . '/class-wp-rest-translations-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { CheckboxControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -12,6 +12,8 @@ import { compose } from '@wordpress/compose';
 import PostPendingStatusCheck from './check';
 
 export function PostPendingStatus( { status, onUpdateStatus } ) {
+	const { __ } = useTranslate();
+
 	const togglePendingStatus = () => {
 		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
 		onUpdateStatus( updatedStatus );

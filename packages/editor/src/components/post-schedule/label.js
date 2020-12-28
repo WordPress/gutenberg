@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { format, __experimentalGetSettings } from '@wordpress/date';
 import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
+	const { __ } = useTranslate();
+
 	const settings = __experimentalGetSettings();
 
 	return date && ! isFloating

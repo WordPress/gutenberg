@@ -94,6 +94,18 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 */
 	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
 		$scripts->set_translations( $handle, 'default' );
+
+		if ( $script && 'wp-react-i18n' !== $handle ) {
+//			$script->deps[] = 'wp-react-i18n';
+
+			$data = <<<JS
+( function( handle ) {
+	wp?.reactI18n?.addHandle( handle );
+} )( "{$handle}" );
+JS;
+
+			$scripts->add_inline_script( $handle, $data );
+		}
 	}
 }
 

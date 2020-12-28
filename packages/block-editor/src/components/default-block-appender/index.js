@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -25,6 +25,8 @@ export function DefaultBlockAppender( {
 	placeholder,
 	rootClientId,
 } ) {
+	const { __ } = useTranslate();
+
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}

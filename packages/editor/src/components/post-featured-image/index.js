@@ -6,7 +6,8 @@ import { has, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
@@ -27,11 +28,6 @@ import PostFeaturedImageCheck from './check';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
-// Used when labels from post type were not yet loaded or when they are not present.
-const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
-const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
-
 function PostFeaturedImage( {
 	currentPostId,
 	featuredImageId,
@@ -42,6 +38,13 @@ function PostFeaturedImage( {
 	postType,
 	noticeUI,
 } ) {
+	const { __ } = useTranslate();
+
+	// Used when labels from post type were not yet loaded or when they are not present.
+	const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
+	const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
+	const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
+
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const instructions = (
 		<p>

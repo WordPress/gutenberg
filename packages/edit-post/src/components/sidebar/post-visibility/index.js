@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import {
 	PostVisibility as PostVisibilityForm,
@@ -10,6 +10,8 @@ import {
 } from '@wordpress/editor';
 
 export function PostVisibility() {
+	const { __ } = useTranslate();
+
 	return (
 		<PostVisibilityCheck
 			render={ ( { canEdit } ) => (

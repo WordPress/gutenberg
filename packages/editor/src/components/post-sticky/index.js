@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useTranslate } from '@wordpress/react-i18n';
 import { CheckboxControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -12,6 +12,8 @@ import { compose } from '@wordpress/compose';
 import PostStickyCheck from './check';
 
 export function PostSticky( { onUpdateSticky, postSticky = false } ) {
+	const { __ } = useTranslate();
+
 	return (
 		<PostStickyCheck>
 			<CheckboxControl

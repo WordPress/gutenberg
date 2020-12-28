@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
+import { LocaleProvider } from '@wordpress/react-i18n';
 
 /**
  * Internal dependencies
@@ -34,25 +35,27 @@ function App() {
 		<div className="playground">
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-						<div className="playground__sidebar">
-							<BlockInspector />
-						</div>
-						<div className="editor-styles-wrapper">
-							<Popover.Slot name="block-toolbar" />
-							<BlockEditorKeyboardShortcuts />
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList />
-								</ObserveTyping>
-							</WritingFlow>
-						</div>
-						<Popover.Slot />
-					</BlockEditorProvider>
+					<LocaleProvider locale="en_US" domain="default">
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ updateBlocks }
+							onChange={ updateBlocks }
+						>
+							<div className="playground__sidebar">
+								<BlockInspector />
+							</div>
+							<div className="editor-styles-wrapper">
+								<Popover.Slot name="block-toolbar" />
+								<BlockEditorKeyboardShortcuts />
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+							<Popover.Slot />
+						</BlockEditorProvider>
+					</LocaleProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</div>
