@@ -42,7 +42,7 @@ export default compose( [
 			postType: select( 'core/editor' ).getCurrentPostType(),
 			authors: select( 'core' ).getUsers( {
 				who: 'authors',
-				per_page: 100,
+				per_page: 2,
 			} ),
 		};
 	} ),
