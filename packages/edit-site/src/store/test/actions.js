@@ -97,17 +97,18 @@ describe( 'actions', () => {
 	describe( 'setPage', () => {
 		it( 'should yield the FIND_TEMPLATE control and return the SET_PAGE action', () => {
 			const page = { path: '/' };
-			const templateId = 1;
 
 			const it = setPage( page );
 			expect( it.next().value ).toEqual( {
-				type: 'FIND_TEMPLATE',
-				path: page.path,
+				type: '@@data/RESOLVE_SELECT',
+				storeKey: 'core',
+				selectorName: '__experimentalGetTemplateForLink',
+				args: [ page.path ],
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( { id: 'tt1-blocks|single' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId,
+				templateId: 'tt1-blocks|single',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
@@ -115,8 +116,6 @@ describe( 'actions', () => {
 
 	describe( 'showHomepage', () => {
 		it( 'should calculate and set the homepage if it is set to show posts', () => {
-			const templateId = 1;
-
 			const it = showHomepage();
 
 			expect( it.next().value ).toEqual( {
@@ -130,24 +129,26 @@ describe( 'actions', () => {
 				path: '/',
 				context: {},
 			};
+
 			expect( it.next( { show_on_front: 'posts' } ).value ).toEqual( {
-				type: 'FIND_TEMPLATE',
-				path: page.path,
+				type: '@@data/RESOLVE_SELECT',
+				storeKey: 'core',
+				selectorName: '__experimentalGetTemplateForLink',
+				args: [ page.path ],
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( { id: 'theme|slug' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId,
+				templateId: 'theme|slug',
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( 'theme|slug' ).value ).toEqual( {
 				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: templateId,
+				homeTemplateId: 'theme|slug',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
 
 		it( 'should calculate and set the homepage if it is set to show a page', () => {
-			const templateId = 2;
 			const pageId = 2;
 
 			const it = showHomepage();
@@ -170,17 +171,19 @@ describe( 'actions', () => {
 				it.next( { show_on_front: 'page', page_on_front: pageId } )
 					.value
 			).toEqual( {
-				type: 'FIND_TEMPLATE',
-				path: page.path,
+				type: '@@data/RESOLVE_SELECT',
+				storeKey: 'core',
+				selectorName: '__experimentalGetTemplateForLink',
+				args: [ page.path ],
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( { id: 'theme|slug' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId,
+				templateId: 'theme|slug',
 			} );
-			expect( it.next( templateId ).value ).toEqual( {
+			expect( it.next( 'theme|slug' ).value ).toEqual( {
 				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: templateId,
+				homeTemplateId: 'theme|slug',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );

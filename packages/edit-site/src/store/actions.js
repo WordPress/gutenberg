@@ -129,13 +129,12 @@ export function* setPage( page ) {
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
-	const templateId = template.theme + '|' + template.slug;
 	yield {
 		type: 'SET_PAGE',
 		page,
-		templateId,
+		templateId: template.id,
 	};
-	return templateId;
+	return template.id;
 }
 
 /**
