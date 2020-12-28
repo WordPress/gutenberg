@@ -19,19 +19,14 @@ export function useBlockSelectionClearer( ref ) {
 			return;
 		}
 
-		function onMouseDown( event ) {
-			// Only handle clicks on the canvas, not the content.
-			if ( event.target.closest( '.wp-block' ) ) {
-				return;
-			}
-
+		function onFocus() {
 			clearSelectedBlock();
 		}
 
-		ref.current.addEventListener( 'mousedown', onMouseDown );
+		ref.current.addEventListener( 'focus', onFocus );
 
 		return () => {
-			ref.current.removeEventListener( 'mousedown', onMouseDown );
+			ref.current.removeEventListener( 'focus', onFocus );
 		};
 	}, [ hasSelection, clearSelectedBlock ] );
 }
@@ -39,5 +34,5 @@ export function useBlockSelectionClearer( ref ) {
 export default function BlockSelectionClearer( props ) {
 	const ref = useRef();
 	useBlockSelectionClearer( ref );
-	return <div ref={ ref } { ...props } />;
+	return <div tabIndex={ -1 } ref={ ref } { ...props } />;
 }

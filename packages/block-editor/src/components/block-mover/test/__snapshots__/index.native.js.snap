@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Block Mover Picker should match snapshot 1`] = `
+<Fragment>
+  <ForwardRef(ToolbarButton)
+    extraProps={
+      Object {
+        "hint": "Double tap to move the block up",
+      }
+    }
+    icon={
+      <SVG
+        viewBox="-2 -2 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M11 18H9V6l-4 4-2-1 7-7 7 7-2 1-4-4v12z"
+        />
+      </SVG>
+    }
+    onLongPress={[Function]}
+    title="Move block up from row NaN to row NaN"
+  />
+  <ForwardRef(ToolbarButton)
+    extraProps={
+      Object {
+        "hint": "Double tap to move the block down",
+      }
+    }
+    icon={
+      <SVG
+        viewBox="-2 -2 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M9 2h2v12l4-4 2 1-7 7-7-7 2-1 4 4V2z"
+        />
+      </SVG>
+    }
+    onLongPress={[Function]}
+    title="Move block down from row NaN to row NaN"
+  />
+  <Picker
+    hideCancelButton={true}
+    leftAlign={true}
+    onChange={[Function]}
+    options={Array []}
+    title="Move block position"
+  />
+</Fragment>
+`;

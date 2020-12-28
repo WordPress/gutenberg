@@ -24,6 +24,10 @@ For each user feature we should also add a importance categorization label  to i
 * [*] Fix theme colors syncing with the editor [#26821]
 * [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 
+## 1.44.0
+
+* [***] Add support for cross-posting between sites
+
 ## 1.41.0
 
 * [***] Faster editor start and overall operation on Android [#26732]

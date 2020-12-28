@@ -225,6 +225,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
+    }
+
     func gutenbergDidRequestMediaSaveSync() {
         print(#function)
     }
@@ -290,6 +294,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
