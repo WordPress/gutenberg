@@ -42,7 +42,9 @@ function BlockTypesList( {
 			className="block-editor-block-types-list"
 			aria-label={ label }
 		>
-			{ items.map( ( item ) => {
+			{ items.sort( ( item1, item2 ) => {
+				return item1.title > item2.title ? 1 : -1;
+			} ).map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }
