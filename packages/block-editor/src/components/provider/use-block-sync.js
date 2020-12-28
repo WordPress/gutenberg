@@ -8,6 +8,7 @@ import { last, noop } from 'lodash';
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
+import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -83,6 +84,7 @@ export default function useBlockSync( {
 	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
+	const subscribed = useRef( false );
 
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
@@ -96,8 +98,17 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, controlledBlocks );
+			const storeBlocks = controlledBlocks.map( ( block ) =>
+				cloneBlock( block )
+			);
+			if ( subscribed.current ) {
+				pendingChanges.current.incoming = storeBlocks;
+			}
+			replaceInnerBlocks( clientId, storeBlocks );
 		} else {
+			if ( subscribed.current ) {
+				pendingChanges.current.incoming = controlledBlocks;
+			}
 			resetBlocks( controlledBlocks );
 		}
 	};
@@ -113,6 +124,37 @@ export default function useBlockSync( {
 		onChangeRef.current = onChange;
 	}, [ onInput, onChange ] );
 
+	// Determine if blocks need to be reset when they change.
+	useEffect( () => {
+		if ( pendingChanges.current.outgoing.includes( controlledBlocks ) ) {
+			// Skip block reset if the value matches expected outbound sync
+			// triggered by this component by a preceding change detection.
+			// Only skip if the value matches expectation, since a reset should
+			// still occur if the value is modified (not equal by reference),
+			// to allow that the consumer may apply modifications to reflect
+			// back on the editor.
+			if (
+				last( pendingChanges.current.outgoing ) === controlledBlocks
+			) {
+				pendingChanges.current.outgoing = [];
+			}
+		} else if ( getBlocks( clientId ) !== controlledBlocks ) {
+			// Reset changing value in all other cases than the sync described
+			// above. Since this can be reached in an update following an out-
+			// bound sync, unset the outbound value to avoid considering it in
+			// subsequent renders.
+			pendingChanges.current.outgoing = [];
+			setControlledBlocks();
+
+			if ( controlledSelectionStart && controlledSelectionEnd ) {
+				resetSelection(
+					controlledSelectionStart,
+					controlledSelectionEnd
+				);
+			}
+		}
+	}, [ controlledBlocks, clientId ] );
+
 	useEffect( () => {
 		const {
 			getSelectionStart,
@@ -125,6 +167,7 @@ export default function useBlockSync( {
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 
+		subscribed.current = true;
 		const unsubscribe = registry.subscribe( () => {
 			// Sometimes, when changing block lists, lingering subscriptions
 			// might trigger before they are cleaned up. If the block for which
@@ -184,36 +227,4 @@ export default function useBlockSync( {
 
 		return () => unsubscribe();
 	}, [ registry, clientId ] );
-
-	// Determine if blocks need to be reset when they change.
-	useEffect( () => {
-		if ( pendingChanges.current.outgoing.includes( controlledBlocks ) ) {
-			// Skip block reset if the value matches expected outbound sync
-			// triggered by this component by a preceding change detection.
-			// Only skip if the value matches expectation, since a reset should
-			// still occur if the value is modified (not equal by reference),
-			// to allow that the consumer may apply modifications to reflect
-			// back on the editor.
-			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
-			) {
-				pendingChanges.current.outgoing = [];
-			}
-		} else if ( getBlocks( clientId ) !== controlledBlocks ) {
-			// Reset changing value in all other cases than the sync described
-			// above. Since this can be reached in an update following an out-
-			// bound sync, unset the outbound value to avoid considering it in
-			// subsequent renders.
-			pendingChanges.current.outgoing = [];
-			pendingChanges.current.incoming = controlledBlocks;
-			setControlledBlocks();
-
-			if ( controlledSelectionStart && controlledSelectionEnd ) {
-				resetSelection(
-					controlledSelectionStart,
-					controlledSelectionEnd
-				);
-			}
-		}
-	}, [ controlledBlocks, clientId ] );
 }
