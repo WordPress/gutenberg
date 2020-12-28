@@ -205,7 +205,7 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response $data
 	 */
-	public function prepare_item_for_response( $template_part, $request ) {
+	public function prepare_item_for_response( $template_part, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$result = array(
 			'id'          => $template_part->id,
 			'theme'       => $template_part->theme,
