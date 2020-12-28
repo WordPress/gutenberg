@@ -102,7 +102,7 @@ function PostAuthorCombobox() {
 			isLoading={ isLoading }
 			allowReset={ false }
 		/>
- 	);
+	);
 }
 
 export default PostAuthorCombobox;
