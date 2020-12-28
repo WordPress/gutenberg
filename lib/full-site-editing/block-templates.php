@@ -135,8 +135,8 @@ function _gutenberg_build_template_result_from_post( $post ) {
  */
 function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template' ) {
 	$wp_query_args = array(
+		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
 		'post_type'      => $template_type,
-		'post_status'    => 'publish',
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
 	);
@@ -155,13 +155,19 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$wp_query_args['post_name__in'] = $query['slug__in'];
 	}
 
+	// This is only needed for the regular templates/template parts CPT listing and editor.
+ 	if ( isset( $query['wp_id'] ) ) {
+		$wp_query_args['p'] = $query['wp_id'];
+	} else {
+		$wp_query_args['post_status'] = 'publish';
+	}
 	$template_query = new WP_Query( $wp_query_args );
 	$query_result   = array();
 	foreach ( $template_query->get_posts() as $post ) {
 		$query_result[] = _gutenberg_build_template_result_from_post( $post );
 	}
 
-	if ( ! isset( $query['theme'] ) || wp_get_theme()->get_stylesheet() === $query['theme'] ) {
+	if ( ! isset( $query['wp_id'] ) && ( ! isset( $query['theme'] ) || wp_get_theme()->get_stylesheet() === $query['theme'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_custom      = array_search(
@@ -190,11 +196,15 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * @return stdClass|null Template.
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
-	list( $theme, $slug ) = explode( '|', $id );
+	$parts = explode( '|', $id, 2 );
+	if ( count( $parts ) < 2 ) {
+		return null;
+	}
+	list( $theme, $slug ) = $parts;
 	$wp_query_args        = array(
 		'name'           => $slug,
 		'post_type'      => $template_type,
-		'post_status'    => 'publish',
+		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
 		'posts_per_page' => 1,
 		'no_found_rows'  => true,
 		array(

@@ -38,11 +38,14 @@ export default function TemplatePartEdit( {
 	const { isResolved, innerBlocks } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
-			const entityRecord = select( 'core' ).getEntityRecord(
-				'postType',
-				'wp_template_part',
-				theme + '|' + slug
-			);
+			const entityRecord =
+				theme && slug
+					? select( 'core' ).getEntityRecord(
+							'postType',
+							'wp_template_part',
+							theme + '|' + slug
+					  )
+					: null;
 
 			return {
 				innerBlocks: getBlocks( clientId ),

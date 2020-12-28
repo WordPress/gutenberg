@@ -36,9 +36,12 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
-					'args'                => array(
-						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
-					),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -106,6 +109,9 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Controller {
 		if ( isset( $request['theme'] ) ) {
 			$query['theme'] = $request['theme'];
 		}
+		if ( isset( $request['wp_id'] ) ) {
+			$query['wp_id'] = $request['wp_id'];
+		}
 		$template_parts = array();
 		foreach ( gutenberg_get_block_templates( $query, 'wp_template_part' ) as $template_part ) {
 			$data             = $this->prepare_item_for_response( $template_part, $request );
@@ -161,15 +167,44 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Creates a single template.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		if ( ! $request['slug'] ) {
+			return new WP_Error( 'rest_template_error', __( 'Template Slug Required.', 'gutenberg' ), array( 'status' => 400 ) );
+		}
+
+		$changes = $this->prepare_item_for_database( $request );
+		$result  = wp_insert_post( $changes, true );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$response = $this->prepare_item_for_response( gutenberg_get_block_template( $changes['theme'] . '|' . $changes['slug'] ), $request );
+
+		return rest_ensure_response( $response );
+	}
+
+	/**
 	 * Prepares a single template part for create or update.
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return array Changes to pass to wp_update_post.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$template_part = gutenberg_get_block_template( $request['id'], 'wp_template_part' );
+		$template_part = $request['id'] ? gutenberg_get_block_template( $request['id'], 'wp_template_part' ) : null;
 		$changes       = array( 'post_name' => $template_part->slug );
-		if ( ! $template_part->is_custom ) {
+		if ( null === $template_part ) {
+			$changes['post_type']   = 'wp_template_part';
+			$changes['post_status'] = 'publish';
+			$changes['tax_input']   = array(
+				'wp_theme' => wp_get_theme()->get_stylesheet(),
+			);
+		} elseif ( ! $template_part->is_custom ) {
 			$changes['post_type']   = 'wp_template_part';
 			$changes['post_status'] = 'publish';
 			$changes['tax_input']   = array(
@@ -180,17 +215,17 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Controller {
 		}
 		if ( isset( $request['content'] ) ) {
 			$changes['post_content'] = $request['content'];
-		} elseif ( ! $template_part->is_custom ) {
+		} elseif ( null !== $template_part && ! $template_part->is_custom ) {
 			$changes['post_content'] = $template_part->content;
 		}
 		if ( isset( $request['title'] ) ) {
 			$changes['post_title'] = $request['title'];
-		} elseif ( ! $template_part->is_custom ) {
+		} elseif ( null !== $template_part && ! $template_part->is_custom ) {
 			$changes['post_title'] = $template_part->title;
 		}
 		if ( isset( $request['description'] ) ) {
 			$changes['post_excerpt'] = $request['description'];
-		} elseif ( ! $template_part->is_custom ) {
+		} elseif ( null !== $template_part && ! $template_part->is_custom ) {
 			$changes['post_excerpt'] = $template_part->description;
 		}
 
@@ -254,7 +289,6 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Controller {
 					'description' => __( 'Theme identifier for the template part.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
 				),
 				'is_custom'   => array(
 					'description' => __( 'Whether the template part is customized.', 'gutenberg' ),
