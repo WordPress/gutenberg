@@ -10,11 +10,6 @@
  * and template parts from the site editor, and close the connection.
  */
 function gutenberg_edit_site_export() {
-	// Theme templates and template parts need to be synchronized
-	// before the export.
-	_gutenberg_synchronize_theme_templates( 'template-part' );
-	_gutenberg_synchronize_theme_templates( 'template' );
-
 	// Create ZIP file and directories.
 	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
 	$zip      = new ZipArchive();
@@ -23,53 +18,21 @@ function gutenberg_edit_site_export() {
 	$zip->addEmptyDir( 'theme/block-templates' );
 	$zip->addEmptyDir( 'theme/block-template-parts' );
 
-	$theme = wp_get_theme()->get_stylesheet();
-
 	// Load templates into the zip file.
-	$template_query = new WP_Query(
-		array(
-			'post_type'      => 'wp_template',
-			'post_status'    => array( 'publish', 'auto-draft' ),
-			'tax_query'      => array(
-				array(
-					'taxonomy' => 'wp_theme',
-					'field'    => 'slug',
-					'terms'    => $theme,
-				),
-			),
-			'posts_per_page' => -1,
-			'no_found_rows'  => true,
-		)
-	);
-	while ( $template_query->have_posts() ) {
-		$template = $template_query->next_post();
+	$templates = gutenberg_get_block_templates( array( 'theme' => wp_get_theme()->get_stylesheet() ) );
+	foreach ( $templates as $template ) {
 		$zip->addFromString(
-			'theme/block-templates/' . $template->post_name . '.html',
-			gutenberg_strip_post_ids_from_template_part_blocks( $template->post_content )
+			'theme/block-templates/' . $template->slug . '.html',
+			gutenberg_strip_post_ids_from_template_part_blocks( $template->content )
 		);
 	}
 
 	// Load template parts into the zip file.
-	$template_part_query = new WP_Query(
-		array(
-			'post_type'      => 'wp_template_part',
-			'post_status'    => array( 'publish', 'auto-draft' ),
-			'tax_query'      => array(
-				array(
-					'taxonomy' => 'wp_theme',
-					'field'    => 'slug',
-					'terms'    => $theme,
-				),
-			),
-			'posts_per_page' => -1,
-			'no_found_rows'  => true,
-		)
-	);
-	while ( $template_part_query->have_posts() ) {
-		$template_part = $template_part_query->next_post();
+	$template_parts = gutenberg_get_block_templates( array( 'theme' => wp_get_theme()->get_stylesheet() ), 'wp_template_part' );
+	foreach ( $template_parts as $template_part ) {
 		$zip->addFromString(
-			'theme/block-template-parts/' . $template_part->post_name . '.html',
-			gutenberg_strip_post_ids_from_template_part_blocks( $template_part->post_content )
+			'theme/block-template-parts/' . $template_part->slug . '.html',
+			gutenberg_strip_post_ids_from_template_part_blocks( $template_part->content )
 		);
 	}
 

@@ -406,13 +406,13 @@ export function* __experimentalGetTemplateForLink( link ) {
 		return;
 	}
 
-	yield getEntityRecord( 'postType', 'wp_template', template.ID );
+	yield getEntityRecord( 'postType', 'wp_template', template.id );
 	const record = yield controls.select(
 		'core',
 		'getEntityRecord',
 		'postType',
 		'wp_template',
-		template.ID
+		template.id
 	);
 
 	if ( record ) {

@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
@@ -17,89 +16,45 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
-import { serialize } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
-import useTemplatePartPost from './use-template-part-post';
 import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
-	attributes: { postId: _postId, slug, theme, tagName: TagName = 'div' },
+	attributes: { slug, theme, tagName: TagName = 'div' },
 	setAttributes,
 	clientId,
 } ) {
-	const initialSlug = useRef( slug );
-	const initialTheme = useRef( theme );
-	const initialContent = useRef();
-
-	// Resolve the post ID if not set, and load its post.
-	const postId = useTemplatePartPost( _postId, slug, theme );
+	const templatePartId = theme + '|' + slug;
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { innerBlocks, expectedContent } = useSelect(
+	const { isResolved, innerBlocks } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
 			const entityRecord = select( 'core' ).getEntityRecord(
 				'postType',
 				'wp_template_part',
-				postId
+				theme + '|' + slug
 			);
 
 			return {
 				innerBlocks: getBlocks( clientId ),
-				expectedContent: entityRecord?.content.raw,
+				isResolved: !! entityRecord,
 			};
 		},
-		[ clientId, postId ]
+		[ templatePartId, clientId ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
-	useEffect( () => {
-		// If postId (entity) has not resolved or _postId (block attr) is set,
-		// then we have no need for this effect.
-		if ( ! postId || _postId ) {
-			return;
-		}
-
-		const innerContent = serialize( innerBlocks );
-
-		// If we havent set initialContent, check if innerBlocks are loaded.
-		if ( ! initialContent.current ) {
-			// If the content of innerBlocks and the content from entity match,
-			// then we can consider innerBlocks as loaded and set initialContent.
-			if ( innerContent === expectedContent ) {
-				initialContent.current = innerContent;
-			}
-			// Continue to return early until this effect is triggered
-			// with innerBlocks already loaded (as denoted by initialContent being set).
-			return;
-		}
-
-		// After initialContent is set and the content is updated, we can set the
-		// postId block attribute and set the post status to 'publish'.
-		// After this is done the hook will no longer run due to the first return above.
-		if ( initialContent.current !== innerContent ) {
-			setAttributes( { postId } );
-			editEntityRecord( 'postType', 'wp_template_part', postId, {
-				status: 'publish',
-			} );
-		}
-	}, [ innerBlocks, expectedContent ] );
 
 	const blockProps = useBlockProps();
-
-	// Part of a template file, post ID already resolved.
-	const isTemplateFile = !! postId;
-	// Fresh new block.
-	const isPlaceholder =
-		! postId && ! initialSlug.current && ! initialTheme.current;
-	// Part of a template file, post ID not resolved yet.
-	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
+	const isPlaceholder = ! slug;
+	const isUnresolvedTemplateFile = ! isPlaceholder && ! isResolved;
 
 	const inspectorAdvancedControls = (
 		<InspectorAdvancedControls>
@@ -130,13 +85,10 @@ export default function TemplatePartEdit( {
 						innerBlocks={ innerBlocks }
 					/>
 				) }
-				{ isTemplateFile && (
+				{ ! isPlaceholder && ! isUnresolvedTemplateFile && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
-							<TemplatePartNamePanel
-								postId={ postId }
-								setAttributes={ setAttributes }
-							/>
+							<TemplatePartNamePanel postId={ templatePartId } />
 							<Dropdown
 								className="wp-block-template-part__preview-dropdown-button"
 								contentClassName="wp-block-template-part__preview-dropdown-content"
@@ -164,13 +116,13 @@ export default function TemplatePartEdit( {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-				{ isTemplateFile && (
+				{ ! isPlaceholder && ! isUnresolvedTemplateFile && (
 					<TemplatePartInnerBlocks
-						postId={ postId }
+						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
 					/>
 				) }
-				{ isUnresolvedTemplateFile && <Spinner /> }
+				{ ! isPlaceholder && isUnresolvedTemplateFile && <Spinner /> }
 			</TagName>
 		</>
 	);

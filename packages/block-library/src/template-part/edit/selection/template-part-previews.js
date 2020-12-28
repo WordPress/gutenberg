@@ -32,7 +32,7 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const { id, slug, wp_theme_slug: theme } = templatePart;
+	const { slug, wp_theme_slug: theme } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -40,7 +40,7 @@ function TemplatePartItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { postId: id, slug, theme } );
+		setAttributes( { slug, theme } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -52,7 +52,7 @@ function TemplatePartItem( {
 			}
 		);
 		onClose();
-	}, [ id, slug, theme ] );
+	}, [ slug, theme ] );
 
 	return (
 		<CompositeItem
@@ -204,17 +204,15 @@ export default function TemplatePartPreviews( {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
 		const publishedTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				status: [ 'publish' ],
-				per_page: -1,
-			} ) || [];
+			select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			) || [];
 
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
 		const themeTemplateParts =
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				theme: currentTheme,
-				status: [ 'auto-draft' ],
-				per_page: -1,
 			} ) || [];
 		return [ ...themeTemplateParts, ...publishedTemplateParts ];
 	}, [] );

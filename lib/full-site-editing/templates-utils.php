@@ -60,11 +60,7 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
 		$themes        = array();
 		$is_file_based = false;
 		foreach ( $terms as $term ) {
-			if ( '_wp_file_based' === $term->slug ) {
-				$is_file_based = true;
-			} else {
-				$themes[] = esc_html( wp_get_theme( $term->slug ) );
-			}
+			$themes[] = esc_html( wp_get_theme( $term->slug ) );
 		}
 		echo implode( '<br />', $themes );
 		if ( $is_file_based ) {

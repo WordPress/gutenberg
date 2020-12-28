@@ -33,7 +33,6 @@ export default function TemplatePartPlaceholder( {
 			}
 		);
 		setAttributes( {
-			postId: templatePart.id,
 			slug: templatePart.slug,
 			theme: templatePart.wp_theme_slug,
 		} );

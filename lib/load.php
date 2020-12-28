@@ -59,6 +59,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-batch-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
+		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Template_Parts_Controller' ) ) {
+		require_once __DIR__ . '/full-site-editing/class-wp-rest-template-parts-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
@@ -76,16 +82,16 @@ require __DIR__ . '/compat.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
-require __DIR__ . '/full-site-editing.php';
+require __DIR__ . '/full-site-editing/full-site-editing.php';
+require __DIR__ . '/full-site-editing/block-templates.php';
 require __DIR__ . '/full-site-editing/default-template-types.php';
 require __DIR__ . '/full-site-editing/templates-utils.php';
 require __DIR__ . '/full-site-editing/page-templates.php';
-require __DIR__ . '/templates-sync.php';
-require __DIR__ . '/templates.php';
-require __DIR__ . '/template-parts.php';
-require __DIR__ . '/template-loader.php';
-require __DIR__ . '/edit-site-page.php';
-require __DIR__ . '/edit-site-export.php';
+require __DIR__ . '/full-site-editing/templates.php';
+require __DIR__ . '/full-site-editing/template-parts.php';
+require __DIR__ . '/full-site-editing/template-loader.php';
+require __DIR__ . '/full-site-editing/edit-site-page.php';
+require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
