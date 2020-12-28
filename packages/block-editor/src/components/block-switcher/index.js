@@ -63,7 +63,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				icon: _icon,
 			};
 		},
-		[ clientIds, blocks, blockInformation?.title ]
+		[ clientIds, blocks, blockInformation?.icon ]
 	);
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
