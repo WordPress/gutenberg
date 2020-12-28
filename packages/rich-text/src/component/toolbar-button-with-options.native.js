@@ -8,6 +8,9 @@ import { Icon } from '@wordpress/icons';
 /**
  * Toolbar button component that, upon a long press, opens a Picker
  * to allow selecting from among multiple options.
+ *
+ * @param {Object} props         Component props.
+ * @param {Object} props.options Options to pick from.
  */
 function ToolbarButtonWithOptions( { options } ) {
 	const picker = useRef();
