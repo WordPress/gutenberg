@@ -29,10 +29,10 @@ export default function TemplatePartsMenu() {
 
 	const templateParts = useSelect( ( select ) => {
 		const unfilteredTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			} ) || [];
+			select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			) || [];
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
 		return unfilteredTemplateParts.filter(
 			( item ) =>

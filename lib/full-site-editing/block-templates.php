@@ -161,7 +161,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$query_result[] = _gutenberg_build_template_result_from_post( $post );
 	}
 
-	if ( isset( $query['theme'] ) && wp_get_theme()->get_stylesheet() === $query['theme'] ) {
+	if ( ! isset( $query['theme'] ) || wp_get_theme()->get_stylesheet() === $query['theme'] ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_custom      = array_search(
