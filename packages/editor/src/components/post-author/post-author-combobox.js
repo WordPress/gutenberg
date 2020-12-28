@@ -10,17 +10,10 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { decodeEntities } from '@wordpress/html-entities';
 
-/**
- * Internal dependencies
- */
-import PostAuthorCheck from './check';
-
-function PostAuthor( { instanceId } ) {
+function PostAuthorCombobox() {
 	const [ fieldValue, setFieldValue ] = useState();
-	const [ isCombobox, setIsCombobox ] = useState( false );
+
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
 			const { __unstableGetAuthor, getAuthors, isResolving } = select(
@@ -30,14 +23,8 @@ function PostAuthor( { instanceId } ) {
 			const author = __unstableGetAuthor(
 				getEditedPostAttribute( 'author' )
 			);
-			const isSearching =
-				isCombobox &&
-				( postAuthor
-					? fieldValue && postAuthor.name !== fieldValue
-					: fieldValue );
-			const query = isSearching
-				? { search: fieldValue, per_page: 100 }
-				: { per_page: 100 };
+			const query =
+				! fieldValue || '' === fieldValue ? {} : { search: fieldValue };
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
@@ -48,12 +35,6 @@ function PostAuthor( { instanceId } ) {
 		[ fieldValue ]
 	);
 	const { editPost } = useDispatch( 'core/editor' );
-
-	useEffect( () => {
-		if ( authors ) {
-			setIsCombobox( authors?.length >= minimumUsersForCombobox );
-		}
-	}, [] );
 
 	const authorOptions = useMemo( () => {
 		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
@@ -85,21 +66,17 @@ function PostAuthor( { instanceId } ) {
 			setFieldValue( postAuthor.name );
 		}
 	}, [ postAuthor ] );
+
 	/**
 	 * Handle author selection.
 	 *
-	 * @param {number|Object} selectedAuthor The selected Author.
+	 * @param {number} postAuthorId The selected Author.
 	 */
-	const handleSelect = ( selectedAuthor ) => {
-		if ( ! selectedAuthor ) {
+	const handleSelect = ( postAuthorId ) => {
+		if ( ! postAuthorId ) {
 			return;
 		}
-		if ( isNaN( selectedAuthor ) ) {
-			const { value } = selectedAuthor.target;
-			editPost( { author: Number( value ) } );
-		} else {
-			editPost( { author: selectedAuthor } );
-		}
+		editPost( { author: postAuthorId } );
 	};
 
 	/**
@@ -115,42 +92,17 @@ function PostAuthor( { instanceId } ) {
 		return null;
 	}
 
-	if ( ! isCombobox ) {
-		const selectId = 'post-author-selector-' + instanceId;
-
-		return (
-			<PostAuthorCheck>
-				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				<select
-					id={ selectId }
-					defaultValue={ postAuthor.id }
-					onBlur={ handleSelect }
-					className="editor-post-author__select"
-				>
-					{ authors &&
-						authors.map( ( author ) => (
-							<option key={ author.id } value={ author.id }>
-								{ decodeEntities( author.name ) }
-							</option>
-						) ) }
-				</select>
-			</PostAuthorCheck>
-		);
-	}
-
 	return (
-		<PostAuthorCheck>
-			<ComboboxControl
-				label={ __( 'Author' ) }
-				options={ authorOptions }
-				value={ authorId }
-				onFilterValueChange={ debounce( handleKeydown, 300 ) }
-				onChange={ handleSelect }
-				isLoading={ isLoading }
-				allowReset={ false }
-			/>
-		</PostAuthorCheck>
-	);
+		<ComboboxControl
+			label={ __( 'Author' ) }
+			options={ authorOptions }
+			value={ authorId }
+			onFilterValueChange={ debounce( handleKeydown, 300 ) }
+			onChange={ handleSelect }
+			isLoading={ isLoading }
+			allowReset={ false }
+		/>
+ 	);
 }
 
-export default compose( [ withInstanceId ] )( PostAuthor );
+export default PostAuthorCombobox;
