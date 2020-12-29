@@ -242,8 +242,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare a single template output for response
 	 *
-	 * @param stdClass        $template    Temlate instance.
-	 * @param WP_REST_Request $request Request object.
+	 * @param WP_Block_Template $template    Temlate instance.
+	 * @param WP_REST_Request   $request Request object.
 	 *
 	 * @return WP_REST_Response $data
 	 */
@@ -389,13 +389,14 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				),
 				'content'     => array(
 					'description' => __( 'Content of template.', 'gutenberg' ),
-					'type'        => 'object',
+					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'title'       => array(
 					'description' => __( 'Title of template.', 'gutenberg' ),
-					'type'        => 'object',
+					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'description' => array(

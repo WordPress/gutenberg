@@ -79,6 +79,9 @@ require __DIR__ . '/compat.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
+if ( ! class_exists( 'WP_Block_Template ' ) ) {
+	require __DIR__ . '/full-site-editing/class-wp-block-template.php';
+}
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';
 require __DIR__ . '/full-site-editing/default-template-types.php';

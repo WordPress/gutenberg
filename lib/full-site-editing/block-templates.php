@@ -76,23 +76,21 @@ function _gutenberg_get_template_files( $template_type ) {
  * @param array $template_file Theme file.
  * @param array $template_type wp_template or wp_template_part.
  *
- * @return stdClass Template.
+ * @return WP_Block_Template Template.
  */
 function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
 	$default_template_types = gutenberg_get_default_template_types();
 
-	$theme                 = wp_get_theme()->get_stylesheet();
-	$template              = new stdClass();
-	$template->wp_id       = null;
-	$template->id          = $theme . '|' . $template_file['slug'];
-	$template->theme       = $theme;
-	$template->content     = file_get_contents( $template_file['path'] );
-	$template->slug        = $template_file['slug'];
-	$template->is_custom   = false;
-	$template->type        = $template_type;
-	$template->description = '';
-	$template->title       = $template_file['slug'];
-	$template->status      = 'publish'; // This is only needed for the regular post editor.
+	$theme               = wp_get_theme()->get_stylesheet();
+	$template            = new WP_Block_Template();
+	$template->id        = $theme . '|' . $template_file['slug'];
+	$template->theme     = $theme;
+	$template->content   = file_get_contents( $template_file['path'] );
+	$template->slug      = $template_file['slug'];
+	$template->is_custom = false;
+	$template->type      = $template_type;
+	$template->title     = $template_file['slug'];
+	$template->status    = 'publish';
 
 	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
@@ -107,13 +105,13 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  *
  * @param WP_Post $post Template post.
  *
- * @return stdClass Template.
+ * @return WP_Block_Template Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
 	// Is this the best way to get the theme of a template post?
 	$theme = get_the_terms( $post, 'wp_theme' )[0]->slug;
 
-	$template              = new stdClass();
+	$template              = new WP_Block_Template();
 	$template->wp_id       = $post->ID;
 	$template->id          = $theme . '|' . $post->post_name;
 	$template->theme       = $theme;
@@ -123,7 +121,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->type        = $post->post_type;
 	$template->description = $post->post_exerpt;
 	$template->title       = $post->post_title;
-	$template->status      = $post->post_status; // This is only needed for the regular post editor.
+	$template->status      = $post->post_status;
 
 	return $template;
 }
@@ -196,7 +194,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * @param array $id Template id.
  * @param array $template_type wp_template or wp_template_part.
  *
- * @return stdClass|null Template.
+ * @return WP_Block_Template|null Template.
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$parts = explode( '|', $id, 2 );
