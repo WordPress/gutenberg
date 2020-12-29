@@ -25,7 +25,7 @@ import {
 	BottomSheet,
 	BottomSheetConsumer,
 	InserterButton,
-	ClipboardConsumer,
+	getClipboard,
 } from '@wordpress/components';
 
 /**
@@ -116,7 +116,7 @@ export class InserterMenu extends Component {
 		this.setState( { numberOfColumns, itemWidth, maxWidth } );
 	}
 
-	getItems( clipboard ) {
+	getItems() {
 		const {
 			items,
 			canInsertBlockType,
@@ -124,6 +124,7 @@ export class InserterMenu extends Component {
 			getBlockType,
 		} = this.props;
 
+		const clipboard = getClipboard();
 		const clipboardBlock =
 			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
 		const shouldAddClipboardBlock =
@@ -163,52 +164,44 @@ export class InserterMenu extends Component {
 		const { numberOfColumns } = this.state;
 
 		return (
-			<ClipboardConsumer>
-				{ ( { clipboard } ) => (
-					<BottomSheet
-						isVisible={ true }
-						onClose={ this.onClose }
-						hideHeader
-						hasNavigation
-					>
-						<TouchableHighlight accessible={ false }>
-							<BottomSheetConsumer>
-								{ ( { listProps, safeAreaBottomInset } ) => (
-									<FlatList
-										onLayout={ this.onLayout }
-										key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-										keyboardShouldPersistTaps="always"
-										numColumns={ numberOfColumns }
-										data={ this.getItems( clipboard ) }
-										ItemSeparatorComponent={ () => (
-											<TouchableWithoutFeedback
-												accessible={ false }
-											>
-												<View
-													style={
-														styles.rowSeparator
-													}
-												/>
-											</TouchableWithoutFeedback>
-										) }
-										keyExtractor={ ( item ) => item.name }
-										renderItem={ this.renderItem }
-										{ ...listProps }
-										contentContainerStyle={ [
-											...listProps.contentContainerStyle,
-											{
-												paddingBottom:
-													safeAreaBottomInset ||
-													styles.list.paddingBottom,
-											},
-										] }
-									/>
+			<BottomSheet
+				isVisible={ true }
+				onClose={ this.onClose }
+				hideHeader
+				hasNavigation
+			>
+				<TouchableHighlight accessible={ false }>
+					<BottomSheetConsumer>
+						{ ( { listProps, safeAreaBottomInset } ) => (
+							<FlatList
+								onLayout={ this.onLayout }
+								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+								keyboardShouldPersistTaps="always"
+								numColumns={ numberOfColumns }
+								data={ this.getItems() }
+								ItemSeparatorComponent={ () => (
+									<TouchableWithoutFeedback
+										accessible={ false }
+									>
+										<View style={ styles.rowSeparator } />
+									</TouchableWithoutFeedback>
 								) }
-							</BottomSheetConsumer>
-						</TouchableHighlight>
-					</BottomSheet>
-				) }
-			</ClipboardConsumer>
+								keyExtractor={ ( item ) => item.name }
+								renderItem={ this.renderItem }
+								{ ...listProps }
+								contentContainerStyle={ [
+									...listProps.contentContainerStyle,
+									{
+										paddingBottom:
+											safeAreaBottomInset ||
+											styles.list.paddingBottom,
+									},
+								] }
+							/>
+						) }
+					</BottomSheetConsumer>
+				</TouchableHighlight>
+			</BottomSheet>
 		);
 	}
 }

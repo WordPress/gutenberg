@@ -6,7 +6,12 @@ import { partial, first, castArray, last, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { ClipboardContext, ToolbarButton, Picker } from '@wordpress/components';
+import {
+	getClipboard,
+	setClipboard,
+	ToolbarButton,
+	Picker,
+} from '@wordpress/components';
 import {
 	getBlockType,
 	getDefaultBlockName,
@@ -19,7 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
-import { useRef, useContext } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -49,7 +54,7 @@ const BlockActionsMenu = ( {
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
-	const { clipboard, updateClipboard } = useContext( ClipboardContext );
+	const clipboard = getClipboard();
 
 	const {
 		actionTitle: {
@@ -162,7 +167,7 @@ const BlockActionsMenu = ( {
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
-				updateClipboard( serialize( copyBlock ) );
+				setClipboard( serialize( copyBlock ) );
 				createSuccessNotice(
 					// translators: displayed right after the block is copied.
 					__( 'Block copied' )
@@ -170,7 +175,7 @@ const BlockActionsMenu = ( {
 				break;
 			case cutButtonOption.value:
 				const cutBlock = getBlocksByClientId( selectedBlockClientId );
-				updateClipboard( serialize( cutBlock ) );
+				setClipboard( serialize( cutBlock ) );
 				removeBlocks( selectedBlockClientId );
 				createSuccessNotice(
 					// translators: displayed right after the block is cut.

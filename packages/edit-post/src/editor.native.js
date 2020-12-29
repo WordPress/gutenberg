@@ -19,7 +19,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
-import { SlotFillProvider, ClipboardProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { Preview } from '@wordpress/block-editor';
 
 /**
@@ -151,17 +151,15 @@ class Editor extends Component {
 
 		return (
 			<SlotFillProvider>
-				<ClipboardProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ normalizedPost }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						{ ...props }
-					>
-						{ this.editorMode( initialHtml, editorMode ) }
-					</EditorProvider>
-				</ClipboardProvider>
+				<EditorProvider
+					settings={ editorSettings }
+					post={ normalizedPost }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					{ ...props }
+				>
+					{ this.editorMode( initialHtml, editorMode ) }
+				</EditorProvider>
 			</SlotFillProvider>
 		);
 	}
