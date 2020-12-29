@@ -163,9 +163,14 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		} else {
 			$result = wp_insert_post( wp_slash( $changes ), true );
 		}
-
 		if ( is_wp_error( $result ) ) {
 			return $result;
+		}
+
+		$template      = gutenberg_get_block_template( $request['id'], $this->post_type );
+		$fields_update = $this->update_additional_fields_for_object( $template, $request );
+		if ( is_wp_error( $fields_update ) ) {
+			return $fields_update;
 		}
 
 		return $this->prepare_item_for_response(
@@ -184,13 +189,19 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		$changes              = $this->prepare_item_for_database( $request );
 		$changes['post_name'] = $request['slug'];
 		$result               = wp_insert_post( wp_slash( $changes ), true );
-
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
+		$id = $changes['theme'] . '|' . $changes['slug'];
+
+		$template      = gutenberg_get_block_template( $id, $this->post_type );
+		$fields_update = $this->update_additional_fields_for_object( $template, $request );
+		if ( is_wp_error( $fields_update ) ) {
+			return $fields_update;
+		}
 
 		return $this->prepare_item_for_response(
-			gutenberg_get_block_template( $changes['theme'] . '|' . $changes['slug'], $this->post_type ),
+			gutenberg_get_block_template( $id, $this->post_type ),
 			$request
 		);
 	}
