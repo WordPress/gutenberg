@@ -398,13 +398,13 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				),
 				'content'     => array(
 					'description' => __( 'Content of template.', 'gutenberg' ),
-					'type'        => 'string',
+					'type'        => array( 'object', 'string' ),
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'title'       => array(
 					'description' => __( 'Title of template.', 'gutenberg' ),
-					'type'        => 'string',
+					'type'        => array( 'object', 'string' ),
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
