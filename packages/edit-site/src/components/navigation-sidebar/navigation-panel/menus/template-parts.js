@@ -27,18 +27,14 @@ export default function TemplatePartsMenu() {
 		setSearch( value );
 	} );
 
-	const templateParts = useSelect( ( select ) => {
-		const unfilteredTemplateParts =
+	const templateParts = useSelect(
+		( select ) =>
 			select( 'core' ).getEntityRecords(
 				'postType',
 				'wp_template_part'
-			) || [];
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-		return unfilteredTemplateParts.filter(
-			( item ) =>
-				item.status === 'publish' || item.wp_theme_slug === currentTheme
-		);
-	}, [] );
+			) || [],
+		[]
+	);
 
 	return (
 		<NavigationMenu

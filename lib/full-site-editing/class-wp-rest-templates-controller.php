@@ -7,18 +7,26 @@
  */
 
 /**
- * Templates REST API Controller.
+ * Base Templates REST API Controller.
  */
 class WP_REST_Templates_Controller extends WP_REST_Controller {
+	/**
+	 * Post type.
+	 *
+	 * @var string
+	 */
+	protected $post_type;
 
 	/**
-	 * Templates controller constructor.
+	 * Constructor.
 	 *
-	 * @since 5.5.0
+	 * @param string $post_type Post type.
 	 */
-	public function __construct() {
+	public function __construct( $post_type ) {
+		$this->post_type = $post_type;
 		$this->namespace = 'wp/v2';
-		$this->rest_base = 'templates';
+		$obj             = get_post_type_object( $post_type );
+		$this->rest_base = ! empty( $obj->rest_base ) ? $obj->rest_base : $obj->name;
 	}
 
 	/**
@@ -36,6 +44,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => $this->get_collection_params(),
 				),
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
@@ -78,15 +87,13 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * Checks if the user has permissions to make the request.
 	 *
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
-	 * @since  5.6.0
-	 * @access public
 	 */
 	public function permissions_check() {
 		// Verify if the current user has edit_theme_options capability.
 		// This capability is required to access the widgets screen.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
-				'templates_cannot_access',
+				'rest_cannot_manage_templates',
 				__( 'Sorry, you are not allowed to access the templates on this site.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
@@ -113,9 +120,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$query['wp_id'] = $request['wp_id'];
 		}
 		$templates = array();
-		foreach ( gutenberg_get_block_templates( $query ) as $template ) {
+		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
 			$data        = $this->prepare_item_for_response( $template, $request );
-			$templates[] = $data;
+			$templates[] = $this->prepare_response_for_collection( $data );
 		}
 
 		return rest_ensure_response( $templates );
@@ -129,14 +136,13 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		$template = gutenberg_get_block_template( $request['id'] );
+		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
-		$response = $this->prepare_item_for_response( $template, $request );
-		return rest_ensure_response( $response );
+		return $this->prepare_item_for_response( $template, $request );
 	}
 
 	/**
@@ -146,25 +152,26 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$template = gutenberg_get_block_template( $request['id'] );
+		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$changes = $this->prepare_item_for_database( $request );
 		if ( $template->is_custom ) {
-			$result = wp_update_post( $changes, true );
+			$result = wp_update_post( wp_slash( $changes ), true );
 		} else {
-			$result = wp_insert_post( $changes, true );
+			$result = wp_insert_post( wp_slash( $changes ), true );
 		}
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 
-		$response = $this->prepare_item_for_response( gutenberg_get_block_template( $request['id'] ), $request );
-
-		return rest_ensure_response( $response );
+		return $this->prepare_item_for_response(
+			gutenberg_get_block_template( $request['id'], $this->post_type ),
+			$request
+		);
 	}
 
 	/**
@@ -174,20 +181,18 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		if ( ! $request['slug'] ) {
-			return new WP_Error( 'rest_template_error', __( 'Template Slug Required.', 'gutenberg' ), array( 'status' => 400 ) );
-		}
-
-		$changes = $this->prepare_item_for_database( $request );
-		$result  = wp_insert_post( $changes, true );
+		$changes              = $this->prepare_item_for_database( $request );
+		$changes['post_name'] = $request['slug'];
+		$result               = wp_insert_post( wp_slash( $changes ), true );
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 
-		$response = $this->prepare_item_for_response( gutenberg_get_block_template( $changes['theme'] . '|' . $changes['slug'] ), $request );
-
-		return rest_ensure_response( $response );
+		return $this->prepare_item_for_response(
+			gutenberg_get_block_template( $changes['theme'] . '|' . $changes['slug'], $this->post_type ),
+			$request
+		);
 	}
 
 	/**
@@ -197,22 +202,23 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return array Changes to pass to wp_update_post.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$template = $request['id'] ? gutenberg_get_block_template( $request['id'] ) : null;
+		$template = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
 		$changes  = array( 'post_name' => $template->slug );
 		if ( null === $template ) {
-			$changes['post_type']   = 'wp_template';
+			$changes['post_type']   = $this->post_type;
 			$changes['post_status'] = 'publish';
 			$changes['tax_input']   = array(
 				'wp_theme' => wp_get_theme()->get_stylesheet(),
 			);
 		} elseif ( ! $template->is_custom ) {
-			$changes['post_type']   = 'wp_template';
+			$changes['post_type']   = $this->post_type;
 			$changes['post_status'] = 'publish';
 			$changes['tax_input']   = array(
-				'wp_theme' => array( $template->theme ),
+				'wp_theme' => $template->theme,
 			);
 		} else {
-			$changes['ID'] = $template->wp_id;
+			$changes['ID']          = $template->wp_id;
+			$changes['post_status'] = 'publish';
 		}
 		if ( isset( $request['content'] ) ) {
 			$changes['post_content'] = $request['content'];
@@ -254,9 +260,90 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				'raw'      => $template->title,
 				'rendered' => $template->title,
 			),
+			'status'      => $template->status,
+			'wp_id'       => $template->wp_id,
 		);
 
-		return $result;
+		$response = rest_ensure_response( $result );
+		$links    = $this->prepare_links( $template->id );
+		$response->add_links( $links );
+		if ( ! empty( $links['self']['href'] ) ) {
+			$actions = $this->get_available_actions();
+			$self    = $links['self']['href'];
+			foreach ( $actions as $rel ) {
+				$response->add_link( $rel, $self );
+			}
+		}
+
+		return $response;
+	}
+
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @param integer $id ID.
+	 * @return array Links for the given post.
+	 */
+	protected function prepare_links( $id ) {
+		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
+
+		$links = array(
+			'self'       => array(
+				'href' => rest_url( trailingslashit( $base ) . $id ),
+			),
+			'collection' => array(
+				'href' => rest_url( $base ),
+			),
+			'about'      => array(
+				'href' => rest_url( 'wp/v2/types/' . $this->post_type ),
+			),
+		);
+
+		return $links;
+	}
+
+	/**
+	 * Get the link relations available for the post and current user.
+	 *
+	 * @return array List of link relations.
+	 */
+	protected function get_available_actions() {
+		$rels = array();
+
+		$post_type = get_post_type_object( $this->post_type );
+
+		if ( current_user_can( $post_type->cap->publish_posts ) ) {
+			$rels[] = 'https://api.w.org/action-publish';
+		}
+
+		if ( current_user_can( 'unfiltered_html' ) ) {
+			$rels[] = 'https://api.w.org/action-unfiltered-html';
+		}
+
+		return $rels;
+	}
+
+	/**
+	 * Retrieves the query params for the posts collection.
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$query_params = parent::get_collection_params();
+
+		$query_params['theme'] = array(
+			'description' => __( 'Limit to the current theme templates.', 'gutenberg' ),
+			'type'        => 'string',
+		);
+		$query_params['wp_id'] = array(
+			'description' => __( 'Limit to the specified post id.', 'gutenberg' ),
+			'type'        => 'integer',
+		);
+
+		return $query_params;
 	}
 
 	/**
@@ -271,7 +358,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'template',
+			'title'      => $this->post_type,
 			'type'       => 'object',
 			'properties' => array(
 				'id'          => array(
@@ -285,6 +372,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
+					'required'    => true,
+					'minLenght'   => 1,
+					'pattern'     => '[a-zA-Z_\-]+',
 				),
 				'theme'       => array(
 					'description' => __( 'Theme identifier for the template.', 'gutenberg' ),
@@ -297,16 +387,15 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'cntent'      => array(
+				'content'     => array(
 					'description' => __( 'Content of template.', 'gutenberg' ),
-					'type'        => 'string',
+					'type'        => 'object',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'title'       => array(
 					'description' => __( 'Title of template.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => 'object',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
 				'description' => array(
@@ -314,6 +403,18 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				'status'      => array(
+					'description' => __( 'Status of template.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => 'publish',
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				'wp_id'       => array(
+					'description' => __( 'Post ID.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
 				),
 			),
 		);

@@ -83,6 +83,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 
 	$theme                 = wp_get_theme()->get_stylesheet();
 	$template              = new stdClass();
+	$template->wp_id       = null;
 	$template->id          = $theme . '|' . $template_file['slug'];
 	$template->theme       = $theme;
 	$template->content     = file_get_contents( $template_file['path'] );
@@ -91,6 +92,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template->type        = $template_type;
 	$template->description = '';
 	$template->title       = $template_file['slug'];
+	$template->status      = 'publish'; // This is only needed for the regular post editor.
 
 	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
@@ -121,6 +123,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->type        = $post->post_type;
 	$template->description = $post->post_exerpt;
 	$template->title       = $post->post_title;
+	$template->status      = $post->post_status; // This is only needed for the regular post editor.
 
 	return $template;
 }
@@ -156,7 +159,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	}
 
 	// This is only needed for the regular templates/template parts CPT listing and editor.
- 	if ( isset( $query['wp_id'] ) ) {
+	if ( isset( $query['wp_id'] ) ) {
 		$wp_query_args['p'] = $query['wp_id'];
 	} else {
 		$wp_query_args['post_status'] = 'publish';
