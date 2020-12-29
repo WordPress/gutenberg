@@ -64,9 +64,11 @@ An object that contains functions to display shortcuts.
 
 _Usage_
 
-    // Assuming macOS:
-    E.g. displayShortcut.primary( 'm' );
-    // "⌘M"
+```js
+// Assuming macOS:
+displayShortcut.primary( 'm' );
+// "⌘M"
+```
 
 _Type_
 
@@ -78,9 +80,11 @@ Return an array of the parts of a keyboard shortcut chord for display.
 
 _Usage_
 
-    // Assuming macOS:
-    displayShortcutList.primary( 'm' );
-    // [ "⌘", "M" ]
+```js
+// Assuming macOS:
+displayShortcutList.primary( 'm' );
+// [ "⌘", "M" ]
+```
 
 _Type_
 
@@ -109,9 +113,11 @@ predefined shortcut combination.
 
 _Usage_
 
-    // Assuming an event for ⌘M key press:
-    isKeyboardEvent.primary( event, 'm' );
-    // true
+```js
+// Assuming an event for ⌘M key press:
+isKeyboardEvent.primary( event, 'm' );
+// true
+```
 
 _Type_
 
@@ -138,9 +144,11 @@ These are intended for user with the KeyboardShortcuts.
 
 _Usage_
 
-    // Assuming macOS:
-    rawShortcut.primary( 'm' )
-    // "meta+m""
+```js
+// Assuming macOS:
+rawShortcut.primary( 'm' )
+// "meta+m""
+```
 
 _Type_
 
@@ -161,9 +169,11 @@ shortcut.
 
 _Usage_
 
-    // Assuming macOS:
-    shortcutAriaLabel.primary( '.' );
-    // "Command + Period"
+```js
+// Assuming macOS:
+shortcutAriaLabel.primary( '.' );
+// "Command + Period"
+```
 
 _Type_
 

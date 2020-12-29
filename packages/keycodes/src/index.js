@@ -154,7 +154,7 @@ export const modifiers = {
  * These are intended for user with the KeyboardShortcuts.
  *
  * @example
- * ```
+ * ```js
  * // Assuming macOS:
  * rawShortcut.primary( 'm' )
  * // "meta+m""
@@ -176,7 +176,7 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  * Return an array of the parts of a keyboard shortcut chord for display.
  *
  * @example
- * ```
+ * ```js
  * // Assuming macOS:
  * displayShortcutList.primary( 'm' );
  * // [ "⌘", "M" ]
@@ -220,9 +220,9 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  * An object that contains functions to display shortcuts.
  *
  * @example
- * ```
+ * ```js
  * // Assuming macOS:
- * E.g. displayShortcut.primary( 'm' );
+ * displayShortcut.primary( 'm' );
  * // "⌘M"
  * ```
  *
@@ -244,7 +244,7 @@ export const displayShortcut = mapValues(
  * shortcut.
  *
  * @example
- * ```
+ * ```js
  * // Assuming macOS:
  * shortcutAriaLabel.primary( '.' );
  * // "Command + Period"
@@ -305,7 +305,7 @@ function getEventModifiers( event ) {
  * predefined shortcut combination.
  *
  * @example
- * ```
+ * ```js
  * // Assuming an event for ⌘M key press:
  * isKeyboardEvent.primary( event, 'm' );
  * // true
