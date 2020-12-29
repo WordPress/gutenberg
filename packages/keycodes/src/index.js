@@ -130,7 +130,7 @@ export const ZERO = 48;
  * Object that contains functions that return the available modifier
  * depending on platform.
  *
- * @type {Record<WPKeycodeModifier, ( isApple: () => boolean ) => WPModifierPart[]>}
+ * @type {WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>}
  */
 export const modifiers = {
 	primary: ( _isApple ) => ( _isApple() ? [ COMMAND ] : [ CTRL ] ),
