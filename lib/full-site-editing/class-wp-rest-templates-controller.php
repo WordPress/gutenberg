@@ -343,18 +343,17 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return array Collection parameters.
 	 */
 	public function get_collection_params() {
-		$query_params = parent::get_collection_params();
-
-		$query_params['theme'] = array(
-			'description' => __( 'Limit to the current theme templates.', 'gutenberg' ),
-			'type'        => 'string',
+		return array(
+			'context' => $this->get_context_param(),
+			'theme'   => array(
+				'description' => __( 'Limit to the current theme templates.', 'gutenberg' ),
+				'type'        => 'string',
+			),
+			'wp_id'   => array(
+				'description' => __( 'Limit to the specified post id.', 'gutenberg' ),
+				'type'        => 'integer',
+			),
 		);
-		$query_params['wp_id'] = array(
-			'description' => __( 'Limit to the specified post id.', 'gutenberg' ),
-			'type'        => 'integer',
-		);
-
-		return $query_params;
 	}
 
 	/**
