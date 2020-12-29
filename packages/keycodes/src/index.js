@@ -43,12 +43,7 @@ import { isAppleOS } from './platform';
  *
  * @typedef {(character: string, isApple?: () => boolean) => T} WPKeyHandler
  */
-
-/**
- * @template T
- *
- * @typedef {(event: KeyboardEvent, character: string, isApple?: () => boolean) => T} WPEventKeyHandler
- */
+/** @typedef {(event: KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
 /* eslint-enable jsdoc/valid-types */
 
 /**
@@ -316,11 +311,11 @@ function getEventModifiers( event ) {
  * // true
  * ```
  *
- * @type {WPModifierHandler<WPEventKeyHandler<boolean>>} Keyed map of functions
+ * @type {WPModifierHandler<WPEventKeyHandler>} Keyed map of functions
  *                                                       to match events.
  */
 export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
-	return /** @type {WPEventKeyHandler<boolean>} */ (
+	return /** @type {WPEventKeyHandler} */ (
 		event,
 		character,
 		_isApple = isAppleOS

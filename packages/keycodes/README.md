@@ -115,7 +115,7 @@ _Usage_
 
 _Type_
 
--   `WPModifierHandler<WPEventKeyHandler<boolean>>` Keyed map of functions to match events.
+-   `WPModifierHandler<WPEventKeyHandler>` Keyed map of functions to match events.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
