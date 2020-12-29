@@ -21,10 +21,7 @@ module.exports = {
 		'**/test/*.[jt]s',
 		'**/?(*.)test.[jt]s',
 	],
-	testPathIgnorePatterns: [
-		'/node_modules/',
-		'<rootDir>/vendor/',
-	],
+	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/vendor/' ],
 	timers: 'fake',
 	transform: {
 		'^.+\\.[jt]sx?$': require.resolve( 'babel-jest' ),
