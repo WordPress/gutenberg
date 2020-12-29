@@ -78,6 +78,18 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'gutenberg' ),
+						),
+					),
+				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
@@ -89,6 +101,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function permissions_check() {
+		return true;
 		// Verify if the current user has edit_theme_options capability.
 		// This capability is required to access the widgets screen.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -204,6 +217,50 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			gutenberg_get_block_template( $id, $this->post_type ),
 			$request
 		);
+	}
+
+	/**
+	 * Deletes a single template.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function delete_item( $request ) {
+		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		if ( ! $template ) {
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
+		$id    = $template->wp_id;
+		$force = (bool) $request['force'];
+
+		// If we're forcing, then delete permanently.
+		if ( $force ) {
+			$previous = $this->prepare_item_for_response( $template, $request );
+			wp_delete_post( $id, true );
+			$response = new WP_REST_Response();
+			$response->set_data(
+				array(
+					'deleted'  => true,
+					'previous' => $previous->get_data(),
+				)
+			);
+
+			return $response;
+		}
+
+		// Otherwise, only trash if we haven't already.
+		if ( 'trash' === $template->status ) {
+			return new WP_Error(
+				'rest_template_already_trashed',
+				__( 'The template has already been deleted.', 'gutenberg' ),
+				array( 'status' => 410 )
+			);
+		}
+
+		wp_trash_post( $id );
+		$template->status = 'trash';
+		return $this->prepare_item_for_response( $template, $request );
 	}
 
 	/**

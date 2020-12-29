@@ -205,7 +205,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$wp_query_args        = array(
 		'name'           => $slug,
 		'post_type'      => $template_type,
-		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
+		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
 		'posts_per_page' => 1,
 		'no_found_rows'  => true,
 		array(
