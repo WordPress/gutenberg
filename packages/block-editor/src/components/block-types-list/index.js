@@ -42,21 +42,25 @@ function BlockTypesList( {
 			className="block-editor-block-types-list"
 			aria-label={ label }
 		>
-			{ items.sort( ( item1, item2 ) => {
-				return item1.title > item2.title ? 1 : -1;
-			} ).map( ( item ) => {
-				return (
-					<InserterListItem
-						key={ item.id }
-						item={ item }
-						className={ getBlockMenuDefaultClassName( item.id ) }
-						onSelect={ onSelect }
-						onHover={ onHover }
-						composite={ composite }
-						isDraggable={ isDraggable }
-					/>
-				);
-			} ) }
+			{ items
+				.sort( ( item1, item2 ) => {
+					return item1.title > item2.title ? 1 : -1;
+				} )
+				.map( ( item ) => {
+					return (
+						<InserterListItem
+							key={ item.id }
+							item={ item }
+							className={ getBlockMenuDefaultClassName(
+								item.id
+							) }
+							onSelect={ onSelect }
+							onHover={ onHover }
+							composite={ composite }
+							isDraggable={ isDraggable }
+						/>
+					);
+				} ) }
 			{ children }
 		</Composite>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
