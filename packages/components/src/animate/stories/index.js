@@ -34,20 +34,21 @@ export const _default = () => {
 		} ),
 		[]
 	);
-	const [ k, setK ] = useState( Number.MIN_SAFE_INTEGER );
-	button( 'Replay animation', () => setK( ( prevK ) => prevK + 1 ) );
+	const [ keySuffix, setKeySuffix ] = useState( Number.MIN_SAFE_INTEGER );
+	button( 'Replay animation', () => setKeySuffix( ( prevK ) => prevK + 1 ) );
 	const type = radios(
 		'Type',
 		[ 'appear', 'slide-in', 'loading' ],
 		'appear'
 	);
 	const origin = radios( 'Origin', ...typeToOrigin[ type ] );
+	const key = `${ type }${ origin }${ keySuffix }`;
 
 	return (
 		<Notice
 			className={ getAnimateClassName( { type, origin } ) }
 			status="success"
-			key={ k }
+			key={ key }
 		>
 			<p>
 				<code>{ type }</code> animation.
