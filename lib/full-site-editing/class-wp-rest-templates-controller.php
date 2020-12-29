@@ -371,9 +371,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'description' => __( 'Unique slug identifying the template.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
 					'required'    => true,
-					'minLenght'   => 1,
+					'minLength'   => 1,
 					'pattern'     => '[a-zA-Z_\-]+',
 				),
 				'theme'       => array(
