@@ -58,7 +58,7 @@ export function getAnimateClassName( options ) {
 // @ts-ignore Reason: Deprecated
 export default function Animate( { type, options = {}, children } ) {
 	deprecated( 'Animate component', {
-		version: '9.7',
+		version: '9.8',
 		alternative: 'getAnimateClassName',
 		hint: '`<AnimatedComponent className={ getAnimateClassName() } />`',
 	} );
