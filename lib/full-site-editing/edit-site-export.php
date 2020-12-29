@@ -12,7 +12,10 @@
 function gutenberg_edit_site_export() {
 	// Create ZIP file and directories.
 	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
-	$zip      = new ZipArchive();
+	if ( ! class_exists( 'ZipArchive' ) ) {
+		return new WP_Error( 'Zip Export not supported.' );
+	}
+	$zip = new ZipArchive();
 	$zip->open( $filename, ZipArchive::OVERWRITE );
 	$zip->addEmptyDir( 'theme' );
 	$zip->addEmptyDir( 'theme/block-templates' );
