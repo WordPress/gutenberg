@@ -332,6 +332,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			'wp_id'       => $template->wp_id,
 		);
 
+		$result = $this->add_additional_fields_to_object( $result, $request );
+
 		$response = rest_ensure_response( $result );
 		$links    = $this->prepare_links( $template->id );
 		$response->add_links( $links );
