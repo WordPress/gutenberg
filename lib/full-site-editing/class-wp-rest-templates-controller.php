@@ -43,13 +43,13 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
 				),
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
@@ -64,7 +64,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
 							'description' => __( 'The id of a template', 'gutenberg' ),
@@ -75,13 +75,13 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
 					'args'                => array(
 						'force' => array(
 							'type'        => 'boolean',
@@ -100,8 +100,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function permissions_check() {
-		return true;
+	protected function permissions_check() {
 		// Verify if the current user has edit_theme_options capability.
 		// This capability is required to access the widgets screen.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -115,6 +114,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if a given request has access to read templates.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function get_items_permissions_check( $request ) {
+		return $this->permissions_check( $request );
 	}
 
 	/**
@@ -142,6 +151,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Checks if a given request has access to read a single template.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 */
+	public function get_item_permissions_check( $request ) {
+		return $this->permissions_check( $request );
+	}
+
+	/**
 	 * Returns the given template
 	 *
 	 * @param WP_REST_Request $request The request instance.
@@ -156,6 +175,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		return $this->prepare_item_for_response( $template, $request );
+	}
+
+	/**
+	 * Checks if a given request has access to write a single template.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		return $this->permissions_check( $request );
 	}
 
 	/**
@@ -193,6 +222,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Checks if a given request has access to create a template.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		return $this->permissions_check( $request );
+	}
+
+	/**
 	 * Creates a single template.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -217,6 +256,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			gutenberg_get_block_template( $id, $this->post_type ),
 			$request
 		);
+	}
+
+	/**
+	 * Checks if a given request has access to delete a single template.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has dedlete access for the item, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		return $this->permissions_check( $request );
 	}
 
 	/**
