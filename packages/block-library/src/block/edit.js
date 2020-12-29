@@ -114,13 +114,12 @@ export default function ReusableBlockEdit( {
 			</BlockControls>
 
 			<div className="block-library-block__reusable-block-container">
-				{ isSelected ||
-					( hasInnerBlockSelected && (
-						<ReusableBlockEditPanel
-							title={ title }
-							onChange={ setTitle }
-						/>
-					) ) }
+				{ ( isSelected || hasInnerBlockSelected ) && (
+					<ReusableBlockEditPanel
+						title={ title }
+						onChange={ setTitle }
+					/>
+				) }
 
 				{ <div { ...innerBlocksProps } /> }
 			</div>
