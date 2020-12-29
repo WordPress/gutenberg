@@ -1,41 +1,25 @@
 /**
+ * WordPress dependencies
+ */
+import { controls } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
 	toggleEditorPanelEnabled,
 	toggleEditorPanelOpened,
 	removeEditorPanel,
-	openGeneralSidebar,
-	closeGeneralSidebar,
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
 	openModal,
 	closeModal,
 	toggleFeature,
-	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
 } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'openGeneralSidebar', () => {
-		it( 'should return OPEN_GENERAL_SIDEBAR action', () => {
-			const name = 'plugin/my-name';
-			expect( openGeneralSidebar( name ) ).toEqual( {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name,
-			} );
-		} );
-	} );
-
-	describe( 'closeGeneralSidebar', () => {
-		it( 'should return CLOSE_GENERAL_SIDEBAR action', () => {
-			expect( closeGeneralSidebar() ).toEqual( {
-				type: 'CLOSE_GENERAL_SIDEBAR',
-			} );
-		} );
-	} );
-
 	describe( 'openPublishSidebar', () => {
 		it( 'should return an OPEN_PUBLISH_SIDEBAR action', () => {
 			expect( openPublishSidebar() ).toEqual( {
@@ -115,21 +99,18 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'togglePinnedPluginItem', () => {
-		it( 'should return TOGGLE_PINNED_PLUGIN_ITEM action', () => {
-			const pluginName = 'foo/bar';
-
-			expect( togglePinnedPluginItem( pluginName ) ).toEqual( {
-				type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-				pluginName,
-			} );
-		} );
-	} );
-
 	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates() ).toEqual( {
-				type: 'REQUEST_META_BOX_UPDATES',
+		it( 'should yield the REQUEST_META_BOX_UPDATES action', () => {
+			const fulfillment = requestMetaBoxUpdates();
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: {
+					type: 'REQUEST_META_BOX_UPDATES',
+				},
+			} );
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: controls.select( 'core/editor', 'getCurrentPost' ),
 			} );
 		} );
 	} );

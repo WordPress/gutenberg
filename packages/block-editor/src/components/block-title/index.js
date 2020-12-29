@@ -1,8 +1,21 @@
 /**
+ * External dependencies
+ */
+import { truncate } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import {
+	getBlockType,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -14,29 +27,38 @@ import { getBlockType } from '@wordpress/blocks';
  * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
  * ```
  *
- * @param {Object}  props
- * @param {?string} props.name Block name.
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of block.
  *
  * @return {?string} Block title.
  */
-export function BlockTitle( { name } ) {
-	if ( ! name ) {
-		return null;
-	}
+export default function BlockTitle( { clientId } ) {
+	const { attributes, name } = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+			const { getBlockName, getBlockAttributes } = select(
+				'core/block-editor'
+			);
+			return {
+				attributes: getBlockAttributes( clientId ),
+				name: getBlockName( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 
+	const blockInformation = useBlockDisplayInformation( clientId );
+	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
-	if ( ! blockType ) {
-		return null;
+	const label = getBlockLabel( blockType, attributes );
+	// Label will fallback to the title if no label is defined for the
+	// current label context. We do not want "Paragraph: Paragraph".
+	// If label is defined we prioritize it over possible possible
+	// block variation match title.
+	if ( label !== blockType.title ) {
+		return `${ blockType.title }: ${ truncate( label, { length: 15 } ) }`;
 	}
-
-	return blockType.title;
+	return blockInformation.title;
 }
-
-export default withSelect( ( select, ownProps ) => {
-	const { getBlockName } = select( 'core/block-editor' );
-	const { clientId } = ownProps;
-
-	return {
-		name: getBlockName( clientId ),
-	};
-} )( BlockTitle );

@@ -11,7 +11,6 @@ function ToolbarItem( { children, ...props }, ref ) {
 		);
 		return null;
 	}
-
 	return children( { ...props, ref } );
 }
 

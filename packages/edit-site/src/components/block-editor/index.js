@@ -1,87 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
-import { uploadMedia } from '@wordpress/media-utils';
-import { useEntityProp } from '@wordpress/core-data';
-import { parse, serialize } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
 	BlockList,
-	ButtonBlockerAppender,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import Sidebar from '../sidebar';
+import TemplatePartConverter from '../template-part-converter';
+import NavigateToLink from '../navigate-to-link';
+import { SidebarInspectorFill } from '../sidebar';
 
-export default function BlockEditor( { settings: _settings } ) {
-	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser(
-			'create',
-			'media'
-		);
-		return _canUserCreateMedia || _canUserCreateMedia !== false;
-	}, [] );
-	const settings = useMemo( () => {
-		if ( ! canUserCreateMedia ) {
-			return _settings;
-		}
-		return {
-			..._settings,
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: _settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
-		};
-	}, [ canUserCreateMedia, _settings ] );
-	const [ content, _setContent ] = useEntityProp(
-		'postType',
-		'wp_template',
-		'content'
+export default function BlockEditor( { setIsInserterOpen } ) {
+	const { settings, templateType, page } = useSelect(
+		( select ) => {
+			const { getSettings, getEditedPostType, getPage } = select(
+				'core/edit-site'
+			);
+			return {
+				settings: getSettings( setIsInserterOpen ),
+				templateType: getEditedPostType(),
+				page: getPage(),
+			};
+		},
+		[ setIsInserterOpen ]
 	);
-	const initialBlocks = useMemo( () => {
-		if ( typeof content !== 'function' ) {
-			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : undefined;
-		}
-	}, [] );
-	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		'wp_template',
-		'blocks'
+		templateType
 	);
-	const setContent = useCallback( ( nextBlocks ) => {
-		setBlocks( nextBlocks );
-		_setContent( serialize( nextBlocks ) );
-	}, [] );
+
+	const { setPage } = useDispatch( 'core/edit-site' );
 	return (
 		<BlockEditorProvider
 			settings={ settings }
 			value={ blocks }
-			onInput={ setBlocks }
-			onChange={ setContent }
+			onInput={ onInput }
+			onChange={ onChange }
+			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
-			<Sidebar.InspectorFill>
+			<TemplatePartConverter />
+			<__experimentalLinkControl.ViewerFill>
+				{ useCallback(
+					( fillProps ) => (
+						<NavigateToLink
+							{ ...fillProps }
+							activePage={ page }
+							onActivePageChange={ setPage }
+						/>
+					),
+					[ page ]
+				) }
+			</__experimentalLinkControl.ViewerFill>
+			<SidebarInspectorFill>
 				<BlockInspector />
-			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper">
+			</SidebarInspectorFill>
+			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							renderAppender={ ButtonBlockerAppender }
-						/>
+						<BlockList className="edit-site-block-editor__block-list" />
 					</ObserveTyping>
 				</WritingFlow>
 			</div>

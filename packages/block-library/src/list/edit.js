@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import {
@@ -18,6 +19,16 @@ import {
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
+import {
+	formatListBullets,
+	formatListBulletsRTL,
+	formatListNumbered,
+	formatListNumberedRTL,
+	formatIndent,
+	formatIndentRTL,
+	formatOutdent,
+	formatOutdentRTL,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,7 +41,6 @@ export default function ListEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	className,
 	isSelected,
 } ) {
 	const { ordered, values, type, reversed, start } = attributes;
@@ -78,7 +88,9 @@ export default function ListEdit( {
 				<ToolbarGroup
 					controls={ [
 						{
-							icon: 'editor-ul',
+							icon: isRTL()
+								? formatListBulletsRTL
+								: formatListBullets,
 							title: __( 'Convert to unordered list' ),
 							isActive: isActiveListType( value, 'ul', tagName ),
 							onClick() {
@@ -93,7 +105,9 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: 'editor-ol',
+							icon: isRTL()
+								? formatListNumberedRTL
+								: formatListNumbered,
 							title: __( 'Convert to ordered list' ),
 							isActive: isActiveListType( value, 'ol', tagName ),
 							onClick() {
@@ -108,7 +122,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: 'editor-outdent',
+							icon: isRTL() ? formatOutdentRTL : formatOutdent,
 							title: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
 							isDisabled: ! canOutdentListItems( value ),
@@ -118,7 +132,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: 'editor-indent',
+							icon: isRTL() ? formatIndentRTL : formatIndent,
 							title: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
 							isDisabled: ! canIndentListItems( value ),
@@ -135,17 +149,20 @@ export default function ListEdit( {
 		</>
 	);
 
+	const blockProps = useBlockProps();
+
 	return (
 		<>
 			<RichText
 				identifier="values"
 				multiline="li"
+				__unstableMultilineRootTag={ tagName }
 				tagName={ tagName }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )
 				}
 				value={ values }
-				className={ className }
+				aria-label={ __( 'List text' ) }
 				placeholder={ __( 'Write list…' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>
@@ -159,6 +176,7 @@ export default function ListEdit( {
 				start={ start }
 				reversed={ reversed }
 				type={ type }
+				{ ...blockProps }
 			>
 				{ controls }
 			</RichText>

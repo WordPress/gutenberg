@@ -12,7 +12,7 @@ To learn all about contributing to the Gutenberg project, see the [Contributor G
 
 - Documentation? See the [documentation section](/docs/contributors/document.md).
 
-- Triage? We need help reviewing existing issues to make sure they’re relevant and actionable. Triage is an important contribution because it allows us to work on the highest priority issues. To learn more, please see the [triaging issues section](docs/contributors/repository-management.md#triaging-issues).
+- Triage? We need help reviewing existing issues to make sure they’re relevant and actionable. Triage is an important contribution because it allows us to work on the highest priority issues. To learn more, please see the [triaging issues section](docs/contributors/triage.md).
 
 ## Guidelines
 

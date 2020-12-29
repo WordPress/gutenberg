@@ -7,19 +7,18 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { imageFillStyles } from './media-container';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
 export default function save( { attributes } ) {
 	const {
-		backgroundColor,
-		customBackgroundColor,
 		isStackedOnMobile,
 		mediaAlt,
 		mediaPosition,
@@ -35,17 +34,19 @@ export default function save( { attributes } ) {
 		linkTarget,
 		rel,
 	} = attributes;
+	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = isEmpty( rel ) ? undefined : rel;
+
+	const imageClasses = classnames( {
+		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+	} );
 
 	let image = (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
-			className={
-				mediaId && mediaType === 'image'
-					? `wp-image-${ mediaId }`
-					: null
-			}
+			className={ imageClasses || null }
 		/>
 	);
 
@@ -66,14 +67,8 @@ export default function save( { attributes } ) {
 		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
-	const backgroundClass = getColorClassName(
-		'background-color',
-		backgroundColor
-	);
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
-		'has-background': backgroundClass || customBackgroundColor,
-		[ backgroundClass ]: backgroundClass,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill': imageFill,
@@ -90,11 +85,10 @@ export default function save( { attributes } ) {
 				: `${ mediaWidth }% auto`;
 	}
 	const style = {
-		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		gridTemplateColumns,
 	};
 	return (
-		<div className={ className } style={ style }>
+		<div { ...useBlockProps.save( { className, style } ) }>
 			<figure
 				className="wp-block-media-text__media"
 				style={ backgroundStyles }

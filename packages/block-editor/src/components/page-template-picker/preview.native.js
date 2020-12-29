@@ -3,14 +3,21 @@
  */
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
 import { ModalHeaderBar } from '@wordpress/components';
-import { usePreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 
 /**
  * External dependencies
  */
-import { Modal, View, SafeAreaView } from 'react-native';
+import { Modal, Platform, View, SafeAreaView } from 'react-native';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 // We are replicating this here because the one in @wordpress/block-editor always
 // tries to scale the preview and we would need a lot of cross platform code to handle
@@ -27,21 +34,44 @@ const BlockPreview = ( { blocks } ) => {
 		readOnly: true,
 	};
 
+	const header = <View style={ styles.previewHeader } />;
+
 	return (
 		<BlockEditorProvider value={ blocks } settings={ settings }>
 			<View style={ { flex: 1 } }>
-				<BlockList />
+				<BlockList header={ header } />
 			</View>
 		</BlockEditorProvider>
 	);
 };
 BlockPreview.displayName = 'BlockPreview';
 
-const Preview = ( props ) => {
+const ModalPreview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
-	const preferredColorScheme = usePreferredColorScheme();
-	const containerBackgroundColor =
-		preferredColorScheme === 'dark' ? 'black' : 'white';
+	const previewContainerStyle = usePreferredColorSchemeStyle(
+		styles.previewContainer,
+		styles.previewContainerDark
+	);
+	const androidModalClosedSubscription = useRef();
+
+	useEffect( () => {
+		if ( Platform.OS === 'android' ) {
+			androidModalClosedSubscription.current = subscribeAndroidModalClosed(
+				() => {
+					onDismiss();
+				}
+			);
+		}
+
+		return () => {
+			if (
+				androidModalClosedSubscription &&
+				androidModalClosedSubscription.current
+			) {
+				androidModalClosedSubscription.current.remove();
+			}
+		};
+	}, [] );
 
 	if ( template === undefined ) {
 		return null;
@@ -64,20 +94,35 @@ const Preview = ( props ) => {
 			onRequestClose={ onDismiss }
 			supportedOrientations={ [ 'portrait', 'landscape' ] }
 		>
-			<SafeAreaView
-				style={ { flex: 1, backgroundColor: containerBackgroundColor } }
-			>
+			<SafeAreaView style={ previewContainerStyle }>
 				<ModalHeaderBar
 					leftButton={ leftButton }
 					rightButton={ rightButton }
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<BlockPreview blocks={ template.blocks } />
+				<Preview blocks={ template.blocks } />
 			</SafeAreaView>
 		</Modal>
 	);
 };
-Preview.displayName = 'TemplatePreview';
+ModalPreview.displayName = 'TemplatePreview';
 
-export default Preview;
+export const Preview = ( props ) => {
+	const { blocks } = props;
+	const previewContentStyle = usePreferredColorSchemeStyle(
+		styles.previewContent,
+		styles.previewContentDark
+	);
+
+	if ( blocks === undefined ) {
+		return null;
+	}
+	return (
+		<View style={ previewContentStyle }>
+			<BlockPreview blocks={ blocks } />
+		</View>
+	);
+};
+
+export default ModalPreview;

@@ -12,6 +12,7 @@ import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import transforms from './transforms';
 
 const { name } = metadata;
 
@@ -41,11 +42,9 @@ export const settings = {
 			label: _x( 'Default', 'block style' ),
 			isDefault: true,
 		},
-		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
+		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid color' ) },
 	],
-	supports: {
-		align: [ 'left', 'right', 'wide', 'full' ],
-	},
+	transforms,
 	edit,
 	save,
 	deprecated,

@@ -44,7 +44,7 @@ describe( 'InnerBlocks Template Sync', () => {
 			paragraphToAdd,
 			blockSlug
 		);
-		// Press "Enter" inside the Code Editor to fire the `onChange` event for the new value.
+		// Press "Enter" inside the code editor to fire the `onChange` event for the new value.
 		await page.click( '.editor-post-text-editor' );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.press( 'ArrowRight' );

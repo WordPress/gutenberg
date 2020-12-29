@@ -15,6 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { reducer as locksReducer } from './locks';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -97,6 +98,43 @@ export function taxonomies( state = [], action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_TAXONOMIES':
 			return action.taxonomies;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the current theme.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function currentTheme( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_THEME':
+			return action.currentTheme.stylesheet;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing installed themes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function themes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_THEME':
+			return {
+				...state,
+				[ action.currentTheme.stylesheet ]: action.currentTheme,
+			};
 	}
 
 	return state;
@@ -233,6 +271,24 @@ function entity( entityConfig ) {
 									action.type === 'SAVE_ENTITY_RECORD_START',
 								error: action.error,
 								isAutosave: action.isAutosave,
+							},
+						};
+				}
+
+				return state;
+			},
+
+			deleting: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'DELETE_ENTITY_RECORD_START':
+					case 'DELETE_ENTITY_RECORD_FINISH':
+						return {
+							...state,
+							[ action.recordId ]: {
+								pending:
+									action.type ===
+									'DELETE_ENTITY_RECORD_START',
+								error: action.error,
 							},
 						};
 				}
@@ -502,12 +558,15 @@ export function autosaves( state = {}, action ) {
 export default combineReducers( {
 	terms,
 	users,
+	currentTheme,
 	currentUser,
 	taxonomies,
+	themes,
 	themeSupports,
 	entities,
 	undo,
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	locks: locksReducer,
 } );

@@ -1,4 +1,4 @@
-module.exports = function( api ) {
+module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
 		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
@@ -16,9 +16,7 @@ module.exports = function( api ) {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {
-			shippedProposals: true,
-		};
+		const opts = {};
 
 		if ( isTestEnv ) {
 			opts.targets = {
@@ -58,7 +56,6 @@ module.exports = function( api ) {
 	return {
 		presets: [ getPresetEnv() ],
 		plugins: [
-			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
@@ -76,9 +73,6 @@ module.exports = function( api ) {
 					pragmaFrag: 'Fragment',
 				},
 			],
-			require.resolve(
-				'@babel/plugin-proposal-async-generator-functions'
-			),
 			maybeGetPluginTransformRuntime(),
 		].filter( Boolean ),
 	};

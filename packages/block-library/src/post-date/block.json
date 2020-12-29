@@ -1,4 +1,25 @@
 {
+	"apiVersion": 2,
 	"name": "core/post-date",
-	"category": "layout"
+	"category": "design",
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
+		"format": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"color": {
+			"gradients": true
+		},
+		"fontSize": true,
+		"lineHeight": true
+	}
 }

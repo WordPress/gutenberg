@@ -15,10 +15,13 @@ const ARABIC_TWO = '٢';
 describe( 'RTL', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await page.evaluate( () => {
+			document.querySelector( '.is-root-container' ).dir = 'rtl';
+			wp.i18n.isRTL = () => true;
+		} );
 	} );
 
 	it( 'should arrow navigate', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		// We need at least three characters as arrow navigation *from* the
@@ -36,7 +39,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should split', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -48,7 +50,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should merge backward', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -61,7 +62,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should merge forward', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -75,7 +75,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should arrow navigate between blocks', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -101,8 +100,10 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should navigate inline boundaries', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
+
+		// Wait for rich text editor to load.
+		await page.waitForSelector( '.block-editor-rich-text__editable' );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );

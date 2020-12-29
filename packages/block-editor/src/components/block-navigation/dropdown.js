@@ -4,8 +4,11 @@
 import { Button, Dropdown, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useCallback } from '@wordpress/element';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
+import { useCallback, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,14 +19,20 @@ const MenuIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 24 24"
-		width="20"
-		height="20"
+		width="24"
+		height="24"
 	>
-		<Path d="M5 5H3v2h2V5zm3 8h11v-2H8v2zm9-8H6v2h11V5zM7 11H5v2h2v-2zm0 8h2v-2H7v2zm3-2v2h11v-2H10z" />
+		<Path d="M13.8 5.2H3v1.5h10.8V5.2zm-3.6 12v1.5H21v-1.5H10.2zm7.2-6H6.6v1.5h10.8v-1.5z" />
 	</SVG>
 );
 
-function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
+function BlockNavigationDropdownToggle( {
+	isEnabled,
+	onToggle,
+	isOpen,
+	innerRef,
+	...props
+} ) {
 	useShortcut(
 		'core/edit-post/toggle-block-navigation',
 		useCallback( onToggle, [ onToggle ] ),
@@ -34,7 +43,7 @@ function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
 	);
 	const shortcut = useSelect(
 		( select ) =>
-			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
 				'core/edit-post/toggle-block-navigation'
 			),
 		[]
@@ -42,10 +51,14 @@ function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
 
 	return (
 		<Button
+			{ ...props }
+			ref={ innerRef }
 			icon={ MenuIcon }
 			aria-expanded={ isOpen }
+			aria-haspopup="true"
 			onClick={ isEnabled ? onToggle : undefined }
-			label={ __( 'Block navigation' ) }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			label={ __( 'Outline' ) }
 			className="block-editor-block-navigation"
 			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }
@@ -53,7 +66,10 @@ function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
 	);
 }
 
-function BlockNavigationDropdown( { isDisabled } ) {
+function BlockNavigationDropdown(
+	{ isDisabled, __experimentalFeatures, ...props },
+	ref
+) {
 	const hasBlocks = useSelect(
 		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
 		[]
@@ -63,17 +79,24 @@ function BlockNavigationDropdown( { isDisabled } ) {
 	return (
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
-			renderToggle={ ( toggleProps ) => (
+			position="bottom right"
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<BlockNavigationDropdownToggle
-					{ ...toggleProps }
+					{ ...props }
+					innerRef={ ref }
+					isOpen={ isOpen }
+					onToggle={ onToggle }
 					isEnabled={ isEnabled }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<BlockNavigation onSelect={ onClose } />
+				<BlockNavigation
+					onSelect={ onClose }
+					__experimentalFeatures={ __experimentalFeatures }
+				/>
 			) }
 		/>
 	);
 }
 
-export default BlockNavigationDropdown;
+export default forwardRef( BlockNavigationDropdown );

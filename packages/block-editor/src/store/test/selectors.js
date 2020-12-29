@@ -50,22 +50,27 @@ const {
 	isFirstMultiSelectedBlock,
 	getBlockMode,
 	isTyping,
+	isDraggingBlocks,
+	getDraggedBlockClientIds,
+	isBlockBeingDragged,
+	isAncestorBeingDragged,
 	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
 	canInsertBlockType,
+	canInsertBlocks,
 	getInserterItems,
+	getBlockTransformItems,
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
-	INSERTER_UTILITY_HIGH,
-	INSERTER_UTILITY_MEDIUM,
-	INSERTER_UTILITY_LOW,
 	getLowestCommonAncestorWithSelectedBlock,
+	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
+	__experimentalGetParsedReusableBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -87,7 +92,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-a', {
 			save: ( props ) => props.attributes.text,
-			category: 'formatting',
+			category: 'design',
 			title: 'Test Block A',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -95,7 +100,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-b', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -106,7 +111,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-c', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block C',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -115,7 +120,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
-			category: 'common',
+			category: 'text',
 			title: 'Test Freeform Content Handler',
 			icon: 'test',
 			attributes: {
@@ -127,7 +132,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/post-content-child', {
 			save: () => null,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block Post Content Child',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -220,6 +225,7 @@ describe( 'selectors', () => {
 					cache: {
 						123: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -239,6 +245,7 @@ describe( 'selectors', () => {
 					order: {},
 					parents: {},
 					cache: {},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -269,6 +276,7 @@ describe( 'selectors', () => {
 						123: {},
 						456: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -311,6 +319,7 @@ describe( 'selectors', () => {
 						123: {},
 						23: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -328,6 +337,78 @@ describe( 'selectors', () => {
 					innerBlocks: [],
 				},
 			] );
+		} );
+		it( 'only returns a new value if the cache key of a direct child changes', () => {
+			const cacheRef = {};
+			const state = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: cacheRef,
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			const oldBlocks = getBlocks( state );
+
+			const newStateSameCache = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: cacheRef,
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			// Makes sure blocks are referentially equal if the cache key stays the same.
+			const newBlocks = getBlocks( newStateSameCache );
+			expect( oldBlocks ).toBe( newBlocks );
+
+			const newStateNewCache = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: {},
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			// Blocks are referentially different if the cache key changes.
+			const newBlocksNewCache = getBlocks( newStateNewCache );
+			expect( oldBlocks ).not.toBe( newBlocksNewCache );
 		} );
 	} );
 
@@ -365,6 +446,7 @@ describe( 'selectors', () => {
 						'client-id-03': {},
 						'client-id-04': {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -379,48 +461,48 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockParentsByBlockName', () => {
-		it( 'should return parent blocks', () => {
-			const state = {
-				blocks: {
-					parents: {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-						'client-id-05': 'client-id-04',
+		const state = {
+			blocks: {
+				parents: {
+					'client-id-01': '',
+					'client-id-02': 'client-id-01',
+					'client-id-03': 'client-id-02',
+					'client-id-04': 'client-id-03',
+					'client-id-05': 'client-id-04',
+				},
+				byClientId: {
+					'client-id-01': {
+						clientId: 'client-id-01',
+						name: 'core/navigation',
 					},
-					byClientId: {
-						'client-id-01': {
-							clientId: 'client-id-01',
-							name: 'core/navigation',
-						},
-						'client-id-02': {
-							clientId: 'client-id-02',
-							name: 'core/columns',
-						},
-						'client-id-03': {
-							clientId: 'client-id-03',
-							name: 'core/navigation',
-						},
-						'client-id-04': {
-							clientId: 'client-id-04',
-							name: 'core/navigation-link',
-						},
-						'client-id-05': {
-							clientId: 'client-id-05',
-							name: 'core/navigation-link',
-						},
+					'client-id-02': {
+						clientId: 'client-id-02',
+						name: 'core/columns',
 					},
-					cache: {
-						'client-id-01': {},
-						'client-id-02': {},
-						'client-id-03': {},
-						'client-id-04': {},
-						'client-id-05': {},
+					'client-id-03': {
+						clientId: 'client-id-03',
+						name: 'core/navigation',
+					},
+					'client-id-04': {
+						clientId: 'client-id-04',
+						name: 'core/navigation-link',
+					},
+					'client-id-05': {
+						clientId: 'client-id-05',
+						name: 'core/navigation-link',
 					},
 				},
-			};
-
+				cache: {
+					'client-id-01': {},
+					'client-id-02': {},
+					'client-id-03': {},
+					'client-id-04': {},
+					'client-id-05': {},
+				},
+				controlledInnerBlocks: {},
+			},
+		};
+		it( 'should return parent blocks', () => {
 			expect(
 				getBlockParentsByBlockName(
 					state,
@@ -444,6 +526,20 @@ describe( 'selectors', () => {
 					'core/unknown-block'
 				)
 			).toEqual( [] );
+		} );
+		it( 'Should optionally accept an array of parent types and return parents of multiple types', () => {
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-03' ] );
+
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-02', 'client-id-03' ] );
 		} );
 	} );
 
@@ -534,6 +630,7 @@ describe( 'selectors', () => {
 						'uuid-28': 'uuid-24',
 						'uuid-30': 'uuid-28',
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 			expect(
@@ -907,6 +1004,7 @@ describe( 'selectors', () => {
 					cache: {
 						23: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				selectionStart: { clientId: 23 },
 				selectionEnd: { clientId: 23 },
@@ -1771,6 +1869,96 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isDraggingBlocks', () => {
+		it( 'should return true if a block is being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-client-id' ],
+			};
+			expect( isDraggingBlocks( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if a block is not being dragged', () => {
+			const state = {
+				draggedBlocks: [],
+			};
+			expect( isDraggingBlocks( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getDraggedBlockClientIds', () => {
+		it( 'returns the draggedBlocks state', () => {
+			const draggedBlocks = [ 'block-client-id' ];
+			const state = {
+				draggedBlocks,
+			};
+			expect( getDraggedBlockClientIds( state ) ).toBe( draggedBlocks );
+		} );
+	} );
+
+	describe( 'isBlockBeingDragged', () => {
+		it( 'returns true if the given client id is one of the blocks being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-1', 'block-2', 'block-3' ],
+			};
+			expect( isBlockBeingDragged( state, 'block-2' ) ).toBe( true );
+		} );
+
+		it( 'returns false if the given client id is not one of the blocks being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-1', 'block-2', 'block-3' ],
+			};
+			expect( isBlockBeingDragged( state, 'block-4' ) ).toBe( false );
+		} );
+
+		it( 'returns false if no blocks are being dragged', () => {
+			const state = {
+				draggedBlocks: [],
+			};
+			expect( isBlockBeingDragged( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isAncestorBeingDragged', () => {
+		it( 'returns true if the given client id is a child of one of the blocks being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-1_grandparent' ],
+				blocks: {
+					parents: {
+						'block-1': 'block-1_parent',
+						'block-1_parent': 'block-1_grandparent',
+					},
+				},
+			};
+			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false if the given client id does not have an ancestor being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-2_grandparent' ],
+				blocks: {
+					parents: {
+						'block-1': 'block-1_parent',
+						'block-1_parent': 'block-1_grandparent',
+					},
+				},
+			};
+			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false if no blocks are being dragged', () => {
+			const state = {
+				draggedBlocks: [],
+				blocks: {
+					parents: {
+						'block-1': 'block-1_parent',
+						'block-1_parent': 'block-1_grandparent',
+					},
+				},
+			};
+			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isCaretWithinFormattedText', () => {
 		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
 			const state = {
@@ -1969,20 +2157,17 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if no assigned insertion point', () => {
+		it( 'should return false if insertion point is set to not show', () => {
 			const state = {
-				insertionPoint: null,
+				insertionPointVisibility: false,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return true if insertion point is set to show', () => {
 			const state = {
-				insertionPoint: {
-					rootClientId: undefined,
-					index: 5,
-				},
+				insertionPointVisibility: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -2082,7 +2267,7 @@ describe( 'selectors', () => {
 			).toBe( false );
 		} );
 
-		it( 'should allow blocks that restrict parent to be inserted into an allowed parent', () => {
+		it( 'should allow blocks to be inserted into an allowed parent', () => {
 			const state = {
 				blocks: {
 					byClientId: {
@@ -2092,7 +2277,29 @@ describe( 'selectors', () => {
 						block1: {},
 					},
 				},
-				blockListSettings: {},
+				blockListSettings: {
+					block1: {},
+				},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-c', 'block1' )
+			).toBe( true );
+		} );
+
+		it( 'should deny blocks from being inserted into a block that does not allow inner blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-b' },
+					},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {
+					block1: {},
+				},
 				settings: {},
 			};
 			expect(
@@ -2199,6 +2406,59 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'canInsertBlocks', () => {
+		it( 'should allow blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [
+							'core/test-block-b',
+							'core/test-block-c',
+						],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( true );
+		} );
+
+		it( 'should deny blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						1: { name: 'core/test-block-a' },
+						2: { name: 'core/test-block-b' },
+						3: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						1: {},
+						2: {},
+						3: {},
+					},
+				},
+				blockListSettings: {
+					1: {
+						allowedBlocks: [ 'core/test-block-c' ],
+					},
+				},
+				settings: {},
+			};
+			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getInserterItems', () => {
 		it( 'should properly list block type and reusable block items', () => {
 			const state = {
@@ -2215,8 +2475,8 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 					],
 				},
@@ -2239,11 +2499,11 @@ describe( 'selectors', () => {
 				icon: {
 					src: 'test',
 				},
-				category: 'formatting',
+				category: 'design',
 				keywords: [ 'testing' ],
 				variations: [],
 				isDisabled: false,
-				utility: 0,
+				utility: 1,
 				frecency: 0,
 			} );
 			const reusableBlockItem = items.find(
@@ -2260,57 +2520,9 @@ describe( 'selectors', () => {
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
-				utility: 0,
+				utility: 1,
 				frecency: 0,
 			} );
-		} );
-
-		it( 'should order items by descending utility and frecency', () => {
-			const state = {
-				blocks: {
-					byClientId: {},
-					attributes: {},
-					order: {},
-					parents: {},
-					cache: {},
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{
-							id: 1,
-							isTemporary: false,
-							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
-						},
-						{
-							id: 2,
-							isTemporary: false,
-							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
-						},
-					],
-				},
-				preferences: {
-					insertUsage: {
-						'core/block/1': { count: 10, time: 1000 },
-						'core/block/2': { count: 20, time: 1000 },
-					},
-				},
-				blockListSettings: {},
-			};
-			const itemIDs = getInserterItems( state ).map(
-				( item ) => item.id
-			);
-			expect( itemIDs ).toEqual( [
-				'core/post-content-child',
-				'core/block/2',
-				'core/block/1',
-				'core/test-block-b',
-				'core/test-freeform',
-				'core/test-block-a',
-			] );
 		} );
 
 		it( 'should correctly cache the return values', () => {
@@ -2335,6 +2547,7 @@ describe( 'selectors', () => {
 						block3: {},
 						block4: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2342,27 +2555,31 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 						{
 							id: 2,
 							isTemporary: false,
 							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
+							title: { raw: 'Reusable Block 2' },
+							content: { raw: '<!-- /wp:test-block-b -->' },
 						},
 					],
 				},
 				preferences: {
 					insertUsage: {},
 				},
-				blockListSettings: {},
+				blockListSettings: {
+					block3: {},
+					block4: {},
+				},
 			};
 
 			const stateSecondBlockRestricted = {
 				...state,
 				blockListSettings: {
+					...state.blockListSettings,
 					block4: {
 						allowedBlocks: [ 'core/test-block-b' ],
 					},
@@ -2376,9 +2593,9 @@ describe( 'selectors', () => {
 			);
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -2388,10 +2605,11 @@ describe( 'selectors', () => {
 				stateSecondBlockRestricted,
 				'block4'
 			);
+			expect( secondBlockFirstCall ).not.toBe( secondBlockSecondCall );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -2418,6 +2636,7 @@ describe( 'selectors', () => {
 					cache: {
 						block1: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2432,29 +2651,7 @@ describe( 'selectors', () => {
 			expect( testBlockBItem.isDisabled ).toBe( true );
 		} );
 
-		it( 'should give common blocks a low utility', () => {
-			const state = {
-				blocks: {
-					byClientId: {},
-					attributes: {},
-					order: {},
-					parents: {},
-					cache: {},
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-				settings: {},
-			};
-			const items = getInserterItems( state );
-			const testBlockBItem = items.find(
-				( item ) => item.id === 'core/test-block-b'
-			);
-			expect( testBlockBItem.utility ).toBe( INSERTER_UTILITY_LOW );
-		} );
-
-		it( 'should give used blocks a medium utility and set a frecency', () => {
+		it( 'should set a frecency', () => {
 			const state = {
 				blocks: {
 					byClientId: {},
@@ -2475,17 +2672,163 @@ describe( 'selectors', () => {
 			const reusableBlock2Item = items.find(
 				( item ) => item.id === 'core/test-block-b'
 			);
-			expect( reusableBlock2Item.utility ).toBe(
-				INSERTER_UTILITY_MEDIUM
-			);
 			expect( reusableBlock2Item.frecency ).toBe( 2.5 );
 		} );
+	} );
 
-		it( 'should give contextual blocks a high utility', () => {
+	describe( 'getBlockTransformItems', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/with-tranforms-a', {
+				category: 'text',
+				title: 'Tranforms a',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-b' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-c' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
+							blocks: [
+								'core/with-tranforms-b',
+								'core/with-tranforms-c',
+							],
+							transform: () => {},
+							isMultiBlock: true,
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/with-tranforms-b', {
+				category: 'text',
+				title: 'Tranforms b',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-a' ],
+							transform: () => {},
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/with-tranforms-c', {
+				category: 'text',
+				title: 'Tranforms c',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-a' ],
+							transform: () => {},
+						},
+					],
+				},
+				supports: { multiple: false },
+			} );
+		} );
+		afterAll( () => {
+			[
+				'core/with-tranforms-a',
+				'core/with-tranforms-b',
+				'core/with-tranforms-c',
+			].forEach( unregisterBlockType );
+		} );
+		it( 'should properly return block type items', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 2 );
+			const returnedProps = Object.keys( items[ 0 ] );
+			// Verify we have only the wanted props.
+			expect( returnedProps ).toHaveLength( 6 );
+			expect( returnedProps ).toEqual(
+				expect.arrayContaining( [
+					'id',
+					'name',
+					'title',
+					'icon',
+					'frecency',
+					'isDisabled',
+				] )
+			);
+			expect( items ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-c',
+					} ),
+				] )
+			);
+		} );
+		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
 			const state = {
 				blocks: {
 					byClientId: {
-						block1: { name: 'core/test-block-b' },
+						block1: { name: 'core/with-tranforms-b' },
+						block2: { name: 'core/with-tranforms-a' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					order: {},
+					parents: {
+						block1: '',
+						block2: 'block1',
+					},
+					cache: {},
+					controlledInnerBlocks: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [ 'core/with-tranforms-c' ],
+					},
+					block2: {},
+				},
+			};
+			const blocks = [
+				{ clientId: 'block2', name: 'core/with-tranforms-a' },
+			];
+			const items = getBlockTransformItems( state, blocks, 'block1' );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ].name ).toEqual( 'core/with-tranforms-c' );
+		} );
+		it( 'should take into account the usage of blocks settings `multiple` - if multiple blocks of the same type are allowed', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/with-tranforms-c',
+						},
 					},
 					attributes: {
 						block1: { attribute: {} },
@@ -2493,12 +2836,10 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1' ],
 					},
-					parents: {
-						block1: '',
-					},
 					cache: {
 						block1: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2506,11 +2847,48 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 				settings: {},
 			};
-			const items = getInserterItems( state, 'block1' );
-			const testBlockCItem = items.find(
-				( item ) => item.id === 'core/test-block-c'
+			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 2 );
+			expect( items ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+						isDisabled: false,
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-c',
+						isDisabled: true,
+					} ),
+				] )
 			);
-			expect( testBlockCItem.utility ).toBe( INSERTER_UTILITY_HIGH );
+		} );
+		it( 'should set frecency', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				preferences: {
+					insertUsage: {
+						'core/with-tranforms-a': { count: 10, time: 1000 },
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-c' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					name: 'core/with-tranforms-a',
+					frecency: 2.5,
+				} )
+			);
 		} );
 	} );
 
@@ -2796,5 +3174,101 @@ describe( 'selectors', () => {
 				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
 			).toBe( 'a' );
 		} );
+	} );
+
+	describe( 'getActiveBlockIdByBlockName', () => {
+		const state = {
+			selectionStart: {
+				clientId: 'client-id-04',
+			},
+			selectionEnd: {
+				clientId: 'client-id-04',
+			},
+			blocks: {
+				parents: {
+					'client-id-01': '',
+					'client-id-02': 'client-id-01',
+					'client-id-03': 'client-id-02',
+					'client-id-04': 'client-id-03',
+					'client-id-05': 'client-id-03',
+				},
+				byClientId: {
+					'client-id-01': {
+						clientId: 'client-id-01',
+						name: 'core/columns',
+					},
+					'client-id-02': {
+						clientId: 'client-id-02',
+						name: 'core/navigation',
+					},
+					'client-id-03': {
+						clientId: 'client-id-03',
+						name: 'core/navigation-link',
+					},
+					'client-id-04': {
+						clientId: 'client-id-04',
+						name: 'core/navigation-link',
+					},
+					'client-id-05': {
+						clientId: 'client-id-05',
+						name: 'core/navigation-link',
+					},
+				},
+				cache: {
+					'client-id-01': {},
+					'client-id-02': {},
+					'client-id-03': {},
+					'client-id-04': {},
+					'client-id-05': {},
+				},
+				order: {
+					'client-id-03': [ 'client-id-04', 'client-id-05' ],
+				},
+				controlledInnerBlocks: {},
+			},
+		};
+		it( 'Should return first active matching block (including self) when single block selected', () => {
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/navigation-link',
+				] )
+			).toEqual( 'client-id-04' );
+
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( 'client-id-02' );
+		} );
+		it( 'Should return first active matching block with (excluding self) when multi selected', () => {
+			state.selectionEnd.clientId = 'client-id-05';
+
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/navigation-link',
+				] )
+			).toEqual( 'client-id-03' );
+		} );
+	} );
+} );
+
+describe( '__experimentalGetParsedReusableBlock', () => {
+	const state = {
+		settings: {
+			__experimentalReusableBlocks: [
+				{
+					id: 1,
+					content: { raw: '' },
+				},
+			],
+		},
+	};
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/26485. See https://github.com/WordPress/gutenberg/issues/26548.
+	it( "Should return an empty array if reusable block's content.raw is an empty string", () => {
+		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
+			[]
+		);
 	} );
 } );

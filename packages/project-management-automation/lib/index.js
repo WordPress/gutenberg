@@ -1,5 +1,5 @@
 /**
- * GitHub dependencies
+ * External dependencies
  */
 const { setFailed, getInput } = require( '@actions/core' );
 const { context, GitHub } = require( '@actions/github' );
@@ -7,22 +7,48 @@ const { context, GitHub } = require( '@actions/github' );
 /**
  * Internal dependencies
  */
-const assignFixedIssues = require( './assign-fixed-issues' );
-const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
-const addMilestone = require( './add-milestone' );
+const assignFixedIssues = require( './tasks/assign-fixed-issues' );
+const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
+const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
+const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
-const ifNotFork = require( './if-not-fork' );
 
+/** @typedef {import('@actions/github').GitHub} GitHub */
+
+/**
+ * Automation task function.
+ *
+ * @typedef {(payload:any,octokit:GitHub)=>void} WPAutomationTask
+ */
+
+/**
+ * Full list of automations, matched by given properties against the incoming
+ * payload object.
+ *
+ * @typedef WPAutomation
+ *
+ * @property {string}           event    Webhook event name to match.
+ * @property {string}           [action] Action to match, if applicable.
+ * @property {WPAutomationTask} task     Task to run.
+ */
+
+/**
+ * @type {WPAutomation[]}
+ */
 const automations = [
 	{
-		event: 'pull_request',
+		event: 'pull_request_target',
 		action: 'opened',
-		task: ifNotFork( assignFixedIssues ),
+		task: assignFixedIssues,
 	},
 	{
-		event: 'pull_request',
+		event: 'pull_request_target',
 		action: 'opened',
-		task: ifNotFork( addFirstTimeContributorLabel ),
+		task: firstTimeContributorLabel,
+	},
+	{
+		event: 'push',
+		task: firstTimeContributorAccountLink,
 	},
 	{
 		event: 'push',

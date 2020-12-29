@@ -4,10 +4,20 @@
 import { compact, get } from 'lodash';
 
 export function serializeGradientColor( { type, value } ) {
+	if ( type === 'literal' ) {
+		return value;
+	}
+	if ( type === 'hex' ) {
+		return `#${ value }`;
+	}
 	return `${ type }(${ value.join( ',' ) })`;
 }
 
-export function serializeGradientPosition( { type, value } ) {
+export function serializeGradientPosition( position ) {
+	if ( ! position ) {
+		return '';
+	}
+	const { value, type } = position;
 	return `${ value }${ type }`;
 }
 

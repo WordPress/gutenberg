@@ -20,10 +20,13 @@ export function PublishButtonLabel( {
 	hasNonPostEntityChanges,
 } ) {
 	if ( isPublishing ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving && ! isAutosaving ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Updating…' );
 	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Scheduling…' );
 	}
 
@@ -37,7 +40,7 @@ export function PublishButtonLabel( {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	}
 
-	return hasNonPostEntityChanges ? __( 'Publish…' ) : __( 'Publish' );
+	return __( 'Publish' );
 }
 
 export default compose( [

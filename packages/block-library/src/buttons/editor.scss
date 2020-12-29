@@ -1,32 +1,35 @@
-.wp-block-buttons .wp-block.block-editor-block-list__block[data-type="core/button"] {
-	display: inline-block;
-	width: auto;
+.wp-block > .wp-block-buttons {
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .wp-block-buttons {
-	&[data-align="center"] .block-editor-block-list__layout {
-		display: flex;
+	> .wp-block {
+		// Override editor auto block margins.
+		margin-left: 0;
+		margin-top: $button-margin;
+	}
+	> .block-list-appender {
+		display: inline-flex;
 		align-items: center;
-		flex-wrap: wrap;
-		justify-content: center;
 	}
+	&.is-vertical {
+		> .block-list-appender .block-list-appender__toggle {
+			justify-content: flex-start;
+		}
+	}
+	> .wp-block-button {
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
 
-	&[data-align="right"] .block-editor-block-list__layout {
-		display: flex;
-		justify-content: flex-end;
-	}
+.wp-block[data-align="center"] > .wp-block-buttons {
+	align-items: center;
+	justify-content: center;
+}
 
-	.block-list-appender {
-		display: inline-block !important;
-		margin: 0;
-	}
-
-	.block-editor-block-list__layout > div:last-child {
-		display: inline-block;
-	}
-
-	.block-editor-button-block-appender {
-		background: none;
-		outline: none;
-	}
+.wp-block[data-align="right"] > .wp-block-buttons {
+	justify-content: flex-end;
 }

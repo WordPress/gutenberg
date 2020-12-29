@@ -1,16 +1,19 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	__experimentalUseEditorFeature as useEditorFeature,
+} from '@wordpress/block-editor';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
+import { removeFormat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -18,18 +21,19 @@ import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { default as InlineColorUI, getActiveColor } from './inline';
 
 const name = 'core/text-color';
-const title = __( 'Text Color' );
+const title = __( 'Text color' );
 
 const EMPTY_ARRAY = [];
 
-function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
-	const colors = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		if ( getSettings ) {
-			return get( getSettings(), [ 'colors' ], EMPTY_ARRAY );
-		}
-		return EMPTY_ARRAY;
-	} );
+function TextColorEdit( {
+	value,
+	onChange,
+	isActive,
+	activeAttributes,
+	contentRef,
+} ) {
+	const allowCustomControl = useEditorFeature( 'color.custom' );
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,
@@ -46,6 +50,12 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 			backgroundColor: activeColor,
 		};
 	}, [ value, colors ] );
+
+	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
+	if ( ! hasColorsToChoose && ! isActive ) {
+		return null;
+	}
+
 	return (
 		<>
 			<RichTextToolbarButton
@@ -64,17 +74,24 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 					</>
 				}
 				title={ title }
-				onClick={ enableIsAddingColor }
+				// If has no colors to choose but a color is active remove the color onClick
+				onClick={
+					hasColorsToChoose
+						? enableIsAddingColor
+						: () => onChange( removeFormat( value, name ) )
+				}
 			/>
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					addingColor={ isAddingColor }
 					onClose={ disableIsAddingColor }
-					isActive={ isActive }
 					activeAttributes={ activeAttributes }
 					value={ value }
-					onChange={ onChange }
+					onChange={ ( ...args ) => {
+						onChange( ...args );
+						disableIsAddingColor();
+					} }
+					contentRef={ contentRef }
 				/>
 			) }
 		</>

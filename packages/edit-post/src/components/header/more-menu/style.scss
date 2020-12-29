@@ -8,20 +8,16 @@
 	}
 
 	@include break-small() {
-		margin-left: 4px;
+		margin-left: 0;
 
 		.components-button {
 			padding: 0 4px;
 		}
 	}
-
-	.components-button svg {
-		transform: rotate(90deg);
-	}
 }
 
 .edit-post-more-menu__content .components-popover__content {
-	min-width: 260px;
+	min-width: 280px;
 
 	// Let the menu scale to fit items.
 	@include break-mobile() {

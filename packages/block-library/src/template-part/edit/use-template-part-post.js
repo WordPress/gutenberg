@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { cleanForSlug } from '@wordpress/url';
 
 export default function useTemplatePartPost( postId, slug, theme ) {
 	return useSelect(
@@ -22,24 +23,23 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 			// load the auto-draft created from the
 			// relevant file.
 			if ( slug && theme ) {
+				const cleanedSlug = cleanForSlug( slug );
 				const posts = select( 'core' ).getEntityRecords(
 					'postType',
 					'wp_template_part',
 					{
-						status: 'auto-draft',
-						slug,
-						meta: { theme },
+						status: [ 'publish', 'auto-draft' ],
+						slug: cleanedSlug,
+						theme,
 					}
 				);
+
+				// A published post might already exist if this template part was customized elsewhere
+				// or if it's part of a customized template.
 				const foundPost =
-					posts &&
-					posts.find(
-						( post ) =>
-							post.slug === slug &&
-							post.meta &&
-							post.meta.theme === theme
-					);
-				return foundPost && foundPost.id;
+					posts?.find( ( post ) => post.status === 'publish' ) ||
+					posts?.find( ( post ) => post.status === 'auto-draft' );
+				return foundPost?.id;
 			}
 		},
 		[ postId, slug, theme ]

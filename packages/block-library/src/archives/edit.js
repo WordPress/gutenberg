@@ -3,7 +3,7 @@
  */
 import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
@@ -14,7 +14,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Archives settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
+						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ () =>
 							setAttributes( {
@@ -23,7 +23,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						}
 					/>
 					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ () =>
 							setAttributes( {
@@ -33,12 +33,14 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Disabled>
-				<ServerSideRender
-					block="core/archives"
-					attributes={ attributes }
-				/>
-			</Disabled>
+			<div { ...useBlockProps() }>
+				<Disabled>
+					<ServerSideRender
+						block="core/archives"
+						attributes={ attributes }
+					/>
+				</Disabled>
+			</div>
 		</>
 	);
 }

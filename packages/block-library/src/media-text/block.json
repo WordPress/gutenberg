@@ -1,16 +1,11 @@
 {
+	"apiVersion": 2,
 	"name": "core/media-text",
-	"category": "layout",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string",
 			"default": "wide"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
 		},
 		"mediaAlt": {
 			"type": "string",
@@ -69,6 +64,9 @@
 			"type": "number",
 			"default": 50
 		},
+		"mediaSizeSlug": {
+			"type": "string"
+		},
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
@@ -82,5 +80,16 @@
 		"focalPoint": {
 			"type": "object"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": [ "wide", "full" ],
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		}
+	},
+	"editorStyle": "wp-block-media-text-editor",
+	"style": "wp-block-media-text"
 }

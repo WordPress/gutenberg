@@ -47,7 +47,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInputButton, {
+		return wp.element.createElement( wp.blockEditor.URLInputButton, {
 			className: props.className,
 			url: props.attributes.url,
 			onChange: function( url, post ) {
@@ -66,7 +66,7 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { URLInputButton } from @wordpress/editor';
+import { URLInputButton } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -129,12 +129,6 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 
 *Optional.* If this property is added, a label will be generated using label property as the content.
 
-### `autoFocus: Boolean`
-
-*Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
-
-If you are not conditionally rendering this component set this property to `false`.
-
 ### `className: String`
 
 *Optional.* Adds and optional class to the parent `div` that wraps the URLInput field and popover
@@ -165,7 +159,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInput, {
+		return wp.element.createElement( wp.blockEditor.URLInput, {
 			className: props.className,
 			value: props.attributes.url,
 			onChange: function( url, post ) {
@@ -184,7 +178,7 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { URLInput } from '@wordpress/editor';
+import { URLInput } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...

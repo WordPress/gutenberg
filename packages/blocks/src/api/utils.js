@@ -184,7 +184,7 @@ export function getAccessibleBlockLabel(
 	if ( hasPosition && direction === 'vertical' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. %1: The block title, %2: The block row number, %3: The block label.. */
+				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The block label.. */
 				__( '%1$s Block. Row %2$d. %3$s' ),
 				title,
 				position,
@@ -193,15 +193,15 @@ export function getAccessibleBlockLabel(
 		}
 
 		return sprintf(
-			/* translators: accessibility text. %s: The block title, %d The block row number. */
-			__( '%s Block. Row %d' ),
+			/* translators: accessibility text. 1: The block title. 2: The block row number. */
+			__( '%1$s Block. Row %2$d' ),
 			title,
 			position
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. %1: The block title, %2: The block column number, %3: The block label.. */
+				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The block label.. */
 				__( '%1$s Block. Column %2$d. %3$s' ),
 				title,
 				position,
@@ -210,8 +210,8 @@ export function getAccessibleBlockLabel(
 		}
 
 		return sprintf(
-			/* translators: accessibility text. %s: The block title, %d The block column number. */
-			__( '%s Block. Column %d' ),
+			/* translators: accessibility text. 1: The block title. 2: The block column number. */
+			__( '%1$s Block. Column %2$d' ),
 			title,
 			position
 		);

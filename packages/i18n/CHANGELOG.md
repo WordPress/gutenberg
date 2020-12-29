@@ -1,3 +1,32 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 3.17.0 (2020-12-17)
+
+### Enhancements
+
+- Improve type declarations for translation functions ([#26171](https://github.com/WordPress/gutenberg/pull/26171))
+
+## 3.12.0 (2020-04-30)
+
+### Bug Fix
+
+- Relax type of `sprintf` arguments type ([#21919](https://github.com/WordPress/gutenberg/pull/21919))
+
+## 3.11.0 (2020-04-15)
+
+### New Features
+
+- Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+- Add `createI18n` method to allow creation of multiple i18n instances ([#21182](https://github.com/WordPress/gutenberg/pull/21182))
+
+## 3.10.0 (2020-04-01)
+
+### New Feature
+
+- Add `isRTL` function  ([#20298](https://github.com/WordPress/gutenberg/pull/20298))
+
 ## 3.1.0 (2018-11-15)
 
 ### Enhancements

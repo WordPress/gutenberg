@@ -5,7 +5,7 @@
 
 	&__main-shortcuts .edit-post-keyboard-shortcut-help-modal__shortcut-list {
 		// Push the shortcut to be flush with top modal header.
-		margin-top: -$grid-size-xlarge -$border-width;
+		margin-top: -$grid-unit-30 -$border-width;
 	}
 
 	&__section-title {
@@ -17,11 +17,11 @@
 		display: flex;
 		align-items: baseline;
 		padding: 0.6rem 0;
-		border-top: 1px solid $light-gray-500;
+		border-top: 1px solid $gray-300;
 		margin-bottom: 0;
 
 		&:last-child {
-			border-bottom: 1px solid $light-gray-500;
+			border-bottom: 1px solid $gray-300;
 		}
 
 		&:empty {

@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "1.5.0",
+	"version": "1.18.0",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"block directory"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-directory/README.md",
@@ -21,17 +22,25 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
+		"@babel/runtime": "^7.12.5",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/data-controls": "file:../data-controls",
+		"@wordpress/edit-post": "file:../edit-post",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
-		"lodash": "^4.17.15"
+		"@wordpress/url": "file:../url",
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

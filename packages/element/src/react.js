@@ -37,7 +37,7 @@ import { isString } from 'lodash';
 /**
  * Object containing a React component.
  *
- * @typedef {import('react').Component} WPComponent
+ * @typedef {import('react').ComponentType} WPComponent
  */
 
 /**

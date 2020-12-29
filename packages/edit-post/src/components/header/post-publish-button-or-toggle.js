@@ -10,6 +10,11 @@ import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PostPublishButton } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
 	forceIsSaving,
@@ -21,6 +26,7 @@ export function PostPublishButtonOrToggle( {
 	isPublishSidebarOpened,
 	isScheduled,
 	togglePublishSidebar,
+	setEntitiesSavedStatesCallback,
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
@@ -70,6 +76,7 @@ export function PostPublishButtonOrToggle( {
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }
+			setEntitiesSavedStatesCallback={ setEntitiesSavedStatesCallback }
 		/>
 	);
 }
@@ -88,12 +95,12 @@ export default compose(
 			'core/editor'
 		).isPublishSidebarEnabled(),
 		isPublishSidebarOpened: select(
-			'core/edit-post'
+			editPostStore
 		).isPublishSidebarOpened(),
 		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const { togglePublishSidebar } = dispatch( editPostStore );
 		return {
 			togglePublishSidebar,
 		};

@@ -23,7 +23,7 @@ Any issues that are irrelevant or not actionable should be closed, because they 
 
 ### Labels
 
-All issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels). 
+All issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels).
 
 Workflow labels start with “Needs” and may be applied as needed. Ideally, each workflow label will have a group that follows it, such as the Accessibility Team for `Needs Accessibility Feedback`, the Testing Team for `Needs Testing`, etc.
 
@@ -60,32 +60,7 @@ To keep the issue list healthy, it needs to be triaged regularly. *Triage* is th
 
 Anyone can help triage, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
 
-To start simply choose from one of these filtered lists of issues:
-
-- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels helps people focused on certain aspects of Gutenberg find relevant issues easier and start working on them.
-- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc). Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
-- [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps make sure all issues are acknowledged, and can help identify issues that may need more information or discussion before they are actionable.
-- [The least commented on issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps the community figure out things like traction for certain proposals. 
-
-You can also create your own custom set of filters on GitHub. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
-
-When triaging, either one of the lists above or issues in general, here are some steps you can perform:
-
-- First search for duplicates. If the issue is duplicate, close it by commenting with “Duplicate of #<original-id>” and add any relevant new details to the existing issue.
-- If the issue is missing labels, add some to better categorize it (requires proper permissions).
-- If the title doesn’t communicate the issue, edit it for clarity (requires proper permissions).
-- If it’s a bug report, test to confirm the report or add the `Needs Testing` label. If there is not enough information to confirm the report, add the `[Status] Needs More Info` label and ask for the details needed.
-- Remove the `[Status] Needs More Info` if the author of the issue has responded with enough details.
-- Close the issue with a note if it has a `[Status] Needs More Info` label but the author didn't respond in 2+ weeks.
-- If there was conversation on the issue but no actionable steps identified, follow up with the participants to see what’s actionable.
-- If you feel comfortable triaging the issue further, then you can also:
-  - Check that the bug report is valid by debugging it to see if you can track down the technical specifics.
-  - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
-
-For triaging there are some labels which are very useful:
-- `Needs Technical Feedback` - you can apply them when you see new features or API changes proposed
-- `Needs More Info` - when it’s not clear what the issue is or it would help to provide additional details
-- `Needs Testing` - it’s useful for old bugs where it seems like they are no longer relevant
+See the [Triage Contributors guide](/docs/contributors/triage.md) for details.
 
 ## Pull Requests
 
@@ -95,6 +70,14 @@ Gutenberg follows a feature branch pull request workflow for all code and docume
 2. Make your changes, testing thoroughly.
 3. Commit your changes when you’re happy with them, and push the branch.
 4. Open your pull request.
+5. If you are a regular contributor with proper access, label and name your pull request appropriately (see below).
+
+For labeling and naming pull requests, here are guidelines to consider that make compiling the changelog more efficient and organized. These guidelines are particularly relevant for regular contributors. Don't let getting the following right be a blocker for sharing your work - mistakes are expected and easy to fix!
+
+- When working on experimental screens and features, apply the `[Type] Experimental` label instead of `Feature`, `Enhancement`, etc.
+- When working on new features to technical packages (scripts, create-block, adding  react hooks, etc), apply the `[Type] New API`  label instead of `Feature`, `Enhancement`, etc.
+- When fixing a bug or making an enhancement to an internal tool used in the project, apply the `[Type] Build Tooling` instead of `Bugs`, `Enhancement`, etc
+- In pull request titles, instead of describing the code change done to fix an issue, consider referring to the actual bug being fixed instead. For example: instead of saying "Check for nullable object in component", it would be preferable to say "Fix editor breakage when clicking the copy block button". 
 
 Along with this process, there are a few important points to mention:
 
@@ -122,7 +105,9 @@ If you are not yet comfortable leaving a full review, try commenting on a PR. Qu
 
 ### Design Review
 
-If your pull request impacts the design, you should ask for a design review. To request a design review add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. As a guide, changes that should be reviewed:
+If your pull request impacts the design/UI, you need to label appropriately to alert design. To request a design review, add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. If there are any PRs that require an update to the design/UI, please use the [Figma Library Update](https://github.com/WordPress/gutenberg/labels/Figma%20Library%20Update) label.
+
+As a guide, changes that should be reviewed:
 
 - A change based on a previous design, to confirm the design is still valid with the change.
 - Anything that changes something visually.

@@ -3,7 +3,7 @@
  */
 import memoize from 'memize';
 import classnames from 'classnames';
-import { map, kebabCase, camelCase, castArray, startCase } from 'lodash';
+import { kebabCase, camelCase, castArray, startCase, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,15 +22,14 @@ import {
 /**
  * Internal dependencies
  */
-import PanelColorSettings from '../panel-color-settings';
-import ContrastChecker from '../contrast-checker';
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
+import ColorPanel from './color-panel';
+import useEditorFeature from '../use-editor-feature';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle, Node } = window;
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
 
 const DEFAULT_COLORS = [];
 
@@ -39,81 +38,6 @@ const COMMON_COLOR_LABELS = {
 	backgroundColor: __( 'Background Color' ),
 };
 
-const resolveContrastCheckerColor = ( color, colorSettings, detectedColor ) => {
-	if ( typeof color === 'function' ) {
-		return color( colorSettings );
-	} else if ( color === true ) {
-		return detectedColor;
-	}
-	return color;
-};
-
-const ColorPanel = ( {
-	title,
-	colorSettings,
-	colorPanelProps,
-	contrastCheckers,
-	detectedBackgroundColor,
-	detectedColor,
-	panelChildren,
-	initialOpen,
-} ) => (
-	<PanelColorSettings
-		title={ title }
-		initialOpen={ initialOpen }
-		colorSettings={ Object.values( colorSettings ) }
-		{ ...colorPanelProps }
-	>
-		{ contrastCheckers &&
-			( Array.isArray( contrastCheckers )
-				? contrastCheckers.map(
-						( { backgroundColor, textColor, ...rest } ) => {
-							backgroundColor = resolveContrastCheckerColor(
-								backgroundColor,
-								colorSettings,
-								detectedBackgroundColor
-							);
-							textColor = resolveContrastCheckerColor(
-								textColor,
-								colorSettings,
-								detectedColor
-							);
-							return (
-								<ContrastChecker
-									key={ `${ backgroundColor }-${ textColor }` }
-									backgroundColor={ backgroundColor }
-									textColor={ textColor }
-									{ ...rest }
-								/>
-							);
-						}
-				  )
-				: map( colorSettings, ( { value } ) => {
-						let { backgroundColor, textColor } = contrastCheckers;
-						backgroundColor = resolveContrastCheckerColor(
-							backgroundColor || value,
-							colorSettings,
-							detectedBackgroundColor
-						);
-						textColor = resolveContrastCheckerColor(
-							textColor || value,
-							colorSettings,
-							detectedColor
-						);
-						return (
-							<ContrastChecker
-								{ ...contrastCheckers }
-								key={ `${ backgroundColor }-${ textColor }` }
-								backgroundColor={ backgroundColor }
-								textColor={ textColor }
-							/>
-						);
-				  } ) ) }
-		{ typeof panelChildren === 'function'
-			? panelChildren( colorSettings )
-			: panelChildren }
-	</PanelColorSettings>
-);
 const InspectorControlsColorPanel = ( props ) => (
 	<InspectorControls>
 		<ColorPanel { ...props } />
@@ -138,16 +62,13 @@ export default function __experimentalUseColors(
 	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
-	const { attributes, settingsColors } = useSelect(
+	const settingsColors =
+		useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
+	const { attributes } = useSelect(
 		( select ) => {
-			const { getBlockAttributes, getSettings } = select(
-				'core/block-editor'
-			);
-			const colors = getSettings().colors;
+			const { getBlockAttributes } = select( 'core/block-editor' );
 			return {
 				attributes: getBlockAttributes( clientId ),
-				settingsColors:
-					! colors || colors === true ? DEFAULT_COLORS : colors,
 			};
 		},
 		[ clientId ]
@@ -172,37 +93,48 @@ export default function __experimentalUseColors(
 					children,
 					className: componentClassName = '',
 					style: componentStyle = {},
-				} ) =>
-					// Clone children, setting the style property from the color configuration,
-					// if not already set explicitly through props.
-					Children.map( children, ( child ) => {
-						let colorStyle = {};
-						if ( color ) {
-							colorStyle = { [ property ]: colorValue };
-						} else if ( customColor ) {
-							colorStyle = { [ property ]: customColor };
-						}
+				} ) => {
+					let colorStyle = {};
+					if ( color ) {
+						colorStyle = { [ property ]: colorValue };
+					} else if ( customColor ) {
+						colorStyle = { [ property ]: customColor };
+					}
+					const extraProps = {
+						className: classnames( componentClassName, {
+							[ `has-${ kebabCase( color ) }-${ kebabCase(
+								property
+							) }` ]: color,
+							[ className || `has-${ kebabCase( name ) }` ]:
+								color || customColor,
+						} ),
+						style: {
+							...colorStyle,
+							...componentStyle,
+						},
+					};
 
-						return cloneElement( child, {
-							className: classnames(
-								componentClassName,
-								child.props.className,
-								{
-									[ `has-${ kebabCase( color ) }-${ kebabCase(
-										property
-									) }` ]: color,
-									[ className ||
-									`has-${ kebabCase( name ) }` ]:
-										color || customColor,
-								}
-							),
-							style: {
-								...colorStyle,
-								...componentStyle,
-								...( child.props.style || {} ),
-							},
-						} );
-					} ),
+					if ( isFunction( children ) ) {
+						return children( extraProps );
+					}
+
+					return (
+						// Clone children, setting the style property from the color configuration,
+						// if not already set explicitly through props.
+						Children.map( children, ( child ) => {
+							return cloneElement( child, {
+								className: classnames(
+									child.props.className,
+									extraProps.className
+								),
+								style: {
+									...extraProps.style,
+									...( child.props.style || {} ),
+								},
+							} );
+						} )
+					);
+				},
 				{ maxSize: colorConfigs.length }
 			),
 		[ colorConfigs.length ]
@@ -270,7 +202,8 @@ export default function __experimentalUseColors(
 			while (
 				backgroundColor === 'rgba(0, 0, 0, 0)' &&
 				backgroundColorNode.parentNode &&
-				backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+				backgroundColorNode.parentNode.nodeType ===
+					backgroundColorNode.parentNode.ELEMENT_NODE
 			) {
 				backgroundColorNode = backgroundColorNode.parentNode;
 				backgroundColor = getComputedStyle( backgroundColorNode )
@@ -304,7 +237,7 @@ export default function __experimentalUseColors(
 
 				panelLabel = colorConfig.label ||
 					COMMON_COLOR_LABELS[ name ] ||
-					startCase( name ), // E.g. 'Background Color'.
+					startCase( name ), // E.g. 'Background color'.
 				componentName = startCase( name ).replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
 				color = colorConfig.color,

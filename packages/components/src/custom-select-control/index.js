@@ -11,7 +11,7 @@ import { Icon, check, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import { Button, VisuallyHidden } from '../';
 
 const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
@@ -79,6 +79,7 @@ export default function CustomSelectControl( {
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
+		'aria-hidden': ! isOpen,
 	} );
 	// We need this here, because the null active descendant is not
 	// fully ARIA compliant.
@@ -98,19 +99,20 @@ export default function CustomSelectControl( {
 				className
 			) }
 		>
-			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
-			<label
-				{ ...getLabelProps( {
-					className: classnames(
-						'components-custom-select-control__label',
-						{
-							'screen-reader-text': hideLabelFromVision,
-						}
-					),
-				} ) }
-			>
-				{ label }
-			</label>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="label" { ...getLabelProps() }>
+					{ label }
+				</VisuallyHidden>
+			) : (
+				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
+				<label
+					{ ...getLabelProps( {
+						className: 'components-custom-select-control__label',
+					} ) }
+				>
+					{ label }
+				</label>
+			) }
 			<Button
 				{ ...getToggleButtonProps( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
@@ -136,6 +138,7 @@ export default function CustomSelectControl( {
 								index,
 								key: item.key,
 								className: classnames(
+									item.className,
 									'components-custom-select-control__item',
 									{
 										'is-highlighted':
@@ -145,13 +148,13 @@ export default function CustomSelectControl( {
 								style: item.style,
 							} ) }
 						>
+							{ item.name }
 							{ item === selectedItem && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
 								/>
 							) }
-							{ item.name }
 						</li>
 					) ) }
 			</ul>

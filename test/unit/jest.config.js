@@ -19,7 +19,6 @@ module.exports = {
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
-		'<rootDir>/test/unit/config/register-context.js',
 	],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
@@ -29,9 +28,14 @@ module.exports = {
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+.native.js$',
+		'/packages/react-native-*',
 	],
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	watchPlugins: [
+		'jest-watch-typeahead/filename',
+		'jest-watch-typeahead/testname',
+	],
 };

@@ -1,3 +1,5 @@
+$media-to-text: 12px;
+
 .wp-block-media-text {
 	display: flex;
 	align-items: flex-start;
@@ -28,13 +30,8 @@
 	align-items: flex-end;
 }
 
-.content {
-	flex: 1;
-}
-
-.contentCentered {
-	flex: 1;
-	align-items: center;
+.is-selected {
+	padding-bottom: 8;
 }
 
 .imageContainer {
@@ -51,24 +48,32 @@
 	align-items: center;
 }
 
-.icon {
+.iconPlaceholder {
 	fill: $gray-dark;
-	width: 24px;
-	height: 24px;
+	width: 100%;
+	height: 100%;
 }
 
-.iconDark {
+.iconPlaceholderDark {
 	fill: $white;
 }
 
 .iconRetry {
 	fill: #fff;
-	width: 100%;
-	height: 100%;
+	width: 24px;
+	height: 24px;
 }
 
 .iconRetryVideo {
 	fill: $gray-dark;
+}
+
+.iconRetryVideoDark {
+	fill: #fff;
+}
+
+.mediaVideo {
+	flex: 1;
 }
 
 .video {
@@ -78,6 +83,15 @@
 
 .videoContainer {
 	flex: 1;
+	flex-direction: row;
+}
+
+.videoContent {
+	width: 100%;
+}
+
+.videoPlayer {
+	flex: 1;
 	background-color: #000;
 }
 
@@ -85,8 +99,12 @@
 	width: 100%;
 	height: 100%;
 	align-items: center;
-	background-color: $gray-lighten-30;
+	background-color: $gray-light;
 	justify-content: center;
+}
+
+.videoPlaceholderDark {
+	background-color: $gray-90;
 }
 
 .uploadFailed {
@@ -104,27 +122,63 @@
 	color: $gray-dark;
 }
 
-.innerPadding {
-	padding: $block-selected-to-content;
+.uploadFailedTextVideoDark {
+	color: $white;
 }
 
-.innerPaddingMediaOnLeft {
-	padding-right: $block-selected-to-content;
+// Inner blocks STACK
+.innerBlockStackMediaLeft {
+	margin-top: $media-to-text;
 }
 
-.innerPaddingMediaOnRight {
-	padding-left: $block-selected-to-content;
+.innerBlockStackMediaRight {
+	margin-bottom: $media-to-text;
 }
 
-.paddingHorizontalNone {
-	padding-left: 0;
-	padding-right: 0;
+// Inner blocks
+.innerBlock {
+	padding-right: $media-to-text;
+	padding-left: $media-to-text;
 }
 
-.regularMediaPadding {
-	padding: $block-edge-to-content;
+// Media STACK
+.mediaStackLeft {
+	margin-bottom: $media-to-text;
 }
 
-.denseMediaPadding {
-	padding: $block-media-container-to-content;
+.mediaStackRight {
+	margin-top: $media-to-text;
+}
+
+// Media
+.mediaLeft {
+	padding-right: $media-to-text;
+}
+
+.mediaRight {
+	padding-left: $media-to-text;
+}
+
+.imageWithFocalPoint {
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.imageFill {
+	height: 200px;
+}
+
+.imageCropped {
+	min-height: 100px;
+}
+
+.mediaImageContainer {
+	height: 100%;
+	flex-direction: row;
+}
+
+.mediaAreaPadding {
+	width: $media-to-text;
 }

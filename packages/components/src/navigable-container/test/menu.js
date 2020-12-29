@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { fireEvent, render } from '@testing-library/react';
 import { each } from 'lodash';
 
 /**
@@ -14,8 +14,8 @@ import { UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
  */
 import { NavigableMenu } from '../menu';
 
-function simulateVisible( wrapper, selector ) {
-	const elements = wrapper.getDOMNode().querySelectorAll( selector );
+function simulateVisible( container, selector ) {
+	const elements = container.querySelectorAll( selector );
 	each( elements, ( elem ) => {
 		elem.getClientRects = () => [
 			'trick-jsdom-into-having-size-for-element-rect',
@@ -23,7 +23,7 @@ function simulateVisible( wrapper, selector ) {
 	} );
 }
 
-function fireKeyDown( container, keyCode, shiftKey ) {
+function fireKeyDown( node, keyCode, shiftKey ) {
 	const interaction = {
 		stopped: false,
 	};
@@ -35,7 +35,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 	event.stopImmediatePropagation = () => {
 		interaction.stopped = true;
 	};
-	container.getDOMNode().dispatchEvent( event );
+	fireEvent( node, event );
 
 	return interaction;
 }
@@ -43,7 +43,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 describe( 'NavigableMenu', () => {
 	it( 'vertical: should navigate by up and down', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container, getByRole } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -71,17 +71,17 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#btn1' )
-			.focus();
+		container.querySelector( '#btn1' ).focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
+			const interaction = fireKeyDown(
+				getByRole( 'menu' ),
+				keyCode,
+				false
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
@@ -94,14 +94,14 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 2, true );
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, false );
-		assertKeyDown( RIGHT, 0, false );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'vertical: should navigate by up and down, and stop at edges', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container, getByRole } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -125,17 +125,17 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#btn1' )
-			.focus();
+		container.querySelector( '#btn1' ).focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
+			const interaction = fireKeyDown(
+				getByRole( 'menu' ),
+				keyCode,
+				false
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
@@ -146,14 +146,14 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( UP, 1, true );
 		assertKeyDown( UP, 0, true );
 		assertKeyDown( UP, 0, true );
-		assertKeyDown( LEFT, 0, false );
-		assertKeyDown( RIGHT, 0, false );
+		assertKeyDown( LEFT, 0, true );
+		assertKeyDown( RIGHT, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'horizontal: should navigate by left and right', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container, getByRole } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -181,17 +181,17 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#btn1' )
-			.focus();
+		container.querySelector( '#btn1' ).focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
+			const interaction = fireKeyDown(
+				getByRole( 'menu' ),
+				keyCode,
+				false
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
@@ -204,14 +204,14 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 2, true );
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( UP, 0, false );
-		assertKeyDown( DOWN, 0, false );
+		assertKeyDown( UP, 0, true );
+		assertKeyDown( DOWN, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container, getByRole } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -235,17 +235,17 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#btn1' )
-			.focus();
+		container.querySelector( '#btn1' ).focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode, false );
+			const interaction = fireKeyDown(
+				getByRole( 'menu' ),
+				keyCode,
+				false
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
@@ -256,14 +256,14 @@ describe( 'NavigableMenu', () => {
 		assertKeyDown( LEFT, 1, true );
 		assertKeyDown( LEFT, 0, true );
 		assertKeyDown( LEFT, 0, true );
-		assertKeyDown( DOWN, 0, false );
-		assertKeyDown( UP, 0, false );
+		assertKeyDown( DOWN, 0, true );
+		assertKeyDown( UP, 0, true );
 		assertKeyDown( SPACE, 0, false );
 	} );
 
 	it( 'both: should navigate by up/down and left/right', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container, getByRole } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -280,17 +280,13 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container, '*' );
 
-		const container = wrapper.find( 'div' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#btn1' )
-			.focus();
+		container.querySelector( '#btn1' ).focus();
 
 		// Navigate options
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
-			const interaction = fireKeyDown( container, keyCode );
+			const interaction = fireKeyDown( getByRole( 'menu' ), keyCode );
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}

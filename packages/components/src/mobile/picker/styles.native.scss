@@ -1,0 +1,21 @@
+.separator {
+	margin-top: $grid-unit-20 / 2;
+	margin-bottom: $grid-unit-20 / 2;
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+	height: $border-width;
+	background-color: $light-gray-400;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}
+
+.disabled {
+	opacity: 0.3;
+}
+
+.panelBody {
+	padding-left: 0;
+	padding-right: 0;
+}

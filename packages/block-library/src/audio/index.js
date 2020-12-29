@@ -29,9 +29,6 @@ export const settings = {
 	icon,
 	transforms,
 	deprecated,
-	supports: {
-		align: true,
-	},
 	edit,
 	save,
 };

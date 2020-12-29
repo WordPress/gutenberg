@@ -1,0 +1,46 @@
+{
+	"apiVersion": 2,
+	"name": "core/query",
+	"category": "design",
+	"attributes": {
+		"queryId": {
+			"type": "number"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"perPage": null,
+				"pages": 1,
+				"offset": 0,
+				"postType": "post",
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true
+			}
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "list"
+			}
+		}
+	},
+	"providesContext": {
+		"queryId": "queryId",
+		"query": "query",
+		"layout": "layout"
+	},
+	"usesContext": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	},
+	"editorStyle": "wp-block-query-editor"
+}

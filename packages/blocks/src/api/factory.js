@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import {
 	every,
 	reduce,
@@ -46,6 +46,10 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
 	const sanitizedAttributes = reduce(
@@ -85,6 +89,36 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 		attributes: sanitizedAttributes,
 		innerBlocks,
 	};
+}
+
+/**
+ * Given an array of InnerBlocks templates or Block Objects,
+ * returns an array of created Blocks from them.
+ * It handles the case of having InnerBlocks as Blocks by
+ * converting them to the proper format to continue recursively.
+ *
+ * @param {Array} innerBlocksOrTemplate Nested blocks or InnerBlocks templates.
+ *
+ * @return {Object[]} Array of Block objects.
+ */
+export function createBlocksFromInnerBlocksTemplate(
+	innerBlocksOrTemplate = []
+) {
+	return innerBlocksOrTemplate.map( ( innerBlock ) => {
+		const innerBlockTemplate = Array.isArray( innerBlock )
+			? innerBlock
+			: [
+					innerBlock.name,
+					innerBlock.attributes,
+					innerBlock.innerBlocks,
+			  ];
+		const [ name, attributes, innerBlocks = [] ] = innerBlockTemplate;
+		return createBlock(
+			name,
+			attributes,
+			createBlocksFromInnerBlocksTemplate( innerBlocks )
+		);
+	} );
 }
 
 /**
@@ -285,23 +319,6 @@ export const isContainerGroupBlock = ( name ) =>
 	name === getGroupingBlockName();
 
 /**
- * Determines whether the provided Blocks are of the same type
- * (eg: all `core/paragraph`).
- *
- * @param  {Array}  blocksArray the Block definitions
- *
- * @return {boolean} whether or not the given Blocks pass the criteria
- */
-export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
-	if ( ! blocksArray.length ) {
-		return false;
-	}
-	const sourceName = blocksArray[ 0 ].name;
-
-	return every( blocksArray, [ 'name', sourceName ] );
-};
-
-/**
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
@@ -406,17 +423,6 @@ export function switchToBlockType( blocks, name ) {
 	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
-
-	// Unless it's a Grouping Block then for multi block selections
-	// check that all Blocks are of the same type otherwise
-	// we can't run a conversion
-	if (
-		! isContainerGroupBlock( name ) &&
-		isMultiBlock &&
-		! isBlockSelectionOfSameType( blocksArray )
-	) {
-		return null;
-	}
 
 	// Find the right transformation by giving priority to the "to"
 	// transformation.

@@ -1,0 +1,18 @@
+{
+	"apiVersion": 2,
+	"name": "core/site-logo",
+	"category": "layout",
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"width": {
+			"type": "number"
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"editorStyle": "wp-block-site-logo-editor",
+	"style": "wp-block-site-logo"
+}

@@ -29,12 +29,7 @@ export const settings = {
 				'</marquee>',
 		},
 	},
-	supports: {
-		customClassName: false,
-		className: false,
-		html: false,
-	},
-	transforms,
 	edit,
 	save,
+	transforms,
 };

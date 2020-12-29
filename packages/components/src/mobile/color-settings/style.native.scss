@@ -1,0 +1,35 @@
+
+.horizontalSeparator {
+	border-bottom-width: $border-width;
+	border-color: $light-gray-400;
+}
+
+.horizontalSeparatorDark {
+	border-color: $gray-70;
+}
+
+.footer {
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	padding: 12px $grid-unit-20;
+}
+
+.colorIndicator {
+	width: 24px;
+	height: 24px;
+}
+
+.selectColorText {
+	text-align: center;
+	color: $gray;
+	font-size: 16px;
+	flex: 2;
+	line-height: 24px;
+}
+
+.flex {
+	flex: 1;
+}
+

@@ -15,7 +15,13 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
+function Option( {
+	className,
+	isSelected,
+	selectedIconProps,
+	tooltipText,
+	...additionalProps
+} ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
@@ -33,7 +39,12 @@ function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
 			) : (
 				optionButton
 			) }
-			{ isSelected && <Icon icon={ check } /> }
+			{ isSelected && (
+				<Icon
+					icon={ check }
+					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+				/>
+			) }
 		</div>
 	);
 }
@@ -53,6 +64,7 @@ function DropdownLinkAction( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
 					isLink
 					{ ...buttonProps }
@@ -94,7 +106,9 @@ export default function CircularOptionPicker( {
 				className
 			) }
 		>
-			{ options }
+			<div className="components-circular-option-picker__swatches">
+				{ options }
+			</div>
 			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">

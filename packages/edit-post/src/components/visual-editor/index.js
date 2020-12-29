@@ -2,66 +2,86 @@
  * WordPress dependencies
  */
 import {
-	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
+	PostTitle,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
-	Typewriter,
-	ObserveTyping,
 	BlockList,
-	CopyHandler,
-	BlockSelectionClearer,
-	MultiSelectScrollIntoView,
+	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+	__unstableUseTypewriter as useTypewriter,
+	__unstableUseClipboardHandler as useClipboardHandler,
+	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
-	__experimentalBlockSettingsMenuPluginsExtension,
+	__experimentalUseResizeCanvas as useResizeCanvas,
+	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
-import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
-import { useResizeCanvas } from '../resize-canvas';
+import { useSelect } from '@wordpress/data';
+import { store as editPostStore } from '../../store';
 
-function VisualEditor() {
-	const inlineStyles = useResizeCanvas();
+export default function VisualEditor() {
+	const ref = useRef();
+	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
+		const {
+			isEditingTemplate,
+			__experimentalGetPreviewDeviceType,
+		} = select( editPostStore );
+		return {
+			deviceType: __experimentalGetPreviewDeviceType(),
+			isTemplateMode: isEditingTemplate(),
+		};
+	}, [] );
+	const hasMetaBoxes = useSelect(
+		( select ) => select( editPostStore ).hasMetaBoxes(),
+		[]
+	);
+	const desktopCanvasStyles = {
+		height: '100%',
+		// Add a constant padding for the typewritter effect. When typing at the
+		// bottom, there needs to be room to scroll up.
+		paddingBottom: hasMetaBoxes ? null : '40vh',
+	};
+	const resizedCanvasStyles = useResizeCanvas( deviceType );
+
+	useScrollMultiSelectionIntoView( ref );
+	useBlockSelectionClearer( ref );
+	useTypewriter( ref );
+	useClipboardHandler( ref );
+	useTypingObserver( ref );
+	useCanvasClickRedirect( ref );
 
 	return (
-		<BlockSelectionClearer
-			className="edit-post-visual-editor editor-styles-wrapper"
-			style={ inlineStyles }
-		>
+		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
-			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />
-			<Typewriter>
-				<CopyHandler>
-					<WritingFlow>
-						<ObserveTyping>
-							<CopyHandler>
-								<PostTitle />
-								<BlockList />
-							</CopyHandler>
-						</ObserveTyping>
-					</WritingFlow>
-				</CopyHandler>
-			</Typewriter>
+			<div
+				ref={ ref }
+				className="editor-styles-wrapper"
+				tabIndex="-1"
+				style={ resizedCanvasStyles || desktopCanvasStyles }
+			>
+				<WritingFlow>
+					{ ! isTemplateMode && (
+						<div className="edit-post-visual-editor__post-title-wrapper">
+							<PostTitle />
+						</div>
+					) }
+					<BlockList />
+				</WritingFlow>
+			</div>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__experimentalBlockSettingsMenuFirstItem>
-			<__experimentalBlockSettingsMenuPluginsExtension>
-				{ ( { clientIds, onClose } ) => (
-					<PluginBlockSettingsMenuGroup.Slot
-						fillProps={ { clientIds, onClose } }
-					/>
-				) }
-			</__experimentalBlockSettingsMenuPluginsExtension>
-		</BlockSelectionClearer>
+		</div>
 	);
 }
-
-export default VisualEditor;

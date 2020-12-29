@@ -1,13 +1,15 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.11.0",
+	"version": "3.23.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"React",
-		"hoc"
+		"gutenberg",
+		"react",
+		"hoc",
+		"hooks"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
 	"repository": {
@@ -23,11 +25,20 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.12.5",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"lodash": "^4.17.15",
-		"mousetrap": "^1.6.2"
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/priority-queue": "file:../priority-queue",
+		"clipboard": "^2.0.1",
+		"lodash": "^4.17.19",
+		"memize": "^1.1.0",
+		"mousetrap": "^1.6.5",
+		"react-merge-refs": "^1.0.0",
+		"react-resize-aware": "^3.0.1",
+		"use-memo-one": "^1.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

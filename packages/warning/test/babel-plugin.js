@@ -20,7 +20,7 @@ function compare( input, output, options = {} ) {
 	expect( code ).toEqual( output );
 }
 
-describe( 'babel-plugin', function() {
+describe( 'babel-plugin', () => {
 	it( 'should replace warning calls with import declaration', () => {
 		compare(
 			join(

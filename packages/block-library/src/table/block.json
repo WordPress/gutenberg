@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/table",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"hasFixedLayout": {
 			"type": "boolean",
@@ -120,5 +121,12 @@
 				}
 			}
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"__experimentalSelector": ".wp-block-table > table"
+	},
+	"editorStyle": "wp-block-table-editor",
+	"style": "wp-block-table"
 }

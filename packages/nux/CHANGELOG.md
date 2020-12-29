@@ -1,6 +1,16 @@
-# 3.1.0 (Unreleased)
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
 
-- The `@wordpress/nux` package has been deprecated. Please use the `Guide` component in `@wordpress/components` to show a user guide.
+## Unreleased
+
+## 3.24.0 (2020-12-17)
+
+### New Feature
+
+-   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
+
+# 3.1.0 (2019-06-03)
+
+-   The `@wordpress/nux` package has been deprecated. Please use the `Guide` component in `@wordpress/components` to show a user guide.
 
 ## 3.0.6 (2019-01-03)
 
@@ -18,7 +28,7 @@
 
 ### Breaking Changes
 
-- The id prop of DotTip has been removed. Please use the tipId prop instead.
+-   The id prop of DotTip has been removed. Please use the tipId prop instead.
 
 ## 2.0.13 (2018-11-12)
 
@@ -36,7 +46,7 @@
 
 ### Deprecations
 
-- The id prop of DotTip has been deprecated. Please use the tipId prop instead.
+-   The id prop of DotTip has been deprecated. Please use the tipId prop instead.
 
 ## 2.0.6 (2018-10-22)
 
@@ -48,4 +58,4 @@
 
 ### Breaking Change
 
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

@@ -90,29 +90,23 @@ export function next( tag, text, index = 0 ) {
  * @return {string} Text with shortcodes replaced.
  */
 export function replace( tag, text, callback ) {
-	return text.replace( regexp( tag ), function(
-		match,
-		left,
-		$3,
-		attrs,
-		slash,
-		content,
-		closing,
-		right
-	) {
-		// If both extra brackets exist, the shortcode has been properly
-		// escaped.
-		if ( left === '[' && right === ']' ) {
-			return match;
+	return text.replace(
+		regexp( tag ),
+		function ( match, left, $3, attrs, slash, content, closing, right ) {
+			// If both extra brackets exist, the shortcode has been properly
+			// escaped.
+			if ( left === '[' && right === ']' ) {
+				return match;
+			}
+
+			// Create the match object and pass it through the callback.
+			const result = callback( fromMatch( arguments ) );
+
+			// Make sure to return any of the extra brackets if they weren't used to
+			// escape the shortcode.
+			return result || result === '' ? left + result + right : match;
 		}
-
-		// Create the match object and pass it through the callback.
-		const result = callback( fromMatch( arguments ) );
-
-		// Make sure to return any of the extra brackets if they weren't used to
-		// escape the shortcode.
-		return result ? left + result + right : match;
-	} );
+	);
 }
 
 /**
@@ -266,7 +260,7 @@ export function fromMatch( match ) {
  * @return {WPShortcode} Shortcode instance.
  */
 const shortcode = extend(
-	function( options ) {
+	function ( options ) {
 		extend(
 			this,
 			pick( options || {}, 'tag', 'attrs', 'type', 'content' )

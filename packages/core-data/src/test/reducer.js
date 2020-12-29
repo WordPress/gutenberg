@@ -39,12 +39,17 @@ describe( 'terms()', () => {
 } );
 
 describe( 'entities', () => {
+	// See also unit tests at `queried-data/test/reducer.js`, which are more
+	// thorough in testing the behavior of what is tracked here as the
+	// `queriedData` property on a kind/name nested object pair.
+
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
 		expect( state.data.root.postType.queriedData ).toEqual( {
 			items: {},
 			queries: {},
+			itemIsComplete: {},
 		} );
 	} );
 
@@ -65,6 +70,10 @@ describe( 'entities', () => {
 				b: { slug: 'b', title: 'beach' },
 				s: { slug: 's', title: 'sun' },
 			},
+			itemIsComplete: {
+				b: true,
+				s: true,
+			},
 			queries: {},
 		} );
 	} );
@@ -77,6 +86,9 @@ describe( 'entities', () => {
 						queriedData: {
 							items: {
 								w: { slug: 'w', title: 'water' },
+							},
+							itemIsComplete: {
+								w: true,
 							},
 							queries: {},
 						},
@@ -95,6 +107,10 @@ describe( 'entities', () => {
 			items: {
 				w: { slug: 'w', title: 'water' },
 				b: { slug: 'b', title: 'beach' },
+			},
+			itemIsComplete: {
+				w: true,
+				b: true,
 			},
 			queries: {},
 		} );

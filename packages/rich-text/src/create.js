@@ -17,10 +17,24 @@ import {
 } from './special-characters';
 
 /**
- * Browser dependencies
+ * @typedef {Object} RichTextFormat
+ *
+ * @property {string} type Format type.
  */
 
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+/**
+ * @typedef {Array<RichTextFormat>} RichTextFormatList
+ */
+
+/**
+ * @typedef {Object} RichTextValue
+ *
+ * @property {string}                    text         Text.
+ * @property {Array<RichTextFormatList>} formats      Formats.
+ * @property {Array<RichTextFormat>}     replacements Replacements.
+ * @property {number|undefined}          start        Selection start.
+ * @property {number|undefined}          end          Selection end.
+ */
 
 function createEmptyValue() {
 	return {
@@ -136,10 +150,11 @@ function toFormat( { type, attributes } ) {
  *                                            multiline.
  * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?boolean} [$1.preserveWhiteSpace]  Whether or not to collapse white
+ * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
  *                                            space characters.
+ * @param {boolean} [$1.__unstableIsEditableTree]
  *
- * @return {Object} A rich text value.
+ * @return {RichTextValue} A rich text value.
  */
 export function create( {
 	element,
@@ -160,6 +175,8 @@ export function create( {
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
+		// It does not matter which document this is, we're just using it to
+		// parse.
 		element = createElement( document, html );
 	}
 
@@ -208,7 +225,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
 		// Range indicates that the current node has selection.
-	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
+	} else if ( node === startContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
 		// Range indicates that the current node is selected.
 	} else if (
@@ -231,7 +248,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
 		// Range indicates that the current node has selection.
-	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
+	} else if ( node === endContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
 		// Range indicates that the current node is selected.
 	} else if (
@@ -258,7 +275,7 @@ function accumulateSelection( accumulator, node, range, value ) {
  * @param {Range}    range  The range to filter.
  * @param {Function} filter Function to use to filter the text.
  *
- * @return {?Object} Object containing range properties.
+ * @return {Object|void} Object containing range properties.
  */
 function filterRange( node, range, filter ) {
 	if ( ! range ) {
@@ -303,17 +320,19 @@ function removePadding( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}    $1                      Named argements.
- * @param {?Element}  $1.element              Element to create value from.
- * @param {?Range}    $1.range                Range to create value from.
- * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ * @param {Object}  $1                        Named argements.
+ * @param {Element} [$1.element]              Element to create value from.
+ * @param {Range}   [$1.range]                Range to create value from.
+ * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
  *                                            multiline.
- * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?boolean} $1.preserveWhiteSpace    Whether or not to collapse white
+ * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
  *                                            space characters.
+ * @param {Array}   [$1.currentWrapperTags]
+ * @param {boolean} [$1.isEditableTree]
  *
- * @return {Object} A rich text value.
+ * @return {RichTextValue} A rich text value.
  */
 function createFromElement( {
 	element,
@@ -342,7 +361,7 @@ function createFromElement( {
 		const node = element.childNodes[ index ];
 		const type = node.nodeName.toLowerCase();
 
-		if ( node.nodeType === TEXT_NODE ) {
+		if ( node.nodeType === node.TEXT_NODE ) {
 			let filter = removePadding;
 
 			if ( ! preserveWhiteSpace ) {
@@ -361,7 +380,7 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.nodeType !== ELEMENT_NODE ) {
+		if ( node.nodeType !== node.ELEMENT_NODE ) {
 			continue;
 		}
 
@@ -470,19 +489,20 @@ function createFromElement( {
  * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Object}   $1                      Named argements.
- * @param {?Element} $1.element              Element to create value from.
- * @param {?Range}   $1.range                Range to create value from.
- * @param {?string}  $1.multilineTag         Multiline tag if the structure is
- *                                           multiline.
- * @param {?Array}   $1.multilineWrapperTags Tags where lines can be found if
- *                                           nesting is possible.
- * @param {boolean}  $1.currentWrapperTags   Whether to prepend a line
- *                                           separator.
- * @param {?boolean} $1.preserveWhiteSpace   Whether or not to collapse white
- *                                           space characters.
+ * @param {Object}  $1                        Named argements.
+ * @param {Element} [$1.element]              Element to create value from.
+ * @param {Range}   [$1.range]                Range to create value from.
+ * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
+ *                                            multiline.
+ * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
+ *                                            nesting is possible.
+ * @param {boolean} [$1.currentWrapperTags]   Whether to prepend a line
+ *                                            separator.
+ * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
+ *                                            space characters.
+ * @param {boolean} [$1.isEditableTree]
  *
- * @return {Object} A rich text value.
+ * @return {RichTextValue} A rich text value.
  */
 function createFromMultilineElement( {
 	element,
@@ -541,11 +561,11 @@ function createFromMultilineElement( {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param {Object}    $1                 Named argements.
- * @param {Element}   $1.element         Element to get attributes from.
+ * @param {Object}  $1         Named argements.
+ * @param {Element} $1.element Element to get attributes from.
  *
- * @return {?Object} Attribute object or `undefined` if the element has no
- *                   attributes.
+ * @return {Object|void} Attribute object or `undefined` if the element has no
+ *                       attributes.
  */
 function getAttributes( { element } ) {
 	if ( ! element.hasAttributes() ) {

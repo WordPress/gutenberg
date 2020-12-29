@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { table as icon } from '@wordpress/icons';
+import { blockTable as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -101,9 +101,6 @@ export const settings = {
 		},
 		{ name: 'stripes', label: __( 'Stripes' ) },
 	],
-	supports: {
-		align: true,
-	},
 	transforms,
 	edit,
 	save,

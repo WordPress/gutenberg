@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/more",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"customText": {
 			"type": "string"
@@ -9,5 +10,12 @@
 			"type": "boolean",
 			"default": false
 		}
-	}
+	},
+	"supports": {
+		"customClassName": false,
+		"className": false,
+		"html": false,
+		"multiple": false
+	},
+	"editorStyle": "wp-block-more-editor"
 }

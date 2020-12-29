@@ -3,8 +3,8 @@
  */
 import { withSelect } from '@wordpress/data';
 
-function PostTrashCheck( { isNew, postId, children } ) {
-	if ( isNew || ! postId ) {
+function PostTrashCheck( { isNew, postId, canUserDelete, children } ) {
+	if ( isNew || ! postId || ! canUserDelete ) {
 		return null;
 	}
 
@@ -12,9 +12,18 @@ function PostTrashCheck( { isNew, postId, children } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { isEditedPostNew, getCurrentPostId } = select( 'core/editor' );
+	const { isEditedPostNew, getCurrentPostId, getCurrentPostType } = select(
+		'core/editor'
+	);
+	const { getPostType, canUser } = select( 'core' );
+	const postId = getCurrentPostId();
+	const postType = getPostType( getCurrentPostType() );
+	const resource = postType?.rest_base || ''; // eslint-disable-line camelcase
+
 	return {
 		isNew: isEditedPostNew(),
-		postId: getCurrentPostId(),
+		postId,
+		canUserDelete:
+			postId && resource ? canUser( 'delete', resource, postId ) : false,
 	};
 } )( PostTrashCheck );

@@ -17,12 +17,12 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'no-unguarded-get-range-at', rule, {
 	valid: [
 		{
-			code: `const selection = window.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
+			code: `const selection = defaultView.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
 		},
 	],
 	invalid: [
 		{
-			code: `window.getSelection().getRangeAt( 0 );`,
+			code: `defaultView.getSelection().getRangeAt( 0 );`,
 			errors: [ { message: 'Avoid unguarded getRangeAt' } ],
 		},
 	],

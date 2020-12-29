@@ -29,11 +29,7 @@ export function BlockModeToggle( {
 	const label =
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
-	return (
-		<MenuItem onClick={ onToggleMode } icon="html">
-			{ ! small && label }
-		</MenuItem>
-	);
+	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
 }
 
 export default compose( [

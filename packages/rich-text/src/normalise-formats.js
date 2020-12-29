@@ -4,13 +4,15 @@
 
 import { isFormatEqual } from './is-format-equal';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Normalises formats: ensures subsequent adjacent equal formats have the same
  * reference.
  *
- * @param {Object} value Value to normalise formats of.
+ * @param {RichTextValue} value Value to normalise formats of.
  *
- * @return {Object} New value with normalised formats.
+ * @return {RichTextValue} New value with normalised formats.
  */
 export function normaliseFormats( value ) {
 	const newFormats = value.formats.slice();

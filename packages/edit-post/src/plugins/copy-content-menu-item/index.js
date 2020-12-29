@@ -1,35 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { ClipboardButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { withState, compose } from '@wordpress/compose';
+import { useCopyOnClick, compose, ifCondition } from '@wordpress/compose';
+import { useRef, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
-function CopyContentMenuItem( {
-	createNotice,
-	editedPostContent,
-	hasCopied,
-	setState,
-} ) {
+function CopyContentMenuItem( { createNotice, editedPostContent } ) {
+	const ref = useRef();
+	const hasCopied = useCopyOnClick( ref, editedPostContent );
+
+	useEffect( () => {
+		if ( ! hasCopied ) {
+			return;
+		}
+
+		createNotice( 'info', __( 'All content copied.' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	}, [ hasCopied ] );
+
 	return (
-		editedPostContent.length > 0 && (
-			<ClipboardButton
-				text={ editedPostContent }
-				role="menuitem"
-				className="components-menu-item__button"
-				onCopy={ () => {
-					setState( { hasCopied: true } );
-					createNotice( 'info', __( 'All content copied.' ), {
-						isDismissible: true,
-						type: 'snackbar',
-					} );
-				} }
-				onFinishCopy={ () => setState( { hasCopied: false } ) }
-			>
-				{ hasCopied ? __( 'Copied!' ) : __( 'Copy all content' ) }
-			</ClipboardButton>
-		)
+		<MenuItem ref={ ref }>
+			{ hasCopied ? __( 'Copied!' ) : __( 'Copy all content' ) }
+		</MenuItem>
 	);
 }
 
@@ -40,11 +37,11 @@ export default compose(
 		),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
+		const { createNotice } = dispatch( noticesStore );
 
 		return {
 			createNotice,
 		};
 	} ),
-	withState( { hasCopied: false } )
+	ifCondition( ( { editedPostContent } ) => editedPostContent.length > 0 )
 )( CopyContentMenuItem );

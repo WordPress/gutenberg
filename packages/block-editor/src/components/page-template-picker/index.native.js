@@ -2,9 +2,9 @@
  * Internal dependencies
  */
 import __experimentalPageTemplatePicker from './picker';
-import __experimentalWithPageTemplatePickerVisible from './with-page-template-picker-visible';
-import __experimentalUsePageTemplatePickerVisible from './use-page-template-picker-visible';
+import __experimentalWithPageTemplatePicker from './with-page-template-picker';
+import { Preview } from './preview';
 
 export { __experimentalPageTemplatePicker };
-export { __experimentalWithPageTemplatePickerVisible };
-export { __experimentalUsePageTemplatePickerVisible };
+export { __experimentalWithPageTemplatePicker };
+export { Preview };

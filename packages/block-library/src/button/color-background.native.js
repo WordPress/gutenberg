@@ -2,17 +2,17 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 /**
  * WordPress dependencies
  */
-import { __experimentalUseGradient } from '@wordpress/block-editor';
+import { Gradient, colorsUtils } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
 function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
+	const { isGradient } = colorsUtils;
 	const wrapperStyles = [
 		styles.richTextWrapper,
 		{
@@ -21,41 +21,11 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 		},
 	];
 
-	const { gradientValue } = __experimentalUseGradient();
-
-	function transformGradient() {
-		const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
-		const matchDeg = /(\d.+)deg/g;
-
-		const colorGroup = gradientValue
-			.match( matchColorGroup )
-			.map( ( color ) => color.split( ' ' ) );
-
-		const colors = colorGroup.map( ( color ) => color[ 0 ] );
-		const locations = colorGroup.map(
-			( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100
-		);
-		const angle = Number( matchDeg.exec( gradientValue )[ 1 ] );
-
-		return {
-			colors,
-			locations,
-			angle,
-		};
-	}
-
-	const { colors, locations, angle } = gradientValue
-		? transformGradient()
-		: {};
-
 	return (
 		<View style={ wrapperStyles }>
-			{ gradientValue && (
-				<LinearGradient
-					colors={ colors }
-					useAngle={ true }
-					angle={ angle }
-					locations={ locations }
+			{ isGradient( backgroundColor ) && (
+				<Gradient
+					gradientValue={ backgroundColor }
 					angleCenter={ { x: 0.5, y: 0.5 } }
 					style={ [
 						styles.linearGradient,

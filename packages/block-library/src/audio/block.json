@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/audio",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"src": {
 			"type": "string",
@@ -34,5 +35,11 @@
 			"selector": "audio",
 			"attribute": "preload"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true
+	},
+	"editorStyle": "wp-block-audio-editor",
+	"style": "wp-block-audio"
 }

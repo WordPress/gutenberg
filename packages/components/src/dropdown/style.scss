@@ -1,3 +1,7 @@
 .components-dropdown {
 	display: inline-block;
 }
+
+.components-dropdown__content .components-popover__content > div {
+	padding: $grid-unit-15;
+}

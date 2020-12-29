@@ -1,6 +1,6 @@
 // Add clickable overlay to blocks with nesting.
 // This makes it easy to select all layers of the block.
-.block-editor-inner-blocks.has-overlay {
+.block-editor-block-list__layout.has-overlay {
 	&::after {
 		content: "";
 		position: absolute;
@@ -8,7 +8,7 @@
 		right: -$block-padding;
 		bottom: -$block-padding;
 		left: -$block-padding;
-		z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
+		z-index: z-index(".block-editor-block-list__layout.has-overlay::after");
 	}
 }
 

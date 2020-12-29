@@ -7,21 +7,15 @@ import { clone } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { blockAutocompleter, userAutocompleter } from '../components';
+import { userAutocompleter } from '../components';
 
-function setDefaultCompleters( completers = [], blockName ) {
+function setDefaultCompleters( completers = [] ) {
 	// Provide copies so filters may directly modify them.
 	completers.push( clone( userAutocompleter ) );
-
-	// Add blocks autocompleter for Paragraph block
-	if ( blockName === getDefaultBlockName() ) {
-		completers.push( clone( blockAutocompleter ) );
-	}
 
 	return completers;
 }

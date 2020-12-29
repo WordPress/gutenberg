@@ -118,9 +118,11 @@ export async function uploadMedia( {
 	const validFiles = [];
 
 	for ( const mediaFile of files ) {
-		// verify if user is allowed to upload this mime type
+		// Verify if user is allowed to upload this mime type.
+		// Defer to the server when type not detected.
 		if (
 			allowedMimeTypesForUser &&
+			mediaFile.type &&
 			! isAllowedMimeTypeForUser( mediaFile.type )
 		) {
 			triggerError( {
@@ -133,8 +135,9 @@ export async function uploadMedia( {
 			continue;
 		}
 
-		// Check if the block supports this mime type
-		if ( ! isAllowedType( mediaFile.type ) ) {
+		// Check if the block supports this mime type.
+		// Defer to the server when type not detected.
+		if ( mediaFile.type && ! isAllowedType( mediaFile.type ) ) {
 			triggerError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
 				message: __( 'Sorry, this file type is not supported here.' ),

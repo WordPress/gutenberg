@@ -24,6 +24,7 @@ export const settings = {
 	keywords: [
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
+		__( 'picture' ),
 	],
 	example: {
 		attributes: {
@@ -58,19 +59,12 @@ export const settings = {
 			return alt + ( caption ? '. ' + caption : '' );
 		}
 	},
-	transforms,
 	getEditWrapperProps( attributes ) {
-		const { align, width } = attributes;
-		if (
-			'left' === align ||
-			'center' === align ||
-			'right' === align ||
-			'wide' === align ||
-			'full' === align
-		) {
-			return { 'data-align': align, 'data-resized': !! width };
-		}
+		return {
+			'data-align': attributes.align,
+		};
 	},
+	transforms,
 	edit,
 	save,
 	deprecated,

@@ -63,11 +63,11 @@ const MyMenuItemsChoice = withState( {
 	choices: [
 		{
 			value: 'visual',
-			label: 'Visual Editor',
+			label: 'Visual editor',
 		},
 		{
 			value: 'text',
-			label: 'Code Editor',
+			label: 'Code editor',
 		},
 	],
 } )( ( { mode, choices, setState } ) => (

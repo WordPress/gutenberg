@@ -1,4 +1,45 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 12.0.0 (2020-12-17)
+
+### Enhancements
+- ComboboxControl: Deburr option labels before filter
+
+### Breaking Change
+
+- Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
+
+## 10.1.0 (2020-09-03)
+
+### New Feature
+
+- Add `ToolbarItem` component.
+- Support `label` prop on the `Toolbar` component.
+
+### Deprecations
+
+- Deprecate the `Toolbar` component when used without the `label` prop. `ToolbarGroup` should be used instead.
+
+## 10.0.0 (2020-07-07)
+
+### Breaking Change
+
+- `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
+- `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
+
+## 9.6.0 (2020-05-14)
+
+### Bug Fix
+
+- Fix and issue that would cause the `Popover` component to throw an error under certain
+  circumstances ([#22264](https://github.com/WordPress/gutenberg/pull/22264)).
+
+### Deprecations
+
+- The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
+- The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
 
 ## 9.2.0 (2020-02-10)
 

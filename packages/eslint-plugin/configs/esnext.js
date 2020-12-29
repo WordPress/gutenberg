@@ -22,7 +22,12 @@ module.exports = {
 		'no-useless-constructor': 'error',
 		'no-var': 'error',
 		'object-shorthand': 'error',
-		'prefer-const': 'error',
+		'prefer-const': [
+			'error',
+			{
+				destructuring: 'all',
+			},
+		],
 		quotes: [
 			'error',
 			'single',

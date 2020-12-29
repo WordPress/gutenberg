@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ExternalLink, Guide, GuidePage } from '@wordpress/components';
+import { ExternalLink, Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { __experimentalCreateInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,15 +16,15 @@ import {
 	DocumentationImage,
 	InserterIconImage,
 } from './images';
+import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuide() {
 	const isActive = useSelect(
-		( select ) =>
-			select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ),
+		( select ) => select( editPostStore ).isFeatureActive( 'welcomeGuide' ),
 		[]
 	);
 
-	const { toggleFeature } = useDispatch( 'core/edit-post' );
+	const { toggleFeature } = useDispatch( editPostStore );
 
 	if ( ! isActive ) {
 		return null;
@@ -33,71 +33,85 @@ export default function WelcomeGuide() {
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
-			contentLabel={ __( 'Welcome to the Block Editor' ) }
+			contentLabel={ __( 'Welcome to the block editor' ) }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
-		>
-			<GuidePage className="edit-post-welcome-guide__page">
-				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Welcome to the Block Editor' ) }
-				</h1>
-				<CanvasImage className="edit-post-welcome-guide__image" />
-				<p className="edit-post-welcome-guide__text">
-					{ __(
-						'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content.'
-					) }
-				</p>
-			</GuidePage>
-
-			<GuidePage className="edit-post-welcome-guide__page">
-				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Make each block your own' ) }
-				</h1>
-				<EditorImage className="edit-post-welcome-guide__image" />
-				<p className="edit-post-welcome-guide__text">
-					{ __(
-						'Each block comes with its own set of controls for changing things like color, width, and alignment. These will show and hide automatically when you have a block selected.'
-					) }
-				</p>
-			</GuidePage>
-
-			<GuidePage className="edit-post-welcome-guide__page">
-				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Get to know the Block Library' ) }
-				</h1>
-				<BlockLibraryImage className="edit-post-welcome-guide__image" />
-				<p className="edit-post-welcome-guide__text">
-					{ __experimentalCreateInterpolateElement(
-						__(
-							'All of the blocks available to you live in the Block Library. You’ll find it wherever you see the <InserterIconImage /> icon.'
-						),
-						{
-							InserterIconImage: (
-								<InserterIconImage className="edit-post-welcome-guide__inserter-icon" />
-							),
-						}
-					) }
-				</p>
-			</GuidePage>
-
-			<GuidePage className="edit-post-welcome-guide__page">
-				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Learn how to use the Block Editor' ) }
-				</h1>
-				<DocumentationImage className="edit-post-welcome-guide__image" />
-				<p className="edit-post-welcome-guide__text">
-					{ __(
-						'New to the Block Editor? Want to learn more about using it? '
-					) }
-					<ExternalLink
-						href={ __(
-							'https://wordpress.org/support/article/wordpress-editor/'
-						) }
-					>
-						{ __( "Here's a detailed guide." ) }
-					</ExternalLink>
-				</p>
-			</GuidePage>
-		</Guide>
+			pages={ [
+				{
+					image: <CanvasImage />,
+					content: (
+						<>
+							<h1 className="edit-post-welcome-guide__heading">
+								{ __( 'Welcome to the block editor' ) }
+							</h1>
+							<p className="edit-post-welcome-guide__text">
+								{ __(
+									'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content.'
+								) }
+							</p>
+						</>
+					),
+				},
+				{
+					image: <EditorImage />,
+					content: (
+						<>
+							<h1 className="edit-post-welcome-guide__heading">
+								{ __( 'Make each block your own' ) }
+							</h1>
+							<p className="edit-post-welcome-guide__text">
+								{ __(
+									'Each block comes with its own set of controls for changing things like color, width, and alignment. These will show and hide automatically when you have a block selected.'
+								) }
+							</p>
+						</>
+					),
+				},
+				{
+					image: <BlockLibraryImage />,
+					content: (
+						<>
+							<h1 className="edit-post-welcome-guide__heading">
+								{ __( 'Get to know the block library' ) }
+							</h1>
+							<p className="edit-post-welcome-guide__text">
+								{ createInterpolateElement(
+									__(
+										'All of the blocks available to you live in the block library. You’ll find it wherever you see the <InserterIconImage /> icon.'
+									),
+									{
+										InserterIconImage: (
+											<InserterIconImage className="edit-post-welcome-guide__inserter-icon" />
+										),
+									}
+								) }
+							</p>
+						</>
+					),
+				},
+				{
+					image: <DocumentationImage />,
+					content: (
+						<>
+							<h1 className="edit-post-welcome-guide__heading">
+								{ __( 'Learn how to use the block editor' ) }
+							</h1>
+							<p className="edit-post-welcome-guide__text">
+								{ __(
+									'New to the block editor? Want to learn more about using it? '
+								) }
+								<ExternalLink
+									href={ __(
+										'https://wordpress.org/support/article/wordpress-editor/'
+									) }
+								>
+									{ __( "Here's a detailed guide." ) }
+								</ExternalLink>
+							</p>
+						</>
+					),
+				},
+			] }
+		/>
 	);
 }

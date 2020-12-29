@@ -11,23 +11,34 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
-	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	__experimentalEditorSkeleton as EditorSkeleton,
+	__experimentalLibrary as Library,
+	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
 	Popover,
-	FocusReturnProvider,
+	__unstableUseDrop as useDrop,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
+import {
+	ComplementaryArea,
+	FullscreenMode,
+	InterfaceSkeleton,
+} from '@wordpress/interface';
+import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { close } from '@wordpress/icons';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -37,96 +48,189 @@ import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
-import OptionsModal from '../options-modal';
-import FullscreenMode from '../fullscreen-mode';
+import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
-import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
+import ActionsPanel from './actions-panel';
+import { store as editPostStore } from '../../store';
 
-function Layout() {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+const interfaceLabels = {
+	secondarySidebar: __( 'Block library' ),
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
+};
+
+function Layout( { settings } ) {
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
-		closePublishSidebar,
 		openGeneralSidebar,
-		togglePublishSidebar,
-	} = useDispatch( 'core/edit-post' );
+		closeGeneralSidebar,
+		setIsInserterOpened,
+	} = useDispatch( editPostStore );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
-		editorSidebarOpened,
-		pluginSidebarOpened,
-		publishSidebarOpened,
+		sidebarIsOpened,
 		hasActiveMetaboxes,
-		isSaving,
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		showMostUsedBlocks,
+		isInserterOpened,
+		showIconLabels,
+		hasReducedUI,
 	} = useSelect( ( select ) => {
 		return {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
-			editorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
-			pluginSidebarOpened: select(
-				'core/edit-post'
-			).isPluginSidebarOpened(),
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			sidebarIsOpened: !! (
+				select( 'core/interface' ).getActiveComplementaryArea(
+					editPostStore.name
+				) || select( editPostStore ).isPublishSidebarOpened()
+			),
+			isFullscreenActive: select( editPostStore ).isFeatureActive(
+				'fullscreenMode'
+			),
+			showMostUsedBlocks: select( editPostStore ).isFeatureActive(
+				'mostUsedBlocks'
+			),
+			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations(
 				'core/edit-post/previous-region'
 			),
 			nextShortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			hasBlockSelected: select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
+			showIconLabels: select( editPostStore ).isFeatureActive(
+				'showIconLabels'
+			),
+			hasReducedUI: select( editPostStore ).isFeatureActive(
+				'reducedUI'
+			),
 		};
 	}, [] );
-	const sidebarIsOpened =
-		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
 
+	// Inserter and Sidebars are mutually exclusive
+	useEffect( () => {
+		if ( sidebarIsOpened && ! isHugeViewport ) {
+			setIsInserterOpened( false );
+		}
+	}, [ sidebarIsOpened, isHugeViewport ] );
+	useEffect( () => {
+		if ( isInserterOpened && ! isHugeViewport ) {
+			closeGeneralSidebar();
+		}
+	}, [ isInserterOpened, isHugeViewport ] );
+
+	// Local state for save panel.
+	// Note 'truthy' callback implies an open panel.
+	const [
+		entitiesSavedStatesCallback,
+		setEntitiesSavedStatesCallback,
+	] = useState( false );
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
+	const ref = useRef();
+
+	useDrop( ref );
+	useEditorStyles( ref, settings.styles );
+	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
+		onClose: () => setIsInserterOpened( false ),
+	} );
+
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<FocusReturnProvider>
-				<EditorSkeleton
-					className={ className }
-					header={ <Header /> }
-					sidebar={
+			<SettingsSidebar />
+			<InterfaceSkeleton
+				ref={ ref }
+				className={ className }
+				labels={ interfaceLabels }
+				header={
+					<Header
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+					/>
+				}
+				secondarySidebar={
+					mode === 'visual' &&
+					isInserterOpened && (
+						<div
+							ref={ inserterDialogRef }
+							{ ...inserterDialogProps }
+							className="edit-post-layout__inserter-panel"
+						>
+							<div className="edit-post-layout__inserter-panel-header">
+								<Button
+									icon={ close }
+									onClick={ () =>
+										setIsInserterOpened( false )
+									}
+								/>
+							</div>
+							<div className="edit-post-layout__inserter-panel-content">
+								<Library
+									showMostUsedBlocks={ showMostUsedBlocks }
+									showInserterHelpPanel
+									onSelect={ () => {
+										if ( isMobileViewport ) {
+											setIsInserterOpened( false );
+										}
+									} }
+								/>
+							</div>
+						</div>
+					)
+				}
+				sidebar={
+					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
-							{ ! sidebarIsOpened && (
+							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toogle-sidebar-panel">
 									<Button
 										isSecondary
@@ -140,74 +244,60 @@ function Layout() {
 									</Button>
 								</div>
 							) }
-							<SettingsSidebar />
-							<Sidebar.Slot />
+							<ComplementaryArea.Slot scope="core/edit-post" />
 						</>
-					}
-					content={
-						<>
-							<EditorNotices />
-							{ ( mode === 'text' || ! isRichEditingEnabled ) && (
-								<TextEditor />
-							) }
-							{ isRichEditingEnabled && mode === 'visual' && (
-								<VisualEditor />
-							) }
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
-							{ isMobileViewport && sidebarIsOpened && (
-								<ScrollLock />
-							) }
-						</>
-					}
-					footer={
-						isRichEditingEnabled &&
-						mode === 'visual' && (
-							<div className="edit-post-layout__footer">
-								<BlockBreadcrumb />
-							</div>
-						)
-					}
-					publish={
-						publishSidebarOpened ? (
-							<PostPublishPanel
-								onClose={ closePublishSidebar }
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								PrePublishExtension={
-									PluginPrePublishPanel.Slot
-								}
-								PostPublishExtension={
-									PluginPostPublishPanel.Slot
-								}
-							/>
-						) : (
-							<div className="edit-post-layout__toogle-publish-panel">
-								<Button
-									isSecondary
-									className="edit-post-layout__toogle-publish-panel-button"
-									onClick={ togglePublishSidebar }
-									aria-expanded={ false }
-								>
-									{ __( 'Open publish panel' ) }
-								</Button>
-							</div>
-						)
-					}
-					shortcuts={ {
-						previous: previousShortcut,
-						next: nextShortcut,
-					} }
-				/>
-				<ManageBlocksModal />
-				<OptionsModal />
-				<KeyboardShortcutHelpModal />
-				<WelcomeGuide />
-				<Popover.Slot />
-				<PluginArea />
-			</FocusReturnProvider>
+					)
+				}
+				content={
+					<>
+						<EditorNotices />
+						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
+							<TextEditor />
+						) }
+						{ isRichEditingEnabled && mode === 'visual' && (
+							<VisualEditor />
+						) }
+						<div className="edit-post-layout__metaboxes">
+							<MetaBoxes location="normal" />
+							<MetaBoxes location="advanced" />
+						</div>
+						{ isMobileViewport && sidebarIsOpened && (
+							<ScrollLock />
+						) }
+					</>
+				}
+				footer={
+					! hasReducedUI &&
+					! isMobileViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual' && (
+						<div className="edit-post-layout__footer">
+							<BlockBreadcrumb />
+						</div>
+					)
+				}
+				actions={
+					<ActionsPanel
+						closeEntitiesSavedStates={ closeEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={
+							entitiesSavedStatesCallback
+						}
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+					/>
+				}
+				shortcuts={ {
+					previous: previousShortcut,
+					next: nextShortcut,
+				} }
+			/>
+			<ManageBlocksModal />
+			<PreferencesModal />
+			<KeyboardShortcutHelpModal />
+			<WelcomeGuide />
+			<Popover.Slot />
+			<PluginArea />
 		</>
 	);
 }

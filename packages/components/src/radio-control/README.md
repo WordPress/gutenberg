@@ -121,3 +121,4 @@ A function that receives the value of the new option that is being selected as i
 
 * To select one or more items from a set, use the `CheckboxControl` component.
 * To toggle a single setting on or off, use the `ToggleControl` component.
+* To format as a button group, use the `RadioGroup` component.

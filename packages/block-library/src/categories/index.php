@@ -28,32 +28,30 @@ function render_block_core_categories( $attributes ) {
 		$id                       = 'wp-block-categories-' . $block_id;
 		$args['id']               = $id;
 		$args['show_option_none'] = __( 'Select Category' );
-		$wrapper_markup           = '<div class="%1$s">%2$s</div>';
+		$wrapper_markup           = '<div %1$s>%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
 
 		if ( ! is_admin() ) {
-			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
+			// Inject the dropdown script immediately after the select dropdown.
+			$items_markup = preg_replace(
+				'#(?<=</select>)#',
+				build_dropdown_script_block_core_categories( $id ),
+				$items_markup,
+				1
+			);
 		}
 	} else {
-		$wrapper_markup = '<ul class="%1$s">%2$s</ul>';
+		$wrapper_markup = '<ul %1$s>%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
 	}
 
-	$class = "wp-block-categories wp-block-categories-{$type}";
-
-	if ( isset( $attributes['align'] ) ) {
-		$class .= " align{$attributes['align']}";
-	}
-
-	if ( isset( $attributes['className'] ) ) {
-		$class .= " {$attributes['className']}";
-	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "wp-block-categories-{$type}" ) );
 
 	return sprintf(
 		$wrapper_markup,
-		esc_attr( $class ),
+		$wrapper_attributes,
 		$items_markup
 	);
 }
@@ -89,30 +87,9 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
  * Registers the `core/categories` block on server.
  */
 function register_block_core_categories() {
-	register_block_type(
-		'core/categories',
+	register_block_type_from_metadata(
+		__DIR__ . '/categories',
 		array(
-			'attributes'      => array(
-				'align'             => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className'         => array(
-					'type' => 'string',
-				),
-				'displayAsDropdown' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'showHierarchy'     => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'showPostCounts'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-			),
 			'render_callback' => 'render_block_core_categories',
 		)
 	);

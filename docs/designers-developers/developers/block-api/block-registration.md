@@ -178,414 +178,126 @@ The data provided in the example object should match the attributes defined. For
 
 ```js
 example: {
-    attributes: {
-        cover: 'https://example.com/image.jpg',
-        author: 'William Shakespeare',
-        pages: 500
-    },
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+		author: 'William Shakespeare',
+		pages: 500
+	},
 },
 ```
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
+It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
+
+```js
+example: {
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	innerBlocks: [
+		{
+			name: 'core/paragraph',
+			attributes: {
+				/* translators: example text. */
+				content: __(
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
+				),
+			},
+		},
+	],
+},
+```
+
+It's also possible to define the width of the preview container in pixels via `viewportWidth`. For example:
+
+```js
+example: {
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	viewportWidth: 800
+},
+```
+
+#### variations (optional)
+
+-   **Type:** `Object[]`
+
+Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted.
+
+By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
+
+```js
+variations: [
+    {
+		name: 'wordpress',
+		isDefault: true,
+		title: __( 'WordPress' ),
+		description: __( 'Code is poetry!' ),
+		icon: WordPressIcon,
+		attributes: { service: 'wordpress' },
+	},
+	{
+		name: 'google',
+		title: __( 'Google' ),
+		icon: GoogleIcon,
+		attributes: { service: 'google' },
+	},
+	{
+		name: 'twitter',
+		title: __( 'Twitter' ),
+		icon: TwitterIcon,
+		attributes: { service: 'twitter' },
+		keywords: [ __('tweet') ],
+	},
+],
+```
+
+An object describing a variation defined for the block type can contain the following fields:
+
+-   `name` (type `string`) – The unique and machine-readable name.
+-   `title` (type `string`) – A human-readable variation title.
+-   `description` (optional, type `string`) – A detailed variation description.
+-   `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
+-   `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
+-   `attributes` (optional, type `Object`) – Values that override block attributes.
+-   `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
+-   `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
+-   `scope` (optional, type `WPBlockVariationScope[]`) - the list of scopes where the variation is applicable. When not provided, it defaults to `block` and `inserter`. Available options:
+    -   `inserter` - Block Variation is shown on the inserter.
+    -   `block` - Used by blocks to filter specific block variations. Mostly used in Placeholder patterns like `Columns` block.
+    -   `transform` - Block Variation will be shown in the component for Block Variations transformations.
+-   `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
+-   `isActive` (optional, type `Function`) - A function that accepts a block's attributes and the variation's attributes and determines if a variation is active. This function doesn't try to find a match dynamically based on all block's attributes, as in many cases some attributes are irrelevant. An example would be for `embed` block where we only care about `providerNameSlug` attribute's value.
+
+It's also possible to override the default block style variation using the `className` attribute when defining block variations.
+
+```js
+variations: [
+	{
+		name: 'blue',
+		title: __( 'Blue Quote' ),
+		isDefault: true,
+		attributes: { color: 'blue', className: 'is-style-blue-quote' },
+		icon: 'format-quote',
+		isActive: ( blockAttributes, variationAttributes ) =>
+			blockAttributes.color === variationAttributes.color
+	},
+],
+```
+
+#### supports (optional)
+
+-   **_Type:_** `Object`
+
+Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/designers-developers/developers/block-api/block-supports.md) for more details.
+
 #### transforms (optional)
 
--   **Type:** `Array`
+-   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
-
-For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: function ( attributes ) {
-                return createBlock( 'core/heading', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ]
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
-                return createBlock( 'core/heading', {
-                    content,
-                } );
-            },
-        },
-    ]
-},
-```
-
-{% end %}
-
-An existing shortcode can be transformed into its block counterpart.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            // Shortcode tag can also be an array of shortcode aliases
-            tag: 'caption',
-            attributes: {
-                // An attribute can be source from a tag attribute in the shortcode content
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                // An attribute can be source from the shortcode attributes
-                align: {
-                    type: 'string',
-                    shortcode: function( attributes ) {
-                        var align = attributes.named.align ? attributes.named.align : 'alignnone';
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-        },
-    ]
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            // Shortcode tag can also be an array of shortcode aliases
-            tag: 'caption',
-            attributes: {
-                // An attribute can be source from a tag attribute in the shortcode content
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                // An attribute can be source from the shortcode attributes
-                align: {
-                    type: 'string',
-                    shortcode: ( { named: { align = 'alignnone' } } ) => {
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-        },
-    ]
-},
-
-```
-
-{% end %}
-
-A block can also be transformed into another block type. For example, a Heading block can be transformed into a Paragraph block.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: function( attributes ) {
-                return createBlock( 'core/paragraph', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
-                return createBlock( 'core/paragraph', {
-                    content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-In addition to accepting an array of known block types, the `blocks` option also accepts a "wildcard" (`"*"`). This allows for transformations which apply to _all_ block types (eg: all blocks can transform into `core/group`):
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ '*' ], // wildcard - match any block
-            transform: function( attributes, innerBlocks ) {
-                // transform logic here
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ '*' ], // wildcard - match any block
-            transform: ( attributes, innerBlocks ) => {
-                // transform logic here
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: function( attributes, innerBlocks ) {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'some/block-with-innerblocks' ],
-            transform: ( attributes, innerBlocks ) => {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-An optional `isMatch` function can be specified on a transform object. This provides an opportunity to perform additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-			blocks: [ 'core/paragraph' ],
-			isMatch: function( attributes ) {
-				return attributes.isText;
-			},
-            transform: function( attributes ) {
-                return createBlock( 'core/paragraph', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-			blocks: [ 'core/paragraph' ],
-			isMatch: ( { isText } ) => isText,
-            transform: ( { content } ) => {
-                return createBlock( 'core/paragraph', {
-                    content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-In the case of shortcode transforms, `isMatch` receives shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API):
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-isMatch: function( attributes ) {
-	return attributes.named.id === 'my-id';
-},
-```
-
-{% ESNext %}
-
-```js
-isMatch( { named: { id } } ) {
-	return id === 'my-id';
-},
-```
-
-{% end %}
-
-To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
-
-A file can be dropped into the editor and converted into a block with a matching transform.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-	from: [
-		{
-			type: 'files',
-			isMatch: function( files ) {
-				return files.length === 1;
-			},
-			// We define a lower priority (higher number) than the default of 10. This
-			// ensures that the File block is only created as a fallback.
-			priority: 15,
-			transform: function( files ) {
-				var file = files[ 0 ];
-				var blobURL = createBlobURL( file );
-
-				// File will be uploaded in componentDidMount()
-				return createBlock( 'core/file', {
-					href: blobURL,
-					fileName: file.name,
-					textLinkHref: blobURL,
-				} );
-			},
-		},
-	];
-}
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-	from: [
-		{
-			type: 'files',
-			isMatch: ( files ) => files.length === 1,
-			// We define a lower priority (higher number) than the default of 10. This
-			// ensures that the File block is only created as a fallback.
-			priority: 15,
-			transform: ( files ) => {
-				const file = files[ 0 ];
-				const blobURL = createBlobURL( file );
-
-				// File will be uploaded in componentDidMount()
-				return createBlock( 'core/file', {
-					href: blobURL,
-					fileName: file.name,
-					textLinkHref: blobURL,
-				} );
-			},
-		},
-	];
-}
-```
-
-{% end %}
-
-A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the Paragraph block with a given pattern and a trailing space.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-	from: [
-		{
-			type: 'prefix',
-			prefix: '?',
-			transform: function( content ) {
-				return createBlock( 'my-plugin/question', {
-					content,
-				} );
-			},
-		},
-	];
-}
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-	from: [
-		{
-			type: 'prefix',
-			prefix: '?',
-			transform( content ) {
-				return createBlock( 'my-plugin/question', {
-					content,
-				} );
-			},
-		},
-	];
-}
-```
-
-{% end %}
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/designers-developers/developers/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 
@@ -598,95 +310,6 @@ Setting `parent` lets a block require that it is only available when nested with
 ```js
 // Only allow this block when it is nested in a Columns block
 parent: [ 'core/columns' ],
-```
-
-#### supports (optional)
-
-_Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted._
-
--   **Type:** `Object`
-
-Optional block extended support features. The following options are supported:
-
--   `align` (default `false`): This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
-
-```js
-// Add the support for block's alignment (left, center, right, wide, full).
-align: true,
-// Pick which alignment options to display.
-align: [ 'left', 'right', 'full' ],
-```
-
-When supports align is used the block attributes definition is extended to include an align attribute with a string type.
-By default, no alignment is assigned to the block.
-The block can apply a default alignment by specifying its own align attribute with a default e.g.:
-
-```
-attributes: {
-	...
-	align: {
-		type: 'string',
-		default: 'right'
-	},
-	...
-}
-```
-
--   `alignWide` (default `true`): This property allows to enable [wide alignment](/docs/designers-developers/developers/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
-
-```js
-// Remove the support for wide alignment.
-alignWide: false,
-```
-
--   `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
-
-```js
-// Add the support for an anchor link.
-anchor: true,
-```
-
--   `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
-
-```js
-// Remove the support for the custom className.
-customClassName: false,
-```
-
--   `className` (default `true`): By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
-
-```js
-// Remove the support for the generated className.
-className: false,
-```
-
--   `html` (default `true`): By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
-
-```js
-// Remove support for an HTML mode.
-html: false,
-```
-
--   `inserter` (default `true`): By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
-
-```js
-// Hide this block from the inserter.
-inserter: false,
-```
-
--   `multiple` (default `true`): A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
-
-```js
-// Use the block just once per post
-multiple: false,
-```
-
--   `reusable` (default `true`): A block may want to disable the ability of being converted into a reusable block.
-    By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
-
-```js
-// Don't allow the block to be converted into a reusable block.
-reusable: false,
 ```
 
 ## Block Collections

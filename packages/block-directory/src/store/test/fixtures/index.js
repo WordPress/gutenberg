@@ -18,7 +18,33 @@ export const downloadableBlock = {
 	humanizedUpdated: '3 months ago',
 };
 
-export const installedItem = {
+export const blockTypeInstalled = {
 	id: 'boxer-block',
 	name: 'boxer/boxer',
 };
+
+export const blockTypeUnused = {
+	id: 'example-block',
+	name: 'fake/unused',
+};
+
+export const blockList = [
+	{
+		clientId: 1,
+		name: 'core/paragraph',
+		attributes: {},
+		innerBlocks: [],
+	},
+	{
+		clientId: 2,
+		name: 'boxer/boxer',
+		attributes: {},
+		innerBlocks: [],
+	},
+	{
+		clientId: 3,
+		name: 'core/heading',
+		attributes: {},
+		innerBlocks: [],
+	},
+];

@@ -48,6 +48,12 @@ Examples: "my-custom-server-side-rendered".
 - Type: `String`
 - Required: No
 
+### httpMethod
+
+The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. The 'POST' value will cause an error on WP earlier than 5.5, unless 'rest_endpoints' is filtered in PHP to allow this. If 'POST', this sends the attributes in the request body, not in the URL. This can allow a bigger attributes object.
+- Type: `String`
+- Required: No
+
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
@@ -91,6 +97,21 @@ const MyServerSideRender = () => (
 	/>
 );
 ```
+If imported from the `wp` global, an alias is required to work in JSX.
+
+```jsx 
+const { serverSideRender: ServerSideRender } = wp;
+
+const MyServerSideRender = () => (
+	<ServerSideRender
+		block="core/archives"
+		attributes={ {
+			showPostCounts: true,
+			displayAsDropdown: false,
+		} }
+	/>
+);
+```
 
 ## Output
 
@@ -106,6 +127,7 @@ If you pass `attributes` to `ServerSideRender`, the block must also be registere
 register_block_type(
 	'core/archives',
 	array(
+		'apiVersion' => 2,
 		'attributes'      => array(
 			'showPostCounts'    => array(
 				'type'      => 'boolean',

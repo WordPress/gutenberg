@@ -4,8 +4,9 @@
         "name": "core/group",
         "isValid": true,
         "attributes": {
-            "backgroundColor": "secondary",
-            "align": "full"
+            "tagName": "div",
+            "align": "full",
+            "backgroundColor": "secondary"
         },
         "innerBlocks": [
             {

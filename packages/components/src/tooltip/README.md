@@ -9,13 +9,13 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
 Render a Tooltip, passing as a child the element to which it should anchor:
 
 ```jsx
-import { Tooltip, Button } from '@wordpress/components';
+import { Tooltip } from '@wordpress/components';
 
 const MyTooltip = () => (
 	<Tooltip text="More information">
-		<Button isSecondary>
+		<div>
 			Hover for more information
-		</Button>
+		</div>
 	</Tooltip>
 );
 ```

@@ -2,13 +2,16 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
-import TestUtils from 'react-dom/test-utils';
-import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
  */
 import Tooltip from '../';
+/**
+ * WordPress dependencies
+ */
+import { TOOLTIP_DELAY } from '../index.js';
+import { act } from '@testing-library/react';
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
@@ -44,7 +47,8 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			wrapper.setState( { isOver: true } );
+			const event = { type: 'focus', currentTarget: {} };
+			wrapper.simulate( 'focus', event );
 
 			const button = wrapper.find( 'button' );
 			const popover = wrapper.find( 'Popover' );
@@ -54,12 +58,7 @@ describe( 'Tooltip', () => {
 			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
 			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect(
-				popover
-					.children()
-					.first()
-					.text()
-			).toBe( 'Help text' );
+			expect( popover.children().first().text() ).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {
@@ -81,11 +80,10 @@ describe( 'Tooltip', () => {
 
 			const popover = wrapper.find( 'Popover' );
 			expect( originalFocus ).toHaveBeenCalledWith( event );
-			expect( wrapper.state( 'isOver' ) ).toBe( true );
 			expect( popover ).toHaveLength( 1 );
 		} );
 
-		it( 'should show not popover on focus as result of mousedown', () => {
+		it( 'should show not popover on focus as result of mousedown', async () => {
 			const originalOnMouseDown = jest.fn();
 			const originalOnMouseUp = jest.fn();
 			const wrapper = mount(
@@ -115,11 +113,10 @@ describe( 'Tooltip', () => {
 			button.simulate( event.type, event );
 
 			const popover = wrapper.find( 'Popover' );
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
 
 			event = new window.MouseEvent( 'mouseup' );
-			document.dispatchEvent( event );
+			await act( async () => document.dispatchEvent( event ) );
 			expect( originalOnMouseUp ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					type: event.type,
@@ -129,7 +126,8 @@ describe( 'Tooltip', () => {
 
 		it( 'should show popover on delayed mouseenter', () => {
 			const originalMouseEnter = jest.fn();
-			const wrapper = TestUtils.renderIntoDocument(
+			jest.useFakeTimers();
+			const wrapper = mount(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -140,32 +138,18 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'button'
-			);
-			// eslint-disable-next-line react/no-find-dom-node
-			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
+			const button = wrapper.find( 'button' );
+			button.simulate( 'mouseenter', { type: 'mouseenter' } );
 
+			const popoverBeforeTimeout = wrapper.find( 'Popover' );
+			expect( popoverBeforeTimeout ).toHaveLength( 0 );
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
-			expect( wrapper.state.isOver ).toBe( false );
-			expect(
-				TestUtils.scryRenderedDOMComponentsWithClass(
-					wrapper,
-					'components-popover'
-				)
-			).toHaveLength( 0 );
 
 			// Force delayedSetIsOver to be called
-			wrapper.delayedSetIsOver.flush();
-
-			expect( wrapper.state.isOver ).toBe( true );
-			expect(
-				TestUtils.scryRenderedDOMComponentsWithClass(
-					wrapper,
-					'components-popover'
-				)
-			).toHaveLength( 1 );
+			setTimeout( () => {
+				const popoverAfterTimeout = wrapper.find( 'Popover' );
+				expect( popoverAfterTimeout ).toHaveLength( 1 );
+			}, TOOLTIP_DELAY );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {
@@ -191,11 +175,9 @@ describe( 'Tooltip', () => {
 				target: wrapper.find( 'button > span' ).getDOMNode(),
 			} );
 
-			expect( originalMouseEnter ).toHaveBeenCalled();
+			expect( originalMouseEnter ).not.toHaveBeenCalled();
 
 			const popover = wrapper.find( 'Popover' );
-			wrapper.instance().delayedSetIsOver.flush();
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
 		} );
 
@@ -216,13 +198,11 @@ describe( 'Tooltip', () => {
 
 			const button = wrapper.find( 'button' );
 			button.simulate( 'mouseenter' );
-			button.simulate( 'mouseleave' );
 
-			wrapper.instance().delayedSetIsOver.flush();
-
-			const popover = wrapper.find( 'Popover' );
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expect( popover ).toHaveLength( 0 );
+			setTimeout( () => {
+				const popover = wrapper.find( 'Popover' );
+				expect( popover ).toHaveLength( 0 );
+			}, TOOLTIP_DELAY );
 		} );
 	} );
 } );

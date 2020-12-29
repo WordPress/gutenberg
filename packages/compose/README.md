@@ -119,6 +119,132 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
+
+React hook returns an array which items get asynchronously appended from a source array.
+This behavior is useful if we want to render a list of items asynchronously for performance reasons.
+
+_Parameters_
+
+-   _list_ `Array`: Source array.
+
+_Returns_
+
+-   `Array`: Async array.
+
+<a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
+
+In Dialogs/modals, the tabbing must be constrained to the content of
+the wrapper element. This hook adds the behavior to the returned ref.
+
+_Usage_
+
+```js
+import { useConstrainedTabbing } from '@wordpress/compose';
+
+const ConstrainedTabbingExample = () => {
+    const constrainedTabbingRef = useConstrainedTabbing()
+    return (
+        <div ref={ constrainedTabbingRef }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Returns_
+
+-   `(Object|Function)`: Element Ref.
+
+<a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
+
+Copies the text to the clipboard when the element is clicked.
+
+_Parameters_
+
+-   _ref_ `Object`: Reference with the element.
+-   _text_ `(string|Function)`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+
+_Returns_
+
+-   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+
+<a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
+
+Debounces a function with Lodash's `debounce`. A new debounced function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to debounce, so please wrap functions created on
+render in components in `useCallback`.
+
+_Parameters_
+
+-   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+
+_Returns_
+
+-   `Function`: Debounced function.
+
+<a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
+
+Hook used to focus the first tabbable element on mount.
+
+_Usage_
+
+```js
+import { useFocusOnMount } from '@wordpress/compose';
+
+const WithFocusOnMount = () => {
+    const ref = useFocusOnMount()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+
+_Returns_
+
+-   `Function`: Ref callback.
+
+<a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
+
+When opening modals/sidebars/dialogs, the focus
+must move to the opened area and return to the
+previously focused element when closed.
+The current hook implements the returning behavior.
+
+_Usage_
+
+```js
+import { useFocusReturn } from '@wordpress/compose';
+
+const WithFocusReturn = () => {
+    const ref = useFocusReturn()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _onFocusReturn_ `?Function`: Overrides the default return behavior.
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
@@ -126,6 +252,7 @@ Provides a unique instance ID.
 _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
+-   _prefix_ `string`: Prefix for the unique id.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
@@ -149,6 +276,19 @@ _Returns_
 
 -   `boolean`: return value of the media query.
 
+<a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
+
+Use something's value from the previous render.
+Based on <https://usehooks.com/usePrevious/>.
+
+_Parameters_
+
+-   _value_ `T`: The value to track.
+
+_Returns_
+
+-   `(T|undefined)`: The value from the previous render.
+
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
 Hook returning whether the user has a preference for reduced motion.
@@ -157,6 +297,45 @@ _Returns_
 
 -   `boolean`: Reduced motion preference value.
 
+<a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
+
+Hook which allows to listen the resize event of any target element when it changes sizes.
+_Note: `useResizeObserver` will report `null` until after first render_
+
+_Usage_
+
+```js
+const App = () => {
+	const [ resizeListener, sizes ] = useResizeObserver();
+
+	return (
+		<div>
+			{ resizeListener }
+			Your content here
+		</div>
+	);
+};
+```
+
+_Returns_
+
+-   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
+
+<a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
+
+Throttles a function with Lodash's `throttle`. A new throttled function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to throttle, so please wrap functions created on
+render in components in `useCallback`.
+
+_Parameters_
+
+-   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+
+_Returns_
+
+-   `Function`: Throttled function.
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
@@ -164,7 +343,7 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-useViewportMatch( 'huge', <' );
+useViewportMatch( 'huge', '<' );
 useViewportMatch( 'medium' );
 ```
 
@@ -177,7 +356,30 @@ _Returns_
 
 -   `boolean`: Whether viewport matches query.
 
+<a name="useWarnOnChange" href="#useWarnOnChange">#</a> **useWarnOnChange**
+
+Hook that performs a shallow comparison between the preview value of an object
+and the new one, if there's a difference, it prints it to the console.
+this is useful in performance related work, to check why a component re-renders.
+
+_Usage_
+
+```jsx
+function MyComponent(props) {
+   useWarnOnChange(props);
+
+   return "Something";
+}
+```
+
+_Parameters_
+
+-   _object_ `Object`: Object which changes to compare.
+-   _prefix_ `string`: Just a prefix to show when console logging.
+
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
+
+> **Deprecated** 
 
 Higher-order component creator which, given an object of DOM event types and
 values corresponding to a callback function name on the component, will

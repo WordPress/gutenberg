@@ -74,9 +74,12 @@ describe( 'TabPanel', () => {
 				},
 			};
 
-			const wrapper = TestUtils.renderIntoDocument(
-				getTestComponent( TabPanel, props )
-			);
+			let wrapper;
+			TestUtils.act( () => {
+				wrapper = TestUtils.renderIntoDocument(
+					getTestComponent( TabPanel, props )
+				);
+			} );
 
 			const alphaTab = getElementByClass( wrapper, 'alpha' );
 			const betaTab = getElementByClass( wrapper, 'beta' );
@@ -162,9 +165,13 @@ describe( 'TabPanel', () => {
 				);
 			},
 		};
-		const wrapper = TestUtils.renderIntoDocument(
-			getTestComponent( TabPanel, props )
-		);
+
+		let wrapper;
+		TestUtils.act( () => {
+			wrapper = TestUtils.renderIntoDocument(
+				getTestComponent( TabPanel, props )
+			);
+		} );
 
 		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
 		expect( getActiveTab().innerHTML ).toBe( 'Beta' );

@@ -1,21 +1,24 @@
 {
+	"apiVersion": 2,
 	"name": "core/columns",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"customTextColor" : {
-			"type": "string"
-		},
-		"textColor": {
-			"type": "string"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		}
+	},
+	"editorStyle": "wp-block-columns-editor",
+	"style": "wp-block-columns"
 }

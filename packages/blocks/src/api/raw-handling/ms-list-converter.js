@@ -7,7 +7,7 @@ function isList( node ) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';
 }
 
-export default function( node, doc ) {
+export default function msListConverter( node, doc ) {
 	if ( node.nodeName !== 'P' ) {
 		return;
 	}

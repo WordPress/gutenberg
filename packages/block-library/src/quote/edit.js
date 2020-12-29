@@ -11,6 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -22,8 +23,16 @@ export default function QuoteEdit( {
 	mergeBlocks,
 	onReplace,
 	className,
+	insertBlocksAfter,
+	mergedStyle,
 } ) {
 	const { align, value, citation } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+		style: mergedStyle,
+	} );
 
 	return (
 		<>
@@ -35,11 +44,7 @@ export default function QuoteEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation
-				className={ classnames( className, {
-					[ `has-text-align-${ align }` ]: align,
-				} ) }
-			>
+			<BlockQuotation { ...blockProps }>
 				<RichText
 					identifier="value"
 					multiline
@@ -57,6 +62,7 @@ export default function QuoteEdit( {
 							onReplace( [] );
 						}
 					} }
+					aria-label={ __( 'Quote text' ) }
 					placeholder={
 						// translators: placeholder text used for the quote
 						__( 'Write quote…' )
@@ -71,6 +77,7 @@ export default function QuoteEdit( {
 					__unstableOnSplitMiddle={ () =>
 						createBlock( 'core/paragraph' )
 					}
+					textAlign={ align }
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
@@ -82,11 +89,16 @@ export default function QuoteEdit( {
 							} )
 						}
 						__unstableMobileNoFocusOnMount
+						aria-label={ __( 'Quote citation text' ) }
 						placeholder={
 							// translators: placeholder text used for the citation
 							__( 'Write citation…' )
 						}
 						className="wp-block-quote__citation"
+						textAlign={ align }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
 					/>
 				) }
 			</BlockQuotation>

@@ -16,7 +16,7 @@ class MyURLPopover extends Component {
 		super( ...arguments );
 
 		this.onChangeURL = this.onChangeURL.bind( this );
-		this.openURLPopover = this.closeURLPopover.bind( this );
+		this.openURLPopover = this.openURLPopover.bind( this );
 		this.closeURLPopover = this.closeURLPopover.bind( this );
 		this.submitURL = this.submitURL.bind( this );
 		this.setTarget = this.setTarget.bind( this );
@@ -64,7 +64,7 @@ class MyURLPopover extends Component {
 						onClose={ this.closeURLPopover }
 						renderSettings={ () => (
 							<ToggleControl
-								label={ __( 'Open in New Tab' ) }
+								label={ __( 'Open in new tab' ) }
 								checked={ opensInNewWindow }
 								onChange={ this.setTarget }
 							/>

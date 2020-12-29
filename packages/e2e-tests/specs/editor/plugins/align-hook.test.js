@@ -10,6 +10,7 @@ import {
 	insertBlock,
 	selectBlockByClientId,
 	setPostContent,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 const alignLabels = {
@@ -21,9 +22,6 @@ const alignLabels = {
 };
 
 describe( 'Align Hook Works As Expected', () => {
-	const CHANGE_ALIGNMENT_BUTTON_SELECTOR =
-		'.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Change alignment"]';
-
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-align-hook' );
 	} );
@@ -37,8 +35,7 @@ describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	const getAlignmentToolbarLabels = async () => {
-		await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
-
+		await clickBlockToolbarButton( 'Change alignment' );
 		const buttonLabels = await page.evaluate( () => {
 			return Array.from(
 				document.querySelectorAll(
@@ -54,7 +51,6 @@ describe( 'Align Hook Works As Expected', () => {
 	const createShowsTheExpectedButtonsTest = ( blockName, buttonLabels ) => {
 		it( 'Shows the expected buttons on the alignment toolbar', async () => {
 			await insertBlock( blockName );
-
 			expect( await getAlignmentToolbarLabels() ).toEqual( buttonLabels );
 		} );
 	};
@@ -62,9 +58,7 @@ describe( 'Align Hook Works As Expected', () => {
 	const createDoesNotApplyAlignmentByDefaultTest = ( blockName ) => {
 		it( 'Does not apply any alignment by default', async () => {
 			await insertBlock( blockName );
-
-			// verify no alignment button is in pressed state
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			const pressedButtons = await page.$$(
 				'.components-dropdown-menu__menu button.is-active'
 			);
@@ -89,11 +83,11 @@ describe( 'Align Hook Works As Expected', () => {
 				'.components-dropdown-menu__menu button.is-active';
 			// set the specified alignment.
 			await insertBlock( blockName );
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 			// verify the button of the specified alignment is pressed.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			let pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 			expect( pressedButtons ).toHaveLength( 1 );
 
@@ -110,11 +104,11 @@ describe( 'Align Hook Works As Expected', () => {
 			);
 
 			// remove the alignment.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 			// verify no alignment button is in pressed state.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 			expect( pressedButtons ).toHaveLength( 0 );
 
@@ -130,7 +124,7 @@ describe( 'Align Hook Works As Expected', () => {
 			);
 
 			// verify no alignment button is in pressed state after parsing the block.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 			expect( pressedButtons ).toHaveLength( 0 );
 		} );
@@ -140,6 +134,8 @@ describe( 'Align Hook Works As Expected', () => {
 		const BLOCK_NAME = 'Test No Alignment Set';
 		it( 'Shows no alignment buttons on the alignment toolbar', async () => {
 			await insertBlock( BLOCK_NAME );
+			const CHANGE_ALIGNMENT_BUTTON_SELECTOR =
+				'.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Change alignment"]';
 			const changeAlignmentButton = await page.$(
 				CHANGE_ALIGNMENT_BUTTON_SELECTOR
 			);
@@ -196,7 +192,7 @@ describe( 'Align Hook Works As Expected', () => {
 		it( 'Applies the selected alignment by default', async () => {
 			await insertBlock( BLOCK_NAME );
 			// verify the correct alignment button is pressed
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			const selectedAlignmentControls = await page.$x(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);
@@ -213,7 +209,7 @@ describe( 'Align Hook Works As Expected', () => {
 		it( 'Can remove the default alignment and the align attribute equals none but alignnone class is not applied', async () => {
 			await insertBlock( BLOCK_NAME );
 			// remove the alignment.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await clickBlockToolbarButton( 'Change alignment' );
 			const [ selectedAlignmentControl ] = await page.$x(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);

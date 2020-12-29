@@ -15,8 +15,8 @@ import {
 } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
-
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -90,7 +90,8 @@ export function getBlockVariations( state, blockName, scope ) {
 		return variations;
 	}
 	return variations.filter( ( variation ) => {
-		return ! variation.scope || variation.scope.includes( scope );
+		// For backward compatibility reasons, variation's scope defaults to `block` and `inserter` when not set.
+		return ( variation.scope || [ 'block', 'inserter' ] ).includes( scope );
 	} );
 }
 
@@ -117,7 +118,7 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Array} Categories list.
+ * @return {WPBlockCategory[]} Categories list.
  */
 export function getCategories( state ) {
 	return state.categories;
@@ -217,7 +218,11 @@ export const getBlockSupport = (
 ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
-	return get( blockType, [ 'supports', feature ], defaultSupports );
+	return get(
+		blockType,
+		[ 'supports', ...feature.split( '.' ) ],
+		defaultSupports
+	);
 };
 
 /**

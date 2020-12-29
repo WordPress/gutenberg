@@ -2,7 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import useResizeAware from 'react-resize-aware';
+
+/**
+ * WordPress dependencies
+ */
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -12,7 +16,16 @@ import Icon from '../icon';
 /**
  * Renders a placeholder. Normally used by blocks to render their empty state.
  *
- * @param  {Object} props The component props.
+ * @param {Object}    props                The component props.
+ * @param {WPIcon}    props.icon           An icon rendered before the label.
+ * @param {WPElement} props.children       Children to be rendered.
+ * @param {string}    props.label          Title of the placeholder.
+ * @param {string}    props.instructions   Instructions of the placeholder.
+ * @param {string}    props.className      Class to set on the container div.
+ * @param {Object}    props.notices        A rendered notices list.
+ * @param {Object}    props.preview        Preview to be rendered in the placeholder.
+ * @param {boolean}   props.isColumnLayout Whether a column layout should be used.
+ *
  * @return {Object}       The rendered placeholder.
  */
 function Placeholder( {
@@ -26,9 +39,9 @@ function Placeholder( {
 	isColumnLayout,
 	...additionalProps
 } ) {
-	const [ resizeListener, { width } ] = useResizeAware();
+	const [ resizeListener, { width } ] = useResizeObserver();
 
-	// Since `useResizeAware` will report a width of `null` until after the
+	// Since `useResizeObserver` will report a width of `null` until after the
 	// first render, avoid applying any modifier classes until width is known.
 	let modifierClassNames;
 	if ( typeof width === 'number' ) {

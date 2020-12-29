@@ -2,8 +2,17 @@
  * External dependencies
  */
 import { NativeModules } from 'react-native';
+import 'react-native-gesture-handler/jestSetup';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/element', () => {
+	return {
+		__esModule: true,
+		...jest.requireActual( '@wordpress/element' ),
+		render: jest.fn(),
+	};
+} );
+
+jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		removeEventListener: jest.fn(),
@@ -13,11 +22,19 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribeAndroidModalClosed: jest.fn(),
+		subscribeUpdateTheme: jest.fn(),
+		subscribePreferredColorScheme: () => 'light',
+		subscribeUpdateCapabilities: jest.fn(),
+		subscribeShowNotice: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
+		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestUnsupportedBlockFallback: jest.fn(),
+		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',
@@ -65,8 +82,6 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( 'react-native-recyclerview-list' );
-
 jest.mock( '@react-native-community/slider', () => () => 'Slider', {
 	virtual: true,
 } );
@@ -80,6 +95,14 @@ if ( ! global.window.matchMedia ) {
 }
 
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
+
+jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
+	virtual: true,
+} );
+
+jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
 } );
 
@@ -103,3 +126,16 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 		} );
 	}
 } );
+
+jest.mock( 'react-native-reanimated', () => {
+	const Reanimated = require( 'react-native-reanimated/mock' );
+
+	// The mock for `call` immediately calls the callback which is incorrect
+	// So we override it with a no-op
+	Reanimated.default.call = () => {};
+
+	return Reanimated;
+} );
+
+// Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
+jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );

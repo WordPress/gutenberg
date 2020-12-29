@@ -16,6 +16,7 @@ import {
 	getPath,
 	isValidPath,
 	getQueryString,
+	buildQueryString,
 	isValidQueryString,
 	getFragment,
 	isValidFragment,
@@ -27,34 +28,17 @@ import {
 	safeDecodeURI,
 	filterURLForDisplay,
 	cleanForSlug,
+	getQueryArgs,
 } from '../';
+import wptData from './fixtures/wpt-data';
 
 describe( 'isURL', () => {
-	it.each( [
-		[ 'http://wordpress.org' ],
-		[ 'https://wordpress.org' ],
-		[ 'HTTPS://WORDPRESS.ORG' ],
-		[ 'https://wordpress.org/./foo' ],
-		[ 'https://wordpress.org/path?query#fragment' ],
-		[ 'https://localhost/foo#bar' ],
-		[ 'mailto:example@example.com' ],
-		[ 'ssh://user:password@127.0.0.1:8080' ],
-	] )( 'valid (true): %s', ( url ) => {
-		expect( isURL( url ) ).toBe( true );
-	} );
-
-	it.each( [
-		[ 'http://word press.org' ],
-		[ 'http://wordpress.org:port' ],
-		[ 'http://[wordpress.org]/' ],
-		[ 'HTTP: HyperText Transfer Protocol' ],
-		[ 'URLs begin with a http:// prefix' ],
-		[ 'Go here: http://wordpress.org' ],
-		[ 'http://' ],
-		[ '' ],
-	] )( 'invalid (false): %s', ( url ) => {
-		expect( isURL( url ) ).toBe( false );
-	} );
+	it.each( wptData.map( ( { input, failure } ) => [ input, !! failure ] ) )(
+		'%s',
+		( input, isFailure ) => {
+			expect( isURL( input ) ).toBe( ! isFailure );
+		}
+	);
 } );
 
 describe( 'isEmail', () => {
@@ -107,6 +91,7 @@ describe( 'getProtocol', () => {
 		expect( getProtocol( 'https://localhost:8080' ) ).toBe( 'https:' );
 		expect( getProtocol( 'tel:1234' ) ).toBe( 'tel:' );
 		expect( getProtocol( 'blob:data' ) ).toBe( 'blob:' );
+		expect( getProtocol( 'file:///folder/file.txt' ) ).toBe( 'file:' );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a URL protocol', () => {
@@ -271,11 +256,6 @@ describe( 'getQueryString', () => {
 	it( 'returns the query string of a URL', () => {
 		expect(
 			getQueryString(
-				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
-			)
-		).toBe( 'query=params&more' );
-		expect(
-			getQueryString(
 				'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#anchor'
 			)
 		).toBe( 'query=params&more' );
@@ -302,16 +282,29 @@ describe( 'getQueryString', () => {
 				'https://andalouses.example/beach?foo[]=bar&foo[]=baz'
 			)
 		).toBe( 'foo[]=bar&foo[]=baz' );
-		expect( getQueryString( 'test.com?foo[]=bar&foo[]=baz' ) ).toBe(
+		expect( getQueryString( 'https://test.com?foo[]=bar&foo[]=baz' ) ).toBe(
 			'foo[]=bar&foo[]=baz'
 		);
-		expect( getQueryString( 'test.com?foo=bar&foo=baz?test' ) ).toBe(
-			'foo=bar&foo=baz?test'
+		expect(
+			getQueryString( 'https://test.com?foo=bar&foo=baz?test' )
+		).toBe( 'foo=bar&foo=baz?test' );
+	} );
+
+	it( 'returns the query string of a path', () => {
+		expect( getQueryString( '/wp-json/wp/v2/posts?type=page' ) ).toBe(
+			'type=page'
 		);
+
+		expect( getQueryString( '/wp-json/wp/v2/posts' ) ).toBeUndefined();
 	} );
 
 	it( 'returns undefined when the provided does not contain a url query string', () => {
 		expect( getQueryString( '' ) ).toBeUndefined();
+		expect(
+			getQueryString(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBeUndefined();
 		expect(
 			getQueryString( 'https://wordpress.org/test-path#anchor' )
 		).toBeUndefined();
@@ -323,11 +316,60 @@ describe( 'getQueryString', () => {
 		).toBeUndefined();
 		expect( getQueryString( 'https://wordpress.org/' ) ).toBeUndefined();
 		expect( getQueryString( 'https://localhost:8080' ) ).toBeUndefined();
-		expect( getQueryString( 'https://' ) ).toBeUndefined();
-		expect( getQueryString( 'https:///test' ) ).toBeUndefined();
-		expect( getQueryString( 'https://#' ) ).toBeUndefined();
-		expect( getQueryString( 'https://?' ) ).toBeUndefined();
-		expect( getQueryString( 'test.com' ) ).toBeUndefined();
+		expect( getQueryString( 'invalid' ) ).toBeUndefined();
+		expect(
+			getQueryString( 'https://example.com/empty?' )
+		).toBeUndefined();
+	} );
+} );
+
+describe( 'buildQueryString', () => {
+	it( 'builds simple strings', () => {
+		const data = {
+			foo: 'bar',
+			baz: 'boom',
+			cow: 'milk',
+			php: 'hypertext processor',
+		};
+
+		expect( buildQueryString( data ) ).toBe(
+			'foo=bar&baz=boom&cow=milk&php=hypertext%20processor'
+		);
+	} );
+
+	it( 'builds complex data', () => {
+		const data = {
+			user: {
+				name: 'Bob Smith',
+				age: 47,
+				sex: 'M',
+				dob: '5/12/1956',
+			},
+			pastimes: [ 'golf', 'opera', 'poker', 'rap' ],
+			children: {
+				bobby: { age: 12, sex: 'M' },
+				sally: { age: 8, sex: 'F' },
+			},
+		};
+
+		expect( buildQueryString( data ) ).toBe(
+			'user%5Bname%5D=Bob%20Smith&user%5Bage%5D=47&user%5Bsex%5D=M&user%5Bdob%5D=5%2F12%2F1956&pastimes%5B0%5D=golf&pastimes%5B1%5D=opera&pastimes%5B2%5D=poker&pastimes%5B3%5D=rap&children%5Bbobby%5D%5Bage%5D=12&children%5Bbobby%5D%5Bsex%5D=M&children%5Bsally%5D%5Bage%5D=8&children%5Bsally%5D%5Bsex%5D=F'
+		);
+	} );
+
+	it( 'builds falsey values', () => {
+		const data = {
+			empty: '',
+			null: null,
+			undefined,
+			zero: 0,
+		};
+
+		expect( buildQueryString( data ) ).toBe( 'empty=&null=&zero=0' );
+	} );
+
+	it( 'builds an empty object as an empty string', () => {
+		expect( buildQueryString( {} ) ).toBe( '' );
 	} );
 } );
 
@@ -362,6 +404,43 @@ describe( 'isValidQueryString', () => {
 		expect( isValidQueryString( 'test=f?alse' ) ).toBe( false );
 		expect( isValidQueryString( '/test=false' ) ).toBe( false );
 		expect( isValidQueryString( 'test=false/' ) ).toBe( false );
+	} );
+} );
+
+describe( 'getPathAndQueryString', () => {
+	beforeAll( jest.resetModules );
+	afterAll( jest.resetModules );
+	it( 'combines the results of `getPath` and `getQueryString`', () => {
+		jest.doMock( '../get-path.js', () => ( {
+			getPath( { path } = {} ) {
+				return path;
+			},
+		} ) );
+		jest.doMock( '../get-query-string.js', () => ( {
+			getQueryString( { queryString } = {} ) {
+				return queryString;
+			},
+		} ) );
+		const {
+			getPathAndQueryString,
+		} = require( '../get-path-and-query-string' );
+		expect(
+			getPathAndQueryString( {
+				path: 'path',
+				queryString: 'queryString',
+			} )
+		).toBe( '/path?queryString' );
+		expect(
+			getPathAndQueryString( {
+				queryString: 'queryString',
+			} )
+		).toBe( '/?queryString' );
+		expect(
+			getPathAndQueryString( {
+				path: 'path',
+			} )
+		).toBe( '/path' );
+		expect( getPathAndQueryString() ).toBe( '/' );
 	} );
 } );
 
@@ -501,6 +580,116 @@ describe( 'addQueryArgs', () => {
 	} );
 } );
 
+describe( 'getQueryArgs', () => {
+	it( 'should parse simple query arguments', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&baz=quux';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: 'bar',
+			baz: 'quux',
+		} );
+	} );
+
+	it( 'should accumulate array of values', () => {
+		const url =
+			'https://andalouses.example/beach?foo[]=zero&foo[]=one&foo[]=two';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: [ 'zero', 'one', 'two' ],
+		} );
+	} );
+
+	it( 'should accumulate keyed array of values', () => {
+		const url =
+			'https://andalouses.example/beach?foo[1]=one&foo[0]=zero&foo[]=two';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: [ 'zero', 'one', 'two' ],
+		} );
+	} );
+
+	it( 'should accumulate object of values', () => {
+		const url =
+			'https://andalouses.example/beach?foo[zero]=0&foo[one]=1&foo[]=empty';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: {
+				'': 'empty',
+				zero: '0',
+				one: '1',
+			},
+		} );
+	} );
+
+	it( 'normalizes mixed numeric and named keys', () => {
+		const url = 'https://andalouses.example/beach?foo[0]=0&foo[one]=1';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: {
+				0: '0',
+				one: '1',
+			},
+		} );
+	} );
+
+	it( 'should return empty object for URL without querystring', () => {
+		const urlWithoutQuerystring = 'https://andalouses.example/beach';
+		const urlWithEmptyQuerystring = 'https://andalouses.example/beach?';
+		const invalidURL = 'example';
+
+		expect( getQueryArgs( invalidURL ) ).toEqual( {} );
+		expect( getQueryArgs( urlWithoutQuerystring ) ).toEqual( {} );
+		expect( getQueryArgs( urlWithEmptyQuerystring ) ).toEqual( {} );
+	} );
+
+	it( 'should gracefully handle empty keys and values', () => {
+		const url = 'https://andalouses.example/beach?&foo';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: '',
+		} );
+	} );
+
+	describe( 'reverses buildQueryString', () => {
+		it( 'unbuilds simple strings', () => {
+			const data = {
+				foo: 'bar',
+				baz: 'boom',
+				cow: 'milk',
+				php: 'hypertext processor',
+			};
+
+			expect(
+				getQueryArgs(
+					'https://example.com/?foo=bar&baz=boom&cow=milk&php=hypertext%20processor'
+				)
+			).toEqual( data );
+		} );
+
+		it( 'unbuilds complex data, with stringified values', () => {
+			const data = {
+				user: {
+					name: 'Bob Smith',
+					age: '47',
+					sex: 'M',
+					dob: '5/12/1956',
+				},
+				pastimes: [ 'golf', 'opera', 'poker', 'rap' ],
+				children: {
+					bobby: { age: '12', sex: 'M' },
+					sally: { age: '8', sex: 'F' },
+				},
+			};
+
+			expect(
+				getQueryArgs(
+					'https://example.com/?user%5Bname%5D=Bob%20Smith&user%5Bage%5D=47&user%5Bsex%5D=M&user%5Bdob%5D=5%2F12%2F1956&pastimes%5B0%5D=golf&pastimes%5B1%5D=opera&pastimes%5B2%5D=poker&pastimes%5B3%5D=rap&children%5Bbobby%5D%5Bage%5D=12&children%5Bbobby%5D%5Bsex%5D=M&children%5Bsally%5D%5Bage%5D=8&children%5Bsally%5D%5Bsex%5D=F'
+				)
+			).toEqual( data );
+		} );
+	} );
+} );
+
 describe( 'getQueryArg', () => {
 	it( 'should get the value of an existing query arg', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
@@ -524,6 +713,7 @@ describe( 'getQueryArg', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz#foo';
 
 		expect( getQueryArg( url, 'foo' ) ).toEqual( 'bar' );
+		expect( getQueryArg( url, 'bar' ) ).toEqual( 'baz' );
 	} );
 } );
 
@@ -548,6 +738,12 @@ describe( 'hasQueryArg', () => {
 } );
 
 describe( 'removeQueryArgs', () => {
+	it( 'should not change URL without a querystring', () => {
+		const url = 'https://andalouses.example/beach';
+
+		expect( removeQueryArgs( url, 'baz', 'test' ) ).toEqual( url );
+	} );
+
 	it( 'should not change URL not containing query args', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
 
@@ -559,6 +755,14 @@ describe( 'removeQueryArgs', () => {
 
 		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual(
 			'https://andalouses.example/beach?baz=foo'
+		);
+	} );
+
+	it( 'should not leave ? char after removing all query args', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual(
+			'https://andalouses.example/beach'
 		);
 	} );
 
@@ -680,11 +884,59 @@ describe( 'filterURLForDisplay', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org/something' );
 		expect( url ).toBe( 'wordpress.org/something' );
 	} );
+	it( 'should preserve the original url if no argument max length', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/myimage.jpg'
+		);
+		expect( url ).toBe( 'wordpress.org/wp-content/uploads/myimage.jpg' );
+	} );
+	it( 'should preserve the original url if the url is short enough', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/ig.jpg',
+			20
+		);
+		expect( url ).toBe( 'wordpress.org/ig.jpg' );
+	} );
+	it( 'should return ellipsis, upper level pieces url, and filename when the url is long enough but filename is short enough', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/myimage.jpg',
+			20
+		);
+		expect( url ).toBe( '…/uploads/myimage.jpg' );
+	} );
+	it( 'should return filename split by ellipsis plus three characters when filename is long enough', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/superlongtitlewithextension.jpeg',
+			20
+		);
+		expect( url ).toBe( 'superlongti…ion.jpeg' );
+	} );
+	it( 'should remove query arguments', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/myimage.jpeg?query_args=a',
+			20
+		);
+		expect( url ).toBe( '…uploads/myimage.jpeg' );
+	} );
+	it( 'should preserve the original url when it is not a file', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/url/',
+			20
+		);
+		expect( url ).toBe( 'wordpress.org/wp-content/url/' );
+	} );
+	it( 'should return file split by ellipsis when the file name has multiple periods', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/filename.2020.12.20.png',
+			20
+		);
+		expect( url ).toBe( 'filename.202….20.png' );
+	} );
 } );
 
 describe( 'cleanForSlug', () => {
 	it( 'should return string prepared for use as url slug', () => {
-		expect( cleanForSlug( ' /Déjà_vu. ' ) ).toBe( 'deja-vu' );
+		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
 	it( 'should return an empty string for missing argument', () => {

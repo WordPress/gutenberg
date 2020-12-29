@@ -6,7 +6,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/dom';
 
@@ -15,29 +15,34 @@ import { getScrollContainer } from '@wordpress/dom';
  */
 import { getBlockDOMNode } from '../../utils/dom';
 
-/**
- * Scrolls the multi block selection end into view if not in view already. This
- * is important to do after selection by keyboard.
- */
-export default function MultiSelectScrollIntoView() {
-	const selector = ( select ) => {
-		const { getBlockSelectionEnd, isMultiSelecting } = select(
-			'core/block-editor'
-		);
+export function useScrollMultiSelectionIntoView( ref ) {
+	const selectionEnd = useSelect( ( select ) => {
+		const {
+			getBlockSelectionEnd,
+			hasMultiSelection,
+			isMultiSelecting,
+		} = select( 'core/block-editor' );
 
-		return {
-			selectionEnd: getBlockSelectionEnd(),
-			isMultiSelecting: isMultiSelecting(),
-		};
-	};
-	const { selectionEnd, isMultiSelecting } = useSelect( selector, [] );
+		const blockSelectionEnd = getBlockSelectionEnd();
 
-	useEffect( () => {
-		if ( ! selectionEnd || isMultiSelecting ) {
+		if (
+			! blockSelectionEnd ||
+			isMultiSelecting() ||
+			! hasMultiSelection()
+		) {
 			return;
 		}
 
-		const extentNode = getBlockDOMNode( selectionEnd );
+		return blockSelectionEnd;
+	}, [] );
+
+	useEffect( () => {
+		if ( ! selectionEnd ) {
+			return;
+		}
+
+		const { ownerDocument } = ref.current;
+		const extentNode = getBlockDOMNode( selectionEnd, ownerDocument );
 
 		if ( ! extentNode ) {
 			return;
@@ -54,7 +59,15 @@ export default function MultiSelectScrollIntoView() {
 		scrollIntoView( extentNode, scrollContainer, {
 			onlyScrollIfNeeded: true,
 		} );
-	}, [ selectionEnd, isMultiSelecting ] );
+	}, [ selectionEnd ] );
+}
 
-	return null;
+/**
+ * Scrolls the multi block selection end into view if not in view already. This
+ * is important to do after selection by keyboard.
+ */
+export default function MultiSelectScrollIntoView() {
+	const ref = useRef();
+	useScrollMultiSelectionIntoView( ref );
+	return <div ref={ ref } />;
 }

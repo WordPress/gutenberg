@@ -1,11 +1,11 @@
 .components-toggle-control .components-base-control__field {
 	display: flex;
-	margin-bottom: $grid-size-small * 3;
+	margin-bottom: $grid-unit-05 * 3;
 	line-height: initial;
 	align-items: center;
 
 	.components-form-toggle {
-		margin-right: $grid-size-large;
+		margin-right: $grid-unit-15;
 	}
 
 	.components-toggle-control__label {

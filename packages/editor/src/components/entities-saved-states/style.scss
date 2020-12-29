@@ -1,5 +1,62 @@
-.editor-entities-saved-states__save-button {
-	display: block;
-	margin-left: auto;
-	margin-right: 0;
+.entities-saved-states__panel {
+	@include reset;
+	background: $white;
+	position: fixed;
+	z-index: z-index(".entities-saved-states__panel");
+	top: $admin-bar-height-big;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	overflow: auto;
+	box-sizing: border-box;
+
+	.entities-saved-states__find-entity {
+		display: none;
+	}
+	.entities-saved-states__find-entity-small {
+		display: block;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+		left: auto;
+		width: $sidebar-width;
+		border-left: $border-width solid $gray-300;
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
+
+		.entities-saved-states__find-entity {
+			display: block;
+		}
+		.entities-saved-states__find-entity-small {
+			display: none;
+		}
+	}
+
+	.entities-saved-states__panel-header {
+		background: $white;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+		height: $header-height + $border-width;
+		border-bottom: $border-width solid $gray-300;
+		display: flex;
+		align-items: center;
+		align-content: space-between;
+
+		.editor-entities-saved-states__save-button {
+			margin: auto;
+		}
+
+		.components-button.has-icon {
+			position: absolute;
+			right: $grid-unit-10;
+		}
+	}
+
+	.entities-saved-states__text-prompt {
+		padding: $grid-unit-20;
+		padding-bottom: $grid-unit-05;
+	}
 }

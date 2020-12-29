@@ -37,15 +37,17 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
 	popoverProps,
 	toggleProps,
 	menuProps,
+	disableOpenOnArrowDown = false,
+	text,
 	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
+	noIcons,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
@@ -87,6 +89,10 @@ function DropdownMenu( {
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
+					if ( disableOpenOnArrowDown ) {
+						return;
+					}
+
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
 						event.stopPropagation();
@@ -124,11 +130,10 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
+						text={ text }
+						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
-						{ ( ! icon || hasArrowIndicator ) && (
-							<span className="components-dropdown-menu__indicator" />
-						) }
+						{ mergedToggleProps.children }
 					</Button>
 				);
 			} }
@@ -136,7 +141,10 @@ function DropdownMenu( {
 				const mergedMenuProps = mergeProps(
 					{
 						'aria-label': menuLabel || label,
-						className: 'components-dropdown-menu__menu',
+						className: classnames(
+							'components-dropdown-menu__menu',
+							{ 'no-icons': noIcons }
+						),
 					},
 					menuProps
 				);

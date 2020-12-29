@@ -1,28 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, Panel } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { cog, typography } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import DefaultSidebar from './default-sidebar';
+import GlobalStylesSidebar from './global-styles-sidebar';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
+export const SidebarInspectorFill = InspectorFill;
 
-function Sidebar() {
+export function SidebarComplementaryAreaFills() {
 	return (
-		<div
-			className="edit-site-sidebar"
-			role="region"
-			aria-label={ __( 'Site editor advanced settings.' ) }
-			tabIndex="-1"
-		>
-			<Panel header={ __( 'Inspector' ) }>
+		<>
+			<DefaultSidebar
+				identifier="edit-site/block-inspector"
+				title={ __( 'Block Inspector' ) }
+				icon={ cog }
+				closeLabel={ __( 'Close block inspector sidebar' ) }
+			>
 				<InspectorSlot bubblesVirtually />
-			</Panel>
-		</div>
+			</DefaultSidebar>
+			<GlobalStylesSidebar
+				identifier="edit-site/global-styles"
+				title={ __( 'Global Styles' ) }
+				closeLabel={ __( 'Close global styles sidebar' ) }
+				icon={ typography }
+			/>
+		</>
 	);
 }
-
-Sidebar.InspectorFill = InspectorFill;
-
-export default Sidebar;

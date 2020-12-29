@@ -4,9 +4,6 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
-import '@wordpress/keyboard-shortcuts';
-import '@wordpress/viewport';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -18,7 +15,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import './hooks';
 import './plugins';
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
 /**
@@ -96,7 +93,9 @@ export function initializeEditor(
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks(
+			settings.__unstableEnableFullSiteEditingBlocks
+		);
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
@@ -113,14 +112,14 @@ export function initializeEditor(
 	// Without this hack the browser scrolls the mobile toolbar off-screen.
 	// Once supported in Safari we can replace this in favor of preventScroll.
 	// For details see issue #18632 and PR #18686
-	// Specifically, we scroll `block-editor-editor-skeleton__body` to enable a fixed top toolbar.
+	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
 	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
-		window.addEventListener( 'scroll', function( event ) {
+		window.addEventListener( 'scroll', ( event ) => {
 			const editorScrollContainer = document.getElementsByClassName(
-				'block-editor-editor-skeleton__body'
+				'interface-interface-skeleton__body'
 			)[ 0 ];
 			if ( event.target === document ) {
 				// Scroll element into view by scrolling the editor container by the same amount
@@ -129,8 +128,12 @@ export function initializeEditor(
 					editorScrollContainer.scrollTop =
 						editorScrollContainer.scrollTop + window.scrollY;
 				}
-				//Undo unwanted scroll on html element
-				window.scrollTo( 0, 0 );
+				// Undo unwanted scroll on html element, but only in the visual editor.
+				if (
+					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
+				) {
+					window.scrollTo( 0, 0 );
+				}
 			}
 		} );
 	}
@@ -155,3 +158,5 @@ export { default as PluginPostStatusInfo } from './components/sidebar/plugin-pos
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
+export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';

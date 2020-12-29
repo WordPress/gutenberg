@@ -1,34 +1,68 @@
 # Nested Blocks: Using InnerBlocks
 
-You can create a single block that nests other blocks using the [InnerBlocks](/packages/block-editor/src/components/inner-blocks) component. This is used in the Columns block, Social Links block, or any block you want to contain other blocks.
+You can create a single block that nests other blocks using the [InnerBlocks](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inner-blocks/README.md) component. This is used in the Columns block, Social Links block, or any block you want to contain other blocks.
 
 Note: A single block can only contain one `InnerBlock` component.
 
 Here is the basic InnerBlocks usage.
 
 {% codetabs %}
+{% ESNext %}
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-06', {
+	// ...
+
+	edit: () => {
+		const blockProps = useBlockProps();
+
+		return (
+			<div { ...blockProps }>
+				<InnerBlocks />
+			</div>
+		);
+	},
+
+	save: () => {
+		const blockProps = useBlockProps.save();
+
+		return (
+			<div { ...blockProps }>
+				<InnerBlocks.Content />
+			</div>
+		);
+	},
+} );
+```
 {% ES5 %}
 ```js
 ( function( blocks, element, blockEditor ) {
 	var el = element.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-06', {
 		title: 'Example: Inner Blocks',
-		category: 'layout',
+		category: 'design',
 
-		edit: function( props ) {
+		edit: function() {
+			var blockProps = useBlockProps();
+
 			return el(
 				'div',
-				{ className: props.className },
+				blockProps,
 				el( InnerBlocks )
 			);
 		},
 
-		save: function( props ) {
+		save: function() {
+			var blockProps = useBlockProps.save();
+
 			return el(
 				'div',
-				{ className: props.className },
+				blockProps,
 				el( InnerBlocks.Content )
 			);
 		},
@@ -39,36 +73,11 @@ Here is the basic InnerBlocks usage.
 	window.wp.blockEditor,
 ) );
 ```
-{% ESNext %}
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
-
-registerBlockType( 'gutenberg-examples/example-06', {
-	// ...
-
-	edit: ( { className } ) => {
-		return (
-			<div className={ className }>
-				<InnerBlocks />
-			</div>
-		);
-	},
-
-	save: ( { className } ) => {
-		return (
-			<div className={ className }>
-				<InnerBlocks.Content />
-			</div>
-		);
-	},
-} );
-```
 {% end %}
 
 ## Allowed Blocks
 
-Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the that can be included only to those listed, all other blocks will not show in the inserter. 
+Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
 
 ```js
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -78,12 +87,41 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 />
 ```
 
+## Orientation
+
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+```js
+<InnerBlocks
+	orientation="horizontal"
+/>
+```
+
+Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
 
 ## Template
 
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
 {% codetabs %}
+{% ESNext %}
+```js
+const MY_TEMPLATE = [
+	[ 'core/image', {} ],
+	[ 'core/heading', { placeholder: 'Book Title' } ],
+	[ 'core/paragraph', { placeholder: 'Summary' } ],
+];
+
+//...
+
+	edit: () => {
+		return (
+			<InnerBlocks
+				template={ MY_TEMPLATE }
+				templateLock="all"
+			/>
+		);
+	},
+```
 {% ES5 %}
 ```js
 const MY_TEMPLATE = [
@@ -104,32 +142,13 @@ const MY_TEMPLATE = [
 		);
 	},
 ```
-{% ESNext %}
-```js
-const MY_TEMPLATE = [
-	[ 'core/image', {} ],
-	[ 'core/heading', { placeholder: 'Book Title' } ],
-	[ 'core/paragraph', { placeholder: 'Summary' } ],
-];
-
-//...
-
-	edit: () => {
-		return (
-			<InnerBlocks
-				template={ MY_TEMPLATE }
-				templateLock="all"
-			/>
-		);
-	},
-```
 {% end %}
 
-Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reorderd. See [templateLock documentation](/packages/block-editor/src/components/inner-blocks#templatelock) for additional information.
+Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
 ### Post Template
 
-Unrelated to `InnerBlocks` but worth mentioning here, you can create a [post template](https://developer.wordpress.org/block-editor/developers/block-api/block-templates/) by post type, that preloads the block editor with a set of blocks. 
+Unrelated to `InnerBlocks` but worth mentioning here, you can create a [post template](https://developer.wordpress.org/block-editor/developers/block-api/block-templates/) by post type, that preloads the block editor with a set of blocks.
 
 The `InnerBlocks` template is for the component in the single block that you created, the rest of the post can include any blocks the user likes. Using a post template, can lock the entire post to just the template you define.
 

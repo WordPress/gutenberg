@@ -2,31 +2,34 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, get, map, times } from 'lodash';
+import { dropRight, get, times } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 
 import {
 	InspectorControls,
-	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseColors,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -45,7 +48,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -61,24 +63,17 @@ function ColumnsEditContainer( {
 		[ clientId ]
 	);
 
-	const ref = useRef();
-	const {
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		TextColor,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
-			colorDetector: { targetRef: ref },
-		}
-	);
-
-	const classes = classnames( className, {
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		orientation: 'horizontal',
+		renderAppender: false,
 	} );
 
 	return (
@@ -95,22 +90,19 @@ function ColumnsEditContainer( {
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 2 }
-						max={ 6 }
+						min={ 1 }
+						max={ Math.max( 6, count ) }
 					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<BackgroundColor>
-				<TextColor>
-					<div className={ classes } ref={ ref }>
-						<InnerBlocks
-							templateLock="all"
-							allowedBlocks={ ALLOWED_BLOCKS }
-						/>
-					</div>
-				</TextColor>
-			</BackgroundColor>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
@@ -154,7 +146,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			const hasExplicitWidths = hasExplicitPercentColumnWidths(
+				innerBlocks
+			);
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -204,77 +198,69 @@ const ColumnsEditContainerWrapper = withDispatch(
 				}
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks, false );
+			replaceInnerBlocks( clientId, innerBlocks );
 		},
 	} )
 )( ColumnsEditContainer );
 
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
-
-const ColumnsEdit = ( props ) => {
-	const { clientId, name } = props;
-	const {
-		blockType,
-		defaultVariation,
-		hasInnerBlocks,
-		variations,
-	} = useSelect(
+function Placeholder( { clientId, name, setAttributes } ) {
+	const { blockType, defaultVariation, variations } = useSelect(
 		( select ) => {
 			const {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				hasInnerBlocks:
-					select( 'core/block-editor' ).getBlocks( clientId ).length >
-					0,
 				variations: getBlockVariations( name, 'block' ),
 			};
 		},
-		[ clientId, name ]
+		[ name ]
 	);
-
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-
-	if ( hasInnerBlocks ) {
-		return <ColumnsEditContainerWrapper { ...props } />;
-	}
+	const blockProps = useBlockProps();
 
 	return (
-		<__experimentalBlockVariationPicker
-			icon={ get( blockType, [ 'icon', 'src' ] ) }
-			label={ get( blockType, [ 'title' ] ) }
-			variations={ variations }
-			onSelect={ ( nextVariation = defaultVariation ) => {
-				if ( nextVariation.attributes ) {
-					props.setAttributes( nextVariation.attributes );
-				}
-				if ( nextVariation.innerBlocks ) {
-					replaceInnerBlocks(
-						props.clientId,
-						createBlocksFromInnerBlocksTemplate(
-							nextVariation.innerBlocks
-						)
-					);
-				}
-			} }
-			allowSkip
-		/>
+		<div { ...blockProps }>
+			<__experimentalBlockVariationPicker
+				icon={ get( blockType, [ 'icon', 'src' ] ) }
+				label={ get( blockType, [ 'title' ] ) }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							),
+							true
+						);
+					}
+				} }
+				allowSkip
+			/>
+		</div>
 	);
+}
+
+const ColumnsEdit = ( props ) => {
+	const { clientId } = props;
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks
+		? ColumnsEditContainerWrapper
+		: Placeholder;
+
+	return <Component { ...props } />;
 };
 
 export default ColumnsEdit;

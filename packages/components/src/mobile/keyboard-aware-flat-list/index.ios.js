@@ -1,8 +1,15 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
+import { isEqual } from 'lodash';
+/**
+ * WordPress dependencies
+ */
+
+const List = React.memo( FlatList, isEqual );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -10,6 +17,7 @@ export const KeyboardAwareFlatList = ( {
 	innerRef,
 	autoScroll,
 	scrollViewStyle,
+	inputAccessoryViewHeight,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
@@ -19,6 +27,7 @@ export const KeyboardAwareFlatList = ( {
 		keyboardShouldPersistTaps="handled"
 		extraScrollHeight={ extraScrollHeight }
 		extraHeight={ 0 }
+		inputAccessoryViewHeight={ inputAccessoryViewHeight }
 		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
 		innerRef={ ( ref ) => {
 			this.scrollViewRef = ref;
@@ -48,11 +57,12 @@ export const KeyboardAwareFlatList = ( {
 		onKeyboardWillShow={ () => {
 			this.keyboardWillShowIndicator = true;
 		} }
+		scrollEnabled={ listProps.scrollEnabled }
 		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} }
 	>
-		<FlatList { ...listProps } />
+		<List { ...listProps } />
 	</KeyboardAwareScrollView>
 );
 

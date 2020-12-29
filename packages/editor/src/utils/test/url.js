@@ -5,7 +5,7 @@ import { cleanForSlug } from '../url';
 
 describe( 'cleanForSlug()', () => {
 	it( 'Should return string prepared for use as url slug', () => {
-		expect( cleanForSlug( ' /Déjà_vu. ' ) ).toBe( 'deja-vu' );
+		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
 	it( 'Should return an empty string for missing argument', () => {

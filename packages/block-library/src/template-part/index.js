@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { startCase } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,8 +19,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Template Part' ),
-	supports: {
-		html: false,
-	},
+	keywords: [ __( 'template part' ) ],
+	__experimentalLabel: ( { slug } ) => startCase( slug ),
 	edit,
 };

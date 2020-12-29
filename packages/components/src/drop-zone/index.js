@@ -13,7 +13,7 @@ import { upload, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { DropZoneConsumer, Context } from './provider';
+import { Context, INITIAL_DROP_ZONE_STATE } from './provider';
 
 export function useDropZone( {
 	element,
@@ -22,13 +22,10 @@ export function useDropZone( {
 	onDrop,
 	isDisabled,
 	withPosition,
+	__unstableIsRelative: isRelative = false,
 } ) {
-	const { addDropZone, removeDropZone } = useContext( Context );
-	const [ state, setState ] = useState( {
-		isDraggingOverDocument: false,
-		isDraggingOverElement: false,
-		type: null,
-	} );
+	const dropZones = useContext( Context );
+	const [ state, setState ] = useState( INITIAL_DROP_ZONE_STATE );
 
 	useEffect( () => {
 		if ( ! isDisabled ) {
@@ -39,30 +36,36 @@ export function useDropZone( {
 				onHTMLDrop,
 				setState,
 				withPosition,
+				isRelative,
 			};
-			addDropZone( dropZone );
+			dropZones.add( dropZone );
 			return () => {
-				removeDropZone( dropZone );
+				dropZones.delete( dropZone );
 			};
 		}
-	}, [ isDisabled, onDrop, onFilesDrop, onHTMLDrop, withPosition ] );
+	}, [
+		isDisabled,
+		onDrop,
+		onFilesDrop,
+		onHTMLDrop,
+		withPosition,
+		isRelative,
+	] );
 
-	return state;
+	const { x, y, ...remainingState } = state;
+	let position = null;
+
+	if ( x !== null && y !== null ) {
+		position = { x, y };
+	}
+
+	return {
+		...remainingState,
+		position,
+	};
 }
 
-const DropZone = ( props ) => (
-	<DropZoneConsumer>
-		{ ( { addDropZone, removeDropZone } ) => (
-			<DropZoneComponent
-				addDropZone={ addDropZone }
-				removeDropZone={ removeDropZone }
-				{ ...props }
-			/>
-		) }
-	</DropZoneConsumer>
-);
-
-function DropZoneComponent( {
+export default function DropZoneComponent( {
 	className,
 	label,
 	onFilesDrop,
@@ -76,6 +79,7 @@ function DropZoneComponent( {
 			onFilesDrop,
 			onHTMLDrop,
 			onDrop,
+			__unstableIsRelative: true,
 		}
 	);
 
@@ -86,7 +90,6 @@ function DropZoneComponent( {
 			<div className="components-drop-zone__content">
 				<Icon
 					icon={ upload }
-					size="40"
 					className="components-drop-zone__content-icon"
 				/>
 				<span className="components-drop-zone__content-text">
@@ -113,5 +116,3 @@ function DropZoneComponent( {
 		</div>
 	);
 }
-
-export default DropZone;

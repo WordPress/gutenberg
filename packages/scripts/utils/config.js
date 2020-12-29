@@ -12,7 +12,7 @@ const {
 	hasArgInCLI,
 	hasFileArgInCLI,
 } = require( './cli' );
-const { fromConfigRoot, hasProjectFile } = require( './file' );
+const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
 // See https://babeljs.io/docs/en/config-files#configuration-file-types
@@ -24,13 +24,40 @@ const hasBabelConfig = () =>
 	hasProjectFile( '.babelrc' ) ||
 	hasPackageProp( 'babel' );
 
+/**
+ * Returns path to a Jest configuration which should be provided as the explicit
+ * configuration when there is none available for discovery by Jest in the
+ * project environment. Returns undefined if Jest should be allowed to discover
+ * an available configuration.
+ *
+ * This can be used in cases where multiple possible configurations are
+ * supported. Since Jest will only discover `jest.config.js`, or `jest` package
+ * directive, such custom configurations must be specified explicitly.
+ *
+ * @param {"e2e"|"unit"} suffix Suffix of configuration file to accept.
+ *
+ * @return {string=} Override or fallback configuration file path.
+ */
+function getJestOverrideConfigFile( suffix ) {
+	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
+		return;
+	}
+
+	if ( hasProjectFile( `jest-${ suffix }.config.js` ) ) {
+		return fromProjectRoot( `jest-${ suffix }.config.js` );
+	}
+
+	if ( ! hasJestConfig() ) {
+		return fromConfigRoot( `jest-${ suffix }.config.js` );
+	}
+}
+
 const hasJestConfig = () =>
-	hasArgInCLI( '-c' ) ||
-	hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'jest.config.js' ) ||
 	hasProjectFile( 'jest.config.json' ) ||
 	hasPackageProp( 'jest' );
 
+// See https://prettier.io/docs/en/configuration.html.
 const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.js' ) ||
 	hasProjectFile( '.prettierrc.json' ) ||
@@ -46,18 +73,26 @@ const hasWebpackConfig = () =>
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 
+// See https://github.com/michael-ciniawsky/postcss-load-config#usage (used by postcss-loader).
+const hasPostCSSConfig = () =>
+	hasProjectFile( 'postcss.config.js' ) ||
+	hasProjectFile( '.postcssrc' ) ||
+	hasProjectFile( '.postcssrc.json' ) ||
+	hasProjectFile( '.postcssrc.yaml' ) ||
+	hasProjectFile( '.postcssrc.yml' ) ||
+	hasProjectFile( '.postcssrc.js' ) ||
+	hasPackageProp( 'postcss' );
+
 /**
  * Converts CLI arguments to the format which webpack understands.
- * It allows to optionally pass some additional webpack CLI arguments.
  *
  * @see https://webpack.js.org/api/cli/#usage-with-config-file
  *
- * @param {?Array} additionalArgs The list of additional CLI arguments.
- *
  * @return {Array} The list of CLI arguments to pass to webpack CLI.
  */
-const getWebpackArgs = ( additionalArgs = [] ) => {
-	let webpackArgs = getArgsFromCLI();
+const getWebpackArgs = () => {
+	// Gets all args from CLI without those prefixed with `--webpack`.
+	let webpackArgs = getArgsFromCLI( [ '--webpack' ] );
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
@@ -99,14 +134,14 @@ const getWebpackArgs = ( additionalArgs = [] ) => {
 		webpackArgs.push( '--config', fromConfigRoot( 'webpack.config.js' ) );
 	}
 
-	webpackArgs.push( ...additionalArgs );
-
 	return webpackArgs;
 };
 
 module.exports = {
 	getWebpackArgs,
 	hasBabelConfig,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPrettierConfig,
+	hasPostCSSConfig,
 };

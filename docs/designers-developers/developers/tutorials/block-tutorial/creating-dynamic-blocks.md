@@ -5,11 +5,11 @@ Dynamic blocks are blocks that build their structure and content on the fly when
 There are two primary uses for dynamic blocks:
 
 1. Blocks where content should change even if a post has not been updated. One example from WordPress itself is the Latest Posts block. This block will update everywhere it is used when a new post is published.
-2. Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. (If a dynamic block is not used then when block code is updated Guterberg's [validation process](https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally").
+2. Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. (If a dynamic block is not used then when block code is updated Guterberg's [validation process](/docs/designers-developers/developers/block-api/block-edit-save.md#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally").
 
-For many dynamic blocks, the `save` callback function should be returned as `null`, which tells the editor to save only the [block attributes](https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/) to the database.  These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. When you return `null`, the editor will skip the block markup validation process, avoiding issues with frequently-changing markup.
+For many dynamic blocks, the `save` callback function should be returned as `null`, which tells the editor to save only the [block attributes](/docs/designers-developers/developers/block-api/block-attributes.md) to the database.  These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. When you return `null`, the editor will skip the block markup validation process, avoiding issues with frequently-changing markup.
 
-If you are using [InnerBlocks](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) in a dynamic block you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`
+If you are using [InnerBlocks](/docs/designers-developers/developers/tutorials/block-tutorial/nested-blocks-inner-blocks.md) in a dynamic block you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`
 
 You can also save an HTML representation of the block. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated or your render callback is removed.
 
@@ -22,8 +22,10 @@ The following code example shows how to create a dynamic block that shows only t
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
+	apiVersion: 2,
 	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
@@ -32,31 +34,34 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		return {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 		};
-	} )( ( { posts, className } ) => {
-		if ( ! posts ) {
-			return 'Loading...';
-		}
+	} )( ( { posts } ) => {
+		const blockProps = useBlockProps();
 
-		if ( posts && posts.length === 0 ) {
-			return 'No posts';
-		}
-
-		const post = posts[ 0 ];
-
-		return <a className={ className } href={ post.link }>
-			{ post.title.rendered }
-		</a>;
+		return (
+			<div { ...blockProps }>
+				{ ! posts && 'Loading' }
+				{ posts && posts.length === 0 && 'No Posts' }
+				{ posts && posts.length > 0 && (
+					<a href={ posts[ 0 ].link }>
+						{ posts[ 0 ].title.rendered }
+					</a>
+				) } 
+			</div>
+		)
+		
 	} ),
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, element, data ) {
+( function( blocks, element, data, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		withSelect = data.withSelect;
+		withSelect = data.withSelect,
+		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
+		apiVersion: 2,
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
@@ -65,20 +70,25 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 			};
 		} )( function( props ) {
+			var blockProps = useBlockProps();
+			var content;
 			if ( ! props.posts ) {
-				return 'Loading...';
+				content = 'Loading...';
+			} else if ( props.posts.length === 0 ) {
+				content = 'No posts';
+			} else {
+				var post = props.posts[ 0 ];
+				content = el(
+					'a',
+					{ href: post.link },
+					post.title.rendered
+				);
 			}
 
-			if ( props.posts.length === 0 ) {
-				return 'No posts';
-			}
-			var className = props.className;
-			var post = props.posts[ 0 ];
-
-			return el(
-				'a',
-				{ className: className, href: post.link },
-				post.title.rendered
+			return el( 
+				'div',
+				blockProps,
+				content
 			);
 		} ),
 	} );
@@ -86,6 +96,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	window.wp.blocks,
 	window.wp.element,
 	window.wp.data,
+	window.wp.blockEditor,
 ) );
 ```
 {% end %}
@@ -99,7 +110,7 @@ Because it is a dynamic block it doesn't need to override the default `save` imp
  * Plugin Name: Gutenberg examples dynamic
  */
 
-function gutenberg_examples_dynamic_render_callback( $attributes, $content ) {
+function gutenberg_examples_dynamic_render_callback( $block_attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
@@ -128,6 +139,7 @@ function gutenberg_examples_dynamic() {
 	);
 
 	register_block_type( 'gutenberg-examples/example-dynamic', array(
+		'apiVersion' => 2,
 		'editor_script' => 'gutenberg-examples-dynamic',
 		'render_callback' => 'gutenberg_examples_dynamic_render_callback'
 	) );
@@ -141,11 +153,11 @@ There are a few things to notice:
 
 * The `edit` function still shows a representation of the block in the editor's context (this could be very different from the rendered version, it's up to the block's author)
 * The built-in `save` function just returns `null` because the rendering is performed server-side.
-* The server-side rendering is a function taking the block attributes and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
+* The server-side rendering is a function taking the block and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
 ## Live rendering in the block editor
 
-Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
+Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/README.md) block which enables rendering to take place on the server using PHP rather than in JavaScript.
 
 *Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation).*
 
@@ -154,40 +166,52 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import ServerSideRender from '@wordpress/server-side-render';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
+	apiVersion: 2,
 	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
 
 	edit: function( props ) {
+		const blockProps = useBlockProps();
 		return (
-			<ServerSideRender
-				block="gutenberg-examples/example-dynamic"
-				attributes={ props.attributes }
-			/>
+			<div {...blockProps}>
+				<ServerSideRender
+					block="gutenberg-examples/example-dynamic"
+					attributes={ props.attributes }
+				/>
+			</div>
 		);
 	},
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, element, serverSideRender ) {
+( function( blocks, element, serverSideRender, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		ServerSideRender = serverSideRender;
+		ServerSideRender = serverSideRender,
+		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
+		apiVersion: 2,
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
 
 		edit: function( props ) {
+			var blockProps = useBlockProps();
 			return (
-				el( ServerSideRender, {
-					block: 'gutenberg-examples/example-dynamic',
-					attributes: props.attributes,
-				} )
+				el(
+					'div',
+					blockProps,
+					el( ServerSideRender, {
+						block: 'gutenberg-examples/example-dynamic',
+						attributes: props.attributes,
+					} )
+				)
 			);
 		},
 	} );
@@ -195,6 +219,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	window.wp.blocks,
 	window.wp.element,
 	window.wp.serverSideRender,
+	window.wp.blockEditor,
 ) );
 ```
 {% end %}

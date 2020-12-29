@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Button, SVG, Path, Modal } from '@wordpress/components';
+import { ToolbarButton, SVG, Path, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,18 +14,18 @@ const NavigatorIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 24 24"
-		width="20"
-		height="20"
+		width="24"
+		height="24"
 	>
-		<Path d="M5 5H3v2h2V5zm3 8h11v-2H8v2zm9-8H6v2h11V5zM7 11H5v2h2v-2zm0 8h2v-2H7v2zm3-2v2h11v-2H10z" />
+		<Path d="M13.8 5.2H3v1.5h10.8V5.2zm-3.6 12v1.5H21v-1.5H10.2zm7.2-6H6.6v1.5h10.8v-1.5z" />
 	</SVG>
 );
 
-export default function useBlockNavigator( clientId ) {
+export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
-		<Button
+		<ToolbarButton
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }
@@ -41,7 +41,10 @@ export default function useBlockNavigator( clientId ) {
 				setIsNavigationListOpen( false );
 			} }
 		>
-			<BlockNavigationList clientId={ clientId } />
+			<BlockNavigationList
+				clientId={ clientId }
+				__experimentalFeatures={ __experimentalFeatures }
+			/>
 		</Modal>
 	);
 

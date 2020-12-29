@@ -21,6 +21,7 @@ import {
 	isUpdatingSameBlockAttribute,
 	blocks,
 	isTyping,
+	draggedBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,
@@ -29,6 +30,7 @@ import {
 	preferences,
 	blocksMode,
 	insertionPoint,
+	insertionPointVisibility,
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
@@ -70,7 +72,7 @@ describe( 'state', () => {
 		it( 'should return false if last action was not updating block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
@@ -88,14 +90,14 @@ describe( 'state', () => {
 		it( 'should return false if not updating the same block', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
 					foo: 20,
 				},
@@ -109,14 +111,14 @@ describe( 'state', () => {
 		it( 'should return false if not updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					bar: 20,
 				},
@@ -130,7 +132,7 @@ describe( 'state', () => {
 		it( 'should return false if no previous action', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
@@ -145,14 +147,14 @@ describe( 'state', () => {
 		it( 'should return true if updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 20,
 				},
@@ -169,7 +171,7 @@ describe( 'state', () => {
 			registerBlockType( 'core/test-block', {
 				save: noop,
 				edit: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 		} );
@@ -183,13 +185,13 @@ describe( 'state', () => {
 				registerBlockType( 'core/test-parent-block', {
 					save: noop,
 					edit: noop,
-					category: 'common',
+					category: 'text',
 					title: 'test parent block',
 				} );
 				registerBlockType( 'core/test-child-block', {
 					save: noop,
 					edit: noop,
-					category: 'common',
+					category: 'text',
 					title: 'test child block 1',
 					attributes: {
 						attr: {
@@ -239,6 +241,7 @@ describe( 'state', () => {
 						chicken: {},
 						'chicken-child': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -291,6 +294,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 				expect( state.cache.chicken ).not.toBe(
 					existingState.cache.chicken
@@ -319,6 +323,7 @@ describe( 'state', () => {
 					cache: {
 						chicken: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -371,6 +376,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 				expect( state.cache.chicken ).not.toBe(
 					existingState.cache.chicken
@@ -421,6 +427,7 @@ describe( 'state', () => {
 						'chicken-child': {},
 						'chicken-child-2': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock1 = createBlock( 'core/test-child-block', {
@@ -511,6 +518,7 @@ describe( 'state', () => {
 						[ newChildBlockId2 ]: {},
 						[ newChildBlockId3 ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 			} );
 
@@ -554,6 +562,7 @@ describe( 'state', () => {
 						'chicken-child': {},
 						'chicken-grand-child': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-block' );
@@ -600,6 +609,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				// the cache key of the parent should be updated
@@ -620,6 +630,7 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				cache: {},
+				controlledInnerBlocks: {},
 			} );
 		} );
 
@@ -1480,8 +1491,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 0,
 			} );
 
@@ -1517,8 +1528,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 2,
 			} );
 
@@ -1554,8 +1565,8 @@ describe( 'state', () => {
 				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 1,
 			} );
 
@@ -1564,6 +1575,79 @@ describe( 'state', () => {
 				'ribs',
 				'veggies',
 			] );
+		} );
+
+		it( 'should move multiple blocks', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'veggies',
+				'chicken',
+			] );
+		} );
+
+		it( 'should move multiple blocks to different parent', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				fromRootClientId: '',
+				toRootClientId: 'chicken',
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [ 'chicken' ] );
+			expect( state.order.chicken ).toEqual( [ 'ribs', 'veggies' ] );
 		} );
 
 		describe( 'blocks', () => {
@@ -1631,7 +1715,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1657,7 +1741,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1683,7 +1767,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1709,7 +1793,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							moreUpdated: true,
 						},
@@ -1730,7 +1814,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1756,7 +1840,7 @@ describe( 'state', () => {
 					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1783,7 +1867,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1817,7 +1901,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
@@ -1841,7 +1925,7 @@ describe( 'state', () => {
 					);
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
@@ -1849,7 +1933,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1873,14 +1957,14 @@ describe( 'state', () => {
 					);
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
 					} );
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1932,35 +2016,82 @@ describe( 'state', () => {
 	} );
 
 	describe( 'insertionPoint', () => {
-		it( 'should default to null', () => {
+		it( 'defaults to `null`', () => {
 			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( null );
 		} );
 
-		it( 'should set insertion point', () => {
-			const state = insertionPoint( null, {
-				type: 'SHOW_INSERTION_POINT',
-				rootClientId: 'clientId1',
-				index: 0,
-			} );
+		it.each( [ 'SET_INSERTION_POINT', 'SHOW_INSERTION_POINT' ] )(
+			'sets the insertion point on %s',
+			( type ) => {
+				const original = deepFreeze( {
+					rootClientId: 'clientId1',
+					index: 0,
+				} );
 
-			expect( state ).toEqual( {
-				rootClientId: 'clientId1',
-				index: 0,
-			} );
-		} );
+				const expectedNewState = {
+					rootClientId: 'clientId2',
+					index: 1,
+				};
 
-		it( 'should clear the insertion point', () => {
+				const state = insertionPoint( original, {
+					type,
+					...expectedNewState,
+				} );
+
+				expect( state ).toEqual( expectedNewState );
+			}
+		);
+
+		it.each( [
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'resets the insertion point to `null` on %s', ( type ) => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 0,
 			} );
 			const state = insertionPoint( original, {
-				type: 'HIDE_INSERTION_POINT',
+				type,
 			} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( null );
+		} );
+	} );
+
+	describe( 'insertionPointVisibility', () => {
+		it( 'defaults to `false`', () => {
+			const state = insertionPointVisibility( undefined, {} );
+			expect( state ).toBe( false );
+		} );
+
+		it( 'shows the insertion point', () => {
+			const state = insertionPointVisibility( false, {
+				type: 'SHOW_INSERTION_POINT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it.each( [
+			'HIDE_INSERTION_POINT',
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'sets the insertion point on %s to `false`', ( type ) => {
+			const state = insertionPointVisibility( true, {
+				type,
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
@@ -1979,6 +2110,27 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'draggedBlocks', () => {
+		it( 'should store the dragged client ids when a user starts dragging blocks', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( [], {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+
+			expect( state ).toBe( clientIds );
+		} );
+
+		it( 'should set the state to an empty array when a user stops dragging blocks', () => {
+			const previousState = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( previousState, {
+				type: 'STOP_DRAGGING_BLOCKS',
+			} );
+
+			expect( state ).toEqual( [] );
 		} );
 	} );
 
@@ -2322,7 +2474,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'bacon',
-						name: 'core-embed/twitter',
+						name: 'core/embed',
 					},
 				],
 				time: 123456,
@@ -2330,10 +2482,10 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123456,
 						count: 1,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 				},
 			} );
@@ -2341,10 +2493,10 @@ describe( 'state', () => {
 			const twoRecentBlocks = preferences(
 				deepFreeze( {
 					insertUsage: {
-						'core-embed/twitter': {
+						'core/embed': {
 							time: 123456,
 							count: 1,
-							insert: { name: 'core-embed/twitter' },
+							insert: { name: 'core/embed' },
 						},
 					},
 				} ),
@@ -2353,7 +2505,7 @@ describe( 'state', () => {
 					blocks: [
 						{
 							clientId: 'eggs',
-							name: 'core-embed/twitter',
+							name: 'core/embed',
 						},
 						{
 							clientId: 'bacon',
@@ -2367,10 +2519,10 @@ describe( 'state', () => {
 
 			expect( twoRecentBlocks ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123457,
 						count: 2,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 					'core/block/123': {
 						time: 123457,
@@ -2596,7 +2748,7 @@ describe( 'state', () => {
 
 			const state = lastBlockAttributesChange( original, {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
 					food: 'banana',
 				},

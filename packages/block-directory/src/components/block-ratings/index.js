@@ -13,13 +13,11 @@ export const BlockRatings = ( { rating, ratingCount } ) => (
 		<Stars rating={ rating } />
 		<span
 			className="block-directory-block-ratings__rating-count"
-			aria-label={
+			aria-label={ sprintf(
 				// translators: %d: number of ratings (number).
-				sprintf(
-					_n( '%d total rating', '%d total ratings', ratingCount ),
-					ratingCount
-				)
-			}
+				_n( '%d total rating', '%d total ratings', ratingCount ),
+				ratingCount
+			) }
 		>
 			({ ratingCount })
 		</span>

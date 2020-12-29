@@ -8,7 +8,7 @@ import { includes, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * A block selection object.
@@ -54,6 +54,11 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
+	const currentCallback = useRef( callback );
+	useEffect( () => {
+		currentCallback.current = callback;
+	}, [ callback ] );
+
 	useEffect( () => {
 		if ( isDisabled ) {
 			return;
@@ -82,13 +87,17 @@ function useKeyboardShortcut(
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
-			mousetrap[ bindFn ]( shortcut, callback, eventName );
+			mousetrap[ bindFn ](
+				shortcut,
+				( ...args ) => currentCallback.current( ...args ),
+				eventName
+			);
 		} );
 
 		return () => {
 			mousetrap.reset();
 		};
-	}, [ shortcuts, bindGlobal, eventName, callback, target, isDisabled ] );
+	}, [ shortcuts, bindGlobal, eventName, target, isDisabled ] );
 }
 
 export default useKeyboardShortcut;

@@ -9,7 +9,7 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
+	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}
 
@@ -49,29 +49,44 @@ function gutenberg_register_template_part_post_type() {
 		'supports'          => array(
 			'title',
 			'slug',
+			'excerpt',
 			'editor',
 			'revisions',
-			'custom-fields',
 		),
 	);
 
-	$meta_args = array(
-		'object_subtype' => 'wp_template_part',
-		'type'           => 'string',
-		'description'    => 'The theme that provided the template part, if any.',
-		'single'         => true,
-		'show_in_rest'   => true,
-	);
-
 	register_post_type( 'wp_template_part', $args );
-	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
+
+/**
+ * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
+ * template part slugs should be unique.
+ *
+ * @param string $slug          The resolved slug (post_name).
+ * @param int    $post_ID       Post ID.
+ * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
+ * @param string $post_type     Post type.
+ * @param int    $post_parent   Post parent ID.
+ * @param int    $original_slug The desired slug (post_name).
+ * @return string The original, desired slug.
+ */
+function gutenberg_filter_wp_template_part_wp_unique_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
+	if ( 'wp_template_part' === $post_type ) {
+		return $original_slug;
+	}
+	return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_part_wp_unique_post_slug', 10, 6 );
 
 /**
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
 function gutenberg_fix_template_part_admin_menu_entry() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;
@@ -89,32 +104,47 @@ function gutenberg_fix_template_part_admin_menu_entry() {
 }
 add_action( 'admin_menu', 'gutenberg_fix_template_part_admin_menu_entry' );
 
-/**
- * Filters the 'wp_template_part' post type columns in the admin list table.
- *
- * @param array $columns Columns to display.
- * @return array Filtered $columns.
- */
-function gutenberg_filter_template_part_list_table_columns( array $columns ) {
-	$columns['slug'] = __( 'Slug', 'gutenberg' );
-	if ( isset( $columns['date'] ) ) {
-		unset( $columns['date'] );
-	}
-	return $columns;
-}
-add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_filter_template_part_list_table_columns' );
+// Customize the `wp_template` admin list.
+add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_templates_lists_custom_columns' );
+add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
+add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
 
 /**
- * Renders column content for the 'wp_template_part' post type list table.
+ * Filter for adding and a `theme` parameter to `wp_template_part` queries.
  *
- * @param string $column_name Column name to render.
- * @param int    $post_id     Post ID.
+ * @param array $query_params The query parameters.
+ * @return array Filtered $query_params.
  */
-function gutenberg_render_template_part_list_table_column( $column_name, $post_id ) {
-	if ( 'slug' !== $column_name ) {
-		return;
-	}
-	$post = get_post( $post_id );
-	echo esc_html( $post->post_name );
+function filter_rest_wp_template_part_collection_params( $query_params ) {
+	$query_params += array(
+		'theme' => array(
+			'description' => __( 'The theme slug for the theme that created the template part.', 'gutenberg' ),
+			'type'        => 'string',
+		),
+	);
+	return $query_params;
 }
-add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_template_part_list_table_column', 10, 2 );
+add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
+
+/**
+ * Filter for supporting the `resolved`, `template`, and `theme` parameters in `wp_template_part` queries.
+ *
+ * @param array           $args    The query arguments.
+ * @param WP_REST_Request $request The request object.
+ * @return array Filtered $args.
+ */
+function filter_rest_wp_template_part_query( $args, $request ) {
+	if ( $request['theme'] ) {
+		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$tax_query[] = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $request['theme'],
+		);
+
+		$args['tax_query'] = $tax_query;
+	}
+
+	return $args;
+}
+add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );

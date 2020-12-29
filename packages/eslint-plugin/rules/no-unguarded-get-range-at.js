@@ -5,7 +5,7 @@ module.exports = {
 	},
 	create( context ) {
 		return {
-			'CallExpression[callee.object.callee.object.name="window"][callee.object.callee.property.name="getSelection"][callee.property.name="getRangeAt"]'(
+			'CallExpression[callee.object.callee.property.name="getSelection"][callee.property.name="getRangeAt"]'(
 				node
 			) {
 				context.report( {

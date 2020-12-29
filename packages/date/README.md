@@ -18,26 +18,40 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 <a name="date" href="#date">#</a> **date**
 
-Formats a date (like `date()` in PHP), in the site's timezone.
+Formats a date (like `date()` in PHP).
+
+_Related_
+
+-   <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
+-   <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC>
 
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
+-   _timezone_ `(string|number|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
 
 _Returns_
 
--   `string`: Formatted date.
+-   `string`: Formatted date in English.
 
 <a name="dateI18n" href="#dateI18n">#</a> **dateI18n**
 
-Formats a date (like `date_i18n()` in PHP).
+Formats a date (like `wp_date()` in PHP), translating it into site's locale.
+
+Backward Compatibility Notice: if `timezone` is set to `true`, the function
+behaves like `gmdateI18n`.
+
+_Related_
+
+-   <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
+-   <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC>
 
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
--   _gmt_ `boolean`: True for GMT/UTC, false for site's timezone.
+-   _timezone_ `(string|number|boolean|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
 
 _Returns_
 
@@ -71,6 +85,20 @@ _Returns_
 <a name="gmdate" href="#gmdate">#</a> **gmdate**
 
 Formats a date (like `date()` in PHP), in the UTC timezone.
+
+_Parameters_
+
+-   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
+-   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
+
+_Returns_
+
+-   `string`: Formatted date in English.
+
+<a name="gmdateI18n" href="#gmdateI18n">#</a> **gmdateI18n**
+
+Formats a date (like `wp_date()` in PHP), translating it into site's locale
+and using the UTC timezone.
 
 _Parameters_
 

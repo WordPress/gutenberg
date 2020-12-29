@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/list",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
@@ -23,5 +24,16 @@
 		"reversed": {
 			"type": "boolean"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"className": false,
+		"fontSize": true,
+		"color": {
+			"gradients": true
+		},
+		"__unstablePasteTextInline": true
+	},
+	"editorStyle": "wp-block-list-editor",
+	"style": "wp-block-list"
 }

@@ -1,3 +1,13 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.11.0 (2020-12-17)
+
+### New Feature
+
+- Include TypeScript type declarations ([#26429](https://github.com/WordPress/gutenberg/pull/26429))
+
 ## 2.6.0 (2019-08-29)
 
 ### Bug Fix

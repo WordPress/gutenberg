@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import filter from '../html-formatting-remover';
-import { deepFilterHTML } from '../utils';
+import { deepFilterHTML, deepFilterNodeList } from '../utils';
 
 describe( 'HTMLFormattingRemover', () => {
 	it( 'should trim text node without parent', () => {
@@ -100,6 +100,24 @@ describe( 'HTMLFormattingRemover', () => {
 	it( 'should ignore pre', () => {
 		const input = `<pre> a\n b\n</pre>`;
 		expect( deepFilterHTML( input, [ filter ] ) ).toEqual( input );
+	} );
+
+	it( 'should tolerate browser quirks of DOM parent property availability', () => {
+		const input = 'a';
+
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = input;
+
+		// Emulate absence of `parentElement` property.
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement#Browser_compatibility
+		Object.defineProperty( doc.body.firstChild, 'parentElement', {
+			get() {
+				return undefined;
+			},
+		} );
+
+		deepFilterNodeList( doc.body.childNodes, [ filter ], doc );
+		expect( doc.body.innerHTML ).toEqual( input );
 	} );
 
 	it( 'should not remove white space if next elemnt has none', () => {

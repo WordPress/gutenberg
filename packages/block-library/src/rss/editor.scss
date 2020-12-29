@@ -1,9 +1,32 @@
-.block-editor .wp-block-rss {
-	padding-left: 2.5em;
-	&.is-grid {
-		padding-left: 0;
-	}
-}
 .wp-block-rss li a > div {
 	display: inline;
+}
+
+.wp-block-rss__placeholder-form {
+	display: flex;
+	align-items: stretch;
+
+	> * {
+		margin-bottom: $grid-unit-10;
+	}
+
+	@include break-medium() {
+		> * {
+			margin-bottom: 0;
+		}
+	}
+}
+
+.wp-block-rss__placeholder-input {
+	display: flex;
+	align-items: stretch;
+	flex-grow: 1;
+
+	.components-base-control__field {
+		margin: 0;
+		display: flex;
+		align-items: stretch;
+		flex-grow: 1;
+		margin-right: $grid-unit-10;
+	}
 }

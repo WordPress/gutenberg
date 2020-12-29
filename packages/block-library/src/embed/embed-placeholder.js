@@ -5,17 +5,16 @@ import { __, _x } from '@wordpress/i18n';
 import { Button, Placeholder, ExternalLink } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
-const EmbedPlaceholder = ( props ) => {
-	const {
-		icon,
-		label,
-		value,
-		onSubmit,
-		onChange,
-		cannotEmbed,
-		fallback,
-		tryAgain,
-	} = props;
+const EmbedPlaceholder = ( {
+	icon,
+	label,
+	value,
+	onSubmit,
+	onChange,
+	cannotEmbed,
+	fallback,
+	tryAgain,
+} ) => {
 	return (
 		<Placeholder
 			icon={ <BlockIcon icon={ icon } showColors /> }
@@ -34,7 +33,7 @@ const EmbedPlaceholder = ( props ) => {
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange }
 				/>
-				<Button isSecondary type="submit">
+				<Button isPrimary type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 			</form>

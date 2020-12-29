@@ -1,23 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-export function MediaUploadCheck( {
-	hasUploadPermissions,
-	fallback = null,
-	children,
-} ) {
+export function MediaUploadCheck( { fallback = null, children } ) {
+	const hasUploadPermissions = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return !! getSettings().mediaUpload;
+	}, [] );
 	return hasUploadPermissions ? children : fallback;
 }
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md
  */
-export default withSelect( ( select ) => {
-	const { getSettings } = select( 'core/block-editor' );
-
-	return {
-		hasUploadPermissions: !! getSettings().mediaUpload,
-	};
-} )( MediaUploadCheck );
+export default MediaUploadCheck;

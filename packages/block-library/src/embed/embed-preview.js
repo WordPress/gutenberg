@@ -1,14 +1,11 @@
 /**
  * Internal dependencies
  */
-import { HOSTS_NO_PREVIEWS } from './constants';
 import { getPhotoHtml } from './util';
 
 /**
  * External dependencies
  */
-import { parse } from 'url';
-import { includes } from 'lodash';
 import classnames from 'classnames/dedupe';
 
 /**
@@ -18,6 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
 import { RichText, BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -56,6 +54,7 @@ class EmbedPreview extends Component {
 	render() {
 		const {
 			preview,
+			previewable,
 			url,
 			type,
 			caption,
@@ -64,18 +63,18 @@ class EmbedPreview extends Component {
 			className,
 			icon,
 			label,
+			insertBlocksAfter,
 		} = this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
 
 		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const parsedHost = parse( url ).host.split( '.' );
+		const parsedHost = new URL( url ).host.split( '.' );
 		const parsedHostBaseUrl = parsedHost
 			.splice( parsedHost.length - 2, parsedHost.length - 1 )
 			.join( '.' );
-		const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedHostBaseUrl );
-		// translators: %s: host providing embed content e.g: www.youtube.com
 		const iframeTitle = sprintf(
+			// translators: %s: host providing embed content e.g: www.youtube.com
 			__( 'Embedded content from %s' ),
 			parsedHostBaseUrl
 		);
@@ -117,7 +116,9 @@ class EmbedPreview extends Component {
 					'is-type-video': 'video' === type,
 				} ) }
 			>
-				{ cannotPreview ? (
+				{ previewable ? (
+					embedWrapper
+				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } showColors /> }
 						label={ label }
@@ -126,8 +127,8 @@ class EmbedPreview extends Component {
 							<a href={ url }>{ url }</a>
 						</p>
 						<p className="components-placeholder__error">
-							{ /* translators: %s: host providing embed content e.g: www.youtube.com */
-							sprintf(
+							{ sprintf(
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
 								__(
 									"Embedded content from %s can't be previewed in the editor."
 								),
@@ -135,8 +136,6 @@ class EmbedPreview extends Component {
 							) }
 						</p>
 					</Placeholder>
-				) : (
-					embedWrapper
 				) }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
@@ -145,6 +144,9 @@ class EmbedPreview extends Component {
 						value={ caption }
 						onChange={ onCaptionChange }
 						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
 					/>
 				) }
 			</figure>

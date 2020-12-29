@@ -22,9 +22,16 @@ const getSelection = async () => {
 			return {};
 		}
 
-		const editables = Array.from(
-			selectedBlock.querySelectorAll( '[contenteditable]' )
-		);
+		let editables;
+
+		if ( selectedBlock.getAttribute( 'contenteditable' ) ) {
+			editables = [ selectedBlock ];
+		} else {
+			editables = Array.from(
+				selectedBlock.querySelectorAll( '[contenteditable]' )
+			);
+		}
+
 		const editableIndex = editables.indexOf( document.activeElement );
 		const selection = window.getSelection();
 
@@ -166,7 +173,8 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'test' );
 		await saveDraft();
 		await page.reload();
-		await page.click( '.wp-block-paragraph' );
+		await page.waitForSelector( '.edit-post-layout' );
+		await page.click( '[data-type="core/paragraph"]' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await pressKeyWithModifier( 'primary', 'z' );
@@ -218,8 +226,8 @@ describe( 'undo', () => {
 		expect( await getSelection() ).toEqual( {
 			blockIndex: 2,
 			editableIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
+			startOffset: 'is'.length,
+			endOffset: 'is'.length,
 		} );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
@@ -238,8 +246,8 @@ describe( 'undo', () => {
 		expect( await getSelection() ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
+			startOffset: 'This'.length,
+			endOffset: 'This'.length,
 		} );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.
@@ -338,6 +346,7 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'original' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.
@@ -384,13 +393,14 @@ describe( 'undo', () => {
 		await page.keyboard.type( '1' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Expect undo button to be disabled.
 		expect(
 			await page.$( '.editor-history__undo[aria-disabled="true"]' )
 		).not.toBeNull();
 
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 
 		await page.keyboard.type( '2' );
 

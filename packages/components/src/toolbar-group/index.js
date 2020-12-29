@@ -40,13 +40,12 @@ import ToolbarContext from '../toolbar-context';
  * Either `controls` or `children` is required, otherwise this components
  * renders nothing.
  *
- * @param {Object}                props               Component props.
- * @param {Array}                 [props.controls]    The controls to render in this toolbar.
- * @param {WPElement}             [props.children]    Any other things to render inside the toolbar besides the controls.
- * @param {string}                [props.className]   Class to set on the container div.
- * @param {boolean}               [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
- * @param {WPBlockTypeIconRender} [props.icon]        The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
- * @param {string}                [props.label]       The menu item text.
+ * @param {Object}    props               Component props.
+ * @param {Array}     [props.controls]    The controls to render in this toolbar.
+ * @param {WPElement} [props.children]    Any other things to render inside the toolbar besides the controls.
+ * @param {string}    [props.className]   Class to set on the container div.
+ * @param {boolean}   [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
+ * @param {string}    [props.title]       ARIA label for dropdown menu if is collapsed.
  */
 function ToolbarGroup( {
 	controls = [],
@@ -57,7 +56,7 @@ function ToolbarGroup( {
 	...props
 } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
-	// `<Toolbar accessibilityLabel="label" />`
+	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ( ! controls || ! controls.length ) && ! children ) {

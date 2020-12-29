@@ -113,6 +113,24 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
+				colorStops: [
+					{
+						type: 'hex',
+						value: '000',
+						length: { type: '%', value: 70 },
+					},
+					{
+						type: 'hex',
+						value: 'fff',
+						length: { type: '%', value: 40 },
+					},
+				],
+			} )
+		).toBe( 'linear-gradient(#fff 40%,#000 70%)' );
+
+		expect(
+			serializeGradient( {
+				type: 'linear-gradient',
 				orientation: { type: 'angular', value: 0 },
 				colorStops: [
 					{

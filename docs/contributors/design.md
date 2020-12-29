@@ -28,7 +28,7 @@ Gutenberg's all-encompassing goal is a post- and page-building experience that m
 
 From the [kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/):
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+> The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 
 We can extract a few key principles from this:
 
@@ -40,7 +40,7 @@ We can extract a few key principles from this:
 
 One thing that sets WordPress apart from other systems is that it allows users to create as rich a post layout as they can imagine — as long as they know HTML and CSS and build a custom theme.
 
-Gutenberg reshapes the editor into a tool that allows users write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
+Gutenberg reshapes the editor into a tool that allows users to write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
 
 ### Vision
 

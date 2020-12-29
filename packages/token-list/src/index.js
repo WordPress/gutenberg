@@ -17,10 +17,48 @@ export default class TokenList {
 	constructor( initialValue = '' ) {
 		this.value = initialValue;
 
-		[ 'entries', 'forEach', 'keys', 'values' ].forEach( ( fn ) => {
-			this[ fn ] = ( ...args ) => this._valueAsArray[ fn ]( ...args );
-		} );
+		// Disable reason: These are type hints on the class.
+		/* eslint-disable no-unused-expressions */
+		/** @type {string} */
+		this._currentValue;
+
+		/** @type {string[]} */
+		this._valueAsArray;
+		/* eslint-enable no-unused-expressions */
 	}
+
+	// Disable reason: JSDoc lint doesn't understand TypeScript types
+	/* eslint-disable jsdoc/valid-types */
+
+	/**
+	 * @param {Parameters<Array<string>['entries']>} args
+	 */
+	entries( ...args ) {
+		return this._valueAsArray.entries( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['forEach']>} args
+	 */
+	forEach( ...args ) {
+		return this._valueAsArray.forEach( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['keys']>} args
+	 */
+	keys( ...args ) {
+		return this._valueAsArray.keys( ...args );
+	}
+
+	/**
+	 * @param {Parameters<Array<string>['values']>} args
+	 */
+	values( ...args ) {
+		return this._valueAsArray.values( ...args );
+	}
+
+	/* eslint-enable jsdoc/valid-types */
 
 	/**
 	 * Returns the associated set as string.

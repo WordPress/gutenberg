@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/pullquote",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"value": {
 			"type": "string",
@@ -26,5 +27,16 @@
 		"customTextColor": {
 			"type": "string"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": [
+			"left",
+			"right",
+			"wide",
+			"full"
+		]
+	},
+	"editorStyle": "wp-block-pullquote-editor",
+	"style": "wp-block-pullquote"
 }

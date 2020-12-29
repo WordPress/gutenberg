@@ -2,18 +2,20 @@
  * External dependencies
  */
 import moment from 'moment';
-import { DayPickerSingleDateController } from 'react-dates';
+// react-dates doesn't tree-shake correctly, so we import from the individual
+// component here, to avoid including too much of the library
+import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
 
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
-const isRTL = () => document.documentElement.dir === 'rtl';
 
 class DatePicker extends Component {
 	constructor() {
@@ -22,6 +24,7 @@ class DatePicker extends Component {
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
 		this.keepFocusInside = this.keepFocusInside.bind( this );
+		this.isDayHighlighted = this.isDayHighlighted.bind( this );
 	}
 
 	/*
@@ -34,10 +37,14 @@ class DatePicker extends Component {
 		if ( ! this.nodeRef.current ) {
 			return;
 		}
+
+		const { ownerDocument } = this.nodeRef.current;
+		const { activeElement } = ownerDocument;
+
 		// If focus was lost.
 		if (
-			! document.activeElement ||
-			! this.nodeRef.current.contains( document.activeElement )
+			! activeElement ||
+			! this.nodeRef.current.contains( ownerDocument.activeElement )
 		) {
 			// Retrieve the focus region div.
 			const focusRegion = this.nodeRef.current.querySelector(
@@ -79,9 +86,24 @@ class DatePicker extends Component {
 		return currentDate ? moment( currentDate ) : moment();
 	}
 
+	// todo change reference to `isDayHighlighted` every time, `events` prop change
+	isDayHighlighted( date ) {
+		// Do not highlight when no events.
+		if ( ! this.props.events?.length ) {
+			return false;
+		}
+		if ( this.props.onMonthPreviewed ) {
+			this.props.onMonthPreviewed( date.toDate() );
+		}
+
+		// Compare date against highlighted events.
+		return this.props.events.some( ( highlighted ) =>
+			date.isSame( highlighted.date, 'day' )
+		);
+	}
+
 	render() {
 		const { currentDate, isInvalidDate } = this.props;
-
 		const momentDate = this.getMomentDate( currentDate );
 
 		return (
@@ -105,6 +127,7 @@ class DatePicker extends Component {
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
 					} }
+					isDayHighlighted={ this.isDayHighlighted }
 					onPrevMonthClick={ this.keepFocusInside }
 					onNextMonthClick={ this.keepFocusInside }
 				/>

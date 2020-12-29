@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { VisuallyHidden } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -127,12 +128,12 @@ export class PostVisibility extends Component {
 					className="editor-post-visibility__dialog-password"
 					key="password-selector"
 				>
-					<label
+					<VisuallyHidden
+						as="label"
 						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-						className="screen-reader-text"
 					>
 						{ __( 'Create password' ) }
-					</label>
+					</VisuallyHidden>
 					<input
 						className="editor-post-visibility__dialog-password-input"
 						id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
