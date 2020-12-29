@@ -236,7 +236,7 @@ RCTAztecView adds the following custom behaviours to the TextView class:
 Android uses a native [`ReactAztecText`](https://github.com/WordPress/gutenberg/blob/7532a485b400f86638145b71f94f6f717e5add25/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecText.java#L50)
 view, which extends [`AztecText`](https://github.com/wordpress-mobile/AztecEditor-Android/blob/437ecec9034003c32b9b8b0b00ec76cb5b248679/aztec/src/main/kotlin/org/wordpress/aztec/AztecText.kt#L130)
 from the [Aztec Library for Android](https://github.com/wordpress-mobile/AztecEditor-Android). All interactions between
-the native `ReactAztecText` view and the Javascript code are handled by the [`ReactAztecManager`](https://github.com/WordPress/gutenberg/blob/7532a485b400f86638145b71f94f6f717e5add25/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java#L62)
+the native `ReactAztecText` view and the JavaScript code are handled by the [`ReactAztecManager`](https://github.com/WordPress/gutenberg/blob/7532a485b400f86638145b71f94f6f717e5add25/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java#L62)
 view manager.
 
 # License

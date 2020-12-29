@@ -22,6 +22,7 @@ import { withDispatch, useSelect } from '@wordpress/data';
 import { DOWN, TAB, ESCAPE } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -205,7 +206,7 @@ const MediaReplaceFlow = ( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { createNotice, removeNotice } = dispatch( 'core/notices' );
+		const { createNotice, removeNotice } = dispatch( noticesStore );
 		return {
 			createNotice,
 			removeNotice,

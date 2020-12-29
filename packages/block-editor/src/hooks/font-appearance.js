@@ -11,10 +11,14 @@ import useEditorFeature from '../components/use-editor-feature';
 import { cleanEmptyObject } from './utils';
 
 /**
- * Key within block settings' support array indicating support for font
- * appearance options e.g. font weight and style.
+ * Key within block settings' support array indicating support for font style.
  */
-export const FONT_APPEARANCE_SUPPORT_KEY = '__experimentalFontAppearance';
+export const FONT_STYLE_SUPPORT_KEY = '__experimentalFontStyle';
+
+/**
+ * Key within block settings' support array indicating support for font weight.
+ */
+export const FONT_WEIGHT_SUPPORT_KEY = '__experimentalFontWeight';
 
 /**
  * Inspector control panel containing the font appearance options.
@@ -28,11 +32,10 @@ export function FontAppearanceEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const fontStyles = useEditorFeature( 'typography.fontStyles' );
-	const fontWeights = useEditorFeature( 'typography.fontWeights' );
-	const isDisabled = useIsFontAppearanceDisabled( props );
+	const hasFontStyles = ! useIsFontStyleDisabled( props );
+	const hasFontWeights = ! useIsFontWeightDisabled( props );
 
-	if ( isDisabled ) {
+	if ( ! hasFontStyles && ! hasFontWeights ) {
 		return null;
 	}
 
@@ -42,41 +45,66 @@ export function FontAppearanceEdit( props ) {
 				...style,
 				typography: {
 					...style?.typography,
-					...newStyles,
+					fontStyle: newStyles.fontStyle,
+					fontWeight: newStyles.fontWeight,
 				},
 			} ),
 		} );
 	};
 
-	const currentSelection = {
-		fontStyle: style?.typography?.fontStyle,
-		fontWeight: style?.typography?.fontWeight,
-	};
+	const fontStyle = style?.typography?.fontStyle;
+
+	const fontWeight = style?.typography?.fontWeight;
 
 	return (
 		<FontAppearanceControl
-			value={ currentSelection }
-			options={ { fontStyles, fontWeights } }
 			onChange={ onChange }
+			hasFontStyles={ hasFontStyles }
+			hasFontWeights={ hasFontWeights }
+			value={ { fontStyle, fontWeight } }
 		/>
 	);
+}
+
+/**
+ * Checks if font style support has been disabled either by not opting in for
+ * support or by failing to provide preset styles.
+ *
+ * @param  {Object} props      Block properties.
+ * @param  {string} props.name Name for the block type.
+ * @return {boolean}           Whether font style support has been disabled.
+ */
+export function useIsFontStyleDisabled( { name: blockName } = {} ) {
+	const styleSupport = hasBlockSupport( blockName, FONT_STYLE_SUPPORT_KEY );
+	const hasFontStyles = useEditorFeature( 'typography.customFontStyle' );
+
+	return ! styleSupport || ! hasFontStyles;
+}
+
+/**
+ * Checks if font weight support has been disabled either by not opting in for
+ * support or by failing to provide preset weights.
+ *
+ * @param  {Object} props      Block properties.
+ * @param  {string} props.name Name for the block type.
+ * @return {boolean}           Whether font weight support has been disabled.
+ */
+export function useIsFontWeightDisabled( { name: blockName } = {} ) {
+	const weightSupport = hasBlockSupport( blockName, FONT_WEIGHT_SUPPORT_KEY );
+	const hasFontWeights = useEditorFeature( 'typography.customFontWeight' );
+
+	return ! weightSupport || ! hasFontWeights;
 }
 
 /**
  * Checks if font appearance support has been disabled.
  *
  * @param  {Object} props      Block properties.
- * @param  {string} props.name Name for the block type.
  * @return {boolean}           Whether font appearance support has been disabled.
  */
-export function useIsFontAppearanceDisabled( { name: blockName } = {} ) {
-	const notSupported = ! hasBlockSupport(
-		blockName,
-		FONT_APPEARANCE_SUPPORT_KEY
-	);
-	const fontStyles = useEditorFeature( 'typography.fontStyles' );
-	const fontWeights = useEditorFeature( 'typography.fontWeights' );
-	const hasFontAppearance = !! fontStyles?.length && !! fontWeights?.length;
+export function useIsFontAppearanceDisabled( props ) {
+	const stylesDisabled = useIsFontStyleDisabled( props );
+	const weightsDisabled = useIsFontWeightDisabled( props );
 
-	return notSupported || ! hasFontAppearance;
+	return stylesDisabled && weightsDisabled;
 }

@@ -19,4 +19,5 @@ export const settings = {
 	icon: loop,
 	edit,
 	save,
+	parent: [ 'core/query' ],
 };

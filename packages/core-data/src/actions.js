@@ -389,8 +389,6 @@ export function* saveEntityRecord(
 		};
 		let updatedRecord;
 		let error;
-		let persistedEntity;
-		let currentEdits;
 		try {
 			const path = `${ entity.baseURL }${
 				recordId ? '/' + recordId : ''
@@ -501,51 +499,21 @@ export function* saveEntityRecord(
 					yield receiveAutosaves( persistedRecord.id, updatedRecord );
 				}
 			} else {
-				// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
-				// but some plugins break with this behavior so we can't filter it on the server.
-				let data = record;
-				if (
-					kind === 'postType' &&
-					persistedRecord &&
-					persistedRecord.status === 'auto-draft'
-				) {
-					if ( ! data.status ) {
-						data = { ...data, status: 'draft' };
-					}
-					if ( ! data.title || data.title === 'Auto Draft' ) {
-						data = { ...data, title: '' };
-					}
+				let edits = record;
+				if ( entity.__unstablePrePersist ) {
+					edits = {
+						...edits,
+						...entity.__unstablePrePersist(
+							persistedRecord,
+							edits
+						),
+					};
 				}
-
-				// Get the full local version of the record before the update,
-				// to merge it with the edits and then propagate it to subscribers
-				persistedEntity = yield controls.select(
-					'core',
-					'__experimentalGetEntityRecordNoResolver',
-					kind,
-					name,
-					recordId
-				);
-				currentEdits = yield controls.select(
-					'core',
-					'getEntityRecordEdits',
-					kind,
-					name,
-					recordId
-				);
-				yield receiveEntityRecords(
-					kind,
-					name,
-					{ ...persistedEntity, ...data },
-					undefined,
-					// This must be false or it will trigger a GET request in parallel to the PUT/POST below
-					false
-				);
 
 				updatedRecord = yield apiFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
-					data,
+					data: edits,
 				} );
 				yield receiveEntityRecords(
 					kind,
@@ -557,34 +525,6 @@ export function* saveEntityRecord(
 			}
 		} catch ( _error ) {
 			error = _error;
-
-			// If we got to the point in the try block where we made an optimistic update,
-			// we need to roll it back here.
-			if ( persistedEntity && currentEdits ) {
-				yield receiveEntityRecords(
-					kind,
-					name,
-					persistedEntity,
-					undefined,
-					true
-				);
-				yield editEntityRecord(
-					kind,
-					name,
-					recordId,
-					{
-						...currentEdits,
-						...( yield controls.select(
-							'core',
-							'getEntityRecordEdits',
-							kind,
-							name,
-							recordId
-						) ),
-					},
-					{ undoIgnore: true }
-				);
-			}
 		}
 		yield {
 			type: 'SAVE_ENTITY_RECORD_FINISH',

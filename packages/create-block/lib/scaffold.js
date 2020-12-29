@@ -18,6 +18,7 @@ const { code, info, success } = require( './log' );
 module.exports = async (
 	blockTemplate,
 	{
+		apiVersion,
 		namespace,
 		slug,
 		title,
@@ -29,6 +30,7 @@ module.exports = async (
 		licenseURI,
 		version,
 		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
@@ -42,6 +44,7 @@ module.exports = async (
 
 	const { outputTemplates } = blockTemplate;
 	const view = {
+		apiVersion,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
@@ -55,10 +58,11 @@ module.exports = async (
 		license,
 		licenseURI,
 		textdomain: slug,
+		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
-		wpScripts,
 	};
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -10,7 +11,7 @@ import BlockIcon from '../block-icon';
 
 export default function ChildBlocks( { rootClientId, children } ) {
 	const { rootBlockTitle, rootBlockIcon } = useSelect( ( select ) => {
-		const { getBlockType } = select( 'core/blocks' );
+		const { getBlockType } = select( blocksStore );
 		const { getBlockName } = select( 'core/block-editor' );
 		const rootBlockName = getBlockName( rootClientId );
 		const rootBlockType = getBlockType( rootBlockName );

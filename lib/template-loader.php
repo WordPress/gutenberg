@@ -63,7 +63,6 @@ function get_template_hierarchy( $template_type ) {
  */
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_content;
-
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	if ( $current_template ) {
@@ -151,9 +150,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	usort(
 		$templates,
 		function ( $template_a, $template_b ) use ( $slug_priorities ) {
-			$priority_a = $slug_priorities[ $template_a->post_name ] * 2 + ( 'publish' === $template_a->post_status ? 1 : 0 );
-			$priority_b = $slug_priorities[ $template_b->post_name ] * 2 + ( 'publish' === $template_b->post_status ? 1 : 0 );
-			return $priority_b - $priority_a;
+			return $slug_priorities[ $template_a->post_name ] - $slug_priorities[ $template_b->post_name ];
 		}
 	);
 
@@ -217,7 +214,7 @@ function gutenberg_viewport_meta_tag() {
  * @return string Template file name without extension.
  */
 function gutenberg_strip_php_suffix( $template_file ) {
-	return preg_replace( '/\.php$/', '', $template_file );
+	return preg_replace( '/\.(php|html)$/', '', $template_file );
 }
 
 /**

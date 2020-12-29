@@ -13,11 +13,12 @@ export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 
 // Hooks
+export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbing';
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
+export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outside';
 export { default as useInstanceId } from './hooks/use-instance-id';
 export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
-export { default as usePrevious } from './hooks/use-previous';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useAsyncList } from './hooks/use-async-list';

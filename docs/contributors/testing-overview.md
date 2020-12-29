@@ -355,9 +355,8 @@ It's tempting to snapshot deep renders, but that makes for huge snapshots. Addit
 Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
 
 -   Why we need to use [Mocking Refs for Snapshot Testing](https://reactjs.org/blog/2016/11/16/react-v15.4.0.html#mocking-refs-for-snapshot-testing) with React.
--   [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
 
-In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
+In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`.
 
 ### Debugging Jest unit tests
 
@@ -461,7 +460,15 @@ Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If yo
 npm run test-php
 ```
 
+To re-run tests automatically when files change (similar to Jest), run:
+
+```
+npm run test-php:watch
+```
+
 _Note: The phpunit commands require `wp-env` to be running and composer dependencies to be installed. The package script will start wp-env for you if it is not already running._
+
+In other environments, run `composer run test` and `composer run test:watch`.
 
 Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
 

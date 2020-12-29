@@ -14,68 +14,72 @@
 function gutenberg_get_default_template_types() {
 	$default_template_types = array(
 		'index'          => array(
-			'title'       => _x( 'Default (Index)', 'Template name', 'gutenberg' ),
-			'description' => __( 'Main template, applied when no other template is found', 'gutenberg' ),
+			'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
+			'description' => __( 'The default template which is used when no other template can be found', 'gutenberg' ),
 		),
 		'home'           => array(
 			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-			'description' => __( 'Template for the latest blog posts', 'gutenberg' ),
+			'description' => __( 'The home page template, which is the front page by default. If you use a static front page this is the template for the page with the latest posts', 'gutenberg' ),
 		),
 		'front-page'     => array(
 			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Front page template, whether it displays the blog posts index or a static page', 'gutenberg' ),
+			'description' => __( 'Used when the site home page is queried', 'gutenberg' ),
 		),
 		'singular'       => array(
-			'title'       => _x( 'Default Singular', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays any content on a single page', 'gutenberg' ),
+			'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a single entry is queried. This template will be overridden the Single, Post, and Page templates where appropriate', 'gutenberg' ),
 		),
 		'single'         => array(
-			'title'       => _x( 'Default Single', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied to individual content like a blog post', 'gutenberg' ),
+			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a single entry that is not a Page is queried', 'gutenberg' ),
+		),
+		'single-post'    => array(
+			'title'       => _x( 'Post', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a single Post is queried', 'gutenberg' ),
 		),
 		'page'           => array(
-			'title'       => _x( 'Default Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied to individual pages', 'gutenberg' ),
+			'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when an individual Page is queried', 'gutenberg' ),
 		),
 		'archive'        => array(
-			'title'       => _x( 'Default Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied to archives like your posts page, categories, or tags', 'gutenberg' ),
+			'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when multiple entries are queried. This template will be overridden the Category, Author, and Date templates where appropriate', 'gutenberg' ),
 		),
 		'author'         => array(
-			'title'       => _x( 'Default Author Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts by a single author', 'gutenberg' ),
+			'title'       => _x( 'Author Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a list of Posts from a single author is queried', 'gutenberg' ),
 		),
 		'category'       => array(
-			'title'       => _x( 'Default Post Category Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts in a category', 'gutenberg' ),
+			'title'       => _x( 'Post Category Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a list of Posts from a category is queried', 'gutenberg' ),
 		),
 		'taxonomy'       => array(
-			'title'       => _x( 'Default Taxonomy Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts in a taxonomy', 'gutenberg' ),
+			'title'       => _x( 'Taxonomy Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a list of posts from a taxonomy is queried', 'gutenberg' ),
 		),
 		'date'           => array(
-			'title'       => _x( 'Default Date Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts in a date range', 'gutenberg' ),
+			'title'       => _x( 'Date Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a list of Posts from a certain date are queried', 'gutenberg' ),
 		),
 		'tag'            => array(
-			'title'       => _x( 'Default Tag Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts with a tag', 'gutenberg' ),
+			'title'       => _x( 'Tag Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a list of Posts with a certain tag is queried', 'gutenberg' ),
 		),
 		'attachment'     => array(
 			'title'       => __( 'Media', 'gutenberg' ),
-			'description' => __( 'Displays media content', 'gutenberg' ),
+			'description' => __( 'Used when a Media entry is queried', 'gutenberg' ),
 		),
 		'search'         => array(
-			'title'       => __( 'Search Results', 'gutenberg' ),
-			'description' => __( 'Applied to search results', 'gutenberg' ),
+			'title'       => _x( 'Search Results', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when a visitor searches the site', 'gutenberg' ),
 		),
 		'privacy-policy' => array(
 			'title'       => __( 'Privacy Policy', 'gutenberg' ),
 			'description' => '',
 		),
 		'404'            => array(
-			'title'       => _x( '404 (Not Found)', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied when content cannot be found', 'gutenberg' ),
+			'title'       => _x( '404', 'Template name', 'gutenberg' ),
+			'description' => __( 'Used when the queried content cannot be found', 'gutenberg' ),
 		),
 	);
 

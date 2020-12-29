@@ -1,7 +1,5 @@
 .edit-post-visual-editor {
 	position: relative;
-	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
-	background-color: $white;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
@@ -27,20 +25,16 @@
 	}
 }
 
-.editor-styles-wrapper,
-.editor-styles-wrapper > .block-editor-writing-flow__click-redirect {
-	height: 100%;
-}
+.editor-styles-wrapper {
+	// Default background color so that grey .edit-post-editor-regions__content
+	// color doesn't show through.
+	background-color: $white;
 
-.edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	// Allow the page to be scrolled with the last block in the middle.
-	min-height: 40vh;
-	width: 100%;
-}
+	cursor: text;
 
-// Hide the extra space when there are metaboxes.
-.has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	height: 0;
+	> * {
+		cursor: auto;
+	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
@@ -58,6 +52,6 @@
 		// Apply default block margin below the post title.
 		// This ensures the first block on the page is in a good position.
 		// This rule can be retired once the title becomes an actual block.
-		margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
+		margin-bottom: $default-block-margin;
 	}
 }

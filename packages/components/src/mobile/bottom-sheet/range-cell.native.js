@@ -34,7 +34,7 @@ class BottomSheetRangeCell extends Component {
 		this.onCellPress = this.onCellPress.bind( this );
 
 		const { value, defaultValue, minimumValue } = props;
-		const initialValue = value || defaultValue || minimumValue;
+		const initialValue = Number( value || defaultValue || minimumValue );
 
 		this.state = {
 			accessible: true,
@@ -66,11 +66,12 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onChange( nextValue ) {
-		const { onChange } = this.props;
+		const { onChange, onComplete } = this.props;
 		this.setState( {
 			sliderValue: nextValue,
 		} );
 		onChange( nextValue );
+		onComplete( nextValue );
 	}
 
 	render() {
@@ -89,6 +90,7 @@ class BottomSheetRangeCell extends Component {
 			thumbTintColor = ! isIOS && '#00669b',
 			preview,
 			cellContainerStyle,
+			onComplete,
 			shouldDisplayTextInput = true,
 			children,
 			decimalNum,
@@ -146,6 +148,7 @@ class BottomSheetRangeCell extends Component {
 						maximumTrackTintColor={ maximumTrackTintColor }
 						thumbTintColor={ thumbTintColor }
 						onValueChange={ this.onChangeValue }
+						onSlidingComplete={ onComplete }
 						ref={ ( slider ) => {
 							this.sliderRef = slider;
 						} }

@@ -10,8 +10,6 @@ import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-const STORE_NAME = 'core/notices';
-
 /**
  * Store definition for the notices namespace.
  *
@@ -19,7 +17,7 @@ const STORE_NAME = 'core/notices';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore( 'core/notices', {
 	reducer,
 	actions,
 	selectors,

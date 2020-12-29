@@ -13,9 +13,6 @@
 		"emitDeclarationOnly": true,
 		"isolatedModules": true,
 
-		/* Prevent type-only imports from impacting the dependency graph */
-		"importsNotUsedAsValues": "error",
-
 		/* Strict Type-Checking Options */
 		"strict": true,
 
@@ -40,8 +37,8 @@
 		"**/*.ios.js",
 		"**/*.native.js",
 		"**/benchmark",
-		"**/build-*/**",
-		"**/build/**",
+		"packages/*/build-*/**",
+		"packages/*/build/**",
 		"**/test/**",
 		"packages/**/react-native-*/**"
 	]
