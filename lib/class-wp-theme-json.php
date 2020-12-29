@@ -493,10 +493,24 @@ class WP_Theme_JSON {
 				if ( 'gradient' === $property ) {
 					$name = 'background';
 				}
-				$result = safecss_filter_attr( "$name: $value" );
 
-				if ( '' === $result ) {
-					unset( $input[ $key ][ $property ] );
+				if ( is_array( $value ) ) {
+					foreach( $value as $subproperty => $subvalue ) {
+						$result_subproperty = safecss_filter_attr( "$name: $subvalue" );
+						if ( '' !== $result_subproperty ) {
+							$result[ $subproperty ] = $result_subproperty;
+						}
+					}
+
+					if ( empty( $result ) ) {
+						unset( $input[ $key ][ $property ] );
+					}
+				} else {
+					$result = safecss_filter_attr( "$name: $value" );
+
+					if ( '' === $result ) {
+						unset( $input[ $key ][ $property ] );
+					}
 				}
 			}
 		}
