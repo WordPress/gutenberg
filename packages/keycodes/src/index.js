@@ -24,7 +24,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { isAppleOS } from './platform';
 
-/** @typedef {'alt' | 'ctrl' | 'meta' | 'shift'} WPModifierPart */
+/** @typedef {typeof ALT | CTRL | COMMAND | SHIFT } WPModifierPart */
 
 /** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt'} WPKeycodeModifier */
 
