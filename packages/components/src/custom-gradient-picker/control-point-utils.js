@@ -6,6 +6,8 @@
  * @property {number} position Integer position of the control point as a percentage.
  */
 
+import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
+
 /**
  * Color as parsed from the gradient by gradient-parser.
  *
@@ -42,7 +44,7 @@ export function isOverlapping(
 	value,
 	initialIndex,
 	newPosition,
-	minDistance = 0
+	minDistance = MINIMUM_DISTANCE_BETWEEN_POINTS
 ) {
 	const initialPosition = value[ initialIndex ].position;
 	const minPosition = Math.min( initialPosition, newPosition );
