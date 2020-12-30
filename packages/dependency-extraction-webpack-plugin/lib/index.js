@@ -196,12 +196,14 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			const runtimeChunk = entrypoint.getRuntimeChunk();
+			const entrypointChunk = isWebpack4
+				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
+				: entrypoint.getEntrypointChunk();
 
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: runtimeChunk.hash,
+				version: entrypointChunk.hash,
 			};
 
 			const assetString = this.stringify( assetData );
@@ -211,7 +213,7 @@ class DependencyExtractionWebpackPlugin {
 			const buildFilename = compilation.getPath(
 				compiler.options.output.filename,
 				{
-					chunk: runtimeChunk,
+					chunk: entrypointChunk,
 					filename,
 					query,
 					basename: basename( filename ),
@@ -233,7 +235,9 @@ class DependencyExtractionWebpackPlugin {
 
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource( assetString );
-			runtimeChunk.files[ isWebpack4 ? 'push' : 'add' ]( assetFilename );
+			entrypointChunk.files[ isWebpack4 ? 'push' : 'add' ](
+				assetFilename
+			);
 		}
 
 		if ( combineAssets ) {
