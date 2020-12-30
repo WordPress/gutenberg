@@ -77,6 +77,7 @@ const LABEL_MAPPING = {
 	'[Package] E2E Test Utils': 'Tools',
 	'[Package] Env': 'Tools',
 	'[Package] ESLint plugin': 'Tools',
+	'[Package] stylelint config': 'Tools',
 	'[Package] Project management automation': 'Tools',
 	'[Type] Project Management': 'Tools',
 	'[Package] Scripts': 'Tools',
