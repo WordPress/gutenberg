@@ -242,11 +242,16 @@ export function getBlockAttribute(
 	let value;
 
 	switch ( attributeSchema.source ) {
-		// undefined source means that it's an attribute serialized to the block's "comment"
+		// undefined source means that it's an attribute serialized to the
+		// block's "comment"
 		case undefined:
 			value = commentAttributes
 				? commentAttributes[ attributeKey ]
 				: undefined;
+			break;
+		// raw source means that it's the original raw block content.
+		case 'raw':
+			value = innerHTML;
 			break;
 		case 'attribute':
 		case 'property':
