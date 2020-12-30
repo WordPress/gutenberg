@@ -6,6 +6,7 @@ const fs = require( 'fs' );
 const semver = require( 'semver' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
+const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -518,13 +519,27 @@ async function runUpdateTrunkContentStep(
 			newReadmeFileContent.replace( STABLE_TAG_PLACEHOLDER, stableTag )
 		);
 
+		let xargsOpts = '';
+		if ( os.platform === 'linux' ) {
+			// When xargs receives no arguments, it behaves differently in macOS and linux:
+			// - macOS: doesn't run
+			// - linux: run without arguments
+			//
+			// In linux, the -r option teaches xargs not to run if it receives no arguments.
+			xargsOpts = '-r';
+		}
+
 		// Commit the content changes
 		runShellScript(
-			"svn st | grep '^?' | awk '{print $2}' | xargs svn add",
+			"svn st | grep '^?' | awk '{print $2}' | xargs " +
+				xargsOpts +
+				' svn add',
 			svnWorkingDirectoryPath
 		);
 		runShellScript(
-			"svn st | grep '^!' | awk '{print $2}' | xargs svn rm",
+			"svn st | grep '^!' | awk '{print $2}' | xargs " +
+				xargsOpts +
+				' svn rm',
 			svnWorkingDirectoryPath
 		);
 		await askForConfirmation(

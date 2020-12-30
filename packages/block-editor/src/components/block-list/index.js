@@ -121,6 +121,7 @@ function Items( {
 						value={ ! isBlockInSelection }
 					>
 						<BlockListBlock
+							rootClientId={ rootClientId }
 							clientId={ clientId }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode

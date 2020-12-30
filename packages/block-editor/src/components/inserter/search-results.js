@@ -140,6 +140,7 @@ function InserterSearchResults( {
 							shownPatterns={ currentShownPatterns }
 							blockPatterns={ filteredBlockPatterns }
 							onClickPattern={ onSelectBlockPattern }
+							isDraggable={ isDraggable }
 						/>
 					</div>
 				</InserterPanel>
