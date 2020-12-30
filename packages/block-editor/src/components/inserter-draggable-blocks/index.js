@@ -7,7 +7,7 @@ import { Draggable } from '@wordpress/components';
  */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
 
-const InserterListItemDraggable = ( { isEnabled, blocks, icon, children } ) => {
+const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
 	const transferData = {
 		type: 'inserter',
 		blocks,
@@ -31,4 +31,4 @@ const InserterListItemDraggable = ( { isEnabled, blocks, icon, children } ) => {
 	);
 };
 
-export default InserterListItemDraggable;
+export default InserterDraggableBlocks;

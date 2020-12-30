@@ -112,6 +112,7 @@ function BlockPatternsCategory( {
 						shownPatterns={ currentShownPatterns }
 						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
+						isDraggable
 					/>
 				</PatternInserterPanel>
 			) }
