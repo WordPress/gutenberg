@@ -116,6 +116,11 @@ export class InserterMenu extends Component {
 		this.setState( { numberOfColumns, itemWidth, maxWidth } );
 	}
 
+	/**
+	 * Processes the inserter items to check
+	 * if there's any copied block in the clipboard
+	 * to add it as an extra item
+	 */
 	getItems() {
 		const {
 			items,
@@ -162,6 +167,7 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { numberOfColumns } = this.state;
+		const items = this.getItems();
 
 		return (
 			<BottomSheet
@@ -178,7 +184,7 @@ export class InserterMenu extends Component {
 								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
 								keyboardShouldPersistTaps="always"
 								numColumns={ numberOfColumns }
-								data={ this.getItems() }
+								data={ items }
 								ItemSeparatorComponent={ () => (
 									<TouchableWithoutFeedback
 										accessible={ false }
