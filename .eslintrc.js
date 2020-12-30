@@ -169,9 +169,15 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ '@(bin|docs)/**/*.js', '*.js' ],
 			rules: {
 				'no-console': 'off',
+				'import/no-extraneous-dependencies': [
+					'error',
+					{
+						devDependencies: true,
+					},
+				],
 			},
 		},
 	],
