@@ -12,7 +12,11 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	toggleGlobalBlockInserter,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
+
+const reusableBlockNameInputSelector =
+	'.block-editor-block-inspector .components-text-control__input';
 
 const saveAll = async () => {
 	await page.click( '.editor-post-publish-button__button.has-changes-dot' );
@@ -50,10 +54,17 @@ const createReusableBlock = async ( content, title ) => {
 		'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 	);
 
+	// Check that we have a reusable block on the page
+	const block = await page.waitForSelector(
+		'.block-editor-block-list__block[data-type="core/block"]'
+	);
+	expect( block ).not.toBeNull();
+
+	await openDocumentSettingsSidebar();
+	const nameInput = await page.waitForSelector(
+		reusableBlockNameInputSelector
+	);
 	if ( title ) {
-		const nameInput = await page.waitForSelector(
-			'.block-library-block__reusable-block-container .components-text-control__input'
-		);
 		await nameInput.click();
 
 		// Select all of the text in the title field.
@@ -62,12 +73,6 @@ const createReusableBlock = async ( content, title ) => {
 		// Give the reusable block a title
 		await page.keyboard.type( title );
 	}
-
-	// Check that we have a reusable block on the page
-	const block = await page.waitForSelector(
-		'.block-editor-block-list__block[data-type="core/block"]'
-	);
-	expect( block ).not.toBeNull();
 };
 
 describe( 'Reusable blocks', () => {
@@ -85,11 +90,9 @@ describe( 'Reusable blocks', () => {
 
 	it( 'can be created with no title', async () => {
 		await createReusableBlock( 'Hello there!' );
-		await page.waitForSelector(
-			'.block-library-block__reusable-block-container .components-text-control__input'
-		);
+		await openDocumentSettingsSidebar();
 		const title = await page.$eval(
-			'.block-library-block__reusable-block-container .components-text-control__input',
+			reusableBlockNameInputSelector,
 			( element ) => element.value
 		);
 		expect( title ).toBe( 'Untitled Reusable Block' );
@@ -104,17 +107,18 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Greeting block' );
 
 		// Change the block's title
+		await openDocumentSettingsSidebar();
 		const nameInput = await page.waitForSelector(
-			'.block-library-block__reusable-block-container .components-text-control__input'
+			reusableBlockNameInputSelector
 		);
 		await nameInput.click();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'Surprised greeting block' );
 
-		// Tab to navigate to the block's content
-		await page.keyboard.press( 'Tab' );
-
 		// Quickly focus the paragraph block
+		await page.click(
+			'.block-editor-block-list__block[data-type="core/block"] p'
+		);
 		await page.keyboard.press( 'Escape' ); // Enter navigation mode
 		await page.keyboard.press( 'Enter' ); // Enter edit mode
 
@@ -166,11 +170,9 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Awesome block' );
 
 		// Check the title.
-		await page.waitForSelector(
-			'.block-library-block__reusable-block-container .components-text-control__input'
-		);
+		await openDocumentSettingsSidebar();
 		const title = await page.$eval(
-			'.block-library-block__reusable-block-container .components-text-control__input',
+			reusableBlockNameInputSelector,
 			( element ) => element.value
 		);
 		expect( title ).toBe( 'Awesome block' );
@@ -199,8 +201,9 @@ describe( 'Reusable blocks', () => {
 		);
 
 		// Set title.
+		await openDocumentSettingsSidebar();
 		const nameInput = await page.waitForSelector(
-			'.block-library-block__reusable-block-container .components-text-control__input'
+			reusableBlockNameInputSelector
 		);
 		await nameInput.click();
 		await pressKeyWithModifier( 'primary', 'a' );
