@@ -154,7 +154,7 @@ export default function ReusableBlockEdit( {
 				</View>
 				<>
 					<BottomSheet.Cell
-						label={ __( 'Edit block in web browser' ) }
+						label={ __( 'Edit using web editor' ) }
 						separatorType="topFullWidth"
 						onPress={ requestFallback }
 						labelStyle={ actionButtonStyle }
