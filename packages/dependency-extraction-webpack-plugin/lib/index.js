@@ -28,6 +28,7 @@ class DependencyExtractionWebpackPlugin {
 				externalizedReport: false,
 				injectPolyfill: false,
 				outputFormat: 'php',
+				outputFilename: null,
 				useDefaults: true,
 			},
 			options
@@ -143,6 +144,7 @@ class DependencyExtractionWebpackPlugin {
 			externalizedReport,
 			injectPolyfill,
 			outputFormat,
+			outputFilename,
 		} = this.options;
 
 		// Dump actually externalized dependencies to a report file.
@@ -228,10 +230,24 @@ class DependencyExtractionWebpackPlugin {
 				continue;
 			}
 
-			const assetFilename = buildFilename.replace(
-				/\.js$/i,
-				'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
-			);
+			let assetFilename;
+
+			if ( outputFilename ) {
+				assetFilename = compilation.getPath( outputFilename, {
+					chunk: entrypointChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash: createHash( 'md4' )
+						.update( assetString )
+						.digest( 'hex' ),
+				} );
+			} else {
+				assetFilename = buildFilename.replace(
+					/\.js$/i,
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
+			}
 
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource( assetString );
