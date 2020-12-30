@@ -11,10 +11,11 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
+	InspectorControls,
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarGroup } from '@wordpress/components';
+import { PanelBody, TextControl, ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ function HeadingEdit( {
 	onReplace,
 	mergedStyle,
 } ) {
-	const { textAlign, content, level, placeholder } = attributes;
+	const { anchor, textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -55,6 +56,18 @@ function HeadingEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Advanced' ) }>
+					<TextControl
+						label={ __( 'HTML Anchor' ) }
+						value={ anchor || '' }
+						valuePlaceholder={ __( 'None' ) }
+						onChangeValue={ ( value ) =>
+							setAttributes( { anchor: value } )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<RichText
 				identifier="content"
 				tagName={ tagName }
