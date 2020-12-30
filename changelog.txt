@@ -1,5 +1,91 @@
 == Changelog ==
 
+= 9.7.0-rc.1 =
+
+### Features
+
+- Support drag and dropping block patterns from the inserter. ([27927](https://github.com/WordPress/gutenberg/pull/27927))
+
+### Enhancements
+
+- Improve the Reusable Blocks UI by relying on multi entity save flow. ([27887](https://github.com/WordPress/gutenberg/pull/27887))
+- Show the insertion point indicator bellow the inbetween inserter. ([27842](https://github.com/WordPress/gutenberg/pull/27842))
+- URL: RemoveQueryArgs should remove the ? char after removing all args. ([27812](https://github.com/WordPress/gutenberg/pull/27812))
+- URL: Enhance the way long URLs are handled in filterURLForDisplay. ([27530](https://github.com/WordPress/gutenberg/pull/27530))
+- ComboboxControl: Updated component to deburr options labels before filter. ([26611](https://github.com/WordPress/gutenberg/pull/26611))
+
+### New APIs
+
+- Create block: Allow to list npm packages to be installed in the template. ([27880](https://github.com/WordPress/gutenberg/pull/27880))
+- Display Block Information by matching block variations. ([27469](https://github.com/WordPress/gutenberg/pull/27469))
+
+### Bug Fixes
+
+- Don't ignore extra edits made in the server when saving posts. ([27929](https://github.com/WordPress/gutenberg/pull/27929))
+- Allow using multiple controlled inner blocks refering to the same entity. ([27885](https://github.com/WordPress/gutenberg/pull/27885))
+- Remove  the animation of post publish button during autosaving. ([27874](https://github.com/WordPress/gutenberg/pull/27874))
+- Remove default style information from the documentation. ([27811](https://github.com/WordPress/gutenberg/pull/27811))
+- Storybook: Fix broken import statements for DateTime component. ([27794](https://github.com/WordPress/gutenberg/pull/27794))
+- Pattern Inserter: Fix bug where the inserter cannot be closed if the user changes pattern category. ([27792](https://github.com/WordPress/gutenberg/pull/27792))
+- Create Block: Another try to fix support for external templates. ([27784](https://github.com/WordPress/gutenberg/pull/27784))
+- LinkControl: Fix horizontal scrollbar within block toolbar. ([27777](https://github.com/WordPress/gutenberg/pull/27777))
+- Create Block: Fix support for external templates hosted on npm. ([27776](https://github.com/WordPress/gutenberg/pull/27776))
+- Fix for bug  #21989, #21650. ([27691](https://github.com/WordPress/gutenberg/pull/27691))
+- HTML Block: Fix editor styles. ([27627](https://github.com/WordPress/gutenberg/pull/27627))
+- Fix: Text color dropdown not showing up after clicking for the first time. ([27596](https://github.com/WordPress/gutenberg/pull/27596))
+
+### Experiments
+
+- Site Logo: Remove duplicate link. ([27924](https://github.com/WordPress/gutenberg/pull/27924))
+- Post excerpt block: Fix incorrect quotes for the class attribute in the wrapper. ([27895](https://github.com/WordPress/gutenberg/pull/27895))
+- Refactor the edit-site store to clarify the purpose of templateId and templatePartId. ([27839](https://github.com/WordPress/gutenberg/pull/27839))
+- Add support for custom templates in FSE themes. ([27778](https://github.com/WordPress/gutenberg/pull/27778))
+- RSS Block: Add border-box CSS. ([27767](https://github.com/WordPress/gutenberg/pull/27767))
+- Add padding control to the Global Styles sidebar. ([27154](https://github.com/WordPress/gutenberg/pull/27154))
+- Navigation block: Fix the text color for links in the navigation block. ([26698](https://github.com/WordPress/gutenberg/pull/26698))
+
+### Documentation
+
+- Fix: OpenURLPopover bind typo (DOCS). ([27909](https://github.com/WordPress/gutenberg/pull/27909))
+- Improve documentation for withNotices HOC in components package. ([27863](https://github.com/WordPress/gutenberg/pull/27863))
+- Docs: Fix typos in components package. ([27799](https://github.com/WordPress/gutenberg/pull/27799))
+- Add ContrastChecker component readme (block-editor). ([25570](https://github.com/WordPress/gutenberg/pull/25570))
+
+### Code Quality
+
+- Use a consistent way to check isRTL. ([27838](https://github.com/WordPress/gutenberg/pull/27838))
+- Update the minimum required WordPress version to 5.5. ([27807](https://github.com/WordPress/gutenberg/pull/27807))
+- Remove unused redux-optimist dependency. ([27798](https://github.com/WordPress/gutenberg/pull/27798))
+- Storybook: Perform cleanup in the Storybook setup. ([27786](https://github.com/WordPress/gutenberg/pull/27786))
+- Raw handling: Remove duplicate code. ([27758](https://github.com/WordPress/gutenberg/pull/27758))
+- Refactor BlockSwitcher - make function component and new specific selector `getBlockTransformItems`. ([27674](https://github.com/WordPress/gutenberg/pull/27674))
+
+### Tools
+
+- Code quality: Remove overrides for JSDoc rules downgraded to warnings (take 2). ([27912](https://github.com/WordPress/gutenberg/pull/27912))
+- Fix svn add/rm commands for release tool. ([27886](https://github.com/WordPress/gutenberg/pull/27886))
+- Include block CSS in the plugin ZIP. ([27884](https://github.com/WordPress/gutenberg/pull/27884))
+- Code quality: Remove overrides for JSDoc rules downgraded to warnings. ([27879](https://github.com/WordPress/gutenberg/pull/27879))
+- Make end to end tests do not rely on font size picker classes. ([27825](https://github.com/WordPress/gutenberg/pull/27825))
+- Remove expect.assertions count from multi-entity-saving tests. ([27818](https://github.com/WordPress/gutenberg/pull/27818))
+- [e2e tests]: Fix assertions number check. ([27802](https://github.com/WordPress/gutenberg/pull/27802))
+- Testing: Remove axe verification executed after every test case. ([26626](https://github.com/WordPress/gutenberg/pull/26626))
+- Add new package `@wordpress/stylelint config`. ([22777](https://github.com/WordPress/gutenberg/pull/22777))
+- Keycodes: Add, enhance types. ([19520](https://github.com/WordPress/gutenberg/pull/19520))
+
+### Various
+
+- Show all taxonomies in Tag Cloud block. ([27930](https://github.com/WordPress/gutenberg/pull/27930))
+- Revert "Code quality: Remove overrides for JSDoc rules downgraded to warnings". ([27908](https://github.com/WordPress/gutenberg/pull/27908))
+- Update: Improve font size end to end tests to work with input changes on blur. ([27871](https://github.com/WordPress/gutenberg/pull/27871))
+- Add block transforms preview. ([27861](https://github.com/WordPress/gutenberg/pull/27861))
+- Add additional information about lock inheritance. ([27834](https://github.com/WordPress/gutenberg/pull/27834))
+- Rich Text: Replace store name string with exposed store definition. ([27820](https://github.com/WordPress/gutenberg/pull/27820))
+- Storybook: Updgrade to the latest version. ([27813](https://github.com/WordPress/gutenberg/pull/27813))
+- Update Twenty Twenty-One theme references. ([27770](https://github.com/WordPress/gutenberg/pull/27770))
+
+
+
 = 9.6.2 =
 
 ### Bug Fixes
