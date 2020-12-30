@@ -12,30 +12,27 @@ import {
 	Spinner,
 	ToolbarGroup,
 	ToolbarButton,
+	TextControl,
+	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InnerBlocks,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
-import ReusableBlockEditPanel from './edit-panel';
 
-export default function ReusableBlockEdit( {
-	attributes: { ref },
-	clientId,
-	isSelected,
-} ) {
+export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const recordArgs = [ 'postType', 'wp_block', ref ];
 
-	const { reusableBlock, hasResolved, hasInnerBlockSelected } = useSelect(
+	const { reusableBlock, hasResolved } = useSelect(
 		( select ) => ( {
 			reusableBlock: select( coreStore ).getEditedEntityRecord(
 				...recordArgs
@@ -44,9 +41,6 @@ export default function ReusableBlockEdit( {
 				'getEditedEntityRecord',
 				recordArgs
 			),
-			hasInnerBlockSelected: select(
-				blockEditorStore
-			).hasSelectedInnerBlock( clientId, true ),
 		} ),
 		[ ref, clientId ]
 	);
@@ -112,15 +106,16 @@ export default function ReusableBlockEdit( {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-
-			<div className="block-library-block__reusable-block-container">
-				{ ( isSelected || hasInnerBlockSelected ) && (
-					<ReusableBlockEditPanel
+			<InspectorControls>
+				<PanelBody>
+					<TextControl
+						label={ __( 'Name' ) }
 						title={ title }
 						onChange={ setTitle }
 					/>
-				) }
-
+				</PanelBody>
+			</InspectorControls>
+			<div className="block-library-block__reusable-block-container">
 				{ <div { ...innerBlocksProps } /> }
 			</div>
 		</div>
