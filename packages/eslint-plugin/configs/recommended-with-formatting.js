@@ -20,7 +20,6 @@ module.exports = {
 		'import/no-extraneous-dependencies': [
 			'error',
 			{
-				devDependencies: false,
 				peerDependencies: true,
 			},
 		],
@@ -31,29 +30,11 @@ module.exports = {
 			// Unit test files and their helpers only.
 			files: [ '**/@(test|__tests__)/**/*.js', '**/?(*.)test.js' ],
 			extends: [ require.resolve( './test-unit.js' ) ],
-			rules: {
-				'import/no-extraneous-dependencies': [
-					'error',
-					{
-						devDependencies: true,
-						peerDependencies: true,
-					},
-				],
-			},
 		},
 		{
 			// End-to-end test files and their helpers only.
 			files: [ '**/specs/**/*.js', '**/?(*.)spec.js' ],
 			extends: [ require.resolve( './test-e2e.js' ) ],
-			rules: {
-				'import/no-extraneous-dependencies': [
-					'error',
-					{
-						devDependencies: true,
-						peerDependencies: true,
-					},
-				],
-			},
 		},
 	],
 };
