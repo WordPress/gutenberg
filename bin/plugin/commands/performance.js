@@ -205,8 +205,8 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {WPPerformanceCommandOptions} options Command options.
  * @param {string[]}                    branches Branches to compare
+ * @param {WPPerformanceCommandOptions} options Command options.
  */
 async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.
