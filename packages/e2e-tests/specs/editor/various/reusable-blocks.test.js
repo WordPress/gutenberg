@@ -12,7 +12,68 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	toggleGlobalBlockInserter,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
+
+const reusableBlockNameInputSelector =
+	'.block-editor-block-inspector .components-text-control__input';
+
+const saveAll = async () => {
+	await page.click( '.editor-post-publish-button__button.has-changes-dot' );
+	await page.waitForSelector(
+		'button.editor-entities-saved-states__save-button'
+	);
+	await page.click( 'button.editor-entities-saved-states__save-button' );
+
+	// no need to publish the post.
+	const cancelPublish = await page.waitForSelector(
+		'.editor-post-publish-panel__header-cancel-button button'
+	);
+	await cancelPublish.click();
+};
+
+const clearAllBlocks = async () => {
+	// Remove all blocks from the post so that we're working with a clean slate
+	await page.evaluate( () => {
+		const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+		const clientIds = blocks.map( ( block ) => block.clientId );
+		wp.data.dispatch( 'core/block-editor' ).removeBlocks( clientIds );
+	} );
+};
+
+const createReusableBlock = async ( content, title ) => {
+	// Insert a paragraph block
+	await insertBlock( 'Paragraph' );
+	await page.keyboard.type( content );
+
+	await clickBlockToolbarButton( 'More options' );
+	await clickMenuItem( 'Add to Reusable blocks' );
+
+	// Wait for creation to finish
+	await page.waitForXPath(
+		'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+	);
+
+	// Check that we have a reusable block on the page
+	const block = await page.waitForSelector(
+		'.block-editor-block-list__block[data-type="core/block"]'
+	);
+	expect( block ).not.toBeNull();
+
+	await openDocumentSettingsSidebar();
+	const nameInput = await page.waitForSelector(
+		reusableBlockNameInputSelector
+	);
+	if ( title ) {
+		await nameInput.click();
+
+		// Select all of the text in the title field.
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		// Give the reusable block a title
+		await page.keyboard.type( title );
+	}
+};
 
 describe( 'Reusable blocks', () => {
 	beforeAll( async () => {
@@ -24,112 +85,40 @@ describe( 'Reusable blocks', () => {
 	} );
 
 	beforeEach( async () => {
-		// Remove all blocks from the post so that we're working with a clean slate
-		await page.evaluate( () => {
-			const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
-			const clientIds = blocks.map( ( block ) => block.clientId );
-			wp.data.dispatch( 'core/block-editor' ).removeBlocks( clientIds );
-		} );
-	} );
-
-	it( 'can be created', async () => {
-		// Insert a paragraph block
-		await insertBlock( 'Paragraph' );
-		await page.keyboard.type( 'Hello there!' );
-
-		await clickBlockToolbarButton( 'More options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
-
-		// Wait for creation to finish
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
-		);
-		await page.waitForXPath(
-			'//*[@class="block-library-block__reusable-block-container"]'
-		);
-
-		// Select all of the text in the title field.
-		await pressKeyWithModifier( 'primary', 'a' );
-
-		// Give the reusable block a title
-		await page.keyboard.type( 'Greeting block' );
-
-		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
-		await saveButton.click();
-
-		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
-
-		// Check that we have a reusable block on the page
-		const block = await page.$(
-			'.block-editor-block-list__block[data-type="core/block"]'
-		);
-		expect( block ).not.toBeNull();
-
-		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Greeting block' );
+		await clearAllBlocks();
 	} );
 
 	it( 'can be created with no title', async () => {
-		// Insert a paragraph block
-		await insertBlock( 'Paragraph' );
-		await page.keyboard.type( 'Hello there!' );
-
-		await clickBlockToolbarButton( 'More options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
-
-		// Wait for creation to finish
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
-		);
-		await page.waitForXPath(
-			'//*[@class="block-library-block__reusable-block-container"]'
-		);
-
-		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
-		await saveButton.click();
-
-		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
-
-		// Check that we have a reusable block on the page
-		const block = await page.$(
-			'.block-editor-block-list__block[data-type="core/block"]'
-		);
-		expect( block ).not.toBeNull();
-
-		// Check that it is untitled
+		await createReusableBlock( 'Hello there!' );
+		await openDocumentSettingsSidebar();
 		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
+			reusableBlockNameInputSelector,
+			( element ) => element.value
 		);
 		expect( title ).toBe( 'Untitled Reusable Block' );
 	} );
 
-	it( 'can be inserted and edited', async () => {
+	it( 'can be created, inserted, edited and converted to a regular block.', async () => {
+		await createReusableBlock( 'Hello there!', 'Greeting block' );
+		await saveAll();
+		await clearAllBlocks();
+
 		// Insert the reusable block we created above
 		await insertReusableBlock( 'Greeting block' );
 
-		// Put the reusable block in edit mode
-		const editButton = await page.waitForXPath(
-			'//button[text()="Edit" and not(@disabled)]'
-		);
-		await editButton.click();
-
 		// Change the block's title
+		await openDocumentSettingsSidebar();
+		const nameInput = await page.waitForSelector(
+			reusableBlockNameInputSelector
+		);
+		await nameInput.click();
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'Surprised greeting block' );
 
-		// Tab three times to navigate to the block's content
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-
 		// Quickly focus the paragraph block
+		await page.click(
+			'.block-editor-block-list__block[data-type="core/block"] p'
+		);
 		await page.keyboard.press( 'Escape' ); // Enter navigation mode
 		await page.keyboard.press( 'Enter' ); // Enter edit mode
 
@@ -137,24 +126,7 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Oh! ' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
-		await saveButton.click();
-
-		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
-
-		// Check that we have a reusable block on the page
-		const block = await page.$(
-			'.block-editor-block-list__block[data-type="core/block"]'
-		);
-		expect( block ).not.toBeNull();
-
-		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Surprised greeting block' );
+		await saveAll();
 
 		// Check that its content is up to date
 		const text = await page.$eval(
@@ -162,58 +134,9 @@ describe( 'Reusable blocks', () => {
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
-	} );
 
-	it( 'can be inserted after refresh', async () => {
-		// Step 1. Insert a paragraph block
+		await clearAllBlocks();
 
-		await insertBlock( 'Paragraph' );
-		await page.keyboard.type( 'Awesome Paragraph' );
-
-		await clickBlockToolbarButton( 'More options' );
-		await clickMenuItem( 'Add to Reusable blocks' );
-
-		// Wait for creation to finish
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
-		);
-		await page.waitForXPath(
-			'//*[@class="block-library-block__reusable-block-container"]'
-		);
-
-		// Select all of the text in the title field.
-		await pressKeyWithModifier( 'primary', 'a' );
-
-		// Give the reusable block a title
-		await page.keyboard.type( 'Awesome block' );
-
-		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
-		await saveButton.click();
-
-		// Step 2. Create new post.
-
-		await createNewPost();
-
-		// Step 3. Insert the block created in Step 1.
-
-		await insertReusableBlock( 'Awesome block' );
-
-		// Check that we have a reusable block on the page
-		const block = await page.$(
-			'.block-editor-block-list__block[data-type="core/block"]'
-		);
-		expect( block ).not.toBeNull();
-
-		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Awesome block' );
-	} );
-
-	it( 'can be converted to a regular block', async () => {
 		// Insert the reusable block we edited above
 		await insertReusableBlock( 'Surprised greeting block' );
 
@@ -221,20 +144,41 @@ describe( 'Reusable blocks', () => {
 		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
 
 		// Check that we have a paragraph block on the page
-		const block = await page.$(
+		const paragraphBlock = await page.$(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
-		expect( block ).not.toBeNull();
+		expect( paragraphBlock ).not.toBeNull();
 
 		// Check that its content is up to date
-		const text = await page.$eval(
+		const paragraphContent = await page.$eval(
 			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
-		expect( text ).toMatch( 'Oh! Hello there!' );
+		expect( paragraphContent ).toMatch( 'Oh! Hello there!' );
 	} );
 
-	it( 'can be created from multiselection', async () => {
+	it( 'can be inserted after refresh', async () => {
+		await createReusableBlock( 'Awesome Paragraph', 'Awesome block' );
+
+		// Save the reusable block
+		await saveAll();
+
+		// Step 2. Create new post.
+		await createNewPost();
+
+		// Step 3. Insert the block created in Step 1.
+		await insertReusableBlock( 'Awesome block' );
+
+		// Check the title.
+		await openDocumentSettingsSidebar();
+		const title = await page.$eval(
+			reusableBlockNameInputSelector,
+			( element ) => element.value
+		);
+		expect( title ).toBe( 'Awesome block' );
+	} );
+
+	it( 'can be created from multiselection and converted back to regular blocks', async () => {
 		await createNewPost();
 
 		// Insert a Two paragraphs block
@@ -255,38 +199,21 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
-		await page.waitForXPath(
-			'//*[@class="block-library-block__reusable-block-container"]'
+
+		// Set title.
+		await openDocumentSettingsSidebar();
+		const nameInput = await page.waitForSelector(
+			reusableBlockNameInputSelector
 		);
-
-		// Select all of the text in the title field.
+		await nameInput.click();
 		await pressKeyWithModifier( 'primary', 'a' );
-
-		// Give the reusable block a title
 		await page.keyboard.type( 'Multi-selection reusable block' );
 
 		// Save the reusable block
-		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
-		await saveButton.click();
+		await saveAll();
 
-		// Wait for saving to finish
-		await page.waitForXPath( '//button[text()="Edit"]' );
+		await clearAllBlocks();
 
-		// Check that we have a reusable block on the page
-		const block = await page.$(
-			'.block-editor-block-list__block[data-type="core/block"]'
-		);
-		expect( block ).not.toBeNull();
-
-		// Check that its title is displayed
-		const title = await page.$eval(
-			'.reusable-block-edit-panel__info',
-			( element ) => element.innerText
-		);
-		expect( title ).toBe( 'Multi-selection reusable block' );
-	} );
-
-	it( 'multi-selection reusable block can be converted back to regular blocks', async () => {
 		// Insert the reusable block we edited above
 		await insertReusableBlock( 'Multi-selection reusable block' );
 
@@ -298,12 +225,18 @@ describe( 'Reusable blocks', () => {
 	} );
 
 	it( 'will not break the editor if empty', async () => {
-		await insertReusableBlock( 'Awesome block' );
+		await createReusableBlock(
+			'Awesome Paragraph',
+			'Random reusable block'
+		);
+		await saveAll();
+		await clearAllBlocks();
+		await insertReusableBlock( 'Random reusable block' );
 
 		await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
 
 		const [ editButton ] = await page.$x(
-			`//a[contains(@aria-label, 'Awesome block')]`
+			`//a[contains(@aria-label, 'Random reusable block')]`
 		);
 		await editButton.click();
 

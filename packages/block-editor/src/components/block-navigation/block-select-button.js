@@ -19,12 +19,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 
 function BlockNavigationBlockSelectButton(
 	{
 		className,
-		block,
+		block: { clientId, name, attributes },
 		isSelected,
 		onClick,
 		position,
@@ -38,12 +39,15 @@ function BlockNavigationBlockSelectButton(
 	},
 	ref
 ) {
-	const { name, attributes } = block;
-
-	const blockType = getBlockType( name );
-	const blockDisplayName = getBlockLabel( blockType, attributes );
+	const blockInformation = useBlockDisplayInformation( clientId );
 	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
+	const blockType = getBlockType( name );
+	const blockLabel = getBlockLabel( blockType, attributes );
+	// If label is defined we prioritize it over possible possible
+	// block variation match title.
+	const blockDisplayName =
+		blockLabel !== blockType.title ? blockLabel : blockInformation?.title;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
@@ -66,7 +70,7 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
-				<BlockIcon icon={ blockType.icon } showColors />
+				<BlockIcon icon={ blockInformation.icon } showColors />
 				{ blockDisplayName }
 				{ isSelected && (
 					<VisuallyHidden>

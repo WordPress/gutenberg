@@ -3,9 +3,11 @@
  */
 const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
-const { readFile } = require( 'fs' ).promises;
+const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { fromPairs, isObject } = require( 'lodash' );
+const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
+const rimraf = require( 'rimraf' ).sync;
 
 /**
  * Internal dependencies
@@ -35,6 +37,11 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon: 'smiley',
+			npmDependencies: [
+				'@wordpress/block-editor',
+				'@wordpress/blocks',
+				'@wordpress/i18n',
+			],
 		},
 	},
 };
@@ -89,13 +96,24 @@ const getBlockTemplate = async ( templateName ) => {
 		);
 	}
 
+	let tempCwd;
+
 	try {
 		info( '' );
 		info( 'Downloading template files. It might take some time...' );
 
-		await command( `npm install ${ templateName } --no-save` );
+		tempCwd = await mkdtemp( join( tmpdir(), 'wp-create-block-' ) );
 
-		const { defaultValues = {}, templatesPath } = require( templateName );
+		await command( `npm install ${ templateName } --no-save`, {
+			cwd: tempCwd,
+		} );
+
+		const { defaultValues = {}, templatesPath } = require( require.resolve(
+			templateName,
+			{
+				paths: [ tempCwd ],
+			}
+		) );
 		if ( ! isObject( defaultValues ) || ! templatesPath ) {
 			throw new Error();
 		}
@@ -108,6 +126,10 @@ const getBlockTemplate = async ( templateName ) => {
 		throw new CLIError(
 			`Invalid template definition provided in "${ templateName }" package.`
 		);
+	} finally {
+		if ( tempCwd ) {
+			rimraf( tempCwd );
+		}
 	}
 };
 
@@ -121,6 +143,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		npmDependencies: [],
 		editorScript: 'file:./build/index.js',
 		editorStyle: 'file:./build/index.css',
 		style: 'file:./build/style-index.css',

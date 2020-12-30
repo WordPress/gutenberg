@@ -6,14 +6,16 @@ import { castArray } from 'lodash';
 /**
  * Returns an action object used in signalling that items have been received.
  *
- * @param {Array} items Items received.
+ * @param {Array}   items Items received.
+ * @param {?Object} edits Optional edits to reset.
  *
  * @return {Object} Action object.
  */
-export function receiveItems( items ) {
+export function receiveItems( items, edits ) {
 	return {
 		type: 'RECEIVE_ITEMS',
 		items: castArray( items ),
+		persistedEdits: edits,
 	};
 }
 
@@ -43,12 +45,13 @@ export function removeItems( kind, name, records, invalidateCache = false ) {
  *
  * @param {Array}   items Queried items received.
  * @param {?Object} query Optional query object.
+ * @param {?Object} edits Optional edits to reset.
  *
  * @return {Object} Action object.
  */
-export function receiveQueriedItems( items, query = {} ) {
+export function receiveQueriedItems( items, query = {}, edits ) {
 	return {
-		...receiveItems( items ),
+		...receiveItems( items, edits ),
 		query,
 	};
 }

@@ -21,6 +21,10 @@
 	&.is-placeholder {
 		min-height: 100px;
 	}
+
+	&[draggable="true"] .block-editor-block-preview__container {
+		cursor: grab;
+	}
 }
 
 .block-editor-block-patterns-list__item-title {
