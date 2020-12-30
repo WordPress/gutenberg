@@ -47,13 +47,12 @@ const manifest = require( '../../../package.json' );
  */
 
 /**
- * Mapping of label names to groups to be used in release notes,
- * intended to be more readable in the context of release notes.
+ * Mapping of label names to sections in the release notes.
  *
- * It's also used in:
- *
- * - merging multiple related groupings to a single heading
- * - prioritize which group is assigned if there are several candidates
+ * Labels are sorted by the priority they have when there are
+ * multiple candidates. For example, if an issue has the labels
+ * "[Block] Navigation" and "[Type] Bug", it'll be assigned the
+ * section declared by "[Block] Navigation".
  *
  * @type {Record<string,string>}
  */
@@ -139,10 +138,10 @@ const REWORD_TERMS = {
 };
 
 /**
- * Returns type candidates based on whether the given labels
+ * Returns candidates based on whether the given labels
  * are part of the allowed list.
  *
- * @param {string[]} labels
+ * @param {string[]} labels Label names.
  *
  * @return {string[]} Type candidates.
  */
@@ -193,10 +192,10 @@ function getIssueType( issue ) {
 }
 
 /**
- * Sort comparator, comparing two group titles.
+ * Sort comparator, comparing two label candidates.
  *
- * @param {string} a First group title.
- * @param {string} b Second group title.
+ * @param {string} a First candidate.
+ * @param {string} b Second candidate.
  *
  * @return {number} Sort result.
  */
