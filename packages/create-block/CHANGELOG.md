@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12.
+
 ## 1.1.0 (2021-01-05)
 
 ### New Feature
