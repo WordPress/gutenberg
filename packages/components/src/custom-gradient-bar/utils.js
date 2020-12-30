@@ -1,12 +1,19 @@
 /**
+ * Internal dependencies
+ */
+import {
+	MINIMUM_DISTANCE_BETWEEN_POINTS,
+	MINIMUM_ABSOLUTE_LEFT_POSITION,
+	INSERT_POINT_WIDTH,
+} from './constants';
+
+/**
  * Control point for the gradient bar.
  *
  * @typedef {Object} ControlPoint
  * @property {string} color    Color of the control point.
  * @property {number} position Integer position of the control point as a percentage.
  */
-
-import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
 
 /**
  * Color as parsed from the gradient by gradient-parser.
@@ -19,6 +26,17 @@ import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
  */
 
 /**
+ * Clamps a number between 0 and 100.
+ *
+ * @param {number} value Value to clamp.
+ *
+ * @return {number} Value clamped between 0 and 100.
+ */
+function clampPercent( value ) {
+	return Math.max( 0, Math.min( 100, value ) );
+}
+
+/**
  * Adds an amount to a percentage, clamped to [0,100].
  *
  * @param {number} position Integer representing the percentage.
@@ -27,7 +45,7 @@ import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
  * @return {number} Clamped percentage.
  */
 export function addPositionClamped( position, amount ) {
-	return Math.max( 0, Math.min( 100, position + amount ) );
+	return clampPercent( position + amount );
 }
 
 /**
@@ -160,4 +178,34 @@ export function updateControlPointColorByPosition(
 ) {
 	const index = points.findIndex( ( point ) => point.position === position );
 	return updateControlPointColor( points, index, newColor );
+}
+
+/**
+ * Gets the horizontal coordinate when dragging a control point with the mouse.
+ *
+ * @param {number}  mouseXCoordinate       Horizontal coordinate of the mouse position.
+ * @param {Element} containerElement       Container for the gradient picker.
+ * @param {number}  positionedElementWidth Width of the positioned element.
+ *
+ * @return {number} Whole number percentage from the left.
+ */
+export function getHorizontalRelativeGradientPosition(
+	mouseXCoordinate,
+	containerElement,
+	positionedElementWidth
+) {
+	if ( ! containerElement ) {
+		return;
+	}
+	const { x, width } = containerElement.getBoundingClientRect();
+	const absolutePositionValue =
+		mouseXCoordinate -
+		x -
+		MINIMUM_ABSOLUTE_LEFT_POSITION -
+		positionedElementWidth / 2;
+	const availableWidth =
+		width - MINIMUM_ABSOLUTE_LEFT_POSITION - INSERT_POINT_WIDTH;
+	return Math.round(
+		clampPercent( ( absolutePositionValue * 100 ) / availableWidth )
+	);
 }
