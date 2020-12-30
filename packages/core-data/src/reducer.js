@@ -221,7 +221,14 @@ function entity( entityConfig ) {
 												'raw',
 												record[ key ]
 											)
-										)
+										) &&
+										// Sometimes the server alters the sent value which means
+										// we need to also remove the edits before the api request.
+										( ! action.persistedEdits ||
+											! isEqual(
+												edits[ key ],
+												action.persistedEdits[ key ]
+											) )
 									) {
 										acc[ key ] = edits[ key ];
 									}
