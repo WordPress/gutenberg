@@ -24,7 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -52,9 +52,13 @@ const BlockActionsMenu = ( {
 	canInsertBlockType,
 	rootClientId,
 } ) => {
+	const [ clipboard, setCurrentClipboard ] = useState( getClipboard() );
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
-	const clipboard = getClipboard();
+	const clipboardBlock = clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+	const isPasteEnabled =
+		clipboardBlock &&
+		canInsertBlockType( clipboardBlock.name, rootClientId );
 
 	const {
 		actionTitle: {
@@ -121,7 +125,7 @@ const BlockActionsMenu = ( {
 		wrapBlockSettings && settingsOption,
 		copyButtonOption,
 		cutButtonOption,
-		isPasteEnabled() && pasteButtonOption,
+		isPasteEnabled && pasteButtonOption,
 		duplicateButtonOption,
 		deleteOption,
 	] );
@@ -132,19 +136,6 @@ const BlockActionsMenu = ( {
 		}
 
 		pasteBlock( rawHandler( { HTML: clipboard } )[ 0 ] );
-	}
-
-	function isPasteEnabled() {
-		if ( ! clipboard ) {
-			return false;
-		}
-
-		const clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
-
-		return (
-			clipboardBlock &&
-			canInsertBlockType( clipboardBlock.name, rootClientId )
-		);
 	}
 
 	function onPickerSelect( value ) {
@@ -167,7 +158,9 @@ const BlockActionsMenu = ( {
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
-				setClipboard( serialize( copyBlock ) );
+				const serializedBlock = serialize( copyBlock );
+				setCurrentClipboard( serializedBlock );
+				setClipboard( serializedBlock );
 				createSuccessNotice(
 					// translators: displayed right after the block is copied.
 					__( 'Block copied' )
