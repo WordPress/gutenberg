@@ -157,7 +157,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		// See schema at WP_Theme_JSON::SCHEMA.
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'global' => array(
+				'global'     => array(
 					'settings' => array(
 						'color'      => array(
 							'text'    => 'value',
@@ -191,20 +191,30 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					),
 					'misc'     => 'value',
 				),
+				'core/group' => array(
+					'styles' => array(
+						'spacing' => array(
+							'padding' => array(
+								'top'    => '12px',
+								'bottom' => '24px',
+							),
+						),
+					),
+				),
 			)
 		);
 
 		$this->assertEquals(
-			$theme_json->get_stylesheet(),
-			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}'
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}',
+			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			$theme_json->get_stylesheet( 'block_styles' ),
-			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}'
+			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}',
+			$theme_json->get_stylesheet( 'block_styles' )
 		);
 		$this->assertEquals(
-			$theme_json->get_stylesheet( 'css_variables' ),
-			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}'
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}',
+			$theme_json->get_stylesheet( 'css_variables' )
 		);
 	}
 
