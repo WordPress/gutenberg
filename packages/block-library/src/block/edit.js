@@ -110,7 +110,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				<PanelBody>
 					<TextControl
 						label={ __( 'Name' ) }
-						title={ title }
+						value={ title }
 						onChange={ setTitle }
 					/>
 				</PanelBody>
