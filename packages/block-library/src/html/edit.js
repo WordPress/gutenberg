@@ -49,7 +49,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	}
 
 	return (
-		<div { ...useBlockProps() }>
+		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
