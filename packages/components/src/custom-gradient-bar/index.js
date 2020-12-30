@@ -15,9 +15,10 @@ import { useRef, useReducer } from '@wordpress/element';
  */
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
-
-const INSERT_POINT_WIDTH = 23;
-const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT = 10;
+import {
+	INSERT_POINT_WIDTH,
+	MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT,
+} from './constants';
 
 function customGradientBarReducer( state, action ) {
 	switch ( action.type ) {

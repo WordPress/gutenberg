@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import AnglePickerControl from '../angle-picker-control';
-import CustomGradientBar from './custom-gradient-bar';
+import CustomGradientBar from '../custom-gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import {

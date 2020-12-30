@@ -20,7 +20,6 @@ import Dropdown from '../dropdown';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import VisuallyHidden from '../visually-hidden';
 
-import { getHorizontalRelativeGradientPosition } from './utils';
 import {
 	addControlPoint,
 	addPositionClamped,
@@ -28,7 +27,8 @@ import {
 	updateControlPointColor,
 	updateControlPointColorByPosition,
 	updateControlPointPosition,
-} from './control-point-utils';
+	getHorizontalRelativeGradientPosition,
+} from './utils';
 import {
 	COLOR_POPOVER_PROPS,
 	GRADIENT_MARKERS_WIDTH,
