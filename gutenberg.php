@@ -39,7 +39,8 @@ add_filter( 'github_updater_no_release_asset_branches', '__return_true' );
 
 
 ### BEGIN AUTO-GENERATED DEFINES
-defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
+define( 'GUTENBERG_VERSION', '9.6.2.20201230' );
+define( 'GUTENBERG_GIT_COMMIT', 'd516050927e6f7d8c4d1917f37c46bab00daacec' );
 ### END AUTO-GENERATED DEFINES
 
 gutenberg_pre_init();
