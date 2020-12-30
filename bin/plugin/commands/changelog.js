@@ -57,7 +57,7 @@ const manifest = require( '../../../package.json' );
  *
  * @type {Record<string,string>}
  */
-const LABEL_MAPPING = {
+const LABEL_TYPE_MAPPING = {
 	'[Block] Navigation': 'Experiments',
 	'[Block] Query': 'Experiments',
 	'[Block] Post Comments Count': 'Experiments',
@@ -150,9 +150,9 @@ function getTypesByLabels( labels ) {
 	return uniq(
 		labels
 			.filter( ( label ) =>
-				Object.keys( LABEL_MAPPING ).includes( label )
+				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
 			)
-			.map( ( label ) => LABEL_MAPPING[ label ] )
+			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
 	);
 }
 
@@ -202,7 +202,7 @@ function getIssueType( issue ) {
  */
 function sortType( a, b ) {
 	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
-		return Object.keys( LABEL_MAPPING ).indexOf( title );
+		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
 	} );
 
 	return aIndex - bIndex;
