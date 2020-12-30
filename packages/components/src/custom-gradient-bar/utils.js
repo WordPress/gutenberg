@@ -32,20 +32,8 @@ import {
  *
  * @return {number} Value clamped between 0 and 100.
  */
-function clampPercent( value ) {
+export function clampPercent( value ) {
 	return Math.max( 0, Math.min( 100, value ) );
-}
-
-/**
- * Adds an amount to a percentage, clamped to [0,100].
- *
- * @param {number} position Integer representing the percentage.
- * @param {number} amount   Integer amount to add to that percentage.
- *
- * @return {number} Clamped percentage.
- */
-export function addPositionClamped( position, amount ) {
-	return clampPercent( position + amount );
 }
 
 /**

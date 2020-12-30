@@ -22,7 +22,7 @@ import VisuallyHidden from '../visually-hidden';
 
 import {
 	addControlPoint,
-	addPositionClamped,
+	clampPercent,
 	removeControlPoint,
 	updateControlPointColor,
 	updateControlPointColorByPosition,
@@ -42,9 +42,8 @@ function ControlPointKeyboardMove( { value: position, onChange, children } ) {
 			// Stop propagation of the key press event to avoid focus moving
 			// to another editor area.
 			event.stopPropagation();
-			const newPosition = addPositionClamped(
-				position,
-				KEYBOARD_CONTROL_POINT_VARIATION
+			const newPosition = clampPercent(
+				position + KEYBOARD_CONTROL_POINT_VARIATION
 			);
 			onChange( newPosition );
 		},
@@ -52,9 +51,8 @@ function ControlPointKeyboardMove( { value: position, onChange, children } ) {
 			// Stop propagation of the key press event to avoid focus moving
 			// to another editor area.
 			event.stopPropagation();
-			const newPosition = addPositionClamped(
-				position,
-				-KEYBOARD_CONTROL_POINT_VARIATION
+			const newPosition = clampPercent(
+				position - KEYBOARD_CONTROL_POINT_VARIATION
 			);
 			onChange( newPosition );
 		},
