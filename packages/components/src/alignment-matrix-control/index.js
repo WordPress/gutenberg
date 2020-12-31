@@ -92,7 +92,7 @@ export default function AlignmentMatrixControl( {
 								isActive={ isActive }
 								key={ cell }
 								value={ cell }
-								onFocus={ () => handleOnChange( cell ) }
+								onClick={ () => handleOnChange( cell ) }
 							/>
 						);
 					} ) }
