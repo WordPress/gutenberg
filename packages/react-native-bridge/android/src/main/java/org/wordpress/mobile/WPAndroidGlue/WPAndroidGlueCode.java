@@ -49,7 +49,6 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceMediaFilesEditedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -95,7 +94,6 @@ public class WPAndroidGlueCode {
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
-    private ReplaceMediaFilesEditedBlockCallback mReplaceMediaFilesEditedBlockCallback;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -432,11 +430,9 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
-                mReplaceMediaFilesEditedBlockCallback = replaceMediaFilesEditedBlockCallback;
                 mOnMediaFilesCollectionBasedBlockEditorListener
                         .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
             }
@@ -954,11 +950,8 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public void replaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
-        if (mReplaceMediaFilesEditedBlockCallback != null) {
-            mReplaceMediaFilesEditedBlockCallback.replaceMediaFilesEditedBlock(mediaFiles, blockId);
-            mReplaceMediaFilesEditedBlockCallback = null;
-        }
+    public void replaceMediaFilesEditedBlock(final String mediaFiles, final String blockId) {
+        mDeferredEventEmitter.onReplaceMediaFilesEditedBlock(mediaFiles, blockId);
     }
 
     private boolean isMediaSelectedCallbackRegistered() {

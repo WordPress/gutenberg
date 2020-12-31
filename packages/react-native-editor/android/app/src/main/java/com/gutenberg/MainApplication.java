@@ -200,7 +200,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {

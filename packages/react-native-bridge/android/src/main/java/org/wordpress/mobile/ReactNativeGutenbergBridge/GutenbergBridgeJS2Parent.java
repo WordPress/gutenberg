@@ -41,14 +41,11 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileSaveFailed(String mediaId);
         void onMediaCollectionSaveResult(String firstMediaIdInCollection, boolean success);
         void onMediaIdChanged(final String oldId, final String newId, final String oldUrl);
+        void onReplaceMediaFilesEditedBlock(final String mediaFiles, final String blockId);
     }
 
     interface ReplaceUnsupportedBlockCallback {
         void replaceUnsupportedBlock(String content, String blockId);
-    }
-
-    interface ReplaceMediaFilesEditedBlockCallback {
-        void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
     }
 
     interface StarterPageTemplatesTooltipShownCallback {
@@ -174,10 +171,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
 
-    void requestMediaFilesEditorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
-                                                     ReadableArray mediaFiles,
-                                                     String blockId
-    );
+    void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId);
 
     void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
 

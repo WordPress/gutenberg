@@ -238,8 +238,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     @ReactMethod
     public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad((savedMediaFiles, savedBlockId) ->
-                replaceBlock(savedMediaFiles, savedBlockId), mediaFiles, blockId);
+        mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad(mediaFiles, blockId);
     }
 
     @ReactMethod
