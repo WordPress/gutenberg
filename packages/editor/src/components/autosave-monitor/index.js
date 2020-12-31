@@ -29,15 +29,11 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if (
-			this.props.disableIntervalChecks &&
-			this.props.editsReference !== prevProps.editsReference
-		) {
-			this.props.autosave();
+		if ( this.props.disableIntervalChecks ) {
 			return;
 		}
 
-		if ( ! this.props.isDirty && prevProps.isDirty ) {
+		if ( ! this.props.isDirty ) {
 			this.needsAutosave = false;
 			return;
 		}
