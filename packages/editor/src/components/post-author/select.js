@@ -19,7 +19,7 @@ function PostAuthorSelect() {
 				value: author.id,
 			} ) ),
 		};
-	} );
+	}, [] );
 
 	const setAuthorId = ( value ) => {
 		const author = Number( value );

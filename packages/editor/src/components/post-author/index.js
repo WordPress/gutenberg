@@ -1,31 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import PostAuthorCombobox from './post-author-combobox';
-import PostAuthorSelect from './post-author-select';
+import PostAuthorCombobox from './combobox';
+import PostAuthorSelect from './select';
 
 const minimumUsersForCombobox = 25;
 
-function PostAuthor( { authors } ) {
-	if ( authors?.length >= minimumUsersForCombobox ) {
+function PostAuthor() {
+	const showCombobox = useSelect( ( select ) => {
+		const authors = select( 'core' ).getUsers( {
+			who: 'authors',
+			per_page: minimumUsersForCombobox + 1,
+		} );
+		return authors?.length >= minimumUsersForCombobox;
+	}, [] );
+
+	if ( showCombobox ) {
 		return <PostAuthorCombobox />;
 	}
 	return <PostAuthorSelect />;
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			authors: select( 'core' ).getUsers( {
-				who: 'authors',
-				per_page: minimumUsersForCombobox + 1,
-			} ),
-		};
-	} ),
-] )( PostAuthor );
+export default PostAuthor;
