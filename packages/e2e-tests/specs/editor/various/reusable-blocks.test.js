@@ -277,12 +277,12 @@ describe( 'Reusable blocks', () => {
 	it( 'should be able to insert a reusable block twice', async () => {
 		await createReusableBlock(
 			'Awesome Paragraph',
-			'Random reusable block'
+			'Duplicated reusable block'
 		);
 		await saveAll();
 		await clearAllBlocks();
-		await insertReusableBlock( 'Random reusable block' );
-		await insertReusableBlock( 'Random reusable block' );
+		await insertReusableBlock( 'Duplicated reusable block' );
+		await insertReusableBlock( 'Duplicated reusable block' );
 		await saveDraft();
 		await page.reload();
 
