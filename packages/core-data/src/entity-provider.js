@@ -137,11 +137,21 @@ export function useEntityProp( kind, type, prop, _id ) {
 export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, type );
 	const id = _id ?? providerId;
+	const { content, blocks } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( 'core' );
+			const editedEntity = getEditedEntityRecord( 'postType', type, id );
+			return {
+				blocks: editedEntity.blocks,
+				content: editedEntity.content,
+			};
+		},
+		[ type, id ]
+	);
+	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
+		'core'
+	);
 
-	const [ content, setContent ] = useEntityProp( kind, type, 'content', id );
-	const [ blocks, onInput ] = useEntityProp( kind, type, 'blocks', id );
-
-	const { editEntityRecord } = useDispatch( 'core' );
 	useEffect( () => {
 		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
@@ -161,14 +171,35 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	}, [ content ] );
 
 	const onChange = useCallback(
-		( nextBlocks ) => {
-			onInput( nextBlocks );
-			// Use a function edit to avoid serializing often.
-			setContent( ( { blocks: blocksToSerialize } ) =>
-				serialize( blocksToSerialize )
-			);
+		( newBlocks, options ) => {
+			const { selectionStart, selectionEnd } = options;
+			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
+			const noChange = blocks === edits.blocks;
+			if ( noChange ) {
+				return __unstableCreateUndoLevel( 'postType', type, id );
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				serialize( blocksForSerialization );
+
+			editEntityRecord( 'postType', type, id, edits );
 		},
-		[ onInput, setContent ]
+		[ blocks, id, type ]
 	);
+
+	const onInput = useCallback(
+		( newBlocks, options ) => {
+			const { selectionStart, selectionEnd } = options;
+			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
+			editEntityRecord( 'postType', type, id, edits, {
+				undoIgnore: true,
+			} );
+		},
+		[ type, id ]
+	);
+
 	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
 }
