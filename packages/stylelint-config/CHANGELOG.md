@@ -6,7 +6,9 @@
 
 ### Breaking Change
 
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 -   Increased minimum peer dependency of `stylelint` to `13.7.0`.
+-   Removed stylelint `^10.1.0`, `^11.0.0`, and `^12.0.0` as peer dependency.
 
 ### Bug Fixes
 

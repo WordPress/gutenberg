@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"files": [
 		"build",

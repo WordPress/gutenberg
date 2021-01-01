@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Increase the minimum Node.js version to 12.
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 
 ## 1.3.0 (2019-06-12)
 

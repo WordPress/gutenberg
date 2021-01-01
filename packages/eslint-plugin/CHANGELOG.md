@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 -   Enabled `import/no-extraneous-dependencies` rule in the `recommended` ruleset.
 -   Enabled `import/no-unresolved` rule in the `recommended` ruleset.
 -   Enabled `no-unsafe-wp-apis` rule in the `recommended` ruleset ([#27327](https://github.com/WordPress/gutenberg/pull/27327)).
