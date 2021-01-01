@@ -2,7 +2,7 @@
 
 End-To-End (E2E) test utils for WordPress.
 
-_It works properly with the minimum version of Gutenberg `8.9.0` or the minimum version of WordPress `5.6.0`._
+_It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
 ## Installation
 
