@@ -293,7 +293,7 @@ describe( 'Reusable blocks', () => {
 		paragraphBlock.focus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( '*' );
+		await page.keyboard.type( ' modified' );
 
 		// Wait for async mode to dispatch the update.
 		// eslint-disable-next-line no-restricted-syntax
@@ -306,7 +306,7 @@ describe( 'Reusable blocks', () => {
 				'p',
 				( element ) => element.textContent
 			);
-			expect( content ).toEqual( 'Awesome Paragraph*' );
+			expect( content ).toEqual( 'Awesome Paragraph modified' );
 		} );
 	} );
 } );
