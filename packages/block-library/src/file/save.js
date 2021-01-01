@@ -7,14 +7,12 @@ import { __, sprintf } from '@wordpress/i18n';
 export default function save( { attributes } ) {
 	const {
 		href,
+		fileId,
 		fileName,
 		textLinkHref,
 		textLinkTarget,
 		showDownloadButton,
 		downloadButtonText,
-		displayPreview,
-		previewHeight,
-		fileId,
 	} = attributes;
 
 	const pdfEmbedLabel = RichText.isEmpty( fileName )
