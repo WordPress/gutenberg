@@ -21,17 +21,21 @@ function PostTemplate() {
 			getCurrentPostType,
 			getCurrentPost,
 		} = select( editorStore );
-		const { __experimentalGetTemplateForLink } = select( coreStore );
+		const { __experimentalGetTemplateForLink, getPostType } = select(
+			coreStore
+		);
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
 		const isFSEEnabled = select( editorStore ).getEditorSettings()
 			.isFSETheme;
+		const isViewable =
+			getPostType( getCurrentPostType() )?.viewable ?? false;
 		return {
 			template:
 				isFSEEnabled &&
+				isViewable &&
 				link &&
-				getCurrentPost().status !== 'auto-draft' &&
-				getCurrentPostType() !== 'wp_template'
+				getCurrentPost().status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( link )
 					: null,
 			isEditing: isEditingTemplate(),
