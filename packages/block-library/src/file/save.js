@@ -6,12 +6,12 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const {
 		href,
+		fileId,
 		fileName,
 		textLinkHref,
 		textLinkTarget,
 		showDownloadButton,
 		downloadButtonText,
-		fileId,
 	} = attributes;
 
 	return (
