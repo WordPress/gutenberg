@@ -6,6 +6,10 @@
 
 -   The peer `jest` dependency has been updated from requiring `>=25` to requiring `>=26` (see [Breaking Changes](https://jestjs.io/blog/2020/05/05/jest-26), [#27956](https://github.com/WordPress/gutenberg/pull/27956)).
 
+### Enhancements
+
+-   `wordpress` subfolder is no longer ignored when detecting files for testing, linting or formatting.
+
 ## 12.6.0 (2020-12-17)
 
 ### Enhancements
