@@ -11,7 +11,7 @@ describe( 'Gutenberg Editor File Block tests @canary', () => {
 		await expect( block ).toBeTruthy();
 	} );
 
-	it( 'should add a file to the block ', async () => {
+	it( 'should add a file to the block', async () => {
 		const block = await editorPage.getFirstBlockVisible();
 
 		block.click();
