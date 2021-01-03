@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   The peer `jest` dependency has been updated from requiring `>=25` to requiring `>=26` (see [Breaking Changes](https://jestjs.io/blog/2020/05/05/jest-26), [#27956](https://github.com/WordPress/gutenberg/pull/27956)).
+-   The bundled `stylelint-config-wordpress` dependency has been replaced with `@wordpress/stylelint-config` (#27810)[https://github.com/WordPress/gutenberg/pull/27810].
 
 ### Enhancements
 
