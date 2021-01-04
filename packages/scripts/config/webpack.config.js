@@ -48,6 +48,7 @@ const cssLoaders = [
 
 const config = {
 	mode,
+	target: 'browserslist',
 	entry: {
 		index: path.resolve( process.cwd(), 'src', 'index.js' ),
 	},

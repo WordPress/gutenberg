@@ -15,6 +15,7 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 
 		// Temporarily this test is skipped on Android,due to the inconsistency of the results,
 		// which are related to getting values in raw pixels instead of density pixels on Android.
+		/* eslint-disable jest/no-conditional-expect */
 		if ( ! isAndroid() ) {
 			const { height } = await coverBlock.getSize();
 			// Height is set to 20rem, where 1rem is 16.
@@ -22,6 +23,7 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			// Finally, the total height should be 20 * 16 + 32 = 352
 			expect( height ).toBe( 352 );
 		}
+		/* eslint-enable jest/no-conditional-expect */
 
 		await coverBlock.click();
 		expect( coverBlock ).toBeTruthy();

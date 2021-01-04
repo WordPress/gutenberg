@@ -90,6 +90,9 @@ class WP_Theme_JSON {
 	 */
 	const SCHEMA = array(
 		'styles'   => array(
+			'border'     => array(
+				'radius' => null,
+			),
 			'color'      => array(
 				'background' => null,
 				'gradient'   => null,
@@ -246,7 +249,7 @@ class WP_Theme_JSON {
 		),
 		'borderRadius'             => array(
 			'value'   => array( 'border', 'radius' ),
-			'support' => array( '__experimentalBorder' ),
+			'support' => array( '__experimentalBorder', 'radius' ),
 		),
 		'color'                    => array(
 			'value'   => array( 'color', 'text' ),
@@ -314,6 +317,7 @@ class WP_Theme_JSON {
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
 			if ( isset( $context['styles'] ) ) {
+				$this->process_key( 'border', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
