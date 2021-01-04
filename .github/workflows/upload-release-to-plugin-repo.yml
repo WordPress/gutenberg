@@ -8,6 +8,7 @@ jobs:
   upload:
     name: Upload Gutenberg Plugin
     runs-on: ubuntu-latest
+    environment: wp.org plugin
     if: github.event.release.assets[0]
     env:
       PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
