@@ -14,7 +14,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  *
  * There are two caveats:
  * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
- * * The timer may be disabled by setting `props.disableIntervalChecks` to `false`. In that mode, any change will immediately trigger `props.autosave()`.
+ * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
  */
 export class AutosaveMonitor extends Component {
 	constructor( props ) {
