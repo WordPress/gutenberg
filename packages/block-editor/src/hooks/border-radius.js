@@ -36,16 +36,18 @@ export function BorderRadiusEdit( props ) {
 			...style,
 			border: {
 				...style?.border,
-				radius: newRadius,
+				radius: newRadius && `${ newRadius }px`,
 			},
 		};
 
 		setAttributes( { style: cleanEmptyObject( newStyle ) } );
 	};
 
+	const value = style?.border?.radius.replace( 'px', '' );
+
 	return (
 		<RangeControl
-			value={ style?.border?.radius }
+			value={ value && parseInt( value ) }
 			label={ __( 'Border radius' ) }
 			min={ MIN_BORDER_RADIUS_VALUE }
 			max={ MAX_BORDER_RADIUS_VALUE }

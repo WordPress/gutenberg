@@ -7,6 +7,7 @@
 		color: #32373c;
 		margin-left: 0.625em;
 		word-break: normal;
+		border-radius: var(--wp--style--border--radius);
 
 		&.has-icon {
 			line-height: 0;
@@ -23,6 +24,7 @@
 		flex: auto;
 		flex-wrap: nowrap;
 		max-width: 100%;
+		border-radius: var(--wp--style--border--radius);
 	}
 
 	.wp-block-search__label {
@@ -33,6 +35,7 @@
 		flex-grow: 1;
 		min-width: 3em;
 		border: 1px solid $gray-600;
+		border-radius: var(--wp--style--border--radius);
 	}
 
 	&.wp-block-search__button-only {
@@ -44,9 +47,14 @@
 	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
 		padding: $grid-unit-05;
 		border: 1px solid $gray-600;
+		// Determine what the minimum inner border radius should be. No outer radius equals 0, otherwise 1px.
+		// Must be 0px so max() can actually compare values later.
+		--wp--search--min-border-radius: clamp(0px, var(--wp--style--border--radius, 0px), 1px); /* stylelint-disable-line length-zero-no-unit */
 
 		.wp-block-search__input {
-			border-radius: 0;
+			// Adjust inner radius so it is visually consistent with outer radius. i.e. no "fat" corners.
+			// Maximum out of the outer radius minus padding or the minimum radius --wp--search--min-border-radius.
+			border-radius: max(var(--wp--style--border--radius, 0) - #{$grid-unit-05}, var(--wp--search--min-border-radius, 1px));
 			border: none;
 			padding: 0 0 0 0.25em;
 
@@ -56,6 +64,9 @@
 		}
 
 		.wp-block-search__button {
+			// Adjust inner radius so it is visually consistent with outer radius. i.e. no "fat" corners.
+			// Maximum out of the outer radius minus padding or the minimum radius --wp--search--min-border-radius.
+			border-radius: max(var(--wp--style--border--radius, 0) - #{$grid-unit-05}, var(--wp--search--min-border-radius, 1px));
 			padding: 0.125em 0.5em;
 		}
 	}

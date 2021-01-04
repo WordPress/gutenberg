@@ -13,6 +13,10 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
+	'--wp--style--border--radius': {
+		value: [ 'border', 'radius' ],
+		support: [ '__experimentalBorder', 'radius' ],
+	},
 	'--wp--style--color--link': {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],

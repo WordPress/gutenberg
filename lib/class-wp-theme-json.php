@@ -235,6 +235,10 @@ class WP_Theme_JSON {
 	 * - 'support': path to the block support in block.json.
 	 */
 	const PROPERTIES_METADATA = array(
+		'--wp--style--border--radius' => array(
+			'value'   => array( 'border', 'radius' ),
+			'support' => array( '__experimentalBorder', 'radius' ),
+		),
 		'--wp--style--color--link' => array(
 			'value'   => array( 'color', 'link' ),
 			'support' => array( 'color', 'link' ),

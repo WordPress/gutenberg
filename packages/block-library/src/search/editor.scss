@@ -9,7 +9,6 @@
 
 	.wp-block-search__button {
 		height: auto;
-		border-radius: initial;
 
 		// This needs high specificity because it otherwise inherits styles from `components-button`.
 		// stylelint-disable-line no-duplicate-selectors

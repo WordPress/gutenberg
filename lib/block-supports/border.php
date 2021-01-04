@@ -46,6 +46,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		if ( isset( $block_attributes['style']['border']['radius'] ) ) {
 			$border_radius = intval( $block_attributes['style']['border']['radius'] );
 			$styles[]      = sprintf( 'border-radius: %dpx;', $border_radius );
+			$styles[]      = sprintf( '--wp--style--border--radius: %dpx;', $border_radius );
 		}
 	}
 
