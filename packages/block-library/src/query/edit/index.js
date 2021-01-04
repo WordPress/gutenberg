@@ -22,7 +22,7 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 const TEMPLATE = [ [ 'core/query-loop' ] ];
 export function QueryContent( {
 	attributes,
-	context: { postId },
+	context: { postId, templateSlug },
 	setAttributes,
 } ) {
 	const { queryId, query, layout } = attributes;
@@ -47,10 +47,15 @@ export function QueryContent( {
 		if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
+		// Show and allow inherit Query options only when
+		// in site-editing context.
+		if ( ! templateSlug && query.inherit ) {
+			newQuery.inherit = false;
+		}
 		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.exclude, postId ] );
+	}, [ query.perPage, query.exclude, query.inherit, postId, templateSlug ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -68,6 +73,7 @@ export function QueryContent( {
 				attributes={ attributes }
 				setQuery={ updateQuery }
 				setLayout={ updateLayout }
+				allowInheritQuery={ !! templateSlug }
 			/>
 			<BlockControls>
 				<QueryToolbar

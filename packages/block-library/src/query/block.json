@@ -37,7 +37,8 @@
 		"layout": "layout"
 	},
 	"usesContext": [
-		"postId"
+		"postId",
+		"templateSlug"
 	],
 	"supports": {
 		"html": false
