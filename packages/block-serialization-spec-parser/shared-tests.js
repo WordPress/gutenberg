@@ -335,9 +335,9 @@ const hasPHP =
 // skipping preserves snapshots while commenting out or simply
 // not injecting the tests prompts `jest` to remove "obsolete snapshots"
 const makeTest = hasPHP
-	? // eslint-disable-next-line jest/valid-describe
+	? // eslint-disable-next-line jest/valid-describe, jest/valid-title
 	  ( ...args ) => describe( ...args )
-	: // eslint-disable-next-line jest/no-disabled-tests, jest/valid-describe
+	: // eslint-disable-next-line jest/no-disabled-tests, jest/valid-describe, jest/valid-title
 	  ( ...args ) => describe.skip( ...args );
 
 export const phpTester = ( name, filename ) =>

@@ -43,6 +43,7 @@ describe( 'Gutenberg Editor Image Block tests @canary', () => {
 		await editorPage.sendTextToParagraphBlock( 2, testData.shortText );
 
 		// skip HTML check for Android since we couldn't add image from media library
+		/* eslint-disable jest/no-conditional-expect */
 		if ( ! isAndroid() ) {
 			const html = await editorPage.getHtmlContent();
 
@@ -50,5 +51,6 @@ describe( 'Gutenberg Editor Image Block tests @canary', () => {
 				html.toLowerCase()
 			);
 		}
+		/* eslint-enable jest/no-conditional-expect */
 	} );
 } );

@@ -238,6 +238,7 @@ describe( 'Post generator actions', () => {
 			testRoutine,
 		] ) => {
 			if ( shouldRun( isAutosaving ) ) {
+				// eslint-disable-next-line jest/valid-title
 				it( testDescription, () => {
 					testRoutine();
 				} );
