@@ -201,9 +201,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 		$changes = $this->prepare_item_for_database( $request );
 		if ( $template->is_custom ) {
-			$result = wp_update_post( wp_slash( $changes ), true );
+			$result = wp_update_post( wp_slash( (array) $changes ), true );
 		} else {
-			$result = wp_insert_post( wp_slash( $changes ), true );
+			$result = wp_insert_post( wp_slash( (array) $changes ), true );
 		}
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -238,13 +238,13 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$changes              = $this->prepare_item_for_database( $request );
-		$changes['post_name'] = $request['slug'];
-		$result               = wp_insert_post( wp_slash( $changes ), true );
+		$changes            = $this->prepare_item_for_database( $request );
+		$changes->post_name = $request['slug'];
+		$result             = wp_insert_post( wp_slash( (array) $changes ), true );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
-		$id = $changes['theme'] . '|' . $changes['slug'];
+		$id = $changes->theme . '|' . $changes->slug;
 
 		$template      = gutenberg_get_block_template( $id, $this->post_type );
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );
@@ -316,41 +316,42 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * Prepares a single template for create or update.
 	 *
 	 * @param WP_REST_Request $request Request object.
-	 * @return array Changes to pass to wp_update_post.
+	 * @return stdClass Changes to pass to wp_update_post.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$template = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
-		$changes  = array( 'post_name' => $template->slug );
+		$template           = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
+		$changes            = new stdClass();
+		$changes->post_name = $template->slug;
 		if ( null === $template ) {
-			$changes['post_type']   = $this->post_type;
-			$changes['post_status'] = 'publish';
-			$changes['tax_input']   = array(
+			$changes->post_type   = $this->post_type;
+			$changes->post_status = 'publish';
+			$changes->tax_input   = array(
 				'wp_theme' => wp_get_theme()->get_stylesheet(),
 			);
 		} elseif ( ! $template->is_custom ) {
-			$changes['post_type']   = $this->post_type;
-			$changes['post_status'] = 'publish';
-			$changes['tax_input']   = array(
+			$changes->post_type   = $this->post_type;
+			$changes->post_status = 'publish';
+			$changes->tax_input   = array(
 				'wp_theme' => $template->theme,
 			);
 		} else {
-			$changes['ID']          = $template->wp_id;
-			$changes['post_status'] = 'publish';
+			$changes->ID          = $template->wp_id;
+			$changes->post_status = 'publish';
 		}
 		if ( isset( $request['content'] ) ) {
-			$changes['post_content'] = $request['content'];
+			$changes->post_content = $request['content'];
 		} elseif ( null !== $template && ! $template->is_custom ) {
-			$changes['post_content'] = $template->content;
+			$changes->post_content = $template->content;
 		}
 		if ( isset( $request['title'] ) ) {
-			$changes['post_title'] = $request['title'];
+			$changes->post_title = $request['title'];
 		} elseif ( null !== $template && ! $template->is_custom ) {
-			$changes['post_title'] = $template->title;
+			$changes->post_title = $template->title;
 		}
 		if ( isset( $request['description'] ) ) {
-			$changes['post_excerpt'] = $request['description'];
+			$changes->post_excerpt = $request['description'];
 		} elseif ( null !== $template && ! $template->is_custom ) {
-			$changes['post_excerpt'] = $template->description;
+			$changes->post_excerpt = $template->description;
 		}
 
 		return $changes;
