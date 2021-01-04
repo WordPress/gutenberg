@@ -6,7 +6,6 @@ const fs = require( 'fs' );
 const semver = require( 'semver' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
-const os = require( 'os' );
 
 /**
  * Internal dependencies
