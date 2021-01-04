@@ -21,7 +21,7 @@ const transforms = {
 			isMatch: ( node ) =>
 				node.nodeName === 'P' &&
 				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
-				node.textContent?.match( `/https/gi` ).length === 1,
+				node.textContent?.match( /https/gi ).length === 1,
 			transform: ( node ) => {
 				return createBlock( EMBED_BLOCK, {
 					url: node.textContent.trim(),
