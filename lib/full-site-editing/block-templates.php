@@ -119,7 +119,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->slug        = $post->post_name;
 	$template->is_custom   = true;
 	$template->type        = $post->post_type;
-	$template->description = $post->post_exerpt;
+	$template->description = $post->post_excerpt;
 	$template->title       = $post->post_title;
 	$template->status      = $post->post_status;
 
