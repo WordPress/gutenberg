@@ -151,13 +151,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	private function get_remote_url( $url ) {
 
 		$args = array(
-			'limit_response_size' => 153600, // 150 KB.
+			'limit_response_size' => 150 * KB_IN_BYTES,
 		);
 
 		/**
 		 * Filters the HTTP request args for URL data retrieval.
 		 *
-		 * Can be used to adjust timeout and response size limit.
+		 * Can be used to adjust response size limit and other WP_Http::request args.
 		 *
 		 * @param array $args Arguments used for the HTTP request
 		 * @param string $url The attempted URL.
