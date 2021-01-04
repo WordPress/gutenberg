@@ -354,6 +354,45 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+	public function test_allows_filtering_data_retrieved_for_a_given_url() {
+
+		add_filter(
+			'rest_url_details_url_data',
+			function() {
+				return array(
+					'title'    => 'Updated response title via filter',
+					'og_title' => 'This was manually added to the data via filter',
+				);
+
+			}
+		);
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		// Instead of the default data retrieved we expect to see the modified
+		// data we provided via the filter.
+		$this->assertEquals(
+			array(
+				'title'    => 'Updated response title via filter',
+				'og_title' => 'This was manually added to the data via filter',
+			),
+			$data
+		);
+
+		remove_all_filters(
+			'rest_url_details_url_data'
+		);
+	}
+
 
 
 	public function test_get_item() {

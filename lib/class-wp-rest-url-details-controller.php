@@ -109,8 +109,24 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return $response_body;
 		}
 
-		$data = array(
-			'title' => $this->get_title( $response_body ),
+		/**
+		 * Filters the data returned for a given URL.
+		 *
+		 * Can be used to modify the data retrieved for a given URL.
+		 * For example, you may wish to retrieve additional information
+		 * from the response body at a given URL over and above the `<title>`.
+		 *
+		 * @param array $data The default data retrieved for the given URL.
+		 * @param array $response_body The response body (HTML) for the given URL.
+		 * @param string $url The attempted URL.
+		 */
+		$data = apply_filters(
+			'rest_url_details_url_data',
+			array(
+				'title' => $this->get_title( $response_body ),
+			),
+			$response_body,
+			$url
 		);
 
 		// Cache the valid response.
