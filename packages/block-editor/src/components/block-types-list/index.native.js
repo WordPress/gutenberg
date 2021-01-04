@@ -117,7 +117,7 @@ export class BlockTypesList extends Component {
 						<View style={ styles.rowSeparator } />
 					</TouchableWithoutFeedback>
 				) }
-				keyExtractor={ ( item ) => item.name }
+				keyExtractor={ ( item ) => item.id }
 				renderItem={ this.renderItem }
 				{ ...listProps }
 			/>
