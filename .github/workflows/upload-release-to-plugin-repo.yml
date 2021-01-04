@@ -37,7 +37,7 @@ jobs:
 
       - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
         env:
-          STABLE_TAG_PLACEHOLDER: 'Stable tag: [0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+          STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
           STABLE_TAG: ${{ steps.get_previous_stable_tag.outputs.stable_tag }}
         run: sed -i "s/${STABLE_TAG_PLACEHOLDER}/${STABLE_TAG}/g" ./trunk/readme.txt
 
