@@ -57,13 +57,16 @@ function Editor( {
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
 		} = select( editPostStore );
-		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
-			'core'
-		);
+		const {
+			getEntityRecord,
+			__experimentalGetTemplateForLink,
+			getPostType,
+		} = select( 'core' );
 		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const postObject = getEntityRecord( 'postType', postType, postId );
 		const isFSETheme = getEditorSettings().isFSETheme;
+		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		return {
 			hasFixedToolbar:
@@ -84,9 +87,9 @@ function Editor( {
 			isTemplateMode: isEditingTemplate(),
 			template:
 				isFSETheme &&
+				isViewable &&
 				postObject &&
-				getCurrentPost().status !== 'auto-draft' &&
-				postType !== 'wp_template'
+				getCurrentPost().status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
 			post: postObject,

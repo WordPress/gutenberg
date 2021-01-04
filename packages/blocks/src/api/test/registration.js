@@ -646,6 +646,7 @@ describe( 'blocks', () => {
 						// Verify that for deprecations, the filter is called with a merge of pre-filter
 						// settings with deprecation keys omitted and the deprecation entry.
 						if ( i > 0 ) {
+							// eslint-disable-next-line jest/no-conditional-expect
 							expect( settings ).toEqual( {
 								...omit(
 									{

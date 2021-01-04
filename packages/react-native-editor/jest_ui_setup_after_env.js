@@ -32,6 +32,7 @@ const getScreenRecordingFileNameBase = ( testPath, id ) => {
 
 let allPassed = true;
 
+// eslint-disable-next-line jest/no-jasmine-globals, no-undef
 jasmine.getEnv().addReporter( {
 	specStarted: ( { testPath, id } ) => {
 		if ( ! isMacOSEnvironment() ) {
