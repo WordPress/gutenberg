@@ -8,6 +8,10 @@
 -   Enabled `import/no-unresolved` rule in the `recommended` ruleset.
 -   Enabled `no-unsafe-wp-apis` rule in the `recommended` ruleset ([#27327](https://github.com/WordPress/gutenberg/pull/27327)).
 
+### New Features
+
+-   Enable `react-hooks/exhaustive-deps` rules in the react config.
+
 ## 7.4.0 (2020-12-17)
 
 ### New Feature
