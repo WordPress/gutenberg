@@ -36,6 +36,10 @@ const DEFAULT_LOCALE_DATA = {
  * @see http://messageformat.github.io/Jed/
  */
 /**
+ * @typedef {(domain?: string) => string} getFilterDomain
+ * Retrieve the domain to use when calling domain-specific filters.
+ */
+/**
  * @typedef {(text: string, domain?: string) => string} __
  *
  * Retrieve the translation of text.
@@ -152,9 +156,17 @@ export const createI18n = ( initialData, initialDomain ) => {
 		return tannin.dcnpgettext( domain, context, single, plural, number );
 	};
 
+	/** @type {getFilterDomain} */
+	const getFilterDomain = ( domain ) => {
+		if ( typeof domain === 'undefined' ) {
+			return 'default';
+		}
+		return domain;
+	};
+
 	/** @type {__} */
 	const __ = ( text, domain ) => {
-		const translation = dcnpgettext( domain, undefined, text );
+		let translation = dcnpgettext( domain, undefined, text );
 		/**
 		 * Filters text with its translation.
 		 *
@@ -162,14 +174,22 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} text        Text to translate.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		return String(
+		translation = String(
 			applyFilters( 'i18n.gettext', translation, text, domain )
+		);
+		return String(
+			applyFilters(
+				'i18n.gettext_' + getFilterDomain( domain ),
+				translation,
+				text,
+				domain
+			)
 		);
 	};
 
 	/** @type {_x} */
 	const _x = ( text, context, domain ) => {
-		const translation = dcnpgettext( domain, context, text );
+		let translation = dcnpgettext( domain, context, text );
 		/**
 		 * Filters text with its translation based on context information.
 		 *
@@ -178,9 +198,18 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} context     Context information for the translators.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		return String(
+		translation = String(
 			applyFilters(
 				'i18n.gettext_with_context',
+				translation,
+				text,
+				context,
+				domain
+			)
+		);
+		return String(
+			applyFilters(
+				'i18n.gettext_with_context_' + getFilterDomain( domain ),
 				translation,
 				text,
 				context,
@@ -191,7 +220,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 
 	/** @type {_n} */
 	const _n = ( single, plural, number, domain ) => {
-		const translation = dcnpgettext(
+		let translation = dcnpgettext(
 			domain,
 			undefined,
 			single,
@@ -207,9 +236,19 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} number      The number to compare against to use either the singular or plural form.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		return String(
+		translation = String(
 			applyFilters(
 				'i18n.ngettext',
+				translation,
+				single,
+				plural,
+				number,
+				domain
+			)
+		);
+		return String(
+			applyFilters(
+				'i18n.ngettext_' + getFilterDomain( domain ),
 				translation,
 				single,
 				plural,
@@ -221,7 +260,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 
 	/** @type {_nx} */
 	const _nx = ( single, plural, number, context, domain ) => {
-		const translation = dcnpgettext(
+		let translation = dcnpgettext(
 			domain,
 			context,
 			single,
@@ -238,9 +277,20 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} context     Context information for the translators.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		return String(
+		translation = String(
 			applyFilters(
 				'i18n.ngettext_with_context',
+				translation,
+				single,
+				plural,
+				number,
+				context,
+				domain
+			)
+		);
+		return String(
+			applyFilters(
+				'i18n.ngettext_with_context_' + getFilterDomain( domain ),
 				translation,
 				single,
 				plural,
