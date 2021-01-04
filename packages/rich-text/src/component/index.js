@@ -42,6 +42,8 @@ import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
+import { slice } from '../slice';
+import { getTextContent } from '../get-text-content';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -311,6 +313,20 @@ function RichText(
 		} );
 	}
 
+	function handleCopy( event ) {
+		const selectedRecord = slice( record.current );
+		const plainText = getTextContent( selectedRecord );
+		const html = toHTMLString( {
+			value: selectedRecord,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+		event.clipboardData.setData( 'text/plain', plainText );
+		event.clipboardData.setData( 'text/html', html );
+		event.clipboardData.setData( 'rich-text', 'true' );
+		event.preventDefault();
+	}
+
 	/**
 	 * Handles a paste event.
 	 *
@@ -374,6 +390,14 @@ function RichText(
 
 		if ( transformed !== record.current ) {
 			handleChange( transformed );
+			return;
+		}
+
+		// If the data comes from a rich text instance, we can directly use it
+		// without filtering the data. The filters are only meant for externally
+		// pasted content and remove inline styles.
+		if ( clipboardData.getData( 'rich-text' ) === 'true' ) {
+			handleChange( insert( record.current, formatToValue( html ) ) );
 			return;
 		}
 
@@ -1078,6 +1102,7 @@ function RichText(
 		ref: useMergeRefs( [ forwardedRef, ref ] ),
 		style: defaultStyle,
 		className: 'rich-text',
+		onCopy: handleCopy,
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
