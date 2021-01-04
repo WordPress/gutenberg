@@ -44,8 +44,8 @@ jobs:
       - name: Commit the content changes
         working-directory: ./trunk
         run: |
-          svn st | grep '^?' | awk '{print $2}' | xargs svn add
-          svn st | grep '^!' | awk '{print $2}' | xargs svn rm
+          svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+          svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
           echo "Committing version $VERSION"
           # svn commit -m "Committing version $VERSION" \
           #  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
