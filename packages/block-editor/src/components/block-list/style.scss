@@ -420,7 +420,7 @@
 	.block-editor-block-list__insertion-point.is-horizontal > & {
 		top: 0;
 		height: 100%;
-		left: 0;
+		left: calc(50% - #{ $border-width });
 		right: 0;
 		width: var(--wp-admin-border-width-focus);
 	}
@@ -436,12 +436,6 @@
 	}
 
 	justify-content: center;
-
-	// Hide the inserter above the selected block.
-	&.is-inserter-hidden .block-editor-inserter__toggle {
-		visibility: hidden;
-		pointer-events: none;
-	}
 
 	top: calc(50% - #{  $button-size-small / 2 });
 	left: calc(50% - #{  $button-size-small / 2 });

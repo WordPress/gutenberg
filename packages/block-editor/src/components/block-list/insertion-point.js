@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,27 +25,6 @@ function InsertionPointInserter( {
 	containerRef,
 } ) {
 	const ref = useRef();
-	// Hide the inserter above the selected block and during multi-selection.
-	const isInserterHidden = useSelect(
-		( select ) => {
-			const {
-				getMultiSelectedBlockClientIds,
-				getSelectedBlockClientId,
-				hasMultiSelection,
-				getSettings,
-			} = select( 'core/block-editor' );
-			const { hasReducedUI } = getSettings();
-			if ( hasReducedUI ) {
-				return true;
-			}
-			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
-			const selectedBlockClientId = getSelectedBlockClientId();
-			return hasMultiSelection()
-				? multiSelectedBlockClientIds.includes( clientId )
-				: clientId === selectedBlockClientId;
-		},
-		[ clientId ]
-	);
 
 	function focusClosestTabbable( event ) {
 		const { clientX, clientY, target } = event;
@@ -83,10 +62,7 @@ function InsertionPointInserter( {
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
 			className={ classnames(
-				'block-editor-block-list__insertion-point-inserter',
-				{
-					'is-inserter-hidden': isInserterHidden,
-				}
+				'block-editor-block-list__insertion-point-inserter'
 			) }
 		>
 			<Inserter
@@ -107,56 +83,90 @@ function InsertionPointPopover( {
 	containerRef,
 	showInsertionPoint,
 } ) {
-	const { element, orientation } = useSelect(
+	const { previousElement, nextElement, orientation, isHidden } = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
 				getBlockRootClientId,
 				getBlockListSettings,
+				getMultiSelectedBlockClientIds,
+				getSelectedBlockClientId,
+				hasMultiSelection,
+				getSettings,
 			} = select( 'core/block-editor' );
 			const { ownerDocument } = containerRef.current;
-			const targetClientId =
-				clientId || last( getBlockOrder( rootClientId ) );
+			const targetRootClientId = clientId
+				? getBlockRootClientId( clientId )
+				: rootClientId;
+			const blockOrder = getBlockOrder( targetRootClientId );
+			if ( blockOrder.length < 2 ) {
+				return {};
+			}
+			const next = clientId
+				? clientId
+				: blockOrder[ blockOrder.length - 1 ];
+			const previous = blockOrder[ blockOrder.indexOf( next ) - 1 ];
+			const { hasReducedUI } = getSettings();
+			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const blockOrientation =
+				getBlockListSettings( targetRootClientId )?.orientation ||
+				'vertical';
 
 			return {
-				element: getBlockDOMNode( targetClientId, ownerDocument ),
-				orientation:
-					getBlockListSettings( getBlockRootClientId( clientId ) )
-						?.orientation || 'vertical',
+				previousElement: getBlockDOMNode( previous, ownerDocument ),
+				nextElement: getBlockDOMNode( next, ownerDocument ),
+				isHidden: hasMultiSelection()
+					? ! hasReducedUI &&
+					  multiSelectedBlockClientIds.includes( clientId )
+					: ! hasReducedUI &&
+					  blockOrientation === 'vertical' &&
+					  clientId === selectedBlockClientId,
+				orientation: blockOrientation,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
 
+	const getAnchorRect = useCallback( () => {
+		const previousRect = previousElement.getBoundingClientRect();
+		const nextRect = nextElement.getBoundingClientRect();
+		if ( orientation === 'vertical' ) {
+			const center =
+				previousRect.bottom +
+				( nextRect.top - previousRect.bottom ) / 2;
+			return {
+				top: center,
+				left: previousRect.left,
+				right: previousRect.right,
+				bottom: center,
+			};
+		}
+		const center =
+			( isRTL() ? previousRect.left : previousRect.right ) +
+			Math.abs( nextRect.left - previousRect.right ) / 2;
+		return {
+			top: previousRect.top,
+			left: center,
+			right: center,
+			bottom: previousRect.bottom,
+		};
+	}, [ previousElement, nextElement ] );
+
+	if ( ! previousElement || isHidden ) {
+		return null;
+	}
+
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
-		'is-' + orientation,
-		{
-			'is-insert-after': ! clientId,
-		}
+		'is-' + orientation
 	);
 
 	return (
 		<Popover
 			noArrow
 			animate={ false }
-			getAnchorRect={ useCallback( () => {
-				const rect = element.getBoundingClientRect();
-				if ( orientation === 'vertical' ) {
-					return {
-						top: clientId ? rect.top : rect.bottom,
-						left: rect.left,
-						right: rect.right,
-						bottom: clientId ? rect.top : rect.bottom,
-					};
-				}
-				return {
-					top: rect.top,
-					left: clientId ? rect.left : rect.right,
-					right: clientId ? rect.left : rect.right,
-					bottom: rect.top,
-				};
-			}, [ element ] ) }
+			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
@@ -165,8 +175,8 @@ function InsertionPointPopover( {
 				className={ className }
 				style={
 					orientation === 'vertical'
-						? { width: element?.offsetWidth }
-						: { height: element?.offsetHeight }
+						? { width: previousElement.offsetWidth }
+						: { height: previousElement.offsetHeight }
 				}
 			>
 				{ ( showInsertionPoint ||
