@@ -35,6 +35,7 @@ _Parameters_
 
 -   _initialData_ `[LocaleData]`: Locale data configuration.
 -   _initialDomain_ `[string]`: Domain for which configuration applies.
+-   _hooks_ `[ApplyFiltersInterface]`: Hooks implementation.
 
 _Returns_
 

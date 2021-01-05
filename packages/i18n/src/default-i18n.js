@@ -1,9 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { createI18n } from './create-i18n';
 
-const i18n = createI18n();
+const i18n = createI18n( undefined, undefined, { applyFilters } );
 
 /*
  * Comments in this file are duplicated from ./i18n due to

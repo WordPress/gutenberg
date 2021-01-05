@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { applyFilters } from '@wordpress/hooks';
-
-/**
  * External dependencies
  */
 import Tannin from 'tannin';
@@ -79,6 +74,9 @@ const DEFAULT_LOCALE_DATA = {
  * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
  * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
  */
+/**
+ * @typedef {{ applyFilters: (hookName:string, ...args: unknown[]) => unknown}} ApplyFiltersInterface
+ */
 /* eslint-enable jsdoc/valid-types */
 
 /**
@@ -101,9 +99,10 @@ const DEFAULT_LOCALE_DATA = {
  *
  * @param {LocaleData} [initialData]    Locale data configuration.
  * @param {string}     [initialDomain]  Domain for which configuration applies.
+ * @param {ApplyFiltersInterface} [hooks]     Hooks implementation.
  * @return {I18n}                       I18n instance
  */
-export const createI18n = ( initialData, initialDomain ) => {
+export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/**
 	 * The underlying instance of Tannin to which exported functions interface.
 	 *
@@ -174,11 +173,14 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} text        Text to translate.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
 		translation = String(
-			applyFilters( 'i18n.gettext', translation, text, domain )
+			hooks.applyFilters( 'i18n.gettext', translation, text, domain )
 		);
 		return String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.gettext_' + getFilterDomain( domain ),
 				translation,
 				text,
@@ -198,8 +200,11 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} context     Context information for the translators.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
 		translation = String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.gettext_with_context',
 				translation,
 				text,
@@ -208,7 +213,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 			)
 		);
 		return String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.gettext_with_context_' + getFilterDomain( domain ),
 				translation,
 				text,
@@ -227,6 +232,9 @@ export const createI18n = ( initialData, initialDomain ) => {
 			plural,
 			number
 		);
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
 		/**
 		 * Filters the singular or plural form of a string.
 		 *
@@ -237,7 +245,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
 		translation = String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.ngettext',
 				translation,
 				single,
@@ -247,7 +255,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 			)
 		);
 		return String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.ngettext_' + getFilterDomain( domain ),
 				translation,
 				single,
@@ -267,6 +275,9 @@ export const createI18n = ( initialData, initialDomain ) => {
 			plural,
 			number
 		);
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
 		/**
 		 * Filters the singular or plural form of a string with gettext context.
 		 *
@@ -278,7 +289,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
 		translation = String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.ngettext_with_context',
 				translation,
 				single,
@@ -289,7 +300,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 			)
 		);
 		return String(
-			applyFilters(
+			hooks.applyFilters(
 				'i18n.ngettext_with_context_' + getFilterDomain( domain ),
 				translation,
 				single,
