@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { serialize } from '@wordpress/blocks';
@@ -20,14 +19,13 @@ export default function TemplatePartPlaceholder( {
 } ) {
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const onCreate = useCallback( async () => {
-		const title = 'Untitled Template Part';
-		const slug = cleanForSlug( title );
+		const title = __( 'Untitled Template Part' );
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
 			{
 				title,
-				slug,
+				slug: 'template-part',
 				content: serialize( innerBlocks ),
 			}
 		);
