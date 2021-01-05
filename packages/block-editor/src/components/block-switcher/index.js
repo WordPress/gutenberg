@@ -16,6 +16,7 @@ import {
 import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,7 +30,12 @@ import BlockStylesMenu from './block-styles-menu';
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
-	const { possibleBlockTransformations, hasBlockStyles, icon } = useSelect(
+	const {
+		possibleBlockTransformations,
+		hasBlockStyles,
+		icon,
+		blockTitle,
+	} = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getBlockTransformItems } = select(
 				blockEditorStore
@@ -61,10 +67,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
+				blockTitle: getBlockType( firstBlockName ).title,
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
+
+	const isSmallScreen = useViewportMatch( 'small', '<' );
+
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
@@ -74,15 +84,20 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				<ToolbarButton
 					disabled
 					className="block-editor-block-switcher__no-switcher-icon"
-					title={ __( 'Block icon' ) }
+					title={ blockTitle }
 					icon={ <BlockIcon icon={ icon } showColors /> }
 				/>
 			</ToolbarGroup>
 		);
 	}
+
+	const singleBlockLabel = isSmallScreen
+		? blockTitle
+		: `${ __( 'Change block type or style' ) } ( ${ blockTitle } )`;
+
 	const blockSwitcherLabel =
 		1 === blocks.length
-			? __( 'Change block type or style' )
+			? singleBlockLabel
 			: sprintf(
 					/* translators: %s: number of blocks. */
 					_n(
