@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { v4 as uuid } from 'uuid';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -26,7 +21,7 @@ export default function TemplatePartPlaceholder( {
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const onCreate = useCallback( async () => {
 		const title = 'Untitled Template Part';
-		const slug = cleanForSlug( title ) + '-' + uuid();
+		const slug = cleanForSlug( title );
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',

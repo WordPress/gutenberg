@@ -108,7 +108,6 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  * @return WP_Block_Template Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
-	// Is this the best way to get the theme of a template post?
 	$theme = get_the_terms( $post, 'wp_theme' )[0]->slug;
 
 	$template              = new WP_Block_Template();
@@ -232,3 +231,51 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 
 	return null;
 }
+
+/**
+ * Generates a unique slug for templates or template parts.
+ *
+ * @param string $slug          The resolved slug (post_name).
+ * @param int    $post_ID       Post ID.
+ * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
+ * @param string $post_type     Post type.
+ * @return string The original, desired slug.
+ */
+function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_status, $post_type ) {
+	if ( 'wp_template' !== $post_type || 'wp_template_part' !== $post_type ) {
+		return $slug;
+	}
+
+	// Template slugs must be unique within the same theme.
+	$theme = get_the_terms( $post_ID, 'wp_theme' )[0]->slug;
+
+	$check_query_args = array(
+		'post_name'      => $slug,
+		'post_type'      => $post_type,
+		'posts_per_page' => 1,
+		'post__not_in'   => $post_ID,
+		'tax_query'      => array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $theme,
+		),
+		'no_found_rows'  => true,
+	);
+	$check_query      = new WP_Query( $check_query_args );
+	$posts            = $check_query->get_posts();
+
+	if ( count( $posts ) > 0 ) {
+		$suffix = 2;
+		do {
+			$query_args              = $check_query_args;
+			$alt_post_name           = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+			$query_args['post_name'] = $alt_post_name;
+			$query                   = new WP_Query( $check_query_args );
+			$suffix++;
+		} while ( count( $query->get_posts() ) > 0 );
+		$slug = $alt_post_name;
+	}
+
+	return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 4 );
