@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 (2021-01-05)
+
 ### New Feature
 
 -   Adds the `npmPackages` field to the template configuration. It allows listing remote npm packages that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
