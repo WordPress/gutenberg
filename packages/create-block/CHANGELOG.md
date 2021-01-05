@@ -9,7 +9,7 @@
 
 ### Bug Fix
 
--   Print the block class name in the `save` method in scaffolded templates.
+-   Print the block class name in the `save` method in scaffolded templates ([#27988](https://github.com/WordPress/gutenberg/pull/27988)).
 
 ## 1.0.2 (2020-12-17)
 
