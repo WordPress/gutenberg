@@ -8,7 +8,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 
 const EMPTY_ARRAY = [];
 
@@ -183,7 +183,7 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
 			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-				serialize( blocksForSerialization );
+				__unstableSerializeAndClean( blocksForSerialization );
 
 			editEntityRecord( 'postType', type, id, edits );
 		},

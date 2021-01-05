@@ -9,7 +9,11 @@ import { has } from 'lodash';
 import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -21,7 +25,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import serializeBlocks from './utils/serialize-blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -624,7 +627,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		// to make sure the edit makes the post dirty and creates
 		// a new undo level.
 		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			serializeBlocks( blocksForSerialization );
+			__unstableSerializeAndClean( blocksForSerialization );
 	}
 	yield* editPost( edits );
 }
