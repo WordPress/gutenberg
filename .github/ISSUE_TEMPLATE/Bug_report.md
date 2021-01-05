@@ -42,11 +42,11 @@ the bug. You can use LIEcap to create a GIF screen recording:
 https://www.cockos.com/licecap/
 -->
 
-## Plugin code (optional)
+## Code snippet (optional)
 <!--
-If this bug is to do with a developer API, please share a code snippet or plugin
-code that demonstrates the issue. You can use GitHub Gist to share multiple code
-files:
+If this bug is to do with a developer API, please share an executable code
+snippet that demonstrates the issue. You can use GitHub Gist to share multiple
+code files:
 https://gist.github.com
 -->
 
