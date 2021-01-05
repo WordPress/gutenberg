@@ -155,8 +155,8 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	useEffect( () => {
 		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
-		// set content to a function already.
-		if ( content && typeof content !== 'function' ) {
+		// set content to a function already or the blocks are already in state.
+		if ( content && typeof content !== 'function' && ! blocks ) {
 			const parsedContent = parse( content );
 			editEntityRecord(
 				kind,
@@ -174,6 +174,7 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 		( newBlocks, options ) => {
 			const { selectionStart, selectionEnd } = options;
 			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
+
 			const noChange = blocks === edits.blocks;
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, type, id );
@@ -187,16 +188,14 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 
 			editEntityRecord( kind, type, id, edits );
 		},
-		[ blocks, id, type, kind ]
+		[ kind, type, id, blocks ]
 	);
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selectionStart, selectionEnd } = options;
 			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
-			editEntityRecord( kind, type, id, edits, {
-				undoIgnore: true,
-			} );
+			editEntityRecord( kind, type, id, edits );
 		},
 		[ kind, type, id ]
 	);
