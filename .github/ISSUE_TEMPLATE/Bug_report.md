@@ -44,10 +44,15 @@ https://www.cockos.com/licecap/
 
 ## Code snippet (optional)
 <!--
-If this bug is to do with a developer API, please share an executable code
-snippet that demonstrates the issue. You can use GitHub Gist to share multiple
-code files:
-https://gist.github.com
+If this bug is to related to a developer API, please share a code snippet that
+demonstrates the issue.
+
+For small snippets paste it directly here, or you can use GitHub Gist to share
+multiple code files: https://gist.github.com
+
+Please ensure the shared code can be used by a developer to reproduce the
+issue—ideally it can be copied into a local development environment or executed
+in a browser console to help debug the issue.
 -->
 
 ## WordPress information
