@@ -43,6 +43,3 @@ function register_block_core_archive_title() {
 	);
 }
 add_action( 'init', 'register_block_core_archive_title' );
-
-
-
