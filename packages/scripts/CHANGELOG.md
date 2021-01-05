@@ -17,6 +17,8 @@
 
 -   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^3.6.1` to requiring `^4.2.0`.
 
+## 12.6.1 (2021-01-05)
+
 ### Bug Fix
 
 -   Fix multiple build (`build` command) runtimes conflicting when using globals ([#27985](https://github.com/WordPress/gutenberg/pull/27985)).
