@@ -13,6 +13,7 @@
 
 -   `wordpress` subfolder is no longer ignored when detecting files for testing, linting or formatting.
 -   The bundled `eslint` dependency has been updated from requiring `^7.1.0` to requiring `^7.17.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   Make it possible to transpile `.jsx` files with `build` and `start` commands ([#28002](https://github.com/WordPress/gutenberg/pull/28002)).
 
 ### Internal
 
