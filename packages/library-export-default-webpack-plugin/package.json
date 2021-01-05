@@ -22,7 +22,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"files": [
 		"index.js"
@@ -30,7 +30,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"lodash": "^4.17.19",
-		"webpack-sources": "^1.1.0"
+		"webpack-sources": "^2.2.0"
 	},
 	"peerDependencies": {
 		"webpack": "^4.0.0"

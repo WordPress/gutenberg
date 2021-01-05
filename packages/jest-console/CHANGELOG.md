@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 -   The peer `jest` dependency has been updated from requiring `>=24` to requiring `>=26` (see [Breaking Changes](https://jestjs.io/blog/2020/05/05/jest-26), [#27956](https://github.com/WordPress/gutenberg/pull/27956)).
 
 ## 3.0.0 (2019-03-06)
