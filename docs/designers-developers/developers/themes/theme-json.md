@@ -317,6 +317,12 @@ h4 {
 }
 ```
 
+#### Border Properties
+
+| Context | Radius |
+| --- | --- |
+| Search | Yes |
+
 #### Color Properties
 
 These are the current color properties supported by blocks:
