@@ -191,4 +191,63 @@ describe( 'createI18n', () => {
 	} );
 } );
 
+describe( 'i18n filters', () => {
+	test( '__() calls filters', () => {
+		const i18n = createI18n( undefined, undefined, {
+			applyFilters: ( filter, translation ) => translation + filter,
+		} );
+		expect( i18n.__( 'hello' ) ).toEqual(
+			'helloi18n.gettexti18n.gettext_default'
+		);
+		expect( i18n.__( 'hello', 'domain' ) ).toEqual(
+			'helloi18n.gettexti18n.gettext_domain'
+		);
+	} );
+	test( '_x() calls filters', () => {
+		const i18n = createI18n( undefined, undefined, {
+			applyFilters: ( filter, translation ) => translation + filter,
+		} );
+		expect( i18n._x( 'hello', 'context' ) ).toEqual(
+			'helloi18n.gettext_with_contexti18n.gettext_with_context_default'
+		);
+		expect( i18n._x( 'hello', 'context', 'domain' ) ).toEqual(
+			'helloi18n.gettext_with_contexti18n.gettext_with_context_domain'
+		);
+	} );
+	test( '_n() calls filters', () => {
+		const i18n = createI18n( undefined, undefined, {
+			applyFilters: ( filter, translation ) => translation + filter,
+		} );
+		expect( i18n._n( 'hello', 'hellos', 1 ) ).toEqual(
+			'helloi18n.ngettexti18n.ngettext_default'
+		);
+		expect( i18n._n( 'hello', 'hellos', 1, 'domain' ) ).toEqual(
+			'helloi18n.ngettexti18n.ngettext_domain'
+		);
+		expect( i18n._n( 'hello', 'hellos', 2 ) ).toEqual(
+			'hellosi18n.ngettexti18n.ngettext_default'
+		);
+		expect( i18n._n( 'hello', 'hellos', 2, 'domain' ) ).toEqual(
+			'hellosi18n.ngettexti18n.ngettext_domain'
+		);
+	} );
+	test( '_nx() calls filters', () => {
+		const i18n = createI18n( undefined, undefined, {
+			applyFilters: ( filter, translation ) => translation + filter,
+		} );
+		expect( i18n._nx( 'hello', 'hellos', 1, 'context' ) ).toEqual(
+			'helloi18n.ngettext_with_contexti18n.ngettext_with_context_default'
+		);
+		expect( i18n._nx( 'hello', 'hellos', 1, 'context', 'domain' ) ).toEqual(
+			'helloi18n.ngettext_with_contexti18n.ngettext_with_context_domain'
+		);
+		expect( i18n._nx( 'hello', 'hellos', 2, 'context' ) ).toEqual(
+			'hellosi18n.ngettext_with_contexti18n.ngettext_with_context_default'
+		);
+		expect( i18n._nx( 'hello', 'hellos', 2, 'context', 'domain' ) ).toEqual(
+			'hellosi18n.ngettext_with_contexti18n.ngettext_with_context_domain'
+		);
+	} );
+} );
+
 /* eslint-enable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
