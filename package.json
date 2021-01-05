@@ -166,7 +166,7 @@
 		"jest-serializer-enzyme": "1.0.0",
 		"jest-watch-typeahead": "0.6.1",
 		"jsdom": "16.4.0",
-		"lerna": "3.18.2",
+		"lerna": "3.22.1",
 		"lint-staged": "9.2.5",
 		"lodash": "4.17.19",
 		"make-dir": "3.0.0",
