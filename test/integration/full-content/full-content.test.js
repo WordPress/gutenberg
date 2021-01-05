@@ -74,6 +74,7 @@ describe( 'full post content fixture', () => {
 	} );
 
 	blockBasenames.forEach( ( basename ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
 			const {
 				filename: htmlFixtureFileName,

@@ -90,7 +90,7 @@ export function* __unstableSetupTemplate( template ) {
 		{
 			blocks,
 		},
-		{ __unstableShouldCreateUndoLevel: false }
+		{ undoIgnore: true }
 	);
 }
 

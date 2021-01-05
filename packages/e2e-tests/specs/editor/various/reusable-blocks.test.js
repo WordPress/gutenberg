@@ -13,6 +13,7 @@ import {
 	visitAdminPage,
 	toggleGlobalBlockInserter,
 	openDocumentSettingsSidebar,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 const reusableBlockNameInputSelector =
@@ -271,5 +272,41 @@ describe( 'Reusable blocks', () => {
 		await toggleGlobalBlockInserter();
 
 		expect( console ).not.toHaveErrored();
+	} );
+
+	it( 'should be able to insert a reusable block twice', async () => {
+		await createReusableBlock(
+			'Awesome Paragraph',
+			'Duplicated reusable block'
+		);
+		await saveAll();
+		await clearAllBlocks();
+		await insertReusableBlock( 'Duplicated reusable block' );
+		await insertReusableBlock( 'Duplicated reusable block' );
+		await saveDraft();
+		await page.reload();
+
+		// Replace the content of the  first paragraph
+		const paragraphBlock = await page.waitForSelector(
+			'.block-editor-block-list__block[data-type="core/paragraph"]'
+		);
+		paragraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( ' modified' );
+
+		// Wait for async mode to dispatch the update.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 1000 );
+
+		// Check that the content of the second reusable block has been updated.
+		const reusableBlocks = await page.$$( '.wp-block-block' );
+		reusableBlocks.forEach( async ( paragraph ) => {
+			const content = await paragraph.$eval(
+				'p',
+				( element ) => element.textContent
+			);
+			expect( content ).toEqual( 'Awesome Paragraph modified' );
+		} );
 	} );
 } );

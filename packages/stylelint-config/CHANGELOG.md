@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## 18.0.0 (2021-01-05)
+
 ### Breaking Change
 
--   Removed stylelint `^10.1.0`, `^11.0.0`, and `^12.0.0` as peer dependency.
+-   Increased minimum peer dependency of `stylelint` to `13.7.0`.
+
+### Bug Fixes
+
+-   Fixed deprecation warning for `declaration-property-unit-whitelist`.
 
 ### Internal
 
