@@ -19,7 +19,7 @@ function render_block_core_archive_title( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$tag_name           = isset( $attributes['level'] ) ? 'h' . $attributes['level'] : 'h2';
+	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h2';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
