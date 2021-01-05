@@ -92,6 +92,10 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         }
     }
 
+    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
+        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN, null);
+    }
+
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress,
                                             String errorMessage) {
         setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN, errorMessage);
@@ -149,12 +153,12 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
 
     @Override
     public void onUploadMediaFileClear(int mediaId) {
-        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, 0, null);
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, 0);
     }
 
     @Override
     public void onMediaFileUploadProgress(int mediaId, float progress) {
-        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress, null);
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
     }
 
     @Override
