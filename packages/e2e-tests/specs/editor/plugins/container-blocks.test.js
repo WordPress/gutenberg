@@ -52,7 +52,7 @@ describe( 'InnerBlocks Template Sync', () => {
 		await switchEditorModeTo( 'Visual' );
 	};
 
-	it( 'Ensures blocks without locking are kept intact even if they do not match the template ', async () => {
+	it( 'Ensures blocks without locking are kept intact even if they do not match the template', async () => {
 		await insertBlockAndAddParagraphInside(
 			'Test Inner Blocks no locking',
 			'test/test-inner-blocks-no-locking'
@@ -60,7 +60,7 @@ describe( 'InnerBlocks Template Sync', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'Removes blocks that are not expected by the template if a lock all exists ', async () => {
+	it( 'Removes blocks that are not expected by the template if a lock all exists', async () => {
 		await insertBlockAndAddParagraphInside(
 			'Test InnerBlocks locking all',
 			'test/test-inner-blocks-locking-all'

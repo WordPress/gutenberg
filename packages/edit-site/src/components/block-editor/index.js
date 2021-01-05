@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -12,7 +12,6 @@ import {
 	WritingFlow,
 	ObserveTyping,
 	BlockList,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 
 /**
@@ -25,12 +24,12 @@ import { SidebarInspectorFill } from '../sidebar';
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page } = useSelect(
 		( select ) => {
-			const { getSettings, getTemplateType, getPage } = select(
+			const { getSettings, getEditedPostType, getPage } = select(
 				'core/edit-site'
 			);
 			return {
 				settings: getSettings( setIsInserterOpen ),
-				templateType: getTemplateType(),
+				templateType: getEditedPostType(),
 				page: getPage(),
 			};
 		},
@@ -40,11 +39,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
+
 	const { setPage } = useDispatch( 'core/edit-site' );
-	const ref = useRef();
-
-	useBlockSelectionClearer( ref );
-
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -70,10 +66,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div
-				ref={ ref }
-				className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper"
-			>
+			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
 						<BlockList className="edit-site-block-editor__block-list" />

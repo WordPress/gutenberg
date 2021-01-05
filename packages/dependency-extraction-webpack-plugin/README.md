@@ -2,9 +2,9 @@
 
 This webpack plugin serves two purposes:
 
-- Externalize dependencies that are available as script dependencies on modern WordPress sites.
-- Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the
-  entry point. The asset file also contains the current version calculated for the current source code.
+-   Externalize dependencies that are available as script dependencies on modern WordPress sites.
+-   Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the
+    entry point. The asset file also contains the current version calculated for the current source code.
 
 This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing
 without an error-prone process of manually maintaining a dependency list.
@@ -19,6 +19,8 @@ Install the module
 npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
+**Note**: This package requires Node.js 12.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
+
 ## Usage
 
 ### Webpack
@@ -30,11 +32,9 @@ Use this plugin as you would other webpack plugins:
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 module.exports = {
-  // …snip
-  plugins: [
-    new DependencyExtractionWebpackPlugin(),
-  ]
-}
+	// …snip
+	plugins: [ new DependencyExtractionWebpackPlugin() ],
+};
 ```
 
 **Note:** Multiple instances of the plugin are not supported and may produced unexpected results. If
@@ -44,18 +44,19 @@ remove the default instance of the plugin:
 ```js
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const config = {
-  ...defaultConfig,
-  plugins: [
-    ...defaultConfig.plugins.filter(
-      plugin => plugin.constructor.name !== 'DependencyExtractionWebpackPlugin',
-    ),
-    new DependencyExtractionWebpackPlugin( {
-      injectPolyfill: true,
-      requestToExternal(request) {
-        /* My externals */
-      },
-    } ),
-  ],
+	...defaultConfig,
+	plugins: [
+		...defaultConfig.plugins.filter(
+			( plugin ) =>
+				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
+		),
+		new DependencyExtractionWebpackPlugin( {
+			injectPolyfill: true,
+			requestToExternal( request ) {
+				/* My externals */
+			},
+		} ),
+	],
 };
 ```
 
@@ -76,16 +77,16 @@ import { Component } from '@wordpress/element';
 
 By default, the following module requests are handled:
 
-| Request | Global | Script handle |
-| --- | --- | --- |
+| Request                      | Global               | Script handle |
+| ---------------------------- | -------------------- | ------------- |
 | `@babel/runtime/regenerator` | `regeneratorRuntime` | `wp-polyfill` |
-| `@wordpress/*` | `wp['*']` | `wp-*` |
-| `jquery` | `jQuery` | `jquery` |
-| `lodash-es` | `lodash` | `lodash` |
-| `lodash` | `lodash` | `lodash` |
-| `moment` | `moment` | `moment` |
-| `react-dom` | `ReactDOM` | `react-dom` |
-| `react` | `React` | `react` |
+| `@wordpress/*`               | `wp['*']`            | `wp-*`        |
+| `jquery`                     | `jQuery`             | `jquery`      |
+| `lodash-es`                  | `lodash`             | `lodash`      |
+| `lodash`                     | `lodash`             | `lodash`      |
+| `moment`                     | `moment`             | `moment`      |
+| `react-dom`                  | `ReactDOM`           | `react-dom`   |
+| `react`                      | `React`              | `react`       |
 
 **Note:** This plugin overlaps with the functionality provided by [webpack
 `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract
@@ -103,56 +104,55 @@ An object can be passed to the constructor to customize the behavior, for exampl
 
 ```js
 module.exports = {
-  plugins: [
-    new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-  ]
-}
+	plugins: [
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+	],
+};
 ```
 
 ##### `outputFormat`
 
-- Type: string
-- Default: `php`
+-   Type: string
+-   Default: `php`
 
 The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
 ##### `combineAssets`
 
-- Type: boolean
-- Default: `false`
+-   Type: boolean
+-   Default: `false`
 
 By default, one asset file is created for each entry point. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory.
 
 ##### `combinedOutputFile`
 
-- Type: string
-- Default: `null`
+-   Type: string
+-   Default: `null`
 
 This option is useful only when the `combineAssets` option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
 
 ##### `useDefaults`
 
-- Type: boolean
-- Default: `true`
+-   Type: boolean
+-   Default: `true`
 
 Pass `useDefaults: false` to disable the default request handling.
 
 ##### `injectPolyfill`
 
-- Type: boolean
-- Default: `false`
+-   Type: boolean
+-   Default: `false`
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as
 adding `import '@wordpress/polyfill';` to each entry point.
 
 ##### `requestToExternal`
 
-- Type: function
+-   Type: function
 
 `requestToExternal` allows the module handling to be customized. The function should accept a
 module request string and may return a string representing the global variable to use. An array of
-strings may be used to access globals via an object path, e.g. `wp.i18n` may be represented as `[
-'wp', 'i18n' ]`.
+strings may be used to access globals via an object path, e.g. `wp.i18n` may be represented as `[ 'wp', 'i18n' ]`.
 
 `requestToExternal` provided via configuration has precedence over default external handling.
 Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
@@ -166,24 +166,21 @@ Unhandled requests will be handled by the default unless `useDefaults` is set to
  * @return {(string|undefined)} Script global
  */
 function requestToExternal( request ) {
-
-  // Handle imports like `import myModule from 'my-module'`
-  if ( request === 'my-module' ) {
-    // Expect to find `my-module` as myModule in the global scope:
-    return 'myModule';
-  }
+	// Handle imports like `import myModule from 'my-module'`
+	if ( request === 'my-module' ) {
+		// Expect to find `my-module` as myModule in the global scope:
+		return 'myModule';
+	}
 }
 
 module.exports = {
-  plugins: [
-    new DependencyExtractionWebpackPlugin( { requestToExternal } ),
-  ]
-}
+	plugins: [ new DependencyExtractionWebpackPlugin( { requestToExternal } ) ],
+};
 ```
 
 ##### `requestToHandle`
 
-- Type: function
+-   Type: function
 
 All of the external modules handled by the plugin are expected to be WordPress script dependencies
 and will be added to the dependency list. `requestToHandle` allows the script handle included in the dependency list to be customized.
@@ -201,19 +198,16 @@ If no string is returned, the script handle is assumed to be the same as the req
  * @return {(string|undefined)} Script global
  */
 function requestToHandle( request ) {
-
-  // Handle imports like `import myModule from 'my-module'`
-  if ( request === 'my-module' ) {
-    // `my-module` depends on the script with the 'my-module-script-handle' handle.
-    return 'my-module-script-handle';
-  }
+	// Handle imports like `import myModule from 'my-module'`
+	if ( request === 'my-module' ) {
+		// `my-module` depends on the script with the 'my-module-script-handle' handle.
+		return 'my-module-script-handle';
+	}
 }
 
 module.exports = {
-  plugins: [
-    new DependencyExtractionWebpackPlugin( { requestToExternal } ),
-  ]
-}
+	plugins: [ new DependencyExtractionWebpackPlugin( { requestToExternal } ) ],
+};
 ```
 
 ##### `requestToExternal` and `requestToHandle`

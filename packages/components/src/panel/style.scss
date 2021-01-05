@@ -89,7 +89,7 @@
 	height: auto;
 
 	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		border-radius: 0;
 	}
 

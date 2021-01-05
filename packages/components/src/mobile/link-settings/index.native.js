@@ -89,7 +89,7 @@ function LinkSettings( {
 
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 	useEffect( () => {
-		if ( ! onLinkCellPressed ) {
+		if ( onHandleClosingBottomSheet ) {
 			onHandleClosingBottomSheet( onCloseSettingsSheet );
 		}
 	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
@@ -224,26 +224,30 @@ function LinkSettings( {
 						onChange={ onChangeLabel }
 					/>
 				) }
-				{ options.openInNewTab && (
-					<ToggleControl
-						icon={ showIcon && external }
-						label={ options.openInNewTab.label }
-						checked={ linkTarget === '_blank' }
-						onChange={ onChangeOpenInNewTab }
-					/>
-				) }
-				{ options.linkRel && (
-					<TextControl
-						icon={ showIcon && LinkRelIcon }
-						label={ options.linkRel.label }
-						value={ linkRelInputValue }
-						valuePlaceholder={ options.linkRel.placeholder }
-						onChange={ onChangeLinkRel }
-						onSubmit={ onCloseSettingsSheet }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-					/>
+				{ !! urlInputValue && (
+					<>
+						{ options.openInNewTab && (
+							<ToggleControl
+								icon={ showIcon && external }
+								label={ options.openInNewTab.label }
+								checked={ linkTarget === '_blank' }
+								onChange={ onChangeOpenInNewTab }
+							/>
+						) }
+						{ options.linkRel && (
+							<TextControl
+								icon={ showIcon && LinkRelIcon }
+								label={ options.linkRel.label }
+								value={ linkRelInputValue }
+								valuePlaceholder={ options.linkRel.placeholder }
+								onChange={ onChangeLinkRel }
+								onSubmit={ onCloseSettingsSheet }
+								autoCapitalize="none"
+								autoCorrect={ false }
+								keyboardType="url"
+							/>
+						) }
+					</>
 				) }
 			</>
 		);

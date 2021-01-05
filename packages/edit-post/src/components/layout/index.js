@@ -71,7 +71,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { settings } ) {
+function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
@@ -171,7 +171,7 @@ function Layout( { settings } ) {
 	const ref = useRef();
 
 	useDrop( ref );
-	useEditorStyles( ref, settings.styles );
+	useEditorStyles( ref, styles );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
