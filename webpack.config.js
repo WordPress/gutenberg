@@ -87,7 +87,6 @@ module.exports = {
 		],
 	},
 	mode,
-	target: 'browserslist',
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
 		memo[ name ] = `./packages/${ packageName }`;

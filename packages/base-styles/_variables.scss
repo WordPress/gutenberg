@@ -83,7 +83,7 @@ $widget-area-width: 700px;
 
 $block-toolbar-height: $grid-unit-60;
 $border-width: 1px;
-$border-width-focus: 1.5px;
+$border-width-focus: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
 $border-width-tab: 4px;
 $helptext-font-size: 12px;
 $radius-round: 50%;

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.0.0 (2021-01-05)
+
 ### Breaking Change
 
 -   Increased minimum peer dependency of `stylelint` to `13.7.0`.
