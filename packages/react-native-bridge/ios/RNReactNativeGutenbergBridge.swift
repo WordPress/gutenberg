@@ -267,7 +267,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func addMention(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    func showUserSuggestions(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         self.delegate?.gutenbergDidRequestMention(callback: { (result) in
             switch result {
             case .success(let mention):
@@ -277,6 +277,18 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             }
         })        
     }
+
+	@objc
+	func showXpostSuggestions(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+		self.delegate?.gutenbergDidRequestXpost(callback: { (result) in
+			switch result {
+			case .success(let mention):
+				resolver([mention])
+			case .failure(let error):
+				rejecter(error.domain, "\(error.code)", error)
+			}
+		})
+	}
 
     @objc
     func requestStarterPageTemplatesTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {

@@ -15,7 +15,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import './hooks';
 import './plugins';
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
 /**

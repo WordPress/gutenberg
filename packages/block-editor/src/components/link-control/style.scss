@@ -165,13 +165,13 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-title {
 		max-width: 230px;
 		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
 	.block-editor-link-control__search-item-title {
 		display: block;
 		margin-bottom: 0.2em;
 		font-weight: 500;
+		position: relative;
 
 		mark {
 			font-weight: 700;
