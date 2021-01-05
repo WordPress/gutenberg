@@ -201,6 +201,7 @@
 			left: $border-width;
 			right: $border-width;
 			bottom: $border-width;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 		}
 
 		&:focus {
@@ -219,6 +220,7 @@
 			right: $border-width;
 			bottom: $border-width;
 			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 		}
 	}
 
