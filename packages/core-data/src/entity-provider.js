@@ -140,13 +140,13 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const { content, blocks } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( 'core' );
-			const editedEntity = getEditedEntityRecord( 'postType', type, id );
+			const editedEntity = getEditedEntityRecord( kind, type, id );
 			return {
 				blocks: editedEntity.blocks,
 				content: editedEntity.content,
 			};
 		},
-		[ type, id ]
+		[ kind, type, id ]
 	);
 	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
 		'core'
@@ -176,7 +176,7 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
 			const noChange = blocks === edits.blocks;
 			if ( noChange ) {
-				return __unstableCreateUndoLevel( 'postType', type, id );
+				return __unstableCreateUndoLevel( kind, type, id );
 			}
 
 			// We create a new function here on every persistent edit
@@ -185,20 +185,20 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
 				__unstableSerializeAndClean( blocksForSerialization );
 
-			editEntityRecord( 'postType', type, id, edits );
+			editEntityRecord( kind, type, id, edits );
 		},
-		[ blocks, id, type ]
+		[ blocks, id, type, kind ]
 	);
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selectionStart, selectionEnd } = options;
 			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
-			editEntityRecord( 'postType', type, id, edits, {
+			editEntityRecord( kind, type, id, edits, {
 				undoIgnore: true,
 			} );
 		},
-		[ type, id ]
+		[ kind, type, id ]
 	);
 
 	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
