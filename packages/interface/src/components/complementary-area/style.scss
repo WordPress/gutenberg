@@ -4,9 +4,6 @@
 	overflow: visible;
 
 	@include break-small() {
-		z-index: auto;
-		height: 100%;
-		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 	}
 
@@ -24,12 +21,6 @@
 		margin-top: -1px;
 		margin-bottom: -1px;
 		position: relative;
-
-		@include break-small() {
-			overflow: visible;
-			height: auto;
-			max-height: none;
-		}
 	}
 
 	> .components-panel .components-panel__header {
@@ -39,13 +30,6 @@
 		left: 0;
 		right: 0;
 		height: $panel-header-height;
-
-		@include break-small() {
-			position: inherit;
-			top: auto;
-			left: auto;
-			right: auto;
-		}
 	}
 
 	p {
