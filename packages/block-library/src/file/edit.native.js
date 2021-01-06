@@ -494,6 +494,7 @@ export class FileEdit extends Component {
 													__( 'Error' )
 												}
 												style={ styles.uploadFailed }
+												multiline={ true }
 											/>
 										</View>
 									) }
