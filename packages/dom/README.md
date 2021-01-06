@@ -156,7 +156,7 @@ _Parameters_
 
 _Returns_
 
--   `void`:
+-   `void`: 
 
 <a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
 
@@ -288,7 +288,7 @@ _Parameters_
 
 _Returns_
 
--   `void`:
+-   `void`: 
 
 <a name="removeInvalidHTML" href="#removeInvalidHTML">#</a> **removeInvalidHTML**
 
@@ -315,7 +315,7 @@ _Parameters_
 
 _Returns_
 
--   `void`:
+-   `void`: 
 
 <a name="replaceTag" href="#replaceTag">#</a> **replaceTag**
 
@@ -340,7 +340,7 @@ _Parameters_
 
 _Returns_
 
--   `void`:
+-   `void`: 
 
 <a name="wrap" href="#wrap">#</a> **wrap**
 
