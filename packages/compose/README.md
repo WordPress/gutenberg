@@ -254,6 +254,10 @@ _Parameters_
 -   _object_ `Object`: Object reference to create an id for.
 -   _prefix_ `string`: Prefix for the unique id.
 
+<a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
+
+Undocumented declaration.
+
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
 Attach a keyboard shortcut handler.
