@@ -21,9 +21,9 @@ In particular:
 
 ## What problem does this address, if any?
 <!--
-If this feature or enhancement is related to a current problem or pain point,
-please describe it. For example, "I'm always frustrated when ..." or "It is
-currently difficult to ...".
+Please describe if this feature or enhancement is related to a current problem
+or pain point. For example, "I'm always frustrated when ..." or "It is currently
+difficult to ...".
 -->
 
 ## What is the solution?
