@@ -5,6 +5,7 @@ export { default as alignJustify } from './library/align-justify';
 export { default as alignLeft } from './library/align-left';
 export { default as alignRight } from './library/align-right';
 export { default as archive } from './library/archive';
+export { default as archiveTitle } from './library/archive-title';
 export { default as arrowDown } from './library/arrow-down';
 export { default as arrowLeft } from './library/arrow-left';
 export { default as arrowRight } from './library/arrow-right';

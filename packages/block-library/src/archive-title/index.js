@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { postTitle as icon } from '@wordpress/icons';
+import { archiveTitle as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,6 +16,6 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Archive Title' ),
 	description: __( 'Display the archive title based on the queried object.' ),
-	icon, // TODO create new Icon.
+	icon,
 	edit,
 };
