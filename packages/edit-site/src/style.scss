@@ -44,10 +44,6 @@ body.toplevel_page_gutenberg-edit-site {
 		min-height: calc(100vh - #{$admin-bar-height});
 	}
 
-	> .components-navigate-regions {
-		height: 100%;
-	}
-
 	// Todo: Remove this rule when edit site gets support
 	// for opening unpinned sidebar items.
 	.interface-complementary-area__pin-unpin-item.components-button {

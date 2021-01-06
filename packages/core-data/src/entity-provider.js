@@ -6,10 +6,11 @@ import {
 	useContext,
 	useCallback,
 	useEffect,
-	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, serialize } from '@wordpress/blocks';
+
+const EMPTY_ARRAY = [];
 
 /**
  * Internal dependencies
@@ -129,56 +130,35 @@ export function useEntityProp( kind, type, prop, _id ) {
  * @param {string} kind                            The entity kind.
  * @param {string} type                            The entity type.
  * @param {Object} options
- * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
- * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
- * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
  * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor(
-	kind,
-	type,
-	{
-		initialEdits,
-		blocksProp = 'blocks',
-		contentProp = 'content',
-		id: _id,
-	} = {}
-) {
+export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, type );
 	const id = _id ?? providerId;
 
-	const [ content, setContent ] = useEntityProp(
-		kind,
-		type,
-		contentProp,
-		id
-	);
+	const [ content, setContent ] = useEntityProp( kind, type, 'content', id );
+	const [ blocks, onInput ] = useEntityProp( kind, type, 'blocks', id );
 
 	const { editEntityRecord } = useDispatch( 'core' );
 	useEffect( () => {
-		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, {
-				undoIgnore: true,
-			} );
-		}
-	}, [ id ] );
-	const initialBlocks = useMemo( () => {
+		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
 		// set content to a function already.
 		if ( content && typeof content !== 'function' ) {
 			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : [];
+			editEntityRecord(
+				kind,
+				type,
+				id,
+				{
+					blocks: parsedContent,
+				},
+				{ undoIgnore: true }
+			);
 		}
-		return [];
 	}, [ content ] );
-	const [ blocks = initialBlocks, onInput ] = useEntityProp(
-		kind,
-		type,
-		blocksProp,
-		id
-	);
 
 	const onChange = useCallback(
 		( nextBlocks ) => {
@@ -190,5 +170,5 @@ export function useEntityBlockEditor(
 		},
 		[ onInput, setContent ]
 	);
-	return [ blocks, onInput, onChange ];
+	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
 }

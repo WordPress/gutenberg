@@ -22,7 +22,7 @@ $ cd todo-list
 $ npm start
 ```
 
-_(requires `node` version `10.0.0` or above, and `npm` version `6.9.0` or above)_
+_(requires `node` version `12.0.0` or above, and `npm` version `6.9.0` or above)_
 
 You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
 
@@ -148,20 +148,22 @@ module.exports = {
 
 The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
 
+-   `apiVersion` (default: `2`)
 -   `slug` (no default)
--   `namespace` (default: `create-block`)
+-   `namespace` (default: `'create-block'`)
 -   `title` (no default)
 -   `description` (no default)
 -   `dashicon` (no default)
--   `category` (default: `widgets`)
--   `author` (default: `The WordPress Contributors`)
--   `license` (default: `GPL-2.0-or-later`)
--   `licenseURI` (default: `https://www.gnu.org/licenses/gpl-2.0.html`)
--   `version` (default: `0.1.0`)
+-   `category` (default: `'widgets'`)
+-   `author` (default: `'The WordPress Contributors'`)
+-   `license` (default: `'GPL-2.0-or-later'`)
+-   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`)
+-   `version` (default: `'0.1.0'`)
 -   `wpScripts` (default: `true`)
--   `editorScript` (default: `file:./build/index.js`)
--   `editorStyle` (default: `file:./build/index.css`)
--   `style` (default: `file:./build/style-index.css`)
+-   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v6/commands/npm-install).
+-   `editorScript` (default: `'file:./build/index.js'`)
+-   `editorStyle` (default: `'file:./build/index.css'`)
+-   `style` (default: `'file:./build/style-index.css'`)
 
 ## WP-CLI
 

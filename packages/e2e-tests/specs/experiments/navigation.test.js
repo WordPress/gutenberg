@@ -267,7 +267,9 @@ beforeEach( async () => {
 afterEach( async () => {
 	await setUpResponseMocking( [] );
 } );
-describe( 'Navigation', () => {
+
+// Skip reason: https://github.com/WordPress/gutenberg/issues/27588.
+describe.skip( 'Navigation', () => {
 	describe( 'Creating from existing Pages', () => {
 		it( 'allows a navigation block to be created using existing pages', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always

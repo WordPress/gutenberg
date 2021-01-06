@@ -22,8 +22,10 @@ The following code example shows how to create a dynamic block that shows only t
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
+	apiVersion: 2,
 	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
@@ -32,31 +34,34 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		return {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 		};
-	} )( ( { posts, className } ) => {
-		if ( ! posts ) {
-			return 'Loading...';
-		}
+	} )( ( { posts } ) => {
+		const blockProps = useBlockProps();
 
-		if ( posts && posts.length === 0 ) {
-			return 'No posts';
-		}
-
-		const post = posts[ 0 ];
-
-		return <a className={ className } href={ post.link }>
-			{ post.title.rendered }
-		</a>;
+		return (
+			<div { ...blockProps }>
+				{ ! posts && 'Loading' }
+				{ posts && posts.length === 0 && 'No Posts' }
+				{ posts && posts.length > 0 && (
+					<a href={ posts[ 0 ].link }>
+						{ posts[ 0 ].title.rendered }
+					</a>
+				) } 
+			</div>
+		)
+		
 	} ),
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, element, data ) {
+( function( blocks, element, data, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		withSelect = data.withSelect;
+		withSelect = data.withSelect,
+		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
+		apiVersion: 2,
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
@@ -65,20 +70,25 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 			};
 		} )( function( props ) {
+			var blockProps = useBlockProps();
+			var content;
 			if ( ! props.posts ) {
-				return 'Loading...';
+				content = 'Loading...';
+			} else if ( props.posts.length === 0 ) {
+				content = 'No posts';
+			} else {
+				var post = props.posts[ 0 ];
+				content = el(
+					'a',
+					{ href: post.link },
+					post.title.rendered
+				);
 			}
 
-			if ( props.posts.length === 0 ) {
-				return 'No posts';
-			}
-			var className = props.className;
-			var post = props.posts[ 0 ];
-
-			return el(
-				'a',
-				{ className: className, href: post.link },
-				post.title.rendered
+			return el( 
+				'div',
+				blockProps,
+				content
 			);
 		} ),
 	} );
@@ -86,6 +96,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	window.wp.blocks,
 	window.wp.element,
 	window.wp.data,
+	window.wp.blockEditor,
 ) );
 ```
 {% end %}
@@ -128,6 +139,7 @@ function gutenberg_examples_dynamic() {
 	);
 
 	register_block_type( 'gutenberg-examples/example-dynamic', array(
+		'apiVersion' => 2,
 		'editor_script' => 'gutenberg-examples-dynamic',
 		'render_callback' => 'gutenberg_examples_dynamic_render_callback'
 	) );
@@ -154,40 +166,52 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/READ
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import ServerSideRender from '@wordpress/server-side-render';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
+	apiVersion: 2,
 	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
 
 	edit: function( props ) {
+		const blockProps = useBlockProps();
 		return (
-			<ServerSideRender
-				block="gutenberg-examples/example-dynamic"
-				attributes={ props.attributes }
-			/>
+			<div {...blockProps}>
+				<ServerSideRender
+					block="gutenberg-examples/example-dynamic"
+					attributes={ props.attributes }
+				/>
+			</div>
 		);
 	},
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, element, serverSideRender ) {
+( function( blocks, element, serverSideRender, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		ServerSideRender = serverSideRender;
+		ServerSideRender = serverSideRender,
+		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
+		apiVersion: 2,
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
 
 		edit: function( props ) {
+			var blockProps = useBlockProps();
 			return (
-				el( ServerSideRender, {
-					block: 'gutenberg-examples/example-dynamic',
-					attributes: props.attributes,
-				} )
+				el(
+					'div',
+					blockProps,
+					el( ServerSideRender, {
+						block: 'gutenberg-examples/example-dynamic',
+						attributes: props.attributes,
+					} )
+				)
 			);
 		},
 	} );
@@ -195,6 +219,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	window.wp.blocks,
 	window.wp.element,
 	window.wp.serverSideRender,
+	window.wp.blockEditor,
 ) );
 ```
 {% end %}

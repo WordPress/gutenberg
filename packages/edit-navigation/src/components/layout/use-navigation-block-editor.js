@@ -9,9 +9,10 @@ import { useEntityBlockEditor } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { KIND, POST_TYPE } from '../../store/utils';
+import { store as editNavigationStore } from '../../store';
 
 export default function useNavigationBlockEditor( post ) {
-	const { createMissingMenuItems } = useDispatch( 'core/edit-navigation' );
+	const { createMissingMenuItems } = useDispatch( editNavigationStore );
 
 	const [ blocks, onInput, _onChange ] = useEntityBlockEditor(
 		KIND,

@@ -13,6 +13,8 @@ import {
 	some,
 	find,
 	filter,
+	mapKeys,
+	orderBy,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -23,6 +25,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	getPossibleBlockTransformations,
 	parse,
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
@@ -1401,6 +1404,85 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 } );
 
 /**
+ * Returns the calculated frecency.
+ *
+ * 'frecency' is a heuristic (https://en.wikipedia.org/wiki/Frecency)
+ * that combines block usage frequenty and recency.
+ *
+ * @param {number} time When the last insert occurred as a UNIX epoch
+ * @param {number} count The number of inserts that have occurred.
+ *
+ * @return {number} The calculated frecency.
+ */
+const calculateFrecency = ( time, count ) => {
+	if ( ! time ) {
+		return count;
+	}
+	// The selector is cached, which means Date.now() is the last time that the
+	// relevant state changed. This suits our needs.
+	const duration = Date.now() - time;
+	switch ( true ) {
+		case duration < MILLISECONDS_PER_HOUR:
+			return count * 4;
+		case duration < MILLISECONDS_PER_DAY:
+			return count * 2;
+		case duration < MILLISECONDS_PER_WEEK:
+			return count / 2;
+		default:
+			return count / 4;
+	}
+};
+
+/**
+ * Returns a function that accepts a block type and builds an item to be shown
+ * in a specific context. It's used for building items for Inserter and available
+ * block Transfroms list.
+ *
+ * @param {Object} state Editor state.
+ * @param {Object} options Options object for handling the building of a block type.
+ * @param {string} options.buildScope The scope for which the item is going to be used.
+ * @return {Function} Function returns an item to be shown in a specific context (Inserter|Transforms list).
+ */
+const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
+	blockType
+) => {
+	const id = blockType.name;
+
+	let isDisabled = false;
+	if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
+		isDisabled = some(
+			getBlocksByClientId( state, getClientIdsWithDescendants( state ) ),
+			{ name: blockType.name }
+		);
+	}
+
+	const { time, count = 0 } = getInsertUsage( state, id ) || {};
+	const blockItemBase = {
+		id,
+		name: blockType.name,
+		title: blockType.title,
+		icon: blockType.icon,
+		isDisabled,
+		frecency: calculateFrecency( time, count ),
+	};
+	if ( buildScope === 'transform' ) return blockItemBase;
+
+	const inserterVariations = blockType.variations.filter(
+		( { scope } ) => ! scope || scope.includes( 'inserter' )
+	);
+	return {
+		...blockItemBase,
+		initialAttributes: {},
+		description: blockType.description,
+		category: blockType.category,
+		keywords: blockType.keywords,
+		variations: inserterVariations,
+		example: blockType.example,
+		utility: 1, // deprecated
+	};
+};
+
+/**
  * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
  *
@@ -1431,64 +1513,9 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const calculateFrecency = ( time, count ) => {
-			if ( ! time ) {
-				return count;
-			}
-
-			// The selector is cached, which means Date.now() is the last time that the
-			// relevant state changed. This suits our needs.
-			const duration = Date.now() - time;
-
-			switch ( true ) {
-				case duration < MILLISECONDS_PER_HOUR:
-					return count * 4;
-				case duration < MILLISECONDS_PER_DAY:
-					return count * 2;
-				case duration < MILLISECONDS_PER_WEEK:
-					return count / 2;
-				default:
-					return count / 4;
-			}
-		};
-
-		const buildBlockTypeInserterItem = ( blockType ) => {
-			const id = blockType.name;
-
-			let isDisabled = false;
-			if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-				isDisabled = some(
-					getBlocksByClientId(
-						state,
-						getClientIdsWithDescendants( state )
-					),
-					{
-						name: blockType.name,
-					}
-				);
-			}
-
-			const { time, count = 0 } = getInsertUsage( state, id ) || {};
-			const inserterVariations = blockType.variations.filter(
-				( { scope } ) => ! scope || scope.includes( 'inserter' )
-			);
-
-			return {
-				id,
-				name: blockType.name,
-				initialAttributes: {},
-				title: blockType.title,
-				description: blockType.description,
-				icon: blockType.icon,
-				category: blockType.category,
-				keywords: blockType.keywords,
-				variations: inserterVariations,
-				example: blockType.example,
-				isDisabled,
-				utility: 1, // deprecated
-				frecency: calculateFrecency( time, count ),
-			};
-		};
+		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
+			buildScope: 'inserter',
+		} );
 
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			const id = `core/block/${ reusableBlock.id }`;
@@ -1568,6 +1595,71 @@ export const getInserterItems = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getReusableBlocks( state ),
+		getBlockTypes(),
+	]
+);
+
+/**
+ * Determines the items that appear in the available block transforms list.
+ *
+ * Each item object contains what's necessary to display a menu item in the
+ * transform list and handle its selection.
+ *
+ * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
+ * that combines block usage frequenty and recency.
+ *
+ * Items are returned ordered descendingly by their 'frecency'.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {WPEditorTransformItem[]} Items that appear in inserter.
+ *
+ * @typedef {Object} WPEditorTransformItem
+ * @property {string}   id                Unique identifier for the item.
+ * @property {string}   name              The type of block to create.
+ * @property {string}   title             Title of the item, as it appears in the inserter.
+ * @property {string}   icon              Dashicon for the item, as it appears in the inserter.
+ * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting
+ *                                        this item.
+ * @property {number}   frecency          Heuristic that combines frequency and recency.
+ */
+export const getBlockTransformItems = createSelector(
+	( state, blocks, rootClientId = null ) => {
+		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
+			buildScope: 'transform',
+		} );
+		const blockTypeTransformItems = getBlockTypes()
+			.filter( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			)
+			.map( buildBlockTypeTransformItem );
+
+		const itemsByName = mapKeys(
+			blockTypeTransformItems,
+			( { name } ) => name
+		);
+		const possibleTransforms = getPossibleBlockTransformations(
+			blocks
+		).reduce( ( accumulator, block ) => {
+			if ( itemsByName[ block?.name ] ) {
+				accumulator.push( itemsByName[ block.name ] );
+			}
+			return accumulator;
+		}, [] );
+		const possibleBlockTransformations = orderBy(
+			possibleTransforms,
+			( block ) => itemsByName[ block.name ].frecency,
+			'desc'
+		);
+		return possibleBlockTransformations;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId,
+		state.preferences.insertUsage,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
 		getBlockTypes(),
 	]
 );

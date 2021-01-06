@@ -15,13 +15,15 @@ import { registerBlockType } from '@wordpress/blocks';
 import { TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'myguten/meta-block', {
 	title: 'Meta Block',
 	icon: 'smiley',
 	category: 'text',
 
-	edit( { className, setAttributes, attributes } ) {
+	edit( { setAttributes, attributes } ) {
+		const blockProps = useBlockProps();
 		const postType = useSelect(
 			( select ) => select( 'core/editor' ).getCurrentPostType(),
 			[]
@@ -37,7 +39,7 @@ registerBlockType( 'myguten/meta-block', {
 		}
 
 		return (
-			<div className={ className }>
+			<div { ...blockProps }>
 				<TextControl
 					label="Meta Block Field"
 					value={ metaFieldValue }
@@ -62,6 +64,7 @@ registerBlockType( 'myguten/meta-block', {
 	var TextControl = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 	var useEntityProp = wp.coreData.useEntityProp;
+	var useBlockProps = wp.blockEditor.useBlockProps;
 
 	registerBlockType( 'myguten/meta-block', {
 		title: 'Meta Block',
@@ -69,8 +72,7 @@ registerBlockType( 'myguten/meta-block', {
 		category: 'text',
 
 		edit: function( props ) {
-			var className = props.className;
-
+			var blockProps = useBlockProps();
 			var postType = useSelect(
 				function( select ) {
 					return select( 'core/editor' ).getCurrentPostType();
@@ -100,7 +102,7 @@ registerBlockType( 'myguten/meta-block', {
 
 			return el(
 				'div',
-				{ className: className },
+				blockProps,
 				el( TextControl, {
 					label: 'Meta Block Field',
 					value: metaFieldValue,
@@ -126,7 +128,7 @@ function myguten_enqueue() {
 	wp_enqueue_script(
 		'myguten-script',
 		plugins_url( 'myguten.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data' )
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data', 'wp-block-editor' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );

@@ -56,12 +56,14 @@ Every context has the same structure, divided in two sections: `settings` and `s
 {
   "some/context": {
     "settings": {
+      "border": [ ... ],
       "color": [ ... ],
       "custom": [ ... ],
       "spacing": [ ... ],
       "typography": [ ... ]
     },
     "styles": {
+      "border": { ... },
       "color": { ... },
       "typography": { ... }
     }
@@ -79,6 +81,9 @@ The settings section has the following structure and default values:
 {
   "some/context": {
     "settings": {
+      "border": {
+        "customRadius": false /* true to opt-in */
+      },
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
         "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
@@ -93,10 +98,13 @@ The settings section has the following structure and default values:
       },
       "typography": {
         "customFontSize": true, /* false to opt-out, as in add_theme_support( 'disable-custom-font-sizes' ) */
+        "customFontWeight": true, /* false to opt-out */
+        "customFontStyle": true, /* false to opt-out */
         "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
         "dropCap": true, /* false to opt-out */
         "fontFamilies": [ ... ], /* font family presets */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
+        "fontStyles": [ ... ], /* font style presets */
         "fontWeights": [ ... ], /* font weight presets */
         "textDecorations": [ ... ], /* text decoration presets */
         "textTransforms": [ ... ] /* text transform presets */
@@ -238,11 +246,22 @@ Each block declares which style properties it exposes. This has been coined as "
 {
   "some/context": {
     "styles": {
+      "border": {
+        "radius": "value"
+      },
       "color": {
         "background": "value",
         "gradient": "value",
         "link": "value",
         "text": "value"
+      },
+      "spacing": {
+        "padding": {
+          "top": "value",
+          "right": "value",
+          "bottom": "value",
+          "left": "value",
+        },
       },
       "typography": {
         "fontFamily": "value",
@@ -341,6 +360,7 @@ These are the current typography properties supported by blocks:
 | Context | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| Code | - | Yes | - | - | - | - | - |
 | Heading [1] | - | Yes | - | - | Yes | - | - |
 | List | - | Yes | - | - | - | - | - |
 | Navigation | Yes | Yes | Yes | Yes | - | Yes | Yes |
@@ -354,7 +374,9 @@ These are the current typography properties supported by blocks:
 | Post Hierarchical Terms | - | Yes | - | - | Yes | - | - |
 | Post Tags | - | Yes | - | - | Yes | - | - |
 | Post Title | Yes | Yes | - | - | Yes | - | - |
+| Preformatted | - | Yes | - | - | - | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
 | Site Title | Yes | Yes | - | - | Yes | - | - |
+| Verse | Yes | Yes | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).

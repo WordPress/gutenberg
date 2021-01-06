@@ -11,6 +11,7 @@ const terminalLink = require( 'terminal-link' );
  * Internal dependencies
  */
 const env = require( './env' );
+const parseXdebugMode = require( './parse-xdebug-mode' );
 
 // Colors
 const boldWhite = chalk.bold.white;
@@ -90,7 +91,7 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first insall, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
+			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
 		( args ) => {
 			args.option( 'update', {
@@ -98,6 +99,12 @@ module.exports = function cli() {
 				describe:
 					'Download source updates and apply WordPress configuration.',
 				default: false,
+			} );
+			args.option( 'xdebug', {
+				describe:
+					'Enables Xdebug. If not passed, Xdebug is turned off. If no modes are set, uses "debug". You may set multiple Xdebug modes by passing them in a comma-separated list: `--xdebug=develop,coverage`. See https://xdebug.org/docs/all_settings#mode for information about Xdebug modes.',
+				coerce: parseXdebugMode,
+				type: 'string',
 			} );
 		},
 		withSpinner( env.start )
@@ -124,7 +131,7 @@ module.exports = function cli() {
 		withSpinner( env.clean )
 	);
 	yargs.command(
-		'logs',
+		'logs [environment]',
 		'displays PHP and Docker logs for given WordPress environment.',
 		( args ) => {
 			args.positional( 'environment', {

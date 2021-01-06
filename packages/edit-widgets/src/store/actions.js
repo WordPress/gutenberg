@@ -8,6 +8,7 @@ import { invert } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch as dataDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -57,7 +58,7 @@ export function* saveEditedWidgetAreas() {
 	try {
 		yield* saveWidgetAreas( editedWidgetAreas );
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Widgets saved.' ),
 			{
@@ -66,7 +67,7 @@ export function* saveEditedWidgetAreas() {
 		);
 	} catch ( e ) {
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			/* translators: %s: The error message. */
 			sprintf( __( 'There was an error. %s' ), e.message ),

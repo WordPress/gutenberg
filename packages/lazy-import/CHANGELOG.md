@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.0 (2020-12-17)
+
 ### New Feature
 
 -   Allow local paths as an option when trying to import a specific file from the package ([#23751](https://github.com/WordPress/gutenberg/pull/23751)).

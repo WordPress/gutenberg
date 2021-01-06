@@ -10,7 +10,12 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize, rawHandler } from '@wordpress/blocks';
+import {
+	parse,
+	serialize,
+	rawHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
@@ -21,6 +26,7 @@ import { Preview } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Layout from './components/layout';
+import { store as editPostStore } from './store';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -166,8 +172,8 @@ export default compose( [
 			getEditorMode,
 			getPreference,
 			__experimentalGetPreviewDeviceType,
-		} = select( 'core/edit-post' );
-		const { getBlockTypes } = select( 'core/blocks' );
+		} = select( editPostStore );
+		const { getBlockTypes } = select( blocksStore );
 
 		return {
 			hasFixedToolbar:
@@ -180,7 +186,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
+		const { switchEditorMode } = dispatch( editPostStore );
 		return {
 			switchEditorMode,
 		};

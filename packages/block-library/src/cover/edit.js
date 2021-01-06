@@ -37,6 +37,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
+	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -89,6 +90,7 @@ function CoverHeightInput( {
 	value = '',
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
+
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -264,6 +266,39 @@ function CoverEdit( {
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isBlogUrl = isBlobURL( url );
 
+	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
+	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
+		minHeightUnit
+	);
+	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
+
+	const toggleMinFullHeight = () => {
+		if ( isMinFullHeight ) {
+			// If there aren't previous values, take the default ones.
+			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
+				return setAttributes( {
+					minHeight: undefined,
+					minHeightUnit: undefined,
+				} );
+			}
+
+			// Set the previous values of height.
+			return setAttributes( {
+				minHeight: prevMinHeightValue,
+				minHeightUnit: prevMinHeightUnit,
+			} );
+		}
+
+		setPrevMinHeightValue( minHeight );
+		setPrevMinHeightUnit( minHeightUnit );
+
+		// Set full height.
+		return setAttributes( {
+			minHeight: 100,
+			minHeightUnit: 'vh',
+		} );
+	};
+
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
@@ -322,6 +357,10 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
+				<FullHeightAlignment
+					isActive={ isMinFullHeight }
+					onToggle={ toggleMinFullHeight }
+				/>
 				{ hasBackground && (
 					<>
 						<BlockAlignmentMatrixToolbar
@@ -405,11 +444,11 @@ function CoverEdit( {
 								onChange={ ( newMinHeight ) =>
 									setAttributes( { minHeight: newMinHeight } )
 								}
-								onUnitChange={ ( nextUnit ) => {
+								onUnitChange={ ( nextUnit ) =>
 									setAttributes( {
 										minHeightUnit: nextUnit,
-									} );
-								} }
+									} )
+								}
 							/>
 						</PanelBody>
 						<PanelColorGradientSettings

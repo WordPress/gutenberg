@@ -59,7 +59,9 @@ export async function toggleGlobalBlockInserter() {
 async function waitForInserterCloseAndContentFocus() {
 	await page.waitForFunction( () =>
 		document.body
-			.querySelector( '.block-editor-block-list__layout' )
+			.querySelector(
+				'.interface-interface-skeleton__content .block-editor-block-list__layout'
+			)
 			.contains( document.activeElement )
 	);
 }
@@ -129,9 +131,9 @@ export async function searchForReusableBlock( searchTerm ) {
  */
 export async function insertBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
-	const insertButton = (
-		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//button//span[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
@@ -162,9 +164,9 @@ export async function insertPattern( searchTerm ) {
  */
 export async function insertReusableBlock( searchTerm ) {
 	await searchForReusableBlock( searchTerm );
-	const insertButton = (
-		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//button//span[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();

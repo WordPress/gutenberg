@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
-	__unstableUseAnimate as useAnimate,
+	__unstableGetAnimateClassName as getAnimateClassName,
 	withNotices,
 	ToolbarGroup,
 	ToolbarButton,
@@ -129,7 +129,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 
 	const blockProps = useBlockProps( {
 		className: classnames(
-			useAnimate( { type: isBlobURL( href ) ? 'loading' : null } ),
+			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': isBlobURL( href ),
 			}
@@ -205,6 +205,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 							<RichText
 								tagName="div" // must be block-level or else cursor disappears
+								aria-label={ __( 'Download button text' ) }
 								className={ 'wp-block-file__button' }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting

@@ -53,15 +53,6 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
-	/**
-	 * Filters the default query arguments.
-	 *
-	 * @since 5.7.0
-	 *
-	 * @param array $args The default query arguments.
-	 */
-	$args = apply_filters( 'block_latest_posts_query_args', $args );
-
 	$recent_posts = get_posts( $args );
 
 	$list_items_markup = '';

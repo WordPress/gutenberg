@@ -3,6 +3,9 @@
 	align-self: flex-start;
 }
 
+// Block spacing used to indicate the space between blocks in the editor.
+// The variable has been retired.
+$block-spacing: 4px;
 .outline {
 	// Border Width has to be spread since width is thicker
 	// on Android when border radius is decreased to 0
