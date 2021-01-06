@@ -31,7 +31,6 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			),
 		);
 
-		self::assertTrue( taxonomy_exists( 'wp_theme' ) );
 		self::$post = self::factory()->post->create_and_get( $args );
 		wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
 	}

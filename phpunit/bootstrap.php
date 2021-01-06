@@ -10,7 +10,7 @@ require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
 // If we're running in WP's build directory, ensure that WP knows that, too.
 if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
-	//define( 'WP_RUN_CORE_TESTS', true );
+	define( 'WP_RUN_CORE_TESTS', true );
 }
 
 // Determine the tests directory (from a WP dev checkout).
