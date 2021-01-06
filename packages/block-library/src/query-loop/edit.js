@@ -82,17 +82,19 @@ export default function QueryLoopEdit( {
 
 			// When you insert this block outside of the edit site then store
 			// does not exist therefore we check for its existence.
+			// TODO: remove this code, edit-site shouldn't be called in block-library.
+			// This creates a cycle dependency.
 			if ( inherit && select( 'core/edit-site' ) ) {
 				// This should be passed from the context exposed by edit site.
-				const { getTemplateId, getTemplateType } = select(
+				const { getEditedPostType, getEditedPostId } = select(
 					'core/edit-site'
 				);
 
-				if ( 'wp_template' === getTemplateType() ) {
+				if ( 'wp_template' === getEditedPostType() ) {
 					const { slug } = select( 'core' ).getEntityRecord(
 						'postType',
 						'wp_template',
-						getTemplateId()
+						getEditedPostId()
 					);
 
 					// Change the post-type if needed.

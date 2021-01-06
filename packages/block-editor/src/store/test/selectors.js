@@ -2930,7 +2930,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return null if the specified clientId was not found ', () => {
+		it( 'should return null if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {

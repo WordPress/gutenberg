@@ -94,6 +94,7 @@ export class PostPublishButton extends Component {
 			isPublished,
 			isSaveable,
 			isSaving,
+			isAutoSaving,
 			isToggle,
 			onSave,
 			onStatusChange,
@@ -147,7 +148,7 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
 			className: 'editor-post-publish-button',
-			isBusy: isSaving && isPublished,
+			isBusy: ! isAutoSaving && isSaving && isPublished,
 			isPrimary: true,
 			onClick: this.createOnClick( onClickButton ),
 		};
@@ -197,6 +198,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			isSavingPost,
+			isAutosavingPost,
 			isEditedPostBeingScheduled,
 			getEditedPostVisibility,
 			isCurrentPostPublished,
@@ -208,8 +210,10 @@ export default compose( [
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 		} = select( 'core/editor' );
+		const _isAutoSaving = isAutosavingPost();
 		return {
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() || _isAutoSaving,
+			isAutoSaving: _isAutoSaving,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),

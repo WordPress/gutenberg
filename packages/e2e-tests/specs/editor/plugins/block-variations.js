@@ -7,6 +7,8 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	searchForBlock,
+	pressKeyWithModifier,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block variations', () => {
@@ -102,5 +104,76 @@ describe( 'Block variations', () => {
 				'.wp-block[data-type="core/columns"] .wp-block[data-type="core/column"]'
 			)
 		).toHaveLength( 4 );
+	} );
+	// @see @wordpres/block-editor/src/components/use-block-display-information (`useBlockDisplayInformation` hook).
+	describe( 'testing block display information with matching variations', () => {
+		const getActiveBreadcrumb = async () =>
+			page.evaluate(
+				() =>
+					document.querySelector(
+						'.block-editor-block-breadcrumb__current'
+					).textContent
+			);
+		const getFirstNavigationItem = async () => {
+			await pressKeyWithModifier( 'access', 'o' );
+			// This also returns the visually hidden text `(selected block)`.
+			// For example `Paragraph(selected block)`. In order to hide this
+			// implementation detail and search for childNodes, we choose to
+			// test with `String.prototype.startsWith()`.
+			return page.evaluate(
+				() =>
+					document.querySelector(
+						'.block-editor-block-navigation-block-select-button'
+					).textContent
+			);
+		};
+		const getBlockCardDescription = async () => {
+			await openDocumentSettingsSidebar();
+			return page.evaluate(
+				() =>
+					document.querySelector(
+						'.block-editor-block-card__description'
+					).textContent
+			);
+		};
+
+		it( 'should show block information when no matching variation is found', async () => {
+			await insertBlock( 'Large Quote' );
+			const breadcrumb = await getActiveBreadcrumb();
+			expect( breadcrumb ).toEqual( 'Quote' );
+			const navigationItem = await getFirstNavigationItem();
+			expect( navigationItem.startsWith( 'Quote' ) ).toBeTruthy();
+			const description = await getBlockCardDescription();
+			expect( description ).toEqual(
+				'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
+			);
+		} );
+		it( 'should display variations info if all declared', async () => {
+			await insertBlock( 'Success Message' );
+			const breadcrumb = await getActiveBreadcrumb();
+			expect( breadcrumb ).toEqual( 'Success Message' );
+			const navigationItem = await getFirstNavigationItem();
+			expect(
+				navigationItem.startsWith( 'Success Message' )
+			).toBeTruthy();
+			const description = await getBlockCardDescription();
+			expect( description ).toEqual(
+				'This block displays a success message. This description overrides the default one provided for the Paragraph block.'
+			);
+		} );
+		it( 'should display mixed block and variation match information', async () => {
+			// Warning Message variation is missing the `description`.
+			await insertBlock( 'Warning Message' );
+			const breadcrumb = await getActiveBreadcrumb();
+			expect( breadcrumb ).toEqual( 'Warning Message' );
+			const navigationItem = await getFirstNavigationItem();
+			expect(
+				navigationItem.startsWith( 'Warning Message' )
+			).toBeTruthy();
+			const description = await getBlockCardDescription();
+			expect( description ).toEqual(
+				'Start with the building block of all narrative.'
+			);
+		} );
 	} );
 } );

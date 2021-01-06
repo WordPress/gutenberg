@@ -27,6 +27,6 @@ p {
 	/* Test `stylelint-config-recommended` inherited `no-extra-semicolons` rule */
 	@include foo;;
 
-	/* Test `stylelint-config-wordpress` inherited `number-leading-zero` rule */
+	/* Test `@wordpress/stylelint-config` inherited `number-leading-zero` rule */
 	top: .2em;
 }

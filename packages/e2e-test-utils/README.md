@@ -2,7 +2,7 @@
 
 End-To-End (E2E) test utils for WordPress.
 
-_It works properly with the minimum version of Gutenberg `5.6.0` or the minimum version of WordPress `5.2.0`._
+_It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
 ## Installation
 
@@ -11,6 +11,8 @@ Install the module
 ```bash
 npm install @wordpress/e2e-test-utils --save-dev
 ```
+
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
 
 ## API
 

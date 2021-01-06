@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.21.0 (2021-01-05)
+
+### New Feature
+
+-	Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
+
 ## 2.16.0 (2020-06-15)
 
 ### New Feature

@@ -37,6 +37,11 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon: 'smiley',
+			npmDependencies: [
+				'@wordpress/block-editor',
+				'@wordpress/blocks',
+				'@wordpress/i18n',
+			],
 		},
 	},
 };
@@ -138,6 +143,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		npmDependencies: [],
 		editorScript: 'file:./build/index.js',
 		editorStyle: 'file:./build/index.css',
 		style: 'file:./build/style-index.css',

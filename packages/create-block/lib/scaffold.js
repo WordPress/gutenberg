@@ -30,6 +30,7 @@ module.exports = async (
 		licenseURI,
 		version,
 		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
@@ -57,10 +58,11 @@ module.exports = async (
 		license,
 		licenseURI,
 		textdomain: slug,
+		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
-		wpScripts,
 	};
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
