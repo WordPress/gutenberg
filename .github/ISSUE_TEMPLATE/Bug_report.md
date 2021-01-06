@@ -13,6 +13,7 @@ Before submitting a bug report:
 - Check if the bug has already been fixed by updating WordPress and/or Gutenberg.
 - Check if the bug is caused by a plugin by deactivating all plugins except Gutenberg.
 - Check if the bug is caused by a theme by activating a default theme e.g. Twenty Twenty.
+- Check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues.
 
 If this is a security issue, please report it in HackerOne instead:
 https://hackerone.com/wordpress
