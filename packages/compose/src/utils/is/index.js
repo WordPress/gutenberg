@@ -1,3 +1,4 @@
+/* global File, Blob */
 /**
  * External dependencies
  */
@@ -82,10 +83,10 @@ function valueEmpty( value ) {
  */
 export const is = {
 	/** @type {(o: any) => o is Blob} */
-	blob: ( o ) => o instanceof window.Blob,
+	blob: ( o ) => o instanceof Blob,
 	defined,
 	/** @type {(o: any) => o is File} */
-	file: ( o ) => o instanceof window.$forFile,
+	file: ( o ) => o instanceof File,
 	numeric,
 	numericZero,
 	valueEmpty,
