@@ -21,6 +21,12 @@
 	// Use position relative for row animation.
 	position: relative;
 
+	&.is-selected .block-editor-block-navigation-block-contents,
+	&.is-selected:focus .block-editor-block-navigation-block-contents {
+		background: $gray-900;
+		color: $white;
+	}
+
 	&.is-dragging {
 		display: none;
 	}
@@ -43,12 +49,6 @@
 
 		&:focus {
 			z-index: 1;
-		}
-
-		&.is-selected,
-		&.is-selected:focus {
-			background: $gray-900;
-			color: $white;
 		}
 
 		&.is-dropping-before::before {
