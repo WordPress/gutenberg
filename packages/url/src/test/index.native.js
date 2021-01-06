@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import './index.test';
+import './index.js';
 
 /**
  * External dependencies
