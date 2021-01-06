@@ -3,7 +3,6 @@
  */
 import { View, Clipboard, TouchableWithoutFeedback, Text } from 'react-native';
 import React from 'react';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -491,11 +490,8 @@ export class FileEdit extends Component {
 											<PlainText
 												editable={ false }
 												value={
-													isEmpty(
-														uploadErrorMessage
-													)
-														? __( 'Error' )
-														: uploadErrorMessage
+													uploadErrorMessage ??
+													__( 'Error' )
 												}
 												style={ styles.uploadFailed }
 											/>
