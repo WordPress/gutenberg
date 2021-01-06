@@ -48,8 +48,9 @@
 
 	// Override external DatePicker styles.
 	.DayPickerNavigation_leftButton__horizontalDefault {
-		/* rtl:ignore */
+		/*!rtl:begin:ignore*/
 		left: 13px;
+		/*!rtl:end:ignore*/
 	}
 
 	.CalendarMonth_caption {
