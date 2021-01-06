@@ -10,15 +10,13 @@
  * Tests for the Block Templates abstraction layer.
  */
 class Block_Templates_Test extends WP_UnitTestCase {
-	private $post;
+	private static $post;
 
-	public function setUp() {
-		parent::setUp();
-
-		register_taxonomy(
-			'wp_theme',
-			array( 'wp_template', 'wp_template_part' )
-		);
+	public static function wpSetUpBeforeClass() {
+		switch_theme( 'tt1-blocks' );
+		gutenberg_register_template_post_type();
+		gutenberg_register_template_part_post_type();
+		gutenberg_register_wp_theme_taxonomy();
 
 		$args = array(
 			'post_type'    => 'wp_template',
@@ -28,12 +26,18 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			'post_excerpt' => 'Description of my template',
 			'tax_input'    => array(
 				'wp_theme' => array(
-					'twentytwenty',
+					get_stylesheet(),
 				),
 			),
 		);
 
-		$this->post = get_post( wp_insert_post( $args ) );
+		self::assertTrue( taxonomy_exists( 'wp_theme' ) );
+		self::$post = self::factory()->post->create_and_get( $args );
+		wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
+	}
+
+	public static function wpTearDownAfterClass() {
+		wp_delete_post( self::$post->ID );
 	}
 
 	function test_gutenberg_build_template_result_from_file() {
@@ -45,29 +49,30 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			'wp_template'
 		);
 
-		$this->assertEquals( $template->id, 'default|single' );
-		$this->assertEquals( $template->theme, 'default' );
-		$this->assertEquals( $template->slug, 'single' );
-		$this->assertEquals( $template->status, 'publish' );
-		$this->assertEquals( $template->is_custom, false );
-		$this->assertEquals( $template->title, 'Single' );
-		$this->assertEquals( $template->description, 'Used when a single entry that is not a Page is queried' );
-		$this->assertEquals( $template->type, 'wp_template' );
+		$this->assertEquals( get_stylesheet() . '|single', $template->id );
+		$this->assertEquals( get_stylesheet(), $template->theme );
+		$this->assertEquals( 'single', $template->slug );
+		$this->assertEquals( 'publish', $template->status );
+		$this->assertEquals( false, $template->is_custom );
+		$this->assertEquals( 'Single', $template->title );
+		$this->assertEquals( 'Used when a single entry that is not a Page is queried', $template->description );
+		$this->assertEquals( 'wp_template', $template->type );
 	}
 
 	function test_gutenberg_build_template_result_from_post() {
 		$template = _gutenberg_build_template_result_from_post(
-			$this->post,
+			self::$post,
 			'wp_template'
 		);
 
-		// $this->assertEquals( $template->id, 'twentytwenty|my_template' );
-		// $this->assertEquals( $template->theme, 'twentytwenty' );
-		$this->assertEquals( $template->slug, 'my_template' );
-		$this->assertEquals( $template->status, 'draft' );
-		$this->assertEquals( $template->is_custom, true );
-		$this->assertEquals( $template->title, 'My Template' );
-		$this->assertEquals( $template->description, 'Description of my template' );
-		$this->assertEquals( $template->type, 'wp_template' );
+		$this->assertNotWPError( $template );
+		$this->assertEquals( get_stylesheet() . '|my_template', $template->id );
+		$this->assertEquals( get_stylesheet(), $template->theme );
+		$this->assertEquals( 'my_template', $template->slug );
+		$this->assertEquals( 'publish', $template->status );
+		$this->assertEquals( true, $template->is_custom );
+		$this->assertEquals( 'My Template', $template->title );
+		$this->assertEquals( 'Description of my template', $template->description );
+		$this->assertEquals( 'wp_template', $template->type );
 	}
 }

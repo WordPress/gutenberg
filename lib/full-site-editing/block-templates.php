@@ -105,10 +105,20 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  *
  * @param WP_Post $post Template post.
  *
- * @return WP_Block_Template Template.
+ * @return WP_Block_Template|WP_Error Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
-	$theme = get_the_terms( $post, 'wp_theme' )[0]->slug;
+	$terms = get_the_terms( $post, 'wp_theme' );
+
+	if ( is_wp_error( $terms ) ) {
+		return $terms;
+	}
+
+	if ( ! $terms ) {
+		return new WP_Error( 'template_part_missing_theme', __( 'No theme is defined for this template part.', 'gutenberg' ) );
+	}
+
+	$theme = $terms[0]->slug;
 
 	$template              = new WP_Block_Template();
 	$template->wp_id       = $post->ID;
@@ -164,7 +174,11 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	$template_query = new WP_Query( $wp_query_args );
 	$query_result   = array();
 	foreach ( $template_query->get_posts() as $post ) {
-		$query_result[] = _gutenberg_build_template_result_from_post( $post );
+		$template = _gutenberg_build_template_result_from_post( $post );
+
+		if ( ! is_wp_error( $template ) ) {
+			$query_result[] = $template;
+		}
 	}
 
 	if ( ! isset( $query['wp_id'] ) && ( ! isset( $query['theme'] ) || wp_get_theme()->get_stylesheet() === $query['theme'] ) ) {
@@ -217,7 +231,11 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$posts                = $template_query->get_posts();
 
 	if ( count( $posts ) > 0 ) {
-		return _gutenberg_build_template_result_from_post( $posts[0] );
+		$template = _gutenberg_build_template_result_from_post( $posts[0] );
+
+		if ( ! is_wp_error( $template ) ) {
+			return $template;
+		}
 	}
 
 	if ( wp_get_theme()->get_stylesheet() === $theme ) {
