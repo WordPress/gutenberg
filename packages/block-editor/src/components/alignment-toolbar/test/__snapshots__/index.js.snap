@@ -47,7 +47,7 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
     </SVG>
   }
   isCollapsed={true}
-  label="Change text alignment"
+  label="Align"
   popoverProps={
     Object {
       "isAlternate": true,
@@ -119,7 +119,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
     </SVG>
   }
   isCollapsed={true}
-  label="Change text alignment"
+  label="Align"
   popoverProps={
     Object {
       "isAlternate": true,
