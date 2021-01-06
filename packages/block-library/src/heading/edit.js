@@ -59,6 +59,7 @@ function HeadingEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Advanced' ) }>
 					<TextControl
+						autoCapitalize="none"
 						label={ __( 'HTML Anchor' ) }
 						value={ anchor || '' }
 						valuePlaceholder={ __( 'None' ) }
