@@ -156,7 +156,7 @@ _Parameters_
 
 _Returns_
 
--   `void`: 
+-   `void`:
 
 <a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
 
@@ -169,7 +169,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Wether or not the element is empty.
+-   `boolean`: Whether or not the element is empty.
 
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 
@@ -288,7 +288,7 @@ _Parameters_
 
 _Returns_
 
--   `void`: 
+-   `void`:
 
 <a name="removeInvalidHTML" href="#removeInvalidHTML">#</a> **removeInvalidHTML**
 
@@ -315,7 +315,7 @@ _Parameters_
 
 _Returns_
 
--   `void`: 
+-   `void`:
 
 <a name="replaceTag" href="#replaceTag">#</a> **replaceTag**
 
@@ -340,7 +340,7 @@ _Parameters_
 
 _Returns_
 
--   `void`: 
+-   `void`:
 
 <a name="wrap" href="#wrap">#</a> **wrap**
 
