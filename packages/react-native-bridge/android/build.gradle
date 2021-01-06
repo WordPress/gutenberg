@@ -120,6 +120,7 @@ android {
     sourceSets {
         main {
             assets.srcDirs += buildAssetsFolder
+            assets.srcDirs += '../../../../src/block-support'
         }
     }
 }
