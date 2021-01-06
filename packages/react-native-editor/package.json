@@ -79,9 +79,10 @@
 		"access": "public"
 	},
 	"scripts": {
-		"start": "react-native start",
-		"start:reset": "npm run clean:runtime && npm run start -- --reset-cache",
+		"start": "npm run clean:runtime && npm run start:quick -- --reset-cache",
 		"start:debug": "node --inspect-brk node_modules/.bin/react-native start",
+		"start:quick": "react-native start",
+        "start:reset": "echo '`start:reset` is deprecated. Please use `start`, which does the same thing that `start:reset` used to do.'",
 		"prern-bundle": "cd ../.. && patch-package --patch-dir packages/react-native-editor/metro-patch",
 		"rn-bundle": "react-native bundle",
 		"postrn-bundle": "cd ../.. && patch-package --reverse --patch-dir packages/react-native-editor/metro-patch",
