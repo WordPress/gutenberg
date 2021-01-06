@@ -52,12 +52,18 @@ export function hasUnits( units ) {
  *
  * @param {string} initialValue Value to parse
  * @param {Array<Object>} units Units to derive from.
+ * @param {string} fallbackUnit fallback unit
  * @return {Array<number, string>} The extracted number and unit.
  */
-export function parseUnit( initialValue, units = CSS_UNITS ) {
+export function parseUnit( initialValue, units = CSS_UNITS, fallbackUnit ) {
 	const value = String( initialValue ).trim();
-
 	let num = parseFloat( value, 10 );
+
+	if ( typeof initialValue === 'number' ) {
+		const fallBack = fallbackUnit || DEFAULT_UNIT.value;
+		return [ num, fallBack ];
+	}
+
 	num = isNaN( num ) ? '' : num;
 
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
@@ -93,7 +99,7 @@ export function getValidParsedUnit(
 	fallbackUnit,
 	type
 ) {
-	if ( ! parseUnit( next, units )[ 0 ] ) {
+	if ( ! parseUnit( next, units, fallbackUnit )[ 0 ] ) {
 		return (
 			( next && type && getCSSValues( next, type ) ) || [
 				fallbackValue,
@@ -102,7 +108,7 @@ export function getValidParsedUnit(
 		);
 	}
 
-	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
+	const [ parsedValue, parsedUnit ] = parseUnit( next, units, fallbackUnit );
 
 	return ! parsedUnit
 		? [ parsedValue, fallbackUnit ]

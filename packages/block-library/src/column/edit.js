@@ -63,7 +63,9 @@ function ColumnEdit( {
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit, ...style } : { ...style },
+		style: widthWithUnit
+			? { flexBasis: widthWithUnit, ...style }
+			: { ...style },
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock,

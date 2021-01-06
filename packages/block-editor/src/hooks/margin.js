@@ -10,16 +10,8 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/unit-control';
 import { SPACING_SUPPORT_KEY } from './padding';
-
-const UNITS = [
-	{ value: '%', label: '%', default: '' },
-	{ value: 'px', label: 'px', default: '' },
-	{ value: 'em', label: 'em', default: '' },
-	{ value: 'rem', label: 'rem', default: '' },
-	{ value: 'vw', label: 'vw', default: '' },
-];
+import useEditorFeature from '../components/use-editor-feature';
 
 const hasMarginSupport = ( blockName ) => {
 	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
@@ -40,7 +32,11 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( UNITS );
+	const customUnits = useEditorFeature( 'spacing.units' );
+	const units = customUnits?.map( ( unit ) => ( {
+		value: unit,
+		label: unit,
+	} ) );
 
 	if ( ! hasMarginSupport( blockName ) ) {
 		return null;

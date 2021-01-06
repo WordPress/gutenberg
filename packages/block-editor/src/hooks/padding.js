@@ -13,13 +13,6 @@ import { cleanEmptyObject } from './utils';
 import useEditorFeature from '../components/use-editor-feature';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
-const UNITS = [
-	{ value: '%', label: '%', default: '' },
-	{ value: 'px', label: 'px', default: '' },
-	{ value: 'em', label: 'em', default: '' },
-	{ value: 'rem', label: 'rem', default: '' },
-	{ value: 'vw', label: 'vw', default: '' },
-];
 
 const hasPaddingSupport = ( blockName ) => {
 	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
@@ -39,7 +32,6 @@ export function PaddingEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
-
 	const customUnits = useEditorFeature( 'spacing.units' );
 	const units = customUnits?.map( ( unit ) => ( {
 		value: unit,
