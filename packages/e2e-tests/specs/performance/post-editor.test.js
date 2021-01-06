@@ -143,6 +143,9 @@ describe( 'Post Editor Performance', () => {
 			}
 		}
 
+		// Save the draft so we don't get browser dialogs about leaving unsaved page.
+		await saveDraft();
+
 		// Measuring block selection performance
 		await createNewPost();
 		await page.evaluate( () => {
