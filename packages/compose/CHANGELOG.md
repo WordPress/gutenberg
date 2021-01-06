@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- Add `is` utility
+
 ## 3.4.0 (2019-06-12)
 
 ### New Features
