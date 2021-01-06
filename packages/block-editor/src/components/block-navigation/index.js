@@ -51,6 +51,10 @@ function BlockNavigation( {
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
 					__experimentalFeatures={ __experimentalFeatures }
+
+					// This just duplicates the above, but if I try to remove the duplication
+					// then things break and I don't know why. -shaun
+					showNestedBlocks
 				/>
 			) }
 		</div>
