@@ -101,6 +101,7 @@ exports[`File block renders file error state without crashing 1`] = `
           allowFontScaling={true}
           editable={false}
           fontFamily="serif"
+          multiline={true}
           onChange={[Function]}
           rejectResponderTermination={true}
           scrollEnabled={false}
