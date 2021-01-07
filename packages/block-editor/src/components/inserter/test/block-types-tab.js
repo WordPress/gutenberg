@@ -81,7 +81,9 @@ describe( 'InserterMenu', () => {
 			collections,
 		] );
 
-		useSelect.mockImplementation( () => false );
+		useSelect.mockImplementation( () => ( {
+			hasChildItems: false,
+		} ) );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
@@ -139,7 +141,9 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'displays child blocks UI when root block has child blocks', () => {
-		useSelect.mockImplementation( () => true );
+		useSelect.mockImplementation( () => ( {
+			hasChildItems: true,
+		} ) );
 
 		const { container } = render( <InserterBlockList /> );
 
@@ -148,6 +152,25 @@ describe( 'InserterMenu', () => {
 		);
 
 		expect( childBlocksContent ).not.toBeNull();
+	} );
+
+	it( "doesn't display child blocks UI when root block has the __experimentalShowCategoriesInInserter flag", () => {
+		useSelect.mockImplementation( () => ( {
+			hasChildItems: true,
+			blockType: {
+				supports: {
+					__experimentalShowCategoriesInInserter: true,
+				},
+			},
+		} ) );
+
+		const { container } = render( <InserterBlockList /> );
+
+		const childBlocksContent = container.querySelector(
+			'.block-editor-inserter__child-blocks'
+		);
+
+		expect( childBlocksContent ).toBeNull();
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
