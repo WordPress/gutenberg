@@ -171,7 +171,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 
 		if ( ! $template ) {
-			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		return $this->prepare_item_for_response( $template, $request );
@@ -196,7 +196,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	public function update_item( $request ) {
 		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		if ( ! $template ) {
-			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$changes = $this->prepare_item_for_database( $request );
@@ -277,7 +277,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	public function delete_item( $request ) {
 		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		if ( ! $template ) {
-			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 		if ( ! $template->is_custom ) {
 			return new WP_Error( 'rest_invalid_template', __( 'Templates based on theme files can\'t be removed.', 'gutenberg' ), array( 'status' => 400 ) );
