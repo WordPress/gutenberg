@@ -419,9 +419,7 @@ export class ImageEdit extends React.Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) } />
 				<PanelBody style={ styles.panelBody }>
-					{ image && (
-						<BlockStyles clientId={ clientId } url={ url } />
-					) }
+					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
 				<PanelBody>
 					{ image && sizeOptionsValid && (
