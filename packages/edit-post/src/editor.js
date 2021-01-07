@@ -75,7 +75,7 @@ function Editor( {
 			const posts = getEntityRecords( 'postType', postType, {
 				wp_id: postId,
 			} );
-			postObject = posts ? posts[ 0 ] : undefined;
+			postObject = posts?.[ 0 ];
 		} else {
 			postObject = getEntityRecord( 'postType', postType, postId );
 		}
