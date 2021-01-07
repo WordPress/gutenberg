@@ -27,6 +27,41 @@ function _gutenberg_get_template_paths( $base_directory ) {
 }
 
 /**
+ * Retrieves the template file from the theme for a given slug.
+ *
+ * @access private
+ * @internal
+ *
+ * @param array  $template_type wp_template or wp_template_part.
+ * @param string $slug template slug.
+ *
+ * @return array Template.
+ */
+function _gutenberg_get_template_file( $template_type, $slug ) {
+	$template_base_paths = array(
+		'wp_template'      => 'block-templates',
+		'wp_template_part' => 'block-template-parts',
+	);
+	$themes              = array(
+		get_stylesheet() => get_stylesheet_directory(),
+		get_template()   => get_template_directory(),
+	);
+	foreach ( $themes as $theme_slug => $theme_dir ) {
+		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
+		if ( file_exists( $file_path ) ) {
+			return array(
+				'slug'  => $slug,
+				'path'  => $file_path,
+				'theme' => $theme_slug,
+				'type'  => $template_type,
+			);
+		}
+	}
+
+	return null;
+}
+
+/**
  * Retrieves the template files from  the theme.
  *
  * @access private
@@ -83,7 +118,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 
 	$theme               = wp_get_theme()->get_stylesheet();
 	$template            = new WP_Block_Template();
-	$template->id        = $theme . '|' . $template_file['slug'];
+	$template->id        = $theme . '|' . $theme;
 	$template->theme     = $theme;
 	$template->content   = file_get_contents( $template_file['path'] );
 	$template->slug      = $template_file['slug'];
@@ -239,11 +274,9 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	}
 
 	if ( wp_get_theme()->get_stylesheet() === $theme ) {
-		$template_files = _gutenberg_get_template_files( $template_type );
-		foreach ( $template_files as $template_file ) {
-			if ( $template_file['slug'] === $slug ) {
-				return _gutenberg_build_template_result_from_file( $template_file, $template_type );
-			}
+		$template_file = _gutenberg_get_template_file( $template_type, $slug );
+		if ( null !== $template_file ) {
+			return _gutenberg_build_template_result_from_file( $template_file, $template_type );
 		}
 	}
 
