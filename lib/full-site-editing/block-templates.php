@@ -176,7 +176,6 @@ function _gutenberg_build_template_result_from_post( $post ) {
  * @param array $query {
  *     Optional. Arguments to retrieve templates.
  *
- *     @type string $theme Template theme.
  *     @type array  $slug__in List of slugs to include.
  *     @type int    $wp_id Post ID of customized template.
  * }
@@ -190,17 +189,12 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
+		array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'name',
+			'terms'    => $query['theme'],
+		),
 	);
-
-	if ( isset( $query['theme'] ) ) {
-		$wp_query_args['tax_query'] = array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => $query['theme'],
-			),
-		);
-	}
 
 	if ( isset( $query['slug__in'] ) ) {
 		$wp_query_args['post_name__in'] = $query['slug__in'];
@@ -223,7 +217,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		}
 	}
 
-	if ( ! isset( $query['wp_id'] ) && ( ! isset( $query['theme'] ) || wp_get_theme()->get_stylesheet() === $query['theme'] ) ) {
+	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_custom      = array_search(

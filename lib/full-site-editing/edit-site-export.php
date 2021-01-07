@@ -22,7 +22,7 @@ function gutenberg_edit_site_export() {
 	$zip->addEmptyDir( 'theme/block-template-parts' );
 
 	// Load templates into the zip file.
-	$templates = gutenberg_get_block_templates( array( 'theme' => wp_get_theme()->get_stylesheet() ) );
+	$templates = gutenberg_get_block_templates();
 	foreach ( $templates as $template ) {
 		$zip->addFromString(
 			'theme/block-templates/' . $template->slug . '.html',
@@ -31,7 +31,7 @@ function gutenberg_edit_site_export() {
 	}
 
 	// Load template parts into the zip file.
-	$template_parts = gutenberg_get_block_templates( array( 'theme' => wp_get_theme()->get_stylesheet() ), 'wp_template_part' );
+	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
 		$zip->addFromString(
 			'theme/block-template-parts/' . $template_part->slug . '.html',
