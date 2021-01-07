@@ -9,7 +9,12 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
-export function MenuGroup( { children, className = '', label } ) {
+export function MenuGroup( {
+	children,
+	className = '',
+	label,
+	role = 'group',
+} ) {
 	const instanceId = useInstanceId( MenuGroup );
 
 	if ( ! Children.count( children ) ) {
@@ -30,7 +35,7 @@ export function MenuGroup( { children, className = '', label } ) {
 					{ label }
 				</div>
 			) }
-			<div role="group" aria-labelledby={ label ? labelId : null }>
+			<div role={ role } aria-labelledby={ label ? labelId : null }>
 				{ children }
 			</div>
 		</div>
