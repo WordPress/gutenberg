@@ -121,6 +121,10 @@ android {
         main {
             assets.srcDirs += buildAssetsFolder
             assets.srcDirs += '../../../../src/block-support'
+            // Despite being in a folder called "resources", the files in
+            // unsupported-block-editor are accessed as assets by their
+            // consumers: the WordPressEditor library.
+            assets.srcDirs += '../../../../resources/unsupported-block-editor'
         }
     }
 }
