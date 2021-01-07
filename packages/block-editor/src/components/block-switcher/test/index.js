@@ -26,7 +26,7 @@ describe( 'BlockSwitcher', () => {
 		expect( wrapper.html() ).toBeNull();
 	} );
 } );
-describe( ' BlockSwitcherDropdownMenu', () => {
+describe( 'BlockSwitcherDropdownMenu', () => {
 	const headingBlock1 = {
 		attributes: {
 			content: [ 'How are you?' ],
