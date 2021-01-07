@@ -102,7 +102,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	protected function permissions_check() {
 		// Verify if the current user has edit_theme_options capability.
-		// This capability is required to access the widgets screen.
+		// This capability is required to edit/view/delete templates.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_manage_templates',
@@ -278,6 +278,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+		if ( ! $template->is_custom ) {
+			return new WP_Error( 'rest_invalid_template', __( 'Templates based on theme files can\'t be removed.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
 		$id    = $template->wp_id;
