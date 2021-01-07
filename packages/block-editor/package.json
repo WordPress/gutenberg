@@ -61,7 +61,7 @@
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"react-spring": "^8.0.19",
-		"reakit": "1.1.0",
+		"reakit": "1.3.4",
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
