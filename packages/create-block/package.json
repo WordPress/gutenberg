@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"description": "Generates PHP, JS and CSS code for registering a block for a WordPress plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=10",
+		"node": ">=12",
 		"npm": ">=6.9"
 	},
 	"files": [

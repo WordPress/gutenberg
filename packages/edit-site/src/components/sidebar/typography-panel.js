@@ -41,8 +41,8 @@ function useHasAppearenceControl( { supports, name } ) {
 
 export default function TypographyPanel( {
 	context: { supports, name },
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 } ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useEditorFeature(
@@ -64,17 +64,17 @@ export default function TypographyPanel( {
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
-					value={ getStyleProperty( name, 'fontFamily' ) }
+					value={ getStyle( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'fontFamily', value )
+						setStyle( name, 'fontFamily', value )
 					}
 				/>
 			) }
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ getStyleProperty( name, 'fontSize' ) }
+					value={ getStyle( name, 'fontSize' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'fontSize', value )
+						setStyle( name, 'fontSize', value )
 					}
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
@@ -82,21 +82,21 @@ export default function TypographyPanel( {
 			) }
 			{ hasLineHeightEnabled && (
 				<LineHeightControl
-					value={ getStyleProperty( name, 'lineHeight' ) }
+					value={ getStyle( name, 'lineHeight' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'lineHeight', value )
+						setStyle( name, 'lineHeight', value )
 					}
 				/>
 			) }
 			{ hasAppearenceControl && (
 				<FontAppearanceControl
 					value={ {
-						fontStyle: getStyleProperty( name, 'fontStyle' ),
-						fontWeight: getStyleProperty( name, 'fontWeight' ),
+						fontStyle: getStyle( name, 'fontStyle' ),
+						fontWeight: getStyle( name, 'fontWeight' ),
 					} }
 					onChange={ ( { fontStyle, fontWeight } ) => {
-						setStyleProperty( name, 'fontStyle', fontStyle );
-						setStyleProperty( name, 'fontWeight', fontWeight );
+						setStyle( name, 'fontStyle', fontStyle );
+						setStyle( name, 'fontWeight', fontWeight );
 					} }
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }

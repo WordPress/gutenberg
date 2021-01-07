@@ -22,7 +22,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=10"
+		"node": ">=12"
 	},
 	"files": [
 		"scripts",
@@ -31,15 +31,14 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@jest/reporters": "^25.3.0",
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^25.3.0",
+		"babel-jest": "^26.6.3",
 		"enzyme": "^3.11.0",
 		"enzyme-adapter-react-16": "^1.15.2",
 		"enzyme-to-json": "^3.4.4"
 	},
 	"peerDependencies": {
-		"jest": ">=25"
+		"jest": ">=26"
 	},
 	"publishConfig": {
 		"access": "public"
