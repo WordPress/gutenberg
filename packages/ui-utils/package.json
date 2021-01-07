@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/ui-utils",
+	"version": "0.0.1",
+	"description": "A collection of simple utilities for building user interfaces.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"utils"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/ui-utils/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ui-utils"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types",
+		"src",
+		"*.md"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"publishConfig": {
+		"access": "public"
+	}
+}

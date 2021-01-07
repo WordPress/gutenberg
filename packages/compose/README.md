@@ -105,10 +105,6 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
-<a name="is" href="#is">#</a> **is**
-
-A collection of (mostly) strongly typed type checks.
-
 <a name="pure" href="#pure">#</a> **pure**
 
 Given a component returns the enhanced component augmented with a component
