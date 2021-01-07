@@ -12,8 +12,6 @@ Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/deve
 
 ## Quick start
 
-![Demo](https://make.wordpress.org/core/files/2020/02/74508276-f0648280-4efe-11ea-9cc0-a607b43d1bcf.gif)
-
 You just need to provide the `slug` which is the target location for scaffolded files and the internal block name.
 
 ```bash
@@ -33,6 +31,8 @@ The following command generates PHP, JS and CSS code for registering a block.
 ```bash
 $ npx @wordpress/create-block [options] [slug]
 ```
+
+![Demo](https://user-images.githubusercontent.com/699132/103872910-4de15f00-50cf-11eb-8c74-67ca91a8c1a4.gif)
 
 `[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overridden with some of the options listed below.
 
