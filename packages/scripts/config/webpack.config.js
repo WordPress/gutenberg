@@ -203,8 +203,8 @@ const config = {
 	plugins: [
 		// During rebuilds, all webpack assets that are not used anymore will be
 		// removed automatically. There is an exception added in watch mode for
-		// fonts and images. It is a known limitations.
-		// @see https://github.com/johnagan/clean-webpack-plugin/issues/159
+		// fonts and images. It is a known limitations:
+		// https://github.com/johnagan/clean-webpack-plugin/issues/159
 		new CleanWebpackPlugin( {
 			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
 		} ),
