@@ -13,7 +13,11 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import {
+	InterfaceSkeleton,
+	ComplementaryArea,
+	store as interfaceStore,
+} from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -42,7 +46,7 @@ function Interface( { blockEditorSettings } ) {
 
 	const { hasSidebarEnabled, isInserterOpened } = useSelect( ( select ) => ( {
 		hasSidebarEnabled: !! select(
-			'core/interface'
+			interfaceStore
 		).getActiveComplementaryArea( 'core/edit-widgets' ),
 		isInserterOpened: !! select( 'core/edit-widgets' ).isInserterOpened(),
 	} ) );
