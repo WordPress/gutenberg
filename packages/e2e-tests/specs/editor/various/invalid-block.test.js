@@ -18,7 +18,7 @@ describe( 'invalid blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 
 		// Change to HTML mode and close the options
 		await clickMenuItem( 'Edit as HTML' );
@@ -36,7 +36,7 @@ describe( 'invalid blocks', () => {
 
 		// Click on the 'three-dots' menu toggle
 		await page.click(
-			'.block-editor-warning__actions button[aria-label="More options"]'
+			'.block-editor-warning__actions button[aria-label="Options"]'
 		);
 
 		await clickMenuItem( 'Resolve' );

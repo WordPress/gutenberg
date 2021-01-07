@@ -43,7 +43,7 @@ async function testGroupKeyboardNavigation( currentBlockLabel ) {
 	await page.keyboard.press( 'Tab' );
 	await expectLabelToHaveFocus( currentBlockLabel );
 	await pressKeyWithModifier( 'shift', 'Tab' );
-	await expectLabelToHaveFocus( 'Select parent (Group)' );
+	await expectLabelToHaveFocus( 'Select Group' );
 	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( 'Change block type or style' );
 }

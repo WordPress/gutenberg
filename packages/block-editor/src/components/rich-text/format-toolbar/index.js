@@ -42,7 +42,7 @@ const FormatToolbar = () => {
 									<DropdownMenu
 										icon={ chevronDown }
 										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'More formatting' ) }
+										label={ __( 'More' ) }
 										toggleProps={ toggleProps }
 										controls={ orderBy(
 											fills.map(

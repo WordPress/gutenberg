@@ -6,7 +6,7 @@ import { castArray, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	ToolbarButton,
@@ -88,18 +88,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		);
 	}
 
-	const blockSwitcherLabel =
-		1 === blocks.length
-			? __( 'Transform block' )
-			: sprintf(
-					/* translators: %s: number of blocks. */
-					_n(
-						'Transform %d block',
-						'Transform %d blocks',
-						blocks.length
-					),
-					blocks.length
-			  );
+	const blockSwitcherLabel = __( 'Transform' );
 
 	return (
 		<ToolbarGroup>
