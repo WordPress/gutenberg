@@ -19,7 +19,6 @@ For each user feature we should also add a importance categorization label  to i
 
 * [***] Add support for cross-posting between sites
 * [***] Full-width and wide alignment support for Columns
-* [**] Add Support to Insert Existing Reusable Blocks from the Editor
 
 ## 1.43.0
 * [***] New Block: File [#27228]
