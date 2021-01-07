@@ -57,7 +57,6 @@ export default function TemplatePartEdit( {
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
-	const isUnresolvedTemplateFile = ! isPlaceholder && ! isResolved;
 
 	const inspectorAdvancedControls = (
 		<InspectorAdvancedControls>
@@ -88,7 +87,7 @@ export default function TemplatePartEdit( {
 						innerBlocks={ innerBlocks }
 					/>
 				) }
-				{ ! isPlaceholder && ! isUnresolvedTemplateFile && (
+				{ ! isPlaceholder && ! isResolved && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
 							<TemplatePartNamePanel postId={ templatePartId } />
@@ -119,13 +118,13 @@ export default function TemplatePartEdit( {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-				{ ! isPlaceholder && ! isUnresolvedTemplateFile && (
+				{ ! isPlaceholder && ! isResolved && (
 					<TemplatePartInnerBlocks
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
 					/>
 				) }
-				{ ! isPlaceholder && isUnresolvedTemplateFile && <Spinner /> }
+				{ ! isPlaceholder && isResolved && <Spinner /> }
 			</TagName>
 		</>
 	);

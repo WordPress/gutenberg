@@ -106,7 +106,7 @@ function _gutenberg_get_template_files( $template_type ) {
 }
 
 /**
- * Build a unified template object based a theme file.
+ * Build a unified template object based on a theme file.
  *
  * @param array $template_file Theme file.
  * @param array $template_type wp_template or wp_template_part.
