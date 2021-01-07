@@ -7,7 +7,6 @@ import { Composite, useCompositeState } from 'reakit';
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,15 +19,9 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 	label,
+	isDraggable = true,
 } ) {
 	const composite = useCompositeState();
-	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
-
-	// This ensures the composite state refreshes when the list order changes.
-	useEffect( () => {
-		composite.unstable_sort();
-	}, [ composite.unstable_sort, orderId ] );
-
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -45,19 +38,12 @@ function BlockTypesList( {
 				return (
 					<InserterListItem
 						key={ item.id }
+						item={ item }
 						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
-						onClick={ () => {
-							onSelect( item );
-							onHover( null );
-						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
+						onSelect={ onSelect }
+						onHover={ onHover }
 						composite={ composite }
+						isDraggable={ isDraggable }
 					/>
 				);
 			} ) }

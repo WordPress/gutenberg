@@ -10,15 +10,12 @@ import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import {
-	STORE_NAME,
-	POST_UPDATE_TRANSACTION_ID,
-	TRASH_POST_NOTICE_ID,
-} from './constants';
+import { STORE_NAME, TRASH_POST_NOTICE_ID } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -93,7 +90,7 @@ export function* __unstableSetupTemplate( template ) {
 		{
 			blocks,
 		},
-		{ __unstableShouldCreateUndoLevel: false }
+		{ undoIgnore: true }
 	);
 }
 
@@ -177,14 +174,15 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
  * Returns an action object used in signalling that a patch of updates for the
  * latest version of the post have been received.
  *
- * @param {Object} edits Updated post fields.
- *
  * @return {Object} Action object.
+ * @deprecated since Gutenberg 9.7.0.
  */
-export function updatePost( edits ) {
+export function updatePost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+		alternative: 'User the core entitires store instead',
+	} );
 	return {
-		type: 'UPDATE_POST',
-		edits,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -223,21 +221,6 @@ export function* editPost( edits, options ) {
 		edits,
 		options
 	);
-}
-
-/**
- * Returns action object produced by the updatePost creator augmented by
- * an optimist option that signals optimistically applying updates.
- *
- * @param {Object} edits  Updated post fields.
- *
- * @return {Object} Action object.
- */
-export function __experimentalOptimisticUpdatePost( edits ) {
-	return {
-		...updatePost( edits ),
-		optimist: { id: POST_UPDATE_TRANSACTION_ID },
-	};
 }
 
 /**
@@ -299,7 +282,7 @@ export function* savePost( options = {} ) {
 		} );
 		if ( args.length ) {
 			yield controls.dispatch(
-				'core/notices',
+				noticesStore,
 				'createErrorNotice',
 				...args
 			);
@@ -321,7 +304,7 @@ export function* savePost( options = {} ) {
 		} );
 		if ( args.length ) {
 			yield controls.dispatch(
-				'core/notices',
+				noticesStore,
 				'createSuccessNotice',
 				...args
 			);
@@ -375,7 +358,7 @@ export function* trashPost() {
 		postTypeSlug
 	);
 	yield controls.dispatch(
-		'core/notices',
+		noticesStore,
 		'removeNotice',
 		TRASH_POST_NOTICE_ID
 	);
@@ -389,7 +372,7 @@ export function* trashPost() {
 		yield controls.dispatch( STORE_NAME, 'savePost' );
 	} catch ( error ) {
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			...getNotificationArgumentsForTrashFail( { error } )
 		);

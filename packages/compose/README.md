@@ -155,7 +155,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `(Object|Function)`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -209,6 +209,37 @@ const WithFocusOnMount = () => {
 _Parameters_
 
 -   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+
+_Returns_
+
+-   `Function`: Ref callback.
+
+<a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
+
+When opening modals/sidebars/dialogs, the focus
+must move to the opened area and return to the
+previously focused element when closed.
+The current hook implements the returning behavior.
+
+_Usage_
+
+```js
+import { useFocusReturn } from '@wordpress/compose';
+
+const WithFocusReturn = () => {
+    const ref = useFocusReturn()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _onFocusReturn_ `?Function`: Overrides the default return behavior.
 
 _Returns_
 

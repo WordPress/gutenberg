@@ -350,4 +350,26 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Paragraph inside group' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/27586
+	it( 'closes the main inserter after inserting a single-use block, like the More block', async () => {
+		await insertBlock( 'More' );
+		await page.waitForSelector(
+			'.edit-post-header-toolbar__inserter-toggle:not(.is-pressed)'
+		);
+
+		// The inserter panel should've closed.
+		const inserterPanels = await page.$$(
+			'.edit-post-layout__inserter-panel'
+		);
+		expect( inserterPanels.length ).toBe( 0 );
+
+		// The editable 'Read More' text should be focused.
+		const isFocusInBlock = await page.evaluate( () =>
+			document
+				.querySelector( '[data-type="core/more"]' )
+				.contains( document.activeElement )
+		);
+		expect( isFocusInBlock ).toBe( true );
+	} );
 } );

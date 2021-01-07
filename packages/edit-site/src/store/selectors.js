@@ -96,36 +96,25 @@ export function getHomeTemplateId( state ) {
 }
 
 /**
- * Returns the current template ID.
+ * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
  * @return {number?} Template ID.
  */
-export function getTemplateId( state ) {
-	return state.templateId;
+export function getEditedPostType( state ) {
+	return state.editedPost.type;
 }
 
 /**
- * Returns the current template part ID.
+ * Returns the ID of the currently edited template or template part.
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template part ID.
+ * @return {number?} Post ID.
  */
-export function getTemplatePartId( state ) {
-	return state.templatePartId;
-}
-
-/**
- * Returns the current template type.
- *
- * @param {Object} state Global application state.
- *
- * @return {string?} Template type.
- */
-export function getTemplateType( state ) {
-	return state.templateType;
+export function getEditedPostId( state ) {
+	return state.editedPost.id;
 }
 
 /**
@@ -136,7 +125,7 @@ export function getTemplateType( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.page;
+	return state.editedPost.page;
 }
 
 /**

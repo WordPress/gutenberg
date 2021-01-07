@@ -63,7 +63,6 @@ function get_template_hierarchy( $template_type ) {
  */
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_content;
-
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	if ( $current_template ) {
@@ -215,7 +214,7 @@ function gutenberg_viewport_meta_tag() {
  * @return string Template file name without extension.
  */
 function gutenberg_strip_php_suffix( $template_file ) {
-	return preg_replace( '/\.php$/', '', $template_file );
+	return preg_replace( '/\.(php|html)$/', '', $template_file );
 }
 
 /**

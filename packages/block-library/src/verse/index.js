@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { verse as icon } from '@wordpress/icons';
 
 /**
@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Verse' ),
+	title: _x( 'Verse', 'block title' ),
 	description: __(
 		'Insert poetry. Use special spacing formats. Or quote song lyrics.'
 	),
