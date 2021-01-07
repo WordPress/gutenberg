@@ -19,6 +19,8 @@ export const settings = {
 	supports: {
 		// Should show the parent selector for its children or not. Defaults to true.
 		__experimentalParentSelector: false,
+		// Should show categorization in the global inserter or not. Defaults to whether the block has child items.
+		__experimentalShowCategoriesInInserter: true,
 	},
 	edit,
 };
