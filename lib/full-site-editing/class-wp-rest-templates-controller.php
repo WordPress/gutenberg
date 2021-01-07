@@ -135,9 +135,6 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$query = array();
-		if ( isset( $request['theme'] ) ) {
-			$query['theme'] = $request['theme'];
-		}
 		if ( isset( $request['wp_id'] ) ) {
 			$query['wp_id'] = $request['wp_id'];
 		}
@@ -456,10 +453,6 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		return array(
 			'context' => $this->get_context_param(),
-			'theme'   => array(
-				'description' => __( 'Limit to the current theme templates.', 'gutenberg' ),
-				'type'        => 'string',
-			),
 			'wp_id'   => array(
 				'description' => __( 'Limit to the specified post id.', 'gutenberg' ),
 				'type'        => 'integer',
