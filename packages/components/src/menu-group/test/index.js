@@ -24,4 +24,15 @@ describe( 'MenuGroup', () => {
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
+
+	test( 'should render given role', () => {
+		const wrapper = shallow(
+			<MenuGroup label="My group" instanceId="1" role="menu">
+				<p>My item</p>
+			</MenuGroup>
+		);
+
+		const menu = wrapper.find( '[role="menu"]' );
+		expect( menu.length ).toBe( 1 );
+	} );
 } );
