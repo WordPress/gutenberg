@@ -22,7 +22,7 @@ async function expectLabelToHaveFocus( label ) {
 
 async function testBlockToolbarKeyboardNavigation( currentBlockLabel ) {
 	await focusBlockToolbar();
-	await expectLabelToHaveFocus( 'Change block type or style' );
+	await expectLabelToHaveFocus( 'Transform' );
 	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( 'Move up' );
 	await page.keyboard.press( 'Tab' );
@@ -32,7 +32,7 @@ async function testBlockToolbarKeyboardNavigation( currentBlockLabel ) {
 }
 
 async function wrapCurrentBlockWithGroup() {
-	await page.click( '[aria-label="Change block type or style"]' );
+	await page.click( '[aria-label="Transform"]' );
 	await page.evaluate( () => {
 		document.querySelector( '.editor-block-list-item-group' ).click();
 	} );
@@ -45,7 +45,7 @@ async function testGroupKeyboardNavigation( currentBlockLabel ) {
 	await pressKeyWithModifier( 'shift', 'Tab' );
 	await expectLabelToHaveFocus( 'Select Group' );
 	await page.keyboard.press( 'ArrowRight' );
-	await expectLabelToHaveFocus( 'Change block type or style' );
+	await expectLabelToHaveFocus( 'Transform' );
 }
 
 describe( 'Toolbar roving tabindex', () => {
@@ -91,7 +91,7 @@ describe( 'Toolbar roving tabindex', () => {
 		await testBlockToolbarKeyboardNavigation( 'Block: Table' );
 		// Move focus to the first toolbar item
 		await page.keyboard.press( 'Home' );
-		await expectLabelToHaveFocus( 'Change block type or style' );
+		await expectLabelToHaveFocus( 'Transform' );
 		await page.click( '.blocks-table__placeholder-button' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Table' );
 		await wrapCurrentBlockWithGroup();
