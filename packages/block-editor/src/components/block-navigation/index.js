@@ -36,27 +36,14 @@ function BlockNavigation( {
 			<p className="block-editor-block-navigation__label">
 				{ __( 'List view' ) }
 			</p>
-			{ hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ [ rootBlock ] }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalFeatures={ __experimentalFeatures }
-					showNestedBlocks
-				/>
-			) }
-			{ ! hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ rootBlocks }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalFeatures={ __experimentalFeatures }
 
-					// This just duplicates the above, but if I try to remove the duplication
-					// then things break and I don't know why. -shaun
-					showNestedBlocks
-				/>
-			) }
+			<BlockNavigationTree
+				blocks={ hasHierarchy ? [ rootBlock ] : rootBlocks }
+				selectedBlockClientId={ selectedBlockClientId }
+				selectBlock={ selectBlock }
+				__experimentalFeatures={ __experimentalFeatures }
+				showNestedBlocks
+			/>
 		</div>
 	);
 }
