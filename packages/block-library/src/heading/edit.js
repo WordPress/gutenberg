@@ -57,12 +57,12 @@ function HeadingEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Advanced' ) }>
+				<PanelBody title={ __( 'Heading settings' ) }>
 					<TextControl
 						autoCapitalize="none"
 						label={ __( 'HTML Anchor' ) }
 						value={ anchor || '' }
-						valuePlaceholder={ __( 'None' ) }
+						valuePlaceholder={ __( 'Add an anchor' ) }
 						onChangeValue={ ( value ) =>
 							setAttributes( { anchor: value } )
 						}
