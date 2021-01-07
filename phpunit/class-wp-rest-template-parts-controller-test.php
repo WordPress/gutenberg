@@ -12,10 +12,10 @@ class WP_REST_Template_Parts_Controller_Test extends WP_Test_REST_Controller_Tes
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey( '/wp/v2/templates', $routes );
-		$this->assertArrayHasKey( '/wp/v2/templates/(?P<id>[|\w-]+)', $routes );
+		$this->assertArrayHasKey( '/wp/v2/templates/(?P<id>[\/|\w-]+)', $routes );
 
 		$this->assertArrayHasKey( '/wp/v2/template-parts', $routes );
-		$this->assertArrayHasKey( '/wp/v2/template-parts/(?P<id>[|\w-]+)', $routes );
+		$this->assertArrayHasKey( '/wp/v2/template-parts/(?P<id>[\/|\w-]+)', $routes );
 	}
 
 	public function test_context_param() {
