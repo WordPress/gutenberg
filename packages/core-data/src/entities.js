@@ -166,15 +166,10 @@ function* loadPostTypeEntities() {
 				selectionEnd: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle: isTemplate
-				? ( record ) =>
-						record?.title?.rendered ||
-						record?.title ||
-						startCase( record.slug )
-				: ( record ) =>
-						record?.title?.rendered ||
-						record?.title ||
-						String( record.id ),
+			getTitle: ( record ) =>
+				record?.title?.rendered ||
+				record?.title ||
+				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
