@@ -152,7 +152,10 @@ function LinkSettings( {
 
 	function onCloseSettingsSheet() {
 		onSetAttributes();
-		onClose();
+
+		if ( onClose ) {
+			onClose();
+		}
 	}
 
 	function onChangeOpenInNewTab( value ) {
