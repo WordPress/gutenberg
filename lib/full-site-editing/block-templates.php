@@ -227,7 +227,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_custom      = array_search(
-				wp_get_theme()->get_stylesheet() . '/' . $template_file['slug'],
+				wp_get_theme()->get_stylesheet() . '|' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
