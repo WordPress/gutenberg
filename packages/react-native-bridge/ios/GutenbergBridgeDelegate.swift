@@ -18,6 +18,7 @@ public struct MediaInfo: Encodable {
 public enum Capabilities: String {
     case mediaFilesCollectionBlock
     case mentions
+    case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
     case modalLayoutPicker
@@ -224,6 +225,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor requested a mention
     /// - Parameter callback: Completion handler to be called with an user mention or an error
     func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void)
+
+	/// Tells the delegate that the editor requested a mention
+	/// - Parameter callback: Completion handler to be called with an xpost or an error
+	func gutenbergDidRequestXpost(callback: @escaping (Swift.Result<String, NSError>) -> Void)
 
     /// Tells the delegate that the editor requested to show the tooltip
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool

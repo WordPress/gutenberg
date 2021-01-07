@@ -23,6 +23,7 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 	label,
+	isDraggable = true,
 } ) {
 	return (
 		<InserterListboxGroup
@@ -34,20 +35,13 @@ function BlockTypesList( {
 					{ row.map( ( item, j ) => (
 						<InserterListItem
 							key={ item.id }
+							item={ item }
 							className={ getBlockMenuDefaultClassName(
 								item.id
 							) }
-							icon={ item.icon }
-							onClick={ () => {
-								onSelect( item );
-								onHover( null );
-							} }
-							onFocus={ () => onHover( item ) }
-							onMouseEnter={ () => onHover( item ) }
-							onMouseLeave={ () => onHover( null ) }
-							onBlur={ () => onHover( null ) }
-							isDisabled={ item.isDisabled }
-							title={ item.title }
+							onSelect={ onSelect }
+							onHover={ onHover }
+							isDraggable={ isDraggable }
 							isFirst={ i === 0 && j === 0 }
 						/>
 					) ) }

@@ -11,6 +11,8 @@ import {
 	createNewPost,
 	saveDraft,
 	insertBlock,
+	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
 function readFile( filePath ) {
@@ -51,6 +53,18 @@ function isFocusEvent( item ) {
 	return isKeyEvent( item ) && item.args.data.type === 'focus';
 }
 
+function isClickEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'click';
+}
+
+function isMouseOverEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'mouseover';
+}
+
+function isMouseOutEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'mouseout';
+}
+
 function getEventDurationsForType( trace, filterFunction ) {
 	return trace.traceEvents
 		.filter( filterFunction )
@@ -69,6 +83,17 @@ function getSelectionEventDurations( trace ) {
 	return [ getEventDurationsForType( trace, isFocusEvent ) ];
 }
 
+function getClickEventDurations( trace ) {
+	return [ getEventDurationsForType( trace, isClickEvent ) ];
+}
+
+function getHoverEventDurations( trace ) {
+	return [
+		getEventDurationsForType( trace, isMouseOverEvent ),
+		getEventDurationsForType( trace, isMouseOutEvent ),
+	];
+}
+
 jest.setTimeout( 1000000 );
 
 describe( 'Post Editor Performance', () => {
@@ -77,6 +102,8 @@ describe( 'Post Editor Performance', () => {
 			load: [],
 			type: [],
 			focus: [],
+			inserterOpen: [],
+			inserterHover: [],
 		};
 
 		const html = readFile(
@@ -110,11 +137,61 @@ describe( 'Post Editor Performance', () => {
 			results.load.push( new Date() - startTime );
 		}
 
-		// Measuring typing performance
+		// Measure time to open inserter
 		await page.waitForSelector( '.edit-post-layout' );
+		const traceFile = __dirname + '/trace.json';
+		let traceResults;
+		for ( let j = 0; j < 10; j++ ) {
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
+			await openGlobalBlockInserter();
+			await page.tracing.stop();
+
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
+			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
+				results.inserterOpen.push( mouseClickEvents[ k ] );
+			}
+			await closeGlobalBlockInserter();
+		}
+
+		// Measure inserter hover performance
+		const paragraphBlockItem =
+			'.block-editor-inserter__menu .editor-block-list-item-paragraph';
+		const headingBlockItem =
+			'.block-editor-inserter__menu .editor-block-list-item-heading';
+		await openGlobalBlockInserter();
+		await page.waitForSelector( paragraphBlockItem );
+		await page.hover( paragraphBlockItem );
+		await page.hover( headingBlockItem );
+		for ( let j = 0; j < 20; j++ ) {
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
+			await page.hover( paragraphBlockItem );
+			await page.hover( headingBlockItem );
+			await page.tracing.stop();
+
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const [ mouseOverEvents, mouseOutEvents ] = getHoverEventDurations(
+				traceResults
+			);
+			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
+				results.inserterHover.push(
+					mouseOverEvents[ k ] + mouseOutEvents[ k ]
+				);
+			}
+		}
+		await closeGlobalBlockInserter();
+
+		// Measuring typing performance
 		await insertBlock( 'Paragraph' );
 		i = 200;
-		const traceFile = __dirname + '/trace.json';
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
@@ -125,7 +202,7 @@ describe( 'Post Editor Performance', () => {
 		}
 
 		await page.tracing.stop();
-		let traceResults = JSON.parse( readFile( traceFile ) );
+		traceResults = JSON.parse( readFile( traceFile ) );
 		const [
 			keyDownEvents,
 			keyPressEvents,

@@ -4,7 +4,7 @@
 
 .defaultButton {
 	border-radius: $border-width * 4;
-	padding: $block-spacing * 2;
+	padding: $grid-unit-10;
 	margin-top: $grid-unit-20;
 	background-color: $button-fallback-bg;
 }

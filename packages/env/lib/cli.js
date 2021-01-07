@@ -131,7 +131,7 @@ module.exports = function cli() {
 		withSpinner( env.clean )
 	);
 	yargs.command(
-		'logs',
+		'logs [environment]',
 		'displays PHP and Docker logs for given WordPress environment.',
 		( args ) => {
 			args.positional( 'environment', {
