@@ -140,7 +140,7 @@ export default function BoxControl( {
 				{ isLinked && (
 					<FlexBlock>
 						<AllInputControl
-							aria-label={ __( 'Padding' ) }
+							aria-label={ label }
 							{ ...inputControlProps }
 						/>
 					</FlexBlock>
