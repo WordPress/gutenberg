@@ -329,7 +329,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
-				'wp_theme' => wp_get_theme()->get_stylesheet(),
+				'wp_theme' => isset( $request['theme'] ) ? $request['content'] : wp_get_theme()->get_stylesheet(),
 			);
 		} elseif ( ! $template->is_custom ) {
 			$changes->post_type   = $this->post_type;
