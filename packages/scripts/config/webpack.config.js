@@ -158,10 +158,6 @@ const config = {
 				],
 			},
 			{
-				test: /\.svg$/,
-				use: [ '@svgr/webpack', 'url-loader' ],
-			},
-			{
 				test: /\.css$/,
 				use: cssLoaders,
 			},
@@ -177,12 +173,41 @@ const config = {
 					},
 				],
 			},
+			{
+				test: /\.svg$/,
+				use: [ '@svgr/webpack', 'url-loader' ],
+			},
+			{
+				test: /\.(bmp|png|jpe?g|gif)$/i,
+				// "url" loader works like "file" loader except that it embeds assets
+				// smaller than specified limit in bytes as data URLs to avoid requests.
+				loader: require.resolve( 'url-loader' ),
+				options: {
+					limit: 5000,
+					name: 'images/[name].[hash:8].[ext]',
+				},
+			},
+			{
+				test: /\.(woff|woff2|eot|ttf|otf)$/,
+				use: [
+					{
+						loader: 'file-loader',
+						options: {
+							name: 'fonts/[name].[hash:8].[ext]',
+						},
+					},
+				],
+			},
 		],
 	},
 	plugins: [
-		// During rebuilds, all webpack assets that are not used anymore
-		// will be removed automatically.
-		new CleanWebpackPlugin(),
+		// During rebuilds, all webpack assets that are not used anymore will be
+		// removed automatically. There is an exception added in watch mode for
+		// fonts and images. It is a known limitations.
+		// @see https://github.com/johnagan/clean-webpack-plugin/issues/159
+		new CleanWebpackPlugin( {
+			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
