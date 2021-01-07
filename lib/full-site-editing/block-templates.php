@@ -173,7 +173,13 @@ function _gutenberg_build_template_result_from_post( $post ) {
 /**
  * Retrieves a list of unified template objects based on a query.
  *
- * @param array $query Query.
+ * @param array $query {
+ *     Optional. Arguments to retrieve templates.
+ *
+ *     @type string $theme Template theme.
+ *     @type array  $slug__in List of slugs to include.
+ *     @type int    $wp_id Post ID of customized template.
+ * }
  * @param array $template_type wp_template or wp_template_part.
  *
  * @return array Templates.
@@ -206,6 +212,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	} else {
 		$wp_query_args['post_status'] = 'publish';
 	}
+
 	$template_query = new WP_Query( $wp_query_args );
 	$query_result   = array();
 	foreach ( $template_query->get_posts() as $post ) {
@@ -239,8 +246,8 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 /**
  * Retrieves a single unified template object using its id.
  *
- * @param array $id Template id.
- * @param array $template_type wp_template or wp_template_part.
+ * @param string $id Template unique identifier (example: theme|slug).
+ * @param array  $template_type wp_template or wp_template_part.
  *
  * @return WP_Block_Template|null Template.
  */
