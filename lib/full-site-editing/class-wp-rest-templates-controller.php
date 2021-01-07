@@ -363,7 +363,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	/**
 	 * Prepare a single template output for response
 	 *
-	 * @param WP_Block_Template $template    Temlate instance.
+	 * @param WP_Block_Template $template Template instance.
 	 * @param WP_REST_Request   $request Request object.
 	 *
 	 * @return WP_REST_Response $data
@@ -404,8 +404,6 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 	/**
 	 * Prepares links for the request.
-	 *
-	 * @since 4.7.0
 	 *
 	 * @param integer $id ID.
 	 * @return array Links for the given post.
