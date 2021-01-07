@@ -35,3 +35,23 @@ exports[`InnerBlocks Template Sync Removes blocks that are not expected by the t
 <!-- /wp:paragraph -->
 <!-- /wp:test/test-inner-blocks-locking-all -->"
 `;
+
+exports[`InnerBlocks Template Sync Synchronizes blocks if lock 'all' is set and the template prop is changed 1`] = `
+"<!-- wp:test/test-inner-blocks-update-locked-template -->
+<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Content…</p>
+<!-- /wp:paragraph -->
+<!-- /wp:test/test-inner-blocks-update-locked-template -->"
+`;
+
+exports[`InnerBlocks Template Sync Synchronizes blocks if lock 'all' is set and the template prop is changed 2`] = `
+"<!-- wp:test/test-inner-blocks-update-locked-template {\\"hasUpdatedTemplate\\":true} -->
+<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Content…</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Two</p>
+<!-- /wp:paragraph -->
+<!-- /wp:test/test-inner-blocks-update-locked-template -->"
+`;
