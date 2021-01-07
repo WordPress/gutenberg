@@ -138,7 +138,7 @@ module.exports = {
 
 #### `assetsPath`
 
-This setting is useful when your template scaffolds a block that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located.
+This setting is useful when your template scaffolds a block that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located. They will be copied to the `assets` subfolder in the generated plugin.
 
 _Example:_
 

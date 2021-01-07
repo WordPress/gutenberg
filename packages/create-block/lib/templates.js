@@ -68,6 +68,24 @@ const getOutputTemplates = async ( outputTemplatesPath ) => {
 	);
 };
 
+const getOutputAssets = async ( outputAssetsPath ) => {
+	const outputAssetFiles = await glob( '**/*', {
+		cwd: outputAssetsPath,
+		dot: true,
+	} );
+	return fromPairs(
+		await Promise.all(
+			outputAssetFiles.map( async ( outputAssetFile ) => {
+				const outputAsset = await readFile(
+					join( outputAssetsPath, outputAssetFile ),
+					'utf8'
+				);
+				return [ outputAssetFile, outputAsset ];
+			} )
+		)
+	);
+};
+
 const externalTemplateExists = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
@@ -84,6 +102,7 @@ const getBlockTemplate = async ( templateName ) => {
 			outputTemplates: await getOutputTemplates(
 				join( __dirname, 'templates', templateName )
 			),
+			outputAssets: {},
 		};
 	}
 	if ( ! ( await externalTemplateExists( templateName ) ) ) {
@@ -108,12 +127,13 @@ const getBlockTemplate = async ( templateName ) => {
 			cwd: tempCwd,
 		} );
 
-		const { defaultValues = {}, templatesPath } = require( require.resolve(
-			templateName,
-			{
-				paths: [ tempCwd ],
-			}
-		) );
+		const {
+			defaultValues = {},
+			templatesPath,
+			assetsPath,
+		} = require( require.resolve( templateName, {
+			paths: [ tempCwd ],
+		} ) );
 		if ( ! isObject( defaultValues ) || ! templatesPath ) {
 			throw new Error();
 		}
@@ -121,6 +141,7 @@ const getBlockTemplate = async ( templateName ) => {
 		return {
 			defaultValues,
 			outputTemplates: await getOutputTemplates( templatesPath ),
+			outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		};
 	} catch ( error ) {
 		throw new CLIError(
