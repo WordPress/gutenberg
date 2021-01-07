@@ -59,7 +59,7 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
     </SVG>
   }
   isCollapsed={true}
-  label="Change alignment"
+  label="Align"
   popoverProps={
     Object {
       "isAlternate": true,
