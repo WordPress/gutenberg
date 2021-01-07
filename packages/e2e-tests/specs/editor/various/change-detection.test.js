@@ -138,9 +138,11 @@ describe( 'Change detection', () => {
 		await page.type( '.editor-post-title__input', '!' );
 
 		await Promise.all( [
-			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
 			page.waitForSelector(
-				'.editor-post-publish-button:not( .is-busy )'
+				'.editor-post-publish-button[aria-disabled="true"]'
+			),
+			page.waitForSelector(
+				'.editor-post-publish-button[aria-disabled="false"]'
 			),
 			page.evaluate( () =>
 				window.wp.data.dispatch( 'core/editor' ).autosave()

@@ -758,6 +758,14 @@ describe( 'removeQueryArgs', () => {
 		);
 	} );
 
+	it( 'should not leave ? char after removing all query args', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual(
+			'https://andalouses.example/beach'
+		);
+	} );
+
 	it( 'should remove array query arg', () => {
 		const url =
 			'https://andalouses.example/beach?foo[]=bar&foo[]=baz&bar=foobar';

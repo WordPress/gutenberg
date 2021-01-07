@@ -71,7 +71,9 @@ class BottomSheetRangeCell extends Component {
 			sliderValue: nextValue,
 		} );
 		onChange( nextValue );
-		onComplete( nextValue );
+		if ( onComplete ) {
+			onComplete( nextValue );
+		}
 	}
 
 	render() {
