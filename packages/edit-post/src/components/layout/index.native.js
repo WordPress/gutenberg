@@ -161,11 +161,9 @@ export default compose( [
 			'core/editor'
 		);
 		const { getEditorMode } = select( editPostStore );
-		const { getSettings } = select( 'core/block-editor' );
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
-			modalLayoutPicker: getSettings( 'capabilities' ).modalLayoutPicker,
 		};
 	} ),
 	withPreferredColorScheme,

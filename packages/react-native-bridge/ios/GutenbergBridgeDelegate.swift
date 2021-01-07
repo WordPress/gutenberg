@@ -21,7 +21,6 @@ public enum Capabilities: String {
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case modalLayoutPicker
 }
 
 /// Wrapper for single block data
