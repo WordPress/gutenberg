@@ -30,6 +30,9 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
+	"dependencies": {
+		"lodash": "^4.17.19"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
