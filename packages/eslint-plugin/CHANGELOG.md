@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+-   Enabled `import/no-extraneous-dependencies` rule in the `recommended` ruleset.
+-   Enabled `import/no-unresolved` rule in the `recommended` ruleset.
+-   Enabled `no-unsafe-wp-apis` rule in the `recommended` ruleset ([#27327](https://github.com/WordPress/gutenberg/pull/27327)).
+-   The bundled `eslint-config-prettier` dependency has been updated from requiring `^6.10.1` to requiring `^7.1.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-jest` dependency has been updated from requiring `^23.8.2` to requiring `^24.1.3` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
+### Enhancements
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^30.2.2` to requiring `^30.7.13` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.2.3` to requiring `^6.4.1` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.1.2` to requiring `^3.3.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.20.0` to requiring `^7.22.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^4.0.4` to requiring `^4.2.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
 ## 7.4.0 (2020-12-17)
 
 ### New Feature

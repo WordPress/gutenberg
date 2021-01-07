@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BlockSwitcher should render disabled block switcher with multi block of different types when no transforms 1`] = `
+exports[`BlockSwitcherDropdownMenu should render disabled block switcher with multi block of different types when no transforms 1`] = `
 <ToolbarGroup>
   <ForwardRef(ToolbarButton)
     className="block-editor-block-switcher__no-switcher-icon"
@@ -25,7 +25,7 @@ exports[`BlockSwitcher should render disabled block switcher with multi block of
 </ToolbarGroup>
 `;
 
-exports[`BlockSwitcher should render enabled block switcher with multi block when transforms exist 1`] = `
+exports[`BlockSwitcherDropdownMenu should render enabled block switcher with multi block when transforms exist 1`] = `
 <ToolbarGroup>
   <ForwardRef(ToolbarItem)>
     <Component />
@@ -33,7 +33,7 @@ exports[`BlockSwitcher should render enabled block switcher with multi block whe
 </ToolbarGroup>
 `;
 
-exports[`BlockSwitcher should render switcher with blocks 1`] = `
+exports[`BlockSwitcherDropdownMenu should render switcher with blocks 1`] = `
 <ToolbarGroup>
   <ForwardRef(ToolbarItem)>
     <Component />

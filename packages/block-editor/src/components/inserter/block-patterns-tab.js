@@ -31,7 +31,7 @@ function BlockPatternsCategory( {
 		() =>
 			allCategories.filter( ( category ) =>
 				allPatterns.some( ( pattern ) =>
-					pattern.categories.includes( category.name )
+					pattern.categories?.includes( category.name )
 				)
 			),
 		[ allPatterns, allCategories ]
@@ -112,6 +112,7 @@ function BlockPatternsCategory( {
 						shownPatterns={ currentShownPatterns }
 						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
+						isDraggable
 					/>
 				</PatternInserterPanel>
 			) }

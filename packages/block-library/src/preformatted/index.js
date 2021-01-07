@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { preformatted as icon } from '@wordpress/icons';
 
 /**
@@ -17,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Preformatted' ),
+	title: _x( 'Preformatted', 'block title' ),
 	description: __(
 		'Add text that respects your spacing and tabs, and also allows styling.'
 	),

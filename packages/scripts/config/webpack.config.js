@@ -17,7 +17,11 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 /**
  * Internal dependencies
  */
-const { hasBabelConfig, hasPostCSSConfig } = require( '../utils' );
+const {
+	getPackageProp,
+	hasBabelConfig,
+	hasPostCSSConfig,
+} = require( '../utils' );
 const FixStyleWebpackPlugin = require( './fix-style-webpack-plugin' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -46,6 +50,32 @@ const cssLoaders = [
 	},
 ];
 
+/**
+ * Gets a unique identifier for the webpack build to avoid multiple webpack
+ * runtimes to conflict when using globals.
+ * This is polyfill and it is based on the default webpack 5 implementation.
+ *
+ * @see https://github.com/webpack/webpack/blob/bbb16e7af2eddba4cd77ca739904c2aa238a2b7b/lib/config/defaults.js#L374-L376
+ *
+ * @return {string} The generated identifier.
+ */
+const getJsonpFunctionIdentifier = () => {
+	const jsonpFunction = 'webpackJsonp_';
+	const packageName = getPackageProp( 'name' );
+	if ( typeof packageName !== 'string' || ! packageName ) {
+		return jsonpFunction;
+	}
+	const IDENTIFIER_NAME_REPLACE_REGEX = /^([^a-zA-Z$_])/;
+	const IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX = /[^a-zA-Z0-9$]+/g;
+
+	return (
+		jsonpFunction +
+		packageName
+			.replace( IDENTIFIER_NAME_REPLACE_REGEX, '_$1' )
+			.replace( IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX, '_' )
+	);
+};
+
 const config = {
 	mode,
 	entry: {
@@ -54,6 +84,10 @@ const config = {
 	output: {
 		filename: '[name].js',
 		path: path.resolve( process.cwd(), 'build' ),
+		// Prevents conflicts when multiple webpack runtimes (from different apps)
+		// are used on the same page.
+		// @see https://github.com/WordPress/gutenberg/issues/23607
+		jsonpFunction: getJsonpFunctionIdentifier(),
 	},
 	resolve: {
 		alias: {
@@ -95,7 +129,7 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
+				test: /\.jsx?$/,
 				exclude: /node_modules/,
 				use: [
 					require.resolve( 'thread-loader' ),

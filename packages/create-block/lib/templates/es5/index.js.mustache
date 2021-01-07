@@ -107,7 +107,7 @@
 		save: function() {
 			return el(
 				'p',
-				{},
+				useBlockProps.save(),
 				__( '{{title}} – hello from the saved content!', '{{textdomain}}' )
 			);
 		},

@@ -80,6 +80,7 @@ export { default as LinkSettingsNavigation } from './mobile/link-settings/link-s
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 export { default as InserterButton } from './mobile/inserter-button';
+export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as Preview } from './mobile/preview';
 
 // Utils

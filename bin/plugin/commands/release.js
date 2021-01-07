@@ -18,7 +18,6 @@ const {
 	runShellScript,
 } = require( '../lib/utils' );
 const git = require( '../lib/git' );
-const svn = require( '../lib/svn' );
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
 	getIssuesByMilestone,
@@ -30,31 +29,6 @@ const {
 	runCleanLocalFoldersStep,
 	findReleaseBranchName,
 } = require( './common' );
-
-const STABLE_TAG_REGEX = /Stable tag: [0-9]+\.[0-9]+\.[0-9]+\s*\n/;
-const STABLE_TAG_PLACEHOLDER = 'Stable tag: V.V.V\n';
-
-/**
- * Fetching the SVN repository to the working directory.
- *
- * @param {string} abortMessage Abort message.
- *
- * @return {Promise<string>} Repository local path.
- */
-async function runSvnRepositoryCheckoutStep( abortMessage ) {
-	// Cloning the repository
-	let svnWorkingDirectoryPath;
-	await runStep( 'Fetching the SVN repository', abortMessage, async () => {
-		log( '>> Fetching the SVN repository' );
-		svnWorkingDirectoryPath = svn.checkout( config.svnRepositoryURL );
-		log(
-			'>> The SVN repository has been successfully fetched in the following temporary folder: ' +
-				formats.success( svnWorkingDirectoryPath )
-		);
-	} );
-
-	return svnWorkingDirectoryPath;
-}
 
 /**
  * Creates a new release branch based on the last package.json version
@@ -478,135 +452,6 @@ async function runGithubReleaseStep(
 }
 
 /**
- * Updates and commits the content of the SVN repo using the new plugin ZIP.
- *
- * @param {string} svnWorkingDirectoryPath SVN Working Directory Path.
- * @param {string} zipPath                 Plugin zip path.
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
- */
-async function runUpdateTrunkContentStep(
-	svnWorkingDirectoryPath,
-	zipPath,
-	version,
-	abortMessage
-) {
-	// Updating the content of the svn
-	await runStep( 'Updating trunk content', abortMessage, async () => {
-		log( '>> Replacing trunk content using the new plugin ZIP' );
-
-		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
-
-		const previousReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-		const stableTag = previousReadmeFileContent.match(
-			STABLE_TAG_REGEX
-		)[ 0 ];
-
-		// Delete everything
-		runShellScript(
-			'find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +',
-			svnWorkingDirectoryPath
-		);
-
-		// Update the content using the plugin ZIP
-		runShellScript( 'unzip ' + zipPath + ' -d ' + svnWorkingDirectoryPath );
-
-		// Replace the stable tag placeholder with the existing stable tag on the SVN repository.
-		const newReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-		fs.writeFileSync(
-			readmePath,
-			newReadmeFileContent.replace( STABLE_TAG_PLACEHOLDER, stableTag )
-		);
-
-		// Commit the content changes
-		runShellScript(
-			"svn st | grep '^?' | awk '{print $2}' | xargs svn add",
-			svnWorkingDirectoryPath
-		);
-		runShellScript(
-			"svn st | grep '^!' | awk '{print $2}' | xargs svn rm",
-			svnWorkingDirectoryPath
-		);
-		await askForConfirmation(
-			'Trunk content has been updated, please check the SVN diff. Commit the changes?',
-			true,
-			abortMessage
-		);
-
-		svn.commit( svnWorkingDirectoryPath, 'Committing version ' + version );
-		log( '>> Trunk has been successfully updated' );
-	} );
-}
-
-/**
- * Creates a new SVN Tag
- *
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
- */
-async function runSvnTagStep( version, abortMessage ) {
-	await runStep( 'Creating the SVN Tag', abortMessage, async () => {
-		await askForConfirmation(
-			'Proceed with the creation of the SVN Tag?',
-			true,
-			abortMessage
-		);
-		svn.tagTrunk(
-			config.svnRepositoryURL,
-			version,
-			'Tagging version ' + version
-		);
-		log(
-			'>> The SVN ' +
-				formats.success( version ) +
-				' tag has been successfully created'
-		);
-	} );
-}
-
-/**
- * Updates the stable version of the plugin in the SVN repository.
- *
- * @param {string} svnWorkingDirectoryPath SVN working directory.
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
- */
-async function updateThePluginStableVersion(
-	svnWorkingDirectoryPath,
-	version,
-	abortMessage
-) {
-	// Updating the content of the svn
-	await runStep(
-		"Updating the plugin's stable version",
-		abortMessage,
-		async () => {
-			const readmePath = svnWorkingDirectoryPath + '/readme.txt';
-			const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-			const newReadmeContent = readmeFileContent.replace(
-				STABLE_TAG_REGEX,
-				'Stable tag: ' + version + '\n'
-			);
-			fs.writeFileSync( readmePath, newReadmeContent );
-
-			// Commit the content changes
-			await askForConfirmation(
-				'The stable version is updated in the readme.txt file. Commit the changes?',
-				true,
-				abortMessage
-			);
-
-			svn.commit(
-				svnWorkingDirectoryPath,
-				'Releasing version ' + version
-			);
-
-			log( '>> Stable version updated successfully' );
-		}
-	);
-}
-
-/**
  * Checks whether the milestone associated with the release has open issues or
  * pull requests. Returns a promise resolving to true if there are no open issue
  * or pull requests, or false otherwise.
@@ -781,10 +626,6 @@ async function releasePlugin( isRC = true ) {
 		'Aborting! Make sure to manually cherry-pick the ' +
 		formats.success( commitHash ) +
 		' commit to the master branch.';
-	if ( ! isRC ) {
-		abortMessage +=
-			' Make sure to perform the SVN release manually as well.';
-	}
 
 	// Cherry-picking the bump commit into master
 	await runCherrypickBumpCommitIntoMasterStep(
@@ -792,43 +633,6 @@ async function releasePlugin( isRC = true ) {
 		commitHash,
 		abortMessage
 	);
-
-	if ( ! isRC ) {
-		abortMessage =
-			'Aborting! The GitHub release is done. Make sure to perform the SVN release manually.';
-
-		await askForConfirmation(
-			'The GitHub release is complete. Proceed with the SVN release? ',
-			true,
-			abortMessage
-		);
-
-		// Fetching the SVN repository
-		const svnWorkingDirectory = await runSvnRepositoryCheckoutStep(
-			abortMessage
-		);
-		temporaryFolders.push( svnWorkingDirectory );
-
-		// Updating the SVN trunk content
-		await runUpdateTrunkContentStep(
-			svnWorkingDirectory,
-			zipPath,
-			version,
-			abortMessage
-		);
-
-		abortMessage =
-			'Aborting! The GitHub release is done, SVN trunk updated. Make sure to create the SVN tag and update the stable version manually.';
-		await runSvnTagStep( version, abortMessage );
-
-		abortMessage =
-			'Aborting! The GitHub release is done, SVN tagged. Make sure to update the stable version manually.';
-		await updateThePluginStableVersion(
-			svnWorkingDirectory,
-			version,
-			abortMessage
-		);
-	}
 
 	abortMessage = 'Aborting! The release is finished though.';
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );

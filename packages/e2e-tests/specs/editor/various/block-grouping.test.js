@@ -140,7 +140,7 @@ describe( 'Block Grouping', () => {
 			expect( availableTransforms ).not.toContain( 'Group' );
 		} );
 
-		it( 'does not show group option in the options toolbar if Grouping block is disabled ', async () => {
+		it( 'does not show group option in the options toolbar if Grouping block is disabled', async () => {
 			await clickBlockToolbarButton( 'More options' );
 
 			const blockOptionsDropdownHTML = await page.evaluate(

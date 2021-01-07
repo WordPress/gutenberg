@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -150,7 +150,7 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run format:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 ### `lint-js`
 
@@ -174,7 +174,7 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -202,7 +202,7 @@ This is how you execute those scripts using the presented setup:
 
 When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -226,7 +226,7 @@ This is how you execute the script with presented setup:
 
 -   `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -250,7 +250,7 @@ This is how you execute the script with presented setup:
 
 -   `npm run lint:md:js` - lints markdown files in the entire project’s directories.
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -278,11 +278,11 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config]((https://www.npmjs.com/package/@wordpress/stylelint-config) ) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 

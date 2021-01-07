@@ -163,7 +163,7 @@ export default function useBlockSync( {
 			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
-		let blocks;
+		let blocks = getBlocks( clientId );
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 

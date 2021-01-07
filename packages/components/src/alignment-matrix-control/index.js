@@ -93,6 +93,7 @@ export default function AlignmentMatrixControl( {
 								key={ cell }
 								value={ cell }
 								onFocus={ () => handleOnChange( cell ) }
+								tabIndex={ isActive ? 0 : -1 }
 							/>
 						);
 					} ) }

@@ -29,7 +29,7 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 3px solid transparent;
@@ -61,7 +61,7 @@
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&:disabled,
@@ -183,6 +183,19 @@
 		}
 	}
 
+	&.is-destructive.is-primary {
+		color: #fff;
+		background: $alert-red;
+		box-shadow: inset 0 0 0 $border-width $alert-red;
+
+		&:hover:not(:disabled) {
+			color: #fff;
+			background: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+	}
+
+
 	/**
 	 * Link buttons.
 	 */
@@ -215,7 +228,7 @@
 			color: #124964;
 			box-shadow:
 				0 0 0 $border-width #5b9dd9,
-				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
+				0 0 var(--wp-admin-border-width-focus) $border-width rgba(30, 140, 190, 0.8);
 		}
 
 		// Link buttons that are red to indicate destructive behavior.
@@ -302,7 +315,7 @@
 		background: $gray-900;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;

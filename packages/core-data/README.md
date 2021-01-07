@@ -145,7 +145,8 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _records_ `(Array|Object)`: Records received.
 -   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _edits_ `?Object`: Edits to reset.
 
 _Returns_
 
