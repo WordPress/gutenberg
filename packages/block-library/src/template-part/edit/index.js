@@ -87,7 +87,7 @@ export default function TemplatePartEdit( {
 						innerBlocks={ innerBlocks }
 					/>
 				) }
-				{ ! isPlaceholder && ! isResolved && (
+				{ ! isPlaceholder && isResolved && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
 							<TemplatePartNamePanel postId={ templatePartId } />
@@ -118,13 +118,13 @@ export default function TemplatePartEdit( {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-				{ ! isPlaceholder && ! isResolved && (
+				{ ! isPlaceholder && isResolved && (
 					<TemplatePartInnerBlocks
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
 					/>
 				) }
-				{ ! isPlaceholder && isResolved && <Spinner /> }
+				{ ! isPlaceholder && ! isResolved && <Spinner /> }
 			</TagName>
 		</>
 	);
