@@ -256,7 +256,9 @@ _Parameters_
 
 <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
 
-Undocumented declaration.
+Preferred over direct usage of `useLayoutEffect` when supporting
+server rendered components (SSR) because currently React
+throws a warning when using useLayoutEffect in that environment.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
