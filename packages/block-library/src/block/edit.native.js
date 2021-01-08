@@ -14,7 +14,11 @@ import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
-import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
+import {
+	requestUnsupportedBlockFallback,
+	sendActionButtonPressedAction,
+	actionButtons,
+} from '@wordpress/react-native-bridge';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
@@ -32,6 +36,9 @@ export default function ReusableBlockEdit( {
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const [ sendFallbackMessage, setSendFallbackMessage ] = useState( false );
+	const [ sendButtonPressMessage, setSendButtonPressMessage ] = useState(
+		false
+	);
 	const timeoutId = useRef();
 	const infoTextStyle = usePreferredColorSchemeStyle(
 		styles.infoText,
@@ -50,8 +57,17 @@ export default function ReusableBlockEdit( {
 		styles.actionButtonDark
 	);
 
-	const { reusableBlock, hasResolved, isEditing, settings } = useSelect(
+	const {
+		reusableBlock,
+		hasResolved,
+		isEditing,
+		settings,
+		isUnsupportedBlockEditorSupported,
+		canEnableUnsupportedBlockEditor,
+	} = useSelect(
 		( select ) => {
+			const { getSettings } = select( 'core/block-editor' );
+
 			return {
 				reusableBlock: select( 'core' ).getEditedEntityRecord(
 					...recordArgs
@@ -71,7 +87,13 @@ export default function ReusableBlockEdit( {
 				isEditing: select(
 					reusableBlocksStore
 				).__experimentalIsEditingReusableBlock( clientId ),
-				settings: select( 'core/block-editor' ).getSettings(),
+				settings: getSettings(),
+				isUnsupportedBlockEditorSupported:
+					getSettings( 'capabilities' ).unsupportedBlockEditor ===
+					true,
+				canEnableUnsupportedBlockEditor:
+					getSettings( 'capabilities' )
+						.canEnableUnsupportedBlockEditor === true,
 			};
 		},
 		[ ref, clientId ]
@@ -106,7 +128,15 @@ export default function ReusableBlockEdit( {
 
 	function requestFallback() {
 		closeSheet();
-		setSendFallbackMessage( true );
+
+		if (
+			canEnableUnsupportedBlockEditor &&
+			! isUnsupportedBlockEditorSupported
+		) {
+			setSendButtonPressMessage( true );
+		} else {
+			setSendFallbackMessage( true );
+		}
 	}
 
 	function renderSheet() {
@@ -139,6 +169,13 @@ export default function ReusableBlockEdit( {
 							);
 						}, 100 );
 						setSendFallbackMessage( false );
+					} else if ( sendButtonPressMessage ) {
+						timeoutId.current = setTimeout( () => {
+							sendActionButtonPressedAction(
+								actionButtons.missingBlockAlertActionButton
+							);
+						}, 100 );
+						setSendButtonPressMessage( false );
 					}
 				} }
 			>
@@ -152,20 +189,23 @@ export default function ReusableBlockEdit( {
 						{ infoTitle }
 					</Text>
 				</View>
-				<>
-					<BottomSheet.Cell
-						label={ __( 'Edit using web editor' ) }
-						separatorType="topFullWidth"
-						onPress={ requestFallback }
-						labelStyle={ actionButtonStyle }
-					/>
-					<BottomSheet.Cell
-						label={ __( 'Dismiss' ) }
-						separatorType="topFullWidth"
-						onPress={ closeSheet }
-						labelStyle={ actionButtonStyle }
-					/>
-				</>
+				{ ( isUnsupportedBlockEditorSupported ||
+					canEnableUnsupportedBlockEditor ) && (
+					<>
+						<BottomSheet.Cell
+							label={ __( 'Edit using web editor' ) }
+							separatorType="topFullWidth"
+							onPress={ requestFallback }
+							labelStyle={ actionButtonStyle }
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Dismiss' ) }
+							separatorType="topFullWidth"
+							onPress={ closeSheet }
+							labelStyle={ actionButtonStyle }
+						/>
+					</>
+				) }
 			</BottomSheet>
 		);
 	}
