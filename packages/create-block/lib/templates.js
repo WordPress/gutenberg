@@ -77,8 +77,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 		await Promise.all(
 			outputAssetFiles.map( async ( outputAssetFile ) => {
 				const outputAsset = await readFile(
-					join( outputAssetsPath, outputAssetFile ),
-					'utf8'
+					join( outputAssetsPath, outputAssetFile )
 				);
 				return [ outputAssetFile, outputAsset ];
 			} )
