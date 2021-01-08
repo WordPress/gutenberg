@@ -5,7 +5,7 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor tests for List block @canary', () => {
+describe( 'Gutenberg Editor tests for List block', () => {
 	it( 'should be able to add a new List block', async () => {
 		await editorPage.addNewBlock( blockNames.list );
 		const listBlockElement = await editorPage.getBlockAtPosition(
