@@ -9,7 +9,7 @@ import { invert } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch as dataDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
+import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
@@ -334,7 +334,7 @@ export function setIsInserterOpened( value ) {
  */
 export function* closeGeneralSidebar() {
 	yield dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'disableComplementaryArea',
 		'core/edit-widgets'
 	);

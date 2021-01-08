@@ -148,7 +148,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
 
 	log( '>> Building the ' + formats.success( branch ) + ' branch' );
 	await runShellScript(
-		'rm -rf node_modules && npm install && npm run build',
+		'rm -rf node_modules packages/*/node_modules && npm install && npm run build',
 		environmentDirectory
 	);
 }

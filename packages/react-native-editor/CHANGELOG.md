@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.44.0
+
+* [***] Add support for cross-posting between sites
 * [***] Full-width and wide alignment support for Columns
 
 ## 1.43.0
@@ -23,10 +26,6 @@ For each user feature we should also add a importance categorization label  to i
 * [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
 * [*] Fix theme colors syncing with the editor [#26821]
 * [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
-
-## 1.44.0
-
-* [***] Add support for cross-posting between sites
 
 ## 1.41.0
 
