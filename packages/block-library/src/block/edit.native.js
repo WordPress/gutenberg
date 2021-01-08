@@ -20,6 +20,7 @@ import {
 	actionButtons,
 } from '@wordpress/react-native-bridge';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -146,6 +147,10 @@ export default function ReusableBlockEdit( {
 						"Reusable blocks aren't editable on WordPress for Android"
 				  )
 				: __( "Reusable blocks aren't editable on WordPress for iOS" );
+		const reusableBlockActionButton = applyFilters(
+			'native.reusable_block_action_button',
+			__( 'Edit using web editor' )
+		);
 
 		return (
 			<BottomSheet
@@ -193,7 +198,7 @@ export default function ReusableBlockEdit( {
 					canEnableUnsupportedBlockEditor ) && (
 					<>
 						<BottomSheet.Cell
-							label={ __( 'Edit using web editor' ) }
+							label={ reusableBlockActionButton }
 							separatorType="topFullWidth"
 							onPress={ requestFallback }
 							labelStyle={ actionButtonStyle }
