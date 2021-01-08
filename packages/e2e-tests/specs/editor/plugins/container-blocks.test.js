@@ -68,6 +68,20 @@ describe( 'InnerBlocks Template Sync', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/27897.
+	it( `Synchronizes blocks if lock 'all' is set and the template prop is changed`, async () => {
+		// Insert the template and assert that the template has its initial value.
+		await insertBlock( 'Test Inner Blocks update locked template' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Trigger a template update and assert that a second block is now present.
+		const [ button ] = await page.$x(
+			`//button[contains(text(), 'Update template')]`
+		);
+		await button.click();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'Ensure inner block writing flow works as expected without additional paragraphs added', async () => {
 		const TEST_BLOCK_NAME = 'Test Inner Blocks Paragraph Placeholder';
 

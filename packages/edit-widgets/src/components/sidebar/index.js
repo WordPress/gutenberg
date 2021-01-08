@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { useEffect, Platform } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { ComplementaryArea } from '@wordpress/interface';
+import {
+	ComplementaryArea,
+	store as interfaceStore,
+} from '@wordpress/interface';
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
@@ -31,7 +34,7 @@ const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
 import WidgetAreas from './widget-areas';
 
 function ComplementaryAreaTab( { identifier, label, isActive } ) {
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	return (
 		<Button
 			onClick={ () =>
@@ -54,7 +57,7 @@ function ComplementaryAreaTab( { identifier, label, isActive } ) {
 }
 
 export default function Sidebar() {
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const {
 		currentArea,
 		hasSelectedNonAreaBlock,
@@ -66,7 +69,7 @@ export default function Sidebar() {
 			getBlock,
 			getBlockParentsByBlockName,
 		} = select( 'core/block-editor' );
-		const { getActiveComplementaryArea } = select( 'core/interface' );
+		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();
 

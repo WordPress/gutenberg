@@ -129,7 +129,7 @@ const config = {
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
+				test: /\.jsx?$/,
 				exclude: /node_modules/,
 				use: [
 					require.resolve( 'thread-loader' ),

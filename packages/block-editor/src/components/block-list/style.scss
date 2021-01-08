@@ -63,7 +63,7 @@
 			// Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
@@ -185,7 +185,7 @@
 
 			// 2px outside.
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
@@ -201,6 +201,7 @@
 			left: $border-width;
 			right: $border-width;
 			bottom: $border-width;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 		}
 
 		&:focus {
@@ -219,6 +220,7 @@
 			right: $border-width;
 			bottom: $border-width;
 			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 		}
 	}
 
@@ -589,7 +591,7 @@
 
 		// Block UI appearance.
 		box-shadow: 0 0 0 $border-width $gray-900;
-		border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+		border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 		background-color: $white;
 
 		// When button is focused, it receives a box-shadow instead of the border.

@@ -89,7 +89,7 @@ function LinkSettings( {
 
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 	useEffect( () => {
-		if ( ! onLinkCellPressed ) {
+		if ( onHandleClosingBottomSheet ) {
 			onHandleClosingBottomSheet( onCloseSettingsSheet );
 		}
 	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
@@ -152,7 +152,10 @@ function LinkSettings( {
 
 	function onCloseSettingsSheet() {
 		onSetAttributes();
-		onClose();
+
+		if ( onClose ) {
+			onClose();
+		}
 	}
 
 	function onChangeOpenInNewTab( value ) {
