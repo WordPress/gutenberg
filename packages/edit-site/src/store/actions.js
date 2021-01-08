@@ -151,8 +151,13 @@ export function* showHomepage() {
 		'site'
 	);
 
+	const { siteUrl } = yield controls.select(
+		'core/edit-site',
+		'getSettings'
+	);
+
 	const page = {
-		path: '/',
+		path: siteUrl,
 		context:
 			showOnFront === 'page'
 				? {
