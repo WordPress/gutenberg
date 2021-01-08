@@ -11,11 +11,7 @@ const { sprintf } = require( 'sprintf-js' );
  * Internal dependencies
  */
 const { log, formats } = require( '../lib/logger' );
-const {
-	askForConfirmation,
-	runStep,
-	readJSONFile,
-} = require( '../lib/utils' );
+const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const git = require( '../lib/git' );
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
@@ -364,7 +360,7 @@ async function isMilestoneClear( version ) {
  *
  * @param {boolean} isRC Whether it's an RC release or not.
  *
- * @return {Promise<Object>} Github release object.
+ * @return {string} The new version.
  */
 async function releasePlugin( isRC = true ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
@@ -437,8 +433,6 @@ async function releasePlugin( isRC = true ) {
 		);
 	}
 
-	const versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
-
 	if ( ! ( await isMilestoneClear( version ) ) ) {
 		await askForConfirmation(
 			'There are still open issues in the milestone. Are you sure you want to proceed?',
@@ -480,7 +474,7 @@ async function releasePlugin( isRC = true ) {
 	abortMessage = 'Aborting! The release is finished though.';
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 
-	return release;
+	return version;
 }
 
 async function releaseRC() {
@@ -493,17 +487,18 @@ async function releaseRC() {
 			' Team.\n'
 	);
 
-	const release = await releasePlugin( true );
+	const version = await releasePlugin( true );
 
 	log(
 		'\n>> 🎉 The ' +
 			config.name +
 			' version ' +
-			formats.success( release.name ) +
-			' has been successfully released.\n',
-		'You can access the GitHub release here: ' +
-			formats.success( release.html_url ) +
+			formats.success( version ) +
+			' has been successfully tagged.\n',
+		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+			formats.success( `https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`) +
 			'\n',
+		"Don't forget to publish the release once the draft is available!\n",
 		'Thanks for performing the release!\n'
 	);
 }
@@ -518,18 +513,19 @@ async function releaseStable() {
 			' Team.\n'
 	);
 
-	const release = await releasePlugin( false );
+	const version = await releasePlugin( false );
 
 	log(
 		'\n>> 🎉 ' +
 			config.name +
 			' ' +
-			formats.success( release.name ) +
-			' has been successfully released.\n',
-		'You can access the GitHub release here: ' +
-			formats.success( release.html_url ) +
+			formats.success( version ) +
+			' has been successfully tagged.\n',
+		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+			formats.success( `https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`) +
 			'\n',
-		"In a few minutes, you'll be able to update the plugin from the WordPress repository.\n",
+		"Don't forget to publish the release once the draft is available!\n",
+		"Once published, it'll be automatically uploaded to the WordPress repository.\n",
 		"Thanks for performing the release! and don't forget to publish the release post.\n"
 	);
 }
