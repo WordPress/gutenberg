@@ -125,12 +125,19 @@ describe( 'actions', () => {
 				type: '@@data/RESOLVE_SELECT',
 			} );
 
+			expect( it.next( { show_on_front: 'posts' } ).value ).toEqual( {
+				args: [],
+				selectorName: 'getSettings',
+				storeKey: 'core/edit-site',
+				type: '@@data/SELECT',
+			} );
+
 			const page = {
-				path: '/',
+				path: 'http:/my-site',
 				context: {},
 			};
 
-			expect( it.next( { show_on_front: 'posts' } ).value ).toEqual( {
+			expect( it.next( { siteUrl: 'http:/my-site' } ).value ).toEqual( {
 				type: '@@data/RESOLVE_SELECT',
 				storeKey: 'core',
 				selectorName: '__experimentalGetTemplateForLink',
@@ -160,17 +167,24 @@ describe( 'actions', () => {
 				type: '@@data/RESOLVE_SELECT',
 			} );
 
+			expect(
+				it.next( { show_on_front: 'page', page_on_front: pageId } )
+					.value
+			).toEqual( {
+				args: [],
+				selectorName: 'getSettings',
+				storeKey: 'core/edit-site',
+				type: '@@data/SELECT',
+			} );
+
 			const page = {
-				path: '/',
+				path: 'http:/my-site',
 				context: {
 					postType: 'page',
 					postId: pageId,
 				},
 			};
-			expect(
-				it.next( { show_on_front: 'page', page_on_front: pageId } )
-					.value
-			).toEqual( {
+			expect( it.next( { siteUrl: 'http:/my-site' } ).value ).toEqual( {
 				type: '@@data/RESOLVE_SELECT',
 				storeKey: 'core',
 				selectorName: '__experimentalGetTemplateForLink',
