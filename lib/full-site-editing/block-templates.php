@@ -193,7 +193,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 			array(
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
-				'terms'    => $query['theme'],
+				'terms'    => wp_get_theme()->get_stylesheet(),
 			),
 		),
 	);
