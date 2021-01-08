@@ -9,4 +9,5 @@ module.exports = {
 		dashicon: 'smiley',
 	},
 	templatesPath: __dirname,
+	assetsPath: require( 'path' ).join( __dirname, 'assets' ),
 };
