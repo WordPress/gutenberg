@@ -496,7 +496,9 @@ async function releaseRC() {
 			formats.success( version ) +
 			' has been successfully tagged.\n',
 		"In a few minutes, you'll be able to find the GitHub release draft here: " +
-			formats.success( `https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`) +
+			formats.success(
+				`https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`
+			) +
 			'\n',
 		"Don't forget to publish the release once the draft is available!\n",
 		'Thanks for performing the release!\n'
@@ -522,7 +524,9 @@ async function releaseStable() {
 			formats.success( version ) +
 			' has been successfully tagged.\n',
 		"In a few minutes, you'll be able to find the GitHub release draft here: " +
-			formats.success( `https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`) +
+			formats.success(
+				`https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`
+			) +
 			'\n',
 		"Don't forget to publish the release once the draft is available!\n",
 		"Once published, it'll be automatically uploaded to the WordPress repository.\n",
