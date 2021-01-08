@@ -22,7 +22,7 @@ $ npm start
 
 _(requires `node` version `12.0.0` or above, and `npm` version `6.9.0` or above)_
 
-You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
+It creates a WordPress plugin that you need to [install manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 
 ## Usage
 
@@ -50,8 +50,6 @@ Options:
 -h, --help                   output usage information
 ```
 
-_Please note that `--version` and `--help` options don't work with `npm init`. You have to use `npx` instead, as presented in the examples._
-
 More examples:
 
 1. Interactive mode - without giving a project name, the script will run in interactive mode giving a chance to customize the important options before generating the files.
@@ -74,7 +72,7 @@ $ npx @wordpress/create-block --help
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name, and the `category`. In most cases, we recommended pairing blocks with plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
-## Available Commands [ESNext template]
+## Available Commands
 
 When bootstrapped with the `esnext` template (or any external template with `wpScripts` flag enabled), you can run several commands inside the directory:
 
@@ -113,6 +111,8 @@ $ npm run packages-update
 ```
 
 Updates WordPress packages to the latest version. [Learn more](/packages/scripts#packages-update).
+
+_Note: You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on coding._
 
 ## External Templates
 
