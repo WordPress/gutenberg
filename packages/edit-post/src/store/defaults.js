@@ -15,4 +15,5 @@ export const PREFERENCES_DEFAULTS = {
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},
 	localAutosaveInterval: 15,
+	__experimentalGlobalGrid: false,
 };

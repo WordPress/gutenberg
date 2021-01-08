@@ -33,7 +33,12 @@ import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/preferences';
 
-export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
+export function PreferencesModal( {
+	isModalActive,
+	isViewable,
+	closeModal,
+	__experimentalGlobalGrid,
+} ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -58,6 +63,13 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					) }
 					label={ __( 'Show most used blocks' ) }
 				/>
+				{ __experimentalGlobalGrid && (
+					<EnableFeature
+						featureName="__experimentalGlobalGrid"
+						help={ __( 'Enables the Global Grid Layout' ) }
+						label={ __( 'Enable Global Grid' ) }
+					/>
+				) }
 			</Section>
 			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
@@ -151,12 +163,16 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 export default compose(
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { __experimentalGlobalGrid } = select(
+			'core/block-editor'
+		).getSettings();
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
 			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			__experimentalGlobalGrid,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
