@@ -5,7 +5,7 @@ on:
     paths-ignore:
     - '**.md'
   release:
-    types: [released]
+    types: [created]
 
 jobs:
   performance:
