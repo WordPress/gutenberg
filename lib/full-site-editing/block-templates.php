@@ -157,7 +157,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 
 	$template              = new WP_Block_Template();
 	$template->wp_id       = $post->ID;
-	$template->id          = $theme . '|' . $post->post_name;
+	$template->id          = $theme . '//' . $post->post_name;
 	$template->theme       = $theme;
 	$template->content     = $post->post_content;
 	$template->slug        = $post->post_name;
