@@ -42,6 +42,7 @@ export default function save( { attributes } ) {
 				) }
 				{ ! RichText.isEmpty( fileName ) && (
 					<a
+						id={ fileId }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={
@@ -56,6 +57,7 @@ export default function save( { attributes } ) {
 						href={ href }
 						className="wp-block-file__button"
 						download={ true }
+						aria-describedby={ fileId }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>
