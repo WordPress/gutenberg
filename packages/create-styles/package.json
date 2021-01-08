@@ -1,0 +1,58 @@
+{
+	"name": "@wordpress/create-styles",
+	"version": "0.0.1",
+	"description": "Style system creator for G2 Components.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"css-in-js"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/create-styles/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/create-styles"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"build",
+		"build-module",
+		"build-types",
+		"src",
+		"*.md"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@emotion/core": "^10.0.28",
+		"@emotion/is-prop-valid": "^0.8.8",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/element": "file:../element",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"create-emotion": "^10.0.27",
+		"emotion": "^10.0.27",
+		"emotion-theming": "^10.0.27",
+		"hoist-non-react-statics": "^3.3.2",
+		"lodash": "^4.17.19",
+		"memize": "^1.1.0",
+		"mitt": "^2.1.0",
+		"react-merge-refs": "^1.1.0",
+		"rtlcss": "^2.6.1",
+		"styled-griddie": "^0.1.3",
+		"zustand": "^3.3.0"
+	},
+	"peerDependencies": {
+		"react": "^16.8.0",
+		"react-dom": "^16.8.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

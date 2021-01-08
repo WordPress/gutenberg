@@ -1476,6 +1476,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-styles",
+		"slug": "packages-create-styles",
+		"markdown_source": "../packages/create-styles/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/custom-templated-path-webpack-plugin",
 		"slug": "packages-custom-templated-path-webpack-plugin",
 		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
