@@ -58,6 +58,17 @@ jobs:
         id: get_release_version
         run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | sed s/^v// | sed 's/-rc./ RC/' )
 
+      - name: Download Plugin Zip Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: gutenberg-plugin
+
+      - name: Extract Changelog for Release
+        run: |
+          unzip -d gutenberg.zip changelog.txt
+          CHANGELOG_REGEX="/=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s=/"
+          awk -i inplace "$CHANGELOG_REGEX"'{p++} p==2{exit} p>=1' changelog.txt
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.0.0
@@ -68,11 +79,7 @@ jobs:
           release_name: ${{ steps.get_release_version.outputs.version }}
           draft: true
           prerelease: ${{ contains(github.ref, 'rc') }}
-
-      - name: Download Plugin Zip Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: gutenberg-plugin
+          body_path: changelog.txt
 
       - name: Upload Release Asset
         id: upload-release-asset
