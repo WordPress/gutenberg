@@ -8,6 +8,7 @@ import { castArray, reduce } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { apiFetch } from '@wordpress/data-controls';
+import { store as interfaceStore } from '@wordpress/interface';
 import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 
@@ -25,7 +26,7 @@ import { store as editPostStore } from '.';
  */
 export function* openGeneralSidebar( name ) {
 	yield controls.dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'enableComplementaryArea',
 		editPostStore.name,
 		name
@@ -39,7 +40,7 @@ export function* openGeneralSidebar( name ) {
  */
 export function* closeGeneralSidebar() {
 	yield controls.dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'disableComplementaryArea',
 		editPostStore.name
 	);
