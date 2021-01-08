@@ -41,6 +41,7 @@ export default function QueryLoopEdit( {
 			search,
 			exclude,
 			sticky,
+			inherit,
 		} = {},
 		queryContext,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -78,6 +79,32 @@ export default function QueryLoopEdit( {
 			if ( sticky ) {
 				query.sticky = sticky === 'only';
 			}
+
+			// When you insert this block outside of the edit site then store
+			// does not exist therefore we check for its existence.
+			// TODO: remove this code, edit-site shouldn't be called in block-library.
+			// This creates a cycle dependency.
+			if ( inherit && select( 'core/edit-site' ) ) {
+				// This should be passed from the context exposed by edit site.
+				const { getEditedPostType, getEditedPostId } = select(
+					'core/edit-site'
+				);
+
+				if ( 'wp_template' === getEditedPostType() ) {
+					const { slug } = select( 'core' ).getEntityRecord(
+						'postType',
+						'wp_template',
+						getEditedPostId()
+					);
+
+					// Change the post-type if needed.
+					if ( slug?.startsWith( 'archive-' ) ) {
+						query.postType = slug.replace( 'archive-', '' );
+						postType = query.postType;
+					}
+				}
+			}
+
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),
@@ -97,6 +124,7 @@ export default function QueryLoopEdit( {
 			postType,
 			exclude,
 			sticky,
+			inherit,
 		]
 	);
 

@@ -19,34 +19,25 @@ import MainDashboardButton from '../../main-dashboard-button';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 
 export default function TemplatesNavigation() {
-	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
-		( select ) => {
-			const {
-				getTemplateId,
-				getTemplatePartId,
-				getTemplateType,
-				getNavigationPanelActiveMenu,
-			} = select( 'core/edit-site' );
+	const { postId, postType, activeMenu } = useSelect( ( select ) => {
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getNavigationPanelActiveMenu,
+		} = select( 'core/edit-site' );
 
-			return {
-				templateId: getTemplateId(),
-				templatePartId: getTemplatePartId(),
-				templateType: getTemplateType(),
-				activeMenu: getNavigationPanelActiveMenu(),
-			};
-		},
-		[]
-	);
+		return {
+			postId: getEditedPostId(),
+			postType: getEditedPostType(),
+			activeMenu: getNavigationPanelActiveMenu(),
+		};
+	}, [] );
 
 	const { setNavigationPanelActiveMenu } = useDispatch( 'core/edit-site' );
 
 	return (
 		<Navigation
-			activeItem={
-				'wp_template' === templateType
-					? `${ templateType }-${ templateId }`
-					: `${ templateType }-${ templatePartId }`
-			}
+			activeItem={ `${ postType }-${ postId }` }
 			activeMenu={ activeMenu }
 			onActivateMenu={ setNavigationPanelActiveMenu }
 		>

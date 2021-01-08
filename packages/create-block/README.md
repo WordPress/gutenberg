@@ -12,8 +12,6 @@ Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/deve
 
 ## Quick start
 
-![Demo](https://make.wordpress.org/core/files/2020/02/74508276-f0648280-4efe-11ea-9cc0-a607b43d1bcf.gif)
-
 You just need to provide the `slug` which is the target location for scaffolded files and the internal block name.
 
 ```bash
@@ -22,7 +20,7 @@ $ cd todo-list
 $ npm start
 ```
 
-_(requires `node` version `10.0.0` or above, and `npm` version `6.9.0` or above)_
+_(requires `node` version `12.0.0` or above, and `npm` version `6.9.0` or above)_
 
 You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
 
@@ -33,6 +31,8 @@ The following command generates PHP, JS and CSS code for registering a block.
 ```bash
 $ npx @wordpress/create-block [options] [slug]
 ```
+
+![Demo](https://user-images.githubusercontent.com/699132/103872910-4de15f00-50cf-11eb-8c74-67ca91a8c1a4.gif)
 
 `[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overridden with some of the options listed below.
 
@@ -148,20 +148,22 @@ module.exports = {
 
 The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
 
+-   `apiVersion` (default: `2`)
 -   `slug` (no default)
--   `namespace` (default: `create-block`)
+-   `namespace` (default: `'create-block'`)
 -   `title` (no default)
 -   `description` (no default)
 -   `dashicon` (no default)
--   `category` (default: `widgets`)
--   `author` (default: `The WordPress Contributors`)
--   `license` (default: `GPL-2.0-or-later`)
--   `licenseURI` (default: `https://www.gnu.org/licenses/gpl-2.0.html`)
--   `version` (default: `0.1.0`)
+-   `category` (default: `'widgets'`)
+-   `author` (default: `'The WordPress Contributors'`)
+-   `license` (default: `'GPL-2.0-or-later'`)
+-   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`)
+-   `version` (default: `'0.1.0'`)
 -   `wpScripts` (default: `true`)
--   `editorScript` (default: `file:./build/index.js`)
--   `editorStyle` (default: `file:./build/index.css`)
--   `style` (default: `file:./build/style-index.css`)
+-   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v6/commands/npm-install).
+-   `editorScript` (default: `'file:./build/index.js'`)
+-   `editorStyle` (default: `'file:./build/index.css'`)
+-   `style` (default: `'file:./build/style-index.css'`)
 
 ## WP-CLI
 

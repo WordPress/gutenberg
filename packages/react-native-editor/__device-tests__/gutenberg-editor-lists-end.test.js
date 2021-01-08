@@ -1,47 +1,15 @@
 /**
  * Internal dependencies
  */
-import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-	isAndroid,
-} from './helpers/utils';
+import { blockNames } from './pages/editor-page';
+import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
-
 describe( 'Gutenberg Editor tests for List block (end)', () => {
-	let driver;
-	let editorPage;
-	let allPassed = true;
-	const listBlockName = 'List';
-
-	// Use reporter for setting status for saucelabs Job
-	if ( ! isLocalEnvironment() ) {
-		const reporter = {
-			specDone: async ( result ) => {
-				allPassed = allPassed && result.status !== 'failed';
-			},
-		};
-
-		jasmine.getEnv().addReporter( reporter );
-	}
-
-	beforeAll( async () => {
-		driver = await setupDriver();
-		editorPage = new EditorPage( driver );
-	} );
-
-	it( 'should be able to see visual editor', async () => {
-		await expect( editorPage.getBlockList() ).resolves.toBe( true );
-	} );
-
 	it( 'should be able to end a List block', async () => {
-		await editorPage.addNewBlock( listBlockName );
+		await editorPage.addNewBlock( blockNames.list );
 		const listBlockElement = await editorPage.getBlockAtPosition(
-			listBlockName
+			blockNames.list
 		);
 
 		// Click List block on Android to force EditText focus
@@ -61,13 +29,9 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 		// send an Enter
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
-		await editorPage.verifyHtmlContent( testData.listEndedHtml );
-	} );
-
-	afterAll( async () => {
-		if ( ! isLocalEnvironment() ) {
-			driver.sauceJobStatus( allPassed );
-		}
-		await stopDriver( driver );
+		const html = await editorPage.getHtmlContent();
+		expect( testData.listEndedHtml.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 	} );
 } );

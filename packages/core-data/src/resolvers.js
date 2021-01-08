@@ -10,6 +10,10 @@ import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+/**
+ * Internal dependencies
+ */
+import { regularFetch } from './controls';
 
 /**
  * Internal dependencies
@@ -381,4 +385,39 @@ export function* getAutosaves( postType, postId ) {
  */
 export function* getAutosave( postType, postId ) {
 	yield controls.resolveSelect( 'core', 'getAutosaves', postType, postId );
+}
+
+/**
+ * Retrieve the frontend template used for a given link.
+ *
+ * @param {string} link  Link.
+ */
+export function* __experimentalGetTemplateForLink( link ) {
+	// Ideally this should be using an apiFetch call
+	// We could potentially do so by adding a "filter" to the `wp_template` end point.
+	// Also it seems the returned object is not a regular REST API post type.
+	const template = yield regularFetch(
+		addQueryArgs( link, {
+			'_wp-find-template': true,
+		} )
+	);
+
+	if ( template === null ) {
+		return;
+	}
+
+	yield getEntityRecord( 'postType', 'wp_template', template.ID );
+	const record = yield controls.select(
+		'core',
+		'getEntityRecord',
+		'postType',
+		'wp_template',
+		template.ID
+	);
+
+	if ( record ) {
+		yield receiveEntityRecords( 'postType', 'wp_template', [ record ], {
+			'find-template': link,
+		} );
+	}
 }

@@ -279,8 +279,12 @@ export function logUserEvent( event, properties ) {
 	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
-export function addMention() {
-	return RNReactNativeGutenbergBridge.addMention();
+export function showUserSuggestions() {
+	return RNReactNativeGutenbergBridge.showUserSuggestions();
+}
+
+export function showXpostSuggestions() {
+	return RNReactNativeGutenbergBridge.showXpostSuggestions();
 }
 
 export function requestStarterPageTemplatesTooltipShown( callback ) {

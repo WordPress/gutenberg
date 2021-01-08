@@ -21,6 +21,7 @@ jest.mock( '@wordpress/blocks/src/api/raw-handling', () => ( {
 describe( 'parseDropEvent', () => {
 	it( 'converts an event dataTransfer property from JSON to an object', () => {
 		const rawDataTransfer = {
+			blocks: null,
 			srcRootClientId: '123',
 			srcClientIds: [ 'abc' ],
 			srcIndex: 1,
@@ -53,12 +54,14 @@ describe( 'parseDropEvent', () => {
 		expect( parseDropEvent( event ) ).toEqual( {
 			srcRootClientId: null,
 			srcIndex: null,
+			blocks: null,
 			...rawDataTransfer,
 		} );
 	} );
 
 	it( 'returns an object with null values if the event dataTransfer can not be parsed', () => {
 		const expected = {
+			blocks: null,
 			srcRootClientId: null,
 			srcClientIds: null,
 			srcIndex: null,
@@ -77,6 +80,7 @@ describe( 'parseDropEvent', () => {
 
 	it( 'returns an object with null values if the event has no dataTransfer property', () => {
 		const expected = {
+			blocks: null,
 			srcRootClientId: null,
 			srcClientIds: null,
 			srcIndex: null,

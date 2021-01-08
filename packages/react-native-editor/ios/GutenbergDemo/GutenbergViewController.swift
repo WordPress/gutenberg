@@ -101,7 +101,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
                 }
             case .other, .any:
-                 callback([MediaInfo(id: 1, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
+                 callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
             default:
                 break
             }
@@ -225,6 +225,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
+    }
+
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
         return false;
     }
@@ -298,6 +302,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,

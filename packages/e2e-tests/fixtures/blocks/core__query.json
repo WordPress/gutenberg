@@ -16,7 +16,8 @@
                 "author": "",
                 "search": "",
                 "exclude": [],
-                "sticky": ""
+                "sticky": "",
+                "inherit": true
             },
             "layout": {
                 "type": "list"

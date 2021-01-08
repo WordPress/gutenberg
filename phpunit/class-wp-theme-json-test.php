@@ -8,6 +8,39 @@
 
 class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
+	function test_user_data_is_escaped() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'global' => array(
+					'styles' => array(
+						'color' => array(
+							'background' => 'green',
+							'gradient'   => 'linear-gradient(10deg,rgba(6,147,227,1) 0%,rgb(61,132,163) 37%,rgb(155,81,224) 100%)',
+							'link'       => 'linear-gradient(10deg,rgba(6,147,227,1) 0%,rgb(61,132,163) 37%,rgb(155,81,224) 100%)',
+							'text'       => 'var:preset|color|dark-gray',
+						),
+					),
+				),
+			),
+			true
+		);
+		$result     = $theme_json->get_raw_data();
+
+		$expected = array(
+			'global' => array(
+				'styles' => array(
+					'color' => array(
+						'background' => 'green',
+						'gradient'   => 'linear-gradient(10deg,rgba(6,147,227,1) 0%,rgb(61,132,163) 37%,rgb(155,81,224) 100%)',
+						'text'       => 'var:preset|color|dark-gray',
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
 	function test_contexts_not_valid_are_skipped() {
 		$theme_json = new WP_Theme_JSON(
 			array(
@@ -31,20 +64,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			'global' => array(
-				'selector' => ':root',
-				'supports' => array(
-					'--wp--style--color--link',
-					'background',
-					'backgroundColor',
-					'color',
-					'fontFamily',
-					'fontSize',
-					'fontStyle',
-					'fontWeight',
-					'lineHeight',
-					'textDecoration',
-					'textTransform',
-				),
 				'settings' => array(
 					'color' => array(
 						'custom' => 'false',
@@ -86,20 +105,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			'global' => array(
-				'selector' => ':root',
-				'supports' => array(
-					'--wp--style--color--link',
-					'background',
-					'backgroundColor',
-					'color',
-					'fontFamily',
-					'fontSize',
-					'fontStyle',
-					'fontWeight',
-					'lineHeight',
-					'textDecoration',
-					'textTransform',
-				),
 				'settings' => array(
 					'color' => array(
 						'custom' => 'false',
@@ -109,32 +114,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'typography' => array(
 						'fontSize' => '12',
 					),
-				),
-			),
-		);
-
-		$this->assertEqualSetsWithIndex( $expected, $result );
-	}
-
-	function test_metadata_is_attached() {
-		$theme_json = new WP_Theme_JSON( array( 'global' => array() ) );
-		$result     = $theme_json->get_raw_data();
-
-		$expected = array(
-			'global' => array(
-				'selector' => ':root',
-				'supports' => array(
-					'--wp--style--color--link',
-					'background',
-					'backgroundColor',
-					'color',
-					'fontFamily',
-					'fontSize',
-					'fontStyle',
-					'fontWeight',
-					'lineHeight',
-					'textDecoration',
-					'textTransform',
 				),
 			),
 		);
@@ -178,7 +157,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		// See schema at WP_Theme_JSON::SCHEMA.
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'global' => array(
+				'global'     => array(
 					'settings' => array(
 						'color'      => array(
 							'text'    => 'value',
@@ -212,20 +191,30 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					),
 					'misc'     => 'value',
 				),
+				'core/group' => array(
+					'styles' => array(
+						'spacing' => array(
+							'padding' => array(
+								'top'    => '12px',
+								'bottom' => '24px',
+							),
+						),
+					),
+				),
 			)
 		);
 
 		$this->assertEquals(
-			$theme_json->get_stylesheet(),
-			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}'
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}',
+			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			$theme_json->get_stylesheet( 'block_styles' ),
-			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}'
+			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}',
+			$theme_json->get_stylesheet( 'block_styles' )
 		);
 		$this->assertEquals(
-			$theme_json->get_stylesheet( 'css_variables' ),
-			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}'
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}',
+			$theme_json->get_stylesheet( 'css_variables' )
 		);
 	}
 
@@ -352,38 +341,16 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 					),
 					'typography' => array(
-						'fontSizes'       => array(
+						'fontSizes'    => array(
 							array(
 								'slug' => 'fontSize',
 								'size' => 'fontSize',
 							),
 						),
-						'fontFamilies'    => array(
+						'fontFamilies' => array(
 							array(
 								'slug'       => 'fontFamily',
 								'fontFamily' => 'fontFamily',
-							),
-						),
-						'fontStyles'      => array(
-							array(
-								'slug' => 'fontStyle',
-							),
-						),
-						'fontWeights'     => array(
-							array(
-								'slug' => 'fontWeight',
-							),
-						),
-						'textDecorations' => array(
-							array(
-								'slug'  => 'textDecoration',
-								'value' => 'textDecoration',
-							),
-						),
-						'textTransforms'  => array(
-							array(
-								'slug'  => 'textTransform',
-								'value' => 'textTransform',
 							),
 						),
 					),
@@ -393,20 +360,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			'global'         => array(
-				'selector' => ':root',
-				'supports' => array(
-					'--wp--style--color--link',
-					'background',
-					'backgroundColor',
-					'color',
-					'fontFamily',
-					'fontSize',
-					'fontStyle',
-					'fontWeight',
-					'lineHeight',
-					'textDecoration',
-					'textTransform',
-				),
 				'settings' => array(
 					'color'      => array(
 						'custom'         => 'true',
@@ -425,38 +378,16 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 					),
 					'typography' => array(
-						'fontSizes'       => array(
+						'fontSizes'    => array(
 							array(
 								'slug' => 'fontSize',
 								'size' => 'fontSize',
 							),
 						),
-						'fontFamilies'    => array(
+						'fontFamilies' => array(
 							array(
 								'slug'       => 'fontFamily',
 								'fontFamily' => 'fontFamily',
-							),
-						),
-						'fontStyles'      => array(
-							array(
-								'slug' => 'fontStyle',
-							),
-						),
-						'fontWeights'     => array(
-							array(
-								'slug' => 'fontWeight',
-							),
-						),
-						'textDecorations' => array(
-							array(
-								'slug'  => 'textDecoration',
-								'value' => 'textDecoration',
-							),
-						),
-						'textTransforms'  => array(
-							array(
-								'slug'  => 'textTransform',
-								'value' => 'textTransform',
 							),
 						),
 					),
@@ -468,14 +399,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			),
 			'core/paragraph' => array(
-				'selector' => 'p',
-				'supports' => array(
-					'--wp--style--color--link',
-					'backgroundColor',
-					'color',
-					'fontSize',
-					'lineHeight',
-				),
 				'settings' => array(
 					'color' => array(
 						'custom' => 'false',
@@ -492,13 +415,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			),
 			'core/list'      => array(
-				'selector' => '.wp-block-list',
-				'supports' => array(
-					'background',
-					'backgroundColor',
-					'color',
-					'fontSize',
-				),
 				'settings' => array(
 					'color' => array(
 						'custom' => 'false',

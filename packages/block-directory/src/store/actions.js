@@ -5,6 +5,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -144,7 +145,7 @@ export function* uninstallBlockType( block ) {
 		yield removeInstalledBlockType( block );
 	} catch ( error ) {
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			error.message || __( 'An error occurred.' )
 		);

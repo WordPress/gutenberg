@@ -234,11 +234,11 @@ describe( 'selectors', () => {
 			},
 		};
 
-		it( 'it should reflect that the block is installing', () => {
+		it( 'should reflect that the block is installing', () => {
 			expect( isInstalling( state, BLOCK_1_ID ) ).toBeTruthy();
 		} );
 
-		it( 'it should reflect that the block is not installing', () => {
+		it( 'should reflect that the block is not installing', () => {
 			expect( isInstalling( state, 'not-in-state' ) ).toBeFalsy();
 			expect( isInstalling( state, BLOCK_2_ID ) ).toBeFalsy();
 		} );

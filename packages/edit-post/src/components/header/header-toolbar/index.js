@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -25,9 +30,15 @@ import {
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import TemplateTitle from '../template-title';
+import { store as editPostStore } from '../../../store';
+
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
+	const { setIsInserterOpened } = useDispatch( editPostStore );
 	const {
 		hasFixedToolbar,
 		isInserterEnabled,
@@ -36,6 +47,7 @@ function HeaderToolbar() {
 		previewDeviceType,
 		showIconLabels,
 		isNavigationTool,
+		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -43,27 +55,28 @@ function HeaderToolbar() {
 			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
 		return {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
-				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+				select( editPostStore ).getEditorMode() === 'visual' &&
 				select( 'core/editor' ).getEditorSettings()
 					.richEditingEnabled &&
 				hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),
-			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
+			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			isTextModeEnabled:
-				select( 'core/edit-post' ).getEditorMode() === 'text',
+				select( editPostStore ).getEditorMode() === 'text',
 			previewDeviceType: select(
-				'core/edit-post'
+				editPostStore
 			).__experimentalGetPreviewDeviceType(),
-			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
 			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -206,8 +219,17 @@ characters. */
 				) }
 			</div>
 
+			<TemplateTitle />
+
 			{ displayBlockToolbar && (
-				<div className="edit-post-header-toolbar__block-toolbar">
+				<div
+					className={ classnames(
+						'edit-post-header-toolbar__block-toolbar',
+						{
+							'is-pushed-down': isTemplateMode,
+						}
+					) }
+				>
 					<BlockToolbar hideDragHandle />
 				</div>
 			) }

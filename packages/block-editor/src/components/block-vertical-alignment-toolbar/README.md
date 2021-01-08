@@ -15,6 +15,7 @@ import { registerBlockType } from '@wordpress/blocks';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/my-block', {
@@ -30,6 +31,7 @@ registerBlockType( 'my-plugin/my-block', {
 	},
 
 	edit( { attributes, setAttributes } ) {
+		const blockProps = useBlockProps();
 		
 		const { verticalAlignment } = attributes;
 
@@ -44,7 +46,7 @@ registerBlockType( 'my-plugin/my-block', {
 						value={ verticalAlignment }
 					/>
 				</BlockControls>
-				<div>
+				<div { ...blockProps }>
 					// your Block here
 				</div>
 			</>

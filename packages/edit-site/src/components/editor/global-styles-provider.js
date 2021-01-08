@@ -24,7 +24,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	GLOBAL_CONTEXT,
+	GLOBAL_CONTEXT_NAME,
+	GLOBAL_CONTEXT_SELECTOR,
+	GLOBAL_CONTEXT_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
 } from './utils';
@@ -36,8 +38,8 @@ const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
 	getSetting: ( context, path ) => {},
 	setSetting: ( context, path, newValue ) => {},
-	getStyleProperty: ( context, propertyName, origin ) => {},
-	setStyleProperty: ( context, propertyName, newValue ) => {},
+	getStyle: ( context, propertyName, origin ) => {},
+	setStyle: ( context, propertyName, newValue ) => {},
 	contexts: {},
 	/* eslint-enable no-unused-vars */
 } );
@@ -78,7 +80,10 @@ const extractSupportKeys = ( supports ) => {
 
 const getContexts = ( blockTypes ) => {
 	const result = {
-		...GLOBAL_CONTEXT,
+		[ GLOBAL_CONTEXT_NAME ]: {
+			selector: GLOBAL_CONTEXT_SELECTOR,
+			supports: GLOBAL_CONTEXT_SUPPORTS,
+		},
 	};
 
 	// Add contexts from block metadata.
@@ -159,7 +164,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				set( contextSettings, path, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
-			getStyleProperty: ( context, propertyName, origin = 'merged' ) => {
+			getStyle: ( context, propertyName, origin = 'merged' ) => {
 				const styles = 'user' === origin ? userStyles : mergedStyles;
 
 				const value = get(
@@ -168,7 +173,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				);
 				return getValueFromVariable( mergedStyles, context, value );
 			},
-			setStyleProperty: ( context, propertyName, newValue ) => {
+			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
 				let contextStyles = newContent?.[ context ]?.styles;
 				if ( ! contextStyles ) {
@@ -203,7 +208,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					css: getGlobalStyles(
 						contexts,
 						mergedStyles,
-						STYLE_PROPERTY,
 						'cssVariables'
 					),
 					isGlobalStyles: true,
@@ -213,7 +217,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					css: getGlobalStyles(
 						contexts,
 						mergedStyles,
-						STYLE_PROPERTY,
 						'blockStyles'
 					),
 					isGlobalStyles: true,
