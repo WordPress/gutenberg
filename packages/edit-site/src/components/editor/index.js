@@ -18,6 +18,7 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
+	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -27,6 +28,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -86,7 +88,7 @@ function Editor() {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! select(
-				'core/interface'
+				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
 			templateType: postType,
@@ -251,7 +253,7 @@ function Editor() {
 												/>
 											}
 											content={
-												<div
+												<BlockSelectionClearer
 													className="edit-site-visual-editor"
 													style={ inlineStyles }
 												>
@@ -265,7 +267,7 @@ function Editor() {
 														/>
 													) }
 													<KeyboardShortcuts />
-												</div>
+												</BlockSelectionClearer>
 											}
 											actions={
 												<>

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { loop as icon } from '@wordpress/icons';
 
 /**
@@ -16,7 +16,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Query' ),
+	title: _x( 'Query', 'block title' ),
 	icon,
 	description: __( 'Displays a list of posts as a result of a query.' ),
 	edit,

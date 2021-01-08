@@ -3,4 +3,7 @@ module.exports = {
 	globals: {
 		editorPage: true, // Defined in 'jest_ui_test_environment.js'
 	},
+	rules: {
+		'jest/expect-expect': 'off',
+	},
 };

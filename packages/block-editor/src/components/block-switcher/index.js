@@ -20,56 +20,53 @@ import { stack } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
+import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
 
-const BlockSwitcher = ( { clientIds } ) => {
-	const { replaceBlocks } = useDispatch( 'core/block-editor' );
-	const {
-		blocks,
-		possibleBlockTransformations,
-		hasBlockStyles,
-		icon,
-	} = useSelect(
+export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
+	const { possibleBlockTransformations, hasBlockStyles, icon } = useSelect(
 		( select ) => {
-			const {
-				getBlocksByClientId,
-				getBlockRootClientId,
-				getBlockTransformItems,
-			} = select( 'core/block-editor' );
+			const { getBlockRootClientId, getBlockTransformItems } = select(
+				blockEditorStore
+			);
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
 			);
-			const _blocks = getBlocksByClientId( clientIds );
-			const isSingleBlockSelected = _blocks?.length === 1;
-			const firstBlock = !! _blocks?.length ? _blocks[ 0 ] : null;
+			const [ { name: firstBlockName } ] = blocks;
+			const _isSingleBlockSelected = blocks.length === 1;
 			const styles =
-				isSingleBlockSelected && getBlockStyles( firstBlock.name );
-			// When selection consists of blocks of multiple types, display an
-			// appropriate icon to communicate the non-uniformity.
-			const isSelectionOfSameType =
-				uniq( ( _blocks || [] ).map( ( { name } ) => name ) ).length ===
-				1;
+				_isSingleBlockSelected && getBlockStyles( firstBlockName );
+			let _icon;
+			if ( _isSingleBlockSelected ) {
+				_icon = blockInformation?.icon; // Take into account active block variations.
+			} else {
+				const isSelectionOfSameType =
+					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
+				// When selection consists of blocks of multiple types, display an
+				// appropriate icon to communicate the non-uniformity.
+				_icon = isSelectionOfSameType
+					? getBlockType( firstBlockName )?.icon
+					: stack;
+			}
 			return {
-				blocks: _blocks,
-				possibleBlockTransformations:
-					_blocks && getBlockTransformItems( _blocks, rootClientId ),
+				possibleBlockTransformations: getBlockTransformItems(
+					blocks,
+					rootClientId
+				),
 				hasBlockStyles: !! styles?.length,
-				icon: isSelectionOfSameType
-					? getBlockType( firstBlock.name )?.icon
-					: stack,
+				icon: _icon,
 			};
 		},
-		[ clientIds ]
+		[ clientIds, blocks, blockInformation?.icon ]
 	);
-
-	if ( ! blocks?.length ) return null;
-
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
-
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
@@ -83,7 +80,6 @@ const BlockSwitcher = ( { clientIds } ) => {
 			</ToolbarGroup>
 		);
 	}
-
 	const blockSwitcherLabel =
 		1 === blocks.length
 			? __( 'Change block type or style' )
@@ -150,6 +146,18 @@ const BlockSwitcher = ( { clientIds } ) => {
 			</ToolbarItem>
 		</ToolbarGroup>
 	);
+};
+
+export const BlockSwitcher = ( { clientIds } ) => {
+	const blocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlocksByClientId( clientIds ),
+		[ clientIds ]
+	);
+
+	return !! blocks?.length ? (
+		<BlockSwitcherDropdownMenu clientIds={ clientIds } blocks={ blocks } />
+	) : null;
 };
 
 export default BlockSwitcher;

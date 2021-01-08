@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"files": [
 		"build",
@@ -31,11 +31,11 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.12.5",
-		"jest-matcher-utils": "^25.3.0",
+		"jest-matcher-utils": "^26.6.2",
 		"lodash": "^4.17.19"
 	},
 	"peerDependencies": {
-		"jest": ">=24"
+		"jest": ">=26"
 	},
 	"publishConfig": {
 		"access": "public"

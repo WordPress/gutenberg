@@ -90,6 +90,9 @@ class WP_Theme_JSON {
 	 */
 	const SCHEMA = array(
 		'styles'   => array(
+			'border'     => array(
+				'radius' => null,
+			),
 			'color'      => array(
 				'background' => null,
 				'gradient'   => null,
@@ -246,7 +249,7 @@ class WP_Theme_JSON {
 		),
 		'borderRadius'             => array(
 			'value'   => array( 'border', 'radius' ),
-			'support' => array( '__experimentalBorder' ),
+			'support' => array( '__experimentalBorder', 'radius' ),
 		),
 		'color'                    => array(
 			'value'   => array( 'color', 'text' ),
@@ -272,21 +275,10 @@ class WP_Theme_JSON {
 			'value'   => array( 'typography', 'lineHeight' ),
 			'support' => array( 'lineHeight' ),
 		),
-		'paddingBottom'            => array(
-			'value'   => array( 'spacing', 'padding', 'bottom' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingLeft'              => array(
-			'value'   => array( 'spacing', 'padding', 'left' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingRight'             => array(
-			'value'   => array( 'spacing', 'padding', 'right' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingTop'               => array(
-			'value'   => array( 'spacing', 'padding', 'top' ),
-			'support' => array( 'spacing', 'padding' ),
+		'padding'                  => array(
+			'value'      => array( 'spacing', 'padding' ),
+			'support'    => array( 'spacing', 'padding' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'textDecoration'           => array(
 			'value'   => array( 'typography', 'textDecoration' ),
@@ -325,6 +317,7 @@ class WP_Theme_JSON {
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
 			if ( isset( $context['styles'] ) ) {
+				$this->process_key( 'border', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
@@ -504,10 +497,25 @@ class WP_Theme_JSON {
 				if ( 'gradient' === $property ) {
 					$name = 'background';
 				}
-				$result = safecss_filter_attr( "$name: $value" );
 
-				if ( '' === $result ) {
-					unset( $input[ $key ][ $property ] );
+				if ( is_array( $value ) ) {
+					$result = array();
+					foreach ( $value as $subproperty => $subvalue ) {
+						$result_subproperty = safecss_filter_attr( "$name: $subvalue" );
+						if ( '' !== $result_subproperty ) {
+							$result[ $subproperty ] = $result_subproperty;
+						}
+					}
+
+					if ( empty( $result ) ) {
+						unset( $input[ $key ][ $property ] );
+					}
+				} else {
+					$result = safecss_filter_attr( "$name: $value" );
+
+					if ( '' === $result ) {
+						unset( $input[ $key ][ $property ] );
+					}
 				}
 			}
 		}
@@ -626,6 +634,21 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Whether the medatata contains a key named properties.
+	 *
+	 * @param array $metadata Description of the style property.
+	 *
+	 * @return boolean True if properties exists, false otherwise.
+	 */
+	private static function has_properties( $metadata ) {
+		if ( array_key_exists( 'properties', $metadata ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Given a context, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
@@ -647,14 +670,33 @@ class WP_Theme_JSON {
 			return;
 		}
 
+		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
 			}
 
-			$value = self::get_property_value( $context['styles'], $metadata['value'] );
+			// Some properties can be shorthand properties, meaning that
+			// they contain multiple values instead of a single one.
+			if ( self::has_properties( $metadata ) ) {
+				foreach ( $metadata['properties'] as $property ) {
+					$properties[] = array(
+						'name'  => $name . ucfirst( $property ),
+						'value' => array_merge( $metadata['value'], array( $property ) ),
+					);
+				}
+			} else {
+				$properties[] = array(
+					'name'  => $name,
+					'value' => $metadata['value'],
+				);
+			}
+		}
+
+		foreach ( $properties as $prop ) {
+			$value = self::get_property_value( $context['styles'], $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
+				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $prop['name'] ) );
 				$declarations[]  = array(
 					'name'  => $kebabcased_name,
 					'value' => $value,

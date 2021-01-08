@@ -47,7 +47,7 @@ export const disabled = () => {
 };
 
 const ControlledRadioGroupWithState = () => {
-	const [ checked, setChecked ] = useState( 'option2' );
+	const [ checked, setChecked ] = useState( 1 );
 
 	/* eslint-disable no-restricted-syntax */
 	return (
@@ -58,9 +58,9 @@ const ControlledRadioGroupWithState = () => {
 			checked={ checked }
 			onChange={ setChecked }
 		>
-			<Radio value="option1">Option 1</Radio>
-			<Radio value="option2">Option 2</Radio>
-			<Radio value="option3">Option 3</Radio>
+			<Radio value={ 0 }>Option 1</Radio>
+			<Radio value={ 1 }>Option 2</Radio>
+			<Radio value={ 2 }>Option 3</Radio>
 		</RadioGroup>
 	);
 	/* eslint-enable no-restricted-syntax */

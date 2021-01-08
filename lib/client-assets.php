@@ -579,7 +579,9 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_styles( $settings ) {
-	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$editor_styles_file = is_rtl() ?
+		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
+		gutenberg_dir_path() . 'build/editor/editor-styles.css';
 
 	/*
 	 * If, for whatever reason, the built editor styles do not exist, avoid
@@ -601,7 +603,9 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		 */
 
 		$default_styles = file_get_contents(
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+			is_rtl() ?
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
 		);
 
 		/*
@@ -640,7 +644,9 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
-	$editor_styles_file              = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$editor_styles_file              = is_rtl() ?
+		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
+		gutenberg_dir_path() . 'build/editor/editor-styles.css';
 	$settings['defaultEditorStyles'] = array(
 		array(
 			'css' => file_get_contents( $editor_styles_file ),

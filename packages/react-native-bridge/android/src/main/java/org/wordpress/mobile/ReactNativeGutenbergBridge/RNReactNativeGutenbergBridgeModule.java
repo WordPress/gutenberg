@@ -21,7 +21,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.StarterPageTemplatesTooltipShownCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
@@ -330,25 +329,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void showXpostSuggestions(Promise promise) {
         mGutenbergBridgeJS2Parent.onShowXpostSuggestions(promise::resolve);
-    }
-
-    @ReactMethod
-    public void setStarterPageTemplatesTooltipShown(boolean tooltipShown) {
-        mGutenbergBridgeJS2Parent.setStarterPageTemplatesTooltipShown(tooltipShown);
-    }
-
-    @ReactMethod
-    public void requestStarterPageTemplatesTooltipShown(final Callback jsCallback) {
-        StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback = requestStarterPageTemplatesTooltipShownCallback(jsCallback);
-        mGutenbergBridgeJS2Parent.requestStarterPageTemplatesTooltipShown(starterPageTemplatesTooltipShownCallback);
-    }
-
-    private StarterPageTemplatesTooltipShownCallback requestStarterPageTemplatesTooltipShownCallback(final Callback jsCallback) {
-        return new StarterPageTemplatesTooltipShownCallback() {
-            @Override public void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown) {
-                jsCallback.invoke(tooltipShown);
-            }
-        };
     }
 
     private GutenbergBridgeJS2Parent.MediaSelectedCallback getNewMediaSelectedCallback(final Boolean allowMultipleSelection, final Callback jsCallback) {

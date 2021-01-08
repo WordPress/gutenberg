@@ -2799,7 +2799,7 @@ describe( 'selectors', () => {
 			).toEqual( {} );
 		} );
 
-		it( 'returns the requested default template type ', () => {
+		it( 'returns the requested default template type', () => {
 			expect(
 				__experimentalGetDefaultTemplateType( state, 'index' )
 			).toEqual( {
