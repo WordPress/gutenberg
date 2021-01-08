@@ -3,45 +3,45 @@
  */
 import { RichText } from '@wordpress/block-editor';
 
-// Version of the file block without PR#22914 accessibility fix.
+// Version of the file block without PR#28062 accessibility fix.
 const deprecated = [
 	{
-		"attributes": {
-			"id": {
-				"type": "number"
+		attributes: {
+			id: {
+				type: 'number',
 			},
-			"href": {
-				"type": "string"
+			href: {
+				type: 'string',
 			},
-			"fileName": {
-				"type": "string",
-				"source": "html",
-				"selector": "a:not([download])"
+			fileName: {
+				type: 'string',
+				source: 'html',
+				selector: 'a:not([download])',
 			},
-			"textLinkHref": {
-				"type": "string",
-				"source": "attribute",
-				"selector": "a:not([download])",
-				"attribute": "href"
+			textLinkHref: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a:not([download])',
+				attribute: 'href',
 			},
-			"textLinkTarget": {
-				"type": "string",
-				"source": "attribute",
-				"selector": "a:not([download])",
-				"attribute": "target"
+			textLinkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a:not([download])',
+				attribute: 'target',
 			},
-			"showDownloadButton": {
-				"type": "boolean",
-				"default": true
+			showDownloadButton: {
+				type: 'boolean',
+				default: true,
 			},
-			"downloadButtonText": {
-				"type": "string",
-				"source": "html",
-				"selector": "a[download]"
-			}
+			downloadButtonText: {
+				type: 'string',
+				source: 'html',
+				selector: 'a[download]',
+			},
 		},
-		"supports": {
-			"align": true
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
@@ -60,7 +60,11 @@ const deprecated = [
 							<a
 								href={ textLinkHref }
 								target={ textLinkTarget }
-								rel={ textLinkTarget ? 'noreferrer noopener' : false }
+								rel={
+									textLinkTarget
+										? 'noreferrer noopener'
+										: false
+								}
 							>
 								<RichText.Content value={ fileName } />
 							</a>
@@ -71,14 +75,16 @@ const deprecated = [
 								className="wp-block-file__button"
 								download={ true }
 							>
-								<RichText.Content value={ downloadButtonText } />
+								<RichText.Content
+									value={ downloadButtonText }
+								/>
 							</a>
 						) }
 					</div>
 				)
 			);
-		}
-	}
+		},
+	},
 ];
 
 export default deprecated;
