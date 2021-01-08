@@ -189,10 +189,12 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
-		array(
-			'taxonomy' => 'wp_theme',
-			'field'    => 'name',
-			'terms'    => $query['theme'],
+		'tax_query' => array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => $query['theme'],
+			),
 		),
 	);
 
