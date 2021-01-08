@@ -140,8 +140,3 @@ jasmine.getEnv().addReporter( {
 		}
 	},
 } );
-
-it( 'should be able to see visual editor', async () => {
-	// wait for the block editor to load
-	await expect( global.editorPage.getBlockList() ).resolves.toBe( true );
-} );
