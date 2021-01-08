@@ -59,7 +59,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		// Lists/updates a single template based on the given id.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\/|\w-]+)',
+			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -242,7 +242,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
-		$id = $changes->theme . '|' . $changes->slug;
+		$id = $changes->theme . '//' . $changes->slug;
 
 		$template      = gutenberg_get_block_template( $id, $this->post_type );
 		$fields_update = $this->update_additional_fields_for_object( $template, $request );

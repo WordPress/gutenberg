@@ -105,10 +105,10 @@ describe( 'actions', () => {
 				selectorName: '__experimentalGetTemplateForLink',
 				args: [ page.path ],
 			} );
-			expect( it.next( { id: 'tt1-blocks|single' } ).value ).toEqual( {
+			expect( it.next( { id: 'tt1-blocks//single' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId: 'tt1-blocks|single',
+				templateId: 'tt1-blocks//single',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
@@ -136,14 +136,14 @@ describe( 'actions', () => {
 				selectorName: '__experimentalGetTemplateForLink',
 				args: [ page.path ],
 			} );
-			expect( it.next( { id: 'theme|slug' } ).value ).toEqual( {
+			expect( it.next( { id: 'theme//slug' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId: 'theme|slug',
+				templateId: 'theme//slug',
 			} );
-			expect( it.next( 'theme|slug' ).value ).toEqual( {
+			expect( it.next( 'theme//slug' ).value ).toEqual( {
 				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: 'theme|slug',
+				homeTemplateId: 'theme//slug',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );
@@ -176,14 +176,14 @@ describe( 'actions', () => {
 				selectorName: '__experimentalGetTemplateForLink',
 				args: [ page.path ],
 			} );
-			expect( it.next( { id: 'theme|slug' } ).value ).toEqual( {
+			expect( it.next( { id: 'theme//slug' } ).value ).toEqual( {
 				type: 'SET_PAGE',
 				page,
-				templateId: 'theme|slug',
+				templateId: 'theme//slug',
 			} );
-			expect( it.next( 'theme|slug' ).value ).toEqual( {
+			expect( it.next( 'theme//slug' ).value ).toEqual( {
 				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: 'theme|slug',
+				homeTemplateId: 'theme//slug',
 			} );
 			expect( it.next().done ).toBe( true );
 		} );

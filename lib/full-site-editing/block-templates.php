@@ -118,7 +118,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 
 	$theme               = wp_get_theme()->get_stylesheet();
 	$template            = new WP_Block_Template();
-	$template->id        = $theme . '|' . $template_file['slug'];
+	$template->id        = $theme . '//' . $template_file['slug'];
 	$template->theme     = $theme;
 	$template->content   = file_get_contents( $template_file['path'] );
 	$template->slug      = $template_file['slug'];
@@ -221,7 +221,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_custom      = array_search(
-				wp_get_theme()->get_stylesheet() . '|' . $template_file['slug'],
+				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
@@ -246,7 +246,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * @return WP_Block_Template|null Template.
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
-	$parts = explode( '|', $id, 2 );
+	$parts = explode( '//', $id, 2 );
 	if ( count( $parts ) < 2 ) {
 		return null;
 	}
