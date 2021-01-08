@@ -47,7 +47,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			'wp_template'
 		);
 
-		$this->assertEquals( get_stylesheet() . '|single', $template->id );
+		$this->assertEquals( get_stylesheet() . '//single', $template->id );
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'single', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
@@ -64,7 +64,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertNotWPError( $template );
-		$this->assertEquals( get_stylesheet() . '|my_template', $template->id );
+		$this->assertEquals( get_stylesheet() . '//my_template', $template->id );
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'my_template', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
@@ -78,7 +78,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	 * Should retrieve the template from the theme files.
 	 */
 	function test_gutenberg_get_block_template_from_file() {
-		$id       = get_stylesheet() . '|' . 'index';
+		$id       = get_stylesheet() . '//' . 'index';
 		$template = gutenberg_get_block_template( $id, 'wp_template' );
 		$this->assertEquals( $id, $template->id );
 		$this->assertEquals( get_stylesheet(), $template->theme );
@@ -92,7 +92,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	 * Should retrieve the template from the CPT.
 	 */
 	function test_gutenberg_get_block_template_from_post() {
-		$id       = get_stylesheet() . '|' . 'my_template';
+		$id       = get_stylesheet() . '//' . 'my_template';
 		$template = gutenberg_get_block_template( $id, 'wp_template' );
 		$this->assertEquals( $id, $template->id );
 		$this->assertEquals( get_stylesheet(), $template->theme );
@@ -118,18 +118,19 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		// All results.
 		$templates    = gutenberg_get_block_templates( array(), 'wp_template' );
 		$template_ids = get_template_ids( $templates );
+
 		// Avoid testing the entire array because the theme might add/remove templates.
-		$this->assertContains( get_stylesheet() . '|' . 'my_template', $template_ids );
-		$this->assertContains( get_stylesheet() . '|' . 'index', $template_ids );
+		$this->assertContains( get_stylesheet() . '//' . 'my_template', $template_ids );
+		$this->assertContains( get_stylesheet() . '//' . 'index', $template_ids );
 
 		// Filter by slug.
 		$templates    = gutenberg_get_block_templates( array( 'slug__in' => array( 'my_template' ) ), 'wp_template' );
 		$template_ids = get_template_ids( $templates );
-		$this->assertEquals( array( get_stylesheet() . '|' . 'my_template' ), $template_ids );
+		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template' ), $template_ids );
 
 		// Filter by CPT ID.
 		$templates    = gutenberg_get_block_templates( array( 'wp_id' => self::$post->ID ), 'wp_template' );
 		$template_ids = get_template_ids( $templates );
-		$this->assertEquals( array( get_stylesheet() . '|' . 'my_template' ), $template_ids );
+		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template' ), $template_ids );
 	}
 }

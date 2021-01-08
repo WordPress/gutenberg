@@ -189,7 +189,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
-		'tax_query' => array(
+		'tax_query'      => array(
 			array(
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
@@ -259,10 +259,12 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
 		'posts_per_page' => 1,
 		'no_found_rows'  => true,
-		array(
-			'taxonomy' => 'wp_theme',
-			'field'    => 'name',
-			'terms'    => $theme,
+		'tax_query'      => array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => $theme,
+			),
 		),
 	);
 	$template_query       = new WP_Query( $wp_query_args );
