@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import DescenderLines from './descender-lines';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 
@@ -70,6 +71,7 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
+				<DescenderLines level={ level } />
 				<BlockIcon icon={ blockInformation.icon } showColors />
 				{ blockDisplayName }
 				{ isSelected && (
