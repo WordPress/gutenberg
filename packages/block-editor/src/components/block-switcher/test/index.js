@@ -15,11 +15,18 @@ import { stack } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import BlockSwitcher from '../';
+import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 
 describe( 'BlockSwitcher', () => {
+	test( 'should not render block switcher without blocks', () => {
+		useSelect.mockImplementation( () => ( {} ) );
+		const wrapper = shallow( <BlockSwitcher /> );
+		expect( wrapper.html() ).toBeNull();
+	} );
+} );
+describe( 'BlockSwitcherDropdownMenu', () => {
 	const headingBlock1 = {
 		attributes: {
 			content: [ 'How are you?' ],
@@ -97,56 +104,59 @@ describe( 'BlockSwitcher', () => {
 		unregisterBlockType( 'core/paragraph' );
 	} );
 
-	test( 'should not render block switcher without blocks', () => {
-		useSelect.mockImplementation( () => ( {} ) );
-		const wrapper = shallow( <BlockSwitcher /> );
-		expect( wrapper.html() ).toBeNull();
-	} );
-
 	test( 'should render switcher with blocks', () => {
 		useSelect.mockImplementation( () => ( {
-			blocks: [ headingBlock1 ],
 			possibleBlockTransformations: [
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
 		} ) );
-		const wrapper = shallow( <BlockSwitcher /> );
+		const wrapper = shallow(
+			<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
 		useSelect.mockImplementation( () => ( {
-			blocks: [ headingBlock1, textBlock ],
 			possibleBlockTransformations: [],
 			icon: stack,
 		} ) );
-		const wrapper = shallow( <BlockSwitcher /> );
+		const wrapper = shallow(
+			<BlockSwitcherDropdownMenu
+				blocks={ [ headingBlock1, textBlock ] }
+			/>
+		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	test( 'should render enabled block switcher with multi block when transforms exist', () => {
 		useSelect.mockImplementation( () => ( {
-			blocks: [ headingBlock1, headingBlock2 ],
 			possibleBlockTransformations: [
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
 		} ) );
-		const wrapper = shallow( <BlockSwitcher /> );
+		const wrapper = shallow(
+			<BlockSwitcherDropdownMenu
+				blocks={ [ headingBlock1, headingBlock2 ] }
+			/>
+		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {
 		beforeAll( () => {
 			useSelect.mockImplementation( () => ( {
-				blocks: [ headingBlock1 ],
 				possibleBlockTransformations: [
 					{ name: 'core/paragraph', frecency: 3 },
 				],
 			} ) );
 		} );
-		const getDropdown = () => mount( <BlockSwitcher /> ).find( 'Dropdown' );
+		const getDropdown = () =>
+			mount(
+				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+			).find( 'Dropdown' );
 
 		test( 'should dropdown exist', () => {
 			expect( getDropdown() ).toHaveLength( 1 );

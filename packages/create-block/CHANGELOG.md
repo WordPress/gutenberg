@@ -2,10 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+
+### Internal
+
+-   Update the demo included in the README file ([#28037](https://github.com/WordPress/gutenberg/pull/28037)).
+
+## 1.1.0 (2021-01-05)
+
 ### New Feature
 
 -   Adds the `npmPackages` field to the template configuration. It allows listing remote npm packages that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 -   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+
+### Bug Fix
+
+-   Print the block class name in the `save` method in scaffolded templates ([#27988](https://github.com/WordPress/gutenberg/pull/27988)).
 
 ## 1.0.2 (2020-12-17)
 

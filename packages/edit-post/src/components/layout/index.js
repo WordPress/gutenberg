@@ -35,6 +35,7 @@ import {
 	ComplementaryArea,
 	FullscreenMode,
 	InterfaceSkeleton,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { close } from '@wordpress/icons';
@@ -71,7 +72,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { settings } ) {
+function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
@@ -99,7 +100,7 @@ function Layout( { settings } ) {
 				'fixedToolbar'
 			),
 			sidebarIsOpened: !! (
-				select( 'core/interface' ).getActiveComplementaryArea(
+				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
 				) || select( editPostStore ).isPublishSidebarOpened()
 			),
@@ -171,7 +172,7 @@ function Layout( { settings } ) {
 	const ref = useRef();
 
 	useDrop( ref );
-	useEditorStyles( ref, settings.styles );
+	useEditorStyles( ref, styles );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
