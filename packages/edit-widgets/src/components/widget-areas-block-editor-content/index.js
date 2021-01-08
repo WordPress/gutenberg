@@ -18,15 +18,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export default function WidgetAreasBlockEditorContent() {
 	return (
-		<div
-			className="edit-widgets-block-editor editor-styles-wrapper"
-			onFocus={ ( event ) => {
-				// Stop propagation of the focus event to avoid the parent
-				// widget layout component catching the event and removing the selected area.
-				event.stopPropagation();
-				event.preventDefault();
-			} }
-		>
+		<div className="edit-widgets-block-editor editor-styles-wrapper">
 			<KeyboardShortcuts />
 			<BlockEditorKeyboardShortcuts />
 			<Notices />
