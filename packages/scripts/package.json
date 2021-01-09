@@ -51,6 +51,7 @@
 		"dir-glob": "^3.0.1",
 		"eslint": "^7.17.0",
 		"eslint-plugin-markdown": "^1.0.2",
+		"file-loader": "^6.2.0",
 		"ignore-emit-webpack-plugin": "^2.0.6",
 		"jest": "^26.6.3",
 		"jest-puppeteer": "^4.4.0",

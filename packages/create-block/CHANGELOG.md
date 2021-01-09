@@ -6,6 +6,10 @@
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 
+### New Features
+
+-   Add support for handling static assets with the `assetsPath` field in the external template configuration ([#28038](https://github.com/WordPress/gutenberg/pull/28038)).
+
 ### Internal
 
 -   Update the demo included in the README file ([#28037](https://github.com/WordPress/gutenberg/pull/28037)).
