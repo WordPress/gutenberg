@@ -119,6 +119,6 @@ describe( 'Toolbar roving tabindex', () => {
 		await pressKeyWithModifier( 'alt', 'F10' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
-		await expectLabelToHaveFocus( 'Change text alignment' );
+		await expectLabelToHaveFocus( 'Bold' );
 	} );
 } );
