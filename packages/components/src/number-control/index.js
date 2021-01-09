@@ -93,9 +93,11 @@ export function NumberControl(
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
-			nextValue = roundClamp( nextValue, min, max, incrementalValue );
-
-			state.value = nextValue;
+			if ( ! isNaN( nextValue ) ) {
+				state.value = roundClamp( nextValue, min, max );
+			} else {
+				state.value = nextValue;
+			}
 		}
 
 		/**
@@ -155,7 +157,11 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			state.value = roundClamp( currentValue, min, max );
+			if ( ! isNaN( currentValue ) ) {
+				state.value = roundClamp( currentValue, min, max );
+			} else {
+				state.value = currentValue;
+			}
 		}
 
 		return state;

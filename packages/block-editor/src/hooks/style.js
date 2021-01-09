@@ -20,6 +20,7 @@ import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
+import { MarginEdit } from './margin';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
@@ -167,6 +168,7 @@ export const withBlockControls = createHigherOrderComponent(
 			hasSpacingSupport && (
 				<SpacingPanelControl key="spacing">
 					<PaddingEdit { ...props } />
+					<MarginEdit { ...props } />
 				</SpacingPanelControl>
 			),
 		];

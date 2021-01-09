@@ -36,8 +36,8 @@ function GroupEdit( { attributes, clientId } ) {
 	return (
 		<TagName { ...blockProps }>
 			<BoxControlVisualizer
-				values={ attributes.style?.spacing?.padding }
-				showValues={ attributes.style?.visualizers?.padding }
+				values={ attributes.style?.spacing }
+				showValues={ attributes.style?.visualizers }
 			/>
 			<div { ...innerBlocksProps } />
 		</TagName>

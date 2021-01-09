@@ -19,6 +19,10 @@
 	"supports": {
 		"anchor": true,
 		"reusable": false,
-		"html": false
+		"html": false,
+		"spacing": {
+			"padding": true,
+			"margin": true
+		}
 	}
 }
