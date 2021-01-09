@@ -12,6 +12,7 @@ import {
 	useState,
 	useLayoutEffect,
 	useCallback,
+	useEffect,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -197,6 +198,24 @@ function setClass( element, name, toggle ) {
 	} else if ( element.classList.contains( name ) ) {
 		element.classList.remove( name );
 	}
+}
+
+function useFocusOutsideWithRef( ref, onFocusOutside ) {
+	const { onFocus, onBlur, ...rest } = useFocusOutside( onFocusOutside );
+	// Use native DOM events instead of React ones because the popover can
+	// contain slots (from the slot-fill module). Events triggered by the
+	// elements in these slots won't be captured by React.
+	useEffect( () => {
+		const element = ref.current;
+		if ( ! element ) return;
+		element.addEventListener( 'focusin', onFocus );
+		element.addEventListener( 'focusout', onBlur );
+		return () => {
+			element.removeEventListener( 'focusin', onFocus );
+			element.removeEventListener( 'focusout', onBlur );
+		};
+	}, [] );
+	return rest;
 }
 
 const Popover = ( {
@@ -420,7 +439,10 @@ const Popover = ( {
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
-	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
+	const focusOutsideProps = useFocusOutsideWithRef(
+		containerRef,
+		handleOnFocusOutside
+	);
 	const allRefs = [
 		containerRef,
 		focusOnMount ? constrainedTabbingRef : null,

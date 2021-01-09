@@ -182,7 +182,7 @@ function BlockPopover( {
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
-			onBlur={ () => {
+			onFocusOutside={ () => {
 				setIsToolbarForced( false );
 			} }
 			shouldAnchorIncludePadding
