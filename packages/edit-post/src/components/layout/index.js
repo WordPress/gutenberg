@@ -35,6 +35,7 @@ import {
 	ComplementaryArea,
 	FullscreenMode,
 	InterfaceSkeleton,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { close } from '@wordpress/icons';
@@ -99,7 +100,7 @@ function Layout( { styles } ) {
 				'fixedToolbar'
 			),
 			sidebarIsOpened: !! (
-				select( 'core/interface' ).getActiveComplementaryArea(
+				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
 				) || select( editPostStore ).isPublishSidebarOpened()
 			),

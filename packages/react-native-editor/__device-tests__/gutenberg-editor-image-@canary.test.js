@@ -5,7 +5,7 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid, clickMiddleOfElement, swipeUp } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor Image Block tests @canary', () => {
+describe( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( blockNames.image );
 		let imageBlock = await editorPage.getBlockAtPosition(

@@ -22,7 +22,7 @@ $ npm start
 
 _(requires `node` version `12.0.0` or above, and `npm` version `6.9.0` or above)_
 
-You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
+It creates a WordPress plugin that you need to [install manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 
 ## Usage
 
@@ -50,8 +50,6 @@ Options:
 -h, --help                   output usage information
 ```
 
-_Please note that `--version` and `--help` options don't work with `npm init`. You have to use `npx` instead, as presented in the examples._
-
 More examples:
 
 1. Interactive mode - without giving a project name, the script will run in interactive mode giving a chance to customize the important options before generating the files.
@@ -74,7 +72,7 @@ $ npx @wordpress/create-block --help
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name, and the `category`. In most cases, we recommended pairing blocks with plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
-## Available Commands [ESNext template]
+## Available Commands
 
 When bootstrapped with the `esnext` template (or any external template with `wpScripts` flag enabled), you can run several commands inside the directory:
 
@@ -114,23 +112,47 @@ $ npm run packages-update
 
 Updates WordPress packages to the latest version. [Learn more](/packages/scripts#packages-update).
 
+_Note: You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on coding._
+
 ## External Templates
 
 Since version `0.19.0` it is possible to use external templates hosted on npm. These packages need to contain `.mustache` files that will be used during the block scaffolding process.
 
 ### Template Configuration
 
-It is mandatory to provide the main file for the package that returns a configuration object. It must containing at least `templatesPath` field with the path pointing to the location where template files live (nested folders are also supported).
+It is mandatory to provide the main file (`index.js` by default) for the package that returns a configuration object. It must contain at least the `templatesPath` field.
+
+#### `templatesPath`
+
+A mandatory field with the path pointing to the location where template files live (nested folders are also supported). All files without the `.mustache` extension will be ignored.
 
 _Example:_
 
 ```js
+const { join } = require( 'path' );
+
 module.exports = {
-	templatesPath: __dirname,
+	templatesPath: join( __dirname, 'templates' ),
 };
 ```
 
-It is also possible to override the default template configuration using the `defaultValues` field.
+#### `assetsPath`
+
+This setting is useful when your template scaffolds a block that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located. They will be copied to the `assets` subfolder in the generated plugin.
+
+_Example:_
+
+```js
+const { join } = require( 'path' );
+
+module.exports = {
+	assetsPath: join( __dirname, 'assets' ),
+};
+```
+
+#### `defaultValues`
+
+It is possible to override the default template configuration using the `defaultValues` field.
 
 _Example:_
 

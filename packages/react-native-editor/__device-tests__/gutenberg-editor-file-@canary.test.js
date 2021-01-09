@@ -4,7 +4,7 @@
 import { blockNames } from './pages/editor-page';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor File Block tests @canary', () => {
+describe( 'Gutenberg Editor File Block tests', () => {
 	it( 'should be able to add a file block', async () => {
 		await editorPage.addNewBlock( blockNames.file );
 		const block = await editorPage.getFirstBlockVisible();
