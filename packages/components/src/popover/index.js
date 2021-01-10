@@ -201,7 +201,7 @@ function setClass( element, name, toggle ) {
 }
 
 function useFocusOutsideWithRef( ref, onFocusOutside ) {
-	const { onFocus, onBlur, ...rest } = useFocusOutside( onFocusOutside );
+	const { onFocus, ...rest } = useFocusOutside( onFocusOutside );
 	// Use native DOM events instead of React ones because the popover can
 	// contain slots (from the slot-fill module). Events triggered by the
 	// elements in these slots won't be captured by React.
@@ -209,10 +209,8 @@ function useFocusOutsideWithRef( ref, onFocusOutside ) {
 		const element = ref.current;
 		if ( ! element ) return;
 		element.addEventListener( 'focusin', onFocus );
-		element.addEventListener( 'focusout', onBlur );
 		return () => {
 			element.removeEventListener( 'focusin', onFocus );
-			element.removeEventListener( 'focusout', onBlur );
 		};
 	}, [] );
 	return rest;
