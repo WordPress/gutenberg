@@ -146,6 +146,17 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should paste special whitespace', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>&thinsp;</p>',
+			plainText: ' ',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( ' ' );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'should parse Markdown', () => {
 		const filtered = pasteHandler( {
 			HTML: '* one<br>* two<br>* three',
