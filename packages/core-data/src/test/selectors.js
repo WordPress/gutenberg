@@ -247,6 +247,75 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'page' },
 		] );
 	} );
+
+	it( 'should return filtered items', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									1: {
+										id: 1,
+										content: 'chicken',
+										author: 'bob',
+									},
+								},
+								itemIsComplete: {
+									1: true,
+								},
+								queries: {
+									'_fields=id%2Ccontent': [ 1 ],
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getEntityRecords( state, 'postType', 'post', {
+				_fields: [ 'id', 'content' ],
+			} )
+		).toEqual( [ { id: 1, content: 'chicken' } ] );
+	} );
+
+	it( 'should return the same instance with the same arguments', () => {
+		let state = deepFreeze( {
+			entities: {
+				data: {},
+			},
+		} );
+
+		const postTypeFirstRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockFirstRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		// Simulate update states
+		state = { ...state };
+
+		const postTypeSecondRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockSecondRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		expect( postTypeFirstRecords ).toBe( postTypeSecondRecords );
+		expect( wpBlockFirstRecords ).toBe( wpBlockSecondRecords );
+	} );
 } );
 
 describe( '__experimentalGetDirtyEntityRecords', () => {
