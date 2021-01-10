@@ -12,6 +12,7 @@ import {
 	KIND,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 /**
  * Trigger an API Fetch request.
@@ -190,6 +191,6 @@ const controls = {
 };
 
 const getState = ( registry ) =>
-	registry.stores[ 'core/edit-widgets' ].store.getState();
+	registry.stores[ editWidgetsStoreName ].store.getState();
 
 export default controls;

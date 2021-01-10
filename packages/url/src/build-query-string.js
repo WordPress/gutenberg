@@ -25,7 +25,7 @@
 export function buildQueryString( data ) {
 	let string = '';
 
-	const stack = Array.from( Object.entries( data ) );
+	const stack = Object.entries( data );
 
 	let pair;
 	while ( ( pair = stack.shift() ) ) {
