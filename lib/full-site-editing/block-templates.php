@@ -105,6 +105,15 @@ function _gutenberg_get_template_files( $template_type ) {
 	return $template_files;
 }
 
+/**
+ * Parses wp_template content and injects the current theme's
+ * stylesheet as a theme attribute into each wp_template_part
+ *
+ * @param string $template_content serialized wp_template content.
+ * @param string $theme the active theme's stylesheet.
+ *
+ * @return string Updated wp_template content.
+ */
 function _inject_theme_attribute_in_content( $template_content, $theme ) {
 	$new_content = '';
 	$blocks      = parse_blocks( $template_content );
