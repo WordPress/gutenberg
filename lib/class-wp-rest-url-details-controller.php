@@ -17,8 +17,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.
-	 *
-	 * @access public
 	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
@@ -27,8 +25,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 	/**
 	 * Registers the necessary REST API routes.
-	 *
-	 * @access public
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -80,7 +76,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Retrieves the contents of the <title> tag from the HTML
 	 * response.
 	 *
-	 * @access public
 	 * @param WP_REST_REQUEST $request Full details about the request.
 	 * @return String|WP_Error The title text or an error.
 	 */
