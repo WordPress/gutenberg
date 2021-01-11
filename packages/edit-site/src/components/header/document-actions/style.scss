@@ -20,6 +20,7 @@
 
 		.components-dropdown {
 			display: inline-flex;
+			margin-left: $grid-unit-05;
 
 			.components-button {
 				min-width: 0;
@@ -59,6 +60,7 @@
 		transform: translateX(8px);
 		opacity: 0;
 		transition: all ease 0.2s;
+		color: $gray-700;
 		@include reduce-motion(transition);
 
 		@include break-medium() {
@@ -72,7 +74,7 @@
 		&::before {
 			content: "/" /*rtl:"\"*/;
 			color: $gray-700;
-			padding: 0 $grid-unit-05;
+			padding: 0 $grid-unit-10;
 		}
 	}
 
