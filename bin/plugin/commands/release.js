@@ -481,7 +481,8 @@ async function releaseRC() {
 	log(
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new RC version of the Plugin.\n',
-		'It goes through different steps: creating the release branch, bumping the plugin version, tagging and creating the GitHub release, building the ZIP...\n',
+		'It goes through different steps: creating the release branch, bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, attach it to a release, and publish it.\n',
 		"To perform a release you'll have to be a member of the " +
 			config.team +
 			' Team.\n'
@@ -495,12 +496,11 @@ async function releaseRC() {
 			' version ' +
 			formats.success( version ) +
 			' has been successfully tagged.\n',
-		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+		"In a few minutes, you'll be able to find the GitHub release here: " +
 			formats.success(
-				`https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`
+				`${ config.wpRepositoryReleasesURL }v${ version }`
 			) +
 			'\n',
-		"Don't forget to publish the release once the draft is available!\n",
 		'Thanks for performing the release!\n'
 	);
 }
@@ -509,7 +509,8 @@ async function releaseStable() {
 	log(
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new stable version of the Plugin.\n',
-		'It goes through different steps: bumping the plugin version, tagging and creating the GitHub release, building the ZIP, pushing the release to the SVN repository...\n',
+		'It goes through different steps: bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, attach it to a release, publish it, and push the release to the SVN repository.\n',
 		"To perform a release you'll have to be a member of the " +
 			config.team +
 			' Team.\n'
@@ -523,13 +524,12 @@ async function releaseStable() {
 			' ' +
 			formats.success( version ) +
 			' has been successfully tagged.\n',
-		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+		"In a few minutes, you'll be able to find the GitHub release here: " +
 			formats.success(
-				`https://github.com/${ config.githubRepositoryOwner }/${ config.githubRepositoryName }/releases/`
+				`${ config.wpRepositoryReleasesURL }v${ version }`
 			) +
 			'\n',
-		"Don't forget to publish the release once the draft is available!\n",
-		"Once published, it'll be automatically uploaded to the WordPress repository.\n",
+		"Once published, it'll be automatically uploaded to the WordPress plugin repository.\n",
 		"Thanks for performing the release! and don't forget to publish the release post.\n"
 	);
 }
