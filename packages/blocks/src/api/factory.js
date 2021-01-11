@@ -39,10 +39,11 @@ import { normalizeBlockType } from './utils';
  * @param {string} name        Block name.
  * @param {Object} attributes  Block attributes.
  * @param {?Array} innerBlocks Nested blocks.
- *
+ * @param clientId
+ * @param id
  * @return {Object} Block object.
  */
-export function createBlock( name, attributes = {}, innerBlocks = [] ) {
+export function createBlock( name, attributes = {}, innerBlocks = [], id ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
@@ -78,7 +79,7 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 		{}
 	);
 
-	const clientId = uuid();
+	const clientId = id || uuid();
 
 	// Blocks are stored with a unique ID, the assigned type name, the block
 	// attributes, and their inner blocks.

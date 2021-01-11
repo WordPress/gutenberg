@@ -19,6 +19,7 @@ function ParagraphBlock( {
 	setAttributes,
 	mergedStyle,
 	style,
+	clientId,
 } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( 'core/block-editor' ).getSettings().isRTL;
@@ -53,7 +54,27 @@ function ParagraphBlock( {
 						content: nextContent,
 					} );
 				} }
-				onSplit={ ( value ) => {
+				onSplit={ ( value, keepId ) => {
+					if ( keepId ) {
+						if ( ! value ) {
+							return createBlock(
+								name,
+								undefined,
+								undefined,
+								clientId
+							);
+						}
+
+						return createBlock(
+							name,
+							{
+								...attributes,
+								content: value,
+							},
+							undefined,
+							clientId
+						);
+					}
 					if ( ! value ) {
 						return createBlock( name );
 					}

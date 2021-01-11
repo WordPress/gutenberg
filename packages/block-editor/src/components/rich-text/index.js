@@ -306,7 +306,8 @@ function RichTextWrapper(
 						toHTMLString( {
 							value: before,
 							multilineTag,
-						} )
+						} ),
+						lastPastedBlockIndex === -1
 					)
 				);
 				lastPastedBlockIndex += 1;
