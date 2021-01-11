@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import menuItemsFixture from './fixtures/menu-items-response-fixture.json';
+import menuItemsFixture from '../fixtures/menu-items-response-fixture.json';
 
 const menusFixture = [
 	{
