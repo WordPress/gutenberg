@@ -102,8 +102,10 @@
 
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
-	// Generic items such as mail, feed, etc.
-	@import "../social-link/socials-with-bg.scss";
+	&:not(.has-icon-color):not(.has-icon-background-color) {
+		// Generic items such as mail, feed, etc.
+		@import "../social-link/socials-with-bg.scss";
+	}
 }
 
 // Treatment for logos only style.
@@ -115,7 +117,9 @@
 		padding: 4px;
 	}
 
-	@import "../social-link/socials-without-bg.scss";
+	&:not(.has-icon-color) {
+		@import "../social-link/socials-without-bg.scss";
+	}
 }
 
 // Treatment for pill shape style.

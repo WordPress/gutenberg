@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useEffect, useState } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -27,12 +27,50 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import { getIconBySite, getNameBySite } from './social-list';
 
-const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
-	const { url, service, label } = attributes;
+const SocialLinkEdit = ( {
+	attributes,
+	context,
+	isSelected,
+	setAttributes,
+} ) => {
+	const { url, service, label, style } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 	} );
+
+	const {
+		iconColor,
+		customIconColor,
+		iconBackgroundColor,
+		customIconBackgroundColor,
+	} = context;
+
+	useEffect( () => {
+		setAttributes( {
+			textColor: iconColor,
+			style: {
+				...style,
+				color: {
+					...style?.color,
+					text: customIconColor,
+				},
+			},
+		} );
+	}, [ iconColor, customIconColor, setAttributes ] );
+
+	useEffect( () => {
+		setAttributes( {
+			backgroundColor: iconBackgroundColor,
+			style: {
+				...style,
+				color: {
+					...style?.color,
+					background: customIconBackgroundColor,
+				},
+			},
+		} );
+	}, [ iconBackgroundColor, customIconBackgroundColor, setAttributes ] );
 
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );

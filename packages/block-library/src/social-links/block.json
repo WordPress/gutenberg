@@ -3,6 +3,18 @@
 	"name": "core/social-links",
 	"category": "widgets",
 	"attributes": {
+		"iconColor": {
+			"type": "string"
+		},
+		"customIconColor": {
+			"type": "string"
+		},
+		"iconBackgroundColor": {
+			"type": "string"
+		},
+		"customIconBackgroundColor": {
+			"type": "string"
+		},
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
@@ -12,7 +24,11 @@
 		}
 	},
 	"providesContext": {
-		"openInNewTab": "openInNewTab"
+		"openInNewTab": "openInNewTab",
+		"iconColor": "iconColor",
+		"customIconColor": "customIconColor",
+		"iconBackgroundColor": "iconBackgroundColor",
+		"customIconBackgroundColor": "customIconBackgroundColor"
 	},
 	"supports": {
 		"align": [
