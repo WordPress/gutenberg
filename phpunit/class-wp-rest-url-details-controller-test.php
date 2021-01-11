@@ -402,7 +402,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				return new WP_REST_Response(
 					array(
 						'status'        => 418,
-						'response'      => "Uncached response for URL $url altered via rest_url_details_prepare_response filter",
+						'response'      => ( $from_cache ? 'Cached' : 'Uncached' ) . " response for URL $url altered via rest_url_details_prepare_response filter",
 						'body_response' => array(),
 					)
 				);
