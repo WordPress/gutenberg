@@ -199,9 +199,9 @@ You'll need to use Subversion to publish the plugin to WordPress.org.
 6. Add new files/remove deleted files from the repository:
 ```bash
 # Add new files:
-svn st | grep '^\?' | awk '{print $2}' | xargs svn add
+svn st | grep '^\?' | awk '{print $2}' | xargs svn add # add the -r option to xargs if you use a linux-based OS
 # Delete old files:
-svn st | grep '^!' | awk '{print $2}' | xargs svn rm
+svn st | grep '^!' | awk '{print $2}' | xargs svn rm # add the -r option to xargs if you use a linux-based OS
 ```
 7. Commit the new version:
 ```bash

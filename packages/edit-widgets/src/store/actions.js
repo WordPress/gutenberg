@@ -9,7 +9,7 @@ import { invert } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch as dataDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
+import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
@@ -24,6 +24,7 @@ import {
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 /**
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
@@ -49,7 +50,7 @@ export const persistStubPost = function* ( id, blocks ) {
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
-		'core/edit-widgets',
+		editWidgetsStoreName,
 		'getEditedWidgetAreas'
 	);
 	if ( ! editedWidgetAreas?.length ) {
@@ -97,7 +98,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 }
 
 export function* saveWidgetArea( widgetAreaId ) {
-	const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
+	const widgets = yield select( editWidgetsStoreName, 'getWidgets' );
 	const widgetIdToClientId = yield getWidgetToClientIdMapping();
 	const clientIdToWidgetId = invert( widgetIdToClientId );
 
@@ -334,8 +335,8 @@ export function setIsInserterOpened( value ) {
  */
 export function* closeGeneralSidebar() {
 	yield dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'disableComplementaryArea',
-		'core/edit-widgets'
+		editWidgetsStoreName
 	);
 }

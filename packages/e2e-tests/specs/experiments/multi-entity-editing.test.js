@@ -200,7 +200,27 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		afterEach( async () => {
-			await saveAllEntities();
+			await Promise.all( [
+				saveAllEntities(),
+
+				// Wait for the save request and the subsequent query to be
+				// fulfilled - both are requests made to /index.php route.
+				// Without that, clicked elements can lose focus sometimes
+				// when the response is received.
+				page.waitForResponse( ( response ) => {
+					return (
+						response.url().includes( 'index.php' ) &&
+						response.request().method() === 'POST'
+					);
+				} ),
+
+				page.waitForResponse( ( response ) => {
+					return (
+						response.url().includes( 'index.php' ) &&
+						response.request().method() === 'GET'
+					);
+				} ),
+			] );
 			removeErrorMocks();
 		} );
 

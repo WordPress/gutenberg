@@ -11,12 +11,10 @@ import Button from '../button';
 import Tooltip from '../tooltip';
 
 export default function LinkedButton( { isLinked, ...props } ) {
-	const linkedTooltipText = isLinked
-		? __( 'Unlink Sides' )
-		: __( 'Link Sides' );
+	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
 
 	return (
-		<Tooltip text={ linkedTooltipText }>
+		<Tooltip text={ label }>
 			<span>
 				<Button
 					{ ...props }
@@ -26,6 +24,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 					isSmall
 					icon={ isLinked ? link : linkOff }
 					iconSize={ 16 }
+					aria-label={ label }
 				/>
 			</span>
 		</Tooltip>

@@ -27,6 +27,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -72,42 +73,33 @@ function Editor() {
 			isInserterOpened,
 			__experimentalGetPreviewDeviceType,
 			getSettings,
-			getTemplateId,
-			getTemplatePartId,
-			getTemplateType,
+			getEditedPostType,
+			getEditedPostId,
 			getPage,
 			isNavigationOpened,
 		} = select( 'core/edit-site' );
-		const _templateId = getTemplateId();
-		const _templatePartId = getTemplatePartId();
-		const _templateType = getTemplateType();
+		const postType = getEditedPostType();
+		const postId = getEditedPostId();
 
 		// The currently selected entity to display. Typically template or template part.
-		let _entityId;
-		if ( _templateType ) {
-			_entityId =
-				_templateType === 'wp_template' ? _templateId : _templatePartId;
-		}
-
 		return {
 			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! select(
-				'core/interface'
+				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
-			templateType: _templateType,
+			templateType: postType,
 			page: getPage(),
-			template:
-				_templateType && _entityId
-					? select( 'core' ).getEntityRecord(
-							'postType',
-							_templateType,
-							_entityId
-					  )
-					: null,
-			entityId: _entityId,
+			template: postId
+				? select( 'core' ).getEntityRecord(
+						'postType',
+						postType,
+						postId
+				  )
+				: null,
+			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
 		};
 	}, [] );

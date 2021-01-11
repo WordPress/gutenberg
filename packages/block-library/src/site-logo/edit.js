@@ -9,7 +9,7 @@ import { includes, pick } from 'lodash';
  */
 import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	Notice,
 	PanelBody,
@@ -63,7 +63,7 @@ const SiteLogo = ( {
 	const classes = classnames( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
-	const { maxWidth, isRTL, title } = useSelect( ( select ) => {
+	const { maxWidth, title } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const siteEntities = select( 'core' ).getEditedEntityRecord(
 			'root',
@@ -71,7 +71,7 @@ const SiteLogo = ( {
 		);
 		return {
 			title: siteEntities.title,
-			...pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] ),
+			...pick( getSettings(), [ 'imageSizes', 'maxWidth' ] ),
 		};
 	} );
 
@@ -151,7 +151,7 @@ const SiteLogo = ( {
 		// When the image is centered, show both handles.
 		showRightHandle = true;
 		showLeftHandle = true;
-	} else if ( isRTL ) {
+	} else if ( isRTL() ) {
 		// In RTL mode the image is on the right by default.
 		// Show the right handle and hide the left handle only when it is
 		// aligned left. Otherwise always show the left handle.

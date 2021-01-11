@@ -57,15 +57,16 @@ function Editor( {
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
 		} = select( editPostStore );
-		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
-			'core'
-		);
-		const { getEditorSettings, __unstableIsAutodraftPost } = select(
-			'core/editor'
-		);
+		const {
+			getEntityRecord,
+			__experimentalGetTemplateForLink,
+			getPostType,
+		} = select( 'core' );
+		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const postObject = getEntityRecord( 'postType', postType, postId );
 		const isFSETheme = getEditorSettings().isFSETheme;
+		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		return {
 			hasFixedToolbar:
@@ -86,9 +87,9 @@ function Editor( {
 			isTemplateMode: isEditingTemplate(),
 			template:
 				isFSETheme &&
+				isViewable &&
 				postObject &&
-				! __unstableIsAutodraftPost() &&
-				postType !== 'wp_template'
+				getCurrentPost().status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
 			post: postObject,
@@ -101,9 +102,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...( hasThemeStyles
-				? settings
-				: omit( settings, [ 'defaultEditorStyles' ] ) ),
+			...omit( settings, [ 'defaultEditorStyles', 'styles' ] ),
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -116,9 +115,6 @@ function Editor( {
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			keepCaretInsideBlock,
-			styles: hasThemeStyles
-				? settings.styles
-				: settings.defaultEditorStyles,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -143,7 +139,6 @@ function Editor( {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
-		hasThemeStyles,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
@@ -152,6 +147,10 @@ function Editor( {
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
 	] );
+
+	const styles = useMemo( () => {
+		return hasThemeStyles ? settings.styles : settings.defaultEditorStyles;
+	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {
 		return null;
@@ -174,7 +173,7 @@ function Editor( {
 						>
 							<ErrorBoundary onError={ onError }>
 								<EditorInitialization postId={ postId } />
-								<Layout settings={ settings } />
+								<Layout styles={ styles } />
 								<KeyboardShortcuts
 									shortcuts={ preventEventDiscovery }
 								/>

@@ -594,7 +594,21 @@ _Returns_
 
 <a name="parse" href="#parse">#</a> **parse**
 
-Parses the post content with a PegJS grammar and returns a list of blocks.
+Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
+defined through a parsing expression grammar to take advantage of the regular
+cadence provided by block delimiters -- composed syntactically through HTML
+comments -- which, given a general HTML document as an input, returns a block
+list array representation.
+
+This is a recursive-descent parser that scans linearly once through the input
+document. Instead of directly recursing it utilizes a trampoline mechanism to
+prevent stack overflow. This initial pass is mainly interested in separating
+and isolating the blocks serialized in the document and manifestly not in the
+content within the blocks.
+
+_Related_
+
+-   <https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/>
 
 _Parameters_
 

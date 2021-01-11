@@ -344,6 +344,40 @@ _Returns_
 
 -   `?string`: Client ID of block selection start.
 
+<a name="getBlockTransformItems" href="#getBlockTransformItems">#</a> **getBlockTransformItems**
+
+Determines the items that appear in the available block transforms list.
+
+Each item object contains what's necessary to display a menu item in the
+transform list and handle its selection.
+
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>)
+that combines block usage frequenty and recency.
+
+Items are returned ordered descendingly by their 'frecency'.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `Array<WPEditorTransformItem>`: Items that appear in inserter.
+
+_Type Definition_
+
+-   _WPEditorTransformItem_ `Object`
+
+_Properties_
+
+-   _id_ `string`: Unique identifier for the item.
+-   _name_ `string`: The type of block to create.
+-   _title_ `string`: Title of the item, as it appears in the inserter.
+-   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+-   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+-   _frecency_ `number`: Heuristic that combines frequency and recency.
+
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
 Returns an array containing the clientIds of all descendants

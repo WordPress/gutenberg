@@ -37,6 +37,11 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon: 'smiley',
+			npmDependencies: [
+				'@wordpress/block-editor',
+				'@wordpress/blocks',
+				'@wordpress/i18n',
+			],
 		},
 	},
 };
@@ -63,6 +68,23 @@ const getOutputTemplates = async ( outputTemplatesPath ) => {
 	);
 };
 
+const getOutputAssets = async ( outputAssetsPath ) => {
+	const outputAssetFiles = await glob( '**/*', {
+		cwd: outputAssetsPath,
+		dot: true,
+	} );
+	return fromPairs(
+		await Promise.all(
+			outputAssetFiles.map( async ( outputAssetFile ) => {
+				const outputAsset = await readFile(
+					join( outputAssetsPath, outputAssetFile )
+				);
+				return [ outputAssetFile, outputAsset ];
+			} )
+		)
+	);
+};
+
 const externalTemplateExists = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
@@ -79,6 +101,7 @@ const getBlockTemplate = async ( templateName ) => {
 			outputTemplates: await getOutputTemplates(
 				join( __dirname, 'templates', templateName )
 			),
+			outputAssets: {},
 		};
 	}
 	if ( ! ( await externalTemplateExists( templateName ) ) ) {
@@ -103,12 +126,13 @@ const getBlockTemplate = async ( templateName ) => {
 			cwd: tempCwd,
 		} );
 
-		const { defaultValues = {}, templatesPath } = require( require.resolve(
-			templateName,
-			{
-				paths: [ tempCwd ],
-			}
-		) );
+		const {
+			defaultValues = {},
+			templatesPath,
+			assetsPath,
+		} = require( require.resolve( templateName, {
+			paths: [ tempCwd ],
+		} ) );
 		if ( ! isObject( defaultValues ) || ! templatesPath ) {
 			throw new Error();
 		}
@@ -116,6 +140,7 @@ const getBlockTemplate = async ( templateName ) => {
 		return {
 			defaultValues,
 			outputTemplates: await getOutputTemplates( templatesPath ),
+			outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		};
 	} catch ( error ) {
 		throw new CLIError(
@@ -138,6 +163,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		npmDependencies: [],
 		editorScript: 'file:./build/index.js',
 		editorStyle: 'file:./build/index.css',
 		style: 'file:./build/style-index.css',

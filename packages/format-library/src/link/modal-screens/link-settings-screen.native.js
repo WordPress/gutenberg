@@ -137,6 +137,8 @@ const LinkSettingsScreen = ( {
 	}, [ navigation, route.params?.text, text ] );
 
 	return useMemo( () => {
+		const shouldShowLinkOptions = !! inputValue;
+
 		return (
 			<>
 				<BottomSheet.LinkCell
@@ -150,20 +152,25 @@ const LinkSettingsScreen = ( {
 					placeholder={ __( 'Add link text' ) }
 					onChangeValue={ setText }
 					onSubmit={ submit }
+					separatorType={ shouldShowLinkOptions ? undefined : 'none' }
 				/>
-				<BottomSheet.SwitchCell
-					icon={ external }
-					label={ __( 'Open in new tab' ) }
-					value={ opensInNewWindow }
-					onValueChange={ setOpensInNewWindows }
-					separatorType={ 'fullWidth' }
-				/>
-				<BottomSheet.Cell
-					label={ __( 'Remove link' ) }
-					labelStyle={ styles.clearLinkButton }
-					separatorType={ 'none' }
-					onPress={ removeLink }
-				/>
+				{ shouldShowLinkOptions && (
+					<>
+						<BottomSheet.SwitchCell
+							icon={ external }
+							label={ __( 'Open in new tab' ) }
+							value={ opensInNewWindow }
+							onValueChange={ setOpensInNewWindows }
+							separatorType={ 'fullWidth' }
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Remove link' ) }
+							labelStyle={ styles.clearLinkButton }
+							separatorType={ 'none' }
+							onPress={ removeLink }
+						/>
+					</>
+				) }
 			</>
 		);
 	}, [ inputValue, text, opensInNewWindow, listProps.safeAreaBottomInset ] );
