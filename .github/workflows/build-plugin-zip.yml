@@ -97,5 +97,6 @@ jobs:
           curl \
             --request PATCH \
             --url https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
+            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
             --header "Accept: application/vnd.github.v3+json" \
             --data-raw '{"draft":false}'
