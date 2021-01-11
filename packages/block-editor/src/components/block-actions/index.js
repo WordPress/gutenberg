@@ -7,7 +7,11 @@ import { castArray, first, last, every } from 'lodash';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	switchToBlockType,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -26,7 +30,7 @@ export default function BlockActions( {
 		getTemplateLock,
 	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
 	const { getDefaultBlockName, getGroupingBlockName } = useSelect(
-		( select ) => select( 'core/blocks' ),
+		( select ) => select( blocksStore ),
 		[]
 	);
 

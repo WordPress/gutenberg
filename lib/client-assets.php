@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 0.1.0
  */
 function gutenberg_dir_path() {
-	return plugin_dir_path( dirname( __FILE__ ) );
+	return plugin_dir_path( __DIR__ );
 }
 
 /**
@@ -31,7 +31,7 @@ function gutenberg_dir_path() {
  * @since 0.1.0
  */
 function gutenberg_url( $path ) {
-	return plugins_url( $path, dirname( __FILE__ ) );
+	return plugins_url( $path, __DIR__ );
 }
 
 /**
@@ -335,12 +335,13 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
+	$block_library_filename = gutenberg_should_load_separate_block_styles() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
-		gutenberg_url( 'build/block-library/style.css' ),
+		gutenberg_url( 'build/block-library/' . $block_library_filename . '.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' )
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
 
@@ -526,15 +527,25 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 		// Determine whether we can write to this file.  If not, don't waste
 		// time doing a network request.
 		// @codingStandardsIgnoreStart
-		$f = @fopen( $full_path, 'a' );
+
+		$is_writable = is_writable( $full_path );
+		if ( $is_writable ) {
+			$f = @fopen( $full_path, 'a' );
+			if ( ! $f ) {
+				$is_writable = false;
+			} else {
+				fclose( $f );
+			}
+		}
+
 		// @codingStandardsIgnoreEnd
-		if ( ! $f ) {
+		if ( ! $is_writable ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
 			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
 			return;
 		}
-		fclose( $f );
+
 		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
 			$f = fopen( $full_path, 'w' );
@@ -568,7 +579,9 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_styles( $settings ) {
-	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$editor_styles_file = is_rtl() ?
+		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
+		gutenberg_dir_path() . 'build/editor/editor-styles.css';
 
 	/*
 	 * If, for whatever reason, the built editor styles do not exist, avoid
@@ -590,7 +603,9 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		 */
 
 		$default_styles = file_get_contents(
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+			is_rtl() ?
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
 		);
 
 		/*
@@ -629,7 +644,9 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
-	$editor_styles_file              = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$editor_styles_file              = is_rtl() ?
+		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
+		gutenberg_dir_path() . 'build/editor/editor-styles.css';
 	$settings['defaultEditorStyles'] = array(
 		array(
 			'css' => file_get_contents( $editor_styles_file ),
@@ -639,3 +656,16 @@ function gutenberg_extend_block_editor_settings_with_default_editor_styles( $set
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );
+
+/**
+ * Adds a flag to the editor settings to know whether we're in FSE theme or not.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
+	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );

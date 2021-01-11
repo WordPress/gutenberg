@@ -22,13 +22,14 @@ import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -145,7 +146,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			const hasExplicitWidths = hasExplicitPercentColumnWidths(
+				innerBlocks
+			);
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -207,7 +210,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),

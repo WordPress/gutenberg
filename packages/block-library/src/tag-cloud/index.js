@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { tag as icon } from '@wordpress/icons';
 
 /**
@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Tag Cloud' ),
+	title: _x( 'Tag Cloud', 'block title' ),
 	description: __( 'A cloud of your most used tags.' ),
 	icon,
 	example: {},

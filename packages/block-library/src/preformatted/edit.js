@@ -8,6 +8,7 @@ export default function PreformattedEdit( {
 	attributes,
 	mergeBlocks,
 	setAttributes,
+	onRemove,
 } ) {
 	const { content } = attributes;
 	const blockProps = useBlockProps();
@@ -23,6 +24,8 @@ export default function PreformattedEdit( {
 					content: nextContent,
 				} );
 			} }
+			onRemove={ onRemove }
+			aria-label={ __( 'Preformatted text' ) }
 			placeholder={ __( 'Write preformatted text…' ) }
 			onMerge={ mergeBlocks }
 			{ ...blockProps }

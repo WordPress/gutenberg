@@ -34,7 +34,6 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
 	],
-	plugins: [ 'import' ],
 	globals: {
 		wp: 'off',
 	},
@@ -54,6 +53,7 @@ module.exports = {
 				allowedTextDomain: 'default',
 			},
 		],
+		'@wordpress/no-unsafe-wp-apis': 'off',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
@@ -121,21 +121,13 @@ module.exports = {
 					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
 		],
-		// Temporarily converted to warning until all errors are resolved.
-		// See https://github.com/WordPress/gutenberg/pull/22771 for the eslint-plugin-jsdoc update.
-		'jsdoc/check-param-names': 'warn',
-		'jsdoc/require-param': 'warn',
 	},
 	overrides: [
 		{
-			files: [ 'packages/**/*.js' ],
-			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				...developmentFiles,
-			],
+			files: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
 			rules: {
-				'import/no-extraneous-dependencies': 'error',
-				'import/no-unresolved': 'error',
+				'import/no-extraneous-dependencies': 'off',
+				'import/no-unresolved': 'off',
 			},
 		},
 		{

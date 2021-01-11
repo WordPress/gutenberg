@@ -8,10 +8,10 @@ const { context, GitHub } = require( '@actions/github' );
  * Internal dependencies
  */
 const assignFixedIssues = require( './tasks/assign-fixed-issues' );
-const firstTimeContributor = require( './tasks/first-time-contributor' );
+const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
+const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
 const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
-const ifNotFork = require( './if-not-fork' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 
@@ -37,13 +37,18 @@ const ifNotFork = require( './if-not-fork' );
  */
 const automations = [
 	{
-		event: 'pull_request',
+		event: 'pull_request_target',
 		action: 'opened',
-		task: ifNotFork( assignFixedIssues ),
+		task: assignFixedIssues,
+	},
+	{
+		event: 'pull_request_target',
+		action: 'opened',
+		task: firstTimeContributorLabel,
 	},
 	{
 		event: 'push',
-		task: firstTimeContributor,
+		task: firstTimeContributorAccountLink,
 	},
 	{
 		event: 'push',

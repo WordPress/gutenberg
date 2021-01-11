@@ -34,12 +34,21 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileUploadFailed(int mediaId);
     }
 
+    interface MediaSaveEventEmitter {
+        void onSaveMediaFileClear(String mediaId);
+        void onMediaFileSaveProgress(String mediaId, float progress);
+        void onMediaFileSaveSucceeded(String mediaId, String mediaUrl);
+        void onMediaFileSaveFailed(String mediaId);
+        void onMediaCollectionSaveResult(String firstMediaIdInCollection, boolean success);
+        void onMediaIdChanged(final String oldId, final String newId, final String oldUrl);
+    }
+
     interface ReplaceUnsupportedBlockCallback {
         void replaceUnsupportedBlock(String content, String blockId);
     }
 
-    interface StarterPageTemplatesTooltipShownCallback {
-        void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown);
+    interface ReplaceMediaFilesEditedBlockCallback {
+        void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
@@ -70,6 +79,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         VIDEO("video"),
         MEDIA("media"),
         AUDIO("audio"),
+        ANY("any"),
         OTHER("other");
 
         String name;
@@ -122,6 +132,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback);
 
+    void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback);
+
     void requestImageFailedRetryDialog(int mediaId);
 
     void requestImageUploadCancelDialog(int mediaId);
@@ -150,9 +162,18 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void gutenbergDidSendButtonPressedAction(String buttonType);
 
-    void onAddMention(Consumer<String> onSuccess);
+    void onShowUserSuggestions(Consumer<String> onResult);
 
-    void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
+    void onShowXpostSuggestions(Consumer<String> onResult);
 
-    void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
+    void requestMediaFilesEditorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+                                                     ReadableArray mediaFiles,
+                                                     String blockId
+    );
+
+    void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
+
+    void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles);
+
+    void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles);
 }

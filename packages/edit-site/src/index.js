@@ -4,7 +4,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -67,5 +66,5 @@ export function initialize( id, settings ) {
 	render( <Editor />, document.getElementById( id ) );
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

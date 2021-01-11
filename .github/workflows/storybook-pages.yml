@@ -30,7 +30,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: '14.x'
 
     - name: Install Dependencies
       run: npm ci
@@ -42,4 +42,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./playground/dist
+        publish_dir: ./storybook/build

@@ -2,7 +2,7 @@
 
 End-To-End (E2E) test utils for WordPress.
 
-_It works properly with the minimum version of Gutenberg `5.6.0` or the minimum version of WordPress `5.2.0`._
+_It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
 ## Installation
 
@@ -11,6 +11,8 @@ Install the module
 ```bash
 npm install @wordpress/e2e-test-utils --save-dev
 ```
+
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
 
 ## API
 
@@ -26,7 +28,7 @@ _Parameters_
 
 <a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
 
-Ativate a theme.
+Activates an installed theme.
 
 _Parameters_
 
@@ -39,6 +41,18 @@ Verifies if publish checks are enabled.
 _Returns_
 
 -   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
+
+<a name="changeSiteTimezone" href="#changeSiteTimezone">#</a> **changeSiteTimezone**
+
+Visits general settings page and changes the timezone to the given value.
+
+_Parameters_
+
+-   _timezone_ `string`: Value of the timezone to set.
+
+_Returns_
+
+-   `string`: Value of the previous timezone.
 
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
@@ -64,6 +78,14 @@ Clicks a button based on the text on the button.
 _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
+
+<a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
+
+Searches for an item in the menu with the text provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
 
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton**
 
@@ -154,6 +176,17 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
+
+Deletes a theme from the site, activating another theme if necessary.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _settings.newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
@@ -348,6 +381,16 @@ _Parameters_
 -   _slug_ `string`: Plugin slug.
 -   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
 
+<a name="installTheme" href="#installTheme">#</a> **installTheme**
+
+Installs a theme from the WP.org repository.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
+
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 
 Checks if current URL is a WordPress path.
@@ -372,6 +415,18 @@ _Returns_
 <a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
 
 Undocumented declaration.
+
+<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
+
+Checks whether a theme exists on the site.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug to check.
+
+_Returns_
+
+-   `boolean`: Whether the theme exists.
 
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
@@ -404,6 +459,18 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 <a name="openGlobalBlockInserter" href="#openGlobalBlockInserter">#</a> **openGlobalBlockInserter**
 
 Opens the global block inserter.
+
+<a name="openPreviewPage" href="#openPreviewPage">#</a> **openPreviewPage**
+
+Opens the preview page of an edited post.
+
+_Parameters_
+
+-   _editorPage_ `Page`: puppeteer editor page.
+
+_Returns_
+
+-   `Page`: preview page.
 
 <a name="openPublishPanel" href="#openPublishPanel">#</a> **openPublishPanel**
 
@@ -495,6 +562,17 @@ _Parameters_
 
 -   _viewport_ `WPViewport`: Viewport name or dimensions object to assign.
 
+<a name="setClipboardData" href="#setClipboardData">#</a> **setClipboardData**
+
+Sets the clipboard data that can be pasted with
+`pressKeyWithModifier( 'primary', 'v' )`.
+
+_Parameters_
+
+-   _$1_ `Object`: Options.
+-   _$1.plainText_ `string`: Plain text to set.
+-   _$1.html_ `string`: HTML to set.
+
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent**
 
 Sets code editor content
@@ -559,6 +637,10 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
+<a name="toggleGlobalBlockInserter" href="#toggleGlobalBlockInserter">#</a> **toggleGlobalBlockInserter**
+
+Toggles the global inserter.
+
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 
 Toggles the More Menu.
@@ -591,6 +673,7 @@ Navigates to the post listing screen and bulk-trashes any posts which exist.
 _Parameters_
 
 -   _postType_ `string`: String slug for type of post to trash.
+-   _postStatus_ `string`: String status of posts to trash.
 
 _Returns_
 

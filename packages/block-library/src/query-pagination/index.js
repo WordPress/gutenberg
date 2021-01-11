@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,6 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Query Pagination' ),
+	title: _x( 'Query Pagination', 'block title' ),
 	edit,
 };

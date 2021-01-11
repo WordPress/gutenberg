@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+
+### New Features
+
+-   Add support for handling static assets with the `assetsPath` field in the external template configuration ([#28038](https://github.com/WordPress/gutenberg/pull/28038)).
+
+### Internal
+
+-   Update the demo included in the README file ([#28037](https://github.com/WordPress/gutenberg/pull/28037)).
+
+## 1.1.0 (2021-01-05)
+
+### New Feature
+
+-   Adds the `npmPackages` field to the template configuration. It allows listing remote npm packages that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+-   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+
+### Bug Fix
+
+-   Print the block class name in the `save` method in scaffolded templates ([#27988](https://github.com/WordPress/gutenberg/pull/27988)).
+
+## 1.0.2 (2020-12-17)
+
+### Bug Fix
+
+-   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
+
+## 1.0.1 (2020-12-17)
+
+### Bug Fix
+
+-   Fix support for external templates hosted on npm.
+
+## 1.0.0 (2020-12-17)
+
+### Breaking Changes
+
+-   Set the minimum required version of WordPress to 5.6.0 to ensure that block is correctly registered with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
+
+### New Features
+
+-   Added basic support for external templates hosted on npm ([#23712](https://github.com/WordPress/gutenberg/pull/23712)).
+-   Update templates to work with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
+
 ## 0.18.0 (2020-10-30)
 
 ### Breaking Changes

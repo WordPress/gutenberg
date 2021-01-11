@@ -4,6 +4,11 @@
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { G2, UI } from '../../utils/colors-values';
@@ -16,13 +21,13 @@ export const NavigationUI = styled.div`
 	background-color: ${ G2.darkGray.primary };
 	box-sizing: border-box;
 	color: #f0f0f0;
-	padding: 0 8px;
+	padding: 0 ${ space( 1 ) };
 	overflow: hidden;
 `;
 
 export const MenuUI = styled.div`
-	margin-top: 24px;
-	margin-bottom: 24px;
+	margin-top: ${ space( 3 ) };
+	margin-bottom: ${ space( 3 ) };
 	display: flex;
 	flex-direction: column;
 	ul {
@@ -31,11 +36,11 @@ export const MenuUI = styled.div`
 		list-style: none;
 	}
 	.components-navigation__back-button {
-		margin-bottom: 24px;
+		margin-bottom: ${ space( 3 ) };
 	}
 
 	.components-navigation__group + .components-navigation__group {
-		margin-top: 24px;
+		margin-top: ${ space( 3 ) };
 	}
 `;
 
@@ -66,10 +71,14 @@ export const MenuTitleHeadingUI = styled( Text )`
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: ${ space( 1 ) };
-	padding: ${ ( props ) =>
-		props.isRTL
-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
-			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
+	padding: ${ () =>
+		isRTL()
+			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space(
+					1.5
+			  ) }`
+			: `${ space( 0.5 ) } ${ space( 1.5 ) } ${ space( 0.5 ) } ${ space(
+					2
+			  ) }` };
 `;
 
 export const MenuTitleActionsUI = styled.span`
@@ -77,7 +86,7 @@ export const MenuTitleActionsUI = styled.span`
 
 	.components-button.is-small {
 		color: ${ G2.lightGray.ui };
-		margin-right: 2px; // Avoid hiding the focus outline
+		margin-right: ${ space( 0.5 ) }; // Avoid hiding the focus outline
 		padding: 0;
 
 		&:active:not( :disabled ) {
@@ -98,8 +107,10 @@ export const MenuTitleSearchUI = styled.div`
 	input {
 		height: ${ space( 4.5 ) }; // 36px, same height as MenuTitle
 		margin-bottom: ${ space( 1 ) };
-		padding-left: 30px; // Leave room for the search icon
-		padding-right: 30px; // Leave room for the close search button
+		padding-left: ${ space( 4 ) }; // Leave room for the search icon
+		padding-right: ${ space(
+			4
+		) }; // Leave room for the close search button
 
 		&::-webkit-search-decoration,
 		&::-webkit-search-cancel-button,
@@ -132,32 +143,22 @@ export const MenuTitleSearchUI = styled.div`
 `;
 
 export const GroupTitleUI = styled( Text )`
-	margin-top: 8px;
-	padding: ${ ( props ) =>
-		props.isRTL
+	margin-top: ${ space( 1 ) };
+	padding: ${ () =>
+		isRTL()
 			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
 			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
 	text-transform: uppercase;
 	color: ${ G2.gray[ 100 ] };
 `;
 
-export const ItemUI = styled.li`
+export const ItemBaseUI = styled.li`
 	border-radius: 2px;
 	color: ${ G2.lightGray.ui };
 	margin-bottom: 0;
 
 	button,
 	a {
-		height: auto;
-		min-height: 32px;
-		margin: 0;
-		font-weight: 400;
-		line-height: 20px;
-		padding-left: 16px;
-		padding-right: 16px;
-		width: 100%;
-		color: ${ G2.lightGray.ui };
-
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
@@ -180,11 +181,24 @@ export const ItemUI = styled.li`
 	}
 `;
 
+export const ItemUI = styled.div`
+	display: flex;
+	align-items: center;
+	height: auto;
+	min-height: 32px;
+	margin: 0;
+	padding: ${ space( 0.75 ) } ${ space( 2 ) };
+	font-weight: 400;
+	line-height: 20px;
+	width: 100%;
+	color: ${ G2.lightGray.ui };
+`;
+
 export const ItemBadgeUI = styled.span`
-	margin-left: ${ ( props ) => ( props.isRTL ? '0' : space( 1 ) ) };
-	margin-right: ${ ( props ) => ( props.isRTL ? space( 1 ) : '0' ) };
+	margin-left: ${ () => ( isRTL() ? '0' : space( 1 ) ) };
+	margin-right: ${ () => ( isRTL() ? space( 1 ) : '0' ) };
 	display: inline-flex;
-	padding: 4px 12px;
+	padding: ${ space( 0.5 ) } ${ space( 1.5 ) };
 	border-radius: 2px;
 	animation: fade-in 250ms ease-out;
 
@@ -201,7 +215,6 @@ export const ItemBadgeUI = styled.span`
 `;
 
 export const ItemTitleUI = styled( Text )`
-	${ ( props ) =>
-		props.isRTL ? 'margin-left: auto;' : 'margin-right: auto;' }
+	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
 	font-size: 13px;
 `;

@@ -154,7 +154,7 @@ describe( 'Navigating the block hierarchy', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should select the wrapper div for a group ', async () => {
+	it( 'should select the wrapper div for a group', async () => {
 		// Insert a group block
 		await insertBlock( 'Group' );
 

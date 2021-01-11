@@ -10,7 +10,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/unit-control';
+import useEditorFeature from '../components/use-editor-feature';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 
@@ -33,7 +33,11 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits();
+	const customUnits = useEditorFeature( 'spacing.units' );
+	const units = customUnits?.map( ( unit ) => ( {
+		value: unit,
+		label: unit,
+	} ) );
 
 	if ( ! hasPaddingSupport( blockName ) ) {
 		return null;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
+import { map, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,6 +9,7 @@ import { omit } from 'lodash';
 import { Button, PanelBody, TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,9 +19,132 @@ import {
 	useGlobalStylesReset,
 } from '../editor/global-styles-provider';
 import DefaultSidebar from './default-sidebar';
-import { GLOBAL_CONTEXT } from '../editor/utils';
-import TypographyPanel from './typography-panel';
-import ColorPanel from './color-panel';
+import { GLOBAL_CONTEXT_NAME } from '../editor/utils';
+import {
+	default as TypographyPanel,
+	useHasTypographyPanel,
+} from './typography-panel';
+import { default as ColorPanel, useHasColorPanel } from './color-panel';
+import { default as SpacingPanel, useHasSpacingPanel } from './spacing-panel';
+
+function GlobalStylesPanel( {
+	wrapperPanelTitle,
+	context,
+	getStyle,
+	setStyle,
+	getSetting,
+	setSetting,
+} ) {
+	const hasColorPanel = useHasColorPanel( context );
+	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasSpacingPanel = useHasSpacingPanel( context );
+
+	if ( ! hasColorPanel && ! hasTypographyPanel && ! hasSpacingPanel ) {
+		return null;
+	}
+
+	const content = (
+		<>
+			{ hasTypographyPanel && (
+				<TypographyPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+				/>
+			) }
+			{ hasColorPanel && (
+				<ColorPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+					getSetting={ getSetting }
+					setSetting={ setSetting }
+				/>
+			) }
+			{ hasSpacingPanel && (
+				<SpacingPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+				/>
+			) }
+		</>
+	);
+	if ( ! wrapperPanelTitle ) {
+		return content;
+	}
+	return (
+		<PanelBody title={ wrapperPanelTitle } initialOpen={ false }>
+			{ content }
+		</PanelBody>
+	);
+}
+
+function getPanelTitle( context ) {
+	/*
+	 * We use the block's name as the panel title.
+	 *
+	 * Some blocks (eg: core/heading) can represent different
+	 * contexts (eg: core/heading/h1, core/heading/h2).
+	 * For those, we attach the selector (h1) after the block's name.
+	 *
+	 * The title can't be accessed in the server,
+	 * as it's translatable and the block.json doesn't
+	 * have it yet.
+	 */
+	const blockType = getBlockType( context.blockName );
+	// Protect against blocks that aren't registered
+	// eg: widget-area
+	if ( blockType === undefined ) {
+		return blockType;
+	}
+
+	let panelTitle = blockType.title;
+	if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
+		panelTitle += ` (${ context.title })`;
+	}
+	return panelTitle;
+}
+
+function GlobalStylesBlockPanels( {
+	contexts,
+	getStyle,
+	setStyle,
+	getSetting,
+	setSetting,
+} ) {
+	const panels = useMemo(
+		() =>
+			sortBy(
+				map( contexts, ( context, name ) => {
+					return {
+						context,
+						name,
+						wrapperPanelTitle: getPanelTitle( context ),
+					};
+				} ),
+				( { wrapperPanelTitle } ) => wrapperPanelTitle
+			),
+		[ contexts ]
+	);
+
+	return map( panels, ( { context, name, wrapperPanelTitle } ) => {
+		if ( name === GLOBAL_CONTEXT_NAME ) {
+			return null;
+		}
+		return (
+			<GlobalStylesPanel
+				key={ 'panel-' + name }
+				wrapperPanelTitle={ wrapperPanelTitle }
+				context={ { ...context, name } }
+				getStyle={ getStyle }
+				setStyle={ setStyle }
+				getSetting={ getSetting }
+				setSetting={ setSetting }
+			/>
+		);
+	} );
+}
 
 export default function GlobalStylesSidebar( {
 	identifier,
@@ -30,14 +154,14 @@ export default function GlobalStylesSidebar( {
 } ) {
 	const {
 		contexts,
-		getStyleProperty,
-		setStyleProperty,
+		getStyle,
+		setStyle,
 		getSetting,
 		setSetting,
 	} = useGlobalStylesContext();
 	const [ canRestart, onReset ] = useGlobalStylesReset();
 
-	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT ] ) {
+	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT_NAME ] ) {
 		// No sidebar is shown.
 		return null;
 	}
@@ -73,112 +197,29 @@ export default function GlobalStylesSidebar( {
 				{ ( tab ) => {
 					/* Per Block Context */
 					if ( 'block' === tab.name ) {
-						return Object.keys(
-							omit( contexts, [ GLOBAL_CONTEXT ] )
-						)
-							.map( ( name ) => {
-								const {
-									supports,
-									selector,
-									blockName,
-								} = contexts[ name ];
-
-								/*
-								 * We use the block's name as the panel title.
-								 *
-								 * Some blocks (eg: core/heading) can represent different
-								 * contexts (eg: core/heading/h1, core/heading/h2).
-								 * For those, we attach the selector (h1) after the block's name.
-								 *
-								 * The title can't be accessed in the server,
-								 * as it's translatable and the block.json doesn't
-								 * have it yet.
-								 */
-
-								const blockType = getBlockType( blockName );
-								// Protect against blocks that aren't registered
-								// eg: widget-area
-								if ( blockType === undefined ) {
-									return blockType;
-								}
-
-								let panelTitle = blockType.title;
-								if (
-									'object' ===
-									typeof blockType?.supports
-										?.__experimentalSelector
-								) {
-									panelTitle += ` (${ selector })`;
-								}
-
-								return (
-									<PanelBody
-										key={ 'panel-' + name }
-										title={ panelTitle }
-										initialOpen={ false }
-									>
-										{ [
-											<TypographyPanel
-												key={
-													'typography-panel-' + name
-												}
-												context={ {
-													supports,
-													name,
-												} }
-												getStyleProperty={
-													getStyleProperty
-												}
-												setStyleProperty={
-													setStyleProperty
-												}
-											/>,
-											<ColorPanel
-												key={ 'color-panel-' + name }
-												context={ {
-													supports,
-													name,
-												} }
-												getStyleProperty={
-													getStyleProperty
-												}
-												setStyleProperty={
-													setStyleProperty
-												}
-												getSetting={ getSetting }
-												setSetting={ setSetting }
-											/>,
-										].filter( Boolean ) }
-									</PanelBody>
-								);
-							} )
-							.filter( Boolean );
+						return (
+							<GlobalStylesBlockPanels
+								contexts={ contexts }
+								getStyle={ getStyle }
+								setStyle={ setStyle }
+								getSetting={ getSetting }
+								setSetting={ setSetting }
+							/>
+						);
 					}
-
-					/* Global Context */
-					const { supports, blockName } = contexts[ GLOBAL_CONTEXT ];
-					return [
-						<TypographyPanel
-							key={ 'typography-panel-' + blockName }
+					return (
+						<GlobalStylesPanel
+							hasWrapper={ false }
 							context={ {
-								supports,
-								name: blockName,
+								...contexts[ GLOBAL_CONTEXT_NAME ],
+								name: GLOBAL_CONTEXT_NAME,
 							} }
-							getStyleProperty={ getStyleProperty }
-							setStyleProperty={ setStyleProperty }
-						/>,
-						<ColorPanel
-							key={ 'color-panel-' + blockName }
-							context={ {
-								supports,
-								name: blockName,
-							} }
-							getStyleProperty={ getStyleProperty }
-							setStyleProperty={ setStyleProperty }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
 							getSetting={ getSetting }
 							setSetting={ setSetting }
-						/>,
-					].filter( Boolean );
+						/>
+					);
 				} }
 			</TabPanel>
 		</DefaultSidebar>

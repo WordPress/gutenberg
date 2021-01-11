@@ -19,7 +19,7 @@ export function PostAuthorCheck( {
 	authors,
 	children,
 } ) {
-	if ( ! hasAssignAuthorAction || ! authors || authors.length < 2 ) {
+	if ( ! hasAssignAuthorAction || ! authors || 1 >= authors.length ) {
 		return null;
 	}
 
@@ -40,7 +40,7 @@ export default compose( [
 				false
 			),
 			postType: select( 'core/editor' ).getCurrentPostType(),
-			authors: select( 'core' ).getUsers( { who: 'authors' } ),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withInstanceId,

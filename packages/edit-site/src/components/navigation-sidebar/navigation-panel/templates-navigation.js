@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationMenu as NavigationMenu,
@@ -16,55 +15,40 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
+import MainDashboardButton from '../../main-dashboard-button';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 
 export default function TemplatesNavigation() {
-	const ref = useRef();
+	const { postId, postType, activeMenu } = useSelect( ( select ) => {
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getNavigationPanelActiveMenu,
+		} = select( 'core/edit-site' );
 
-	useEffect( () => {
-		if ( ref.current ) {
-			ref.current.focus();
-		}
-	}, [ ref ] );
-
-	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
-		( select ) => {
-			const {
-				getTemplateId,
-				getTemplatePartId,
-				getTemplateType,
-				getNavigationPanelActiveMenu,
-			} = select( 'core/edit-site' );
-
-			return {
-				templateId: getTemplateId(),
-				templatePartId: getTemplatePartId(),
-				templateType: getTemplateType(),
-				activeMenu: getNavigationPanelActiveMenu(),
-			};
-		},
-		[]
-	);
+		return {
+			postId: getEditedPostId(),
+			postType: getEditedPostType(),
+			activeMenu: getNavigationPanelActiveMenu(),
+		};
+	}, [] );
 
 	const { setNavigationPanelActiveMenu } = useDispatch( 'core/edit-site' );
 
 	return (
 		<Navigation
-			activeItem={
-				'wp_template' === templateType
-					? `${ templateType }-${ templateId }`
-					: `${ templateType }-${ templatePartId }`
-			}
+			activeItem={ `${ postType }-${ postId }` }
 			activeMenu={ activeMenu }
 			onActivateMenu={ setNavigationPanelActiveMenu }
 		>
 			{ activeMenu === MENU_ROOT && (
-				<NavigationBackButton
-					backButtonLabel={ __( 'Dashboard' ) }
-					className="edit-site-navigation-panel__back-to-dashboard"
-					href="index.php"
-					ref={ ref }
-				/>
+				<MainDashboardButton.Slot>
+					<NavigationBackButton
+						backButtonLabel={ __( 'Dashboard' ) }
+						className="edit-site-navigation-panel__back-to-dashboard"
+						href="index.php"
+					/>
+				</MainDashboardButton.Slot>
 			) }
 
 			<NavigationMenu title={ __( 'Theme' ) }>
