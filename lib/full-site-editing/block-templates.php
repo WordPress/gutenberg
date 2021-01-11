@@ -120,7 +120,7 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 
 	$updated_blocks = array_map(
 		function( $block ) use ( $theme ) {
-			if ( 'core/template-part' === $block['blockName'] ) {
+			if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['theme'] ) ) {
 				$block['attrs']['theme'] = $theme;
 			}
 
