@@ -55,34 +55,24 @@ function ParagraphBlock( {
 					} );
 				} }
 				onSplit={ ( value, keepId ) => {
-					if ( keepId ) {
-						if ( ! value ) {
-							return createBlock(
-								name,
-								undefined,
-								undefined,
-								clientId
-							);
-						}
-
+					if ( ! value ) {
 						return createBlock(
 							name,
-							{
-								...attributes,
-								content: value,
-							},
 							undefined,
-							clientId
+							undefined,
+							keepId ? clientId : undefined
 						);
 					}
-					if ( ! value ) {
-						return createBlock( name );
-					}
 
-					return createBlock( name, {
-						...attributes,
-						content: value,
-					} );
+					return createBlock(
+						name,
+						{
+							...attributes,
+							content: value,
+						},
+						undefined,
+						keepId ? clientId : undefined
+					);
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

@@ -307,7 +307,8 @@ function RichTextWrapper(
 							value: before,
 							multilineTag,
 						} ),
-						lastPastedBlockIndex === -1
+						// Set true to not recreate the original paragraph
+						true
 					)
 				);
 				lastPastedBlockIndex += 1;
