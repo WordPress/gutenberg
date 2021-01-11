@@ -111,10 +111,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			 *
 			 * @param WP_REST_Response $response The response object.
 			 * @param string           $url      The requested URL.
-			 * @param WP_REST_Request  $request  Request object.
 			 * @param bool             $from_cache Whether the response is from the cache.
+			 * @param WP_REST_Request  $request  Request object.
 			 */
-			return apply_filters( 'rest_url_details_prepare_response', $response, $url, $request, $from_cache );
+			return apply_filters( 'rest_url_details_prepare_response', $response, $url, $from_cache, $request );
 		}
 
 		// If we're this far the response is not from the cache.
@@ -160,10 +160,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 *
 		 * @param WP_REST_Response $response The response object.
 		 * @param string           $url      The requested URL.
-		 * @param WP_REST_Request  $request  Request object.
 		 * @param bool             $from_cache Whether the response is from the cache.
+		 * @param WP_REST_Request  $request  Request object.
 		 */
-		return apply_filters( 'rest_url_details_prepare_response', $response, $url, $request, $from_cache );
+		return apply_filters( 'rest_url_details_prepare_response', $response, $url, $from_cache, $request );
 	}
 
 	/**

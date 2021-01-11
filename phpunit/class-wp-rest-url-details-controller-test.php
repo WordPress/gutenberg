@@ -394,6 +394,51 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 
+	public function test_allows_filtering_response() {
+
+		add_filter(
+			'rest_url_details_prepare_response',
+			function( $response, $url, $from_cache ) {
+				return new WP_REST_Response(
+					array(
+						'status'        => 418,
+						'response'      => "Uncached response for URL $url altered via rest_url_details_prepare_response filter",
+						'body_response' => array(),
+					)
+				);
+			},
+			10,
+			3
+		);
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$data = $response->get_data();
+
+		$this->assertEquals(
+			'418',
+			$data['status']
+		);
+
+		$this->assertEquals(
+			'Uncached response for URL https://dummysite.com altered via rest_url_details_prepare_response filter',
+			$data['response']
+		);
+
+		remove_all_filters(
+			'rest_url_details_prepare_response'
+		);
+	}
+
+
 
 	public function test_get_item() {
 	}
@@ -450,6 +495,8 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			),
 		);
 	}
+
+
 
 	/**
 	 * Mocks the HTTP response for the the `wp_safe_remote_get()` which
