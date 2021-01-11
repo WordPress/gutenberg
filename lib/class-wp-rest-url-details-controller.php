@@ -100,10 +100,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$cache_key = $this->build_cache_key_for_url( $url );
 
 		// Attempt to retrieve cached response.
-		$data = $this->get_cache( $cache_key );
+		$cached_response = $this->get_cache( $cache_key );
 
-		if ( ! empty( $data ) ) {
-			return json_decode( $data, true );
+		if ( ! empty( $cached_response ) ) {
+			return rest_ensure_response( json_decode( $cached_response, true ) );
 		}
 
 		$response_body = $this->get_remote_url( $url );
@@ -133,10 +133,15 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			$url
 		);
 
+		$data = $this->add_additional_fields_to_object( $data, $request );
+
 		// Cache the valid response.
 		$this->set_cache( $cache_key, $data );
 
-		return rest_ensure_response( $data );
+		// Wrap the data in a response object.
+		$response = rest_ensure_response( $data );
+
+		return $response;
 	}
 
 	/**
