@@ -6,7 +6,6 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -15,20 +14,27 @@ import { useSelect } from '@wordpress/data';
 import { MENU_CONTENT_PAGES, MENU_ROOT } from '../constants';
 import ContentNavigationItem from '../content-navigation-item';
 import SearchResults from '../search-results';
+import useDebouncedSearch from '../use-debounced-search';
 
 export default function ContentPagesMenu() {
-	const [ search, setSearch ] = useState( '' );
-	const onSearch = useCallback( ( value ) => {
-		setSearch( value );
-	} );
+	const {
+		search,
+		searchQuery,
+		onSearch,
+		isDebouncing,
+	} = useDebouncedSearch();
 
 	const pages = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'page', {
-				per_page: -1,
+				search: searchQuery,
 			} ),
-		[]
+		[ searchQuery ]
 	);
+
+	const isLoading = ! search && pages === null;
+	const shouldShowLoadingForDebouncing = search && isDebouncing;
+	const showLoading = isLoading || shouldShowLoadingForDebouncing;
 
 	return (
 		<NavigationMenu
@@ -39,7 +45,9 @@ export default function ContentPagesMenu() {
 			onSearch={ onSearch }
 			search={ search }
 		>
-			{ search && <SearchResults items={ pages } search={ search } /> }
+			{ search && ! isDebouncing && (
+				<SearchResults items={ pages } search={ search } />
+			) }
 
 			{ ! search &&
 				pages?.map( ( page ) => (
@@ -49,7 +57,7 @@ export default function ContentPagesMenu() {
 					/>
 				) ) }
 
-			{ ! search && pages === null && (
+			{ showLoading && (
 				<NavigationItem title={ __( 'Loading…' ) } isText />
 			) }
 		</NavigationMenu>
