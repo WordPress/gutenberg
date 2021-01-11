@@ -214,7 +214,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: phpunitImage,
 				depends_on: [ 'tests-wordpress' ],
 				volumes: [
-					...testsMounts,
+					...testsMounts.filter(
+						( mount ) =>
+							! mount.endsWith(
+								':/var/www/html/wp-content/uploads'
+							)
+					),
 					'phpunit-uploads:/var/www/html/wp-content/uploads',
 				],
 				environment: {
