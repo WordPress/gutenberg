@@ -55,38 +55,21 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 120px;
-		width: 0;
-		transform: translateX(8px);
+		max-width: 0;
 		opacity: 0;
+		padding: 0;
 		transition: all ease 0.2s;
-		color: $gray-700;
+		background: $gray-200;
+		border-radius: 2px;
 		@include reduce-motion(transition);
-
-		@include break-medium() {
-			max-width: 75px;
-		}
-
-		@include break-xlarge() {
-			max-width: 180px;
-		}
-
-		&::before {
-			content: "/" /*rtl:"\"*/;
-			color: $gray-700;
-			padding: 0 $grid-unit-10;
-		}
 	}
 
 	&.has-secondary-label {
 		.edit-site-document-actions__secondary-item {
-			width: auto;
 			opacity: 1;
-			transform: translateX(0);
-
-			&::before {
-				color: $gray-700;
-			}
+			padding: 0 4px;
+			max-width: 180px;
+			margin-left: 6px;
 		}
 	}
 }
