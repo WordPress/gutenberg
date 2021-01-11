@@ -40,7 +40,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	protected static $route = '/__experimental/url-details';
 
 
-	protected static $url_placeholder = 'https://dummysite.com';
+	protected static $url_placeholder = 'https://placeholder-site.com';
 
 	protected static $request_args = array();
 
@@ -429,7 +429,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 
 		$this->assertEquals(
-			'Uncached response for URL https://dummysite.com altered via rest_url_details_prepare_response filter',
+			'Uncached response for URL https://placeholder-site.com altered via rest_url_details_prepare_response filter',
 			$data['response']
 		);
 
