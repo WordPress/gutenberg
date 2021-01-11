@@ -108,6 +108,7 @@ def enableProguardInReleaseBuilds = false
 def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     compileOptions {
@@ -121,6 +122,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        ndk { 
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips" 
+            
+        } 
     }
     splits {
         abi {
