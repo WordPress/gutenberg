@@ -42,6 +42,11 @@ export function createStyledComponents( { compiler, core } ) {
 	 */
 	const Box = core.div;
 
+	/**
+	 *
+	 * @param {import('react').ComponentType} tagName
+	 * @param {{ props?: any }} options
+	 */
 	function createStyled( tagName, options = {} ) {
 		const {
 			/**
@@ -50,7 +55,11 @@ export function createStyledComponents( { compiler, core } ) {
 			props: extraProps,
 		} = options;
 
-		return ( ...interpolatedProps ) => {
+		return ( /** @type {any[]} */ ...interpolatedProps ) => {
+			/**
+			 * @param {Pick<any, string | number | symbol>} props
+			 * @param {import('react').Ref<any>} ref
+			 */
 			const render = ( { as: asProp, className, ...props }, ref ) => {
 				// Combine all of te props together.
 				const mergedProps = { ...extraProps, ...props, ref };
@@ -127,6 +136,7 @@ export function createStyledComponents( { compiler, core } ) {
 	// Generating the core collection of styled[tagName], with our enhanced
 	// version of styled.
 	tags.forEach( ( tagName ) => {
+		// @ts-ignore We're extending the base `styled` function object and TS doesn't like that
 		styled[ tagName ] = createStyled( tagName );
 	} );
 

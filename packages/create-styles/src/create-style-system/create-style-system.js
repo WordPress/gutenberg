@@ -22,7 +22,7 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * @typedef CreateStyleSystemObjects
  * @property {import('./polymorphic-component').CoreElements} core A set of coreElements.
  * @property {import('../create-compiler').Compiler} compiler The Style system compiler (a custom Emotion instance).
- * @property {(tagName: import('react').ComponentType) => ReturnType<createCoreElement>} createCoreElement A function to create a coreElement (with settings from the Style system).
+ * @property {(tagName: keyof JSX.IntrinsicElements) => ReturnType<createCoreElement>} createCoreElement A function to create a coreElement (with settings from the Style system).
  * @property {import('../create-compiler').Compiler['css']} css A function to compile CSS styles.
  * @property {import('../create-compiler').Compiler['cx']} cx A function to resolve + combine classNames.
  * @property {(tokenName: string) => string} createToken A function to generate a design token (CSS variable) used by the system.
@@ -123,7 +123,7 @@ export function createStyleSystem( options = defaultOptions ) {
 	/**
 	 * Export prebound createCoreElement factory.
 	 *
-	 * @param {import('react').ComponentType} tagName
+	 * @param {keyof JSX.IntrinsicElements} tagName
 	 */
 	const _createCoreElement = ( tagName ) =>
 		createCoreElement( tagName, { baseStyles, compiler, globalStyles } );

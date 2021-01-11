@@ -35,14 +35,20 @@ export function createCSS( compile ) {
 		const [ arg, ...rest ] = args;
 
 		if ( isPlainObject( arg ) ) {
-			return compile( responsive( arg ) );
+			return compile(
+				responsive(
+					/** @type {import('create-emotion').ObjectInterpolation<undefined>} */ ( arg )
+				)
+			);
 		}
 
 		if ( Array.isArray( arg ) ) {
 			for ( let i = 0, len = arg.length; i < len; i++ ) {
 				const n = arg[ i ];
 				if ( isPlainObject( n ) ) {
-					arg[ i ] = responsive( n );
+					arg[ i ] = responsive(
+						/** @type {import('create-emotion').ObjectInterpolation<undefined>} */ ( n )
+					);
 				}
 			}
 			return compile( ...[ arg, ...rest ] );

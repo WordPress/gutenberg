@@ -7,7 +7,7 @@ import { sanitizeParens, VAR_REG_EXP } from './utils';
  * Interprets and retrieves the CSS property and value of a declaration rule.
  *
  * @param {string} declaration A CSS declaration rule to parse.
- * @param {Object} rootStore A store for CSS root variables.
+ * @param {import('./create-root-store').RootStore} rootStore A store for CSS root variables.
  * @return {[string, string | undefined]} [prop, value] parsed from the declaration.
  */
 export function getPropValue( declaration, rootStore ) {

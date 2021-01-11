@@ -160,6 +160,7 @@ export const createCoreElement = ( tagName, options ) => {
 
 	const SystemComponent = forwardRef( render );
 
+	// @ts-ignore
 	if ( process.env.NODE_ENV === 'development' ) {
 		const displayName = typeof tagName === 'string' ? tagName : 'Component';
 

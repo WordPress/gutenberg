@@ -13,7 +13,7 @@ import { hasVariable, isCustomProperty } from './utils';
  * Interprets and retrieves the CSS fallback value of a declaration rule.
  *
  * @param {string} declaration A CSS declaration rule to parse.
- * @param {Object} rootStore A store for CSS root variables.
+ * @param {import('./create-root-store').RootStore} rootStore A store for CSS root variables.
  * @return {string | undefined} A CSS declaration rule with a fallback (if applicable).
  */
 export function getFallbackDeclaration( declaration, rootStore ) {
@@ -30,7 +30,7 @@ export function getFallbackDeclaration( declaration, rootStore ) {
  * variables.
  *
  * @param {string} content Stylis content to parse.
- * @param {Object} rootStore A store for CSS root variables.
+ * @param {import('./create-root-store').RootStore} rootStore A store for CSS root variables.
  * @return {string | undefined} The transformed content with CSS variable fallbacks.
  */
 export function baseTransformContent( content, rootStore ) {

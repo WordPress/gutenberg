@@ -10,6 +10,7 @@ import cssVariablesPlugin from './css-variables';
 import specificityPlugin from './extra-specificity';
 import rtlPlugin from './rtl';
 
+// @ts-ignore
 const isProd = process.env.NODE_ENV === 'production';
 
 /**

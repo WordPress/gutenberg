@@ -16,18 +16,23 @@ import {
 
 /**
  * @typedef ThemeProviderContext
- * @property {boolean} [isDark] Whether dark mode is enabled.
- * @property {boolean} [isColorBlind] Whether color blind mode is enabled.
- * @property {boolean} [isReducedMotion] Whether reduced motion is enabled.
- * @property {boolean} [isHighContrast] Whether high contrast mode is enabled.
+ * @property {boolean | null} isDark Whether dark mode is enabled.
+ * @property {boolean | null} isColorBlind Whether color blind mode is enabled.
+ * @property {boolean | null} isReducedMotion Whether reduced motion is enabled.
+ * @property {boolean | null} isHighContrast Whether high contrast mode is enabled.
  */
 
-export const ThemeProviderContext = createContext( {
+/** @type {ThemeProviderContext} */
+const DEFAULT_THEME_PROVIDER_CONTEXT = {
 	isDark: null,
 	isColorBlind: null,
 	isReducedMotion: null,
 	isHighContrast: null,
-} );
+};
+
+export const ThemeProviderContext = createContext(
+	DEFAULT_THEME_PROVIDER_CONTEXT
+);
 
 export const useThemeProviderContext = () => useContext( ThemeProviderContext );
 
@@ -38,7 +43,9 @@ export const useThemeProviderContext = () => useContext( ThemeProviderContext );
  *
  * @param {ThemeProviderContext} currentContextState
  */
-export function useThemeProviderContextBridge( currentContextState = {} ) {
+export function useThemeProviderContextBridge(
+	currentContextState = DEFAULT_THEME_PROVIDER_CONTEXT
+) {
 	const parentThemeProviderContextState = useThemeProviderContext();
 	const nextContextState = useRef( {
 		...parentThemeProviderContextState,
@@ -46,7 +53,9 @@ export function useThemeProviderContextBridge( currentContextState = {} ) {
 
 	for ( const [ key, value ] of Object.entries( currentContextState ) ) {
 		if ( ! isNil( value ) ) {
-			nextContextState[ key ] = value;
+			nextContextState[
+				/** @type {keyof ThemeProviderContext} */ ( key )
+			] = value;
 		}
 	}
 
@@ -58,7 +67,9 @@ export function useThemeProviderContextBridge( currentContextState = {} ) {
  *
  * @param {ThemeProviderContext} currentContextState
  */
-export function useThemeProviderModeHtmlAttributes( currentContextState = {} ) {
+export function useThemeProviderModeHtmlAttributes(
+	currentContextState = DEFAULT_THEME_PROVIDER_CONTEXT
+) {
 	const {
 		isColorBlind,
 		isDark,
@@ -66,6 +77,7 @@ export function useThemeProviderModeHtmlAttributes( currentContextState = {} ) {
 		isReducedMotion,
 	} = currentContextState;
 
+	/** @type {Record<string, boolean | string>} */
 	const htmlAttrs = {};
 
 	if ( isDark ) {
