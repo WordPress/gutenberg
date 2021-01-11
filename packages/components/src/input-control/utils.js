@@ -41,10 +41,10 @@ export function useDragCursor( isDragging, dragDirection ) {
 	useEffect( () => {
 		if ( isDragging ) {
 			document.documentElement.style.cursor = dragCursor;
-			document.documentElement.style.pointerEvents = 'none';
+			document.documentElement.style.userSelect = 'none';
 		} else {
 			document.documentElement.style.cursor = null;
-			document.documentElement.style.pointerEvents = null;
+			document.documentElement.style.userSelect = null;
 		}
 	}, [ isDragging ] );
 
