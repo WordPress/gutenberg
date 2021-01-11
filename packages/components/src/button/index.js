@@ -106,7 +106,10 @@ export function Button( props, ref ) {
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = uniqueId();
+	const descriptionId = describedBy ? uniqueId() : null;
+
+	const describedById =
+		additionalProps[ 'aria-describedby' ] || descriptionId;
 
 	const element = (
 		<Tag
@@ -114,7 +117,7 @@ export function Button( props, ref ) {
 			{ ...additionalProps }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
-			aria-describedby={ describedBy ? descriptionId : null }
+			aria-describedby={ describedById }
 			ref={ ref }
 		>
 			{ icon && iconPosition === 'left' && (
