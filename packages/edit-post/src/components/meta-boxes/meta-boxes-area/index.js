@@ -10,6 +10,11 @@ import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
 class MetaBoxesArea extends Component {
 	/**
 	 * @inheritdoc
@@ -78,6 +83,6 @@ class MetaBoxesArea extends Component {
 
 export default withSelect( ( select ) => {
 	return {
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isSaving: select( editPostStore ).isSavingMetaBoxes(),
 	};
 } )( MetaBoxesArea );

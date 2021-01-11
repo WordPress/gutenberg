@@ -60,7 +60,7 @@
 
 	.block-editor-block-compare__preview {
 		padding: 0;
-		padding-top: $block-padding;
+		padding-top: $grid-unit-20;
 
 		p {
 			font-size: 12px;
@@ -69,7 +69,7 @@
 	}
 
 	.block-editor-block-compare__action {
-		margin-top: $block-padding;
+		margin-top: $grid-unit-20;
 	}
 
 	.block-editor-block-compare__heading {

@@ -47,20 +47,51 @@ const manifest = require( '../../../package.json' );
  */
 
 /**
- * Mapping of label names to grouping heading text to be used in release notes,
- * intended to be more readable in the context of release notes. Also used in
- * merging multiple related groupings to a single heading.
+ * Mapping of label names to sections in the release notes.
+ *
+ * Labels are sorted by the priority they have when there are
+ * multiple candidates. For example, if an issue has the labels
+ * "[Block] Navigation" and "[Type] Bug", it'll be assigned the
+ * section declared by "[Block] Navigation".
  *
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	Bug: 'Bug Fixes',
-	Regression: 'Bug Fixes',
-	Feature: 'Features',
-	Enhancement: 'Enhancements',
-	'New API': 'New APIs',
-	Experimental: 'Experiments',
-	Task: 'Various',
+	'[Block] Navigation': 'Experiments',
+	'[Block] Query': 'Experiments',
+	'[Block] Post Comments Count': 'Experiments',
+	'[Block] Post Comments Form': 'Experiments',
+	'[Block] Post Comments': 'Experiments',
+	'[Block] Post Featured Image': 'Experiments',
+	'[Block] Post Hierarchical Terms': 'Experiments',
+	'[Block] Post Title': 'Experiments',
+	'[Block] Site Logo': 'Experiments',
+	'[Feature] Full Site Editing': 'Experiments',
+	'Global Styles': 'Experiments',
+	'[Feature] Navigation Screen': 'Experiments',
+	'[Feature] Widgets Screen': 'Experiments',
+	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Package] Jest Puppeteer aXe': 'Tools',
+	'[Package] E2E Tests': 'Tools',
+	'[Package] E2E Test Utils': 'Tools',
+	'[Package] Env': 'Tools',
+	'[Package] ESLint plugin': 'Tools',
+	'[Package] stylelint config': 'Tools',
+	'[Package] Project management automation': 'Tools',
+	'[Type] Project Management': 'Tools',
+	'[Package] Scripts': 'Tools',
+	'[Type] Build Tooling': 'Tools',
+	'Automated Testing': 'Tools',
+	'[Type] Experimental': 'Experiments',
+	'[Type] Bug': 'Bug Fixes',
+	'[Type] Regression': 'Bug Fixes',
+	'[Type] Feature': 'Features',
+	'[Type] Enhancement': 'Enhancements',
+	'[Type] New API': 'New APIs',
+	'[Type] Performance': 'Performance',
+	'[Type] Documentation': 'Documentation',
+	'[Type] Code Quality': 'Code Quality',
+	'[Type] Security': 'Security',
 };
 
 /**
@@ -78,6 +109,7 @@ const GROUP_TITLE_ORDER = [
 	'Experiments',
 	'Documentation',
 	'Code Quality',
+	'Tools',
 	undefined,
 	'Various',
 ];
@@ -105,7 +137,8 @@ const REWORD_TERMS = {
 };
 
 /**
- * Returns type candidates based on given issue label names.
+ * Returns candidates based on whether the given labels
+ * are part of the allowed list.
  *
  * @param {string[]} labels Label names.
  *
@@ -114,13 +147,10 @@ const REWORD_TERMS = {
 function getTypesByLabels( labels ) {
 	return uniq(
 		labels
-			.filter( ( label ) => label.startsWith( '[Type] ' ) )
-			.map( ( label ) => label.slice( '[Type] '.length ) )
-			.map( ( label ) =>
-				LABEL_TYPE_MAPPING.hasOwnProperty( label )
-					? LABEL_TYPE_MAPPING[ label ]
-					: label
+			.filter( ( label ) =>
+				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
 			)
+			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
 	);
 }
 
@@ -151,12 +181,29 @@ function getTypesByTitle( title ) {
  * @return {string} Type label.
  */
 function getIssueType( issue ) {
+	const labels = issue.labels.map( ( { name } ) => name );
 	const candidates = [
-		...getTypesByLabels( issue.labels.map( ( { name } ) => name ) ),
+		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
 
-	return candidates.length ? candidates.sort( sortGroup )[ 0 ] : 'Various';
+	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
+}
+
+/**
+ * Sort comparator, comparing two label candidates.
+ *
+ * @param {string} a First candidate.
+ * @param {string} b Second candidate.
+ *
+ * @return {number} Sort result.
+ */
+function sortType( a, b ) {
+	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
+		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
+	} );
+
+	return aIndex - bIndex;
 }
 
 /**
@@ -287,11 +334,8 @@ function removeRedundantTypePrefix( title, issue ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByTitlePrefix( [ '[rnmobile]' ] ),
-	createOmitByLabel( [
-		'Mobile App Compatibility',
-		'[Type] Project Management',
-	] ),
+	createOmitByLabel( [ 'Mobile App Android/iOS' ] ),
+	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,

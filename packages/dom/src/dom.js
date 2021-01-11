@@ -958,7 +958,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
  *
  * @param {Element} element The element to check.
  *
- * @return {boolean} Wether or not the element is empty.
+ * @return {boolean} Whether or not the element is empty.
  */
 export function isEmpty( element ) {
 	if ( ! element.hasChildNodes() ) {

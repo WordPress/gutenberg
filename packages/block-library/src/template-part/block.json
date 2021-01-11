@@ -3,9 +3,6 @@
 	"name": "core/template-part",
 	"category": "design",
 	"attributes": {
-		"postId": {
-			"type": "number"
-		},
 		"slug": {
 			"type": "string"
 		},
@@ -24,5 +21,6 @@
 			"gradients": true,
 			"link": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-template-part-editor"
 }

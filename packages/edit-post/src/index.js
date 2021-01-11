@@ -4,7 +4,6 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -16,7 +15,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import './hooks';
 import './plugins';
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
 /**

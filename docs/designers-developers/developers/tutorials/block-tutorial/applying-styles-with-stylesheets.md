@@ -8,8 +8,11 @@ The editor will automatically generate a class name for each block type to simpl
 {% ESNext %}
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
+	apiVersion: 2,
+
 	title: 'Example: Stylesheets',
 
 	icon: 'universal-access-alt',
@@ -18,43 +21,51 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 	example: {},
 
-	edit( { className } ) {
-		return <p className={ className }>Hello World, step 2 (from the editor, in green).</p>;
+	edit() {
+		const blockProps = useBlockProps();
+
+		return <p { ...blockProps }>Hello World, step 2 (from the editor, in green).</p>;
 	},
 
 	save() {
-		return <p>Hello World, step 2 (from the frontend, in red).</p>;
+		const blockProps = useBlockProps.save();
+
+		return <p { ...blockProps }>Hello World, step 2 (from the frontend, in red).</p>;
 	},
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, element ) {
+( function( blocks, element, blockEditor ) {
 	var el = element.createElement;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
+		apiVersion: 2,
 		title: 'Example: Stylesheets',
 		icon: 'universal-access-alt',
 		category: 'design',
 		example: {},
 		edit: function( props ) {
+			var blockProps = blockEditor.useBlockProps();
 			return el(
 				'p',
-				{ className: props.className },
+				blockProps,
 				'Hello World, step 2 (from the editor, in green).'
 			);
 		},
 		save: function() {
+			var blockProps = blockEditor.useBlockProps.save();
 			return el(
 				'p',
-				{},
+				blockProps,
 				'Hello World, step 2 (from the frontend, in red).'
 			);
 		},
 	} );
 }(
 	window.wp.blocks,
-	window.wp.element
+	window.wp.element,
+	window.wp.blockEditor,
 ) );
 ```
 {% end %}
@@ -120,6 +131,7 @@ function gutenberg_examples_02_register_block() {
 	);
 
 	register_block_type( 'gutenberg-examples/example-02-stylesheets', array(
+		'apiVersion' => 2,
 		'style' => 'gutenberg-examples-02',
 		'editor_style' => 'gutenberg-examples-02-editor',
 		'editor_script' => 'gutenberg-examples-02',

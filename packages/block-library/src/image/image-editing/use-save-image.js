@@ -5,6 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 export default function useSaveImage( {
 	crop,
@@ -17,7 +18,7 @@ export default function useSaveImage( {
 	onSaveImage,
 	onFinishEditing,
 } ) {
-	const { createErrorNotice } = useDispatch( 'core/notices' );
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const [ isInProgress, setIsInProgress ] = useState( false );
 
 	const cancel = useCallback( () => {

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.27.0 (2020-12-17)
+
 ### Enhancement
 
 - File Block: Copy url button is moved to Block toolbar.

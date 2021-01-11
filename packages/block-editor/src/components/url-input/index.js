@@ -22,7 +22,6 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
-/* eslint-disable jsx-a11y/no-autofocus */
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -393,7 +392,6 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
-			autoFocus = true,
 		} = this.props;
 
 		const {
@@ -415,7 +413,6 @@ class URLInput extends Component {
 		const inputProps = {
 			value,
 			required: true,
-			autoFocus,
 			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
@@ -539,7 +536,6 @@ class URLInput extends Component {
 		return null;
 	}
 }
-/* eslint-enable jsx-a11y/no-autofocus */
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
