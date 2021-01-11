@@ -69,7 +69,7 @@ jobs:
           CHANGELOG_REGEX="/=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s=/"
           awk -i inplace "$CHANGELOG_REGEX"'{p++;next} p==2{exit} p>=1' changelog.txt
 
-      - name: Create Release
+      - name: Create Release Draft
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -91,3 +91,11 @@ jobs:
           asset_path: ./gutenberg.zip
           asset_name: gutenberg.zip
           asset_content_type: application/zip
+
+      - name: Publish Release
+        run: |
+          curl \
+            -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
+            -d '{"draft":false}'
