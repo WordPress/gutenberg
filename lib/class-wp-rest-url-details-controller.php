@@ -103,8 +103,22 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$cached_response = $this->get_cache( $cache_key );
 
 		if ( ! empty( $cached_response ) ) {
-			return rest_ensure_response( json_decode( $cached_response, true ) );
+			$from_cache = true;
+			$response = rest_ensure_response( json_decode( $cached_response, true ) );
+
+			/**
+			 * Filters the URL data for the response.
+			 *
+			 * @param WP_REST_Response $response The response object.
+			 * @param string           $url      The requested URL.
+			 * @param WP_REST_Request  $request  Request object.
+			 * @param bool             $from_cache Whether the response is from the cache.
+			 */
+			return apply_filters( 'rest_url_details_prepare_response', $response, $url, $request, $from_cache );
 		}
+
+		// If we're this far the response is not from the cache.
+		$from_cache = false;
 
 		$response_body = $this->get_remote_url( $url );
 
@@ -141,7 +155,15 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
 
-		return $response;
+		/**
+		 * Filters the URL data for the response.
+		 *
+		 * @param WP_REST_Response $response The response object.
+		 * @param string           $url      The requested URL.
+		 * @param WP_REST_Request  $request  Request object.
+		 * @param bool             $from_cache Whether the response is from the cache.
+		 */
+		return apply_filters( 'rest_url_details_prepare_response', $response, $url, $request, $from_cache );
 	}
 
 	/**
