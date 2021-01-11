@@ -6,6 +6,7 @@ import { castArray, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	ToolbarButton,
@@ -89,6 +90,19 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 
 	const blockSwitcherLabel = blockTitle;
 
+	const blockSwitcherDescription =
+		1 === blocks.length
+			? __( 'Change block type or style' )
+			: sprintf(
+					/* translators: %s: number of blocks. */
+					_n(
+						'Change type of %d block',
+						'Change type of %d blocks',
+						blocks.length
+					),
+					blocks.length
+			  );
+
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -108,7 +122,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 								showColors
 							/>
 						}
-						toggleProps={ toggleProps }
+						toggleProps={ {
+							describedBy: blockSwitcherDescription,
+							...toggleProps,
+						} }
 						menuProps={ { orientation: 'both' } }
 					>
 						{ ( { onClose } ) =>
