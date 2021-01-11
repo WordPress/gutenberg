@@ -15,6 +15,7 @@ import { Panel, PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import WidgetAreaInnerBlocks from './inner-blocks';
+import { store as editWidgetsStore } from '../../../store';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -25,10 +26,10 @@ export default function WidgetAreaEdit( {
 } ) {
 	const isOpen = useSelect(
 		( select ) =>
-			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( clientId ),
+			select( editWidgetsStore ).getIsWidgetAreaOpen( clientId ),
 		[ clientId ]
 	);
-	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
+	const { setIsWidgetAreaOpen } = useDispatch( editWidgetsStore );
 
 	const wrapper = useRef();
 	const setOpen = useCallback(

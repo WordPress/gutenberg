@@ -18,7 +18,6 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
-	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -253,7 +252,7 @@ function Editor() {
 												/>
 											}
 											content={
-												<BlockSelectionClearer
+												<div
 													className="edit-site-visual-editor"
 													style={ inlineStyles }
 												>
@@ -267,7 +266,7 @@ function Editor() {
 														/>
 													) }
 													<KeyboardShortcuts />
-												</BlockSelectionClearer>
+												</div>
 											}
 											actions={
 												<>

@@ -66,7 +66,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	if ( $current_template ) {
-		$_wp_current_template_content = empty( $current_template->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->post_content;
+		$_wp_current_template_content = empty( $current_template->content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->content;
 
 		if ( isset( $_GET['_wp-find-template'] ) ) {
 			wp_send_json_success( $current_template );
@@ -124,24 +124,11 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	);
 
 	// Find all potential templates 'wp_template' post matching the hierarchy.
-	$template_query = new WP_Query(
-		array(
-			'post_type'      => 'wp_template',
-			'post_status'    => array( 'publish', 'auto-draft' ),
-			'post_name__in'  => $slugs,
-			'orderby'        => 'post_name__in',
-			'posts_per_page' => -1,
-			'no_found_rows'  => true,
-			'tax_query'      => array(
-				array(
-					'taxonomy' => 'wp_theme',
-					'field'    => 'slug',
-					'terms'    => wp_get_theme()->get_stylesheet(),
-				),
-			),
-		)
+	$query     = array(
+		'theme'    => wp_get_theme()->get_stylesheet(),
+		'slug__in' => $slugs,
 	);
-	$templates      = $template_query->get_posts();
+	$templates = gutenberg_get_block_templates( $query );
 
 	// Order these templates per slug priority.
 	// Build map of template slugs to their priority in the current hierarchy.
@@ -150,7 +137,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	usort(
 		$templates,
 		function ( $template_a, $template_b ) use ( $slug_priorities ) {
-			return $slug_priorities[ $template_a->post_name ] - $slug_priorities[ $template_b->post_name ];
+			return $slug_priorities[ $template_a->slug ] - $slug_priorities[ $template_b->slug ];
 		}
 	);
 
