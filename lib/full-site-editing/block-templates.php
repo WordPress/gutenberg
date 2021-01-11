@@ -108,15 +108,17 @@ function _gutenberg_get_template_files( $template_type ) {
 /**
  * Build a unified template object based on a theme file.
  *
- * @param array $template_file Theme file.
- * @param array $template_type wp_template or wp_template_part.
+ * @param array  $template_file Theme file.
+ * @param array  $template_type wp_template or wp_template_part.
+ * @param string $theme_override Override the theme slug
  *
  * @return WP_Block_Template Template.
  */
-function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
+function _gutenberg_build_template_result_from_file( $template_file, $template_type, $theme_override = '' ) {
 	$default_template_types = gutenberg_get_default_template_types();
 
-	$theme               = wp_get_theme()->get_stylesheet();
+	$theme = empty( $theme_override ) ? wp_get_theme()->get_stylesheet() : $theme_override;
+
 	$template            = new WP_Block_Template();
 	$template->id        = $theme . '//' . $template_file['slug'];
 	$template->theme     = $theme;
@@ -139,10 +141,11 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  * Build a unified template object based a post Object.
  *
  * @param WP_Post $post Template post.
+ * @param string  $theme_override Override the theme slug
  *
  * @return WP_Block_Template|WP_Error Template.
  */
-function _gutenberg_build_template_result_from_post( $post ) {
+function _gutenberg_build_template_result_from_post( $post, $theme_override = '' ) {
 	$terms = get_the_terms( $post, 'wp_theme' );
 
 	if ( is_wp_error( $terms ) ) {
@@ -153,7 +156,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 	}
 
-	$theme = $terms[0]->name;
+	$theme = empty( $theme_override ) ? $terms[0]->name : $theme_override;
 
 	$template              = new WP_Block_Template();
 	$template->wp_id       = $post->ID;
@@ -278,10 +281,43 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
-	if ( wp_get_theme()->get_stylesheet() === $theme ) {
+	// If there are no templates for the requested theme, try matching it with the path of an installed theme
+	$installed_themes = wp_get_themes();
+	$fallback_theme   = null;
+	foreach ( $installed_themes as $installed_theme_slug => $installed_theme ) {
+		$installed_theme_path_parts = explode( '/', $installed_theme_slug );
+		if ( count( $installed_theme_path_parts ) > 1 && $theme === end( $installed_theme_path_parts ) ) {
+			$fallback_theme = $installed_theme_slug;
+			break;
+		}
+	}
+
+	if ( $fallback_theme ) {
+		$wp_query_args['tax_query'] = array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => $fallback_theme,
+			),
+		);
+		$template_query       = new WP_Query( $wp_query_args );
+		$posts                = $template_query->get_posts();
+
+		if ( count( $posts ) > 0 ) {
+			$template = _gutenberg_build_template_result_from_post( $posts[0], $theme );
+
+			if ( ! is_wp_error( $template ) ) {
+				return $template;
+			}
+		}
+	}
+
+	$theme_stylesheet = wp_get_theme()->get_stylesheet();
+	if ( in_array( $theme_stylesheet, array( $theme, $fallback_theme ) ) ) {
 		$template_file = _gutenberg_get_template_file( $template_type, $slug );
 		if ( null !== $template_file ) {
-			return _gutenberg_build_template_result_from_file( $template_file, $template_type );
+			$theme_override = $theme_stylesheet === $fallback_theme ? $theme : '';
+			return _gutenberg_build_template_result_from_file( $template_file, $template_type, $theme_override );
 		}
 	}
 
