@@ -119,6 +119,7 @@
 			// ... and display labels.
 			&::after {
 				content: attr(aria-label);
+				font-size: 0.75rem;
 			}
 		}
 	}
@@ -171,8 +172,11 @@
 		border-right: 1px solid $gray-900;
 	}
 
-	.is-up-button {
+	// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
+	.is-up-button.is-up-button.is-up-button {
 		border-bottom: 1px solid $gray-900;
+		margin-right: 0;
+		border-radius: 0;
 	}
 
 	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
