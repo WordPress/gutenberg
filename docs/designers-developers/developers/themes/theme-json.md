@@ -34,44 +34,18 @@ By providing the block style properties in a structured way, the Block Editor ca
 
 ## Specification
 
-The `experimental-theme.json` file is divided into sections known as "contexts", that represent a different CSS selector. For example, the `core/paragraph` context maps to `p` while `core/group` maps to `.wp-block-group`. In general, one block will map to a single context as in the cases mentioned. There are cases where one block can generate multiple contexts (different CSS selectors). For example, the heading block generates six different contexts (`core/heading/h1`, `core/heading/h2`, etc), one for each different selector (h1, h2, etc).
+The `experimental-theme.json` file declares how a theme wants the editor configured (`settings`) as well as the style properties it sets (`styles`).
 
 ```
 {
-  "global": { ... },
-  "core/paragraph": { ... },
-  "core/group": { ... },
-  "core/heading/h1": { ... },
-  "core/heading/h2": { ... },
-  "core/heading/h3": { ... },
-  "core/heading/h4": { ... },
-  "core/heading/h5": { ... },
-  "core/heading/h6": { ... }
+  "settings": { ... },
+  "styles": { ... }
 }
 ```
 
-Every context has the same structure, divided in two sections: `settings` and `styles`. The `settings` are used to control the editor (enable/disable certain features, declare presets), taking over what was previously declared via `add_theme_support`. The `styles` will be used to create new style rules to be appended to a new stylesheet `global-styles-inline-css` enqueued in the front-end and post editor.
+Each one of these sections is sub-divided into "contexts" that loosely map to a block. In general, one block will create one single context ―the paragraph block can be addressed via `core/paragraph`― but there are also cases where one block will create multiple contexts ―the heading block represents different HTML elements, h1 to h6, so it creates one context  for each such `core/heading/h1`, `core/heading/h2`, etc. Every context has the same inner structure.
 
-```
-{
-  "some/context": {
-    "settings": {
-      "border": [ ... ],
-      "color": [ ... ],
-      "custom": [ ... ],
-      "spacing": [ ... ],
-      "typography": [ ... ]
-    },
-    "styles": {
-      "border": { ... },
-      "color": { ... },
-      "typography": { ... }
-    }
-  }
-}
-```
-
-This structure is the same for the three different origins that exist: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
 
 ### Settings
 
@@ -79,8 +53,8 @@ The settings section has the following structure and default values:
 
 ```
 {
-  "some/context": {
-    "settings": {
+  "settings": {
+    "some/context": {
       "border": {
         "customRadius": false /* true to opt-in */
       },
@@ -114,26 +88,25 @@ The settings section has the following structure and default values:
 }
 ```
 
-To retain backward compatibility, `add_theme_support` declarations are retrofit in the proper categories. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `global.settings.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+To retain backward compatibility, `add_theme_support` declarations are retrofit in the proper categories. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.global.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
 Settings can also be controlled by context, providing a more fine-grained control over what exists via `add_theme_support`. As an example, let's say that a theme author wants to enable custom colors for the paragraph block exclusively. This is how it'd be done:
 
 ```json
 {
-  "global": {
-    "settings": {
+  "settings": {
+    "global": {
       "color": {
         "custom": false
       }
-    }
-  },
-  "core/paragraph": {
-    "settings": {
+    },
+    "core/paragraph": {
       "color": {
         "custom": true
       }
     }
   }
+}
 ```
 
 Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
@@ -146,8 +119,8 @@ For example, for this input:
 
 ```json
 {
-  "global": {
-    "settings": {
+  "settings": {
+    "global": {
       "color": {
         "palette": [
           {
@@ -204,14 +177,14 @@ The goal is that presets can be defined using this format, although, right now, 
 
 #### Free-form CSS Custom Properties
 
-In addition to create CSS Custom Properties for the presets, the theme.json also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
+In addition to create CSS Custom Properties for the presets, the theme.json also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/context>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
 
 For example, for this input:
 
 ```json
 {
-  "global": {
-    "settings": {
+  "settings": {
+    "global": {
       "custom": {
         "base-font": 16,
         "line-height": {
@@ -244,8 +217,8 @@ Each block declares which style properties it exposes. This has been coined as "
 
 ```json
 {
-  "some/context": {
-    "styles": {
+  "styles": {
+    "some/context": {
       "border": {
         "radius": "value"
       },
@@ -281,18 +254,16 @@ For example, an input like this:
 
 ```json
 {
-  "core/heading/h1": {
-    "styles": {
+  "styles": {
+    "core/heading/h1": {
       "color": {
         "text": "var(--wp--preset--color--primary)"
       },
       "typography": {
         "fontSize": "calc(1px * var(--wp--preset--font-size--huge))"
       }
-    }
-  },
-  "core/heading/h4": {
-    "styles": {
+    },
+    "core/heading/h4": {
       "color": {
         "text": "var(--wp--preset--color--secondary)"
       },
