@@ -47,3 +47,56 @@ jobs:
         with:
           name: gutenberg-plugin
           path: ./gutenberg.zip
+
+  create-release:
+    name: Create Release Draft and Attach Asset
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Set Release Version
+        id: get_release_version
+        run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | sed s/^v// | sed 's/-rc./ RC/' )
+
+      - name: Download Plugin Zip Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: gutenberg-plugin
+
+      - name: Extract Changelog for Release
+        run: |
+          unzip gutenberg.zip changelog.txt
+          CHANGELOG_REGEX="/=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s=/"
+          awk -i inplace "$CHANGELOG_REGEX"'{p++;next} p==2{exit} p>=1' changelog.txt
+
+      - name: Create Release Draft
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ steps.get_release_version.outputs.version }}
+          draft: true
+          prerelease: ${{ contains(github.ref, 'rc') }}
+          body_path: changelog.txt
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./gutenberg.zip
+          asset_name: gutenberg.zip
+          asset_content_type: application/zip
+
+      - name: Publish Release
+        run: |
+          curl \
+            --request PATCH \
+            --url https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
+            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
+            --header "Accept: application/vnd.github.v3+json" \
+            --data-raw '{"draft":false}'
