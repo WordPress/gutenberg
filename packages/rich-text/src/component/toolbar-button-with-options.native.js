@@ -43,7 +43,7 @@ function ToolbarButtonWithOptions( { options } ) {
 					title={ firstOption.title }
 					icon={ <Icon icon={ firstOption.icon } /> }
 					onClick={ firstOption.onClick }
-					onLongPress={ enablePicker && presentPicker }
+					onLongPress={ enablePicker ? presentPicker : undefined }
 				/>
 			</ToolbarGroup>
 			{ enablePicker && (
