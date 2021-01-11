@@ -202,7 +202,7 @@ describe( 'Multi-entity editor states', () => {
 			);
 
 			// Our custom template shows up in the " templates > all" menu; let's use it.
-			clickTemplateItem( [ 'Templates', 'All' ], templateName );
+			await clickTemplateItem( [ 'Templates', 'All' ], templateName );
 			await page.waitForXPath(
 				`//p[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
 			);
