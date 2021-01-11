@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { Composite, useCompositeState } from 'reakit';
-
-/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { Composite, useCompositeState } from '@wordpress/components';
 
 /**
  * Internal dependencies

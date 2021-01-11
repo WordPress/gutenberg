@@ -2,13 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { CompositeItem } from 'reakit';
 
 /**
  * WordPress dependencies
  */
 import { useMemo, useRef, memo } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, CompositeItem } from '@wordpress/components';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
