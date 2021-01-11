@@ -6,7 +6,7 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -15,22 +15,31 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { MENU_CONTENT_POSTS, MENU_ROOT } from '../constants';
 import ContentNavigationItem from '../content-navigation-item';
 import SearchResults from '../search-results';
+import useDebouncedSearch from '../use-debounced-search';
 
 export default function ContentPostsMenu() {
-	const [ search, setSearch ] = useState( '' );
-	const onSearch = useCallback( ( value ) => {
-		setSearch( value );
-	} );
+	const {
+		search,
+		searchQuery,
+		onSearch,
+		isDebouncing,
+	} = useDebouncedSearch();
 
-	const { posts, showOnFront } = useSelect( ( select ) => {
-		const { getEntityRecords, getEditedEntityRecord } = select( 'core' );
-		return {
-			posts: getEntityRecords( 'postType', 'post', {
-				per_page: -1,
-			} ),
-			showOnFront: getEditedEntityRecord( 'root', 'site' ).show_on_front,
-		};
-	}, [] );
+	const { posts, showOnFront } = useSelect(
+		( select ) => {
+			const { getEntityRecords, getEditedEntityRecord } = select(
+				'core'
+			);
+			return {
+				posts: getEntityRecords( 'postType', 'post', {
+					search: searchQuery,
+				} ),
+				showOnFront: getEditedEntityRecord( 'root', 'site' )
+					.show_on_front,
+			};
+		},
+		[ searchQuery ]
+	);
 
 	const { setPage } = useDispatch( 'core/edit-site' );
 
@@ -45,6 +54,10 @@ export default function ContentPostsMenu() {
 		} );
 	}, [ setPage ] );
 
+	const isLoading = ! search && posts === null;
+	const shouldShowLoadingForDebouncing = search && isDebouncing;
+	const showLoading = isLoading || shouldShowLoadingForDebouncing;
+
 	return (
 		<NavigationMenu
 			menu={ MENU_CONTENT_POSTS }
@@ -54,7 +67,9 @@ export default function ContentPostsMenu() {
 			onSearch={ onSearch }
 			search={ search }
 		>
-			{ search && <SearchResults items={ posts } search={ search } /> }
+			{ search && ! isDebouncing && (
+				<SearchResults items={ posts } search={ search } />
+			) }
 
 			{ ! search && (
 				<>
@@ -75,7 +90,7 @@ export default function ContentPostsMenu() {
 				</>
 			) }
 
-			{ ! search && posts === null && (
+			{ showLoading && (
 				<NavigationItem title={ __( 'Loading…' ) } isText />
 			) }
 		</NavigationMenu>
