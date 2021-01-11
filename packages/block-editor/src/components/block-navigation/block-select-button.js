@@ -72,7 +72,7 @@ function BlockNavigationBlockSelectButton(
 				draggable={ draggable }
 			>
 				<DescenderLines level={ level } />
-				<BlockIcon icon={ blockInformation.icon } showColors />
+				<BlockIcon icon={ blockInformation?.icon } showColors />
 				{ blockDisplayName }
 				{ isSelected && (
 					<VisuallyHidden>

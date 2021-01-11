@@ -20,6 +20,7 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
+	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
@@ -38,7 +39,6 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import serializeBlocks from './utils/serialize-blocks';
 import { cleanForSlug } from '../utils/url';
 
 /**
@@ -991,7 +991,7 @@ export const getEditedPostContent = createRegistrySelector(
 			if ( typeof record.content === 'function' ) {
 				return record.content( record );
 			} else if ( record.blocks ) {
-				return serializeBlocks( record.blocks );
+				return __unstableSerializeAndClean( record.blocks );
 			} else if ( record.content ) {
 				return record.content;
 			}

@@ -167,7 +167,13 @@ function BlockPopover( {
 		: 'top right left';
 	const stickyBoundaryElement = showEmptyBlockSideInserter
 		? undefined
-		: getScrollContainer( node ) || ownerDocument.body;
+		: // The sticky boundary element should be the boundary at which the
+		  // the block toolbar becomes sticky when the block scolls out of view.
+		  // In case of an iframe, this should be the iframe boundary, otherwise
+		  // the scroll container.
+		  ownerDocument.defaultView.frameElement ||
+		  getScrollContainer( node ) ||
+		  ownerDocument.body;
 
 	return (
 		<Popover

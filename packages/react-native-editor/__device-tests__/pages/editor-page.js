@@ -10,6 +10,7 @@ const {
 	typeString,
 	toggleHtmlMode,
 	swipeFromTo,
+	longPressMiddleOfElement,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -115,6 +116,13 @@ class EditorPage {
 		);
 	}
 
+	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
+		const emptyAreaBelowLastBlock = await this.driver.elementByAccessibilityId(
+			'Add paragraph block'
+		);
+		await emptyAreaBelowLastBlock.click();
+	}
+
 	async getTitleElement( options = { autoscroll: false } ) {
 		//TODO: Improve the identifier for this element
 		const elements = await this.driver.elementsByXPath(
@@ -192,7 +200,7 @@ class EditorPage {
 	// Block toolbar functions
 	// =========================
 
-	async addNewBlock( blockName ) {
+	async addNewBlock( blockName, relativePosition ) {
 		// Click add button
 		let identifier = 'Add block';
 		if ( isAndroid() ) {
@@ -201,7 +209,18 @@ class EditorPage {
 		const addButton = await this.driver.elementByAccessibilityId(
 			identifier
 		);
-		await addButton.click();
+
+		if ( relativePosition === 'before' ) {
+			await longPressMiddleOfElement( this.driver, addButton );
+
+			const addBlockBeforeButton = await this.driver.elementByAccessibilityId(
+				'Add Block Before'
+			);
+
+			await addBlockBeforeButton.click();
+		} else {
+			await addButton.click();
+		}
 
 		// Click on block of choice
 		const blockButton = await this.findBlockButton( blockName );

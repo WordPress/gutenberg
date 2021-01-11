@@ -8,7 +8,7 @@ A development environment is a catch-all term for what you need setup on your co
 2. WordPress Development Site
 3. Code Editor
 
-## Quickstart
+## Quick Start
 
 Here is a summary of the guide. See each section for additional details and explanations.
 
