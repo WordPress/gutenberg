@@ -6,7 +6,6 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -15,20 +14,27 @@ import { useSelect } from '@wordpress/data';
 import { MENU_CONTENT_CATEGORIES, MENU_ROOT } from '../constants';
 import ContentNavigationItem from '../content-navigation-item';
 import SearchResults from '../search-results';
+import useDebouncedSearch from '../use-debounced-search';
 
 export default function ContentCategoriesMenu() {
-	const [ search, setSearch ] = useState( '' );
-	const onSearch = useCallback( ( value ) => {
-		setSearch( value );
-	} );
+	const {
+		search,
+		searchQuery,
+		onSearch,
+		isDebouncing,
+	} = useDebouncedSearch();
 
 	const categories = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'taxonomy', 'category', {
-				per_page: -1,
+				search: searchQuery,
 			} ),
-		[]
+		[ searchQuery ]
 	);
+
+	const isLoading = ! search && categories === null;
+	const shouldShowLoadingForDebouncing = search && isDebouncing;
+	const showLoading = isLoading || shouldShowLoadingForDebouncing;
 
 	return (
 		<NavigationMenu
@@ -39,7 +45,7 @@ export default function ContentCategoriesMenu() {
 			onSearch={ onSearch }
 			search={ search }
 		>
-			{ search && (
+			{ search && ! isDebouncing && (
 				<SearchResults items={ categories } search={ search } />
 			) }
 
@@ -51,7 +57,7 @@ export default function ContentCategoriesMenu() {
 					/>
 				) ) }
 
-			{ ! search && categories === null && (
+			{ showLoading && (
 				<NavigationItem title={ __( 'Loading…' ) } isText />
 			) }
 		</NavigationMenu>
