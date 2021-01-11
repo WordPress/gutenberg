@@ -18,6 +18,14 @@
 		position: sticky;
 		top: 0;
 		z-index: z-index(".components-panel__header");
+
+		&.edit-post-sidebar__panel-tabs {
+			top: 48px;
+
+			@include break-medium() {
+				top: 0;
+			}
+		}
 	}
 
 	p {
