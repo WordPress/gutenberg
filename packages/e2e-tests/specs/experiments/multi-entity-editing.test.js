@@ -8,6 +8,7 @@ import {
 	publishPost,
 	trashAllPosts,
 	activateTheme,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -21,7 +22,7 @@ const visitSiteEditor = async () => {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
-	await page.waitForSelector( '.edit-site-visual-editor' );
+	await page.waitForSelector( '.edit-site-visual-editor iframe' );
 };
 
 const clickTemplateItem = async ( menus, itemName ) => {
@@ -144,15 +145,25 @@ describe( 'Multi-entity editor states', () => {
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await visitSiteEditor();
 		await clickTemplateItem( 'Template Parts', 'header' );
+		await page.waitForFunction( () =>
+			Array.from( window.frames ).find(
+				( { name } ) => name === 'editor-canvas'
+			)
+		);
 
 		// Wait for blocks to load.
-		await page.waitForSelector( '.wp-block' );
+		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
 		await clickTemplateItem( 'Templates', 'Front Page' );
-		await page.waitForSelector( '.wp-block' );
+		await page.waitForFunction( () =>
+			Array.from( window.frames ).find(
+				( { name } ) => name === 'editor-canvas'
+			)
+		);
+		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
@@ -186,7 +197,7 @@ describe( 'Multi-entity editor states', () => {
 			await visitSiteEditor();
 
 			// Wait for site editor to load.
-			await page.waitForSelector(
+			await canvas().waitForSelector(
 				'.wp-block-template-part .block-editor-block-list__layout'
 			);
 
@@ -237,7 +248,7 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the child when editing the child', async () => {
-			await page.click(
+			await canvas().click(
 				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Some more test words!' );
@@ -248,7 +259,7 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
-			await page.click(
+			await canvas().click(
 				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Nested test words!' );
