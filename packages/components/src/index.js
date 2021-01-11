@@ -41,6 +41,7 @@ export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
+export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
 export { default as Draggable } from './draggable';
 export {
 	default as DropZone,

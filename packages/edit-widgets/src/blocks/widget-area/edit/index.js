@@ -1,15 +1,14 @@
 /**
- * External dependencies
- */
-import { DisclosureContent } from 'reakit/Disclosure';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
-import { Panel, PanelBody } from '@wordpress/components';
+import {
+	__unstableDisclosureContent,
+	Panel,
+	PanelBody,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -67,7 +66,7 @@ export default function WidgetAreaEdit( {
 				{ ( { opened } ) => (
 					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
 					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
-					<DisclosureContent visible={ opened }>
+					<__unstableDisclosureContent visible={ opened }>
 						<EntityProvider
 							kind="root"
 							type="postType"
@@ -75,7 +74,7 @@ export default function WidgetAreaEdit( {
 						>
 							<WidgetAreaInnerBlocks />
 						</EntityProvider>
-					</DisclosureContent>
+					</__unstableDisclosureContent>
 				) }
 			</PanelBody>
 		</Panel>
