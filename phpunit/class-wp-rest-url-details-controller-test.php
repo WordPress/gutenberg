@@ -400,7 +400,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function test_allows_filtering_response( $expected, $expected_is_from_cache ) {
 
-
 		// If we're testing ability to filter response from cache then
 		// force the response to come from the cache code path.
 		if ( $expected_is_from_cache ) {
