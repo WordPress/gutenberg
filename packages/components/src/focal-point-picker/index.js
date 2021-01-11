@@ -52,6 +52,14 @@ export class FocalPointPicker extends Component {
 	componentDidMount() {
 		document.addEventListener( 'mouseup', this.handleOnMouseUp );
 		window.addEventListener( 'resize', this.updateBounds );
+
+		/*
+		 * Set initial bound values.
+		 *
+		 * This is necessary for Safari:
+		 * https://github.com/WordPress/gutenberg/issues/25814
+		 */
+		this.updateBounds();
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
@@ -59,7 +67,7 @@ export class FocalPointPicker extends Component {
 				isDragging: false,
 			} );
 		}
-		/**
+		/*
 		 * Handles cases where the incoming value changes.
 		 * An example is the values resetting based on an UNDO action.
 		 */
