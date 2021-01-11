@@ -181,6 +181,9 @@ export class FocalPointPicker extends Component {
 
 		if ( ! isDragging ) return;
 
+		// Prevents text-selection when dragging.
+		event.preventDefault();
+
 		const { shiftKey } = event;
 		const pickerDimensions = this.pickerDimensions();
 		const cursorPosition = {
