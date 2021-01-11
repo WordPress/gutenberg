@@ -18,7 +18,7 @@ describe( 'adding blocks', () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote content' );
 
-		await clickBlockToolbarButton( 'Transform' );
+		await clickBlockToolbarButton( 'Quote' );
 
 		const styleVariations = await page.$$(
 			'.block-editor-block-styles__item'
