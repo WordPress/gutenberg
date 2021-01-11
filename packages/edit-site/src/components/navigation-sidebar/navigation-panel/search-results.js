@@ -20,7 +20,7 @@ import ContentNavigationItem from './content-navigation-item';
 
 export default function SearchResults( { items, search } ) {
 	let itemType = null;
-	if ( items.length > 0 ) {
+	if ( items?.length > 0 ) {
 		if ( items[ 0 ].taxonomy ) {
 			itemType = 'taxonomy';
 		} else {
@@ -30,6 +30,10 @@ export default function SearchResults( { items, search } ) {
 
 	const itemInfos = useSelect(
 		( select ) => {
+			if ( itemType === null || items === null ) {
+				return [];
+			}
+
 			if ( itemType === 'wp_template' ) {
 				const {
 					__experimentalGetTemplateInfo: getTemplateInfo,
