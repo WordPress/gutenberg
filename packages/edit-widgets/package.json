@@ -47,7 +47,7 @@
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.20",
 		"reakit": "^1.3.4",
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"
