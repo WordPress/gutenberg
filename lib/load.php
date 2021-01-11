@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+require_once __DIR__ . '/upgrade.php';
+
 /**
  * Checks whether the Gutenberg experiment is enabled.
  *
