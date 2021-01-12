@@ -2,19 +2,30 @@
 	padding: 16px;
 }
 
+.backgroundSolid {
+	background-color: $gray-lighten-30;
+}
+
+.backgroundSolidDark {
+	background-color: $background-dark-secondary;
+}
+
 .media {
 	flex-direction: row;
 	justify-content: center;
 }
 
 .mediaContainer {
-	border: 1px solid $blue-medium;
 	position: relative;
 	max-height: 200px;
 }
 
 .mediaPlaceholder {
 	min-width: 100%;
+}
+
+.video {
+	border: 2px solid $blue-medium;
 }
 
 .focalPointGroup {
