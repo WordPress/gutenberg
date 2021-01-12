@@ -11,7 +11,12 @@ import { Icon, BottomSheet } from '@wordpress/components';
 import { blockSettingsScreens } from '@wordpress/block-editor';
 import { chevronRight } from '@wordpress/icons';
 
-function FocalPointSettings( {} ) {
+function FocalPointSettings( {
+	focalPoint,
+	minHeight,
+	onFocalPointChange,
+	url,
+} ) {
 	const navigation = useNavigation();
 	return (
 		<BottomSheet.Cell
@@ -19,10 +24,11 @@ function FocalPointSettings( {} ) {
 			leftAlign
 			label={ __( 'Edit focal point' ) }
 			onPress={ () => {
-				// TODO(David): Pass necessary route params to render and modify focal
-				// point
 				navigation.navigate( blockSettingsScreens.focalPoint, {
-					url: 'puppy.jpg',
+					focalPoint,
+					minHeight,
+					onFocalPointChange,
+					url,
 				} );
 			} }
 		>

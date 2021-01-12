@@ -9,7 +9,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useContext } from '@wordpress/element';
+import { useEffect, useContext, useState } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 import { Icon, check, close } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -21,7 +21,14 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from '../../color-picker/style.scss';
 
 const FocalPointSettingsMemo = React.memo(
-	( { onHandleClosingBottomSheet, shouldEnableBottomSheetMaxHeight } ) => {
+	( {
+		focalPoint,
+		minHeight,
+		onFocalPointChange,
+		onHandleClosingBottomSheet,
+		shouldEnableBottomSheetMaxHeight,
+		url,
+	} ) => {
 		useEffect( () => {
 			shouldEnableBottomSheetMaxHeight( true );
 			onHandleClosingBottomSheet( null );
@@ -47,24 +54,19 @@ const FocalPointSettingsMemo = React.memo(
 			navigation.goBack();
 			onHandleClosingBottomSheet( null );
 			shouldEnableBottomSheetMaxHeight( true );
-			// TODO(David): Persist focal point changes
 			if ( action === 'apply' ) {
-				console.log( '> APPLY: Focal Point' );
-			} else {
-				console.log( '> CANCEL: Focal Point' );
+				onFocalPointChange( draftFocalPoint );
 			}
 		}
+		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
 
 		return (
 			<>
 				<FocalPointPicker
-				// url={ url }
-				// value={ focalPoint }
-				// onChange={ ( newFocalPoint ) =>
-				// 	setAttributes( {
-				// 		focalPoint: newFocalPoint,
-				// 	} )
-				// }
+					focalPoint={ draftFocalPoint }
+					minHeight={ minHeight }
+					onChange={ setDraftFocalPoint }
+					url={ url }
 				/>
 				<View style={ footerStyle }>
 					<TouchableWithoutFeedback
