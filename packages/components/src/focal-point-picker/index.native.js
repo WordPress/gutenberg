@@ -12,7 +12,7 @@ import {
 	setFocalPointPickerTooltipShown,
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
-import { Image, RangeControl } from '@wordpress/components';
+import { Image, UnitControl } from '@wordpress/components';
 import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -26,6 +26,7 @@ import { isVideoType } from './utils';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
+const FOCAL_POINT_UNITS = [ { default: '50', label: '%', value: '%' } ];
 
 function FocalPointPicker( props ) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
@@ -221,22 +222,24 @@ function FocalPointPicker( props ) {
 						) }
 					</View>
 				</View>
-				<RangeControl
-					inputSuffix="%"
+				<UnitControl
 					key={ `xAxis-${ sliderKey }` }
 					label={ __( 'X-Axis Position' ) }
 					max={ MAX_POSITION_VALUE }
 					min={ MIN_POSITION_VALUE }
 					onChange={ ( x ) => setPosition( { x: x / 100 } ) }
+					unit="%"
+					units={ FOCAL_POINT_UNITS }
 					value={ Math.round( focalPoint.x * 100 ) }
 				/>
-				<RangeControl
-					inputSuffix="%"
+				<UnitControl
 					key={ `yAxis-${ sliderKey }` }
 					label={ __( 'Y-Axis Position' ) }
 					max={ MAX_POSITION_VALUE }
 					min={ MIN_POSITION_VALUE }
 					onChange={ ( y ) => setPosition( { y: y / 100 } ) }
+					unit="%"
+					units={ FOCAL_POINT_UNITS }
 					value={ Math.round( focalPoint.y * 100 ) }
 				/>
 			</Tooltip>
