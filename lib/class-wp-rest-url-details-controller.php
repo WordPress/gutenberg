@@ -90,7 +90,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 */
 	public function parse_url_details( $request ) {
 
-		$url = untrailingslashit( $request->get_param( 'url' ) );
+		$url = untrailingslashit( $request['url'] );
 
 		if ( empty( $url ) ) {
 			return new WP_Error( 'rest_invalid_url', __( 'Invalid URL', 'gutenberg' ), array( 'status' => 404 ) );
@@ -104,7 +104,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		if ( ! empty( $cached_response ) ) {
 			$from_cache = true;
-			$response = rest_ensure_response( json_decode( $cached_response, true ) );
+			$response   = rest_ensure_response( json_decode( $cached_response, true ) );
 
 			/**
 			 * Filters the URL data for the response.
