@@ -19,7 +19,11 @@ function FocalPointSettings( {} ) {
 			leftAlign
 			label={ __( 'Edit focal point' ) }
 			onPress={ () => {
-				navigation.navigate( blockSettingsScreens.focalPoint, {} );
+				// TODO(David): Pass necessary route params to render and modify focal
+				// point
+				navigation.navigate( blockSettingsScreens.focalPoint, {
+					url: 'puppy.jpg',
+				} );
 			} }
 		>
 			<Icon icon={ chevronRight } />
