@@ -136,6 +136,31 @@ function modify_admin_bar( $wp_admin_bar ) {
 }
 add_action( 'admin_bar_menu', 'modify_admin_bar', 40 );
 
+
+remove_action( 'welcome_panel', 'wp_welcome_panel' );
+/**
+ * Modify Dashboard welcome panel.
+ *
+ * When widgets are merged in core this should go into `wp-admin/includes/dashboard.php`
+ * and replace the widgets link in the `wp_welcome_panel` checking for the same condition,
+ * because then `gutenberg_use_widgets_block_editor` will exist in core.
+ */
+function modify_welcome_panel() {
+	ob_start();
+	wp_welcome_panel();
+	$welcome_panel = ob_get_clean();
+	if ( gutenberg_use_widgets_block_editor() ) {
+		echo str_replace(
+			admin_url( 'widgets.php' ),
+			admin_url( 'themes.php?page=gutenberg-widgets' ),
+			$welcome_panel
+		);
+	} else {
+		echo $welcome_panel;
+	}
+}
+add_action( 'welcome_panel', 'modify_welcome_panel', 40 );
+
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
  *
