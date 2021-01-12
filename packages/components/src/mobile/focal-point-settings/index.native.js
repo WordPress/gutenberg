@@ -17,8 +17,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-// TODO(David): Duplicate styles or identify abstraction
-import styles from '../../color-picker/style.scss';
+import styles from './styles.scss';
 
 const FocalPointSettingsMemo = React.memo(
 	( {
