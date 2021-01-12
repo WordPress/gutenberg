@@ -11,6 +11,10 @@ $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 	z-index: 1;
 }
 
+.tooltipLeftAlign {
+	left: 0;
+}
+
 .tooltipShadow {
 	color: $black;
 }
@@ -31,4 +35,8 @@ $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 	position: absolute;
 	top: 100%;
 	width: 0;
+}
+
+.arrowLeftAlign {
+	left: 16px;
 }
