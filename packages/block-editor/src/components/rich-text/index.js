@@ -307,7 +307,7 @@ function RichTextWrapper(
 							value: before,
 							multilineTag,
 						} ),
-						// Set true to not recreate the original paragraph
+						// Set true to not recreate the original block
 						true
 					)
 				);

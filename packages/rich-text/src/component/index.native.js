@@ -47,6 +47,7 @@ import { remove } from '../remove';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 import { store as richTextStore } from '../store';
+import { InteractionManager } from 'react-native';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -730,8 +731,8 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() ) {
-			this._editor.blur();
+		if ( this._editor?.isFocused() ) {
+			this._editor?.blur();
 		}
 	}
 
@@ -753,7 +754,9 @@ export class RichText extends Component {
 				this.props.selectionEnd || 0
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
-			this._editor.blur();
+			InteractionManager.runAfterInteractions( () => {
+				this._editor.blur();
+			} );
 		}
 	}
 
