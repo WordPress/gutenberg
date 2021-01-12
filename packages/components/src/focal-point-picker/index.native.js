@@ -55,12 +55,14 @@ function FocalPointPicker( props ) {
 	const pan = useRef( new Animated.ValueXY() ).current;
 
 	// Set initial cursor poition
-	if ( containerSize ) {
-		pan.setValue( {
-			x: focalPoint.x * containerSize.width,
-			y: focalPoint.y * containerSize.height,
-		} );
-	}
+	useEffect( () => {
+		if ( containerSize ) {
+			pan.setValue( {
+				x: focalPoint.x * containerSize.width,
+				y: focalPoint.y * containerSize.height,
+			} );
+		}
+	}, [ focalPoint, containerSize ] );
 
 	const panResponder = useMemo(
 		() =>
@@ -73,8 +75,8 @@ function FocalPointPicker( props ) {
 				onPanResponderGrant: ( event ) => {
 					shouldEnableBottomSheetScroll( false );
 					const { locationX: x, locationY: y } = event.nativeEvent;
-					pan.setValue( { x, y } ); // Set cursor to tap origin
-					pan.setOffset( { x: pan.x._value, y: pan.y._value } );
+					pan.setValue( { x, y } ); // Set cursor to tap location
+					pan.extractOffset(); // Set offset to current value
 				},
 				// Move cursor to match delta drag
 				onPanResponderMove: Animated.event( [
@@ -83,7 +85,7 @@ function FocalPointPicker( props ) {
 				] ),
 				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
-					pan.flattenOffset();
+					pan.flattenOffset(); // Flatten offset into value
 					const { locationX: x, locationY: y } = event.nativeEvent;
 					setPosition( {
 						x: x / containerSize?.width,
