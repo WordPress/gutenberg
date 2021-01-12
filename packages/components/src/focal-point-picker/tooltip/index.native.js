@@ -29,7 +29,9 @@ function Tooltip( { children, onPress, style, visible } ) {
 			 * becomes the controlling responder. https://bit.ly/2J3ugKF
 			 */
 			onStartShouldSetPanResponderCapture: () => {
-				onPress();
+				if ( onPress ) {
+					onPress();
+				}
 				return false;
 			},
 		} )
