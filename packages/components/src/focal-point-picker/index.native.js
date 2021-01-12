@@ -25,6 +25,7 @@ export default function FocalPointPicker( props ) {
 
 	const [ containerSize, setContainerSize ] = useState( null );
 	const [ sliderKey, setSliderKey ] = useState( 0 );
+	const [ tooltipVisible, setTooltipVisible ] = useState( true );
 
 	const pan = useRef( new Animated.ValueXY() ).current;
 
@@ -57,6 +58,7 @@ export default function FocalPointPicker( props ) {
 				] ),
 				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
+					setTooltipVisible( false );
 					pan.flattenOffset();
 					const { locationX: x, locationY: y } = event.nativeEvent;
 					setPosition( {
@@ -136,7 +138,7 @@ export default function FocalPointPicker( props ) {
 							},
 						] }
 					>
-						{ true && <Tooltip onHide={ () => {} } /> }
+						<Tooltip visible={ tooltipVisible } />
 						<View style={ styles.focalPointConstraint }>
 							<FocalPoint />
 						</View>
