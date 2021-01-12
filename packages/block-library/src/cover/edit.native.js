@@ -316,6 +316,13 @@ const Cover = ( {
 		} );
 	};
 
+	function focalPointPosition( { x, y } = IMAGE_DEFAULT_FOCAL_POINT ) {
+		return {
+			left: `${ ( hasParallax ? 0.5 : x ) * 100 }%`,
+			top: `${ ( hasParallax ? 0.5 : y ) * 100 }%`,
+		};
+	}
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -384,18 +391,7 @@ const Cover = ( {
 									testMe={ true }
 									style={ [
 										styles.focalPointHint,
-										{
-											left: `${
-												( hasParallax
-													? 0.5
-													: focalPoint.x ) * 100
-											}%`,
-											top: `${
-												( hasParallax
-													? 0.5
-													: focalPoint.y ) * 100
-											}%`,
-										},
+										focalPointPosition( focalPoint ),
 									] }
 								/>
 							</View>
