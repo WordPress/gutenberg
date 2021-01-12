@@ -37,8 +37,7 @@ export default function FocalPointPicker( { focalPoint, onChange, url } ) {
 				<View
 					style={ [
 						styles.focalPointWrapper,
-						// TODO(David): Update coordinates with state
-						{ top: '50%', left: '50%' },
+						{ top: `${ y * 100 }%`, left: `${ x * 100 }%` },
 					] }
 				>
 					<SVG
