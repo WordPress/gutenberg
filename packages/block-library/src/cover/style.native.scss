@@ -140,6 +140,16 @@
 	width: 100%;
 }
 
+.focalPointHint {
+	fill: $white;
+	left: 50%;
+	margin: -25px 0 0 -25px;
+	opacity: 0.66;
+	position: absolute;
+	top: 50%;
+	width: 50px;
+}
+
 .colorPaletteWrapper {
 	min-height: 50px;
 }
