@@ -1,10 +1,6 @@
-# Project Overview
+# Getting started
 
-The Gutenberg project is transforming the way content is created on WordPress. A block editor was the first product launched creating a new methodology for working with content.
-
-The Block Editor handbook provides documentation for designers and developers on how to extend the editor, and also how you can start contributing to the project. For authors, writers, and users of the block editor see the [block editor support documentation](https://wordpress.org/support/article/wordpress-editor/).
-
-![Gutenberg Demo](https://cldup.com/kZXGDcGPMU.gif)
+"Gutenberg" is the codename for the new WordPress editor, also known as the block editor. The Gutenberg project is transforming the way content is created on WordPress.
 
 Using a system of Blocks to compose and format content, the new block-based editor is designed to create rich, flexible layouts for websites and digital products. Content is created in the unit of blocks instead of freeform text with inserted media, embeds and Shortcodes (there's a Shortcode block though).
 
@@ -12,12 +8,21 @@ Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, whe
 
 The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.
 
-## Quick Links
+<!-- Here, we could add the different visuals representing the areas of the editor (see https://github.com/WordPress/gutenberg/issues/27400#issue-754467949). -->
 
--   Beginners: The [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md) walks through creating a block plugin using the `@wordpress/create-block` package; a quick and easy way to start creating your own block.
+## Quick links
+- [Create a block tutorial](#create-a-block-tutorial) 
+- Develop for the block editor 
+- [Contribute to the block editor](contribute-to-the-block-editor)
 
--   [Gutenberg Architecture](/docs/architecture/readme.md) covers the conceptual and tool choices going into the Gutenberg project, from repository structure to packages and tools.
+### [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md)
+Learn how to create your first block for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
 
--   [Block API Reference](/docs/designers-developers/developers/block-api/README.md)
+### Develop for the block editor
+Whether you want to extend the functionality of the block editor, or create a plugin based on it, you will find here all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
--   [Contributors Guide](/docs/contributors/readme.md) covers how **you** can help; be it code, design, documentation, language, or triage, we need you to help make Gutenberg.
+<!-- Here we will have chapters on the API, component references, etc ...
+Also, we can have as bullet points links pointing to these chapters. -->
+
+### [Contribute to the block editor](/docs/contributors/readme.md)
+Everything you need to know to start contributing to the block editor. Whether you are interested in the design, code, documentation, support or internationalization of the block editor, you will find here guides to help you.
