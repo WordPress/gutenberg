@@ -3,15 +3,14 @@
 }
 
 .media {
-	position: relative;
+	flex-direction: row;
+	justify-content: center;
 }
 
 .imageContainer {
 	border: 1px solid $blue-medium;
-}
-
-.image {
-	width: 100%;
+	position: relative;
+	max-height: 200px;
 }
 
 .focalPointWrapper {
