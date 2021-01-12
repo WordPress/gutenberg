@@ -150,6 +150,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
+            }
+
+            @Override
+            public void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback) {
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:

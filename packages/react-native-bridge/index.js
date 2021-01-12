@@ -346,4 +346,16 @@ export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
 	);
 }
 
+export function requestFocalPointPickerTooltipShown( callback ) {
+	return RNReactNativeGutenbergBridge.requestFocalPointPickerTooltipShown(
+		callback
+	);
+}
+
+export function setFocalPointPickerTooltipShown( tooltipShown ) {
+	return RNReactNativeGutenbergBridge.setFocalPointPickerTooltipShown(
+		tooltipShown
+	);
+}
+
 export default RNReactNativeGutenbergBridge;
