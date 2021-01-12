@@ -111,6 +111,7 @@ export default function FocalPointPicker( props ) {
 					</PanGestureHandler>
 				</TapGestureHandler>
 				<Animated.View
+					pointerEvents="none"
 					style={ [
 						styles.focalPointWrapper,
 						{
