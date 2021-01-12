@@ -349,9 +349,9 @@ const Cover = ( {
 						</View>
 					</BottomSheet.Cell>
 					<BottomSheet.Cell
+						customActionButton
 						leftAlign
 						label={ __( 'Edit focal point' ) }
-						value="" /* TODO(David): Why is a value required display chevron icon? */
 					>
 						<Icon icon={ chevronRight } />
 					</BottomSheet.Cell>
