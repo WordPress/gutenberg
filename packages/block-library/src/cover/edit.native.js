@@ -350,35 +350,20 @@ const Cover = ( {
 				{ url ? (
 					<>
 						<BottomSheet.Cell
-							leftAlign
-							cellContainerStyle={ { minHeight } }
+							style={ [ styles.mediaPreview, backgroundColor ] }
 						>
-							<View
-								style={ [ styles.background, backgroundColor ] }
-							>
-								<View style={ styles.imageContainer }>
-									<Image
-										editButton={ true }
-										focalPoint={
-											focalPoint ||
-											IMAGE_DEFAULT_FOCAL_POINT
-										}
-										isSelected={ true }
-										isUploadFailed={ didUploadFail }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										onSelectMediaUploadOption={
-											onSelectMedia
-										}
-										openMediaOptions={
-											openMediaOptionsRef.current
-										}
-										url={ url }
-										width={ styles.image.width }
-									/>
-								</View>
-							</View>
+							<Image
+								editButton={ true }
+								isSelected={ true }
+								isUploadFailed={ didUploadFail }
+								isUploadInProgress={ isUploadInProgress }
+								onSelectMediaUploadOption={ onSelectMedia }
+								openMediaOptions={ openMediaOptionsRef.current }
+								resizeMode="contain"
+								url={ url }
+								height="100%"
+								width={ styles.image.width }
+							/>
 							<Icon
 								icon={ plus }
 								size={ styles.focalPointHint.width }

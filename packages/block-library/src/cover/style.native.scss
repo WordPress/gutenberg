@@ -148,6 +148,10 @@
 	width: 100%;
 }
 
+.mediaPreview {
+	max-height: 300px;
+}
+
 .focalPointHint {
 	fill: $white;
 	left: 50%;
