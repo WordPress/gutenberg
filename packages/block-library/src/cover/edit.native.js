@@ -223,6 +223,10 @@ const Cover = ( {
 		} );
 	}
 
+	function setFocalPoint( focalPoint ) {
+		setAttributes( { focalPoint } );
+	}
+
 	function openColorPicker() {
 		selectBlock();
 		setCustomColorPickerShowing( true );
@@ -365,8 +369,10 @@ const Cover = ( {
 						</View>
 					</BottomSheet.Cell>
 					<FocalPointSettings
-						attributes={ attributes }
-						setAttributes={ setAttributes }
+						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
+						minHeight={ minHeight }
+						onFocalPointChange={ setFocalPoint }
+						url={ url }
 					/>
 					<BottomSheet.Cell
 						leftAlign
