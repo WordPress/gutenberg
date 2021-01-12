@@ -9,7 +9,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useContext, useState } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 
 /**
@@ -22,21 +22,13 @@ const FocalPointSettingsMemo = React.memo(
 	( {
 		focalPoint,
 		onFocalPointChange,
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetMaxHeight,
 		shouldEnableBottomSheetScroll,
 		url,
 	} ) => {
-		useEffect( () => {
-			shouldEnableBottomSheetMaxHeight( false );
-			onHandleClosingBottomSheet( null );
-		}, [] );
 		const navigation = useNavigation();
 
 		function onButtonPress( action ) {
 			navigation.goBack();
-			onHandleClosingBottomSheet( null );
-			shouldEnableBottomSheetMaxHeight( true );
 			if ( action === 'apply' ) {
 				onFocalPointChange( draftFocalPoint );
 			}
@@ -66,19 +58,11 @@ const FocalPointSettingsMemo = React.memo(
 
 function FocalPointSettings( props ) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		shouldEnableBottomSheetScroll,
-		shouldEnableBottomSheetMaxHeight,
-	} = useContext( BottomSheetContext );
+	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
 
 	return (
 		<FocalPointSettingsMemo
-			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
 			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
-			shouldEnableBottomSheetMaxHeight={
-				shouldEnableBottomSheetMaxHeight
-			}
 			{ ...props }
 			{ ...route.params }
 		/>
