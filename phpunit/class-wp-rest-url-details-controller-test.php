@@ -395,43 +395,18 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 
 
-	/**
-	 * @dataProvider provide_response_is_from_cache
-	 */
-	public function test_allows_filtering_response( $expected, $expected_is_from_cache ) {
 
-		// If we're testing ability to filter response from cache then
-		// force the response to come from the cache code path.
-		if ( $expected_is_from_cache ) {
-			$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
-
-			remove_filter(
-				"pre_transient_$transient_name",
-				'__return_null'
-			);
-
-			// Force cache to return a known value.
-			add_filter(
-				"pre_transient_$transient_name",
-				function() {
-					return wp_json_encode(
-						array(
-							'title' => 'This value from cache',
-						)
-					);
-				}
-			);
-		}
+	public function test_allows_filtering_response() {
 
 		// Filter the response to known set of values changing only
 		// based on whether the response came from the cache or not.
 		add_filter(
 			'rest_url_details_prepare_response',
-			function( $response, $url, $from_cache ) {
+			function( $response, $url ) {
 				return new WP_REST_Response(
 					array(
 						'status'        => 418,
-						'response'      => ( $from_cache ? 'Cached' : 'Uncached' ) . " response for URL $url altered via rest_url_details_prepare_response filter",
+						'response'      => "Response for URL $url altered via rest_url_details_prepare_response filter",
 						'body_response' => array(),
 					)
 				);
@@ -458,16 +433,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 
 		$this->assertEquals(
-			( $expected_is_from_cache ? 'Cached' : 'Uncached' ) . ' response for URL https://placeholder-site.com altered via rest_url_details_prepare_response filter',
+			'Response for URL https://placeholder-site.com altered via rest_url_details_prepare_response filter',
 			$data['response']
 		);
 
 		remove_all_filters(
 			'rest_url_details_prepare_response'
-		);
-
-		remove_all_filters(
-			"pre_transient_$transient_name"
 		);
 	}
 
