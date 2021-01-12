@@ -51,7 +51,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
-import { chevronRight, cover as icon, replace, image, warning } from '@wordpress/icons';
+import { chevronRight, cover as icon, replace, image } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -66,6 +66,7 @@ import {
 	CSS_UNITS,
 } from './shared';
 import OverlayColorSettings from './overlay-color-settings';
+import FocalPointSettings from './focal-point-settings';
 
 /**
  * Constants
@@ -363,13 +364,10 @@ const Cover = ( {
 							</View>
 						</View>
 					</BottomSheet.Cell>
-					<BottomSheet.Cell
-						customActionButton
-						leftAlign
-						label={ __( 'Edit focal point' ) }
-					>
-						<Icon icon={ chevronRight } />
-					</BottomSheet.Cell>
+					<FocalPointSettings
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+					/>
 					<BottomSheet.Cell
 						leftAlign
 						label={ __( 'Clear Media' ) }
