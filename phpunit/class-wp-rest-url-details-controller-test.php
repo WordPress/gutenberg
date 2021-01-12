@@ -401,12 +401,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// Filter the response to known set of values changing only
 		// based on whether the response came from the cache or not.
 		add_filter(
-			'rest_url_details_prepare_response',
+			'rest_prepare_url_details',
 			function( $response, $url ) {
 				return new WP_REST_Response(
 					array(
 						'status'        => 418,
-						'response'      => "Response for URL $url altered via rest_url_details_prepare_response filter",
+						'response'      => "Response for URL $url altered via rest_prepare_url_details filter",
 						'body_response' => array(),
 					)
 				);
@@ -433,12 +433,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 
 		$this->assertEquals(
-			'Response for URL https://placeholder-site.com altered via rest_url_details_prepare_response filter',
+			'Response for URL https://placeholder-site.com altered via rest_prepare_url_details filter',
 			$data['response']
 		);
 
 		remove_all_filters(
-			'rest_url_details_prepare_response'
+			'rest_prepare_url_details'
 		);
 	}
 

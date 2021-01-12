@@ -112,7 +112,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			 * @param string           $url      The requested URL.
 			 * @param WP_REST_Request  $request  Request object.
 			 */
-			return apply_filters( 'rest_url_details_prepare_response', $response, $url, $request );
+			return apply_filters( 'rest_prepare_url_details', $response, $url, $request );
 		}
 
 		$response_body = $this->get_remote_url( $url );
@@ -157,7 +157,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 * @param string           $url      The requested URL.
 		 * @param WP_REST_Request  $request  Request object.
 		 */
-		return apply_filters( 'rest_url_details_prepare_response', $response, $url, $request );
+		return apply_filters( 'rest_prepare_url_details', $response, $url, $request );
 	}
 
 	/**
