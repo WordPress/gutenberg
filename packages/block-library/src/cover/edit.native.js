@@ -222,6 +222,8 @@ const Cover = ( {
 		} );
 	}
 
+	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
+
 	function setFocalPoint( value ) {
 		setAttributes( { focalPoint: value } );
 	}
@@ -229,7 +231,9 @@ const Cover = ( {
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
-			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+			...( ! hasParallax
+				? { focalPoint: undefined }
+				: { focalPoint: IMAGE_DEFAULT_FOCAL_POINT } ),
 		} );
 	};
 
@@ -350,25 +354,51 @@ const Cover = ( {
 				{ url ? (
 					<>
 						<BottomSheet.Cell
-							style={ [ styles.mediaPreview, backgroundColor ] }
+							style={ backgroundColor }
+							cellContainerStyle={ styles.mediaPreview }
 						>
-							<Image
-								editButton={ true }
-								isSelected={ true }
-								isUploadFailed={ didUploadFail }
-								isUploadInProgress={ isUploadInProgress }
-								onSelectMediaUploadOption={ onSelectMedia }
-								openMediaOptions={ openMediaOptionsRef.current }
-								resizeMode="contain"
-								url={ url }
-								height="100%"
-								width={ styles.image.width }
-							/>
-							<Icon
-								icon={ plus }
-								size={ styles.focalPointHint.width }
-								style={ styles.focalPointHint }
-							/>
+							<View style={ styles.mediaInner }>
+								<Image
+									editButton={ true }
+									isSelected={ true }
+									isUploadFailed={ didUploadFail }
+									isUploadInProgress={ isUploadInProgress }
+									onImageDataLoad={ () => {
+										setDisplayPlaceholder( false );
+									} }
+									onSelectMediaUploadOption={ onSelectMedia }
+									openMediaOptions={
+										openMediaOptionsRef.current
+									}
+									url={ url }
+									height="100%"
+									style={ [
+										displayPlaceholder &&
+											styles.imagePlaceholder,
+									] }
+									width={ styles.image.width }
+								/>
+								<Icon
+									icon={ plus }
+									size={ styles.focalPointHint.width }
+									testMe={ true }
+									style={ [
+										styles.focalPointHint,
+										{
+											left: `${
+												( hasParallax
+													? 0.5
+													: focalPoint.x ) * 100
+											}%`,
+											top: `${
+												( hasParallax
+													? 0.5
+													: focalPoint.y ) * 100
+											}%`,
+										},
+									] }
+								/>
+							</View>
 						</BottomSheet.Cell>
 						<FocalPointSettings
 							focalPoint={

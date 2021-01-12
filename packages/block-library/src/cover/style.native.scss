@@ -149,7 +149,17 @@
 }
 
 .mediaPreview {
+	flex-direction: row;
+	justify-content: center;
+}
+
+.mediaInner {
 	max-height: 150px;
+	position: relative;
+}
+
+.imagePlaceholder {
+	min-width: 100%;
 }
 
 .focalPointHint {
