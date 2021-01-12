@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Animated, PanResponder, View } from 'react-native';
+import Video from 'react-native-video';
 
 /**
  * WordPress dependencies
@@ -9,6 +10,7 @@ import { Animated, PanResponder, View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
 import { useRef, useState, useMemo } from '@wordpress/element';
+import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -21,12 +23,19 @@ const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
 
 export default function FocalPointPicker( props ) {
-	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
+	const {
+		focalPoint,
+		mediaType,
+		onChange,
+		shouldEnableBottomSheetScroll,
+		url,
+	} = props;
 
 	const [ containerSize, setContainerSize ] = useState( null );
 	const [ sliderKey, setSliderKey ] = useState( 0 );
 	const [ tooltipVisible, setTooltipVisible ] = useState( true );
 	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
+	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 
 	const pan = useRef( new Animated.ValueXY() ).current;
 
@@ -102,16 +111,42 @@ export default function FocalPointPicker( props ) {
 					} }
 					style={ styles.imageContainer }
 				>
-					<Image
-						height="100%"
-						url={ url }
-						style={ [
-							displayPlaceholder && styles.imagePlaceholder,
-						] }
-						onImageDataLoad={ () => {
-							setDisplayPlaceholder( false );
-						} }
-					/>
+					{ MEDIA_TYPE_IMAGE === mediaType && (
+						<Image
+							height="100%"
+							url={ url }
+							style={ [
+								displayPlaceholder && styles.imagePlaceholder,
+							] }
+							onImageDataLoad={ () => {
+								setDisplayPlaceholder( false );
+							} }
+						/>
+					) }
+					{ MEDIA_TYPE_VIDEO === mediaType && (
+						<Video
+							muted
+							paused
+							disableFocus
+							onLoad={ ( event ) => {
+								const { height, width } = event.naturalSize;
+								setVideoNaturalSize( { height, width } );
+								setDisplayPlaceholder( false );
+							} }
+							resizeMode={ 'contain' }
+							source={ { uri: url } }
+							style={ [
+								{
+									aspectRatio:
+										videoNaturalSize &&
+										videoNaturalSize.width /
+											videoNaturalSize.height,
+									height: '100%',
+								},
+								displayPlaceholder && styles.imagePlaceholder,
+							] }
+						/>
+					) }
 					<Animated.View
 						pointerEvents="none"
 						style={ [
