@@ -22,6 +22,7 @@ import styles from './styles.scss';
 const FocalPointSettingsMemo = React.memo(
 	( {
 		focalPoint,
+		mediaType,
 		onFocalPointChange,
 		onHandleClosingBottomSheet,
 		shouldEnableBottomSheetMaxHeight,
@@ -63,6 +64,7 @@ const FocalPointSettingsMemo = React.memo(
 			<>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
+					mediaType={ mediaType }
 					onChange={ setDraftFocalPoint }
 					shouldEnableBottomSheetScroll={
 						shouldEnableBottomSheetScroll

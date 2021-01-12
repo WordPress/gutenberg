@@ -470,6 +470,7 @@ const Cover = ( {
 							focalPoint={
 								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
 							}
+							mediaType={ backgroundType }
 							onFocalPointChange={ setFocalPoint }
 							url={ url }
 						/>
