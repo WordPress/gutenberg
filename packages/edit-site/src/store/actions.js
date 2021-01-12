@@ -5,11 +5,6 @@ import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 
 /**
- * Internal dependencies
- */
-import { findTemplate } from './controls';
-
-/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
@@ -129,13 +124,17 @@ export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
 		page.path = `?p=${ page.context.postId }`;
 	}
-	const templateId = yield findTemplate( page.path );
+	const template = yield controls.resolveSelect(
+		'core',
+		'__experimentalGetTemplateForLink',
+		page.path
+	);
 	yield {
 		type: 'SET_PAGE',
 		page,
-		templateId,
+		templateId: template.id,
 	};
-	return templateId;
+	return template.id;
 }
 
 /**
@@ -152,8 +151,13 @@ export function* showHomepage() {
 		'site'
 	);
 
+	const { siteUrl } = yield controls.select(
+		'core/edit-site',
+		'getSettings'
+	);
+
 	const page = {
-		path: '/',
+		path: siteUrl,
 		context:
 			showOnFront === 'page'
 				? {

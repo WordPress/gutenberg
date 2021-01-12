@@ -72,6 +72,85 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Processes a tree from i18n-theme.json into a linear array
+	 * containing the a translatable path from theme.json and an array
+	 * of properties that are translatable.
+	 *
+	 * @param array $file_structure_partial A part of a theme.json i18n tree.
+	 * @param array $current_path           An array with a path on the theme.json i18n tree.
+	 *
+	 * @return array An array of arrays each one containing a translatable path and an array of properties that are translatable.
+	 */
+	private static function theme_json_i18_file_structure_to_preset_paths( $file_structure_partial, $current_path = array() ) {
+		$result = array();
+		foreach ( $file_structure_partial as $property => $partial_child ) {
+			if ( is_numeric( $property ) ) {
+				return array(
+					array(
+						'path'              => $current_path,
+						'translatable_keys' => $file_structure_partial,
+					),
+				);
+			}
+			$result = array_merge(
+				$result,
+				self::theme_json_i18_file_structure_to_preset_paths( $partial_child, array_merge( $current_path, array( $property ) ) )
+			);
+		}
+		return $result;
+	}
+
+	/**
+	 * Returns a data structure used in theme.json translation.
+	 *
+	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
+	 */
+	private static function get_presets_to_translate() {
+		static $theme_json_i18n = null;
+		if ( null === $theme_json_i18n ) {
+			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
+			$theme_json_i18n = self::theme_json_i18_file_structure_to_preset_paths( $file_structure );
+
+		}
+		return $theme_json_i18n;
+	}
+
+	/**
+	 * Translates a theme.json structure.
+	 *
+	 * @param array  $theme_json_structure A theme.json structure that is going to be translatable.
+	 * @param string $domain               Optional. Text domain. Unique identifier for retrieving translated strings.
+	 *                                     Default 'default'.
+	 */
+	private static function translate_presets( &$theme_json_structure, $domain = 'default' ) {
+		$preset_to_translate = self::get_presets_to_translate();
+		foreach ( $theme_json_structure as &$context_value ) {
+			if ( empty( $context_value ) ) {
+				continue;
+			}
+			foreach ( $preset_to_translate as $preset ) {
+				$path               = $preset['path'];
+				$translatable_keys  = $preset['translatable_keys'];
+				$array_to_translate = gutenberg_experimental_get( $context_value, $path, null );
+				if ( null === $array_to_translate ) {
+					continue;
+				}
+				foreach ( $array_to_translate as &$item_to_translate ) {
+					foreach ( $translatable_keys as $translatable_key ) {
+						if ( empty( $item_to_translate[ $translatable_key ] ) ) {
+							continue;
+						}
+						// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
+						$item_to_translate[ $translatable_key ] = translate( $item_to_translate[ $translatable_key ], $domain );
+						// phpcs:enable
+					}
+				}
+				gutenberg_experimental_set( $context_value, $path, $array_to_translate );
+			}
+		}
+	}
+
+	/**
 	 * Return core's origin config.
 	 *
 	 * @return WP_Theme_JSON Entity that holds core data.
@@ -82,6 +161,7 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$config = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
+		self::translate_presets( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
 		$default_colors_i18n = array(
@@ -136,37 +216,6 @@ class WP_Theme_JSON_Resolver {
 				$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 			}
 		}
-
-		$default_font_styles_i18n = array(
-			'normal'  => __( 'Regular', 'gutenberg' ),
-			'italic'  => __( 'Italic', 'gutenberg' ),
-			'initial' => __( 'Initial', 'gutenberg' ),
-			'inherit' => __( 'Inherit', 'gutenberg' ),
-		);
-		if ( ! empty( $config['global']['settings']['typography']['fontStyles'] ) ) {
-			foreach ( $config['global']['settings']['typography']['fontStyles'] as &$font_style ) {
-				$font_style['name'] = $default_font_styles_i18n[ $font_style['slug'] ];
-			}
-		}
-
-		$default_font_weights_i18n = array(
-			'100'     => __( 'Ultralight', 'gutenberg' ),
-			'200'     => __( 'Thin', 'gutenberg' ),
-			'300'     => __( 'Light', 'gutenberg' ),
-			'400'     => __( 'Regular', 'gutenberg' ),
-			'500'     => __( 'Medium', 'gutenberg' ),
-			'600'     => __( 'Semibold', 'gutenberg' ),
-			'700'     => __( 'Bold', 'gutenberg' ),
-			'800'     => __( 'Heavy', 'gutenberg' ),
-			'900'     => __( 'Black', 'gutenberg' ),
-			'initial' => __( 'Initial', 'gutenberg' ),
-			'inherit' => __( 'Inherit', 'gutenberg' ),
-		);
-		if ( ! empty( $config['global']['settings']['typography']['fontWeights'] ) ) {
-			foreach ( $config['global']['settings']['typography']['fontWeights'] as &$font_weight ) {
-				$font_weight['name'] = $default_font_weights_i18n[ $font_weight['slug'] ];
-			}
-		}
 		// End i18n logic to remove when JSON i18 strings are extracted.
 
 		self::$core = new WP_Theme_JSON( $config );
@@ -186,6 +235,7 @@ class WP_Theme_JSON_Resolver {
 	 */
 	private function get_theme_origin( $theme_support_data = array() ) {
 		$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
+		self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 
 		/*
 		 * We want the presets and settings declared in theme.json
@@ -268,7 +318,7 @@ class WP_Theme_JSON_Resolver {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON( $config );
+		self::$user = new WP_Theme_JSON( $config, true );
 
 		return self::$user;
 	}
@@ -301,7 +351,6 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON
 	 */
 	public function get_origin( $theme_support_data = array(), $origin = 'user', $merged = true ) {
-
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
@@ -332,10 +381,6 @@ class WP_Theme_JSON_Resolver {
 	 * Registers a Custom Post Type to store the user's origin config.
 	 */
 	public static function register_user_custom_post_type() {
-		if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-			return;
-		}
-
 		$args = array(
 			'label'        => __( 'Global Styles', 'gutenberg' ),
 			'description'  => 'CPT to store user design tokens',

@@ -6,7 +6,7 @@ import { startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Template Part' ),
+	title: _x( 'Template Part', 'block title' ),
 	keywords: [ __( 'template part' ) ],
 	__experimentalLabel: ( { slug } ) => startCase( slug ),
 	edit,

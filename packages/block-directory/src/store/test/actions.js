@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -281,7 +282,7 @@ describe( 'actions', () => {
 			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
-				storeKey: 'core/notices',
+				storeKey: noticesStore,
 			} );
 
 			expect( generator.next() ).toEqual( {

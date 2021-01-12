@@ -17,6 +17,7 @@ describe( 'RTL', () => {
 		await createNewPost();
 		await page.evaluate( () => {
 			document.querySelector( '.is-root-container' ).dir = 'rtl';
+			wp.i18n.isRTL = () => true;
 		} );
 	} );
 
