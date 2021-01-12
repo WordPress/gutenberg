@@ -5,7 +5,6 @@
         "isValid": true,
         "attributes": {
             "query": {
-                "inherit": true,
                 "perPage": null,
                 "pages": 1,
                 "offset": 0,
@@ -17,7 +16,8 @@
                 "author": "",
                 "search": "",
                 "exclude": [],
-                "sticky": ""
+                "sticky": "",
+                "inherit": true
             },
             "layout": {
                 "type": "list"

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import optimist from 'redux-optimist';
 import { omit, keys, isEqual } from 'lodash';
 
 /**
@@ -86,7 +85,6 @@ export function postId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
-		case 'UPDATE_POST':
 			return action.post.id;
 	}
 
@@ -97,7 +95,6 @@ export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
-		case 'UPDATE_POST':
 			return action.post.type;
 	}
 
@@ -284,17 +281,15 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default optimist(
-	combineReducers( {
-		postId,
-		postType,
-		preferences,
-		saving,
-		postLock,
-		template,
-		postSavingLock,
-		isReady,
-		editorSettings,
-		postAutosavingLock,
-	} )
-);
+export default combineReducers( {
+	postId,
+	postType,
+	preferences,
+	saving,
+	postLock,
+	template,
+	postSavingLock,
+	isReady,
+	editorSettings,
+	postAutosavingLock,
+} );

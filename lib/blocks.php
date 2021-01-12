@@ -17,7 +17,7 @@ function gutenberg_reregister_core_block_types() {
 				'audio',
 				'button',
 				'buttons',
-				'classic',
+				'freeform',
 				'code',
 				'column',
 				'columns',
@@ -120,6 +120,7 @@ function gutenberg_reregister_core_block_types() {
 				$registry->unregister( $metadata['name'] );
 			}
 
+			gutenberg_register_core_block_styles( $folder_name );
 			register_block_type_from_metadata( $block_json_file );
 		}
 
@@ -132,11 +133,13 @@ function gutenberg_reregister_core_block_types() {
 				if ( $registry->is_registered( $block_names ) ) {
 					$registry->unregister( $block_names );
 				}
+				gutenberg_register_core_block_styles( $block_names );
 			} elseif ( is_array( $block_names ) ) {
 				foreach ( $block_names as $block_name ) {
 					if ( $registry->is_registered( $block_name ) ) {
 						$registry->unregister( $block_name );
 					}
+					gutenberg_register_core_block_styles( $block_name );
 				}
 			}
 
@@ -146,6 +149,46 @@ function gutenberg_reregister_core_block_types() {
 }
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Registers block styles for a core block.
+ *
+ * @param string $block_name The block-name.
+ *
+ * @return void
+ */
+function gutenberg_register_core_block_styles( $block_name ) {
+	if ( ! gutenberg_should_load_separate_block_styles() ) {
+		return;
+	}
+
+	$block_name = str_replace( 'core/', '', $block_name );
+
+	$style_path        = is_rtl()
+		? "build/block-library/blocks/$block_name/style-rtl.css"
+		: "build/block-library/blocks/$block_name/style.css";
+	$editor_style_path = is_rtl()
+		? "build/block-library/blocks/$block_name/style-editor-rtl.css"
+		: "build/block-library/blocks/$block_name/style-editor.css";
+
+	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_register_style(
+			'wp-block-' . $block_name,
+			gutenberg_url( $style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $style_path )
+		);
+	}
+
+	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_register_style(
+			'wp-block-' . $block_name . '-editor',
+			gutenberg_url( $editor_style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $editor_style_path )
+		);
+	}
+}
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it

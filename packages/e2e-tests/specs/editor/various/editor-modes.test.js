@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -54,8 +59,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// The font size picker for the paragraph block should appear, even in
 		// HTML editing mode.
-		const fontSizePicker = await page.$$(
-			'.edit-post-sidebar .components-font-size-picker__controls'
+		const fontSizePicker = await page.$x(
+			"//label[contains(text(), 'Font size')]"
 		);
 		expect( fontSizePicker ).toHaveLength( 1 );
 	} );
@@ -73,13 +78,11 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(5)'
-		);
-		await page.waitForXPath(
-			`//button[contains(@class, "components-custom-select-control__button") and contains(text(), 'Large')]`
-		);
+		await first(
+			await page.$x( "//label[contains(text(), 'Font size')]" )
+		).click();
+		await pressKeyTimes( 'ArrowDown', 4 );
+		await page.keyboard.press( 'Enter' );
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval(
