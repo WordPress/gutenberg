@@ -1,6 +1,6 @@
 $tooltipColor: #121212;
 $tooltipArrowSize: 6px;
-$tooltipArrowOffset: -( $tooltipArrowSize - 1 );
+$tooltipArrowOffset: -($tooltipArrowSize - 1);
 
 .tooltip {
 	background-color: $tooltipColor;
