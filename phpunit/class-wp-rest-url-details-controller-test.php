@@ -150,7 +150,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertEquals( WP_Http::UNAUTHORIZED, $response->get_status() );
 
 		$this->assertEquals(
-			'rest_user_cannot_view',
+			'rest_cannot_view_url_details',
 			$data['code']
 		);
 
@@ -175,7 +175,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertEquals( WP_Http::FORBIDDEN, $response->get_status() );
 
 		$this->assertEquals(
-			'rest_user_cannot_view',
+			'rest_cannot_view_url_details',
 			$data['code']
 		);
 

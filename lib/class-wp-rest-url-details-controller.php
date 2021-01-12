@@ -177,7 +177,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		}
 
 		return new WP_Error(
-			'rest_user_cannot_view',
+			'rest_cannot_view_url_details',
 			__( 'Sorry, you are not allowed to process remote urls.', 'gutenberg' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
