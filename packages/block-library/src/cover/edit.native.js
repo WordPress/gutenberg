@@ -365,26 +365,47 @@ const Cover = ( {
 							cellContainerStyle={ styles.mediaPreview }
 						>
 							<View style={ styles.mediaInner }>
-								<Image
-									editButton={ true }
-									isSelected={ true }
-									isUploadFailed={ didUploadFail }
-									isUploadInProgress={ isUploadInProgress }
-									onImageDataLoad={ () => {
-										setDisplayPlaceholder( false );
-									} }
-									onSelectMediaUploadOption={ onSelectMedia }
-									openMediaOptions={
-										openMediaOptionsRef.current
-									}
-									url={ url }
-									height="100%"
-									style={ [
-										displayPlaceholder &&
-											styles.imagePlaceholder,
-									] }
-									width={ styles.image.width }
-								/>
+								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+									<Image
+										editButton={ true }
+										isSelected={ true }
+										isUploadFailed={ didUploadFail }
+										isUploadInProgress={
+											isUploadInProgress
+										}
+										onImageDataLoad={ () => {
+											setDisplayPlaceholder( false );
+										} }
+										onSelectMediaUploadOption={
+											onSelectMedia
+										}
+										openMediaOptions={
+											openMediaOptionsRef.current
+										}
+										url={ url }
+										height="100%"
+										style={ [
+											displayPlaceholder &&
+												styles.imagePlaceholder,
+										] }
+										width={ styles.image.width }
+									/>
+								) }
+								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+									<Video
+										muted
+										disableFocus
+										repeat
+										resizeMode={ 'contain' }
+										source={ { uri: url } }
+										onLoad={ onVideoLoad }
+										onLoadStart={ onVideoLoadStart }
+										style={
+											// Hide Video component since it has black background while loading the source
+											{ opacity: isVideoLoading ? 0 : 1 }
+										}
+									/>
+								) }
 								{ ! hasParallax && (
 									<Icon
 										icon={ plus }
