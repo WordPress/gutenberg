@@ -59,6 +59,7 @@ export default function FocalPointPicker( props ) {
 	return (
 		<View style={ styles.container }>
 			<View style={ [ styles.media ] }>
+				{ /* TODO(David): Add TapGestureHandler to allow tapping to set focal point. */ }
 				<PanGestureHandler
 					minDist={ 1 }
 					onHandlerStateChange={ onHandlerStateChange }
