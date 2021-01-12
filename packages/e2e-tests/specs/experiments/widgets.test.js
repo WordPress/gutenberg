@@ -76,11 +76,9 @@ describe( 'Widgets screen', () => {
 		);
 
 		expect(
-			(
-				await page.accessibility.snapshot( {
-					root: addedParagraphBlockInFirstWidgetArea,
-				} )
-			 ).focused
+			await addedParagraphBlockInFirstWidgetArea.evaluate(
+				( node ) => node === document.activeElement
+			)
 		).toBe( true );
 
 		await page.keyboard.type( 'First Paragraph' );
@@ -108,18 +106,12 @@ describe( 'Widgets screen', () => {
 		);
 
 		expect(
-			(
-				await page.accessibility.snapshot( {
-					root: addedParagraphBlockInSecondWidgetArea,
-				} )
-			 ).focused
+			await addedParagraphBlockInSecondWidgetArea.evaluate(
+				( node ) => node === document.activeElement
+			)
 		).toBe( true );
 
 		await page.keyboard.type( 'Second Paragraph' );
-
-		// TODO: Add tests for updating/saving when possible.
-		// const [ updateButton ] = await page.$x( '//*[@role="button"][*[text()="Update"]]' );
-		// await updateButton.click();
 	} );
 
 	it( 'Should insert content using the inline inserter', async () => {
@@ -162,11 +154,9 @@ describe( 'Widgets screen', () => {
 		);
 
 		expect(
-			(
-				await page.accessibility.snapshot( {
-					root: addedParagraphBlockInFirstWidgetArea,
-				} )
-			 ).focused
+			await addedParagraphBlockInFirstWidgetArea.evaluate(
+				( node ) => node === document.activeElement
+			)
 		).toBe( true );
 
 		await page.keyboard.type( 'First Paragraph' );
