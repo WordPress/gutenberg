@@ -131,6 +131,28 @@ describe( 'Button', () => {
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'Custom' );
 		} );
 
+		it( 'should support adding aria-describedby text', () => {
+			const buttonDescription = shallow(
+				<Button describedBy="Description text" />
+			)
+				.find( 'VisuallyHidden' )
+				.shallow()
+				.text();
+			expect( buttonDescription ).toBe( 'Description text' );
+		} );
+
+		it( 'should populate tooltip with describedBy content', () => {
+			const buttonTooltip = shallow(
+				<Button
+					describedBy="Description text"
+					label="Label"
+					icon={ plusCircle }
+				/>
+			).find( 'Tooltip' );
+
+			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Description text' );
+		} );
+
 		it( 'should allow tooltip disable', () => {
 			const iconButton = shallow(
 				<Button
