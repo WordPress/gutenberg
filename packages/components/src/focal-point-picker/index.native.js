@@ -168,6 +168,7 @@ export default function FocalPointPicker( props ) {
 				</Animated.View>
 			</View>
 			<RangeControl
+				inputSuffix="%"
 				key={ `xAxis-${ sliderKey }` }
 				label={ __( 'X-Axis Position' ) }
 				max={ MAX_POSITION_VALUE }
@@ -176,6 +177,7 @@ export default function FocalPointPicker( props ) {
 				value={ Math.round( focalPoint.x * 100 ) }
 			/>
 			<RangeControl
+				inputSuffix="%"
 				key={ `yAxis-${ sliderKey }` }
 				label={ __( 'Y-Axis Position' ) }
 				max={ MAX_POSITION_VALUE }
