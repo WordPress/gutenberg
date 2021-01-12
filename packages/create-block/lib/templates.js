@@ -29,6 +29,7 @@ const predefinedBlockTemplates = {
 			editorStyle: 'file:./editor.css',
 			style: 'file:./style.css',
 		},
+		templatesPath: join( __dirname, 'templates', 'es5' ),
 	},
 	esnext: {
 		defaultValues: {
@@ -43,6 +44,7 @@ const predefinedBlockTemplates = {
 				'@wordpress/i18n',
 			],
 		},
+		templatesPath: join( __dirname, 'templates', 'esnext' ),
 	},
 };
 
@@ -94,16 +96,41 @@ const externalTemplateExists = async ( templateName ) => {
 	return true;
 };
 
+const configToTemplate = async ( {
+	assetsPath,
+	defaultValues = {},
+	templatesPath,
+} ) => {
+	if ( ! isObject( defaultValues ) || ! templatesPath ) {
+		throw new CLIError( 'Template found but invalid definition provided.' );
+	}
+
+	return {
+		defaultValues,
+		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
+		outputTemplates: await getOutputTemplates( templatesPath ),
+	};
+};
+
 const getBlockTemplate = async ( templateName ) => {
 	if ( predefinedBlockTemplates[ templateName ] ) {
-		return {
-			...predefinedBlockTemplates[ templateName ],
-			outputTemplates: await getOutputTemplates(
-				join( __dirname, 'templates', templateName )
-			),
-			outputAssets: {},
-		};
+		return await configToTemplate(
+			predefinedBlockTemplates[ templateName ]
+		);
 	}
+
+	try {
+		return await configToTemplate( require( templateName ) );
+	} catch ( error ) {
+		if ( error instanceof CLIError ) {
+			throw error;
+		} else if ( error.code !== 'MODULE_NOT_FOUND' ) {
+			throw new CLIError(
+				`Invalid block template loaded. Error: ${ error.message }`
+			);
+		}
+	}
+
 	if ( ! ( await externalTemplateExists( templateName ) ) ) {
 		throw new CLIError(
 			`Invalid block template type name: "${ templateName }". Allowed values: ` +
@@ -126,26 +153,19 @@ const getBlockTemplate = async ( templateName ) => {
 			cwd: tempCwd,
 		} );
 
-		const {
-			defaultValues = {},
-			templatesPath,
-			assetsPath,
-		} = require( require.resolve( templateName, {
-			paths: [ tempCwd ],
-		} ) );
-		if ( ! isObject( defaultValues ) || ! templatesPath ) {
-			throw new Error();
-		}
-
-		return {
-			defaultValues,
-			outputTemplates: await getOutputTemplates( templatesPath ),
-			outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
-		};
-	} catch ( error ) {
-		throw new CLIError(
-			`Invalid template definition provided in "${ templateName }" package.`
+		return await configToTemplate(
+			require( require.resolve( templateName, {
+				paths: [ tempCwd ],
+			} ) )
 		);
+	} catch ( error ) {
+		if ( error instanceof CLIError ) {
+			throw error;
+		} else {
+			throw new CLIError(
+				`Invalid block template downloaded. Error: ${ error.message }`
+			);
+		}
 	} finally {
 		if ( tempCwd ) {
 			rimraf( tempCwd );
