@@ -121,9 +121,8 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 
 	foreach ( $template_blocks as $key => $block ) {
 		if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['theme'] ) ) {
-			// phpcs:ignore
-			$template_blocks[$key]['attrs']['theme'] = $theme;
-			$has_updated_content                     = true;
+			$template_blocks[ $key ]['attrs']['theme'] = $theme;
+			$has_updated_content                       = true;
 		}
 	}
 

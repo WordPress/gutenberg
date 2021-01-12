@@ -20,8 +20,7 @@ function _remove_theme_attribute_from_content( $template_content ) {
 
 	foreach ( $template_blocks as $key => $block ) {
 		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
-			// phpcs:ignore
-			unset( $template_blocks[$key]['attrs']['theme'] );
+			unset( $template_blocks[ $key ]['attrs']['theme'] );
 			$has_updated_content = true;
 		}
 	}
