@@ -140,49 +140,46 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<Tooltip
-					onPress={ this.onTooltipHidden }
-					style={ styles.tooltipContainer }
-					visible={ this.state.tooltipVisible }
-				>
-					<AutosaveMonitor disableIntervalChecks />
-					<View
-						style={ getStylesFromColorScheme(
-							styles.background,
-							styles.backgroundDark
-						) }
+				<Tooltip visible={ this.state.tooltipVisible }>
+					<Tooltip.Overlay
+						onPress={ this.onTooltipHidden }
+						style={ styles.tooltipOverlay }
 					>
-						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
-						{ ! isHtmlView && Platform.OS === 'android' && (
-							<FloatingToolbar />
-						) }
-						<NoticeList />
-					</View>
-					<View
-						style={ {
-							flex: 0,
-							flexBasis: marginBottom,
-							height: marginBottom,
-						} }
-					/>
-					<Tooltip.Label
-						align="left"
-						xOffset={ 12 }
-						yOffset={ -96 }
-						text={ __( 'Try a starter layout' ) }
-					/>
+						<AutosaveMonitor disableIntervalChecks />
+						<View
+							style={ getStylesFromColorScheme(
+								styles.background,
+								styles.backgroundDark
+							) }
+						>
+							{ isHtmlView
+								? this.renderHTML()
+								: this.renderVisual() }
+							{ ! isHtmlView && Platform.OS === 'android' && (
+								<FloatingToolbar />
+							) }
+							<NoticeList />
+						</View>
+						<View
+							style={ {
+								flex: 0,
+								flexBasis: marginBottom,
+								height: marginBottom,
+							} }
+						/>
+					</Tooltip.Overlay>
+					{ ! isHtmlView && (
+						<KeyboardAvoidingView
+							parentHeight={ this.state.rootViewHeight }
+							style={ toolbarKeyboardAvoidingViewStyle }
+							withAnimatedHeight
+						>
+							{ Platform.OS === 'ios' && <FloatingToolbar /> }
+							<Header />
+							<BottomSheetSettings />
+						</KeyboardAvoidingView>
+					) }
 				</Tooltip>
-				{ ! isHtmlView && (
-					<KeyboardAvoidingView
-						parentHeight={ this.state.rootViewHeight }
-						style={ toolbarKeyboardAvoidingViewStyle }
-						withAnimatedHeight
-					>
-						{ Platform.OS === 'ios' && <FloatingToolbar /> }
-						<Header />
-						<BottomSheetSettings />
-					</KeyboardAvoidingView>
-				) }
 			</SafeAreaView>
 		);
 	}
