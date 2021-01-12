@@ -38,6 +38,7 @@ const ImageComponent = ( {
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
+	onImageDataLoad,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	resizeMode,
@@ -54,11 +55,15 @@ const ImageComponent = ( {
 	useEffect( () => {
 		if ( url ) {
 			Image.getSize( url, ( imgWidth, imgHeight ) => {
-				setImageData( {
+				const metaData = {
 					aspectRatio: imgWidth / imgHeight,
 					width: imgWidth,
 					height: imgHeight,
-				} );
+				};
+				setImageData( metaData );
+				if ( typeof onImageDataLoad === 'function' ) {
+					onImageDataLoad( metaData );
+				}
 			} );
 		}
 	}, [ url ] );
