@@ -253,6 +253,11 @@ const Cover = ( {
 		styles.backgroundSolidDark
 	);
 
+	const addMediaButtonStyle = getStylesFromColorScheme(
+		styles.addMediaButton,
+		styles.addMediaButtonDark
+	);
+
 	const overlayStyles = [
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
@@ -357,55 +362,74 @@ const Cover = ( {
 					key={ minHeightUnit }
 				/>
 			</PanelBody>
-			{ url ? (
-				<PanelBody title={ __( 'Media' ) }>
-					<BottomSheet.Cell
-						leftAlign
-						cellContainerStyle={ { minHeight } }
-					>
-						<View style={ [ styles.background, backgroundColor ] }>
-							<View style={ styles.imageContainer }>
-								<Image
-									editButton={ true }
-									focalPoint={
-										focalPoint || IMAGE_DEFAULT_FOCAL_POINT
-									}
-									isSelected={ true }
-									isUploadFailed={ didUploadFail }
-									isUploadInProgress={ isUploadInProgress }
-									onSelectMediaUploadOption={ onSelectMedia }
-									openMediaOptions={
-										openMediaOptionsRef.current
-									}
-									url={ url }
-									width={ styles.image.width }
-								/>
+
+			<PanelBody title={ __( 'Media' ) }>
+				{ url ? (
+					<>
+						<BottomSheet.Cell
+							leftAlign
+							cellContainerStyle={ { minHeight } }
+						>
+							<View
+								style={ [ styles.background, backgroundColor ] }
+							>
+								<View style={ styles.imageContainer }>
+									<Image
+										editButton={ true }
+										focalPoint={
+											focalPoint ||
+											IMAGE_DEFAULT_FOCAL_POINT
+										}
+										isSelected={ true }
+										isUploadFailed={ didUploadFail }
+										isUploadInProgress={
+											isUploadInProgress
+										}
+										onSelectMediaUploadOption={
+											onSelectMedia
+										}
+										openMediaOptions={
+											openMediaOptionsRef.current
+										}
+										url={ url }
+										width={ styles.image.width }
+									/>
+								</View>
 							</View>
-						</View>
-						<Icon
-							icon={ plus }
-							size={ styles.focalPointHint.width }
-							style={ styles.focalPointHint }
+							<Icon
+								icon={ plus }
+								size={ styles.focalPointHint.width }
+								style={ styles.focalPointHint }
+							/>
+						</BottomSheet.Cell>
+						<FocalPointSettings
+							focalPoint={
+								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
+							}
+							onFocalPointChange={ setFocalPoint }
+							url={ url }
 						/>
-					</BottomSheet.Cell>
-					<FocalPointSettings
-						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
-						onFocalPointChange={ setFocalPoint }
-						url={ url }
-					/>
-					<ToggleControl
-						label={ __( 'Fixed background' ) }
-						checked={ hasParallax }
-						onChange={ toggleParallax }
-					/>
+						<ToggleControl
+							label={ __( 'Fixed background' ) }
+							checked={ hasParallax }
+							onChange={ toggleParallax }
+						/>
+						<TextControl
+							leftAlign
+							label={ __( 'Clear Media' ) }
+							labelStyle={ styles.clearMediaButton }
+							onPress={ onClearMedia }
+						/>
+					</>
+				) : (
 					<TextControl
+						label={ __( 'Add image or video' ) }
+						labelStyle={ addMediaButtonStyle }
 						leftAlign
-						label={ __( 'Clear Media' ) }
-						labelStyle={ styles.clearMediaButton }
-						onPress={ onClearMedia }
+						onPress={ openMediaOptionsRef.current }
 					/>
-				</PanelBody>
-			) : null }
+				) }
+			</PanelBody>
 		</InspectorControls>
 	);
 
