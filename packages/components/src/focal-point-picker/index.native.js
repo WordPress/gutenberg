@@ -14,7 +14,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
 import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
-import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -23,6 +22,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import FocalPoint from './focal-point';
 import Tooltip from './tooltip';
 import styles from './style.scss';
+import { isVideoType } from './utils';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
@@ -31,11 +31,12 @@ function FocalPointPicker( props ) {
 	const {
 		focalPoint,
 		getStylesFromColorScheme,
-		mediaType,
 		onChange,
 		shouldEnableBottomSheetScroll,
 		url,
 	} = props;
+
+	const isVideo = isVideoType( url );
 
 	const [ containerSize, setContainerSize ] = useState( null );
 	const [ sliderKey, setSliderKey ] = useState( 0 );
@@ -182,7 +183,7 @@ function FocalPointPicker( props ) {
 							} }
 							style={ styles.mediaContainer }
 						>
-							{ MEDIA_TYPE_IMAGE === mediaType && (
+							{ ! isVideo && (
 								<Image
 									editButton={ false }
 									isSelected={ ! displayPlaceholder }
@@ -194,7 +195,8 @@ function FocalPointPicker( props ) {
 									} }
 								/>
 							) }
-							{ MEDIA_TYPE_VIDEO === mediaType && (
+
+							{ isVideo && (
 								<Video
 									muted
 									paused
