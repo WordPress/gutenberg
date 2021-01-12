@@ -26,31 +26,42 @@ export default function FocalPointPicker( props ) {
 	const [ sliderKey, setSliderKey ] = useState( 0 );
 
 	const pan = useRef( new Animated.ValueXY() ).current;
+
+	// Set initial cursor poition
 	if ( containerSize ) {
 		pan.setValue( {
-			x: focalPoint.x * containerSize?.width,
-			y: focalPoint.y * containerSize?.height,
+			x: focalPoint.x * containerSize.width,
+			y: focalPoint.y * containerSize.height,
 		} );
 	}
+
 	const panResponder = useMemo(
 		() =>
 			PanResponder.create( {
-				// Ask to be the responder:
 				onStartShouldSetPanResponder: () => true,
 				onStartShouldSetPanResponderCapture: () => true,
 				onMoveShouldSetPanResponder: () => true,
 				onMoveShouldSetPanResponderCapture: () => true,
 
 				onPanResponderGrant: ( event ) => {
-					extrapolatePositionFromGesture( event );
-				},
-				onPanResponderMove: ( event ) => {
 					shouldEnableBottomSheetScroll( false );
-					extrapolatePositionFromGesture( event );
+					const { locationX: x, locationY: y } = event.nativeEvent;
+					pan.setValue( { x, y } ); // Set cursor to tap origin
+					pan.setOffset( { x: pan.x._value, y: pan.y._value } );
 				},
-				onPanResponderTerminationRequest: () => true,
-				onPanResponderRelease: () => {
+				// Move cursor to match delta drag
+				onPanResponderMove: Animated.event( [
+					null,
+					{ dx: pan.x, dy: pan.y },
+				] ),
+				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
+					pan.flattenOffset();
+					const { locationX: x, locationY: y } = event.nativeEvent;
+					setPosition( {
+						x: x / containerSize?.width,
+						y: y / containerSize?.height,
+					} );
 					// Slider (child of RangeCell) is uncontrolled, so we must increment a
 					// key to re-mount and sync the pan gesture values to the sliders
 					// https://git.io/JTe4A
@@ -66,14 +77,6 @@ export default function FocalPointPicker( props ) {
 			...( x ? { x } : {} ),
 			...( y ? { y } : {} ),
 		} ) );
-	}
-
-	function extrapolatePositionFromGesture( event ) {
-		const { locationX: x, locationY: y } = event.nativeEvent;
-		setPosition( {
-			x: x / containerSize?.width,
-			y: y / containerSize?.height,
-		} );
 	}
 
 	return (
