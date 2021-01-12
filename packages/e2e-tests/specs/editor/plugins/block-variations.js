@@ -9,11 +9,13 @@ import {
 	searchForBlock,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	toggleScreenOption,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block variations', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-block-variations' );
+		await toggleScreenOption( 'Display block breadcrumbs', true );
 	} );
 
 	beforeEach( async () => {
@@ -22,6 +24,7 @@ describe( 'Block variations', () => {
 
 	afterAll( async () => {
 		await deactivatePlugin( 'gutenberg-test-block-variations' );
+		await toggleScreenOption( 'Display block breadcrumbs', false );
 	} );
 
 	const expectInserterItem = async (
