@@ -327,7 +327,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
 	}
 
-	@objc
+    @objc
     func requestFocalPointPickerTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {
         callback([self.delegate?.gutenbergDidRequestFocalPointPickerTooltipShown() ?? false])
     }
