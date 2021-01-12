@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { groupBy, deburr } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -7,15 +12,14 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/components';
+import {
+	__unstableComposite as Composite,
+	__unstableCompositeItem as CompositeItem,
+	Icon,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * External dependencies
- */
-import { groupBy, deburr } from 'lodash';
-import { Composite, useCompositeState, CompositeItem } from 'reakit';
 
 function PreviewPlaceholder() {
 	return (
