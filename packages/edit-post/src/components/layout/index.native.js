@@ -17,12 +17,7 @@ import {
 	NoticeList,
 } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
-import {
-	sendNativeEditorDidLayout,
-	requestStarterPageTemplatesTooltipShown,
-	setStarterPageTemplatesTooltipShown,
-} from '@wordpress/react-native-bridge';
-import { __ } from '@wordpress/i18n';
+import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -32,7 +27,6 @@ import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
 import { store as editPostStore } from '../../store';
-import Tooltip from '../../../../components/src/focal-point-picker/tooltip';
 
 class Layout extends Component {
 	constructor() {
@@ -44,7 +38,6 @@ class Layout extends Component {
 		this.state = {
 			rootViewHeight: 0,
 			safeAreaInsets: { top: 0, bottom: 0, right: 0, left: 0 },
-			tooltipVisible: false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -58,7 +51,6 @@ class Layout extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
-		this.shouldShowTooltip();
 	}
 
 	componentWillUnmount() {
@@ -86,19 +78,6 @@ class Layout extends Component {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
 	}
-
-	shouldShowTooltip = () => {
-		requestStarterPageTemplatesTooltipShown( ( tooltipShown ) => {
-			if ( ! tooltipShown ) {
-				this.setState( { tooltipVisible: true } );
-				setStarterPageTemplatesTooltipShown( true );
-			}
-		} );
-	};
-
-	onTooltipHidden = () => {
-		this.setState( { tooltipVisible: false } );
-	};
 
 	renderHTML() {
 		return <HTMLTextInput parentHeight={ this.state.rootViewHeight } />;
@@ -140,46 +119,37 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<Tooltip visible={ this.state.tooltipVisible }>
-					<Tooltip.Overlay
-						onPress={ this.onTooltipHidden }
-						style={ styles.tooltipOverlay }
-					>
-						<AutosaveMonitor disableIntervalChecks />
-						<View
-							style={ getStylesFromColorScheme(
-								styles.background,
-								styles.backgroundDark
-							) }
-						>
-							{ isHtmlView
-								? this.renderHTML()
-								: this.renderVisual() }
-							{ ! isHtmlView && Platform.OS === 'android' && (
-								<FloatingToolbar />
-							) }
-							<NoticeList />
-						</View>
-						<View
-							style={ {
-								flex: 0,
-								flexBasis: marginBottom,
-								height: marginBottom,
-							} }
-						/>
-					</Tooltip.Overlay>
-					{ ! isHtmlView && (
-						<KeyboardAvoidingView
-							parentHeight={ this.state.rootViewHeight }
-							style={ toolbarKeyboardAvoidingViewStyle }
-							withAnimatedHeight
-						>
-							{ Platform.OS === 'ios' && <FloatingToolbar /> }
-							<Header />
-							<BottomSheetSettings />
-						</KeyboardAvoidingView>
+				<AutosaveMonitor disableIntervalChecks />
+				<View
+					style={ getStylesFromColorScheme(
+						styles.background,
+						styles.backgroundDark
 					) }
-				</Tooltip>
+				>
+					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+					{ ! isHtmlView && Platform.OS === 'android' && (
+						<FloatingToolbar />
+					) }
+					<NoticeList />
+				</View>
+				<View
+					style={ {
+						flex: 0,
+						flexBasis: marginBottom,
+						height: marginBottom,
+					} }
+				/>
+				{ ! isHtmlView && (
+					<KeyboardAvoidingView
+						parentHeight={ this.state.rootViewHeight }
+						style={ toolbarKeyboardAvoidingViewStyle }
+						withAnimatedHeight
+					>
+						{ Platform.OS === 'ios' && <FloatingToolbar /> }
+						<Header />
+						<BottomSheetSettings />
+					</KeyboardAvoidingView>
+				) }
 			</SafeAreaView>
 		);
 	}
