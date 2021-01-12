@@ -4,6 +4,11 @@
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { G2, UI } from '../../utils/colors-values';
@@ -66,10 +71,14 @@ export const MenuTitleHeadingUI = styled( Text )`
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: ${ space( 1 ) };
-	padding: ${ ( props ) =>
-		props.isRTL
-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
-			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
+	padding: ${ () =>
+		isRTL()
+			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space(
+					1.5
+			  ) }`
+			: `${ space( 0.5 ) } ${ space( 1.5 ) } ${ space( 0.5 ) } ${ space(
+					2
+			  ) }` };
 `;
 
 export const MenuTitleActionsUI = styled.span`
@@ -135,31 +144,21 @@ export const MenuTitleSearchUI = styled.div`
 
 export const GroupTitleUI = styled( Text )`
 	margin-top: ${ space( 1 ) };
-	padding: ${ ( props ) =>
-		props.isRTL
+	padding: ${ () =>
+		isRTL()
 			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
 			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
 	text-transform: uppercase;
 	color: ${ G2.gray[ 100 ] };
 `;
 
-export const ItemUI = styled.li`
+export const ItemBaseUI = styled.li`
 	border-radius: 2px;
 	color: ${ G2.lightGray.ui };
 	margin-bottom: 0;
 
 	button,
 	a {
-		height: auto;
-		min-height: 32px;
-		margin: 0;
-		font-weight: 400;
-		line-height: 20px;
-		padding-left: ${ space( 2 ) };
-		padding-right: ${ space( 2 ) };
-		width: 100%;
-		color: ${ G2.lightGray.ui };
-
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
@@ -182,9 +181,22 @@ export const ItemUI = styled.li`
 	}
 `;
 
+export const ItemUI = styled.div`
+	display: flex;
+	align-items: center;
+	height: auto;
+	min-height: 32px;
+	margin: 0;
+	padding: ${ space( 0.75 ) } ${ space( 2 ) };
+	font-weight: 400;
+	line-height: 20px;
+	width: 100%;
+	color: ${ G2.lightGray.ui };
+`;
+
 export const ItemBadgeUI = styled.span`
-	margin-left: ${ ( props ) => ( props.isRTL ? '0' : space( 1 ) ) };
-	margin-right: ${ ( props ) => ( props.isRTL ? space( 1 ) : '0' ) };
+	margin-left: ${ () => ( isRTL() ? '0' : space( 1 ) ) };
+	margin-right: ${ () => ( isRTL() ? space( 1 ) : '0' ) };
 	display: inline-flex;
 	padding: ${ space( 0.5 ) } ${ space( 1.5 ) };
 	border-radius: 2px;
@@ -203,7 +215,6 @@ export const ItemBadgeUI = styled.span`
 `;
 
 export const ItemTitleUI = styled( Text )`
-	${ ( props ) =>
-		props.isRTL ? 'margin-left: auto;' : 'margin-right: auto;' }
+	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
 	font-size: 13px;
 `;

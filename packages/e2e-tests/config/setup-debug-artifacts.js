@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const util = require( 'util' );
-const root = process.env.GITHUB_WORKSPACE || __dirname + '/../../../';
+const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH = root + '/artifacts';
 
 const writeFile = util.promisify( fs.writeFile );
@@ -21,7 +21,7 @@ if ( ! fs.existsSync( ARTIFACTS_PATH ) ) {
  * Kudos to Tom Esterez (@testerez) for sharing this idea in https://github.com/smooth-code/jest-puppeteer/issues/131#issuecomment-424073620
  */
 let artifactsPromise;
-// eslint-disable-next-line jest/no-jasmine-globals
+// eslint-disable-next-line jest/no-jasmine-globals, no-undef
 jasmine.getEnv().addReporter( {
 	specDone: ( result ) => {
 		if ( result.status === 'failed' ) {

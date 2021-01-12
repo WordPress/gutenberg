@@ -5,11 +5,6 @@ import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 
 /**
- * Internal dependencies
- */
-import { findTemplate } from './controls';
-
-/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
@@ -114,7 +109,8 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page and displays both.
+ * Resolves the template for a page and displays both. If no path is given, attempts
+ * to use the postId to generate a path like `?p=${ postId }`.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -125,13 +121,20 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
-	const templateId = yield findTemplate( page.path );
+	if ( ! page.path && page.context?.postId ) {
+		page.path = `?p=${ page.context.postId }`;
+	}
+	const template = yield controls.resolveSelect(
+		'core',
+		'__experimentalGetTemplateForLink',
+		page.path
+	);
 	yield {
 		type: 'SET_PAGE',
 		page,
-		templateId,
+		templateId: template.id,
 	};
-	return templateId;
+	return template.id;
 }
 
 /**
@@ -148,8 +151,13 @@ export function* showHomepage() {
 		'site'
 	);
 
+	const { siteUrl } = yield controls.select(
+		'core/edit-site',
+		'getSettings'
+	);
+
 	const page = {
-		path: '/',
+		path: siteUrl,
 		context:
 			showOnFront === 'page'
 				? {

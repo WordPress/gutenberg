@@ -8,7 +8,7 @@ import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
@@ -594,11 +594,12 @@ describe( 'Default search suggestions', () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
+		const searchInput = getURLInput();
+		searchInput.focus();
+
 		await eventLoopTick();
 
 		const searchResultElements = getSearchResults();
-
-		const searchInput = getURLInput();
 
 		// search input is set to the URL value
 		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
@@ -1372,6 +1373,7 @@ describe( 'Selecting links', () => {
 
 				// Search Input UI
 				const searchInput = getURLInput();
+				searchInput.focus();
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
@@ -1539,54 +1541,6 @@ describe( 'Selecting links', () => {
 
 			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 		} );
-	} );
-
-	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
-		// Regression: Previously, there had been issues where if `onChange`
-		// would programmatically shift focus, LinkControl would try to force it
-		// back, based on its internal logic to determine whether it had focus
-		// when finishing an edit occuring _before_ `onChange` having been run.
-		//
-		// See: https://github.com/WordPress/gutenberg/pull/19462
-
-		const LinkControlConsumer = () => {
-			const focusTarget = useRef();
-
-			return (
-				<>
-					<div tabIndex={ -1 } data-expected ref={ focusTarget } />
-					<LinkControl
-						onChange={ () => focusTarget.current.focus() }
-					/>
-				</>
-			);
-		};
-
-		act( () => {
-			render( <LinkControlConsumer />, container );
-		} );
-
-		// Change value.
-		const form = container.querySelector( 'form' );
-		const searchInput = getURLInput();
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: 'https://example.com' },
-			} );
-		} );
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: ENTER } );
-		} );
-		act( () => {
-			Simulate.submit( form );
-		} );
-
-		const isExpectedFocusTarget = document.activeElement.hasAttribute(
-			'data-expected'
-		);
-		expect( isExpectedFocusTarget ).toBe( true );
 	} );
 } );
 

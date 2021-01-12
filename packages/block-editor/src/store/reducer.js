@@ -1585,6 +1585,10 @@ export function hasBlockMovingClientId( state = null, action ) {
 		return action.hasBlockMovingClientId;
 	}
 
+	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+		return null;
+	}
+
 	return state;
 }
 
@@ -1649,6 +1653,7 @@ export function automaticChangeStatus( state, action ) {
 			return;
 		// Undoing an automatic change should still be possible after mouse
 		// move.
+		case 'START_TYPING':
 		case 'STOP_TYPING':
 			return state;
 	}

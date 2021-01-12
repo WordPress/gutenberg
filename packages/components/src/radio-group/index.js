@@ -26,8 +26,8 @@ function RadioGroup(
 		...radioState,
 		disabled,
 		// controlled or uncontrolled
-		state: checked || radioState.state,
-		setState: onChange || radioState.setState,
+		state: checked ?? radioState.state,
+		setState: onChange ?? radioState.setState,
 	};
 
 	return (

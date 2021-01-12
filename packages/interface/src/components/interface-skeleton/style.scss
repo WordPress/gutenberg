@@ -36,8 +36,7 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__editor {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
-	max-width: 100%;
+	flex: 0 1 100%;
 }
 
 @include editor-left(".interface-interface-skeleton");
@@ -142,18 +141,12 @@ html.interface-interface-skeleton__html-container {
 	flex-shrink: 0;
 	border-top: $border-width solid $gray-200;
 	color: $gray-900;
-	position: fixed;
+	position: absolute;
 	bottom: 0;
+	left: 0;
 	width: 100%;
 	background-color: $white;
 	z-index: z-index(".interface-interface-skeleton__footer");
-
-	// When the navigate regions shortcut is used it applies position: relative
-	// to regions. The footer should always stay stuck to the bottom though, so
-	// override using a more specific selector with position: fixed.
-	.is-focusing-regions &[role="region"] {
-		position: fixed;
-	}
 
 	// On Mobile the footer is hidden
 	display: none;

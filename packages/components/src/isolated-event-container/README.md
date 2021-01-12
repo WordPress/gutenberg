@@ -1,5 +1,7 @@
 # Isolated Event Container
 
+**Deprecated**
+
 This is a container that prevents certain events from propagating outside of the container. This is used to wrap
 UI elements such as modals and popovers where the propagated event can cause problems. The event continues to work
 inside the component.

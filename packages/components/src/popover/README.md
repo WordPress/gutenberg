@@ -138,7 +138,7 @@ A callback function which is used to override the anchor value computation algor
 
 If you need the `DOMRect` object i.e., the position of popover to be calculated on every time, the popover re-renders, then use `getAnchorRect`.
 
-`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` objcet.
+`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` object.
 
 - Type: `Function`
 - Required: No

@@ -72,6 +72,6 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 
 export default withSelect( ( select ) => {
 	return {
-		taxonomies: select( 'core' ).getTaxonomies(),
+		taxonomies: select( 'core' ).getTaxonomies( { per_page: -1 } ),
 	};
 } )( TagCloudEdit );

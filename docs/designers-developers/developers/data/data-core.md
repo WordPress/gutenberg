@@ -34,6 +34,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `Object`: Data state.
+-   _query_ `(Object|undefined)`: Optional object of query parameters to include with request.
 
 _Returns_
 
@@ -611,7 +612,8 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _records_ `(Array|Object)`: Records received.
 -   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _edits_ `?Object`: Edits to reset.
 
 _Returns_
 

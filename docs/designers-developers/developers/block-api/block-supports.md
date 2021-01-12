@@ -86,8 +86,8 @@ supports: {
 - Default value: null
 - Subproperties:
   - `background`: type `boolean`, default value `true`
-  - `gradient`: type `boolean`, default value `true`
-  - `text`: type `boolean`, default value `false`
+  - `gradient`: type `boolean`, default value `false`
+  - `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
@@ -338,24 +338,6 @@ supports: {
 }
 ```
 
-When the block declares support for a specific spacing property, the attributes definition is extended to include some attributes.
+When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
-
-```js
-attributes: {
-    style: {
-        type: 'object',
-        default: {
-            spacing: {
-                padding: {
-                    top: 'value',
-                    right: 'value',
-                    bottom: 'value',
-                    left: 'value'
-                }
-            }
-        }
-    }
-}
-```
+- `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user.

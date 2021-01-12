@@ -20,18 +20,27 @@
 				"author": "",
 				"search": "",
 				"exclude": [],
-				"sticky": ""
+				"sticky": "",
+				"inherit": true
+			}
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "list"
 			}
 		}
 	},
 	"providesContext": {
 		"queryId": "queryId",
-		"query": "query"
+		"query": "query",
+		"layout": "layout"
 	},
 	"usesContext": [
 		"postId"
 	],
 	"supports": {
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-query-editor"
 }

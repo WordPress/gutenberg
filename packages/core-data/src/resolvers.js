@@ -10,6 +10,10 @@ import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+/**
+ * Internal dependencies
+ */
+import { regularFetch } from './controls';
 
 /**
  * Internal dependencies
@@ -33,12 +37,28 @@ import {
 
 /**
  * Requests authors from the REST API.
+ *
+ * @param {Object|undefined} query Optional object of query parameters to
+ *                                 include with request.
  */
-export function* getAuthors() {
-	const users = yield apiFetch( {
-		path: '/wp/v2/users/?who=authors&per_page=-1',
-	} );
-	yield receiveUserQuery( 'authors', users );
+export function* getAuthors( query ) {
+	const path = addQueryArgs(
+		'/wp/v2/users/?who=authors&per_page=100',
+		query
+	);
+	const users = yield apiFetch( { path } );
+	yield receiveUserQuery( path, users );
+}
+
+/**
+ * Temporary approach to resolving editor access to author queries.
+ *
+ * @param {number} id The author id.
+ */
+export function* __unstableGetAuthor( id ) {
+	const path = `/wp/v2/users?who=authors&include=${ id }`;
+	const users = yield apiFetch( { path } );
+	yield receiveUserQuery( 'author', users );
 }
 
 /**
@@ -365,4 +385,39 @@ export function* getAutosaves( postType, postId ) {
  */
 export function* getAutosave( postType, postId ) {
 	yield controls.resolveSelect( 'core', 'getAutosaves', postType, postId );
+}
+
+/**
+ * Retrieve the frontend template used for a given link.
+ *
+ * @param {string} link  Link.
+ */
+export function* __experimentalGetTemplateForLink( link ) {
+	// Ideally this should be using an apiFetch call
+	// We could potentially do so by adding a "filter" to the `wp_template` end point.
+	// Also it seems the returned object is not a regular REST API post type.
+	const template = yield regularFetch(
+		addQueryArgs( link, {
+			'_wp-find-template': true,
+		} )
+	);
+
+	if ( template === null ) {
+		return;
+	}
+
+	yield getEntityRecord( 'postType', 'wp_template', template.id );
+	const record = yield controls.select(
+		'core',
+		'getEntityRecord',
+		'postType',
+		'wp_template',
+		template.id
+	);
+
+	if ( record ) {
+		yield receiveEntityRecords( 'postType', 'wp_template', [ record ], {
+			'find-template': link,
+		} );
+	}
 }

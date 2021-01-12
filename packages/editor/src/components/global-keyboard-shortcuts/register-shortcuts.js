@@ -5,10 +5,11 @@ import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 function EditorKeyboardShortcutsRegister() {
 	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/editor/save',

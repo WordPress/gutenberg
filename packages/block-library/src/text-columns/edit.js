@@ -6,7 +6,7 @@ import { get, times } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import {
 	BlockControls,
@@ -73,6 +73,11 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 										],
 									} );
 								} }
+								aria-label={ sprintf(
+									// translators: %d: column index (starting with 1)
+									__( 'Column %d text' ),
+									index + 1
+								) }
 								placeholder={ __( 'New Column' ) }
 							/>
 						</div>

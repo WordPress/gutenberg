@@ -5,6 +5,7 @@
         "isValid": true,
         "attributes": {
             "contentJustification": "center",
+            "orientation": "horizontal",
             "align": "wide"
         },
         "innerBlocks": [

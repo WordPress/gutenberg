@@ -59,7 +59,7 @@ function BlockMover( {
 					clientIds={ clientIds }
 					cloneClassname="block-editor-block-mover__drag-clone"
 				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
@@ -68,9 +68,7 @@ function BlockMover( {
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable={ isDraggable }
+							{ ...draggableProps }
 						/>
 					) }
 				</BlockDraggable>

@@ -84,7 +84,7 @@ _Parameters_
 
 _Returns_
 
--   `Set`: A set containing all files.
+-   `Array<Object>`: An array containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
@@ -169,7 +169,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Wether or not the element is empty.
+-   `boolean`: Whether or not the element is empty.
 
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 

@@ -27,7 +27,7 @@ import { getScrollContainer } from '@wordpress/dom';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
-import { BlockNodes } from './root-container';
+import { BlockNodes } from './';
 import { getBlockDOMNode } from '../../utils/dom';
 
 function selector( select ) {
@@ -92,7 +92,9 @@ function BlockPopover( {
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
-		useCallback( () => setIsToolbarForced( true ), [] ),
+		useCallback( () => {
+			setIsToolbarForced( true );
+		}, [] ),
 		{
 			bindGlobal: true,
 			eventName: 'keydown',
@@ -165,7 +167,13 @@ function BlockPopover( {
 		: 'top right left';
 	const stickyBoundaryElement = showEmptyBlockSideInserter
 		? undefined
-		: getScrollContainer( node ) || ownerDocument.body;
+		: // The sticky boundary element should be the boundary at which the
+		  // the block toolbar becomes sticky when the block scolls out of view.
+		  // In case of an iframe, this should be the iframe boundary, otherwise
+		  // the scroll container.
+		  ownerDocument.defaultView.frameElement ||
+		  getScrollContainer( node ) ||
+		  ownerDocument.body;
 
 	return (
 		<Popover
@@ -180,7 +188,9 @@ function BlockPopover( {
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
-			onBlur={ () => setIsToolbarForced( false ) }
+			onFocusOutside={ () => {
+				setIsToolbarForced( false );
+			} }
 			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
@@ -225,6 +235,7 @@ function BlockPopover( {
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
+					blockElement={ node }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (

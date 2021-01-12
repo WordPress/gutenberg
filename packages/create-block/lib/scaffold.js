@@ -5,7 +5,7 @@ const { writeFile } = require( 'fs' ).promises;
 const { snakeCase } = require( 'lodash' );
 const makeDir = require( 'make-dir' );
 const { render } = require( 'mustache' );
-const { dirname } = require( 'path' );
+const { dirname, join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -18,6 +18,7 @@ const { code, info, success } = require( './log' );
 module.exports = async (
 	blockTemplate,
 	{
+		apiVersion,
 		namespace,
 		slug,
 		title,
@@ -29,6 +30,7 @@ module.exports = async (
 		licenseURI,
 		version,
 		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
@@ -40,8 +42,9 @@ module.exports = async (
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
-	const { outputTemplates } = blockTemplate;
+	const { outputTemplates, outputAssets } = blockTemplate;
 	const view = {
+		apiVersion,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
@@ -55,23 +58,32 @@ module.exports = async (
 		license,
 		licenseURI,
 		textdomain: slug,
+		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
-		wpScripts,
 	};
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ outputFile.replace(
-				/\$slug/g,
-				slug
-			) }`;
+			const outputFilePath = join(
+				slug,
+				outputFile.replace( /\$slug/g, slug )
+			);
 			await makeDir( dirname( outputFilePath ) );
 			writeFile(
 				outputFilePath,
 				render( outputTemplates[ outputFile ], view )
 			);
+		} )
+	);
+
+	await Promise.all(
+		Object.keys( outputAssets ).map( async ( outputFile ) => {
+			const outputFilePath = join( slug, 'assets', outputFile );
+			await makeDir( dirname( outputFilePath ) );
+			writeFile( outputFilePath, outputAssets[ outputFile ] );
 		} )
 	);
 
