@@ -51,6 +51,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
     }
 
+    interface FocalPointPickerTooltipShownCallback {
+        void onRequestFocalPointPickerTooltipShown(boolean tooltipShown);
+    }
+
     // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
     enum LogLevel {
         TRACE(0),
@@ -176,4 +180,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles);
 
     void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles);
+
+    void setFocalPointPickerTooltipShown(boolean tooltipShown);
+
+    void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback);
 }

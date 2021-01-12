@@ -7,9 +7,13 @@ import Video from 'react-native-video';
 /**
  * WordPress dependencies
  */
+import {
+	requestFocalPointPickerTooltipShown,
+	setFocalPointPickerTooltipShown,
+} from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
-import { useRef, useState, useMemo } from '@wordpress/element';
+import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
 /**
@@ -35,7 +39,16 @@ export default function FocalPointPicker( props ) {
 	const [ sliderKey, setSliderKey ] = useState( 0 );
 	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
-	const [ tooltipVisible, setTooltipVisible ] = useState( true );
+	const [ tooltipVisible, setTooltipVisible ] = useState( false );
+
+	useEffect( () => {
+		requestFocalPointPickerTooltipShown( ( tooltipShown ) => {
+			if ( ! tooltipShown ) {
+				setTooltipVisible( true );
+				setFocalPointPickerTooltipShown( true );
+			}
+		} );
+	}, [] );
 
 	const pan = useRef( new Animated.ValueXY() ).current;
 
