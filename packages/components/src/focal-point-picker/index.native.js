@@ -14,7 +14,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
 import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,13 +28,7 @@ const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
 
 function FocalPointPicker( props ) {
-	const {
-		focalPoint,
-		getStylesFromColorScheme,
-		onChange,
-		shouldEnableBottomSheetScroll,
-		url,
-	} = props;
+	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
 
 	const isVideo = isVideoType( url );
 
@@ -109,7 +103,7 @@ function FocalPointPicker( props ) {
 		} ) );
 	}
 
-	const backgroundColor = getStylesFromColorScheme(
+	const backgroundColor = usePreferredColorSchemeStyle(
 		styles.backgroundSolid,
 		styles.backgroundSolidDark
 	);
@@ -261,4 +255,4 @@ function FocalPointPicker( props ) {
 	);
 }
 
-export default withPreferredColorScheme( FocalPointPicker );
+export default FocalPointPicker;

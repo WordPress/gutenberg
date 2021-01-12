@@ -19,7 +19,7 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -41,7 +41,6 @@ import {
 function Controls( {
 	attributes,
 	didUploadFail,
-	getStylesFromColorScheme,
 	isUploadInProgress,
 	onClearMedia,
 	onSelectMedia,
@@ -94,7 +93,7 @@ function Controls( {
 		} );
 	};
 
-	const addMediaButtonStyle = getStylesFromColorScheme(
+	const addMediaButtonStyle = usePreferredColorSchemeStyle(
 		styles.addMediaButton,
 		styles.addMediaButtonDark
 	);
@@ -260,4 +259,4 @@ function Controls( {
 	);
 }
 
-export default withPreferredColorScheme( Controls );
+export default Controls;
