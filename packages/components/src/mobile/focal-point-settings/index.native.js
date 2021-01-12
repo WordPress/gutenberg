@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useContext } from '@wordpress/element';
-import { BottomSheetContext } from '@wordpress/components';
+import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 import { Icon, check, close } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -60,6 +60,15 @@ function FocalPointSettings() {
 
 	return (
 		<>
+			<FocalPointPicker
+			// url={ url }
+			// value={ focalPoint }
+			// onChange={ ( newFocalPoint ) =>
+			// 	setAttributes( {
+			// 		focalPoint: newFocalPoint,
+			// 	} )
+			// }
+			/>
 			<View style={ footerStyle }>
 				<TouchableWithoutFeedback
 					onPress={ () => onButtonPress( 'cancel' ) }
