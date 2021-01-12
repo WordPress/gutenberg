@@ -118,8 +118,8 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 
 	$theme               = wp_get_theme()->get_stylesheet();
 	$template            = new WP_Block_Template();
-	$template->id        = $theme . '//' . $template_file['slug'];
-	$template->theme     = $theme;
+	$template->id        = $template_file['slug'];
+	$template->theme     = array( $theme );
 	$template->content   = file_get_contents( $template_file['path'] );
 	$template->slug      = $template_file['slug'];
 	$template->is_custom = false;
@@ -153,12 +153,10 @@ function _gutenberg_build_template_result_from_post( $post ) {
 		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 	}
 
-	$theme = $terms[0]->name;
-
 	$template              = new WP_Block_Template();
 	$template->wp_id       = $post->ID;
-	$template->id          = $theme . '//' . $post->post_name;
-	$template->theme       = $theme;
+	$template->id          = $post->post_name;
+	$template->theme       = array();
 	$template->content     = $post->post_content;
 	$template->slug        = $post->post_name;
 	$template->is_custom   = true;
@@ -166,6 +164,10 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->description = $post->post_excerpt;
 	$template->title       = $post->post_title;
 	$template->status      = $post->post_status;
+
+	foreach ( $terms as $term ) {
+		$template->theme[] = $term->slug;
+	}
 
 	return $template;
 }
@@ -192,7 +194,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'tax_query'      => array(
 			array(
 				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
+				'field'    => 'slug',
 				'terms'    => wp_get_theme()->get_stylesheet(),
 			),
 		),
@@ -223,7 +225,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_custom      = array_search(
-				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
+				$template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
@@ -242,17 +244,13 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 /**
  * Retrieves a single unified template object using its id.
  *
- * @param string $id Template unique identifier (example: theme|slug).
+ * @param string $slug Template unique identifier (example: theme|slug).
  * @param array  $template_type wp_template or wp_template_part.
  *
  * @return WP_Block_Template|null Template.
  */
-function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
-	$parts = explode( '//', $id, 2 );
-	if ( count( $parts ) < 2 ) {
-		return null;
-	}
-	list( $theme, $slug ) = $parts;
+function gutenberg_get_block_template( $slug, $template_type = 'wp_template' ) {
+	$theme = wp_get_theme()->get_stylesheet();
 	$wp_query_args        = array(
 		'name'           => $slug,
 		'post_type'      => $template_type,
@@ -262,7 +260,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		'tax_query'      => array(
 			array(
 				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
+				'field'    => 'slug',
 				'terms'    => $theme,
 			),
 		),
@@ -278,11 +276,9 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
-	if ( wp_get_theme()->get_stylesheet() === $theme ) {
-		$template_file = _gutenberg_get_template_file( $template_type, $slug );
-		if ( null !== $template_file ) {
-			return _gutenberg_build_template_result_from_file( $template_file, $template_type );
-		}
+	$template_file = _gutenberg_get_template_file( $template_type, $slug );
+	if ( null !== $template_file ) {
+		return _gutenberg_build_template_result_from_file( $template_file, $template_type );
 	}
 
 	return null;
@@ -303,18 +299,24 @@ function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_s
 	}
 
 	// Template slugs must be unique within the same theme.
-	$theme = get_the_terms( $post_ID, 'wp_theme' )[0]->slug;
+	$tax_query = array(
+		'relation' => 'OR',
+	);
+	$terms = get_the_terms( $post_ID, 'wp_theme' );
+	foreach ( $terms as $term ) {
+		$tax_query[] = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $term->slug,
+		);
+	}
 
 	$check_query_args = array(
 		'post_name'      => $slug,
 		'post_type'      => $post_type,
 		'posts_per_page' => 1,
 		'post__not_in'   => $post_ID,
-		'tax_query'      => array(
-			'taxonomy' => 'wp_theme',
-			'field'    => 'name',
-			'terms'    => $theme,
-		),
+		'tax_query'      => $tax_query,
 		'no_found_rows'  => true,
 	);
 	$check_query      = new WP_Query( $check_query_args );

@@ -19,9 +19,9 @@ class WP_Block_Template {
 	public $type;
 
 	/**
-	 * Theme.
+	 * Theme(s).
 	 *
-	 * @var string
+	 * @var array
 	 */
 	public $theme;
 

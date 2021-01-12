@@ -26,11 +26,11 @@ import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
-	attributes: { slug, theme, tagName: TagName = 'div' },
+	attributes: { slug, tagName: TagName = 'div' },
 	setAttributes,
 	clientId,
 } ) {
-	const templatePartId = theme + '//' + slug;
+	const templatePartId = slug;
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
@@ -43,7 +43,7 @@ export default function TemplatePartEdit( {
 					? select( 'core' ).getEntityRecord(
 							'postType',
 							'wp_template_part',
-							theme + '//' + slug
+							slug
 					  )
 					: null;
 

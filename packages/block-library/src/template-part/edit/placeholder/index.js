@@ -31,7 +31,6 @@ export default function TemplatePartPlaceholder( {
 		);
 		setAttributes( {
 			slug: templatePart.slug,
-			theme: templatePart.theme,
 		} );
 	}, [ setAttributes ] );
 

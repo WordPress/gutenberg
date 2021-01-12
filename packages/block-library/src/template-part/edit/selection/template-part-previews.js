@@ -32,7 +32,7 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const { slug, theme, title } = templatePart;
+	const { slug, title } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -40,7 +40,7 @@ function TemplatePartItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { slug, theme } );
+		setAttributes( { slug } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -52,7 +52,7 @@ function TemplatePartItem( {
 			}
 		);
 		onClose();
-	}, [ slug, theme ] );
+	}, [ slug ] );
 
 	return (
 		<CompositeItem
@@ -100,12 +100,12 @@ function TemplatePartsByTheme( {
 	composite,
 } ) {
 	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'theme' ) );
+		return Object.values( groupBy( templateParts, 'slug' ) );
 	}, [ templateParts ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
 	return templatePartsByTheme.map( ( templatePartList ) => (
-		<PanelGroup key={ templatePartList[ 0 ].theme }>
+		<PanelGroup key={ templatePartList[ 0 ].slug }>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
 					<TemplatePartItem
@@ -135,10 +135,10 @@ function TemplatePartSearchResults( {
 		// Remove diacritics and convert to lowercase to normalize.
 		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { slug, theme } ) =>
+			( { slug } ) =>
 				slug.toLowerCase().includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
-				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
+				deburr( slug ).toLowerCase().includes( normalizedFilterValue )
 		);
 		// Order based on value location.
 		searchResults.sort( ( a, b ) => {
@@ -159,10 +159,10 @@ function TemplatePartSearchResults( {
 			// Second prioritize index found in theme.
 			// Since diacritics can be used in theme names, remove them for the comparison.
 			return (
-				deburr( a.theme )
+				deburr( a.slug )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue ) -
-				deburr( b.theme ).toLowerCase().indexOf( normalizedFilterValue )
+				deburr( b.slug ).toLowerCase().indexOf( normalizedFilterValue )
 			);
 		} );
 		return searchResults;
@@ -173,7 +173,7 @@ function TemplatePartSearchResults( {
 	return filteredTPs.map( ( templatePart ) => (
 		<PanelGroup
 			key={ templatePart.id }
-			title={ templatePart.theme || __( 'Custom' ) }
+			title={ templatePart.slug || __( 'Custom' ) }
 		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem

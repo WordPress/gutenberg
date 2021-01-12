@@ -6,9 +6,6 @@
 		"slug": {
 			"type": "string"
 		},
-		"theme": {
-			"type": "string"
-		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
