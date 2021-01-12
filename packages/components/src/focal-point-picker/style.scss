@@ -1,10 +1,13 @@
-// TODO(David): Why does naming this file `style.native.scss` throw errors?
 .container {
 	padding: 16px;
 }
 
 .media {
 	position: relative;
+}
+
+.imageContainer {
+	border: 1px solid $blue-medium;
 }
 
 .image {

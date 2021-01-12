@@ -110,6 +110,7 @@ export default function FocalPointPicker( props ) {
 									setContainerSize( { width, height } );
 								}
 							} }
+							style={ styles.imageContainer }
 						>
 							<Image url={ url } width={ styles.image.width } />
 						</Animated.View>
