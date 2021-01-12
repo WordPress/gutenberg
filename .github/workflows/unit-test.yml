@@ -5,7 +5,7 @@ on:
     paths-ignore:
     - '**.md'
   push:
-    branches: [master]
+    branches: [master, wp-trunk]
     paths-ignore:
     - '**.md'
 
@@ -92,7 +92,7 @@ jobs:
     - name: Running single site unit tests
       run: npm run test-unit-php
       if: ${{ success() || failure() }}
-    
+
     - name: Running multisite unit tests
       run: npm run test-unit-php-multisite
       if: ${{ success() || failure() }}

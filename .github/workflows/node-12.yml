@@ -1,17 +1,19 @@
-name: Create Block
+name: Node.js 12.x
 
 on:
   pull_request:
-    paths:
-    - 'packages/**'
-    - '!packages/**/test/**'
-    - '!packages/**/*.md'
+    paths-ignore:
+    - 'docs/**'
+    - 'lib/**'
+    - 'phpunit/**'
+    - '**.md'
   push:
-    branches: [master, wp/trunk]
-    paths:
-    - 'packages/**'
-    - '!packages/**/test/**'
-    - '!packages/**/*.md'
+    branches: [master, wp-trunk]
+    paths-ignore:
+    - 'docs/**'
+    - 'lib/**'
+    - 'phpunit/**'
+    - '**.md'
 
 jobs:
   checks:
@@ -34,12 +36,18 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js 14.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: 12.x
 
-    - name: npm install, build, format and lint
+    - name: Npm install and build
       run: |
         npm ci
-        npm run test:create-block
+        npm run build
+
+    - name: Lint JavaScript and Styles
+      run: npm run lint
+
+    - name: Test Create Block
+      run: npm run test:create-block
