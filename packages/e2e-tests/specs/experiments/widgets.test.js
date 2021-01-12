@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	createURL,
+	visitAdminPage,
 	deactivatePlugin,
 	activatePlugin,
 } from '@wordpress/e2e-test-utils';
@@ -11,13 +11,11 @@ import {
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
-		await page.goto(
-			createURL( 'wp-admin/themes.php', 'page=gutenberg-widgets' ),
-			{
-				waitUntil: [ 'networkidle0' ],
-			}
+		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+		// Wait for the widget areas to load.
+		await page.waitForSelector(
+			'[aria-label="Block: Widget Area"][role="group"]'
 		);
-		await page.waitForSelector( 'aria/Block: Widget Area[role="group"]' );
 	} );
 
 	beforeAll( async () => {
@@ -52,21 +50,18 @@ describe( 'Widgets screen', () => {
 
 	it( 'Should insert content using the global inserter', async () => {
 		const widgetAreas = await page.$$(
-			'aria/Block: Widget Area[role="group"]'
+			'[aria-label="Block: Widget Area"][role="group"]'
 		);
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
 
-		// FIXME: We can't add [role="button"] here since CDP has a bug
-		// where buttons with aria-pressed can't be queried with the button role.
-		// See https://bugs.chromium.org/p/chromium/issues/detail?id=1164294
-		const addBlockButton = await page.$( 'aria/Add block' );
+		const addBlockButton = await page.$( 'button[aria-label="Add block"]' );
 		await addBlockButton.click();
 
 		let blockLibrary = await page.waitForSelector(
-			'aria/Block Library[role="region"]'
+			'[aria-label="Block Library"][role="region"]'
 		);
-		let addParagraphBlock = await blockLibrary.$(
-			'aria/Paragraph[role="option"]'
+		let [ addParagraphBlock ] = await blockLibrary.$x(
+			'//*[@role="option"][*[text()="Paragraph"]]'
 		);
 		await addParagraphBlock.hover();
 
@@ -94,10 +89,10 @@ describe( 'Widgets screen', () => {
 		await addBlockButton.click();
 
 		blockLibrary = await page.waitForSelector(
-			'aria/Block Library[role="region"]'
+			'[aria-label="Block Library"][role="region"]'
 		);
-		addParagraphBlock = await blockLibrary.$(
-			'aria/Paragraph[role="option"]'
+		[ addParagraphBlock ] = await blockLibrary.$x(
+			'//*[@role="option"][*[text()="Paragraph"]]'
 		);
 		await addParagraphBlock.hover();
 
@@ -123,13 +118,13 @@ describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 
 		// TODO: Add tests for updating/saving when possible.
-		// const updateButton = await page.$( 'aria/Update[role="button"]' );
+		// const [ updateButton ] = await page.$x( '//*[@role="button"][*[text()="Update"]]' );
 		// await updateButton.click();
 	} );
 
 	it( 'Should insert content using the inline inserter', async () => {
 		const firstWidgetArea = await page.$(
-			'aria/Block: Widget Area[role="group"]'
+			'[aria-label="Block: Widget Area"][role="group"]'
 		);
 
 		// Scroll to the end of the first widget area.
@@ -148,16 +143,17 @@ describe( 'Widgets screen', () => {
 		);
 
 		// Aria selectors cannot select buttons with the aria-haspopup property, fallback to CSS selector.
-		await page.click(
+		const inlineInserterButton = await page.waitForSelector(
 			'button[aria-label="Add block"][aria-haspopup="true"]'
 		);
+		await inlineInserterButton.click();
 
 		const inlineQuickInserter = await page.waitForSelector(
-			'aria/Blocks[role="listbox"]'
+			'[aria-label="Blocks"][role="listbox"]'
 		);
 
-		const paragraphBlock = await inlineQuickInserter.$(
-			'aria/Paragraph[role="option"]'
+		const [ paragraphBlock ] = await inlineQuickInserter.$x(
+			'//*[@role="option"][*[text()="Paragraph"]]'
 		);
 		await paragraphBlock.click();
 
@@ -175,29 +171,32 @@ describe( 'Widgets screen', () => {
 
 		await page.keyboard.type( 'First Paragraph' );
 
-		// Click near the end of the widget area to select it.
+		const addedParagraphBlockInFirstWidgetAreaBoundingBox = await addedParagraphBlockInFirstWidgetArea.boundingBox();
+
+		// Click outside the block to move the focus back to the widget area.
 		await page.mouse.click(
-			firstWidgetAreaBoundingBox.x + firstWidgetAreaBoundingBox.width / 2,
-			firstWidgetAreaBoundingBox.y +
-				firstWidgetAreaBoundingBox.height -
+			addedParagraphBlockInFirstWidgetAreaBoundingBox.x +
+				firstWidgetAreaBoundingBox.width / 2,
+			addedParagraphBlockInFirstWidgetAreaBoundingBox.y +
+				addedParagraphBlockInFirstWidgetAreaBoundingBox.height +
 				10
 		);
 
-		const addedParagraphBlockInFirstWidgetAreaBoundingBox = await addedParagraphBlockInFirstWidgetArea.boundingBox();
-		// Hover above the last block to trigger the inline inserter between blocks
+		// Hover above the last block to trigger the inline inserter between blocks.
 		await page.mouse.move(
 			addedParagraphBlockInFirstWidgetAreaBoundingBox.x +
 				addedParagraphBlockInFirstWidgetAreaBoundingBox.width / 2,
 			addedParagraphBlockInFirstWidgetAreaBoundingBox.y - 10
 		);
 
-		const inserterButton = await page.$(
+		const inserterButton = await page.waitForSelector(
 			'button[aria-label="Add block"][aria-haspopup="true"]'
 		);
 		await inserterButton.click();
 
+		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for a block[role="searchbox"]'
+			'input[type="search"][placeholder="Search for a block"]'
 		);
 		expect(
 			await inserterSearchBox.evaluate(
@@ -207,11 +206,11 @@ describe( 'Widgets screen', () => {
 
 		await page.keyboard.type( 'Heading' );
 
-		const inserterListBox = await page.waitForSelector(
-			'aria/Blocks[role="listbox"]'
+		const inserterListBox = await page.$(
+			'[role="listbox"][aria-label="Blocks"]'
 		);
-		const headingBlockOption = await inserterListBox.$(
-			'aria/Heading[role="option"]'
+		const [ headingBlockOption ] = await inserterListBox.$x(
+			'//*[@role="option"][*[text()="Heading"]]'
 		);
 		await headingBlockOption.click();
 
