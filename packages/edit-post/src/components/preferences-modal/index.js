@@ -93,6 +93,13 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					help={ __( 'Make the editor look like your theme.' ) }
 					label={ __( 'Use theme styles' ) }
 				/>
+				<EnableFeature
+					featureName="showBlockBreadcrumbs"
+					help={ __(
+						'Shows block breadcrumbs on the bottom of the editor.'
+					) }
+					label={ __( 'Display block breadcrumbs' ) }
+				/>
 			</Section>
 			<Section
 				title={ __( 'Document settings' ) }
