@@ -8,12 +8,14 @@ import { Path, SVG } from '@wordpress/primitives';
  */
 import styles from './style.scss';
 
-export default function FocalPoint() {
+export default function FocalPoint( { height, style, width } ) {
 	return (
 		<SVG
-			style={ styles.focalPointIcon }
-			xmlns="http://www.w3.org/2000/svg"
+			height={ height }
+			style={ style }
 			viewBox="0 0 30 30"
+			width={ width }
+			xmlns="http://www.w3.org/2000/svg"
 		>
 			<Path
 				style={ styles.focalPointIconPathOutline }

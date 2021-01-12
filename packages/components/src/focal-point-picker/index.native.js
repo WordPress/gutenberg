@@ -33,9 +33,9 @@ export default function FocalPointPicker( props ) {
 
 	const [ containerSize, setContainerSize ] = useState( null );
 	const [ sliderKey, setSliderKey ] = useState( 0 );
-	const [ tooltipVisible, setTooltipVisible ] = useState( true );
 	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
+	const [ tooltipVisible, setTooltipVisible ] = useState( true );
 
 	const pan = useRef( new Animated.ValueXY() ).current;
 
@@ -68,7 +68,6 @@ export default function FocalPointPicker( props ) {
 				] ),
 				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
-					setTooltipVisible( false );
 					pan.flattenOffset();
 					const { locationX: x, locationY: y } = event.nativeEvent;
 					setPosition( {
@@ -120,86 +119,96 @@ export default function FocalPointPicker( props ) {
 
 	return (
 		<View style={ styles.container }>
-			<View style={ styles.media }>
-				<View
-					{ ...panResponder.panHandlers }
-					onLayout={ ( event ) => {
-						const { height, width } = event.nativeEvent.layout;
+			<Tooltip
+				visible={ tooltipVisible }
+				onTooltipHidden={ () => setTooltipVisible( false ) }
+			>
+				<View style={ styles.media }>
+					<View
+						{ ...panResponder.panHandlers }
+						onLayout={ ( event ) => {
+							const { height, width } = event.nativeEvent.layout;
 
-						if (
-							width !== 0 &&
-							height !== 0 &&
-							( containerSize?.width !== width ||
-								containerSize?.height !== height )
-						) {
-							setContainerSize( { width, height } );
-						}
-					} }
-					style={ styles.mediaContainer }
-				>
-					{ MEDIA_TYPE_IMAGE === mediaType && (
-						<Image
-							height="100%"
-							url={ url }
-							style={ [ mediaPlaceholderStyles ] }
-							onImageDataLoad={ () => {
-								setDisplayPlaceholder( false );
-							} }
-						/>
-					) }
-					{ MEDIA_TYPE_VIDEO === mediaType && (
-						<Video
-							muted
-							paused
-							disableFocus
-							onLoad={ ( event ) => {
-								const { height, width } = event.naturalSize;
-								setVideoNaturalSize( { height, width } );
-								setDisplayPlaceholder( false );
-							} }
-							resizeMode={ 'contain' }
-							source={ { uri: url } }
-							style={ [
-								{
-									aspectRatio:
-										videoNaturalSize &&
-										videoNaturalSize.width /
-											videoNaturalSize.height,
-									height: '100%',
-								},
-								mediaPlaceholderStyles,
-							] }
-						/>
-					) }
-					<Animated.View
-						pointerEvents="none"
-						style={ focalPointGroupStyles }
+							if (
+								width !== 0 &&
+								height !== 0 &&
+								( containerSize?.width !== width ||
+									containerSize?.height !== height )
+							) {
+								setContainerSize( { width, height } );
+							}
+						} }
+						style={ styles.mediaContainer }
 					>
-						<Tooltip visible={ tooltipVisible } />
-						<View style={ styles.focalPointConstraint }>
-							<FocalPoint />
-						</View>
-					</Animated.View>
+						{ MEDIA_TYPE_IMAGE === mediaType && (
+							<Image
+								height="100%"
+								url={ url }
+								style={ [ mediaPlaceholderStyles ] }
+								onImageDataLoad={ () => {
+									setDisplayPlaceholder( false );
+								} }
+							/>
+						) }
+						{ MEDIA_TYPE_VIDEO === mediaType && (
+							<Video
+								muted
+								paused
+								disableFocus
+								onLoad={ ( event ) => {
+									const { height, width } = event.naturalSize;
+									setVideoNaturalSize( { height, width } );
+									setDisplayPlaceholder( false );
+								} }
+								resizeMode={ 'contain' }
+								source={ { uri: url } }
+								style={ [
+									{
+										aspectRatio:
+											videoNaturalSize &&
+											videoNaturalSize.width /
+												videoNaturalSize.height,
+										height: '100%',
+									},
+									mediaPlaceholderStyles,
+								] }
+							/>
+						) }
+						<Animated.View
+							pointerEvents="none"
+							style={ focalPointGroupStyles }
+						>
+							<Tooltip.Label
+								text={ __( 'Drag to adjust focal point' ) }
+								yOffset={ -25 } // Account for styles.focalPoint offset
+							/>
+							<FocalPoint
+								height={ styles.focalPoint.height }
+								style={ styles.focalPoint }
+								width={ styles.focalPoint.width }
+							/>
+						</Animated.View>
+					</View>
 				</View>
-			</View>
-			<RangeControl
-				inputSuffix="%"
-				key={ `xAxis-${ sliderKey }` }
-				label={ __( 'X-Axis Position' ) }
-				max={ MAX_POSITION_VALUE }
-				min={ MIN_POSITION_VALUE }
-				onChange={ ( x ) => setPosition( { x: x / 100 } ) }
-				value={ Math.round( focalPoint.x * 100 ) }
-			/>
-			<RangeControl
-				inputSuffix="%"
-				key={ `yAxis-${ sliderKey }` }
-				label={ __( 'Y-Axis Position' ) }
-				max={ MAX_POSITION_VALUE }
-				min={ MIN_POSITION_VALUE }
-				onChange={ ( y ) => setPosition( { y: y / 100 } ) }
-				value={ Math.round( focalPoint.y * 100 ) }
-			/>
+				<RangeControl
+					inputSuffix="%"
+					key={ `xAxis-${ sliderKey }` }
+					label={ __( 'X-Axis Position' ) }
+					max={ MAX_POSITION_VALUE }
+					min={ MIN_POSITION_VALUE }
+					onChange={ ( x ) => setPosition( { x: x / 100 } ) }
+					value={ Math.round( focalPoint.x * 100 ) }
+				/>
+				<RangeControl
+					inputSuffix="%"
+					key={ `yAxis-${ sliderKey }` }
+					label={ __( 'Y-Axis Position' ) }
+					max={ MAX_POSITION_VALUE }
+					min={ MIN_POSITION_VALUE }
+					onChange={ ( y ) => setPosition( { y: y / 100 } ) }
+					value={ Math.round( focalPoint.y * 100 ) }
+				/>
+			</Tooltip>
 		</View>
 	);
 }
