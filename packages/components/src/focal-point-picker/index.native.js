@@ -145,6 +145,17 @@ function FocalPointPicker( props ) {
 		},
 	];
 
+	const FOCAL_POINT_SIZE = 50;
+	const focalPointStyles = [
+		styles.focalPoint,
+		{
+			height: FOCAL_POINT_SIZE,
+			marginLeft: -( FOCAL_POINT_SIZE / 2 ),
+			marginTop: -( FOCAL_POINT_SIZE / 2 ),
+			width: FOCAL_POINT_SIZE,
+		},
+	];
+
 	return (
 		<View style={ styles.container }>
 			<Tooltip
@@ -202,11 +213,11 @@ function FocalPointPicker( props ) {
 							>
 								<Tooltip.Label
 									text={ __( 'Drag to adjust focal point' ) }
-									yOffset={ -25 } // Account for styles.focalPoint offset
+									yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
 								/>
 								<FocalPoint
 									height={ styles.focalPoint.height }
-									style={ styles.focalPoint }
+									style={ focalPointStyles }
 									width={ styles.focalPoint.width }
 								/>
 							</Animated.View>

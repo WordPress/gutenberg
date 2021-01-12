@@ -3,12 +3,12 @@ $tooltipArrowSize: 6px;
 $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 
 .tooltip {
-	z-index: 1;
 	background-color: $tooltipColor;
 	border-radius: 4px;
-	position: absolute;
 	left: 50%;
+	position: absolute;
 	top: $tooltipArrowOffset;
+	z-index: 1;
 }
 
 .tooltipShadow {
@@ -21,14 +21,14 @@ $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 }
 
 .arrow {
-	position: absolute;
-	bottom: $tooltipArrowOffset;
-	top: 100%;
-	width: 0;
-	height: 0;
+	border-color: $tooltipColor transparent transparent transparent;
 	border-style: solid;
 	border-width: $tooltipArrowSize $tooltipArrowSize 0 $tooltipArrowSize;
-	margin-left: -$tooltipArrowSize;
+	bottom: $tooltipArrowOffset;
+	height: 0;
 	left: 50%;
-	border-color: $tooltipColor transparent transparent transparent;
+	margin-left: -$tooltipArrowSize;
+	position: absolute;
+	top: 100%;
+	width: 0;
 }
