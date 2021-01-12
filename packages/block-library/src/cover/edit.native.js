@@ -339,10 +339,19 @@ const Cover = ( {
 
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 
-	function toFixed( number, fixed ) {
-		const re = new RegExp( `^-?\\d+(?:.\\d{0,${ fixed || -1 }})?` );
-		return parseFloat( number.toString().match( re )[ 0 ] );
-	}
+	const imagePreviewStyles = [
+		displayPlaceholder && styles.imagePlaceholder,
+	];
+	const videoPreviewStyles = [
+		{
+			aspectRatio:
+				videoNaturalSize &&
+				videoNaturalSize.width / videoNaturalSize.height,
+			height: '100%',
+		},
+		! displayPlaceholder && styles.video,
+		displayPlaceholder && styles.imagePlaceholder,
+	];
 
 	const controls = (
 		<InspectorControls>
@@ -391,8 +400,8 @@ const Cover = ( {
 							<View style={ styles.mediaInner }>
 								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 									<Image
-										editButton={ true }
-										isSelected={ true }
+										editButton={ ! displayPlaceholder }
+										isSelected={ ! displayPlaceholder }
 										isUploadFailed={ didUploadFail }
 										isUploadInProgress={
 											isUploadInProgress
@@ -408,10 +417,7 @@ const Cover = ( {
 										}
 										url={ url }
 										height="100%"
-										style={ [
-											displayPlaceholder &&
-												styles.imagePlaceholder,
-										] }
+										style={ imagePreviewStyles }
 										width={ styles.image.width }
 									/>
 								) }
@@ -431,29 +437,12 @@ const Cover = ( {
 											} );
 											setDisplayPlaceholder( false );
 										} }
-										resizeMode={ 'contain' }
+										resizeMode={ 'cover' }
 										source={ { uri: url } }
-										style={ [
-											styles.video,
-											{
-												aspectRatio:
-													// toFixed is used to fix the ratio to 2 decimals, but
-													// without rounding to avoid gapping between video
-													// and container
-													videoNaturalSize &&
-													toFixed(
-														videoNaturalSize.width /
-															videoNaturalSize.height,
-														2
-													),
-												height: '100%',
-											},
-											displayPlaceholder &&
-												styles.imagePlaceholder,
-										] }
+										style={ videoPreviewStyles }
 									/>
 								) }
-								{ ! hasParallax && (
+								{ ! hasParallax && ! displayPlaceholder && (
 									<Icon
 										icon={ plus }
 										size={ styles.focalPointHint.width }

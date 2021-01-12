@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
 import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,9 +27,10 @@ import styles from './style.scss';
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
 
-export default function FocalPointPicker( props ) {
+function FocalPointPicker( props ) {
 	const {
 		focalPoint,
+		getStylesFromColorScheme,
 		mediaType,
 		onChange,
 		shouldEnableBottomSheetScroll,
@@ -104,10 +106,23 @@ export default function FocalPointPicker( props ) {
 		} ) );
 	}
 
-	const mediaPlaceholderStyles = [
+	const backgroundColor = getStylesFromColorScheme(
+		styles.backgroundSolid,
+		styles.backgroundSolidDark
+	);
+	const imagePreviewStyles = [
 		displayPlaceholder && styles.mediaPlaceholder,
 	];
-
+	const videoPreviewStyles = [
+		{
+			aspectRatio:
+				videoNaturalSize &&
+				videoNaturalSize.width / videoNaturalSize.height,
+			height: '100%',
+		},
+		! displayPlaceholder && styles.video,
+		displayPlaceholder && styles.mediaPlaceholder,
+	];
 	const focalPointGroupStyles = [
 		styles.focalPointGroup,
 		{
@@ -136,7 +151,7 @@ export default function FocalPointPicker( props ) {
 				visible={ tooltipVisible }
 				onTooltipHidden={ () => setTooltipVisible( false ) }
 			>
-				<View style={ styles.media }>
+				<View style={ [ styles.media, backgroundColor ] }>
 					<View
 						{ ...panResponder.panHandlers }
 						onLayout={ ( event ) => {
@@ -155,9 +170,11 @@ export default function FocalPointPicker( props ) {
 					>
 						{ MEDIA_TYPE_IMAGE === mediaType && (
 							<Image
+								editButton={ false }
+								isSelected={ ! displayPlaceholder }
 								height="100%"
 								url={ url }
-								style={ [ mediaPlaceholderStyles ] }
+								style={ imagePreviewStyles }
 								onImageDataLoad={ () => {
 									setDisplayPlaceholder( false );
 								} }
@@ -173,34 +190,27 @@ export default function FocalPointPicker( props ) {
 									setVideoNaturalSize( { height, width } );
 									setDisplayPlaceholder( false );
 								} }
-								resizeMode={ 'contain' }
+								resizeMode={ 'cover' }
 								source={ { uri: url } }
-								style={ [
-									{
-										aspectRatio:
-											videoNaturalSize &&
-											videoNaturalSize.width /
-												videoNaturalSize.height,
-										height: '100%',
-									},
-									mediaPlaceholderStyles,
-								] }
+								style={ videoPreviewStyles }
 							/>
 						) }
-						<Animated.View
-							pointerEvents="none"
-							style={ focalPointGroupStyles }
-						>
-							<Tooltip.Label
-								text={ __( 'Drag to adjust focal point' ) }
-								yOffset={ -25 } // Account for styles.focalPoint offset
-							/>
-							<FocalPoint
-								height={ styles.focalPoint.height }
-								style={ styles.focalPoint }
-								width={ styles.focalPoint.width }
-							/>
-						</Animated.View>
+						{ ! displayPlaceholder && (
+							<Animated.View
+								pointerEvents="none"
+								style={ focalPointGroupStyles }
+							>
+								<Tooltip.Label
+									text={ __( 'Drag to adjust focal point' ) }
+									yOffset={ -25 } // Account for styles.focalPoint offset
+								/>
+								<FocalPoint
+									height={ styles.focalPoint.height }
+									style={ styles.focalPoint }
+									width={ styles.focalPoint.width }
+								/>
+							</Animated.View>
+						) }
 					</View>
 				</View>
 				<RangeControl
@@ -225,3 +235,5 @@ export default function FocalPointPicker( props ) {
 		</View>
 	);
 }
+
+export default withPreferredColorScheme( FocalPointPicker );
