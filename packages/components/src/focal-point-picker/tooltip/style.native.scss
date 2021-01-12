@@ -1,11 +1,22 @@
 $tooltipColor: #121212;
+$tooltipArrowSize: 6px;
+$tooltipArrowOffset: -( $tooltipArrowSize - 1 );
+
+.overlay {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
 
 .tooltip {
+	z-index: 1;
 	background-color: $tooltipColor;
 	border-radius: 4px;
-	left: -100;
-	padding: 12px 16px;
-	top: -70px;
+	position: absolute;
+	left: 50%;
+	top: $tooltipArrowOffset;
 }
 
 .tooltipShadow {
@@ -14,18 +25,18 @@ $tooltipColor: #121212;
 
 .text {
 	color: $white;
-	white-space: nowrap;
-	width: auto;
+	padding: 12px 16px;
 }
 
 .arrow {
-	z-index: 1;
 	position: absolute;
-	bottom: -5px;
+	bottom: $tooltipArrowOffset;
+	top: 100%;
 	width: 0;
 	height: 0;
 	border-style: solid;
-	border-width: 6px 6px 0 6px;
-	left: 94px;
+	border-width: $tooltipArrowSize $tooltipArrowSize 0 $tooltipArrowSize;
+	margin-left: -$tooltipArrowSize;
+	left: 50%;
 	border-color: $tooltipColor transparent transparent transparent;
 }
