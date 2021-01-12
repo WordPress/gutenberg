@@ -326,6 +326,30 @@ const Cover = ( {
 				<PanelBody title={ __( 'Media' ) }>
 					<BottomSheet.Cell
 						leftAlign
+						cellContainerStyle={ { minHeight } }
+					>
+						<View style={ [ styles.background, backgroundColor ] }>
+							<View style={ styles.imageContainer }>
+								<Image
+									editButton={ false }
+									focalPoint={
+										focalPoint || IMAGE_DEFAULT_FOCAL_POINT
+									}
+									isSelected={ isParentSelected }
+									isUploadFailed={ didUploadFail }
+									isUploadInProgress={ isUploadInProgress }
+									onSelectMediaUploadOption={ onSelectMedia }
+									openMediaOptions={
+										openMediaOptionsRef.current
+									}
+									url={ url }
+									width={ styles.image.width }
+								/>
+							</View>
+						</View>
+					</BottomSheet.Cell>
+					<BottomSheet.Cell
+						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
 						onPress={ onClearMedia }
