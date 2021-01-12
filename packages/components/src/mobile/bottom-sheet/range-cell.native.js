@@ -98,7 +98,6 @@ class BottomSheetRangeCell extends Component {
 			shouldDisplayTextInput = true,
 			children,
 			decimalNum,
-			inputSuffix,
 			...cellProps
 		} = this.props;
 
@@ -118,11 +117,6 @@ class BottomSheetRangeCell extends Component {
 			styles.container,
 			isIOS ? styles.containerIOS : styles.containerAndroid,
 		];
-
-		const suffixColor = getStylesFromColorScheme(
-			styles.suffixColor,
-			styles.suffixColorDark
-		);
 
 		return (
 			<Cell
@@ -180,11 +174,6 @@ class BottomSheetRangeCell extends Component {
 						>
 							{ children }
 						</RangeTextInput>
-					) }
-					{ shouldDisplayTextInput && inputSuffix && (
-						<Text style={ [ styles.suffix, suffixColor ] }>
-							{ inputSuffix }
-						</Text>
 					) }
 				</View>
 			</Cell>
