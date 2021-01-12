@@ -28,6 +28,7 @@ export default function FocalPointPicker( props ) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
 
 	const [ containerSize, setContainerSize ] = useState( null );
+	const [ sliderKey, setSliderKey ] = useState( 0 );
 	const panRef = useRef();
 
 	function setPosition( { x, y } ) {
@@ -55,6 +56,10 @@ export default function FocalPointPicker( props ) {
 				break;
 			default:
 				shouldEnableBottomSheetScroll( true );
+				// Slider (child of RangeCell) is uncontrolled, so we must increment a
+				// key to re-mount and sync the pan gesture values to the sliders
+				// https://git.io/JTe4A
+				setSliderKey( ( prevState ) => prevState + 1 );
 				break;
 		}
 	}
@@ -162,8 +167,8 @@ export default function FocalPointPicker( props ) {
 					</SVG>
 				</Animated.View>
 			</View>
-			{ /* TODO(David): RangeControl is uncontrolled, how might I set its value via the pan gesture? */ }
 			<RangeControl
+				key={ `xAxis-${ sliderKey }` }
 				label={ __( 'X-Axis Position' ) }
 				max={ MAX_POSITION_VALUE }
 				min={ MIN_POSITION_VALUE }
@@ -171,6 +176,7 @@ export default function FocalPointPicker( props ) {
 				value={ Math.round( focalPoint.x * 100 ) }
 			/>
 			<RangeControl
+				key={ `yAxis-${ sliderKey }` }
 				label={ __( 'Y-Axis Position' ) }
 				max={ MAX_POSITION_VALUE }
 				min={ MIN_POSITION_VALUE }
