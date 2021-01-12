@@ -92,9 +92,35 @@ export default function FocalPointPicker( props ) {
 		} ) );
 	}
 
+	const mediaPlaceholderStyles = [
+		displayPlaceholder && styles.mediaPlaceholder,
+	];
+
+	const focalPointGroupStyles = [
+		styles.focalPointGroup,
+		{
+			transform: [
+				{
+					translateX: pan.x.interpolate( {
+						inputRange: [ 0, containerSize?.width || 0 ],
+						outputRange: [ 0, containerSize?.width || 0 ],
+						extrapolate: 'clamp',
+					} ),
+				},
+				{
+					translateY: pan.y.interpolate( {
+						inputRange: [ 0, containerSize?.height || 0 ],
+						outputRange: [ 0, containerSize?.height || 0 ],
+						extrapolate: 'clamp',
+					} ),
+				},
+			],
+		},
+	];
+
 	return (
 		<View style={ styles.container }>
-			<View style={ [ styles.media ] }>
+			<View style={ styles.media }>
 				<View
 					{ ...panResponder.panHandlers }
 					onLayout={ ( event ) => {
@@ -109,15 +135,13 @@ export default function FocalPointPicker( props ) {
 							setContainerSize( { width, height } );
 						}
 					} }
-					style={ styles.imageContainer }
+					style={ styles.mediaContainer }
 				>
 					{ MEDIA_TYPE_IMAGE === mediaType && (
 						<Image
 							height="100%"
 							url={ url }
-							style={ [
-								displayPlaceholder && styles.imagePlaceholder,
-							] }
+							style={ [ mediaPlaceholderStyles ] }
 							onImageDataLoad={ () => {
 								setDisplayPlaceholder( false );
 							} }
@@ -143,45 +167,13 @@ export default function FocalPointPicker( props ) {
 											videoNaturalSize.height,
 									height: '100%',
 								},
-								displayPlaceholder && styles.imagePlaceholder,
+								mediaPlaceholderStyles,
 							] }
 						/>
 					) }
 					<Animated.View
 						pointerEvents="none"
-						style={ [
-							styles.focalPointGroup,
-							{
-								transform: [
-									{
-										translateX: pan.x.interpolate( {
-											inputRange: [
-												0,
-												containerSize?.width || 0,
-											],
-											outputRange: [
-												0,
-												containerSize?.width || 0,
-											],
-											extrapolate: 'clamp',
-										} ),
-									},
-									{
-										translateY: pan.y.interpolate( {
-											inputRange: [
-												0,
-												containerSize?.height || 0,
-											],
-											outputRange: [
-												0,
-												containerSize?.height || 0,
-											],
-											extrapolate: 'clamp',
-										} ),
-									},
-								],
-							},
-						] }
+						style={ focalPointGroupStyles }
 					>
 						<Tooltip visible={ tooltipVisible } />
 						<View style={ styles.focalPointConstraint }>
