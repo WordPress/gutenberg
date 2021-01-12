@@ -61,6 +61,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
+    aria-describedby={null}
     className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
     disabled={false}
     onClick={[Function]}
@@ -176,6 +177,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
     A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
+    aria-describedby={null}
     className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
     disabled={false}
     onClick={[Function]}

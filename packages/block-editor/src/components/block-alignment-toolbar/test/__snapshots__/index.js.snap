@@ -65,5 +65,10 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
       "isAlternate": true,
     }
   }
+  toggleProps={
+    Object {
+      "describedBy": "Change alignment",
+    }
+  }
 />
 `;
