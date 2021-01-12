@@ -58,6 +58,13 @@ registerBlockType('{{namespace}}/{{slug}}', {
 
     {{/dashicon}}
 
+    /**
+    * Attributes are the way a block stores data, they define how a block is parsed to extract data from the saved content.
+    * When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an attributes.message variable.
+    *
+    * @see https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-attributes.md
+    */
+
     attributes: {
         message: {
             type: 'string',

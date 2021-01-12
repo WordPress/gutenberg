@@ -1,11 +1,11 @@
 {
 	"name": "@wordpress/gutenpride-template",
 	"version": "1.0.0-prerelease",
-	"description": "A package containing a block template to use with @wordpress/create-block.",
+	"description": "Template for @wordpress/create-block used in the official WordPress tutorial.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [ "wordpress", "create block", "gutenpride", "block template" ],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/gutenpride-template/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/docs/designers-developers/developers/tutorials/create-block",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
