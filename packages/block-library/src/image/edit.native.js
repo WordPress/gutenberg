@@ -374,6 +374,7 @@ export class ImageEdit extends React.Component {
 				url={ mappedAttributes.url }
 				rel={ mappedAttributes.rel }
 				label={ mappedAttributes.label }
+				linkTarget={ mappedAttributes.linkTarget }
 				onClose={ this.dismissSheet }
 				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
