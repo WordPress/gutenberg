@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { _x, __ } from '@wordpress/i18n';
+import { queryPaginationPrevious as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ export { metadata, name };
 export const settings = {
 	title: _x( 'Query Pagination Previous', 'block title' ),
 	description: __( 'Displays the previous posts page link.' ),
-	// TODO create icon
+	icon,
 	edit,
 	parent: [ 'core/query-pagination' ],
 };

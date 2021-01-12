@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { _x, __ } from '@wordpress/i18n';
+import { queryPagination as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,7 +19,7 @@ export const settings = {
 	description: __(
 		'Displays a paginated navigation to next/previous set of posts, when applicable.'
 	),
-	// TODO create icon
+	icon,
 	edit,
 	save,
 	parent: [ 'core/query' ],
