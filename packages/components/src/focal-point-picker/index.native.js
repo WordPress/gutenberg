@@ -14,6 +14,7 @@ import { useRef, useState, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import FocalPoint from './focal-point';
+import Tooltip from './tooltip';
 import styles from './style.scss';
 
 const MIN_POSITION_VALUE = 0;
@@ -102,7 +103,7 @@ export default function FocalPointPicker( props ) {
 					<Animated.View
 						pointerEvents="none"
 						style={ [
-							styles.focalPointWrapper,
+							styles.focalPointGroup,
 							{
 								transform: [
 									{
@@ -135,7 +136,10 @@ export default function FocalPointPicker( props ) {
 							},
 						] }
 					>
-						<FocalPoint />
+						{ true && <Tooltip onHide={ () => {} } /> }
+						<View style={ styles.focalPointConstraint }>
+							<FocalPoint />
+						</View>
 					</Animated.View>
 				</View>
 			</View>
