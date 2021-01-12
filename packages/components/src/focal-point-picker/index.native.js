@@ -26,6 +26,7 @@ export default function FocalPointPicker( props ) {
 	const [ containerSize, setContainerSize ] = useState( null );
 	const [ sliderKey, setSliderKey ] = useState( 0 );
 	const [ tooltipVisible, setTooltipVisible ] = useState( true );
+	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
 
 	const pan = useRef( new Animated.ValueXY() ).current;
 
@@ -101,7 +102,16 @@ export default function FocalPointPicker( props ) {
 					} }
 					style={ styles.imageContainer }
 				>
-					<Image height="100%" url={ url } />
+					<Image
+						height="100%"
+						url={ url }
+						style={ [
+							displayPlaceholder && styles.imagePlaceholder,
+						] }
+						onImageDataLoad={ () => {
+							setDisplayPlaceholder( false );
+						} }
+					/>
 					<Animated.View
 						pointerEvents="none"
 						style={ [
