@@ -23,12 +23,6 @@ import {
 	Image,
 	ImageEditingButton,
 	IMAGE_DEFAULT_FOCAL_POINT,
-	PanelBody,
-	RangeControl,
-	UnitControl,
-	TextControl,
-	BottomSheet,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -53,7 +47,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
-import { cover as icon, plus, replace, image, warning } from '@wordpress/icons';
+import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -62,13 +56,11 @@ import { getProtocol } from '@wordpress/url';
 import styles from './style.scss';
 import {
 	attributesFromMedia,
-	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	CSS_UNITS,
+	COVER_DEFAULT_HEIGHT,
 } from './shared';
-import OverlayColorSettings from './overlay-color-settings';
-import FocalPointSettings from './focal-point-settings';
+import Controls from './controls';
 
 /**
  * Constants
@@ -83,8 +75,6 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
-const COVER_MAX_HEIGHT = 1000;
-const COVER_DEFAULT_HEIGHT = 300;
 
 const Cover = ( {
 	attributes,
@@ -103,7 +93,6 @@ const Cover = ( {
 		backgroundType,
 		dimRatio,
 		focalPoint,
-		hasParallax,
 		minHeight,
 		url,
 		id,
@@ -111,8 +100,6 @@ const Cover = ( {
 		customOverlayColor,
 		minHeightUnit = 'px',
 	} = attributes;
-
-	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
@@ -178,19 +165,6 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = useCallback(
-		( value ) => {
-			if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
-				setAttributes( { minHeight: value } );
-			}
-		},
-		[ minHeight ]
-	);
-
-	const onOpacityChange = useCallback( ( value ) => {
-		setAttributes( { dimRatio: value } );
-	}, [] );
-
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
@@ -231,21 +205,6 @@ const Cover = ( {
 		} );
 	}
 
-	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
-
-	function setFocalPoint( value ) {
-		setAttributes( { focalPoint: value } );
-	}
-
-	const toggleParallax = () => {
-		setAttributes( {
-			hasParallax: ! hasParallax,
-			...( ! hasParallax
-				? { focalPoint: undefined }
-				: { focalPoint: IMAGE_DEFAULT_FOCAL_POINT } ),
-		} );
-	};
-
 	function openColorPicker() {
 		selectBlock();
 		setCustomColorPickerShowing( true );
@@ -255,11 +214,6 @@ const Cover = ( {
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
 		styles.backgroundSolidDark
-	);
-
-	const addMediaButtonStyle = getStylesFromColorScheme(
-		styles.addMediaButton,
-		styles.addMediaButtonDark
 	);
 
 	const overlayStyles = [
@@ -314,180 +268,11 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	const onChangeUnit = useCallback( ( nextUnit ) => {
-		setAttributes( {
-			minHeightUnit: nextUnit,
-			minHeight:
-				nextUnit === 'px'
-					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
-					: CONTAINER_HEIGHT,
-		} );
-	}, [] );
-
 	const onBottomSheetClosed = useCallback( () => {
 		InteractionManager.runAfterInteractions( () => {
 			setCustomColorPickerShowing( false );
 		} );
 	}, [] );
-
-	function focalPointPosition( { x, y } = IMAGE_DEFAULT_FOCAL_POINT ) {
-		return {
-			left: `${ ( hasParallax ? 0.5 : x ) * 100 }%`,
-			top: `${ ( hasParallax ? 0.5 : y ) * 100 }%`,
-		};
-	}
-
-	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
-
-	const imagePreviewStyles = [
-		displayPlaceholder && styles.imagePlaceholder,
-	];
-	const videoPreviewStyles = [
-		{
-			aspectRatio:
-				videoNaturalSize &&
-				videoNaturalSize.width / videoNaturalSize.height,
-			height: '100%',
-		},
-		! displayPlaceholder && styles.video,
-		displayPlaceholder && styles.imagePlaceholder,
-	];
-
-	const controls = (
-		<InspectorControls>
-			<OverlayColorSettings
-				overlayColor={ attributes.overlayColor }
-				customOverlayColor={ attributes.customOverlayColor }
-				gradient={ attributes.gradient }
-				customGradient={ attributes.customGradient }
-				setAttributes={ setAttributes }
-			/>
-			{ url ? (
-				<PanelBody>
-					<RangeControl
-						label={ __( 'Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpacityChange }
-						style={ styles.rangeCellContainer }
-						separatorType={ 'topFullWidth' }
-					/>
-				</PanelBody>
-			) : null }
-			<PanelBody title={ __( 'Dimensions' ) }>
-				<UnitControl
-					label={ __( 'Minimum height' ) }
-					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
-					max={ COVER_MAX_HEIGHT }
-					unit={ minHeightUnit }
-					value={ CONTAINER_HEIGHT }
-					onChange={ onHeightChange }
-					onUnitChange={ onChangeUnit }
-					units={ CSS_UNITS }
-					style={ styles.rangeCellContainer }
-					key={ minHeightUnit }
-				/>
-			</PanelBody>
-
-			<PanelBody title={ __( 'Media' ) }>
-				{ url ? (
-					<>
-						<BottomSheet.Cell
-							style={ backgroundColor }
-							cellContainerStyle={ styles.mediaPreview }
-						>
-							<View style={ styles.mediaInner }>
-								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-									<Image
-										editButton={ ! displayPlaceholder }
-										isSelected={ ! displayPlaceholder }
-										isUploadFailed={ didUploadFail }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										onImageDataLoad={ () => {
-											setDisplayPlaceholder( false );
-										} }
-										onSelectMediaUploadOption={
-											onSelectMedia
-										}
-										openMediaOptions={
-											openMediaOptionsRef.current
-										}
-										url={ url }
-										height="100%"
-										style={ imagePreviewStyles }
-										width={ styles.image.width }
-									/>
-								) }
-								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-									<Video
-										muted
-										paused
-										disableFocus
-										onLoad={ ( event ) => {
-											const {
-												height,
-												width,
-											} = event.naturalSize;
-											setVideoNaturalSize( {
-												height,
-												width,
-											} );
-											setDisplayPlaceholder( false );
-										} }
-										resizeMode={ 'cover' }
-										source={ { uri: url } }
-										style={ videoPreviewStyles }
-									/>
-								) }
-								{ ! hasParallax && ! displayPlaceholder && (
-									<Icon
-										icon={ plus }
-										size={ styles.focalPointHint.width }
-										testMe={ true }
-										style={ [
-											styles.focalPointHint,
-											focalPointPosition( focalPoint ),
-										] }
-									/>
-								) }
-							</View>
-						</BottomSheet.Cell>
-						<FocalPointSettings
-							focalPoint={
-								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
-							}
-							mediaType={ backgroundType }
-							onFocalPointChange={ setFocalPoint }
-							url={ url }
-						/>
-						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-							<ToggleControl
-								label={ __( 'Fixed background' ) }
-								checked={ hasParallax }
-								onChange={ toggleParallax }
-							/>
-						) }
-						<TextControl
-							leftAlign
-							label={ __( 'Clear Media' ) }
-							labelStyle={ styles.clearMediaButton }
-							onPress={ onClearMedia }
-						/>
-					</>
-				) : (
-					<TextControl
-						label={ __( 'Add image or video' ) }
-						labelStyle={ addMediaButtonStyle }
-						leftAlign
-						onPress={ openMediaOptionsRef.current }
-					/>
-				) }
-			</PanelBody>
-		</InspectorControls>
-	);
 
 	const colorPickerControls = (
 		<InspectorControls>
@@ -658,7 +443,17 @@ const Cover = ( {
 
 	return (
 		<View style={ styles.backgroundContainer }>
-			{ isSelected && controls }
+			{ isSelected && (
+				<Controls
+					attributes={ attributes }
+					didUploadFail={ didUploadFail }
+					isUploadInProgress={ isUploadInProgress }
+					onClearMedia={ onClearMedia }
+					onSelectMedia={ onSelectMedia }
+					openMediaOptionsRef={ openMediaOptionsRef }
+					setAttributes={ setAttributes }
+				/>
+			) }
 
 			{ isImage &&
 				url &&
