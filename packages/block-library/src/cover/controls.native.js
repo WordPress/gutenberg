@@ -122,6 +122,17 @@ function Controls( {
 		displayPlaceholder && styles.imagePlaceholder,
 	];
 
+	const focalPointHint = ! hasParallax && ! displayPlaceholder && (
+		<Icon
+			icon={ plus }
+			size={ styles.focalPointHint.width }
+			style={ [
+				styles.focalPointHint,
+				focalPointPosition( focalPoint ),
+			] }
+		/>
+	);
+
 	return (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -185,39 +196,33 @@ function Controls( {
 										height="100%"
 										style={ imagePreviewStyles }
 										width={ styles.image.width }
-									/>
+									>
+										{ focalPointHint }
+									</Image>
 								) }
 								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-									<Video
-										muted
-										paused
-										disableFocus
-										onLoad={ ( event ) => {
-											const {
-												height,
-												width,
-											} = event.naturalSize;
-											setVideoNaturalSize( {
-												height,
-												width,
-											} );
-											setDisplayPlaceholder( false );
-										} }
-										resizeMode={ 'cover' }
-										source={ { uri: url } }
-										style={ videoPreviewStyles }
-									/>
-								) }
-								{ ! hasParallax && ! displayPlaceholder && (
-									<Icon
-										icon={ plus }
-										size={ styles.focalPointHint.width }
-										testMe={ true }
-										style={ [
-											styles.focalPointHint,
-											focalPointPosition( focalPoint ),
-										] }
-									/>
+									<>
+										<Video
+											muted
+											paused
+											disableFocus
+											onLoad={ ( event ) => {
+												const {
+													height,
+													width,
+												} = event.naturalSize;
+												setVideoNaturalSize( {
+													height,
+													width,
+												} );
+												setDisplayPlaceholder( false );
+											} }
+											resizeMode={ 'cover' }
+											source={ { uri: url } }
+											style={ videoPreviewStyles }
+										/>
+										{ focalPointHint }
+									</>
 								) }
 							</View>
 						</BottomSheet.Cell>
