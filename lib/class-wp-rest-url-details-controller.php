@@ -270,15 +270,17 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return;
 		}
 
+		$ttl = HOUR_IN_SECONDS;
+
 		/**
 		 * Filters the cache expiration.
 		 *
 		 * Can be used to adjust the time until expiration in seconds for the cache
 		 * of the data retrieved for the given URL.
 		 *
-		 * @param int HOUR_IN_SECONDS the time until cache expiration in seconds.
+		 * @param int $ttl the time until cache expiration in seconds.
 		 */
-		$cache_expiration = apply_filters( 'rest_url_details_cache_expiration', HOUR_IN_SECONDS );
+		$cache_expiration = apply_filters( 'rest_url_details_cache_expiration', $ttl );
 
 		return set_transient( $key, wp_json_encode( $data ), $cache_expiration );
 	}
