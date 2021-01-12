@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { Platform } from 'react-native';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -35,14 +31,12 @@ function ParagraphBlock( {
 		...style,
 	};
 
-	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991 on Android
-	if ( Platform.OS === 'android' ) {
-		const fontSize = styles.fontSize;
-		styles.fontSize =
-			fontSize && fontSize.endsWith( 'px' )
-				? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
-				: fontSize;
-	}
+	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
+	const fontSize = styles.fontSize;
+	styles.fontSize =
+		fontSize && fontSize.endsWith( 'px' )
+			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
+			: fontSize;
 
 	return (
 		<>
