@@ -8,6 +8,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import isTemplateRevertable from '../../utils/is-template-revertable';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 
@@ -17,7 +18,9 @@ export default function TemplateDetails( { template, onClose } ) {
 			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const { openNavigationPanelToMenu } = useDispatch( editSiteStore );
+	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
+		editSiteStore
+	);
 
 	if ( ! template ) {
 		return null;
@@ -26,6 +29,11 @@ export default function TemplateDetails( { template, onClose } ) {
 	const showTemplateInSidebar = () => {
 		onClose();
 		openNavigationPanelToMenu( MENU_TEMPLATES );
+	};
+
+	const revert = () => {
+		revertTemplate( template );
+		onClose();
 	};
 
 	return (
@@ -42,6 +50,19 @@ export default function TemplateDetails( { template, onClose } ) {
 					</Text>
 				) }
 			</div>
+
+			{ isTemplateRevertable( template ) && (
+				<div className="edit-site-template-details">
+					<Button isLink onClick={ revert }>
+						{ __( 'Revert' ) }
+					</Button>
+					<Text variant="caption">
+						{ __(
+							'Reset this template to the theme supplied default'
+						) }
+					</Text>
+				</div>
+			) }
 
 			<Button
 				className="edit-site-template-details__show-all-button"
