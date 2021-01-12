@@ -11,6 +11,7 @@ import { noFilter } from '@wordpress/icons';
  */
 import Swatch from './duotone-swatch';
 import {
+	getCustomDuotoneIdFromHexColors,
 	getDefaultColors,
 	getHexColorsFromValues,
 	getValuesFromHexColors,
@@ -94,11 +95,9 @@ function CustomDuotonePicker( { colorPalette, value, onChange } ) {
 					newColors.length >= 2
 						? {
 								values: getValuesFromHexColors( newColors ),
-								id: `duotone-filter-custom-${ newColors
-									.map( ( hex ) =>
-										hex.slice( 1 ).toLowerCase()
-									)
-									.join( '-' ) }`,
+								id: getCustomDuotoneIdFromHexColors(
+									newColors
+								),
 						  }
 						: undefined
 				)

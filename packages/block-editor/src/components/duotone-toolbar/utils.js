@@ -195,3 +195,9 @@ export function getDefaultColors( palette ) {
 		)
 		.map( ( { color } ) => color );
 }
+
+export function getCustomDuotoneIdFromHexColors( colors ) {
+	return `duotone-filter-custom-${ colors
+		.map( ( hex ) => hex.slice( 1 ).toLowerCase() )
+		.join( '-' ) }`;
+}
