@@ -9,7 +9,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useEffect, useContext, useState } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 
 /**
@@ -22,10 +22,23 @@ const FocalPointSettingsMemo = React.memo(
 	( {
 		focalPoint,
 		onFocalPointChange,
+		onHandleClosingBottomSheet,
+		setIsFullScreen,
 		shouldEnableBottomSheetScroll,
 		url,
 	} ) => {
 		const navigation = useNavigation();
+
+		/**
+		 * Ensure the full-screen bottom sheet is disabled. `useFocusEffect` is not
+		 * triggered when dismissing the bottom sheet via swipe or tapping the
+		 * overlay.
+		 */
+		useEffect( () => {
+			onHandleClosingBottomSheet( () => {
+				setIsFullScreen( false );
+			} );
+		}, [] );
 
 		function onButtonPress( action ) {
 			navigation.goBack();
@@ -58,10 +71,16 @@ const FocalPointSettingsMemo = React.memo(
 
 function FocalPointSettings( props ) {
 	const route = useRoute();
-	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
+	const {
+		onHandleClosingBottomSheet,
+		setIsFullScreen,
+		shouldEnableBottomSheetScroll,
+	} = useContext( BottomSheetContext );
 
 	return (
 		<FocalPointSettingsMemo
+			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
+			setIsFullScreen={ setIsFullScreen }
 			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 			{ ...props }
 			{ ...route.params }
