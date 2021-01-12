@@ -1,0 +1,31 @@
+$tooltipColor: #121212;
+
+.tooltip {
+	background-color: $tooltipColor;
+	border-radius: 4px;
+	left: -100;
+	padding: 12px 16px;
+	top: -70px;
+}
+
+.tooltipShadow {
+	color: $black;
+}
+
+.text {
+	color: $white;
+	white-space: nowrap;
+	width: auto;
+}
+
+.arrow {
+	z-index: 1;
+	position: absolute;
+	bottom: -5px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 6px 6px 0 6px;
+	left: 94px;
+	border-color: $tooltipColor transparent transparent transparent;
+}

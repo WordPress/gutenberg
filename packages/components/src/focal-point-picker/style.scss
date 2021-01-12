@@ -13,20 +13,23 @@
 	max-height: 200px;
 }
 
-.focalPointWrapper {
-	background-color: transparent;
-	height: 50px;
+.focalPointGroup {
 	left: 0;
-	margin: -25px 0 0 -25px;
-	opacity: 0.8;
 	position: absolute;
 	top: 0;
+}
+
+.focalPointConstraint {
+	height: 50px;
+	margin: -25px 0 0 -25px;
+	position: absolute;
 	width: 50px;
 }
 
 .focalPointIcon {
 	height: 100%;
 	left: 0;
+	opacity: 0.8;
 	position: absolute;
 	top: 0;
 	width: 100%;
