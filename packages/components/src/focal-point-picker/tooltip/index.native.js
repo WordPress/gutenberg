@@ -2,7 +2,14 @@
  * External dependencies
  */
 import React from 'react';
-import { Animated, Easing, PanResponder, Text, View } from 'react-native';
+import {
+	Animated,
+	Easing,
+	PanResponder,
+	Text,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -68,7 +75,7 @@ function Overlay( { children, onPress, style } ) {
 	);
 }
 
-function Label( { align, text, xOffset, yOffset } ) {
+function Label( { align, onPress, text, xOffset, yOffset } ) {
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ dimensions, setDimensions ] = useState( null );
 	const visible = useTooltipContext();
@@ -136,16 +143,18 @@ function Label( { align, text, xOffset, yOffset } ) {
 				],
 			} }
 		>
-			<View
-				onLayout={ ( { nativeEvent } ) => {
-					const { height, width } = nativeEvent.layout;
-					setDimensions( { height, width } );
-				} }
-				style={ tooltipStyles }
-			>
-				<Text style={ styles.text }>{ text }</Text>
-				<View style={ arrowStyles } />
-			</View>
+			<TouchableWithoutFeedback onPress={ onPress }>
+				<View
+					onLayout={ ( { nativeEvent } ) => {
+						const { height, width } = nativeEvent.layout;
+						setDimensions( { height, width } );
+					} }
+					style={ tooltipStyles }
+				>
+					<Text style={ styles.text }>{ text }</Text>
+					<View style={ arrowStyles } />
+				</View>
+			</TouchableWithoutFeedback>
 		</Animated.View>
 	);
 }
