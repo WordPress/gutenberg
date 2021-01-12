@@ -105,13 +105,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		if ( ! empty( $cached_response ) ) {
 			$response = rest_ensure_response( json_decode( $cached_response, true ) );
 
-			/**
-			 * Filters the URL data for the response.
-			 *
-			 * @param WP_REST_Response $response The response object.
-			 * @param string           $url      The requested URL.
-			 * @param WP_REST_Request  $request  Request object.
-			 */
+			/** This filter is documented in lib/class-wp-rest-url-details-controller.php#147 */
 			return apply_filters( 'rest_prepare_url_details', $response, $url, $request );
 		}
 
