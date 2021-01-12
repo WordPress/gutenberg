@@ -314,6 +314,11 @@ function RichText(
 	}
 
 	function handleCopy( event ) {
+		// Something other than the browser already set data.
+		if ( event.clipboardData.getData( 'text/plain' ) ) {
+			return;
+		}
+
 		const selectedRecord = slice( record.current );
 		const plainText = getTextContent( selectedRecord );
 		const html = toHTMLString( {
@@ -393,22 +398,16 @@ function RichText(
 			return;
 		}
 
-		// If the data comes from a rich text instance, we can directly use it
-		// without filtering the data. The filters are only meant for externally
-		// pasted content and remove inline styles.
-		if ( clipboardData.getData( 'rich-text' ) === 'true' ) {
-			handleChange( insert( record.current, formatToValue( html ) ) );
-			return;
-		}
-
 		if ( onPaste ) {
 			const files = getFilesFromDataTransfer( clipboardData );
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
+				isInternal,
 				files: [ ...files ],
 				activeFormats,
 			} );
