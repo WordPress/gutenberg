@@ -325,6 +325,11 @@ const Cover = ( {
 
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 
+	function toFixed( number, fixed ) {
+		const re = new RegExp( `^-?\\d+(?:.\\d{0,${ fixed || -1 }})?` );
+		return parseFloat( number.toString().match( re )[ 0 ] );
+	}
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -407,17 +412,27 @@ const Cover = ( {
 												height,
 												width,
 											} );
+											setDisplayPlaceholder( false );
 										} }
 										resizeMode={ 'contain' }
 										source={ { uri: url } }
 										style={ [
+											styles.video,
 											{
 												aspectRatio:
+													// toFixed is used to fix the ratio to 2 decimals, but
+													// without rounding to avoid gapping between video
+													// and container
 													videoNaturalSize &&
-													videoNaturalSize.width /
-														videoNaturalSize.height,
+													toFixed(
+														videoNaturalSize.width /
+															videoNaturalSize.height,
+														2
+													),
 												height: '100%',
 											},
+											displayPlaceholder &&
+												styles.imagePlaceholder,
 										] }
 									/>
 								) }
