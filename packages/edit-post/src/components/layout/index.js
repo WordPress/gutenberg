@@ -93,7 +93,7 @@ function Layout( { styles } ) {
 		showMostUsedBlocks,
 		isInserterOpened,
 		showIconLabels,
-		hasReducedUI,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
@@ -126,8 +126,8 @@ function Layout( { styles } ) {
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			hasReducedUI: select( editPostStore ).isFeatureActive(
-				'reducedUI'
+			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
+				'showBlockBreadcrumbs'
 			),
 		};
 	}, [] );
@@ -268,7 +268,7 @@ function Layout( { styles } ) {
 					</>
 				}
 				footer={
-					! hasReducedUI &&
+					showBlockBreadcrumbs &&
 					! isMobileViewport &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (
