@@ -27,6 +27,8 @@ import {
 	RangeControl,
 	UnitControl,
 	TextControl,
+	BottomSheet,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -101,6 +103,7 @@ const Cover = ( {
 		backgroundType,
 		dimRatio,
 		focalPoint,
+		hasParallax,
 		minHeight,
 		url,
 		id,
@@ -211,6 +214,7 @@ const Cover = ( {
 	const onClearMedia = useCallback( () => {
 		setAttributes( {
 			focalPoint: undefined,
+			hasParallax: undefined,
 			id: undefined,
 			url: undefined,
 		} );
@@ -230,6 +234,13 @@ const Cover = ( {
 	function setFocalPoint( value ) {
 		setAttributes( { focalPoint: value } );
 	}
+
+	const toggleParallax = () => {
+		setAttributes( {
+			hasParallax: ! hasParallax,
+			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+		} );
+	};
 
 	function openColorPicker() {
 		selectBlock();
@@ -348,7 +359,7 @@ const Cover = ( {
 			</PanelBody>
 			{ url ? (
 				<PanelBody title={ __( 'Media' ) }>
-					<TextControl
+					<BottomSheet.Cell
 						leftAlign
 						cellContainerStyle={ { minHeight } }
 					>
@@ -382,7 +393,12 @@ const Cover = ( {
 						onFocalPointChange={ setFocalPoint }
 						url={ url }
 					/>
-					<BottomSheet.Cell
+					<ToggleControl
+						label={ __( 'Fixed background' ) }
+						checked={ hasParallax }
+						onChange={ toggleParallax }
+					/>
+					<TextControl
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
