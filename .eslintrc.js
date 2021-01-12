@@ -65,7 +65,8 @@ module.exports = {
 					},
 					{
 						name: 'reakit',
-						message: 'Please use `@wordpress/components` instead.',
+						message:
+							'Please use Reakit API through `@wordpress/components` instead.',
 					},
 					{
 						name: 'redux',
