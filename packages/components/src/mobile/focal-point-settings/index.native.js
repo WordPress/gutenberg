@@ -29,10 +29,6 @@ const FocalPointSettingsMemo = React.memo(
 		const navigation = useNavigation();
 		const isIOS = Platform.OS === 'ios';
 		const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-		useEffect( () => {
-			shouldEnableBottomSheetMaxHeight( true );
-			onHandleClosingBottomSheet( null );
-		}, [] );
 
 		const applyButtonStyle = usePreferredColorSchemeStyle(
 			styles.applyButton,
