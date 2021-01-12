@@ -331,11 +331,11 @@ const Cover = ( {
 						<View style={ [ styles.background, backgroundColor ] }>
 							<View style={ styles.imageContainer }>
 								<Image
-									editButton={ false }
+									editButton={ true }
 									focalPoint={
 										focalPoint || IMAGE_DEFAULT_FOCAL_POINT
 									}
-									isSelected={ isParentSelected }
+									isSelected={ true }
 									isUploadFailed={ didUploadFail }
 									isUploadInProgress={ isUploadInProgress }
 									onSelectMediaUploadOption={ onSelectMedia }
