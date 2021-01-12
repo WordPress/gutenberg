@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 /**
@@ -11,12 +11,11 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useContext, useState } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
-import { Icon, check, close } from '@wordpress/icons';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import NavigationHeader from '../bottom-sheet/navigation-header';
 import styles from './styles.scss';
 
 const FocalPointSettingsMemo = React.memo(
@@ -29,25 +28,10 @@ const FocalPointSettingsMemo = React.memo(
 		url,
 	} ) => {
 		useEffect( () => {
-			shouldEnableBottomSheetMaxHeight( true );
+			shouldEnableBottomSheetMaxHeight( false );
 			onHandleClosingBottomSheet( null );
 		}, [] );
 		const navigation = useNavigation();
-		const isIOS = Platform.OS === 'ios';
-		const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-
-		const applyButtonStyle = usePreferredColorSchemeStyle(
-			styles.applyButton,
-			styles.applyButtonDark
-		);
-		const cancelButtonStyle = usePreferredColorSchemeStyle(
-			styles.cancelButton,
-			styles.cancelButtonDark
-		);
-		const footerStyle = usePreferredColorSchemeStyle(
-			styles.footer,
-			styles.footerDark
-		);
 
 		function onButtonPress( action ) {
 			navigation.goBack();
@@ -60,7 +44,13 @@ const FocalPointSettingsMemo = React.memo(
 		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
 
 		return (
-			<>
+			<SafeAreaView style={ styles.safearea }>
+				<NavigationHeader
+					screen={ __( 'Edit focal point' ) }
+					leftButtonOnPress={ () => onButtonPress( 'cancel' ) }
+					applyButtonOnPress={ () => onButtonPress( 'apply' ) }
+					isFullscreen
+				/>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
 					onChange={ setDraftFocalPoint }
@@ -69,45 +59,7 @@ const FocalPointSettingsMemo = React.memo(
 					}
 					url={ url }
 				/>
-				<View style={ footerStyle }>
-					<TouchableWithoutFeedback
-						onPress={ () => onButtonPress( 'cancel' ) }
-						hitSlop={ hitSlop }
-					>
-						<View>
-							{ isIOS ? (
-								<Text style={ cancelButtonStyle }>
-									{ __( 'Cancel' ) }
-								</Text>
-							) : (
-								<Icon
-									icon={ close }
-									size={ 24 }
-									style={ cancelButtonStyle }
-								/>
-							) }
-						</View>
-					</TouchableWithoutFeedback>
-					<TouchableWithoutFeedback
-						onPress={ () => onButtonPress( 'apply' ) }
-						hitSlop={ hitSlop }
-					>
-						<View>
-							{ isIOS ? (
-								<Text style={ applyButtonStyle }>
-									{ __( 'Apply' ) }
-								</Text>
-							) : (
-								<Icon
-									icon={ check }
-									size={ 24 }
-									style={ applyButtonStyle }
-								/>
-							) }
-						</View>
-					</TouchableWithoutFeedback>
-				</View>
-			</>
+			</SafeAreaView>
 		);
 	}
 );
