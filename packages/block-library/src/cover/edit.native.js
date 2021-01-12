@@ -223,8 +223,8 @@ const Cover = ( {
 		} );
 	}
 
-	function setFocalPoint( focalPoint ) {
-		setAttributes( { focalPoint } );
+	function setFocalPoint( value ) {
+		setAttributes( { focalPoint: value } );
 	}
 
 	function openColorPicker() {

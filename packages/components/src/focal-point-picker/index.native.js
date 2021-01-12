@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, Text, View } from 'react-native';
+import { Animated, View } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
@@ -10,7 +10,7 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
 import { Path, SVG } from '@wordpress/primitives';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +22,6 @@ const MAX_POSITION_VALUE = 100;
 
 export default function FocalPointPicker( props ) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
-	const { x, y } = focalPoint;
 
 	const [ containerSize, setContainerSize ] = useState( null );
 
@@ -36,8 +35,12 @@ export default function FocalPointPicker( props ) {
 		} ) );
 	}
 
-	_touchX = new Animated.Value( x * containerSize?.width || 1 );
-	_touchY = new Animated.Value( y * containerSize?.height || 1 );
+	const _touchX = new Animated.Value(
+		focalPoint.x * containerSize?.width || 1
+	);
+	const _touchY = new Animated.Value(
+		focalPoint.y * containerSize?.height || 1
+	);
 
 	function onHandlerStateChange( { nativeEvent } ) {
 		switch ( nativeEvent.state ) {
@@ -143,20 +146,20 @@ export default function FocalPointPicker( props ) {
 			</View>
 			{ /* TODO(David): RangeControl is uncontrolled, how might I set its value via the pan gesture? */ }
 			<RangeControl
-				value={ x * 100 }
+				value={ focalPoint.x * 100 }
 				label={ __( 'X-Axis Position' ) }
 				min={ MIN_POSITION_VALUE }
 				max={ MAX_POSITION_VALUE }
-				initialPosition={ x * 100 }
+				initialPosition={ focalPoint.x * 100 }
 				allowReset
 				onChange={ ( x ) => setPosition( { x: x / 100 } ) }
 			/>
 			<RangeControl
-				value={ y * 100 }
+				value={ focalPoint.y * 100 }
 				label={ __( 'Y-Axis Position' ) }
 				min={ MIN_POSITION_VALUE }
 				max={ MAX_POSITION_VALUE }
-				initialPosition={ y * 100 }
+				initialPosition={ focalPoint.y * 100 }
 				allowReset
 				onChange={ ( y ) => setPosition( { y: y / 100 } ) }
 			/>
