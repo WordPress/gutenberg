@@ -385,15 +385,17 @@ const Cover = ( {
 									] }
 									width={ styles.image.width }
 								/>
-								<Icon
-									icon={ plus }
-									size={ styles.focalPointHint.width }
-									testMe={ true }
-									style={ [
-										styles.focalPointHint,
-										focalPointPosition( focalPoint ),
-									] }
-								/>
+								{ ! hasParallax && (
+									<Icon
+										icon={ plus }
+										size={ styles.focalPointHint.width }
+										testMe={ true }
+										style={ [
+											styles.focalPointHint,
+											focalPointPosition( focalPoint ),
+										] }
+									/>
+								) }
 							</View>
 						</BottomSheet.Cell>
 						<FocalPointSettings
