@@ -119,7 +119,7 @@
 			// ... and display labels.
 			&::after {
 				content: attr(aria-label);
-				font-size: 0.75rem;
+				font-size: $helptext-font-size;
 			}
 		}
 	}
@@ -166,17 +166,25 @@
 		white-space: nowrap;
 	}
 
+	.block-editor-block-mover-button {
+		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
+		padding-left: $grid-unit !important;
+		padding-right: $grid-unit !important;
+	}
+
 	.block-editor-block-mover__drag-handle.has-icon {
 		padding-left: 6px !important;
 		padding-right: 6px !important;
 		border-right: 1px solid $gray-900;
 	}
 
-	// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
-	.is-up-button.is-up-button.is-up-button {
-		border-bottom: 1px solid $gray-900;
-		margin-right: 0;
-		border-radius: 0;
+	@include break-small() {
+		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
+		.is-up-button.is-up-button.is-up-button {
+			border-bottom: 1px solid $gray-900;
+			margin-right: 0;
+			border-radius: 0;
+		}
 	}
 
 	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
