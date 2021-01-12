@@ -30,8 +30,6 @@ export default function FocalPointPicker( props ) {
 	const [ containerSize, setContainerSize ] = useState( null );
 	const panRef = useRef();
 
-	// TODO(David): Need to round the value placed into state at some point, to
-	// avoid floats in sliders. Maybe do it in the slider?
 	function setPosition( { x, y } ) {
 		onChange( ( prevState ) => ( {
 			...prevState,
@@ -165,7 +163,7 @@ export default function FocalPointPicker( props ) {
 			</View>
 			{ /* TODO(David): RangeControl is uncontrolled, how might I set its value via the pan gesture? */ }
 			<RangeControl
-				value={ focalPoint.x * 100 }
+				value={ Math.round( focalPoint.x * 100 ) }
 				label={ __( 'X-Axis Position' ) }
 				min={ MIN_POSITION_VALUE }
 				max={ MAX_POSITION_VALUE }
@@ -174,7 +172,7 @@ export default function FocalPointPicker( props ) {
 				onChange={ ( x ) => setPosition( { x: x / 100 } ) }
 			/>
 			<RangeControl
-				value={ focalPoint.y * 100 }
+				value={ Math.round( focalPoint.y * 100 ) }
 				label={ __( 'Y-Axis Position' ) }
 				min={ MIN_POSITION_VALUE }
 				max={ MAX_POSITION_VALUE }
