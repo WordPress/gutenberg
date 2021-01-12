@@ -2,13 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	Animated,
-	Easing,
-	Text,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import { Animated, Easing, PanResponder, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -22,17 +16,33 @@ import styles from './style.scss';
 
 const TooltipContext = React.createContext();
 
-function Tooltip( { children, onTooltipHidden, visible } ) {
+function Tooltip( { children, onPress, style, visible } ) {
+	const panResponder = useRef(
+		PanResponder.create( {
+			/**
+			 * To allow dimissing the tooltip on press while also avoiding blocking
+			 * interactivity within the child context, we place this `onPress` side
+			 * effect within the `onStartShouldSetPanResponderCapture` callback.
+			 *
+			 * This is a bit unorthodox, but may be the simplest approach to achieving
+			 * this outcome. This is effectively a gesture responder that never
+			 * becomes the controlling responder. https://bit.ly/2J3ugKF
+			 */
+			onStartShouldSetPanResponderCapture: () => {
+				onPress();
+				return false;
+			},
+		} )
+	).current;
+
 	return (
 		<TooltipContext.Provider value={ visible }>
-			{ children }
-			{ visible && (
-				<TouchableWithoutFeedback
-					onPress={ () => onTooltipHidden( false ) }
-				>
-					<View style={ styles.overlay } />
-				</TouchableWithoutFeedback>
-			) }
+			<View
+				{ ...( visible ? panResponder.panHandlers : {} ) }
+				style={ style }
+			>
+				{ children }
+			</View>
 		</TooltipContext.Provider>
 	);
 }
