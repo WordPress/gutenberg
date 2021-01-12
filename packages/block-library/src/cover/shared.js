@@ -21,6 +21,8 @@ const POSITION_CLASSNAMES = {
 export const IMAGE_BACKGROUND_TYPE = 'image';
 export const VIDEO_BACKGROUND_TYPE = 'video';
 export const COVER_MIN_HEIGHT = 50;
+export const COVER_MAX_HEIGHT = 1000;
+export const COVER_DEFAULT_HEIGHT = 300;
 export function backgroundImageStyles( url ) {
 	return url ? { backgroundImage: `url(${ url })` } : {};
 }
