@@ -114,10 +114,12 @@ function Label( { align, text, xOffset, yOffset } ) {
 			transform: tooltipTransforms,
 		},
 		align === 'left' && styles.tooltipLeftAlign,
+		align === 'right' && styles.tooltipRightAlign,
 	];
 	const arrowStyles = [
 		styles.arrow,
 		align === 'left' && styles.arrowLeftAlign,
+		align === 'right' && styles.arrowRightAlign,
 	];
 
 	return (
