@@ -39,7 +39,7 @@ export default function TemplatePartEdit( {
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
 			const entityRecord =
-				theme && slug
+				slug
 					? select( 'core' ).getEntityRecord(
 							'postType',
 							'wp_template_part',
