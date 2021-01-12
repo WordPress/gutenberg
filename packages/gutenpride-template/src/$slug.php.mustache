@@ -45,6 +45,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	wp_set_script_translations( '{{namespace}}-{{slug}}-block-editor', '{{textdomain}}' );
 
 	$editor_css = 'build/index.css';
+
 	wp_register_style(
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $editor_css, __FILE__ ),
@@ -53,6 +54,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	);
 
 	$style_css = 'build/style-index.css';
+
 	wp_register_style(
 		'{{namespace}}-{{slug}}-block',
 		plugins_url( $style_css, __FILE__ ),
