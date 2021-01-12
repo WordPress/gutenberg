@@ -40,6 +40,7 @@ class Layout extends Component {
 
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.onRootViewLayout = this.onRootViewLayout.bind( this );
+		this.onTooltipHidden = this.onTooltipHidden.bind( this );
 
 		this.state = {
 			rootViewHeight: 0,
@@ -87,18 +88,18 @@ class Layout extends Component {
 		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
 	}
 
-	shouldShowTooltip = () => {
+	shouldShowTooltip() {
 		requestStarterPageTemplatesTooltipShown( ( tooltipShown ) => {
 			if ( ! tooltipShown ) {
 				this.setState( { tooltipVisible: true } );
 				setStarterPageTemplatesTooltipShown( true );
 			}
 		} );
-	};
+	}
 
-	onTooltipHidden = () => {
+	onTooltipHidden() {
 		this.setState( { tooltipVisible: false } );
-	};
+	}
 
 	renderHTML() {
 		return <HTMLTextInput parentHeight={ this.state.rootViewHeight } />;
