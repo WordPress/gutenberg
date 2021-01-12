@@ -39,6 +39,7 @@ export function AlignmentToolbar( props ) {
 		onChange,
 		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
 		label = __( 'Align' ),
+		describedBy = __( 'Change text alignment' ),
 		isCollapsed = true,
 	} = props;
 
@@ -61,6 +62,7 @@ export function AlignmentToolbar( props ) {
 			isCollapsed={ isCollapsed }
 			icon={ setIcon() }
 			label={ label }
+			toggleProps={ { describedBy } }
 			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;

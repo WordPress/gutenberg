@@ -92,6 +92,7 @@ export default function ListEdit( {
 								? formatListBulletsRTL
 								: formatListBullets,
 							title: __( 'Unordered' ),
+							describedBy: __( 'Convert to unordered list' ),
 							isActive: isActiveListType( value, 'ul', tagName ),
 							onClick() {
 								onChange(
@@ -109,6 +110,7 @@ export default function ListEdit( {
 								? formatListNumberedRTL
 								: formatListNumbered,
 							title: __( 'Ordered' ),
+							describedBy: __( 'Convert to ordered list' ),
 							isActive: isActiveListType( value, 'ol', tagName ),
 							onClick() {
 								onChange(
@@ -124,6 +126,7 @@ export default function ListEdit( {
 						{
 							icon: isRTL() ? formatOutdentRTL : formatOutdent,
 							title: __( 'Outdent' ),
+							describedBy: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
 							isDisabled: ! canOutdentListItems( value ),
 							onClick() {
@@ -134,6 +137,7 @@ export default function ListEdit( {
 						{
 							icon: isRTL() ? formatIndentRTL : formatIndent,
 							title: __( 'Indent' ),
+							describedBy: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
 							isDisabled: ! canIndentListItems( value ),
 							onClick() {
