@@ -16,7 +16,28 @@ import styles from './style.scss';
 
 const TooltipContext = React.createContext();
 
-function Tooltip( { children, onPress, style, visible } ) {
+function useTooltipContext() {
+	const visible = useContext( TooltipContext );
+
+	if ( typeof visible === 'undefined' ) {
+		throw new Error(
+			'Tooltip compound components cannot be rendered outside of the Tooltip component'
+		);
+	}
+
+	return visible;
+}
+
+function Tooltip( { children, visible } ) {
+	return (
+		<TooltipContext.Provider value={ visible }>
+			{ children }
+		</TooltipContext.Provider>
+	);
+}
+
+function Overlay( { children, onPress, style } ) {
+	const visible = useTooltipContext();
 	const panResponder = useRef(
 		PanResponder.create( {
 			/**
@@ -38,27 +59,19 @@ function Tooltip( { children, onPress, style, visible } ) {
 	).current;
 
 	return (
-		<TooltipContext.Provider value={ visible }>
-			<View
-				{ ...( visible ? panResponder.panHandlers : {} ) }
-				style={ style }
-			>
-				{ children }
-			</View>
-		</TooltipContext.Provider>
+		<View
+			{ ...( visible ? panResponder.panHandlers : {} ) }
+			style={ style }
+		>
+			{ children }
+		</View>
 	);
 }
 
 function Label( { align, text, xOffset, yOffset } ) {
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ dimensions, setDimensions ] = useState( null );
-	const visible = useContext( TooltipContext );
-
-	if ( typeof visible === 'undefined' ) {
-		throw new Error(
-			'Tooltip.Label cannot be rendered outside of the Tooltip component'
-		);
-	}
+	const visible = useTooltipContext();
 
 	useEffect( () => {
 		startAnimation();
@@ -141,6 +154,7 @@ Label.defaultProps = {
 	yOffset: 0,
 };
 
+Tooltip.Overlay = Overlay;
 Tooltip.Label = Label;
 
 export default Tooltip;
