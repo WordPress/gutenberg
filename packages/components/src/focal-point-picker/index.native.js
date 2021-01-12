@@ -17,12 +17,7 @@ import styles from './style.scss';
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
 
-export default function FocalPointPicker( {
-	focalPoint,
-	minHeight,
-	onChange,
-	url,
-} ) {
+export default function FocalPointPicker( { focalPoint, onChange, url } ) {
 	const { x, y } = focalPoint;
 
 	function setAxisPostion( axis ) {
@@ -36,13 +31,8 @@ export default function FocalPointPicker( {
 
 	return (
 		<View style={ styles.container }>
-			{ /* TODO(David): Should I set `height` or `minHeight`? */ }
-			<View style={ [ styles.media, { minHeight } ] }>
-				<Image
-					// TODO(David): Setting this creates a vertically evergrowing image. Why?
-					// focalPoint={ focalPoint }
-					url={ url }
-				/>
+			<View style={ [ styles.media ] }>
+				<Image url={ url } width={ styles.image.width } />
 			</View>
 			<RangeControl
 				value={ x * 100 }

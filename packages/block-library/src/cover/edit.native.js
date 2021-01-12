@@ -355,7 +355,6 @@ const Cover = ( {
 					</BottomSheet.Cell>
 					<FocalPointSettings
 						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
-						minHeight={ minHeight }
 						onFocalPointChange={ setFocalPoint }
 						url={ url }
 					/>
