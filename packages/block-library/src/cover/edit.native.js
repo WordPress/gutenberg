@@ -323,6 +323,8 @@ const Cover = ( {
 		};
 	}
 
+	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -394,16 +396,29 @@ const Cover = ( {
 								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 									<Video
 										muted
+										paused
 										disableFocus
-										repeat
+										onLoad={ ( event ) => {
+											const {
+												height,
+												width,
+											} = event.naturalSize;
+											setVideoNaturalSize( {
+												height,
+												width,
+											} );
+										} }
 										resizeMode={ 'contain' }
 										source={ { uri: url } }
-										onLoad={ onVideoLoad }
-										onLoadStart={ onVideoLoadStart }
-										style={
-											// Hide Video component since it has black background while loading the source
-											{ opacity: isVideoLoading ? 0 : 1 }
-										}
+										style={ [
+											{
+												aspectRatio:
+													videoNaturalSize &&
+													videoNaturalSize.width /
+														videoNaturalSize.height,
+												height: '100%',
+											},
+										] }
 									/>
 								) }
 								{ ! hasParallax && (
