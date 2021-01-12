@@ -151,7 +151,7 @@ export default function FocalPointPicker( props ) {
 				label={ __( 'X-Axis Position' ) }
 				min={ MIN_POSITION_VALUE }
 				max={ MAX_POSITION_VALUE }
-				initialPosition={ focalPoint.x * 100 }
+				initialPosition={ 50 }
 				allowReset
 				onChange={ ( x ) => setPosition( { x: x / 100 } ) }
 			/>
@@ -160,7 +160,7 @@ export default function FocalPointPicker( props ) {
 				label={ __( 'Y-Axis Position' ) }
 				min={ MIN_POSITION_VALUE }
 				max={ MAX_POSITION_VALUE }
-				initialPosition={ focalPoint.y * 100 }
+				initialPosition={ 50 }
 				allowReset
 				onChange={ ( y ) => setPosition( { y: y / 100 } ) }
 			/>
