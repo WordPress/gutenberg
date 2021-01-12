@@ -2,14 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	Animated,
-	Easing,
-	PanResponder,
-	Text,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import { Animated, Easing, PanResponder, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -23,28 +16,7 @@ import styles from './style.scss';
 
 const TooltipContext = React.createContext();
 
-function useTooltipContext() {
-	const visible = useContext( TooltipContext );
-
-	if ( typeof visible === 'undefined' ) {
-		throw new Error(
-			'Tooltip compound components cannot be rendered outside of the Tooltip component'
-		);
-	}
-
-	return visible;
-}
-
-function Tooltip( { children, visible } ) {
-	return (
-		<TooltipContext.Provider value={ visible }>
-			{ children }
-		</TooltipContext.Provider>
-	);
-}
-
-function Overlay( { children, onPress, style } ) {
-	const visible = useTooltipContext();
+function Tooltip( { children, onPress, style, visible } ) {
 	const panResponder = useRef(
 		PanResponder.create( {
 			/**
@@ -66,19 +38,27 @@ function Overlay( { children, onPress, style } ) {
 	).current;
 
 	return (
-		<View
-			{ ...( visible ? panResponder.panHandlers : {} ) }
-			style={ style }
-		>
-			{ children }
-		</View>
+		<TooltipContext.Provider value={ visible }>
+			<View
+				{ ...( visible ? panResponder.panHandlers : {} ) }
+				style={ style }
+			>
+				{ children }
+			</View>
+		</TooltipContext.Provider>
 	);
 }
 
-function Label( { align, onPress, text, xOffset, yOffset } ) {
+function Label( { align, text, xOffset, yOffset } ) {
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ dimensions, setDimensions ] = useState( null );
-	const visible = useTooltipContext();
+	const visible = useContext( TooltipContext );
+
+	if ( typeof visible === 'undefined' ) {
+		throw new Error(
+			'Tooltip.Label cannot be rendered outside of the Tooltip component'
+		);
+	}
 
 	useEffect( () => {
 		startAnimation();
@@ -121,12 +101,10 @@ function Label( { align, onPress, text, xOffset, yOffset } ) {
 			transform: tooltipTransforms,
 		},
 		align === 'left' && styles.tooltipLeftAlign,
-		align === 'right' && styles.tooltipRightAlign,
 	];
 	const arrowStyles = [
 		styles.arrow,
 		align === 'left' && styles.arrowLeftAlign,
-		align === 'right' && styles.arrowRightAlign,
 	];
 
 	return (
@@ -143,18 +121,16 @@ function Label( { align, onPress, text, xOffset, yOffset } ) {
 				],
 			} }
 		>
-			<TouchableWithoutFeedback onPress={ onPress }>
-				<View
-					onLayout={ ( { nativeEvent } ) => {
-						const { height, width } = nativeEvent.layout;
-						setDimensions( { height, width } );
-					} }
-					style={ tooltipStyles }
-				>
-					<Text style={ styles.text }>{ text }</Text>
-					<View style={ arrowStyles } />
-				</View>
-			</TouchableWithoutFeedback>
+			<View
+				onLayout={ ( { nativeEvent } ) => {
+					const { height, width } = nativeEvent.layout;
+					setDimensions( { height, width } );
+				} }
+				style={ tooltipStyles }
+			>
+				<Text style={ styles.text }>{ text }</Text>
+				<View style={ arrowStyles } />
+			</View>
 		</Animated.View>
 	);
 }
@@ -165,7 +141,6 @@ Label.defaultProps = {
 	yOffset: 0,
 };
 
-Tooltip.Overlay = Overlay;
 Tooltip.Label = Label;
 
 export default Tooltip;
