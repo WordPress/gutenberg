@@ -80,4 +80,11 @@ class WP_Block_Template {
 	 * @var string
 	 */
 	public $status;
+
+	/**
+	 * Whether a template is, or is based upon, an existing template file.
+	 *
+	 * @var boolean
+	 */
+	public $original_file_exists;
 }
