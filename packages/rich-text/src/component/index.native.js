@@ -7,7 +7,7 @@
  * WordPress dependencies
  */
 import RCTAztecView from '@wordpress/react-native-aztec';
-import { View, Platform } from 'react-native';
+import { View, Platform, InteractionManager } from 'react-native';
 import {
 	showUserSuggestions,
 	showXpostSuggestions,
@@ -47,7 +47,6 @@ import { remove } from '../remove';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 import { store as richTextStore } from '../store';
-import { InteractionManager } from 'react-native';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
