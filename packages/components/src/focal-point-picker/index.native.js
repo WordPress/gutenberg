@@ -148,8 +148,8 @@ function FocalPointPicker( props ) {
 	return (
 		<View style={ styles.container }>
 			<Tooltip
+				onPress={ () => setTooltipVisible( false ) }
 				visible={ tooltipVisible }
-				onTooltipHidden={ () => setTooltipVisible( false ) }
 			>
 				<View style={ [ styles.media, backgroundColor ] }>
 					<View
