@@ -23,7 +23,6 @@ import styles from '../../color-picker/style.scss';
 const FocalPointSettingsMemo = React.memo(
 	( {
 		focalPoint,
-		minHeight,
 		onFocalPointChange,
 		onHandleClosingBottomSheet,
 		shouldEnableBottomSheetMaxHeight,
@@ -64,7 +63,6 @@ const FocalPointSettingsMemo = React.memo(
 			<>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
-					minHeight={ minHeight }
 					onChange={ setDraftFocalPoint }
 					url={ url }
 				/>

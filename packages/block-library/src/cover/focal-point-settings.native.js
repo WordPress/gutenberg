@@ -11,12 +11,7 @@ import { Icon, BottomSheet } from '@wordpress/components';
 import { blockSettingsScreens } from '@wordpress/block-editor';
 import { chevronRight } from '@wordpress/icons';
 
-function FocalPointSettings( {
-	focalPoint,
-	minHeight,
-	onFocalPointChange,
-	url,
-} ) {
+function FocalPointSettings( { focalPoint, onFocalPointChange, url } ) {
 	const navigation = useNavigation();
 	return (
 		<BottomSheet.Cell
@@ -26,7 +21,6 @@ function FocalPointSettings( {
 			onPress={ () => {
 				navigation.navigate( blockSettingsScreens.focalPoint, {
 					focalPoint,
-					minHeight,
 					onFocalPointChange,
 					url,
 				} );
