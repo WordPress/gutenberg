@@ -2,7 +2,11 @@
  * External dependencies
  */
 import { Animated, View } from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import {
+	PanGestureHandler,
+	TapGestureHandler,
+	State,
+} from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -10,7 +14,7 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { __ } from '@wordpress/i18n';
 import { Image, RangeControl } from '@wordpress/components';
 import { Path, SVG } from '@wordpress/primitives';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +28,7 @@ export default function FocalPointPicker( props ) {
 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
 
 	const [ containerSize, setContainerSize ] = useState( null );
+	const panRef = useRef();
 
 	// TODO(David): Need to round the value placed into state at some point, to
 	// avoid floats in sliders. Maybe do it in the slider?
@@ -56,44 +61,57 @@ export default function FocalPointPicker( props ) {
 		}
 	}
 
+	function extrapolatePositionFromGesture( event ) {
+		const { x, y } = event.nativeEvent;
+		setPosition( {
+			x: x / containerSize?.width,
+			y: y / containerSize?.height,
+		} );
+	}
+
 	return (
 		<View style={ styles.container }>
 			<View style={ [ styles.media ] }>
-				{ /* TODO(David): Add TapGestureHandler to allow tapping to set focal point. */ }
-				<PanGestureHandler
-					minDist={ 1 }
-					onHandlerStateChange={ onHandlerStateChange }
-					onGestureEvent={ Animated.event(
-						[ { nativeEvent: { x: _touchX, y: _touchY } } ],
-						{
-							useNativeDriver: true,
-							listener: ( { nativeEvent } ) => {
-								const { x, y } = nativeEvent;
-								setPosition( {
-									x: x / containerSize?.width,
-									y: y / containerSize?.height,
-								} );
-							},
-						}
-					) }
+				<TapGestureHandler
+					onHandlerStateChange={ ( event ) => {
+						onHandlerStateChange( event );
+						extrapolatePositionFromGesture( event );
+					} }
+					waitFor={ panRef }
 				>
-					<Animated.View
-						onLayout={ ( event ) => {
-							const { height, width } = event.nativeEvent.layout;
-
-							if (
-								width !== 0 &&
-								height !== 0 &&
-								( containerSize?.width !== width ||
-									containerSize?.height !== height )
-							) {
-								setContainerSize( { width, height } );
+					<PanGestureHandler
+						minDist={ 1 }
+						onHandlerStateChange={ onHandlerStateChange }
+						onGestureEvent={ Animated.event(
+							[ { nativeEvent: { x: _touchX, y: _touchY } } ],
+							{
+								useNativeDriver: false,
+								listener: extrapolatePositionFromGesture,
 							}
-						} }
+						) }
+						ref={ panRef }
 					>
-						<Image url={ url } width={ styles.image.width } />
-					</Animated.View>
-				</PanGestureHandler>
+						<Animated.View
+							onLayout={ ( event ) => {
+								const {
+									height,
+									width,
+								} = event.nativeEvent.layout;
+
+								if (
+									width !== 0 &&
+									height !== 0 &&
+									( containerSize?.width !== width ||
+										containerSize?.height !== height )
+								) {
+									setContainerSize( { width, height } );
+								}
+							} }
+						>
+							<Image url={ url } width={ styles.image.width } />
+						</Animated.View>
+					</PanGestureHandler>
+				</TapGestureHandler>
 				<Animated.View
 					style={ [
 						styles.focalPointWrapper,
