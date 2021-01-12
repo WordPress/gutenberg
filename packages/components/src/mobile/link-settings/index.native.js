@@ -32,8 +32,6 @@ function LinkSettings( {
 	isVisible,
 	// Callback that is called on closing bottom sheet
 	onClose,
-	// Object of attributes to be set or updated in `LinkSettings`
-	attributes,
 	// Function called to set attributes
 	setAttributes,
 	// Callback that is called when url input field is empty
@@ -80,8 +78,12 @@ function LinkSettings( {
 	showIcon,
 	onLinkCellPressed,
 	urlValue,
+	// Attributes properties
+	url,
+	label,
+	linkTarget,
+	rel,
 } ) {
-	const { url, label, linkTarget, rel } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );

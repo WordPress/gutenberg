@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import React from 'react';
+/**
  * Internal dependencies
  */
 import BottomSheet from '../bottom-sheet';
@@ -10,7 +14,7 @@ const linkSettingsScreens = {
 	linkPicker: 'linkPicker',
 };
 
-function LinkSettingsNavigation( props ) {
+const LinkSettingsNavigation = React.memo( ( props ) => {
 	if ( ! props.withBottomSheet ) {
 		return <LinkSettingsScreen { ...props } />;
 	}
@@ -39,6 +43,6 @@ function LinkSettingsNavigation( props ) {
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
-}
+} );
 
 export default LinkSettingsNavigation;

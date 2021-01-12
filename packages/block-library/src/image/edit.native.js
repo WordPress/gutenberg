@@ -91,6 +91,23 @@ export class ImageEdit extends React.Component {
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
 			this
 		);
+		this.setMappedAttributes = this.setMappedAttributes.bind( this );
+
+		this.options = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
 	}
 
 	componentDidMount() {
@@ -336,44 +353,32 @@ export class ImageEdit extends React.Component {
 			: width;
 	}
 
+	setMappedAttributes = ( { url: href, ...restAttributes } ) => {
+		const { setAttributes } = this.props;
+		return href === undefined
+			? setAttributes( restAttributes )
+			: setAttributes( { ...restAttributes, href } );
+	};
+
 	getLinkSettings() {
 		const { isLinkSheetVisible } = this.state;
 		const {
 			attributes: { href: url, ...unMappedAttributes },
-			setAttributes,
 		} = this.props;
 
 		const mappedAttributes = { ...unMappedAttributes, url };
-		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
-			href === undefined
-				? setAttributes( restAttributes )
-				: setAttributes( { ...restAttributes, href } );
-
-		const options = {
-			url: {
-				label: __( 'Image Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: false,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
-			},
-		};
 
 		return (
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				attributes={ mappedAttributes }
+				url={ mappedAttributes.url }
+				rel={ mappedAttributes.rel }
+				label={ mappedAttributes.label }
 				onClose={ this.dismissSheet }
-				setAttributes={ setMappedAttributes }
+				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
-				options={ options }
+				options={ this.options }
 				showIcon={ false }
 			/>
 		);

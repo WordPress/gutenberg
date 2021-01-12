@@ -164,7 +164,9 @@ const SocialLinkEdit = ( {
 			) }
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				attributes={ attributes }
+				url={ attributes.url }
+				label={ attributes.label }
+				rel={ attributes.rel }
 				onEmptyURL={ onEmptyURL }
 				onClose={ onCloseSettingsSheet }
 				setAttributes={ setAttributes }
