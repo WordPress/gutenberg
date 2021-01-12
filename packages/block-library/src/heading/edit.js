@@ -27,6 +27,7 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	mergedStyle,
+	clientId,
 } ) {
 	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
@@ -61,15 +62,25 @@ function HeadingEdit( {
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				onSplit={ ( value ) => {
+				onSplit={ ( value, keepId ) => {
 					if ( ! value ) {
-						return createBlock( 'core/paragraph' );
+						return createBlock(
+							'core/paragraph',
+							undefined,
+							undefined,
+							keepId ? clientId : undefined
+						);
 					}
 
-					return createBlock( 'core/heading', {
-						...attributes,
-						content: value,
-					} );
+					return createBlock(
+						'core/heading',
+						{
+							...attributes,
+							content: value,
+						},
+						undefined,
+						keepId ? clientId : undefined
+					);
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
