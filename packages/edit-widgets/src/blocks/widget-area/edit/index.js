@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
 import {
-	__unstableDisclosureContent,
+	__unstableDisclosureContent as DisclosureContent,
 	Panel,
 	PanelBody,
 } from '@wordpress/components';
@@ -66,7 +66,7 @@ export default function WidgetAreaEdit( {
 				{ ( { opened } ) => (
 					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
 					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
-					<__unstableDisclosureContent visible={ opened }>
+					<DisclosureContent visible={ opened }>
 						<EntityProvider
 							kind="root"
 							type="postType"
@@ -74,7 +74,7 @@ export default function WidgetAreaEdit( {
 						>
 							<WidgetAreaInnerBlocks />
 						</EntityProvider>
-					</__unstableDisclosureContent>
+					</DisclosureContent>
 				) }
 			</PanelBody>
 		</Panel>

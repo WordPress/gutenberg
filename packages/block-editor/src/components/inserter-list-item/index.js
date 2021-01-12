@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMemo, useRef, memo } from '@wordpress/element';
-import { Button, CompositeItem } from '@wordpress/components';
+import {
+	Button,
+	__unstableCompositeItem as CompositeItem,
+} from '@wordpress/components';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,

@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { Composite, useCompositeState } from '@wordpress/components';
+import {
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies

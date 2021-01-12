@@ -35,7 +35,12 @@ export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
-export * from './composite';
+export {
+	Composite as __unstableComposite,
+	CompositeGroup as __unstableCompositeGroup,
+	CompositeItem as __unstableCompositeItem,
+	useCompositeState as __unstableUseCompositeState,
+} from './composite';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';

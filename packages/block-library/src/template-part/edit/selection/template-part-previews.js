@@ -13,10 +13,10 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import {
-	Composite,
-	CompositeItem,
+	__unstableComposite as Composite,
+	__unstableCompositeItem as CompositeItem,
 	Icon,
-	useCompositeState,
+	__unstableUseCompositeState as useCompositeState,
 } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
