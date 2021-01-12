@@ -10,6 +10,7 @@
  * The plan is to build own API that accounts for future breaking changes
  * in Reakit (https://github.com/WordPress/gutenberg/pull/28085).
  */
+/* eslint-disable-next-line no-restricted-imports */
 export {
 	Composite,
 	CompositeGroup,
