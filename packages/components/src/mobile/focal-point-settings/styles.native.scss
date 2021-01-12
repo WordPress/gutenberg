@@ -1,0 +1,32 @@
+.footer {
+	border-top-width: $border-width;
+	border-color: $light-gray-400;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: $grid-unit-20;
+	margin-top: $grid-unit-20;
+	flex-wrap: wrap;
+}
+
+.footerDark {
+	border-color: $gray-70;
+}
+
+.cancelButton {
+	color: #d63638;
+	font-size: 17px;
+}
+
+.cancelButtonDark {
+	color: #f86368;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
+}
