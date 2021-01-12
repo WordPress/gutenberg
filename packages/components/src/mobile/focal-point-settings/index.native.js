@@ -26,6 +26,7 @@ const FocalPointSettingsMemo = React.memo(
 		onFocalPointChange,
 		onHandleClosingBottomSheet,
 		shouldEnableBottomSheetMaxHeight,
+		shouldEnableBottomSheetScroll,
 		url,
 	} ) => {
 		useEffect( () => {
@@ -64,6 +65,9 @@ const FocalPointSettingsMemo = React.memo(
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
 					onChange={ setDraftFocalPoint }
+					shouldEnableBottomSheetScroll={
+						shouldEnableBottomSheetScroll
+					}
 					url={ url }
 				/>
 				<View style={ footerStyle }>
@@ -113,12 +117,14 @@ function FocalPointSettings( props ) {
 	const route = useRoute();
 	const {
 		onHandleClosingBottomSheet,
+		shouldEnableBottomSheetScroll,
 		shouldEnableBottomSheetMaxHeight,
 	} = useContext( BottomSheetContext );
 
 	return (
 		<FocalPointSettingsMemo
 			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
+			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 			shouldEnableBottomSheetMaxHeight={
 				shouldEnableBottomSheetMaxHeight
 			}
