@@ -115,25 +115,27 @@ function _gutenberg_get_template_files( $template_type ) {
  * @return string Updated wp_template content.
  */
 function _inject_theme_attribute_in_content( $template_content, $theme ) {
-	$new_content = '';
-	$blocks      = parse_blocks( $template_content );
+	$has_updated_content = false;
+	$new_content         = '';
+	$template_blocks     = parse_blocks( $template_content );
 
-	$updated_blocks = array_map(
-		function( $block ) use ( $theme ) {
-			if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['theme'] ) ) {
-				$block['attrs']['theme'] = $theme;
-			}
-
-			return $block;
-		},
-		$blocks
-	);
-
-	foreach ( $updated_blocks as $block ) {
-		$new_content = $new_content . serialize_block( $block );
+	foreach ( $template_blocks as $key => $block ) {
+		if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['theme'] ) ) {
+			// phpcs:ignore
+			$template_blocks[$key]['attrs']['theme'] = $theme;
+			$has_updated_content                     = true;
+		}
 	}
 
-	return $new_content;
+	if ( $has_updated_content ) {
+		foreach ( $template_blocks as $block ) {
+			$new_content = $new_content . serialize_block( $block );
+		}
+
+		return $new_content;
+	} else {
+		return $template_content;
+	}
 }
 
 /**
