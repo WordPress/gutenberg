@@ -377,11 +377,13 @@ const Cover = ( {
 							onFocalPointChange={ setFocalPoint }
 							url={ url }
 						/>
-						<ToggleControl
-							label={ __( 'Fixed background' ) }
-							checked={ hasParallax }
-							onChange={ toggleParallax }
-						/>
+						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+							<ToggleControl
+								label={ __( 'Fixed background' ) }
+								checked={ hasParallax }
+								onChange={ toggleParallax }
+							/>
+						) }
 						<BottomSheet.Cell
 							leftAlign
 							label={ __( 'Clear Media' ) }
