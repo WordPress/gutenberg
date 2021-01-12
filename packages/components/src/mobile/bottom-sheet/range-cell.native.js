@@ -5,7 +5,6 @@ import {
 	Platform,
 	AccessibilityInfo,
 	findNodeHandle,
-	Text,
 	View,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -91,7 +90,6 @@ class BottomSheetRangeCell extends Component {
 				: '#5198d9',
 			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
 			thumbTintColor = ! isIOS && '#00669b',
-			getStylesFromColorScheme,
 			preview,
 			cellContainerStyle,
 			onComplete,
