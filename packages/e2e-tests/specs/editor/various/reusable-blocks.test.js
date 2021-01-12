@@ -292,7 +292,7 @@ describe( 'Reusable blocks', () => {
 		);
 		paragraphBlock.focus();
 		await pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' modified' );
 
 		// Wait for async mode to dispatch the update.

@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 9.7.1 =
+
+### Bug Fixes
+
+ - Fix styling of the verse block.
+
+
 = 9.7.0 =
 
 ### Features

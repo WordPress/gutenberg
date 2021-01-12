@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useState,
-	useMemo,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -18,10 +12,7 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
-	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableUseEditorStyles as useEditorStyles,
-	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
@@ -60,7 +51,6 @@ function Editor() {
 	const {
 		isFullscreenActive,
 		isInserterOpen,
-		deviceType,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -72,7 +62,6 @@ function Editor() {
 		const {
 			isFeatureActive,
 			isInserterOpened,
-			__experimentalGetPreviewDeviceType,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
@@ -86,7 +75,6 @@ function Editor() {
 		return {
 			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
-			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-site' ),
@@ -115,8 +103,6 @@ function Editor() {
 	useEffect( () => {
 		updateEditorSettings( { defaultTemplateTypes } );
 	}, [ defaultTemplateTypes ] );
-
-	const inlineStyles = useResizeCanvas( deviceType );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -164,9 +150,6 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const ref = useRef();
-
-	useEditorStyles( ref, settings.styles );
 
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
@@ -201,7 +184,6 @@ function Editor() {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											ref={ ref }
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={
@@ -253,12 +235,8 @@ function Editor() {
 												/>
 											}
 											content={
-												<BlockSelectionClearer
-													className="edit-site-visual-editor"
-													style={ inlineStyles }
-												>
+												<>
 													<Notices />
-													<Popover.Slot name="block-toolbar" />
 													{ template && (
 														<BlockEditor
 															setIsInserterOpen={
@@ -267,7 +245,7 @@ function Editor() {
 														/>
 													) }
 													<KeyboardShortcuts />
-												</BlockSelectionClearer>
+												</>
 											}
 											actions={
 												<>

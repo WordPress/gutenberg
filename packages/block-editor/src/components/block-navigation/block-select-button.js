@@ -70,7 +70,7 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
-				<BlockIcon icon={ blockInformation.icon } showColors />
+				<BlockIcon icon={ blockInformation?.icon } showColors />
 				{ blockDisplayName }
 				{ isSelected && (
 					<VisuallyHidden>
