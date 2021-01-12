@@ -209,7 +209,11 @@ const Cover = ( {
 	};
 
 	const onClearMedia = useCallback( () => {
-		setAttributes( { id: undefined, url: undefined } );
+		setAttributes( {
+			focalPoint: undefined,
+			id: undefined,
+			url: undefined,
+		} );
 		closeSettingsBottomSheet();
 	}, [ closeSettingsBottomSheet ] );
 
