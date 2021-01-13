@@ -3,16 +3,14 @@
 
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
-	ul.blocks-gallery-grid {
+	display: block;
+
+	figure.blocks-gallery-grid {
 		display: flex;
 		flex-wrap: wrap;
-		list-style-type: none;
-		margin: 0; // Some themes give all <ul> default margin instead of padding.
-		padding: 0;
-
 		// Need bogus :not(#individual-image) to override long :not()
 		// specificity chain on default image block on front end.
-		li.list-image:not(#individual-image) {
+		figure.wp-block-image:not(#individual-image) {
 			// Add space between thumbnails, and unset right most thumbnails later.
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
 
@@ -21,7 +19,7 @@
 			}
 		}
 
-		li.list-image {
+		figure.wp-block-image {
 			display: flex;
 			flex-grow: 1;
 			justify-content: center;
@@ -32,23 +30,8 @@
 				flex-direction: column;
 			}
 
-			// Again, we need :not(#individual-image) to override long :not()
-			// chain on frontend styles.
-			figure:not(#individual-image) {
-				display: block; // IE11's lack of object-fit cover means flex will distort image as it fills space.
-				margin: 0;
-				max-width: 100%; // When aligned wide or full, this allows image to fill row.
-
-				// Avoid applying flex styles to IE11.
-				@supports ( position: sticky ) {
-					display: flex;
-					flex-direction: column; // Needed for frontend when img isn't wrapped in div.
-					flex-grow: 1;
-				}
-			}
-
-			figure > div,
-			figure > a {
+			> div,
+			> a {
 				margin: 0;
 
 				// Avoid applying flex styles to IE11.
@@ -97,9 +80,9 @@
 	}
 
 	// Cropped Images.
-	&.is-cropped ul.blocks-gallery-grid li.list-image:not(#individual-image) {
-		figure > div:not(.components-drop-zone),
-		figure > a {
+	&.is-cropped figure.blocks-gallery-grid figure.wp-block-image:not(#individual-image) {
+		> div:not(.components-drop-zone),
+		> a {
 			display: block; // Thanks to IE11 not supporting object-fit fall back to display: block.
 
 			// Without IE11 object-fit support "display: flex;" here causes distortion of aspect ratio.
@@ -122,7 +105,7 @@
 	}
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& li:not(#individual-image) {
+	& figure.wp-block-image:not(#individual-image) {
 		width: calc(50% - #{$grid-unit-20});
 
 		&:nth-of-type(even) {
@@ -130,7 +113,7 @@
 		}
 	}
 
-	&.columns-1 li:not(#individual-image) {
+	&.columns-1 figure.wp-block-image:not(#individual-image) {
 		margin-right: 0;
 		width: 100%;
 	}
@@ -138,7 +121,7 @@
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } li.list-image:not(#individual-image) {
+			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
 				margin-right: $grid-unit-20;
 				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 			}
@@ -146,7 +129,7 @@
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
-			&.columns-#{$column-count} li.list-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
+			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
