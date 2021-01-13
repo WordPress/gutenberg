@@ -63,6 +63,12 @@ class WP_Switch_Theme_Page
 			foreach ( $keep_templates as $template ) {
 				$template = gutenberg_get_block_template( $template, 'wp_template');
 
+				foreach ( parse_blocks( $template->content ) as $block ) {
+					if ( 'core/template-part' === $block['blockName'] && ! empty( $block['attrs']['slug'] ) && ! in_array( $block['attrs']['slug'], $keep_template_parts ) ) {
+						$keep_template_parts[] = $block['attrs']['slug'];
+					}
+				}
+
 				if ( $template->wp_id ) {
 					wp_set_post_terms( $template->wp_id, esc_sql( $_POST['switch_theme_2'] ), 'wp_theme', true );
 				}
