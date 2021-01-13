@@ -88,14 +88,14 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			$content_with_existing_theme_attribute,
 			$theme
 		);
-		$this->assertStringNotContainsString( $theme, $template_content );
+		$this->assertEquals( $content_with_existing_theme_attribute, $template_content );
 
 		$content_with_no_template_part = '<!-- wp:post-content /-->';
 		$template_content              = _inject_theme_attribute_in_content(
-			$content_with_existing_theme_attribute,
+			$content_with_no_template_part,
 			$theme
 		);
-		$this->assertStringNotContainsString( $theme, $template_content );
+		$this->assertEquals( $content_with_no_template_part, $template_content );
 	}
 
 	/**
