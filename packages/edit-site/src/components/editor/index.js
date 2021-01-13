@@ -116,13 +116,9 @@ function Editor() {
 		setIsEntitiesSavedStatesOpen( false );
 	}, [] );
 
-	// Set default query for misplaced Query Loop blocks, and
-	// provide the root `queryContext` for top-level Query Loop
-	// and Query Pagination blocks.
 	const blockContext = useMemo(
 		() => ( {
 			...page?.context,
-			query: page?.context.query || { categoryIds: [], tagIds: [] },
 			queryContext: [
 				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>

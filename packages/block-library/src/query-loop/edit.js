@@ -43,11 +43,12 @@ export default function QueryLoopEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryContext,
+		queryContext = [ {} ],
+		templateSlug,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
-	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
+	const [ { page } ] = useQueryContext() || queryContext;
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
 	const { posts, blocks } = useSelect(
@@ -79,32 +80,14 @@ export default function QueryLoopEdit( {
 			if ( sticky ) {
 				query.sticky = sticky === 'only';
 			}
-
-			// When you insert this block outside of the edit site then store
-			// does not exist therefore we check for its existence.
-			// TODO: remove this code, edit-site shouldn't be called in block-library.
-			// This creates a cycle dependency.
-			if ( inherit && select( 'core/edit-site' ) ) {
-				// This should be passed from the context exposed by edit site.
-				const { getEditedPostType, getEditedPostId } = select(
-					'core/edit-site'
-				);
-
-				if ( 'wp_template' === getEditedPostType() ) {
-					const { slug } = select( 'core' ).getEntityRecord(
-						'postType',
-						'wp_template',
-						getEditedPostId()
-					);
-
-					// Change the post-type if needed.
-					if ( slug?.startsWith( 'archive-' ) ) {
-						query.postType = slug.replace( 'archive-', '' );
-						postType = query.postType;
-					}
+			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
+			if ( inherit ) {
+				// Change the post-type if needed.
+				if ( templateSlug?.startsWith( 'archive-' ) ) {
+					query.postType = templateSlug.replace( 'archive-', '' );
+					postType = query.postType;
 				}
 			}
-
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),
@@ -125,6 +108,7 @@ export default function QueryLoopEdit( {
 			exclude,
 			sticky,
 			inherit,
+			templateSlug,
 		]
 	);
 
