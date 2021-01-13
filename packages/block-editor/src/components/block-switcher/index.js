@@ -155,9 +155,13 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		[ clientIds ]
 	);
 
-	return !! blocks?.length ? (
+	if ( ! blocks.length || blocks.some( ( block ) => ! block ) ) {
+		return null;
+	}
+
+	return (
 		<BlockSwitcherDropdownMenu clientIds={ clientIds } blocks={ blocks } />
-	) : null;
+	);
 };
 
 export default BlockSwitcher;
