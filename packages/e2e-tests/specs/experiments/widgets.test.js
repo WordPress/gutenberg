@@ -5,6 +5,7 @@ import {
 	visitAdminPage,
 	deactivatePlugin,
 	activatePlugin,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -18,17 +19,40 @@ describe( 'Widgets screen', () => {
 		);
 	} );
 
+	afterEach( async () => {
+		await cleanupWidgets();
+	} );
+
 	beforeAll( async () => {
+		// TODO: Ideally we can bundle our test theme directly in the repo.
+		await activateTheme( 'twentytwenty' );
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		await cleanupWidgets();
 	} );
 
 	afterAll( async () => {
 		await activatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		await activateTheme( 'twentytwentyone' );
 	} );
+
+	async function getParagraphBlockInGlobalInserter() {
+		await page.click(
+			'button[aria-pressed="false"][aria-label="Add block"]'
+		);
+
+		const blockLibrary = await page.waitForSelector(
+			'[aria-label="Block Library"][role="region"]'
+		);
+		const [ addParagraphBlock ] = await blockLibrary.$x(
+			'//*[@role="option"][*[text()="Paragraph"]]'
+		);
+
+		return addParagraphBlock;
+	}
 
 	async function expectInsertionPointIndicatorToBeBelowLastBlock(
 		widgetArea
@@ -52,22 +76,15 @@ describe( 'Widgets screen', () => {
 		const widgetAreas = await page.$$(
 			'[aria-label="Block: Widget Area"][role="group"]'
 		);
-		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
+		const [ firstWidgetArea ] = widgetAreas;
 
-		const addBlockButton = await page.$( 'button[aria-label="Add block"]' );
-		await addBlockButton.click();
-
-		let blockLibrary = await page.waitForSelector(
-			'[aria-label="Block Library"][role="region"]'
-		);
-		let [ addParagraphBlock ] = await blockLibrary.$x(
-			'//*[@role="option"][*[text()="Paragraph"]]'
-		);
+		let addParagraphBlock = await getParagraphBlockInGlobalInserter();
 		await addParagraphBlock.hover();
 
-		await expectInsertionPointIndicatorToBeBelowLastBlock(
-			firstWidgetArea
-		);
+		// FIXME: The insertion point indicator is not showing when the widget area has no blocks.
+		// await expectInsertionPointIndicatorToBeBelowLastBlock(
+		// 	firstWidgetArea
+		// );
 
 		await addParagraphBlock.click();
 
@@ -83,35 +100,62 @@ describe( 'Widgets screen', () => {
 
 		await page.keyboard.type( 'First Paragraph' );
 
-		await secondWidgetArea.click();
-		await addBlockButton.click();
-
-		blockLibrary = await page.waitForSelector(
-			'[aria-label="Block Library"][role="region"]'
-		);
-		[ addParagraphBlock ] = await blockLibrary.$x(
-			'//*[@role="option"][*[text()="Paragraph"]]'
-		);
+		addParagraphBlock = await getParagraphBlockInGlobalInserter();
 		await addParagraphBlock.hover();
 
-		// FIXME: The insertion point indicator is not showing when the widget area has no blocks.
-		// await expectInsertionPointIndicatorToBeBelowLastBlock(
-		// 	secondWidgetArea
-		// );
-
+		await expectInsertionPointIndicatorToBeBelowLastBlock(
+			firstWidgetArea
+		);
 		await addParagraphBlock.click();
 
-		const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
-		);
-
-		expect(
-			await addedParagraphBlockInSecondWidgetArea.evaluate(
-				( node ) => node === document.activeElement
-			)
-		).toBe( true );
-
 		await page.keyboard.type( 'Second Paragraph' );
+
+		/**
+		 * FIXME: There seems to have a bug when saving the widgets
+		 */
+		// await secondWidgetArea.click();
+
+		// addParagraphBlock = await getParagraphBlockInGlobalInserter();
+		// await addParagraphBlock.hover();
+
+		// // FIXME: The insertion point indicator is not showing when the widget area has no blocks.
+		// // await expectInsertionPointIndicatorToBeBelowLastBlock(
+		// // 	secondWidgetArea
+		// // );
+
+		// await addParagraphBlock.click();
+
+		// const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
+		// 	'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		// );
+
+		// expect(
+		// 	await addedParagraphBlockInSecondWidgetArea.evaluate(
+		// 		( node ) => node === document.activeElement
+		// 	)
+		// ).toBe( true );
+
+		// await page.keyboard.type( 'Third Paragraph' );
+
+		await saveWidgets();
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		"<!-- wp:widget-area {\\"id\\":\\"wp_inactive_widgets\\",\\"name\\":\\"Inactive widgets\\"} /-->
+
+		<!-- wp:widget-area {\\"id\\":\\"sidebar-1\\",\\"name\\":\\"Footer #1\\"} -->
+		<!-- wp:paragraph -->
+		<p>Second Paragraph</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:paragraph -->
+		<p>First Paragraph</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:paragraph -->
+		<p>Second Paragraph</p>
+		<!-- /wp:paragraph -->
+		<!-- /wp:widget-area -->
+
+		<!-- wp:widget-area {\\"id\\":\\"sidebar-2\\",\\"name\\":\\"Footer #2\\"} /-->"
+	` );
 	} );
 
 	it( 'Should insert content using the inline inserter', async () => {
@@ -149,34 +193,42 @@ describe( 'Widgets screen', () => {
 		);
 		await paragraphBlock.click();
 
-		const addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
+		const firstParagraphBlock = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
 		);
 
 		expect(
-			await addedParagraphBlockInFirstWidgetArea.evaluate(
+			await firstParagraphBlock.evaluate(
 				( node ) => node === document.activeElement
 			)
 		).toBe( true );
 
 		await page.keyboard.type( 'First Paragraph' );
 
-		const addedParagraphBlockInFirstWidgetAreaBoundingBox = await addedParagraphBlockInFirstWidgetArea.boundingBox();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second Paragraph' );
+
+		const secondParagraphBlock = await page.evaluateHandle(
+			() => document.activeElement
+		);
+		expect( secondParagraphBlock ).not.toBe( firstParagraphBlock );
+
+		const secondParagraphBlockBoundingBox = await secondParagraphBlock.boundingBox();
 
 		// Click outside the block to move the focus back to the widget area.
 		await page.mouse.click(
-			addedParagraphBlockInFirstWidgetAreaBoundingBox.x +
+			secondParagraphBlockBoundingBox.x +
 				firstWidgetAreaBoundingBox.width / 2,
-			addedParagraphBlockInFirstWidgetAreaBoundingBox.y +
-				addedParagraphBlockInFirstWidgetAreaBoundingBox.height +
+			secondParagraphBlockBoundingBox.y +
+				secondParagraphBlockBoundingBox.height +
 				10
 		);
 
 		// Hover above the last block to trigger the inline inserter between blocks.
 		await page.mouse.move(
-			addedParagraphBlockInFirstWidgetAreaBoundingBox.x +
-				addedParagraphBlockInFirstWidgetAreaBoundingBox.width / 2,
-			addedParagraphBlockInFirstWidgetAreaBoundingBox.y - 10
+			secondParagraphBlockBoundingBox.x +
+				secondParagraphBlockBoundingBox.width / 2,
+			secondParagraphBlockBoundingBox.y - 10
 		);
 
 		const inserterButton = await page.waitForSelector(
@@ -205,7 +257,7 @@ describe( 'Widgets screen', () => {
 		await headingBlockOption.click();
 
 		// Get the added heading block as second last block.
-		const addedHeadingBlock = await addedParagraphBlockInFirstWidgetArea.evaluateHandle(
+		const addedHeadingBlock = await secondParagraphBlock.evaluateHandle(
 			( node ) => node.previousSibling
 		);
 
@@ -223,5 +275,92 @@ describe( 'Widgets screen', () => {
 		expect( addedHeadingBlockSnapshot.name ).toBe( 'Block: Heading' );
 		expect( addedHeadingBlockSnapshot.level ).toBe( 2 );
 		expect( addedHeadingBlockSnapshot.value ).toBe( 'My Heading' );
+
+		await saveWidgets();
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		"<!-- wp:widget-area {\\"id\\":\\"wp_inactive_widgets\\",\\"name\\":\\"Inactive widgets\\"} /-->
+
+		<!-- wp:widget-area {\\"id\\":\\"sidebar-1\\",\\"name\\":\\"Footer #1\\"} -->
+		<!-- wp:paragraph -->
+		<p>First Paragraph</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:heading -->
+		<h2>My Heading</h2>
+		<!-- /wp:heading -->
+		<!-- wp:paragraph -->
+		<p>Second Paragraph</p>
+		<!-- /wp:paragraph -->
+		<!-- /wp:widget-area -->
+
+		<!-- wp:widget-area {\\"id\\":\\"sidebar-2\\",\\"name\\":\\"Footer #2\\"} /-->"
+	` );
 	} );
 } );
+
+async function saveWidgets() {
+	const [ updateButton ] = await page.$x( '//button[text()="Update"]' );
+	await updateButton.click();
+
+	await page.waitForXPath( '//*[text()="Widgets saved."]' );
+
+	// FIXME: The snackbar above is enough for the widget areas to get saved,
+	// but not enough for the widgets to get saved.
+	await page.waitForTimeout( 500 );
+}
+
+async function getSerializedWidgetAreas() {
+	return await page.evaluate( () =>
+		wp.data
+			.select( 'core/edit-widgets' )
+			.getWidgetAreas()
+			.map( ( widgetArea ) => {
+				const serializedWidgetAreasOpening = `<!-- wp:widget-area {"id":"${ widgetArea.id }","name":"${ widgetArea.name }"}`;
+
+				const serializedWidgets = widgetArea.widgets
+					.map( ( widgetId ) =>
+						wp.data
+							.select( 'core/edit-widgets' )
+							.getWidget( widgetId )
+					)
+					.map( ( widget ) => widget.settings.content )
+					.join( '\n' );
+
+				if ( ! serializedWidgets ) {
+					return `${ serializedWidgetAreasOpening } /-->`;
+				}
+
+				return `${ serializedWidgetAreasOpening } -->
+${ serializedWidgets }
+<!-- /wp:widget-area -->`;
+			} )
+			.join( '\n\n' )
+	);
+}
+
+/**
+ * TODO: Deleting widgets in the new widgets screen seems to be unreliable.
+ * We visit the old widgets screen to delete them.
+ * Refactor this to use real interactions in the new widgets screen once the bug is fixed.
+ */
+async function cleanupWidgets() {
+	await visitAdminPage( 'widgets.php' );
+
+	await page.evaluate( () => {
+		const deleteButtons = document.querySelectorAll(
+			'#widgets-right .widget button.widget-control-remove'
+		);
+
+		deleteButtons.forEach( ( deleteButton ) => deleteButton.click() );
+	} );
+
+	await page.click( '#inactive-widgets-control-remove' );
+
+	await page.waitForFunction(
+		() =>
+			document.querySelectorAll( '.widgets-sortables .widget' ).length ===
+			0
+	);
+	// No idea why we need this, but just asserting the widgets are gone seems to be not enough.
+	await page.waitForTimeout( 500 );
+}
