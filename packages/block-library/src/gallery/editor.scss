@@ -21,7 +21,10 @@
 }
 
 figure.wp-block-gallery {
-	display: block;
+	.media-placeholder {
+		display: block;
+		width: 100%;
+	}
 }
 
 /**
