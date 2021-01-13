@@ -49,9 +49,13 @@ function FocalPointPicker( props ) {
 		} );
 	}, [] );
 
+	// Animated coordinates for drag handle
 	const pan = useRef( new Animated.ValueXY() ).current;
 
-	// Set initial cursor poition
+	/**
+	 * Set drag handle position anytime focal point coordinates change.
+	 * E.g. initial render, dragging range sliders.
+	 */
 	useEffect( () => {
 		if ( containerSize ) {
 			pan.setValue( {
@@ -61,6 +65,7 @@ function FocalPointPicker( props ) {
 		}
 	}, [ focalPoint, containerSize ] );
 
+	// Pan responder to manage drag handle interactivity
 	const panResponder = useMemo(
 		() =>
 			PanResponder.create( {
@@ -135,7 +140,6 @@ function FocalPointPicker( props ) {
 			],
 		},
 	];
-
 	const FOCAL_POINT_SIZE = 50;
 	const focalPointStyles = [
 		styles.focalPoint,
