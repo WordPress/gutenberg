@@ -67,21 +67,24 @@ export const Gallery = ( props ) => {
 			} ) }
 		>
 			<Fragment { ...innerBlocksProps } />
-
-			{ mediaPlaceholder }
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				tagName="figcaption"
-				className="blocks-gallery-caption"
-				aria-label={ __( 'Gallery caption text' ) }
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
-				}
-			/>
+			<div className="media-placeholder">
+				{ mediaPlaceholder }
+				<RichTextVisibilityHelper
+					isHidden={ ! isSelected && RichText.isEmpty( caption ) }
+					tagName="figcaption"
+					className="blocks-gallery-caption"
+					aria-label={ __( 'Gallery caption text' ) }
+					placeholder={ __( 'Write gallery caption…' ) }
+					value={ caption }
+					onChange={ ( value ) =>
+						setAttributes( { caption: value } )
+					}
+					inlineToolbar
+					__unstableOnSplitAtEnd={ () =>
+						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+					}
+				/>
+			</div>
 		</figure>
 	);
 };
