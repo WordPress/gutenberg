@@ -31,7 +31,7 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	// In the meantime, this removes it from the output.
 	add_filter( 'deprecated_file_trigger_error', '__return_false' );
 	comments_template();
-	add_filter( 'deprecated_file_trigger_error', '__return_true' );
+	remove_filter( 'deprecated_file_trigger_error', '__return_false' );
 	$post = $post_before;
 
 	$classes = '';
