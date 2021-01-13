@@ -92,6 +92,7 @@ export class ImageEdit extends React.Component {
 			this
 		);
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
+		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
 
 		this.options = {
 			url: {
@@ -108,6 +109,11 @@ export class ImageEdit extends React.Component {
 				placeholder: __( 'None' ),
 			},
 		};
+
+		this.sizeOptions = map( this.props.imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			name,
+		} ) );
 	}
 
 	componentDidMount() {
@@ -385,22 +391,16 @@ export class ImageEdit extends React.Component {
 		);
 	}
 
+	onSizeChangeValue( newValue ) {
+		this.onSetSizeSlug( newValue );
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
-		const {
-			attributes,
-			isSelected,
-			image,
-			imageSizes,
-			clientId,
-		} = this.props;
+		const { attributes, isSelected, image, clientId } = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
-		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
-			value: slug,
-			name,
-		} ) );
-		const sizeOptionsValid = find( sizeOptions, [
+		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
 			DEFAULT_SIZE_SLUG,
 		] );
@@ -433,10 +433,8 @@ export class ImageEdit extends React.Component {
 							icon={ expand }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
-							onChangeValue={ ( newValue ) =>
-								this.onSetSizeSlug( newValue )
-							}
-							options={ sizeOptions }
+							onChangeValue={ this.onSizeChangeValue }
+							options={ this.sizeOptions }
 						/>
 					) }
 					<TextControl
