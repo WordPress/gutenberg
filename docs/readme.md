@@ -2,13 +2,13 @@
 
 "Gutenberg" is the codename for the new WordPress editor, also known as the block editor. The Gutenberg project is transforming the way content is created on WordPress.
 
+![Quick view of the block editor](https://make.wordpress.org/core/files/2021/01/quick-view-gutenberg-editor.png)
+
 Using a system of Blocks to compose and format content, the new block-based editor is designed to create rich, flexible layouts for websites and digital products. Content is created in the unit of blocks instead of freeform text with inserted media, embeds and Shortcodes (there's a Shortcode block though).
 
 Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, when strung together, make up the content stored in the WordPress database, replacing the traditional concept of freeform text with embedded media and shortcodes. The new editor is designed with progressive enhancement, meaning that it is back-compatible with all legacy content, and it also offers a process to try to convert and split a Classic block into equivalent blocks using client-side parsing. Finally, the blocks offer enhanced editing and format controls.
 
 The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.
-
-<!-- Here, we could add the different visuals representing the areas of the editor (see https://github.com/WordPress/gutenberg/issues/27400#issue-754467949). -->
 
 ## Quick links
 - [Create a block tutorial](#create-a-block-tutorial) 
