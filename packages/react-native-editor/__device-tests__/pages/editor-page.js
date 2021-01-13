@@ -11,8 +11,13 @@ const {
 	typeString,
 	toggleHtmlMode,
 	swipeFromTo,
-	longPressMiddleOfElement,
 } = require( '../helpers/utils' );
+
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line import/no-extraneous-dependencies
+const wd = require( 'wd' );
 
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
