@@ -205,6 +205,7 @@ _Parameters_
 -   _name_ `string`: Block name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
+-   _id_ `?string`: ClientId to use.
 
 _Returns_
 

@@ -39,7 +39,7 @@ import { normalizeBlockType } from './utils';
  * @param {string} name        Block name.
  * @param {Object} attributes  Block attributes.
  * @param {?Array} innerBlocks Nested blocks.
- * @param {?string} id 	       ClientId to use.
+ * @param {?string} id	ClientId to use.
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [], id ) {
