@@ -291,7 +291,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 		$theme_json = new WP_Theme_JSON( $decoded_data );
 		$theme_json->remove_insecure_properties();
-		$data_to_encode = $theme_json->get_raw_data();
+		$data_to_encode                                = $theme_json->get_raw_data();
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
 		return wp_json_encode( $data_to_encode );
 	}
