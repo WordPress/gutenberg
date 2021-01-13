@@ -291,11 +291,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 		$theme_json = new WP_Theme_JSON( $decoded_data );
 		$theme_json->remove_insecure_properties();
-<<<<<<< HEAD
 		$data_to_encode                                = $theme_json->get_raw_data();
-=======
-		$data_to_encode = $theme_json->get_raw_data();
->>>>>>> 7604d2f3f7... Add: Save time theme.json escaping.
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
 		return wp_json_encode( $data_to_encode );
 	}
@@ -324,11 +320,7 @@ function gutenberg_global_styles_kses_remove_filters() {
  */
 function gutenberg_global_styles_kses_init() {
 	gutenberg_global_styles_kses_remove_filters();
-<<<<<<< HEAD
 	if ( ! current_user_can( 'unfiltered_html' ) ) {
-=======
-	if ( ! current_user_can( 'unfiltered_html' ) || true ) {
->>>>>>> 7604d2f3f7... Add: Save time theme.json escaping.
 		gutenberg_global_styles_kses_init_filters();
 	}
 }
