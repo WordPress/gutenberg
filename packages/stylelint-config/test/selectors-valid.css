@@ -1,0 +1,19 @@
+#comment-form {
+	margin: 1em 0;
+}
+
+input[type="text"] {
+	line-height: 1.1;
+}
+
+.selector::after {
+	color: #000;
+}
+
+.selector-class {
+	color: #000;
+}
+
+#selector-id {
+	color: #000;
+}

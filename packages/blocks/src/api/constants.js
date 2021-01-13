@@ -25,6 +25,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color' ],
 	},
+	borderRadius: {
+		value: [ 'border', 'radius' ],
+		support: [ '__experimentalBorder', 'radius' ],
+	},
 	color: {
 		value: [ 'color', 'text' ],
 		support: [ 'color' ],
@@ -39,31 +43,20 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
-		support: [ '__experimentalFontAppearance' ],
+		support: [ '__experimentalFontStyle' ],
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
-		support: [ '__experimentalFontAppearance' ],
+		support: [ '__experimentalFontWeight' ],
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'lineHeight' ],
 	},
-	paddingBottom: {
-		value: [ 'spacing', 'padding', 'bottom' ],
+	padding: {
+		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
-	},
-	paddingLeft: {
-		value: [ 'spacing', 'padding', 'left' ],
-		support: [ 'spacing', 'padding' ],
-	},
-	paddingRight: {
-		value: [ 'spacing', 'padding', 'right' ],
-		support: [ 'spacing', 'padding' ],
-	},
-	paddingTop: {
-		value: [ 'spacing', 'padding', 'top' ],
-		support: [ 'spacing', 'padding' ],
+		properties: [ 'top', 'right', 'bottom', 'left' ],
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],

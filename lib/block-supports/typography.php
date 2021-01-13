@@ -15,12 +15,19 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_appearance_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontAppearance' ), false );
 	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
+	$has_font_style_support      = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
 	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
-	$has_typography_support      = $has_font_appearance_support || $has_font_size_support || $has_line_height_support || $has_text_transform_support || $has_text_decoration_support;
+
+	$has_typography_support = $has_font_size_support
+		|| $has_font_weight_support
+		|| $has_font_style_support
+		|| $has_line_height_support
+		|| $has_text_transform_support
+		|| $has_text_decoration_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -57,8 +64,9 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$classes = array();
 	$styles  = array();
 
-	$has_font_appearance_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontAppearance' ), false );
 	$has_font_family_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
+	$has_font_style_support      = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
 	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
 	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
@@ -94,14 +102,17 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Font appearance - style and weight.
-	if ( $has_font_appearance_support ) {
+	// Font style.
+	if ( $has_font_style_support ) {
 		// Apply font style.
 		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
 		if ( $font_style ) {
 			$styles[] = $font_style;
 		}
+	}
 
+	// Font weight.
+	if ( $has_font_weight_support ) {
 		// Apply font weight.
 		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
 		if ( $font_weight ) {

@@ -174,6 +174,8 @@ function RichText(
 	} = useFormatTypes( {
 		clientId,
 		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
@@ -374,7 +376,7 @@ function RichText(
 		}
 
 		if ( onPaste ) {
-			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
+			const files = getFilesFromDataTransfer( clipboardData );
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
@@ -1102,10 +1104,6 @@ function RichText(
 		<>
 			{ isSelected && (
 				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
 					value={ record.current }
 					onChange={ handleChange }
 					onFocus={ focus }

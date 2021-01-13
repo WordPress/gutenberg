@@ -7,7 +7,10 @@ import { first, last } from 'lodash';
  */
 import { useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
@@ -168,7 +171,7 @@ function KeyboardShortcuts() {
 
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/block-editor/duplicate',

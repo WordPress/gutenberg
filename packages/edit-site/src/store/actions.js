@@ -5,11 +5,6 @@ import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 
 /**
- * Internal dependencies
- */
-import { findTemplate } from './controls';
-
-/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Feature name.
@@ -41,13 +36,25 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
  * Returns an action object used to set a template.
  *
  * @param {number} templateId The template ID.
- *
+ * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
-export function setTemplate( templateId ) {
+export function* setTemplate( templateId, templateSlug ) {
+	const pageContext = { templateSlug };
+	if ( ! templateSlug ) {
+		const template = yield controls.resolveSelect(
+			'core',
+			'getEntityRecord',
+			'postType',
+			'wp_template',
+			templateId
+		);
+		pageContext.templateSlug = template?.slug;
+	}
 	return {
 		type: 'SET_TEMPLATE',
 		templateId,
+		page: { context: pageContext },
 	};
 }
 
@@ -69,6 +76,7 @@ export function* addTemplate( template ) {
 	return {
 		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
+		page: { context: { templateSlug: newTemplate.slug } },
 	};
 }
 
@@ -114,7 +122,8 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page and displays both.
+ * Resolves the template for a page and displays both. If no path is given, attempts
+ * to use the postId to generate a path like `?p=${ postId }`.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -125,10 +134,25 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
-	const templateId = yield findTemplate( page.path );
+	if ( ! page.path && page.context?.postId ) {
+		page.path = `?p=${ page.context.postId }`;
+	}
+	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
+		'core',
+		'__experimentalGetTemplateForLink',
+		page.path
+	);
 	yield {
 		type: 'SET_PAGE',
-		page,
+		page: ! templateSlug
+			? page
+			: {
+					...page,
+					context: {
+						...page.context,
+						templateSlug,
+					},
+			  },
 		templateId,
 	};
 	return templateId;
@@ -148,8 +172,13 @@ export function* showHomepage() {
 		'site'
 	);
 
+	const { siteUrl } = yield controls.select(
+		'core/edit-site',
+		'getSettings'
+	);
+
 	const page = {
-		path: '/',
+		path: siteUrl,
 		context:
 			showOnFront === 'page'
 				? {

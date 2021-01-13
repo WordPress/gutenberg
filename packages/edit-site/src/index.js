@@ -4,7 +4,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -18,7 +17,6 @@ import './plugins';
 import './hooks';
 import registerEditSiteStore from './store';
 import Editor from './components/editor';
-import { findTemplate } from './utils';
 
 const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 	apiFetch( {
@@ -53,7 +51,6 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
-	findTemplate.siteUrl = settings.siteUrl;
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
@@ -67,4 +64,5 @@ export function initialize( id, settings ) {
 	render( <Editor />, document.getElementById( id ) );
 }
 
+export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

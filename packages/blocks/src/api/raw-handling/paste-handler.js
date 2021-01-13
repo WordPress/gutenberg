@@ -1,24 +1,20 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact, identity, difference } from 'lodash';
+import { flatMap, compact } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	getPhrasingContentSchema,
-	alterSpecialTags,
-	removeInvalidHTML,
-} from '@wordpress/dom';
+import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockContent } from '../serializer';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
@@ -44,67 +40,6 @@ import emptyParagraphRemover from './empty-paragraph-remover';
  */
 const { console } = window;
 
-const getNonDefaultStyles = ( { defaultStylesEntries, stylesEntries } ) =>
-	stylesEntries.reduce( ( acc, [ key, values ] ) => {
-		const defaultValues = ( defaultStylesEntries.find(
-			( [ defaultKey ] ) => defaultKey === key
-		) || [] )[ 1 ];
-		const diff = difference( values, defaultValues );
-		const nonDefaultStyles = diff.length
-			? {
-					[ key ]: diff,
-			  }
-			: {};
-		return {
-			...acc,
-			...nonDefaultStyles,
-		};
-	}, {} );
-
-const getStylesEntries = ( stylesString ) => {
-	const stylesArr = stylesString
-		.replace( /\(.*?\)/g, ( match ) => match.replace( / /g, '_' ) )
-		.split( '&quot;' )
-		.join( `'` )
-		.split( ';' )
-		.filter( ( x ) => x );
-
-	console.log( stylesArr );
-	return stylesArr
-		.map( ( styles ) => {
-			const [ key, values = [] ] = styles.trim().split( ':' );
-			console.log( values );
-			if ( key === 'color' ) return [ key, [ values ] ];
-			const valuesArr = values.split( ', ' ).map( ( w ) => w.trim() );
-			return [ key, valuesArr ];
-		} )
-		.replace( /\(.*?\)/g, ( match ) => match.replace( /_/g, '' ) );
-};
-const defaultStyles =
-	"color: rgb(40, 48, 61); font-family: -apple-system, system-ui, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; font-size: 20px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(209, 228, 221); text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;";
-
-const fromObjToString = ( obj ) =>
-	Object.entries( obj )
-		.map( ( pair ) => pair.join( ':' ) )
-		.join( '; ' );
-
-const sanitize = ( x ) => x;
-const removeDefaultStyles = ( html ) => {
-	const container = document.createElement( 'div' );
-	container.innerHTML = html;
-	const elementStyles = container.firstElementChild.style.cssText;
-	const defaultStylesEntries = getStylesEntries( defaultStyles );
-	const stylesEntries = getStylesEntries( elementStyles );
-	const diff = getNonDefaultStyles( {
-		defaultStylesEntries,
-		stylesEntries,
-	} );
-	const nonDefaultStyles = fromObjToString( diff );
-	for ( const child of container.children ) {
-		child.style = nonDefaultStyles;
-	}
-	return container.children.map( ( child ) => child.value );
-};
 /**
  * Filters HTML to only contain phrasing content.
  *
@@ -114,17 +49,14 @@ const removeDefaultStyles = ( html ) => {
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML, preserveWhiteSpace ) {
-	HTML = sanitize( removeDefaultStyles( HTML ) );
 	HTML = deepFilterHTML( HTML, [
 		googleDocsUIDRemover,
 		phrasingContentReducer,
 		commentRemover,
 	] );
-	// HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
-	// 	inline: true,
-	// } );
-
-	HTML = alterSpecialTags( HTML );
+	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
+		inline: true,
+	} );
 
 	if ( ! preserveWhiteSpace ) {
 		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
@@ -134,62 +66,6 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	console.log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
-}
-
-function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
-		( transform ) => {
-			return transform.isMatch
-				? transform
-				: {
-						...transform,
-						isMatch: ( node ) =>
-							transform.selector &&
-							node.matches( transform.selector ),
-				  };
-		}
-	);
-}
-
-/**
- * Converts HTML directly to blocks. Looks for a matching transform for each
- * top-level tag. The HTML should be filtered to not have any text between
- * top-level tags and formatted in a way that blocks can handle the HTML.
- *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
- *
- * @return {Array} An array of blocks.
- */
-function htmlToBlocks( { html, rawTransforms } ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-
-	doc.body.innerHTML = html;
-
-	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
-			isMatch( node )
-		);
-
-		if ( ! rawTransform ) {
-			return createBlock(
-				// Should not be hardcoded.
-				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
-			);
-		}
-
-		const { transform, blockName } = rawTransform;
-
-		if ( transform ) {
-			return transform( node );
-		}
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
-		);
-	} );
 }
 
 /**
@@ -289,13 +165,8 @@ export function pasteHandler( {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
 
-	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema(
-		rawTransforms,
-		phrasingContentSchema,
-		true
-	);
+	const blockContentSchema = getBlockContentSchema( 'paste' );
 
 	const blocks = compact(
 		flatMap( pieces, ( piece ) => {
@@ -336,7 +207,7 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			console.log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( { html: piece, rawTransforms } );
+			return htmlToBlocks( piece );
 		} )
 	);
 

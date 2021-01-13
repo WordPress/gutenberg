@@ -37,6 +37,7 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
+import { store as blocksStore } from '../../store';
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {
@@ -645,6 +646,7 @@ describe( 'blocks', () => {
 						// Verify that for deprecations, the filter is called with a merge of pre-filter
 						// settings with deprecation keys omitted and the deprecation entry.
 						if ( i > 0 ) {
+							// eslint-disable-next-line jest/no-conditional-expect
 							expect( settings ).toEqual( {
 								...omit(
 									{
@@ -732,7 +734,7 @@ describe( 'blocks', () => {
 		it( 'creates a new block collection', () => {
 			registerBlockCollection( 'core', { title: 'Core' } );
 
-			expect( select( 'core/blocks' ).getCollections() ).toEqual( {
+			expect( select( blocksStore ).getCollections() ).toEqual( {
 				core: { title: 'Core', icon: undefined },
 			} );
 		} );
@@ -744,7 +746,7 @@ describe( 'blocks', () => {
 			registerBlockCollection( 'core2', { title: 'Core2' } );
 			unregisterBlockCollection( 'core' );
 
-			expect( select( 'core/blocks' ).getCollections() ).toEqual( {
+			expect( select( blocksStore ).getCollections() ).toEqual( {
 				core2: { title: 'Core2', icon: undefined },
 			} );
 		} );

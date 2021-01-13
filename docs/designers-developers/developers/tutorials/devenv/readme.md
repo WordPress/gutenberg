@@ -8,7 +8,7 @@ A development environment is a catch-all term for what you need setup on your co
 2. WordPress Development Site
 3. Code Editor
 
-## Quickstart
+## Quick Start
 
 Here is a summary of the guide. See each section for additional details and explanations.
 
@@ -17,10 +17,11 @@ Here is a summary of the guide. See each section for additional details and expl
 Download and install [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm)
 
 ```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 ```
 
 Quit and restart terminal
+Install the long-term support (lts) version of node.
 ```
 nvm install --lts
 ```

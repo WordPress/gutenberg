@@ -50,6 +50,7 @@ import createCoreDataStore from './store';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	let listeners = [];
+	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
@@ -85,12 +86,20 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
+		__experimentalListeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
 		return parent && parent.select( storeName );
+	}
+
+	function __experimentalMarkListeningStores( callback, ref ) {
+		__experimentalListeningStores.clear();
+		const result = callback.call( this );
+		ref.current = Array.from( __experimentalListeningStores );
+		return result;
 	}
 
 	const getResolveSelectors = memize(
@@ -140,13 +149,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * and modified so that they return promises that resolve to their eventual values,
 	 * after any resolvers have ran.
 	 *
-	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( storeName ) {
-		return getResolveSelectors( select( storeName ) );
+	function __experimentalResolveSelect( storeNameOrDefinition ) {
+		return getResolveSelectors( select( storeNameOrDefinition ) );
 	}
 
 	/**
@@ -213,6 +222,29 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
 	}
 
+	/**
+	 * Subscribe handler to a store.
+	 *
+	 * @param {string[]} storeName The store name.
+	 * @param {Function} handler   The function subscribed to the store.
+	 * @return {Function} A function to unsubscribe the handler.
+	 */
+	function __experimentalSubscribeStore( storeName, handler ) {
+		if ( storeName in stores ) {
+			return stores[ storeName ].subscribe( handler );
+		}
+
+		// Trying to access a store that hasn't been registered,
+		// this is a pattern rarely used but seen in some places.
+		// We fallback to regular `subscribe` here for backward-compatibility for now.
+		// See https://github.com/WordPress/gutenberg/pull/27466 for more info.
+		if ( ! parent ) {
+			return subscribe( handler );
+		}
+
+		return parent.__experimentalSubscribeStore( storeName, handler );
+	}
+
 	let registry = {
 		registerGenericStore,
 		stores,
@@ -223,6 +255,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
+		__experimentalMarkListeningStores,
+		__experimentalSubscribeStore,
 	};
 
 	/**

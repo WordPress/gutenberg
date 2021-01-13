@@ -20,7 +20,7 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
-import { TEMPLATES_STATUSES } from './constants';
+import { TEMPLATES_NEW_OPTIONS } from './constants';
 
 export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
@@ -29,8 +29,7 @@ export default function NewTemplateDropdown() {
 		} = select( 'core/editor' );
 		const templateEntities = select( 'core' ).getEntityRecords(
 			'postType',
-			'wp_template',
-			{ status: TEMPLATES_STATUSES, per_page: -1 }
+			'wp_template'
 		);
 		return {
 			defaultTemplateTypes: getDefaultTemplateTypes(),
@@ -59,8 +58,14 @@ export default function NewTemplateDropdown() {
 
 	const missingTemplates = filter(
 		defaultTemplateTypes,
-		( template ) => ! includes( existingTemplateSlugs, template.slug )
+		( template ) =>
+			includes( TEMPLATES_NEW_OPTIONS, template.slug ) &&
+			! includes( existingTemplateSlugs, template.slug )
 	);
+
+	if ( ! missingTemplates.length ) {
+		return null;
+	}
 
 	return (
 		<DropdownMenu
@@ -77,7 +82,7 @@ export default function NewTemplateDropdown() {
 			} }
 		>
 			{ ( { onClose } ) => (
-				<NavigableMenu>
+				<NavigableMenu className="edit-site-navigation-panel__new-template-popover">
 					<MenuGroup label={ __( 'Add Template' ) }>
 						{ map(
 							missingTemplates,

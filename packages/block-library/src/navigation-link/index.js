@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	category as categoryIcon,
 	mapMarker as linkIcon,
@@ -23,7 +23,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Link' ),
+	title: _x( 'Link', 'block title' ),
 
 	icon: linkIcon,
 

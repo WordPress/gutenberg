@@ -8,6 +8,7 @@ import {
 	publishPost,
 	trashAllPosts,
 	activateTheme,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -21,7 +22,7 @@ const visitSiteEditor = async () => {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
-	await page.waitForSelector( '.edit-site-visual-editor' );
+	await page.waitForSelector( '.edit-site-visual-editor iframe' );
 };
 
 const clickTemplateItem = async ( menus, itemName ) => {
@@ -97,17 +98,6 @@ const openEntitySavePanel = async () => {
 	}
 	// If we made it this far, the panel is opened.
 
-	// Expand to view savable entities if necessary.
-	const reviewChangesButton = await page.$(
-		'.entities-saved-states__review-changes-button'
-	);
-	const [ needsToOpen ] = await reviewChangesButton.$x(
-		'//*[contains(text(),"Review changes.")]'
-	);
-	if ( needsToOpen ) {
-		await reviewChangesButton.click();
-	}
-
 	return true;
 };
 
@@ -137,13 +127,8 @@ const removeErrorMocks = () => {
 };
 
 describe( 'Multi-entity editor states', () => {
-	// Setup & Teardown.
-	const templateName = 'Front Page';
-	const templatePartName = 'Test Template Part Name Edit';
-	const nestedTPName = 'Test Nested Template Part Name Edit';
-
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentyone-blocks' );
+		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -160,15 +145,25 @@ describe( 'Multi-entity editor states', () => {
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await visitSiteEditor();
 		await clickTemplateItem( 'Template Parts', 'header' );
+		await page.waitForFunction( () =>
+			Array.from( window.frames ).find(
+				( { name } ) => name === 'editor-canvas'
+			)
+		);
 
 		// Wait for blocks to load.
-		await page.waitForSelector( '.wp-block' );
+		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', templateName );
-		await page.waitForSelector( '.wp-block' );
+		await clickTemplateItem( 'Templates', 'Front Page' );
+		await page.waitForFunction( () =>
+			Array.from( window.frames ).find(
+				( { name } ) => name === 'editor-canvas'
+			)
+		);
+		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
@@ -176,6 +171,10 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	describe( 'Multi-entity edit', () => {
+		const templatePartName = 'Test Template Part Name Edit';
+		const nestedTPName = 'Test Nested Template Part Name Edit';
+		const templateName = 'Custom Template';
+
 		beforeAll( async () => {
 			await trashAllPosts( 'wp_template' );
 			await trashAllPosts( 'wp_template_part' );
@@ -196,15 +195,43 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await visitSiteEditor();
-			// Waits for the template part to load...
-			await page.waitForSelector(
+
+			// Wait for site editor to load.
+			await canvas().waitForSelector(
 				'.wp-block-template-part .block-editor-block-list__layout'
 			);
+
+			// Our custom template shows up in the " templates > all" menu; let's use it.
+			await clickTemplateItem( [ 'Templates', 'All' ], templateName );
+			await page.waitForXPath(
+				`//p[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
+			);
+
 			removeErrorMocks();
 		} );
 
 		afterEach( async () => {
-			await saveAllEntities();
+			await Promise.all( [
+				saveAllEntities(),
+
+				// Wait for the save request and the subsequent query to be
+				// fulfilled - both are requests made to /index.php route.
+				// Without that, clicked elements can lose focus sometimes
+				// when the response is received.
+				page.waitForResponse( ( response ) => {
+					return (
+						response.url().includes( 'index.php' ) &&
+						response.request().method() === 'POST'
+					);
+				} ),
+
+				page.waitForResponse( ( response ) => {
+					return (
+						response.url().includes( 'index.php' ) &&
+						response.request().method() === 'GET'
+					);
+				} ),
+			] );
 			removeErrorMocks();
 		} );
 
@@ -221,7 +248,7 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the child when editing the child', async () => {
-			await page.click(
+			await canvas().click(
 				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Some more test words!' );
@@ -232,7 +259,7 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
-			await page.click(
+			await canvas().click(
 				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Nested test words!' );
