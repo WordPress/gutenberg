@@ -94,6 +94,7 @@ require __DIR__ . '/full-site-editing/template-parts.php';
 require __DIR__ . '/full-site-editing/template-loader.php';
 require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
+require __DIR__ . '/full-site-editing/switch-theme.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
