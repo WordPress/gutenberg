@@ -59,11 +59,11 @@ export default function TemplateDetails( { template, onClose } ) {
 				<div className="edit-site-template-details__revert">
 					<MenuItem
 						info={ __(
-							'Reset this template to the theme supplied default'
+							'Restore template to theme default'
 						) }
 						onClick={ revert }
 					>
-						{ __( 'Revert' ) }
+						{ __( 'Clear customizations' ) }
 					</MenuItem>
 				</div>
 			) }
