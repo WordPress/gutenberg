@@ -2,97 +2,99 @@
 @import "./deprecated.scss";
 
 // Styles for current version of gallery block.
-.wp-block-gallery.has-nested-images {
-	display: block;
+.wp-block-gallery.blocks-gallery-grid.has-nested-images {
+	display: flex;
+	flex-wrap: wrap;
+	// Need bogus :not(#individual-image) to override long :not()
+	// specificity chain on default image block on front end.
+	figure.wp-block-image:not(#individual-image) {
+		// Add space between thumbnails, and unset right most thumbnails later.
+		margin: 0 $grid-unit-20 $grid-unit-20 0;
 
-	figure.blocks-gallery-grid {
+		&:last-of-type:not(#individual-image) {
+			margin-right: 0;
+		}
+
+		width: calc(50% - #{$grid-unit-20});
+
+		&:nth-of-type(even) {
+			margin-right: 0;
+		}
+	}
+
+	figure.wp-block-image {
 		display: flex;
-		flex-wrap: wrap;
-		// Need bogus :not(#individual-image) to override long :not()
-		// specificity chain on default image block on front end.
-		figure.wp-block-image:not(#individual-image) {
-			// Add space between thumbnails, and unset right most thumbnails later.
-			margin: 0 $grid-unit-20 $grid-unit-20 0;
+		flex-grow: 1;
+		justify-content: center;
+		position: relative;
+		margin-top: auto;
+		margin-bottom: auto;
+		// IE11 doesn't like the "flex-direction: column;" here.
+		@supports ( position: sticky ) {
+			flex-direction: column;
+		}
 
-			&:last-of-type {
-				margin-right: 0;
+		> div,
+		> a {
+			margin: 0;
+
+			// Avoid applying flex styles to IE11.
+			@supports ( position: sticky ) {
+				flex-direction: column;
+				flex-grow: 1;
 			}
 		}
 
-		figure.wp-block-image {
-			display: flex;
-			flex-grow: 1;
-			justify-content: center;
-			position: relative;
-			margin-top: auto;
-			margin-bottom: auto;
-			// IE11 doesn't like the "flex-direction: column;" here.
+		img {
+			display: block;
+			height: auto;
+			max-width: 100%;
+			width: 100%;
+
+			// IE doesn't handle cropping, so we need an explicit width here.
+			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 			@supports ( position: sticky ) {
-				flex-direction: column;
+				width: auto;
 			}
+		}
 
-			> div,
-			> a {
-				margin: 0;
-
-				// Avoid applying flex styles to IE11.
-				@supports ( position: sticky ) {
-					flex-direction: column;
-					flex-grow: 1;
-				}
-			}
+		figcaption {
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+			bottom: 0;
+			color: $white;
+			font-size: $default-font-size;
+			left: 0;
+			margin-bottom: 0;
+			max-height: 100%;
+			overflow: auto;
+			padding: 40px 10px 9px;
+			position: absolute;
+			text-align: center;
+			width: 100%;
 
 			img {
-				display: block;
-				height: auto;
-				max-width: 100%;
-				width: 100%;
+				display: inline;
+			}
+		}
 
-				// IE doesn't handle cropping, so we need an explicit width here.
-				// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+		&.is-style-rounded {
+			> div,
+			> a {
+				// Not supported in IE11.
 				@supports ( position: sticky ) {
-					width: auto;
+					flex: 1 1 auto;
 				}
 			}
-
 			figcaption {
-				background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
-				bottom: 0;
-				color: $white;
-				font-size: $default-font-size;
-				left: 0;
-				margin-bottom: 0;
-				max-height: 100%;
-				overflow: auto;
-				padding: 40px 10px 9px;
-				position: absolute;
-				text-align: center;
-				width: 100%;
-
-				img {
-					display: inline;
-				}
-			}
-
-			&.is-style-rounded {
-				> div,
-				> a {
-					// Not supported in IE11.
-					@supports ( position: sticky ) {
-						flex: 1 1 auto;
-					}
-				}
-				figcaption {
+				background: none;
+				// Not supported in IE11.
+				@supports ( position: sticky ) {
+					flex: initial;
 					background: none;
-					// Not supported in IE11.
-					@supports ( position: sticky ) {
-						flex: initial;
-						background: none;
-						color: inherit;
-						margin: 0;
-						padding: 10px 10px 9px;
-						position: relative;
-					}
+					color: inherit;
+					margin: 0;
+					padding: 10px 10px 9px;
+					position: relative;
 				}
 			}
 		}
@@ -100,27 +102,27 @@
 
 	figcaption {
 		flex-grow: 1;
+		flex-basis: 100%;
 	}
 
 	// Non cropped images.
 	&:not(.is-cropped) {
-		figure.blocks-gallery-grid {
-			figure.wp-block-image:not(#individual-image) {
-				margin-top: auto;
-				margin-bottom: auto;
-				img {
-					margin-bottom: $grid-unit-20;
-				}
 
-				figcaption {
-					bottom: $grid-unit-20;
-				}
+		figure.wp-block-image:not(#individual-image) {
+			margin-top: auto;
+			margin-bottom: auto;
+			img {
+				margin-bottom: $grid-unit-20;
+			}
+
+			figcaption {
+				bottom: $grid-unit-20;
 			}
 		}
 	}
 
 	// Cropped Images.
-	&.is-cropped figure.blocks-gallery-grid figure.wp-block-image:not(#individual-image) {
+	&.is-cropped figure.wp-block-image:not(#individual-image) {
 		> div:not(.components-drop-zone),
 		> a {
 			display: block; // Thanks to IE11 not supporting object-fit fall back to display: block.
@@ -144,15 +146,6 @@
 		}
 	}
 
-	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& figure.wp-block-image:not(#individual-image) {
-		width: calc(50% - #{$grid-unit-20});
-
-		&:nth-of-type(even) {
-			margin-right: 0;
-		}
-	}
-
 	&.columns-1 figure.wp-block-image:not(#individual-image) {
 		margin-right: 0;
 		width: 100%;
@@ -169,7 +162,7 @@
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
-			&.columns-#{$column-count} figure.blocks-gallery-grid figure.wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
+			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
@@ -184,8 +177,6 @@
 
 	// If the gallery is centered, center the content inside as well.
 	&.aligncenter {
-		figure.wp-block-image {
-			justify-content: center;
-		}
+		justify-content: center;
 	}
 }
