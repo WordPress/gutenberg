@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 9.7.2 =
+
+### Bug Fixes
+
+- Keep the inserter opened when clicking the scrollbar.
+
+### Various
+
+- Updated the "tested up to" WordPress version.
+
+
 = 9.7.1 =
 
 ### Bug Fixes
