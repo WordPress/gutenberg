@@ -36,7 +36,7 @@ describe( 'invalid blocks', () => {
 
 		// Click on the 'three-dots' menu toggle
 		await page.click(
-			'.block-editor-warning__actions button[aria-label="Options"]'
+			'.block-editor-warning__actions button[aria-label="More options"]'
 		);
 
 		await clickMenuItem( 'Resolve' );

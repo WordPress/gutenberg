@@ -38,7 +38,7 @@ export function AlignmentToolbar( props ) {
 		value,
 		onChange,
 		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-		label = __( 'Align text' ),
+		label = __( 'Align' ),
 		describedBy = __( 'Change text alignment' ),
 		isCollapsed = true,
 	} = props;
