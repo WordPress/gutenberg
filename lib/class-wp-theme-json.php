@@ -358,6 +358,17 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Returns the property name of a kebab-cased property.
+	 *
+	 * @param string $property Property name to convert in kebab-case.
+	 * @return string Name of the property
+	 */
+	private static function to_property( $property ) {
+		$mappings = get_case_mappings();
+		return $mappings[ 'to_property' ][ $property ];
+	}
+
+	/**
 	 * Returns a mapping on metadata properties to avoid having to constantly
 	 * transforms properties between camel case and kebab.
 	 *
@@ -1069,7 +1080,6 @@ class WP_Theme_JSON {
 	 */
 	public function remove_insecure_properties() {
 		$blocks_metadata   = self::get_blocks_metadata();
-		$metadata_mappings = self::get_case_mappings();
 		foreach ( $this->contexts as $context_name => &$context ) {
 			// Escape the context key.
 			if ( empty( $blocks_metadata[ $context_name ] ) ) {
@@ -1091,7 +1101,7 @@ class WP_Theme_JSON {
 						if ( null === $escaped_styles ) {
 							$escaped_styles = array();
 						}
-						$property = $metadata_mappings['to_property'][ $declaration['name'] ];
+						$property = self::to_property( $declaration['name'] );
 						$path     = self::PROPERTIES_METADATA[ $property ]['value'];
 						if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
 							$declaration_divided = explode( '-', $declaration['name'] );
