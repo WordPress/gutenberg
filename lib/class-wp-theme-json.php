@@ -347,6 +347,17 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Returns the kebab-cased name of a given property.
+	 *
+	 * @param string $property Property name to convert.
+	 * @return string kebab-cased name of the property
+	 */
+	private static function to_kebab_case( $property ) {
+		$mappings = get_case_mappings();
+		return $mappings[ 'to_kebab_case' ][ $property ];
+	}
+
+	/**
 	 * Returns a mapping on metadata properties to avoid having to constantly
 	 * transforms properties between camel case and kebab.
 	 *
@@ -358,31 +369,31 @@ class WP_Theme_JSON {
 	 *  "to_property" mapping properties in kebab case to
 	 *    the main properties in camel case e.g: "padding-top" to "padding".
 	 */
-	private static function get_properties_metadata_case_mappings() {
-		static $properties_metadata_case_mappings;
-		if ( null === $properties_metadata_case_mappings ) {
-			$properties_metadata_case_mappings = array(
+	private static function get_case_mappings() {
+		static $case_mappings;
+		if ( null === $case_mappings ) {
+			$case_mappings = array(
 				'to_kebab_case' => array(),
 				'to_camel_case' => array(),
 				'to_property'   => array(),
 			);
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
-				$properties_metadata_case_mappings['to_kebab_case'][ $key ]        = $kebab_case;
-				$properties_metadata_case_mappings['to_camel_case'][ $kebab_case ] = $key;
-				$properties_metadata_case_mappings['to_property'][ $kebab_case ]   = $key;
+				$case_mappings['to_kebab_case'][ $key ]        = $kebab_case;
+				$case_mappings['to_camel_case'][ $kebab_case ] = $key;
+				$case_mappings['to_property'][ $kebab_case ]   = $key;
 				if ( self::has_properties( $metadata ) ) {
 					foreach ( $metadata['properties'] as $property ) {
 						$camel_case = $key . ucfirst( $property );
 						$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $camel_case ) );
-						$properties_metadata_case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
-						$properties_metadata_case_mappings['to_camel_case'][ $kebab_case ] = $camel_case;
-						$properties_metadata_case_mappings['to_property'][ $kebab_case ]   = $key;
+						$case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
+						$case_mappings['to_camel_case'][ $kebab_case ] = $camel_case;
+						$case_mappings['to_property'][ $kebab_case ]   = $key;
 					}
 				}
 			}
 		}
-		return $properties_metadata_case_mappings;
+		return $case_mappings;
 	}
 
 	/**
@@ -708,8 +719,7 @@ class WP_Theme_JSON {
 		if ( empty( $context['styles'] ) ) {
 			return;
 		}
-		$metadata_mappings = self::get_properties_metadata_case_mappings();
-		$properties        = array();
+		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
@@ -735,7 +745,7 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $context['styles'], $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$kebab_cased_name = $metadata_mappings['to_kebab_case'][ $prop['name'] ];
+				$kebab_cased_name = self::to_kebab_case( $prop['name'] );
 				$declarations[]   = array(
 					'name'  => $kebab_cased_name,
 					'value' => $value,
@@ -1059,7 +1069,7 @@ class WP_Theme_JSON {
 	 */
 	public function remove_insecure_properties() {
 		$blocks_metadata   = self::get_blocks_metadata();
-		$metadata_mappings = self::get_properties_metadata_case_mappings();
+		$metadata_mappings = self::get_case_mappings();
 		foreach ( $this->contexts as $context_name => &$context ) {
 			// Escape the context key.
 			if ( empty( $blocks_metadata[ $context_name ] ) ) {
