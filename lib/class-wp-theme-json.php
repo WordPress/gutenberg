@@ -709,7 +709,7 @@ class WP_Theme_JSON {
 			return;
 		}
 		$metadata_mappings = self::get_properties_metadata_case_mappings();
-		$properties = array();
+		$properties        = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
@@ -736,7 +736,7 @@ class WP_Theme_JSON {
 			$value = self::get_property_value( $context['styles'], $prop['value'] );
 			if ( ! empty( $value ) ) {
 				$kebab_cased_name = $metadata_mappings['to_kebab_case'][ $prop['name'] ];
-				$declarations[]  = array(
+				$declarations[]   = array(
 					'name'  => $kebab_cased_name,
 					'value' => $value,
 				);
@@ -1061,7 +1061,7 @@ class WP_Theme_JSON {
 		$blocks_metadata   = self::get_blocks_metadata();
 		$metadata_mappings = self::get_properties_metadata_case_mappings();
 		foreach ( $this->contexts as $context_name => &$context ) {
-			// Escape the context key;
+			// Escape the context key.
 			if ( empty( $blocks_metadata[ $context_name ] ) ) {
 				unset( $this->contexts[ $context_name ] );
 				continue;
@@ -1114,8 +1114,8 @@ class WP_Theme_JSON {
 								esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
 								sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
 							) {
-								$value = $single_preset[ $preset_metadata['value_key'] ];
-								$single_preset_is_valid;
+								$value                  = $single_preset[ $preset_metadata['value_key'] ];
+								$single_preset_is_valid = null;
 								if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
 									$single_preset_is_valid = true;
 									foreach ( $preset_metadata['classes'] as $class_meta_data ) {
@@ -1127,8 +1127,8 @@ class WP_Theme_JSON {
 										}
 									}
 								} else {
-									$property = $preset_metadata['css_var_infix'];
-									$style_to_validate = $property . ': ' . $value;
+									$property               = $preset_metadata['css_var_infix'];
+									$style_to_validate      = $property . ': ' . $value;
 									$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
 								}
 								if ( $single_preset_is_valid ) {
@@ -1151,12 +1151,12 @@ class WP_Theme_JSON {
 
 			if ( null === $escaped_settings && null === $escaped_styles ) {
 				unset( $this->contexts[ $context_name ] );
-			} else if ( null !== $escaped_settings && null !== $escaped_styles ) {
+			} elseif ( null !== $escaped_settings && null !== $escaped_styles ) {
 				$context = array(
 					'styles'   => $escaped_styles,
 					'settings' => $escaped_settings,
 				);
-			} else if ( null === $escaped_settings ) {
+			} elseif ( null === $escaped_settings ) {
 				$context = array(
 					'styles' => $escaped_styles,
 				);
