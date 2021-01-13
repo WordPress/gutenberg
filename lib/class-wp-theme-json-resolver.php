@@ -314,7 +314,14 @@ class WP_Theme_JSON_Resolver {
 				return $config;
 			}
 
-			if ( is_array( $decoded_data ) ) {
+			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
+			// If is not true the content was not escaped and is not safe.
+			if (
+				is_array( $decoded_data ) &&
+				isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
+				$decoded_data['isGlobalStylesUserThemeJSON']
+			) {
+				unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 				$config = $decoded_data;
 			}
 		}
