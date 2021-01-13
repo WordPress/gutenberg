@@ -144,9 +144,6 @@ describe( 'Widgets screen', () => {
 
 		<!-- wp:widget-area {\\"id\\":\\"sidebar-1\\",\\"name\\":\\"Footer #1\\"} -->
 		<!-- wp:paragraph -->
-		<p>Second Paragraph</p>
-		<!-- /wp:paragraph -->
-		<!-- wp:paragraph -->
 		<p>First Paragraph</p>
 		<!-- /wp:paragraph -->
 		<!-- wp:paragraph -->
