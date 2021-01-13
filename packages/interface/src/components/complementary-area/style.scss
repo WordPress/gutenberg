@@ -20,7 +20,7 @@
 		z-index: z-index(".components-panel__header");
 
 		&.edit-post-sidebar__panel-tabs {
-			top: 48px;
+			top: $panel-header-height;
 
 			@include break-medium() {
 				top: 0;
