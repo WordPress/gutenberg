@@ -14,7 +14,13 @@ import {
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import { Image, UnitControl } from '@wordpress/components';
-import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useMemo,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -151,27 +157,47 @@ function FocalPointPicker( props ) {
 		},
 	];
 
+	const onTooltipPress = useCallback( () => setTooltipVisible( false ) );
+	const onMediaLayout = useCallback(
+		( event ) => {
+			const { height, width } = event.nativeEvent.layout;
+
+			if (
+				width !== 0 &&
+				height !== 0 &&
+				( containerSize?.width !== width ||
+					containerSize?.height !== height )
+			) {
+				setContainerSize( { width, height } );
+			}
+		},
+		[ containerSize ]
+	);
+	const onImageDataLoad = useCallback(
+		() => setDisplayPlaceholder( false ),
+		[]
+	);
+	const onVideoLoad = useCallback( ( event ) => {
+		const { height, width } = event.naturalSize;
+		setVideoNaturalSize( { height, width } );
+		setDisplayPlaceholder( false );
+	}, [] );
+	const onXCoordinateChange = useCallback(
+		( x ) => onChange( { x: x / 100 } ),
+		[]
+	);
+	const onYCoordinateChange = useCallback(
+		( y ) => onChange( { y: y / 100 } ),
+		[]
+	);
+
 	return (
 		<View style={ styles.container }>
-			<Tooltip
-				onPress={ () => setTooltipVisible( false ) }
-				visible={ tooltipVisible }
-			>
+			<Tooltip onPress={ onTooltipPress } visible={ tooltipVisible }>
 				<View style={ [ styles.media, backgroundColor ] }>
 					<View
 						{ ...panResponder.panHandlers }
-						onLayout={ ( event ) => {
-							const { height, width } = event.nativeEvent.layout;
-
-							if (
-								width !== 0 &&
-								height !== 0 &&
-								( containerSize?.width !== width ||
-									containerSize?.height !== height )
-							) {
-								setContainerSize( { width, height } );
-							}
-						} }
+						onLayout={ onMediaLayout }
 						style={ styles.mediaContainer }
 					>
 						{ ! isVideo && (
@@ -181,9 +207,7 @@ function FocalPointPicker( props ) {
 								height="100%"
 								url={ url }
 								style={ imagePreviewStyles }
-								onImageDataLoad={ () => {
-									setDisplayPlaceholder( false );
-								} }
+								onImageDataLoad={ onImageDataLoad }
 							/>
 						) }
 						{ isVideo && (
@@ -191,11 +215,7 @@ function FocalPointPicker( props ) {
 								muted
 								paused
 								disableFocus
-								onLoad={ ( event ) => {
-									const { height, width } = event.naturalSize;
-									setVideoNaturalSize( { height, width } );
-									setDisplayPlaceholder( false );
-								} }
+								onLoad={ onVideoLoad }
 								resizeMode={ 'cover' }
 								source={ { uri: url } }
 								style={ videoPreviewStyles }
@@ -224,7 +244,7 @@ function FocalPointPicker( props ) {
 					label={ __( 'X-Axis Position' ) }
 					max={ MAX_POSITION_VALUE }
 					min={ MIN_POSITION_VALUE }
-					onChange={ ( x ) => onChange( { x: x / 100 } ) }
+					onChange={ onXCoordinateChange }
 					unit="%"
 					units={ FOCAL_POINT_UNITS }
 					value={ Math.round( focalPoint.x * 100 ) }
@@ -234,7 +254,7 @@ function FocalPointPicker( props ) {
 					label={ __( 'Y-Axis Position' ) }
 					max={ MAX_POSITION_VALUE }
 					min={ MIN_POSITION_VALUE }
-					onChange={ ( y ) => onChange( { y: y / 100 } ) }
+					onChange={ onYCoordinateChange }
 					unit="%"
 					units={ FOCAL_POINT_UNITS }
 					value={ Math.round( focalPoint.y * 100 ) }
