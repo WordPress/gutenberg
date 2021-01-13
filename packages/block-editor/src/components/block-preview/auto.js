@@ -1,55 +1,57 @@
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import Iframe from '../iframe';
 
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
+function AutoBlockPreview( { viewportWidth } ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
 	] = useResizeObserver();
 	const [
-		containtResizeListener,
+		contentResizeListener,
 		{ height: contentHeight },
 	] = useResizeObserver();
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
-	const scale =
-		( containerWidth - 2 * __experimentalPadding ) / viewportWidth;
+	const scale = containerWidth / viewportWidth;
 
 	return (
-		<div
-			className="block-editor-block-preview__container editor-styles-wrapper"
-			aria-hidden
-			style={ {
-				height: contentHeight * scale + 2 * __experimentalPadding,
-			} }
-		>
+		<div className="block-editor-block-preview__container">
 			{ containerResizeListener }
-			<Disabled
+			<div
+				className="block-editor-block-preview__content"
 				style={ {
 					transform: `scale(${ scale })`,
-					width: viewportWidth,
-					left: __experimentalPadding,
-					right: __experimentalPadding,
-					top: __experimentalPadding,
+					height: contentHeight * scale,
 				} }
-				className="block-editor-block-preview__content"
 			>
-				{ containtResizeListener }
-				<MemoizedBlockList />
-			</Disabled>
+				<Iframe
+					contentRef={ ( body ) => {
+						body.style.position = 'absolute';
+					} }
+					aria-hidden
+					style={ {
+						width: viewportWidth,
+						height: contentHeight,
+						pointerEvents: 'none',
+					} }
+				>
+					{ contentResizeListener }
+					<MemoizedBlockList />
+				</Iframe>
+			</div>
 		</div>
 	);
 }
