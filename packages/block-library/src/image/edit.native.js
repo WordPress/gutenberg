@@ -483,8 +483,8 @@ export class ImageEdit extends React.Component {
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
-						{ getInspectorControls() }
-						{ getMediaOptions() }
+						{ isSelected && getInspectorControls() }
+						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress

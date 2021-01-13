@@ -147,32 +147,35 @@ const SocialLinkEdit = ( {
 	return (
 		<View>
 			{ isSelected && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							title={ sprintf(
-								// translators: %s: social link name e.g: "Instagram".
-								__( 'Add link to %s' ),
-								socialLinkName
-							) }
-							icon={ link }
-							onClick={ onOpenSettingsSheet }
-							isActive={ url }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								title={ sprintf(
+									// translators: %s: social link name e.g: "Instagram".
+									__( 'Add link to %s' ),
+									socialLinkName
+								) }
+								icon={ link }
+								onClick={ onOpenSettingsSheet }
+								isActive={ url }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<LinkSettingsNavigation
+						isVisible={ isLinkSheetVisible }
+						url={ attributes.url }
+						label={ attributes.label }
+						rel={ attributes.rel }
+						onEmptyURL={ onEmptyURL }
+						onClose={ onCloseSettingsSheet }
+						setAttributes={ setAttributes }
+						options={ linkSettingsOptions }
+						withBottomSheet
+					/>
+				</>
 			) }
-			<LinkSettingsNavigation
-				isVisible={ isLinkSheetVisible }
-				url={ attributes.url }
-				label={ attributes.label }
-				rel={ attributes.rel }
-				onEmptyURL={ onEmptyURL }
-				onClose={ onCloseSettingsSheet }
-				setAttributes={ setAttributes }
-				options={ linkSettingsOptions }
-				withBottomSheet={ true }
-			/>
+
 			<TouchableWithoutFeedback
 				onPress={ onIconPress }
 				accessibilityRole={ 'button' }

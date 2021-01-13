@@ -88,6 +88,7 @@ const Cover = ( {
 	setAttributes,
 	openGeneralSidebar,
 	closeSettingsBottomSheet,
+	isSelected,
 } ) => {
 	const {
 		backgroundType,
@@ -508,7 +509,7 @@ const Cover = ( {
 
 	return (
 		<View style={ styles.backgroundContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ isImage &&
 				url &&

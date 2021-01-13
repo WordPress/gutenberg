@@ -9,6 +9,7 @@ import { find } from 'lodash';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -33,10 +34,6 @@ function BlockStyles( { clientId, url } ) {
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 
-	if ( ! styles || styles.length === 0 ) {
-		return null;
-	}
-
 	const renderedStyles = find( styles, 'isDefault' )
 		? styles
 		: [
@@ -48,37 +45,46 @@ function BlockStyles( { clientId, url } ) {
 				...styles,
 		  ];
 
-	const activeStyle = getActiveStyle( renderedStyles, className );
+	const mappedRenderedStyles = useMemo( () => {
+		const activeStyle = getActiveStyle( renderedStyles, className );
+
+		return renderedStyles.map( ( style ) => {
+			const styleClassName = replaceActiveStyle(
+				className,
+				activeStyle,
+				style
+			);
+			const isActive = activeStyle === style;
+
+			const onStylePress = () => {
+				updateBlockAttributes( clientId, {
+					className: styleClassName,
+				} );
+			};
+
+			return (
+				<StylePreview
+					onPress={ onStylePress }
+					isActive={ isActive }
+					key={ style.name }
+					style={ style }
+					url={ url }
+				/>
+			);
+		} );
+	}, [ renderedStyles, className, clientId ] );
+
+	if ( ! styles || styles.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<ScrollView
 			horizontal
 			showsHorizontalScrollIndicator={ false }
 			contentContainerStyle={ containerStyles.content }
 		>
-			{ renderedStyles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle(
-					className,
-					activeStyle,
-					style
-				);
-				const isActive = activeStyle === style;
-
-				const onStylePress = () => {
-					updateBlockAttributes( clientId, {
-						className: styleClassName,
-					} );
-				};
-
-				return (
-					<StylePreview
-						onPress={ onStylePress }
-						isActive={ isActive }
-						key={ style.name }
-						style={ style }
-						url={ url }
-					/>
-				);
-			} ) }
+			{ mappedRenderedStyles }
 		</ScrollView>
 	);
 }
