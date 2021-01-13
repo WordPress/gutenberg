@@ -17,8 +17,8 @@
 		"src/tip/**/*",
 		"src/truncate/**/*",
 		"src/utils/**/*",
-		"src/visually-hidden/**/*",
-		"src/view/**/*"
+		"src/view/**/*",
+		"src/visually-hidden/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
