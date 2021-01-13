@@ -27,17 +27,16 @@
 	margin-left: $grid-unit-10;
 }
 
-.components-tooltip .event-catcher {
-	z-index: z-index(".components-tooltip .event-catcher");
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-}
-
-.components-tooltip .disabled-element-wrapper {
+.disabled-element-wrapper {
 	position: relative;
+	.event-catcher {
+		z-index: z-index(".components-tooltip .event-catcher");
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+	}
 }
