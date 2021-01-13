@@ -354,7 +354,7 @@ class WP_Theme_JSON {
 	 */
 	private static function to_kebab_case( $property ) {
 		$mappings = self::get_case_mappings();
-		return $mappings[ 'to_kebab_case' ][ $property ];
+		return $mappings['to_kebab_case'][ $property ];
 	}
 
 	/**
@@ -365,7 +365,7 @@ class WP_Theme_JSON {
 	 */
 	private static function to_property( $property ) {
 		$mappings = self::get_case_mappings();
-		return $mappings[ 'to_property' ][ $property ];
+		return $mappings['to_property'][ $property ];
 	}
 
 	/**
@@ -387,12 +387,14 @@ class WP_Theme_JSON {
 			);
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
+
 				$case_mappings['to_kebab_case'][ $key ]      = $kebab_case;
 				$case_mappings['to_property'][ $kebab_case ] = $key;
 				if ( self::has_properties( $metadata ) ) {
 					foreach ( $metadata['properties'] as $property ) {
 						$camel_case = $key . ucfirst( $property );
 						$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $camel_case ) );
+
 						$case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
 						$case_mappings['to_property'][ $kebab_case ]   = $key;
 					}
@@ -1074,7 +1076,7 @@ class WP_Theme_JSON {
 	 * Removes insecure data from theme.json.
 	 */
 	public function remove_insecure_properties() {
-		$blocks_metadata   = self::get_blocks_metadata();
+		$blocks_metadata = self::get_blocks_metadata();
 		foreach ( $this->contexts as $context_name => &$context ) {
 			// Escape the context key.
 			if ( empty( $blocks_metadata[ $context_name ] ) ) {
