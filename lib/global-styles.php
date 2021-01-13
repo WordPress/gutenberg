@@ -320,7 +320,7 @@ function gutenberg_global_styles_kses_remove_filters() {
  */
 function gutenberg_global_styles_kses_init() {
 	gutenberg_global_styles_kses_remove_filters();
-	if ( ! current_user_can( 'unfiltered_html' ) || true ) {
+	if ( ! current_user_can( 'unfiltered_html' ) ) {
 		gutenberg_global_styles_kses_init_filters();
 	}
 }
