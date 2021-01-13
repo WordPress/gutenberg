@@ -32,4 +32,8 @@ const addAnnotationClassName = ( OriginalComponent ) => {
 	} )( OriginalComponent );
 };
 
-addFilter( 'editor.BlockListBlock', STORE_NAME, addAnnotationClassName );
+addFilter(
+	'editor.BlockListBlock',
+	'core/annotations',
+	addAnnotationClassName
+);
