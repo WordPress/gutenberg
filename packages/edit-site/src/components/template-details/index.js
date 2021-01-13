@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import {
+	Button,
+	MenuItem,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -52,15 +56,15 @@ export default function TemplateDetails( { template, onClose } ) {
 			</div>
 
 			{ isTemplateRevertable( template ) && (
-				<div className="edit-site-template-details">
-					<Button isLink onClick={ revert }>
-						{ __( 'Revert' ) }
-					</Button>
-					<Text variant="caption">
-						{ __(
+				<div className="edit-site-template-details__revert">
+					<MenuItem
+						info={ __(
 							'Reset this template to the theme supplied default'
 						) }
-					</Text>
+						onClick={ revert }
+					>
+						{ __( 'Revert' ) }
+					</MenuItem>
 				</div>
 			) }
 
