@@ -4,6 +4,7 @@
 import React from 'react';
 import { SafeAreaView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { isFinite } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +47,15 @@ const FocalPointSettingsMemo = React.memo(
 				onFocalPointChange( draftFocalPoint );
 			}
 		}
+
 		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
+		function setPosition( { x, y } ) {
+			setDraftFocalPoint( ( prevState ) => ( {
+				...prevState,
+				...( isFinite( x ) ? { x } : {} ),
+				...( isFinite( y ) ? { y } : {} ),
+			} ) );
+		}
 
 		return (
 			<SafeAreaView style={ styles.safearea }>
@@ -58,7 +67,7 @@ const FocalPointSettingsMemo = React.memo(
 				/>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
-					onChange={ setDraftFocalPoint }
+					onChange={ setPosition }
 					shouldEnableBottomSheetScroll={
 						shouldEnableBottomSheetScroll
 					}

@@ -3,6 +3,7 @@
  */
 import { Animated, PanResponder, View } from 'react-native';
 import Video from 'react-native-video';
+import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -83,9 +84,9 @@ function FocalPointPicker( props ) {
 					shouldEnableBottomSheetScroll( true );
 					pan.flattenOffset(); // Flatten offset into value
 					const { locationX: x, locationY: y } = event.nativeEvent;
-					setPosition( {
-						x: x / containerSize?.width,
-						y: y / containerSize?.height,
+					onChange( {
+						x: clamp( x / containerSize?.width, 0, 1 ),
+						y: clamp( y / containerSize?.height, 0, 1 ),
 					} );
 					// Slider (child of RangeCell) is uncontrolled, so we must increment a
 					// key to re-mount and sync the pan gesture values to the sliders
@@ -95,14 +96,6 @@ function FocalPointPicker( props ) {
 			} ),
 		[ containerSize ]
 	);
-
-	function setPosition( { x, y } ) {
-		onChange( ( prevState ) => ( {
-			...prevState,
-			...( x ? { x } : {} ),
-			...( y ? { y } : {} ),
-		} ) );
-	}
 
 	const backgroundColor = usePreferredColorSchemeStyle(
 		styles.backgroundSolid,
@@ -227,7 +220,7 @@ function FocalPointPicker( props ) {
 					label={ __( 'X-Axis Position' ) }
 					max={ MAX_POSITION_VALUE }
 					min={ MIN_POSITION_VALUE }
-					onChange={ ( x ) => setPosition( { x: x / 100 } ) }
+					onChange={ ( x ) => onChange( { x: x / 100 } ) }
 					unit="%"
 					units={ FOCAL_POINT_UNITS }
 					value={ Math.round( focalPoint.x * 100 ) }
@@ -237,7 +230,7 @@ function FocalPointPicker( props ) {
 					label={ __( 'Y-Axis Position' ) }
 					max={ MAX_POSITION_VALUE }
 					min={ MIN_POSITION_VALUE }
-					onChange={ ( y ) => setPosition( { y: y / 100 } ) }
+					onChange={ ( y ) => onChange( { y: y / 100 } ) }
 					unit="%"
 					units={ FOCAL_POINT_UNITS }
 					value={ Math.round( focalPoint.y * 100 ) }
