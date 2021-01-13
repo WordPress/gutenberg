@@ -96,8 +96,7 @@ export function BlockAlignmentToolbar( {
 					? activeAlignmentControl.icon
 					: defaultAlignmentControl.icon
 			}
-			label={ __( 'Align' ) }
-			toggleProps={ { describedBy: __( 'Change alignment' ) } }
+			label={ __( 'Align block' ) }
 			controls={ enabledControls.map( ( control ) => {
 				return {
 					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
