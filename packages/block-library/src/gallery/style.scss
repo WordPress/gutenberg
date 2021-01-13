@@ -158,6 +158,11 @@
 				margin-right: $grid-unit-20;
 				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 			}
+
+			// Prevent collapsing margin while sibling is being dragged.
+			&.columns-#{$i} figure.wp-block-image:not(#individual-image).is-dragging ~ figure.wp-block-image:not(#individual-image) {
+				margin-right: $grid-unit-20;
+			}
 		}
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
