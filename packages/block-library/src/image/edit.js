@@ -94,7 +94,7 @@ export function ImageEdit( {
 		sizeSlug,
 		inhertedAttributes,
 	} = attributes;
-	const { isListItem } = context;
+	const { isGrouped } = context;
 	const [ tempUrl, setTempUrl ] = useState();
 	const altRef = useRef();
 	useEffect( () => {
@@ -162,7 +162,7 @@ export function ImageEdit( {
 
 		// Check if default link setting, or the one inherited from parent block should be used.
 		let linkDestination =
-			isListItem && context.linkTo
+			isGrouped && context.linkTo
 				? context.linkTo
 				: attributes.linkDestination;
 
@@ -203,7 +203,7 @@ export function ImageEdit( {
 		}
 		mediaAttributes.href = href;
 
-		if ( isListItem ) {
+		if ( isGrouped ) {
 			const parentSizeAttributes = getImageSizeAttributes(
 				media,
 				context.sizeSlug
@@ -290,12 +290,6 @@ export function ImageEdit( {
 		revokeBlobURL( tempUrl );
 	}, [ isTemp, url ] );
 
-	useEffect( () => {
-		if ( isListItem ) {
-			setAttributes( { isListItem } );
-		}
-	}, [ isListItem ] );
-
 	const isExternal = isExternalImage( id, url );
 	const controls = (
 		<BlockControls>
@@ -335,7 +329,6 @@ export function ImageEdit( {
 		'is-resized': !! width || !! height,
 		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
-		'list-image': isListItem,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -358,20 +351,6 @@ export function ImageEdit( {
 			inhertedAttributes={ inhertedAttributes }
 		/>
 	);
-
-	if ( isListItem ) {
-		return (
-			<>
-				{ controls }
-				<li { ...blockProps }>
-					<figure>
-						{ image }
-						{ mediaPlaceholder }
-					</figure>
-				</li>
-			</>
-		);
-	}
 
 	return (
 		<>
