@@ -45,3 +45,19 @@ jobs:
         if: github.event.inputs.version == 'stable'
         run: |
           PLUGIN_VERSION=$(jq -r .version package.json)
+          VERSION_REGEX="([0-9]+)\.([0-9]+)\.([0-9]+)(-rc\.([0-9])+)?"
+          [[ $PLUGIN_VERSION =~ $VERSION_REGEX ]]
+          MAJOR=${BASH_REMATCH[1]}
+          MINOR=${BASH_REMATCH[2]}
+          PATCH=${BASH_REMATCH[3]}
+          RC=${BASH_REMATCH[5]}
+          if [[ ${BASH_REMATCH[4]} ]]; then
+            # Version in package.json is RC
+            NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+          else
+            # Version in package.json is stable
+            NEXT_VERSION="$MAJOR.$MINOR.$(( $PATCH + 1 ))"
+          fi
+          RELEASE_BRANCH="release/$MAJOR.$MINOR"
+          git fetch origin "$RELEASE_BRANCH"
+          git checkout "$RELEASE_BRANCH"
