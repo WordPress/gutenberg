@@ -60,7 +60,6 @@ export default function QueryInspectorControls( {
 	attributes: { query, layout },
 	setQuery,
 	setLayout,
-	allowInheritQuery,
 } ) {
 	const {
 		order,
@@ -171,18 +170,14 @@ export default function QueryInspectorControls( {
 		<InspectorControls>
 			<CreateNewPostLink type={ postType } />
 			<PanelBody title={ __( 'Settings' ) }>
-				{ allowInheritQuery && (
-					<ToggleControl
-						label={ __( 'Inherit query from URL' ) }
-						help={ __(
-							'Disable the option to customize the query arguments. Leave enabled to inherit the global query depending on the URL.'
-						) }
-						checked={ !! inherit }
-						onChange={ ( value ) =>
-							setQuery( { inherit: !! value } )
-						}
-					/>
-				) }
+				<ToggleControl
+					label={ __( 'Inherit query from URL' ) }
+					help={ __(
+						'Disable the option to customize the query arguments. Leave enabled to inherit the global query depending on the URL.'
+					) }
+					checked={ !! inherit }
+					onChange={ ( value ) => setQuery( { inherit: !! value } ) }
+				/>
 				{ ! inherit && (
 					<SelectControl
 						options={ postTypesSelectOptions }

@@ -80,7 +80,6 @@ export default function QueryLoopEdit( {
 			if ( sticky ) {
 				query.sticky = sticky === 'only';
 			}
-
 			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
 			if ( inherit ) {
 				// Change the post-type if needed.
@@ -89,7 +88,6 @@ export default function QueryLoopEdit( {
 					postType = query.postType;
 				}
 			}
-
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),

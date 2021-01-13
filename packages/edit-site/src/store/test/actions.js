@@ -24,11 +24,30 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'setTemplate', () => {
-		it( 'should return the SET_TEMPLATE action', () => {
+		it( 'should return the SET_TEMPLATE action when slug is provided', () => {
 			const templateId = 1;
-			expect( setTemplate( templateId ) ).toEqual( {
+			const templateSlug = 'archive';
+			const it = setTemplate( templateId, templateSlug );
+			expect( it.next().value ).toEqual( {
 				type: 'SET_TEMPLATE',
 				templateId,
+				page: { context: { templateSlug } },
+			} );
+		} );
+		it( 'should return the SET_TEMPLATE by getting the template slug', () => {
+			const templateId = 1;
+			const template = { slug: 'index' };
+			const it = setTemplate( templateId );
+			expect( it.next().value ).toEqual( {
+				type: '@@data/RESOLVE_SELECT',
+				storeKey: 'core',
+				selectorName: 'getEntityRecord',
+				args: [ 'postType', 'wp_template', templateId ],
+			} );
+			expect( it.next( template ).value ).toEqual( {
+				type: 'SET_TEMPLATE',
+				templateId,
+				page: { context: { templateSlug: template.slug } },
 			} );
 		} );
 	} );
@@ -36,7 +55,7 @@ describe( 'actions', () => {
 	describe( 'addTemplate', () => {
 		it( 'should yield the DISPATCH control to create the template and return the SET_TEMPLATE action', () => {
 			const template = { slug: 'index' };
-			const newTemplate = { id: 1 };
+			const newTemplate = { id: 1, slug: 'index' };
 
 			const it = addTemplate( template );
 			expect( it.next().value ).toEqual( {
@@ -49,6 +68,7 @@ describe( 'actions', () => {
 				value: {
 					type: 'SET_TEMPLATE',
 					templateId: newTemplate.id,
+					page: { context: { templateSlug: newTemplate.slug } },
 				},
 				done: true,
 			} );
