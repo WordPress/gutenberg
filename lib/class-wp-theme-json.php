@@ -353,7 +353,7 @@ class WP_Theme_JSON {
 	 * @return string kebab-cased name of the property
 	 */
 	private static function to_kebab_case( $property ) {
-		$mappings = get_case_mappings();
+		$mappings = self::get_case_mappings();
 		return $mappings[ 'to_kebab_case' ][ $property ];
 	}
 
@@ -364,7 +364,7 @@ class WP_Theme_JSON {
 	 * @return string Name of the property
 	 */
 	private static function to_property( $property ) {
-		$mappings = get_case_mappings();
+		$mappings = self::get_case_mappings();
 		return $mappings[ 'to_property' ][ $property ];
 	}
 
