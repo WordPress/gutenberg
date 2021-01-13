@@ -252,7 +252,8 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 function gutenberg_get_block_template( $slug, $template_type = 'wp_template' ) {
 	$theme = wp_get_theme()->get_stylesheet();
 	$wp_query_args        = array(
-		'name'           => $slug,
+		// Can't use 'name' because tax_query won't work.
+		'post_name__in'  => array( $slug ),
 		'post_type'      => $template_type,
 		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
 		'posts_per_page' => 1,
@@ -312,7 +313,8 @@ function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_s
 	}
 
 	$check_query_args = array(
-		'post_name'      => $slug,
+		// Can't use 'name' because tax_query won't work.
+		'post_name__in'  => array( $slug ),
 		'post_type'      => $post_type,
 		'posts_per_page' => 1,
 		'post__not_in'   => $post_ID,
@@ -325,10 +327,10 @@ function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_s
 	if ( count( $posts ) > 0 ) {
 		$suffix = 2;
 		do {
-			$query_args              = $check_query_args;
-			$alt_post_name           = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
-			$query_args['post_name'] = $alt_post_name;
-			$query                   = new WP_Query( $check_query_args );
+			$query_args                     = $check_query_args;
+			$alt_post_name                  = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+			$query_args['post_name__in'][0] = $alt_post_name;
+			$query                          = new WP_Query( $query_args );
 			$suffix++;
 		} while ( count( $query->get_posts() ) > 0 );
 		$slug = $alt_post_name;
