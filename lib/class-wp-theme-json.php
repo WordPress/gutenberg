@@ -375,8 +375,6 @@ class WP_Theme_JSON {
 	 * @return array Containing three mappings
 	 *  "to_kebab_case" mapping properties in camel case to
 	 *    properties in kebab case e.g: "paddingTop" to "padding-top".
-	 *  "to_camel_case" mapping properties in kebab case to
-	 *    properties in camel case e.g: "padding-top" to "paddingTop".
 	 *  "to_property" mapping properties in kebab case to
 	 *    the main properties in camel case e.g: "padding-top" to "padding".
 	 */
@@ -385,20 +383,17 @@ class WP_Theme_JSON {
 		if ( null === $case_mappings ) {
 			$case_mappings = array(
 				'to_kebab_case' => array(),
-				'to_camel_case' => array(),
 				'to_property'   => array(),
 			);
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
-				$case_mappings['to_kebab_case'][ $key ]        = $kebab_case;
-				$case_mappings['to_camel_case'][ $kebab_case ] = $key;
-				$case_mappings['to_property'][ $kebab_case ]   = $key;
+				$case_mappings['to_kebab_case'][ $key ]      = $kebab_case;
+				$case_mappings['to_property'][ $kebab_case ] = $key;
 				if ( self::has_properties( $metadata ) ) {
 					foreach ( $metadata['properties'] as $property ) {
 						$camel_case = $key . ucfirst( $property );
 						$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $camel_case ) );
 						$case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
-						$case_mappings['to_camel_case'][ $kebab_case ] = $camel_case;
 						$case_mappings['to_property'][ $kebab_case ]   = $key;
 					}
 				}
