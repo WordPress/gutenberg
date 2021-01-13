@@ -105,7 +105,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. Similarly to this package, the default requirements are `node` 10.0.0 or later, and `npm` 6.9.0 or later. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 

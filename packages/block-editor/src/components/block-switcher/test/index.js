@@ -25,6 +25,16 @@ describe( 'BlockSwitcher', () => {
 		const wrapper = shallow( <BlockSwitcher /> );
 		expect( wrapper.html() ).toBeNull();
 	} );
+
+	test( 'should not render block switcher with null blocks', () => {
+		useSelect.mockImplementation( () => ( { blocks: [ null ] } ) );
+		const wrapper = shallow(
+			<BlockSwitcher
+				clientIds={ [ 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9' ] }
+			/>
+		);
+		expect( wrapper.html() ).toBeNull();
+	} );
 } );
 describe( 'BlockSwitcherDropdownMenu', () => {
 	const headingBlock1 = {

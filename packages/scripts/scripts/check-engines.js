@@ -9,18 +9,26 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  */
 const { getArgsFromCLI, hasArgInCLI } = require( '../utils' );
 
-const args = getArgsFromCLI();
+const getConfig = () => {
+	const hasConfig =
+		hasArgInCLI( '--package' ) ||
+		hasArgInCLI( '--node' ) ||
+		hasArgInCLI( '--npm' ) ||
+		hasArgInCLI( '--yarn' );
 
-const hasConfig =
-	hasArgInCLI( '--package' ) ||
-	hasArgInCLI( '--node' ) ||
-	hasArgInCLI( '--npm' ) ||
-	hasArgInCLI( '--yarn' );
-const config = ! hasConfig ? [ '--node', '>=10.0.0', '--npm', '>=6.9.0' ] : [];
+	if ( hasConfig ) {
+		return [];
+	}
+	const {
+		engines: { node, npm },
+	} = require( '../package.json' );
+
+	return [ '--node', node, '--npm', npm ];
+};
 
 const result = spawn(
 	resolveBin( 'check-node-version' ),
-	[ ...config, ...args ],
+	[ ...getConfig(), ...getArgsFromCLI() ],
 	{
 		stdio: 'inherit',
 	}
