@@ -1,5 +1,10 @@
 .edit-site-template-details {
-	margin: $grid-unit-10 $grid-unit-20;
+	border-bottom: $border-width solid $gray-400;
+	padding: $grid-unit-10 $grid-unit-20;
+
+	&:last-of-type {
+		border-bottom: none;
+	}
 
 	p {
 		padding: $grid-unit-10 0;
