@@ -80,3 +80,19 @@ export function getGradientAstWithControlPoints(
 		} ),
 	};
 }
+
+export function getStopCssColor( colorStop ) {
+	switch ( colorStop.type ) {
+		case 'hex':
+			return `#${ colorStop.value }`;
+		case 'literal':
+			return colorStop.value;
+		case 'rgb':
+		case 'rgba':
+			return `${ colorStop.type }(${ colorStop.value.join( ',' ) })`;
+		default:
+			// Should be unreachable if passing an AST from gradient-parser.
+			// See https://github.com/rafaelcaricio/gradient-parser#ast.
+			return 'transparent';
+	}
+}
