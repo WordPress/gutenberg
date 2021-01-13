@@ -15,8 +15,10 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
 		"src/utils/**/*",
-		"src/visually-hidden/**/*"
+		"src/visually-hidden/**/*",
+		"src/view/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
