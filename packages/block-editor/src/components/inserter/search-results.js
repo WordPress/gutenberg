@@ -153,7 +153,7 @@ function InserterSearchResults( {
 						onHover,
 						filterValue,
 						hasItems,
-						rootClientId,
+						rootClientId: destinationRootClientId,
 					} }
 				>
 					{ ( fills ) => {
