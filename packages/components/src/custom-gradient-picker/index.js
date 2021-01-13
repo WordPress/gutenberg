@@ -19,6 +19,7 @@ import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentationOfARadial,
 	getGradientAstWithControlPoints,
+	getStopCssColor,
 } from './utils';
 import { serializeGradient } from './serializer';
 import {
@@ -112,13 +113,10 @@ export default function CustomGradientPicker( { value, onChange } ) {
 			: gradientAST.value;
 	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
 	// Control points color option may be hex from presets, custom colors will be rgb.
-	// The position should always be a percentage. TODO: Add fallback in case it isn't.
-	const controlPoints = gradientAST.colorStops.map( ( p ) => ( {
-		color:
-			p.type === 'hex'
-				? `#${ p.value }`
-				: `${ p.type }(${ p.value.join( ',' ) })`,
-		position: parseInt( p.length.value ),
+	// The position should always be a percentage.
+	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => ( {
+		color: getStopCssColor( colorStop ),
+		position: parseInt( colorStop.length.value ),
 	} ) );
 
 	return (
