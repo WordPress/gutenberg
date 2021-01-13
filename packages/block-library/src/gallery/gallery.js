@@ -38,7 +38,7 @@ export const Gallery = ( props ) => {
 		imageCrop,
 	} = attributes;
 	const galleryRef = useRef();
-	const innerBlocksProps = useInnerBlocksProps(
+	const { children, ...innerBlocksProps } = useInnerBlocksProps(
 		{
 			className: 'blocks-gallery-grid',
 		},
@@ -66,22 +66,25 @@ export const Gallery = ( props ) => {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<figure { ...innerBlocksProps } />
-
-			{ mediaPlaceholder }
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				tagName="figcaption"
-				className="blocks-gallery-caption"
-				aria-label={ __( 'Gallery caption text' ) }
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
-				}
-			/>
+			<figure { ...innerBlocksProps }>
+				{ children }
+				{ mediaPlaceholder }
+				<RichTextVisibilityHelper
+					isHidden={ ! isSelected && RichText.isEmpty( caption ) }
+					tagName="figcaption"
+					className="blocks-gallery-caption"
+					aria-label={ __( 'Gallery caption text' ) }
+					placeholder={ __( 'Write gallery caption…' ) }
+					value={ caption }
+					onChange={ ( value ) =>
+						setAttributes( { caption: value } )
+					}
+					inlineToolbar
+					__unstableOnSplitAtEnd={ () =>
+						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+					}
+				/>
+			</figure>
 		</div>
 	);
 };
