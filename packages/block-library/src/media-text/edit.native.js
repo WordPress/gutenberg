@@ -337,7 +337,9 @@ class MediaTextEdit extends Component {
 
 		return (
 			<>
-				{ mediaType === MEDIA_TYPE_IMAGE && this.getControls() }
+				{ isSelected &&
+					mediaType === MEDIA_TYPE_IMAGE &&
+					this.getControls() }
 				{ isSelected && (
 					<BlockControls>
 						{ ( isMediaSelected ||

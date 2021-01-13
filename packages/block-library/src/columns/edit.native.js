@@ -177,7 +177,7 @@ function ColumnsEditContainer( {
 		onChangeWidth( nextWidth, valueUnit, columnId );
 	};
 
-	const getColumnsSliders = () => {
+	const getColumnsSliders = useMemo( () => {
 		if ( ! editorSidebarOpened || ! isSelected ) {
 			return null;
 		}
@@ -219,7 +219,14 @@ function ColumnsEditContainer( {
 				/>
 			);
 		} );
-	};
+	}, [ editorSidebarOpened, isSelected, innerColumns ] );
+
+	const onChangeColumnsNum = useCallback(
+		( value ) => {
+			updateColumns( columnCount, value );
+		},
+		[ columnCount ]
+	);
 
 	return (
 		<>
@@ -231,14 +238,12 @@ function ColumnsEditContainer( {
 								label={ __( 'Number of columns' ) }
 								icon={ columns }
 								value={ columnCount }
-								onChange={ ( value ) =>
-									updateColumns( columnCount, value )
-								}
+								onChange={ onChangeColumnsNum }
 								min={ MIN_COLUMNS_NUM }
 								max={ columnCount + 1 }
 								type="stepper"
 							/>
-							{ getColumnsSliders() }
+							{ getColumnsSliders }
 						</PanelBody>
 						<PanelBody>
 							<FooterMessageControl
