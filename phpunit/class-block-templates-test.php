@@ -81,8 +81,10 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			$content_without_theme_attribute,
 			$theme
 		);
-		$this->assertStringContainsString( $theme, $template_content );
+		$actual                          = '<!-- wp:template-part {"slug":"header","theme":"$theme","align":"full", "tagName":"header","className":"site-header"} /-->';
+		$this->assertStringContainsString( $actual, $template_content );
 
+		// Does not inject theme when there is an existing theme attribute.
 		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
 		$template_content                      = _inject_theme_attribute_in_content(
 			$content_with_existing_theme_attribute,
@@ -90,6 +92,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( $content_with_existing_theme_attribute, $template_content );
 
+		// Does not inject theme when there is no template part.
 		$content_with_no_template_part = '<!-- wp:post-content /-->';
 		$template_content              = _inject_theme_attribute_in_content(
 			$content_with_no_template_part,
