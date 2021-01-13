@@ -1,6 +1,10 @@
 /**
  * External dependencies
  */
+import React from 'react';
+/**
+ * External dependencies
+ */
 import {
 	Text,
 	View,
@@ -20,46 +24,49 @@ import { CSS_UNITS } from './utils';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useCallback } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
-function UnitControl( {
-	currentInput,
-	label,
-	value,
-	onChange,
-	onUnitChange,
-	initialPosition,
-	min,
-	max,
-	separatorType,
-	units = CSS_UNITS,
-	unit,
-	getStylesFromColorScheme,
-	decimalNum,
-	...props
-} ) {
-	const pickerRef = useRef();
-	const anchorNodeRef = useRef();
+const UnitControl = React.memo(
+	( {
+		currentInput,
+		label,
+		value,
+		onChange,
+		onUnitChange,
+		initialPosition,
+		min,
+		max,
+		separatorType,
+		units = CSS_UNITS,
+		unit,
+		getStylesFromColorScheme,
+		decimalNum,
+		...props
+	} ) => {
+		const pickerRef = useRef();
+		const anchorNodeRef = useRef();
 
-	function onPickerPresent() {
-		if ( pickerRef?.current ) {
-			pickerRef.current.presentPicker();
+		function onPickerPresent() {
+			if ( pickerRef?.current ) {
+				pickerRef.current.presentPicker();
+			}
 		}
-	}
 
-	const currentInputValue = currentInput === null ? value : currentInput;
-	const initialControlValue = isFinite( currentInputValue )
-		? currentInputValue
-		: initialPosition;
+		const currentInputValue = currentInput === null ? value : currentInput;
+		const initialControlValue = isFinite( currentInputValue )
+			? currentInputValue
+			: initialPosition;
 
-	const unitButtonTextStyle = getStylesFromColorScheme(
-		styles.unitButtonText,
-		styles.unitButtonTextDark
-	);
+		const unitButtonTextStyle = getStylesFromColorScheme(
+			styles.unitButtonText,
+			styles.unitButtonTextDark
+		);
 
-	const renderUnitButton = () => {
+		/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
+		const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
+
 		const accessibilityHint =
 			Platform.OS === 'ios'
 				? __( 'Double tap to open Action Sheet with available options' )
@@ -67,78 +74,77 @@ function UnitControl( {
 						'Double tap to open Bottom Sheet with available options'
 				  );
 
-		/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
-		const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
+		const renderUnitButton = () => {
+			return (
+				<TouchableWithoutFeedback
+					onPress={ onPickerPresent }
+					accessibilityLabel={ accessibilityLabel }
+					accessibilityRole="button"
+					accessibilityHint={ accessibilityHint }
+				>
+					<View style={ styles.unitButton }>
+						<Text style={ unitButtonTextStyle }>{ unit }</Text>
+					</View>
+				</TouchableWithoutFeedback>
+			);
+		};
 
-		return (
-			<TouchableWithoutFeedback
-				onPress={ onPickerPresent }
-				accessibilityLabel={ accessibilityLabel }
-				accessibilityRole="button"
-				accessibilityHint={ accessibilityHint }
-			>
-				<View style={ styles.unitButton }>
-					<Text style={ unitButtonTextStyle }>{ unit }</Text>
+		const getAnchor = () =>
+			anchorNodeRef?.current
+				? findNodeHandle( anchorNodeRef?.current )
+				: undefined;
+
+		const renderUnitPicker = useCallback( () => {
+			return (
+				<View style={ styles.unitMenu } ref={ anchorNodeRef }>
+					{ renderUnitButton() }
+					<Picker
+						ref={ pickerRef }
+						options={ units }
+						onChange={ onUnitChange }
+						hideCancelButton
+						leftAlign
+						getAnchor={ getAnchor }
+					/>
 				</View>
-			</TouchableWithoutFeedback>
-		);
-	};
+			);
+		}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
-	const getAnchor = () =>
-		anchorNodeRef?.current
-			? findNodeHandle( anchorNodeRef?.current )
-			: undefined;
-
-	const renderUnitPicker = () => {
 		return (
-			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
-				{ renderUnitButton() }
-				<Picker
-					ref={ pickerRef }
-					options={ units }
-					onChange={ onUnitChange }
-					hideCancelButton
-					leftAlign
-					getAnchor={ getAnchor }
-				/>
-			</View>
+			<>
+				{ unit !== '%' ? (
+					<StepperCell
+						label={ label }
+						max={ max }
+						min={ min }
+						onChange={ onChange }
+						separatorType={ separatorType }
+						value={ value }
+						defaultValue={ initialControlValue }
+						shouldDisplayTextInput
+						decimalNum={ unit === 'px' ? 0 : decimalNum }
+						{ ...props }
+					>
+						{ renderUnitPicker() }
+					</StepperCell>
+				) : (
+					<RangeCell
+						label={ label }
+						onChange={ onChange }
+						minimumValue={ min }
+						maximumValue={ max }
+						value={ value }
+						defaultValue={ initialControlValue }
+						separatorType={ separatorType }
+						decimalNum={ decimalNum }
+						{ ...props }
+					>
+						{ renderUnitPicker() }
+					</RangeCell>
+				) }
+			</>
 		);
-	};
-
-	return (
-		<>
-			{ unit !== '%' ? (
-				<StepperCell
-					label={ label }
-					max={ max }
-					min={ min }
-					onChange={ onChange }
-					separatorType={ separatorType }
-					value={ value }
-					defaultValue={ initialControlValue }
-					shouldDisplayTextInput
-					decimalNum={ unit === 'px' ? 0 : decimalNum }
-					{ ...props }
-				>
-					{ renderUnitPicker() }
-				</StepperCell>
-			) : (
-				<RangeCell
-					label={ label }
-					onChange={ onChange }
-					minimumValue={ min }
-					maximumValue={ max }
-					value={ value }
-					defaultValue={ initialControlValue }
-					separatorType={ separatorType }
-					decimalNum={ decimalNum }
-					{ ...props }
-				>
-					{ renderUnitPicker() }
-				</RangeCell>
-			) }
-		</>
-	);
-}
+	}
+);
 
 export default withPreferredColorScheme( UnitControl );
