@@ -81,8 +81,11 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			$content_without_theme_attribute,
 			$theme
 		);
-		$actual                          = '<!-- wp:template-part {"slug":"header","theme":"$theme","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$this->assertStringContainsString( $actual, $template_content );
+		$expected                        = sprintf(
+			'<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header","theme":"%s"} /-->',
+			get_stylesheet()
+		);
+		$this->assertEquals( $expected, $template_content );
 
 		// Does not inject theme when there is an existing theme attribute.
 		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
