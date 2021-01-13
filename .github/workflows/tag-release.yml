@@ -1,0 +1,47 @@
+name: Create Changelog and tag release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Plugin version to release (must start with a "v")'
+        required: true
+
+jobs:
+  build:
+    name: Build Release Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Tag Release Candidate
+        if: github.event.inputs.version == 'rc'
+        run: |
+          PLUGIN_VERSION=$(jq -r .version package.json)
+          VERSION_REGEX="([0-9]+)\.([0-9]+)\.([0-9]+)(-rc\.([0-9])+)?"
+          [[ $PLUGIN_VERSION =~ $VERSION_REGEX ]]
+          MAJOR=${BASH_REMATCH[1]}
+          MINOR=${BASH_REMATCH[2]}
+          PATCH=${BASH_REMATCH[3]}
+          RC=${BASH_REMATCH[5]}
+          if [[ ${BASH_REMATCH[4]} ]]; then
+            # Version in package.json is RC
+            NEXT_VERSION="$MAJOR.$MINOR.$PATCH-rc.$(( $RC + 1 ))"
+            RELEASE_BRANCH="release/$MAJOR.$MINOR"
+            git fetch origin "$RELEASE_BRANCH"
+            git checkout "$RELEASE_BRANCH"
+          else
+            # Version in package.json is stable
+            NEXT_VERSION_BASE_10=$(( $MAJOR * 10 + $MINOR + 1 ))
+            NEXT_MAJOR=$(( $NEXT_VERSION_BASE_10 / 10 ))
+            NEXT_MINOR=$(( $NEXT_VERSION_BASE_10 % 10 ))
+            NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.0-rc.0"
+            RELEASE_BRANCH="release/$NEXT_MAJOR.$NEXT_MINOR"
+            git checkout -b "$RELEASE_BRANCH"
+          fi
+
+      - name: Tag Stable Version
+        if: github.event.inputs.version == 'stable'
+        run: |
+          PLUGIN_VERSION=$(jq -r .version package.json)
