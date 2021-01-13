@@ -148,6 +148,16 @@ function Navigation( {
 									'right' === attributes.itemsJustification,
 								onClick: handleItemsAlignment( 'right' ),
 							},
+							{
+								icon: navIcons.justifySpaceBetweenIcon,
+								title: __( 'Space between items' ),
+								isActive:
+									'space-between' ===
+									attributes.itemsJustification,
+								onClick: handleItemsAlignment(
+									'space-between'
+								),
+							},
 						] }
 					/>
 				) }
