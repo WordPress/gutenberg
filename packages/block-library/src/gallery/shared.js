@@ -3,8 +3,13 @@
  */
 import { get, pick } from 'lodash';
 
-export function defaultColumnsNumber( attributes ) {
-	return Math.min( 3, attributes.images.length );
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+export function defaultColumnsNumber( images ) {
+	return images?.length ? Math.min( 3, images.length ) : 3;
 }
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
@@ -19,5 +24,7 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	if ( fullUrl ) {
 		imageProps.fullUrl = fullUrl;
 	}
+	imageProps.alt =
+		imageProps.alt !== '' ? imageProps.alt : __( 'Image gallery image' );
 	return imageProps;
 };
