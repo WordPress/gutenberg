@@ -511,6 +511,10 @@ class WP_Theme_JSON {
 		foreach( $schema as $key => $data ) {
 			if ( is_array( $schema[ $key ] ) && isset( $subtree[ $key ] ) ) {
 				self::process_subtree( $subtree[ $key ], $schema[ $key ] );
+
+				if ( empty( $subtree[ $key ] ) ) {
+					unset( $subtree[ $key ] );
+				}
 			}
 		}
 	}

@@ -60,17 +60,25 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	function test_schema_validation_subtree_is_removed_if_empty() {
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'styles'       => array(
+				'settings'       => array(
 					'invalid/key' => array(
 						'color' => array(
-							'background' => 'red',
+							'custom' => false,
 						),
 					),
 				),
-				'settings' => array(
+				'styles' => array(
 					'global' => array(
 						'color' => array(
-							'custom' => false,
+							'link' => 'blue',
+						),
+						'typography' => array(
+							'invalid/key' => false,
+						),
+						'spacing' => array(
+							'padding' => array(
+								'invalid/key' => '10px',
+							),
 						),
 					),
 				),
@@ -79,10 +87,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$result     = $theme_json->get_raw_data();
 
 		$expected = array(
-			'settings' => array(
+			'styles' => array(
 				'global' => array(
 					'color' => array(
-						'custom' => false,
+						'link' => 'blue',
 					),
 				),
 			),
