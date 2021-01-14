@@ -114,6 +114,9 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
+		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -269,6 +272,13 @@ export class RichText extends Component {
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
+	}
+
+	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
+	convertFontSizeFromString( fontSize ) {
+		return fontSize && fontSize.endsWith( 'px' )
+			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
+			: fontSize;
 	}
 
 	/*
@@ -935,7 +945,9 @@ export class RichText extends Component {
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
-						this.props.fontSize || ( style && style.fontSize )
+						this.props.fontSize ||
+						( style &&
+							this.convertFontSizeFromString( style.fontSize ) )
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
