@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { upperFirst, replace } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,10 +46,10 @@ function Navigation( {
 	hasListViewModal = true,
 } ) {
 	const navIcons = {
-		justifyLeft,
-		justifyCenter,
-		justifyRight,
-		justifySpaceBetween,
+		left: justifyLeft,
+		center: justifyCenter,
+		right: justifyRight,
+		'space-between': justifySpaceBetween,
 	};
 
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
@@ -59,14 +58,9 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	// We replace B with -b to allow spaceBetween to become space-between as a classname.
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
-			[ `items-justified-${ replace(
-				attributes.itemsJustification,
-				'B',
-				'-b'
-			) }` ]: attributes.itemsJustification,
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
 		} ),
 	} );
@@ -134,12 +128,8 @@ function Navigation( {
 					<ToolbarGroup
 						icon={
 							attributes.itemsJustification
-								? navIcons[
-										`justify${ upperFirst(
-											attributes.itemsJustification
-										) }`
-								  ]
-								: navIcons.justifyLeft
+								? navIcons[ attributes.itemsJustification ]
+								: navIcons.left
 						}
 						label={ __( 'Change items justification' ) }
 						isCollapsed
@@ -169,9 +159,11 @@ function Navigation( {
 								icon: justifySpaceBetween,
 								title: __( 'Space between items' ),
 								isActive:
-									'spaceBetween' ===
+									'space-between' ===
 									attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'spaceBetween' ),
+								onClick: handleItemsAlignment(
+									'space-between'
+								),
 							},
 						] }
 					/>
