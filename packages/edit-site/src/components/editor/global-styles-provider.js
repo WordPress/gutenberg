@@ -32,7 +32,8 @@ import {
 } from './utils';
 import getGlobalStyles from './global-styles-renderer';
 
-const EMPTY_CONTENT = '{}';
+const EMPTY_CONTENT = { isGlobalStylesUserThemeJSON: true };
+const EMPTY_CONTENT_STRING = JSON.stringify( EMPTY_CONTENT );
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
@@ -61,10 +62,10 @@ const useGlobalStylesEntityContent = () => {
 
 export const useGlobalStylesReset = () => {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
-	const canRestart = !! content && content !== EMPTY_CONTENT;
+	const canRestart = !! content && content !== EMPTY_CONTENT_STRING;
 	return [
 		canRestart,
-		useCallback( () => setContent( EMPTY_CONTENT ), [ setContent ] ),
+		useCallback( () => setContent( EMPTY_CONTENT_STRING ), [ setContent ] ),
 	];
 };
 
@@ -135,7 +136,12 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
-		const newUserStyles = content ? JSON.parse( content ) : {};
+		let newUserStyles = content ? JSON.parse( content ) : EMPTY_CONTENT;
+		// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
+		// If it is not true the content was not escaped and is not safe.
+		if ( ! newUserStyles.isGlobalStylesUserThemeJSON ) {
+			newUserStyles = EMPTY_CONTENT;
+		}
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,

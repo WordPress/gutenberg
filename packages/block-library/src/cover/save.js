@@ -38,6 +38,7 @@ export default function save( { attributes } ) {
 		isRepeated,
 		overlayColor,
 		url,
+		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
 	} = attributes;
@@ -53,33 +54,20 @@ export default function save( { attributes } ) {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const style = isImageBackground ? backgroundImageStyles( url ) : {};
-	const videoStyle = {};
+	const style = {
+		...( isImageBackground && hasParallax
+			? backgroundImageStyles( url )
+			: {} ),
+		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
+		background: customGradient && ! url ? customGradient : undefined,
+		minHeight: minHeight || undefined,
+	};
 
-	if ( ! overlayColorClass ) {
-		style.backgroundColor = customOverlayColor;
-	}
-
-	if ( customGradient && ! url ) {
-		style.background = customGradient;
-	}
-	style.minHeight = minHeight || undefined;
-
-	let positionValue;
-
-	if ( focalPoint ) {
-		positionValue = `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
-			focalPoint.y * 100
-		) }%`;
-
-		if ( isImageBackground && ! hasParallax ) {
-			style.backgroundPosition = positionValue;
-		}
-
-		if ( isVideoBackground ) {
-			videoStyle.objectPosition = positionValue;
-		}
-	}
+	const objectPosition =
+		// prettier-ignore
+		focalPoint && ! hasParallax
+			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			: undefined;
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
@@ -113,15 +101,33 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
+			{ isImageBackground && url && ! hasParallax && (
+				<img
+					className={ classnames(
+						'wp-block-cover__image-background',
+						id ? `wp-image-${ id }` : null
+					) }
+					alt=""
+					src={ url }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
+				/>
+			) }
 			{ isVideoBackground && url && (
 				<video
-					className="wp-block-cover__video-background"
+					className={ classnames(
+						'wp-block-cover__video-background',
+						'intrinsic-ignore'
+					) }
 					autoPlay
 					muted
 					loop
 					playsInline
 					src={ url }
-					style={ videoStyle }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">

@@ -136,6 +136,9 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 
 		const record = yield apiFetch( { path } );
 		yield receiveEntityRecords( kind, name, record, query );
+	} catch ( error ) {
+		// We need a way to handle and access REST API errors in state
+		// Until then, catching the error ensures the resolver is marked as resolved.
 	} finally {
 		yield* __unstableReleaseStoreLock( lock );
 	}

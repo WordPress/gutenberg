@@ -1,6 +1,7 @@
 ---
-name: Bug report
-about: Report a bug with the WordPress block editor or Gutenberg plugin
+name: Bug report (Mobile)
+about: Report a bug with the mobile app version of Gutenberg
+labels: Mobile App Android/iOS
 
 ---
 
@@ -39,21 +40,7 @@ Please list the steps needed to reproduce the bug. For example:
 ## Screenshots or screen recording (optional)
 <!--
 If possible, please upload a screenshot or screen recording which demonstrates
-the bug. You can use LIEcap to create a GIF screen recording:
-https://www.cockos.com/licecap/
--->
-
-## Code snippet (optional)
-<!--
-If this bug is to related to a developer API, please share a code snippet that
-demonstrates the issue.
-
-For small snippets paste it directly here, or you can use GitHub Gist to share
-multiple code files: https://gist.github.com
-
-Please ensure the shared code can be used by a developer to reproduce the
-issue—ideally it can be copied into a local development environment or executed
-in a browser console to help debug the issue.
+the bug. 
 -->
 
 ## WordPress information
@@ -63,6 +50,6 @@ in a browser console to help debug the issue.
 - Are you using a default theme (e.g. Twenty Twenty-One)? <!-- "Yes" or "No" -->
 
 ## Device information
-- Device: <!-- e.g. "Desktop" or "iPhone 11" -->
-- Operating system: <!-- e.g. "Windows 10" or "iOS 14" -->
-- Browser: <!-- e.g. "Chrome 86.0" or "Mobile Safari" -->
+- Device: <!-- e.g. "Pixel 4" or "iPhone 11" -->
+- Operating system: <!-- e.g. "Android 11.0" or "iOS 14.0" -->
+- WordPress app version: <!-- e.g. "16.3" or branch name / git commit hash -->

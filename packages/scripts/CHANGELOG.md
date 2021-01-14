@@ -17,6 +17,10 @@
 -   Make it possible to transpile `.jsx` files with `build` and `start` commands ([#28002](https://github.com/WordPress/gutenberg/pull/28002)).
 -   Add support for static assets (fonts and images) for `build` and `start` commands ([#28043](https://github.com/WordPress/gutenberg/pull/28043)).
 
+### Bug Fix
+
+-   Ensure that `check-engines` uses the same default version of Node.js and npm as this package ([#28143](https://github.com/WordPress/gutenberg/pull/28143)).
+
 ### Internal
 
 -   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^3.6.1` to requiring `^4.2.0`.
