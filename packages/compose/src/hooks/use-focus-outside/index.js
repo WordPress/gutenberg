@@ -84,15 +84,10 @@ function isFocusNormalizedButton( eventTarget ) {
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
  *
- * @param {EventCallback} onFocusOutside        A callback triggered when focus moves outside
- *                                              the element the event handlers are bound to.
- * @param {'dom'|'react'|'both'} __experimentalDOMOrReact	Determines whether event listeners will
- * 																												be attached directly to the DOM, as
- * 																												React props or both.
+ * @param {EventCallback} onFocusOutside A callback triggered when focus moves outside the element the event handlers are bound to.
+ * @param {'dom'|'react'|'both'} __experimentalDOMOrReact Determines whether event listeners will be attached directly to the DOM, as React props or both.
  *
- * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers
- *                                   to a wrapping element element to capture when focus moves
- *                                   outside that element.
+ * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers to a wrapping element element to capture when focus moves outside that element.
  */
 export default function useFocusOutside(
 	onFocusOutside,
