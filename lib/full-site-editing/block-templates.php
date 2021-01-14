@@ -120,7 +120,11 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 	$template_blocks     = parse_blocks( $template_content );
 
 	foreach ( $template_blocks as $key => $block ) {
-		if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['theme'] ) ) {
+		if (
+			'core/template-part' === $block['blockName'] &&
+			! isset( $block['attrs']['theme'] ) &&
+			wp_get_theme()->get_stylesheet() === $theme
+		) {
 			$template_blocks[ $key ]['attrs']['theme'] = $theme;
 			$has_updated_content                       = true;
 		}
