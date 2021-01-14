@@ -234,6 +234,14 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		'4.17.19',
 		true
 	);
+
+	gutenberg_register_vendor_script(
+		$scripts,
+		'object-fit-polyfill',
+		'https://unpkg.com/objectFitPolyfill@2.3.0/dist/objectFitPolyfill.min.js',
+		array(),
+		'2.3.0'
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -706,3 +714,29 @@ function gutenberg_extend_block_editor_styles_html() {
 	echo "<script>window.__editorStyles = $editor_styles</script>";
 }
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
+
+/**
+ * Adds a polyfill for object-fit in environments which do not support it.
+ *
+ * The script registration occurs in `gutenberg_register_vendor_scripts`, which
+ * should be removed in coordination with this function.
+ *
+ * @see gutenberg_register_vendor_scripts
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
+ *
+ * @since 9.1.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_add_object_fit_polyfill( $scripts ) {
+	did_action( 'init' ) && $scripts->add_inline_script(
+		'wp-polyfill',
+		wp_get_script_polyfill(
+			$scripts,
+			array(
+				'"objectFit" in document.documentElement.style' => 'object-fit-polyfill',
+			)
+		)
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_add_object_fit_polyfill', 20 );

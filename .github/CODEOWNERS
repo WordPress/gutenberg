@@ -11,7 +11,7 @@
 /packages/data-controls                         @nerrad
 
 # Blocks
-/packages/block-library                         @ajitbohra @talldan
+/packages/block-library                         @ajitbohra
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
@@ -54,7 +54,7 @@
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
-/packages/e2e-tests                             @ntwb @nerrad @ajitbohra @talldan
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
@@ -88,10 +88,10 @@
 /packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
-/packages/keycodes                              @talldan @ellatrix
+/packages/keycodes                              @ellatrix
 /packages/priority-queue
 /packages/token-list
-/packages/url                                   @talldan
+/packages/url
 /packages/wordcount
 /packages/warning
 /packages/keyboard-shortcuts
