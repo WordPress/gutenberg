@@ -16,7 +16,7 @@ class WP_Theme_JSON {
 	 *
 	 * @var array
 	 */
-	private $contexts = null;
+	private $theme_json = null;
 
 	/**
 	 * Holds block metadata extracted from block.json
@@ -292,56 +292,35 @@ class WP_Theme_JSON {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $contexts A structure that follows the theme.json schema.
+	 * @param array $theme_json A structure that follows the theme.json schema.
 	 */
-	public function __construct( $contexts = array() ) {
-		$this->contexts = array();
+	public function __construct( $theme_json = array() ) {
+		$this->theme_json = array();
 
-		if ( ! is_array( $contexts ) ) {
+		if ( ! is_array( $theme_json ) ) {
 			return;
 		}
 
-		$metadata = $this->get_blocks_metadata();
-		foreach ( $contexts as $key => $context ) {
-			if ( ! isset( $metadata[ $key ] ) ) {
-				// Skip incoming contexts that can't be found
-				// within the contexts registered.
-				continue;
-			}
+		// Filter out top-level keys that aren't valid according to the schema.
+		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
 
-			// Filter out top-level keys that aren't valid according to the schema.
-			$context = array_intersect_key( $context, self::SCHEMA );
+		// Filter out all block selectors that aren't registered for styles & settings.
+		$block_metadata  = $this->get_blocks_metadata();
 
-			// Process styles subtree.
-			$this->process_key( 'styles', $context, self::SCHEMA );
-			if ( isset( $context['styles'] ) ) {
-				$this->process_key( 'border', $context['styles'], self::SCHEMA['styles'] );
-				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
-				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'] );
-				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
-
-				if ( empty( $context['styles'] ) ) {
-					unset( $context['styles'] );
-				} else {
-					$this->contexts[ $key ]['styles'] = $context['styles'];
-				}
-			}
-
-			// Process settings subtree.
-			$this->process_key( 'settings', $context, self::SCHEMA );
-			if ( isset( $context['settings'] ) ) {
-				$this->process_key( 'border', $context['settings'], self::SCHEMA['settings'] );
-				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
-				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
-				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
-
-				if ( empty( $context['settings'] ) ) {
-					unset( $context['settings'] );
-				} else {
-					$this->contexts[ $key ]['settings'] = $context['settings'];
-				}
+		if ( isset( $this->theme_json['styles'] ) ) {
+			$this->theme_json['styles']  = array_intersect_key( $this->theme_json['styles'], $block_metadata );
+			if ( empty( $this->theme_json['styles'] ) ) {
+				unset( $this->theme_json['styles'] );
 			}
 		}
+
+		if ( isset( $this->theme_json['settings'] ) ) {
+			$this->theme_json['settings'] = array_intersect_key( $this->theme_json['settings'], $block_metadata );
+			if ( empty( $this->theme_json['settings'] ) ) {
+				unset( $this->theme_json['settings'] );
+			}
+		}
+
 	}
 
 	/**
@@ -879,7 +858,7 @@ class WP_Theme_JSON {
 	private function get_css_variables() {
 		$stylesheet = '';
 		$metadata   = $this->get_blocks_metadata();
-		foreach ( $this->contexts as $context_name => $context ) {
+		foreach ( $this->theme_json as $context_name => $context ) {
 			if ( empty( $metadata[ $context_name ]['selector'] ) ) {
 				continue;
 			}
@@ -935,7 +914,7 @@ class WP_Theme_JSON {
 	private function get_block_styles() {
 		$stylesheet = '';
 		$metadata   = $this->get_blocks_metadata();
-		foreach ( $this->contexts as $context_name => $context ) {
+		foreach ( $this->theme_json as $context_name => $context ) {
 			if ( empty( $metadata[ $context_name ]['selector'] ) || empty( $metadata[ $context_name ]['supports'] ) ) {
 				continue;
 			}
@@ -976,7 +955,7 @@ class WP_Theme_JSON {
 	 */
 	public function get_settings() {
 		return array_filter(
-			array_map( array( $this, 'extract_settings' ), $this->contexts ),
+			array_map( array( $this, 'extract_settings' ), $this->theme_json ),
 			function ( $element ) {
 				return null !== $element;
 			}
@@ -1015,8 +994,8 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				if ( ! isset( $this->contexts[ $context ][ $subtree ] ) ) {
-					$this->contexts[ $context ][ $subtree ] = $incoming_data[ $context ][ $subtree ];
+				if ( ! isset( $this->theme_json[ $context ][ $subtree ] ) ) {
+					$this->theme_json[ $context ][ $subtree ] = $incoming_data[ $context ][ $subtree ];
 					continue;
 				}
 
@@ -1025,13 +1004,13 @@ class WP_Theme_JSON {
 						continue;
 					}
 
-					if ( ! isset( $this->contexts[ $context ][ $subtree ][ $leaf ] ) ) {
-						$this->contexts[ $context ][ $subtree ][ $leaf ] = $incoming_data[ $context ][ $subtree ][ $leaf ];
+					if ( ! isset( $this->theme_json[ $context ][ $subtree ][ $leaf ] ) ) {
+						$this->theme_json[ $context ][ $subtree ][ $leaf ] = $incoming_data[ $context ][ $subtree ][ $leaf ];
 						continue;
 					}
 
-					$this->contexts[ $context ][ $subtree ][ $leaf ] = array_merge(
-						$this->contexts[ $context ][ $subtree ][ $leaf ],
+					$this->theme_json[ $context ][ $subtree ][ $leaf ] = array_merge(
+						$this->theme_json[ $context ][ $subtree ][ $leaf ],
 						$incoming_data[ $context ][ $subtree ][ $leaf ]
 					);
 				}
@@ -1044,10 +1023,10 @@ class WP_Theme_JSON {
 	 */
 	public function remove_insecure_properties() {
 		$blocks_metadata = self::get_blocks_metadata();
-		foreach ( $this->contexts as $context_name => &$context ) {
+		foreach ( $this->theme_json as $context_name => &$context ) {
 			// Escape the context key.
 			if ( empty( $blocks_metadata[ $context_name ] ) ) {
-				unset( $this->contexts[ $context_name ] );
+				unset( $this->theme_json[ $context_name ] );
 				continue;
 			}
 
@@ -1134,7 +1113,7 @@ class WP_Theme_JSON {
 			}
 
 			if ( null === $escaped_settings && null === $escaped_styles ) {
-				unset( $this->contexts[ $context_name ] );
+				unset( $this->theme_json[ $context_name ] );
 			} elseif ( null !== $escaped_settings && null !== $escaped_styles ) {
 				$context = array(
 					'styles'   => $escaped_styles,
@@ -1158,7 +1137,7 @@ class WP_Theme_JSON {
 	 * @return array Raw data.
 	 */
 	public function get_raw_data() {
-		return $this->contexts;
+		return $this->theme_json;
 	}
 
 }
