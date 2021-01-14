@@ -42,7 +42,7 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
+	hasItemJustificationControls = attributes.orientation === 'horizontal',
 	hasListViewModal = true,
 } ) {
 	const navIcons = {
