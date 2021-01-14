@@ -301,33 +301,37 @@ class WP_Theme_JSON {
 			return;
 		}
 
-		// Filter out top-level keys that aren't valid according to the schema.
+		// Remove top-level keys that aren't present in the schema.
 		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
-		foreach( [ 'settings', 'styles'] as $key => $subtree ) {
+
+		$block_metadata = $this->get_blocks_metadata();
+		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
+			// Remove settings & styles if they aren't arrays.
 			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
 				unset( $this->theme_json[ $subtree ] );
 			}
-		}
 
-		// Filter out all block selectors within settings & styles that aren't registered.
-		$block_metadata  = $this->get_blocks_metadata();
-		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
+			// Remove block selectors within settings & styles if that aren't registered.
 			if ( isset( $this->theme_json[ $subtree ] ) ) {
 				$this->theme_json[ $subtree ]  = array_intersect_key( $this->theme_json[ $subtree ], $block_metadata );
 			}
 		}
 
-		// Filter out the styles & settings subtrees for each block selector.
+		// Future optimization: at this point, we could iterate over the block selectors present
+		// in either styles or settings instead of iterating over all registered.
 		foreach( $block_metadata as $block_selector => $metadata ) {
 			foreach( [ 'styles', 'settings' ] as $key => $subtree ) {
 				if ( isset( $this->theme_json[ $subtree ][ $block_selector] ) ) {
+					// Remove the block selector subtree if it's not an array.
 					if ( ! is_array( $this->theme_json[ $subtree ][ $block_selector] ) ) {
 						unset( $this->theme_json[ $subtree ][ $block_selector] );
 						continue;
 					}
 
-					self::process_subtree( $this->theme_json[ $subtree ][ $block_selector ], self::SCHEMA[ $subtree ] );
+					// Remove the properties within the styles & settings subtrees if they aren't present in the schema.
+					self::remove_keys_not_in_schema( $this->theme_json[ $subtree ][ $block_selector ], self::SCHEMA[ $subtree ] );
 
+					// Remove the block selector subtree if it is empty after having processed it.
 					if ( empty( $this->theme_json[ $subtree ][ $block_selector ] ) ) {
 						unset( $this->theme_json[ $subtree ][ $block_selector ] );
 					}
@@ -335,7 +339,7 @@ class WP_Theme_JSON {
 			}
 		}
 
-		// Filter if they're empty.
+		// Remove the settings & styles subtrees if they're empty after having processed them.
 		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
 			if ( empty( $this->theme_json[ $subtree ] ) ) {
 				unset( $this->theme_json[ $subtree ] );
@@ -516,15 +520,23 @@ class WP_Theme_JSON {
 		return self::$blocks_metadata;
 	}
 
-	private static function process_subtree( &$subtree, $schema ) {
-		$subtree = array_intersect_key( $subtree, $schema );
+	/**
+	 * Given a tree, removes the keys that are not present in the schema.
+	 *
+	 * It is recursive and modifies the input in-place.
+	 *
+	 * @param array $tree Input to process.
+	 * @param array $schema Schema to adhere to.
+	 */
+	private static function remove_keys_not_in_schema( &$tree, $schema ) {
+		$tree = array_intersect_key( $tree, $schema );
 
 		foreach( $schema as $key => $data ) {
-			if ( is_array( $schema[ $key ] ) && isset( $subtree[ $key ] ) ) {
-				self::process_subtree( $subtree[ $key ], $schema[ $key ] );
+			if ( is_array( $schema[ $key ] ) && isset( $tree[ $key ] ) ) {
+				self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
-				if ( empty( $subtree[ $key ] ) ) {
-					unset( $subtree[ $key ] );
+				if ( empty( $tree[ $key ] ) ) {
+					unset( $tree[ $key ] );
 				}
 			}
 		}
