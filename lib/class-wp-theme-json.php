@@ -543,40 +543,6 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Normalize the subtree according to the given schema.
-	 * This function modifies the given input by removing
-	 * the nodes that aren't valid per the schema.
-	 *
-	 * @param string $key Key of the subtree to normalize.
-	 * @param array  $input Whole tree to normalize.
-	 * @param array  $schema Schema to use for normalization.
-	 */
-	private static function process_key( $key, &$input, $schema ) {
-		if ( ! isset( $input[ $key ] ) ) {
-			return;
-		}
-
-		// Consider valid the input value.
-		if ( null === $schema[ $key ] ) {
-			return;
-		}
-
-		if ( ! is_array( $input[ $key ] ) ) {
-			unset( $input[ $key ] );
-			return;
-		}
-
-		$input[ $key ] = array_intersect_key(
-			$input[ $key ],
-			$schema[ $key ]
-		);
-
-		if ( 0 === count( $input[ $key ] ) ) {
-			unset( $input[ $key ] );
-		}
-	}
-
-	/**
 	 * Given a tree, it creates a flattened one
 	 * by merging the keys and binding the leaf values
 	 * to the new keys.
