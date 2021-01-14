@@ -28,7 +28,6 @@ import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
-import ConvertToGroupButton from '../convert-to-group-buttons';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -169,7 +168,6 @@ export function BlockSettingsDropdown( {
 									/>
 								) }
 							</MenuGroup>
-							<ConvertToGroupButton onClose={ onClose } />
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
 								clientIds={ clientIds }

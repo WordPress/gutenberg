@@ -9,6 +9,11 @@ import { compact, isEmpty, map } from 'lodash';
 import { createSlotFill, MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import ConvertToGroupButton from '../convert-to-group-buttons';
+
 const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 	'BlockSettingsMenuControls'
 );
@@ -31,9 +36,14 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
-			{ ( fills ) =>
-				! isEmpty( fills ) && <MenuGroup>{ fills }</MenuGroup>
-			}
+			{ ( fills ) => {
+				return (
+					<MenuGroup>
+						{ ! isEmpty( fills ) && fills }
+						<ConvertToGroupButton />
+					</MenuGroup>
+				);
+			} }
 		</Slot>
 	);
 };
