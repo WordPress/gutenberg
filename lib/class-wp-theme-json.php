@@ -321,7 +321,7 @@ class WP_Theme_JSON {
 
 		// Filter out the styles & settings subtrees for each block selector.
 		foreach( $block_metadata as $block_selector => $metadata ) {
-			foreach( [ 'styles', 'settings '] as $key => $subtree ) {
+			foreach( [ 'styles', 'settings' ] as $key => $subtree ) {
 				if ( isset( $this->theme_json[ $subtree ][ $block_selector] ) ) {
 					self::process_subtree( $this->theme_json[ $subtree ][ $block_selector ], self::SCHEMA[ $subtree ] );
 

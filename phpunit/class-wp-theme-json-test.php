@@ -98,31 +98,32 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'global' => array(
 						'color'      => array(
-							'link' => 'value',
+							'custom' => false,
 						),
-						'custom'     => 'value',
-						'typography' => 'value',
-						'misc'       => 'value',
+						'invalid/key' => 'value',
 					),
 				),
 				'styles'   => array(
 					'global' => array(
-						'color' => 'value',
-						'misc'  => 'value',
-					)
+						'color' => array(
+							'link' => 'blue',
+						),
+					),
 				),
-				'misc'     => 'value',
 			)
 		);
 
 		$result = $theme_json->get_settings();
 
-		$this->assertArrayHasKey( 'global', $result );
-		$this->assertCount( 1, $result );
+		$expected = array(
+			'global' => array(
+				'color' => array(
+					'custom' => false,
+				),
+			),
+		);
 
-		$this->assertArrayHasKey( 'color', $result['global'] );
-		$this->assertArrayHasKey( 'custom', $result['global'] );
-		$this->assertCount( 2, $result['global'] );
+		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
 	// function test_get_stylesheet() {
