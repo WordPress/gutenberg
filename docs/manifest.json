@@ -1470,6 +1470,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-tutorial-template",
+		"slug": "packages-create-block-tutorial-template",
+		"markdown_source": "../packages/create-block-tutorial-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block",
 		"slug": "packages-create-block",
 		"markdown_source": "../packages/create-block/README.md",
@@ -1599,12 +1605,6 @@
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/gutenpride-template",
-		"slug": "packages-gutenpride-template",
-		"markdown_source": "../packages/gutenpride-template/README.md",
 		"parent": "packages"
 	},
 	{
