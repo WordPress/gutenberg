@@ -10,7 +10,7 @@ jobs:
     - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'This issue is being marked as stale because it is marked "Needs More Info" and has been 15 days with no activity. To keep open, remove the stale label or comment on the issue, else this will be closed in 5 days.'
+        stale-issue-message: 'Help us move this issue forward. It has no activity after 15 days of requesting more information. A bot is marking the issue as stale. Please add additional information or this issued will be closed in 5 days.'
         close-issue-message: 'This issue was closed because more information was requested and there was no activity. If this is a bug report and still a problem, please supply the additional information requested and reopen the issue.'
         days-before-stale: 15
         days-before-close: 5
