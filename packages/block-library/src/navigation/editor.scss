@@ -285,16 +285,16 @@ $color-control-label-height: 20px;
 	}
 }
 
-// Both, when block is vertical.
-.wp-block-navigation-placeholder__preview,
-.wp-block-navigation-placeholder__controls {
-	.is-vertical & {
-		flex-direction: column;
-		align-items: flex-start;
-		min-height: $icon-size + ($grid-unit-20 + $grid-unit-15 + $grid-unit-15) * 3;
-	}
+// When block is vertical.
+.is-vertical .wp-block-navigation-placeholder {
+	min-height: $icon-size + ($grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15) * 3;
 }
 
+.is-vertical .wp-block-navigation-placeholder__preview,
+.is-vertical .wp-block-navigation-placeholder__controls {
+	flex-direction: column;
+	align-items: flex-start;
+}
 
 .wp-block-navigation-placeholder__actions {
 	display: flex;
