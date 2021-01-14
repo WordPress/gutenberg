@@ -28,8 +28,6 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 
-const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
-
 function BlockForType( {
 	attributes,
 	clientId,
@@ -182,7 +180,7 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-
+		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;

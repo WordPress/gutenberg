@@ -32,7 +32,7 @@ export default function TemplateNavigationItem( { item } ) {
 
 	const onActivateItem = () =>
 		'wp_template' === item.type
-			? setTemplate( item.id )
+			? setTemplate( item.id, item.slug )
 			: setTemplatePart( item.id );
 
 	return (

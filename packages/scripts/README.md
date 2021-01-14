@@ -105,7 +105,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. Similarly to this package, the default requirements are `node` 10.0.0 or later, and `npm` 6.9.0 or later. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -282,7 +282,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config]((https://www.npmjs.com/package/@wordpress/stylelint-config) ) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](<(https://www.npmjs.com/package/@wordpress/stylelint-config)>) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 
@@ -539,6 +539,24 @@ wp-scripts start entry-one.js entry-two.js --output-path=custom
 If you do so, then CSS files generated will follow the names of the entry points: `entry-one.css` and `entry-two.css`.
 
 Avoid using `style` keyword in an entry point name, this might break your build process.
+
+#### Using fonts and images
+
+It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg` and `gif`) files from CSS that is controlled by webpack as explained in the previous section.
+
+_Example:_
+
+```css
+/* style.css */
+@font-face {
+	font-family: Gilbert;
+	src: url( ../assets/gilbert-color.otf );
+}
+.wp-block-my-block {
+	background-color: url( ../assets/block-background.png );
+	font-family: Gilbert;
+}
+```
 
 #### Using SVG
 

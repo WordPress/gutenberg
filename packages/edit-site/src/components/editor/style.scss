@@ -22,7 +22,14 @@
 
 .edit-site-visual-editor {
 	position: relative;
-	background-color: $white;
+	height: 100%;
+
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		background-color: $white;
+	}
 }
 
 .edit-site-editor__inserter-panel {
