@@ -494,7 +494,7 @@ const Popover = ( {
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const { ref: focusOutsideRef, ...focusOutsideProps } = useFocusOutside(
 		handleOnFocusOutside,
-		__unstableHasSlots ? 'both' : 'react'
+		__unstableHasSlots ? 'dom' : 'react'
 	);
 	const allRefs = [
 		containerRef,
