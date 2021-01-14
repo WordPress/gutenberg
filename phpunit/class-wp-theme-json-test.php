@@ -21,7 +21,12 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'unsupported/property' => array(
 							'custom'     => false,
 							'background' => 'red',
-						)
+						),
+						'spacing' => array(
+							'padding' => array(
+								'top' => '10px',
+							),
+						),
 					),
 					'core/invalid' => array(
 						'color' => array(
@@ -45,6 +50,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'global' => array(
 					'color' => array(
 						'background' => 'red',
+					),
+					'spacing' => array(
+						'padding' => array(
+							'top' => '10px',
+						),
 					),
 				),
 			),

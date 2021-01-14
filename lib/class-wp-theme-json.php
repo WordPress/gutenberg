@@ -515,6 +515,12 @@ class WP_Theme_JSON {
 
 	private static function process_subtree( &$subtree, $schema ) {
 		$subtree = array_intersect_key( $subtree, $schema );
+
+		foreach( $schema as $key => $data ) {
+			if ( is_array( $schema[ $key ] ) && isset( $subtree[ $key ] ) ) {
+				self::process_subtree( $subtree[ $key ], $schema[ $key ] );
+			}
+		}
 	}
 
 	/**
