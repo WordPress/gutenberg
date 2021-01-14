@@ -10,15 +10,6 @@ import { omit, without } from 'lodash';
  */
 
 /**
- * @type {{coloured: {attributes: [string]}}}
- * Some spans will carry additional styling that needs to be preserved.
- * In order not to loose information about styling (as all spans are removed) a special tags are introduced, wich later will be turned back to span.
- */
-const specialTags = {
-	coloured: { attributes: [ 'style' ], originalTag: 'span' },
-};
-
-/**
  * All text-level semantic elements.
  *
  * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html
@@ -56,32 +47,7 @@ const textContentSchema = {
 	bdo: { attributes: [ 'dir' ] },
 	wbr: {},
 	'#text': {},
-	...specialTags,
 };
-
-export const alterSpecialTags = ( HTML ) =>
-	Object.entries( specialTags ).reduce( ( acc, [ tag, { originalTag } ] ) => {
-		const openingTagRegExp = new RegExp( `<${ tag }`, 'g' );
-		const closingTagRegExp = new RegExp( `</${ tag }`, 'g' );
-
-		const withOriginalOpeningTag = HTML.replace(
-			openingTagRegExp,
-			`<${ originalTag }`
-		);
-		return withOriginalOpeningTag.replace(
-			closingTagRegExp,
-			`</${ originalTag }`
-		);
-	}, HTML );
-
-export const removeSpecialTags = ( HTML ) =>
-	Object.entries( specialTags ).reduce( ( acc, [ tag ] ) => {
-		const openingTagRegExp = new RegExp( `<${ tag }`, 'g' );
-		const closingTagRegExp = new RegExp( `</${ tag }`, 'g' );
-
-		const withOriginalOpeningTag = HTML.replace( openingTagRegExp, `` );
-		return withOriginalOpeningTag.replace( closingTagRegExp, `` );
-	}, HTML );
 
 // Recursion is needed.
 // Possible: strong > em > strong.
