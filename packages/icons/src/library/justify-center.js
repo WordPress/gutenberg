@@ -3,10 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const menu = (
+const justifyCenter = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M5 5.5V7h14V5.5H5zM5 13h14v-1.5H5V13zm0 6h14v-1.5H5V19z" />
+		<Path d="M20 9h-7.2V4h-1.6v5H4v6h7.2v5h1.6v-5H20z" />
 	</SVG>
 );
 
-export default menu;
+export default justifyCenter;
