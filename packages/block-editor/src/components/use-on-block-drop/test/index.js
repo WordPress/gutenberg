@@ -305,6 +305,7 @@ describe( 'onBlockDrop', () => {
 describe( 'onFilesDrop', () => {
 	it( 'does nothing if hasUploadPermissions is false', () => {
 		const updateBlockAttributes = jest.fn();
+		const canInsertBlockType = noop;
 		const insertBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
@@ -315,6 +316,7 @@ describe( 'onFilesDrop', () => {
 			targetBlockIndex,
 			uploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		);
 		onFileDropHandler();
@@ -329,6 +331,7 @@ describe( 'onFilesDrop', () => {
 		findTransform.mockImplementation( noop );
 		const updateBlockAttributes = noop;
 		const insertBlocks = jest.fn();
+		const canInsertBlockType = noop;
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const uploadPermissions = true;
@@ -338,6 +341,7 @@ describe( 'onFilesDrop', () => {
 			targetBlockIndex,
 			uploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		);
 		onFileDropHandler();
@@ -354,6 +358,7 @@ describe( 'onFilesDrop', () => {
 		const transformation = { transform: jest.fn( () => blocks ) };
 		findTransform.mockImplementation( () => transformation );
 		const updateBlockAttributes = noop;
+		const canInsertBlockType = noop;
 		const insertBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
@@ -364,6 +369,7 @@ describe( 'onFilesDrop', () => {
 			targetBlockIndex,
 			uploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		);
 		const files = 'test';

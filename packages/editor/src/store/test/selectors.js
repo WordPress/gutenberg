@@ -2010,6 +2010,26 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostDateFloating( state ) ).toBe( true );
 		} );
+
+		it( 'should return false for private posts even if the edited status is "draft"', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'private',
+				},
+				editor: {
+					present: {
+						edits: {
+							status: 'draft',
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isSavingPost', () => {
