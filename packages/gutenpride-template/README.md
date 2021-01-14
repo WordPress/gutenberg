@@ -1,7 +1,7 @@
 # Gutenpride Template
 
 
-This is a template for @wordpress/create-block that is the finished version of the block in the official [WordPress tutorial](https://github.com/WordPress/gutenberg/tree/master/docs/designers-developers/developers/tutorials/create-block).
+This is a template for @wordpress/create-block that is the finished version of the block in the official [WordPress tutorial](/docs/designers-developers/developers/tutorials/create-block).
 
 
 ## Usage
