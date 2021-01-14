@@ -12,7 +12,6 @@ import {
 	useState,
 	useLayoutEffect,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -227,22 +226,6 @@ function setClass( element, name, toggle ) {
 	}
 }
 
-function useFocusOutsideWithRef( ref, onFocusOutside ) {
-	const { onFocus, ...rest } = useFocusOutside( onFocusOutside );
-	// Use native DOM events instead of React ones because the popover can
-	// contain slots (from the slot-fill module). Events triggered by the
-	// elements in these slots won't be captured by React.
-	useEffect( () => {
-		const element = ref.current;
-		if ( ! element ) return;
-		element.addEventListener( 'focusin', onFocus );
-		return () => {
-			element.removeEventListener( 'focusin', onFocus );
-		};
-	}, [] );
-	return rest;
-}
-
 function getAnchorDocument( anchor ) {
 	if ( ! anchor ) {
 		return;
@@ -286,6 +269,7 @@ const Popover = ( {
 	__unstableObserveElement,
 	__unstableBoundaryParent,
 	__unstableForcePosition,
+	__unstableHasSlots,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -508,12 +492,13 @@ const Popover = ( {
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
-	const focusOutsideProps = useFocusOutsideWithRef(
-		containerRef,
-		handleOnFocusOutside
+	const { ref: focusOutsideRef, ...focusOutsideProps } = useFocusOutside(
+		handleOnFocusOutside,
+		__unstableHasSlots ? 'both' : 'react'
 	);
 	const allRefs = [
 		containerRef,
+		focusOutsideRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,

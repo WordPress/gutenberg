@@ -185,6 +185,7 @@ function BlockPopover( {
 			className="block-editor-block-list__block-popover"
 			__unstableStickyBoundaryElement={ stickyBoundaryElement }
 			__unstableSlotName="block-toolbar"
+			__unstableHasSlots
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
