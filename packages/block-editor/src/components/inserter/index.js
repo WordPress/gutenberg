@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { size } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -10,10 +9,9 @@ import classnames from 'classnames';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -70,13 +68,8 @@ const defaultRenderToggle = ( {
 function Inserter( {
 	onToggle,
 	disabled,
-	blockTitle,
-	hasSingleBlockType,
 	toggleProps,
-	hasItems,
 	position,
-	insertOnlyAllowedBlock,
-	rootClientId,
 	clientId,
 	isAppender,
 	showInserterHelpPanel,
@@ -85,40 +78,95 @@ function Inserter( {
 	// This prop is experimental to give some time for the quick inserter to mature
 	// Feel free to make them stable after a few releases.
 	__experimentalIsQuick: isQuick,
+	...props
 } ) {
-	/**
-	 * Render callback to display Dropdown content element.
-	 *
-	 * @param {Object}   options
-	 * @param {Function} options.onClose Callback to invoke when dropdown is
-	 *                                   closed.
-	 *
-	 * @return {WPElement} Dropdown content element.
-	 */
-	function renderContent( { onClose } ) {
-		const props = {
-			onSelect: onClose,
-			rootClientId,
-			clientId,
-			isAppender,
-		};
+	const { insertBlock } = useDispatch( 'core/block-editor' );
 
-		if ( isQuick ) {
-			return (
-				<QuickInserter
-					{ ...props }
-					selectBlockOnInsert={ selectBlockOnInsert }
-				/>
-			);
+	const {
+		hasItems,
+		hasSingleBlockType,
+		blockTitle,
+		allowedBlockType,
+		rootClientId,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockRootClientId,
+			hasInserterItems,
+			__experimentalGetAllowedBlocks: getAllowedBlocks,
+		} = select( 'core/block-editor' );
+		const { getBlockVariations } = select( blocksStore );
+
+		const _rootClientId =
+			props.rootClientId || getBlockRootClientId( clientId ) || undefined;
+
+		const allowedBlocks = getAllowedBlocks( _rootClientId );
+
+		const inserterBlockVariations = getBlockVariations(
+			allowedBlocks?.length && allowedBlocks[ 0 ].name,
+			'inserter'
+		);
+
+		const isSingleBlockType =
+			allowedBlocks?.length === 1 && ! inserterBlockVariations?.length;
+
+		return {
+			hasItems: hasInserterItems( rootClientId ),
+			hasSingleBlockType: isSingleBlockType,
+			blockTitle: allowedBlockType?.title ?? '',
+			allowedBlockType: isSingleBlockType && allowedBlocks[ 0 ],
+			rootClientId: _rootClientId,
+		};
+	});
+
+	const {
+		getBlockIndex,
+		getBlockSelectionEnd,
+		getBlockOrder,
+	} = useSelect( ( select ) => select( 'core/block-editor' ) );
+
+	// The global inserter should always be visible.
+	// We are using(!isAppender && !rootClientId && !clientId) as
+	// a way to detect the global Inserter.
+	if ( ! ( hasItems || ( ! isAppender && ! rootClientId && ! clientId ) ) ) {
+		return null;
+	}
+
+	function insertOnlyAllowedBlock() {
+		if ( ! hasSingleBlockType ) {
+			return;
 		}
 
-		return (
-			<InserterMenu
-				{ ...props }
-				showInserterHelpPanel={ showInserterHelpPanel }
-				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
-			/>
+		const blockToInsert = createBlock( allowedBlockType.name );
+
+		function getInsertionIndex() {
+			if ( clientId ) {
+				return getBlockIndex( clientId, rootClientId );
+			}
+
+			const end = getBlockSelectionEnd();
+
+			if ( ! isAppender && end ) {
+				return getBlockIndex( end, rootClientId ) + 1;
+			}
+
+			return getBlockOrder( rootClientId ).length;
+		}
+
+		insertBlock(
+			blockToInsert,
+			getInsertionIndex(),
+			rootClientId,
+			selectBlockOnInsert
 		);
+
+		if ( ! selectBlockOnInsert ) {
+			const message = sprintf(
+				// translators: %s: the name of the block that has been added
+				__( '%s block added' ),
+				allowedBlockType.title
+			);
+			speak( message );
+		}
 	}
 
 	if ( hasSingleBlockType ) {
@@ -129,6 +177,41 @@ function Inserter( {
 			hasSingleBlockType,
 			toggleProps,
 		} );
+	}
+
+	/**
+	 * Render callback to display Dropdown content element.
+	 *
+	 * @param {Object}   options
+	 * @param {Function} options.onClose Callback to invoke when dropdown is
+	 *                                   closed.
+	 *
+	 * @return {WPElement} Dropdown content element.
+	 */
+	function renderContent( { onClose } ) {
+		const inserterProps = {
+			onSelect: onClose,
+			rootClientId,
+			clientId,
+			isAppender,
+		};
+
+		if ( isQuick ) {
+			return (
+				<QuickInserter
+					{ ...inserterProps }
+					selectBlockOnInsert={ selectBlockOnInsert }
+				/>
+			);
+		}
+
+		return (
+			<InserterMenu
+				{ ...inserterProps }
+				showInserterHelpPanel={ showInserterHelpPanel }
+				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+			/>
+		);
 	}
 
 	const contentClassName = classnames( 'block-editor-inserter__popover', {
@@ -151,101 +234,4 @@ function Inserter( {
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
-		const {
-			getBlockRootClientId,
-			hasInserterItems,
-			__experimentalGetAllowedBlocks,
-		} = select( 'core/block-editor' );
-		const { getBlockVariations } = select( blocksStore );
-
-		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
-
-		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
-
-		const hasSingleBlockType =
-			size( allowedBlocks ) === 1 &&
-			size(
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-			) === 0;
-
-		let allowedBlockType = false;
-		if ( hasSingleBlockType ) {
-			allowedBlockType = allowedBlocks[ 0 ];
-		}
-
-		return {
-			hasItems: hasInserterItems( rootClientId ),
-			hasSingleBlockType,
-			blockTitle: allowedBlockType ? allowedBlockType.title : '',
-			allowedBlockType,
-			rootClientId,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
-		return {
-			insertOnlyAllowedBlock() {
-				const { rootClientId, clientId, isAppender } = ownProps;
-				const {
-					hasSingleBlockType,
-					allowedBlockType,
-					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
-				} = ownProps;
-
-				if ( ! hasSingleBlockType ) {
-					return;
-				}
-
-				function getInsertionIndex() {
-					const {
-						getBlockIndex,
-						getBlockSelectionEnd,
-						getBlockOrder,
-					} = select( 'core/block-editor' );
-
-					// If the clientId is defined, we insert at the position of the block.
-					if ( clientId ) {
-						return getBlockIndex( clientId, rootClientId );
-					}
-
-					// If there a selected block, we insert after the selected block.
-					const end = getBlockSelectionEnd();
-					if ( ! isAppender && end ) {
-						return getBlockIndex( end, rootClientId ) + 1;
-					}
-
-					// Otherwise, we insert at the end of the current rootClientId
-					return getBlockOrder( rootClientId ).length;
-				}
-
-				const { insertBlock } = dispatch( 'core/block-editor' );
-
-				const blockToInsert = createBlock( allowedBlockType.name );
-
-				insertBlock(
-					blockToInsert,
-					getInsertionIndex(),
-					rootClientId,
-					selectBlockOnInsert
-				);
-
-				if ( ! selectBlockOnInsert ) {
-					const message = sprintf(
-						// translators: %s: the name of the block that has been added
-						__( '%s block added' ),
-						allowedBlockType.title
-					);
-					speak( message );
-				}
-			},
-		};
-	} ),
-	// The global inserter should always be visible, we are using ( ! isAppender && ! rootClientId && ! clientId ) as
-	// a way to detect the global Inserter.
-	ifCondition(
-		( { hasItems, isAppender, rootClientId, clientId } ) =>
-			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
-	),
-] )( Inserter );
+export default Inserter;
