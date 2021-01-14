@@ -244,115 +244,115 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	// 	);
 	// }
 
-	// public function test_merge_incoming_data() {
-	// 	$initial = array(
-	// 		'settings'         => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'custom'  => 'false',
-	// 					'palette' => array(
-	// 						array(
-	// 							'slug'  => 'red',
-	// 							'color' => 'red',
-	// 						),
-	// 						array(
-	// 							'slug'  => 'blue',
-	// 							'color' => 'blue',
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 			'core/paragraph' => array(
-	// 				'color' => array(
-	// 					'custom' => 'false',
-	// 				),
-	// 			),
-	// 		),
-	// 		'styles'   => array(
-	// 			'global' => array(
-	// 				'typography' => array(
-	// 					'fontSize' => '12',
-	// 				),
-	// 			)
-	// 		),
-	// 	);
+	public function test_merge_incoming_data() {
+		$initial = array(
+			'settings'         => array(
+				'global' => array(
+					'color' => array(
+						'custom'  => 'false',
+						'palette' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+							array(
+								'slug'  => 'blue',
+								'color' => 'blue',
+							),
+						),
+					),
+				),
+				'core/paragraph' => array(
+					'color' => array(
+						'custom' => 'false',
+					),
+				),
+			),
+			'styles'   => array(
+				'global' => array(
+					'typography' => array(
+						'fontSize' => '12',
+					),
+				)
+			),
+		);
 
-	// 	$add_new_context = array(
-	// 		'settings' => array(
-	// 			'core/list' => array(
-	// 				'color' => array(
-	// 					'custom' => 'false',
-	// 				),
-	// 			),
-	// 		),
-	// 		'styles'   => array(
-	// 			'core/list' => array(
-	// 				'typography' => array(
-	// 					'fontSize' => '12',
-	// 				),
-	// 				'color'      => array(
-	// 					'link'       => 'pink',
-	// 					'background' => 'brown',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$add_new_context = array(
+			'settings' => array(
+				'core/list' => array(
+					'color' => array(
+						'custom' => 'false',
+					),
+				),
+			),
+			'styles'   => array(
+				'core/list' => array(
+					'typography' => array(
+						'fontSize' => '12',
+					),
+					'color'      => array(
+						'link'       => 'pink',
+						'background' => 'brown',
+					),
+				),
+			),
+		);
 
-	// 	$add_key_in_settings = array(
-	// 		'settings' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'customGradient' => 'true',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$add_key_in_settings = array(
+			'settings' => array(
+				'global' => array(
+					'color' => array(
+						'customGradient' => 'true',
+					),
+				),
+			),
+		);
 
-	// 	$update_key_in_settings = array(
-	// 		'settings' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'custom' => 'true',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$update_key_in_settings = array(
+			'settings' => array(
+				'global' => array(
+					'color' => array(
+						'custom' => 'true',
+					),
+				),
+			),
+		);
 
-	// 	$add_styles = array(
-	// 		'styles' => array(
-	// 			'core/paragraph' => array(
-	// 				'typography' => array(
-	// 					'fontSize' => '12',
-	// 				),
-	// 				'color'      => array(
-	// 					'link' => 'pink',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$add_styles = array(
+			'styles' => array(
+				'core/paragraph' => array(
+					'typography' => array(
+						'fontSize' => '12',
+					),
+					'color'      => array(
+						'link' => 'pink',
+					),
+				),
+			),
+		);
 
-	// 	$add_key_in_styles = array(
-	// 		'styles' => array(
-	// 			'core/paragraph' => array(
-	// 				'typography' => array(
-	// 					'lineHeight' => '12',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$add_key_in_styles = array(
+			'styles' => array(
+				'core/paragraph' => array(
+					'typography' => array(
+						'lineHeight' => '12',
+					),
+				),
+			),
+		);
 
-	// 	$add_invalid_context = array(
-	// 		'styles' => array(
-	// 			'core/para' => array(
-	// 				'typography' => array(
-	// 					'lineHeight' => '12',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$add_invalid_context = array(
+			'styles' => array(
+				'core/para' => array(
+					'typography' => array(
+						'lineHeight' => '12',
+					),
+				),
+			),
+		);
 
-	// $this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 
 	function test_remove_insecure_properties_removes_invalid_contexts() {
 		$theme_json = new WP_Theme_JSON(
