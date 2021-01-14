@@ -57,6 +57,19 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
+	function test_schema_validation_subtree_is_removed_if_not_array() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => 'invalid/not/array',
+			)
+		);
+
+		$actual   = $theme_json->get_raw_data();
+		$expected = array();
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_schema_validation_subtree_is_removed_if_empty() {
 		$theme_json = new WP_Theme_JSON(
 			array(

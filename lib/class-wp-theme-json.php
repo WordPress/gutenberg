@@ -306,16 +306,14 @@ class WP_Theme_JSON {
 
 		// Filter out all block selectors that aren't registered for styles & settings.
 		$block_metadata  = $this->get_blocks_metadata();
-		if ( isset( $this->theme_json['styles'] ) ) {
-			$this->theme_json['styles']  = array_intersect_key( $this->theme_json['styles'], $block_metadata );
-			if ( empty( $this->theme_json['styles'] ) ) {
-				unset( $this->theme_json['styles'] );
-			}
-		}
-		if ( isset( $this->theme_json['settings'] ) ) {
-			$this->theme_json['settings'] = array_intersect_key( $this->theme_json['settings'], $block_metadata );
-			if ( empty( $this->theme_json['settings'] ) ) {
-				unset( $this->theme_json['settings'] );
+		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
+			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
+				unset( $this->theme_json[ $subtree ] );
+			} elseif ( isset( $this->theme_json[ $subtree ] ) ) {
+				$this->theme_json[ $subtree ]  = array_intersect_key( $this->theme_json[ $subtree ], $block_metadata );
+				if ( empty( $this->theme_json[ $subtree ] ) ) {
+					unset( $this->theme_json[ $subtree ] );
+				}
 			}
 		}
 
