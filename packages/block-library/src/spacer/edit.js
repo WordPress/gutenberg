@@ -11,7 +11,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
 
 const MIN_SPACER_HEIGHT = 1;
@@ -26,11 +26,11 @@ const SpacerEdit = ( {
 } ) => {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { height } = attributes;
-	const updateHeight = ( value ) => {
+	const updateHeight = useCallback( ( value ) => {
 		setAttributes( {
 			height: value,
 		} );
-	};
+	}, [] );
 
 	const handleOnResizeStart = ( ...args ) => {
 		onResizeStart( ...args );
@@ -82,17 +82,19 @@ const SpacerEdit = ( {
 					} }
 				/>
 			</View>
-			<InspectorControls>
-				<PanelBody title={ __( 'Spacer settings' ) }>
-					<RangeControl
-						label={ __( 'Height in pixels' ) }
-						min={ MIN_SPACER_HEIGHT }
-						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
-						value={ height }
-						onChange={ updateHeight }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ isSelected && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Spacer settings' ) }>
+						<RangeControl
+							label={ __( 'Height in pixels' ) }
+							min={ MIN_SPACER_HEIGHT }
+							max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+							value={ height }
+							onChange={ updateHeight }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
 		</>
 	);
 };
