@@ -6,7 +6,7 @@
  */
 
 class Edit_Site_Export_Test extends WP_UnitTestCase {
-	function test_inject_theme_attribute_in_content() {
+	function test_remove_theme_attribute_from_content() {
 		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"tt1-blocks","align":"full","tagName":"header","className":"site-header"} /-->';
 		$template_content                = _remove_theme_attribute_from_content( $content_without_theme_attribute );
 		$expected                        = '<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header"} /-->';
