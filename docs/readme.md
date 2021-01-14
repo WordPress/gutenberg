@@ -11,9 +11,6 @@ Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, whe
 The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.
 
 ## Quick links
-- [Create a block tutorial](#create-a-block-tutorial) 
-- Develop for the block editor 
-- [Contribute to the block editor](#contribute-to-the-block-editor)
 
 ### [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md)
 Learn how to create your first block for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
