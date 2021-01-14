@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { upperFirst } from 'lodash';
+import { upperFirst, replace } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -59,9 +59,14 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
+	// We replace B with -b to allow spaceBetween to become space-between as a classname.
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
-			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			[ `items-justified-${ replace(
+				attributes.itemsJustification,
+				'B',
+				'-b'
+			) }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
 		} ),
 	} );
@@ -164,11 +169,9 @@ function Navigation( {
 								icon: justifySpaceBetween,
 								title: __( 'Space between items' ),
 								isActive:
-									'space-between' ===
+									'spaceBetween' ===
 									attributes.itemsJustification,
-								onClick: handleItemsAlignment(
-									'space-between'
-								),
+								onClick: handleItemsAlignment( 'spaceBetween' ),
 							},
 						] }
 					/>
