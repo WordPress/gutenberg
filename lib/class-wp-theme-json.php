@@ -293,10 +293,9 @@ class WP_Theme_JSON {
 	/**
 	 * Constructor.
 	 *
-	 * @param array   $contexts A structure that follows the theme.json schema.
-	 * @param boolean $should_escape_styles Whether the incoming styles should be escaped.
+	 * @param array $contexts A structure that follows the theme.json schema.
 	 */
-	public function __construct( $contexts = array(), $should_escape_styles = false ) {
+	public function __construct( $contexts = array() ) {
 		$this->contexts = array();
 
 		if ( ! is_array( $contexts ) ) {
@@ -317,10 +316,10 @@ class WP_Theme_JSON {
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
 			if ( isset( $context['styles'] ) ) {
-				$this->process_key( 'border', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
-				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
-				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
-				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'], $should_escape_styles );
+				$this->process_key( 'border', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
 
 				if ( empty( $context['styles'] ) ) {
 					unset( $context['styles'] );
@@ -523,12 +522,11 @@ class WP_Theme_JSON {
 	 * This function modifies the given input by removing
 	 * the nodes that aren't valid per the schema.
 	 *
-	 * @param string  $key Key of the subtree to normalize.
-	 * @param array   $input Whole tree to normalize.
-	 * @param array   $schema Schema to use for normalization.
-	 * @param boolean $should_escape Whether the subproperties should be escaped.
+	 * @param string $key Key of the subtree to normalize.
+	 * @param array  $input Whole tree to normalize.
+	 * @param array  $schema Schema to use for normalization.
 	 */
-	private static function process_key( $key, &$input, $schema, $should_escape = false ) {
+	private static function process_key( $key, &$input, $schema ) {
 		if ( ! isset( $input[ $key ] ) ) {
 			return;
 		}
@@ -547,36 +545,6 @@ class WP_Theme_JSON {
 			$input[ $key ],
 			$schema[ $key ]
 		);
-
-		if ( $should_escape ) {
-			$subtree = $input[ $key ];
-			foreach ( $subtree as $property => $value ) {
-				$name = 'background-color';
-				if ( 'gradient' === $property ) {
-					$name = 'background';
-				}
-
-				if ( is_array( $value ) ) {
-					$result = array();
-					foreach ( $value as $subproperty => $subvalue ) {
-						$result_subproperty = safecss_filter_attr( "$name: $subvalue" );
-						if ( '' !== $result_subproperty ) {
-							$result[ $subproperty ] = $result_subproperty;
-						}
-					}
-
-					if ( empty( $result ) ) {
-						unset( $input[ $key ][ $property ] );
-					}
-				} else {
-					$result = safecss_filter_attr( "$name: $value" );
-
-					if ( '' === $result ) {
-						unset( $input[ $key ][ $property ] );
-					}
-				}
-			}
-		}
 
 		if ( 0 === count( $input[ $key ] ) ) {
 			unset( $input[ $key ] );

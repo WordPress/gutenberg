@@ -8,39 +8,6 @@
 
 class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
-	function test_user_data_is_escaped() {
-		$theme_json = new WP_Theme_JSON(
-			array(
-				'global' => array(
-					'styles' => array(
-						'color' => array(
-							'background' => 'green',
-							'gradient'   => 'linear-gradient(10deg,rgba(6,147,227,1) 0%,rgb(61,132,163) 37%,rgb(155,81,224) 100%)',
-							'link'       => 'linear-gradient(10deg,rgba(6,147,227,1) 0%,rgb(61,132,163) 37%,rgb(155,81,224) 100%)',
-							'text'       => 'var:preset|color|dark-gray',
-						),
-					),
-				),
-			),
-			true
-		);
-		$result     = $theme_json->get_raw_data();
-
-		$expected = array(
-			'global' => array(
-				'styles' => array(
-					'color' => array(
-						'background' => 'green',
-						'gradient'   => 'linear-gradient(10deg,rgba(6,147,227,1) 0%,rgb(61,132,163) 37%,rgb(155,81,224) 100%)',
-						'text'       => 'var:preset|color|dark-gray',
-					),
-				),
-			),
-		);
-
-		$this->assertEqualSetsWithIndex( $expected, $result );
-	}
-
 	function test_contexts_not_valid_are_skipped() {
 		$theme_json = new WP_Theme_JSON(
 			array(
