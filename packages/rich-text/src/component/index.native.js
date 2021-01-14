@@ -12,7 +12,7 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { get, pickBy, debounce } from 'lodash';
+import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -276,7 +276,7 @@ export class RichText extends Component {
 
 	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
 	convertFontSizeFromString( fontSize ) {
-		return fontSize && fontSize.endsWith( 'px' )
+		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
 			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
 			: fontSize;
 	}
