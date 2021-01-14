@@ -9,7 +9,7 @@ This is a template for @wordpress/create-block that is the finished version of t
 This block template can be used by running the following command:
 
 ```bash
-npx  @wordpress/create-block --template create-block-tutorial-template
+npx  @wordpress/create-block --template @wordpress/create-block-tutorial-template
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
