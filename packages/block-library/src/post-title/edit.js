@@ -73,11 +73,10 @@ export default function PostTitleEdit( {
 	);
 
 	if ( ! postType || ! postId ) {
-		const Tag = level === 0 ? 'p' : `h${ level }`;
 		titleElement = (
-			<Tag { ...( isLink ? {} : blockProps ) }>
+			<TagName { ...( isLink ? {} : blockProps ) }>
 				{ __( 'Placeholder for post title' ) }
-			</Tag>
+			</TagName>
 		);
 	}
 
