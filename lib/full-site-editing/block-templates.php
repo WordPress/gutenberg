@@ -132,7 +132,7 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 
 	if ( $has_updated_content ) {
 		foreach ( $template_blocks as $block ) {
-			$new_content = $new_content . serialize_block( $block );
+			$new_content .= serialize_block( $block );
 		}
 
 		return $new_content;
