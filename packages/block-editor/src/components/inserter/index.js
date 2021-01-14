@@ -116,7 +116,7 @@ function Inserter( {
 			allowedBlockType: isSingleBlockType && allowedBlocks[ 0 ],
 			rootClientId: _rootClientId,
 		};
-	});
+	} );
 
 	const {
 		getBlockIndex,
