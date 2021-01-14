@@ -269,7 +269,6 @@ const Popover = ( {
 	__unstableObserveElement,
 	__unstableBoundaryParent,
 	__unstableForcePosition,
-	__unstableHasSlots,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -492,13 +491,9 @@ const Popover = ( {
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
-	const { ref: focusOutsideRef, ...focusOutsideProps } = useFocusOutside(
-		handleOnFocusOutside,
-		__unstableHasSlots ? 'dom' : 'react'
-	);
+	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 	const allRefs = [
 		containerRef,
-		focusOutsideRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,

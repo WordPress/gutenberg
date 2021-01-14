@@ -84,16 +84,14 @@ function isFocusNormalizedButton( eventTarget ) {
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
  *
- * @param {EventCallback} onFocusOutside A callback triggered when focus moves outside the element the event handlers are bound to.
- * @param {'dom'|'react'|'both'} __experimentalDOMOrReact Determines whether event listeners will be attached directly to the DOM, as React props or both.
+ * @param {EventCallback} onFocusOutside        A callback triggered when focus moves outside
+ *                                              the element the event handlers are bound to.
  *
- * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers to a wrapping element element to capture when focus moves outside that element.
+ * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers
+ *                                   to a wrapping element element to capture when focus moves
+ *                                   outside that element.
  */
-export default function useFocusOutside(
-	onFocusOutside,
-	__experimentalDOMOrReact = 'react'
-) {
-	const ref = useRef();
+export default function useFocusOutside( onFocusOutside ) {
 	const currentOnFocusOutside = useRef( onFocusOutside );
 	useEffect( () => {
 		currentOnFocusOutside.current = onFocusOutside;
@@ -159,11 +157,7 @@ export default function useFocusOutside(
 	const queueBlurCheck = useCallback( ( event ) => {
 		// React does not allow using an event reference asynchronously
 		// due to recycling behavior, except when explicitly persisted.
-		// Check if `event.persist` exists in case this function is passed to a
-		// native DOM event instead.
-		if ( 'persist' in event ) {
-			event.persist();
-		}
+		event.persist();
 
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
 		if ( preventBlurCheck.current ) {
@@ -186,28 +180,7 @@ export default function useFocusOutside(
 		}, 0 );
 	}, [] );
 
-	useEffect( () => {
-		const element = ref.current;
-		if ( __experimentalDOMOrReact === 'react' || ! element ) {
-			return;
-		}
-		element.addEventListener( 'focusin', cancelBlurCheck );
-		element.addEventListener( 'mousedown', normalizeButtonFocus );
-		element.addEventListener( 'mouseup', normalizeButtonFocus );
-		element.addEventListener( 'touchstart', normalizeButtonFocus );
-		element.addEventListener( 'touchend', normalizeButtonFocus );
-		element.addEventListener( 'focusout', queueBlurCheck );
-		return () => {
-			element.removeEventListener( 'focusin', cancelBlurCheck );
-			element.removeEventListener( 'mousedown', normalizeButtonFocus );
-			element.removeEventListener( 'mouseup', normalizeButtonFocus );
-			element.removeEventListener( 'touchstart', normalizeButtonFocus );
-			element.removeEventListener( 'touchend', normalizeButtonFocus );
-			element.removeEventListener( 'focusout', queueBlurCheck );
-		};
-	}, [ __experimentalDOMOrReact ] );
-
-	const reactEventProps = {
+	return {
 		onFocus: cancelBlurCheck,
 		onMouseDown: normalizeButtonFocus,
 		onMouseUp: normalizeButtonFocus,
@@ -215,12 +188,4 @@ export default function useFocusOutside(
 		onTouchEnd: normalizeButtonFocus,
 		onBlur: queueBlurCheck,
 	};
-
-	if ( __experimentalDOMOrReact === 'react' ) {
-		return reactEventProps;
-	}
-	if ( __experimentalDOMOrReact === 'both' ) {
-		return { ref, ...reactEventProps };
-	}
-	return { ref };
 }
