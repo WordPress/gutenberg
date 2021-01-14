@@ -15,10 +15,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'styles'       => array(
 					'global' => array(
 						'color' => array(
-							'custom'     => false,
-							'background' => 'red',
+							'custom'      => false,
+							'background'  => 'red',
+							'invalid/key' => true,
 						),
-						'unsupported/property' => array(
+						'invalid/key' => array(
 							'custom'     => false,
 							'background' => 'red',
 						),
@@ -28,18 +29,23 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'core/invalid' => array(
+					'invalid/key' => array(
 						'color' => array(
 							'custom' => 'false',
 						),
 					),
 				),
 				'settings'    => array(
-					'core/invalid' => array(
+					'invalid/key' => array(
 						'color' => array(
 							'custom' => false,
 						),
 					),
+					'global' => array(
+						'color' => array(
+							'custom' => false,
+						)
+					)
 				),
 			)
 		);
@@ -55,6 +61,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'padding' => array(
 							'top' => '10px',
 						),
+					),
+				),
+			),
+			'settings' => array(
+				'global' => array(
+					'color' => array(
+						'custom' => false,
 					),
 				),
 			),
@@ -93,6 +106,41 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'global' => array(
 					'color' => array(
 						'background' => 'red',
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
+	function test_schema_validation_subtree_is_removed_if_empty() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'invalid/key' => 'content',
+				'styles'       => array(
+					'invalid/key' => array(
+						'color' => array(
+							'background' => 'red',
+						),
+					),
+				),
+				'settings' => array(
+					'global' => array(
+						'color' => array(
+							'custom' => false,
+						),
+					),
+				),
+			)
+		);
+		$result     = $theme_json->get_raw_data();
+
+		$expected = array(
+			'settings' => array(
+				'global' => array(
+					'color' => array(
+						'custom' => false,
 					),
 				),
 			),

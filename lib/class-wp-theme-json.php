@@ -306,14 +306,12 @@ class WP_Theme_JSON {
 
 		// Filter out all block selectors that aren't registered for styles & settings.
 		$block_metadata  = $this->get_blocks_metadata();
-
 		if ( isset( $this->theme_json['styles'] ) ) {
 			$this->theme_json['styles']  = array_intersect_key( $this->theme_json['styles'], $block_metadata );
 			if ( empty( $this->theme_json['styles'] ) ) {
 				unset( $this->theme_json['styles'] );
 			}
 		}
-
 		if ( isset( $this->theme_json['settings'] ) ) {
 			$this->theme_json['settings'] = array_intersect_key( $this->theme_json['settings'], $block_metadata );
 			if ( empty( $this->theme_json['settings'] ) ) {
@@ -321,21 +319,15 @@ class WP_Theme_JSON {
 			}
 		}
 
-		// Filter out styles subtree according to the schema.
-		foreach( $block_metadata as $block_selector => $metadata ) { 
-			if ( isset( $this->theme_json['styles'][ $block_selector] ) ) {
-				self::process_subtree( $this->theme_json['styles'][ $block_selector ], self::SCHEMA['styles'] );
+		// Filter out the styles & settings subtrees for each block selector.
+		foreach( $block_metadata as $block_selector => $metadata ) {
+			foreach( [ 'styles', 'settings '] as $key => $subtree ) {
+				if ( isset( $this->theme_json[ $subtree ][ $block_selector] ) ) {
+					self::process_subtree( $this->theme_json[ $subtree ][ $block_selector ], self::SCHEMA[ $subtree ] );
 
-				if ( empty( $this->theme_json['styles'][ $block_selector ] ) ) {
-					unset( $this->theme_json['styles'][ $block_selector ] );
-				}
-			}
-
-			if ( isset( $this->theme_json['settings'][ $block_selector] ) ) {
-				self::process_subtree( $this->theme_json['settings'][ $block_selector ], self::SCHEMA['settings'] );
-
-				if ( empty( $this->theme_json['settings'][ $block_selector ] ) ) {
-					unset( $this->theme_json['settings'][ $block_selector ] );
+					if ( empty( $this->theme_json[ $subtree ][ $block_selector ] ) ) {
+						unset( $this->theme_json[ $subtree ][ $block_selector ] );
+					}
 				}
 			}
 		}
