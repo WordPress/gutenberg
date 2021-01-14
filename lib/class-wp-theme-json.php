@@ -293,7 +293,7 @@ class WP_Theme_JSON {
 	/**
 	 * Constructor.
 	 *
-	 * @param array   $contexts A structure that follows the theme.json schema.
+	 * @param array $contexts A structure that follows the theme.json schema.
 	 */
 	public function __construct( $contexts = array() ) {
 		$this->contexts = array();
@@ -522,9 +522,9 @@ class WP_Theme_JSON {
 	 * This function modifies the given input by removing
 	 * the nodes that aren't valid per the schema.
 	 *
-	 * @param string  $key Key of the subtree to normalize.
-	 * @param array   $input Whole tree to normalize.
-	 * @param array   $schema Schema to use for normalization.
+	 * @param string $key Key of the subtree to normalize.
+	 * @param array  $input Whole tree to normalize.
+	 * @param array  $schema Schema to use for normalization.
 	 */
 	private static function process_key( $key, &$input, $schema ) {
 		if ( ! isset( $input[ $key ] ) ) {
