@@ -321,6 +321,24 @@ class WP_Theme_JSON {
 			}
 		}
 
+		// Filter out styles subtree according to the schema.
+		foreach( $block_metadata as $block_selector => $metadata ) { 
+			if ( isset( $this->theme_json['styles'][ $block_selector] ) ) {
+				self::process_subtree( $this->theme_json['styles'][ $block_selector ], self::SCHEMA['styles'] );
+
+				if ( empty( $this->theme_json['styles'][ $block_selector ] ) ) {
+					unset( $this->theme_json['styles'][ $block_selector ] );
+				}
+			}
+
+			if ( isset( $this->theme_json['settings'][ $block_selector] ) ) {
+				self::process_subtree( $this->theme_json['settings'][ $block_selector ], self::SCHEMA['settings'] );
+
+				if ( empty( $this->theme_json['settings'][ $block_selector ] ) ) {
+					unset( $this->theme_json['settings'][ $block_selector ] );
+				}
+			}
+		}
 	}
 
 	/**
@@ -493,6 +511,10 @@ class WP_Theme_JSON {
 		}
 
 		return self::$blocks_metadata;
+	}
+
+	private static function process_subtree( &$subtree, $schema ) {
+		$subtree = array_intersect_key( $subtree, $schema );
 	}
 
 	/**
