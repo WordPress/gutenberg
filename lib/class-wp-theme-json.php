@@ -550,21 +550,6 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Given a context, it returns its settings subtree.
-	 *
-	 * @param array $context Context adhering to the theme.json schema.
-	 *
-	 * @return array|null The settings subtree.
-	 */
-	private static function extract_settings( $context ) {
-		if ( empty( $context['settings'] ) ) {
-			return null;
-		}
-
-		return $context['settings'];
-	}
-
-	/**
 	 * Given a tree, it creates a flattened one
 	 * by merging the keys and binding the leaf values
 	 * to the new keys.
@@ -974,12 +959,7 @@ class WP_Theme_JSON {
 	 * @return array Settings per context.
 	 */
 	public function get_settings() {
-		return array_filter(
-			array_map( array( $this, 'extract_settings' ), $this->theme_json ),
-			function ( $element ) {
-				return null !== $element;
-			}
-		);
+		return $this->theme_json['settings'];
 	}
 
 	/**

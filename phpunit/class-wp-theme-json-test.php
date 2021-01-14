@@ -149,89 +149,39 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	// function test_properties_not_valid_are_skipped() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'invalidKey' => 'invalid value',
-	// 			'settings' => array(
-	// 				'global'   => array(
-	// 					'color'          => array(
-	// 						'custom'     => 'false',
-	// 						'invalidKey' => 'invalid value',
-	// 					),
-	// 					'invalidSection' => array(
-	// 						'invalidKey' => 'invalid value',
-	// 					),
-	// 				),
-	// 			),
-	// 			'styles'     => array(
-	// 				'global' => array(
-	// 					'typography'     => array(
-	// 						'fontSize'        => '12',
-	// 						'invalidProperty' => 'invalid value',
-	// 					),
-	// 					'invalidSection' => array(
-	// 						'invalidProperty' => 'invalid value',
-	// 					),
-	// 				)
-	// 			),
-	// 		)
-	// 	);
-	// 	$result     = $theme_json->get_raw_data();
+	function test_get_settings() {
+		// See schema at WP_Theme_JSON::SCHEMA.
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'settings' => array(
+					'global' => array(
+						'color'      => array(
+							'link' => 'value',
+						),
+						'custom'     => 'value',
+						'typography' => 'value',
+						'misc'       => 'value',
+					),
+				),
+				'styles'   => array(
+					'global' => array(
+						'color' => 'value',
+						'misc'  => 'value',
+					)
+				),
+				'misc'     => 'value',
+			)
+		);
 
-	// 	$expected = array(
-	// 		'settings' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'custom' => 'false',
-	// 				),
-	// 			),
-	// 		),
-	// 		'styles'   => array(
-	// 			'global' => array(
-	// 				'typography' => array(
-	// 					'fontSize' => '12',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
+		$result = $theme_json->get_settings();
 
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+		$this->assertArrayHasKey( 'global', $result );
+		$this->assertCount( 1, $result );
 
-	// function test_get_settings() {
-	// 	// See schema at WP_Theme_JSON::SCHEMA.
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'settings' => array(
-	// 				'global' => array(
-	// 					'color'      => array(
-	// 						'link' => 'value',
-	// 					),
-	// 					'custom'     => 'value',
-	// 					'typography' => 'value',
-	// 					'misc'       => 'value',
-	// 				),
-	// 			),
-	// 			'styles'   => array(
-	// 				'global' => array(
-	// 					'color' => 'value',
-	// 					'misc'  => 'value',
-	// 				)
-	// 			),
-	// 			'misc'     => 'value',
-	// 		)
-	// 	);
-
-	// 	$result = $theme_json->get_settings();
-
-	// 	$this->assertArrayHasKey( 'global', $result );
-	// 	$this->assertCount( 1, $result );
-
-	// 	$this->assertArrayHasKey( 'color', $result['global'] );
-	// 	$this->assertArrayHasKey( 'custom', $result['global'] );
-	// 	$this->assertCount( 2, $result['global'] );
-	// }
+		$this->assertArrayHasKey( 'color', $result['global'] );
+		$this->assertArrayHasKey( 'custom', $result['global'] );
+		$this->assertCount( 2, $result['global'] );
+	}
 
 	// function test_get_stylesheet() {
 	// 	// See schema at WP_Theme_JSON::SCHEMA.
