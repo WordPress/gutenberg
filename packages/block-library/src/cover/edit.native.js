@@ -22,7 +22,7 @@ import {
 	PanelBody,
 	RangeControl,
 	UnitControl,
-	BottomSheet,
+	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -46,13 +46,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import {
-	useEffect,
-	useState,
-	useRef,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
@@ -176,11 +170,11 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = ( value ) => {
+	const onHeightChange = useCallback( ( value ) => {
 		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
 			setAttributes( { minHeight: value } );
 		}
-	};
+	}, [] );
 
 	const onOpacityChange = useCallback( ( value ) => {
 		setAttributes( { dimRatio: value } );
@@ -209,7 +203,7 @@ const Cover = ( {
 	const onClearMedia = useCallback( () => {
 		setAttributes( { id: undefined, url: undefined } );
 		closeSettingsBottomSheet();
-	} );
+	}, [] );
 
 	function setColor( color ) {
 		setAttributes( {
@@ -285,7 +279,7 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	const onChangeUnit = ( nextUnit ) => {
+	const onChangeUnit = useCallback( ( nextUnit ) => {
 		setAttributes( {
 			minHeightUnit: nextUnit,
 			minHeight:
@@ -293,23 +287,7 @@ const Cover = ( {
 					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
 					: CONTAINER_HEIGHT,
 		} );
-	};
-
-	const getClearMediaControl = useMemo( () => {
-		if ( ! url ) {
-			return null;
-		}
-		return (
-			<PanelBody title={ __( 'Media' ) }>
-				<BottomSheet.Cell
-					leftAlign
-					label={ __( 'Clear Media' ) }
-					labelStyle={ styles.clearMediaButton }
-					onPress={ onClearMedia }
-				/>
-			</PanelBody>
-		);
-	}, [ url ] );
+	}, [] );
 
 	const controls = (
 		<InspectorControls>
@@ -347,7 +325,16 @@ const Cover = ( {
 					key={ minHeightUnit }
 				/>
 			</PanelBody>
-			{ getClearMediaControl }
+			{ url ? (
+				<PanelBody title={ __( 'Media' ) }>
+					<TextControl
+						leftAlign
+						label={ __( 'Clear Media' ) }
+						labelStyle={ styles.clearMediaButton }
+						onPress={ onClearMedia }
+					/>
+				</PanelBody>
+			) : null }
 		</InspectorControls>
 	);
 

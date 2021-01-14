@@ -28,7 +28,7 @@ import {
 	ToolbarGroup,
 	PanelBody,
 	ToggleControl,
-	BottomSheet,
+	TextControl,
 	SelectControl,
 	Icon,
 } from '@wordpress/components';
@@ -298,7 +298,7 @@ export class FileEdit extends Component {
 							onChange={ this.onChangeDownloadButtonVisibility }
 						/>
 					) }
-					<BottomSheet.Cell
+					<TextControl
 						disabled={ isCopyUrlDisabled }
 						label={
 							this.state.isUrlCopied
