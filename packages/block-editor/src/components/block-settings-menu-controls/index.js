@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { compact, isEmpty, map } from 'lodash';
+import { compact, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,8 +39,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 			{ ( fills ) => {
 				return (
 					<MenuGroup>
-						{ ! isEmpty( fills ) && fills }
-						<ConvertToGroupButton />
+						{ fills }
+						<ConvertToGroupButton onClose={ fillProps?.onClose } />
 					</MenuGroup>
 				);
 			} }
