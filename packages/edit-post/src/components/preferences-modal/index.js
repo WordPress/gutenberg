@@ -96,7 +96,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				<EnableFeature
 					featureName="showBlockBreadcrumbs"
 					help={ __(
-						'Shows block breadcrumbs on the bottom of the editor.'
+						'Shows block breadcrumbs at the bottom of the editor.'
 					) }
 					label={ __( 'Display block breadcrumbs' ) }
 				/>

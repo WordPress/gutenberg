@@ -53,7 +53,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     />
     <WithSelect(WithDispatch(BaseOption))
       featureName="showBlockBreadcrumbs"
-      help="Shows block breadcrumbs on the bottom of the editor."
+      help="Shows block breadcrumbs at the bottom of the editor."
       label="Display block breadcrumbs"
     />
   </Section>
