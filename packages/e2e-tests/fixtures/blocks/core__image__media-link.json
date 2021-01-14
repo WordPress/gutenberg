@@ -8,7 +8,12 @@
             "alt": "",
             "caption": "",
             "href": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
-            "linkDestination": "media"
+            "linkDestination": "media",
+            "inheritedAttributes": {
+                "linkTo": false,
+                "linkTarget": false,
+                "sizeSlug": false
+            }
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-image\"><a href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>"
