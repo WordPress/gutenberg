@@ -24,11 +24,6 @@
 		flex-basis: 100%;
 	}
 
-	// These have to be explicitly set in order for them to be animatable.
-	margin: auto;
-	width: 100%;
-	transition: width 0.1s ease;
-	@include reduce-motion("transition");
 }
 
 .editor-styles-wrapper {
@@ -41,6 +36,14 @@
 	> * {
 		cursor: auto;
 	}
+
+	// Animate the viewport.
+	transition: width 0.2s ease;
+	@include reduce-motion("transition");
+
+	// These have to be explicitly set in order for them to be animatable.
+	margin: auto;
+	width: 100%;
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
