@@ -60,15 +60,41 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	function test_schema_validation_subtree_is_removed_if_not_array() {
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'styles' => 'invalid/not/array',
-				'settings' => array(
+				'settings' => 'invalid/not/array',
+				'styles' => array(
 					'global' => 'invalid/not/array',
-				)
+					'core/paragraph' => array(
+						'invalid/not/array' => false,
+					),
+					'core/group' => array(
+						'invalid/not/array' => false,
+						'color' => array(
+							'invalid/not/array' => true,
+						),
+						'typography' => array(
+							'invalid/key' => false,
+							'lineHeight' => '2',
+						),
+						'spacing' => array(
+							'padding' => array(
+								'invalid/not/array' => '10px'
+							),
+						),
+					),
+				),
 			)
 		);
 
 		$actual   = $theme_json->get_raw_data();
-		$expected = array();
+		$expected = array(
+			'styles' => array(
+				'core/group' => array(
+					'typography' => array(
+						'lineHeight' => '2',
+					),
+				),
+			),
+		);
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
