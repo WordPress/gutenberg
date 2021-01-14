@@ -16,6 +16,29 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__popover.is-quick {
+	.components-popover__content {
+		border: none;
+
+		.block-editor-inserter__quick-inserter > * {
+			border-left: 1px solid $gray-400;
+			border-right: 1px solid $gray-400;
+
+			&:first-child {
+				border-top: 1px solid $gray-400;
+			}
+
+			&:last-child {
+				border-bottom: 1px solid $gray-400;
+			}
+
+			&.components-button {
+				border: 1px solid $gray-900;
+			}
+		}
+	}
+}
+
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
