@@ -139,7 +139,9 @@ function InsertionPointPopover( {
 				className={ className }
 				style={ { width: element?.offsetWidth } }
 			>
-				{ showInsertionPoint && (
+				{ ( showInsertionPoint ||
+					isInserterShown ||
+					isInserterForced ) && (
 					<div className="block-editor-block-list__insertion-point-indicator" />
 				) }
 				{ ( isInserterShown || isInserterForced ) && (

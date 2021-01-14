@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import RangeMark from './mark';
@@ -58,8 +63,6 @@ function Marks( {
 }
 
 function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
-	const isRTL = document.documentElement.dir === 'rtl';
-
 	if ( ! marks ) {
 		return [];
 	}
@@ -81,7 +84,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 		const offset = `${ ( ( mark.value - min ) / range ) * 100 }%`;
 
 		const offsetStyle = {
-			[ isRTL ? 'right' : 'left' ]: offset,
+			[ isRTL() ? 'right' : 'left' ]: offset,
 		};
 
 		placedMarks.push( {

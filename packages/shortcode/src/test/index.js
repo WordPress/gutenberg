@@ -219,6 +219,30 @@ describe( 'shortcode', () => {
 			);
 			expect( result2 ).toBe( 'this has the [foo] shortcode' );
 		} );
+
+		it( 'should replace shortcode with a number', () => {
+			const result1 = replace( 'foo', 'hello [foo] world', () => 3 );
+			expect( result1 ).toBe( 'hello 3 world' );
+
+			const result2 = replace(
+				'foo',
+				'hello [foo bar=bar baz="baz" qux]delete me[/foo] world',
+				() => 4
+			);
+			expect( result2 ).toBe( 'hello 4 world' );
+		} );
+
+		it( 'should replace shortcode with an empty string', () => {
+			const result1 = replace( 'foo', 'hello [foo] world', () => '' );
+			expect( result1 ).toBe( 'hello  world' );
+
+			const result2 = replace(
+				'foo',
+				'hello [foo bar=bar baz="baz" qux]delete me[/foo] world',
+				() => ''
+			);
+			expect( result2 ).toBe( 'hello  world' );
+		} );
 	} );
 
 	describe( 'attrs', () => {

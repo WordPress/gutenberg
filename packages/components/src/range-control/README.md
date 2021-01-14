@@ -213,7 +213,7 @@ const MyRangeControl() {
 
 #### onChange
 
-A function that receives the new value. The value will be less than `max` and more than `min` unless a reset (enabled by `allowReset`) has occured. In which case the value will be either that of `resetFallbackValue` if it has been specified or otherwise `undefined`.
+A function that receives the new value. The value will be less than `max` and more than `min` unless a reset (enabled by `allowReset`) has occurred. In which case the value will be either that of `resetFallbackValue` if it has been specified or otherwise `undefined`.
 
 -   Type: `function`
 -   Required: Yes

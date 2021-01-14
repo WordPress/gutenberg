@@ -212,7 +212,7 @@ _Parameters_
 
 _Returns_
 
--   `(Function|Object)`: Element Ref.
+-   `Function`: Ref callback.
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 
@@ -253,6 +253,12 @@ _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
 -   _prefix_ `string`: Prefix for the unique id.
+
+<a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
+
+Preferred over direct usage of `useLayoutEffect` when supporting
+server rendered components (SSR) because currently React
+throws a warning when using useLayoutEffect in that environment.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 

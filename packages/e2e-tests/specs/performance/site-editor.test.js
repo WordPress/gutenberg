@@ -11,6 +11,7 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	activateTheme,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -18,7 +19,7 @@ jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentyone-blocks' );
+		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template', 'auto-draft' );
 		await trashAllPosts( 'wp_template_part' );
@@ -34,6 +35,8 @@ describe( 'Site Editor Performance', () => {
 			load: [],
 			type: [],
 			focus: [],
+			inserterOpen: [],
+			inserterHover: [],
 		};
 
 		await visitAdminPage(
@@ -49,7 +52,11 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.wp-block', { timeout: 120000 } );
+			await page.waitForSelector( '.edit-site-visual-editor', {
+				timeout: 120000,
+			} );
+			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+
 			results.load.push( new Date() - startTime );
 		}
 
