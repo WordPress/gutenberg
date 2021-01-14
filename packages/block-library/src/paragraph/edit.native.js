@@ -31,13 +31,6 @@ function ParagraphBlock( {
 		...style,
 	};
 
-	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
-	const fontSize = styles.fontSize;
-	styles.fontSize =
-		fontSize && fontSize.endsWith( 'px' )
-			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
-			: fontSize;
-
 	return (
 		<>
 			<BlockControls>
