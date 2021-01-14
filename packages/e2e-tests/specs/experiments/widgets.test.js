@@ -8,6 +8,11 @@ import {
 	activateTheme,
 } from '@wordpress/e2e-test-utils';
 
+/**
+ * External dependencies
+ */
+import { groupBy, mapValues } from 'lodash';
+
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
 describe( 'Widgets screen', () => {
@@ -140,18 +145,14 @@ describe( 'Widgets screen', () => {
 		await saveWidgets();
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
-		"<!-- wp:widget-area {\\"id\\":\\"wp_inactive_widgets\\",\\"name\\":\\"Inactive widgets\\"} /-->
-
-		<!-- wp:widget-area {\\"id\\":\\"sidebar-1\\",\\"name\\":\\"Footer #1\\"} -->
-		<!-- wp:paragraph -->
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
-		<!-- /wp:paragraph -->
-		<!-- wp:paragraph -->
+		</div></div>
+		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
-		<!-- /wp:paragraph -->
-		<!-- /wp:widget-area -->
-
-		<!-- wp:widget-area {\\"id\\":\\"sidebar-2\\",\\"name\\":\\"Footer #2\\"} /-->"
+		</div></div>",
+		}
 	` );
 	} );
 
@@ -276,21 +277,17 @@ describe( 'Widgets screen', () => {
 		await saveWidgets();
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
-		"<!-- wp:widget-area {\\"id\\":\\"wp_inactive_widgets\\",\\"name\\":\\"Inactive widgets\\"} /-->
-
-		<!-- wp:widget-area {\\"id\\":\\"sidebar-1\\",\\"name\\":\\"Footer #1\\"} -->
-		<!-- wp:paragraph -->
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
-		<!-- /wp:paragraph -->
-		<!-- wp:heading -->
+		</div></div>
+		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<h2>My Heading</h2>
-		<!-- /wp:heading -->
-		<!-- wp:paragraph -->
+		</div></div>
+		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
-		<!-- /wp:paragraph -->
-		<!-- /wp:widget-area -->
-
-		<!-- wp:widget-area {\\"id\\":\\"sidebar-2\\",\\"name\\":\\"Footer #2\\"} /-->"
+		</div></div>",
+		}
 	` );
 	} );
 } );
@@ -307,32 +304,20 @@ async function saveWidgets() {
 }
 
 async function getSerializedWidgetAreas() {
-	return await page.evaluate( () =>
-		wp.data
-			.select( 'core/edit-widgets' )
-			.getWidgetAreas()
-			.map( ( widgetArea ) => {
-				const serializedWidgetAreasOpening = `<!-- wp:widget-area {"id":"${ widgetArea.id }","name":"${ widgetArea.name }"}`;
-
-				const serializedWidgets = widgetArea.widgets
-					.map( ( widgetId ) =>
-						wp.data
-							.select( 'core/edit-widgets' )
-							.getWidget( widgetId )
-					)
-					.map( ( widget ) => widget.settings.content )
-					.join( '\n' );
-
-				if ( ! serializedWidgets ) {
-					return `${ serializedWidgetAreasOpening } /-->`;
-				}
-
-				return `${ serializedWidgetAreasOpening } -->
-${ serializedWidgets }
-<!-- /wp:widget-area -->`;
-			} )
-			.join( '\n\n' )
+	const widgets = await page.evaluate( () =>
+		wp.data.select( 'core' ).getWidgets()
 	);
+
+	const serializedWidgetAreas = mapValues(
+		groupBy( widgets, 'sidebar' ),
+		( sidebarWidgets ) =>
+			sidebarWidgets
+				.map( ( widget ) => widget.rendered )
+				.filter( Boolean )
+				.join( '\n' )
+	);
+
+	return serializedWidgetAreas;
 }
 
 /**
