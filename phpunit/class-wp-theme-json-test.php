@@ -8,44 +8,32 @@
 
 class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
-	function test_schema_validation() {
+	function test_schema_validation_invalid_keys_are_removed() {
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'invalid/key' => 'content',
 				'styles'       => array(
-					'global' => array(
-						'color' => array(
-							'custom'      => false,
-							'background'  => 'red',
-							'invalid/key' => true,
-						),
-						'invalid/key' => array(
-							'custom'     => false,
-							'background' => 'red',
-						),
-						'spacing' => array(
-							'padding' => array(
-								'top' => '10px',
-							),
-						),
-					),
 					'invalid/key' => array(
 						'color' => array(
 							'custom' => 'false',
 						),
 					),
-				),
-				'settings'    => array(
-					'invalid/key' => array(
+					'global' => array(
+						'invalid/key' => array(
+							'custom'     => false,
+							'background' => 'red',
+						),
 						'color' => array(
-							'custom' => false,
+							'invalid/key' => true,
+							'background'  => 'red',
+						),
+						'spacing' => array(
+							'padding' => array(
+								'invalid/key' => false,
+								'top' => '10px',
+							),
 						),
 					),
-					'global' => array(
-						'color' => array(
-							'custom' => false,
-						)
-					)
 				),
 			)
 		);
@@ -63,52 +51,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-			),
-			'settings' => array(
-				'global' => array(
-					'color' => array(
-						'custom' => false,
-					),
-				),
-			),
-		);
-
-		$this->assertEqualSetsWithIndex( $expected, $result );
-	}
-
-	function test_schema_validation_works_with_partial_data() {
-		$theme_json = new WP_Theme_JSON(
-			array(
-				'invalid/key' => 'content',
-				'styles'       => array(
-					'global' => array(
-						'color' => array(
-							'custom'     => false,
-							'background' => 'red',
-						),
-						'unsupported/property' => array(
-							'custom'     => false,
-							'background' => 'red',
-						)
-					),
-					'core/invalid' => array(
-						'color' => array(
-							'custom' => 'false',
-						),
-					),
-				)
 			)
-		);
-		$result     = $theme_json->get_raw_data();
-
-		$expected = array(
-			'styles' => array(
-				'global' => array(
-					'color' => array(
-						'background' => 'red',
-					),
-				),
-			),
 		);
 
 		$this->assertEqualSetsWithIndex( $expected, $result );
@@ -117,7 +60,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	function test_schema_validation_subtree_is_removed_if_empty() {
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'invalid/key' => 'content',
 				'styles'       => array(
 					'invalid/key' => array(
 						'color' => array(
