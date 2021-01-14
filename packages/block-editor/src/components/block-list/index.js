@@ -106,6 +106,18 @@ function Items( {
 
 	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
+	// Filter non-selected blocks as potential last drop targets.
+	const nonSelectedIds = blockClientIds.filter(
+		( id ) =>
+			! multiSelectedBlockClientIds.includes( id ) &&
+			id !== selectedBlockClientId
+	);
+
+	// Find index in list for last possible drop target.
+	const lastBlockIndex = nonSelectedIds.length
+		? blockClientIds.indexOf( nonSelectedIds[ nonSelectedIds.length - 1 ] )
+		: undefined;
+
 	return (
 		<>
 			{ blockClientIds.map( ( clientId, index ) => {
@@ -113,7 +125,16 @@ function Items( {
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget = dropTargetIndex === index;
+				// Allows display of horizontal drop indicator at the end
+				// position of a list when the appender is hidden.
+				const isLastDropTarget =
+					! renderAppender &&
+					dropTargetIndex > index &&
+					orientation === 'horizontal' &&
+					index === lastBlockIndex;
+
+				const isDropTarget =
+					dropTargetIndex === index || isLastDropTarget;
 
 				return (
 					<AsyncModeProvider
@@ -133,6 +154,7 @@ function Items( {
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
+								'is-last-drop-target': isLastDropTarget,
 								'has-active-entity': activeEntityBlockId,
 							} ) }
 							activeEntityBlockId={ activeEntityBlockId }

@@ -33,6 +33,16 @@
 		border-top: none;
 		border-left: 4px solid var(--wp-admin-theme-color);
 	}
+
+	// Displays horizontal drop indicator after last block in list if appender is hidden
+	&.is-drop-target.is-dropping-horizontally.is-last-drop-target::before {
+		top: 0;
+		bottom: 0;
+		left: auto;
+		right: -6px;
+		border-top: none;
+		border-left: 4px solid var(--wp-admin-theme-color);
+	}
 }
 
 /**
