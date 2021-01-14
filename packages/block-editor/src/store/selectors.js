@@ -1233,9 +1233,11 @@ export function getTemplateLock( state, rootClientId ) {
  * This function is not exported and not memoized because using a memoized selector
  * inside another memoized selector is just a waste of time.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object}         state        Editor state.
+ * @param {string|Object}  blockName    The block type object, e.g., the response
+ *                                      from the block directory; or a string name of
+ *                                      an installed block type, e.g.' core/paragraph'.
+ * @param {?string}        rootClientId Optional root client ID of block list.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
@@ -1260,7 +1262,13 @@ const canInsertBlockTypeUnmemoized = (
 		return defaultResult;
 	};
 
-	const blockType = getBlockType( blockName );
+	let blockType;
+	if ( blockName && 'object' === typeof blockName ) {
+		blockType = blockName;
+		blockName = blockType.name;
+	} else {
+		blockType = getBlockType( blockName );
+	}
 	if ( ! blockType ) {
 		return false;
 	}
