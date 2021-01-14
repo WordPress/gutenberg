@@ -20,7 +20,6 @@ function InserterLibrary( {
 	isAppender,
 	showInserterHelpPanel,
 	showMostUsedBlocks = false,
-	__experimentalSelectBlockOnInsert,
 	__experimentalInsertionIndex,
 	onSelect = noop,
 } ) {
@@ -43,9 +42,6 @@ function InserterLibrary( {
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
-			__experimentalSelectBlockOnInsert={
-				__experimentalSelectBlockOnInsert
-			}
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 		/>
 	);

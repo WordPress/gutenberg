@@ -657,6 +657,7 @@ _Returns_
 
 Returns the initial caret position for the selected block.
 This position is to used to position the caret properly when the selected block changes.
+If the current block is not a RichText, having initial position set to 0 means "focus block"
 
 _Parameters_
 

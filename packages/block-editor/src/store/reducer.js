@@ -1192,7 +1192,7 @@ function selectionHelper( state = {}, action ) {
 		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			// REPLACE_INNER_BLOCKS can be called with an empty array.
-			if ( ! action.updateSelection || ! action.blocks.length ) {
+			if ( ! action.blocks.length ) {
 				return state;
 			}
 
@@ -1225,11 +1225,7 @@ function selectionHelper( state = {}, action ) {
 				return state;
 			}
 
-			const newState = { clientId: blockToSelect.clientId };
-			if ( typeof action.initialPosition === 'number' ) {
-				newState.initialPosition = action.initialPosition;
-			}
-			return newState;
+			return { clientId: blockToSelect.clientId };
 		}
 	}
 
@@ -1372,6 +1368,11 @@ export function initialPosition( state, action ) {
 		return state;
 	} else if ( action.type === 'START_TYPING' ) {
 		return state;
+	} else if (
+		action.type === 'INSERT_BLOCKS' ||
+		action.type === 'REPLACE_INNER_BLOCKS'
+	) {
+		return action.updateSelection ? 0 : undefined;
 	}
 
 	// Reset the state by default (for any action not handled).
