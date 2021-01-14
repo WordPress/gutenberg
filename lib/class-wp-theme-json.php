@@ -303,13 +303,16 @@ class WP_Theme_JSON {
 
 		// Filter out top-level keys that aren't valid according to the schema.
 		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
-
-		// Filter out all block selectors that aren't registered for styles & settings.
-		$block_metadata  = $this->get_blocks_metadata();
-		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
+		foreach( [ 'settings', 'styles'] as $key => $subtree ) {
 			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
 				unset( $this->theme_json[ $subtree ] );
-			} elseif ( isset( $this->theme_json[ $subtree ] ) ) {
+			}
+		}
+
+		// Filter out all block selectors within settings & styles that aren't registered.
+		$block_metadata  = $this->get_blocks_metadata();
+		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
+			if ( isset( $this->theme_json[ $subtree ] ) ) {
 				$this->theme_json[ $subtree ]  = array_intersect_key( $this->theme_json[ $subtree ], $block_metadata );
 				if ( empty( $this->theme_json[ $subtree ] ) ) {
 					unset( $this->theme_json[ $subtree ] );
