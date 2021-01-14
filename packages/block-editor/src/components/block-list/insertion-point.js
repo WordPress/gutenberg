@@ -7,60 +7,21 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
-import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import { getClosestTabbable } from '../writing-flow';
 import { getBlockDOMNode } from '../../utils/dom';
 
-function InsertionPointInserter( {
-	clientId,
-	setIsInserterForced,
-	containerRef,
-} ) {
-	const ref = useRef();
-
-	function focusClosestTabbable( event ) {
-		const { clientX, clientY, target } = event;
-
-		// Only handle click on the wrapper specifically, and not an event
-		// bubbled from the inserter itself.
-		if ( target !== ref.current ) {
-			return;
-		}
-
-		const { ownerDocument } = containerRef.current;
-		const targetRect = target.getBoundingClientRect();
-		const isReverse = clientY < targetRect.top + targetRect.height / 2;
-		const blockNode = getBlockDOMNode( clientId, ownerDocument );
-		const container = isReverse ? containerRef.current : blockNode;
-		const closest =
-			getClosestTabbable( blockNode, true, container ) || blockNode;
-		const rect = new window.DOMRect( clientX, clientY, 0, 16 );
-
-		placeCaretAtVerticalEdge( closest, isReverse, rect, false );
-	}
-
+function InsertionPointInserter( { clientId, setIsInserterForced } ) {
 	return (
 		/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		<div
-			ref={ ref }
 			onFocus={ () => setIsInserterForced( true ) }
-			onBlur={ () => setIsInserterForced( false ) }
-			onClick={ focusClosestTabbable }
-			// While ideally it would be enough to capture the
-			// bubbling focus event from the Inserter, due to the
-			// characteristics of click focusing of `button`s in
-			// Firefox and Safari, it is not reliable.
-			//
-			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-			tabIndex={ -1 }
 			className={ classnames(
 				'block-editor-block-list__insertion-point-inserter'
 			) }
@@ -69,6 +30,8 @@ function InsertionPointInserter( {
 				position="bottom center"
 				clientId={ clientId }
 				__experimentalIsQuick
+				onToggle={ setIsInserterForced }
+				onSelectOrClose={ () => setIsInserterForced( false ) }
 			/>
 		</div>
 	);
@@ -192,7 +155,6 @@ function InsertionPointPopover( {
 					<InsertionPointInserter
 						clientId={ clientId }
 						setIsInserterForced={ setIsInserterForced }
-						containerRef={ containerRef }
 					/>
 				) }
 			</div>
@@ -330,7 +292,12 @@ export default function useInsertionPoint( ref ) {
 				rootClientId={ selectedRootClientId }
 				isInserterShown={ isInserterShown }
 				isInserterForced={ isInserterForced }
-				setIsInserterForced={ setIsInserterForced }
+				setIsInserterForced={ ( value ) => {
+					setIsInserterForced( value );
+					if ( ! value ) {
+						setIsInserterShown( value );
+					}
+				} }
 				containerRef={ ref }
 				showInsertionPoint={ isInserterVisible }
 			/>
