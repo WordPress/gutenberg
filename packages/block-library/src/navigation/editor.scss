@@ -286,7 +286,9 @@ $color-control-label-height: 20px;
 }
 
 // When block is vertical.
-.is-vertical .wp-block-navigation-placeholder {
+.is-vertical .wp-block-navigation-placeholder,
+.is-vertical .wp-block-navigation-placeholder__preview,
+.is-vertical .wp-block-navigation-placeholder__controls {
 	min-height: $icon-size + ($grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15) * 3;
 }
 
