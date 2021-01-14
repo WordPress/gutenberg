@@ -324,6 +324,11 @@ class WP_Theme_JSON {
 		foreach( $block_metadata as $block_selector => $metadata ) {
 			foreach( [ 'styles', 'settings' ] as $key => $subtree ) {
 				if ( isset( $this->theme_json[ $subtree ][ $block_selector] ) ) {
+					if ( ! is_array( $this->theme_json[ $subtree ][ $block_selector] ) ) {
+						unset( $this->theme_json[ $subtree ][ $block_selector] );
+						continue;
+					}
+
 					self::process_subtree( $this->theme_json[ $subtree ][ $block_selector ], self::SCHEMA[ $subtree ] );
 
 					if ( empty( $this->theme_json[ $subtree ][ $block_selector ] ) ) {

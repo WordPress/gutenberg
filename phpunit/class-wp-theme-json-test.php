@@ -61,6 +61,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'styles' => 'invalid/not/array',
+				'settings' => array(
+					'global' => 'invalid/not/array',
+				)
 			)
 		);
 
@@ -78,6 +81,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'color' => array(
 							'custom' => false,
 						),
+					),
+					'global' => array(
+						'invalid/key' => false,
 					),
 				),
 				'styles' => array(
