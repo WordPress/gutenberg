@@ -7,7 +7,7 @@ export const TEMPLATES_GENERAL = [
 	'404',
 ];
 
-export const TEMPLATES_POSTS = [ 'home', 'single' ];
+export const TEMPLATES_POSTS = [ 'home', 'single', 'single-post' ];
 
 export const TEMPLATES_NEW_OPTIONS = [
 	'front-page',
