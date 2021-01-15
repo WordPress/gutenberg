@@ -62,7 +62,7 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	{{/description}}
 	/**
 	 * Blocks are grouped into categories to help users browse and discover them.
-	 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
+	 * The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
 	 */
 	category: '{{category}}',
 
@@ -96,6 +96,15 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	supports: {
 		// Removes support for an HTML mode.
 		html: false,
+	},
+
+	/**
+	 * Used to construct a preview for the block to be shown in the block inserter.
+	 */
+	example: {
+		attributes: {
+			message: '{{title}}',
+		},
 	},
 
 	/**
