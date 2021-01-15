@@ -59,7 +59,7 @@ export default function PostTitleEdit( {
 
 	let titleElement = (
 		<TagName { ...( isLink ? {} : blockProps ) }>
-			{ __( 'Placeholder for post title' ) }
+			{ __( 'An example title' ) }
 		</TagName>
 	);
 
