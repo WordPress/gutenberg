@@ -13,7 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
-export const THROTTLE_TIME = 300;
+export const DEBOUNCE_TIME = 300;
 export default function PostTextEditor() {
 	const postContent = useSelect(
 		( select ) => select( 'core/editor' ).getEditedPostContent(),
@@ -36,7 +36,7 @@ export default function PostTextEditor() {
 	};
 
 	useEffect( () => {
-		const timeoutId = setTimeout( saveText, THROTTLE_TIME );
+		const timeoutId = setTimeout( saveText, DEBOUNCE_TIME );
 		return () => {
 			clearTimeout( timeoutId );
 		};

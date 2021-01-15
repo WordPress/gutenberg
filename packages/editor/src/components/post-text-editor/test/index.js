@@ -12,7 +12,7 @@ import * as wp from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import PostTextEditor, { THROTTLE_TIME } from '../';
+import PostTextEditor, { DEBOUNCE_TIME } from '../';
 
 const useSelect = wp.useSelect;
 // "Downgrade" ReactAutosizeTextarea to a regular textarea. Assumes aligned
@@ -176,7 +176,7 @@ describe( 'PostTextEditor', () => {
 
 		expect( textarea.props.value ).toBe( 'Goodbye World' );
 	} );
-	it( 'throttle value update after given time', () => {
+	it( 'debounce value update after given time', () => {
 		let wrapper;
 		act( () => {
 			wrapper = create( <PostTextEditor /> );
@@ -193,6 +193,6 @@ describe( 'PostTextEditor', () => {
 		act( () => textarea.props.onChange( { target: { value: 'text' } } ) );
 		setTimeout( () => {
 			expect( mockDispatchFn ).toHaveBeenCalled();
-		}, THROTTLE_TIME );
+		}, DEBOUNCE_TIME );
 	} );
 } );
