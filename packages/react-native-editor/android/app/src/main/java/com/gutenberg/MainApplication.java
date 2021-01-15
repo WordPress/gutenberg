@@ -155,6 +155,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback) {
+                focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(false);
             }
 
             @Override
