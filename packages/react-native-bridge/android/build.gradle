@@ -210,8 +210,18 @@ dependencies {
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
 
-    debugImplementation files(hermesPath + "hermes-debug.aar")
-    releaseImplementation files(hermesPath + "hermes-release.aar")
+    // We used to add the Hermes engine like this, but it creates problems with
+    // both direct AAR from Bintray usage and Gradle composite build.
+    //
+    // Leaving it here as a starting point for eventually embed it correctly
+    // here so that consumers don't have to do it.
+    //
+    // See:
+    // - https://github.com/wordpress-mobile/WordPress-Android/pull/13642
+    // - https://github.com/wordpress-mobile/gutenberg-mobile/issues/2973
+    //
+    // debugImplementation files(hermesPath + "hermes-debug.aar")
+    // releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
 boolean isBundleUpToDate() {
