@@ -979,37 +979,12 @@ class WP_Theme_JSON {
 	 * @param WP_Theme_JSON $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
-		$incoming_data = $incoming ->get_raw_data();
-		$blocks_metadata = self::get_blocks_metadata();
+		$incoming_data = $incoming->get_raw_data();
+		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
-		foreach ( $blocks_metadata as $block_selector => $metadata ) {
-			foreach ( array( 'settings', 'styles' ) as $subtree ) {
-				if ( ! isset( $incoming_data[ $subtree ][ $block_selector ] ) ) {
-					continue;
-				}
-
-				if ( ! isset( $this->theme_json[ $subtree ][ $block_selector ] ) ) {
-					$this->theme_json[ $subtree ][ $block_selector ] = $incoming_data[ $subtree ][ $block_selector ];
-					continue;
-				}
-
-				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $section ) {
-					if ( ! isset( $incoming_data[ $subtree ][ $block_selector ][ $section ] ) ) {
-						continue;
-					}
-
-					if ( ! isset( $this->theme_json[ $subtree ][ $block_selector ][ $section ] ) ) {
-						$this->theme_json[ $subtree ][ $block_selector ][ $section ] = $incoming_data[ $subtree ][ $block_selector ][ $section ];
-						continue;
-					}
-
-					$this->theme_json[ $subtree ][ $block_selector ][ $section ] = array_merge(
-						$this->theme_json[ $subtree ][ $block_selector ][ $section ],
-						$incoming_data[ $subtree ][ $block_selector ][ $section ]
-					);
-				}
-			}
-		}
+		// We treat presets differently than the rest of the properties.
+		// In this case, we want the incoming preset leaf to replace
+		// the existing.
 	}
 
 	/**

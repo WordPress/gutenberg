@@ -256,8 +256,8 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 								'color' => 'red',
 							),
 							array(
-								'slug'  => 'blue',
-								'color' => 'blue',
+								'slug'  => 'green',
+								'color' => 'green',
 							),
 						),
 					),
@@ -585,8 +585,8 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'customGradient' => true,
 						'palette'        => array(
 							array(
-								'slug'  => 'color',
-								'color' => 'color',
+								'slug'  => 'blue',
+								'color' => 'blue',
 							),
 						),
 						'gradients'      => array(
