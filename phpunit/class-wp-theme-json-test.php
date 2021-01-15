@@ -8,7 +8,7 @@
 
 class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
-	function test_schema_validation_invalid_keys_are_removed() {
+	function test_schema_validation_subtree_is_removed_if_key_invalid() {
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'invalid/key' => 'content',
