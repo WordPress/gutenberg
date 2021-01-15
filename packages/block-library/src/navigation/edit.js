@@ -121,6 +121,11 @@ function Navigation( {
 		};
 	}
 
+	const POPOVER_PROPS = {
+		position: 'bottom right',
+		isAlternate: true,
+	};
+
 	return (
 		<>
 			<BlockControls>
@@ -131,6 +136,7 @@ function Navigation( {
 								? navIcons[ attributes.itemsJustification ]
 								: navIcons.left
 						}
+						popoverProps={ POPOVER_PROPS }
 						label={ __( 'Change items justification' ) }
 						isCollapsed
 						controls={ [
