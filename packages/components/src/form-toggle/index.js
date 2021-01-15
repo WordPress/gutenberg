@@ -3,13 +3,24 @@
  */
 import classnames from 'classnames';
 import { noop } from 'lodash';
+/**
+ * Internal dependencies
+ */
+import Disabled from '../disabled';
 
-function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+function FormToggle( {
+	className,
+	checked,
+	id,
+	disabled,
+	onChange = noop,
+	...props
+} ) {
 	const wrapperClasses = classnames( 'components-form-toggle', className, {
 		'is-checked': checked,
 	} );
 
-	return (
+	const formToggleInput = (
 		<span className={ wrapperClasses }>
 			<input
 				className="components-form-toggle__input"
@@ -22,6 +33,12 @@ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
 			<span className="components-form-toggle__track"></span>
 			<span className="components-form-toggle__thumb"></span>
 		</span>
+	);
+
+	return disabled ? (
+		<Disabled>{ formToggleInput }</Disabled>
+	) : (
+		formToggleInput
 	);
 }
 
