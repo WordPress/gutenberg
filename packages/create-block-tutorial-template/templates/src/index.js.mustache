@@ -13,7 +13,12 @@ import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Sass files
+ * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
+ * All files containing `style` keyword are bundled together. The code used
+ * gets applied both to the front of your site and to the editor. All other files
+ * get applied to the editor only.
+ *
+ * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
  */
 import './style.scss';
 import './editor.scss';
@@ -29,17 +34,20 @@ import save from './save';
  *
  * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
  */
-registerBlockType('{{namespace}}/{{slug}}', {
+registerBlockType( '{{namespace}}/{{slug}}', {
 	/**
-	* @see https://make.wordpress.org/core/2020/11/18/block-api-version-2/
-	*/
+	 * @see https://make.wordpress.org/core/2020/11/18/block-api-version-2/
+	 */
 	apiVersion: {{apiVersion}},
 
 	/**
 	 * This is the display title for your block, which can be translated with `i18n` functions.
 	 * The block inserter will show this name.
 	 */
-	title: __('{{title}}', '{{textdomain}}'),
+	title: __(
+		'{{title}}',
+		'{{textdomain}}'
+	),
 
 	{{#description}}
 	/**
@@ -52,10 +60,9 @@ registerBlockType('{{namespace}}/{{slug}}', {
 	),
 
 	{{/description}}
-
 	/**
 	 * Blocks are grouped into categories to help users browse and discover them.
-	 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
+	 * The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
 	 */
 	category: '{{category}}',
 
@@ -67,14 +74,14 @@ registerBlockType('{{namespace}}/{{slug}}', {
 	icon: '{{dashicon}}',
 
 	{{/dashicon}}
-
 	/**
-	* Attributes are the way a block stores data, they define how a block is parsed to extract data from the saved content.
-	* When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an attributes.message variable.
-	*
-	*  @see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/
-	*/
-
+	 * Attributes are the way a block stores data, they define how a block is parsed
+	 * to extract data from the saved content. When the block loads it will look
+	 * at the saved content for the block, look for the `div` tag, take the text portion,
+	 * and store the content in an `attributes.message` variable.
+	 *
+	 *  @see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/
+	 */
 	attributes: {
 		message: {
 			type: 'string',
@@ -92,6 +99,15 @@ registerBlockType('{{namespace}}/{{slug}}', {
 	},
 
 	/**
+	 * Used to construct a preview for the block to be shown in the block inserter.
+	 */
+	example: {
+		attributes: {
+			message: '{{title}}',
+		},
+	},
+
+	/**
 	 * @see ./edit.js
 	 */
 	edit: Edit,
@@ -100,4 +116,4 @@ registerBlockType('{{namespace}}/{{slug}}', {
 	 * @see ./save.js
 	 */
 	save,
-});
+} );

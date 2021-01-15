@@ -26,12 +26,12 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	$dir = dirname( __FILE__ );
+	$dir = __DIR__;
 
 	$script_asset_path = "$dir/build/index.asset.php";
 	if ( ! file_exists( $script_asset_path ) ) {
 		throw new Error(
-			'You need to run `npm start` or `npm run build` for the "{{namespace}}/{{textdomain}}" block first.'
+			'You need to run `npm start` or `npm run build` for the "{{namespace}}/{{slug}}" block first.'
 		);
 	}
 	$index_js     = 'build/index.js';
@@ -45,7 +45,6 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	wp_set_script_translations( '{{namespace}}-{{slug}}-block-editor', '{{textdomain}}' );
 
 	$editor_css = 'build/index.css';
-
 	wp_register_style(
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $editor_css, __FILE__ ),
@@ -54,7 +53,6 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	);
 
 	$style_css = 'build/style-index.css';
-
 	wp_register_style(
 		'{{namespace}}-{{slug}}-block',
 		plugins_url( $style_css, __FILE__ ),
@@ -62,10 +60,13 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		filemtime( "$dir/$style_css" )
 	);
 
-	register_block_type( '{{namespace}}/{{slug}}', array(
-		'editor_script' => '{{namespace}}-{{slug}}-block-editor',
-		'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
-		'style'         => '{{namespace}}-{{slug}}-block',
-	) );
+	register_block_type(
+		'{{namespace}}/{{slug}}',
+		array(
+			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
+			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
+			'style'         => '{{namespace}}-{{slug}}-block',
+		)
+	);
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
