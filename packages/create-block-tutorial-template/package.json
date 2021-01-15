@@ -4,7 +4,11 @@
 	"description": "Template for @wordpress/create-block used in the official WordPress tutorial.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"keywords": [ "wordpress", "create block", "block template" ],
+	"keywords": [
+		"wordpress",
+		"create block",
+		"block template"
+	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/docs/designers-developers/developers/tutorials/create-block",
 	"repository": {
 		"type": "git",

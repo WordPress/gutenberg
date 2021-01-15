@@ -3,14 +3,7 @@
  *
  * @see https://developer.wordpress.org/block-editor/packages/packages-components/
  */
-import { Placeholder, TextControl } from '@wordpress/components';
-
-/**
- * Retrieves the translation of text.
- *
- * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
- */
-import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
 
 /**
  * React hook that is used to mark the block wrapper element.
@@ -26,16 +19,20 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#edit
  *
+ * @param {Object}   props               Properties passed to the function.
+ * @param {Object}   props.attributes    Available block attributes.
+ * @param {Function} props.setAttributes Function that updates individual attributes.
+ *
  * @return {WPElement} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps();
 	return (
-	<div { ...blockProps }>
-		<TextControl
-			value={ attributes.message }
-			onChange={ ( val ) => setAttributes( { message: val } ) }
-		/>
-	</div>
+		<div { ...blockProps }>
+			<TextControl
+				value={ attributes.message }
+				onChange={ ( val ) => setAttributes( { message: val } ) }
+			/>
+		</div>
 	);
 }

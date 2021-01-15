@@ -1,8 +1,6 @@
 # Create Block Tutorial Template
 
-
-This is a template for @wordpress/create-block that is the finished version of the block in the official [WordPress tutorial](/docs/designers-developers/developers/tutorials/create-block).
-
+This is a template for [`@wordpress/create-block`](/packages/create-block/README.md) that is the finished version of the block in the official [WordPress Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md) for the block editor.
 
 ## Usage
 
