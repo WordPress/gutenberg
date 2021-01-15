@@ -171,7 +171,6 @@ describe( 'Tooltip', () => {
 				currentTarget: {},
 			} );
 
-
 			setTimeout( () => {
 				const popover = wrapper.find( 'Popover' );
 				expect( popover ).toHaveLength( 1 );
