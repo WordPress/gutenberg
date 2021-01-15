@@ -18,10 +18,7 @@ export default function DarkEditorStyle( ref ) {
 			.getComputedStyle( editorStylesWrapper[ 0 ], null )
 			.getPropertyValue( 'background-color' );
 
-		// Calculate the luminosity (0 - 255)
-		const brightness = tinycolor( backgroundColor ).getBrightness();
-
-		if ( brightness > 100 ) {
+		if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
 			// Is 100 the right number?
 			const body = ownerDocument.getElementsByTagName( 'body' )[ 0 ];
 			// If we only remove it rather than adding it, then if themes don't declare support this will have no impact
