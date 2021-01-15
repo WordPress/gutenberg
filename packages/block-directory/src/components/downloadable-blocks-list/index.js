@@ -6,6 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 import { store as editPostStore } from '@wordpress/edit-post';
 
@@ -35,12 +36,16 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 					<DownloadableBlockListItem
 						key={ item.id }
 						onClick={ () => {
-							installBlockType( item ).then( ( success ) => {
-								if ( success ) {
-									onSelect( item );
-									setIsInserterOpened( false );
-								}
-							} );
+							if ( getBlockType( item.name ) ) {
+								onSelect( item );
+							} else {
+								installBlockType( item ).then( ( success ) => {
+									if ( success ) {
+										onSelect( item );
+										setIsInserterOpened( false );
+									}
+								} );
+							}
 							onHover( null );
 						} }
 						item={ item }
