@@ -207,7 +207,16 @@ export default function useInsertionPoint( ref ) {
 				return;
 			}
 
-			const rootClientId = event.target.getAttribute( 'data-block' );
+			let rootClientId;
+			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+				const blockElement = event.target.classList.contains(
+					'wp-block'
+				)
+					? event.target
+					: event.target.closest( '.wp-block' );
+				rootClientId = blockElement.getAttribute( 'data-block' );
+			}
+
 			const orientation =
 				getBlockListSettings( rootClientId )?.orientation || 'vertical';
 			const rect = event.target.getBoundingClientRect();
