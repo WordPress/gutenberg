@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 9.7.3 =
+
+### Bug Fixes
+
+- Prevent mangle of translation functions to fix RTL locales.
+
+
 = 9.7.2 =
 
 ### Bug Fixes
