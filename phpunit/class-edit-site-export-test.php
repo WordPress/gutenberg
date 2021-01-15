@@ -1,29 +1,26 @@
 <?php
-
 /**
  * Test `gutenberg_edit_site_export` and its helper functions.
  *
- * @package Gutenberg
+ * @package    Gutenberg
  */
 
 class Edit_Site_Export_Test extends WP_UnitTestCase {
-	/**
-	 * Verify that post ids are stripped from template part blocks during the export.
-	 *
-	 * This is needed so that the exported template is loaded from the theme.
-	 */
-	public function test_post_ids_are_stripped_from_template_parts() {
-		$post = self::factory()->post->create_and_get(
-			array(
-				'post_content' => '<!-- wp:template-part {"postId":123,"slug":"header","theme":"gutenberg-tests"} /-->',
-				'post_title'   => 'Archive',
-				'post_type'    => 'wp_template',
-			)
-		);
+	function test_remove_theme_attribute_from_content() {
+		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"tt1-blocks","align":"full","tagName":"header","className":"site-header"} /-->';
+		$template_content                = _remove_theme_attribute_from_content( $content_without_theme_attribute );
+		$expected                        = '<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header"} /-->';
+		$this->assertEquals( $expected, $template_content );
 
-		$this->assertSame(
-			'<!-- wp:template-part {"slug":"header","theme":"gutenberg-tests"} /-->',
-			gutenberg_strip_post_ids_from_template_part_blocks( $post->post_content )
-		);
+		// Does not modify content when there is no existing theme attribute.
+		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header"} /-->';
+		$template_content                      = _remove_theme_attribute_from_content( $content_with_existing_theme_attribute );
+		$this->assertEquals( $content_with_existing_theme_attribute, $template_content );
+
+		// Does not remove theme when there is no template part.
+		$content_with_no_template_part = '<!-- wp:post-content /-->';
+		$template_content              = _remove_theme_attribute_from_content( $content_with_no_template_part );
+		$this->assertEquals( $content_with_no_template_part, $template_content );
 	}
 }
+

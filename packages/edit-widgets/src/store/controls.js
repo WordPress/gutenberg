@@ -142,6 +142,8 @@ export function dispatch( registryName, actionName, ...args ) {
 }
 
 const controls = {
+	AWAIT_PROMISE: ( { promise } ) => promise,
+
 	SELECT: createRegistryControl(
 		( registry ) => ( { registryName, selectorName, args } ) => {
 			return registry.select( registryName )[ selectorName ]( ...args );

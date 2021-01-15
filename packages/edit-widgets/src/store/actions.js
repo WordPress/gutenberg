@@ -181,6 +181,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 		} );
 	}
 
+	// HACK: Await any promise here so that rungen passes execution back to
+	// `saveEntityRecord` above. This prevents `processBatch` from being called
+	// here before `addToBatch` is called by `saveEntityRecord`.
+	// See https://github.com/WordPress/gutenberg/issues/27173.
+	yield {
+		type: 'AWAIT_PROMISE',
+		promise: Promise.resolve(),
+	};
+
 	const batch = yield dispatch(
 		'core/__experimental-batch-processing',
 		'processBatch',
