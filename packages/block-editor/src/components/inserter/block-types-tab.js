@@ -7,15 +7,12 @@ import { map, findIndex, flow, sortBy, groupBy, orderBy } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
-import ChildBlocks from './child-blocks';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 
@@ -33,29 +30,6 @@ export function BlockTypesTab( {
 		rootClientId,
 		onInsert
 	);
-
-	const { hasChildItems, blockType } = useSelect(
-		( select ) => {
-			const { getBlockName } = select( 'core/block-editor' );
-			const { getChildBlockNames, getBlockType } = select( blocksStore );
-			const rootBlockName = getBlockName( rootClientId );
-
-			return {
-				hasChildItems: !! getChildBlockNames( rootBlockName ).length,
-				blockType: getBlockType( rootBlockName ),
-			};
-		},
-		[ rootClientId ]
-	);
-
-	const shouldShowCategories =
-		( blockType &&
-			hasBlockSupport(
-				blockType,
-				'__experimentalShowCategoriesInInserter',
-				false
-			) ) ||
-		! hasChildItems;
 
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
@@ -103,24 +77,6 @@ export function BlockTypesTab( {
 
 	// Hide block preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
-
-	if ( ! shouldShowCategories ) {
-		return (
-			<div>
-				<ChildBlocks rootClientId={ rootClientId }>
-					<BlockTypesList
-						// Pass along every block, as useBlockTypesState() and
-						// getInserterItems() will have already filtered out
-						// non-child blocks.
-						items={ items }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Child Blocks' ) }
-					/>
-				</ChildBlocks>
-			</div>
-		);
-	}
 
 	return (
 		<div>

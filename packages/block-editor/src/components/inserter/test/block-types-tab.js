@@ -7,7 +7,6 @@ import { render, fireEvent } from '@testing-library/react';
  * WordPress dependencies
  */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -80,10 +79,6 @@ describe( 'InserterMenu', () => {
 			categories,
 			collections,
 		] );
-
-		useSelect.mockImplementation( () => ( {
-			hasChildItems: false,
-		} ) );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
@@ -140,30 +135,7 @@ describe( 'InserterMenu', () => {
 		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 	} );
 
-	it( 'displays child blocks UI when root block has child blocks', () => {
-		useSelect.mockImplementation( () => ( {
-			hasChildItems: true,
-		} ) );
-
-		const { container } = render( <InserterBlockList /> );
-
-		const childBlocksContent = container.querySelector(
-			'.block-editor-inserter__child-blocks'
-		);
-
-		expect( childBlocksContent ).not.toBeNull();
-	} );
-
-	it( "doesn't display child blocks UI when root block has the __experimentalShowCategoriesInInserter flag", () => {
-		useSelect.mockImplementation( () => ( {
-			hasChildItems: true,
-			blockType: {
-				supports: {
-					__experimentalShowCategoriesInInserter: true,
-				},
-			},
-		} ) );
-
+	it( "doesn't display child blocks UI", () => {
 		const { container } = render( <InserterBlockList /> );
 
 		const childBlocksContent = container.querySelector(
