@@ -224,8 +224,8 @@ function URLInput( {
 			return false;
 		}
 
-		// Allow if this is a manual search where serach input length is not required.
-		if ( ! search.length ) {
+		// Allow if the search query is empty but show initial suggestions is enabled
+		if ( ! search.length && showInitialSuggestions ) {
 			return true;
 		}
 
