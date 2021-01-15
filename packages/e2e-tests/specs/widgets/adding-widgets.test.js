@@ -52,6 +52,11 @@ describe( 'Widgets screen', () => {
 		const blockLibrary = await page.waitForSelector(
 			'[aria-label="Block Library"][role="region"]'
 		);
+
+		// Check that there are categorizations in the inserter (#26329).
+		const categoryHeader = await blockLibrary.$$( 'h2' );
+		expect( categoryHeader.length > 0 ).toBe( true );
+
 		const [ addParagraphBlock ] = await blockLibrary.$x(
 			'//*[@role="option"][*[text()="Paragraph"]]'
 		);
