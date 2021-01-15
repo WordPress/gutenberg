@@ -17,14 +17,9 @@
 		}
 	},
 	"usesContext": [
-		"openInNewTab",
-		"iconColor",
-		"customIconColor",
-		"iconBackgroundColor",
-		"customIconBackgroundColor"
+		"openInNewTab"
 	],
 	"supports": {
-		"color": true,
 		"reusable": false,
 		"html": false
 	},

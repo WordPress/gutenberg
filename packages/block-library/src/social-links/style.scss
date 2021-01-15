@@ -68,6 +68,19 @@
 	&.alignright {
 		justify-content: flex-end;
 	}
+
+	// Ensure user color selections are applied to inner Social Link blocks.
+	// Double selectors to increase specificity to avoid themes overwriting user selection.
+	&.has-icon-color.has-icon-color {
+		> .wp-social-link {
+			color: var(--wp--social-links--icon-color);
+		}
+	}
+	&.has-icon-background-color.has-icon-background-color {
+		> .wp-social-link {
+			background-color: var(--wp--social-links--icon-background-color);
+		}
+	}
 }
 
 .wp-social-link {
@@ -102,10 +115,8 @@
 
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {
-	&:not(.has-icon-color):not(.has-icon-background-color) {
-		// Generic items such as mail, feed, etc.
-		@import "../social-link/socials-with-bg.scss";
-	}
+	// Generic items such as mail, feed, etc.
+	@import "../social-link/socials-with-bg.scss";
 }
 
 // Treatment for logos only style.
@@ -117,9 +128,7 @@
 		padding: 4px;
 	}
 
-	&:not(.has-icon-color) {
-		@import "../social-link/socials-without-bg.scss";
-	}
+	@import "../social-link/socials-without-bg.scss";
 }
 
 // Treatment for pill shape style.

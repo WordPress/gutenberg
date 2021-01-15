@@ -9,10 +9,16 @@
 		"customIconColor": {
 			"type": "string"
 		},
+		"iconColorValue": {
+			"type": "string"
+		},
 		"iconBackgroundColor": {
 			"type": "string"
 		},
 		"customIconBackgroundColor": {
+			"type": "string"
+		},
+		"iconBackgroundColorValue": {
 			"type": "string"
 		},
 		"openInNewTab": {
@@ -24,11 +30,7 @@
 		}
 	},
 	"providesContext": {
-		"openInNewTab": "openInNewTab",
-		"iconColor": "iconColor",
-		"customIconColor": "customIconColor",
-		"iconBackgroundColor": "iconBackgroundColor",
-		"customIconBackgroundColor": "customIconBackgroundColor"
+		"openInNewTab": "openInNewTab"
 	},
 	"supports": {
 		"align": [

@@ -56,9 +56,13 @@ export function SocialLinksEdit( props ) {
 		attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
 	useEffect( () => {
 		if ( logosOnly ) {
-			setIconBackgroundColor();
+			setAttributes( {
+				iconBackgroundColor: undefined,
+				customIconBackgroundColor: undefined,
+				iconBackgroundColorValue: undefined,
+			} );
 		}
-	}, [ logosOnly, setIconBackgroundColor ] );
+	}, [ logosOnly, setAttributes ] );
 
 	const SocialPlaceholder = (
 		<div className="wp-block-social-links__social-placeholder">
@@ -75,7 +79,13 @@ export function SocialLinksEdit( props ) {
 		'has-icon-color': iconColor.color,
 		'has-icon-background-color': iconBackgroundColor.color,
 	} );
-	const blockProps = useBlockProps( { className } );
+
+	const style = {
+		'--wp--social-links--icon-color': iconColor.color,
+		'--wp--social-links--icon-background-color': iconBackgroundColor.color,
+	};
+
+	const blockProps = useBlockProps( { className, style } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
@@ -153,12 +163,22 @@ export function SocialLinksEdit( props ) {
 					colorSettings={ [
 						{
 							value: iconColor.color,
-							onChange: setIconColor,
+							onChange: ( colorValue ) => {
+								setIconColor( colorValue );
+								// Set explicit color value used to add CSS variable in save.js
+								setAttributes( { iconColorValue: colorValue } );
+							},
 							label: __( 'Icon color' ),
 						},
 						! logosOnly && {
 							value: iconBackgroundColor.color,
-							onChange: setIconBackgroundColor,
+							onChange: ( colorValue ) => {
+								setIconBackgroundColor( colorValue );
+								// Set explicit color value used to add CSS variable in save.js
+								setAttributes( {
+									iconBackgroundColorValue: colorValue,
+								} );
+							},
 							label: __( 'Icon background color' ),
 						},
 					] }
