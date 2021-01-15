@@ -11,6 +11,7 @@ const {
 	toggleHtmlMode,
 	swipeFromTo,
 	longPressMiddleOfElement,
+	tapPasteAboveElement,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -172,8 +173,23 @@ class EditorPage {
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
+		const base64String = Buffer.from( html ).toString( 'base64' );
+
+		await this.driver.setClipboard( base64String, 'plaintext' );
+
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.type( html );
+
+		await longPressMiddleOfElement( this.driver, htmlContentView );
+
+		if ( isAndroid() ) {
+			await tapPasteAboveElement( this.driver, htmlContentView );
+		} else {
+			const pasteButton = this.driver.elementByXPath(
+				'//XCUIElementTypeMenuItem[@name="Paste"]'
+			);
+
+			await pasteButton.click();
+		}
 
 		await toggleHtmlMode( this.driver, false );
 	}
