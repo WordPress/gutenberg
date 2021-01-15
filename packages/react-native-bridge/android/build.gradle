@@ -395,9 +395,7 @@ bintray {
         repo = 'maven'
         name = 'react-native-gutenberg-bridge'
         licenses = ['GPL-2.0']
-        // FIXME: Once this works properly poit to 'wordpress-mobile'
-        userOrg = 'mokagio'
-        // FIXME: Once this works properly poit to the original gutenberg (or gutenberg-mobile) repo. See also: https://github.com/oguzkocer/gutenberg/commit/0ca71b1abe3ea22b77abb3f390534e66e39161d5#diff-320e7dacc9e9a83ac8128d299319f82cf6dfa2609e0ebbc043d13de33ea92773R350-R353
+        userOrg = 'wordpress-mobile'
         vcsUrl = 'https://github.com/wordpress-mobile/gutenberg-mobile.git'
         version {
             name = getBintrayVersion()
