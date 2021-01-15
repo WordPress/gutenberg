@@ -976,35 +976,36 @@ class WP_Theme_JSON {
 	/**
 	 * Merge new incoming data.
 	 *
-	 * @param WP_Theme_JSON $theme_json Data to merge.
+	 * @param WP_Theme_JSON $incoming Data to merge.
 	 */
-	public function merge( $theme_json ) {
-		$incoming_data = $theme_json->get_raw_data();
+	public function merge( $incoming ) {
+		$incoming_data = $incoming ->get_raw_data();
+		$blocks_metadata = self::get_blocks_metadata();
 
-		foreach ( array_keys( $incoming_data ) as $context ) {
+		foreach ( $blocks_metadata as $block_selector => $metadata ) {
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
-				if ( ! isset( $incoming_data[ $context ][ $subtree ] ) ) {
+				if ( ! isset( $incoming_data[ $subtree ][ $block_selector ] ) ) {
 					continue;
 				}
 
-				if ( ! isset( $this->theme_json[ $context ][ $subtree ] ) ) {
-					$this->theme_json[ $context ][ $subtree ] = $incoming_data[ $context ][ $subtree ];
+				if ( ! isset( $this->theme_json[ $subtree ][ $block_selector ] ) ) {
+					$this->theme_json[ $subtree ][ $block_selector ] = $incoming_data[ $subtree ][ $block_selector ];
 					continue;
 				}
 
-				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $leaf ) {
-					if ( ! isset( $incoming_data[ $context ][ $subtree ][ $leaf ] ) ) {
+				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $section ) {
+					if ( ! isset( $incoming_data[ $subtree ][ $block_selector ][ $section ] ) ) {
 						continue;
 					}
 
-					if ( ! isset( $this->theme_json[ $context ][ $subtree ][ $leaf ] ) ) {
-						$this->theme_json[ $context ][ $subtree ][ $leaf ] = $incoming_data[ $context ][ $subtree ][ $leaf ];
+					if ( ! isset( $this->theme_json[ $subtree ][ $block_selector ][ $section ] ) ) {
+						$this->theme_json[ $subtree ][ $block_selector ][ $section ] = $incoming_data[ $subtree ][ $block_selector ][ $section ];
 						continue;
 					}
 
-					$this->theme_json[ $context ][ $subtree ][ $leaf ] = array_merge(
-						$this->theme_json[ $context ][ $subtree ][ $leaf ],
-						$incoming_data[ $context ][ $subtree ][ $leaf ]
+					$this->theme_json[ $subtree ][ $block_selector ][ $section ] = array_merge(
+						$this->theme_json[ $subtree ][ $block_selector ][ $section ],
+						$incoming_data[ $subtree ][ $block_selector ][ $section ]
 					);
 				}
 			}
