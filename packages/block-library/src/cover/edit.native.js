@@ -22,7 +22,7 @@ import {
 	PanelBody,
 	RangeControl,
 	UnitControl,
-	BottomSheet,
+	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -46,7 +46,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
@@ -88,6 +88,7 @@ const Cover = ( {
 	setAttributes,
 	openGeneralSidebar,
 	closeSettingsBottomSheet,
+	isSelected,
 } ) => {
 	const {
 		backgroundType,
@@ -169,15 +170,15 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = ( value ) => {
+	const onHeightChange = useCallback( ( value ) => {
 		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
 			setAttributes( { minHeight: value } );
 		}
-	};
+	}, [] );
 
-	const onOpacityChange = ( value ) => {
+	const onOpacityChange = useCallback( ( value ) => {
 		setAttributes( { dimRatio: value } );
-	};
+	}, [] );
 
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
@@ -199,10 +200,10 @@ const Cover = ( {
 		setIsVideoLoading( false );
 	};
 
-	const onClearMedia = () => {
+	const onClearMedia = useCallback( () => {
 		setAttributes( { id: undefined, url: undefined } );
 		closeSettingsBottomSheet();
-	};
+	}, [] );
 
 	function setColor( color ) {
 		setAttributes( {
@@ -278,7 +279,7 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	const onChangeUnit = ( nextUnit ) => {
+	const onChangeUnit = useCallback( ( nextUnit ) => {
 		setAttributes( {
 			minHeightUnit: nextUnit,
 			minHeight:
@@ -286,12 +287,15 @@ const Cover = ( {
 					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
 					: CONTAINER_HEIGHT,
 		} );
-	};
+	}, [] );
 
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
-				attributes={ attributes }
+				overlayColor={ attributes.overlayColor }
+				customOverlayColor={ attributes.customOverlayColor }
+				gradient={ attributes.gradient }
+				customGradient={ attributes.customGradient }
 				setAttributes={ setAttributes }
 			/>
 			{ url ? (
@@ -321,10 +325,9 @@ const Cover = ( {
 					key={ minHeightUnit }
 				/>
 			</PanelBody>
-
 			{ url ? (
 				<PanelBody title={ __( 'Media' ) }>
-					<BottomSheet.Cell
+					<TextControl
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
@@ -508,7 +511,7 @@ const Cover = ( {
 
 	return (
 		<View style={ styles.backgroundContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ isImage &&
 				url &&
