@@ -178,9 +178,8 @@ class WP_Theme_JSON_Resolver {
 						if ( empty( $item_to_translate[ $translatable_key ] ) ) {
 							continue;
 						}
-
-						// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
-						$item_to_translate[ $translatable_key ] = translate( $item_to_translate[ $translatable_key ], $domain );
+						// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
+						$item_to_translate[ $translatable_key ] = translate_with_gettext_context( $item_to_translate[ $translatable_key ], sprintf( 'theme %s %s', $path, $translatable_key ), $domain );
 						// phpcs:enable
 					}
 				}
