@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarGroup } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import {
 	positionCenter,
 	positionLeft,
@@ -12,6 +11,11 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useLayout } from '../inner-blocks/layout';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -49,17 +53,35 @@ export function BlockAlignmentToolbar( {
 	onChange,
 	controls = DEFAULT_CONTROLS,
 	isCollapsed = true,
-	wideControlsEnabled = false,
 } ) {
+	const { wideControlsEnabled = false } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const settings = getSettings();
+		return {
+			wideControlsEnabled: settings.alignWide,
+		};
+	} );
+	const layout = useLayout();
+	const supportsAlignments = layout.type === 'default';
+
+	if ( ! supportsAlignments ) {
+		return null;
+	}
+
+	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
+	const enabledControls = controls.filter(
+		( control ) =>
+			( wideControlsEnabled || ! WIDE_CONTROLS.includes( control ) ) &&
+			availableAlignments.includes( control )
+	);
+
+	if ( enabledControls.length === 0 ) {
+		return null;
+	}
+
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
-
-	const enabledControls = wideControlsEnabled
-		? controls
-		: controls.filter(
-				( control ) => WIDE_CONTROLS.indexOf( control ) === -1
-		  );
 
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
 	const defaultAlignmentControl =
@@ -87,12 +109,4 @@ export function BlockAlignmentToolbar( {
 	);
 }
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const settings = getSettings();
-		return {
-			wideControlsEnabled: settings.alignWide,
-		};
-	} )
-)( BlockAlignmentToolbar );
+export default BlockAlignmentToolbar;

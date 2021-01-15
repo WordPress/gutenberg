@@ -73,9 +73,14 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities } = this.props;
+		const { capabilities, colors, gradients } = this.props;
 
-		this.props.updateSettings( capabilities );
+		this.props.updateSettings( {
+			...capabilities,
+			// Set theme colors for the editor
+			...( colors ? { colors } : {} ),
+			...( gradients ? { gradients } : {} ),
+		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
@@ -141,7 +146,7 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentShowNotice = subscribeShowNotice(
 			( payload ) => {
-				this.props.createInfoNotice( payload.message );
+				this.props.createSuccessNotice( payload.message );
 			}
 		);
 	}
@@ -302,9 +307,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks, createInfoNotice } = dispatch(
-			'core/editor'
-		);
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		const {
 			updateSettings,
 			clearSelectedBlock,
@@ -313,13 +316,14 @@ export default compose( [
 		} = dispatch( 'core/block-editor' );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
+		const { createSuccessNotice } = dispatch( 'core/notices' );
 
 		return {
 			updateSettings,
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,
-			createInfoNotice,
+			createSuccessNotice,
 			editTitle( title ) {
 				editPost( { title } );
 			},

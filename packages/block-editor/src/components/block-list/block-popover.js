@@ -7,12 +7,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useContext } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useContext,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -20,7 +27,8 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
-import { BlockNodes } from './root-container';
+import { BlockNodes } from './';
+import { getBlockDOMNode } from '../../utils/dom';
 
 function selector( select ) {
 	const {
@@ -84,13 +92,25 @@ function BlockPopover( {
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
-		useCallback( () => setIsToolbarForced( true ), [] ),
+		useCallback( () => {
+			setIsToolbarForced( true );
+		}, [] ),
 		{
 			bindGlobal: true,
 			eventName: 'keydown',
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
+
+	// Stores the active toolbar item index so the block toolbar can return focus
+	// to it when re-mounting.
+	const initialToolbarItemIndexRef = useRef();
+
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
 
 	if (
 		! shouldShowBreadcrumb &&
@@ -103,12 +123,14 @@ function BlockPopover( {
 
 	let node = blockNodes[ clientId ];
 
-	if ( capturingClientId ) {
-		node = document.getElementById( 'block-' + capturingClientId );
-	}
-
 	if ( ! node ) {
 		return null;
+	}
+
+	const { ownerDocument } = node;
+
+	if ( capturingClientId ) {
+		node = getBlockDOMNode( capturingClientId, ownerDocument );
 	}
 
 	let anchorRef = node;
@@ -143,6 +165,15 @@ function BlockPopover( {
 	const popoverPosition = showEmptyBlockSideInserter
 		? 'top left right'
 		: 'top right left';
+	const stickyBoundaryElement = showEmptyBlockSideInserter
+		? undefined
+		: // The sticky boundary element should be the boundary at which the
+		  // the block toolbar becomes sticky when the block scolls out of view.
+		  // In case of an iframe, this should be the iframe boundary, otherwise
+		  // the scroll container.
+		  ownerDocument.defaultView.frameElement ||
+		  getScrollContainer( node ) ||
+		  ownerDocument.body;
 
 	return (
 		<Popover
@@ -152,12 +183,14 @@ function BlockPopover( {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
-			__unstableSticky={ ! showEmptyBlockSideInserter }
+			__unstableStickyBoundaryElement={ stickyBoundaryElement }
 			__unstableSlotName="block-toolbar"
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
-			onBlur={ () => setIsToolbarForced( false ) }
+			onFocusOutside={ () => {
+				setIsToolbarForced( false );
+			} }
 			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
@@ -190,12 +223,19 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
+					__experimentalInitialIndex={
+						initialToolbarItemIndexRef.current
+					}
+					__experimentalOnIndexChange={ ( index ) => {
+						initialToolbarItemIndexRef.current = index;
+					} }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
+					blockElement={ node }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (

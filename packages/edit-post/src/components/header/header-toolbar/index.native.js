@@ -23,6 +23,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
+import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar( {
 	hasRedo,
@@ -110,10 +111,9 @@ export default compose( [
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter:
-			select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+			select( editPostStore ).getEditorMode() === 'visual' &&
 			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled:
-			select( 'core/edit-post' ).getEditorMode() === 'text',
+		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
 		isRTL: select( 'core/block-editor' ).getSettings().isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {

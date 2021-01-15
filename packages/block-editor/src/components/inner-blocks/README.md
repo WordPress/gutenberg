@@ -11,22 +11,26 @@ In a block's `edit` implementation, render `InnerBlocks`. Then, in the `save` im
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...
 
-	edit( { className } ) {
+	edit() {
+		const blockProps = useBlockProps();
+
 		return (
-			<div className={ className }>
+			<div { ...blockProps }>
 				<InnerBlocks />
 			</div>
 		);
 	},
 
 	save() {
+		const blockProps = useBlockProps.save();
+
 		return (
-			<div>
+			<div { ...blockProps }>
 				<InnerBlocks.Content />
 			</div>
 		);
@@ -102,7 +106,7 @@ The previous example creates an InnerBlocks area containing two columns one with
 
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`
-* **Default:** `true`
+* **Default:** `false`
 
 If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.

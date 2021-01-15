@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -16,10 +15,9 @@ import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
+import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
-
-const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function InserterMenu( {
 	rootClientId,
@@ -31,7 +29,6 @@ function InserterMenu( {
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 } ) {
-	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
@@ -63,100 +60,104 @@ function InserterMenu( {
 
 	const showPatterns = ! destinationRootClientId && hasPatterns;
 
-	const onKeyDown = ( event ) => {
-		if (
-			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].includes(
-				event.keyCode
-			)
-		) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	};
+	const onInsert = useCallback(
+		( blocks ) => {
+			onInsertBlocks( blocks );
+			onSelect();
+		},
+		[ onInsertBlocks, onSelect ]
+	);
 
-	const onInsert = ( blocks ) => {
-		onInsertBlocks( blocks );
-		onSelect();
-	};
+	const onInsertPattern = useCallback(
+		( blocks, patternName ) => {
+			onInsertBlocks( blocks, { patternName } );
+			onSelect();
+		},
+		[ onInsertBlocks, onSelect ]
+	);
 
-	const onInsertPattern = ( blocks, patternName ) => {
-		onInsertBlocks( blocks, { patternName } );
-		onSelect();
-	};
+	const onHover = useCallback(
+		( item ) => {
+			onToggleInsertionPoint( !! item );
+			setHoveredItem( item );
+		},
+		[ onToggleInsertionPoint, setHoveredItem ]
+	);
 
-	const onHover = ( item ) => {
-		onToggleInsertionPoint( !! item );
-		setHoveredItem( item );
-	};
+	const onClickPatternCategory = useCallback(
+		( patternCategory ) => {
+			setSelectedPatternCategory( patternCategory );
+		},
+		[ setSelectedPatternCategory ]
+	);
 
-	const onClickPatternCategory = ( patternCategory ) => {
-		setSelectedPatternCategory( patternCategory );
-	};
-
-	const blocksTab = (
-		<>
-			<div className="block-editor-inserter__block-list">
-				<BlockTypesTab
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsert }
-					onHover={ onHover }
-					filterValue={ filterValue }
-					showMostUsedBlocks={ showMostUsedBlocks }
-				/>
-			</div>
-			{ showInserterHelpPanel && (
-				<div className="block-editor-inserter__tips">
-					<VisuallyHidden as="h2">
-						{ __( 'A tip for using the block editor' ) }
-					</VisuallyHidden>
-					<Tips />
+	const blocksTab = useMemo(
+		() => (
+			<>
+				<div className="block-editor-inserter__block-list">
+					<BlockTypesTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						showMostUsedBlocks={ showMostUsedBlocks }
+					/>
 				</div>
-			) }
-		</>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__tips">
+						<VisuallyHidden as="h2">
+							{ __( 'A tip for using the block editor' ) }
+						</VisuallyHidden>
+						<Tips />
+					</div>
+				) }
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			onHover,
+			filterValue,
+			showMostUsedBlocks,
+			showInserterHelpPanel,
+		]
 	);
 
-	const patternsTab = (
-		<BlockPatternsTabs
-			onInsert={ onInsertPattern }
-			filterValue={ filterValue }
-			onClickCategory={ onClickPatternCategory }
-			selectedCategory={ selectedPatternCategory }
-		/>
+	const patternsTab = useMemo(
+		() => (
+			<BlockPatternsTabs
+				onInsert={ onInsertPattern }
+				onClickCategory={ onClickPatternCategory }
+				selectedCategory={ selectedPatternCategory }
+			/>
+		),
+		[ onInsertPattern, onClickPatternCategory, selectedPatternCategory ]
 	);
 
-	const reusableBlocksTab = (
-		<ReusableBlocksTab
-			rootClientId={ destinationRootClientId }
-			onInsert={ onInsert }
-			onHover={ onHover }
-			filterValue={ filterValue }
-		/>
+	const reusableBlocksTab = useMemo(
+		() => (
+			<ReusableBlocksTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsert }
+				onHover={ onHover }
+			/>
+		),
+		[ destinationRootClientId, onInsert, onHover ]
 	);
 
-	const searchFormPlaceholder = () => {
-		if ( activeTab === 'reusable' ) {
-			return __( 'Search for a reusable block' );
-		}
+	const getCurrentTab = useCallback(
+		( tab ) => {
+			if ( tab.name === 'blocks' ) {
+				return blocksTab;
+			} else if ( tab.name === 'patterns' ) {
+				return patternsTab;
+			}
+			return reusableBlocksTab;
+		},
+		[ blocksTab, patternsTab, reusableBlocksTab ]
+	);
 
-		if ( activeTab === 'patterns' ) {
-			return __( 'Search for a pattern' );
-		}
-
-		return __( 'Search for a block' );
-	};
-
-	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
-	// is always visible, and one which already incurs this behavior of autoFocus via
-	// Popover's focusOnMount.
-	// Disable reason (no-static-element-interactions): Navigational key-presses within
-	// the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
-	/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	return (
-		<div
-			className="block-editor-inserter__menu"
-			onKeyPress={ stopKeyPropagation }
-			onKeyDown={ onKeyDown }
-		>
+		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
@@ -166,25 +167,34 @@ function InserterMenu( {
 							setFilterValue( value );
 						} }
 						value={ filterValue }
-						placeholder={ searchFormPlaceholder() }
+						placeholder={ __( 'Search' ) }
 					/>
-					{ ( showPatterns || hasReusableBlocks ) && (
+					{ !! filterValue && (
+						<InserterSearchResults
+							filterValue={ filterValue }
+							onSelect={ onSelect }
+							onHover={ onHover }
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							isAppender={ isAppender }
+							selectBlockOnInsert={
+								__experimentalSelectBlockOnInsert
+							}
+							showBlockDirectory
+						/>
+					) }
+					{ ! filterValue && ( showPatterns || hasReusableBlocks ) && (
 						<InserterTabs
 							showPatterns={ showPatterns }
 							showReusableBlocks={ hasReusableBlocks }
-							onSelect={ setActiveTab }
 						>
-							{ ( tab ) => {
-								if ( tab.name === 'blocks' ) {
-									return blocksTab;
-								} else if ( tab.name === 'patterns' ) {
-									return patternsTab;
-								}
-								return reusableBlocksTab;
-							} }
+							{ getCurrentTab }
 						</InserterTabs>
 					) }
-					{ ! showPatterns && ! hasReusableBlocks && blocksTab }
+					{ ! filterValue &&
+						! showPatterns &&
+						! hasReusableBlocks &&
+						blocksTab }
 				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
@@ -192,7 +202,6 @@ function InserterMenu( {
 			) }
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 }
 
 export default InserterMenu;

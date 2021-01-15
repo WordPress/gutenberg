@@ -20,6 +20,25 @@
 			0 0 0 1px $white,
 			0 0 0 3px var(--wp-admin-theme-color);
 	}
+
+	&.components-snackbar-explicit-dismiss {
+		cursor: default;
+	}
+
+	.components-snackbar__content-with-icon {
+		margin-left: 24px;
+	}
+
+	.components-snackbar__icon {
+		position: absolute;
+		top: 24px;
+		left: 28px;
+	}
+
+	.components-snackbar__dismiss-button {
+		margin-left: 32px;
+		cursor: pointer;
+	}
 }
 
 .components-snackbar__action.components-button {

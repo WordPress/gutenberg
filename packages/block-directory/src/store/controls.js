@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Load an asset for a block.
  *
  * This function returns a Promise that will resolve once the asset is loaded,
- * or in the case of Stylesheets and Inline Javascript, will resolve immediately.
+ * or in the case of Stylesheets and Inline JavaScript, will resolve immediately.
  *
  * @param {HTMLElement} el A HTML Element asset to inject.
  *
@@ -62,47 +62,36 @@ export function loadAssets( assets ) {
 }
 
 const controls = {
-	LOAD_ASSETS() {
+	async LOAD_ASSETS() {
 		/*
 		 * Fetch the current URL (post-new.php, or post.php?post=1&action=edit) and compare the
-		 * Javascript and CSS assets loaded between the pages. This imports the required assets
+		 * JavaScript and CSS assets loaded between the pages. This imports the required assets
 		 * for the block into the current page while not requiring that we know them up-front.
 		 * In the future this can be improved by reliance upon block.json and/or a script-loader
-		 * dependancy API.
+		 * dependency API.
 		 */
-		return apiFetch( {
+		const response = await apiFetch( {
 			url: document.location.href,
 			parse: false,
-		} )
-			.then( ( response ) => response.text() )
-			.then( ( data ) => {
-				const doc = new window.DOMParser().parseFromString(
-					data,
-					'text/html'
-				);
+		} );
 
-				const newAssets = Array.from(
-					doc.querySelectorAll( 'link[rel="stylesheet"],script' )
-				).filter(
-					( asset ) =>
-						asset.id && ! document.getElementById( asset.id )
-				);
+		const data = await response.text();
 
-				return new Promise( async ( resolve, reject ) => {
-					for ( const i in newAssets ) {
-						try {
-							/*
-							 * Load each asset in order, as they may depend upon an earlier loaded script.
-							 * Stylesheets and Inline Scripts will resolve immediately upon insertion.
-							 */
-							await loadAsset( newAssets[ i ] );
-						} catch ( e ) {
-							reject( e );
-						}
-					}
-					resolve();
-				} );
-			} );
+		const doc = new window.DOMParser().parseFromString( data, 'text/html' );
+
+		const newAssets = Array.from(
+			doc.querySelectorAll( 'link[rel="stylesheet"],script' )
+		).filter(
+			( asset ) => asset.id && ! document.getElementById( asset.id )
+		);
+
+		/*
+		 * Load each asset in order, as they may depend upon an earlier loaded script.
+		 * Stylesheets and Inline Scripts will resolve immediately upon insertion.
+		 */
+		for ( const newAsset of newAssets ) {
+			await loadAsset( newAsset );
+		}
 	},
 };
 

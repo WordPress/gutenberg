@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
 
 /**
  * Higher-order function which invokes the given resolver only if it has not
@@ -20,7 +20,7 @@ const ifNotResolved = ( resolver, selectorName ) =>
 	 * @param {...any} args Original resolver arguments.
 	 */
 	function* resolveIfNotResolved( ...args ) {
-		const hasStartedResolution = yield select(
+		const hasStartedResolution = yield controls.select(
 			'core',
 			'hasStartedResolution',
 			selectorName,

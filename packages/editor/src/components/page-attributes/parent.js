@@ -7,6 +7,7 @@ import {
 	debounce,
 	flatMap,
 	repeat,
+	find,
 } from 'lodash';
 
 /**
@@ -31,6 +32,7 @@ function getTitle( post ) {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
 	const [ fieldValue, setFieldValue ] = useState( false );
+	const isSearching = fieldValue;
 	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
 			const { getPostType, getEntityRecords, getEntityRecord } = select(
@@ -52,7 +54,9 @@ export function PageAttributesParent() {
 				order: 'asc',
 				_fields: 'id,title,parent',
 			};
-			if ( parentPost && fieldValue && '' !== fieldValue ) {
+
+			// Perform a search when the field is changed.
+			if ( isSearching ) {
 				query.search = fieldValue;
 			}
 
@@ -84,15 +88,30 @@ export function PageAttributesParent() {
 	};
 
 	const parentOptions = useMemo( () => {
-		const tree = buildTermsTree(
-			pageItems.map( ( item ) => ( {
-				id: item.id,
-				parent: item.parent,
-				name: getTitle( item ),
-			} ) )
-		);
+		let tree = pageItems.map( ( item ) => ( {
+			id: item.id,
+			parent: item.parent,
+			name: getTitle( item ),
+		} ) );
+
+		// Only build a hierarchical tree when not searching.
+		if ( ! isSearching ) {
+			tree = buildTermsTree( tree );
+		}
+
 		const opts = getOptionsFromTree( tree );
 
+		// Ensure the current parent is in the options list.
+		const optsHasParent = find(
+			opts,
+			( item ) => item.value === parentPostId
+		);
+		if ( parentPost && ! optsHasParent ) {
+			opts.unshift( {
+				value: parentPostId,
+				label: getTitle( parentPost ),
+			} );
+		}
 		return opts;
 	}, [ pageItems ] );
 

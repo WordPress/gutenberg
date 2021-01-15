@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+-   The bundled `jest` dependency has been updated to the next major version `^26.6.3` (see [Breaking Changes](https://jestjs.io/blog/2020/05/05/jest-26), [#27956](https://github.com/WordPress/gutenberg/pull/27956)).
+-   The bundled `@wordpress/eslint-plugin` dependency has been updated to the next major version `^8.0.0`. There are new ESLint rules enabled in the recommended config used by `lint-js` command.
+-   The bundled `stylelint-config-wordpress` dependency has been replaced with `@wordpress/stylelint-config` (#27810)[https://github.com/WordPress/gutenberg/pull/27810].
+-   The bundled `puppeteer-core` (`3.0.0`) dependency has been upgraded to version `5.5.0`. Puppeteer uses Chromium v88 instead of Chromium v71. See the full list of breaking changes of [4.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v4.0.0) and [5.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v5.0.0).
+
+### Enhancements
+
+-   `wordpress` subfolder is no longer ignored when detecting files for testing, linting or formatting.
+-   The bundled `eslint` dependency has been updated from requiring `^7.1.0` to requiring `^7.17.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   Make it possible to transpile `.jsx` files with `build` and `start` commands ([#28002](https://github.com/WordPress/gutenberg/pull/28002)).
+-   Add support for static assets (fonts and images) for `build` and `start` commands ([#28043](https://github.com/WordPress/gutenberg/pull/28043)).
+
+### Bug Fix
+
+-   Ensure that `check-engines` uses the same default version of Node.js and npm as this package ([#28143](https://github.com/WordPress/gutenberg/pull/28143)).
+
+### Internal
+
+-   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^3.6.1` to requiring `^4.2.0`.
+
+## 12.6.1 (2021-01-05)
+
+### Bug Fix
+
+-   Fix multiple build (`build` command) runtimes conflicting when using globals ([#27985](https://github.com/WordPress/gutenberg/pull/27985)).
+
+## 12.6.0 (2020-12-17)
+
+### Enhancements
+
+-   Autoformat TypeScript files (`*.ts` and `*.tsx`) in `format-js` script (#27138)[https://github.com/WordPress/gutenberg/pull/27138].
+-   The bundled `wp-prettier` dependency has been upgraded from `2.0.5` to `2.2.1`.
+-   The bundled Babel dependency has been upgraded from `7.11` to `7.12`.
+
+### Internal
+
+-   The bundled `ignore-emit-webpack-plugin` dependency has been updated from requiring `2.0.3` to requiring `^2.0.6`.
+
+## 12.5.0 (2020-10-30)
+
+### Enhancements
+
+-   Ignore `/vendor` folder when searching for files to lint or format.
+
+### Bug Fixes
+
+-   Temporary pin `ignore-emit-webpack-plugin` to the version `2.0.3` to fix a known issue with version `2.0.4` ([GitHub issue](https://github.com/mrbar42/ignore-emit-webpack-plugin/issues/17)).
+
 ## 12.1.0 (2020-07-07)
 
 ### Enhancements

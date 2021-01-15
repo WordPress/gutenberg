@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, isNil } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -24,6 +19,7 @@ import {
 	ESCAPE,
 } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -178,6 +174,8 @@ function RichText(
 	} = useFormatTypes( {
 		clientId,
 		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
@@ -324,13 +322,7 @@ function RichText(
 			return;
 		}
 
-		const clipboardData = event.clipboardData;
-		let { items, files } = clipboardData;
-
-		// In Edge these properties can be null instead of undefined, so a more
-		// rigorous test is required over using default values.
-		items = isNil( items ) ? [] : items;
-		files = isNil( files ) ? [] : files;
+		const { clipboardData } = event;
 
 		let plainText = '';
 		let html = '';
@@ -384,32 +376,14 @@ function RichText(
 		}
 
 		if ( onPaste ) {
-			files = Array.from( files );
-
-			Array.from( items ).forEach( ( item ) => {
-				if ( ! item.getAsFile ) {
-					return;
-				}
-
-				const file = item.getAsFile();
-
-				if ( ! file ) {
-					return;
-				}
-
-				const { name, type, size } = file;
-
-				if ( ! find( files, { name, type, size } ) ) {
-					files.push( file );
-				}
-			} );
+			const files = getFilesFromDataTransfer( clipboardData );
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
-				files,
+				files: [ ...files ],
 				activeFormats,
 			} );
 		}
@@ -1130,14 +1104,11 @@ function RichText(
 		<>
 			{ isSelected && (
 				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
 					value={ record.current }
 					onChange={ handleChange }
 					onFocus={ focus }
 					formatTypes={ formatTypes }
+					forwardedRef={ ref }
 				/>
 			) }
 			{ children &&

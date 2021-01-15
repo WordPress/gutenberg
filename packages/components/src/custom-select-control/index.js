@@ -148,13 +148,13 @@ export default function CustomSelectControl( {
 								style: item.style,
 							} ) }
 						>
+							{ item.name }
 							{ item === selectedItem && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
 								/>
 							) }
-							{ item.name }
 						</li>
 					) ) }
 			</ul>

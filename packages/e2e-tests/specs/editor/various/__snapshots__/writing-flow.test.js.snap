@@ -148,6 +148,16 @@ exports[`Writing Flow should navigate around nested inline boundaries 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should navigate contenteditable with normal line height 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should navigate contenteditable with padding 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>

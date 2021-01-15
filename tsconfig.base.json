@@ -33,14 +33,13 @@
 		"types": []
 	},
 	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/build/**",
-		"**/build-*/**",
 		"**/*.android.js",
 		"**/*.ios.js",
 		"**/*.native.js",
-		"packages/**/react-native-*/**",
-		"packages/**/stories"
+		"**/benchmark",
+		"packages/*/build-*/**",
+		"packages/*/build/**",
+		"**/test/**",
+		"packages/**/react-native-*/**"
 	]
 }

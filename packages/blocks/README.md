@@ -73,7 +73,7 @@ function random_image_enqueue_block_editor_assets() {
 	wp_enqueue_script(
 		'random-image-block',
 		plugins_url( 'block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' )
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_assets' );
@@ -81,9 +81,10 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-( function( blocks, element ) {
+( function( blocks, element, blockEditor ) {
 	var el = element.createElement,
-		source = blocks.source;
+		source = blocks.source,
+		useBlockProps = blockEditor.useBlockProps;
 
 	function RandomImage( props ) {
 		var src = 'http://lorempixel.com/400/200/' + props.category;
@@ -95,6 +96,8 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 	}
 
 	blocks.registerBlockType( 'myplugin/random-image', {
+		apiVersion: 2,
+
 		title: 'Random Image',
 
 		icon: 'format-image',
@@ -111,6 +114,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 		},
 
 		edit: function( props ) {
+			var blockProps = useBlockProps();
 			var category = props.attributes.category,
 				children;
 
@@ -134,7 +138,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				)
 			);
 
-			return el( 'form', { onSubmit: setCategory }, children );
+			return el( 'form', Object.assing( blockProps, {  onSubmit: setCategory } ), children );
 		},
 
 		save: function( props ) {
@@ -143,7 +147,8 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 	} );
 } )(
 	window.wp.blocks,
-	window.wp.element
+	window.wp.element,
+	window.wp.blockEditor
 );
 ```
 
@@ -589,7 +594,21 @@ _Returns_
 
 <a name="parse" href="#parse">#</a> **parse**
 
-Parses the post content with a PegJS grammar and returns a list of blocks.
+Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
+defined through a parsing expression grammar to take advantage of the regular
+cadence provided by block delimiters -- composed syntactically through HTML
+comments -- which, given a general HTML document as an input, returns a block
+list array representation.
+
+This is a recursive-descent parser that scans linearly once through the input
+document. Instead of directly recursing it utilizes a trampoline mechanism to
+prevent stack overflow. This initial pass is mainly interested in separating
+and isolating the blocks serialized in the document and manifestly not in the
+content within the blocks.
+
+_Related_
+
+-   <https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/>
 
 _Parameters_
 
@@ -624,6 +643,7 @@ _Parameters_
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
+-   _options.preserveWhiteSpace_ `[boolean]`: Whether or not to preserve consequent white space.
 
 _Returns_
 
@@ -738,6 +758,18 @@ Assigns name of block handling unregistered block types.
 _Parameters_
 
 -   _blockName_ `string`: Block name.
+
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the blocks namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 

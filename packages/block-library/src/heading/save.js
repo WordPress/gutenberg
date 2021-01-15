@@ -9,11 +9,11 @@ import classnames from 'classnames';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { align, content, level } = attributes;
+	const { textAlign, content, level } = attributes;
 	const TagName = 'h' + level;
 
 	const className = classnames( {
-		[ `has-text-align-${ align }` ]: align,
+		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 
 	return (

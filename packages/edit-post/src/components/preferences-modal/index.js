@@ -29,6 +29,7 @@ import {
 	EnableFeature,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
+import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/preferences';
 
@@ -64,7 +65,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					help={ __(
 						'Aids screen readers by stopping text caret from leaving blocks.'
 					) }
-					label={ __( 'Contain text cursor inside block.' ) }
+					label={ __( 'Contain text cursor inside block' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Appearance' ) }>
@@ -154,15 +155,13 @@ export default compose(
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			isModalActive: select( 'core/edit-post' ).isModalActive(
-				MODAL_NAME
-			),
+			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		return {
-			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
+			closeModal: () => dispatch( editPostStore ).closeModal(),
 		};
 	} )
 )( PreferencesModal );

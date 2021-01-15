@@ -242,7 +242,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					}
 				/>
 			) }
-			{ imageFill && (
+			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
 					label={ __( 'Focal point picker' ) }
 					url={ mediaUrl }
@@ -286,13 +286,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-media-text__content',
-		},
-		{
-			template: TEMPLATE,
-			templateInsertUpdatesSelection: false,
-		}
+		{ className: 'wp-block-media-text__content' },
+		{ template: TEMPLATE }
 	);
 
 	return (

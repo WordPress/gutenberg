@@ -97,8 +97,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith(
 			'test', // It should use the given client ID.
-			fakeBlocks, // It should use the controlled blocks value.
-			false // It shoudl not update the selection state.
+			fakeBlocks // It should use the controlled blocks value.
 		);
 
 		const testBlocks = [
@@ -119,11 +118,8 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( resetBlocks ).not.toHaveBeenCalled();
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith(
-			'test',
-			testBlocks,
-			false
-		);
+		// We can't check the args because the blocks are cloned.
+		expect( replaceInnerBlocks ).toHaveBeenCalled();
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
@@ -205,7 +201,6 @@ describe( 'useBlockSync hook', () => {
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
-
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
@@ -315,7 +310,7 @@ describe( 'useBlockSync hook', () => {
 			);
 		} );
 
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [], false );
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 	} );

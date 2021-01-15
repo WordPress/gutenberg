@@ -5,10 +5,14 @@
 	"usesContext": [
 		"queryId",
 		"query",
-		"queryContext"
+		"queryContext",
+		"layout",
+		"templateSlug"
 	],
 	"supports": {
 		"reusable": false,
 		"html": false
-	}
+	},
+	"style": "wp-block-query-loop",
+	"editorStyle": "wp-block-query-loop-editor"
 }

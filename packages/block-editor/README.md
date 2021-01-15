@@ -19,12 +19,12 @@ import {
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
-	ObserveTyping
+	ObserveTyping,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-function MyEditorComponent () {
+function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	return (
@@ -490,21 +490,30 @@ _Properties_
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
--   _isRTL_ `boolean`: Whether the editor is in RTL mode
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
--   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
--   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
 Undocumented declaration.
+
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the block editor namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
 
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
@@ -558,6 +567,26 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useBlockDisplayInformation" href="#useBlockDisplayInformation">#</a> **useBlockDisplayInformation**
+
+Hook used to try to find a matching block variation and return
+the appropriate information for display reasons. In order to
+to try to find a match we need to things:
+1\. Block's client id to extract it's current attributes.
+2\. A block variation should have set `isActive` prop to a proper function.
+
+If for any reason a block variaton match cannot be found,
+the returned information come from the Block Type.
+If no blockType is found with the provided clientId, returns null.
+
+_Parameters_
+
+-   _clientId_ `string`: Block's client id.
+
+_Returns_
+
+-   `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 

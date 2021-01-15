@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { groupBy, deburr } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -7,14 +12,14 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/components';
+import {
+	__unstableComposite as Composite,
+	__unstableCompositeItem as CompositeItem,
+	Icon,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
-
-/**
- * External dependencies
- */
-import { groupBy, uniq, deburr } from 'lodash';
-import { Composite, useCompositeState, CompositeItem } from 'reakit';
+import { store as noticesStore } from '@wordpress/notices';
 
 function PreviewPlaceholder() {
 	return (
@@ -31,36 +36,33 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const {
-		id,
-		slug,
-		meta: { theme },
-	} = templatePart;
+	const { slug, theme, title } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
 	const blocks = useMemo( () => parse( content ), [ content ] );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { postId: id, slug, theme } );
+		setAttributes( { slug, theme } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
 				__( 'Template Part "%s" inserted.' ),
-				slug
+				title
 			),
 			{
 				type: 'snackbar',
 			}
 		);
 		onClose();
-	}, [ id, slug, theme ] );
+	}, [ slug, theme ] );
 
 	return (
 		<CompositeItem
+			as="div"
 			className="wp-block-template-part__selection-preview-item"
-			role="listitem"
+			role="option"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
@@ -102,15 +104,12 @@ function TemplatePartsByTheme( {
 	composite,
 } ) {
 	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'meta.theme' ) );
+		return Object.values( groupBy( templateParts, 'theme' ) );
 	}, [ templateParts ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
 	return templatePartsByTheme.map( ( templatePartList ) => (
-		<PanelGroup
-			key={ templatePartList[ 0 ].meta.theme }
-			title={ templatePartList[ 0 ].meta.theme }
-		>
+		<PanelGroup key={ templatePartList[ 0 ].theme }>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
 					<TemplatePartItem
@@ -140,7 +139,7 @@ function TemplatePartSearchResults( {
 		// Remove diacritics and convert to lowercase to normalize.
 		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { slug, meta: { theme } } ) =>
+			( { slug, theme } ) =>
 				slug.toLowerCase().includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
 				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
@@ -164,12 +163,10 @@ function TemplatePartSearchResults( {
 			// Second prioritize index found in theme.
 			// Since diacritics can be used in theme names, remove them for the comparison.
 			return (
-				deburr( a.meta.theme )
+				deburr( a.theme )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue ) -
-				deburr( b.meta.theme )
-					.toLowerCase()
-					.indexOf( normalizedFilterValue )
+				deburr( b.theme ).toLowerCase().indexOf( normalizedFilterValue )
 			);
 		} );
 		return searchResults;
@@ -178,7 +175,10 @@ function TemplatePartSearchResults( {
 	const currentShownTPs = useAsyncList( filteredTPs );
 
 	return filteredTPs.map( ( templatePart ) => (
-		<PanelGroup key={ templatePart.id } title={ templatePart.meta.theme }>
+		<PanelGroup
+			key={ templatePart.id }
+			title={ templatePart.theme || __( 'Custom' ) }
+		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
 					key={ templatePart.id }
@@ -194,40 +194,19 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( {
+export default function TemplatePartPreviews( {
 	setAttributes,
 	filterValue,
 	onClose,
 } ) {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
-		const publishedTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
-				status: [ 'publish' ],
-				per_page: -1,
-			}
+		return (
+			select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			) || []
 		);
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-
-		const themeTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
-				theme: currentTheme,
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			}
-		);
-		const combinedTemplateParts = [];
-		if ( publishedTemplateParts ) {
-			combinedTemplateParts.push( ...publishedTemplateParts );
-		}
-		if ( themeTemplateParts ) {
-			combinedTemplateParts.push( ...themeTemplateParts );
-		}
-		return uniq( combinedTemplateParts );
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {
@@ -238,7 +217,7 @@ export default function TemplateParts( {
 		return (
 			<Composite
 				{ ...composite }
-				role="list"
+				role="listbox"
 				aria-label={ __( 'List of template parts' ) }
 			>
 				<TemplatePartSearchResults
@@ -255,7 +234,7 @@ export default function TemplateParts( {
 	return (
 		<Composite
 			{ ...composite }
-			role="list"
+			role="listbox"
 			aria-label={ __( 'List of template parts' ) }
 		>
 			<TemplatePartsByTheme

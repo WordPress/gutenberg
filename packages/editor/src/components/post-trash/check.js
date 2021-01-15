@@ -18,7 +18,7 @@ export default withSelect( ( select ) => {
 	const { getPostType, canUser } = select( 'core' );
 	const postId = getCurrentPostId();
 	const postType = getPostType( getCurrentPostType() );
-	const resource = postType?.[ 'rest_base' ] || '';
+	const resource = postType?.rest_base || ''; // eslint-disable-line camelcase
 
 	return {
 		isNew: isEditedPostNew(),

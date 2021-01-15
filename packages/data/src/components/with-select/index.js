@@ -18,14 +18,14 @@ import useSelect from '../use-select';
  *
  * @example
  * ```js
+ * import { withSelect } from '@wordpress/data';
+ *
  * function PriceDisplay( { price, currency } ) {
  * 	return new Intl.NumberFormat( 'en-US', {
  * 		style: 'currency',
  * 		currency,
  * 	} ).format( price );
  * }
- *
- * const { withSelect } = wp.data;
  *
  * const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
  * 	const { getPrice } = select( 'my-shop' );
