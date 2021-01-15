@@ -982,9 +982,37 @@ class WP_Theme_JSON {
 		$incoming_data = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
-		// We treat presets differently than the rest of the properties.
-		// In this case, we want the incoming preset leaf to replace
-		// the existing.
+		// The array_replace_recursive algorithm merges at the leaf level.
+		// This means that when a leaf value is actually an array,
+		// the incoming array won't replace the existing,
+		// but the numeric indexes are used for replacement.
+		//
+		// These are the cases that have array values at the leaf levels.
+		$block_metadata = self::get_blocks_metadata();
+		foreach( $block_metadata as $block_selector => $meta ) {
+			// color presets: palette & gradients
+			if( isset( $incoming_data[ 'settings' ][ $block_selector ]['color']['palette'] ) ) {
+				$this->theme_json[ 'settings' ][ $block_selector ]['color']['palette'] = $incoming_data[ 'settings' ][ $block_selector ]['color']['palette'];
+			}
+			if( isset( $incoming_data[ 'settings' ][ $block_selector ]['color']['gradients'] ) ) {
+				$this->theme_json[ 'settings' ][ $block_selector ]['color']['gradients'] = $incoming_data[ 'settings' ][ $block_selector ]['color']['gradients'];
+			}
+			// spacing: units
+			if( isset( $incoming_data[ 'settings' ][ $block_selector ]['spacing']['units'] ) ) {
+				$this->theme_json[ 'settings' ][ $block_selector ]['spacing']['units'] = $incoming_data[ 'settings' ][ $block_selector ]['spacing']['units'];
+			}
+			// typography presets: fontSizes & fontFamilies
+			if( isset( $incoming_data[ 'settings' ][ $block_selector ]['typography']['fontSizes'] ) ) {
+				$this->theme_json[ 'settings' ][ $block_selector ]['typography']['fontSizes'] = $incoming_data[ 'settings' ][ $block_selector ]['typography']['fontSizes'];
+			}
+			if( isset( $incoming_data[ 'settings' ][ $block_selector ]['typography']['fontFamilies'] ) ) {
+				$this->theme_json[ 'settings' ][ $block_selector ]['typography']['fontFamilies'] = $incoming_data[ 'settings' ][ $block_selector ]['typography']['fontFamilies'];
+			}
+			// custom section
+			if( isset( $incoming_data[ 'settings' ][ $block_selector ]['custom'] ) ) {
+				$this->theme_json[ 'settings' ][ $block_selector ]['custom'] = $incoming_data[ 'settings' ][ $block_selector ]['custom'];
+			}
+		}
 	}
 
 	/**
