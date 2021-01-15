@@ -270,7 +270,11 @@ function URLInput( {
 
 		try {
 			const result = await request;
-			if ( result && request === pendingRequest.current ) {
+			if (
+				result &&
+				Array.isArray( result ) &&
+				request === pendingRequest.current
+			) {
 				setSuggestions( result );
 				setShowSuggestions( !! result.length );
 				speakUpdateResult();
