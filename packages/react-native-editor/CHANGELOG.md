@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.44.1
+* [**] Fix crash in mobile paragraph blocks with custom font size [#28121]
+* [**] Add move to top bottom when long pressing block movers  [#27554]
+
 ## 1.44.0
 
 * [***] Add support for cross-posting between sites
