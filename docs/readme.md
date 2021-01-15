@@ -22,4 +22,4 @@ Whether you want to extend the functionality of the block editor, or create a pl
 Also, we can have as bullet points links pointing to these chapters. -->
 
 ### [Contribute to the block editor](/docs/contributors/readme.md)
-Everything you need to know to start contributing to the block editor. Whether you are interested in the design, code, documentation, support or internationalization of the block editor, you will find here guides to help you.
+Everything you need to know to start contributing to the block editor. Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
