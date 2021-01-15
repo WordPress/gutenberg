@@ -70,11 +70,7 @@ function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
 }
 
-function getEndpointMocks(
-	matchingRoutes,
-	responsesByMethod,
-	processor = ( data ) => data
-) {
+function getEndpointMocks( matchingRoutes, responsesByMethod ) {
 	return [ 'GET', 'POST', 'DELETE', 'PUT' ].reduce( ( mocks, restMethod ) => {
 		if ( responsesByMethod[ restMethod ] ) {
 			return [
@@ -84,7 +80,7 @@ function getEndpointMocks(
 						matchUrlToRoute( request.url(), matchingRoutes ) &&
 						request.method() === restMethod,
 					onRequestMatch: createJSONResponse(
-						processor( responsesByMethod[ restMethod ] )
+						responsesByMethod[ restMethod ]
 					),
 				},
 			];
@@ -94,20 +90,29 @@ function getEndpointMocks(
 	}, [] );
 }
 
-function getMenuMocks( responsesByMethod ) {
-	const assignMenuIds = ( menus ) =>
-		menus.length
-			? menus.map( ( menu, index ) => ( {
-					...menu,
-					id: index + 1,
-			  } ) )
-			: [];
+function assignMockMenuIds( menus ) {
+	return menus.length
+		? menus.map( ( menu, index ) => ( {
+				...menu,
+				id: index + 1,
+		  } ) )
+		: [];
+}
 
-	return getEndpointMocks(
-		REST_MENUS_ROUTES,
-		responsesByMethod,
-		assignMenuIds
-	);
+function createMockPages( pages ) {
+	return pages.map( ( { title, slug }, index ) => ( {
+		id: index + 1,
+		type: 'page',
+		link: `https://this/is/a/test/page/${ slug }`,
+		title: {
+			rendered: title,
+			raw: title,
+		},
+	} ) );
+}
+
+function getMenuMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_MENUS_ROUTES, responsesByMethod );
 }
 
 function getMenuItemMocks( responsesByMethod ) {
@@ -115,18 +120,7 @@ function getMenuItemMocks( responsesByMethod ) {
 }
 
 function getPagesMocks( responsesByMethod ) {
-	const buildPages = ( pages ) =>
-		pages.map( ( { title, slug }, index ) => ( {
-			id: index + 1,
-			type: 'page',
-			link: `https://this/is/a/test/page/${ slug }`,
-			title: {
-				rendered: title,
-				raw: title,
-			},
-		} ) );
-
-	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod, buildPages );
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -149,25 +143,36 @@ describe( 'Navigation editor', () => {
 	} );
 
 	it( 'allows creation of a menu', async () => {
+		const pagesResponse = createMockPages( pagesFixture );
+		// Prepare the endpoints for creating a menu.
+		const menuResponse = {
+			id: 4,
+			description: '',
+			name: 'Main Menu',
+			slug: 'main-menu',
+			meta: [],
+			auto_add: false,
+		};
+
+		// Initially return nothing from the API
 		await setUpResponseMocking( [
-			...getMenuMocks( {
-				GET: [],
-				POST: {
-					id: 4,
-					description: '',
-					name: 'Main Menu',
-					slug: 'main-menu',
-					meta: [],
-					auto_add: false,
-				},
-			} ),
+			...getMenuMocks( { GET: [] } ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: pagesFixture } ),
+			...getPagesMocks( { GET: pagesResponse } ),
 		] );
 		await visitNavigationEditor();
 
 		// Wait for the header to show that no menus are available.
 		await page.waitForXPath( '//h2[contains(., "No menus available")]' );
+
+		await setUpResponseMocking( [
+			...getMenuMocks( {
+				GET: [ menuResponse ],
+				POST: menuResponse,
+			} ),
+			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: pagesResponse } ),
+		] );
 
 		// Add a new menu.
 		const [ addNewButton ] = await page.$x(
@@ -196,7 +201,7 @@ describe( 'Navigation editor', () => {
 
 	it( 'displays the first menu from the REST response when at least one menu exists', async () => {
 		await setUpResponseMocking( [
-			...getMenuMocks( { GET: menusFixture } ),
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
 			...getMenuItemMocks( { GET: menuItemsFixture } ),
 		] );
 		await visitNavigationEditor();
