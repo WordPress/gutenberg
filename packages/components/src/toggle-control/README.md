@@ -50,7 +50,7 @@ If no value is passed the toggle will be unchecked.
 
 ### disabled
 
-If disabled is true the toggle input will be wrapped in `Disabled` component and apply the appropriate styles.
+If disabled is true the toggle will be disabled and apply the appropriate styles.
 
 - Type: `Boolean`
 - Required: No
