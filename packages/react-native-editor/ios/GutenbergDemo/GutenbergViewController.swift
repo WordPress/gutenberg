@@ -225,12 +225,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
-        return false;
-    }
-
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
-        print("Gutenberg requested setting tooltip flag")
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
     }
 
     func gutenbergDidRequestMediaSaveSync() {
@@ -298,6 +294,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,

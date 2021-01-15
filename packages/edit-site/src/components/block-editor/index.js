@@ -10,10 +10,15 @@ import {
 	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
-	ObserveTyping,
 	BlockList,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	__unstableUseEditorStyles as useEditorStyles,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { DropZoneProvider, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,16 +27,34 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
+function Canvas( { body, styles } ) {
+	useBlockSelectionClearer( body );
+	useTypingObserver( body );
+	useEditorStyles( body, styles );
+
+	return (
+		<DropZoneProvider>
+			<WritingFlow>
+				<BlockList className="edit-site-block-editor__block-list" />
+			</WritingFlow>
+		</DropZoneProvider>
+	);
+}
+
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page } = useSelect(
+	const { settings, templateType, page, deviceType } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, getPage } = select(
-				'core/edit-site'
-			);
+			const {
+				getSettings,
+				getEditedPostType,
+				getPage,
+				__experimentalGetPreviewDeviceType,
+			} = select( 'core/edit-site' );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
 				page: getPage(),
+				deviceType: __experimentalGetPreviewDeviceType(),
 			};
 		},
 		[ setIsInserterOpen ]
@@ -41,9 +64,18 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		templateType
 	);
 	const { setPage } = useDispatch( 'core/edit-site' );
-	const ref = useRef();
 
-	useBlockSelectionClearer( ref );
+	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
+	const ref = useRef();
+	const contentRef = useRef();
+
+	useMouseMoveTypingReset( ref );
+
+	// Allow scrolling "through" popovers over the canvas. This is only called
+	// for as long as the pointer is over a popover.
+	function onWheel( { deltaX, deltaY } ) {
+		contentRef.current.scrollBy( deltaX, deltaY );
+	}
 
 	return (
 		<BlockEditorProvider
@@ -70,15 +102,16 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div
-				ref={ ref }
-				className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper"
-			>
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="edit-site-block-editor__block-list" />
-					</ObserveTyping>
-				</WritingFlow>
+			<div className="edit-site-visual-editor" onWheel={ onWheel }>
+				<Popover.Slot name="block-toolbar" />
+				<Iframe
+					style={ resizedCanvasStyles }
+					head={ window.__editorStyles.html }
+					ref={ ref }
+					contentRef={ contentRef }
+				>
+					<Canvas body={ contentRef } styles={ settings.styles } />
+				</Iframe>
 			</div>
 		</BlockEditorProvider>
 	);

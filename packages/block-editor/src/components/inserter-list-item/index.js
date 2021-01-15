@@ -2,23 +2,25 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { CompositeItem } from 'reakit';
 
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { useMemo, useRef, memo } from '@wordpress/element';
+import {
+	Button,
+	__unstableCompositeItem as CompositeItem,
+} from '@wordpress/components';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import InserterListItemDraggable from './draggable';
+import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
 function InserterListItem( {
 	className,
@@ -47,7 +49,7 @@ function InserterListItem( {
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
 	return (
-		<InserterListItemDraggable
+		<InserterDraggableBlocks
 			isEnabled={ isDraggable && ! item.disabled }
 			blocks={ blocks }
 			icon={ item.icon }
@@ -116,8 +118,8 @@ function InserterListItem( {
 					</CompositeItem>
 				</div>
 			) }
-		</InserterListItemDraggable>
+		</InserterDraggableBlocks>
 	);
 }
 
-export default InserterListItem;
+export default memo( InserterListItem );

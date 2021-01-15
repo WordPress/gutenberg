@@ -72,8 +72,8 @@ export function addEntities( entities ) {
  * @param {string}       name            Name of the received entity.
  * @param {Array|Object} records         Records received.
  * @param {?Object}      query           Query Object.
- * @param {?boolean}     invalidateCache Should invalidate query caches
- *
+ * @param {?boolean}     invalidateCache Should invalidate query caches.
+ * @param {?Object}      edits           Edits to reset.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
@@ -81,7 +81,8 @@ export function receiveEntityRecords(
 	name,
 	records,
 	query,
-	invalidateCache = false
+	invalidateCache = false,
+	edits
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -92,9 +93,9 @@ export function receiveEntityRecords(
 	}
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query );
+		action = receiveQueriedItems( records, query, edits );
 	} else {
-		action = receiveItems( records );
+		action = receiveItems( records, edits );
 	}
 
 	return {
@@ -520,7 +521,8 @@ export function* saveEntityRecord(
 					name,
 					updatedRecord,
 					undefined,
-					true
+					true,
+					edits
 				);
 			}
 		} catch ( _error ) {

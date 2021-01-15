@@ -131,7 +131,8 @@ describe( 'saveEntityRecord', () => {
 				'post',
 				updatedRecord,
 				undefined,
-				true
+				true,
+				{ title: 'new post' }
 			)
 		);
 		expect( fulfillment.next().value.type ).toBe(
@@ -173,7 +174,10 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( post );
 		expect( received ).toEqual(
-			receiveEntityRecords( 'postType', 'post', post, undefined, true )
+			receiveEntityRecords( 'postType', 'post', post, undefined, true, {
+				title: 'new post',
+				id: 10,
+			} )
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
@@ -222,7 +226,8 @@ describe( 'saveEntityRecord', () => {
 				'postType',
 				postType,
 				undefined,
-				true
+				true,
+				{ slug: 'page', title: 'Pages' }
 			)
 		);
 		expect( fulfillment.next().value.type ).toBe(

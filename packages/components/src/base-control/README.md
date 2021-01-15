@@ -82,7 +82,7 @@ import { BaseControl } from '@wordpress/components';
 
 const MyBaseControl = () => (
 	<BaseControl
-		help="Pressing the Select an author buttom will open a modal that allows an advanced mechanism for author selection"
+		help="Pressing the Select an author button will open a modal that allows an advanced mechanism for author selection"
 	>
 		<BaseControl.VisualLabel>
 			Author

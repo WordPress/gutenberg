@@ -13,6 +13,11 @@ import {
 } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import useBlockDisplayInformation from '../use-block-display-information';
+
+/**
  * Renders the block's configured title as a string, or empty if the title
  * cannot be determined.
  *
@@ -44,22 +49,16 @@ export default function BlockTitle( { clientId } ) {
 		[ clientId ]
 	);
 
-	if ( ! name ) {
-		return null;
-	}
-
+	const blockInformation = useBlockDisplayInformation( clientId );
+	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
-	if ( ! blockType ) {
-		return null;
-	}
-
-	const { title } = blockType;
 	const label = getBlockLabel( blockType, attributes );
-
-	// Label will often fall back to the title if no label is defined for the
+	// Label will fallback to the title if no label is defined for the
 	// current label context. We do not want "Paragraph: Paragraph".
-	if ( label !== title ) {
-		return `${ title }: ${ truncate( label, { length: 15 } ) }`;
+	// If label is defined we prioritize it over possible possible
+	// block variation match title.
+	if ( label !== blockType.title ) {
+		return `${ blockType.title }: ${ truncate( label, { length: 15 } ) }`;
 	}
-	return title;
+	return blockInformation.title;
 }
