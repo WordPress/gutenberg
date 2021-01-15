@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every, toString } from 'lodash';
+import { filter, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -59,19 +59,14 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
+
 			attributes: {
-				images: {
+				shortCodeTransforms: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
 						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id: toString( id ),
+							id: parseInt( id ),
 						} ) );
-					},
-				},
-				ids: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						return parseShortcodeIds( ids );
 					},
 				},
 				columns: {

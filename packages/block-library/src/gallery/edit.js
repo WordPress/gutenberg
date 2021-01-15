@@ -44,6 +44,7 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 import useImageSizes from './use-image-sizes';
+import useShortCodeTransform from './use-short-code-transform';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -84,20 +85,23 @@ function GalleryEdit( props ) {
 		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
+		shortCodeTransforms,
 		imageCrop,
 	} = attributes;
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		'core/block-editor'
-	);
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceInnerBlocks,
+	} = useDispatch( 'core/block-editor' );
 
-	const { getSettings, preferredStyle } = useSelect( ( select ) => {
+	const { getSettings, preferredStyle, getMedia } = useSelect( ( select ) => {
 		const settings = select( 'core/block-editor' ).getSettings();
 		const preferredStyleVariations =
 			settings.__experimentalPreferredStyleVariations;
 		return {
 			getBlock: select( 'core/block-editor' ).getBlock,
 			getSettings: select( 'core/block-editor' ).getSettings,
+			getMedia: select( 'core' ).getMedia,
 			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
 		};
 	}, [] );
@@ -116,33 +120,37 @@ function GalleryEdit( props ) {
 		[ innerBlockImages ]
 	);
 
-	const imageData = useSelect(
-		( select ) => {
-			if (
-				innerBlockImages.length === 0 ||
-				some(
-					innerBlockImages,
-					( imageBlock ) => ! imageBlock.attributes.id
-				)
-			) {
-				return imageData;
-			}
-
-			const getMedia = select( 'core' ).getMedia;
-			const newImageData = innerBlockImages.map( ( imageBlock ) => {
-				return {
-					id: imageBlock.attributes.id,
-					data: getMedia( imageBlock.attributes.id ),
-				};
-			} );
-
-			if ( every( newImageData, ( img ) => img.data ) ) {
-				return newImageData;
-			}
-
+	const imageData = useSelect( () => {
+		if (
+			innerBlockImages.length === 0 ||
+			some(
+				innerBlockImages,
+				( imageBlock ) => ! imageBlock.attributes.id
+			)
+		) {
 			return imageData;
-		},
-		[ innerBlockImages ]
+		}
+
+		const newImageData = innerBlockImages.map( ( imageBlock ) => {
+			return {
+				id: imageBlock.attributes.id,
+				data: getMedia( imageBlock.attributes.id ),
+			};
+		} );
+
+		if ( every( newImageData, ( img ) => img.data ) ) {
+			return newImageData;
+		}
+
+		return imageData;
+	}, [ innerBlockImages ] );
+
+	useShortCodeTransform(
+		shortCodeTransforms,
+		getMedia,
+		setAttributes,
+		replaceInnerBlocks,
+		clientId
 	);
 
 	useEffect( () => {
@@ -156,8 +164,6 @@ function GalleryEdit( props ) {
 		isSelected,
 		getSettings
 	);
-
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
 	/**
 	 * Determines the image attributes that should be applied to an image block
