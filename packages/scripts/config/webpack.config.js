@@ -122,7 +122,7 @@ const config = {
 						passes: 2,
 					},
 					mangle: {
-						//reserved: [ '__', '_n', '_nx', '_x' ],
+						reserved: [ '__', '_n', '_nx', '_x' ],
 					},
 				},
 				extractComments: false,
