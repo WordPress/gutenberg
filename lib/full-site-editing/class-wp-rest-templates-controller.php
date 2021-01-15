@@ -199,6 +199,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
+		// If the request explicitly sets `is_custom` to false,
+		// delete the template post, and return the template file.
+		if ( isset( $request['is_custom'] ) && false === $request['is_custom'] ) {
+			wp_delete_post( $template->wp_id, true );
+			return $this->prepare_item_for_response(
+				gutenberg_get_block_template( $request['id'], $this->post_type ),
+				$request
+			);
+		}
+
 		$changes = $this->prepare_item_for_database( $request );
 
 		if ( $template->is_custom ) {

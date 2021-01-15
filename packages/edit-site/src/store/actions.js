@@ -318,27 +318,12 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
-		yield controls.dispatch(
+		const fileTemplate = yield controls.dispatch(
 			'core',
-			'deleteEntityRecord',
+			'saveEntityRecord',
 			'postType',
 			'wp_template',
-			template.id
-		);
-
-		yield controls.dispatch(
-			'core',
-			'invalidateResolution',
-			'getEntityRecord',
-			[ 'postType', 'wp_template', template.id ]
-		);
-
-		const fileTemplate = yield controls.resolveSelect(
-			'core',
-			'getEntityRecord',
-			'postType',
-			'wp_template',
-			template.id
+			{ id: template.id, is_custom: false }
 		);
 
 		if ( ! fileTemplate ) {
