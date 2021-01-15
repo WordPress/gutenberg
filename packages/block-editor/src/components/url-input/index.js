@@ -111,15 +111,18 @@ function URLInput( {
 	const suggestionNodes = useRef( [] );
 	const instanceId = useInstanceId( URLInput );
 
-	const { fetchLinkSuggestions } = useSelect(
+	// Allow passing in a __experimentalFetchLinkSuggestions function as a prop
+	// otherwise use the __experimentalFetchLinkSuggestions in the block editor settings.
+	const {
+		fetchLinkSuggestions = __experimentalFetchLinkSuggestions,
+	} = useSelect(
 		( select ) => {
 			if ( typeof __experimentalFetchLinkSuggestions === 'function' ) {
-				return {
-					fetchLinkSuggestions: __experimentalFetchLinkSuggestions,
-				};
+				return {};
 			}
 
 			const { getSettings } = select( 'core/block-editor' );
+
 			const settings = getSettings();
 			return {
 				fetchLinkSuggestions:
