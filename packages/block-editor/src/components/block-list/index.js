@@ -128,7 +128,7 @@ function Items( {
 				// Allows display of horizontal drop indicator at the end
 				// position of a list when the appender is hidden.
 				const isLastDropTarget =
-					! renderAppender &&
+					renderAppender === false &&
 					dropTargetIndex > index &&
 					orientation === 'horizontal' &&
 					index === lastBlockIndex;
