@@ -1237,105 +1237,79 @@ function selectionHelper( state = {}, action ) {
 }
 
 /**
- * Higher-order reducer that ensures a valid block selection remains after the
- * RESET_BLOCKS action.
+ * Reducer returning the selection state.
  *
- * @param {Function} reducer The selection reducer.
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @return {Object} Selection state.
+ * @return {boolean} Updated state.
  */
-const withSelectionUpdateOnBlockReset = ( reducer ) => ( state, action ) => {
-	// When RESET_BLOCKS is dispatched, the currently selected blocks may be
-	//  replaced, in which case selection should be cleared.
-	if ( action.type === 'RESET_BLOCKS' ) {
-		const startClientId = state?.selectionStart?.clientId;
-		const endClientId = state?.selectionEnd?.clientId;
-
-		// Do nothing if there's no selected block.
-		if ( ! startClientId && ! endClientId ) {
-			return state;
-		}
-
-		// If the start of the selection won't exist after reset, remove selection.
-		if (
-			! action.blocks.some(
-				( block ) => block.clientId === startClientId
-			)
-		) {
+export function selection( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SELECTION_CHANGE':
 			return {
-				selectionStart: {},
-				selectionEnd: {},
-			};
-		}
-
-		// If the end of the selection won't exist after reset, collapse selection.
-		if (
-			! action.blocks.some( ( block ) => block.clientId === endClientId )
-		) {
-			return {
-				...state,
-				selectionEnd: state.selectionStart,
-			};
-		}
-	}
-
-	return reducer( state, action );
-};
-
-export const selection = flow(
-	combineReducers,
-	withSelectionUpdateOnBlockReset
-)( {
-	/**
-	 * Reducer returning the block selection's start.
-	 *
-	 * @param {Object} state  Current state.
-	 * @param {Object} action Dispatched action.
-	 *
-	 * @return {Object} Updated state.
-	 */
-	selectionStart( state = {}, action ) {
-		switch ( action.type ) {
-			case 'SELECTION_CHANGE':
-				return {
+				selectionStart: {
 					clientId: action.clientId,
 					attributeKey: action.attributeKey,
 					offset: action.startOffset,
-				};
-			case 'RESET_SELECTION':
-				return action.selectionStart;
-			case 'MULTI_SELECT':
-				return { clientId: action.start };
-		}
-
-		return selectionHelper( state, action );
-	},
-
-	/**
-	 * Reducer returning the block selection's end.
-	 *
-	 * @param {Object} state  Current state.
-	 * @param {Object} action Dispatched action.
-	 *
-	 * @return {Object} Updated state.
-	 */
-	selectionEnd( state = {}, action ) {
-		switch ( action.type ) {
-			case 'SELECTION_CHANGE':
-				return {
+				},
+				selectionEnd: {
 					clientId: action.clientId,
 					attributeKey: action.attributeKey,
 					offset: action.endOffset,
-				};
-			case 'RESET_SELECTION':
-				return action.selectionEnd;
-			case 'MULTI_SELECT':
-				return { clientId: action.end };
-		}
+				},
+			};
+		case 'RESET_SELECTION':
+			const { selectionStart, selectionEnd } = action;
+			return {
+				selectionStart,
+				selectionEnd,
+			};
+		case 'MULTI_SELECT':
+			const { start, end } = action;
+			return {
+				selectionStart: { clientId: start },
+				selectionEnd: { clientId: end },
+			};
+		case 'RESET_BLOCKS':
+			const startClientId = state?.selectionStart?.clientId;
+			const endClientId = state?.selectionEnd?.clientId;
 
-		return selectionHelper( state, action );
-	},
-} );
+			// Do nothing if there's no selected block.
+			if ( ! startClientId && ! endClientId ) {
+				return state;
+			}
+
+			// If the start of the selection won't exist after reset, remove selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === startClientId
+				)
+			) {
+				return {
+					selectionStart: {},
+					selectionEnd: {},
+				};
+			}
+
+			// If the end of the selection won't exist after reset, collapse selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === endClientId
+				)
+			) {
+				return {
+					...state,
+					selectionEnd: state.selectionStart,
+				};
+			}
+	}
+
+	return {
+		selectionStart: selectionHelper( state.selectionStart, action ),
+		selectionEnd: selectionHelper( state.selectionEnd, action ),
+	};
+}
 
 /**
  * Reducer returning whether the user is multi-selecting.
