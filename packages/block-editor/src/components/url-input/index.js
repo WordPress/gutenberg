@@ -86,7 +86,7 @@ function URLInput( {
 	__experimentalHandleURLSuggestions: handleURLSuggestions = false,
 	__experimentalShowInitialSuggestions: showInitialSuggestions = false,
 	setTimeout,
-	parentAutocompleteRef,
+	autocompleteRef: parentAutocompleteRef,
 } ) {
 	const [ isLoading, setLoading ] = useState( false );
 	const [ suggestions, setSuggestions ] = useState( [] );
@@ -111,19 +111,23 @@ function URLInput( {
 	const suggestionNodes = useRef( [] );
 	const instanceId = useInstanceId( URLInput );
 
-	const {
-		fetchLinkSuggestions = __experimentalFetchLinkSuggestions,
-	} = useSelect( ( select ) => {
-		if ( typeof __experimentalFetchLinkSuggestions === 'function' ) {
-			return {};
-		}
+	const { fetchLinkSuggestions } = useSelect(
+		( select ) => {
+			if ( typeof __experimentalFetchLinkSuggestions === 'function' ) {
+				return {
+					fetchLinkSuggestions: __experimentalFetchLinkSuggestions,
+				};
+			}
 
-		const { getSettings } = select( 'core/block-editor' );
-		const settings = getSettings();
-		return {
-			fetchLinkSuggestions: settings.__experimentalFetchLinkSuggestions,
-		};
-	} );
+			const { getSettings } = select( 'core/block-editor' );
+			const settings = getSettings();
+			return {
+				fetchLinkSuggestions:
+					settings.__experimentalFetchLinkSuggestions,
+			};
+		},
+		[ __experimentalFetchLinkSuggestions ]
+	);
 
 	useEffect( () => {
 		// Only have to worry about scrolling selected suggestion into view when already expanded.
@@ -464,7 +468,7 @@ function URLInput( {
 		<>
 			{ renderControl( controlProps ) }
 			{ showSuggestions &&
-				suggestions?.length &&
+				!! suggestions?.length &&
 				renderSuggestions( suggestionProps ) }
 		</>
 	);
