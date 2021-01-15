@@ -265,6 +265,10 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
+<a name="DarkEditorStyle" href="#DarkEditorStyle">#</a> **DarkEditorStyle**
+
+Undocumented declaration.
+
 <a name="DefaultBlockAppender" href="#DefaultBlockAppender">#</a> **DefaultBlockAppender**
 
 Undocumented declaration.

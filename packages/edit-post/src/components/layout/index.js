@@ -18,6 +18,7 @@ import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
 	__unstableUseEditorStyles as useEditorStyles,
+	DarkEditorStyle,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -177,6 +178,7 @@ function Layout( { styles } ) {
 
 	useDrop( ref );
 	useEditorStyles( ref, styles );
+	DarkEditorStyle( ref );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );

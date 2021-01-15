@@ -94,6 +94,7 @@ export {
 	default as CopyHandler,
 	useClipboardHandler as __unstableUseClipboardHandler,
 } from './copy-handler';
+export { default as DarkEditorStyle } from './dark-editor-style';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableUseEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
