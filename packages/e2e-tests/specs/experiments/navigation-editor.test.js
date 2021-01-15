@@ -144,7 +144,6 @@ describe( 'Navigation editor', () => {
 
 	it( 'allows creation of a menu', async () => {
 		const pagesResponse = createMockPages( pagesFixture );
-		// Prepare the endpoints for creating a menu.
 		const menuResponse = {
 			id: 4,
 			description: '',
@@ -154,7 +153,7 @@ describe( 'Navigation editor', () => {
 			auto_add: false,
 		};
 
-		// Initially return nothing from the API
+		// Initially return nothing from the menu and menuItem endpoints
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: [] } ),
 			...getMenuItemMocks( { GET: [] } ),
@@ -165,6 +164,7 @@ describe( 'Navigation editor', () => {
 		// Wait for the header to show that no menus are available.
 		await page.waitForXPath( '//h2[contains(., "No menus available")]' );
 
+		// Prepare the menu endpoint for creating a menu.
 		await setUpResponseMocking( [
 			...getMenuMocks( {
 				GET: [ menuResponse ],
