@@ -62,6 +62,5 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		'If you want to learn more about WordPress development in general, check out the [Core Handbook](https://make.wordpress.org/core/handbook/) full of helpful information.'
 	} );
 }
-}
 
 module.exports = firstTimeContributorLabel;
