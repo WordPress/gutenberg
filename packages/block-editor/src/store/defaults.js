@@ -14,6 +14,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
+ * @property {string} imageEditingCrossOriginValue Optional value to add to the image editing img el's `crossOrigin` attribute
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes Allowed block types
