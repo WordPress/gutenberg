@@ -1,12 +1,10 @@
 /**
- * External dependencies
- */
-import { CompositeItem } from 'reakit/Composite';
-
-/**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	unstable_CompositeItem as CompositeItem,
+} from '@wordpress/components';
 import { forwardRef, useContext } from '@wordpress/element';
 
 /**

@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { useCompositeState } from 'reakit/Composite';
-
-/**
  * WordPress dependencies
  */
+import { unstable_useCompositeState as useCompositeState } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 
 /**

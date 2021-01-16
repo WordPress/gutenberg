@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { forwardRef, useContext } from '@wordpress/element';
-/**
- * External dependencies
- */
-import { CompositeGroup } from 'reakit/Composite';
+import { unstable_CompositeGroup as CompositeGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
