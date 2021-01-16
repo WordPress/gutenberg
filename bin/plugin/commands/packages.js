@@ -108,8 +108,18 @@ async function updatePackages(
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
+	const changelogFilesPublicPackages = changelogFiles.filter(
+		( changelogPath ) => {
+			const pkg = require( path.join(
+				path.dirname( changelogPath ),
+				'package.json'
+			) );
+			return pkg.private !== true;
+		}
+	);
+
 	const processedPackages = await Promise.all(
-		changelogFiles.map( async ( changelogPath ) => {
+		changelogFilesPublicPackages.map( async ( changelogPath ) => {
 			const fileStream = fs.createReadStream( changelogPath );
 
 			const rl = readline.createInterface( {

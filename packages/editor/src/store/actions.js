@@ -9,7 +9,11 @@ import { has } from 'lodash';
 import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -21,7 +25,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import serializeBlocks from './utils/serialize-blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -71,27 +74,6 @@ export function* setupEditor( post, edits, template ) {
 	) {
 		yield editPost( edits );
 	}
-}
-
-/**
- * Initiliazes an FSE template into the core-data store.
- * We could avoid this action entirely by having a fallback if the edit is undefined.
- *
- * @param {Object} template  Template object.
- */
-export function* __unstableSetupTemplate( template ) {
-	const blocks = parse( template.content.raw );
-	yield controls.dispatch(
-		'core',
-		'editEntityRecord',
-		'postType',
-		template.type,
-		template.id,
-		{
-			blocks,
-		},
-		{ undoIgnore: true }
-	);
 }
 
 /**
@@ -645,7 +627,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		// to make sure the edit makes the post dirty and creates
 		// a new undo level.
 		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			serializeBlocks( blocksForSerialization );
+			__unstableSerializeAndClean( blocksForSerialization );
 	}
 	yield* editPost( edits );
 }

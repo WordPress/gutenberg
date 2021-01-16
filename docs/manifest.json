@@ -1470,6 +1470,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-tutorial-template",
+		"slug": "packages-create-block-tutorial-template",
+		"markdown_source": "../packages/create-block-tutorial-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block",
 		"slug": "packages-create-block",
 		"markdown_source": "../packages/create-block/README.md",

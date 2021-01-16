@@ -232,7 +232,7 @@ function NavigationLinkEdit( {
 
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
-			status: 'publish',
+			status: 'draft',
 		} );
 
 		return {
@@ -389,12 +389,12 @@ function NavigationLinkEdit( {
 									if ( type === 'post' ) {
 										/* translators: %s: search term. */
 										format = __(
-											'Create post: <mark>%s</mark>'
+											'Create draft post: <mark>%s</mark>'
 										);
 									} else {
 										/* translators: %s: search term. */
 										format = __(
-											'Create page: <mark>%s</mark>'
+											'Create draft page: <mark>%s</mark>'
 										);
 									}
 									return createInterpolateElement(

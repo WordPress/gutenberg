@@ -11,6 +11,7 @@ import {
 	getAllBlocks,
 	selectBlockByClientId,
 	clickBlockToolbarButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -39,7 +40,7 @@ describe( 'Template Part', () => {
 					page: 'gutenberg-edit-site',
 				} ).slice( 1 )
 			);
-			await page.waitForSelector( '.edit-site-visual-editor' );
+			await page.waitForSelector( '.edit-site-visual-editor iframe' );
 		} );
 
 		async function updateHeader( content ) {
@@ -89,7 +90,7 @@ describe( 'Template Part', () => {
 		}
 
 		async function assertParagraphInTemplatePart( content ) {
-			const paragraphInTemplatePart = await page.waitForXPath(
+			const paragraphInTemplatePart = await canvas().waitForXPath(
 				`//*[@data-type="core/template-part"][//p[text()="${ content }"]]`
 			);
 			expect( paragraphInTemplatePart ).not.toBeNull();
@@ -105,7 +106,7 @@ describe( 'Template Part', () => {
 		it( 'Should detach blocks from template part', async () => {
 			await updateHeader( 'Header Template Part 456' );
 
-			const initialTemplateParts = await page.$$(
+			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
 
@@ -115,16 +116,17 @@ describe( 'Template Part', () => {
 				( block ) => block.name === 'core/template-part'
 			);
 			await selectBlockByClientId( headerBlock.clientId );
+
+			// Detach blocks from template part using ellipsis menu.
+			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
+
 			// TODO: Remove when toolbar supports text fields
 			expect( console ).toHaveWarnedWith(
 				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
 			);
 
-			// Detach blocks from template part using ellipsis menu.
-			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
-
 			// Verify there is one less template part on the page.
-			const finalTemplateParts = await page.$$(
+			const finalTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
 			expect(
@@ -132,15 +134,15 @@ describe( 'Template Part', () => {
 			).toBe( 1 );
 
 			// Verify content of the template part is still present.
-			const [ expectedContent ] = await page.$x(
+			const [ expectedContent ] = await canvas().$x(
 				'//p[contains(text(), "Header Template Part 456")]'
 			);
 			expect( expectedContent ).not.toBeUndefined();
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await page.waitForSelector( '.wp-block-template-part' );
-			const initialTemplateParts = await page.$$(
+			await canvas().waitForSelector( '.wp-block-template-part' );
+			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
 
@@ -162,7 +164,7 @@ describe( 'Template Part', () => {
 			);
 
 			// Verify there is 1 more template part on the page than previously.
-			const finalTemplateParts = await page.$$(
+			const finalTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
 			expect(
@@ -171,8 +173,8 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await page.waitForSelector( '.wp-block-template-part' );
-			const initialTemplateParts = await page.$$(
+			await canvas().waitForSelector( '.wp-block-template-part' );
+			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
 
@@ -206,7 +208,7 @@ describe( 'Template Part', () => {
 			);
 
 			// Verify there is 1 more template part on the page than previously.
-			const finalTemplateParts = await page.$$(
+			const finalTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
 			expect(

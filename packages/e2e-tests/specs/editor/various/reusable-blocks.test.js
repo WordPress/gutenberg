@@ -274,6 +274,24 @@ describe( 'Reusable blocks', () => {
 		expect( console ).not.toHaveErrored();
 	} );
 
+	it( 'Should show a proper message when the reusable block is missing', async () => {
+		// Insert a non-existant reusable block
+		await page.evaluate( () => {
+			const { createBlock } = window.wp.blocks;
+			const { dispatch } = window.wp.data;
+			dispatch( 'core/block-editor' ).resetBlocks( [
+				createBlock( 'core/block', { ref: 123456 } ),
+			] );
+		} );
+
+		await page.waitForXPath(
+			'//*[contains(@class, "block-editor-warning")]/*[text()="Block has been deleted or is unavailable."]'
+		);
+
+		// This happens when the 404 is returned.
+		expect( console ).toHaveErrored();
+	} );
+
 	it( 'should be able to insert a reusable block twice', async () => {
 		await createReusableBlock(
 			'Awesome Paragraph',
@@ -292,7 +310,7 @@ describe( 'Reusable blocks', () => {
 		);
 		paragraphBlock.focus();
 		await pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' modified' );
 
 		// Wait for async mode to dispatch the update.

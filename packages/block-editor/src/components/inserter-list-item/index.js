@@ -6,11 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useMemo, useRef, memo } from '@wordpress/element';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -113,4 +113,4 @@ function InserterListItem( {
 	);
 }
 
-export default InserterListItem;
+export default memo( InserterListItem );

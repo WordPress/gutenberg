@@ -4,49 +4,17 @@
 import { getActiveFormat } from '../get-active-format';
 import { getActiveObject } from '../get-active-object';
 
-/**
- * Set of all interactive content tags.
- *
- * @see https://html.spec.whatwg.org/multipage/dom.html#interactive-content
- */
-const interactiveContentTags = new Set( [
-	'a',
-	'audio',
-	'button',
-	'details',
-	'embed',
-	'iframe',
-	'input',
-	'label',
-	'select',
-	'textarea',
-	'video',
-] );
-
 export default function FormatEdit( {
 	formatTypes,
 	onChange,
 	onFocus,
 	value,
-	allowedFormats,
-	withoutInteractiveFormatting,
 	forwardedRef,
 } ) {
 	return formatTypes.map( ( settings ) => {
-		const { name, edit: Edit, tagName } = settings;
+		const { name, edit: Edit } = settings;
 
 		if ( ! Edit ) {
-			return null;
-		}
-
-		if ( allowedFormats && allowedFormats.indexOf( name ) === -1 ) {
-			return null;
-		}
-
-		if (
-			withoutInteractiveFormatting &&
-			interactiveContentTags.has( tagName )
-		) {
 			return null;
 		}
 
