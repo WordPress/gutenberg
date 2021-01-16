@@ -13,7 +13,11 @@ const SUPPORTED_ENDPOINTS = [
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
-const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
+const fetchHandler = (
+	{ path, parse = true },
+	retries = 20,
+	retryCount = 1
+) => {
 	if ( ! isPathSupported( path ) ) {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
@@ -23,7 +27,16 @@ const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 	const parseResponse = ( response ) => {
 		if ( typeof response === 'string' ) {
 			response = JSON.parse( response );
+			if ( ! parse ) {
+				// Create the expected response object.
+				return new Response( response.body, {
+					status: response.statusCode,
+					headers: response.headers,
+				} );
+			}
+			return response.body;
 		}
+
 		return response;
 	};
 

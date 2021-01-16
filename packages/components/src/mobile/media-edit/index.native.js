@@ -13,6 +13,8 @@ import {
 	requestMediaEditor,
 	mediaSources,
 } from '@wordpress/react-native-bridge';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 
@@ -32,7 +34,7 @@ const replaceOption = {
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 
-export class MediaEdit extends React.Component {
+class MediaEditClass extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
@@ -44,10 +46,15 @@ export class MediaEdit extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { pickerOptions, openReplaceMediaOptions, source } = this.props;
+		const {
+			pickerOptions,
+			openReplaceMediaOptions,
+			source,
+			hasMediaUpload,
+		} = this.props;
 
 		return compact( [
-			source?.uri && editOption,
+			source?.uri && hasMediaUpload && editOption,
 			openReplaceMediaOptions && replaceOption,
 			...( pickerOptions ? pickerOptions : [] ),
 		] );
@@ -123,4 +130,13 @@ export class MediaEdit extends React.Component {
 	}
 }
 
+const MediaEdit = compose(
+	withSelect( ( select ) => {
+		return {
+			hasMediaUpload: !! select( 'core' ).canUser( 'create', 'media' ),
+		};
+	} )
+)( MediaEditClass );
+
+export { MediaEdit };
 export default MediaEdit;
