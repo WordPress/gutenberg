@@ -198,7 +198,7 @@ function useMouseDragListener(
 	}, [ element ] );
 }
 
-function ControlPointDropdown( {
+function ControlPoint( {
 	pointIndex,
 	point,
 	controlPoints,
@@ -319,32 +319,6 @@ function ControlPointDropdown( {
 	);
 }
 
-function ControlPoints( {
-	gradientPickerDomRef,
-	ignoreMarkerPosition,
-	value: controlPoints,
-	onChange,
-	onStartControlPointChange,
-	onStopControlPointChange,
-} ) {
-	return controlPoints.map( ( point, index ) => {
-		return (
-			ignoreMarkerPosition !== point?.position && (
-				<ControlPointDropdown
-					key={ index }
-					point={ point }
-					pointIndex={ index }
-					controlPoints={ controlPoints }
-					gradientPickerDomRef={ gradientPickerDomRef }
-					onStartControlPointChange={ onStartControlPointChange }
-					onStopControlPointChange={ onStopControlPointChange }
-					onChange={ onChange }
-				/>
-			)
-		);
-	} );
-}
-
 function InsertPoint( {
 	value: controlPoints,
 	onChange,
@@ -410,6 +384,8 @@ function InsertPoint( {
 		/>
 	);
 }
-ControlPoints.InsertPoint = InsertPoint;
 
-export default ControlPoints;
+export default {
+	ControlPoint,
+	InsertPoint,
+};

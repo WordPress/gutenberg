@@ -116,6 +116,10 @@ export default function CustomGradientBar( {
 	const isInsertingControlPoint =
 		gradientBarState.id === 'INSERTING_CONTROL_POINT';
 
+	const ignoreMarkerPosition = isInsertingControlPoint
+		? gradientBarState.insertPosition
+		: undefined;
+
 	return (
 		<div
 			ref={ gradientPickerDomRef }
@@ -146,26 +150,30 @@ export default function CustomGradientBar( {
 						} }
 					/>
 				) }
-				<ControlPoints
-					gradientPickerDomRef={ gradientPickerDomRef }
-					ignoreMarkerPosition={
-						isInsertingControlPoint
-							? gradientBarState.insertPosition
-							: undefined
-					}
-					value={ controlPoints }
-					onChange={ onChange }
-					onStartControlPointChange={ () => {
-						gradientBarStateDispatch( {
-							type: 'START_CONTROL_CHANGE',
-						} );
-					} }
-					onStopControlPointChange={ () => {
-						gradientBarStateDispatch( {
-							type: 'STOP_CONTROL_CHANGE',
-						} );
-					} }
-				/>
+				{ controlPoints.map( ( point, index ) => {
+					return (
+						ignoreMarkerPosition !== point?.position && (
+							<ControlPoints.ControlPoint
+								key={ index }
+								point={ point }
+								pointIndex={ index }
+								controlPoints={ controlPoints }
+								gradientPickerDomRef={ gradientPickerDomRef }
+								onStartControlPointChange={ () => {
+									gradientBarStateDispatch( {
+										type: 'START_CONTROL_CHANGE',
+									} );
+								} }
+								onStopControlPointChange={ () => {
+									gradientBarStateDispatch( {
+										type: 'STOP_CONTROL_CHANGE',
+									} );
+								} }
+								onChange={ onChange }
+							/>
+						)
+					);
+				} ) }
 			</div>
 		</div>
 	);
