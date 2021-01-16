@@ -33,6 +33,20 @@ export function removeFormat(
 	const { formats, activeFormats } = value;
 	const newFormats = formats.slice();
 
+	if ( typeof formatType !== 'string' ) {
+		newFormats.forEach( ( f, i ) => {
+			filterFormats( newFormats, i, formatType );
+		} );
+
+		console.log( newFormats );
+
+		return normaliseFormats( {
+			...value,
+			formats: newFormats,
+			activeFormats: reject( activeFormats, formatType ),
+		} );
+	}
+
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
 	if ( startIndex === endIndex ) {
@@ -67,9 +81,12 @@ export function removeFormat(
 }
 
 function filterFormats( formats, index, formatType ) {
-	const newFormats = formats[ index ].filter(
-		( { type } ) => type !== formatType
-	);
+	const fn =
+		typeof formatType === 'string'
+			? ( { type } ) => type !== formatType
+			: ( format ) => format !== formatType;
+
+	const newFormats = formats[ index ].filter( fn );
 
 	if ( newFormats.length ) {
 		formats[ index ] = newFormats;

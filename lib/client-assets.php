@@ -449,6 +449,8 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  * @since 0.1.0
  */
 function gutenberg_enqueue_block_editor_assets() {
+	wp_enqueue_script( 'wp-footnotes' );
+
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
 

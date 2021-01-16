@@ -7,7 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
+import {
+	useRef,
+	createContext,
+	useState,
+	useContext,
+} from '@wordpress/element';
+import { withFilters } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,6 +33,14 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
 
+const WrapperRef = createContext();
+
+console.log( withFilters( 'blockEditor.BlockListItems' ) );
+
+const FilteredBlockListItems = withFilters( 'blockEditor.BlockListItems' )(
+	BlockListItems
+);
+
 export default function BlockList( { className } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
@@ -43,9 +57,11 @@ export default function BlockList( { className } ) {
 					className
 				) }
 			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
-				</SetBlockNodes.Provider>
+				<WrapperRef.Provider value={ ref }>
+					<SetBlockNodes.Provider value={ setBlockNodes }>
+						<FilteredBlockListItems />
+					</SetBlockNodes.Provider>
+				</WrapperRef.Provider>
 			</div>
 		</BlockNodes.Provider>
 	);
@@ -56,7 +72,6 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	wrapperRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -98,6 +113,7 @@ function Items( {
 		enableAnimation,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
+	const wrapperRef = useContext( WrapperRef );
 
 	const dropTargetIndex = useBlockDropZone( {
 		element: wrapperRef,

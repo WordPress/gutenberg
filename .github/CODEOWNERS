@@ -104,6 +104,7 @@
 /packages/format-library                        @ellatrix @cameronvoell @guarani
 /packages/rich-text                             @ellatrix @cameronvoell @guarani
 /packages/block-editor/src/components/rich-text @ellatrix @cameronvoell @guarani
+/packages/footnotes                             @ellatrix
 
 # Project Management
 /.github                                        @mapk @karmatosed

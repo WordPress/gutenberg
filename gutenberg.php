@@ -241,3 +241,5 @@ function register_site_icon_url( $response ) {
 add_filter( 'rest_index', 'register_site_icon_url' );
 
 add_theme_support( 'widgets-block-editor' );
+
+require __DIR__ . '/packages/footnotes/index.php';

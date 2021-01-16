@@ -1111,6 +1111,13 @@ function RichText(
 					forwardedRef={ ref }
 				/>
 			) }
+			<FormatEdit
+				always={ true }
+				value={ record.current }
+				onChange={ handleChange }
+				onFocus={ focus }
+				formatTypes={ formatTypes }
+			/>
 			{ children &&
 				children( {
 					isSelected,

@@ -1,19 +1,19 @@
 {
-	"name": "@wordpress/format-library",
-	"version": "1.26.1",
-	"description": "Format library for the WordPress editor.",
+	"name": "@wordpress/footnotes",
+	"version": "1.0.0",
+	"description": "Footnotes for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"formats"
+		"footnotes"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/format-library/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/footnotes/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/format-library"
+		"directory": "packages/footnotes"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -28,12 +28,15 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/dom": "file:../dom",
+        "@wordpress/dom": "file:../dom",
+        "@wordpress/edit-post": "file:../edit-post",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/keycodes": "file:../keycodes",
+        "@wordpress/keycodes": "file:../keycodes",
+        "@wordpress/plugins": "file:../plugins",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.19",

@@ -1602,6 +1602,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/footnotes",
+		"slug": "packages-footnotes",
+		"markdown_source": "../packages/footnotes/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
