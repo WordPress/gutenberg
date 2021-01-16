@@ -2,8 +2,6 @@
 
 = 9.8.0-rc.1 =
 
-
-
 ### Enhancements
 
 - Try: Transparent spacer. ([28103](https://github.com/WordPress/gutenberg/pull/28103))
@@ -130,6 +128,12 @@
 - Use standard select element for small number of authors. ([26426](https://github.com/WordPress/gutenberg/pull/26426))
 - Add srcset for cover image. ([25171](https://github.com/WordPress/gutenberg/pull/25171))
 
+
+= 9.7.3 =
+
+### Bug Fixes
+
+- Prevent mangle of translation functions to fix RTL locales.
 
 
 = 9.7.2 =

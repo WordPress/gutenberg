@@ -115,6 +115,7 @@
 		"@wordpress/base-styles": "file:packages/base-styles",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
 		"@wordpress/create-block": "file:packages/create-block",
+		"@wordpress/create-block-tutorial-template": "file:packages/create-block-tutorial-template",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:packages/dependency-extraction-webpack-plugin",
 		"@wordpress/docgen": "file:packages/docgen",
