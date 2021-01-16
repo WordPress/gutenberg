@@ -484,6 +484,7 @@ _Properties_
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
+-   _imageEditingCrossOriginValue_ `string`: Optional value to add to the image editing img el's `crossOrigin` attribute
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types

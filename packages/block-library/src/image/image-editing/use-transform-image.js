@@ -2,6 +2,12 @@
  * WordPress dependencies
  */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * External dependencies
+ */
+import { pick } from 'lodash';
 
 function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ editedUrl, setEditedUrl ] = useState();
@@ -11,6 +17,11 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ rotation, setRotation ] = useState();
 	const [ aspect, setAspect ] = useState();
 	const [ defaultAspect, setDefaultAspect ] = useState();
+
+	const { imageEditingCrossOriginValue } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return pick( getSettings(), [ 'imageEditingCrossOriginValue' ] );
+	} );
 
 	const initializeTransformValues = useCallback( () => {
 		setPosition( { x: 0, y: 0 } );
@@ -90,6 +101,9 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		const el = new window.Image();
 		el.src = url;
 		el.onload = editImage;
+		if ( imageEditingCrossOriginValue ) {
+			el.crossOrigin = imageEditingCrossOriginValue;
+		}
 	}, [
 		rotation,
 		naturalWidth,
