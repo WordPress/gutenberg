@@ -11,7 +11,7 @@ import { NavigableToolbar, BlockToolbar } from '@wordpress/block-editor';
 import SaveButton from './save-button';
 import BlockInspectorDropdown from './block-inspector-dropdown';
 
-export default function Toolbar( { isPending, navigationPost } ) {
+export default function Toolbar( { isPending, navigationPost, onSavePost } ) {
 	return (
 		<div className="edit-navigation-toolbar">
 			{ isPending ? (
@@ -29,7 +29,10 @@ export default function Toolbar( { isPending, navigationPost } ) {
 					</NavigableToolbar>
 					<Popover.Slot name="block-toolbar" />
 					<BlockInspectorDropdown />
-					<SaveButton navigationPost={ navigationPost } />
+					<SaveButton
+						onSavePost={ onSavePost }
+						navigationPost={ navigationPost }
+					/>
 				</>
 			) }
 		</div>

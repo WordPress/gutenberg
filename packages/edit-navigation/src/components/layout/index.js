@@ -6,6 +6,7 @@ import {
 	Popover,
 	SlotFillProvider,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
@@ -24,6 +25,7 @@ import Notices from '../notices';
 import Toolbar from '../toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
+import { store as editNavigationStore } from '../../store';
 
 export default function Layout( { blockEditorSettings } ) {
 	const {
@@ -39,7 +41,9 @@ export default function Layout( { blockEditorSettings } ) {
 	);
 
 	useMenuNotifications( selectedMenuId );
+	const { saveNavigationPost } = useDispatch( editNavigationStore );
 
+	const onSavePost = () => saveNavigationPost( navigationPost );
 	return (
 		<ErrorBoundary>
 			<SlotFillProvider>
@@ -71,8 +75,10 @@ export default function Layout( { blockEditorSettings } ) {
 							<Toolbar
 								isPending={ ! navigationPost }
 								navigationPost={ navigationPost }
+								onSavePost={ onSavePost }
 							/>
 							<Editor
+								onSavePost={ onSavePost }
 								isPending={ ! navigationPost }
 								blocks={ blocks }
 							/>
