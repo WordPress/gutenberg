@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	unstable_CompositeItem as CompositeItem,
+	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { forwardRef, useContext } from '@wordpress/element';
 

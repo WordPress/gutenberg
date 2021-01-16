@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { unstable_useCompositeState as useCompositeState } from '@wordpress/components';
+import { __unstableUseCompositeState as useCompositeState } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 
 /**

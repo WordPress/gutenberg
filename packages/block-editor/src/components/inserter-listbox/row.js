@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { forwardRef, useContext } from '@wordpress/element';
-import { unstable_CompositeGroup as CompositeGroup } from '@wordpress/components';
+import { __unstableCompositeGroup as CompositeGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
