@@ -269,4 +269,5 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) { }
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) { }
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesBlockReplaceSync() {}
 }

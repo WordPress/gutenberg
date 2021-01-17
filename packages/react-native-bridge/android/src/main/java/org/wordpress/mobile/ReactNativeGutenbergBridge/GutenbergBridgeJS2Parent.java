@@ -178,4 +178,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles);
 
     void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles);
+
+    void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId);
 }

@@ -222,6 +222,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void mediaFilesBlockReplaceSync(
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }
