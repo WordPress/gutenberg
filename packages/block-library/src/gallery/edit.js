@@ -186,7 +186,6 @@ function GalleryEdit( props ) {
 		if ( existingBlock ) {
 			return existingBlock.attributes;
 		}
-
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
@@ -226,6 +225,7 @@ function GalleryEdit( props ) {
 
 				return file;
 			} );
+
 		const existingImageBlocks = replace
 			? innerBlockImages.filter( ( block ) =>
 					processedImages.find(
