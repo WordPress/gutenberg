@@ -94,14 +94,13 @@ function GalleryEdit( props ) {
 		replaceInnerBlocks,
 	} = useDispatch( 'core/block-editor' );
 
-	const { getSettings, preferredStyle, getMedia } = useSelect( ( select ) => {
+	const { getSettings, preferredStyle } = useSelect( ( select ) => {
 		const settings = select( 'core/block-editor' ).getSettings();
 		const preferredStyleVariations =
 			settings.__experimentalPreferredStyleVariations;
 		return {
 			getBlock: select( 'core/block-editor' ).getBlock,
 			getSettings: select( 'core/block-editor' ).getSettings,
-			getMedia: select( 'core' ).getMedia,
 			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
 		};
 	}, [] );
@@ -120,38 +119,43 @@ function GalleryEdit( props ) {
 		[ innerBlockImages ]
 	);
 
-	const imageData = useSelect( () => {
-		if (
-			innerBlockImages.length === 0 ||
-			some(
-				innerBlockImages,
-				( imageBlock ) => ! imageBlock.attributes.id
-			)
-		) {
+	const imageData = useSelect(
+		( select ) => {
+			if (
+				innerBlockImages.length === 0 ||
+				some(
+					innerBlockImages,
+					( imageBlock ) => ! imageBlock.attributes.id
+				)
+			) {
+				return imageData;
+			}
+			const getMedia = select( 'core' ).getMedia;
+			const newImageData = innerBlockImages.map( ( imageBlock ) => {
+				return {
+					id: imageBlock.attributes.id,
+					data: getMedia( imageBlock.attributes.id ),
+				};
+			} );
+
+			if ( every( newImageData, ( img ) => img.data ) ) {
+				return newImageData;
+			}
+
 			return imageData;
-		}
-
-		const newImageData = innerBlockImages.map( ( imageBlock ) => {
-			return {
-				id: imageBlock.attributes.id,
-				data: getMedia( imageBlock.attributes.id ),
-			};
-		} );
-
-		if ( every( newImageData, ( img ) => img.data ) ) {
-			return newImageData;
-		}
-
-		return imageData;
-	}, [ innerBlockImages ] );
-
-	useShortCodeTransform(
-		shortCodeTransforms,
-		getMedia,
-		setAttributes,
-		replaceInnerBlocks,
-		clientId
+		},
+		[ innerBlockImages ]
 	);
+
+	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
+
+	useEffect( () => {
+		if ( ! shortCodeTransforms || ! shortCodeImages ) {
+			return;
+		}
+		onSelectImages( shortCodeImages );
+		setAttributes( { shortCodeTransforms: undefined } );
+	}, [ shortCodeTransforms, shortCodeImages ] );
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
@@ -222,7 +226,6 @@ function GalleryEdit( props ) {
 
 				return file;
 			} );
-
 		const existingImageBlocks = replace
 			? innerBlockImages.filter( ( block ) =>
 					processedImages.find(
