@@ -358,7 +358,6 @@ export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
 	);
 }
 
-
 /**
  * Request the host app to listen to mediaFiles collection based block replacement signals
  * in case such an event was enqueued
