@@ -23,23 +23,14 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.12.5",
-		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-        "@wordpress/dom": "file:../dom",
-        "@wordpress/edit-post": "file:../edit-post",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-        "@wordpress/keycodes": "file:../keycodes",
-        "@wordpress/plugins": "file:../plugins",
 		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.19",
 		"uuid": "^7.0.2"
 	},
 	"publishConfig": {

@@ -19,8 +19,14 @@ import {
 } from '@wordpress/rich-text';
 import { Fill, IconButton } from '@wordpress/components';
 import { formatListNumbered } from '@wordpress/icons';
+import { useContext } from '@wordpress/element';
 
-const name = 'core/note';
+/**
+ * Internal dependencies
+ */
+import { slotName, SlotRemount } from './';
+
+const name = 'core/footnote';
 const title = __( 'Footnote' );
 
 function getInstances( value, type ) {
@@ -86,8 +92,10 @@ function removeFootnote( value ) {
 }
 
 function Edit( { value, onChange, isActive } ) {
+	const remountSlot = useContext( SlotRemount );
 	const add = () => {
 		onChange( addFootnote( value ) );
+		remountSlot();
 	};
 	const rm = () => {
 		onChange( removeFootnote( value ) );
@@ -124,7 +132,7 @@ function AlwaysEdit( { value, onChange, isActive } ) {
 				...instance,
 				attributes: {
 					...instance.attributes,
-					'data-text': text,
+					text,
 				},
 			};
 
@@ -157,16 +165,28 @@ function AlwaysEdit( { value, onChange, isActive } ) {
 			);
 		};
 
+		const { id, text } = instance.attributes;
+
+		function onClick( { target } ) {
+			const { ownerDocument } = target;
+			// This is a hack to get the target to focus.
+			// The attribute will later be removed when selection is set.
+			ownerDocument.getElementById( `${ id }-anchor` ).contentEditable =
+				'false';
+		}
+
 		return (
-			<Fill
-				key={ instance.attributes.id }
-				name="__unstable-footnote-controls"
-			>
+			<Fill key={ id } name={ slotName }>
 				<li data-active={ isActive }>
-					<textarea
-						value={ instance.attributes[ 'data-text' ] }
-						onChange={ update }
-					/>
+					<a
+						id={ id }
+						href={ `#${ id }-anchor` }
+						aria-label={ __( 'Back to content' ) }
+						onClick={ onClick }
+					>
+						↑
+					</a>
+					<textarea value={ text } onChange={ update } />
 					<IconButton icon="trash" onClick={ rm }>
 						{ __( 'Remove Footnote' ) }
 					</IconButton>
@@ -183,8 +203,8 @@ export default {
 	className: 'note-anchor',
 	attributes: {
 		href: 'href',
-		id: 'id',
-		'data-text': 'data-text',
+		id: 'data-core-footnotes-id',
+		text: 'data-text',
 	},
 	edit: Edit,
 	alwaysEdit: AlwaysEdit,

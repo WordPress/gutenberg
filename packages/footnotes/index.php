@@ -27,9 +27,10 @@ function wp_footnotes_content_filter( $content ) {
 		list( $tag, $id ) = $match;
 
 		$list .= '<li id="' . $id . '">';
+		$list .= '<a id="' . $id . '" href="#' . $id . '-anchor" aria-label="' . __( 'Back to content', 'gutenberg' ) . '">↑</a>';
 
 		if ( preg_match( '/data-text="([^"]*)"/i', $tag, $text ) ) {
-			$list .= $text[1];
+			$list .= ' ' . $text[1];
 		}
 
 		$list .= '</li>';
@@ -37,5 +38,7 @@ function wp_footnotes_content_filter( $content ) {
 
 	$list .= '</ol>';
 
-	return $content . $list;
+	$style = '<style>body{counter-reset:footnotes}.note-anchor{counter-increment:footnotes}.note-anchor::after{margin-left:2px;content:"["counter(footnotes)"]";vertical-align:super;font-size:smaller;}</style>';
+
+	return $content . $list . $style;
 }
