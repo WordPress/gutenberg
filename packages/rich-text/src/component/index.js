@@ -906,13 +906,17 @@ function RichText(
 	 * Select object when they are clicked. The browser will not set any
 	 * selection when clicking e.g. an image.
 	 *
-	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
+	 * @param {WPSyntheticEvent} event Synthetic event.
 	 */
-	function handlePointerDown( event ) {
-		const { target } = event;
+	function handleObjectSelection( event ) {
+		const { target, type } = event;
+
+		if ( target === ref.current ) {
+			return;
+		}
 
 		// If the child element has no text content, it must be an object.
-		if ( target === ref.current || target.textContent ) {
+		if ( type !== 'focus' && target.textContent ) {
 			return;
 		}
 
@@ -926,6 +930,8 @@ function RichText(
 
 		selection.removeAllRanges();
 		selection.addRange( range );
+
+		event.preventDefault();
 	}
 
 	const rafId = useRef();
@@ -946,8 +952,10 @@ function RichText(
 	 * @see setFocusedElement
 	 *
 	 * @private
+	 *
+	 * @param {WPSyntheticEvent} event Synthetic focus event.
 	 */
-	function handleFocus() {
+	function handleFocus( event ) {
 		if ( onFocus ) {
 			onFocus();
 		}
@@ -986,6 +994,8 @@ function RichText(
 		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
 
 		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
+
+		handleObjectSelection( event );
 
 		if ( setFocusedElement ) {
 			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
@@ -1083,8 +1093,7 @@ function RichText(
 		onKeyDown: handleKeyDown,
 		onFocus: handleFocus,
 		onBlur: handleBlur,
-		onMouseDown: handlePointerDown,
-		onTouchStart: handlePointerDown,
+		onClick: handleObjectSelection,
 		// Selection updates must be done at these events as they
 		// happen before the `selectionchange` event. In some cases,
 		// the `selectionchange` event may not even fire, for

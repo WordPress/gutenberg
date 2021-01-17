@@ -23,27 +23,32 @@ import { formatListNumbered } from '@wordpress/icons';
 const name = 'core/note';
 const title = __( 'Footnote' );
 
-function getFormatInstances( value, type ) {
-	return value.formats.reduce( ( accumulator, formatsList ) => {
+function getInstances( value, type ) {
+	const instances = [];
+	const unique = [];
+
+	value.formats.forEach( ( formatsList, index ) => {
 		formatsList.forEach( ( format ) => {
 			if ( format.type === type ) {
-				accumulator.add( format );
+				instances[ index ] = format;
 			}
 		} );
+	} );
 
-		return accumulator;
-	}, new Set() );
+	value.replacements.forEach( ( replacement, index ) => {
+		if ( replacement.type === type ) {
+			instances[ index ] = replacement;
+		}
+	} );
+
+	instances.forEach( ( instance ) => {
+		if ( unique.indexOf( instance ) === -1 ) {
+			unique.push( instance );
+		}
+	} );
+
+	return unique;
 }
-
-// function getReplacementInstances( value, type ) {
-// 	return value.replacements.reduce( ( accumulator, replacement ) => {
-// 		if ( replacement.type === type ) {
-// 			accumulator.add( replacement );
-// 		}
-
-// 		return accumulator;
-// 	}, new Set() );
-// }
 
 function addFootnote( value ) {
 	// It does not matter what this is, as long as it is unique per page.
@@ -99,36 +104,45 @@ function Edit( { value, onChange, isActive } ) {
 }
 
 function AlwaysEdit( { value, onChange, isActive } ) {
-	const instances = getFormatInstances( value, name );
-
-	// console.log( instances );
-
-	if ( ! instances.size ) {
-		return null;
-	}
-
-	// console.log( instances );
-
-	return [ ...instances ].map( ( instance ) => {
+	return getInstances( value, name ).map( ( instance ) => {
 		const rm = () => {
-			onChange( removeFormat( value, instance ) );
+			const replacementIndex = value.replacements.indexOf( instance );
+			if ( replacementIndex !== -1 ) {
+				onChange(
+					remove( value, replacementIndex, replacementIndex + 1 )
+				);
+			} else {
+				onChange( removeFormat( value, instance ) );
+			}
 		};
 
 		const update = ( event ) => {
 			const text = event.target.value;
-			const { formats } = value;
+			const { formats, replacements } = value;
+			const replacementIndex = replacements.indexOf( instance );
+			const newInstance = {
+				...instance,
+				attributes: {
+					...instance.attributes,
+					'data-text': text,
+				},
+			};
+
+			if ( replacementIndex !== -1 ) {
+				const newReplacements = replacements.slice();
+				newReplacements[ replacementIndex ] = newInstance;
+				return onChange( {
+					...value,
+					replacements: newReplacements,
+				} );
+			}
+
 			const newFormats = formats.slice();
 
 			newFormats.forEach( ( f, i ) => {
 				newFormats[ i ] = newFormats[ i ].map( ( format ) => {
 					if ( format === instance ) {
-						return {
-							...instance,
-							attributes: {
-								...instance.attributes,
-								'data-text': text,
-							},
-						};
+						return newInstance;
 					}
 
 					return format;

@@ -91,7 +91,7 @@ function remove( object ) {
 	return object;
 }
 
-function createElementHTML( { type, attributes, object, children } ) {
+function createElementHTML( { type, attributes, isSelfClosing, children } ) {
 	let attributeString = '';
 
 	for ( const key in attributes ) {
@@ -104,7 +104,7 @@ function createElementHTML( { type, attributes, object, children } ) {
 		) }"`;
 	}
 
-	if ( object ) {
+	if ( isSelfClosing ) {
 		return `<${ type }${ attributeString }>`;
 	}
 

@@ -20,14 +20,16 @@ const List = forwardRef( ( props, ref ) => (
 addFilter(
 	'blockEditor.BlockListItems',
 	'core/footnotes',
-	( BlockListItems ) => () => (
-		<>
-			<BlockListItems />
-			<Slot
-				name="__unstable-footnote-controls"
-				as={ List }
-				bubblesVirtually
-			/>
-		</>
-	)
+	( BlockListItems ) => () => {
+		return (
+			<>
+				<BlockListItems />
+				<Slot
+					name="__unstable-footnote-controls"
+					as={ List }
+					bubblesVirtually
+				/>
+			</>
+		);
+	}
 );

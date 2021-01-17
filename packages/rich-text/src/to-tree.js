@@ -14,17 +14,19 @@ import {
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
  *
- * @param  {Object}  $1                        Named parameters.
- * @param  {string}  $1.type                   The format type.
- * @param  {Object}  $1.attributes             The format attributes.
- * @param  {Object}  $1.unregisteredAttributes The unregistered format
- *                                             attributes.
- * @param  {boolean} $1.object                 Whether or not it is an object
- *                                             format.
- * @param  {boolean} $1.boundaryClass          Whether or not to apply a boundary
- *                                             class.
- * @return {Object}                            Information to be used for
- *                                             element creation.
+ * @param {Object}  $1                        Named parameters.
+ * @param {string}  $1.type                   The format type.
+ * @param {Object}  $1.attributes             The format attributes.
+ * @param {Object}  $1.unregisteredAttributes The unregistered format
+ *                                            attributes.
+ * @param {boolean} $1.object                 Whether or not it is an object
+ *                                            format.
+ * @param {boolean} $1.boundaryClass          Whether or not to apply a boundary
+ *                                            class.
+ * @param {boolean} $1.isEditableTree         Whether or not the content is
+ *                                            editable.
+ *
+ * @return {Object} Information to be used for element creation.
  */
 function fromFormat( {
 	type,
@@ -32,6 +34,7 @@ function fromFormat( {
 	unregisteredAttributes,
 	object,
 	boundaryClass,
+	isEditableTree,
 } ) {
 	const formatType = getFormatType( type );
 
@@ -46,12 +49,16 @@ function fromFormat( {
 			elementAttributes = { ...attributes, ...elementAttributes };
 		}
 
-		return { type, attributes: elementAttributes, object };
+		return { type, attributes: elementAttributes, isSelfClosing: object };
 	}
 
 	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
 
 	for ( const name in attributes ) {
+		if ( attributes[ name ] === undefined ) {
+			continue;
+		}
+
 		const key = formatType.attributes
 			? formatType.attributes[ name ]
 			: false;
@@ -61,6 +68,10 @@ function fromFormat( {
 		} else {
 			elementAttributes[ name ] = attributes[ name ];
 		}
+	}
+
+	if ( isEditableTree && object && ! formatType.object ) {
+		elementAttributes.contenteditable = 'false';
 	}
 
 	if ( formatType.className ) {
@@ -73,7 +84,7 @@ function fromFormat( {
 
 	return {
 		type: formatType.tagName,
-		object: formatType.object,
+		isSelfClosing: formatType.object,
 		attributes: elementAttributes,
 	};
 }
@@ -258,13 +269,18 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			pointer = append(
-				getParent( pointer ),
-				fromFormat( {
-					...replacements[ i ],
-					object: true,
-				} )
-			);
+			if ( replacements[ i ] ) {
+				pointer = append(
+					getParent( pointer ),
+					fromFormat( {
+						...replacements[ i ],
+						object: true,
+						isEditableTree,
+						boundaryClass: isEditableTree && start === i,
+					} )
+				);
+			}
+
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
 		} else if ( ! preserveWhiteSpace && character === '\n' ) {
@@ -275,7 +291,7 @@ export function toTree( {
 							'data-rich-text-line-break': 'true',
 					  }
 					: undefined,
-				object: true,
+				selfClosing: true,
 			} );
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );

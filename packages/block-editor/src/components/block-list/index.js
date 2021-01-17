@@ -35,8 +35,6 @@ export const SetBlockNodes = createContext();
 
 const WrapperRef = createContext();
 
-console.log( withFilters( 'blockEditor.BlockListItems' ) );
-
 const FilteredBlockListItems = withFilters( 'blockEditor.BlockListItems' )(
 	BlockListItems
 );
