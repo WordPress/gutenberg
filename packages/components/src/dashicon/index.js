@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * @typedef OwnProps
  *
  * @property {string} icon        Icon name
@@ -11,6 +16,10 @@
  * @return {JSX.Element} Element
  */
 function Dashicon( { icon, className, ...extraProps } ) {
+	deprecated( '`Dashicon component`', {
+		alternative: '`Icon component` from `@wordpress/icon` package',
+	} );
+
 	const iconClass = [
 		'dashicon',
 		'dashicons',
