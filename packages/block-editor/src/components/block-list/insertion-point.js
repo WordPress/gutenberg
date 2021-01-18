@@ -79,12 +79,12 @@ function InsertionPointPopover( {
 			return {
 				previousElement: getBlockDOMNode( previous, ownerDocument ),
 				nextElement: getBlockDOMNode( next, ownerDocument ),
-				isHidden: hasMultiSelection()
-					? ! hasReducedUI &&
-					  multiSelectedBlockClientIds.includes( clientId )
-					: ! hasReducedUI &&
-					  blockOrientation === 'vertical' &&
-					  clientId === selectedBlockClientId,
+				isHidden:
+					hasReducedUI ||
+					( hasMultiSelection()
+						? multiSelectedBlockClientIds.includes( clientId )
+						: blockOrientation === 'vertical' &&
+						  clientId === selectedBlockClientId ),
 				orientation: blockOrientation,
 			};
 		},
