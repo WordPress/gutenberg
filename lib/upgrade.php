@@ -49,9 +49,9 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	}
 
 	// Delete _wp_file_based term.
-	$term = get_term_by( 'name', '_wp_file_based', 'wp-theme' );
+	$term = get_term_by( 'name', '_wp_file_based', 'wp_theme' );
 	if ( $term ) {
-		wp_delete_term( $term->term_id, 'wp-theme' );
+		wp_delete_term( $term->term_id, 'wp_theme' );
 	}
 
 	// Delete useless options.
