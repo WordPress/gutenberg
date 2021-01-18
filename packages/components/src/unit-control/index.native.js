@@ -1,10 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
-/**
- * External dependencies
- */
 import {
 	Text,
 	View,
@@ -24,11 +20,11 @@ import { CSS_UNITS } from './utils';
 /**
  * WordPress dependencies
  */
-import { useRef, useCallback, useMemo } from '@wordpress/element';
+import { useRef, useCallback, useMemo, memo } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
-const UnitControl = React.memo(
+const UnitControl = memo(
 	( {
 		currentInput,
 		label,
