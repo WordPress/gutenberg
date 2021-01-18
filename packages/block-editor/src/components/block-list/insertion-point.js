@@ -209,11 +209,11 @@ export default function useInsertionPoint( ref ) {
 
 			let rootClientId;
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
-				const blockElement = event.target.classList.contains(
-					'wp-block'
+				const blockElement = !! event.target.getAttribute(
+					'data-block'
 				)
 					? event.target
-					: event.target.closest( '.wp-block' );
+					: event.target.closest( '[data-block]' );
 				rootClientId = blockElement.getAttribute( 'data-block' );
 			}
 
