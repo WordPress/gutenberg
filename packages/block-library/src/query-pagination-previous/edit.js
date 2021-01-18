@@ -18,7 +18,7 @@ export default function QueryPaginationPreviousEdit( {
 						aria-label={ __( 'Previous page link' ) }
 						placeholder={ placeholder }
 						value={ label }
-						formattingControls={ [ 'bold', 'italic' ] }
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 						onChange={ ( newLabel ) =>
 							setAttributes( { label: newLabel } )
 						}

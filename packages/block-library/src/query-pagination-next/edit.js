@@ -18,7 +18,7 @@ export default function QueryPaginationNextEdit( {
 						aria-label={ __( 'Next page link' ) }
 						placeholder={ placeholder }
 						value={ label }
-						formattingControls={ [ 'bold', 'italic' ] }
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 						onChange={ ( newLabel ) =>
 							setAttributes( { label: newLabel } )
 						}
