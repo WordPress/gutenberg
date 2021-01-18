@@ -51,10 +51,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
     }
 
-    interface StarterPageTemplatesTooltipShownCallback {
-        void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown);
-    }
-
     // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
     enum LogLevel {
         TRACE(0),
@@ -169,10 +165,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void onShowUserSuggestions(Consumer<String> onResult);
 
     void onShowXpostSuggestions(Consumer<String> onResult);
-
-    void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
-
-    void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
 
     void requestMediaFilesEditorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                                                      ReadableArray mediaFiles,

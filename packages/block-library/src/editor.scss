@@ -52,11 +52,6 @@
 @import "./query/editor.scss";
 @import "./post-featured-image/editor.scss";
 
-/**
- * Import styles from internal editor components used by the blocks.
- */
-@import "./block/edit-panel/editor.scss";
-
 :root .editor-styles-wrapper {
 	// Background colors.
 	@include background-colors();

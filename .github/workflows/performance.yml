@@ -4,10 +4,12 @@ on:
   pull_request:
     paths-ignore:
     - '**.md'
+  release:
+    types: [created]
 
 jobs:
   performance:
-    name: Compare performance with master
+    name: Run performance tests
 
     runs-on: ubuntu-latest
 
@@ -36,5 +38,23 @@ jobs:
       run: |
         npm ci
 
-    - name: Run the performance tests
+    - name: Compare performance with master
+      if: github.event_name == 'pull_request'
       run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA master --tests-branch $GITHUB_SHA
+
+    - name: Compare performance with current WordPress Core and previous Gutenberg versions
+      if: github.event_name == 'release'
+      env:
+        PLUGIN_VERSION: ${{ github.event.release.name }}
+      run: |
+        IFS='.' read -r -a PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
+        CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
+        PREVIOUS_VERSION_BASE_10=$(expr ${PLUGIN_VERSION_ARRAY[0]} \* 10 + ${PLUGIN_VERSION_ARRAY[1]} - 1)
+        PREVIOUS_RELEASE_BRANCH="release/$(expr $PREVIOUS_VERSION_BASE_10 / 10).$(expr $PREVIOUS_VERSION_BASE_10 % 10)"
+        TESTED_UP_TO_REGEX="Tested up to: \K([0-9]+)\.([0-9]+)\.?([0-9]?)"
+        WP_VERSION=$(grep -oP "$TESTED_UP_TO_REGEX" ./readme.txt)
+        IFS='.' read -r -a WP_VERSION_ARRAY <<< "$WP_VERSION"
+        WP_BRANCH="wp/${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
+        ./bin/plugin/cli.js perf --ci $WP_BRANCH $PREVIOUS_RELEASE_BRANCH $CURRENT_RELEASE_BRANCH
+      
+

@@ -64,7 +64,7 @@ export function BorderRadiusEdit( props ) {
  */
 export function hasBorderRadiusSupport( blockType ) {
 	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return true === support || ( support && !! support.radius );
+	return !! ( true === support || support?.radius );
 }
 
 /**
