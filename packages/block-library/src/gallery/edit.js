@@ -22,7 +22,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
+import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -38,7 +38,6 @@ import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import { getHrefAndDestination } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
-
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -81,7 +80,7 @@ function GalleryEdit( props ) {
 	const {
 		imageCount,
 		linkTarget,
-		linkTo = Platform.OS !== 'web' ? 'none' : undefined,
+		linkTo,
 		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
@@ -395,7 +394,6 @@ function GalleryEdit( props ) {
 				mediaPlaceholder={ mediaPlaceholder }
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
-				imageCrop={ imageCrop }
 			/>
 		</>
 	);
