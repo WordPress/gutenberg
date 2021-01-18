@@ -181,6 +181,7 @@ class WP_Theme_JSON {
 	 */
 	const PRESETS_METADATA = array(
 		array(
+			'path_settings' => array( 'color', 'palette' ),
 			'path'          => array( 'settings', 'color', 'palette' ),
 			'value_key'     => 'color',
 			'css_var_infix' => 'color',
@@ -196,6 +197,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
+			'path_settings' => array( 'color', 'gradients' ),
 			'path'          => array( 'settings', 'color', 'gradients' ),
 			'value_key'     => 'gradient',
 			'css_var_infix' => 'gradient',
@@ -207,6 +209,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
+			'path_settings' => array( 'typography', 'fontSizes' ),
 			'path'          => array( 'settings', 'typography', 'fontSizes' ),
 			'value_key'     => 'size',
 			'css_var_infix' => 'font-size',
@@ -218,7 +221,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'fontFamilies' ),
+			'path_settings' => array( 'typography', 'fontFamilies' ),
 			'value_key'     => 'fontFamily',
 			'css_var_infix' => 'font-family',
 			'classes'       => array(),
@@ -742,7 +745,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Given a context, it extracts the CSS Custom Properties
+	 * Given the block settings, it extracts the CSS Custom Properties
 	 * for the presets and adds them to the $declarations array
 	 * following the format:
 	 *
@@ -756,11 +759,11 @@ class WP_Theme_JSON {
 	 * Note that this modifies the $declarations in place.
 	 *
 	 * @param array $declarations Holds the existing declarations.
-	 * @param array $context Input context to process.
+	 * @param array $settings Settings to process.
 	 */
-	private static function compute_preset_vars( &$declarations, $context ) {
+	private static function compute_preset_vars( &$declarations, $settings ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $context, $preset['path'], array() );
+			$values = gutenberg_experimental_get( $settings, $preset['path_settings'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -771,7 +774,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Given a context, it extracts the CSS Custom Properties
+	 * Given an array of settings, it extracts the CSS Custom Properties
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
 	 *
@@ -785,10 +788,10 @@ class WP_Theme_JSON {
 	 * Note that this modifies the $declarations in place.
 	 *
 	 * @param array $declarations Holds the existing declarations.
-	 * @param array $context Input context to process.
+	 * @param array $settings Settings to process.
 	 */
-	private static function compute_theme_vars( &$declarations, $context ) {
-		$custom_values = gutenberg_experimental_get( $context, array( 'settings', 'custom' ) );
+	private static function compute_theme_vars( &$declarations, $settings ) {
+		$custom_values = gutenberg_experimental_get( $context, array( 'custom' ) );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -856,15 +859,15 @@ class WP_Theme_JSON {
 	private function get_css_variables() {
 		$stylesheet = '';
 		$metadata   = $this->get_blocks_metadata();
-		foreach ( $this->theme_json as $context_name => $context ) {
-			if ( empty( $metadata[ $context_name ]['selector'] ) ) {
+		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
+			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
 				continue;
 			}
-			$selector = $metadata[ $context_name ]['selector'];
+			$selector = $metadata[ $block_selector ]['selector'];
 
 			$declarations = array();
-			self::compute_preset_vars( $declarations, $context );
-			self::compute_theme_vars( $declarations, $context );
+			self::compute_preset_vars( $declarations, $settings );
+			self::compute_theme_vars( $declarations, $settings );
 
 			// Attach the ruleset for style and custom properties.
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
