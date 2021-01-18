@@ -17,7 +17,8 @@ import deprecated from '@wordpress/deprecated';
  */
 function Dashicon( { icon, className, ...extraProps } ) {
 	deprecated( '`Dashicon component`', {
-		alternative: '`Icon component` from `@wordpress/icon` package',
+		alternative:
+			'`Icon component` from `@wordpress/icon` package along with `@wordpress/icons` SVG icons or custom SVG icons',
 	} );
 
 	const iconClass = [
