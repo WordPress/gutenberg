@@ -178,7 +178,8 @@ describe( 'Widgets screen', () => {
 
 		// Aria selectors cannot select buttons with the aria-haspopup property, fallback to CSS selector.
 		const inlineInserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]'
+			'button[aria-label="Add block"][aria-haspopup="true"]',
+			{ visible: true }
 		);
 		await inlineInserterButton.click();
 
@@ -230,7 +231,8 @@ describe( 'Widgets screen', () => {
 		);
 
 		const inserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]'
+			'button[aria-label="Add block"][aria-haspopup="true"]',
+			{ visible: true }
 		);
 		await inserterButton.click();
 
