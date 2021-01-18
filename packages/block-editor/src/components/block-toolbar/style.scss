@@ -106,3 +106,100 @@
 		transform: translateY(-($block-toolbar-height + $grid-unit-15));
 	}
 }
+
+.show-icon-labels {
+	.block-editor-block-toolbar {
+		.components-button.has-icon {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+
+	// Padding overrides.
+
+	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
+		padding-left: 6px;
+		padding-right: 6px;
+	}
+
+	// Switcher overrides.
+	.block-editor-block-switcher {
+		border-right: 1px solid $gray-900;
+
+		.components-dropdown-menu__toggle {
+			margin-left: 0;
+		}
+	}
+
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: 0 !important;
+			height: 0 !important;
+		}
+
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+
+	// Parent selector overrides
+
+	.block-editor-block-parent-selector__button {
+		.block-editor-block-icon {
+			width: 0;
+		}
+	}
+
+	// Mover overrides.
+	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		margin-left: 0;
+		white-space: nowrap;
+	}
+
+	.block-editor-block-mover-button {
+		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
+		padding-left: $grid-unit !important;
+		padding-right: $grid-unit !important;
+	}
+
+	.block-editor-block-mover__drag-handle.has-icon {
+		padding-left: 6px !important;
+		padding-right: 6px !important;
+		border-right: 1px solid $gray-900;
+	}
+
+	@include break-small() {
+		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
+		.is-up-button.is-up-button.is-up-button {
+			border-bottom: 1px solid $gray-900;
+			margin-right: 0;
+			border-radius: 0;
+		}
+	}
+
+	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
+		width: auto;
+	}
+
+	// Mobile adjustments
+	.components-toolbar,
+	.components-toolbar-group {
+		flex-shrink: 1;
+	}
+
+	.block-editor-format-toolbar {
+		.components-button + .components-button {
+			margin-left: 6px;
+		}
+	}
+}

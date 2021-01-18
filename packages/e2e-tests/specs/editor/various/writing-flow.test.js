@@ -586,7 +586,7 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'Change alignment' );
+		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Wide width' );
 		await page.keyboard.press( 'ArrowUp' );
 

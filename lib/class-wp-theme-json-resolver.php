@@ -325,7 +325,7 @@ class WP_Theme_JSON_Resolver {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON( $config, true );
+		self::$user = new WP_Theme_JSON( $config );
 
 		return self::$user;
 	}

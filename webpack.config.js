@@ -81,6 +81,9 @@ module.exports = {
 					compress: {
 						passes: 2,
 					},
+					mangle: {
+						reserved: [ '__', '_n', '_nx', '_x' ],
+					},
 				},
 				extractComments: false,
 			} ),

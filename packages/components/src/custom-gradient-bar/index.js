@@ -8,94 +8,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useReducer, useState } from '@wordpress/element';
-import { plus } from '@wordpress/icons';
+import { useRef, useReducer } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import ColorPicker from '../color-picker';
-import Dropdown from '../dropdown';
 import ControlPoints from './control-points';
+import { getHorizontalRelativeGradientPosition } from './utils';
 import {
 	INSERT_POINT_WIDTH,
-	COLOR_POPOVER_PROPS,
 	MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT,
 } from './constants';
-import { serializeGradient } from './serializer';
-import {
-	getGradientWithColorAtPositionChanged,
-	getGradientWithColorStopAdded,
-	getHorizontalRelativeGradientPosition,
-	getMarkerPoints,
-	getGradientParsed,
-	getLinearGradientRepresentationOfARadial,
-} from './utils';
-
-function InsertPoint( {
-	onChange,
-	gradientAST,
-	onOpenInserter,
-	onCloseInserter,
-	insertPosition,
-} ) {
-	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
-	return (
-		<Dropdown
-			className="components-custom-gradient-picker__inserter"
-			onClose={ () => {
-				onCloseInserter();
-			} }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ () => {
-						if ( isOpen ) {
-							onCloseInserter();
-						} else {
-							setAlreadyInsertedPoint( false );
-							onOpenInserter();
-						}
-						onToggle();
-					} }
-					className="components-custom-gradient-picker__insert-point"
-					icon={ plus }
-					style={ {
-						left:
-							insertPosition !== null
-								? `${ insertPosition }%`
-								: undefined,
-					} }
-				/>
-			) }
-			renderContent={ () => (
-				<ColorPicker
-					onChangeComplete={ ( { rgb } ) => {
-						let newGradient;
-						if ( alreadyInsertedPoint ) {
-							newGradient = getGradientWithColorAtPositionChanged(
-								gradientAST,
-								insertPosition,
-								rgb
-							);
-						} else {
-							newGradient = getGradientWithColorStopAdded(
-								gradientAST,
-								insertPosition,
-								rgb
-							);
-							setAlreadyInsertedPoint( true );
-						}
-						onChange( newGradient );
-					} }
-				/>
-			) }
-			popoverProps={ COLOR_POPOVER_PROPS }
-		/>
-	);
-}
 
 function customGradientBarReducer( state, action ) {
 	switch ( action.type ) {
@@ -148,17 +71,13 @@ function customGradientBarReducer( state, action ) {
 }
 const customGradientBarReducerInitialState = { id: 'IDLE' };
 
-export default function CustomGradientBar( { value, onChange } ) {
-	const { gradientAST, gradientValue, hasGradient } = getGradientParsed(
-		value
-	);
-
-	const onGradientStructureChange = ( newGradientStructure ) => {
-		onChange( serializeGradient( newGradientStructure ) );
-	};
-
+export default function CustomGradientBar( {
+	background,
+	hasGradient,
+	value: controlPoints,
+	onChange,
+} ) {
 	const gradientPickerDomRef = useRef();
-	const markerPoints = getMarkerPoints( gradientAST );
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
@@ -173,9 +92,9 @@ export default function CustomGradientBar( { value, onChange } ) {
 
 		// If the insert point is close to an existing control point don't show it.
 		if (
-			some( markerPoints, ( { positionValue } ) => {
+			some( controlPoints, ( { position } ) => {
 				return (
-					Math.abs( insertPosition - positionValue ) <
+					Math.abs( insertPosition - position ) <
 					MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT
 				);
 			} )
@@ -206,24 +125,15 @@ export default function CustomGradientBar( { value, onChange } ) {
 			) }
 			onMouseEnter={ onMouseEnterAndMove }
 			onMouseMove={ onMouseEnterAndMove }
-			// On radial gradients the bar should display a linear gradient.
-			// On radial gradients the bar represents a slice of the gradient from the center until the outside.
-			style={ {
-				background:
-					gradientAST.type === 'radial-gradient'
-						? getLinearGradientRepresentationOfARadial(
-								gradientAST
-						  )
-						: gradientValue,
-			} }
+			style={ { background } }
 			onMouseLeave={ onMouseLeave }
 		>
 			<div className="components-custom-gradient-picker__markers-container">
 				{ ( isMovingInserter || isInsertingControlPoint ) && (
-					<InsertPoint
+					<ControlPoints.InsertPoint
 						insertPosition={ gradientBarState.insertPosition }
-						onChange={ onGradientStructureChange }
-						gradientAST={ gradientAST }
+						value={ controlPoints }
+						onChange={ onChange }
 						onOpenInserter={ () => {
 							gradientBarStateDispatch( {
 								type: 'OPEN_INSERTER',
@@ -243,9 +153,8 @@ export default function CustomGradientBar( { value, onChange } ) {
 							? gradientBarState.insertPosition
 							: undefined
 					}
-					markerPoints={ markerPoints }
-					onChange={ onGradientStructureChange }
-					gradientAST={ gradientAST }
+					value={ controlPoints }
+					onChange={ onChange }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {
 							type: 'START_CONTROL_CHANGE',
