@@ -94,7 +94,6 @@ export function ImageEdit( {
 		sizeSlug,
 		inhertedAttributes,
 	} = attributes;
-
 	const [ tempUrl, setTempUrl ] = useState();
 	const altRef = useRef();
 	useEffect( () => {
