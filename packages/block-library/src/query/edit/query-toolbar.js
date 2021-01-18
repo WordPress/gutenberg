@@ -55,7 +55,9 @@ export default function QueryToolbar( {
 										min={ 1 }
 										max={ 100 }
 										onChange={ ( value ) =>
-											setQuery( { perPage: +value ?? -1 } )
+											setQuery( {
+												perPage: +value ?? -1,
+											} )
 										}
 										step="1"
 										value={ query.perPage }
