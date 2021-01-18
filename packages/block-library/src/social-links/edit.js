@@ -39,17 +39,13 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
-export function SocialLinksEdit( props ) {
+export function SocialLinksEdit( { attributes, setAttributes } ) {
 	const {
-		attributes,
-		iconBackgroundColor,
-		iconColor,
-		setAttributes,
-		setIconBackgroundColor,
-		setIconColor,
-	} = props;
-
-	const { openInNewTab, size } = attributes;
+		iconBackgroundColorValue,
+		iconColorValue,
+		openInNewTab,
+		size,
+	} = attributes;
 
 	// Remove icon background color if logos only style selected.
 	const logosOnly =
@@ -76,13 +72,13 @@ export function SocialLinksEdit( props ) {
 	);
 
 	const className = classNames( size, {
-		'has-icon-color': iconColor.color,
-		'has-icon-background-color': iconBackgroundColor.color,
+		'has-icon-color': iconColorValue,
+		'has-icon-background-color': iconBackgroundColorValue,
 	} );
 
 	const style = {
-		'--wp--social-links--icon-color': iconColor.color,
-		'--wp--social-links--icon-background-color': iconBackgroundColor.color,
+		'--wp--social-links--icon-color': iconColorValue,
+		'--wp--social-links--icon-background-color': iconBackgroundColorValue,
 	};
 
 	const blockProps = useBlockProps( { className, style } );
@@ -162,18 +158,20 @@ export function SocialLinksEdit( props ) {
 					title={ __( 'Color settings' ) }
 					colorSettings={ [
 						{
-							value: iconColor.color,
+							// Using custom attribute as it prevents loss of named color selection when
+							// switching themes to a new theme that does not have a matching named color.
+							value: iconColorValue,
 							onChange: ( colorValue ) => {
-								setIconColor( colorValue );
 								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( { iconColorValue: colorValue } );
 							},
 							label: __( 'Icon color' ),
 						},
 						! logosOnly && {
-							value: iconBackgroundColor.color,
+							// Using custom attribute as it prevents loss of named color selection when
+							// switching themes to a new theme that does not have a matching named color.
+							value: iconBackgroundColorValue,
 							onChange: ( colorValue ) => {
-								setIconBackgroundColor( colorValue );
 								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( {
 									iconBackgroundColorValue: colorValue,
@@ -186,8 +184,8 @@ export function SocialLinksEdit( props ) {
 				{ ! logosOnly && (
 					<ContrastChecker
 						{ ...{
-							textColor: iconColor.color,
-							backgroundColor: iconBackgroundColor.color,
+							textColor: iconColorValue,
+							backgroundColor: iconBackgroundColorValue,
 						} }
 						isLargeText={ false }
 					/>
