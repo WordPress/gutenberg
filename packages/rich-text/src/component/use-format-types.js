@@ -50,7 +50,7 @@ export function useFormatTypes( {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
 		return allFormatTypes.filter( ( { name, tagName } ) => {
-			if ( allowedFormats && allowedFormats.includes( name ) ) {
+			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
 				return false;
 			}
 
