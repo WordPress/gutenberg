@@ -485,24 +485,6 @@ function gutenberg_register_packages_styles( $styles ) {
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 
 /**
- * Registers common scripts and styles to be used as dependencies of the editor
- * and plugins.
- *
- * @since 0.1.0
- */
-function gutenberg_enqueue_block_editor_assets() {
-	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
-		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
-
-		wp_enqueue_script(
-			'gutenberg-live-reload',
-			$live_reload_url
-		);
-	}
-}
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets' );
-
-/**
  * Retrieves a unique and reasonably short and human-friendly filename for a
  * vendor script based on a URL and the script handle.
  *
