@@ -189,6 +189,7 @@ describe( 'Navigation editor', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Select the navigation block and create a block from existing pages.
+		await page.waitForSelector( 'div[aria-label="Block: Navigation"]' );
 		await page.click( 'div[aria-label="Block: Navigation"]' );
 
 		const [ addAllPagesButton ] = await page.$x(
