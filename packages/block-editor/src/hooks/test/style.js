@@ -20,6 +20,7 @@ describe( 'getInlineStyles', () => {
 				border: { radius: 10 },
 			} )
 		).toEqual( {
+			'--wp--style--border--radius': 10,
 			backgroundColor: 'black',
 			borderRadius: 10,
 			color: 'red',
