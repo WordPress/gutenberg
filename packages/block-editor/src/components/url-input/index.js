@@ -274,7 +274,6 @@ function URLInput( {
 		try {
 			const result = await request;
 			if (
-				result &&
 				Array.isArray( result ) &&
 				request === pendingRequest.current
 			) {
