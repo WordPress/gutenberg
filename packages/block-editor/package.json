@@ -60,11 +60,11 @@
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"react-merge-refs": "^1.0.0",
+		"react-merge-refs": "^1.1.0",
 		"react-spring": "^8.0.19",
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
-		"tinycolor2": "^1.4.1",
+		"tinycolor2": "^1.4.2",
 		"traverse": "^0.6.6"
 	},
 	"publishConfig": {
