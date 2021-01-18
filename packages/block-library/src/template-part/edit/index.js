@@ -38,14 +38,6 @@ export default function TemplatePartEdit( {
 	// new edits to trigger this.
 	const { isResolved, innerBlocks, isMissing } = useSelect(
 		( select ) => {
-			if ( ! templatePartId ) {
-				return {
-					isResolved: false,
-					innerBlocks: [],
-					isMissing: false,
-				};
-			}
-
 			const { getEntityRecord, hasFinishedResolution } = select( 'core' );
 			const { getBlocks } = select( 'core/block-editor' );
 
@@ -54,11 +46,12 @@ export default function TemplatePartEdit( {
 				'wp_template_part',
 				templatePartId,
 			];
-			const entityRecord = getEntityRecord( ...getEntityArgs );
-			const hasResolvedEntity = hasFinishedResolution(
-				'getEntityRecord',
-				getEntityArgs
-			);
+			const entityRecord = templatePartId
+				? getEntityRecord( ...getEntityArgs )
+				: null;
+			const hasResolvedEntity = templatePartId
+				? hasFinishedResolution( 'getEntityRecord', getEntityArgs )
+				: false;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
