@@ -59,4 +59,7 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	delete_option( 'gutenberg_last_synchronize_theme_template-part_checks' );
 }
 
-add_action( 'plugins_loaded', '_gutenberg_migrate_database' );
+// Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen
+// after its taxonomy (`wp_theme`) is registered. This happens in `gutenberg_register_wp_theme_taxonomy`,
+// which is hooked into `init` (default priority, i.e. 10).
+add_action( 'init', '_gutenberg_migrate_database', 20 );
