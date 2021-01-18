@@ -135,18 +135,11 @@ function Layout( { styles } ) {
 			),
 		};
 	}, [] );
-	const shouldShowBlockBreadcrumb =
-		! hasReducedUI &&
-		showBlockBreadcrumbs &&
-		! isMobileViewport &&
-		isRichEditingEnabled &&
-		mode === 'visual';
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
-		'show-block-breadcrumbs': shouldShowBlockBreadcrumb,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -279,7 +272,11 @@ function Layout( { styles } ) {
 					</>
 				}
 				footer={
-					shouldShowBlockBreadcrumb && (
+					! hasReducedUI &&
+					showBlockBreadcrumbs &&
+					! isMobileViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
 							<BlockBreadcrumb />
 						</div>
