@@ -24,7 +24,6 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
-		isListItem,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -67,16 +66,6 @@ export default function save( { attributes } ) {
 	);
 
 	const blockProps = useBlockProps.save( { className: classes } );
-<<<<<<< HEAD
-	if ( isListItem ) {
-		return (
-			<li className="list-image">
-				<figure { ...blockProps }>{ figure }</figure>
-			</li>
-		);
-	}
-=======
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (

@@ -38,26 +38,12 @@ export const Gallery = ( props ) => {
 		imageCrop,
 	} = attributes;
 	const galleryRef = useRef();
-<<<<<<< HEAD
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'blocks-gallery-grid',
-		},
-		{
-			allowedBlocks: [ 'core/image' ],
-			orientation: 'horizontal',
-			renderAppender: false,
-			__experimentalLayout: { type: 'default', alignments: [] },
-		}
-	);
-=======
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/image' ],
 		orientation: 'horizontal',
 		renderAppender: false,
 		__experimentalLayout: { type: 'default', alignments: [] },
 	} );
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 
 	useEffect( () => {
 		if ( galleryRef.current && isSelected ) {
@@ -68,18 +54,6 @@ export const Gallery = ( props ) => {
 	return (
 		<figure
 			ref={ galleryRef }
-<<<<<<< HEAD
-			{ ...blockProps }
-			className={ classnames( blockProps.className, {
-				[ `align${ align }` ]: align,
-				[ `columns-${ columns }` ]: columns,
-				'is-cropped': imageCrop,
-			} ) }
-		>
-			<ul { ...innerBlocksProps } />
-
-			{ mediaPlaceholder }
-=======
 			{ ...innerBlocksProps }
 			className={ classnames(
 				blockProps.className,
@@ -92,7 +66,6 @@ export const Gallery = ( props ) => {
 			) }
 		>
 			{ children }
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"

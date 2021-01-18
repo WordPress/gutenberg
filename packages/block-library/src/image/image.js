@@ -82,11 +82,7 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
-<<<<<<< HEAD
-	allowResize,
-=======
 	context,
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );

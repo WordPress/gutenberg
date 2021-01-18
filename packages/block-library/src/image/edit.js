@@ -81,11 +81,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-<<<<<<< HEAD
-	context: { allowResize = true, isListItem = false },
-=======
 	context,
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 } ) {
 	const {
 		url = '',
@@ -98,10 +94,7 @@ export function ImageEdit( {
 		sizeSlug,
 		inhertedAttributes,
 	} = attributes;
-<<<<<<< HEAD
 
-=======
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 	const [ tempUrl, setTempUrl ] = useState();
 	const altRef = useRef();
 	useEffect( () => {
@@ -295,15 +288,6 @@ export function ImageEdit( {
 		}
 		revokeBlobURL( tempUrl );
 	}, [ isTemp, url ] );
-<<<<<<< HEAD
-
-	useEffect( () => {
-		if ( isListItem ) {
-			setAttributes( { isListItem } );
-		}
-	}, [ isListItem ] );
-=======
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 
 	const isExternal = isExternalImage( id, url );
 	const controls = (
@@ -362,32 +346,11 @@ export function ImageEdit( {
 			onSelectURL={ onSelectURL }
 			onUploadError={ onUploadError }
 			containerRef={ ref }
-<<<<<<< HEAD
-			allowResize={ allowResize }
-		/>
-	);
-
-	if ( isListItem ) {
-		return (
-			<>
-				{ controls }
-				<li className="list-image">
-					<figure { ...blockProps }>
-						{ image }
-						{ mediaPlaceholder }
-					</figure>
-				</li>
-			</>
-		);
-	}
-
-=======
 			context={ context }
 			inhertedAttributes={ inhertedAttributes }
 		/>
 	);
 
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 	return (
 		<>
 			{ controls }

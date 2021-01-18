@@ -47,11 +47,7 @@ describe( 'Gallery', () => {
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
 
 		const regex = new RegExp(
-<<<<<<< HEAD
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\",\\"imageCount\\":\\d+} -->\\s*<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"large\\",\\"linkDestination\\":\\"none\\",\\"isListItem\\":true} -->\\s*<li class=\\"list-image\\"><figure class=\\"size-large\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure><\/li>\\s*<!-- \/wp:image --><\/ul><\/figure>\\s*<!-- \/wp:gallery -->`
-=======
 			`<!-- wp:gallery {\\"linkTo\\":\\"none\\",\\"imageCount\\":\\d+} -->\\s*<figure class=\\"wp-block-gallery blocks-gallery-grid has-nested-images columns-1 is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"large\\",\\"linkDestination\\":\\"none\\",\\"inheritedAttributes\\":{\\"linkDestination\\":true,\\"linkTarget\\":true,\\"sizeSlug\\":true}} -->\\s*<figure class=\\"wp-block-image size-large\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );

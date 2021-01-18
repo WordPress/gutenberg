@@ -21,13 +21,7 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure { ...useBlockProps.save( { className } ) }>
-<<<<<<< HEAD
-			<ul className="blocks-gallery-grid">
-				<InnerBlocks.Content />
-			</ul>
-=======
 			<InnerBlocks.Content />
->>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
