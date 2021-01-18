@@ -11,6 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	useBlockProps,
+	RichText,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -20,20 +21,40 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-export default function ArchiveTitleEdit( {
-	attributes: { level, textAlign },
+export default function QueryTitleEdit( {
+	attributes: { content, type, level, textAlign },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
+	const tagName = `h${ level }`;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
-	const titleElement = (
-		<TagName { ...blockProps }>{ __( 'Archive Title' ) }</TagName>
-	);
+	let titleElement;
+	if ( type === 'archive' ) {
+		titleElement = (
+			<TagName { ...blockProps }>
+				{ __( 'Archive title placeholder' ) }
+			</TagName>
+		);
+	} else {
+		titleElement = (
+			<div { ...blockProps }>
+				<RichText
+					tagName={ tagName }
+					value={ content }
+					placeholder={ __( 'Query title' ) }
+					allowedFormats={ [ 'core/bold', 'core/italic' ] }
+					onChange={ ( newContent ) =>
+						setAttributes( { content: newContent } )
+					}
+					disableLineBreaks={ true }
+				/>
+			</div>
+		);
+	}
 	return (
 		<>
 			<BlockControls>

@@ -50,7 +50,6 @@ function gutenberg_reregister_core_block_types() {
 			'block_names'   => array_merge(
 				array(
 					'archives.php'                => 'core/archives',
-					'archive-title.php'           => 'core/archive-title',
 					'block.php'                   => 'core/block',
 					'calendar.php'                => 'core/calendar',
 					'categories.php'              => 'core/categories',
@@ -79,6 +78,7 @@ function gutenberg_reregister_core_block_types() {
 					'post-hierarchical-terms.php' => 'core/post-hierarchical-terms',
 					'post-tags.php'               => 'core/post-tags',
 					'post-title.php'              => 'core/post-title',
+					'query-title.php'             => 'core/query-title',
 					'query.php'                   => 'core/query',
 					'query-loop.php'              => 'core/query-loop',
 					'query-pagination.php'        => 'core/query-pagination',
