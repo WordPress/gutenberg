@@ -159,6 +159,8 @@ export const ItemBaseUI = styled.li`
 
 	button,
 	a {
+		width: 100%;
+
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {

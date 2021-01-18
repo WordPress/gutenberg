@@ -48,7 +48,6 @@ const getStyles = (
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
 };
-const { isWider } = alignmentHelpers;
 
 export class BlockList extends Component {
 	constructor() {
@@ -192,6 +191,7 @@ export class BlockList extends Component {
 
 		const isContentStretch = contentResizeMode === 'stretch';
 		const isMultiBlocks = blockClientIds.length > 1;
+		const { isWider } = alignmentHelpers;
 
 		return (
 			<View
@@ -313,6 +313,7 @@ export class BlockList extends Component {
 				<>
 					<TouchableWithoutFeedback
 						accessibilityLabel={ __( 'Add paragraph block' ) }
+						testID={ __( 'Add paragraph block' ) }
 						onPress={ () => {
 							this.addBlockToEndOfPost( paragraphBlock );
 						} }

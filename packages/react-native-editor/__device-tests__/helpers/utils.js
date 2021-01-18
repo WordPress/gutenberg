@@ -364,14 +364,12 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
 
-		// Go at the end of the popup to hit the "Show html"
-		// TODO: c'mon, find a more robust way to hit that item! :(
-		for ( let i = 0; i < 10; i++ ) {
-			await driver.pressKeycode( 20 );
-		}
-
-		// hit Enter
-		await driver.pressKeycode( 66 );
+		const showHtmlButtonXpath =
+			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
+		const showHtmlButton = await driver.elementByXPath(
+			showHtmlButtonXpath
+		);
+		await showHtmlButton.click();
 	} else {
 		const menuButton = await driver.elementByAccessibilityId( '...' );
 		await menuButton.click();

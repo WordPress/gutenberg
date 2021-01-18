@@ -12,6 +12,7 @@ import {
 	KIND,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 /**
  * Trigger an API Fetch request.
@@ -141,6 +142,8 @@ export function dispatch( registryName, actionName, ...args ) {
 }
 
 const controls = {
+	AWAIT_PROMISE: ( { promise } ) => promise,
+
 	SELECT: createRegistryControl(
 		( registry ) => ( { registryName, selectorName, args } ) => {
 			return registry.select( registryName )[ selectorName ]( ...args );
@@ -190,6 +193,6 @@ const controls = {
 };
 
 const getState = ( registry ) =>
-	registry.stores[ 'core/edit-widgets' ].store.getState();
+	registry.stores[ editWidgetsStoreName ].store.getState();
 
 export default controls;

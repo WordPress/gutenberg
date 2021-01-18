@@ -108,6 +108,7 @@ export { default as NavigableToolbar } from './navigable-toolbar';
 export {
 	default as ObserveTyping,
 	useTypingObserver as __unstableUseTypingObserver,
+	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
 } from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
@@ -119,6 +120,7 @@ export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
+export { default as __unstableIframe } from './iframe';
 
 /*
  * State Related Components

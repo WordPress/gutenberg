@@ -11,12 +11,7 @@ const { sprintf } = require( 'sprintf-js' );
  * Internal dependencies
  */
 const { log, formats } = require( '../lib/logger' );
-const {
-	askForConfirmation,
-	runStep,
-	readJSONFile,
-	runShellScript,
-} = require( '../lib/utils' );
+const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const git = require( '../lib/git' );
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
@@ -220,35 +215,6 @@ async function runBumpPluginVersionUpdateChangelogAndCommitStep(
 }
 
 /**
- * Run the Plugin ZIP Creation step.
- *
- * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
- * @param {string} abortMessage            Abort message.
- *
- * @return {Promise<string>} Plugin ZIP Path
- */
-async function runPluginZIPCreationStep(
-	gitWorkingDirectoryPath,
-	abortMessage
-) {
-	const zipPath = gitWorkingDirectoryPath + '/' + config.slug + '.zip';
-	await runStep( 'Plugin ZIP creation', abortMessage, async () => {
-		await askForConfirmation(
-			'Proceed and build the plugin ZIP? (It takes a few minutes)',
-			true,
-			abortMessage
-		);
-		runShellScript( config.buildZipCommand, gitWorkingDirectoryPath );
-		log(
-			'>> The plugin ZIP has been built successfully. Path: ' +
-				formats.success( zipPath )
-		);
-	} );
-
-	return zipPath;
-}
-
-/**
  * Create a local Git Tag.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
@@ -346,112 +312,6 @@ async function runCherrypickBumpCommitIntoMasterStep(
 }
 
 /**
- * Creates the github release and uploads the ZIP file into it.
- *
- * @param {string}  zipPath       Plugin zip path.
- * @param {string}  version       Released version.
- * @param {string}  versionLabel  Label of the released Version.
- * @param {string}  changelog     Release changelog.
- * @param {boolean} isPrerelease  is a pre-release.
- * @param {string}  abortMessage  Abort message.
- *
- * @return {Promise<Object>} Github release object.
- */
-async function runGithubReleaseStep(
-	zipPath,
-	version,
-	versionLabel,
-	changelog,
-	isPrerelease,
-	abortMessage
-) {
-	let octokit;
-	let releaseDraft;
-	let release;
-
-	await runStep(
-		'Creating the GitHub release draft',
-		abortMessage,
-		async () => {
-			await askForConfirmation(
-				'Proceed with the creation of the GitHub release draft?',
-				true,
-				abortMessage
-			);
-
-			const { token } = await inquirer.prompt( [
-				{
-					type: 'input',
-					name: 'token',
-					message:
-						'Please enter a GitHub personal authentication token.\n' +
-						'You can create one by navigating to ' +
-						formats.success(
-							'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages'
-						) +
-						'.\nToken:',
-				},
-			] );
-
-			octokit = new Octokit( {
-				auth: token,
-			} );
-
-			const releaseDraftData = await octokit.repos.createRelease( {
-				owner: config.githubRepositoryOwner,
-				repo: config.githubRepositoryName,
-				tag_name: 'v' + version,
-				name: versionLabel,
-				body: changelog,
-				prerelease: isPrerelease,
-				draft: true,
-			} );
-			releaseDraft = releaseDraftData.data;
-
-			log( '>> The GitHub release draft has been created.' );
-		}
-	);
-	abortMessage =
-		abortMessage +
-		' Make sure to remove the the GitHub release draft as well.';
-
-	// Uploading the Zip to the Github release
-	await runStep( 'Uploading the plugin ZIP', abortMessage, async () => {
-		const filestats = fs.statSync( zipPath );
-		await octokit.repos.uploadReleaseAsset( {
-			url: releaseDraft.upload_url,
-			headers: {
-				'content-length': filestats.size,
-				'content-type': 'application/zip',
-			},
-			name: config.slug + '.zip',
-			file: fs.createReadStream( zipPath ),
-		} );
-		log( '>> The plugin ZIP has been successfully uploaded.' );
-	} );
-
-	// Remove draft status from the Github release
-	await runStep( 'Publishing the Github release', abortMessage, async () => {
-		const releaseData = await octokit.repos.updateRelease( {
-			owner: config.githubRepositoryOwner,
-			repo: config.githubRepositoryName,
-			release_id: releaseDraft.id,
-			draft: false,
-		} );
-		release = releaseData.data;
-
-		log( '>> The GitHub release has been published.' );
-	} );
-
-	log(
-		'>> The GitHub release is available here: ' +
-			formats.success( release.html_url )
-	);
-
-	return release;
-}
-
-/**
  * Checks whether the milestone associated with the release has open issues or
  * pull requests. Returns a promise resolving to true if there are no open issue
  * or pull requests, or false otherwise.
@@ -500,7 +360,7 @@ async function isMilestoneClear( version ) {
  *
  * @param {boolean} isRC Whether it's an RC release or not.
  *
- * @return {Promise<Object>} Github release object.
+ * @return {string} The new version.
  */
 async function releasePlugin( isRC = true ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
@@ -573,8 +433,6 @@ async function releasePlugin( isRC = true ) {
 		);
 	}
 
-	const versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
-
 	if ( ! ( await isMilestoneClear( version ) ) ) {
 		await askForConfirmation(
 			'There are still open issues in the milestone. Are you sure you want to proceed?',
@@ -591,12 +449,6 @@ async function releasePlugin( isRC = true ) {
 		abortMessage
 	);
 
-	// Plugin ZIP creation
-	const zipPath = await runPluginZIPCreationStep(
-		gitWorkingDirectory,
-		abortMessage
-	);
-
 	// Creating the git tag
 	await runCreateGitTagStep( gitWorkingDirectory, version, abortMessage );
 
@@ -604,21 +456,6 @@ async function releasePlugin( isRC = true ) {
 	await runPushGitChangesStep(
 		gitWorkingDirectory,
 		releaseBranch,
-		abortMessage
-	);
-
-	abortMessage =
-		'Aborting! Make sure to ' +
-		( isRC ? 'remove' : 'reset' ) +
-		' the remote release branch and remove the git tag.';
-
-	// Creating the GitHub Release
-	const release = await runGithubReleaseStep(
-		zipPath,
-		version,
-		versionLabel,
-		changelog,
-		isRC,
 		abortMessage
 	);
 
@@ -637,29 +474,32 @@ async function releasePlugin( isRC = true ) {
 	abortMessage = 'Aborting! The release is finished though.';
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 
-	return release;
+	return version;
 }
 
 async function releaseRC() {
 	log(
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new RC version of the Plugin.\n',
-		'It goes through different steps: creating the release branch, bumping the plugin version, tagging and creating the GitHub release, building the ZIP...\n',
+		'It goes through different steps: creating the release branch, bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, attach it to a release, and publish it.\n',
 		"To perform a release you'll have to be a member of the " +
 			config.team +
 			' Team.\n'
 	);
 
-	const release = await releasePlugin( true );
+	const version = await releasePlugin( true );
 
 	log(
 		'\n>> 🎉 The ' +
 			config.name +
 			' version ' +
-			formats.success( release.name ) +
-			' has been successfully released.\n',
-		'You can access the GitHub release here: ' +
-			formats.success( release.html_url ) +
+			formats.success( version ) +
+			' has been successfully tagged.\n',
+		"In a few minutes, you'll be able to find the GitHub release here: " +
+			formats.success(
+				`${ config.wpRepositoryReleasesURL }v${ version }`
+			) +
 			'\n',
 		'Thanks for performing the release!\n'
 	);
@@ -669,24 +509,27 @@ async function releaseStable() {
 	log(
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new stable version of the Plugin.\n',
-		'It goes through different steps: bumping the plugin version, tagging and creating the GitHub release, building the ZIP, pushing the release to the SVN repository...\n',
+		'It goes through different steps: bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, attach it to a release, publish it, and push the release to the SVN repository.\n',
 		"To perform a release you'll have to be a member of the " +
 			config.team +
 			' Team.\n'
 	);
 
-	const release = await releasePlugin( false );
+	const version = await releasePlugin( false );
 
 	log(
 		'\n>> 🎉 ' +
 			config.name +
 			' ' +
-			formats.success( release.name ) +
-			' has been successfully released.\n',
-		'You can access the GitHub release here: ' +
-			formats.success( release.html_url ) +
+			formats.success( version ) +
+			' has been successfully tagged.\n',
+		"In a few minutes, you'll be able to find the GitHub release here: " +
+			formats.success(
+				`${ config.wpRepositoryReleasesURL }v${ version }`
+			) +
 			'\n',
-		"In a few minutes, you'll be able to update the plugin from the WordPress repository.\n",
+		"Once published, it'll be automatically uploaded to the WordPress plugin repository.\n",
 		"Thanks for performing the release! and don't forget to publish the release post.\n"
 	);
 }

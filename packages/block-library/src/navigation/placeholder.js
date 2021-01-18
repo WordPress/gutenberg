@@ -22,12 +22,13 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronDown, search } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import createDataTree from './create-data-tree';
+import PlaceholderPreview from './placeholder-preview';
 
 /**
  * A recursive function that maps menu item nodes to blocks.
@@ -235,12 +236,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	return (
 		<div className="wp-block-navigation-placeholder">
-			<div className="wp-block-navigation-placeholder__preview">
-				<span className="wp-block-navigation-link"></span>
-				<span className="wp-block-navigation-link"></span>
-				<span className="wp-block-navigation-link"></span>
-				<Icon icon={ search } />
-			</div>
+			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
 				{ isLoading && (

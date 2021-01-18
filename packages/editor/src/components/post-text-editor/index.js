@@ -7,12 +7,13 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
+export const DEBOUNCE_TIME = 300;
 export default function PostTextEditor() {
 	const postContent = useSelect(
 		( select ) => select( 'core/editor' ).getEditedPostContent(),
@@ -29,6 +30,18 @@ export default function PostTextEditor() {
 		setValue( postContent );
 	}
 
+	const saveText = () => {
+		const blocks = parse( value );
+		resetEditorBlocks( blocks );
+	};
+
+	useEffect( () => {
+		const timeoutId = setTimeout( saveText, DEBOUNCE_TIME );
+		return () => {
+			clearTimeout( timeoutId );
+		};
+	}, [ value ] );
+
 	/**
 	 * Handles a textarea change event to notify the onChange prop callback and
 	 * reflect the new value in the component's own state. This marks the start
@@ -42,9 +55,7 @@ export default function PostTextEditor() {
 	 */
 	const onChange = ( event ) => {
 		const newValue = event.target.value;
-
 		editPost( { content: newValue } );
-
 		setValue( newValue );
 		setIsDirty( true );
 	};
@@ -56,9 +67,7 @@ export default function PostTextEditor() {
 	 */
 	const stopEditing = () => {
 		if ( isDirty ) {
-			const blocks = parse( value );
-			resetEditorBlocks( blocks );
-
+			saveText();
 			setIsDirty( false );
 		}
 	};

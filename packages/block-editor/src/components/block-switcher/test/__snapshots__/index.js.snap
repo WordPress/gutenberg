@@ -20,7 +20,6 @@ exports[`BlockSwitcherDropdownMenu should render disabled block switcher with mu
         showColors={true}
       />
     }
-    title="Block icon"
   />
 </ToolbarGroup>
 `;

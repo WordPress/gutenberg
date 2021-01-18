@@ -22,6 +22,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	Warning,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
@@ -30,18 +31,25 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
  */
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const recordArgs = [ 'postType', 'wp_block', ref ];
-
-	const { reusableBlock, hasResolved } = useSelect(
-		( select ) => ( {
-			reusableBlock: select( coreStore ).getEditedEntityRecord(
-				...recordArgs
-			),
-			hasResolved: select( coreStore ).hasFinishedResolution(
-				'getEditedEntityRecord',
-				recordArgs
-			),
-		} ),
+	const { isMissing, hasResolved } = useSelect(
+		( select ) => {
+			const persistedBlock = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
+			const hasResolvedBlock = select(
+				coreStore
+			).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'wp_block',
+				ref,
+			] );
+			return {
+				hasResolved: hasResolvedBlock,
+				isMissing: hasResolvedBlock && ! persistedBlock,
+			};
+		},
 		[ ref, clientId ]
 	);
 
@@ -75,21 +83,21 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	const blockProps = useBlockProps();
 
+	if ( isMissing ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block has been deleted or is unavailable.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
 	if ( ! hasResolved ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder>
 					<Spinner />
-				</Placeholder>
-			</div>
-		);
-	}
-
-	if ( ! reusableBlock ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder>
-					{ __( 'Block has been deleted or is unavailable.' ) }
 				</Placeholder>
 			</div>
 		);
