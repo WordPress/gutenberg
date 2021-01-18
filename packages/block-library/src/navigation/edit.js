@@ -30,6 +30,7 @@ import {
 	justifySpaceBetween,
 } from '@wordpress/icons';
 import NavigationPlaceholder from './placeholder';
+import PlaceholderPreview from './placeholder-preview';
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -92,6 +93,7 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
+			placeholder: <PlaceholderPreview />,
 		}
 	);
 
