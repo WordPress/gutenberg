@@ -21,7 +21,7 @@ import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
 	{
-		buttonProps,
+		buttonProps = {},
 		children,
 		className,
 		icon,
