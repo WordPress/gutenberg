@@ -51,27 +51,3 @@ figure.wp-block-gallery {
 		margin: 0 8px 0 4px;
 	}
 }
-
-.gallery-settings-buttons {
-	.components-button:first-child {
-		margin-right: 8px;
-	}
-}
-
-.gallery-image-sizes {
-	.components-base-control__label {
-		display: block;
-		margin-bottom: 4px;
-	}
-
-	.gallery-image-sizes__loading {
-		display: flex;
-		align-items: center;
-		color: $gray-700;
-		font-size: $helptext-font-size;
-	}
-
-	.components-spinner {
-		margin: 0 8px 0 4px;
-	}
-}
