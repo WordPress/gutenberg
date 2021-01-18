@@ -30,6 +30,7 @@ import { useRef } from '@wordpress/element';
 import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../store';
+import GridPreview from './grid-preview';
 
 export default function VisualEditor() {
 	const ref = useRef();
@@ -49,6 +50,9 @@ export default function VisualEditor() {
 	);
 	const useExperimentalGlobalGrid = useSelect( ( select ) =>
 		select( editPostStore ).isFeatureActive( '__experimentalGlobalGrid' )
+	);
+	const isDraggingBlocks = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isDraggingBlocks()
 	);
 	const desktopCanvasStyles = {
 		height: '100%',
@@ -83,6 +87,9 @@ export default function VisualEditor() {
 						<div className="edit-post-visual-editor__post-title-wrapper">
 							<PostTitle />
 						</div>
+					) }
+					{ useExperimentalGlobalGrid && isDraggingBlocks && (
+						<GridPreview parent={ ref } />
 					) }
 					<BlockList className={ className } />
 				</WritingFlow>
