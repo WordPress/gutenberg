@@ -77,6 +77,15 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
+	async function getInlineInserterButton() {
+		return await page.waitForSelector(
+			'button[aria-label="Add block"][aria-haspopup="true"]',
+			{
+				visible: true,
+			}
+		);
+	}
+
 	it( 'Should insert content using the global inserter', async () => {
 		const widgetAreas = await page.$$(
 			'[aria-label="Block: Widget Area"][role="group"]'
@@ -176,11 +185,7 @@ describe( 'Widgets screen', () => {
 				10
 		);
 
-		// Aria selectors cannot select buttons with the aria-haspopup property, fallback to CSS selector.
-		const inlineInserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]',
-			{ visible: true }
-		);
+		let inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
 
 		const inlineQuickInserter = await page.waitForSelector(
@@ -230,11 +235,8 @@ describe( 'Widgets screen', () => {
 			secondParagraphBlockBoundingBox.y - 10
 		);
 
-		const inserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]',
-			{ visible: true }
-		);
-		await inserterButton.click();
+		inlineInserterButton = await getInlineInserterButton();
+		await inlineInserterButton.click();
 
 		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
