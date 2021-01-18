@@ -183,6 +183,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		wpEnv: false,
 		npmDependencies: [],
 		editorScript: 'file:./build/index.js',
 		editorStyle: 'file:./build/index.css',
