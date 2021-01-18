@@ -654,7 +654,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Given a context, it extracts the style properties
+	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
 	 * ```php
@@ -666,17 +666,18 @@ class WP_Theme_JSON {
 	 *
 	 * Note that this modifies the $declarations in place.
 	 *
-	 * @param array $declarations     Holds the existing declarations.
-	 * @param array $context Input    context to process.
-	 * @param array $context_supports Supports information for this context.
+	 * @param array $declarations Holds the existing declarations.
+	 * @param array $styles       Styles to process.
+	 * @param array $supports     Supports information for this context.
 	 */
-	private static function compute_style_properties( &$declarations, $context, $context_supports ) {
-		if ( empty( $context['styles'] ) ) {
+	private static function compute_style_properties( &$declarations, $styles, $supports ) {
+		if ( empty( $styles ) ) {
 			return;
 		}
+
 		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			if ( ! in_array( $name, $context_supports, true ) ) {
+			if ( ! in_array( $name, $supports, true ) ) {
 				continue;
 			}
 
@@ -698,7 +699,7 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( $properties as $prop ) {
-			$value = self::get_property_value( $context['styles'], $prop['value'] );
+			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
 				$kebab_cased_name = self::to_kebab_case( $prop['name'] );
 				$declarations[]   = array(
@@ -710,16 +711,16 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Given a context, it extracts its presets
+	 * Given a settings array, it extracts its presets
 	 * and adds them to the given input $stylesheet.
 	 *
 	 * Note this function modifies $stylesheet in place.
 	 *
 	 * @param string $stylesheet Input stylesheet to add the presets to.
-	 * @param array  $context Context to process.
+	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
 	 */
-	private static function compute_preset_classes( &$stylesheet, $context, $selector ) {
+	private static function compute_preset_classes( &$stylesheet, $settings, $selector ) {
 		if ( self::GLOBAL_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -727,7 +728,7 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $context, $preset['path'], array() );
+			$values = gutenberg_experimental_get( $settings, $preset['path_settings'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -915,20 +916,21 @@ class WP_Theme_JSON {
 	private function get_block_styles() {
 		$stylesheet = '';
 		$metadata   = $this->get_blocks_metadata();
-		foreach ( $this->theme_json as $context_name => $context ) {
-			if ( empty( $metadata[ $context_name ]['selector'] ) || empty( $metadata[ $context_name ]['supports'] ) ) {
+		foreach ( $this->theme_json['styles'] as $block_selector => $styles ) {
+			if ( empty( $metadata[ $block_selector ]['selector'] ) || empty( $metadata[ $block_selector ]['supports'] ) ) {
 				continue;
 			}
-			$selector = $metadata[ $context_name ]['selector'];
-			$supports = $metadata[ $context_name ]['supports'];
+
+			$selector = $metadata[ $block_selector ]['selector'];
+			$supports = $metadata[ $block_selector ]['supports'];
 
 			$declarations = array();
-			self::compute_style_properties( $declarations, $context, $supports );
+			self::compute_style_properties( $declarations, $styles, $supports );
 
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 
 			// Attach the rulesets for the classes.
-			self::compute_preset_classes( $stylesheet, $context, $selector );
+			self::compute_preset_classes( $stylesheet, $this->theme_json['settings'][ $block_selector ], $selector );
 		}
 
 		return $stylesheet;
@@ -1023,10 +1025,10 @@ class WP_Theme_JSON {
 	 */
 	public function remove_insecure_properties() {
 		$blocks_metadata = self::get_blocks_metadata();
-		foreach ( $this->theme_json as $context_name => &$context ) {
+		foreach ( $this->theme_json as $block_selector => &$context ) {
 			// Escape the context key.
-			if ( empty( $blocks_metadata[ $context_name ] ) ) {
-				unset( $this->theme_json[ $context_name ] );
+			if ( empty( $blocks_metadata[ $block_selector ] ) ) {
+				unset( $this->theme_json[ $block_selector ] );
 				continue;
 			}
 
@@ -1035,7 +1037,7 @@ class WP_Theme_JSON {
 
 			// Style escaping.
 			if ( ! empty( $context['styles'] ) ) {
-				$supports     = $blocks_metadata[ $context_name ]['supports'];
+				$supports     = $blocks_metadata[ $block_selector ]['supports'];
 				$declarations = array();
 				self::compute_style_properties( $declarations, $context, $supports );
 				foreach ( $declarations as $declaration ) {
@@ -1113,7 +1115,7 @@ class WP_Theme_JSON {
 			}
 
 			if ( null === $escaped_settings && null === $escaped_styles ) {
-				unset( $this->theme_json[ $context_name ] );
+				unset( $this->theme_json[ $block_selector ] );
 			} elseif ( null !== $escaped_settings && null !== $escaped_styles ) {
 				$context = array(
 					'styles'   => $escaped_styles,
