@@ -22,7 +22,7 @@ import { MediaPlaceholder } from '@wordpress/block-editor';
 			allowedTypes = { [ 'image' ] }
 			multiple = { false }
 			labels = { { title: 'The Image' } }
-		>
+		/>
 			"extra content"
 		</MediaPlaceholder>;
 		...
