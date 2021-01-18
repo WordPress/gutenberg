@@ -698,37 +698,37 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	// function test_remove_insecure_properties_removes_invalid_properties() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'styles' => array(
-	// 				'global' => array(
-	// 					'color' => array(
-	// 						'gradient' => 'linear-gradient(55deg,rgba(6,147,227,1) 0%,rgb(84,177,218) 54%,rgb(155,81,224) 100%)',
-	// 						'text'       => 'var:preset|color|dark-gray',
-	// 					),
-	// 				),
-	// 				'invalid'   => array(
-	// 					'background' => 'green',
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'styles' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'gradient' => 'linear-gradient(55deg,rgba(6,147,227,1) 0%,rgb(84,177,218) 54%,rgb(155,81,224) 100%)',
-	// 					'text'       => 'var:preset|color|dark-gray',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+	function test_remove_insecure_properties_removes_invalid_properties() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'global' => array(
+						'color' => array(
+							'gradient' => 'linear-gradient(55deg,rgba(6,147,227,1) 0%,rgb(84,177,218) 54%,rgb(155,81,224) 100%)',
+							'text'       => 'var:preset|color|dark-gray',
+						),
+					),
+					'invalid'   => array(
+						'background' => 'green',
+					),
+				),
+			),
+			true
+		);
+		$theme_json->escape_styles();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'global' => array(
+					'color' => array(
+						'gradient' => 'linear-gradient(55deg,rgba(6,147,227,1) 0%,rgb(84,177,218) 54%,rgb(155,81,224) 100%)',
+						'text'       => 'var:preset|color|dark-gray',
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 
 	// function test_remove_insecure_properties_removes_unsafe_properties() {
 	// 	$theme_json = new WP_Theme_JSON(
