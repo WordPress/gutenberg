@@ -57,4 +57,4 @@ View <a href="https://developer.wordpress.org/block-editor/principles/versions-i
 
 == Changelog ==
 
-To read the changelog for Gutenberg 9.7.3, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v9.7.3">release page</a>.
+To read the changelog for Gutenberg 9.7.4, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v9.7.4">release page</a>.

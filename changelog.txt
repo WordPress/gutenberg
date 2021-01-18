@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 9.7.4 =
+
+### Bug Fixes
+
+- Fix isRTL check by loading the ltr string explicitely.
+
+
 = 9.7.3 =
 
 ### Bug Fixes
