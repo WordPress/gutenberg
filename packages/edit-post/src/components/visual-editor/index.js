@@ -89,7 +89,7 @@ export default function VisualEditor() {
 						</div>
 					) }
 					{ useExperimentalGlobalGrid && isDraggingBlocks && (
-						<GridPreview parent={ ref } />
+						<GridPreview />
 					) }
 					<BlockList className={ className } />
 				</WritingFlow>
