@@ -2,3 +2,33 @@
 .block-editor-block-list__block[data-type="core/paragraph"].has-drop-cap:focus {
 	min-height: auto !important;
 }
+
+// Hide multiple empty paragraphs.
+@keyframes empty-paragraph__fade-out-animation {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.block-editor-block-list__block[data-empty="true"] {
+	opacity: 1;
+
+	// Fade empty paragraphs out after a delay.
+	animation: empty-paragraph__fade-out-animation 0.4s ease 2s;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+
+	// Except if the paragraph is the first or last in a container.
+	&:first-child,
+	&:last-of-type {
+		animation: none;
+	}
+
+	// Or if hovered.
+	&:hover {
+		animation: none;
+	}
+}
