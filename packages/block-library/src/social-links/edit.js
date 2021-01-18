@@ -39,7 +39,16 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
-export function SocialLinksEdit( { attributes, setAttributes } ) {
+export function SocialLinksEdit( props ) {
+	const {
+		attributes,
+		iconBackgroundColor,
+		iconColor,
+		setAttributes,
+		setIconBackgroundColor,
+		setIconColor,
+	} = props;
+
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
@@ -71,14 +80,18 @@ export function SocialLinksEdit( { attributes, setAttributes } ) {
 		</div>
 	);
 
+	// Fallback color values are used maintain selections in case switching
+	// themes and named colors in palette do not match.
 	const className = classNames( size, {
-		'has-icon-color': iconColorValue,
-		'has-icon-background-color': iconBackgroundColorValue,
+		'has-icon-color': iconColor.color || iconColorValue,
+		'has-icon-background-color':
+			iconBackgroundColor.color || iconBackgroundColorValue,
 	} );
 
 	const style = {
-		'--wp--social-links--icon-color': iconColorValue,
-		'--wp--social-links--icon-background-color': iconBackgroundColorValue,
+		'--wp--social-links--icon-color': iconColor.color || iconColorValue,
+		'--wp--social-links--icon-background-color':
+			iconBackgroundColor.color || iconBackgroundColorValue,
 	};
 
 	const blockProps = useBlockProps( { className, style } );
@@ -158,20 +171,24 @@ export function SocialLinksEdit( { attributes, setAttributes } ) {
 					title={ __( 'Color settings' ) }
 					colorSettings={ [
 						{
-							// Using custom attribute as it prevents loss of named color selection when
+							// Use custom attribute as fallback to prevent loss of named color selection when
 							// switching themes to a new theme that does not have a matching named color.
-							value: iconColorValue,
+							value: iconColor.color || iconColorValue,
 							onChange: ( colorValue ) => {
+								setIconColor( colorValue );
 								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( { iconColorValue: colorValue } );
 							},
 							label: __( 'Icon color' ),
 						},
 						! logosOnly && {
-							// Using custom attribute as it prevents loss of named color selection when
+							// Use custom attribute as fallback to prevent loss of named color selection when
 							// switching themes to a new theme that does not have a matching named color.
-							value: iconBackgroundColorValue,
+							value:
+								iconBackgroundColor.color ||
+								iconBackgroundColorValue,
 							onChange: ( colorValue ) => {
+								setIconBackgroundColor( colorValue );
 								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( {
 									iconBackgroundColorValue: colorValue,
