@@ -73,6 +73,18 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
+	if ( ! isPlaceholder && isMissing ) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ __(
+						'Template part has been deleted or is unavailable.'
+					) }
+				</Warning>
+			</TagName>
+		);
+	}
+
 	const inspectorAdvancedControls = (
 		<InspectorAdvancedControls>
 			<SelectControl
@@ -140,13 +152,6 @@ export default function TemplatePartEdit( {
 					/>
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }
-				{ ! isPlaceholder && isMissing && (
-					<Warning>
-						{ __(
-							'Template part has been deleted or is unavailable.'
-						) }
-					</Warning>
-				) }
 			</TagName>
 		</>
 	);
