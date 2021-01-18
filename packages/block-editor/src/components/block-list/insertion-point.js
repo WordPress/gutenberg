@@ -195,7 +195,6 @@ export default function useInsertionPoint( ref ) {
 
 	const onMouseMove = useCallback(
 		( event ) => {
-			event.stopPropagation();
 			if (
 				! event.target.classList.contains(
 					'block-editor-block-list__layout'
