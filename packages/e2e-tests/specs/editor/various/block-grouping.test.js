@@ -77,7 +77,7 @@ describe( 'Block Grouping', () => {
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -90,13 +90,13 @@ describe( 'Block Grouping', () => {
 			await pressKeyWithModifier( 'primary', 'a' );
 
 			// Group
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// UnGroup
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Ungroup' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -104,7 +104,7 @@ describe( 'Block Grouping', () => {
 
 		it( 'does not allow ungrouping a group block that has no children', async () => {
 			await insertBlock( 'Group' );
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			const ungroupButtons = await page.$x(
 				'//button/span[text()="Ungroup"]'
 			);
@@ -141,7 +141,7 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'does not show group option in the options toolbar if Grouping block is disabled', async () => {
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 
 			const blockOptionsDropdownHTML = await page.evaluate(
 				() =>
@@ -161,7 +161,7 @@ describe( 'Block Grouping', () => {
 
 			// Full width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Change alignment' );
+			await clickBlockToolbarButton( 'Align' );
 			const fullButton = await page.waitForXPath(
 				`//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Full width')]`
 			);
@@ -172,7 +172,7 @@ describe( 'Block Grouping', () => {
 
 			// Wide width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Change alignment' );
+			await clickBlockToolbarButton( 'Align' );
 			const wideButton = await page.waitForXPath(
 				`//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Wide width')]`
 			);
@@ -226,7 +226,7 @@ describe( 'Block Grouping', () => {
 			// Group - this will use whichever Block is registered as the Grouping Block
 			// as opposed to "transformTo()" which uses whatever is passed to it. To
 			// ensure this test is meaningful we must rely on what is registered.
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();

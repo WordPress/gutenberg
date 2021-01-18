@@ -29,6 +29,21 @@ const menusFixture = [
 	},
 ];
 
+const pagesFixture = [
+	{
+		title: 'Home',
+		slug: 'home',
+	},
+	{
+		title: 'About',
+		slug: 'about',
+	},
+	{
+		title: 'Contact',
+		slug: 'contact',
+	},
+];
+
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
 const REST_MENUS_ROUTES = [
@@ -38,6 +53,10 @@ const REST_MENUS_ROUTES = [
 const REST_MENU_ITEMS_ROUTES = [
 	'/__experimental/menu-items',
 	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
+];
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
 
 /**
@@ -51,38 +70,57 @@ function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
 }
 
-/**
- * Creates mocked REST API responses for calls to menus and menu-items
- * endpoints.
- * Note: this needs to be within a single call to
- * `setUpResponseMocking` as you can only setup response mocking once per test run.
- *
- * @param {Array} menus menus to provide as mocked responses to menus entity API requests.
- * @param {Array} menuItems menu items to provide as mocked responses to menu-items entity API requests.
- */
-async function mockAllMenusResponses(
-	menus = menusFixture,
-	menuItems = menuItemsFixture
-) {
-	const mappedMenus = menus.length
+function getEndpointMocks( matchingRoutes, responsesByMethod ) {
+	return [ 'GET', 'POST', 'DELETE', 'PUT' ].reduce( ( mocks, restMethod ) => {
+		if ( responsesByMethod[ restMethod ] ) {
+			return [
+				...mocks,
+				{
+					match: ( request ) =>
+						matchUrlToRoute( request.url(), matchingRoutes ) &&
+						request.method() === restMethod,
+					onRequestMatch: createJSONResponse(
+						responsesByMethod[ restMethod ]
+					),
+				},
+			];
+		}
+
+		return mocks;
+	}, [] );
+}
+
+function assignMockMenuIds( menus ) {
+	return menus.length
 		? menus.map( ( menu, index ) => ( {
 				...menu,
 				id: index + 1,
 		  } ) )
 		: [];
+}
 
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
-			onRequestMatch: createJSONResponse( mappedMenus ),
+function createMockPages( pages ) {
+	return pages.map( ( { title, slug }, index ) => ( {
+		id: index + 1,
+		type: 'page',
+		link: `https://this/is/a/test/page/${ slug }`,
+		title: {
+			rendered: title,
+			raw: title,
 		},
-		{
-			match: ( request ) =>
-				matchUrlToRoute( request.url(), REST_MENU_ITEMS_ROUTES ),
-			onRequestMatch: createJSONResponse( menuItems ),
-		},
-	] );
+	} ) );
+}
+
+function getMenuMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_MENUS_ROUTES, responsesByMethod );
+}
+
+function getMenuItemMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_MENU_ITEMS_ROUTES, responsesByMethod );
+}
+
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -100,13 +138,73 @@ async function getSerializedBlocks() {
 
 describe( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
-
 	afterEach( async () => {
 		await setUpResponseMocking( [] );
 	} );
 
+	it( 'allows creation of a menu', async () => {
+		const pagesResponse = createMockPages( pagesFixture );
+		const menuResponse = {
+			id: 4,
+			description: '',
+			name: 'Main Menu',
+			slug: 'main-menu',
+			meta: [],
+			auto_add: false,
+		};
+
+		// Initially return nothing from the menu and menuItem endpoints
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: [] } ),
+			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: pagesResponse } ),
+		] );
+		await visitNavigationEditor();
+
+		// Wait for the header to show that no menus are available.
+		await page.waitForXPath( '//h2[contains(., "No menus available")]' );
+
+		// Prepare the menu endpoint for creating a menu.
+		await setUpResponseMocking( [
+			...getMenuMocks( {
+				GET: [ menuResponse ],
+				POST: menuResponse,
+			} ),
+			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: pagesResponse } ),
+		] );
+
+		// Add a new menu.
+		const [ addNewButton ] = await page.$x(
+			'//button[contains(., "Add new")]'
+		);
+		await addNewButton.click();
+		await page.keyboard.type( 'Main Menu' );
+		const [ createMenuButton ] = await page.$x(
+			'//button[contains(., "Create menu")]'
+		);
+		await createMenuButton.click();
+
+		// Close the dropdown.
+		await page.keyboard.press( 'Escape' );
+
+		// Select the navigation block and create a block from existing pages.
+		await page.waitForSelector( 'div[aria-label="Block: Navigation"]' );
+		await page.click( 'div[aria-label="Block: Navigation"]' );
+
+		const [ addAllPagesButton ] = await page.$x(
+			'//button[contains(., "Add all pages")]'
+		);
+		await addAllPagesButton.click();
+
+		expect( await getSerializedBlocks() ).toMatchSnapshot();
+	} );
+
 	it( 'displays the first menu from the REST response when at least one menu exists', async () => {
-		await mockAllMenusResponses();
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.

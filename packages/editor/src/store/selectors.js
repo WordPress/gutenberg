@@ -757,7 +757,12 @@ export function isEditedPostBeingScheduled( state ) {
 export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
-	const status = getEditedPostAttribute( state, 'status' );
+
+	// This should be the status of the persisted post
+	// It shouldn't use the "edited" status otherwise it breaks the
+	// infered post data floating status
+	// See https://github.com/WordPress/gutenberg/issues/28083
+	const status = getCurrentPost( state ).status;
 	if (
 		status === 'draft' ||
 		status === 'auto-draft' ||

@@ -53,6 +53,10 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	if ( $term ) {
 		wp_delete_term( $term->term_id, 'wp-theme' );
 	}
+
+	// Delete useless options.
+	delete_option( 'gutenberg_last_synchronize_theme_template_checks' );
+	delete_option( 'gutenberg_last_synchronize_theme_template-part_checks' );
 }
 
 add_action( 'plugins_loaded', '_gutenberg_migrate_database' );
