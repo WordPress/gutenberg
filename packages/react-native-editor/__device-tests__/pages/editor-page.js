@@ -178,10 +178,9 @@ class EditorPage {
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 
-		await htmlContentView.click();
-
 		if ( isAndroid() ) {
-			await this.driver.pressKeycode( 279 ); // KEYCODE_PASTE
+			await htmlContentView.click();
+			await this.driver.pressKeycode( 279 /* KEYCODE_PASTE */ );
 		} else {
 			await longPressMiddleOfElement( this.driver, htmlContentView );
 			const pasteButton = this.driver.elementByXPath(
