@@ -151,7 +151,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 			}
 
 			// Needed in case unsetting is over while delayed set pending, i.e.
-			// quickly blur/mouseleave before delayedSetIsOver is cgualled
+			// quickly blur/mouseleave before delayedSetIsOver is called
 			delayedSetIsOver.cancel();
 
 			const _isOver = includes( [ 'focus', 'mouseenter' ], event.type );
