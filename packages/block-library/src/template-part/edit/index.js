@@ -6,6 +6,7 @@ import {
 	BlockControls,
 	InspectorAdvancedControls,
 	useBlockProps,
+	Warning,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
@@ -30,26 +31,39 @@ export default function TemplatePartEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const templatePartId = theme + '//' + slug;
+	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks } = useSelect(
+	const { isResolved, innerBlocks, isMissing } = useSelect(
 		( select ) => {
+			if ( ! templatePartId ) {
+				return {
+					isResolved: false,
+					innerBlocks: [],
+					isMissing: false,
+				};
+			}
+
+			const { getEntityRecord, hasFinishedResolution } = select( 'core' );
 			const { getBlocks } = select( 'core/block-editor' );
-			const entityRecord =
-				theme && slug
-					? select( 'core' ).getEntityRecord(
-							'postType',
-							'wp_template_part',
-							theme + '//' + slug
-					  )
-					: null;
+
+			const getEntityArgs = [
+				'postType',
+				'wp_template_part',
+				templatePartId,
+			];
+			const entityRecord = getEntityRecord( ...getEntityArgs );
+			const hasResolvedEntity = hasFinishedResolution(
+				'getEntityRecord',
+				getEntityArgs
+			);
 
 			return {
 				innerBlocks: getBlocks( clientId ),
-				isResolved: !! entityRecord,
+				isResolved: hasResolvedEntity,
+				isMissing: hasResolvedEntity && ! entityRecord,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -57,6 +71,7 @@ export default function TemplatePartEdit( {
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
+	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
 	const inspectorAdvancedControls = (
 		<InspectorAdvancedControls>
@@ -87,7 +102,7 @@ export default function TemplatePartEdit( {
 						innerBlocks={ innerBlocks }
 					/>
 				) }
-				{ ! isPlaceholder && isResolved && (
+				{ isEntityAvailable && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
 							<TemplatePartNamePanel postId={ templatePartId } />
@@ -118,13 +133,20 @@ export default function TemplatePartEdit( {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-				{ ! isPlaceholder && isResolved && (
+				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
 					/>
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }
+				{ ! isPlaceholder && isMissing && (
+					<Warning>
+						{ __(
+							'Template part has been deleted or is unavailable.'
+						) }
+					</Warning>
+				) }
 			</TagName>
 		</>
 	);
