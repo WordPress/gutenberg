@@ -1,13 +1,13 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import React from 'react';
+import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import PickerCell from '../mobile/bottom-sheet/picker-cell';
 
-const SelectControl = React.memo(
+const SelectControl = memo(
 	( {
 		help,
 		instanceId,
