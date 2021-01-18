@@ -95,6 +95,11 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
+	if ( 'wp-i18n' === $handle ) {
+		$ltr    = _x( 'ltr', 'text direction', 'default' );
+		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
+		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
+	}
 }
 
 /**
