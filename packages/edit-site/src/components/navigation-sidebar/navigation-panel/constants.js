@@ -5,14 +5,15 @@ import { __ } from '@wordpress/i18n';
 
 export const TEMPLATES_GENERAL = [
 	'front-page',
+	'home',
 	'archive',
 	'singular',
+	'single',
+	'single-post',
 	'index',
 	'search',
 	'404',
 ];
-
-export const TEMPLATES_POSTS = [ 'home', 'single', 'single-post' ];
 
 export const TEMPLATES_NEW_OPTIONS = [
 	'front-page',
