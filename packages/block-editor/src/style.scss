@@ -26,10 +26,12 @@
 @import "./components/block-switcher/style.scss";
 @import "./components/block-types-list/style.scss";
 @import "./components/block-variation-picker/style.scss";
+@import "./components/block-variation-transforms/style.scss";
 @import "./components/button-block-appender/style.scss";
 @import "./components/colors-gradients/style.scss";
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
+@import "./components/font-appearance-control/style.scss";
 @import "./components/link-control/style.scss";
 @import "./components/line-height-control/style.scss";
 @import "./components/image-size-control/style.scss";
@@ -45,11 +47,11 @@
 @import "./components/skip-to-selected-block/style.scss";
 @import "./components/text-decoration-and-transform/style.scss";
 @import "./components/text-transform-control/style.scss";
+@import "./components/text-decoration-control/style.scss";
 @import "./components/tool-selector/style.scss";
 @import "./components/url-input/style.scss";
 @import "./components/url-popover/style.scss";
 @import "./components/warning/style.scss";
-@import "./components/writing-flow/style.scss";
 @import "./hooks/anchor.scss";
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
@@ -62,3 +64,5 @@
 @import "./components/block-toolbar/style.scss";
 @import "./components/inserter/style.scss";
 @import "./components/preview-options/style.scss";
+
+@include wordpress-admin-schemes();

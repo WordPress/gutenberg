@@ -9,6 +9,7 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -17,8 +18,9 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from './registration';
-import { normalizeBlockType } from './utils';
+import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -116,10 +118,14 @@ export function getSaveElement(
 
 	let element = save( { attributes, innerBlocks } );
 
+	const hasLightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
+
 	if (
 		isObject( element ) &&
 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
-		! blockType.apiVersion
+		! hasLightBlockWrapper
 	) {
 		/**
 		 * Filters the props applied to the block save result element.
@@ -342,6 +348,28 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockType = getBlockType( blockName );
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+}
+
+export function __unstableSerializeAndClean( blocks ) {
+	// A single unmodified default block is assumed to
+	// be equivalent to an empty post.
+	if ( blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] ) ) {
+		blocks = [];
+	}
+
+	let content = serialize( blocks );
+
+	// For compatibility, treat a post consisting of a
+	// single freeform block as legacy content and apply
+	// pre-block-editor removep'd content formatting.
+	if (
+		blocks.length === 1 &&
+		blocks[ 0 ].name === getFreeformContentHandlerName()
+	) {
+		content = removep( content );
+	}
+
+	return content;
 }
 
 /**

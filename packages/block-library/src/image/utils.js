@@ -1,12 +1,17 @@
 /**
  * External dependencies
  */
-import { isEmpty, each } from 'lodash';
+import { isEmpty, each, get } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { NEW_TAB_REL } from './constants';
+import {
+	NEW_TAB_REL,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_NONE,
+} from './constants';
 
 export function removeNewTabRel( currentRel ) {
 	let newRel = currentRel;
@@ -55,4 +60,41 @@ export function getUpdatedLinkTargetSettings( value, { rel } ) {
 		linkTarget,
 		rel: updatedRel,
 	};
+}
+
+/**
+ * Determines new href and linkDestination values for an image block from the
+ * supplied link destination.
+ *
+ * @param {Object} image       Image.
+ * @param {string} destination Link destination.
+ * @return {string}            New url attributes to assign to image block.
+ */
+export function getUrl( image, destination ) {
+	switch ( destination ) {
+		case LINK_DESTINATION_MEDIA:
+			return image?.source_url || image?.url; // eslint-disable-line camelcase
+		case LINK_DESTINATION_ATTACHMENT:
+			return image?.link;
+		case LINK_DESTINATION_NONE:
+			return undefined;
+	}
+
+	return {};
+}
+
+/**
+ * Determines new Image block attributes size selection.
+ *
+ * @param {Object} image Media file object for gallery image.
+ * @param {string} size  Selected size slug to apply.
+ */
+export function getImageSizeAttributes( image, size ) {
+	const url = get( image, [ 'media_details', 'sizes', size, 'source_url' ] );
+
+	if ( url ) {
+		return { url, width: undefined, height: undefined, sizeSlug: size };
+	}
+
+	return {};
 }

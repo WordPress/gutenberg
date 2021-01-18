@@ -106,31 +106,3 @@
 		transform: translateY(-($block-toolbar-height + $grid-unit-15));
 	}
 }
-
-.block-editor-block-toolbar-animated-width-container {
-	position: relative;
-	overflow: hidden;
-	transition: width 300ms;
-}
-
-.block-editor-block-toolbar-content-enter {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: auto;
-	opacity: 0;
-}
-.block-editor-block-toolbar-content-enter-active {
-	position: absolute;
-	opacity: 1;
-	transition: opacity 300ms;
-}
-.block-editor-block-toolbar-content-exit {
-	width: auto;
-	opacity: 1;
-	pointer-events: none;
-}
-.block-editor-block-toolbar-content-exit-active {
-	opacity: 0;
-	transition: opacity 300ms;
-}

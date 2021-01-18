@@ -7,12 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	LINK_COLOR,
-	useEditorFeature,
-	getPresetValueFromVariable,
-	getPresetVariable,
-} from '../editor/utils';
+import { LINK_COLOR, useEditorFeature } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {
@@ -26,8 +21,8 @@ export function useHasColorPanel( { supports } ) {
 
 export default function ColorPanel( {
 	context: { supports, name },
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
@@ -42,53 +37,43 @@ export default function ColorPanel( {
 	const settings = [];
 
 	if ( supports.includes( 'color' ) ) {
-		const color = getStyleProperty( name, 'color' );
+		const color = getStyle( name, 'color' );
+		const userColor = getStyle( name, 'color', 'user' );
 		settings.push( {
-			colorValue:
-				getPresetValueFromVariable( 'color', colors, color ) || color,
-			onColorChange: ( value ) =>
-				setStyleProperty(
-					name,
-					'color',
-					getPresetVariable( 'color', colors, value ) || value
-				),
+			colorValue: color,
+			onColorChange: ( value ) => setStyle( name, 'color', value ),
 			label: __( 'Text color' ),
+			clearable: color === userColor,
 		} );
 	}
 
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
-		const backgroundColor = getStyleProperty( name, 'backgroundColor' );
+		const backgroundColor = getStyle( name, 'backgroundColor' );
+		const userBackgroundColor = getStyle( name, 'backgroundColor', 'user' );
 		backgroundSettings = {
-			colorValue:
-				getPresetValueFromVariable(
-					'color',
-					colors,
-					backgroundColor
-				) || backgroundColor,
+			colorValue: backgroundColor,
 			onColorChange: ( value ) =>
-				setStyleProperty(
-					name,
-					'backgroundColor',
-					getPresetVariable( 'color', colors, value ) || value
-				),
+				setStyle( name, 'backgroundColor', value ),
 		};
+		if ( backgroundColor ) {
+			backgroundSettings.clearable =
+				backgroundColor === userBackgroundColor;
+		}
 	}
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
-		const gradient = getStyleProperty( name, 'background' );
+		const gradient = getStyle( name, 'background' );
+		const userGradient = getStyle( name, 'background', 'user' );
 		gradientSettings = {
-			gradientValue:
-				getPresetValueFromVariable( 'gradient', gradients, gradient ) ||
-				gradient,
+			gradientValue: gradient,
 			onGradientChange: ( value ) =>
-				setStyleProperty(
-					name,
-					'background',
-					getPresetVariable( 'gradient', gradients, value ) || value
-				),
+				setStyle( name, 'background', value ),
 		};
+		if ( gradient ) {
+			gradientSettings.clearable = gradient === userGradient;
+		}
 	}
 
 	if (
@@ -103,17 +88,13 @@ export default function ColorPanel( {
 	}
 
 	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getStyleProperty( name, LINK_COLOR );
+		const color = getStyle( name, LINK_COLOR );
+		const userColor = getStyle( name, LINK_COLOR, 'user' );
 		settings.push( {
-			colorValue:
-				getPresetValueFromVariable( 'color', colors, color ) || color,
-			onColorChange: ( value ) =>
-				setStyleProperty(
-					name,
-					LINK_COLOR,
-					getPresetVariable( 'color', colors, value ) || value
-				),
+			colorValue: color,
+			onColorChange: ( value ) => setStyle( name, LINK_COLOR, value ),
 			label: __( 'Link color' ),
+			clearable: color === userColor,
 		} );
 	}
 	return (

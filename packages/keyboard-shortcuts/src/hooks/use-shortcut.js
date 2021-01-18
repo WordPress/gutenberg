@@ -5,6 +5,11 @@ import { useSelect } from '@wordpress/data';
 import { useKeyboardShortcut } from '@wordpress/compose';
 
 /**
+ * Internal dependencies
+ */
+import { store as keyboardShortcutsStore } from '../store';
+
+/**
  * Attach a keyboard shortcut handler.
  *
  * @param {string} name       Shortcut name.
@@ -15,7 +20,7 @@ function useShortcut( name, callback, options ) {
 	const shortcuts = useSelect(
 		( select ) => {
 			return select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations( name );
 		},
 		[ name ]

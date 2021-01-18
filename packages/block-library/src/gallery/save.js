@@ -15,13 +15,19 @@ export default function save( { attributes } ) {
 		imageCrop,
 		caption,
 	} = attributes;
-	const className = `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }`;
+	const className = `blocks-gallery-grid has-nested-images columns-${ columns } ${
+		imageCrop ? 'is-cropped' : ''
+	}`;
 
 	return (
 		<figure { ...useBlockProps.save( { className } ) }>
+<<<<<<< HEAD
 			<ul className="blocks-gallery-grid">
 				<InnerBlocks.Content />
 			</ul>
+=======
+			<InnerBlocks.Content />
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"

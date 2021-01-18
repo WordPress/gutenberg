@@ -50,11 +50,13 @@
 		"html": false,
 		"inserter": true,
 		"fontSize": true,
+		"__experimentalFontStyle": true,
+		"__experimentalFontWeight": true,
 		"__experimentalTextTransform": true,
-		"color": {
-			"textColor": true,
-			"backgroundColor": true
-		},
-		"__experimentalFontFamily": true
-	}
+		"color": true,
+		"__experimentalFontFamily": true,
+		"__experimentalTextDecoration": true
+	},
+	"editorStyle": "wp-block-navigation-editor",
+	"style": "wp-block-navigation"
 }

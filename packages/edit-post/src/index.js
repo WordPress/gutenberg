@@ -4,10 +4,6 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
-import '@wordpress/keyboard-shortcuts';
-import '@wordpress/reusable-blocks';
-import '@wordpress/viewport';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -19,7 +15,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import './hooks';
 import './plugins';
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
 /**
@@ -163,3 +159,4 @@ export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pr
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';

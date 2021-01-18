@@ -49,3 +49,15 @@ function CustomButton() {
 	);
 }
 ```
+
+### Props
+
+The component accepts the following props:
+
+#### isDisabled
+
+Whether to disable all the descendant fields. Defaults to `true`.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`

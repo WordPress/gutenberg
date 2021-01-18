@@ -16,6 +16,19 @@ import {
 	receiveCurrentUser,
 } from '../actions';
 
+jest.mock( '../locks/actions', () => ( {
+	__unstableAcquireStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_ACQUIRE_LOCK',
+		},
+	] ),
+	__unstableReleaseStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_RELEASE_LOCK',
+		},
+	] ),
+} ) );
+
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', () => {
 		const entity = { kind: 'someKind', name: 'someName', id: 'someId' };
@@ -28,6 +41,7 @@ describe( 'editEntityRecord', () => {
 		expect( fulfillment.next().value ).toEqual(
 			controls.select( 'core', 'getEntity', entity.kind, entity.name )
 		);
+
 		// Don't pass back an entity config.
 		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
@@ -46,8 +60,13 @@ describe( 'deleteEntityRecord', () => {
 		// Trigger generator
 		fulfillment.next();
 
-		// Start
+		// Acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Start
+		expect( fulfillment.next().value.type ).toEqual(
 			'DELETE_ENTITY_RECORD_START'
 		);
 
@@ -62,6 +81,11 @@ describe( 'deleteEntityRecord', () => {
 
 		expect( fulfillment.next().value.type ).toBe(
 			'DELETE_ENTITY_RECORD_FINISH'
+		);
+
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 
 		expect( fulfillment.next() ).toMatchObject( {
@@ -80,21 +104,18 @@ describe( 'saveEntityRecord', () => {
 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
+
+		// Provide entities and acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Trigger apiFetch
+		expect( fulfillment.next().value.type ).toEqual(
 			'SAVE_ENTITY_RECORD_START'
 		);
 
-		// Should select __experimentalGetEntityRecordNoResolver selector (as opposed to getEntityRecord)
-		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318.
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.selectorName ).toBe(
-			'__experimentalGetEntityRecordNoResolver'
-		);
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		const receiveItems = fulfillment.next().value;
-		expect( receiveItems.type ).toBe( 'RECEIVE_ITEMS' );
-		expect( receiveItems.invalidateCache ).toBe( false );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts',
@@ -110,12 +131,18 @@ describe( 'saveEntityRecord', () => {
 				'post',
 				updatedRecord,
 				undefined,
-				true
+				true,
+				{ title: 'new post' }
 			)
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
 		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
+		);
+
 		expect( fulfillment.next().value ).toBe( updatedRecord );
 	} );
 
@@ -127,16 +154,17 @@ describe( 'saveEntityRecord', () => {
 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
+
+		// Provide entities and acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Trigger apiFetch
+		expect( fulfillment.next().value.type ).toEqual(
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		const receiveItems = fulfillment.next().value;
-		expect( receiveItems.type ).toBe( 'RECEIVE_ITEMS' );
-		expect( receiveItems.invalidateCache ).toBe( false );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
@@ -146,10 +174,17 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( post );
 		expect( received ).toEqual(
-			receiveEntityRecords( 'postType', 'post', post, undefined, true )
+			receiveEntityRecords( 'postType', 'post', post, undefined, true, {
+				title: 'new post',
+				id: 10,
+			} )
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
+		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 
@@ -166,14 +201,17 @@ describe( 'saveEntityRecord', () => {
 		const fulfillment = saveEntityRecord( 'root', 'postType', postType );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
+
+		// Provide entities and acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Trigger apiFetch
+		expect( fulfillment.next().value.type ).toEqual(
 			'SAVE_ENTITY_RECORD_START'
 		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/page',
@@ -188,11 +226,16 @@ describe( 'saveEntityRecord', () => {
 				'postType',
 				postType,
 				undefined,
-				true
+				true,
+				{ slug: 'page', title: 'Pages' }
 			)
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
+		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 } );

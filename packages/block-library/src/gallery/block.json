@@ -38,7 +38,7 @@
 			"type": "boolean",
 			"default": false
 		},
-		"isListItem": {
+		"isGrouped": {
 			"type": "boolean",
 			"default": true
 		},
@@ -49,10 +49,15 @@
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
-		"isListItem": "isListItem"
+		"isGrouped": "isGrouped",
+		"linkTo": "linkTo",
+		"linkTarget": "linkTarget",
+		"sizeSlug": "sizeSlug"
 	},
 	"supports": {
 		"anchor": true,
 		"align": true
-	}
+	},
+	"editorStyle": "wp-block-gallery-editor",
+	"style": "wp-block-gallery"
 }

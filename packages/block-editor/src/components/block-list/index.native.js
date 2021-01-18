@@ -15,6 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 	WIDE_ALIGNMENTS,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -176,6 +177,8 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
+			contentResizeMode,
+			blockWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -191,6 +194,11 @@ export class BlockList extends Component {
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
+
+		const isContentStretch = contentResizeMode === 'stretch';
+		const isMultiBlocks = blockClientIds.length > 1;
+		const { isWider } = alignmentHelpers;
+
 		return (
 			<View
 				style={ containerStyle }
@@ -222,9 +230,13 @@ export class BlockList extends Component {
 					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
-					contentContainerStyle={
-						horizontal && styles.horizontalContentContainer
-					}
+					contentContainerStyle={ [
+						horizontal && styles.horizontalContentContainer,
+						isWider( blockWidth, 'medium' ) &&
+							( isContentStretch && isMultiBlocks
+								? styles.horizontalContentContainerStretch
+								: styles.horizontalContentContainerCenter ),
+					] }
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,
@@ -313,6 +325,7 @@ export class BlockList extends Component {
 				<>
 					<TouchableWithoutFeedback
 						accessibilityLabel={ __( 'Add paragraph block' ) }
+						testID={ __( 'Add paragraph block' ) }
 						onPress={ () => {
 							this.addBlockToEndOfPost( paragraphBlock );
 						} }
@@ -365,7 +378,8 @@ export default compose( [
 			return {
 				blockClientIds,
 				blockCount,
-				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+				isBlockInsertionPointVisible:
+					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
 				isReadOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,

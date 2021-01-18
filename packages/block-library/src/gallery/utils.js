@@ -1,9 +1,12 @@
 /**
+<<<<<<< HEAD
  * External dependencies
  */
 import { get } from 'lodash';
 
 /**
+=======
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
  * Internal dependencies
  */
 import {
@@ -49,6 +52,7 @@ export function getHrefAndDestination( image, destination ) {
 
 	return {};
 }
+<<<<<<< HEAD
 
 /**
  * Determines new Image block attributes affected by a change in Gallery image
@@ -66,3 +70,5 @@ export function getImageSizeAttributes( image, size ) {
 
 	return {};
 }
+=======
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826

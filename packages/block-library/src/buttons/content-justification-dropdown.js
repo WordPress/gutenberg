@@ -3,34 +3,26 @@
  */
 import { DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import {
-	contentJustificationCenterIcon,
-	contentJustificationLeftIcon,
-	contentJustificationRightIcon,
-} from './icons';
+import { justifyLeft, justifyCenter, justifyRight } from '@wordpress/icons';
 
 const DEFAULT_ALLOWED_VALUES = [ 'left', 'center', 'right' ];
 
 const CONTROLS = {
 	left: {
-		icon: contentJustificationLeftIcon,
+		icon: justifyLeft,
 		title: __( 'Justify content left' ),
 	},
 	center: {
-		icon: contentJustificationCenterIcon,
+		icon: justifyCenter,
 		title: __( 'Justify content center' ),
 	},
 	right: {
-		icon: contentJustificationRightIcon,
+		icon: justifyRight,
 		title: __( 'Justify content right' ),
 	},
 };
 
-const DEFAULT_ICON = CONTROLS.center.icon;
+const DEFAULT_ICON = CONTROLS.left.icon;
 
 /**
  * Dropdown for selecting a content justification option.

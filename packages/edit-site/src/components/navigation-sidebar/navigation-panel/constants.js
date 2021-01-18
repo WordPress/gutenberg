@@ -9,6 +9,16 @@ export const TEMPLATES_GENERAL = [
 
 export const TEMPLATES_POSTS = [ 'home', 'single' ];
 
+export const TEMPLATES_NEW_OPTIONS = [
+	'front-page',
+	'single-post',
+	'page',
+	'archive',
+	'search',
+	'404',
+	'index',
+];
+
 export const MENU_ROOT = 'root';
 export const MENU_CONTENT_CATEGORIES = 'content-categories';
 export const MENU_CONTENT_PAGES = 'content-pages';

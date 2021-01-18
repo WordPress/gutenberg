@@ -84,14 +84,13 @@ export const Gallery = ( props ) => {
 			parentWidth: maxWidth + 2 * TILE_SPACING,
 		}
 	);
+	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
 	const focusGalleryCaption = () => {
 		if ( ! isCaptionSelected ) {
 			setIsCaptionSelected( true );
 		}
 	};
-
-	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
 	return (
 		<View style={ isFullWidth && styles.fullWidth }>

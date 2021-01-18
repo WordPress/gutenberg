@@ -61,6 +61,7 @@ const {
 	canInsertBlockType,
 	canInsertBlocks,
 	getInserterItems,
+	getBlockTransformItems,
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
@@ -69,6 +70,7 @@ const {
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
+	__experimentalGetParsedReusableBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2155,20 +2157,17 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if no assigned insertion point', () => {
+		it( 'should return false if insertion point is set to not show', () => {
 			const state = {
-				insertionPoint: null,
+				insertionPointVisibility: false,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return true if insertion point is set to show', () => {
 			const state = {
-				insertionPoint: {
-					rootClientId: undefined,
-					index: 5,
-				},
+				insertionPointVisibility: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -2677,6 +2676,222 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getBlockTransformItems', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/with-tranforms-a', {
+				category: 'text',
+				title: 'Tranforms a',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-b' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-c' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
+							blocks: [
+								'core/with-tranforms-b',
+								'core/with-tranforms-c',
+							],
+							transform: () => {},
+							isMultiBlock: true,
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/with-tranforms-b', {
+				category: 'text',
+				title: 'Tranforms b',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-a' ],
+							transform: () => {},
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/with-tranforms-c', {
+				category: 'text',
+				title: 'Tranforms c',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/with-tranforms-a' ],
+							transform: () => {},
+						},
+					],
+				},
+				supports: { multiple: false },
+			} );
+		} );
+		afterAll( () => {
+			[
+				'core/with-tranforms-a',
+				'core/with-tranforms-b',
+				'core/with-tranforms-c',
+			].forEach( unregisterBlockType );
+		} );
+		it( 'should properly return block type items', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 2 );
+			const returnedProps = Object.keys( items[ 0 ] );
+			// Verify we have only the wanted props.
+			expect( returnedProps ).toHaveLength( 6 );
+			expect( returnedProps ).toEqual(
+				expect.arrayContaining( [
+					'id',
+					'name',
+					'title',
+					'icon',
+					'frecency',
+					'isDisabled',
+				] )
+			);
+			expect( items ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-c',
+					} ),
+				] )
+			);
+		} );
+		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/with-tranforms-b' },
+						block2: { name: 'core/with-tranforms-a' },
+					},
+					attributes: {
+						block1: {},
+						block2: {},
+					},
+					order: {},
+					parents: {
+						block1: '',
+						block2: 'block1',
+					},
+					cache: {},
+					controlledInnerBlocks: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {
+					block1: {
+						allowedBlocks: [ 'core/with-tranforms-c' ],
+					},
+					block2: {},
+				},
+			};
+			const blocks = [
+				{ clientId: 'block2', name: 'core/with-tranforms-a' },
+			];
+			const items = getBlockTransformItems( state, blocks, 'block1' );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ].name ).toEqual( 'core/with-tranforms-c' );
+		} );
+		it( 'should take into account the usage of blocks settings `multiple` - if multiple blocks of the same type are allowed', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: {
+							clientId: 'block1',
+							name: 'core/with-tranforms-c',
+						},
+					},
+					attributes: {
+						block1: { attribute: {} },
+					},
+					order: {
+						'': [ 'block1' ],
+					},
+					cache: {
+						block1: {},
+					},
+					controlledInnerBlocks: {},
+				},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 2 );
+			expect( items ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+						isDisabled: false,
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-c',
+						isDisabled: true,
+					} ),
+				] )
+			);
+		} );
+		it( 'should set frecency', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				preferences: {
+					insertUsage: {
+						'core/with-tranforms-a': { count: 10, time: 1000 },
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const blocks = [ { name: 'core/with-tranforms-c' } ];
+			const items = getBlockTransformItems( state, blocks );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					name: 'core/with-tranforms-a',
+					frecency: 2.5,
+				} )
+			);
+		} );
+	} );
+
 	describe( 'isValidTemplate', () => {
 		it( 'should return true if template is valid', () => {
 			const state = {
@@ -2715,7 +2930,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return null if the specified clientId was not found ', () => {
+		it( 'should return null if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3035,5 +3250,25 @@ describe( 'selectors', () => {
 				] )
 			).toEqual( 'client-id-03' );
 		} );
+	} );
+} );
+
+describe( '__experimentalGetParsedReusableBlock', () => {
+	const state = {
+		settings: {
+			__experimentalReusableBlocks: [
+				{
+					id: 1,
+					content: { raw: '' },
+				},
+			],
+		},
+	};
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/26485. See https://github.com/WordPress/gutenberg/issues/26548.
+	it( "Should return an empty array if reusable block's content.raw is an empty string", () => {
+		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
+			[]
+		);
 	} );
 } );

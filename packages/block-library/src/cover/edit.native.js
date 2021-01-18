@@ -21,6 +21,7 @@ import {
 	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
+	UnitControl,
 	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
@@ -28,6 +29,7 @@ import {
 	ColorPalette,
 	ColorPicker,
 	BottomSheetConsumer,
+	useConvertUnitToMobile,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -57,6 +59,7 @@ import {
 	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	CSS_UNITS,
 } from './shared';
 import OverlayColorSettings from './overlay-color-settings';
 
@@ -95,8 +98,16 @@ const Cover = ( {
 		id,
 		style,
 		customOverlayColor,
+		minHeightUnit = 'px',
 	} = attributes;
+
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const convertedMinHeight = useConvertUnitToMobile(
+		minHeight || COVER_DEFAULT_HEIGHT,
+		minHeightUnit
+	);
+
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
@@ -164,7 +175,7 @@ const Cover = ( {
 		}
 	};
 
-	const onOpactiyChange = ( value ) => {
+	const onOpacityChange = ( value ) => {
 		setAttributes( { dimRatio: value } );
 	};
 
@@ -267,6 +278,16 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
+	const onChangeUnit = ( nextUnit ) => {
+		setAttributes( {
+			minHeightUnit: nextUnit,
+			minHeight:
+				nextUnit === 'px'
+					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
+					: CONTAINER_HEIGHT,
+		} );
+	};
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -280,20 +301,24 @@ const Cover = ( {
 						minimumValue={ 0 }
 						maximumValue={ 100 }
 						value={ dimRatio }
-						onChange={ onOpactiyChange }
+						onChange={ onOpacityChange }
 						style={ styles.rangeCellContainer }
 						separatorType={ 'topFullWidth' }
 					/>
 				</PanelBody>
 			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
-				<RangeControl
-					label={ __( 'Minimum height in pixels' ) }
-					minimumValue={ COVER_MIN_HEIGHT }
-					maximumValue={ COVER_MAX_HEIGHT }
+				<UnitControl
+					label={ __( 'Minimum height' ) }
+					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
+					max={ COVER_MAX_HEIGHT }
+					unit={ minHeightUnit }
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
+					onUnitChange={ onChangeUnit }
+					units={ CSS_UNITS }
 					style={ styles.rangeCellContainer }
+					key={ minHeightUnit }
 				/>
 			</PanelBody>
 
@@ -512,7 +537,7 @@ const Cover = ( {
 
 			<View
 				pointerEvents="box-none"
-				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
 				<InnerBlocks
 					template={ INNER_BLOCKS_TEMPLATE }

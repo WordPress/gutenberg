@@ -67,6 +67,7 @@ export default function save( { attributes } ) {
 	);
 
 	const blockProps = useBlockProps.save( { className: classes } );
+<<<<<<< HEAD
 	if ( isListItem ) {
 		return (
 			<li className="list-image">
@@ -74,6 +75,8 @@ export default function save( { attributes } ) {
 			</li>
 		);
 	}
+=======
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (

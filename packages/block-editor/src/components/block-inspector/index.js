@@ -6,6 +6,7 @@ import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -23,6 +24,9 @@ import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
+import BlockVariationTransforms from '../block-variation-transforms';
+import useBlockDisplayInformation from '../use-block-display-information';
+
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -62,21 +66,36 @@ const BlockInspector = ( {
 		}
 		return null;
 	}
+	return (
+		<BlockInspectorSingleBlock
+			clientId={ selectedBlockClientId }
+			blockName={ blockType.name }
+			hasBlockStyles={ hasBlockStyles }
+			bubblesVirtually={ bubblesVirtually }
+		/>
+	);
+};
 
+const BlockInspectorSingleBlock = ( {
+	clientId,
+	blockName,
+	hasBlockStyles,
+	bubblesVirtually,
+} ) => {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard blockType={ blockType } />
+			<BlockCard { ...blockInformation } />
+			<BlockVariationTransforms blockClientId={ clientId } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ selectedBlockClientId } />
+						<BlockStyles clientId={ clientId } />
 						{ hasBlockSupport(
-							blockType.name,
+							blockName,
 							'defaultStylePicker',
 							true
-						) && (
-							<DefaultStylePicker blockName={ blockType.name } />
-						) }
+						) && <DefaultStylePicker blockName={ blockName } /> }
 					</PanelBody>
 				</div>
 			) }
@@ -119,7 +138,7 @@ export default withSelect( ( select ) => {
 		getSelectedBlockCount,
 		getBlockName,
 	} = select( 'core/block-editor' );
-	const { getBlockStyles } = select( 'core/blocks' );
+	const { getBlockStyles } = select( blocksStore );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =
 		selectedBlockClientId && getBlockName( selectedBlockClientId );

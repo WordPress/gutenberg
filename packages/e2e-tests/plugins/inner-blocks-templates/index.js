@@ -1,4 +1,4 @@
-( function () {
+(function () {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var createBlock = wp.blocks.createBlock;
 	var el = wp.element.createElement;
@@ -24,55 +24,106 @@
 		],
 	];
 
+	var TEMPLATE_TWO_PARAGRAPHS = [
+		[
+			'core/paragraph',
+			{
+				fontSize: 'large',
+				content: 'One',
+			},
+		],
+		[
+			'core/paragraph',
+			{
+				fontSize: 'large',
+				content: 'Two',
+			},
+		],
+	];
+
 	var save = function () {
-		return el( InnerBlocks.Content );
+		return el(InnerBlocks.Content);
 	};
 
-	registerBlockType( 'test/test-inner-blocks-no-locking', {
+	registerBlockType('test/test-inner-blocks-no-locking', {
 		title: 'Test Inner Blocks no locking',
 		icon: 'cart',
 		category: 'text',
 
-		edit: function ( props ) {
-			return el( InnerBlocks, {
+		edit: function (props) {
+			return el(InnerBlocks, {
 				template: TEMPLATE,
-			} );
+			});
 		},
 
 		save,
-	} );
+	});
 
-	registerBlockType( 'test/test-inner-blocks-locking-all', {
+	registerBlockType('test/test-inner-blocks-locking-all', {
 		title: 'Test InnerBlocks locking all',
 		icon: 'cart',
 		category: 'text',
 
-		edit: function ( props ) {
-			return el( InnerBlocks, {
+		edit: function (props) {
+			return el(InnerBlocks, {
 				template: TEMPLATE,
 				templateLock: 'all',
-			} );
+			});
 		},
 
 		save,
-	} );
+	});
 
-	registerBlockType( 'test/test-inner-blocks-paragraph-placeholder', {
+	registerBlockType('test/test-inner-blocks-update-locked-template', {
+		title: 'Test Inner Blocks update locked template',
+		icon: 'cart',
+		category: 'text',
+
+		attributes: {
+			hasUpdatedTemplate: {
+				type: 'boolean',
+				default: false,
+			},
+		},
+
+		edit: function (props) {
+			const hasUpdatedTemplated = props.attributes.hasUpdatedTemplate;
+			return el(
+				'div',
+				null,
+				[
+					el('button', {
+						onClick() {
+							props.setAttributes({ hasUpdatedTemplate: true })
+						}
+					}, 'Update template'),
+					el(InnerBlocks, {
+						template: hasUpdatedTemplated ? TEMPLATE_TWO_PARAGRAPHS : TEMPLATE,
+						templateLock: 'all',
+					})
+				]
+			);
+		},
+
+		save,
+	});
+
+	registerBlockType('test/test-inner-blocks-paragraph-placeholder', {
 		title: 'Test Inner Blocks Paragraph Placeholder',
 		icon: 'cart',
 		category: 'text',
 
-		edit: function ( props ) {
-			return el( InnerBlocks, {
+		edit: function (props) {
+			return el(InnerBlocks, {
 				template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
 				templateInsertUpdatesSelection: true,
-			} );
+			});
 		},
 
 		save,
-	} );
+	});
 
-	registerBlockType( 'test/test-inner-blocks-transformer-target', {
+	registerBlockType('test/test-inner-blocks-transformer-target', {
 		title: 'Test Inner Blocks transformer target',
 		icon: 'cart',
 		category: 'text',
@@ -87,7 +138,7 @@
 						'test/test-inner-blocks-locking-all',
 						'test/test-inner-blocks-paragraph-placeholder',
 					],
-					transform: function ( attributes, innerBlocks ) {
+					transform: function (attributes, innerBlocks) {
 						return createBlock(
 							'test/test-inner-blocks-transformer-target',
 							attributes,
@@ -99,8 +150,8 @@
 			to: [
 				{
 					type: 'block',
-					blocks: [ 'test/i-dont-exist' ],
-					transform: function ( attributes, innerBlocks ) {
+					blocks: ['test/i-dont-exist'],
+					transform: function (attributes, innerBlocks) {
 						return createBlock(
 							'test/test-inner-blocks-transformer-target',
 							attributes,
@@ -111,12 +162,12 @@
 			],
 		},
 
-		edit: function ( props ) {
-			return el( InnerBlocks, {
+		edit: function (props) {
+			return el(InnerBlocks, {
 				template: TEMPLATE,
-			} );
+			});
 		},
 
 		save,
-	} );
-} )();
+	});
+})();

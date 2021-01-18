@@ -115,6 +115,36 @@ export const kinds = [
 ];
 
 /**
+ * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
+ *
+ * @param {Object} persistedRecord Already persisted Post
+ * @param {Object} edits Edits.
+ * @return {Object} Updated edits.
+ */
+export const prePersistPostType = ( persistedRecord, edits ) => {
+	const newEdits = {};
+
+	if ( persistedRecord?.status === 'auto-draft' ) {
+		// Saving an auto-draft should create a draft by default.
+		if ( ! edits.status && ! newEdits.status ) {
+			newEdits.status = 'draft';
+		}
+
+		// Fix the auto-draft default title.
+		if (
+			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			! newEdits.title &&
+			( ! persistedRecord?.title ||
+				persistedRecord?.title === 'Auto Draft' )
+		) {
+			newEdits.title = '';
+		}
+	}
+
+	return newEdits;
+};
+
+/**
  * Returns the list of post type entities.
  *
  * @return {Promise} Entities promise
@@ -122,6 +152,9 @@ export const kinds = [
 function* loadPostTypeEntities() {
 	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
@@ -133,12 +166,11 @@ function* loadPostTypeEntities() {
 				selectionEnd: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle( record ) {
-				if ( [ 'wp_template_part', 'wp_template' ].includes( name ) ) {
-					return startCase( record.slug );
-				}
-				return record?.title?.renderd || record?.title || record.id;
-			},
+			getTitle: ( record ) =>
+				record?.title?.rendered ||
+				record?.title ||
+				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
 }

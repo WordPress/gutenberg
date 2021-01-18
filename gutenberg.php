@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 9.3.0
+ * Version: 9.8.0-rc.1
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -66,22 +66,6 @@ function gutenberg_menu() {
 			);
 		}
 	}
-
-	if ( gutenberg_is_fse_theme() ) {
-		add_menu_page(
-			__( 'Site Editor (beta)', 'gutenberg' ),
-			sprintf(
-				/* translators: %s: "beta" label. */
-				__( 'Site Editor %s', 'gutenberg' ),
-				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
-			),
-			'edit_theme_options',
-			'gutenberg-edit-site',
-			'gutenberg_edit_site_page',
-			'dashicons-layout'
-		);
-	}
-
 	if ( current_user_can( 'edit_posts' ) ) {
 		add_submenu_page(
 			'gutenberg',
@@ -111,6 +95,31 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
 
 /**
+ * Site editor's Menu.
+ *
+ * Adds a new wp-admin menu item for the Site editor.
+ *
+ * @since 9.4.0
+ */
+function gutenberg_site_editor_menu() {
+	if ( gutenberg_is_fse_theme() ) {
+		add_menu_page(
+			__( 'Site Editor (beta)', 'gutenberg' ),
+			sprintf(
+			/* translators: %s: "beta" label. */
+				__( 'Site Editor %s', 'gutenberg' ),
+				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
+			),
+			'edit_theme_options',
+			'gutenberg-edit-site',
+			'gutenberg_edit_site_page',
+			'dashicons-layout'
+		);
+	}
+}
+add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
+
+/**
  * Modify WP admin bar.
  *
  * @param WP_Admin_Bar $wp_admin_bar Core class used to implement the Toolbar API.
@@ -126,6 +135,31 @@ function modify_admin_bar( $wp_admin_bar ) {
 	}
 }
 add_action( 'admin_bar_menu', 'modify_admin_bar', 40 );
+
+
+remove_action( 'welcome_panel', 'wp_welcome_panel' );
+/**
+ * Modify Dashboard welcome panel.
+ *
+ * When widgets are merged in core this should go into `wp-admin/includes/dashboard.php`
+ * and replace the widgets link in the `wp_welcome_panel` checking for the same condition,
+ * because then `gutenberg_use_widgets_block_editor` will exist in core.
+ */
+function modify_welcome_panel() {
+	ob_start();
+	wp_welcome_panel();
+	$welcome_panel = ob_get_clean();
+	if ( gutenberg_use_widgets_block_editor() ) {
+		echo str_replace(
+			admin_url( 'widgets.php' ),
+			admin_url( 'themes.php?page=gutenberg-widgets' ),
+			$welcome_panel
+		);
+	} else {
+		echo $welcome_panel;
+	}
+}
+add_action( 'welcome_panel', 'modify_welcome_panel', 40 );
 
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
@@ -159,7 +193,7 @@ function gutenberg_build_files_notice() {
  */
 function gutenberg_pre_init() {
 	global $wp_version;
-	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/build/blocks' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
@@ -175,7 +209,7 @@ function gutenberg_pre_init() {
 		return;
 	}
 
-	require_once dirname( __FILE__ ) . '/lib/load.php';
+	require_once __DIR__ . '/lib/load.php';
 }
 
 /**

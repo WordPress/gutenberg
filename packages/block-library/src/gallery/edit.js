@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+<<<<<<< HEAD
 import {
 	isEqual,
 	isEmpty,
@@ -10,6 +11,10 @@ import {
 	some,
 	every,
 } from 'lodash';
+=======
+import classnames from 'classnames';
+import { isEmpty, concat, differenceBy, some, every } from 'lodash';
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 
 /**
  * WordPress dependencies
@@ -29,7 +34,11 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+<<<<<<< HEAD
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
+=======
+import { Platform, useEffect, useMemo } from '@wordpress/element';
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -42,7 +51,11 @@ import { createBlobURL } from '@wordpress/blob';
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+<<<<<<< HEAD
 import { getHrefAndDestination, getImageSizeAttributes } from './utils';
+=======
+import { getHrefAndDestination } from './utils';
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
 import DirtyImageOptions from './dirty-image-options';
@@ -78,6 +91,10 @@ function GalleryEdit( props ) {
 	const {
 		setAttributes,
 		attributes,
+<<<<<<< HEAD
+=======
+		className,
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 		clientId,
 		noticeOperations,
 		isSelected,
@@ -88,7 +105,11 @@ function GalleryEdit( props ) {
 	const {
 		imageCount,
 		linkTarget,
+<<<<<<< HEAD
 		linkTo = Platform.OS !== 'web' ? 'none' : undefined,
+=======
+		linkTo,
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
@@ -99,6 +120,7 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
+<<<<<<< HEAD
 	const currentImageOptions = useMemo(
 		() => ( {
 			linkTarget,
@@ -124,6 +146,16 @@ function GalleryEdit( props ) {
 		return {
 			getBlock: select( 'core/block-editor' ).getBlock,
 			getSettings: select( 'core/block-editor' ).getSettings,
+=======
+	const { getSettings, preferredStyle } = useSelect( ( select ) => {
+		const settings = select( 'core/block-editor' ).getSettings();
+		const preferredStyleVariations =
+			settings.__experimentalPreferredStyleVariations;
+		return {
+			getBlock: select( 'core/block-editor' ).getBlock,
+			getSettings: select( 'core/block-editor' ).getSettings,
+			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 		};
 	}, [] );
 
@@ -181,11 +213,17 @@ function GalleryEdit( props ) {
 		isSelected,
 		getSettings
 	);
+<<<<<<< HEAD
 
 	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
 		'core/block-editor'
 	);
 
+=======
+
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 	/**
 	 * Determines the image attributes that should be applied to an image block
 	 * after the gallery updates.
@@ -208,6 +246,12 @@ function GalleryEdit( props ) {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+<<<<<<< HEAD
+=======
+			className: preferredStyle
+				? `is-style-${ preferredStyle }`
+				: undefined,
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 			sizeSlug,
 		};
 	}
@@ -254,6 +298,14 @@ function GalleryEdit( props ) {
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
 				...buildImageAttributes( false, image ),
+<<<<<<< HEAD
+=======
+				inheritedAttributes: {
+					linkDestination: true,
+					linkTarget: true,
+					sizeSlug: true,
+				},
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 				id: image.id,
 			} );
 		} );
@@ -289,6 +341,7 @@ function GalleryEdit( props ) {
 
 	function toggleOpenInNewTab() {
 		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
+<<<<<<< HEAD
 	}
 
 	function applyImageOptions() {
@@ -308,6 +361,8 @@ function GalleryEdit( props ) {
 
 	function cancelImageOptions() {
 		setAttributes( imageSettings );
+=======
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 	}
 
 	function updateImagesSize( newSizeSlug ) {
@@ -360,7 +415,9 @@ function GalleryEdit( props ) {
 		/>
 	);
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( className, 'has-nested-images' ),
+	} );
 
 	if ( ! hasImages ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
@@ -435,7 +492,10 @@ function GalleryEdit( props ) {
 				mediaPlaceholder={ mediaPlaceholder }
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
+<<<<<<< HEAD
 				imageCrop={ imageCrop }
+=======
+>>>>>>> f5e1485f1cbc83de9f6998d6fe4ce59b4aa4e826
 			/>
 		</>
 	);

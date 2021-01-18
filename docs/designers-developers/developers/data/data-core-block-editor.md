@@ -160,16 +160,22 @@ _Returns_
 
 <a name="getBlockInsertionPoint" href="#getBlockInsertionPoint">#</a> **getBlockInsertionPoint**
 
-Returns the insertion point, the index at which the new inserted block would
-be placed. Defaults to the last index.
+Returns the insertion point. This will be:
+
+1) The insertion point manually set using setInsertionPoint() or
+   showInsertionPoint(); or
+2) The point after the current block selection, if there is a selection; or
+3) The point at the end of the block list.
+
+Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
--   `Object`: Insertion point object with `rootClientId`, `index`.
+-   `Object`: Insertion point object with `rootClientId` and `index`.
 
 <a name="getBlockListSettings" href="#getBlockListSettings">#</a> **getBlockListSettings**
 
@@ -337,6 +343,40 @@ _Parameters_
 _Returns_
 
 -   `?string`: Client ID of block selection start.
+
+<a name="getBlockTransformItems" href="#getBlockTransformItems">#</a> **getBlockTransformItems**
+
+Determines the items that appear in the available block transforms list.
+
+Each item object contains what's necessary to display a menu item in the
+transform list and handle its selection.
+
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>)
+that combines block usage frequenty and recency.
+
+Items are returned ordered descendingly by their 'frecency'.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `Array<WPEditorTransformItem>`: Items that appear in inserter.
+
+_Type Definition_
+
+-   _WPEditorTransformItem_ `Object`
+
+_Properties_
+
+-   _id_ `string`: Unique identifier for the item.
+-   _name_ `string`: The type of block to create.
+-   _title_ `string`: Title of the item, as it appears in the inserter.
+-   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+-   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+-   _frecency_ `number`: Heuristic that combines frequency and recency.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
@@ -812,7 +852,8 @@ _Returns_
 
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 
-Returns true if we should show the block insertion point.
+Whether or not the insertion point should be shown to users. This is set
+using showInsertionPoint() or hideInsertionPoint().
 
 _Parameters_
 
@@ -820,7 +861,7 @@ _Parameters_
 
 _Returns_
 
--   `?boolean`: Whether the insertion point is visible or not.
+-   `?boolean`: Whether the insertion point should be shown.
 
 <a name="isBlockMultiSelected" href="#isBlockMultiSelected">#</a> **isBlockMultiSelected**
 
@@ -1048,7 +1089,7 @@ _Parameters_
 
 <a name="hideInsertionPoint" href="#hideInsertionPoint">#</a> **hideInsertionPoint**
 
-Returns an action object hiding the insertion point.
+Hides the insertion point for users.
 
 _Returns_
 
@@ -1127,10 +1168,6 @@ _Parameters_
 -   _firstBlockClientId_ `string`: Client ID of the first block to merge.
 -   _secondBlockClientId_ `string`: Client ID of the second block to merge.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="moveBlocksDown" href="#moveBlocksDown">#</a> **moveBlocksDown**
 
 Undocumented declaration.
@@ -1171,10 +1208,6 @@ _Parameters_
 
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="receiveBlocks" href="#receiveBlocks">#</a> **receiveBlocks**
 
@@ -1265,10 +1298,6 @@ content reflected as an edit in state.
 _Parameters_
 
 -   _blocks_ `Array`: Array of blocks.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="resetSelection" href="#resetSelection">#</a> **resetSelection**
 
@@ -1373,13 +1402,14 @@ _Returns_
 
 <a name="showInsertionPoint" href="#showInsertionPoint">#</a> **showInsertionPoint**
 
-Returns an action object used in signalling that the insertion point should
-be shown.
+Sets the insertion point and shows it to users.
+
+Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _index_ `?number`: Index at which block should be inserted.
+-   _rootClientId_ `?string`: Root client ID of block list in which to insert. Use `undefined` for the root block list.
+-   _index_ `number`: Index at which block should be inserted.
 
 _Returns_
 
@@ -1531,6 +1561,17 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object
+
+<a name="validateBlocksToTemplate" href="#validateBlocksToTemplate">#</a> **validateBlocksToTemplate**
+
+Block validity is a function of blocks state (at the point of a
+reset) and the template setting. As a compromise to its placement
+across distinct parts of state, it is implemented here as a side-
+effect of the block reset action.
+
+_Parameters_
+
+-   _blocks_ `Array`: Array of blocks.
 
 
 <!-- END TOKEN(Autogenerated actions|../../../../packages/block-editor/src/store/actions.js) -->

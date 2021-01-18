@@ -6,8 +6,8 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
-	InnerBlocks,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -21,12 +21,14 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
 export function QueryContent( {
-	attributes: { queryId, query },
+	attributes,
 	context: { postId },
 	setAttributes,
 } ) {
+	const { queryId, query, layout } = attributes;
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -48,7 +50,7 @@ export function QueryContent( {
 		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.exclude, postId ] );
+	}, [ query.perPage, query.exclude, query.inherit, postId ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -58,15 +60,25 @@ export function QueryContent( {
 	}, [ queryId, instanceId ] );
 	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
+	const updateLayout = ( newLayout ) =>
+		setAttributes( { layout: { ...layout, ...newLayout } } );
 	return (
 		<>
-			<QueryInspectorControls query={ query } setQuery={ updateQuery } />
+			<QueryInspectorControls
+				attributes={ attributes }
+				setQuery={ updateQuery }
+				setLayout={ updateLayout }
+			/>
 			<BlockControls>
-				<QueryToolbar query={ query } setQuery={ updateQuery } />
+				<QueryToolbar
+					attributes={ attributes }
+					setQuery={ updateQuery }
+					setLayout={ updateLayout }
+				/>
 			</BlockControls>
 			<div { ...blockProps }>
 				<QueryProvider>
-					<InnerBlocks template={ TEMPLATE } />
+					<div { ...innerBlocksProps } />
 				</QueryProvider>
 			</div>
 		</>
