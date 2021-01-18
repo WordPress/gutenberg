@@ -27,11 +27,7 @@ import { __ } from '@wordpress/i18n';
 import { CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
-	attributes: {
-		verticalAlignment,
-		width,
-		templateLock = false,
-	},
+	attributes: { verticalAlignment, width, templateLock = false },
 	setAttributes,
 	clientId,
 } ) {
