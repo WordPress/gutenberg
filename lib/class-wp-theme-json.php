@@ -1026,12 +1026,6 @@ class WP_Theme_JSON {
 	public function remove_insecure_properties() {
 		$blocks_metadata = self::get_blocks_metadata();
 		foreach ( $this->theme_json as $block_selector => &$context ) {
-			// Escape the context key.
-			if ( empty( $blocks_metadata[ $block_selector ] ) ) {
-				unset( $this->theme_json[ $block_selector ] );
-				continue;
-			}
-
 			$escaped_settings = null;
 			$escaped_styles   = null;
 
