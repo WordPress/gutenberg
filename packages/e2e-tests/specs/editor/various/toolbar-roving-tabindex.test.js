@@ -129,4 +129,11 @@ describe( 'Toolbar roving tabindex', () => {
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expectLabelToHaveFocus( 'Bold' );
 	} );
+
+	it( 'can reach toolbar items with arrow keys after pressing alt+F10', async () => {
+		await pressKeyWithModifier( 'alt', 'F10' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await expectLabelToHaveFocus( 'Bold' );
+	} );
 } );
