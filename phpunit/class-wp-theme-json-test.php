@@ -144,6 +144,39 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
+	function test_schema_validation_subtree_is_removed_if_style_not_supported_by_block() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'global' => array(
+						'color' => array(
+							'text' => 'var:preset|color|dark-gray',
+						),
+						'spacing' => array(
+							'padding' => array(
+								'top'    => '1px',
+								'right'  => '1px',
+								'bottom' => '1px',
+								'left'   => '1px',
+							),
+						),
+					),
+				),
+			)
+		);
+		$actual   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'global' => array(
+					'color' => array(
+						'text' => 'var:preset|color|dark-gray',
+					),
+				)
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_get_settings() {
 		// See schema at WP_Theme_JSON::SCHEMA.
 		$theme_json = new WP_Theme_JSON(
@@ -685,64 +718,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	// 			'global' => array(
 	// 				'color' => array(
 	// 					'text'       => 'var:preset|color|dark-gray',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
-
-	// function test_remove_insecure_properties_removes_properties_when_not_allowed_in_a_context() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'styles' => array(
-	// 				'global' => array(
-	// 					'color' => array(
-	// 						'text'       => 'var:preset|color|dark-gray',
-	// 					),
-	// 					'spacing' => array(
-	// 						'padding' => array(
-	// 							'top' => '1px',
-	// 							'right' => '1px',
-	// 							'bottom' => '1px',
-	// 							'left' => '1px',
-	// 						),
-	// 					),
-	// 				),
-	// 				'invalid'   => array(
-	// 					'background' => 'green',
-	// 				),
-	// 				'core/group' => array(
-	// 					'spacing' => array(
-	// 						'padding' => array(
-	// 							'top' => '1px',
-	// 							'right' => '1px',
-	// 							'bottom' => '1px',
-	// 							'left' => '1px',
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'styles' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'text'       => 'var:preset|color|dark-gray',
-	// 				),
-	// 			),
-	// 			'core/group' => array(
-	// 				'spacing' => array(
-	// 					'padding' => array(
-	// 						'top' => '1px',
-	// 						'right' => '1px',
-	// 						'bottom' => '1px',
-	// 						'left' => '1px',
-	// 					),
 	// 				),
 	// 			),
 	// 		),
