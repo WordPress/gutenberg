@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import React from 'react';
+import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -14,7 +14,7 @@ const linkSettingsScreens = {
 	linkPicker: 'linkPicker',
 };
 
-const LinkSettingsNavigation = React.memo( ( props ) => {
+const LinkSettingsNavigation = memo( ( props ) => {
 	if ( ! props.withBottomSheet ) {
 		return <LinkSettingsScreen { ...props } />;
 	}

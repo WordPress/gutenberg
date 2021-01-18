@@ -1,13 +1,13 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import React from 'react';
+import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import CyclePickerCell from '../bottom-sheet/cycle-picker-cell';
 
-const CycleSelectControl = React.memo(
+const CycleSelectControl = memo(
 	( {
 		help,
 		instanceId,
