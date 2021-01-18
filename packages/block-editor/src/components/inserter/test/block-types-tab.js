@@ -135,16 +135,6 @@ describe( 'InserterMenu', () => {
 		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 	} );
 
-	it( "doesn't display child blocks UI", () => {
-		const { container } = render( <InserterBlockList /> );
-
-		const childBlocksContent = container.querySelector(
-			'.block-editor-inserter__child-blocks'
-		);
-
-		expect( childBlocksContent ).toBeNull();
-	} );
-
 	it( 'should disable items with `isDisabled`', () => {
 		const { container } = initializeAllClosedMenuState();
 		const layoutTabContent = container.querySelectorAll(
