@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
+import {
+	ActivityIndicator,
+	Platform,
+	Text,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -216,7 +222,11 @@ export default function ReusableBlockEdit( {
 	}
 
 	if ( ! hasResolved ) {
-		return null;
+		return (
+			<View style={ styles.spinner }>
+				<ActivityIndicator animating />
+			</View>
+		);
 	}
 
 	if ( ! reusableBlock ) {

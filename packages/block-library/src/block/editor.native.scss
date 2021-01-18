@@ -101,3 +101,11 @@
 .actionButtonDark {
 	color: $blue-30;
 }
+
+.spinner {
+	height: $grid-unit-60;
+	border-width: $border-width;
+	border-radius: $radius-block-ui;
+	border-color: $light-gray-400;
+	justify-content: center;
+}
