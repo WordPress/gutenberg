@@ -1,13 +1,13 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import React from 'react';
+import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import Cell from '../mobile/bottom-sheet/cell';
 
-const TextControl = React.memo(
+const TextControl = memo(
 	( {
 		label,
 		hideLabelFromVision,
