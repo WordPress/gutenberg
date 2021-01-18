@@ -661,40 +661,42 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	// function test_remove_insecure_properties_removes_invalid_contexts() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'styles' => array(
-	// 				'global' => array(
-	// 					'color' => array(
-	// 						'background' => 'green',
-	// 						'text'       => 'var:preset|color|dark-gray',
-	// 					),
-	// 				),
-	// 				'.my-class' => array(
-	// 					'color' => array(
-	// 						'background' => 'green',
-	// 						'text'       => 'var:preset|color|dark-gray',
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'styles' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'background' => 'green',
-	// 					'text'       => 'var:preset|color|dark-gray',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+	// This is done in the constructor already.
+	// No need to test it or do anything code-wise.
+	function test_remove_insecure_properties_removes_invalid_contexts() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'global' => array(
+						'color' => array(
+							'background' => 'green',
+							'text'       => 'var:preset|color|dark-gray',
+						),
+					),
+					'.my-class' => array(
+						'color' => array(
+							'background' => 'green',
+							'text'       => 'var:preset|color|dark-gray',
+						),
+					),
+				),
+			),
+			true
+		);
+		$theme_json->escape_styles();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'global' => array(
+					'color' => array(
+						'background' => 'green',
+						'text'       => 'var:preset|color|dark-gray',
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 
 	// function test_remove_insecure_properties_removes_invalid_properties() {
 	// 	$theme_json = new WP_Theme_JSON(
