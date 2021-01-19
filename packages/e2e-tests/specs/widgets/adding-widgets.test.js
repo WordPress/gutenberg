@@ -82,6 +82,15 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
+	async function getInlineInserterButton() {
+		return await page.waitForSelector(
+			'button[aria-label="Add block"][aria-haspopup="true"]',
+			{
+				visible: true,
+			}
+		);
+	}
+
 	it( 'Should insert content using the global inserter', async () => {
 		const widgetAreas = await page.$$(
 			'[aria-label="Block: Widget Area"][role="group"]'
@@ -181,10 +190,7 @@ describe( 'Widgets screen', () => {
 				10
 		);
 
-		// Aria selectors cannot select buttons with the aria-haspopup property, fallback to CSS selector.
-		const inlineInserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]'
-		);
+		let inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
 
 		const inlineQuickInserter = await page.waitForSelector(
@@ -234,10 +240,8 @@ describe( 'Widgets screen', () => {
 			secondParagraphBlockBoundingBox.y - 10
 		);
 
-		const inserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]'
-		);
-		await inserterButton.click();
+		inlineInserterButton = await getInlineInserterButton();
+		await inlineInserterButton.click();
 
 		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
@@ -333,21 +337,16 @@ async function getSerializedWidgetAreas() {
 async function cleanupWidgets() {
 	await visitAdminPage( 'widgets.php' );
 
-	await page.evaluate( () => {
-		const deleteButtons = document.querySelectorAll(
-			'#widgets-right .widget button.widget-control-remove'
-		);
+	let widget = await page.$( '.widgets-sortables .widget' );
 
-		deleteButtons.forEach( ( deleteButton ) => deleteButton.click() );
-	} );
+	// We have to do this one-by-one since there might be race condition when deleting multiple widgets at once.
+	while ( widget ) {
+		const deleteButton = await widget.$( 'button.widget-control-remove' );
+		const id = await widget.evaluate( ( node ) => node.id );
+		await deleteButton.evaluate( ( node ) => node.click() );
+		// Wait for the widget to be removed from DOM.
+		await page.waitForSelector( `#${ id }`, { hidden: true } );
 
-	await page.click( '#inactive-widgets-control-remove' );
-
-	await page.waitForFunction(
-		() =>
-			document.querySelectorAll( '.widgets-sortables .widget' ).length ===
-			0
-	);
-	// No idea why we need this, but just asserting the widgets are gone seems to be not enough.
-	await page.waitForTimeout( 500 );
+		widget = await page.$( '.widgets-sortables .widget' );
+	}
 }
