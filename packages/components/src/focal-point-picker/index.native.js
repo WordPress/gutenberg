@@ -14,13 +14,7 @@ import {
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import { Image, UnitControl } from '@wordpress/components';
-import {
-	useRef,
-	useState,
-	useMemo,
-	useEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -157,39 +151,27 @@ function FocalPointPicker( props ) {
 		},
 	];
 
-	const onTooltipPress = useCallback( () => setTooltipVisible( false ) );
-	const onMediaLayout = useCallback(
-		( event ) => {
-			const { height, width } = event.nativeEvent.layout;
+	const onTooltipPress = () => setTooltipVisible( false );
+	const onMediaLayout = ( event ) => {
+		const { height, width } = event.nativeEvent.layout;
 
-			if (
-				width !== 0 &&
-				height !== 0 &&
-				( containerSize?.width !== width ||
-					containerSize?.height !== height )
-			) {
-				setContainerSize( { width, height } );
-			}
-		},
-		[ containerSize ]
-	);
-	const onImageDataLoad = useCallback(
-		() => setDisplayPlaceholder( false ),
-		[]
-	);
-	const onVideoLoad = useCallback( ( event ) => {
+		if (
+			width !== 0 &&
+			height !== 0 &&
+			( containerSize?.width !== width ||
+				containerSize?.height !== height )
+		) {
+			setContainerSize( { width, height } );
+		}
+	};
+	const onImageDataLoad = () => setDisplayPlaceholder( false );
+	const onVideoLoad = ( event ) => {
 		const { height, width } = event.naturalSize;
 		setVideoNaturalSize( { height, width } );
 		setDisplayPlaceholder( false );
-	}, [] );
-	const onXCoordinateChange = useCallback(
-		( x ) => onChange( { x: x / 100 } ),
-		[]
-	);
-	const onYCoordinateChange = useCallback(
-		( y ) => onChange( { y: y / 100 } ),
-		[]
-	);
+	};
+	const onXCoordinateChange = ( x ) => onChange( { x: x / 100 } );
+	const onYCoordinateChange = ( y ) => onChange( { y: y / 100 } );
 
 	return (
 		<View style={ styles.container }>
