@@ -13,7 +13,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ aspect, setAspect ] = useState();
 	const [ defaultAspect, setDefaultAspect ] = useState();
 
-	const { imageEditingCrossOrigin } = useSelect( ( select ) => {
+	const imageEditingCrossOrigin = useSelect( ( select ) => {
 		const value = select( 'core/block-editor' ).getSettings()
 			.imageEditingCrossOrigin;
 		return typeof value === 'string' ? value : undefined;
