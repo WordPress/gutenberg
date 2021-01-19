@@ -1,20 +1,25 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { Animated, Easing, PanResponder, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState, useContext } from '@wordpress/element';
+import {
+	createContext,
+	useEffect,
+	useRef,
+	useState,
+	useContext,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-const TooltipContext = React.createContext();
+const TooltipContext = createContext();
 
 function Tooltip( { children, onPress, style, visible } ) {
 	const panResponder = useRef(
