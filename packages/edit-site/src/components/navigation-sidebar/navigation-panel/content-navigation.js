@@ -57,7 +57,7 @@ export default function ContentNavigation( { onActivateMenu } ) {
 					navigateToMenu={ MENU_CONTENT_POSTS }
 				/>
 			</NavigationMenu>
-			adfasdf
+
 			<ContentPagesMenu />
 			<ContentCategoriesMenu />
 			<ContentPostsMenu />
