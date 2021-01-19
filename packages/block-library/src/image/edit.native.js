@@ -53,9 +53,14 @@ import {
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { getUpdatedLinkTargetSettings } from './utils';
+import { getUpdatedLinkTargetSettings, getImageSizeAttributes } from './utils';
 
-import { LINK_DESTINATION_CUSTOM, DEFAULT_SIZE_SLUG } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_ATTACHMENT,
+	DEFAULT_SIZE_SLUG,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
@@ -277,13 +282,19 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const { id, url } = this.props.attributes;
-
+		const {
+			id,
+			url,
+			context,
+			linkDestination: destination,
+		} = this.props.attributes;
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
 		};
+		// Check if default link setting, or the one inherited from parent block should be used.
+		const linkDestination = context?.linkTo ? context.linkTo : destination;
 
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
@@ -298,9 +309,42 @@ export class ImageEdit extends React.Component {
 			additionalAttributes = { url };
 		}
 
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
+		}
+		mediaAttributes.href = href;
+
+		if ( ! isEmpty( context ) ) {
+			const parentSizeAttributes = getImageSizeAttributes(
+				media,
+				context.sizeSlug
+			);
+
+			if ( context.linkTarget ) {
+				additionalAttributes.linkTarget = context.linkTarget;
+			}
+
+			additionalAttributes = {
+				...additionalAttributes,
+				inheritedAttributes: {
+					linkDestination: true,
+					linkTarget: true,
+					sizeSlug: true,
+				},
+				...parentSizeAttributes,
+			};
+		}
+
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 

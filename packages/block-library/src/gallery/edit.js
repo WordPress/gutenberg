@@ -367,23 +367,13 @@ function GalleryEdit( props ) {
 							onChange={ toggleOpenInNewTab }
 						/>
 					) }
-					{ shouldShowSizeOptions ? (
+					{ shouldShowSizeOptions && (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
 						/>
-					) : (
-						<BaseControl className={ 'gallery-image-sizes' }>
-							<BaseControl.VisualLabel>
-								{ __( 'Image size' ) }
-							</BaseControl.VisualLabel>
-							<View className={ 'gallery-image-sizes__loading' }>
-								<Spinner />
-								{ __( 'Loading options…' ) }
-							</View>
-						</BaseControl>
 					) }
 				</PanelBody>
 			</InspectorControls>
