@@ -22,23 +22,10 @@ const FocalPointSettingsMemo = memo(
 	( {
 		focalPoint,
 		onFocalPointChange,
-		onHandleClosingBottomSheet,
-		setIsFullScreen,
 		shouldEnableBottomSheetScroll,
 		url,
 	} ) => {
 		const navigation = useNavigation();
-
-		/**
-		 * Ensure the full-screen bottom sheet is disabled. `useFocusEffect` is not
-		 * triggered when dismissing the bottom sheet via swipe or tapping the
-		 * overlay.
-		 */
-		useEffect( () => {
-			onHandleClosingBottomSheet( () => {
-				setIsFullScreen( false );
-			} );
-		}, [] );
 
 		function onButtonPress( action ) {
 			navigation.goBack();
@@ -79,16 +66,10 @@ const FocalPointSettingsMemo = memo(
 
 function FocalPointSettings( props ) {
 	const route = useRoute();
-	const {
-		onHandleClosingBottomSheet,
-		setIsFullScreen,
-		shouldEnableBottomSheetScroll,
-	} = useContext( BottomSheetContext );
+	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
 
 	return (
 		<FocalPointSettingsMemo
-			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
-			setIsFullScreen={ setIsFullScreen }
 			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 			{ ...props }
 			{ ...route.params }
