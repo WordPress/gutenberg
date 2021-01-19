@@ -141,7 +141,7 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
-	if ( 'core/template-part' === blockType.name ) {
+	if ( 'core/template-part' === blockType.name && attributes.slug ) {
 		const entity = select( 'core' ).getEntityRecord(
 			'postType',
 			'wp_template_part',
