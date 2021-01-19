@@ -21,6 +21,7 @@ import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
 	{
+		buttonProps = {},
 		children,
 		className,
 		icon,
@@ -82,6 +83,7 @@ export function PanelBody(
 				isOpened={ isOpened }
 				onClick={ handleOnToggle }
 				title={ title }
+				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
 				? children( { opened: isOpened } )

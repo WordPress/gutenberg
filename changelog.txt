@@ -129,6 +129,13 @@
 - Add srcset for cover image. ([25171](https://github.com/WordPress/gutenberg/pull/25171))
 
 
+= 9.7.4 =
+
+### Bug Fixes
+
+- Fix isRTL check by loading the ltr string explicitely.
+
+
 = 9.7.3 =
 
 ### Bug Fixes

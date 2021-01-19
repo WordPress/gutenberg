@@ -64,6 +64,11 @@ module.exports = {
 						message: 'Please use `memize` instead.',
 					},
 					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+					},
+					{
 						name: 'reakit',
 						message:
 							'Please use Reakit API through `@wordpress/components` instead.',

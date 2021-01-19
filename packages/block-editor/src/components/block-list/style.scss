@@ -312,6 +312,11 @@
 		}
 	}
 
+	// Reusable blocks parent borer.
+	&.is-reusable.has-child-selected::after {
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	}
+
 	// Select tool/navigation mode shows the default cursor until an additional click edits.
 	.is-navigate-mode & {
 		cursor: default;
