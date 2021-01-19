@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text } from 'react-native';
+import { Text, TouchableWithoutFeedback, Linking, Alert } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -10,47 +10,83 @@ import { View } from '@wordpress/primitives';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { audio } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { play, volume } from './icons';
 
-function Slider() {
-	return (
-		<View style={ styles.sliderContainer }>
-			<View style={ styles.sliderKnob } />
-			<View style={ styles.sliderTrack } />
-		</View>
-	);
-}
+function Player( {
+	getStylesFromColorScheme,
+	source,
+	isUploadInProgress,
+	fileName,
+	isUploadFailed,
+	retryMessage,
+} ) {
+	const onPressListen = () => {
+		if ( source ) {
+			Linking.canOpenURL( source )
+				.then( ( supported ) => {
+					if ( ! supported ) {
+						Alert.alert(
+							__( 'Problem opening the audio' ),
+							__( 'No application can handle this request.' )
+						);
+					} else {
+						return Linking.openURL( source );
+					}
+				} )
+				.catch( () => {
+					Alert.alert(
+						__( 'Problem opening the audio' ),
+						__( 'An unknown error occurred. Please try again.' )
+					);
+				} );
+		}
+	};
 
-function Player( { getStylesFromColorScheme } ) {
 	const containerStyle = getStylesFromColorScheme(
 		styles.container,
 		styles.containerDark
 	);
 
+	let title = '';
+	let extension = '';
+
+	if ( fileName ) {
+		const [ _title, _extension ] = fileName.split( '.' );
+		title = _title;
+		extension = _extension.toUpperCase();
+	}
+
 	return (
-		<View
-			style={ containerStyle }
-			accessible
-			accessibilityLabel={ __( 'Audio Player' ) }
-		>
+		<View style={ containerStyle }>
 			<View style={ styles.iconContainer }>
-				<Icon icon={ play } style={ styles.icon } />
+				<Icon icon={ audio } style={ styles.icon } size={ 24 } />
 			</View>
-			<Text style={ styles.timeText }>
-				{
-					/* translators: Audio player time marker. It will always be on 0. */
-					__( '0:00' )
-				}
-			</Text>
-			<Slider />
-			<View style={ styles.iconContainer }>
-				<Icon icon={ volume } style={ styles.icon } />
+			<View style={ styles.titleContainer }>
+				<Text style={ styles.title }>{ title }</Text>
+				<Text style={ styles.subtitle }>
+					{ isUploadInProgress && __( 'Uploading…' ) }
+					{ isUploadFailed && retryMessage }
+					{ ! isUploadInProgress &&
+						! isUploadFailed &&
+						// translators: displays audio file extension. e.g. MP3 audio file
+						extension + __( ' audio file' ) }
+				</Text>
 			</View>
+			<TouchableWithoutFeedback
+				accessibilityLabel={ __( 'Audio Player' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __(
+					'Double tap to listen the audio file'
+				) }
+				onPress={ onPressListen }
+			>
+				<Text style={ styles.buttonText }>{ __( 'Listen' ) }</Text>
+			</TouchableWithoutFeedback>
 		</View>
 	);
 }
