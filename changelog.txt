@@ -50,7 +50,10 @@
 
 ### Experiments
 
-- Delete unused options while upgrading the plugin. ([28164](https://github.com/WordPress/gutenberg/pull/28164))
+- Full Site Editing Framework:
+  - Load content in iframe. ([25775](https://github.com/WordPress/gutenberg/pull/25775))
+  - Avoid using auto-drafts for theme templates and template parts. ([27910](https://github.com/WordPress/gutenberg/pull/27910))
+    - Delete unused options while upgrading the plugin. ([28164](https://github.com/WordPress/gutenberg/pull/28164))
 - Hide the theme without comments.php deprecation message. ([28128](https://github.com/WordPress/gutenberg/pull/28128))
 - Fix navigation editor. ([28080](https://github.com/WordPress/gutenberg/pull/28080))
 - Widgets: Temporary fix for saving widgets. ([28078](https://github.com/WordPress/gutenberg/pull/28078))
@@ -60,7 +63,6 @@
 - Theme JSON: Add border radius to the theme styles schema. ([27791](https://github.com/WordPress/gutenberg/pull/27791))
 - Add theme.json i18n mechanism and JSON file specifying which theme.json paths are translatable. ([27380](https://github.com/WordPress/gutenberg/pull/27380))
 - Navigation Block: Use draft status when user creates a post and don't render unpublished posts in menus. ([27207](https://github.com/WordPress/gutenberg/pull/27207))
-- Full site editor: Load content in iframe. ([25775](https://github.com/WordPress/gutenberg/pull/25775))
 
 ### Documentation
 
@@ -86,6 +88,10 @@
 
 ### Tools
 
+- GitHub Actions:
+  - Create Release Draft when tagging version. ([27488](https://github.com/WordPress/gutenberg/pull/27488))
+  - Add action to upload release to SVN repo. ([27591](https://github.com/WordPress/gutenberg/pull/27591))
+  - Compare Performance upon Release. ([28046](https://github.com/WordPress/gutenberg/pull/28046))
 - Scripts: Align default engines for `check-engines` with the package. ([28143](https://github.com/WordPress/gutenberg/pull/28143))
 - end-to-end FSE: Fix intermittent errors in multi entity editing test. ([28107](https://github.com/WordPress/gutenberg/pull/28107))
 - Testing: Prevent a direct usage of Reakit. ([28095](https://github.com/WordPress/gutenberg/pull/28095))
@@ -93,7 +99,6 @@
 - Testing: Fix randomly failing end-to-end test. ([28073](https://github.com/WordPress/gutenberg/pull/28073))
 - Upgrade puppeteer to 5.5.0. ([28055](https://github.com/WordPress/gutenberg/pull/28055))
 - Build Plugin Workflow: Bump node version to 14. ([28048](https://github.com/WordPress/gutenberg/pull/28048))
-- GH Actions: Compare Performance upon Release. ([28046](https://github.com/WordPress/gutenberg/pull/28046))
 - Scripts: Add support for static assets in build commands. ([28043](https://github.com/WordPress/gutenberg/pull/28043))
 - Performance tests: Fix. ([28026](https://github.com/WordPress/gutenberg/pull/28026))
 - Scripts: Make it possible to transpile `.jsx` files with build command. ([28002](https://github.com/WordPress/gutenberg/pull/28002))
@@ -103,8 +108,6 @@
 - Update the minimum Node.js version to 12. ([27934](https://github.com/WordPress/gutenberg/pull/27934))
 - wp-env: Ensure the environment is used with the logs command. ([27907](https://github.com/WordPress/gutenberg/pull/27907))
 - Use @wordpress/stylelint-config in @wordpress/scripts. ([27810](https://github.com/WordPress/gutenberg/pull/27810))
-- GH Actions: Add action to upload release to SVN repo. ([27591](https://github.com/WordPress/gutenberg/pull/27591))
-- GitHub Actions: Create Release Draft when tagging version. ([27488](https://github.com/WordPress/gutenberg/pull/27488))
 - ESLint Plugin: Enable import rules used in Gutenberg. ([27387](https://github.com/WordPress/gutenberg/pull/27387))
 - Eslint: Add no-unsafe-wp-apis to recommended configuration. ([27327](https://github.com/WordPress/gutenberg/pull/27327))
 - Upgrade webpack to version 5. ([26382](https://github.com/WordPress/gutenberg/pull/26382))
@@ -122,7 +125,6 @@
 - Chore: Update Lerna dependency. ([27990](https://github.com/WordPress/gutenberg/pull/27990))
 - Try: Make focus width a CSS variable. ([27968](https://github.com/WordPress/gutenberg/pull/27968))
 - Add translation context to all block's titles. ([27933](https://github.com/WordPress/gutenberg/pull/27933))
-- Avoid using auto-drafts for theme templates and template parts. ([27910](https://github.com/WordPress/gutenberg/pull/27910))
 - Add primary destructive button style. ([27774](https://github.com/WordPress/gutenberg/pull/27774))
 - Modifies the widgets dashboard link to point to the new widgets editor. ([26880](https://github.com/WordPress/gutenberg/pull/26880))
 - Use standard select element for small number of authors. ([26426](https://github.com/WordPress/gutenberg/pull/26426))
