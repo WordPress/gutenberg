@@ -50,7 +50,7 @@ class WP_Theme_JSON {
 		'--wp--style--color--link',
 		'background',
 		'backgroundColor',
-		'border',
+		'borderRadius',
 		'color',
 		'fontFamily',
 		'fontSize',
