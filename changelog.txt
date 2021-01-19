@@ -18,18 +18,20 @@
 
 ### Bug Fixes
 
+- Reusable Blocks:
+  - Show an error message when a reusable block has gone missing. ([28126](https://github.com/WordPress/gutenberg/pull/28126))
+  - Fix dismiss notice after error. ([28015](https://github.com/WordPress/gutenberg/pull/28015))
+- Cover Block:
+  - Fix nested cover block bug. ([28114](https://github.com/WordPress/gutenberg/pull/28114))
+  - Fix invalid cover block transforms. ([28087](https://github.com/WordPress/gutenberg/pull/28087))
 - Fix block error when transforming blocks with Link Popover opened. ([28136](https://github.com/WordPress/gutenberg/pull/28136))
 - Fix PHP Notice in navigation-link. ([28134](https://github.com/WordPress/gutenberg/pull/28134))
 - Prevent link paste in RichText components in Button and Navigation blocks. ([28130](https://github.com/WordPress/gutenberg/pull/28130))
 - Fix floating date status inferred for posts where the status has been edited. ([28127](https://github.com/WordPress/gutenberg/pull/28127))
-- Show an error message when a reusable block has gone missing. ([28126](https://github.com/WordPress/gutenberg/pull/28126))
 - BlockSwitcher: Fix crash due to null reference. ([28122](https://github.com/WordPress/gutenberg/pull/28122))
-- Fix nested cover block bug. ([28114](https://github.com/WordPress/gutenberg/pull/28114))
 - Verse: Fix line-wrap rendering on front-end of site. ([28109](https://github.com/WordPress/gutenberg/pull/28109))
 - FocalPointPicker: Fix rendering and dragging experience. ([28096](https://github.com/WordPress/gutenberg/pull/28096))
-- Fix invalid cover block transforms. ([28087](https://github.com/WordPress/gutenberg/pull/28087))
 - Block Directory: Fix "missing" block when the block can be installed from the directory. ([28030](https://github.com/WordPress/gutenberg/pull/28030))
-- Reusable blocks: Fix dismiss notice after error. ([28015](https://github.com/WordPress/gutenberg/pull/28015))
 - Fix locked template not updating when inner blocks template prop changes. ([28007](https://github.com/WordPress/gutenberg/pull/28007))
 - Fix editor crash when registering a block pattern without `categories`. ([27970](https://github.com/WordPress/gutenberg/pull/27970))
 - Fix the RTL editor styles and the theme styles option. ([27947](https://github.com/WordPress/gutenberg/pull/27947))
