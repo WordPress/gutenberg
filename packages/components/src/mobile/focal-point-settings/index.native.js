@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { SafeAreaView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { isFinite } from 'lodash';
@@ -10,7 +9,7 @@ import { isFinite } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useContext, useState } from '@wordpress/element';
+import { memo, useEffect, useContext, useState } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 
 /**
@@ -19,7 +18,7 @@ import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import styles from './styles.scss';
 
-const FocalPointSettingsMemo = React.memo(
+const FocalPointSettingsMemo = memo(
 	( {
 		focalPoint,
 		onFocalPointChange,
