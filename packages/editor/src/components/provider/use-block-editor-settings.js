@@ -150,6 +150,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
 				'__experimentalFeatures',
+				'__experimentalGlobalGrid',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
 				'__experimentalPreferredStyleVariations',
