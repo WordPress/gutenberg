@@ -101,7 +101,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		const el = new window.Image();
 		el.src = url;
 		el.onload = editImage;
-		if ( imageEditingCrossOriginValue ) {
+		if ( typeof imageEditingCrossOriginValue === 'string' ) {
 			el.crossOrigin = imageEditingCrossOriginValue;
 		}
 	}, [
