@@ -388,6 +388,11 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 		await showHtmlButton.click();
 	} else {
 		const menuButton = await driver.elementByAccessibilityId( '...' );
+		// eslint-disable-next-line no-console
+		console.log(
+			'XXX ~ file: utils.js ~ line 386 ~ toggleHtmlMode ~ menuButton',
+			menuButton
+		);
 		await menuButton.click();
 		let toggleHtmlButton;
 		if ( toggleOn ) {
