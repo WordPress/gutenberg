@@ -63,6 +63,10 @@ export default function ReusableBlockEdit( {
 		styles.actionButton,
 		styles.actionButtonDark
 	);
+	const spinnerStyle = usePreferredColorSchemeStyle(
+		styles.spinner,
+		styles.spinnerDark
+	);
 
 	const {
 		reusableBlock,
@@ -223,7 +227,7 @@ export default function ReusableBlockEdit( {
 
 	if ( ! hasResolved ) {
 		return (
-			<View style={ styles.spinner }>
+			<View style={ spinnerStyle }>
 				<ActivityIndicator animating />
 			</View>
 		);
