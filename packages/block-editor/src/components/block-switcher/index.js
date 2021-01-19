@@ -13,7 +13,11 @@ import {
 	ToolbarGroup,
 	ToolbarItem,
 } from '@wordpress/components';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import {
+	switchToBlockType,
+	store as blocksStore,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
 
@@ -59,6 +63,15 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
+
+			const reusableTitle =
+				isReusableBlock( blocks[ 0 ] ) &&
+				select( 'core' ).getEntityRecord(
+					'postType',
+					'wp_block',
+					blocks[ 0 ].attributes.ref
+				).title?.raw;
+
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -66,11 +79,15 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle: getBlockType( firstBlockName ).title,
+				blockTitle: isReusable
+					? reusableTitle
+					: getBlockType( firstBlockName ).title,
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
+
+	const isReusable = isReusableBlock( blocks[ 0 ] );
 
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
@@ -116,11 +133,18 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={
-							<BlockIcon
-								icon={ icon }
-								className="block-editor-block-switcher__toggle"
-								showColors
-							/>
+							<>
+								<BlockIcon
+									icon={ icon }
+									className="block-editor-block-switcher__toggle"
+									showColors
+								/>
+								{ isReusable && (
+									<span className="block-editor-block-switcher__toggle-text">
+										{ blockTitle }
+									</span>
+								) }
+							</>
 						}
 						toggleProps={ {
 							describedBy: blockSwitcherDescription,
