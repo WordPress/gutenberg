@@ -288,7 +288,7 @@ export function toTree( {
 							'data-rich-text-line-break': 'true',
 					  }
 					: undefined,
-				selfClosing: true,
+				isSelfClosing: true,
 			} );
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
