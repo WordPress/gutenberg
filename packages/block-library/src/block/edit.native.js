@@ -122,7 +122,7 @@ export default function ReusableBlockEdit( {
 		return () => {
 			clearTimeout( timeoutId.current );
 			/**
-			 * Invalidate entity record upon unmount to keep the reusable block udpated
+			 * Invalidate entity record upon unmount to keep the reusable block updated
 			 * in case it's modified through UBE
 			 */
 			invalidateResolution( 'getEntityRecord', recordArgs );
