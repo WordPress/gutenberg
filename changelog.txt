@@ -4,11 +4,8 @@
 
 ### Enhancements
 
-- Try: Transparent spacer. ([28103](https://github.com/WordPress/gutenberg/pull/28103))
-- Fix the border radius in the site editor. ([27986](https://github.com/WordPress/gutenberg/pull/27986))
+- Use a semi transparent background for the spacer block when selected. ([28103](https://github.com/WordPress/gutenberg/pull/28103))
 - Display matching variation icon in Block Switcher. ([27903](https://github.com/WordPress/gutenberg/pull/27903))
-- Group Block: Add border radius. ([27665](https://github.com/WordPress/gutenberg/pull/27665))
-- Try: Fix appender margins again. ([27392](https://github.com/WordPress/gutenberg/pull/27392))
 
 ### New APIs
 
@@ -44,6 +41,7 @@
 - Add aria labels to box control component inputs/button. ([27727](https://github.com/WordPress/gutenberg/pull/27727))
 - Use clientWidth when no width is available for cropper. ([27687](https://github.com/WordPress/gutenberg/pull/27687))
 - Core Data: Normalize `_fields` value for use in `stableKey`. ([27526](https://github.com/WordPress/gutenberg/pull/27526))
+- Fix appender margins again. ([27392](https://github.com/WordPress/gutenberg/pull/27392))
 
 ### Performance
 
@@ -56,10 +54,12 @@
   - Load content in iframe. ([25775](https://github.com/WordPress/gutenberg/pull/25775))
   - Avoid using auto-drafts for theme templates and template parts. ([27910](https://github.com/WordPress/gutenberg/pull/27910))
     - Delete unused options while upgrading the plugin. ([28164](https://github.com/WordPress/gutenberg/pull/28164))
+  - Fix the border radius in the site editor. ([27986](https://github.com/WordPress/gutenberg/pull/27986))
 - theme.json:
   - Add border radius to the theme styles schema. ([27791](https://github.com/WordPress/gutenberg/pull/27791))
   - Add theme.json i18n mechanism and JSON file specifying which theme.json paths are translatable. ([27380](https://github.com/WordPress/gutenberg/pull/27380))
   - Add: Save time theme.json escaping. ([28061](https://github.com/WordPress/gutenberg/pull/28061))
+- Group Block: Add border radius. ([27665](https://github.com/WordPress/gutenberg/pull/27665))
 - Hide the theme without comments.php deprecation message. ([28128](https://github.com/WordPress/gutenberg/pull/28128))
 - Fix navigation editor. ([28080](https://github.com/WordPress/gutenberg/pull/28080))
 - Widgets: Temporary fix for saving widgets. ([28078](https://github.com/WordPress/gutenberg/pull/28078))
