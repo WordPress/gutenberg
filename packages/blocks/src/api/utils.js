@@ -141,6 +141,8 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
+	// Attempt to find entity title if block is a template part.
+	// Require slug to request, otherwise entity is uncreated and will throw 404.
 	if ( 'core/template-part' === blockType.name && attributes.slug ) {
 		const entity = select( 'core' ).getEntityRecord(
 			'postType',
