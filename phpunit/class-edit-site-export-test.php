@@ -22,5 +22,33 @@ class Edit_Site_Export_Test extends WP_UnitTestCase {
 		$template_content              = _remove_theme_attribute_from_content( $content_with_no_template_part );
 		$this->assertEquals( $content_with_no_template_part, $template_content );
 	}
+
+	function test_gutenberg_edit_site_export() {
+		$filename = tempnam( get_temp_dir(), 'edit-site-export' );
+		gutenberg_edit_site_export_create_zip( $filename );
+		$this->assertTrue( file_exists( $filename ), 'zip file is created at the specified path' );
+		$this->assertTrue( filesize( $filename ) > 0, 'zip file is larger than 0 bytes' );
+
+		// Open ZIP file and make sure the directories exist.
+		$zip = new ZipArchive();
+		$zip->open( $filename, ZipArchive::RDONLY );
+		$hasThemeDir              = $zip->locateName( 'theme/' ) !== false;
+		$hasBlockTemplatesDir     = $zip->locateName( 'theme/block-templates/' ) !== false;
+		$hasBlockTemplatePartsDir = $zip->locateName( 'theme/block-template-parts/' ) !== false;
+		$this->assertTrue( $hasThemeDir, 'theme directory exists' );
+		$this->assertTrue( $hasBlockTemplatesDir, 'theme/block-templates directory exists' );
+		$this->assertTrue( $hasBlockTemplatePartsDir, 'theme/block-template-parts directory exists' );
+
+		// ZIP file contains at least one HTML file.
+		$hasHtmlFiles = false;
+		for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+			$filename = $zip->getNameIndex( $i );
+			if ( substr( $filename, -5 ) === '.html' ) {
+				$hasHtmlFiles = true;
+				break;
+			}
+		}
+		$this->assertTrue( $hasHtmlFiles, 'contains at least one html file' );
+	}
 }
 
