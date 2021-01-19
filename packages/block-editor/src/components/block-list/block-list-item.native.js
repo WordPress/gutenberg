@@ -115,13 +115,14 @@ export class BlockListItem extends Component {
 			parentWidth,
 			marginHorizontal,
 			blockName,
+			blockWidth,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
 		const { isContainerRelated } = alignmentHelpers;
 
-		if ( ! this.props.blockWidth ) {
+		if ( ! blockWidth ) {
 			return null;
 		}
 
