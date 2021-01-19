@@ -38,6 +38,7 @@ exports[`recordToDom should create a value with image object 1`] = `
 <body>
   
   <img
+    data-rich-text-format-boundary="true"
     src=""
   />
   
@@ -51,6 +52,7 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
   >
     
     <img
+      data-rich-text-format-boundary="true"
       src=""
     />
     
@@ -66,6 +68,7 @@ exports[`recordToDom should create a value with image object and text after 1`] 
   >
     
     <img
+      data-rich-text-format-boundary="true"
       src=""
     />
     te

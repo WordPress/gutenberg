@@ -269,18 +269,15 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( replacements[ i ] ) {
-				pointer = append(
-					getParent( pointer ),
-					fromFormat( {
-						...replacements[ i ],
-						object: true,
-						isEditableTree,
-						boundaryClass: isEditableTree && start === i,
-					} )
-				);
-			}
-
+			pointer = append(
+				getParent( pointer ),
+				fromFormat( {
+					...replacements[ i ],
+					object: true,
+					isEditableTree,
+					boundaryClass: isEditableTree && start === i,
+				} )
+			);
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
 		} else if ( ! preserveWhiteSpace && character === '\n' ) {

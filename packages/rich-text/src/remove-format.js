@@ -38,8 +38,6 @@ export function removeFormat(
 			filterFormats( newFormats, i, formatType );
 		} );
 
-		console.log( newFormats );
-
 		return normaliseFormats( {
 			...value,
 			formats: newFormats,
