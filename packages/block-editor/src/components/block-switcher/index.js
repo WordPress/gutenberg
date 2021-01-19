@@ -87,7 +87,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
 
-	const isReusable = isReusableBlock( blocks[ 0 ] );
+	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
