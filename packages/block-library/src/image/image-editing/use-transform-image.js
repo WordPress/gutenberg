@@ -4,11 +4,6 @@
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
-/**
- * External dependencies
- */
-import { pick } from 'lodash';
-
 function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ editedUrl, setEditedUrl ] = useState();
 	const [ crop, setCrop ] = useState();
