@@ -6,8 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	useState,
+	useEffect,
+	useCallback,
+	useRef,
+	useMemo,
+} from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 
@@ -19,9 +25,7 @@ import { getBlockDOMNode } from '../../utils/dom';
 
 function InsertionPointInserter( { clientId, setIsInserterForced } ) {
 	return (
-		/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		<div
-			onFocus={ () => setIsInserterForced( true ) }
 			className={ classnames(
 				'block-editor-block-list__insertion-point-inserter'
 			) }
@@ -46,6 +50,9 @@ function InsertionPointPopover( {
 	containerRef,
 	showInsertionPoint,
 } ) {
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const ref = useRef();
+
 	const { previousElement, nextElement, orientation, isHidden } = useSelect(
 		( select ) => {
 			const {
@@ -91,32 +98,46 @@ function InsertionPointPopover( {
 		[ clientId, rootClientId ]
 	);
 
+	const style = useMemo( () => {
+		if ( ! previousElement || ! nextElement ) {
+			return {};
+		}
+		const previousRect = previousElement.getBoundingClientRect();
+		const nextRect = nextElement.getBoundingClientRect();
+
+		return orientation === 'vertical'
+			? {
+					width: previousElement.offsetWidth,
+					height: nextRect.top - previousRect.bottom,
+			  }
+			: {
+					width: isRTL()
+						? previousRect.left - nextRect.right
+						: nextRect.left - previousRect.right,
+					height: previousElement.offsetHeight,
+			  };
+	}, [ previousElement, nextElement ] );
+
 	const getAnchorRect = useCallback( () => {
 		const previousRect = previousElement.getBoundingClientRect();
 		const nextRect = nextElement.getBoundingClientRect();
 		if ( orientation === 'vertical' ) {
-			const center =
-				previousRect.bottom +
-				( nextRect.top - previousRect.bottom ) / 2;
 			return {
-				top: center,
+				top: previousRect.bottom,
 				left: previousRect.left,
 				right: previousRect.right,
-				bottom: center,
+				bottom: nextRect.top,
 			};
 		}
-		const center =
-			( isRTL() ? previousRect.left : previousRect.right ) +
-			Math.abs( nextRect.left - previousRect.right ) / 2;
 		return {
 			top: previousRect.top,
-			left: center,
-			right: center,
+			left: isRTL() ? nextRect.right : previousRect.right,
+			right: isRTL() ? previousRect.left : nextRect.left,
 			bottom: previousRect.bottom,
 		};
 	}, [ previousElement, nextElement ] );
 
-	if ( ! previousElement || isHidden ) {
+	if ( ! previousElement ) {
 		return null;
 	}
 
@@ -125,6 +146,27 @@ function InsertionPointPopover( {
 		'is-' + orientation
 	);
 
+	function onClick( event ) {
+		if ( event.target === ref.current ) {
+			selectBlock( clientId, -1 );
+		}
+	}
+
+	function onFocus( event ) {
+		// Only handle click on the wrapper specifically, and not an event
+		// bubbled from the inserter itself.
+		if ( event.target !== ref.current ) {
+			setIsInserterForced( true );
+		}
+	}
+
+	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+	// While ideally it would be enough to capture the
+	// bubbling focus event from the Inserter, due to the
+	// characteristics of click focusing of `button`s in
+	// Firefox and Safari, it is not reliable.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
 		<Popover
 			noArrow
@@ -135,23 +177,20 @@ function InsertionPointPopover( {
 			__unstableSlotName="block-toolbar"
 		>
 			<div
+				ref={ ref }
+				tabIndex={ -1 }
+				onClick={ onClick }
+				onFocus={ onFocus }
 				className={ className }
-				style={
-					orientation === 'vertical'
-						? { width: previousElement.offsetWidth }
-						: { height: previousElement.offsetHeight }
-				}
+				style={ style }
 			>
-				{ ( showInsertionPoint ||
-					isInserterShown ||
-					isInserterForced ) && (
-					<div
-						className={
-							'block-editor-block-list__insertion-point-indicator'
-						}
-					/>
-				) }
-				{ ( isInserterShown || isInserterForced ) && (
+				{ ! isHidden &&
+					( showInsertionPoint ||
+						isInserterShown ||
+						isInserterForced ) && (
+						<div className="block-editor-block-list__insertion-point-indicator" />
+					) }
+				{ ! isHidden && ( isInserterShown || isInserterForced ) && (
 					<InsertionPointInserter
 						clientId={ clientId }
 						setIsInserterForced={ setIsInserterForced }
@@ -160,6 +199,7 @@ function InsertionPointPopover( {
 			</div>
 		</Popover>
 	);
+	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
 export default function useInsertionPoint( ref ) {

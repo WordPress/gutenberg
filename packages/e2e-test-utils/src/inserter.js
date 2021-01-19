@@ -16,7 +16,7 @@ export async function openGlobalBlockInserter() {
 	if ( await isGlobalInserterOpen() ) {
 		// If global inserter is already opened, reset to an initial state where
 		// the default (first) tab is selected.
-		const tab = await page.$(
+		const tab = await page.waitForSelector(
 			'.block-editor-inserter__tabs .components-tab-panel__tabs-item:nth-of-type(1):not(.is-active)'
 		);
 
