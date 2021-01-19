@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -31,17 +31,6 @@ import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-
-function AudioUploading( { fileName } ) {
-	const [ title, extension ] = fileName.split( '.' );
-	return (
-		<Text>{ `Uploading "${ title }" an ${ extension.toUpperCase() } audio file ...` }</Text>
-	);
-}
-
-function AudioError( { retryMessage } ) {
-	return <Text>{ `ERROR: ${ retryMessage }` }</Text>;
-}
 
 function AudioEdit( {
 	attributes,
@@ -153,17 +142,17 @@ function AudioEdit( {
 					retryMessage
 				) => {
 					return (
-						<View>
+						<>
 							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
-							<AudioPlayer />
-							{ isUploadInProgress && fileName && (
-								<AudioUploading fileName={ fileName } />
-							) }
-							{ isUploadFailed && (
-								<AudioError retryMessage={ retryMessage } />
-							) }
-						</View>
+							<AudioPlayer
+								source={ attributes.src }
+								fileName={ fileName }
+								isUploadInProgress={ isUploadInProgress }
+								isUploadFailed={ isUploadFailed }
+								retryMessage={ retryMessage }
+							/>
+						</>
 					);
 				} }
 			/>
