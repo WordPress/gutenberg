@@ -15,8 +15,20 @@ The Editor offers rich new value to users with visual, drag-and-drop creation to
 ### [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md)
 Learn how to create your first block for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
 
-### Develop for the block editor
+- [Dynamic Blocks](https://developer.wordpress.org/block-editor/tutorials/block-tutorial/creating-dynamic-blocks/)
+
+### [Develop for the block editor](https://developer.wordpress.org/block-editor/developers/)
 Whether you want to extend the functionality of the block editor, or create a plugin based on it, you will find here all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
+
+- [Block Filters](https://developer.wordpress.org/block-editor/developers/filters/block-filters/)
+- [Editor Filters](https://developer.wordpress.org/block-editor/developers/filters/editor-filters/)
+- [Theming for the Block Editor](https://developer.wordpress.org/block-editor/developers/themes/)
+- [Parser Filters](https://developer.wordpress.org/block-editor/developers/filters/parser-filters/)
+- [Block API Reference](https://developer.wordpress.org/block-editor/developers/block-api/)
+- [Block Editor Accessibility](https://developer.wordpress.org/block-editor/developers/accessibility/)
+-[Internationalization](https://developer.wordpress.org/block-editor/developers/internationalization/)
+
+
 
 <!-- Here we will have chapters on the API, component references, etc ...
 Also, we can have as bullet points links pointing to these chapters. -->
