@@ -10,7 +10,7 @@
 
 Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
 
-[Download the SVG logo](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg).
+[Download the SVG logo](https://github.com/WordPress/gutenberg/blob/HEAD/docs/final-g-wapuu-black.svg).
 
 ## Mockups
 

@@ -12,16 +12,16 @@ Unlike other components that exist in the [Component Reference](/packages/compon
 
 ## Property Reference
 
-For a list of the possible properties to pass your RichText component, [check out the component documentation on Github](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md).
+For a list of the possible properties to pass your RichText component, [check out the component documentation on Github](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md).
 
 ## Core Blocks Using the RichText Component
 
 There are a number of core blocks using the RichText component. The JavaScript edit function linked below for each block can be used as a best practice reference while creating your own blocks.
 
-* **[Button](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/button/edit.js):** RichText is used to enter the button's text.
-* **[Heading](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/heading/edit.js):** RichText is used to enter the heading's text.
-* **[Quote](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/quote/edit.js):** RichText is used in two places, for both the quotation and citation text.
-* **[Search](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/search/edit.js):** RichText is used in two places, for both the label above the search field and the submit button text.
+* **[Button](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/button/edit.js):** RichText is used to enter the button's text.
+* **[Heading](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/heading/edit.js):** RichText is used to enter the heading's text.
+* **[Quote](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/quote/edit.js):** RichText is used in two places, for both the quotation and citation text.
+* **[Search](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/search/edit.js):** RichText is used in two places, for both the label above the search field and the submit button text.
 
 ## Example
 

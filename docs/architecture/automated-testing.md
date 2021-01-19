@@ -13,7 +13,7 @@ These include:
 
 For more context, refer to the following resources:
 
-- [Testing Overview: End-to-End Testing](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/testing-overview.md#end-to-end-testing)
+- [Testing Overview: End-to-End Testing](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/testing-overview.md#end-to-end-testing)
 - [Testing: Experiment with Puppeteer for E2E testing](https://github.com/WordPress/gutenberg/pull/5618)
    - In early iterations, the contributing team opted to use Cypress for end-to-end testing. This pull request outlines problems with the approach, and proposed the initial transition to Puppeteer.
 - [JavaScript Chat Summary: January 28, 2020](https://make.wordpress.org/core/2020/02/04/javascript-chat-summary-january-28-2020/)

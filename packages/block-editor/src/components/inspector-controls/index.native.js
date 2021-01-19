@@ -42,6 +42,6 @@ const InspectorControls = FillWithSettingsButton;
 InspectorControls.Slot = Slot;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md
  */
 export default InspectorControls;
