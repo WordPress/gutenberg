@@ -44,6 +44,7 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 import useImageSizes from './use-image-sizes';
+import useShortCodeTransform from './use-short-code-transform';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -84,12 +85,14 @@ function GalleryEdit( props ) {
 		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
+		shortCodeTransforms,
 		imageCrop,
 	} = attributes;
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		'core/block-editor'
-	);
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceInnerBlocks,
+	} = useDispatch( 'core/block-editor' );
 
 	const { getSettings, preferredStyle } = useSelect( ( select ) => {
 		const settings = select( 'core/block-editor' ).getSettings();
@@ -127,7 +130,6 @@ function GalleryEdit( props ) {
 			) {
 				return imageData;
 			}
-
 			const getMedia = select( 'core' ).getMedia;
 			const newImageData = innerBlockImages.map( ( imageBlock ) => {
 				return {
@@ -145,6 +147,16 @@ function GalleryEdit( props ) {
 		[ innerBlockImages ]
 	);
 
+	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
+
+	useEffect( () => {
+		if ( ! shortCodeTransforms || ! shortCodeImages ) {
+			return;
+		}
+		onSelectImages( shortCodeImages );
+		setAttributes( { shortCodeTransforms: undefined } );
+	}, [ shortCodeTransforms, shortCodeImages ] );
+
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
 			setAttributes( { imageCount: images.length } );
@@ -156,8 +168,6 @@ function GalleryEdit( props ) {
 		isSelected,
 		getSettings
 	);
-
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
 	/**
 	 * Determines the image attributes that should be applied to an image block
@@ -176,7 +186,6 @@ function GalleryEdit( props ) {
 		if ( existingBlock ) {
 			return existingBlock.attributes;
 		}
-
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),

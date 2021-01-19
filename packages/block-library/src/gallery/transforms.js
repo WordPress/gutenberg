@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every, toString } from 'lodash';
+import { filter, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,11 @@ import { createBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import { pickRelevantMediaFiles } from './shared';
-import { LINK_DESTINATION_ATTACHMENT } from './constants';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -59,19 +63,14 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
+
 			attributes: {
-				images: {
+				shortCodeTransforms: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
 						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id: toString( id ),
+							id: parseInt( id ),
 						} ) );
-					},
-				},
-				ids: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						return parseShortcodeIds( ids );
 					},
 				},
 				columns: {
@@ -83,9 +82,16 @@ const transforms = {
 				linkTo: {
 					type: 'string',
 					shortcode: ( {
-						named: { link = LINK_DESTINATION_ATTACHMENT },
+						named: { link = LINK_DESTINATION_NONE },
 					} ) => {
-						return link;
+						switch ( link ) {
+							case 'post':
+								return LINK_DESTINATION_ATTACHMENT;
+							case 'file':
+								return LINK_DESTINATION_MEDIA;
+							default:
+								return LINK_DESTINATION_NONE;
+						}
 					},
 				},
 			},
