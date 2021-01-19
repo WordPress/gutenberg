@@ -55,7 +55,7 @@ export default function save( { attributes } ) {
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const style = {
-		...( isImageBackground && hasParallax
+		...( isImageBackground && ( hasParallax || isRepeated )
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
