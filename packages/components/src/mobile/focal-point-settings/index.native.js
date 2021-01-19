@@ -9,7 +9,7 @@ import { isFinite } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { memo, useEffect, useContext, useState } from '@wordpress/element';
+import { memo, useContext, useState } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 
 /**
