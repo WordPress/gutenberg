@@ -17,7 +17,7 @@ export function PreferencesMenuItem( { openModal } ) {
 				openModal( 'edit-post/preferences-old' );
 			} }
 		>
-			{ __( 'Preferences' ) }
+			{ __( 'Preferences Old' ) }
 		</MenuItem>
 	);
 }

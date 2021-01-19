@@ -1,6 +1,33 @@
 .edit-post-preferences-modal {
+	min-width: 350px;
 	@include break-small() {
 		height: calc(100% - #{$header-height} - #{$header-height});
+	}
+
+	.edit-post-preferences-modal__content {
+		.components-navigation {
+			background-color: #fff;
+			padding: 0;
+			.components-navigation__menu {
+				margin: 0;
+				.components-navigation__item {
+					& > button {
+						color: initial;
+						padding-left: 0;
+						padding-right: 0;
+					}
+					.components-toggle-control__label {
+						color: initial;
+					}
+				}
+				.components-navigation__menu-title-heading {
+					color: initial;
+					border-bottom: 1px solid $gray-300;
+					padding-left: 0;
+					padding-right: 0;
+				}
+			}
+		}
 	}
 
 	.edit-post-preferences__tabs {

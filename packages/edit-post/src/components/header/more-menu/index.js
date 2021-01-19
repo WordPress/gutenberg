@@ -11,7 +11,6 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import ModeSwitcher from '../mode-switcher';
-import PreferencesMenuItemOld from '../preferences-menu-item-old';
 import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import WritingMenu from '../writing-menu';
@@ -57,9 +56,6 @@ const MoreMenu = ( { showIconLabels } ) => {
 						fillProps={ { onClick: onClose } }
 					/>
 					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
-					<MenuGroup>
-						<PreferencesMenuItemOld />
-					</MenuGroup>
 					<MenuGroup>
 						<PreferencesMenuItem />
 					</MenuGroup>

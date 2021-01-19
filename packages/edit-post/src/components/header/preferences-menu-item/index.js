@@ -18,7 +18,7 @@ export default function PreferencesMenuItem() {
 				openModal( 'edit-post/preferences' );
 			} }
 		>
-			{ __( 'Preferences tsek' ) }
+			{ __( 'Preferences' ) }
 		</MenuItem>
 	);
 }
