@@ -46,7 +46,7 @@ Examples for an Image Slider block:
 - carousel
 - gallery
 
-[Read more about keywords.](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-metadata.md#keywords)
+[Read more about keywords.](https://github.com/WordPress/gutenberg/blob/HEAD/docs/designers-developers/developers/block-api/block-metadata.md#keywords)
 
 ### Choose the right category
 
@@ -59,7 +59,7 @@ The Block Editor allows you to indicate the category your block belongs in, maki
 - widgets
 - embed
 
-[Read more about categories.](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-metadata.md#category)
+[Read more about categories.](https://github.com/WordPress/gutenberg/blob/HEAD/docs/designers-developers/developers/block-api/block-metadata.md#category)
 
 Wondering where to input all this information? Read the next section :)
 
@@ -90,7 +90,7 @@ Here is an example of a basic block.json file.
 }
 ```
 
-The `block.json` file also contains other important properties. Take a look at an [example block.json](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-metadata.md) for additional properties to be included in the block.json file.
+The `block.json` file also contains other important properties. Take a look at an [example block.json](https://github.com/WordPress/gutenberg/blob/HEAD/docs/designers-developers/developers/block-api/block-metadata.md) for additional properties to be included in the block.json file.
 
 
 ## Step 3: Zip & Submit

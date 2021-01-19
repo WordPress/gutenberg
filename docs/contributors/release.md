@@ -328,7 +328,7 @@ Check the versions listed in the current `CHANGELOG.md` file, looking through th
 
 Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
 
-Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#maintaining-changelogs) documentation and commit the changes:
+Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
 
 1. `git checkout wp/trunk`
 2. Update each of the `CHANGELOG.md` files
@@ -414,4 +414,4 @@ Time to announce the published changes in the #core-js and #core-editor Slack ch
 Ta-da! 🎉
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
-[package release process]: https://github.com/WordPress/gutenberg/blob/master/packages/README.md#releasing-packages
+[package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages
