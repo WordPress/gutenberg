@@ -18,14 +18,14 @@ if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
  */
 function _gutenberg_migrate_database() {
 	// The default value used here is the first version before migrations were added.
-	$gutenberg_installed_version = get_option( '_GUTENBERG_VERSION_MIGRATION', '9.7.0' );
+	$gutenberg_installed_version = get_option( 'gutenberg_version_migration', '9.7.0' );
 
 	if ( _GUTENBERG_VERSION_MIGRATION !== $gutenberg_installed_version ) {
 		if ( version_compare( $gutenberg_installed_version, '9.8.0', '<' ) ) {
 			_gutenberg_migrate_remove_fse_drafts();
 		}
 
-		update_option( '_GUTENBERG_VERSION_MIGRATION', _GUTENBERG_VERSION_MIGRATION );
+		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
 	}
 }
 
