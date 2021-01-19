@@ -8,21 +8,32 @@
 /**
  * Renders the `core/pages` block on server.
  *
+ * @param array $attributes The block attributes.
+ *
  * @return string Returns the pages list/dropdown markup.
  */
-function render_block_core_pages() {
+function render_block_core_pages( $attributes ) {
 	static $block_id = 0;
 	$block_id++;
+
+	$walker = new Walker_Pages_Block;
 
 	$args = array(
 		'echo'     => false,
 		'title_li' => '',
+		'walker'   => $walker,
 	);
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 	$items_markup   = wp_list_pages( $args );
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'wp-block-page-list' ) );
+	$classes = 'wp-block-page-list';
+
+	if ( isset( $attributes['showSubmenuIcon'] ) && $attributes['showSubmenuIcon'] ) {
+		$classes .= ' show-submenu-icons';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf(
 		$wrapper_markup,

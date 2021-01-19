@@ -1,0 +1,87 @@
+.wp-block-navigation-link__submenu-icon {
+	display: none;
+}
+
+.show-submenu-icons {
+	.wp-block-navigation-link__submenu-icon {
+		display: block;
+	}
+}
+
+// The Pages block should inherit navigation styles when nested within it
+.wp-block-navigation {
+	.wp-block-page-list {
+		display: flex;
+		flex-wrap: wrap;
+	}
+	.page_item a {
+		display: block;
+		color: inherit;
+		padding: 0.5em 1em;
+	}
+
+	.page_item_has_children {
+		display: flex;
+		position: relative;
+
+		> a {
+			padding-right: 0.5em;
+		}
+		> .children {
+			border: $border-width solid rgba(0, 0, 0, 0.15);
+			background-color: inherit;
+			color: inherit;
+			position: absolute;
+			left: 0;
+			top: 100%;
+			width: fit-content;
+			z-index: 2;
+			opacity: 0;
+			transition: opacity 0.1s linear;
+			visibility: hidden;
+
+			@include break-medium {
+				left: 1.5em;
+
+				// Nested submenus sit to the left on large breakpoints
+				.children {
+					left: 100%;
+					top: -1px;
+
+					// Prevent the menu from disappearing when the mouse is over the gap
+					&::before {
+						content: "";
+						position: absolute;
+						right: 100%;
+						height: 100%;
+						display: block;
+						width: 0.5em;
+						background: transparent;
+					}
+				}
+
+				.wp-block-navigation-link__submenu-icon svg {
+					transform: rotate(0);
+				}
+			}
+		}
+
+		&:hover {
+			cursor: pointer;
+
+			> .children {
+				visibility: visible;
+				opacity: 1;
+			}
+		}
+
+		&:focus-within {
+			cursor: pointer;
+
+			> .children {
+				visibility: visible;
+				opacity: 1;
+			}
+		}
+	}
+}
