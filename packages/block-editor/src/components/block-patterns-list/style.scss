@@ -1,4 +1,5 @@
 .block-editor-block-patterns-list__list-item {
+	border-radius: $radius-block-ui;
 	cursor: pointer;
 	margin-top: $grid-unit-20;
 
@@ -18,6 +19,23 @@
 	position: relative;
 	border: $border-width solid transparent;
 
+	// Show patterns in two columns, in the main inserter.
+	.edit-post-layout__inserter-panel & {
+		width: calc(50% - #{ $grid-unit-15 / 2 });
+
+		// Every pattern comes with an adjacent div.
+		// Using nth-child, we apply rules to only every 3rd patterns, starting from 1. That targets ever 2nd visual item.
+		// Right:
+		float: right;
+		clear: right;
+
+		// Left:
+		&:nth-of-type(4n+1) {
+			float: left;
+			clear: left;
+		}
+	}
+
 	&:hover {
 		border: $border-width solid var(--wp-admin-theme-color);
 	}
@@ -32,6 +50,6 @@
 
 .block-editor-block-patterns-list__item-title {
 	padding: $grid-unit-05;
-	font-size: 12px;
+	font-size: $helptext-font-size;
 	text-align: center;
 }
