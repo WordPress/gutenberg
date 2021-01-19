@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 
@@ -10,22 +10,15 @@ import { MenuItem } from '@wordpress/components';
  */
 import { store as editPostStore } from '../../../store';
 
-export function PreferencesMenuItem( { openModal } ) {
+export default function PreferencesMenuItem() {
+	const { openModal } = useDispatch( editPostStore );
 	return (
 		<MenuItem
 			onClick={ () => {
 				openModal( 'edit-post/preferences' );
 			} }
 		>
-			{ __( 'Preferences' ) }
+			{ __( 'Preferences tsek' ) }
 		</MenuItem>
 	);
 }
-
-export default withDispatch( ( dispatch ) => {
-	const { openModal } = dispatch( editPostStore );
-
-	return {
-		openModal,
-	};
-} )( PreferencesMenuItem );

@@ -1,4 +1,29 @@
 .edit-post-preferences-modal {
+	@include break-small() {
+		height: calc(100% - #{$header-height} - #{$header-height});
+	}
+
+	.edit-post-preferences__tabs {
+		display: flex;
+		flex-direction: row;
+		.components-tab-panel__tabs {
+			width: 200px;
+			.components-tab-panel__tabs-item {
+				&.is-active {
+					background: $gray-100;
+					box-shadow: none;
+				}
+				&:focus:not(:disabled) {
+					box-shadow: none;
+				}
+			}
+		}
+		.components-tab-panel__tab-content {
+			width: 400px;
+			padding-left: $grid-unit-30;
+		}
+	}
+
 	&__section {
 		margin: 0 0 2.5rem 0;
 	}
@@ -9,11 +34,9 @@
 	}
 
 	&__option {
-
 		.components-base-control__field {
 			align-items: center;
 			display: flex;
-			margin: 0;
 		}
 
 		.components-checkbox-control__label {
@@ -35,7 +58,7 @@
 	}
 
 	.components-base-control__help {
-		margin: -$grid-unit-10 0 $grid-unit-10 ( $grid-unit-50 + 2px );
+		margin-left: 48px;
 		font-size: $helptext-font-size;
 		font-style: normal;
 		color: $gray-700;

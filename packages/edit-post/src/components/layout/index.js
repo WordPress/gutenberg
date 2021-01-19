@@ -50,6 +50,7 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import PreferencesModal from '../preferences-modal';
+import PreferencesModalOld from '../preferences-modal-old';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -299,6 +300,7 @@ function Layout( { styles } ) {
 				} }
 			/>
 			<ManageBlocksModal />
+			<PreferencesModalOld />
 			<PreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
