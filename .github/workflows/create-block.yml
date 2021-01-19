@@ -18,6 +18,10 @@ jobs:
     name: Checks
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node: [12, 14]
+
     steps:
     - uses: actions/checkout@v2
 
@@ -34,10 +38,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js 14.x
+    - name: Use Node.js ${{ matrix.node }}.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: ${{ matrix.node }}
 
     - name: npm install, build, format and lint
       run: |
