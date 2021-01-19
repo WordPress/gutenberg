@@ -141,7 +141,7 @@ const stopDriver = async ( driver ) => {
 			.createHmac( 'md5', jobID )
 			.update( serverConfigs.sauce.auth )
 			.digest( 'hex' );
-		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }.`;
+		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }`;
 		// eslint-disable-next-line no-console
 		console.log( `You can view the video of this test run at ${ jobURL }` );
 	}
