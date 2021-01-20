@@ -131,11 +131,6 @@ const setupDriver = async () => {
 const stopDriver = async ( driver ) => {
 	if ( ! isLocalEnvironment() ) {
 		const jobID = driver.sessionID;
-		// eslint-disable-next-line no-console
-		console.log(
-			'file: utils.js ~ line 134 ~ stopDriver ~ driver',
-			driver
-		);
 
 		const hash = crypto
 			.createHmac( 'md5', jobID )
