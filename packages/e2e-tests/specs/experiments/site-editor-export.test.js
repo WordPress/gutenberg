@@ -20,7 +20,7 @@ async function waitForFileExists( filePath, timeout = 10000 ) {
 	while ( ! fs.existsSync( filePath ) ) {
 		await delay( 1000 );
 		if ( Date.now() - start > timeout ) {
-			throw Error( 'waitFile timeout' );
+			throw Error( 'waitForFileExists timeout' );
 		}
 	}
 }
