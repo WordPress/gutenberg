@@ -24,15 +24,31 @@ export default function ContentPagesMenu() {
 		isDebouncing,
 	} = useDebouncedSearch();
 
-	const pages = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'page', {
-				search: searchQuery,
-			} ),
+	const { pages, isResolved } = useSelect(
+		( select ) => {
+			const { getEntityRecords, hasFinishedResolution } = select(
+				'core'
+			);
+			const getEntityRecordsArgs = [
+				'postType',
+				'page',
+				{
+					search: searchQuery,
+				},
+			];
+			const hasResolvedPosts = hasFinishedResolution(
+				'getEntityRecords',
+				getEntityRecordsArgs
+			);
+			return {
+				pages: getEntityRecords( ...getEntityRecordsArgs ),
+				isResolved: hasResolvedPosts,
+			};
+		},
 		[ searchQuery ]
 	);
 
-	const isLoading = ! search && pages === null;
+	const isLoading = ! search && ! isResolved;
 	const shouldShowLoadingForDebouncing = search && isDebouncing;
 	const showLoading = isLoading || shouldShowLoadingForDebouncing;
 
@@ -44,6 +60,7 @@ export default function ContentPagesMenu() {
 			hasSearch={ true }
 			onSearch={ onSearch }
 			search={ search }
+			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
 			{ search && ! isDebouncing && (
 				<SearchResults items={ pages } search={ search } />
