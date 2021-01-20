@@ -8,6 +8,7 @@
 		}
 	},
 	"supports": {
+		"align": false,
 		"customClassName": false,
 		"html": false,
 		"inserter": false

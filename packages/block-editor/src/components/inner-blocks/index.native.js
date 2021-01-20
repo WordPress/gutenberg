@@ -20,7 +20,7 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
-import { defaultLayout, LayoutProvider } from './layout';
+import { defaultLayout, flexHorizontalLayout, LayoutProvider } from './layout';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -51,8 +51,16 @@ function UncontrolledInnerBlocks( props ) {
 		horizontalAlignment,
 		filterInnerBlocks,
 		blockWidth,
-		__experimentalLayout: layout = defaultLayout,
+		__experimentalLayout,
 	} = props;
+
+	let layout = __experimentalLayout;
+	if ( ! layout && orientation === 'horizontal' ) {
+		layout = flexHorizontalLayout;
+	}
+	if ( ! layout && orientation !== 'horizontal' ) {
+		layout = defaultLayout;
+	}
 
 	const block = useSelect(
 		( select ) => select( 'core/block-editor' ).getBlock( clientId ),

@@ -71,6 +71,7 @@
 		}
 	},
 	"supports": {
+		"align": false,
 		"anchor": true
 	},
 	"editorStyle": "wp-block-image-editor",

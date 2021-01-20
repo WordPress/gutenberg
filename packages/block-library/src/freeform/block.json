@@ -11,7 +11,8 @@
 	"supports": {
 		"className": false,
 		"customClassName": false,
-		"reusable": false
+		"reusable": false,
+		"align": false
 	},
 	"editorStyle": "wp-block-freeform-editor"
 }

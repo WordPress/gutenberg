@@ -4,6 +4,7 @@
 import { createContext, useContext } from '@wordpress/element';
 
 export const defaultLayout = { type: 'default' };
+export const flexHorizontalLayout = { type: 'flex-horizontal' };
 
 const Layout = createContext( defaultLayout );
 

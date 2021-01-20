@@ -89,7 +89,7 @@ export function addAttribute( settings ) {
 	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, 'align' ) ) {
+	if ( hasBlockSupport( settings, 'align', true ) ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -120,7 +120,7 @@ export const withToolbarControls = createHigherOrderComponent(
 		// and without checking the layout for availble alignments.
 		// BlockAlignmentToolbar takes both of these into account.
 		const validAlignments = getValidAlignments(
-			getBlockSupport( blockName, 'align' ),
+			getBlockSupport( blockName, 'align', true ),
 			hasBlockSupport( blockName, 'alignWide', true )
 		);
 
@@ -174,7 +174,7 @@ export const withDataAlign = createHigherOrderComponent(
 		}
 
 		const validAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
+			getBlockSupport( name, 'align', true ),
 			hasBlockSupport( name, 'alignWide', true ),
 			hasWideEnabled
 		);
@@ -199,7 +199,7 @@ export const withDataAlign = createHigherOrderComponent(
  */
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;
-	const blockAlign = getBlockSupport( blockType, 'align' );
+	const blockAlign = getBlockSupport( blockType, 'align', true );
 	const hasWideBlockSupport = hasBlockSupport( blockType, 'alignWide', true );
 
 	// Compute valid alignments without taking into account if

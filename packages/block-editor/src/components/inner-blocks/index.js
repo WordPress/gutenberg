@@ -27,7 +27,7 @@ import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
-import { defaultLayout, LayoutProvider } from './layout';
+import { defaultLayout, flexHorizontalLayout, LayoutProvider } from './layout';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -50,8 +50,16 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
-		__experimentalLayout: layout = defaultLayout,
+		__experimentalLayout,
 	} = props;
+
+	let layout = __experimentalLayout;
+	if ( ! layout && orientation === 'horizontal' ) {
+		layout = flexHorizontalLayout;
+	}
+	if ( ! layout && orientation !== 'horizontal' ) {
+		layout = defaultLayout;
+	}
 
 	useNestedSettingsUpdate(
 		clientId,
