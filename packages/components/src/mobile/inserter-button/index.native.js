@@ -66,7 +66,7 @@ class MenuItem extends Component {
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
 				accessibilityRole="button"
-				accessibilityLabel={ `${item.title} block` }
+				accessibilityLabel={ `${ item.title } block` }
 				onPress={ this.onPress }
 				disabled={ item.isDisabled }
 			>
