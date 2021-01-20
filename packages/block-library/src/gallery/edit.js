@@ -122,8 +122,7 @@ function GalleryEdit( props ) {
 	const imageData = useSelect(
 		( select ) => {
 			if (
-				! innerBlockImages ||
-				innerBlockImages.length === 0 ||
+				! innerBlockImages?.length ||
 				some(
 					innerBlockImages,
 					( imageBlock ) => ! imageBlock.attributes.id
