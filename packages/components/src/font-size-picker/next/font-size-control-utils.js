@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 /**
  * External dependencies
  */
 import { ui } from '@wp-g2/styles';
-import { createUnitValue, is, parseUnitValue } from '@wp-g2/utils';
+import { createUnitValue, parseUnitValue } from '@wp-g2/utils';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -55,9 +56,10 @@ export function getSelectOptions( {
 	}
 
 	return options.map( ( option ) => {
-		const fontSize = is.number( option.size )
-			? createUnitValue( option.size, 'px' )
-			: option.size;
+		const fontSize =
+			typeof option.size === 'number'
+				? createUnitValue( option.size, 'px' )
+				: option.size;
 
 		return {
 			...option,
@@ -80,7 +82,8 @@ export function getInputValue( fontSizes = [], value ) {
 	}
 
 	const isPixelValue =
-		is.number( value ) || ( is.string( value ) && value.endsWith( 'px' ) );
+		typeof value === 'number' ||
+		( typeof value === 'string' && value.endsWith( 'px' ) );
 
 	const inputValue = ( isPixelValue && noUnitsValue ) || '';
 

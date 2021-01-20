@@ -6,8 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { noop } from '@wp-g2/utils';
 import {
 	Grid,
 	TextInput,

@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 /**
  * External dependencies
  */
-import { noop } from '@wp-g2/utils';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
