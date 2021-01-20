@@ -4,6 +4,7 @@
 import { __experimentalNavigationItem as NavigationItem } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { getPathAndQueryString } from '@wordpress/url';
 
 const getTitle = ( entity ) =>
@@ -33,7 +34,7 @@ export default function ContentNavigationItem( { item } ) {
 		<NavigationItem
 			className="edit-site-navigation-panel__content-item"
 			item={ `${ item.taxonomy || item.type }-${ item.id }` }
-			title={ getTitle( item ) }
+			title={ getTitle( item ) || __( '(no title)' ) }
 			onClick={ onActivateItem }
 		/>
 	);
