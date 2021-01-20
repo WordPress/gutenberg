@@ -280,12 +280,14 @@ async function publishPackagesToNpm(
 		: minimumVersionBump;
 	await command( `npx lerna version ${ version } --no-private`, {
 		cwd: gitWorkingDirectoryPath,
+		stdio: 'inherit',
 	} );
 
 	log( '>> Publishing packages to npm.' );
 	const distTag = isPrerelease ? ' --dist-tag next' : '';
 	await command( `npx lerna publish from-package${ distTag }`, {
 		cwd: gitWorkingDirectoryPath,
+		stdio: 'inherit',
 	} );
 }
 
