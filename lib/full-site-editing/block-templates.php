@@ -136,9 +136,9 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 		}
 
 		return $new_content;
-	} else {
-		return $template_content;
 	}
+
+	return $template_content;
 }
 
 /**
