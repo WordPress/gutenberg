@@ -25,15 +25,26 @@ export default function ContentPostsMenu() {
 		isDebouncing,
 	} = useDebouncedSearch();
 
-	const { posts, showOnFront } = useSelect(
+	const { posts, showOnFront, isResolved } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getEditedEntityRecord } = select(
 				'core'
+			);
+			const hasResolvedPosts = select( 'core' ).hasFinishedResolution(
+				'getEntityRecords',
+				[
+					'postType',
+					'post',
+					{
+						search: searchQuery,
+					},
+				]
 			);
 			return {
 				posts: getEntityRecords( 'postType', 'post', {
 					search: searchQuery,
 				} ),
+				isResolved: hasResolvedPosts,
 				showOnFront: getEditedEntityRecord( 'root', 'site' )
 					.show_on_front,
 			};
@@ -54,7 +65,7 @@ export default function ContentPostsMenu() {
 		} );
 	}, [ setPage ] );
 
-	const isLoading = ! search && posts === null;
+	const isLoading = ! search && ! isResolved;
 	const shouldShowLoadingForDebouncing = search && isDebouncing;
 	const showLoading = isLoading || shouldShowLoadingForDebouncing;
 
