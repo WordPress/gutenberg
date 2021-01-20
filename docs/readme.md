@@ -19,6 +19,9 @@ The Editor offers rich new value to users with visual, drag-and-drop creation to
 
 ## Quick links
 
+### [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md)
+Learn how to create your first block for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
+
 ### [Develop for the block editor](https://developer.wordpress.org/block-editor/developers/)
 Whether you want to extend the functionality of the block editor, or create a plugin based on it, you will find here all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
@@ -29,9 +32,6 @@ Whether you want to extend the functionality of the block editor, or create a pl
 - [Block API Reference](/docs/designers-developers/developers/block-api/readme.md)
 - [Block Editor Accessibility](/docs/designers-developers/developers/accessibility.md)
 - [Internationalization](/docs/designers-developers/developers/internationalization.md)
-
-### [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md)
-Learn how to create your first block for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
 
 ### [Contribute to the block editor](/docs/contributors/readme.md)
 Everything you need to know to start contributing to the block editor. Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
