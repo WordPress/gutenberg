@@ -197,12 +197,15 @@ $block-inserter-tabs-height: 44px;
 	font-weight: 500;
 }
 
-.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
-	line-height: 1.2;
-}
-
-.block-editor-inserter__panel-dropdown select {
-	border: none;
+.block-editor-inserter__panel-chips {
+	.components-button.components-button {
+		box-shadow: 0 0 0 $border-width $gray-300;
+		margin: 0 $grid-unit-10 $grid-unit-10 0;
+		border-radius: $radius-block-ui;
+		font-size: $helptext-font-size;
+		height: auto;
+		padding: 6px;
+	}
 }
 
 .block-editor-inserter__block-list {
