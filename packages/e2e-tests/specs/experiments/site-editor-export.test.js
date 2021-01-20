@@ -18,17 +18,11 @@ import { siteEditor } from '../../experimental-features';
 async function waitForFileExists( filePath, timeout = 10000 ) {
 	const start = Date.now();
 	while ( ! fs.existsSync( filePath ) ) {
-		await delay( 1000 );
+		await page.waitForTimeout( 1000 );
 		if ( Date.now() - start > timeout ) {
 			throw Error( 'waitForFileExists timeout' );
 		}
 	}
-}
-
-function delay( time ) {
-	return new Promise( function ( resolve ) {
-		setTimeout( resolve, time );
-	} );
 }
 
 describe( 'Site Editor Templates Export', () => {
