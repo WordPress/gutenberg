@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 1.0.0-next.0 (2021-01-20)
-
 ### Breaking Changes
 
 -   `leftSidebar` prop in `InterfaceSkeleton` component was removed ([#26517](https://github.com/WordPress/gutenberg/pull/26517). Use `secondarySidebar` prop instead.
