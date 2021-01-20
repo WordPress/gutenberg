@@ -107,7 +107,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 	public function test_create_item() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/templates' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/templates' );
 		$request->set_body_params(
 			array(
 				'slug'        => 'my_custom_template',
@@ -144,7 +144,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'PUT', '/wp/v2/templates/tt1-blocks//index' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/tt1-blocks//index' );
 		$request->set_body_params(
 			array(
 				'title' => 'My new Index Title',
