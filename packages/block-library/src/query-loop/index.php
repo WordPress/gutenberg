@@ -28,7 +28,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 			unset( $query['offset'] );
 			$query = wp_parse_args( $wp_query->query_vars, $query );
 
-			if ( '' === $query['post_type'] && is_singular() ) {
+			if ( empty( $query['post_type'] ) && is_singular() ) {
 				$query['post_type'] = get_post_type( get_the_ID() );
 			}
 		}
