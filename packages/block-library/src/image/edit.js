@@ -92,7 +92,6 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
-		inhertedAttributes,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -324,7 +323,6 @@ export function ImageEdit( {
 			onUploadError={ onUploadError }
 			containerRef={ ref }
 			context={ context }
-			inhertedAttributes={ inhertedAttributes }
 		/>
 	);
 
