@@ -51,9 +51,7 @@ export function useTruncate( props ) {
 		}
 	);
 
-	const shouldTruncate =
-		ellipsizeMode === TRUNCATE_TYPE.auto &&
-		ellipsizeMode !== TRUNCATE_TYPE.none;
+	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
 
 	const classes = useMemo( () => {
 		const sx = {};

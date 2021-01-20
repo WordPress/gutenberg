@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import React from 'react';
 
 /**
  * Internal dependencies
@@ -14,23 +13,27 @@ describe( 'props', () => {
 		const { container } = render(
 			<Truncate>Some people are worth melting for.</Truncate>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild.textContent ).toEqual(
+			'Some people are worth melting for.'
+		);
 	} );
 
 	test( 'should render limit', () => {
 		const { container } = render(
-			<Truncate limit={ 5 }>Some people are worth melting for.</Truncate>
+			<Truncate limit={ 1 } ellipsizeMode="tail">
+				Some
+			</Truncate>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild.textContent ).toEqual( 'S…' );
 	} );
 
 	test( 'should render custom ellipsis', () => {
 		const { container } = render(
-			<Truncate ellipsis="!!!" limit={ 5 }>
+			<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
 				Some people are worth melting for.
 			</Truncate>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild.textContent ).toEqual( 'Some !!!' );
 	} );
 
 	test( 'should render custom ellipsizeMode', () => {
@@ -39,15 +42,6 @@ describe( 'props', () => {
 				Some people are worth melting for.
 			</Truncate>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
-
-	test( 'should render numberOfLines', () => {
-		const { container } = render(
-			<Truncate numberOfLines={ 3 }>
-				Some people are worth melting for.
-			</Truncate>
-		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild.textContent ).toEqual( 'So!!!r.' );
 	} );
 } );
