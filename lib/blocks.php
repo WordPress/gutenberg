@@ -171,18 +171,33 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		static $inline_pool_size = 0;
 
 		// The default threshold for inlining styles in the frontend (in bytes).
 		$threshold = 3000;
 
 		/**
 		 * The threshold for inlining styles instead of enqueueing them (in bytes).
+		 *
 		 * If a stylesheet is below the defined threshold then it will get inlined instead of enqueued.
 		 *
 		 * @param int $threshold The file-size threshold, in bytes.
 		 * @return int
 		 */
 		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold );
+
+		// The default maximum total size of inlined styles.
+		$max_inline_total_size = 15000;
+
+		/**
+		 * The maximum size of all inlined styles (in bytes).
+		 *
+		 * Inlining will stop if this size is reached.
+		 *
+		 * @param int $max_inline_total_size The maximum size of all inlined styles - in bytes.
+		 * @return int
+		 */
+		$max_inline_total_size = apply_filters( 'block_styles_max_inline_total_size', $max_inline_total_size );
 
 		/**
 		 * Get the file size.
@@ -191,7 +206,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		 */
 		$stylesheet_size = ( $threshold ) ? filesize( gutenberg_dir_path() . $style_path ) : 1;
 
-		if ( $stylesheet_size > $threshold ) {
+		if ( $stylesheet_size > $threshold || $max_inline_total_size < $inline_pool_size + $stylesheet_size ) {
 
 			// Register the style.
 			wp_register_style(
@@ -223,6 +238,8 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
 				$inline_styles = gutenberg_minify_styles( $inline_styles );
 			}
+
+			$inline_pool_size += strlen( $inline_styles );
 
 			// Add inline styles to the registered style.
 			wp_add_inline_style( "wp-block-{$block_name}", $inline_styles );
