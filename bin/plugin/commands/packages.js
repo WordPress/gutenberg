@@ -210,7 +210,9 @@ async function updatePackages(
 				);
 
 				log(
-					`   - ${ packageName }: ${ version } -> ${ nextVersion }`
+					`   - ${ packageName }: ${ version } -> ${
+						isPrerelease ? nextVersion + '-next.0' : nextVersion
+					}`
 				);
 			}
 		)
