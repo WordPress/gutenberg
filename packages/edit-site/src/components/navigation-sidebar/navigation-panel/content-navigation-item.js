@@ -12,20 +12,18 @@ const getTitle = ( entity ) =>
 export default function ContentNavigationItem( { item } ) {
 	const { setPage } = useDispatch( 'core/edit-site' );
 
-	const onActivateItem = useCallback(
-		( { type, slug, link, id } ) => {
-			setPage( {
-				type,
-				slug,
-				path: getPathAndQueryString( link ),
-				context: {
-					postType: type,
-					postId: id,
-				},
-			} );
-		},
-		[ setPage ]
-	);
+	const onActivateItem = useCallback( () => {
+		const { type, slug, link, id } = item;
+		setPage( {
+			type,
+			slug,
+			path: getPathAndQueryString( link ),
+			context: {
+				postType: type,
+				postId: id,
+			},
+		} );
+	}, [ setPage, item ] );
 
 	if ( ! item ) {
 		return null;
