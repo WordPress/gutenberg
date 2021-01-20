@@ -27,18 +27,14 @@ Learn how to create your first block for the WordPress block editor. From settin
 ### [Develop for the block editor](https://developer.wordpress.org/block-editor/developers/)
 Whether you want to extend the functionality of the block editor, or create a plugin based on it, you will find here all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
-- [Block Filters](https://developer.wordpress.org/block-editor/developers/filters/block-filters/)
-- [Editor Filters](https://developer.wordpress.org/block-editor/developers/filters/editor-filters/)
-- [Theming for the Block Editor](https://developer.wordpress.org/block-editor/developers/themes/)
-- [Parser Filters](https://developer.wordpress.org/block-editor/developers/filters/parser-filters/)
-- [Block API Reference](https://developer.wordpress.org/block-editor/developers/block-api/)
-- [Block Editor Accessibility](https://developer.wordpress.org/block-editor/developers/accessibility/)
-- [Internationalization](https://developer.wordpress.org/block-editor/developers/internationalization/)
+- [Gutenberg Architecture](/docs/architecture/readme.md)
+- [Block Style Variations](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations)
+- [Creating Block Patterns](/docs/designers-developers/developers/block-api/block-patterns.md)
+- [Theming for the Block Editor](/docs/designers-developers/developers/themes/readme.md)
+- [Block API Reference](/docs/designers-developers/developers/block-api/readme.md)
+- [Block Editor Accessibility](/docs/designers-developers/developers/accessibility.md)
+- [Internationalization](/docs/designers-developers/developers/internationalization.md)
 
-
-
-<!-- Here we will have chapters on the API, component references, etc ...
-Also, we can have as bullet points links pointing to these chapters. -->
 
 ### [Contribute to the block editor](/docs/contributors/readme.md)
 Everything you need to know to start contributing to the block editor. Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
