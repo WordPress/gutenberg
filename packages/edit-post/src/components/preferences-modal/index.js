@@ -42,6 +42,7 @@ import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/preferences';
+const PREFERENCES_MENU = 'preferences-menu';
 
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -239,9 +240,8 @@ export default function PreferencesModal() {
 		],
 		[ isViewable, showBlockBreadcrumbsOption ]
 	);
-	const preferencesMenu = 'preferences-menu';
-	const [ activeTab ] = useState();
-	const [ activeMenu, setActiveMenu ] = useState( preferencesMenu );
+
+	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
 	/**
 	 * Create helper objects from `sections` for easier data handling.
 	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
@@ -281,11 +281,10 @@ export default function PreferencesModal() {
 	} else {
 		modalContent = (
 			<Navigation
-				activeItem={ activeTab }
 				activeMenu={ activeMenu }
 				onActivateMenu={ setActiveMenu }
 			>
-				<NavigationMenu menu={ preferencesMenu }>
+				<NavigationMenu menu={ PREFERENCES_MENU }>
 					{ tabs.map( ( tab ) => {
 						return (
 							<NavigationItem
@@ -302,7 +301,7 @@ export default function PreferencesModal() {
 							key={ `${ section.name }-menu` }
 							menu={ section.name }
 							title={ section.tabLabel }
-							parentMenu={ preferencesMenu }
+							parentMenu={ PREFERENCES_MENU }
 						>
 							<NavigationItem>{ section.content }</NavigationItem>
 						</NavigationMenu>
@@ -318,9 +317,7 @@ export default function PreferencesModal() {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
-			<div className="edit-post-preferences-modal__content">
-				{ modalContent }
-			</div>
+			{ modalContent }
 		</Modal>
 	);
 }

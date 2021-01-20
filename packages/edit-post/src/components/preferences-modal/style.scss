@@ -1,31 +1,29 @@
 .edit-post-preferences-modal {
-	min-width: 350px;
+	min-width: 360px;
 	@include break-small() {
 		height: calc(100% - #{$header-height} - #{$header-height});
 	}
 
-	.edit-post-preferences-modal__content {
-		.components-navigation {
-			background-color: #fff;
-			padding: 0;
-			.components-navigation__menu {
-				margin: 0;
-				.components-navigation__item {
-					& > button {
-						color: initial;
-						padding-left: 0;
-						padding-right: 0;
-					}
-					.components-toggle-control__label {
-						color: initial;
-					}
-				}
-				.components-navigation__menu-title-heading {
+	.components-navigation {
+		background-color: #fff;
+		padding: 0;
+		.components-navigation__menu {
+			margin: 0;
+			.components-navigation__item {
+				& > button {
 					color: initial;
-					border-bottom: 1px solid $gray-300;
 					padding-left: 0;
 					padding-right: 0;
 				}
+				.components-toggle-control__label {
+					color: initial;
+				}
+			}
+			.components-navigation__menu-title-heading {
+				color: initial;
+				border-bottom: 1px solid $gray-300;
+				padding-left: 0;
+				padding-right: 0;
 			}
 		}
 	}
@@ -34,19 +32,22 @@
 		display: flex;
 		flex-direction: row;
 		.components-tab-panel__tabs {
-			width: 200px;
+			width: 160px;
 			.components-tab-panel__tabs-item {
+				border-radius: $radius-block-ui;
+				font-weight: 400;
 				&.is-active {
 					background: $gray-100;
 					box-shadow: none;
+					font-weight: 500;
 				}
 				&:focus:not(:disabled) {
-					box-shadow: none;
+					box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 				}
 			}
 		}
 		.components-tab-panel__tab-content {
-			width: 400px;
+			width: 500px;
 			padding-left: $grid-unit-30;
 		}
 	}
@@ -61,14 +62,17 @@
 	}
 
 	&__option {
-		.components-base-control__field {
-			align-items: center;
-			display: flex;
-		}
+		.components-base-control {
+			.components-base-control__field {
+				align-items: center;
+				display: flex;
+				margin-bottom: 0;
 
-		.components-checkbox-control__label {
-			flex-grow: 1;
-			padding: 0.6rem 0 0.6rem 10px;
+				& > label {
+					flex-grow: 1;
+					padding: 0.6rem 0 0.6rem 10px;
+				}
+			}
 		}
 	}
 
@@ -85,7 +89,7 @@
 	}
 
 	.components-base-control__help {
-		margin-left: 48px;
+		margin: -$grid-unit-10 0 $grid-unit-10 58px;
 		font-size: $helptext-font-size;
 		font-style: normal;
 		color: $gray-700;
