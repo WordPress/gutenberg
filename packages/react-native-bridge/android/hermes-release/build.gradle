@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('../vendor/hermes-engine/hermes-release.aar'))
+artifacts.add("default", file('../../../../node_modules/hermes-engine/android/hermes-release.aar'))
