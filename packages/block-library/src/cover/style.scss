@@ -3,9 +3,9 @@
 	position: relative;
 	background-size: cover;
 	background-position: center center;
-	overflow: hidden;
 	min-height: 430px;
 	width: 100%;
+	height: 100%; // This explicit height rule is necessary for the focal point picker to work.
 	display: flex;
 	justify-content: center;
 	align-items: center;
