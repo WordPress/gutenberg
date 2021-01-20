@@ -35,20 +35,25 @@ export default function BorderPanel( {
 	setStyle,
 } ) {
 	const hasBorderRadius = useHasBorderRadiusControl( { supports, name } );
+	const borderRadiusValue = parseInt(
+		getStyle( name, 'borderRadius' ) || 0,
+		10
+	);
 
 	return (
 		<PanelBody title={ __( 'Border' ) } initialOpen={ true }>
 			{ hasBorderRadius && (
 				<RangeControl
-					value={ getStyle( name, 'borderRadius' ) }
+					value={ borderRadiusValue }
 					label={ __( 'Border radius' ) }
 					min={ MIN_BORDER_RADIUS_VALUE }
 					max={ MAX_BORDER_RADIUS_VALUE }
-					initialPosition={ getStyle( name, 'borderRadius' ) || 0 }
+					initialPosition={ borderRadiusValue }
 					allowReset
-					onChange={ ( value ) =>
-						setStyle( name, 'borderRadius', value )
-					}
+					onChange={ ( value ) => {
+						const radiusStyle = value ? `${ value }px` : undefined;
+						setStyle( name, 'borderRadius', radiusStyle );
+					} }
 				/>
 			) }
 		</PanelBody>
