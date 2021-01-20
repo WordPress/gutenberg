@@ -31,7 +31,7 @@ const addThreeParagraphsToNewPost = async () => {
  * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
  */
 const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 
 	let isRemoveButton = false;
 

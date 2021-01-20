@@ -27,18 +27,14 @@ export default function TemplatePartsMenu() {
 		setSearch( value );
 	} );
 
-	const templateParts = useSelect( ( select ) => {
-		const unfilteredTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			} ) || [];
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-		return unfilteredTemplateParts.filter(
-			( item ) =>
-				item.status === 'publish' || item.wp_theme_slug === currentTheme
-		);
-	}, [] );
+	const templateParts = useSelect(
+		( select ) =>
+			select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			) || [],
+		[]
+	);
 
 	return (
 		<NavigationMenu

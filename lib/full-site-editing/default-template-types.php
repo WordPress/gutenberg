@@ -27,7 +27,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'singular'       => array(
 			'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
-			'description' => __( 'Used when a single entry is queried. This template will be overridden the Single, Post, and Page templates where appropriate', 'gutenberg' ),
+			'description' => __( 'Used when a single entry is queried. This template will be overridden by the Single, Post, and Page templates where appropriate', 'gutenberg' ),
 		),
 		'single'         => array(
 			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
@@ -43,7 +43,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'archive'        => array(
 			'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Used when multiple entries are queried. This template will be overridden the Category, Author, and Date templates where appropriate', 'gutenberg' ),
+			'description' => __( 'Used when multiple entries are queried. This template will be overridden by the Category, Author, and Date templates where appropriate', 'gutenberg' ),
 		),
 		'author'         => array(
 			'title'       => _x( 'Author Archive', 'Template name', 'gutenberg' ),

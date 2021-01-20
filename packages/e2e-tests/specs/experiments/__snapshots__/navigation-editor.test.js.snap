@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Navigation editor allows creation of a menu 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/page/home\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/page/about\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/page/contact\\"} /-->
+<!-- /wp:navigation -->"
+`;
+
+exports[`Navigation editor displays the first menu from the REST response when at least one menu exists 1`] = `
+"<!-- wp:navigation -->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=41\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Debitis cum consequatur sit doloremque\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=51\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+<!-- /wp:navigation-link -->
+
+<!-- wp:navigation-link {\\"label\\":\\"Est ea vero non nihil officiis in\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=53\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Fuga odio quis tempora\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=56\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"In consectetur repellendus eveniet maiores aperiam\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=15\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Mollitia maiores consequatur ea dolorem blanditiis\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=45\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Necessitatibus nisi qui qui necessitatibus quaerat possimus\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=27\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+
+<!-- wp:navigation-link {\\"label\\":\\"Nulla omnis autem dolores eligendi\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=43\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Sample Page\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=2\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Beatae qui labore voluptas eveniet officia quia voluptas qui porro sequi et aut est\\",\\"description\\":\\"Ratione nemo ut aut ullam sed assumenda quis est exercitationem\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?cat=7\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Et minus itaque velit tempore hic quisquam saepe quas asperiores\\",\\"description\\":\\"Vel fuga enim rerum perspiciatis sapiente mollitia magni ut molestiae labore quae quia quia libero perspiciatis voluptatem quidem deleniti eveniet laboriosam doloribus dolor laborum accusantium modi ducimus itaque rerum cum nostrum\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?cat=19\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Et quas a et mollitia et voluptas optio voluptate quia quo unde aut in nostrum iste impedit quisquam id aut\\",\\"description\\":\\"Quas sit labore earum omnis eos sint iste est possimus harum aut soluta sint optio quos distinctio inventore voluptate non ut aliquam ad ut voluptates fugiat numquam magnam modi repellendus modi laudantium et debitis officia est voluptatum quidem unde molestiae animi vero fuga accusamus nam\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?cat=6\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Illo quis sit impedit itaque expedita earum deserunt magni doloremque velit eum id error\\",\\"description\\":\\"Doloremque vero sunt officiis iste voluptatibus voluptas molestiae sint asperiores recusandae amet praesentium et explicabo nesciunt similique voluptatum laudantium amet officiis quas distinctio quis enim nihil tempora\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?cat=16\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation-link -->
+
+<!-- wp:navigation-link {\\"label\\":\\"WordPress.org\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"https://wordpress.org\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"https://google.com\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
+<!-- /wp:navigation-link -->
+<!-- /wp:navigation -->"
+`;

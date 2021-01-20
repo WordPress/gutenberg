@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { POSITIONS } from './utils';
-import { useRTL } from '../../utils/style-mixins';
 import {
 	TooltipWrapper,
 	Tooltip,
@@ -21,8 +21,6 @@ function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props },
 	ref
 ) {
-	const isRTL = useRTL();
-
 	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;
@@ -56,8 +54,8 @@ function Label(
 			...style,
 			position: 'absolute',
 			top: CORNER_OFFSET,
-			right: isRTL ? null : CORNER_OFFSET,
-			left: isRTL ? CORNER_OFFSET : null,
+			right: isRTL() ? null : CORNER_OFFSET,
+			left: isRTL() ? CORNER_OFFSET : null,
 		};
 	}
 

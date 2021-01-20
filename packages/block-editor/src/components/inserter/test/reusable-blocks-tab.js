@@ -6,6 +6,7 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -51,6 +52,16 @@ const initializeAllClosedMenuState = ( propOverrides ) => {
 };
 
 describe( 'InserterMenu', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/block', {
+			save: () => {},
+			title: 'reusable block',
+			edit: () => {},
+		} );
+	} );
+	afterAll( () => {
+		unregisterBlockType( 'core/block' );
+	} );
 	beforeEach( () => {
 		debouncedSpeak.mockClear();
 

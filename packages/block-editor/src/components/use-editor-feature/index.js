@@ -87,7 +87,7 @@ export default function useEditorFeature( featurePath ) {
 				'__experimentalSelector',
 			] );
 			if ( isObject( selectors ) ) {
-				const blockAttributes = getBlockAttributes( clientId );
+				const blockAttributes = getBlockAttributes( clientId ) || {};
 				for ( const contextSelector in selectors ) {
 					const { attributes } = selectors[ contextSelector ];
 					if ( blockAttributesMatch( blockAttributes, attributes ) ) {

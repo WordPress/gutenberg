@@ -3,16 +3,13 @@
  */
 import { apiFetch } from '@wordpress/data-controls';
 import { controls } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import * as actions from '../actions';
-import {
-	STORE_NAME,
-	TRASH_POST_NOTICE_ID,
-	POST_UPDATE_TRANSACTION_ID,
-} from '../constants';
+import { STORE_NAME, TRASH_POST_NOTICE_ID } from '../constants';
 
 const postType = {
 	rest_base: 'posts',
@@ -195,7 +192,7 @@ describe( 'Post generator actions', () => {
 						const { value } = fulfillment.next( postType );
 						expect( value ).toEqual(
 							controls.dispatch(
-								'core/notices',
+								noticesStore,
 								'createSuccessNotice',
 								'Updated Post',
 								{
@@ -241,6 +238,7 @@ describe( 'Post generator actions', () => {
 			testRoutine,
 		] ) => {
 			if ( shouldRun( isAutosaving ) ) {
+				// eslint-disable-next-line jest/valid-title
 				it( testDescription, () => {
 					testRoutine();
 				} );
@@ -310,7 +308,7 @@ describe( 'Post generator actions', () => {
 				const { value } = fulfillment.next( postType );
 				expect( value ).toEqual(
 					controls.dispatch(
-						'core/notices',
+						noticesStore,
 						'removeNotice',
 						TRASH_POST_NOTICE_ID
 					)
@@ -338,7 +336,7 @@ describe( 'Post generator actions', () => {
 				const { value } = fulfillment.throw( error );
 				expect( value ).toEqual(
 					controls.dispatch(
-						'core/notices',
+						noticesStore,
 						'createErrorNotice',
 						'Trashing failed',
 						{
@@ -458,17 +456,6 @@ describe( 'Editor actions', () => {
 		} );
 	} );
 
-	describe( 'updatePost', () => {
-		it( 'should return the UPDATE_POST action', () => {
-			const edits = {};
-			const result = actions.updatePost( edits );
-			expect( result ).toEqual( {
-				type: 'UPDATE_POST',
-				edits,
-			} );
-		} );
-	} );
-
 	describe( 'editPost', () => {
 		it( 'should edit the relevant entity record', () => {
 			const edits = { format: 'sample' };
@@ -493,18 +480,6 @@ describe( 'Editor actions', () => {
 			expect( fulfillment.next() ).toEqual( {
 				done: true,
 				value: undefined,
-			} );
-		} );
-	} );
-
-	describe( 'optimisticUpdatePost', () => {
-		it( 'should return the UPDATE_POST action with optimist property', () => {
-			const edits = {};
-			const result = actions.__experimentalOptimisticUpdatePost( edits );
-			expect( result ).toEqual( {
-				type: 'UPDATE_POST',
-				edits,
-				optimist: { id: POST_UPDATE_TRANSACTION_ID },
 			} );
 		} );
 	} );

@@ -13,7 +13,7 @@ import * as actions from './actions';
 /**
  * Module Constants
  */
-const STORE_NAME = 'core/annotations';
+import { STORE_NAME } from './constants';
 
 /**
  * Store definition for the annotations namespace.

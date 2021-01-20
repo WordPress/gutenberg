@@ -2,23 +2,27 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+
 ## 2.2.0 (2018-07-12)
 
 ### Internal
 
-- Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
+-   Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
 
 ## 2.1.4 (2018-05-18)
 
 ### Polish
 
-- Fix: Standardized `package.json` format  ([#119](https://github.com/WordPress/packages/pull/119))
+-   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 2.1.3 (2018-05-18)
 
 ### Polish
 
-- Docs update of the Browserslist example repo URL  ([#98](https://github.com/WordPress/packages/pull/98))
+-   Docs update of the Browserslist example repo URL ([#98](https://github.com/WordPress/packages/pull/98))
 
 ## 2.1.2 (2018-02-28)
 

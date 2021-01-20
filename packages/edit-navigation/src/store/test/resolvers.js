@@ -7,7 +7,7 @@ import { KIND, POST_TYPE, buildNavigationPostId } from '../utils';
 
 // Mock createBlock to avoid creating block in test environment
 jest.mock( '@wordpress/blocks', () => {
-	const blocks = require.requireActual( '@wordpress/blocks' );
+	const blocks = jest.requireActual( '@wordpress/blocks' );
 	let id = 0;
 
 	return {

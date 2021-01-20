@@ -26,7 +26,8 @@
 			{ "docs/designers-developers/developers/block-api/block-transforms.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },
-			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] }
+			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] },
+			{ "docs/designers-developers/developers/block-api/versions.md": [] }
 		] },
 		{ "docs/designers-developers/developers/filters/README.md": [
 			{ "docs/designers-developers/developers/filters/block-filters.md": [] },

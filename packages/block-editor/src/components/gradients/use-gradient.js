@@ -70,7 +70,7 @@ export function __experimentalUseGradient( {
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( 'core/block-editor' );
-			const attributes = getBlockAttributes( clientId );
+			const attributes = getBlockAttributes( clientId ) || {};
 			return {
 				customGradient: attributes[ customGradientAttribute ],
 				gradient: attributes[ gradientAttribute ],

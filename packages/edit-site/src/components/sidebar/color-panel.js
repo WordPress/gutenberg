@@ -21,8 +21,8 @@ export function useHasColorPanel( { supports } ) {
 
 export default function ColorPanel( {
 	context: { supports, name },
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
@@ -37,12 +37,11 @@ export default function ColorPanel( {
 	const settings = [];
 
 	if ( supports.includes( 'color' ) ) {
-		const color = getStyleProperty( name, 'color' );
-		const userColor = getStyleProperty( name, 'color', 'user' );
+		const color = getStyle( name, 'color' );
+		const userColor = getStyle( name, 'color', 'user' );
 		settings.push( {
 			colorValue: color,
-			onColorChange: ( value ) =>
-				setStyleProperty( name, 'color', value ),
+			onColorChange: ( value ) => setStyle( name, 'color', value ),
 			label: __( 'Text color' ),
 			clearable: color === userColor,
 		} );
@@ -50,16 +49,12 @@ export default function ColorPanel( {
 
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
-		const backgroundColor = getStyleProperty( name, 'backgroundColor' );
-		const userBackgroundColor = getStyleProperty(
-			name,
-			'backgroundColor',
-			'user'
-		);
+		const backgroundColor = getStyle( name, 'backgroundColor' );
+		const userBackgroundColor = getStyle( name, 'backgroundColor', 'user' );
 		backgroundSettings = {
 			colorValue: backgroundColor,
 			onColorChange: ( value ) =>
-				setStyleProperty( name, 'backgroundColor', value ),
+				setStyle( name, 'backgroundColor', value ),
 		};
 		if ( backgroundColor ) {
 			backgroundSettings.clearable =
@@ -69,12 +64,12 @@ export default function ColorPanel( {
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
-		const gradient = getStyleProperty( name, 'background' );
-		const userGradient = getStyleProperty( name, 'background', 'user' );
+		const gradient = getStyle( name, 'background' );
+		const userGradient = getStyle( name, 'background', 'user' );
 		gradientSettings = {
 			gradientValue: gradient,
 			onGradientChange: ( value ) =>
-				setStyleProperty( name, 'background', value ),
+				setStyle( name, 'background', value ),
 		};
 		if ( gradient ) {
 			gradientSettings.clearable = gradient === userGradient;
@@ -93,12 +88,11 @@ export default function ColorPanel( {
 	}
 
 	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getStyleProperty( name, LINK_COLOR );
-		const userColor = getStyleProperty( name, LINK_COLOR, 'user' );
+		const color = getStyle( name, LINK_COLOR );
+		const userColor = getStyle( name, LINK_COLOR, 'user' );
 		settings.push( {
 			colorValue: color,
-			onColorChange: ( value ) =>
-				setStyleProperty( name, LINK_COLOR, value ),
+			onColorChange: ( value ) => setStyle( name, LINK_COLOR, value ),
 			label: __( 'Link color' ),
 			clearable: color === userColor,
 		} );
