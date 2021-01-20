@@ -43,6 +43,7 @@ function InserterLibrary( {
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
+			shouldFocusBlock={ false }
 		/>
 	);
 }
