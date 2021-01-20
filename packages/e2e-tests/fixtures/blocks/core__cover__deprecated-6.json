@@ -9,7 +9,8 @@
             "dimRatio": 40,
             "backgroundType": "image",
             "title": "",
-            "contentAlign": "center"
+            "contentAlign": "center",
+            "isRepeated": false
         },
         "innerBlocks": [
             {
