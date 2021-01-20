@@ -47,7 +47,7 @@ const createReusableBlock = async ( content, title ) => {
 	await insertBlock( 'Paragraph' );
 	await page.keyboard.type( content );
 
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 	await clickMenuItem( 'Add to Reusable blocks' );
 
 	// Wait for creation to finish
@@ -193,7 +193,7 @@ describe( 'Reusable blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Convert block to a reusable block
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
@@ -249,7 +249,7 @@ describe( 'Reusable blocks', () => {
 		await page.click( blockSelector );
 
 		// Delete the block, leaving the reusable block empty
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		const deleteButton = await page.waitForXPath(
 			'//button/span[text()="Remove block"]'
 		);

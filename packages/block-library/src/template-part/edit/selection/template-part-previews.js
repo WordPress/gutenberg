@@ -49,7 +49,7 @@ function TemplatePartItem( {
 			sprintf(
 				/* translators: %s: template part title. */
 				__( 'Template Part "%s" inserted.' ),
-				title
+				title.rendered
 			),
 			{
 				type: 'snackbar',

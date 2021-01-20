@@ -9,7 +9,7 @@
  */
 
 body {
-	font-family: $editor-font;
+	font-family: $default-font;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
 	color: $gray-900;
@@ -32,7 +32,6 @@ h3 {
 }
 
 // These follow a Major Third type scale
-// https://type-scale.com/?size=16&scale=1.250&text=A%20Visual%20Type%20Scale&font=Noto%20Serif&fontweight=600
 // Default margins.
 h1 {
 	font-size: 2.44em;

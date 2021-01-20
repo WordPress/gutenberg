@@ -74,6 +74,36 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'wp_template', $template->type );
 	}
 
+	function test_inject_theme_attribute_in_content() {
+		$theme                           = get_stylesheet();
+		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /-->';
+		$template_content                = _inject_theme_attribute_in_content(
+			$content_without_theme_attribute,
+			$theme
+		);
+		$expected                        = sprintf(
+			'<!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header","theme":"%s"} /-->',
+			get_stylesheet()
+		);
+		$this->assertEquals( $expected, $template_content );
+
+		// Does not inject theme when there is an existing theme attribute.
+		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
+		$template_content                      = _inject_theme_attribute_in_content(
+			$content_with_existing_theme_attribute,
+			$theme
+		);
+		$this->assertEquals( $content_with_existing_theme_attribute, $template_content );
+
+		// Does not inject theme when there is no template part.
+		$content_with_no_template_part = '<!-- wp:post-content /-->';
+		$template_content              = _inject_theme_attribute_in_content(
+			$content_with_no_template_part,
+			$theme
+		);
+		$this->assertEquals( $content_with_no_template_part, $template_content );
+	}
+
 	/**
 	 * Should retrieve the template from the theme files.
 	 */
