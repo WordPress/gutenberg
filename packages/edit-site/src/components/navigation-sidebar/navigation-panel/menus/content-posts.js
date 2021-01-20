@@ -77,6 +77,7 @@ export default function ContentPostsMenu() {
 			hasSearch={ true }
 			onSearch={ onSearch }
 			search={ search }
+			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
 			{ search && ! isDebouncing && (
 				<SearchResults items={ posts } search={ search } />
