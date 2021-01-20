@@ -96,9 +96,11 @@ export const createQueue = () => {
 			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 				nextElement
 			) );
-			if ( callback instanceof Function ) {
+
+			if ( typeof callback === 'function' ) {
 				callback();
 			}
+
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );
 
