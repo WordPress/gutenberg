@@ -95,8 +95,6 @@ group='com.github.wordpress-mobile.gutenberg-mobile'
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 
-def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
-def hermesPath = hermesOriginalPath;
 def buildAssetsFolder = 'build/assets'
 
 android {
@@ -191,8 +189,6 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "./vendor/hermes-engine/";
-
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../react-native-editor/package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')))
@@ -283,32 +279,6 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         args = ['run', 'bundle:android']
     }
 
-    task backupHermesDebugAAR(type: Copy) {
-        dependsOn bundleUpToDateCheck
-        onlyIf { !isBundleUpToDate() }
-
-        def origFileName = 'hermes-debug.aar'
-        def origWithPath = hermesOriginalPath + origFileName
-        from origWithPath
-        into hermesPath
-        doLast {
-            println "Done backing up Hermes debug AARs"
-        }
-    }
-
-    task backupHermesReleaseAAR(type: Copy) {
-        dependsOn bundleUpToDateCheck
-        onlyIf { !isBundleUpToDate() }
-
-        def origFileName = 'hermes-release.aar'
-        def origWithPath = hermesOriginalPath + origFileName
-        from origWithPath
-        into hermesPath
-        doLast {
-            println "Done backing up Hermes release AARs"
-        }
-    }
-
     task copyJSBundle(type: Copy) {
         dependsOn bundleUpToDateCheck
         onlyIf { !isBundleUpToDate() }
@@ -354,9 +324,6 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
     }
 
     preBuild.dependsOn(cleanupNodeModulesFolders)
-    cleanupNodeModulesFolders.dependsOn(backupHermesDebugAAR)
-    backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
-    backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
     buildJSBundle.dependsOn(npmInstall)
     nodeSetup.dependsOn(resetExtractedRNTools)
