@@ -6,28 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { ButtonGroup, Button } from '@wordpress/components';
 
 function PatternInserterPanel( {
-	selectedCategory,
 	patternCategories,
 	onClickCategory,
 	children,
 } ) {
-	const categoryOptions = () => {
-		const options = [];
-
-		patternCategories.map( ( patternCategory ) => {
-			return options.push( {
-				value: patternCategory.name,
-				label: patternCategory.label,
-			} );
-		} );
-
-		return options;
-	};
-
 	const onChangeSelect = ( selected ) => {
 		onClickCategory(
 			patternCategories.find(
@@ -46,14 +31,20 @@ function PatternInserterPanel( {
 	return (
 		<>
 			<div className={ getPanelHeaderClassName() }>
-				<SelectControl
-					className="block-editor-inserter__panel-dropdown"
-					label={ __( 'Filter patterns' ) }
-					hideLabelFromVision
-					value={ selectedCategory.name }
-					onChange={ onChangeSelect }
-					options={ categoryOptions() }
-				/>
+				<ButtonGroup className="block-editor-inserter__panel-chips">
+					{ patternCategories.map( ( patternCategory ) => {
+						return (
+							<Button
+								key={ patternCategory.name }
+								onClick={ () => {
+									onChangeSelect( patternCategory.name );
+								} }
+							>
+								{ patternCategory.label }
+							</Button>
+						);
+					} ) }
+				</ButtonGroup>
 			</div>
 			<div className="block-editor-inserter__panel-content">
 				{ children }
