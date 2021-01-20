@@ -27,23 +27,24 @@ export default function ContentPostsMenu() {
 
 	const { posts, showOnFront, isResolved } = useSelect(
 		( select ) => {
-			const { getEntityRecords, getEditedEntityRecord } = select(
-				'core'
-			);
-			const hasResolvedPosts = select( 'core' ).hasFinishedResolution(
+			const {
+				getEntityRecords,
+				getEditedEntityRecord,
+				hasFinishedResolution,
+			} = select( 'core' );
+			const getEntityRecodsArgs = [
+				'postType',
+				'post',
+				{
+					search: searchQuery,
+				},
+			];
+			const hasResolvedPosts = hasFinishedResolution(
 				'getEntityRecords',
-				[
-					'postType',
-					'post',
-					{
-						search: searchQuery,
-					},
-				]
+				getEntityRecodsArgs
 			);
 			return {
-				posts: getEntityRecords( 'postType', 'post', {
-					search: searchQuery,
-				} ),
+				posts: getEntityRecords( ...getEntityRecodsArgs ),
 				isResolved: hasResolvedPosts,
 				showOnFront: getEditedEntityRecord( 'root', 'site' )
 					.show_on_front,
