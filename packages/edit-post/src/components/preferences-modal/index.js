@@ -30,7 +30,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import BlockManager from '../manage-blocks-modal/manager';
+import BlockManager from '../manage-blocks-modal';
 import Section from './section';
 import {
 	EnablePluginDocumentSettingPanelOption,

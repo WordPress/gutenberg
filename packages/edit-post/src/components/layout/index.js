@@ -48,7 +48,6 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import ManageBlocksModal from '../manage-blocks-modal';
 import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -298,7 +297,6 @@ function Layout( { styles } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<ManageBlocksModal />
 			<PreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
