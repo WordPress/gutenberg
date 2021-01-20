@@ -5,10 +5,10 @@ import {
 	ToolbarGroup,
 	Dropdown,
 	ToolbarButton,
-	RangeControl,
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
 
@@ -17,6 +17,10 @@ export default function QueryToolbar( {
 	setQuery,
 	setLayout,
 } ) {
+	const maxPageInputId = useInstanceId(
+		QueryToolbar,
+		'blocks-query-pagination-max-page-input'
+	);
 	const layoutControls = [
 		{
 			icon: list,
@@ -79,15 +83,24 @@ export default function QueryToolbar( {
 										isDragEnabled={ false }
 									/>
 								</BaseControl>
-								<BaseControl>
-									<RangeControl
-										label={ __( 'Number of Pages' ) }
-										min={ 1 }
-										allowReset
-										value={ query.pages }
+								<BaseControl
+									id={ maxPageInputId }
+									help={ __(
+										'Limit the pages you want to show, even if the query has more results. To show all pages use 0 (zero).'
+									) }
+								>
+									<NumberControl
+										id={ maxPageInputId }
+										__unstableInputWidth="60px"
+										label={ __( 'Max page to show' ) }
+										labelPosition="edge"
+										min={ 0 }
 										onChange={ ( value ) =>
-											setQuery( { pages: value ?? -1 } )
+											setQuery( { pages: +value } )
 										}
+										step="1"
+										value={ query.pages }
+										isDragEnabled={ false }
 									/>
 								</BaseControl>
 							</>
