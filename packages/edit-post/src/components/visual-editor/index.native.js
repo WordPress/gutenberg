@@ -53,11 +53,13 @@ export default class VisualEditor extends Component {
 	}
 	render() {
 		const { safeAreaBottomInset } = this.props;
+		const { isKeyboardOpen } = this.state;
+
 		return (
 			<BlockList
 				header={ this.renderHeader }
 				safeAreaBottomInset={ safeAreaBottomInset }
-				autoScroll={ this.state.isKeyboardOpen }
+				autoScroll={ isKeyboardOpen }
 			/>
 		);
 	}
