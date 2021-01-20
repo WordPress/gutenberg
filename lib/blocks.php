@@ -171,13 +171,62 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
-		wp_register_style(
-			"wp-block-{$block_name}",
-			gutenberg_url( $style_path ),
-			array(),
-			filemtime( gutenberg_dir_path() . $style_path )
-		);
-		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
+
+		// The default threshold for inlining styles in the frontend (in bytes).
+		$threshold = 3000;
+
+		/**
+		 * The threshold for inlining styles instead of enqueueing them (in bytes).
+		 * If a stylesheet is below the defined threshold then it will get inlined instead of enqueued.
+		 *
+		 * @param int $threshold The file-size threshold, in bytes.
+		 * @return int
+		 */
+		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold );
+
+		/**
+		 * Get the file size.
+		 *
+		 * Do a quick check and bypass the filesize() call if threshold was set to 0 using a filter.
+		 */
+		$stylesheet_size = ( $threshold ) ? filesize( gutenberg_dir_path() . $style_path ) : 1;
+
+		if ( $stylesheet_size > $threshold ) {
+
+			// Register the style.
+			wp_register_style(
+				"wp-block-{$block_name}",
+				gutenberg_url( $style_path ),
+				array(),
+				filemtime( gutenberg_dir_path() . $style_path )
+			);
+
+			// Replace stylesheet if RTL.
+			wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
+		} else {
+
+			// If an RTL language, get the modified file path.
+			$style_path = is_rtl() ? "build/block-library/blocks/$block_name/style-rtl.css" : $style_path;
+
+			// Register the style using `false` as src.
+			wp_register_style(
+				"wp-block-{$block_name}",
+				false,
+				array(),
+				filemtime( gutenberg_dir_path() . $style_path )
+			);
+
+			// Get the styles.
+			$inline_styles = file_get_contents( gutenberg_dir_path() . $style_path );
+
+			// If SCRIPT_DEBUG is not defined, minify the styles by removing comments & whitespace.
+			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+				$inline_styles = gutenberg_minify_styles( $inline_styles );
+			}
+
+			// Add inline styles to the registered style.
+			wp_add_inline_style( "wp-block-{$block_name}", $inline_styles );
+		}
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
@@ -189,6 +238,22 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		);
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
 	}
+}
+
+/**
+ * Minify styles.
+ *
+ * Removes inline comments and whitespace.
+ *
+ * @param string $styles The styles to be minified.
+ * @return string
+ */
+function gutenberg_minify_styles( $styles ) {
+	$re1 = '(?sx)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|/\\* (?> .*? \\*/ )';
+	$re2 = '(?six)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|\\s*+ ; \\s*+ ( } ) \\s*+|\\s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\\b ) \\s*+|( [[(:] ) \\s++|\\s++ ( [])] )|\\s++ ( : ) \\s*+(?!(?>[^{}"\']++|"(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')*+{)|^ \\s++ | \\s++ \\z|(\\s)\\s+';
+
+	$styles = preg_replace( "%$re1%", '$1', $styles );
+	return preg_replace( "%$re2%", '$1$2$3$4$5$6$7', $styles );
 }
 
 /**
