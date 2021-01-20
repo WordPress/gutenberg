@@ -107,12 +107,12 @@ function GalleryEdit( props ) {
 	}, [] );
 
 	const innerBlockImages = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlock( clientId ).innerBlocks;
+		return select( 'core/block-editor' ).getBlock( clientId )?.innerBlocks;
 	} );
 
 	const images = useMemo(
 		() =>
-			innerBlockImages.map( ( block ) => ( {
+			innerBlockImages?.map( ( block ) => ( {
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
@@ -123,7 +123,7 @@ function GalleryEdit( props ) {
 	const imageData = useSelect(
 		( select ) => {
 			if (
-				innerBlockImages.length === 0 ||
+				! innerBlockImages?.length ||
 				some(
 					innerBlockImages,
 					( imageBlock ) => ! imageBlock.attributes.id
@@ -159,6 +159,11 @@ function GalleryEdit( props ) {
 	}, [ shortCodeTransforms, shortCodeImages ] );
 
 	useEffect( () => {
+		if ( ! images ) {
+			setAttributes( { imageCount: undefined } );
+			return;
+		}
+
 		if ( images.length !== imageCount ) {
 			setAttributes( { imageCount: images.length } );
 		}
@@ -309,7 +314,7 @@ function GalleryEdit( props ) {
 		}
 	}, [ linkTo ] );
 
-	const hasImages = !! images.length;
+	const hasImages = !! images?.length;
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
