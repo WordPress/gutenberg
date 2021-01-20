@@ -20,7 +20,7 @@ export default class VisualEditor extends Component {
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
 		this.state = {
-			shouldEnableAutoScroll: true,
+			isAutoScrollEnabled: true,
 		};
 	}
 
@@ -41,11 +41,11 @@ export default class VisualEditor extends Component {
 	}
 
 	keyboardDidShow() {
-		this.setState( { shouldEnableAutoScroll: false } );
+		this.setState( { isAutoScrollEnabled: false } );
 	}
 
 	keyboardDidHide() {
-		this.setState( { shouldEnableAutoScroll: true } );
+		this.setState( { isAutoScrollEnabled: true } );
 	}
 
 	renderHeader() {
@@ -55,13 +55,13 @@ export default class VisualEditor extends Component {
 
 	render() {
 		const { safeAreaBottomInset } = this.props;
-		const { shouldEnableAutoScroll } = this.state;
+		const { isAutoScrollEnabled } = this.state;
 
 		return (
 			<BlockList
 				header={ this.renderHeader }
 				safeAreaBottomInset={ safeAreaBottomInset }
-				autoScroll={ shouldEnableAutoScroll }
+				autoScroll={ isAutoScrollEnabled }
 			/>
 		);
 	}
