@@ -1825,7 +1825,7 @@ export const __experimentalGetParsedReusableBlock = createSelector(
  *
  * @return {string} The reusable block saved title.
  */
-export const getReusableBlockTitle = createSelector(
+export const __experimentalGetReusableBlockTitle = createSelector(
 	( state, ref ) => {
 		const reusableBlock = find(
 			getReusableBlocks( state ),
@@ -1878,7 +1878,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  *
  * @return {Array} Reusable blocks
  */
-export function getReusableBlocks( state ) {
+function getReusableBlocks( state ) {
 	return state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 

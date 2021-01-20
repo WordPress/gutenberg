@@ -43,7 +43,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const {
 				getBlockRootClientId,
 				getBlockTransformItems,
-				getReusableBlockTitle,
+				__experimentalGetReusableBlockTitle,
 			} = select( blockEditorStore );
 
 			const { getBlockStyles, getBlockType } = select( blocksStore );
@@ -60,7 +60,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				_icon = blockInformation?.icon; // Take into account active block variations.
 				reusableBlockTitle =
 					isReusableBlock( blocks[ 0 ] ) &&
-					getReusableBlockTitle( blocks[ 0 ].attributes.ref );
+					__experimentalGetReusableBlockTitle(
+						blocks[ 0 ].attributes.ref
+					);
 			} else {
 				const isSelectionOfSameType =
 					uniq( blocks.map( ( { name } ) => name ) ).length === 1;

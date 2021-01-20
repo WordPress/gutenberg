@@ -41,13 +41,13 @@ export default function BlockTitle( { clientId } ) {
 			const {
 				getBlockName,
 				getBlockAttributes,
-				getReusableBlockTitle,
+				__experimentalGetReusableBlockTitle,
 			} = select( 'core/block-editor' );
 
 			return {
 				attributes: getBlockAttributes( clientId ),
 				name: getBlockName( clientId ),
-				reusableBlockTitle: getReusableBlockTitle(
+				reusableBlockTitle: __experimentalGetReusableBlockTitle(
 					getBlockAttributes( clientId ).ref
 				),
 			};

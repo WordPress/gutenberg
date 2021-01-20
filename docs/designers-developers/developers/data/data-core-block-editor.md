@@ -604,31 +604,6 @@ _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
 
-<a name="getReusableBlocks" href="#getReusableBlocks">#</a> **getReusableBlocks**
-
-Returns the available reusable blocks
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Array`: Reusable blocks
-
-<a name="getReusableBlockTitle" href="#getReusableBlockTitle">#</a> **getReusableBlockTitle**
-
-Returns the title of a given reusable block
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
--   _ref_ `(number|string)`: The shared block's ID.
-
-_Returns_
-
--   `string`: The reusable block saved title.
-
 <a name="getSelectedBlock" href="#getSelectedBlock">#</a> **getSelectedBlock**
 
 Returns the currently selected block, or null if there is no selected block.
