@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq } from 'lodash';
+import { castArray, uniq, truncate } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -141,7 +141,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 								/>
 								{ isReusable && (
 									<span className="block-editor-block-switcher__toggle-text">
-										{ blockTitle }
+										{ truncate( blockTitle, {
+											length: 35,
+										} ) }
 									</span>
 								) }
 							</>

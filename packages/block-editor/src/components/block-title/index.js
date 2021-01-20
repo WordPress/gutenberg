@@ -67,7 +67,7 @@ export default function BlockTitle( { clientId } ) {
 		return `${ blockType.title }: ${ truncate( label, { length: 15 } ) }`;
 	}
 	if ( reusableBlockTitle ) {
-		return truncate( reusableBlockTitle, { length: 20 } );
+		return truncate( reusableBlockTitle, { length: 35 } );
 	}
 	return blockInformation.title;
 }
