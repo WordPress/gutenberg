@@ -16,50 +16,52 @@ export default class VisualEditor extends Component {
 	constructor( props ) {
 		super( props );
 		this.renderHeader = this.renderHeader.bind( this );
-		this.keyboardWillShow = this.keyboardWillShow.bind( this );
-		this.keyboardWillHide = this.keyboardWillHide.bind( this );
+		this.keyboardDidShow = this.keyboardDidShow.bind( this );
+		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
 		this.state = {
-			isKeyboardOpen: false,
+			shouldEnableAutoScroll: true,
 		};
 	}
 
 	componentWillMount() {
-		this.keyboardWillShowListener = Keyboard.addListener(
-			'keyboardWillShow',
-			this.keyboardWillShow
+		this.keyboardDidShow = Keyboard.addListener(
+			'keyboardDidShow',
+			this.keyboardDidShow
 		);
-		this.keyboardWillHideListener = Keyboard.addListener(
-			'keyboardWillHide',
-			this.keyboardWillHide
+		this.keyboardDidHideListener = Keyboard.addListener(
+			'keyboardDidHide',
+			this.keyboardDidHide
 		);
 	}
 
 	componentWillUnmount() {
-		this.keyboardWillShowListener.remove();
-		this.keyboardWillHideListener.remove();
+		this.keyboardDidShow.remove();
+		this.keyboardDidHideListener.remove();
 	}
 
-	keyboardWillShow() {
-		this.setState( { isKeyboardOpen: true } );
+	keyboardDidShow() {
+		this.setState( { shouldEnableAutoScroll: false } );
 	}
 
-	keyboardWillHide() {
-		this.setState( { isKeyboardOpen: false } );
+	keyboardDidHide() {
+		this.setState( { shouldEnableAutoScroll: true } );
 	}
+
 	renderHeader() {
 		const { setTitleRef } = this.props;
 		return <Header setTitleRef={ setTitleRef } />;
 	}
+
 	render() {
 		const { safeAreaBottomInset } = this.props;
-		const { isKeyboardOpen } = this.state;
+		const { shouldEnableAutoScroll } = this.state;
 
 		return (
 			<BlockList
 				header={ this.renderHeader }
 				safeAreaBottomInset={ safeAreaBottomInset }
-				autoScroll={ isKeyboardOpen }
+				autoScroll={ shouldEnableAutoScroll }
 			/>
 		);
 	}
