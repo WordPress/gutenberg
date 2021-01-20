@@ -10,6 +10,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	getBlockType,
 	__experimentalGetBlockLabel as getBlockLabel,
+	isReusableBlock,
 } from '@wordpress/blocks';
 
 /**
@@ -33,7 +34,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
  * @return {?string} Block title.
  */
 export default function BlockTitle( { clientId } ) {
-	const { attributes, name } = useSelect(
+	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return {};
@@ -41,9 +42,19 @@ export default function BlockTitle( { clientId } ) {
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
 			);
+
+			const getReusableBlockTitle =
+				isReusableBlock( getBlockType( getBlockName( clientId ) ) ) &&
+				select( 'core' ).getEntityRecord(
+					'postType',
+					'wp_block',
+					getBlockAttributes( clientId ).ref
+				).title?.raw;
+
 			return {
 				attributes: getBlockAttributes( clientId ),
 				name: getBlockName( clientId ),
+				reusableBlockTitle: getReusableBlockTitle,
 			};
 		},
 		[ clientId ]
@@ -59,6 +70,9 @@ export default function BlockTitle( { clientId } ) {
 	// block variation match title.
 	if ( label !== blockType.title ) {
 		return `${ blockType.title }: ${ truncate( label, { length: 15 } ) }`;
+	}
+	if ( reusableBlockTitle ) {
+		return truncate( reusableBlockTitle, { length: 20 } );
 	}
 	return blockInformation.title;
 }
