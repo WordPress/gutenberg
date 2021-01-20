@@ -180,8 +180,9 @@ describe( 'Navigation editor', () => {
 			'//button[contains(., "Add new")]'
 		);
 		await addNewButton.click();
+
 		await page.keyboard.type( 'Main Menu' );
-		const [ createMenuButton ] = await page.$x(
+		const createMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create menu")]'
 		);
 		await createMenuButton.click();
@@ -198,7 +199,7 @@ describe( 'Navigation editor', () => {
 		);
 		await navigationBlock.click();
 
-		const [ addAllPagesButton ] = await page.$x(
+		const addAllPagesButton = await page.waitForXPath(
 			'//button[contains(., "Add all pages")]'
 		);
 		await addAllPagesButton.click();
