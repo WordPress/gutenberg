@@ -46,32 +46,30 @@ const MODAL_NAME = 'edit-post/preferences';
 export default function PreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
-	const { isModalActive, isViewable, showBlockBreadcrumbs } = useSelect(
+	const { isModalActive, isViewable } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		return {
+			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
+			isViewable: get( postType, [ 'viewable' ], false ),
+		};
+	}, [] );
+	const showBlockBreadcrumbsOption = useSelect(
 		( select ) => {
-			const { getEditedPostAttribute, getEditorSettings } = select(
-				editorStore
-			);
-			const { getPostType } = select( coreStore );
-			const {
-				isModalActive: _isModalActive,
-				getEditorMode,
-				isFeatureActive,
-			} = select( editPostStore );
+			const { getEditorSettings } = select( editorStore );
+			const { getEditorMode, isFeatureActive } = select( editPostStore );
 			const mode = getEditorMode();
-			const { isRichEditingEnabled } = getEditorSettings();
+			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const hasReducedUI = isFeatureActive( 'reducedUI' );
-			const postType = getPostType( getEditedPostAttribute( 'type' ) );
-			return {
-				isModalActive: _isModalActive( MODAL_NAME ),
-				isViewable: get( postType, [ 'viewable' ], false ),
-				showBlockBreadcrumbs:
-					! hasReducedUI &&
-					isLargeViewport &&
-					isRichEditingEnabled &&
-					mode === 'visual',
-			};
+			return (
+				! hasReducedUI &&
+				isLargeViewport &&
+				isRichEditingEnabled &&
+				mode === 'visual'
+			);
 		},
-		[]
+		[ isLargeViewport ]
 	);
 	const sections = useMemo(
 		() => [
@@ -103,7 +101,7 @@ export default function PreferencesModal() {
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
-							{ showBlockBreadcrumbs && (
+							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
 									featureName="showBlockBreadcrumbs"
 									help={ __(
@@ -239,7 +237,7 @@ export default function PreferencesModal() {
 				),
 			},
 		],
-		[ isViewable, showBlockBreadcrumbs ]
+		[ isViewable, showBlockBreadcrumbsOption ]
 	);
 	const preferencesMenu = 'preferences-menu';
 	const [ activeTab ] = useState();
@@ -268,16 +266,19 @@ export default function PreferencesModal() {
 	if ( ! isModalActive ) {
 		return null;
 	}
-	let modalContent = (
-		<TabPanel
-			className="edit-post-preferences__tabs"
-			tabs={ tabs }
-			orientation="vertical"
-		>
-			{ getCurrentTab }
-		</TabPanel>
-	);
-	if ( ! isLargeViewport ) {
+	let modalContent;
+	// We render different components based on the viewport size.
+	if ( isLargeViewport ) {
+		modalContent = (
+			<TabPanel
+				className="edit-post-preferences__tabs"
+				tabs={ tabs }
+				orientation="vertical"
+			>
+				{ getCurrentTab }
+			</TabPanel>
+		);
+	} else {
 		modalContent = (
 			<Navigation
 				activeItem={ activeTab }
