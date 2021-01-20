@@ -160,6 +160,7 @@ dependencies {
         implementation project(':react-native-screens')
         implementation project(':react-native-safe-area-context')
         implementation project(':react-native-reanimated')
+        implementation project(':react-native-prompt-android')
 
         implementation 'com.facebook.react:react-native:+'
     } else {
@@ -175,6 +176,7 @@ dependencies {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-screens', readHashedVersion('../../react-native-editor/package.json', 'react-native-screens', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-safe-area-context', readHashedVersion('../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-reanimated', readHashedVersion('../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-prompt-android', readHashedVersion('../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')))
 
         // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
         //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')

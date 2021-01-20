@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { Alert } from 'react-native';
+import prompt from 'react-native-prompt-android';
 
 /**
  * WordPress dependencies
@@ -153,7 +153,7 @@ export class MediaUpload extends React.Component {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 
 		if ( value === 'URL' ) {
-			Alert.prompt(
+			prompt(
 				__( 'Type a URL' ), // title
 				undefined, // message
 				[

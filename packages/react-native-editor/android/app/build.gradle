@@ -171,6 +171,7 @@ dependencies {
     implementation project(':react-native-screens')
     implementation project(':react-native-safe-area-context')
     implementation project(':react-native-reanimated')
+    implementation project(':react-native-prompt-android')
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation "com.facebook.react:react-native:+"  // From node_modules
