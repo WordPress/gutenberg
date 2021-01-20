@@ -352,14 +352,14 @@ async function prepareForPackageRelease( isPrerelease ) {
 }
 
 /**
- * Prepares everything for publishing a new stable version of WordPress packages.
+ * Publishes a new latest version of WordPress packages.
  */
-async function prepareLatestDistTag() {
+async function publishNpmLatestDistTag() {
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
 		),
-		'Welcome! This tool is going to help you with publishing a new stable version of WordPress packages.\n',
+		'Welcome! This tool is going to help you with publishing a new latest version of WordPress packages.\n',
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
@@ -372,9 +372,9 @@ async function prepareLatestDistTag() {
 }
 
 /**
- * Prepares everything for publishing a new next version of WordPress packages.
+ * Publishes a new next version of WordPress packages.
  */
-async function prepareNextDistTag() {
+async function publishNpmNextDistTag() {
 	log(
 		formats.title(
 			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
@@ -391,4 +391,4 @@ async function prepareNextDistTag() {
 	);
 }
 
-module.exports = { prepareLatestDistTag, prepareNextDistTag };
+module.exports = { publishNpmLatestDistTag, publishNpmNextDistTag };

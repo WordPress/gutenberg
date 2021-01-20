@@ -240,7 +240,6 @@
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",
-		"publish:dev": "lerna publish prerelease --preid rc --dist-tag next",
 		"publish:patch": "lerna publish --dist-tag patch",
 		"publish:prod": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
