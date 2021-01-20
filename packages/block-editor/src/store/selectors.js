@@ -1818,6 +1818,29 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 );
 
 /**
+ * Returns the title of a given reusable block
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {string} The reusable block saved title.
+ */
+export const getReusableBlockTitle = createSelector(
+	( state, ref ) => {
+		const reusableBlock = find(
+			getReusableBlocks( state ),
+			( block ) => block.id === ref
+		);
+		if ( ! reusableBlock ) {
+			return null;
+		}
+
+		return reusableBlock.title?.raw;
+	},
+	( state ) => [ getReusableBlocks( state ) ]
+);
+
+/**
  * Returns true if the most recent block change is be considered ignored, or
  * false otherwise. An ignored change is one not to be committed by
  * BlockEditorProvider, neither via `onChange` nor `onInput`.
@@ -1855,7 +1878,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  *
  * @return {Array} Reusable blocks
  */
-function getReusableBlocks( state ) {
+export function getReusableBlocks( state ) {
 	return state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 

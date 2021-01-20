@@ -40,9 +40,12 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		blockTitle,
 	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockTransformItems } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockRootClientId,
+				getBlockTransformItems,
+				getReusableBlockTitle,
+			} = select( blockEditorStore );
+
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
@@ -52,8 +55,12 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const styles =
 				_isSingleBlockSelected && getBlockStyles( firstBlockName );
 			let _icon;
+			let reusableBlockTitle;
 			if ( _isSingleBlockSelected ) {
 				_icon = blockInformation?.icon; // Take into account active block variations.
+				reusableBlockTitle =
+					isReusableBlock( blocks[ 0 ] ) &&
+					getReusableBlockTitle( blocks[ 0 ].attributes.ref );
 			} else {
 				const isSelectionOfSameType =
 					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
@@ -64,14 +71,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					: stack;
 			}
 
-			const reusableTitle =
-				isReusableBlock( blocks[ 0 ] ) &&
-				select( 'core' ).getEntityRecord(
-					'postType',
-					'wp_block',
-					blocks[ 0 ].attributes.ref
-				).title?.raw;
-
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -79,9 +78,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle: isReusable
-					? reusableTitle
-					: getBlockType( firstBlockName ).title,
+				blockTitle:
+					reusableBlockTitle || getBlockType( firstBlockName ).title,
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
