@@ -2,6 +2,8 @@
 
 "Gutenberg" is the codename for the new WordPress editor, also known as the block editor. The Gutenberg project is transforming the way content is created on WordPress.
 
+**Gutenberg** is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. The project is right now in the first phase of a four-phase process that will touch every piece of WordPress -- Editing, Customization, Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor (which is the topic of the current documentation).
+
 ![Quick view of the block editor](https://make.wordpress.org/core/files/2021/01/quick-view-of-the-block-editor.png)
 
 **Legend :**
