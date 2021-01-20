@@ -233,7 +233,7 @@ class VideoEdit extends React.Component {
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
-					{ ! this.state.isCaptionSelected && (
+					{ isSelected && ! this.state.isCaptionSelected && (
 						<BlockControls>{ toolbarEditButton }</BlockControls>
 					) }
 					{ isSelected && (

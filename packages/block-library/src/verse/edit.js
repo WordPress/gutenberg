@@ -18,6 +18,7 @@ export default function VerseEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
+	isSelected,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
@@ -28,14 +29,16 @@ export default function VerseEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ isSelected && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<RichText
 				tagName="pre"
 				identifier="content"

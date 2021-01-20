@@ -483,7 +483,8 @@ export class ImageEdit extends React.Component {
 					<View style={ styles.content }>
 						{ isSelected && getInspectorControls() }
 						{ isSelected && getMediaOptions() }
-						{ ! this.state.isCaptionSelected &&
+						{ isSelected &&
+							! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress
 							coverUrl={ url }

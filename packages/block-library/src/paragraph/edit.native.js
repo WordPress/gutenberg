@@ -19,6 +19,7 @@ function ParagraphBlock( {
 	setAttributes,
 	mergedStyle,
 	style,
+	isSelected,
 } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( 'core/block-editor' ).getSettings().isRTL;
@@ -33,15 +34,17 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ align }
-					isRTL={ isRTL }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ isSelected && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ align }
+						isRTL={ isRTL }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName="p"

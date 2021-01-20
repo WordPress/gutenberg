@@ -84,68 +84,82 @@ export default function ListEdit( {
 					/>
 				</>
 			) }
-			<BlockControls>
-				<ToolbarGroup
-					controls={ [
-						{
-							icon: isRTL()
-								? formatListBulletsRTL
-								: formatListBullets,
-							title: __( 'Convert to unordered list' ),
-							isActive: isActiveListType( value, 'ul', tagName ),
-							onClick() {
-								onChange(
-									changeListType( value, { type: 'ul' } )
-								);
-								onFocus();
+			{ isSelected && (
+				<BlockControls>
+					<ToolbarGroup
+						controls={ [
+							{
+								icon: isRTL()
+									? formatListBulletsRTL
+									: formatListBullets,
+								title: __( 'Convert to unordered list' ),
+								isActive: isActiveListType(
+									value,
+									'ul',
+									tagName
+								),
+								onClick() {
+									onChange(
+										changeListType( value, { type: 'ul' } )
+									);
+									onFocus();
 
-								if ( isListRootSelected( value ) ) {
-									setAttributes( { ordered: false } );
-								}
+									if ( isListRootSelected( value ) ) {
+										setAttributes( { ordered: false } );
+									}
+								},
 							},
-						},
-						{
-							icon: isRTL()
-								? formatListNumberedRTL
-								: formatListNumbered,
-							title: __( 'Convert to ordered list' ),
-							isActive: isActiveListType( value, 'ol', tagName ),
-							onClick() {
-								onChange(
-									changeListType( value, { type: 'ol' } )
-								);
-								onFocus();
+							{
+								icon: isRTL()
+									? formatListNumberedRTL
+									: formatListNumbered,
+								title: __( 'Convert to ordered list' ),
+								isActive: isActiveListType(
+									value,
+									'ol',
+									tagName
+								),
+								onClick() {
+									onChange(
+										changeListType( value, { type: 'ol' } )
+									);
+									onFocus();
 
-								if ( isListRootSelected( value ) ) {
-									setAttributes( { ordered: true } );
-								}
+									if ( isListRootSelected( value ) ) {
+										setAttributes( { ordered: true } );
+									}
+								},
 							},
-						},
-						{
-							icon: isRTL() ? formatOutdentRTL : formatOutdent,
-							title: __( 'Outdent list item' ),
-							shortcut: _x( 'Backspace', 'keyboard key' ),
-							isDisabled: ! canOutdentListItems( value ),
-							onClick() {
-								onChange( outdentListItems( value ) );
-								onFocus();
+							{
+								icon: isRTL()
+									? formatOutdentRTL
+									: formatOutdent,
+								title: __( 'Outdent list item' ),
+								shortcut: _x( 'Backspace', 'keyboard key' ),
+								isDisabled: ! canOutdentListItems( value ),
+								onClick() {
+									onChange( outdentListItems( value ) );
+									onFocus();
+								},
 							},
-						},
-						{
-							icon: isRTL() ? formatIndentRTL : formatIndent,
-							title: __( 'Indent list item' ),
-							shortcut: _x( 'Space', 'keyboard key' ),
-							isDisabled: ! canIndentListItems( value ),
-							onClick() {
-								onChange(
-									indentListItems( value, { type: tagName } )
-								);
-								onFocus();
+							{
+								icon: isRTL() ? formatIndentRTL : formatIndent,
+								title: __( 'Indent list item' ),
+								shortcut: _x( 'Space', 'keyboard key' ),
+								isDisabled: ! canIndentListItems( value ),
+								onClick() {
+									onChange(
+										indentListItems( value, {
+											type: tagName,
+										} )
+									);
+									onFocus();
+								},
 							},
-						},
-					] }
-				/>
-			</BlockControls>
+						] }
+					/>
+				</BlockControls>
+			) }
 		</>
 	);
 

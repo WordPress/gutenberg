@@ -337,28 +337,33 @@ class MediaTextEdit extends Component {
 
 		return (
 			<>
-				{ mediaType === MEDIA_TYPE_IMAGE && this.getControls() }
-				<BlockControls>
-					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
-						<ToolbarGroup>
-							<Button
-								label={ __( 'Edit media' ) }
-								icon={ replace }
-								onClick={ this.onReplaceMedia }
-							/>
-						</ToolbarGroup>
-					) }
-					{ ( ! isMediaSelected ||
-						mediaType === MEDIA_TYPE_VIDEO ) && (
-						<>
-							<ToolbarGroup controls={ toolbarControls } />
-							<BlockVerticalAlignmentToolbar
-								onChange={ onVerticalAlignmentChange }
-								value={ verticalAlignment }
-							/>
-						</>
-					) }
-				</BlockControls>
+				{ isSelected &&
+					mediaType === MEDIA_TYPE_IMAGE &&
+					this.getControls() }
+				{ isSelected && (
+					<BlockControls>
+						{ ( isMediaSelected ||
+							mediaType === MEDIA_TYPE_VIDEO ) && (
+							<ToolbarGroup>
+								<Button
+									label={ __( 'Edit media' ) }
+									icon={ replace }
+									onClick={ this.onReplaceMedia }
+								/>
+							</ToolbarGroup>
+						) }
+						{ ( ! isMediaSelected ||
+							mediaType === MEDIA_TYPE_VIDEO ) && (
+							<>
+								<ToolbarGroup controls={ toolbarControls } />
+								<BlockVerticalAlignmentToolbar
+									onChange={ onVerticalAlignmentChange }
+									value={ verticalAlignment }
+								/>
+							</>
+						) }
+					</BlockControls>
+				) }
 				<View
 					style={ containerStyles }
 					onLayout={ this.onLayoutChange }

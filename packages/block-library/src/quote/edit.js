@@ -36,14 +36,16 @@ export default function QuoteEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ isSelected && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<BlockQuotation { ...blockProps }>
 				<RichText
 					identifier="value"

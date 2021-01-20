@@ -82,17 +82,19 @@ const SpacerEdit = ( {
 					} }
 				/>
 			</View>
-			<InspectorControls>
-				<PanelBody title={ __( 'Spacer settings' ) }>
-					<RangeControl
-						label={ __( 'Height in pixels' ) }
-						min={ MIN_SPACER_HEIGHT }
-						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
-						value={ height }
-						onChange={ updateHeight }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ isSelected && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Spacer settings' ) }>
+						<RangeControl
+							label={ __( 'Height in pixels' ) }
+							min={ MIN_SPACER_HEIGHT }
+							max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+							value={ height }
+							onChange={ updateHeight }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
 		</>
 	);
 };

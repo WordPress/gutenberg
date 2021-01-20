@@ -27,6 +27,7 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	mergedStyle,
+	isSelected,
 } ) {
 	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
@@ -39,22 +40,24 @@ function HeadingEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<HeadingLevelDropdown
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
+			{ isSelected && (
+				<BlockControls>
+					<ToolbarGroup>
+						<HeadingLevelDropdown
+							selectedLevel={ level }
+							onChange={ ( newLevel ) =>
+								setAttributes( { level: newLevel } )
+							}
+						/>
+					</ToolbarGroup>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
 					/>
-				</ToolbarGroup>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+				</BlockControls>
+			) }
 			<RichText
 				identifier="content"
 				tagName={ tagName }
