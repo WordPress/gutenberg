@@ -6,8 +6,8 @@
  */
 
 /**
- * Parses wp_template content and injects the current theme's
- * stylesheet as a theme attribute into each wp_template_part
+ * Parses wp_template content and removes the theme attribute from
+ * each wp_template_part
  *
  * @param string $template_content serialized wp_template content.
  *
