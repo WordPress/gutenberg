@@ -188,6 +188,7 @@ class EditorPage {
 			);
 
 			await pasteButton.click();
+			await this.driver.sleep( 3000 ); // wait for paste notification to disappear
 		}
 
 		await toggleHtmlMode( this.driver, false );
