@@ -51,6 +51,11 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
       help="Make the editor look like your theme."
       label="Use theme styles"
     />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="showBlockBreadcrumbs"
+      help="Shows block breadcrumbs at the bottom of the editor."
+      label="Display block breadcrumbs"
+    />
   </Section>
   <Section
     description="Choose what displays in the panel."

@@ -3,8 +3,10 @@
         "blockName": "core/query-pagination",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
+        "innerHTML": "\n<div class=\"wp-block-query-pagination\"></div>\n",
+        "innerContent": [
+            "\n<div class=\"wp-block-query-pagination\"></div>\n"
+        ]
     },
     {
         "blockName": null,

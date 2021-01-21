@@ -5,6 +5,11 @@
  * @package gutenberg
  */
 
+/**
+ * Get the template HTML.
+ * This needs to run before <head> so that blocks can add scripts and styles in wp_head().
+ */
+$template_html = gutenberg_get_the_template_html();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -16,7 +21,7 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<?php gutenberg_render_the_template(); ?>
+<?php echo $template_html; // phpcs:ignore WordPress.Security.EscapeOutput ?>
 
 <?php wp_footer(); ?>
 </body>
