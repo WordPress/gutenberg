@@ -13,9 +13,9 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ aspect, setAspect ] = useState();
 	const [ defaultAspect, setDefaultAspect ] = useState();
 
-	const imageCrossOrigin = useSelect( ( select ) => {
+	const mediaCrossOrigin = useSelect( ( select ) => {
 		const value = select( 'core/block-editor' ).getSettings()
-			.imageCrossOrigin;
+			.mediaCrossOrigin;
 		return typeof value === 'string' ? value : undefined;
 	} );
 
@@ -97,8 +97,8 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		const el = new window.Image();
 		el.src = url;
 		el.onload = editImage;
-		if ( typeof imageCrossOrigin === 'string' ) {
-			el.crossOrigin = imageCrossOrigin;
+		if ( typeof mediaCrossOrigin === 'string' ) {
+			el.crossOrigin = mediaCrossOrigin;
 		}
 	}, [
 		rotation,
