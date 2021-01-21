@@ -184,6 +184,8 @@ class EditorPage {
 			await this.driver.pressKeycode( 279 /* KEYCODE_PASTE */ );
 		} else {
 			await doubleTap( this.driver, htmlContentView );
+			// Sometimes double tap is not enough so we also long press
+			await longPressMiddleOfElement( this.driver, htmlContentView );
 
 			const pasteButton = this.driver.elementByXPath(
 				'//XCUIElementTypeMenuItem[@name="Paste"]'
