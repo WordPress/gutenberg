@@ -238,6 +238,8 @@ export default function PreferencesModal() {
 		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
+	// This is also used to sync the two different rendered components
+	// between small and large viewports.
 	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
 	/**
 	 * Create helper objects from `sections` for easier data handling.
@@ -270,6 +272,10 @@ export default function PreferencesModal() {
 			<TabPanel
 				className="edit-post-preferences__tabs"
 				tabs={ tabs }
+				initialTabName={
+					activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
+				}
+				onSelect={ setActiveMenu }
 				orientation="vertical"
 			>
 				{ getCurrentTab }
