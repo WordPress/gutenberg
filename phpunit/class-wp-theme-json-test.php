@@ -821,90 +821,90 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	// 	$this->assertEqualSetsWithIndex( $expected, $result );
 	// }
 
-	// function test_remove_insecure_properties_removes_unsafe_preset_settings() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'settings' => array(
-	// 				'global' => array(
-	// 					'color' => array(
-	// 						'palette' => array(
-	// 							array(
-	// 								'name'  => 'Red/><b>ok</ok>',
-	// 								'slug'  => 'red',
-	// 								'color' => '#ff0000',
-	// 							),
-	// 							array(
-	// 								'name'  => 'Green',
-	// 								'slug'  => 'a" attr',
-	// 								'color' => '#00ff00',
-	// 							),
-	// 							array(
-	// 								'name'  => 'Blue',
-	// 								'slug'  => 'blue',
-	// 								'color' => 'var(--custom-v1)',
-	// 							),
-	// 							array(
-	// 								'name'  => 'Pink',
-	// 								'slug'  => 'pink',
-	// 								'color' => '#FFC0CB',
-	// 							),
-	// 						),
-	// 					),
-	// 					'typography' => array(
-	// 						'fontFamilies' => array(
-	// 							array(
-	// 								'name'       => 'Helvetica Arial/><b>test</b>',
-	// 								'slug'       => 'helvetica-arial',
-	// 								'fontFamily' => 'Helvetica Neue, Helvetica, Arial, sans-serif',
-	// 							),
-	// 							array(
-	// 								'name'       => 'Geneva',
-	// 								'slug'       => 'geneva#asa',
-	// 								'fontFamily' => 'Geneva, Tahoma, Verdana, sans-serif',
-	// 							),
-	// 							array(
-	// 								'name'       => 'Cambria',
-	// 								'slug'       => 'cambria',
-	// 								'fontFamily' => 'Cambria, Georgia, serif',
-	// 							),
-	// 							array(
-	// 								'name'       => 'Helvetica Arial',
-	// 								'slug'       => 'helvetica-arial',
-	// 								'fontFamily' => 'var(--custom-var-1)',
-	// 							),
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'settings' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'palette' => array(
-	// 						array(
-	// 							'name'  => 'Pink',
-	// 							'slug'  => 'pink',
-	// 							'color' => '#FFC0CB',
-	// 						),
-	// 					),
-	// 				),
-	// 				'typography' => array(
-	// 					'fontFamilies' => array(
-	// 						array(
-	// 							'name'       => 'Cambria',
-	// 							'slug'       => 'cambria',
-	// 							'fontFamily' => 'Cambria, Georgia, serif',
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+	function test_remove_insecure_properties_removes_unsafe_preset_settings() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'settings' => array(
+					'global' => array(
+						'color' => array(
+							'palette' => array(
+								array(
+									'name'  => 'Red/><b>ok</ok>',
+									'slug'  => 'red',
+									'color' => '#ff0000',
+								),
+								array(
+									'name'  => 'Green',
+									'slug'  => 'a" attr',
+									'color' => '#00ff00',
+								),
+								array(
+									'name'  => 'Blue',
+									'slug'  => 'blue',
+									'color' => 'var(--custom-v1)',
+								),
+								array(
+									'name'  => 'Pink',
+									'slug'  => 'pink',
+									'color' => '#FFC0CB',
+								),
+							),
+						),
+						'typography' => array(
+							'fontFamilies' => array(
+								array(
+									'name'       => 'Helvetica Arial/><b>test</b>',
+									'slug'       => 'helvetica-arial',
+									'fontFamily' => 'Helvetica Neue, Helvetica, Arial, sans-serif',
+								),
+								array(
+									'name'       => 'Geneva',
+									'slug'       => 'geneva#asa',
+									'fontFamily' => 'Geneva, Tahoma, Verdana, sans-serif',
+								),
+								array(
+									'name'       => 'Cambria',
+									'slug'       => 'cambria',
+									'fontFamily' => 'Cambria, Georgia, serif',
+								),
+								array(
+									'name'       => 'Helvetica Arial',
+									'slug'       => 'helvetica-arial',
+									'fontFamily' => 'var(--custom-var-1)',
+								),
+							),
+						),
+					),
+				),
+			),
+			true
+		);
+		$theme_json->remove_insecure_properties();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'settings' => array(
+				'global' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'name'  => 'Pink',
+								'slug'  => 'pink',
+								'color' => '#FFC0CB',
+							),
+						),
+					),
+					'typography' => array(
+						'fontFamilies' => array(
+							array(
+								'name'       => 'Cambria',
+								'slug'       => 'cambria',
+								'fontFamily' => 'Cambria, Georgia, serif',
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 }

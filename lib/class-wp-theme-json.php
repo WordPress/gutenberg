@@ -1078,9 +1078,13 @@ class WP_Theme_JSON {
 
 			// Settings escaping.
 			// For now the ony allowed settings are presets.
-			if ( ! empty( $context['settings'] ) ) {
+			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
 				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-					$current_preset = gutenberg_experimental_get( $context, $preset_metadata['path'], null );
+					$current_preset = gutenberg_experimental_get(
+						$this->theme_json['settings'][ $block_selector],
+						$preset_metadata['path_settings'],
+						null
+					);
 					if ( null !== $current_preset ) {
 						$escaped_preset = array();
 						foreach ( $current_preset as $single_preset ) {
@@ -1101,6 +1105,7 @@ class WP_Theme_JSON {
 										}
 									}
 								} else {
+									// font family
 									$property               = $preset_metadata['css_var_infix'];
 									$style_to_validate      = $property . ': ' . $value;
 									$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
@@ -1110,13 +1115,10 @@ class WP_Theme_JSON {
 								}
 							}
 						}
-						if ( count( $escaped_preset ) > 0 ) {
-							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path'], $escaped_preset );
+						if ( ! empty( $escaped_preset ) ) {
+							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path_settings'], $escaped_preset );
 						}
 					}
-				}
-				if ( empty( $escaped_settings ) ) {
-					$escaped_settings = $escaped_settings['settings'];
 				}
 			}
 
