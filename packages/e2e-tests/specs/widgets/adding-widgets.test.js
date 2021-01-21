@@ -316,6 +316,7 @@ async function saveWidgets() {
 
 	// FIXME: The snackbar above is enough for the widget areas to get saved,
 	// but not enough for the widgets to get saved.
+	// eslint-disable-next-line no-restricted-syntax
 	await page.waitForTimeout( 500 );
 }
 
