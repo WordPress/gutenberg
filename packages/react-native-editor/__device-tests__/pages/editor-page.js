@@ -183,7 +183,7 @@ class EditorPage {
 		if ( isAndroid() ) {
 			await this.driver.pressKeycode( 279 /* KEYCODE_PASTE */ );
 		} else {
-			await doubleTap( this.driver, htmlContentView);
+			await doubleTap( this.driver, htmlContentView );
 
 			const pasteButton = this.driver.elementByXPath(
 				'//XCUIElementTypeMenuItem[@name="Paste"]'
