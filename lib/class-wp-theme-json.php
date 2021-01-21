@@ -28,21 +28,21 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
-	 * The name of the global context.
+	 * The name of the global block.
 	 *
 	 * @var string
 	 */
 	const GLOBAL_NAME = 'global';
 
 	/**
-	 * The CSS selector for the global context.
+	 * The CSS selector for the global block.
 	 *
 	 * @var string
 	 */
 	const GLOBAL_SELECTOR = ':root';
 
 	/**
-	 * The supported properties of the global context.
+	 * The supported properties of the global block.
 	 *
 	 * @var array
 	 */
@@ -61,12 +61,12 @@ class WP_Theme_JSON {
 	);
 
 	/**
-	 * Data schema of each context within a theme.json.
+	 * Data schema of each block within a theme.json.
 	 *
 	 * Example:
 	 *
 	 * {
-	 *   'context-one': {
+	 *   'block-one': {
 	 *     'styles': {
 	 *       'color': {
 	 *         'background': 'color'
@@ -78,7 +78,7 @@ class WP_Theme_JSON {
 	 *       }
 	 *     }
 	 *   },
-	 *   'context-two': {
+	 *   'block-two': {
 	 *     'styles': {
 	 *       'color': {
 	 *         'link': 'color'
@@ -164,7 +164,7 @@ class WP_Theme_JSON {
 	 *
 	 * This contains the necessary metadata to process them:
 	 *
-	 * - path          => where to find the preset in a theme.json context
+	 * - path          => where to find the preset in a theme.json block
 	 *
 	 * - value_key     => the key that represents the value
 	 *
@@ -690,7 +690,7 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles       Styles to process.
-	 * @param array $supports     Supports information for this context.
+	 * @param array $supports     Supports information for this block.
 	 */
 	private static function compute_style_properties( &$declarations, $styles, $supports ) {
 		if ( empty( $styles ) ) {
@@ -864,15 +864,15 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Converts each context into a list of rulesets
+	 * Converts each styles section into a list of rulesets
 	 * to be appended to the stylesheet.
 	 * These rulesets contain all the css variables (custom variables and preset variables).
 	 *
 	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
 	 *
-	 * For each context this creates a new ruleset such as:
+	 * For each section this creates a new ruleset such as:
 	 *
-	 *   context-selector {
+	 *   block-selector {
 	 *     --wp--preset--category--slug: value;
 	 *     --wp--custom--variable: value;
 	 *   }
@@ -899,14 +899,14 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Converts each context into a list of rulesets
+	 * Converts each style section into a list of rulesets
 	 * containing the block styles to be appended to the stylesheet.
 	 *
 	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
 	 *
-	 * For each context this creates a new ruleset such as:
+	 * For each section this creates a new ruleset such as:
 	 *
-	 *   context-selector {
+	 *   block-selector {
 	 *     style-property-one: value;
 	 *   }
 	 *
@@ -959,7 +959,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returns the existing settings for each context.
+	 * Returns the existing settings for each block.
 	 *
 	 * Example:
 	 *
@@ -976,7 +976,7 @@ class WP_Theme_JSON {
 	 *   }
 	 * }
 	 *
-	 * @return array Settings per context.
+	 * @return array Settings per block.
 	 */
 	public function get_settings() {
 		return $this->theme_json['settings'];
