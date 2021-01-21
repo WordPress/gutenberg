@@ -29,6 +29,7 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 /**
  * Internal dependencies
  */
+import hasNestedReusableBlocks from './has-nested-reusable-blocks';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const { isMissing, hasResolved } = useSelect(
@@ -82,6 +83,16 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 
 	const blockProps = useBlockProps();
+
+	if ( hasNestedReusableBlocks( blocks ) ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( `Recursion is cool, until it isn't.` ) }
+				</Warning>
+			</div>
+		);
+	}
 
 	if ( isMissing ) {
 		return (
