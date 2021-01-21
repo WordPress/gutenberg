@@ -2,16 +2,14 @@
  * Internal dependencies
  */
 import initialHtml from '../src/initial-html';
+import { blockNames } from './pages/editor-page';
 
 describe( 'Gutenberg Editor Blocks test', () => {
 	it( 'should be able to create a post with all blocks and scroll to the last one', async () => {
-		const lastBlockAccessibilityLabel = 'Heading with line-height set';
 		await editorPage.setHtmlContent( initialHtml );
 
-		const lastBlockElement = await editorPage.scrollAndReturnElement(
-			lastBlockAccessibilityLabel
-		);
+		await editorPage.addNewBlock( blockNames.paragraph );
 
-		expect( lastBlockElement ).toBeTruthy();
+		await editorPage.driver.sleep( 5000 ); // wait the scroll to paragraph block
 	} );
 } );
