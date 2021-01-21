@@ -42,4 +42,4 @@ Beware that first onFileChange is called with temporary blob URLs and then with 
 ### MediaUpload
 
 Media upload component provides a UI button that allows users to open the WordPress media library. It is normally used in conjunction with the filter `editor.MediaUpload`.
-The component follows the interface specified in https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md, and more details regarding its usage can be checked there.
+The component follows the interface specified in https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md, and more details regarding its usage can be checked there.

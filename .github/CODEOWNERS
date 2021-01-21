@@ -18,12 +18,12 @@
 /packages/block-library/src/image               @ajlende
 
 # Editor
-/packages/annotations                           @atimmer @ellatrix
+/packages/annotations                           @atimmer
 /packages/autop
 /packages/block-editor                          @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @ellatrix
+/packages/blocks
 /packages/edit-post
 /packages/editor
 /packages/list-reusable-blocks
@@ -88,7 +88,7 @@
 /packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
-/packages/keycodes                              @ellatrix
+/packages/keycodes
 /packages/priority-queue
 /packages/token-list
 /packages/url

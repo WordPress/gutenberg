@@ -5,15 +5,18 @@ on:
     paths-ignore:
     - '**.md'
   push:
-    branches: [master]
+    branches: [master, wp-trunk]
     paths-ignore:
     - '**.md'
 
 jobs:
   unit-js:
     name: JavaScript
-
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [12, 14]
 
     steps:
     - uses: actions/checkout@v2
@@ -31,10 +34,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js 14.x
+    - name: Use Node.js ${{ matrix.node }}.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: ${{ matrix.node }}
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret
@@ -92,7 +95,7 @@ jobs:
     - name: Running single site unit tests
       run: npm run test-unit-php
       if: ${{ success() || failure() }}
-    
+
     - name: Running multisite unit tests
       run: npm run test-unit-php-multisite
       if: ${{ success() || failure() }}

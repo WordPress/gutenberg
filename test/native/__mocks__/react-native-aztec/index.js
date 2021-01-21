@@ -1,9 +1,9 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import React from 'react';
+import { Component } from '@wordpress/element';
 
-class AztecView extends React.Component {
+class AztecView extends Component {
 	blur = () => {};
 
 	focus = () => {};

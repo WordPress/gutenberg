@@ -21,8 +21,8 @@ const catchException = ( command ) => {
  */
 const { releaseRC, releaseStable } = require( './commands/release' );
 const {
-	prepareLatestDistTag,
-	prepareNextDistTag,
+	publishNpmLatestDistTag,
+	publishNpmNextDistTag,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
@@ -40,20 +40,20 @@ program
 	.action( catchException( releaseStable ) );
 
 program
-	.command( 'prepare-packages-stable' )
-	.alias( 'npm-stable' )
+	.command( 'publish-npm-packages-latest' )
+	.alias( 'npm-latest' )
 	.description(
-		'Prepares the packages to be published to npm as stable (latest dist-tag, production version)'
+		'Publishes packages to npm (latest dist-tag, production version)'
 	)
-	.action( catchException( prepareLatestDistTag ) );
+	.action( catchException( publishNpmLatestDistTag ) );
 
 program
-	.command( 'prepare-packages-rc' )
-	.alias( 'npm-rc' )
+	.command( 'publish-npm-packages-next' )
+	.alias( 'npm-next' )
 	.description(
-		'Prepares the packages to be published to npm as RC (next dist-tag, RC version)'
+		'Publishes packages to npm (next dist-tag, prerelease version)'
 	)
-	.action( catchException( prepareNextDistTag ) );
+	.action( catchException( publishNpmNextDistTag ) );
 
 program
 	.command( 'release-plugin-changelog' )

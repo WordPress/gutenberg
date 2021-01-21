@@ -93,6 +93,10 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
+			__experimentalLayout: {
+				type: 'default',
+				alignments: [],
+			},
 			placeholder: <PlaceholderPreview />,
 		}
 	);

@@ -51,6 +51,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlot;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  */
 export default BlockSettingsMenuControls;
