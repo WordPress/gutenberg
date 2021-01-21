@@ -11,6 +11,11 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { store as editWidgetsStore } from '../../../store';
+
 export default function WidgetSelectControl( {
 	availableLegacyWidgets,
 	currentWidget,
@@ -19,7 +24,7 @@ export default function WidgetSelectControl( {
 	emptyLabel = __( 'There are no widgets available.' ),
 } ) {
 	const usedReferenceWidgetNames = useSelect( ( select ) =>
-		select( 'core/edit-widgets' )
+		select( editWidgetsStore )
 			.getReferenceWidgetBlocks()
 			.map( ( { attributes } ) => attributes?.referenceWidgetName )
 	);

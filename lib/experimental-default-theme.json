@@ -171,7 +171,7 @@
 				"units": [ "px", "em", "rem", "vh", "vw" ]
 			},
 			"border": {
-				"customRadius": true
+				"customRadius": false
 			}
 		}
 	}

@@ -2,11 +2,25 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+
+### New Features
+
+-   Add support for handling static assets with the `assetsPath` field in the external template configuration ([#28038](https://github.com/WordPress/gutenberg/pull/28038)).
+-   Allow using locally installed packages with templates ([#28105](https://github.com/WordPress/gutenberg/pull/28105)).
+-   Add new CLI option `--wp-env` that lets users override the setting that template defines for integration with `@wordpress/env` package ([#28234](https://github.com/WordPress/gutenberg/pull/28234)).
+
+### Internal
+
+-   Update the demo included in the README file ([#28037](https://github.com/WordPress/gutenberg/pull/28037)).
+
 ## 1.1.0 (2021-01-05)
 
 ### New Feature
 
--   Adds the `npmPackages` field to the template configuration. It allows listing remote npm packages that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+-   Adds the `npmDependencies` field to the template configuration. It allows listing remote npm dependencies that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 -   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 
 ### Bug Fix

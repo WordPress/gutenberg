@@ -32,6 +32,7 @@ const getScreenRecordingFileNameBase = ( testPath, id ) => {
 
 let allPassed = true;
 
+// eslint-disable-next-line jest/no-jasmine-globals, no-undef
 jasmine.getEnv().addReporter( {
 	specStarted: ( { testPath, id } ) => {
 		if ( ! isMacOSEnvironment() ) {
@@ -138,9 +139,4 @@ jasmine.getEnv().addReporter( {
 			global.editorPage.sauceJobStatus( allPassed );
 		}
 	},
-} );
-
-it( 'should be able to see visual editor', async () => {
-	// wait for the block editor to load
-	await expect( global.editorPage.getBlockList() ).resolves.toBe( true );
 } );

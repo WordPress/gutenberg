@@ -25,7 +25,6 @@ import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
 } from '../block-mover/button';
-import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
@@ -39,7 +38,6 @@ export default function BlockNavigationBlock( {
 	rowCount,
 	siblingBlockCount,
 	showBlockMovers,
-	terminatedLevels,
 	path,
 } ) {
 	const cellRef = useRef( null );
@@ -108,11 +106,6 @@ export default function BlockNavigationBlock( {
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-block__contents-container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
 						<BlockNavigationBlockContents
 							block={ block }
 							onClick={ () => onClick( block.clientId ) }

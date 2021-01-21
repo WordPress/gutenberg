@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useState,
-	useMemo,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -18,16 +12,14 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
-	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableUseEditorStyles as useEditorStyles,
-	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -59,7 +51,6 @@ function Editor() {
 	const {
 		isFullscreenActive,
 		isInserterOpen,
-		deviceType,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -71,7 +62,6 @@ function Editor() {
 		const {
 			isFeatureActive,
 			isInserterOpened,
-			__experimentalGetPreviewDeviceType,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
@@ -85,9 +75,8 @@ function Editor() {
 		return {
 			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
-			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! select(
-				'core/interface'
+				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
 			templateType: postType,
@@ -115,8 +104,6 @@ function Editor() {
 		updateEditorSettings( { defaultTemplateTypes } );
 	}, [ defaultTemplateTypes ] );
 
-	const inlineStyles = useResizeCanvas( deviceType );
-
 	const [
 		isEntitiesSavedStatesOpen,
 		setIsEntitiesSavedStatesOpen,
@@ -129,13 +116,9 @@ function Editor() {
 		setIsEntitiesSavedStatesOpen( false );
 	}, [] );
 
-	// Set default query for misplaced Query Loop blocks, and
-	// provide the root `queryContext` for top-level Query Loop
-	// and Query Pagination blocks.
 	const blockContext = useMemo(
 		() => ( {
 			...page?.context,
-			query: page?.context.query || { categoryIds: [], tagIds: [] },
 			queryContext: [
 				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -163,9 +146,6 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const ref = useRef();
-
-	useEditorStyles( ref, settings.styles );
 
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
@@ -200,7 +180,6 @@ function Editor() {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											ref={ ref }
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={
@@ -252,12 +231,8 @@ function Editor() {
 												/>
 											}
 											content={
-												<BlockSelectionClearer
-													className="edit-site-visual-editor"
-													style={ inlineStyles }
-												>
+												<>
 													<Notices />
-													<Popover.Slot name="block-toolbar" />
 													{ template && (
 														<BlockEditor
 															setIsInserterOpen={
@@ -266,7 +241,7 @@ function Editor() {
 														/>
 													) }
 													<KeyboardShortcuts />
-												</BlockSelectionClearer>
+												</>
 											}
 											actions={
 												<>

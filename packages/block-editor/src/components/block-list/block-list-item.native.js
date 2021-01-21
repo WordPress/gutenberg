@@ -22,13 +22,6 @@ const stretchStyle = {
 	flex: 1,
 };
 
-const {
-	isFullWidth,
-	isWideWidth,
-	isWider,
-	isContainerRelated,
-} = alignmentHelpers;
-
 export class BlockListItem extends Component {
 	constructor() {
 		super( ...arguments );
@@ -60,6 +53,12 @@ export class BlockListItem extends Component {
 			parentWidth,
 		} = this.props;
 		const { blockWidth } = this.state;
+		const {
+			isFullWidth,
+			isWideWidth,
+			isWider,
+			isContainerRelated,
+		} = alignmentHelpers;
 
 		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
@@ -106,6 +105,7 @@ export class BlockListItem extends Component {
 			hasParents,
 			parentBlockName,
 		} = this.props;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 
 		return [
 			readableContentViewStyle,
@@ -138,6 +138,8 @@ export class BlockListItem extends Component {
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
+		const { isContainerRelated } = alignmentHelpers;
+
 		return (
 			<ReadableContentView
 				align={ blockAlignment }

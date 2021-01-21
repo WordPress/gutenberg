@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"files": [
 		"build",
@@ -36,7 +36,7 @@
 		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {
-		"jest": ">=24",
+		"jest": ">=26",
 		"puppeteer": ">=1.19.0"
 	},
 	"publishConfig": {

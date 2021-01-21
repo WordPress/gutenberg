@@ -229,14 +229,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("ma.tt"))
     }
 
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
-        return false;
-    }
-
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
-        print("Gutenberg requested setting tooltip flag")
-    }
-
     func gutenbergDidRequestMediaSaveSync() {
         print(#function)
     }

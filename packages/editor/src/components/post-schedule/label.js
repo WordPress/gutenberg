@@ -7,7 +7,6 @@ import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
 	const settings = __experimentalGetSettings();
-
 	return date && ! isFloating
 		? format(
 				`${ settings.formats.date } ${ settings.formats.time }`,

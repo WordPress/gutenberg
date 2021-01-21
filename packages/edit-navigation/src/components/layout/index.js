@@ -66,6 +66,7 @@ export default function Layout( { blockEditorSettings } ) {
 								templateLock: 'all',
 								hasFixedToolbar: true,
 							} }
+							useSubRegistry={ false }
 						>
 							<Toolbar
 								isPending={ ! navigationPost }
