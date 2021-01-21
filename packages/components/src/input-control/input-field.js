@@ -183,29 +183,12 @@ function InputField(
 		}
 	);
 
-	const { onMouseDown, onTouchStart } = isDragEnabled
-		? dragGestureProps()
-		: {};
-	let handleOnMouseDown = onMouseDown;
-
-	/*
-	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
-	 * type=number when their spinner arrows are pressed.
-	 */
-	if ( type === 'number' ) {
-		handleOnMouseDown = ( event ) => {
-			if ( event.target !== event.target.ownerDocument.activeElement ) {
-				event.target.focus();
-			}
-			if ( isDragEnabled ) {
-				onMouseDown( event );
-			}
-		};
-	}
+	const dragProps = isDragEnabled ? dragGestureProps() : {};
 
 	return (
 		<Input
 			{ ...props }
+			{ ...dragProps }
 			className="components-input-control__input"
 			disabled={ disabled }
 			dragCursor={ dragCursor }
@@ -215,8 +198,6 @@ function InputField(
 			onChange={ handleOnChange }
 			onFocus={ handleOnFocus }
 			onKeyDown={ handleOnKeyDown }
-			onMouseDown={ handleOnMouseDown }
-			onTouchStart={ onTouchStart }
 			ref={ ref }
 			size={ size }
 			value={ value }
