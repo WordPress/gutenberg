@@ -85,7 +85,8 @@ export class FocalPointPicker extends Component {
 	calculateBounds() {
 		const bounds = INITIAL_BOUNDS;
 
-		if ( ! this.mediaRef.current ) {
+		// Returns early if the ref isn't available or has no size
+		if ( ! this.mediaRef.current?.clientWidth ) {
 			return bounds;
 		}
 
