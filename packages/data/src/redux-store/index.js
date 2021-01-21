@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import { flowRight, get, mapValues } from 'lodash';
+import { flowRight, get, mapValues, omit } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
@@ -123,6 +123,8 @@ export default function createReduxStore( key, options ) {
 
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
+			const getResolveSelectors = () =>
+				mapResolveSelectors( selectors, store );
 
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
@@ -156,6 +158,7 @@ export default function createReduxStore( key, options ) {
 				selectors,
 				resolvers,
 				getSelectors,
+				__experimentalGetResolveSelectors: getResolveSelectors,
 				getActions,
 				subscribe,
 			};
@@ -264,6 +267,44 @@ function mapActions( actions, store ) {
 	};
 
 	return mapValues( actions, createBoundAction );
+}
+
+/**
+ * Maps selectors to functions that return a resolution promise for them
+ *
+ * @param {Object} selectors Selectors to map.
+ * @param {Object} store     The redux store the selectors select from.
+ * @return {Object}          Selectors mapped to their resolution functions.
+ */
+function mapResolveSelectors( selectors, store ) {
+	return mapValues(
+		omit( selectors, [
+			'getIsResolving',
+			'hasStartedResolution',
+			'hasFinishedResolution',
+			'isResolving',
+			'getCachedResolvers',
+		] ),
+		( selector, selectorName ) => ( ...args ) =>
+			new Promise( ( resolve ) => {
+				const hasFinished = () =>
+					selectors.hasFinishedResolution( selectorName, args );
+				const getResult = () => selector.apply( null, args );
+
+				// trigger the selector (to trigger the resolver)
+				const result = getResult();
+				if ( hasFinished() ) {
+					return resolve( result );
+				}
+
+				const unsubscribe = store.subscribe( () => {
+					if ( hasFinished() ) {
+						unsubscribe();
+						resolve( getResult() );
+					}
+				} );
+			} )
+	);
 }
 
 /**
