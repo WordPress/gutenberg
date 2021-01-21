@@ -10,6 +10,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	getBlockType,
 	__experimentalGetBlockLabel as getBlockLabel,
+	isReusableBlock,
 } from '@wordpress/blocks';
 
 /**
@@ -44,12 +45,18 @@ export default function BlockTitle( { clientId } ) {
 				__experimentalGetReusableBlockTitle,
 			} = select( 'core/block-editor' );
 
+			const isReusable = isReusableBlock(
+				getBlockType( getBlockName( clientId ) )
+			);
+
 			return {
 				attributes: getBlockAttributes( clientId ),
 				name: getBlockName( clientId ),
-				reusableBlockTitle: __experimentalGetReusableBlockTitle(
-					getBlockAttributes( clientId ).ref
-				),
+				reusableBlockTitle:
+					isReusable &&
+					__experimentalGetReusableBlockTitle(
+						getBlockAttributes( clientId ).ref
+					),
 			};
 		},
 		[ clientId ]
