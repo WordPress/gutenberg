@@ -61,6 +61,35 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
+ * Registers the 'template_part_type' taxonomy.
+ */
+function gutenberg_register_template_part_type_taxonomy(){
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	register_taxonomy(
+		'template_part_type',
+		array( 'wp_template_part' ),
+		array(
+			'public'            => false,
+			'hierarchical'      => false,
+			'labels'            => array(
+				'name'          => __( 'Types', 'gutenberg' ),
+				'singular_name' => __( 'Type', 'gutenberg' ),
+			),
+			'query_var'         => false,
+			'rewrite'           => false,
+			'show_ui'           => false,
+			'_builtin'          => true,
+			'show_in_nav_menus' => false,
+			'show_in_rest'      => false,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_template_part_type_taxonomy' );
+
+/**
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
 function gutenberg_fix_template_part_admin_menu_entry() {
