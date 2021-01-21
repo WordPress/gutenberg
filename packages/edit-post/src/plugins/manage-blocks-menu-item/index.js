@@ -8,9 +8,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { store as editPostStore } from '../../store';
 
 export function ManageBlocksMenuItem( { openModal } ) {

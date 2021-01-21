@@ -78,14 +78,21 @@ export default function PreferencesModal() {
 				tabLabel: __( 'General' ),
 				content: (
 					<>
-						<Section title={ __( 'Choose your own experience' ) }>
-							<EnablePublishSidebarOption
-								help={ __(
-									'Review settings such as categories and tags.'
-								) }
-								label={ __( 'Include pre-publish checklist' ) }
-							/>
-						</Section>
+						{ isLargeViewport && (
+							<Section
+								title={ __( 'Choose your own experience' ) }
+							>
+								<EnablePublishSidebarOption
+									help={ __(
+										'Review settings such as categories and tags.'
+									) }
+									label={ __(
+										'Include pre-publish checklist'
+									) }
+								/>
+							</Section>
+						) }
+
 						<Section title={ __( 'Decide what to focus on' ) }>
 							<EnableFeature
 								featureName="reducedUI"
@@ -228,7 +235,7 @@ export default function PreferencesModal() {
 				),
 			},
 		],
-		[ isViewable, showBlockBreadcrumbsOption ]
+		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
 	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
