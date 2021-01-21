@@ -663,15 +663,6 @@ _Parameters_
 -   _optionLabel_ `string`: The option label to search the button for.
 -   _shouldBeChecked_ `[boolean]`: If true, turns the option on. If false, off. If not provided, the option will be toggled.
 
-<a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
-
-Toggles the screen option with the given label.
-
-_Parameters_
-
--   _label_ `string`: The label of the screen option, e.g. 'Show Tips'.
--   _shouldBeChecked_ `?boolean`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
-
 <a name="transformBlockTo" href="#transformBlockTo">#</a> **transformBlockTo**
 
 Converts editor's block type.
