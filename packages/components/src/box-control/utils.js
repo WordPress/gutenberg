@@ -60,7 +60,9 @@ function mode( arr ) {
  * @return {string} A value + unit for the 'all' input.
  */
 export function getAllValue( values = {} ) {
-	const parsedValues = Object.values( values ).map( parseUnit );
+	const parsedValues = Object.values( values ).map( ( value ) =>
+		parseUnit( value )
+	);
 
 	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
 	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );

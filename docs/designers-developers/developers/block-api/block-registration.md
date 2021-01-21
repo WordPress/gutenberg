@@ -222,7 +222,7 @@ example: {
 
 #### variations (optional)
 
-- **Type:** `Object[]`
+-   **Type:** `Object[]`
 
 Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted.
 
@@ -256,19 +256,20 @@ variations: [
 
 An object describing a variation defined for the block type can contain the following fields:
 
-- `name` (type `string`) – The unique and machine-readable name.
-- `title` (type `string`) – A human-readable variation title.
-- `description` (optional, type `string`) – A detailed variation description.
-- `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
-- `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
-- `attributes` (optional, type `Object`) – Values that override block attributes.
-- `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
-- `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
-- `scope` (optional, type `WPBlockVariationScope[]`) - the list of scopes where the variation is applicable. When not provided, it defaults to `block` and `inserter`. Available options:
-	- `inserter` - Block Variation is shown on the inserter.
-	- `block` - Used by blocks to filter specific block variations. Mostly used in Placeholder patterns like `Columns` block.
-	- `transform` - Block Variation will be shown in the component for Block Variations transformations.
-- `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
+-   `name` (type `string`) – The unique and machine-readable name.
+-   `title` (type `string`) – A human-readable variation title.
+-   `description` (optional, type `string`) – A detailed variation description.
+-   `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
+-   `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
+-   `attributes` (optional, type `Object`) – Values that override block attributes.
+-   `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
+-   `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
+-   `scope` (optional, type `WPBlockVariationScope[]`) - the list of scopes where the variation is applicable. When not provided, it defaults to `block` and `inserter`. Available options:
+    -   `inserter` - Block Variation is shown on the inserter.
+    -   `block` - Used by blocks to filter specific block variations. Mostly used in Placeholder patterns like `Columns` block.
+    -   `transform` - Block Variation will be shown in the component for Block Variations transformations.
+-   `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
+-   `isActive` (optional, type `Function`) - A function that accepts a block's attributes and the variation's attributes and determines if a variation is active. This function doesn't try to find a match dynamically based on all block's attributes, as in many cases some attributes are irrelevant. An example would be for `embed` block where we only care about `providerNameSlug` attribute's value.
 
 It's also possible to override the default block style variation using the `className` attribute when defining block variations.
 
@@ -278,15 +279,17 @@ variations: [
 		name: 'blue',
 		title: __( 'Blue Quote' ),
 		isDefault: true,
-		attributes: { className: 'is-style-blue-quote' },
+		attributes: { color: 'blue', className: 'is-style-blue-quote' },
 		icon: 'format-quote',
+		isActive: ( blockAttributes, variationAttributes ) =>
+			blockAttributes.color === variationAttributes.color
 	},
 ],
 ```
 
 #### supports (optional)
 
--   ***Type:*** `Object`
+-   **_Type:_** `Object`
 
 Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/designers-developers/developers/block-api/block-supports.md) for more details.
 
@@ -300,7 +303,7 @@ Transforms provide rules for what a block can be transformed from and what it ca
 
 -   **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 

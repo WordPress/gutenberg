@@ -156,6 +156,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block API Versions",
+		"slug": "versions",
+		"markdown_source": "../docs/designers-developers/developers/block-api/versions.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/designers-developers/developers/filters/README.md",
@@ -1464,6 +1470,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-tutorial-template",
+		"slug": "packages-create-block-tutorial-template",
+		"markdown_source": "../packages/create-block-tutorial-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block",
 		"slug": "packages-create-block",
 		"markdown_source": "../packages/create-block/README.md",
@@ -1797,6 +1809,12 @@
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "../packages/shortcode/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/stylelint-config",
+		"slug": "packages-stylelint-config",
+		"markdown_source": "../packages/stylelint-config/README.md",
 		"parent": "packages"
 	},
 	{

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.24.0 (2021-01-21)
+
+### New Features
+
+- Add the `useIsomorphicLayoutEffect` hook.
+
 ## 3.4.0 (2019-06-12)
 
 ### New Features

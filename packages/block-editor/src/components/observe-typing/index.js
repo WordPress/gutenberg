@@ -15,6 +15,8 @@ import {
 	TAB,
 } from '@wordpress/keycodes';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.
  *
@@ -43,12 +45,77 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && KEY_DOWN_ELIGIBLE_KEY_CODES.has( keyCode );
 }
 
+/**
+ * Removes the `isTyping` flag when the mouse moves in the document of the given
+ * element.
+ *
+ * @param {RefObject} ref React ref containing an element.
+ */
+export function useMouseMoveTypingReset( ref ) {
+	const isTyping = useSelect( ( select ) =>
+		select( 'core/block-editor' ).isTyping()
+	);
+	const { stopTyping } = useDispatch( 'core/block-editor' );
+
+	useEffect( () => {
+		if ( ! isTyping ) {
+			return;
+		}
+
+		const element = ref.current;
+		const { ownerDocument } = element;
+		let lastClientX;
+		let lastClientY;
+
+		/**
+		 * On mouse move, unset typing flag if user has moved cursor.
+		 *
+		 * @param {MouseEvent} event Mousemove event.
+		 */
+		function stopTypingOnMouseMove( event ) {
+			const { clientX, clientY } = event;
+
+			// We need to check that the mouse really moved because Safari
+			// triggers mousemove events when shift or ctrl are pressed.
+			if (
+				lastClientX &&
+				lastClientY &&
+				( lastClientX !== clientX || lastClientY !== clientY )
+			) {
+				stopTyping();
+			}
+
+			lastClientX = clientX;
+			lastClientY = clientY;
+		}
+
+		ownerDocument.addEventListener( 'mousemove', stopTypingOnMouseMove );
+
+		return () => {
+			ownerDocument.removeEventListener(
+				'mousemove',
+				stopTypingOnMouseMove
+			);
+		};
+	}, [ isTyping, stopTyping ] );
+}
+
+/**
+ * Sets and removes the `isTyping` flag based on user actions:
+ *
+ * - Sets the flag if the user types within the given element.
+ * - Removes the flag when the user selects some text, focusses a non-text
+ *   field, presses ESC or TAB, or moves the mouse in the document.
+ *
+ * @param {RefObject} ref React ref containing an element.
+ */
 export function useTypingObserver( ref ) {
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
 	);
 	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
 
+	useMouseMoveTypingReset( ref );
 	useEffect( () => {
 		const element = ref.current;
 		const { ownerDocument } = element;
@@ -108,40 +175,11 @@ export function useTypingObserver( ref ) {
 				}
 			}
 
-			let lastClientX;
-			let lastClientY;
-
-			/**
-			 * On mouse move, unset typing flag if user has moved cursor.
-			 *
-			 * @param {MouseEvent} event Mousemove event.
-			 */
-			function stopTypingOnMouseMove( event ) {
-				const { clientX, clientY } = event;
-
-				// We need to check that the mouse really moved because Safari
-				// triggers mousemove events when shift or ctrl are pressed.
-				if (
-					lastClientX &&
-					lastClientY &&
-					( lastClientX !== clientX || lastClientY !== clientY )
-				) {
-					stopTyping();
-				}
-
-				lastClientX = clientX;
-				lastClientY = clientY;
-			}
-
 			element.addEventListener( 'focus', stopTypingOnNonTextField );
 			element.addEventListener( 'keydown', stopTypingOnEscapeKey );
 			ownerDocument.addEventListener(
 				'selectionchange',
 				stopTypingOnSelectionUncollapse
-			);
-			ownerDocument.addEventListener(
-				'mousemove',
-				stopTypingOnMouseMove
 			);
 
 			return () => {
@@ -154,10 +192,6 @@ export function useTypingObserver( ref ) {
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					stopTypingOnSelectionUncollapse
-				);
-				ownerDocument.removeEventListener(
-					'mousemove',
-					stopTypingOnMouseMove
 				);
 			};
 		}
@@ -209,6 +243,6 @@ function ObserveTyping( { children } ) {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md
  */
 export default ObserveTyping;

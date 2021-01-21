@@ -128,7 +128,7 @@ function myguten_enqueue() {
 	wp_enqueue_script(
 		'myguten-script',
 		plugins_url( 'myguten.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data' )
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data', 'wp-block-editor' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );

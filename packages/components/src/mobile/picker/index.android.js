@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View } from 'react-native';
 
 /**
@@ -10,7 +9,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -52,8 +51,27 @@ export default class Picker extends Component {
 		this.onClose();
 	}
 
+	getOptions() {
+		const { options, leftAlign } = this.props;
+
+		return options.map( ( option ) => (
+			<View key={ `${ option.label }-${ option.value }` }>
+				{ options.length > 1 && option.separated && <Separator /> }
+				<BottomSheet.Cell
+					icon={ option.icon }
+					leftAlign={ leftAlign }
+					label={ option.label }
+					separatorType={ 'none' }
+					onPress={ () => this.onCellPress( option.value ) }
+					disabled={ option.disabled }
+					style={ option.disabled && styles.disabled }
+				/>
+			</View>
+		) );
+	}
+
 	render() {
-		const { options, leftAlign, hideCancelButton, title } = this.props;
+		const { hideCancelButton, title } = this.props;
 		const { isVisible } = this.state;
 
 		return (
@@ -64,26 +82,9 @@ export default class Picker extends Component {
 				hideHeader
 			>
 				<PanelBody title={ title } style={ styles.panelBody }>
-					{ options.map( ( option ) => (
-						<View key={ `${ option.label }-${ option.value }` }>
-							{ options.length > 1 && option.separated && (
-								<Separator />
-							) }
-							<BottomSheet.Cell
-								icon={ option.icon }
-								leftAlign={ leftAlign }
-								label={ option.label }
-								separatorType={ 'none' }
-								onPress={ () =>
-									this.onCellPress( option.value )
-								}
-								disabled={ option.disabled }
-								style={ option.disabled && styles.disabled }
-							/>
-						</View>
-					) ) }
+					{ this.getOptions() }
 					{ ! hideCancelButton && (
-						<BottomSheet.Cell
+						<TextControl
 							label={ __( 'Cancel' ) }
 							onPress={ this.onClose }
 							separatorType={ 'none' }
