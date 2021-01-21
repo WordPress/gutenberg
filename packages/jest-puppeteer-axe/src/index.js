@@ -70,9 +70,9 @@ function formatViolations( violations ) {
  *                                             to exclude from analysis.
  * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
  * @param {?RunOptions}   params.options       A flexible way to configure how Axe run operates,
- *                                             see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter.
+ *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter.
  * @param {?Spec}         params.config        Axe configuration object,
- *                                             see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure.
+ *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure.
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */

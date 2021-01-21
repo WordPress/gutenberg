@@ -415,7 +415,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	function test_remove_insecure_properties_removes_invalid_contexts() {
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'global' => array(
+				'global'    => array(
 					'styles' => array(
 						'color' => array(
 							'background' => 'green',
@@ -453,13 +453,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'global' => array(
-					'styles' => array(
+					'styles'  => array(
 						'color' => array(
 							'gradient' => 'linear-gradient(55deg,rgba(6,147,227,1) 0%,rgb(84,177,218) 54%,rgb(155,81,224) 100%)',
-							'text'       => 'var:preset|color|dark-gray',
+							'text'     => 'var:preset|color|dark-gray',
 						),
 					),
-					'invalid'   => array(
+					'invalid' => array(
 						'background' => 'green',
 					),
 				),
@@ -473,7 +473,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'styles' => array(
 					'color' => array(
 						'gradient' => 'linear-gradient(55deg,rgba(6,147,227,1) 0%,rgb(84,177,218) 54%,rgb(155,81,224) 100%)',
-						'text'       => 'var:preset|color|dark-gray',
+						'text'     => 'var:preset|color|dark-gray',
 					),
 				),
 			),
@@ -485,13 +485,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'global' => array(
-					'styles' => array(
+					'styles'  => array(
 						'color' => array(
 							'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
-							'text'       => 'var:preset|color|dark-gray',
+							'text'     => 'var:preset|color|dark-gray',
 						),
 					),
-					'invalid'   => array(
+					'invalid' => array(
 						'background' => 'green',
 					),
 				),
@@ -504,7 +504,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'global' => array(
 				'styles' => array(
 					'color' => array(
-						'text'       => 'var:preset|color|dark-gray',
+						'text' => 'var:preset|color|dark-gray',
 					),
 				),
 			),
@@ -515,21 +515,21 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	function test_remove_insecure_properties_removes_properties_when_not_allowed_in_a_context() {
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'global' => array(
-					'styles' => array(
-						'color' => array(
-							'text'       => 'var:preset|color|dark-gray',
+				'global'     => array(
+					'styles'  => array(
+						'color'   => array(
+							'text' => 'var:preset|color|dark-gray',
 						),
 						'spacing' => array(
 							'padding' => array(
-								'top' => '1px',
-								'right' => '1px',
+								'top'    => '1px',
+								'right'  => '1px',
 								'bottom' => '1px',
-								'left' => '1px',
+								'left'   => '1px',
 							),
 						),
 					),
-					'invalid'   => array(
+					'invalid' => array(
 						'background' => 'green',
 					),
 				),
@@ -537,10 +537,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'styles' => array(
 						'spacing' => array(
 							'padding' => array(
-								'top' => '1px',
-								'right' => '1px',
+								'top'    => '1px',
+								'right'  => '1px',
 								'bottom' => '1px',
-								'left' => '1px',
+								'left'   => '1px',
 							),
 						),
 					),
@@ -551,10 +551,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->remove_insecure_properties();
 		$result   = $theme_json->get_raw_data();
 		$expected = array(
-			'global' => array(
+			'global'     => array(
 				'styles' => array(
 					'color' => array(
-						'text'       => 'var:preset|color|dark-gray',
+						'text' => 'var:preset|color|dark-gray',
 					),
 				),
 			),
@@ -562,10 +562,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'styles' => array(
 					'spacing' => array(
 						'padding' => array(
-							'top' => '1px',
-							'right' => '1px',
+							'top'    => '1px',
+							'right'  => '1px',
 							'bottom' => '1px',
-							'left' => '1px',
+							'left'   => '1px',
 						),
 					),
 				),
@@ -581,10 +581,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'styles' => array(
 						'spacing' => array(
 							'padding' => array(
-								'top' => '1px',
-								'right' => '1px',
+								'top'    => '1px',
+								'right'  => '1px',
 								'bottom' => 'var(--unsafe-var-y)',
-								'left' => '1px',
+								'left'   => '1px',
 							),
 						),
 					),
@@ -599,9 +599,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'styles' => array(
 					'spacing' => array(
 						'padding' => array(
-							'top' => '1px',
+							'top'   => '1px',
 							'right' => '1px',
-							'left' => '1px',
+							'left'  => '1px',
 						),
 					),
 				),
@@ -615,8 +615,8 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			array(
 				'global' => array(
 					'settings' => array(
-						'color' => array(
-							'custom'   => true,
+						'color'   => array(
+							'custom'  => true,
 							'palette' => array(
 								array(
 									'name'  => 'Red',
@@ -678,7 +678,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			array(
 				'global' => array(
 					'settings' => array(
-						'color' => array(
+						'color'      => array(
 							'palette' => array(
 								array(
 									'name'  => 'Red/><b>ok</ok>',
@@ -736,7 +736,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$expected = array(
 			'global' => array(
 				'settings' => array(
-					'color' => array(
+					'color'      => array(
 						'palette' => array(
 							array(
 								'name'  => 'Pink',

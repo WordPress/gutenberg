@@ -50,7 +50,7 @@ describe( 'New User Experience (NUX)', () => {
 		);
 		// This shouldn't be necessary
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 500 );
+		await page.waitForTimeout( 500 );
 
 		// Press the right arrow key for Page 3
 		await page.keyboard.press( 'ArrowRight' );

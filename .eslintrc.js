@@ -64,6 +64,11 @@ module.exports = {
 						message: 'Please use `memize` instead.',
 					},
 					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+					},
+					{
 						name: 'reakit',
 						message:
 							'Please use Reakit API through `@wordpress/components` instead.',
@@ -105,6 +110,12 @@ module.exports = {
 			{
 				selector:
 					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message:
+					'This method is deprecated. You should use the more explicit API methods available.',
+			},
+			{
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{

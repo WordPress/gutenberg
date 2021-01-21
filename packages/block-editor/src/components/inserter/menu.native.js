@@ -123,11 +123,16 @@ export class InserterMenu extends Component {
 	 */
 	getItems() {
 		const {
-			items,
+			items: initialItems,
 			canInsertBlockType,
 			destinationRootClientId,
 			getBlockType,
 		} = this.props;
+
+		// Filter out reusable blocks (they will be added in another tab)
+		const items = initialItems.filter(
+			( { name } ) => name !== 'core/block'
+		);
 
 		const clipboard = getClipboard();
 		const clipboardBlock =

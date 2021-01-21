@@ -315,7 +315,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for async mode to dispatch the update.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 1000 );
+		await page.waitForTimeout( 1000 );
 
 		// Check that the content of the second reusable block has been updated.
 		const reusableBlocks = await page.$$( '.wp-block-block' );
