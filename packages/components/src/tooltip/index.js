@@ -28,6 +28,53 @@ import { useDebounce } from '@wordpress/compose';
  */
 export const TOOLTIP_DELAY = 700;
 
+const eventCatcher = <div className="event-catcher" />;
+
+const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
+	cloneElement(
+		<span className="disabled-element-wrapper">
+			{ cloneElement( eventCatcher, eventHandlers ) }
+			{ cloneElement( child, {
+				children: childrenWithPopover,
+			} ) }
+			,
+		</span>,
+		eventHandlers
+	);
+
+const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
+	cloneElement( child, {
+		...eventHandlers,
+		children: childrenWithPopover,
+	} );
+
+const addPopoverToGrandchildren = ( {
+	grandchildren,
+	isOver,
+	position,
+	text,
+	shortcut,
+} ) =>
+	concatChildren(
+		grandchildren,
+		isOver && (
+			<Popover
+				focusOnMount={ false }
+				position={ position }
+				className="components-tooltip"
+				aria-hidden="true"
+				animate={ false }
+				noArrow={ true }
+			>
+				{ text }
+				<Shortcut
+					className="components-tooltip__shortcut"
+					shortcut={ shortcut }
+				/>
+			</Popover>
+		)
+	);
+
 const emitToChild = ( children, eventName, event ) => {
 	if ( Children.count( children ) !== 1 ) {
 		return;
@@ -136,33 +183,36 @@ function Tooltip( { children, position, text, shortcut } ) {
 		return children;
 	}
 
-	const child = Children.only( children );
-	return cloneElement( child, {
+	const eventHandlers = {
 		onMouseEnter: createToggleIsOver( 'onMouseEnter', true ),
 		onMouseLeave: createToggleIsOver( 'onMouseLeave' ),
 		onClick: createToggleIsOver( 'onClick' ),
 		onFocus: createToggleIsOver( 'onFocus' ),
 		onBlur: createToggleIsOver( 'onBlur' ),
 		onMouseDown: createMouseEvent( 'mouseDown' ),
-		children: concatChildren(
-			child.props.children,
-			isOver && (
-				<Popover
-					focusOnMount={ false }
-					position={ position }
-					className="components-tooltip"
-					aria-hidden="true"
-					animate={ false }
-					noArrow={ true }
-				>
-					{ text }
-					<Shortcut
-						className="components-tooltip__shortcut"
-						shortcut={ shortcut }
-					/>
-				</Popover>
-			)
-		),
+	};
+
+	const child = Children.only( children );
+	const { children: grandchildren, disabled } = child.props;
+	const getElementWithPopover = disabled
+		? getDisabledElement
+		: getRegularElement;
+
+	const popoverData = {
+		isOver,
+		position,
+		text,
+		shortcut,
+	};
+	const childrenWithPopover = addPopoverToGrandchildren( {
+		grandchildren,
+		...popoverData,
+	} );
+
+	return getElementWithPopover( {
+		child,
+		eventHandlers,
+		childrenWithPopover,
 	} );
 }
 
