@@ -15,7 +15,9 @@ export default function save( { attributes } ) {
 		imageCrop,
 		caption,
 	} = attributes;
-	const className = `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }`;
+	const className = `has-nested-images columns-${ columns } ${
+		imageCrop ? 'is-cropped' : ''
+	}`;
 
 	return (
 		<figure { ...useBlockProps.save( { className } ) }>

@@ -3,7 +3,6 @@
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
 	li {
-		list-style-type: none;
 		.components-drop-zone {
 			display: none;
 			pointer-events: none;
@@ -82,6 +81,9 @@ figure.wp-block-gallery {
 	}
 }
 
+/**
+ * Gallery inspector controls settings.
+ */
 .gallery-settings-buttons {
 	.components-button:first-child {
 		margin-right: 8px;
