@@ -167,18 +167,19 @@
 			width: auto;
 		}
 	}
-}
 
-.wp-block-cover__image-background,
-.wp-block-cover__video-background {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: inherit;
-	height: inherit;
-	object-fit: cover;
+	// Extra specificity for in edit mode where other styles would override it otherwise.
+	img.wp-block-cover__image-background,
+	video.wp-block-cover__video-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: inherit;
+		height: inherit;
+		object-fit: cover;
+	}
 }
 
 .wp-block-cover__video-background {
