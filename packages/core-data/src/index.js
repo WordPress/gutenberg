@@ -63,6 +63,7 @@ const storeConfig = {
 	actions: { ...actions, ...entityActions, ...locksActions },
 	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
+	__experimentalUseThunks: true,
 };
 
 /**

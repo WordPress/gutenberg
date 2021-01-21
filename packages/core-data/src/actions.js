@@ -7,8 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -159,8 +158,10 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {string}  recordId          Record ID of the deleted entity.
  * @param {?Object} query             Special query parameters for the DELETE API call.
  */
-export function* deleteEntityRecord( kind, name, recordId, query ) {
-	const entities = yield getKindEntities( kind );
+export const deleteEntityRecord = ( kind, name, recordId, query ) => async ( {
+	dispatch,
+} ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
@@ -168,18 +169,20 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		return;
 	}
 
-	const lock = yield* __unstableAcquireStoreLock(
-		'core',
-		[ 'entities', 'data', kind, name, recordId ],
-		{ exclusive: true }
+	const lock = await dispatch(
+		__unstableAcquireStoreLock(
+			'core',
+			[ 'entities', 'data', kind, name, recordId ],
+			{ exclusive: true }
+		)
 	);
 	try {
-		yield {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind,
 			name,
 			recordId,
-		};
+		} );
 
 		try {
 			let path = `${ entity.baseURL }/${ recordId }`;
@@ -188,29 +191,29 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 				path = addQueryArgs( path, query );
 			}
 
-			deletedRecord = yield apiFetch( {
+			deletedRecord = await apiFetch( {
 				path,
 				method: 'DELETE',
 			} );
 
-			yield removeItems( kind, name, recordId, true );
+			dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
 			error = _error;
 		}
 
-		yield {
+		dispatch( {
 			type: 'DELETE_ENTITY_RECORD_FINISH',
 			kind,
 			name,
 			recordId,
 			error,
-		};
+		} );
 
 		return deletedRecord;
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		await dispatch( __unstableReleaseStoreLock( lock ) );
 	}
-}
+};
 
 /**
  * Returns an action object that triggers an
@@ -225,28 +228,22 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
  *
  * @return {Object} Action object.
  */
-export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield controls.select( 'core', 'getEntity', kind, name );
+export const editEntityRecord = (
+	kind,
+	name,
+	recordId,
+	edits,
+	options = {}
+) => ( { select, dispatch } ) => {
+	const entity = select.getEntity( kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
-	const record = yield controls.select(
-		'core',
-		'getRawEntityRecord',
-		kind,
-		name,
-		recordId
-	);
-	const editedRecord = yield controls.select(
-		'core',
-		'getEditedEntityRecord',
-		kind,
-		name,
-		recordId
-	);
+	const record = select.getRawEntityRecord( kind, name, recordId );
+	const editedRecord = select.getEditedEntityRecord( kind, name, recordId );
 
 	const edit = {
 		kind,
@@ -265,7 +262,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		}, {} ),
 		transientEdits,
 	};
-	return {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,
 		meta: {
@@ -278,44 +275,44 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 				}, {} ),
 			},
 		},
-	};
-}
+	} );
+};
 
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
  */
-export function* undo() {
-	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
+export const undo = () => ( { select, dispatch } ) => {
+	const undoEdit = select.getUndoEdit();
 	if ( ! undoEdit ) {
 		return;
 	}
-	yield {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...undoEdit,
 		meta: {
 			isUndo: true,
 		},
-	};
-}
+	} );
+};
 
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
  */
-export function* redo() {
-	const redoEdit = yield controls.select( 'core', 'getRedoEdit' );
+export const redo = () => ( { select, dispatch } ) => {
+	const redoEdit = select.getRedoEdit();
 	if ( ! redoEdit ) {
 		return;
 	}
-	yield {
+	dispatch( {
 		type: 'EDIT_ENTITY_RECORD',
 		...redoEdit,
 		meta: {
 			isRedo: true,
 		},
-	};
-}
+	} );
+};
 
 /**
  * Forces the creation of a new undo level.
@@ -335,13 +332,13 @@ export function __unstableCreateUndoLevel() {
  * @param {Object}  options                    Saving options.
  * @param {boolean} [options.isAutosave=false] Whether this is an autosave.
  */
-export function* saveEntityRecord(
+export const saveEntityRecord = (
 	kind,
 	name,
 	record,
 	{ isAutosave = false } = { isAutosave: false }
-) {
-	const entities = yield getKindEntities( kind );
+) => async ( { select, dispatch } ) => {
+	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
@@ -349,10 +346,12 @@ export function* saveEntityRecord(
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
-	const lock = yield* __unstableAcquireStoreLock(
-		'core',
-		[ 'entities', 'data', kind, name, recordId || uuid() ],
-		{ exclusive: true }
+	const lock = await dispatch(
+		__unstableAcquireStoreLock(
+			'core',
+			[ 'entities', 'data', kind, name, recordId || uuid() ],
+			{ exclusive: true }
+		)
 	);
 	try {
 		// Evaluate optimized edits.
@@ -360,15 +359,9 @@ export function* saveEntityRecord(
 		for ( const [ key, value ] of Object.entries( record ) ) {
 			if ( typeof value === 'function' ) {
 				const evaluatedValue = value(
-					yield controls.select(
-						'core',
-						'getEditedEntityRecord',
-						kind,
-						name,
-						recordId
-					)
+					select.getEditedEntityRecord( kind, name, recordId )
 				);
-				yield editEntityRecord(
+				await dispatch.editEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -381,22 +374,20 @@ export function* saveEntityRecord(
 			}
 		}
 
-		yield {
+		dispatch( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind,
 			name,
 			recordId,
 			isAutosave,
-		};
+		} );
 		let updatedRecord;
 		let error;
 		try {
 			const path = `${ entity.baseURL }${
 				recordId ? '/' + recordId : ''
 			}`;
-			const persistedRecord = yield controls.select(
-				'core',
-				'getRawEntityRecord',
+			const persistedRecord = select.getRawEntityRecord(
 				kind,
 				name,
 				recordId
@@ -407,14 +398,9 @@ export function* saveEntityRecord(
 				// This is fine for now as it is the only supported autosave,
 				// but ideally this should all be handled in the back end,
 				// so the client just sends and receives objects.
-				const currentUser = yield controls.select(
-					'core',
-					'getCurrentUser'
-				);
+				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = yield controls.select(
-					'core',
-					'getAutosave',
+				const autosavePost = select.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId
@@ -423,7 +409,11 @@ export function* saveEntityRecord(
 				// So we fallback to the previous autosave and then
 				// to the actual persisted entity if the edits don't
 				// have a value.
-				let data = { ...persistedRecord, ...autosavePost, ...record };
+				let data = {
+					...persistedRecord,
+					...autosavePost,
+					...record,
+				};
 				data = Object.keys( data ).reduce(
 					( acc, key ) => {
 						if (
@@ -441,7 +431,7 @@ export function* saveEntityRecord(
 								: data.status,
 					}
 				);
-				updatedRecord = yield apiFetch( {
+				updatedRecord = await apiFetch( {
 					path: `${ path }/autosaves`,
 					method: 'POST',
 					data,
@@ -489,7 +479,7 @@ export function* saveEntityRecord(
 						},
 						{}
 					);
-					yield receiveEntityRecords(
+					await dispatch.receiveEntityRecords(
 						kind,
 						name,
 						newRecord,
@@ -497,7 +487,10 @@ export function* saveEntityRecord(
 						true
 					);
 				} else {
-					yield receiveAutosaves( persistedRecord.id, updatedRecord );
+					await dispatch.receiveAutosaves(
+						persistedRecord.id,
+						updatedRecord
+					);
 				}
 			} else {
 				let edits = record;
@@ -511,12 +504,12 @@ export function* saveEntityRecord(
 					};
 				}
 
-				updatedRecord = yield apiFetch( {
+				updatedRecord = await apiFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
 				} );
-				yield receiveEntityRecords(
+				await dispatch.receiveEntityRecords(
 					kind,
 					name,
 					updatedRecord,
@@ -528,20 +521,20 @@ export function* saveEntityRecord(
 		} catch ( _error ) {
 			error = _error;
 		}
-		yield {
+		dispatch( {
 			type: 'SAVE_ENTITY_RECORD_FINISH',
 			kind,
 			name,
 			recordId,
 			error,
 			isAutosave,
-		};
+		} );
 
 		return updatedRecord;
 	} finally {
-		yield* __unstableReleaseStoreLock( lock );
+		await dispatch( __unstableReleaseStoreLock( lock ) );
 	}
-}
+};
 
 /**
  * Action triggered to save an entity record's edits.
@@ -551,28 +544,21 @@ export function* saveEntityRecord(
  * @param {Object} recordId ID of the record.
  * @param {Object} options  Saving options.
  */
-export function* saveEditedEntityRecord( kind, name, recordId, options ) {
-	if (
-		! ( yield controls.select(
-			'core',
-			'hasEditsForEntityRecord',
-			kind,
-			name,
-			recordId
-		) )
-	) {
+export const saveEditedEntityRecord = ( kind, name, recordId, options ) => ( {
+	select,
+	dispatch,
+} ) => {
+	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
-	const edits = yield controls.select(
-		'core',
-		'getEntityRecordNonTransientEdits',
+	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
 	);
 	const record = { id: recordId, ...edits };
-	yield* saveEntityRecord( kind, name, record, options );
-}
+	dispatch.saveEntityRecord( kind, name, record, options );
+};
 
 /**
  * Returns an action object used in signalling that Upload permissions have been received.

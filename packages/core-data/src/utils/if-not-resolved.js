@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { controls } from '@wordpress/data';
-
-/**
  * Higher-order function which invokes the given resolver only if it has not
  * already been resolved with the arguments passed to the enhanced function.
  *
@@ -15,21 +10,13 @@ import { controls } from '@wordpress/data';
  *
  * @return {Function} Enhanced resolver.
  */
-const ifNotResolved = ( resolver, selectorName ) =>
-	/**
-	 * @param {...any} args Original resolver arguments.
-	 */
-	function* resolveIfNotResolved( ...args ) {
-		const hasStartedResolution = yield controls.select(
-			'core',
-			'hasStartedResolution',
-			selectorName,
-			args
-		);
-
-		if ( ! hasStartedResolution ) {
-			yield* resolver( ...args );
-		}
-	};
+const ifNotResolved = ( resolver, selectorName ) => ( ...args ) => ( {
+	select,
+	dispatch,
+} ) => {
+	if ( ! select.hasStartedResolution( selectorName, args ) ) {
+		dispatch( resolver( ...args ) );
+	}
+};
 
 export default ifNotResolved;
