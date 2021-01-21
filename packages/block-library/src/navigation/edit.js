@@ -77,7 +77,7 @@ function Navigation( {
 			templateLock: false,
 			__experimentalLayout: {
 				type: 'default',
-				alignments: [],
+				alignments: [], 
 			},
 		}
 	);
