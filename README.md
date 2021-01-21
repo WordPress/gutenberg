@@ -13,7 +13,7 @@
 
 Welcome to the development hub for the WordPress Gutenberg project!
 
-"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the first phase of a four-phase process that will touch every piece of WordPress -- Editing, Customization, Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor.
+"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, **Customization** (which includes Full Site Editing, Block Patterns, Block Directory and Block based themes), Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor.
 
 The block editor introduces a modular approach to pages and posts: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can added, arranged, and rearranged, allowing WordPress users to create media-rich pages in a visually intuitive way -- and without work-arounds like shortcodes or custom HTML.
 

@@ -220,7 +220,7 @@ It is preferred to implement all components as [function components](https://rea
 
 ## JavaScript Documentation using JSDoc
 
-Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/master/packages/docgen).
+Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/master/packages/docgen).
 
 For additional guidance, consult the following resources:
 
@@ -266,7 +266,7 @@ Note the use of quotes when defining a set of string literals. As in the [JavaSc
 
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#import-types) to import type declarations from other files or third-party dependencies.
 
-Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/coding-guidelines.md#imports).
+Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/coding-guidelines.md#imports).
 
 ```js
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */

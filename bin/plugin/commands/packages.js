@@ -210,7 +210,9 @@ async function updatePackages(
 				);
 
 				log(
-					`   - ${ packageName }: ${ version } -> ${ nextVersion }`
+					`   - ${ packageName }: ${ version } -> ${
+						isPrerelease ? nextVersion + '-next.0' : nextVersion
+					}`
 				);
 			}
 		)
@@ -272,23 +274,33 @@ async function publishPackagesToNpm(
 		cwd: gitWorkingDirectoryPath,
 	} );
 
-	log(
-		'>> Bumping version of public packages changed since the last release.'
-	);
-	const version = isPrerelease
-		? 'prerelease --preid next'
-		: minimumVersionBump;
-	await command( `npx lerna version ${ version } --no-private`, {
-		cwd: gitWorkingDirectoryPath,
-		stdio: 'inherit',
-	} );
+	if ( isPrerelease ) {
+		log( '>> Publishing modified packages to npm.' );
+		await command(
+			`npx lerna publish --canary ${ minimumVersionBump } --preid next`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	} else {
+		log(
+			'>> Bumping version of public packages changed since the last release.'
+		);
+		await command(
+			`npx lerna version ${ minimumVersionBump } --no-private`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
 
-	log( '>> Publishing packages to npm.' );
-	const distTag = isPrerelease ? ' --dist-tag next' : '';
-	await command( `npx lerna publish from-package${ distTag }`, {
-		cwd: gitWorkingDirectoryPath,
-		stdio: 'inherit',
-	} );
+		log( '>> Publishing modified packages to npm.' );
+		await command( `npx lerna publish from-package`, {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
+	}
 }
 
 /**

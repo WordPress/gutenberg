@@ -54,6 +54,9 @@ $z-layers: (
 	// Needs to be bellow media library that has a z-index of 160000.
 	"{core/video track editor popover}": 160000 - 10,
 
+	// Needs to be bellow media library that has a z-index of 160000.
+	".block-editor-format-toolbar__image-popover": 160000 - 10,
+
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
 	".block-editor-block-list__layout.has-overlay::after": 60,

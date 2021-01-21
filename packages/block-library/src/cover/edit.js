@@ -331,7 +331,7 @@ function CoverEdit( {
 		: minHeight;
 
 	const style = {
-		...( isImageBackground && hasParallax
+		...( isImageBackground && ( hasParallax || isRepeated )
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: overlayColor.color,

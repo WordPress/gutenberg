@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 9.8.0-rc.1 =
+= 9.8.0 =
 
 ### Enhancements
 
@@ -21,6 +21,9 @@
 - Cover Block:
   - Fix nested cover block bug. ([28114](https://github.com/WordPress/gutenberg/pull/28114))
   - Fix invalid cover block transforms. ([28087](https://github.com/WordPress/gutenberg/pull/28087))
+  - Fix cover regression. ([28287](https://github.com/WordPress/gutenberg/pull/28287))
+  - Fix Cover focal point picker. ([28350](https://github.com/WordPress/gutenberg/pull/28350))
+  - Fix matrix alignment issue. ([28361](https://github.com/WordPress/gutenberg/pull/28361))
 - Fix block error when transforming blocks with Link Popover opened. ([28136](https://github.com/WordPress/gutenberg/pull/28136))
 - Fix PHP Notice in navigation-link. ([28134](https://github.com/WordPress/gutenberg/pull/28134))
 - Prevent link paste in RichText components in Button and Navigation blocks. ([28130](https://github.com/WordPress/gutenberg/pull/28130))
@@ -54,6 +57,7 @@
   - Load content in iframe. ([25775](https://github.com/WordPress/gutenberg/pull/25775))
   - Avoid using auto-drafts for theme templates and template parts. ([27910](https://github.com/WordPress/gutenberg/pull/27910))
     - Delete unused options while upgrading the plugin. ([28164](https://github.com/WordPress/gutenberg/pull/28164))
+    - Fix _wp_file_based term deletion in migration. ([28300](https://github.com/WordPress/gutenberg/pull/28300))
   - Fix the border radius in the site editor. ([27986](https://github.com/WordPress/gutenberg/pull/27986))
 - theme.json:
   - Add border radius to the theme styles schema. ([27791](https://github.com/WordPress/gutenberg/pull/27791))
@@ -77,6 +81,7 @@
 - Update Quickstart guide for the Development Environment documentation. ([28005](https://github.com/WordPress/gutenberg/pull/28005))
 - Update copyright year to 2021 in `license.md`. ([27951](https://github.com/WordPress/gutenberg/pull/27951))
 - Block API: Add more inline comments. ([20257](https://github.com/WordPress/gutenberg/pull/20257))
+- Changelog: Group entries for 9.8.0-rc.1. ([28332](https://github.com/WordPress/gutenberg/pull/28332))
 
 ### Code Quality
 
@@ -117,11 +122,15 @@
 - Testing: Prevent a direct usage of Reakit. ([28095](https://github.com/WordPress/gutenberg/pull/28095))
 - Update the minimum Node.js version to 12. ([27934](https://github.com/WordPress/gutenberg/pull/27934))
 - wp-env: Ensure the environment is used with the logs command. ([27907](https://github.com/WordPress/gutenberg/pull/27907))
+- Packages: Fully automate npm publishing with the latest and next tags ([28335](https://github.com/WordPress/gutenberg/pull/28335))
 - Upgrade webpack to version 5. ([26382](https://github.com/WordPress/gutenberg/pull/26382))
 - Revert "Upgrade webpack to version 5". ([27974](https://github.com/WordPress/gutenberg/pull/27974))
 
 ### Various
 
+- Gutenpride Template:
+  - New Package to use with the tutorial. ([27881](https://github.com/WordPress/gutenberg/pull/27881))
+  - Create Block: Enhancements to Gutenpride tutorial template. ([28215](https://github.com/WordPress/gutenberg/pull/28215))
 - URL: Remove redundant array coercion. ([28072](https://github.com/WordPress/gutenberg/pull/28072))
 - Visual editor: Remove focusable wrapper. ([28058](https://github.com/WordPress/gutenberg/pull/28058))
 - Readme: Increase tested Version up to WP 5.6. ([28050](https://github.com/WordPress/gutenberg/pull/28050))
