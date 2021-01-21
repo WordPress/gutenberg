@@ -889,7 +889,7 @@ class WP_Theme_JSON {
 			$selector = $metadata[ $block_selector ]['selector'];
 
 			$declarations = array();
-			self::compute_preset_vars( $declarations, $settings );
+			// self::compute_preset_vars( $declarations, $settings );
 			self::compute_theme_vars( $declarations, $settings );
 
 			// Attach the ruleset for style and custom properties.
