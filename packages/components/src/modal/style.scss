@@ -122,7 +122,7 @@
 // Modal contents.
 .components-modal__content {
 	box-sizing: border-box;
-	height: 100%;
+	min-height: 100%;
 	padding: 0 $grid-unit-30 $grid-unit-30;
 
 	// Rules inside this query are only run by Microsoft Edge.
