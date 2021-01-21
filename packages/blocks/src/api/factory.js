@@ -136,10 +136,10 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	const clientId = uuid();
 
 	const blockType = getBlockType( block.name );
-	const attributes = pick(
-		block.attributes,
-		Object.keys( blockType.attributes )
-	);
+	let attributes = block.attributes;
+	if ( blockType ) {
+		attributes = pick( attributes, Object.keys( blockType.attributes ) );
+	}
 
 	return {
 		...block,
