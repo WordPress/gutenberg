@@ -13,9 +13,17 @@
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_block( $attributes ) {
+	static $seen_refs = array();
+
 	if ( empty( $attributes['ref'] ) ) {
 		return '';
 	}
+
+	if ( in_array( $attributes['ref'], $seen_refs, true ) ) {
+		return 'nope';
+	}
+
+	$seen_refs[] = $attributes['ref'];
 
 	$reusable_block = get_post( $attributes['ref'] );
 	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
