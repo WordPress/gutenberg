@@ -43,6 +43,8 @@ function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
 			html: false,
 			inserter: true,
 		},
+		// Remove any block variations.
+		variations: undefined,
 	};
 }
 
