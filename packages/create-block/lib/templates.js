@@ -5,6 +5,7 @@ const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { fromPairs, isObject } = require( 'lodash' );
+const npmPackageArg = require( 'npm-package-arg' );
 const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
@@ -153,8 +154,9 @@ const getBlockTemplate = async ( templateName ) => {
 			cwd: tempCwd,
 		} );
 
+		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( templateName, {
+			require( require.resolve( name, {
 				paths: [ tempCwd ],
 			} ) )
 		);
