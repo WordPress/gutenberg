@@ -51,8 +51,12 @@ function render_block_core_template_part( $attributes ) {
 		}
 	}
 
-	if ( is_null( $content ) ) {
-		return 'Template Part Not Found';
+	if ( is_null( $content ) && is_user_logged_in() ) {
+		return sprintf(
+			/* translators: %s: template part slug. */
+			__( 'Template part has been deleted or is unavailable: %s' ),
+			$attributes['slug']
+		);
 	}
 
 	// Run through the actions that are typically taken on the_content.
