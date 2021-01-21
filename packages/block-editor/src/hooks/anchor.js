@@ -77,7 +77,7 @@ export const withInspectorControl = createHigherOrderComponent(
 								help={
 									<>
 										{ __(
-											'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+											'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
 										) }
 
 										<ExternalLink

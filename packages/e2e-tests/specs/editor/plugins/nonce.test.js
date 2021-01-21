@@ -24,7 +24,7 @@ describe( 'Nonce', () => {
 	it( 'should refresh when expired', async () => {
 		await page.keyboard.press( 'Enter' );
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 5000 );
+		await page.waitForTimeout( 5000 );
 		await page.keyboard.type( 'test' );
 		// `saveDraft` waits for saving to be successful, so this test would
 		// timeout if it's not.
