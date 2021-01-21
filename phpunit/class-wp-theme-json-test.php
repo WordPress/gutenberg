@@ -691,36 +691,36 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	// function test_remove_insecure_properties_removes_unsafe_properties() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'styles' => array(
-	// 				'global' => array(
-	// 					'color' => array(
-	// 						'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
-	// 						'text'       => 'var:preset|color|dark-gray',
-	// 					),
-	// 				),
-	// 				'invalid'   => array(
-	// 					'background' => 'green',
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'styles' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'text'       => 'var:preset|color|dark-gray',
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+	function test_remove_insecure_properties_removes_unsafe_styles() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'core/group' => array(
+						'color' => array(
+							'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
+							'text'     => 'var:preset|color|dark-gray'
+						),
+					),
+					'invalid/key'   => array(
+						'background' => 'green',
+					),
+				),
+			),
+			true
+		);
+		$theme_json->remove_insecure_properties();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'core/group' => array(
+					'color' => array(
+						'text' => 'var:preset|color|dark-gray'
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 
 	// function test_remove_insecure_properties_removes_unsafe_sub_properties() {
 	// 	$theme_json = new WP_Theme_JSON(

@@ -1050,38 +1050,28 @@ class WP_Theme_JSON {
 	 */
 	public function remove_insecure_properties() {
 		$blocks_metadata = self::get_blocks_metadata();
-		foreach ( $this->theme_json as $block_selector => &$context ) {
-			$escaped_settings = null;
-			$escaped_styles   = null;
+		foreach ( $blocks_metadata as $block_selector => $metadata ) {
+			$escaped_settings = array();
+			$escaped_styles   = array();
 
 			// Style escaping.
-			if ( ! empty( $context['styles'] ) ) {
-				$supports     = $blocks_metadata[ $block_selector ]['supports'];
+			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
 				$declarations = array();
-				self::compute_style_properties( $declarations, $context, $supports );
+				self::compute_style_properties( $declarations, $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
 				foreach ( $declarations as $declaration ) {
 					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
 					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
-						if ( null === $escaped_styles ) {
-							$escaped_styles = array();
-						}
 						$property = self::to_property( $declaration['name'] );
 						$path     = self::PROPERTIES_METADATA[ $property ]['value'];
 						if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
 							$declaration_divided = explode( '-', $declaration['name'] );
 							$path[]              = $declaration_divided[1];
-							gutenberg_experimental_set(
-								$escaped_styles,
-								$path,
-								gutenberg_experimental_get( $context['styles'], $path )
-							);
-						} else {
-							gutenberg_experimental_set(
-								$escaped_styles,
-								$path,
-								gutenberg_experimental_get( $context['styles'], $path )
-							);
 						}
+						gutenberg_experimental_set(
+							$escaped_styles,
+							$path,
+							gutenberg_experimental_get( $this->theme_json['styles'][ $block_selector ], $path )
+						);
 					}
 				}
 			}
@@ -1121,33 +1111,25 @@ class WP_Theme_JSON {
 							}
 						}
 						if ( count( $escaped_preset ) > 0 ) {
-							if ( null === $escaped_settings ) {
-								$escaped_settings = array();
-							}
 							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path'], $escaped_preset );
 						}
 					}
 				}
-				if ( null !== $escaped_settings ) {
+				if ( empty( $escaped_settings ) ) {
 					$escaped_settings = $escaped_settings['settings'];
 				}
 			}
 
-			if ( null === $escaped_settings && null === $escaped_styles ) {
-				unset( $this->theme_json[ $block_selector ] );
-			} elseif ( null !== $escaped_settings && null !== $escaped_styles ) {
-				$context = array(
-					'styles'   => $escaped_styles,
-					'settings' => $escaped_settings,
-				);
-			} elseif ( null === $escaped_settings ) {
-				$context = array(
-					'styles' => $escaped_styles,
-				);
+			if ( empty( $escaped_settings ) ) {
+				unset( $this->theme_json['settings'][ $block_selector ] );
 			} else {
-				$context = array(
-					'settings' => $escaped_settings,
-				);
+				$this->theme_json['settings'][ $block_selector ] = $escaped_settings;
+			}
+
+			if ( empty( $escaped_styles ) ) {
+				unset( $this->theme_json['styles'][ $block_selector ] );
+			} else {
+				$this->theme_json['styles'][ $block_selector ] = $escaped_styles;
 			}
 		}
 	}
