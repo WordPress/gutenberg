@@ -17,6 +17,7 @@ import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 import { builtinControls } from '../controls';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
+import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
@@ -81,7 +82,32 @@ export default function createReduxStore( key, options ) {
 		name: key,
 		instantiate: ( registry ) => {
 			const reducer = options.reducer;
-			const store = instantiateReduxStore( key, options, registry );
+			const thunkArgs = {
+				registry,
+				get dispatch() {
+					return Object.assign(
+						( action ) => store.dispatch( action ),
+						getActions()
+					);
+				},
+				get select() {
+					return Object.assign(
+						( selector ) =>
+							selector( store.__unstableOriginalGetState() ),
+						getSelectors()
+					);
+				},
+				get resolveSelect() {
+					return getResolveSelectors();
+				},
+			};
+
+			const store = instantiateReduxStore(
+				key,
+				options,
+				registry,
+				thunkArgs
+			);
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -92,6 +118,7 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
+
 			let selectors = mapSelectors(
 				{
 					...mapValues(
@@ -174,10 +201,10 @@ export default function createReduxStore( key, options ) {
  *                                  describing reducer, actions, selectors,
  *                                  and resolvers.
  * @param {WPDataRegistry} registry Registry reference.
- *
+ * @param {Object} thunkArgs        Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
-function instantiateReduxStore( key, options, registry ) {
+function instantiateReduxStore( key, options, registry, thunkArgs ) {
 	const controls = {
 		...options.controls,
 		...builtinControls,
@@ -192,6 +219,10 @@ function instantiateReduxStore( key, options, registry ) {
 		promise,
 		createReduxRoutineMiddleware( normalizedControls ),
 	];
+
+	if ( options.__experimentalUseThunks ) {
+		middlewares.push( createThunkMiddleware( thunkArgs ) );
+	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
 	if (
