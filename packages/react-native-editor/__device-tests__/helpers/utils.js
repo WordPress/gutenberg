@@ -182,13 +182,17 @@ const clearTextBox = async ( driver, element ) => {
 	// We are double tapping on the text field and pressing backspace until all content is removed.
 	do {
 		originalText = await element.text();
-		const action = new wd.TouchAction( driver );
-		action.tap( { el: element, count: 2 } );
-		await action.perform();
+		await doubleTap( driver, element );
 		await element.type( '\b' );
 		text = await element.text();
 		// We compare with the original content and not empty because text always return any hint set on the element.
 	} while ( originalText !== text );
+};
+
+const doubleTap = async ( driver, element ) => {
+	const action = new wd.TouchAction( driver );
+	action.tap( { el: element, count: 2 } );
+	await action.perform();
 };
 
 const typeStringAndroid = async (
@@ -426,4 +430,5 @@ module.exports = {
 	stopDriver,
 	toggleHtmlMode,
 	toggleOrientation,
+	doubleTap,
 };

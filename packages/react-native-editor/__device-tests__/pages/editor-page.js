@@ -11,6 +11,7 @@ const {
 	toggleHtmlMode,
 	swipeFromTo,
 	longPressMiddleOfElement,
+	doubleTap,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -177,12 +178,13 @@ class EditorPage {
 		await this.driver.setClipboard( base64String, 'plaintext' );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		await htmlContentView.click();
 
 		if ( isAndroid() ) {
-			await htmlContentView.click();
 			await this.driver.pressKeycode( 279 /* KEYCODE_PASTE */ );
 		} else {
-			await longPressMiddleOfElement( this.driver, htmlContentView );
+			await doubleTap( this.driver, htmlContentView);
+
 			const pasteButton = this.driver.elementByXPath(
 				'//XCUIElementTypeMenuItem[@name="Paste"]'
 			);
