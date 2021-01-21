@@ -181,8 +181,7 @@ class WP_Theme_JSON {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path_settings' => array( 'color', 'palette' ),
-			'path'          => array( 'settings', 'color', 'palette' ),
+			'path'          => array( 'color', 'palette' ),
 			'value_key'     => 'color',
 			'css_var_infix' => 'color',
 			'classes'       => array(
@@ -197,8 +196,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path_settings' => array( 'color', 'gradients' ),
-			'path'          => array( 'settings', 'color', 'gradients' ),
+			'path'          => array( 'color', 'gradients' ),
 			'value_key'     => 'gradient',
 			'css_var_infix' => 'gradient',
 			'classes'       => array(
@@ -209,8 +207,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path_settings' => array( 'typography', 'fontSizes' ),
-			'path'          => array( 'settings', 'typography', 'fontSizes' ),
+			'path'          => array( 'typography', 'fontSizes' ),
 			'value_key'     => 'size',
 			'css_var_infix' => 'font-size',
 			'classes'       => array(
@@ -221,7 +218,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path_settings' => array( 'typography', 'fontFamilies' ),
+			'path' => array( 'typography', 'fontFamilies' ),
 			'value_key'     => 'fontFamily',
 			'css_var_infix' => 'font-family',
 			'classes'       => array(),
@@ -753,7 +750,7 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $settings, $preset['path_settings'], array() );
+			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -789,7 +786,7 @@ class WP_Theme_JSON {
 	 */
 	private static function compute_preset_vars( &$declarations, $settings ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $settings, $preset['path_settings'], array() );
+			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -1082,7 +1079,7 @@ class WP_Theme_JSON {
 				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
 					$current_preset = gutenberg_experimental_get(
 						$this->theme_json['settings'][ $block_selector],
-						$preset_metadata['path_settings'],
+						$preset_metadata['path'],
 						null
 					);
 					if ( null !== $current_preset ) {
@@ -1116,7 +1113,7 @@ class WP_Theme_JSON {
 							}
 						}
 						if ( ! empty( $escaped_preset ) ) {
-							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path_settings'], $escaped_preset );
+							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path'], $escaped_preset );
 						}
 					}
 				}
