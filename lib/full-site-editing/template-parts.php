@@ -63,7 +63,7 @@ add_action( 'init', 'gutenberg_register_template_part_post_type' );
 /**
  * Registers the 'template_part_type' taxonomy.
  */
-function gutenberg_register_template_part_type_taxonomy(){
+function gutenberg_register_template_part_type_taxonomy() {
 	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}

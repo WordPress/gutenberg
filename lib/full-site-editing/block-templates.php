@@ -171,6 +171,17 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
 	}
 
+	if ( 'wp_template_part' === $template_type && is_readable( locate_template( 'experimental-theme.json' ) ) ) {
+		$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
+		$data       = json_decode(
+			$theme_json,
+			true
+		);
+		if ( isset( $data['template-parts'][ $template_file['slug'] ]['type'] ) ) {
+			$template->template_part_type = $data['template-parts'][ $template_file['slug'] ]['type'];
+		}
+	}
+
 	return $template;
 }
 
@@ -182,7 +193,8 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  * @return WP_Block_Template|WP_Error Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
-	$terms = get_the_terms( $post, 'wp_theme' );
+	$terms      = get_the_terms( $post, 'wp_theme' );
+	$type_terms = get_the_terms( $post, 'template_part_type' );
 
 	if ( is_wp_error( $terms ) ) {
 		return $terms;
@@ -192,19 +204,21 @@ function _gutenberg_build_template_result_from_post( $post ) {
 		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 	}
 
-	$theme = $terms[0]->name;
+	$theme              = $terms[0]->name;
+	$template_part_type = $type_terms[0]->name;
 
-	$template              = new WP_Block_Template();
-	$template->wp_id       = $post->ID;
-	$template->id          = $theme . '//' . $post->post_name;
-	$template->theme       = $theme;
-	$template->content     = $post->post_content;
-	$template->slug        = $post->post_name;
-	$template->is_custom   = true;
-	$template->type        = $post->post_type;
-	$template->description = $post->post_excerpt;
-	$template->title       = $post->post_title;
-	$template->status      = $post->post_status;
+	$template                     = new WP_Block_Template();
+	$template->wp_id              = $post->ID;
+	$template->id                 = $theme . '//' . $post->post_name;
+	$template->theme              = $theme;
+	$template->content            = $post->post_content;
+	$template->slug               = $post->post_name;
+	$template->is_custom          = true;
+	$template->type               = $post->post_type;
+	$template->description        = $post->post_excerpt;
+	$template->title              = $post->post_title;
+	$template->status             = $post->post_status;
+	$template->template_part_type = $template_part_type;
 
 	return $template;
 }
