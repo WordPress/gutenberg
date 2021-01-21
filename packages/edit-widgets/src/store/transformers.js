@@ -8,7 +8,7 @@ function __experimentalAddWidgetIdToBlock( block, widgetId ) {
 		...block,
 		attributes: {
 			...( block.attributes || {} ),
-			__internal_widget_id: widgetId,
+			__internalWidgetId: widgetId,
 		},
 	};
 }

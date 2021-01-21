@@ -121,7 +121,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
-		const widgetId = block.attributes.__internal_widget_id;
+		const widgetId = block.attributes.__internalWidgetId;
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
 		// We'll replace the null widgetId after save, but we track it here
