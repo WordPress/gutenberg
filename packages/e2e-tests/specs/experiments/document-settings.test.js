@@ -59,12 +59,12 @@ describe( 'Document Settings', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Index' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
 
-			expect( actual ).toEqual( 'Index' );
+			expect( actual ).toEqual( 'Front Page' );
 		} );
 
 		describe( 'and a template part is clicked in the template', () => {
