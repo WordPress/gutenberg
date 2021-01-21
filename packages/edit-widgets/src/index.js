@@ -11,6 +11,7 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -21,6 +22,18 @@ import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 
+function __experimentalAddWidgetIdAttribute( settings ) {
+	return {
+		...settings,
+		attributes: {
+			...( settings.attributes || {} ),
+			__internal_widget_id: {
+				type: 'string',
+			},
+		},
+	};
+}
+
 /**
  * Initializes the block editor in the widgets screen.
  *
@@ -28,6 +41,12 @@ import Layout from './components/layout';
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
+	addFilter(
+		'blocks.registerBlockType',
+		'gutenberg/edit-widgets/add-widget-id',
+		__experimentalAddWidgetIdAttribute
+	);
+
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
