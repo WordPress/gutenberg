@@ -38,42 +38,7 @@ figure.wp-block-gallery {
 		}
 	}
 
-	figure.wp-block-image {
-		// Hide the focus outline that otherwise briefly appears when selecting a block.
-		&:not(.is-selected):focus,
-		img:focus {
-			outline: none;
-		}
 
-		&.is-selected {
-			box-shadow:
-				0 0 0 $border-width $white,
-				0 0 0 3px var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui;
-			outline: 2px solid transparent;
-
-			&::before {
-				box-shadow: 0 0 0 $border-width $white inset, 0 0 0 3px var(--wp-admin-theme-color) inset;
-				content: "";
-				// Shown in Windows 10 high contrast mode.
-				outline: 2px solid transparent;
-				position: absolute;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				left: 0;
-				z-index: 1;
-			}
-		}
-
-		&.is-transient img {
-			opacity: 0.3;
-		}
-
-		&.is-selected .block-library-gallery-item__inline-menu {
-			display: inline-flex;
-		}
-	}
 }
 
 
