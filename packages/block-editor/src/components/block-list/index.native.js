@@ -44,6 +44,7 @@ const getStyles = (
 	const computedStyles = [
 		isStackedHorizontally && styles.horizontal,
 		horizontalAlignment && styles[ `is-aligned-${ horizontalAlignment }` ],
+		styles.overflowVisible,
 	];
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
@@ -119,13 +120,17 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			contentStyle,
 			renderAppender,
+			blockProps,
+			gridProperties,
 		} = this.props;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
-			this.extraData.renderAppender !== renderAppender
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockProps !== blockProps ||
+			this.extraData.gridProperties !== gridProperties
 		) {
 			this.extraData = {
 				parentWidth,
@@ -133,6 +138,8 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				blockProps,
+				gridProperties,
 			};
 		}
 		return this.extraData;
@@ -181,7 +188,6 @@ export class BlockList extends Component {
 			headerToolbar,
 			floatingToolbar,
 		} = styles;
-
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
 			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
@@ -274,9 +280,12 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			rootClientId,
 			isStackedHorizontally,
+			blockClientIds,
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			blockProps,
+			gridProperties,
 		} = this.props;
 		return (
 			<BlockListItem
@@ -296,6 +305,9 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
+				blockProps={ blockProps }
+				gridProperties={ gridProperties }
+				items={ blockClientIds }
 			/>
 		);
 	}

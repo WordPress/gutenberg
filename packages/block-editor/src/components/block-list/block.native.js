@@ -44,6 +44,7 @@ function BlockForType( {
 	onReplace,
 	parentWidth,
 	wrapperProps,
+	blockProps,
 } ) {
 	const defaultColors = useEditorFeature( 'color.palette' ) || [];
 
@@ -79,6 +80,7 @@ function BlockForType( {
 							parentWidth={ parentWidth }
 							contentStyle={ contentStyle }
 							onDeleteBlock={ onDeleteBlock }
+							{ ...( blockProps || {} ) }
 						/>
 						<View onLayout={ getBlockWidth } />
 					</GlobalStylesContext.Provider>

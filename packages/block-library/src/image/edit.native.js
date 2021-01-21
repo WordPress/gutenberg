@@ -53,9 +53,18 @@ import {
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { getUpdatedLinkTargetSettings } from './utils';
+import {
+	getUpdatedLinkTargetSettings,
+	getImageSizeAttributes,
+	getUrl,
+} from './utils';
 
-import { LINK_DESTINATION_CUSTOM, DEFAULT_SIZE_SLUG } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_ATTACHMENT,
+	DEFAULT_SIZE_SLUG,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
@@ -141,10 +150,46 @@ export class ImageEdit extends React.Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		if ( ! previousProps.image && this.props.image ) {
-			const { image, attributes } = this.props;
+		const { image, attributes, context, setAttributes } = this.props;
+		const { inheritedAttributes } = attributes;
+		if ( ! previousProps.image && image ) {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
-			this.props.setAttributes( { url } );
+			setAttributes( { url } );
+		}
+		// TODO use `useParentAttributes` instead after refactor to function component
+		if (
+			previousProps.image !== image ||
+			previousProps.context?.linkTo !== context?.linkTo
+		) {
+			if ( inheritedAttributes?.linkDestination && image ) {
+				const href = getUrl( image, context?.linkTo );
+				if ( href !== previousProps.attributes.href ) {
+					setAttributes( {
+						href,
+						linkDestination: context?.linkTo,
+					} );
+				}
+			}
+		}
+		if ( previousProps.context?.linkTarget !== context?.linkTarget ) {
+			if ( inheritedAttributes.linkTarget ) {
+				setAttributes( {
+					linkTarget: context?.linkTarget,
+				} );
+			}
+		}
+
+		if ( previousProps.context?.sizeSlug !== context?.sizeSlug ) {
+			if ( inheritedAttributes.sizeSlug ) {
+				const sizeAttributes = getImageSizeAttributes(
+					image,
+					context?.sizeSlug
+				);
+
+				setAttributes( {
+					...sizeAttributes,
+				} );
+			}
 		}
 	}
 
@@ -246,7 +291,13 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetLinkDestination( href ) {
+		const { inheritedAttributes } = this.props.attributes;
 		this.props.setAttributes( {
+			inheritedAttributes: {
+				...inheritedAttributes,
+				linkDestination: false,
+				linkTarget: false,
+			},
 			linkDestination: LINK_DESTINATION_CUSTOM,
 			href,
 		} );
@@ -261,29 +312,40 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetSizeSlug( sizeSlug ) {
-		const { image } = this.props;
+		const { image, setAttributes } = this.props;
+		const { inheritedAttributes } = this.props.attributes;
 
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
 			return null;
 		}
-
-		this.props.setAttributes( {
+		setAttributes( {
 			url,
 			width: undefined,
 			height: undefined,
 			sizeSlug,
+			...( inheritedAttributes?.sizeSlug
+				? {
+						inheritedAttributes: {
+							...inheritedAttributes,
+							sizeSlug: false,
+						},
+				  }
+				: {} ),
 		} );
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const { id, url } = this.props.attributes;
-
+		const { id, url, linkDestination: destination } = this.props.attributes;
+		const { context } = this.props;
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
 		};
+
+		// Check if default link setting, or the one inherited from parent block should be used.
+		const linkDestination = context?.linkTo ? context.linkTo : destination;
 
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
@@ -298,9 +360,42 @@ export class ImageEdit extends React.Component {
 			additionalAttributes = { url };
 		}
 
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
+		}
+		mediaAttributes.href = href;
+
+		if ( ! isEmpty( context ) ) {
+			const parentSizeAttributes = getImageSizeAttributes(
+				media,
+				context.sizeSlug
+			);
+
+			if ( context.linkTarget ) {
+				additionalAttributes.linkTarget = context.linkTarget;
+			}
+
+			additionalAttributes = {
+				...additionalAttributes,
+				inheritedAttributes: {
+					linkDestination: true,
+					linkTarget: true,
+					sizeSlug: true,
+				},
+				...parentSizeAttributes,
+			};
+		}
+
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
@@ -339,15 +434,30 @@ export class ImageEdit extends React.Component {
 	getLinkSettings() {
 		const { isLinkSheetVisible } = this.state;
 		const {
-			attributes: { href: url, ...unMappedAttributes },
+			attributes: {
+				href: url,
+				inheritedAttributes,
+				...unMappedAttributes
+			},
 			setAttributes,
 		} = this.props;
-
+		const additionalAttributes = {
+			inheritedAttributes: {
+				...inheritedAttributes,
+				linkDestination: false,
+				linkTarget: false,
+			},
+			linkDestination: LINK_DESTINATION_CUSTOM,
+		};
 		const mappedAttributes = { ...unMappedAttributes, url };
 		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
 			href === undefined
-				? setAttributes( restAttributes )
-				: setAttributes( { ...restAttributes, href } );
+				? setAttributes( restAttributes, ...additionalAttributes )
+				: setAttributes( {
+						...restAttributes,
+						href,
+						...additionalAttributes,
+				  } );
 
 		const options = {
 			url: {
@@ -387,9 +497,10 @@ export class ImageEdit extends React.Component {
 			image,
 			imageSizes,
 			clientId,
+			isGallery,
+			imageCrop,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
-
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
 			name,
@@ -468,6 +579,13 @@ export class ImageEdit extends React.Component {
 			wide: 'center',
 		};
 
+		const additionalImageProps = isGallery
+			? {
+					height: '100%',
+					resizeMode: imageCrop ? 'cover' : 'contain',
+			  }
+			: {};
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<>
 				<TouchableWithoutFeedback
@@ -500,25 +618,38 @@ export class ImageEdit extends React.Component {
 								retryMessage,
 							} ) => {
 								return (
-									<Image
-										align={ align && alignToFlex[ align ] }
-										alt={ alt }
-										isSelected={
-											isSelected && ! isCaptionSelected
+									<View
+										style={
+											this.props.isGallery &&
+											styles.isGallery
 										}
-										isUploadFailed={ isUploadFailed }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										onSelectMediaUploadOption={
-											this.onSelectMediaUploadOption
-										}
-										openMediaOptions={ openMediaOptions }
-										retryMessage={ retryMessage }
-										url={ url }
-										shapeStyle={ styles[ className ] }
-										width={ this.getWidth() }
-									/>
+									>
+										<Image
+											align={
+												align && alignToFlex[ align ]
+											}
+											alt={ alt }
+											isSelected={
+												isSelected &&
+												! isCaptionSelected
+											}
+											isUploadFailed={ isUploadFailed }
+											isUploadInProgress={
+												isUploadInProgress
+											}
+											onSelectMediaUploadOption={
+												this.onSelectMediaUploadOption
+											}
+											openMediaOptions={
+												openMediaOptions
+											}
+											retryMessage={ retryMessage }
+											url={ url }
+											shapeStyle={ styles[ className ] }
+											width={ this.getWidth() }
+											{ ...additionalImageProps }
+										/>
+									</View>
 								);
 							} }
 						/>
@@ -556,12 +687,16 @@ export default compose( [
 		const {
 			attributes: { id, url },
 			isSelected,
+			context,
 		} = props;
 		const { imageSizes } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+		const { linkTo: parentLinkDestination, sizeSlug: parentSizeSlug } =
+			context || {};
 
 		const shouldGetMedia =
-			( isSelected && isNotFileUrl ) ||
+			( ( isSelected || parentLinkDestination || parentSizeSlug ) &&
+				isNotFileUrl ) ||
 			// Edge case to update the image after uploading if the block gets unselected
 			// Check if it's the original image and not the resized one with queryparams
 			( ! isSelected &&
