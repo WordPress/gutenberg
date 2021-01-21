@@ -18,7 +18,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							'custom' => 'false',
 						),
 					),
-					'global' => array(
+					'core/group' => array(
 						'invalid/key' => array(
 							'custom'     => false,
 							'background' => 'red',
@@ -41,7 +41,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			'styles' => array(
-				'global' => array(
+				'core/group' => array(
 					'color' => array(
 						'background' => 'red',
 					),
@@ -69,15 +69,14 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'core/group' => array(
 						'invalid/not/array' => false,
 						'color' => array(
-							'invalid/not/array' => true,
+							'link' => 'pink',
 						),
 						'typography' => array(
 							'invalid/key' => false,
-							'lineHeight' => '2',
 						),
 						'spacing' => array(
 							'padding' => array(
-								'invalid/not/array' => '10px'
+								'invalid/key' => '10px',
 							),
 						),
 					),
@@ -89,8 +88,8 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$expected = array(
 			'styles' => array(
 				'core/group' => array(
-					'typography' => array(
-						'lineHeight' => '2',
+					'color' => array(
+						'link' => 'pink',
 					),
 				),
 			),
@@ -160,7 +159,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 								'left'   => '1px',
 							),
 						),
-					),
+					)
 				),
 			)
 		);
@@ -324,7 +323,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'fontSize' => '12',
 					),
 					'color'      => array(
-						'link'       => 'pink',
 						'background' => 'brown',
 					),
 				),
@@ -353,7 +351,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$add_styles = array(
 			'styles' => array(
-				'core/paragraph' => array(
+				'core/group' => array(
 					'spacing' => array(
 						'padding' => array(
 							'top' => '12px'
@@ -365,7 +363,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$add_key_in_styles = array(
 			'styles' => array(
-				'core/paragraph' => array(
+				'core/group' => array(
 					'spacing' => array(
 						'padding' => array(
 							'bottom' => '12px',
@@ -661,7 +659,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'fontSize' => '12',
 					),
 				),
-				'core/paragraph' => array(
+				'core/group' => array(
 					'spacing' => array(
 						'padding' => array(
 							'top' => '12px',
@@ -674,7 +672,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'fontSize' => '12',
 					),
 					'color'      => array(
-						'link'       => 'pink',
 						'background' => 'brown',
 					),
 				),

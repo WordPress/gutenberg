@@ -320,24 +320,49 @@ class WP_Theme_JSON {
 			}
 		}
 
-		// Future optimization: at this point, we could iterate over the block selectors present
-		// in either styles or settings instead of iterating over all registered.
 		foreach( $block_metadata as $block_selector => $metadata ) {
-			foreach( [ 'styles', 'settings' ] as $key => $subtree ) {
-				if ( isset( $this->theme_json[ $subtree ][ $block_selector] ) ) {
-					// Remove the block selector subtree if it's not an array.
-					if ( ! is_array( $this->theme_json[ $subtree ][ $block_selector] ) ) {
-						unset( $this->theme_json[ $subtree ][ $block_selector] );
-						continue;
-					}
+			if ( isset( $this->theme_json['styles'][ $block_selector] ) ) {
+				// Remove the block selector subtree if it's not an array.
+				if ( ! is_array( $this->theme_json['styles'][ $block_selector] ) ) {
+					unset( $this->theme_json['styles'][ $block_selector] );
+					continue;
+				}
 
-					// Remove the properties within the styles & settings subtrees if they aren't present in the schema.
-					self::remove_keys_not_in_schema( $this->theme_json[ $subtree ][ $block_selector ], self::SCHEMA[ $subtree ] );
-
-					// Remove the block selector subtree if it is empty after having processed it.
-					if ( empty( $this->theme_json[ $subtree ][ $block_selector ] ) ) {
-						unset( $this->theme_json[ $subtree ][ $block_selector ] );
+				// Remove the properties the block doesn't support.
+				// This is a subset of the full styles schema.
+				$styles_schema = self::SCHEMA['styles'];
+				foreach( self::PROPERTIES_METADATA as $prop_name => $prop_meta ) {
+					if( ! in_array( $prop_name, $metadata['supports'] ) ) {
+						unset( $styles_schema[ $prop_meta['value'][0] ][ $prop_meta['value'][1] ] );
 					}
+				}
+				self::remove_keys_not_in_schema(
+					$this->theme_json['styles'][ $block_selector ],
+					$styles_schema
+				);
+
+				// Remove the block selector subtree if it is empty after having processed it.
+				if ( empty( $this->theme_json['styles'][ $block_selector ] ) ) {
+					unset( $this->theme_json['styles'][ $block_selector ] );
+				}
+			}
+
+			if ( isset( $this->theme_json['settings'][ $block_selector] ) ) {
+				// Remove the block selector subtree if it's not an array.
+				if ( ! is_array( $this->theme_json['settings'][ $block_selector] ) ) {
+					unset( $this->theme_json['settings'][ $block_selector] );
+					continue;
+				}
+
+				// Remove the properties that aren't present in the schema.
+				self::remove_keys_not_in_schema(
+					$this->theme_json[ 'settings' ][ $block_selector ],
+					self::SCHEMA['settings']
+				);
+
+				// Remove the block selector subtree if it is empty after having processed it.
+				if ( empty( $this->theme_json['settings'][ $block_selector ] ) ) {
+					unset( $this->theme_json['settings'][ $block_selector ] );
 				}
 			}
 		}
