@@ -60,13 +60,6 @@ URL of the image or video to be displayed
 
 Autoplays HTML5 video. This only applies to video sources (`url`).
 
-### `dimensions`
-
--   Type: `Object`
--   Required: Yes
-
-An object describing the height and width of the image. Requires two parameters: `height`, `width`.
-
 ### `value`
 
 -   Type: `Object`
