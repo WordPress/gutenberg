@@ -7,3 +7,15 @@
 		padding-left: 0;
 	}
 }
+
+.edit-navigation-layout {
+	display: flex;
+	flex-direction: column;
+	// Make the navigation layout full-height, accounting for wp-admin top bar and other furniture.
+	height: calc(100vh - 146px);
+
+	// Wp admin top bar becomes less-chunky, so a smaller subtraction is needed.
+	@include break-medium() {
+		height: calc(100vh - 97px);
+	}
+}
