@@ -19,8 +19,41 @@ function gutenberg_add_template_loader_filters() {
 		}
 		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
 	}
+
+	// for admin.php?p=1&_wp-find-template=true requests
+	add_action( 'load-admin.php', 'gutenberg_find_template_by_id' );
 }
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
+
+/**
+ * This is bad and gross and it works.
+ * See https://github.com/WordPress/gutenberg/issues/28315
+ *
+ * @return void
+ */
+function gutenberg_find_template_by_id() {
+	if ( ! ( isset( $_GET['p'] ) && isset( $_GET['_wp-find-template'] ) ) ) {
+		return;
+	}
+	$post_id = absint( $_GET['p'] );
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );;
+	}
+
+	$type = $post->post_type;
+	$slug = $post->post_name;
+	$id = $post->ID;
+
+	// this is just a hacky replication of get_page_templates()
+	$templates = array(
+		sprintf( '%s-%s.php', $type, $slug ),
+		sprintf( '%s-%d.php', $type, $id ),
+		sprintf( '%s.php', $type )
+	);
+
+	gutenberg_override_query_template( '', $type, $templates );
+}
 
 /**
  * Get the template hierarchy for a given template type.
