@@ -12,7 +12,13 @@ import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
-function InserterSearchForm( { className, onChange, value, placeholder } ) {
+function InserterSearchForm( {
+	className,
+	onChange,
+	value,
+	label,
+	placeholder,
+} ) {
 	const instanceId = useInstanceId( InserterSearchForm );
 	const searchInput = useRef();
 
@@ -27,7 +33,7 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 				as="label"
 				htmlFor={ `block-editor-inserter__search-${ instanceId }` }
 			>
-				{ placeholder }
+				{ label || placeholder }
 			</VisuallyHidden>
 			<input
 				ref={ searchInput }

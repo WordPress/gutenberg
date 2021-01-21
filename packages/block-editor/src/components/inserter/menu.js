@@ -167,7 +167,8 @@ function InserterMenu( {
 							setFilterValue( value );
 						} }
 						value={ filterValue }
-						placeholder={ __( 'Search' ) }
+						label={ __( 'Search' ) }
+						placeholder={ __( 'Search for blocks and patterns' ) }
 					/>
 					{ !! filterValue && (
 						<InserterSearchResults
