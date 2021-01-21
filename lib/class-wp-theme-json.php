@@ -814,7 +814,7 @@ class WP_Theme_JSON {
 	 * @param array $settings Settings to process.
 	 */
 	private static function compute_theme_vars( &$declarations, $settings ) {
-		$custom_values = gutenberg_experimental_get( $context, array( 'custom' ) );
+		$custom_values = gutenberg_experimental_get( $settings, array( 'custom' ) );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -889,7 +889,7 @@ class WP_Theme_JSON {
 			$selector = $metadata[ $block_selector ]['selector'];
 
 			$declarations = array();
-			// self::compute_preset_vars( $declarations, $settings );
+			self::compute_preset_vars( $declarations, $settings );
 			self::compute_theme_vars( $declarations, $settings );
 
 			// Attach the ruleset for style and custom properties.
