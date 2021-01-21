@@ -165,15 +165,18 @@ export function onFilesDrop(
 			targetRootClientId
 		);
 
-		if ( parentBlock?.name === 'core/gallery' && files?.length > 1 ) {
+		const imageFiles = files.filter(
+			( file ) => file.type.indexOf( 'image/' ) === 0
+		);
+		if ( parentBlock?.name === 'core/gallery' && imageFiles?.length > 0 ) {
 			const transformation = findTransform(
 				getBlockTransforms( 'from' ),
 				( transform ) =>
 					transform.type === 'files' &&
-					transform.isMatch( [ files[ 0 ] ] )
+					transform.isMatch( [ imageFiles[ 0 ] ] )
 			);
 			if ( transformation ) {
-				const blocks = files.map( ( file ) =>
+				const blocks = imageFiles.map( ( file ) =>
 					transformation.transform( [ file ], updateBlockAttributes )
 				);
 
