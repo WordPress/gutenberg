@@ -16,6 +16,7 @@ import {
 	isFunction,
 	isEmpty,
 	map,
+	pick,
 } from 'lodash';
 
 /**
@@ -134,11 +135,17 @@ export function createBlocksFromInnerBlocksTemplate(
 export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	const clientId = uuid();
 
+	const blockType = getBlockType( block.name );
+	const attributes = pick(
+		block.attributes,
+		Object.keys( blockType.attributes )
+	);
+
 	return {
 		...block,
 		clientId,
 		attributes: {
-			...block.attributes,
+			...attributes,
 			...mergeAttributes,
 		},
 		innerBlocks:
