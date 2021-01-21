@@ -164,7 +164,7 @@ class WP_Theme_JSON {
 	 *
 	 * This contains the necessary metadata to process them:
 	 *
-	 * - path          => where to find the preset in a theme.json block
+	 * - path          => where to find the preset within the settings section
 	 *
 	 * - value_key     => the key that represents the value
 	 *
@@ -306,12 +306,12 @@ class WP_Theme_JSON {
 
 		$block_metadata = $this->get_blocks_metadata();
 		foreach( [ 'settings', 'styles' ] as $key => $subtree ) {
-			// Remove settings & styles if they aren't arrays.
+			// Remove settings & styles subtrees if they aren't arrays.
 			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
 				unset( $this->theme_json[ $subtree ] );
 			}
 
-			// Remove block selectors within settings & styles if that aren't registered.
+			// Remove block selectors subtrees declared within settings & styles if that aren't registered.
 			if ( isset( $this->theme_json[ $subtree ] ) ) {
 				$this->theme_json[ $subtree ]  = array_intersect_key( $this->theme_json[ $subtree ], $block_metadata );
 			}
@@ -399,10 +399,12 @@ class WP_Theme_JSON {
 	 * Returns a mapping on metadata properties to avoid having to constantly
 	 * transforms properties between camel case and kebab.
 	 *
-	 * @return array Containing three mappings
-	 *  "to_kebab_case" mapping properties in camel case to
+	 * @return array Containing two mappings:
+	 *
+	 *   - "to_kebab_case" mapping properties in camel case to
 	 *    properties in kebab case e.g: "paddingTop" to "padding-top".
-	 *  "to_property" mapping properties in kebab case to
+	 *
+	 *  - "to_property" mapping properties in kebab case to
 	 *    the main properties in camel case e.g: "padding-top" to "padding".
 	 */
 	private static function get_case_mappings() {
@@ -705,6 +707,7 @@ class WP_Theme_JSON {
 
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
+			// An example of this is the padding property, see self::SCHEMA.
 			if ( self::has_properties( $metadata ) ) {
 				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
@@ -1010,7 +1013,7 @@ class WP_Theme_JSON {
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		// The array_replace_recursive algorithm merges at the leaf level.
-		// This means that when a leaf value is actually an array,
+		// This means that when a leaf value is an array,
 		// the incoming array won't replace the existing,
 		// but the numeric indexes are used for replacement.
 		//
@@ -1102,7 +1105,6 @@ class WP_Theme_JSON {
 										}
 									}
 								} else {
-									// font family
 									$property               = $preset_metadata['css_var_infix'];
 									$style_to_validate      = $property . ': ' . $value;
 									$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
