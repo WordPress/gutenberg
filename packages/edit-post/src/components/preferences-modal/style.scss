@@ -4,6 +4,10 @@
 		height: calc(100% - #{$header-height} - #{$header-height});
 	}
 
+	.components-modal__content {
+		height: auto;
+	}
+
 	.components-navigation {
 		background-color: #fff;
 		padding: 0;

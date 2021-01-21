@@ -30,7 +30,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import BlockManager from '../manage-blocks-modal';
 import Section from './section';
 import {
 	EnablePluginDocumentSettingPanelOption,
@@ -158,15 +157,6 @@ export default function PreferencesModal() {
 							) }
 							label={ __( 'Contain text cursor inside block' ) }
 						/>
-					</Section>
-				),
-			},
-			{
-				name: 'block-manager',
-				tabLabel: __( 'Block Manager' ),
-				content: (
-					<Section title={ __( 'Decide what blocks to show' ) }>
-						<BlockManager />
 					</Section>
 				),
 			},
