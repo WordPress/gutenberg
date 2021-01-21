@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.0.0 (2021-01-21)
+
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
