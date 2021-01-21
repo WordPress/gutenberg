@@ -722,41 +722,41 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	// function test_remove_insecure_properties_removes_unsafe_sub_properties() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'styles' => array(
-	// 				'core/group' => array(
-	// 					'spacing' => array(
-	// 						'padding' => array(
-	// 							'top' => '1px',
-	// 							'right' => '1px',
-	// 							'bottom' => 'var(--unsafe-var-y)',
-	// 							'left' => '1px',
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'styles' => array(
-	// 			'core/group' => array(
-	// 				'spacing' => array(
-	// 					'padding' => array(
-	// 						'top' => '1px',
-	// 						'right' => '1px',
-	// 						'left' => '1px',
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+	function test_remove_insecure_properties_removes_unsafe_styles_sub_properties() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'core/group' => array(
+						'spacing' => array(
+							'padding' => array(
+								'top' => '1px',
+								'right' => '1px',
+								'bottom' => 'var(--unsafe-var-y)',
+								'left' => '1px',
+							),
+						),
+					),
+				),
+			),
+			true
+		);
+		$theme_json->remove_insecure_properties();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'core/group' => array(
+					'spacing' => array(
+						'padding' => array(
+							'top' => '1px',
+							'right' => '1px',
+							'left' => '1px',
+						),
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 
 	// function test_remove_insecure_properties_removes_non_preset_settings() {
 	// 	$theme_json = new WP_Theme_JSON(
