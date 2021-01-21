@@ -24,6 +24,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
+import InserterListbox from '../inserter-listbox';
 
 function InserterSearchResults( {
 	filterValue,
@@ -103,7 +104,7 @@ function InserterSearchResults( {
 		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
 
 	return (
-		<>
+		<InserterListbox>
 			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
 
 			{ !! filteredBlockTypes.length && (
@@ -167,7 +168,7 @@ function InserterSearchResults( {
 					} }
 				</__experimentalInserterMenuExtension.Slot>
 			) }
-		</>
+		</InserterListbox>
 	);
 }
 
