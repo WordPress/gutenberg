@@ -44,7 +44,7 @@ export default function BlockNavigationBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
-	const { isDragging, getParents } = useSelect(
+	const { isDragging, blockParents } = useSelect(
 		( select ) => {
 			const {
 				isBlockBeingDragged,
@@ -56,13 +56,11 @@ export default function BlockNavigationBlock( {
 				isDragging:
 					isBlockBeingDragged( clientId ) ||
 					isAncestorBeingDragged( clientId ),
-				getParents: getBlockParents,
+				blockParents: getBlockParents( clientId ),
 			};
 		},
 		[ clientId ]
 	);
-
-	const blockParents = getParents( clientId );
 
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
