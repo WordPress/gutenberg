@@ -9,13 +9,13 @@
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
 		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 $grid-unit-20 $grid-unit-20 0;
+		margin: 0 var(--gallery-block--gutter-size, #{$grid-unit-20}) var(--gallery-block--gutter-size, #{$grid-unit-20}) 0;
 
 		&:last-of-type:not(#individual-image) {
 			margin-right: 0;
 		}
 
-		width: calc(50% - #{$grid-unit-20});
+		width: calc(50% - var(--gallery-block--gutter-size, #{$grid-unit-20}));
 
 		&:nth-of-type(even) {
 			margin-right: 0;
@@ -112,11 +112,11 @@
 			margin-top: auto;
 			margin-bottom: auto;
 			img {
-				margin-bottom: $grid-unit-20;
+				margin-bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
 			}
 
 			figcaption {
-				bottom: $grid-unit-20;
+				bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
 			}
 		}
 	}
@@ -155,19 +155,19 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
-				margin-right: $grid-unit-20;
-				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
+				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
+				width: calc(#{100% / $i} - calc(var(--gallery-block--gutter-size, #{$grid-unit-20}) * calc(#{$i - 1}) / #{$i}));
 			}
 
 			// Prevent collapsing margin while sibling is being dragged.
 			&.columns-#{$i} figure.wp-block-image:not(#individual-image).is-dragging ~ figure.wp-block-image:not(#individual-image) {
-				margin-right: $grid-unit-20;
+				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
 			}
 		}
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
-			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
+			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type(#{ $column-count }n) {
 				margin-right: 0;
 			}
 		}
