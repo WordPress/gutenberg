@@ -204,8 +204,13 @@ describe( 'Widgets screen', () => {
 		);
 		await paragraphBlock.click();
 
-		const firstParagraphBlock = await firstWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		const firstParagraphBlock = await page.waitForFunction(
+			( widgetArea ) =>
+				widgetArea.querySelector(
+					'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+				),
+			{},
+			firstWidgetArea
 		);
 
 		expect(
