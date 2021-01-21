@@ -175,7 +175,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'hasFixedToolbar',
 				'hasReducedUI',
 				'imageEditing',
-				'imageCrossOrigin',
+				'mediaCrossOrigin',
 				'imageSizes',
 				'imageDimensions',
 				'isRTL',
