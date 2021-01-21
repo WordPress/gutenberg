@@ -5,9 +5,9 @@
 ![Quick view of the block editor](https://make.wordpress.org/core/files/2021/01/quick-view-of-the-block-editor.png)
 
 **Legend :**
-1. Block directory
+1. Block Inserter
 2. Block editor content area
-3. Block options
+3. Settings Sidebar
 
 Using a system of Blocks to compose and format content, the new block-based editor is designed to create rich, flexible layouts for websites and digital products. Content is created in the unit of blocks instead of freeform text with inserted media, embeds and Shortcodes (there's a Shortcode block though).
 
