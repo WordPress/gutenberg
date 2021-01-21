@@ -67,6 +67,10 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 	native: { type: 'stepper' },
 } );
 
+const DEFAULT_GUTTER_SIZE = 16;
+const MAX_GUTTER_SIZE = 100;
+const MIN_GUTTER_SIZE = 0;
+
 function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -80,14 +84,15 @@ function GalleryEdit( props ) {
 	} = props;
 
 	const {
+		columns = defaultColumnsNumber( imageCount ),
+		gutterSize,
 		imageCount,
+		imageCrop,
+		imageUploads,
 		linkTarget,
 		linkTo,
-		columns = defaultColumnsNumber( imageCount ),
-		sizeSlug,
-		imageUploads,
 		shortCodeTransforms,
-		imageCrop,
+		sizeSlug,
 	} = attributes;
 
 	const {
@@ -339,6 +344,10 @@ function GalleryEdit( props ) {
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, 'has-nested-images' ),
+		style: {
+			'--gallery-block--gutter-size':
+				gutterSize !== undefined && `${ gutterSize }px`,
+		},
 	} );
 
 	if ( ! hasImages ) {
@@ -363,6 +372,19 @@ function GalleryEdit( props ) {
 							required
 						/>
 					) }
+					<RangeControl
+						label={ __( 'Gutter size' ) }
+						value={ gutterSize }
+						onChange={ ( newGutterSize ) =>
+							setAttributes( { gutterSize: newGutterSize } )
+						}
+						initialPosition={ DEFAULT_GUTTER_SIZE }
+						min={ MIN_GUTTER_SIZE }
+						max={ MAX_GUTTER_SIZE }
+						{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
+						resetFallbackValue={ DEFAULT_GUTTER_SIZE }
+						allowReset
+					/>
 					<ToggleControl
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
