@@ -16,7 +16,10 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const mediaCrossOrigin = useSelect( ( select ) => {
 		const value = select( 'core/block-editor' ).getSettings()
 			.mediaCrossOrigin;
-		return typeof value === 'string' ? value : undefined;
+		return typeof value === 'string' &&
+			value.includes( '', 'anonymous', 'use-credentials' )
+			? value
+			: undefined;
 	} );
 
 	const initializeTransformValues = useCallback( () => {
