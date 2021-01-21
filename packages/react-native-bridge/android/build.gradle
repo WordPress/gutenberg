@@ -206,8 +206,8 @@ dependencies {
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
 
-    debugImplementation project(":hermes-debug")
-    releaseImplementation project(":hermes-release")
+    debugEmbed project(":hermes-debug")
+    releaseEmbed project(":hermes-release")
 }
 
 boolean isBundleUpToDate() {
