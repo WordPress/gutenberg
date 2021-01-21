@@ -53,7 +53,11 @@ import {
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { getUpdatedLinkTargetSettings, getImageSizeAttributes } from './utils';
+import {
+	getUpdatedLinkTargetSettings,
+	getImageSizeAttributes,
+	getUrl,
+} from './utils';
 
 import {
 	LINK_DESTINATION_CUSTOM,
@@ -146,10 +150,46 @@ export class ImageEdit extends React.Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		if ( ! previousProps.image && this.props.image ) {
-			const { image, attributes } = this.props;
+		const { image, attributes, context, setAttributes } = this.props;
+		const { inheritedAttributes } = attributes;
+		if ( ! previousProps.image && image ) {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
-			this.props.setAttributes( { url } );
+			setAttributes( { url } );
+		}
+		// TODO use `useParentAttributes` instead after refactor to function component
+		if (
+			previousProps.image !== image ||
+			previousProps.context?.linkTo !== context?.linkTo
+		) {
+			if ( inheritedAttributes?.linkDestination && image ) {
+				const href = getUrl( image, context?.linkTo );
+				if ( href !== previousProps.attributes.href ) {
+					setAttributes( {
+						href,
+						linkDestination: context?.linkTo,
+					} );
+				}
+			}
+		}
+		if ( previousProps.context?.linkTarget !== context?.linkTarget ) {
+			if ( inheritedAttributes.linkTarget ) {
+				setAttributes( {
+					linkTarget: context?.linkTarget,
+				} );
+			}
+		}
+
+		if ( previousProps.context?.sizeSlug !== context?.sizeSlug ) {
+			if ( inheritedAttributes.sizeSlug ) {
+				const sizeAttributes = getImageSizeAttributes(
+					image,
+					context?.sizeSlug
+				);
+
+				setAttributes( {
+					...sizeAttributes,
+				} );
+			}
 		}
 	}
 
@@ -251,7 +291,13 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetLinkDestination( href ) {
+		const { inheritedAttributes } = this.props.attributes;
 		this.props.setAttributes( {
+			inheritedAttributes: {
+				...inheritedAttributes,
+				linkDestination: false,
+				linkTarget: false,
+			},
 			linkDestination: LINK_DESTINATION_CUSTOM,
 			href,
 		} );
@@ -266,33 +312,38 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetSizeSlug( sizeSlug ) {
-		const { image } = this.props;
+		const { image, setAttributes } = this.props;
+		const { inheritedAttributes } = this.props.attributes;
 
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
 			return null;
 		}
-
-		this.props.setAttributes( {
+		setAttributes( {
 			url,
 			width: undefined,
 			height: undefined,
 			sizeSlug,
+			...( inheritedAttributes?.sizeSlug
+				? {
+						inheritedAttributes: {
+							...inheritedAttributes,
+							sizeSlug: false,
+						},
+				  }
+				: {} ),
 		} );
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const {
-			id,
-			url,
-			context,
-			linkDestination: destination,
-		} = this.props.attributes;
+		const { id, url, linkDestination: destination } = this.props.attributes;
+		const { context } = this.props;
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
 		};
+
 		// Check if default link setting, or the one inherited from parent block should be used.
 		const linkDestination = context?.linkTo ? context.linkTo : destination;
 
@@ -383,15 +434,30 @@ export class ImageEdit extends React.Component {
 	getLinkSettings() {
 		const { isLinkSheetVisible } = this.state;
 		const {
-			attributes: { href: url, ...unMappedAttributes },
+			attributes: {
+				href: url,
+				inheritedAttributes,
+				...unMappedAttributes
+			},
 			setAttributes,
 		} = this.props;
-
+		const additionalAttributes = {
+			inheritedAttributes: {
+				...inheritedAttributes,
+				linkDestination: false,
+				linkTarget: false,
+			},
+			linkDestination: LINK_DESTINATION_CUSTOM,
+		};
 		const mappedAttributes = { ...unMappedAttributes, url };
 		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
 			href === undefined
-				? setAttributes( restAttributes )
-				: setAttributes( { ...restAttributes, href } );
+				? setAttributes( restAttributes, ...additionalAttributes )
+				: setAttributes( {
+						...restAttributes,
+						href,
+						...additionalAttributes,
+				  } );
 
 		const options = {
 			url: {
@@ -435,7 +501,6 @@ export class ImageEdit extends React.Component {
 			imageCrop,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
-
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
 			name,
@@ -622,12 +687,16 @@ export default compose( [
 		const {
 			attributes: { id, url },
 			isSelected,
+			context,
 		} = props;
 		const { imageSizes } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+		const { linkTo: parentLinkDestination, sizeSlug: parentSizeSlug } =
+			context || {};
 
 		const shouldGetMedia =
-			( isSelected && isNotFileUrl ) ||
+			( ( isSelected || parentLinkDestination || parentSizeSlug ) &&
+				isNotFileUrl ) ||
 			// Edge case to update the image after uploading if the block gets unselected
 			// Check if it's the original image and not the resized one with queryparams
 			( ! isSelected &&

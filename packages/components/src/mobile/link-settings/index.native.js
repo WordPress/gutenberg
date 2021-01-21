@@ -81,7 +81,7 @@ function LinkSettings( {
 	onLinkCellPressed,
 	urlValue,
 } ) {
-	const { url, label, linkTarget, rel } = attributes;
+	const { url = '', label = '', linkTarget, rel = '' } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
@@ -126,9 +126,12 @@ function LinkSettings( {
 		if ( ! urlValue && onEmptyURL ) {
 			onEmptyURL();
 		}
-		setAttributes( {
-			url: prependHTTP( urlValue ),
-		} );
+		const newUrl = prependHTTP( urlValue );
+		if ( newUrl && url !== newUrl ) {
+			setAttributes( {
+				url: prependHTTP( urlValue ),
+			} );
+		}
 	}, [ urlValue ] );
 
 	function onChangeURL( value ) {
@@ -143,11 +146,18 @@ function LinkSettings( {
 	}
 
 	function onSetAttributes() {
-		setAttributes( {
-			url: prependHTTP( urlInputValue ),
-			label: labelInputValue,
-			rel: linkRelInputValue,
-		} );
+		const newUrl = prependHTTP( urlInputValue );
+		if (
+			newUrl !== url ||
+			labelInputValue !== label ||
+			linkRelInputValue !== rel
+		) {
+			setAttributes( {
+				url: prependHTTP( urlInputValue ),
+				label: labelInputValue,
+				rel: linkRelInputValue,
+			} );
+		}
 	}
 
 	function onCloseSettingsSheet() {
@@ -188,7 +198,6 @@ function LinkSettings( {
 		if ( ! isURL( clipboardText ) ) {
 			return;
 		}
-
 		setAttributes( { url: clipboardText } );
 	}
 
