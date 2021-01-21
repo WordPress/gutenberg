@@ -10,17 +10,24 @@ import { defaultColumnsNumber } from './shared';
 
 export default function save( { attributes } ) {
 	const {
-		imageCount,
-		columns = defaultColumnsNumber( imageCount ),
-		imageCrop,
 		caption,
+		columns = defaultColumnsNumber( imageCount ),
+		gutterSize,
+		imageCount,
+		imageCrop,
 	} = attributes;
+
 	const className = `blocks-gallery-grid has-nested-images columns-${ columns } ${
 		imageCrop ? 'is-cropped' : ''
 	}`;
 
+	const style = {
+		'--gallery-block--gutter-size':
+			gutterSize !== undefined && `${ gutterSize }px`,
+	};
+
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
+		<figure { ...useBlockProps.save( { className, style } ) }>
 			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
