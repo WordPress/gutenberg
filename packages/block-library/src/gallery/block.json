@@ -52,6 +52,9 @@
 		"imageCount": {
 			"type": "number",
 			"default": 0
+		},
+		"gutterSize": {
+			"type": "number"
 		}
 	},
 	"providesContext": {
