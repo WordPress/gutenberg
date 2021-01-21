@@ -758,68 +758,68 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	// function test_remove_insecure_properties_removes_non_preset_settings() {
-	// 	$theme_json = new WP_Theme_JSON(
-	// 		array(
-	// 			'settings' => array(
-	// 				'global' => array(
-	// 					'color' => array(
-	// 						'custom'   => true,
-	// 						'palette' => array(
-	// 							array(
-	// 								'name'  => 'Red',
-	// 								'slug'  => 'red',
-	// 								'color' => '#ff0000',
-	// 							),
-	// 							array(
-	// 								'name'  => 'Green',
-	// 								'slug'  => 'green',
-	// 								'color' => '#00ff00',
-	// 							),
-	// 							array(
-	// 								'name'  => 'Blue',
-	// 								'slug'  => 'blue',
-	// 								'color' => '#0000ff',
-	// 							),
-	// 						),
-	// 					),
-	// 					'spacing' => array(
-	// 						'customPadding' => false,
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 		true
-	// 	);
-	// 	$theme_json->remove_insecure_properties();
-	// 	$result   = $theme_json->get_raw_data();
-	// 	$expected = array(
-	// 		'settings' => array(
-	// 			'global' => array(
-	// 				'color' => array(
-	// 					'palette' => array(
-	// 						array(
-	// 							'name'  => 'Red',
-	// 							'slug'  => 'red',
-	// 							'color' => '#ff0000',
-	// 						),
-	// 						array(
-	// 							'name'  => 'Green',
-	// 							'slug'  => 'green',
-	// 							'color' => '#00ff00',
-	// 						),
-	// 						array(
-	// 							'name'  => 'Blue',
-	// 							'slug'  => 'blue',
-	// 							'color' => '#0000ff',
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 		),
-	// 	);
-	// 	$this->assertEqualSetsWithIndex( $expected, $result );
-	// }
+	function test_remove_insecure_properties_removes_non_preset_settings() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'settings' => array(
+					'global' => array(
+						'color' => array(
+							'custom'   => true,
+							'palette' => array(
+								array(
+									'name'  => 'Red',
+									'slug'  => 'red',
+									'color' => '#ff0000',
+								),
+								array(
+									'name'  => 'Green',
+									'slug'  => 'green',
+									'color' => '#00ff00',
+								),
+								array(
+									'name'  => 'Blue',
+									'slug'  => 'blue',
+									'color' => '#0000ff',
+								),
+							),
+						),
+						'spacing' => array(
+							'customPadding' => false,
+						),
+					),
+				),
+			),
+			true
+		);
+		$theme_json->remove_insecure_properties();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'settings' => array(
+				'global' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'name'  => 'Red',
+								'slug'  => 'red',
+								'color' => '#ff0000',
+							),
+							array(
+								'name'  => 'Green',
+								'slug'  => 'green',
+								'color' => '#00ff00',
+							),
+							array(
+								'name'  => 'Blue',
+								'slug'  => 'blue',
+								'color' => '#0000ff',
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
 
 	function test_remove_insecure_properties_removes_unsafe_preset_settings() {
 		$theme_json = new WP_Theme_JSON(
