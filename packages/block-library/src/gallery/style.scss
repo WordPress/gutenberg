@@ -1,4 +1,8 @@
-.wp-block-gallery {
+// Import styles for rendering the static content of deprecated gallery versions.
+@import "./deprecated.scss";
+
+// Styles for current version of gallery block.
+.wp-block-gallery.has-nested-images {
 	ul.blocks-gallery-grid {
 		display: flex;
 		flex-wrap: wrap;
@@ -7,11 +11,12 @@
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
 
-		// Need to add the bogus :not(#individual-image) to override long :not()
+		// Need bogus :not(#individual-image) to override long :not()
 		// specificity chain on default image block on front end.
-		// Add space between thumbnails, and unset right most thumbnails later.
 		li.list-image:not(#individual-image) {
+			// Add space between thumbnails, and unset right most thumbnails later.
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
+
 			&:last-child {
 				margin-right: 0;
 			}
@@ -31,9 +36,11 @@
 				flex-grow: 1;
 				display: flex;
 				flex-direction: column; // Needed for frontend when img isn't wrapped in div.
+				max-width: 100%; // When aligned wide or full, this allows image to fill row.
 			}
 
-			figure > div {
+			figure > div,
+			figure > a {
 				margin: 0;
 				flex-direction: column;
 				flex-grow: 1;
@@ -75,9 +82,10 @@
 		flex-grow: 1;
 	}
 
-	// Cropped
+	// Cropped Images.
 	&.is-cropped ul.blocks-gallery-grid li.list-image:not(#individual-image) {
-		figure > div {
+		figure > div,
+		figure > a {
 			display: flex;
 		}
 
