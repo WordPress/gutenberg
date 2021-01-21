@@ -1,34 +1,43 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { PanelBody, ToggleControl } from '@wordpress/components';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
-import ServerSideRender from '@wordpress/server-side-render';
 
-export default function PagesEdit( {
-	attributes,
-	setAttributes,
-	hasSubmenuIndicatorSetting = true,
-} ) {
+import { useBlockProps } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
+import { useSelect } from '@wordpress/data';
+
+export default function PagesEdit( { clientId } ) {
+	const navigationBlockAttributes = useSelect( ( select ) => {
+		const { getBlockAttributes, getBlockParentsByBlockName } = select(
+			'core/block-editor'
+		);
+		const parentBlock = getBlockParentsByBlockName(
+			clientId,
+			'core/navigation'
+		)[ 0 ];
+		return getBlockAttributes( parentBlock );
+	} );
+	const showSubmenuIcon = !! navigationBlockAttributes?.showSubmenuIcon;
+	const { textColor, backgroundColor } = navigationBlockAttributes || {};
+
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'has-text-color': !! textColor,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': !! backgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			'show-submenu-icons': showSubmenuIcon,
+		} ),
+	} );
+
 	return (
-		<div { ...useBlockProps() }>
-			<InspectorControls>
-				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display settings' ) }>
-						<ToggleControl
-							checked={ attributes.showSubmenuIcon }
-							onChange={ ( value ) => {
-								setAttributes( {
-									showSubmenuIcon: value,
-								} );
-							} }
-							label={ __( 'Show submenu indicator icons' ) }
-						/>
-					</PanelBody>
-				) }
-			</InspectorControls>
-			<ServerSideRender block="core/pages" attributes={ attributes } />
+		<div { ...blockProps }>
+			<ServerSideRender block="core/pages" />
 		</div>
 	);
 }

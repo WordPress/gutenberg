@@ -1,10 +1,11 @@
-.wp-block-navigation-link__submenu-icon {
+.wp-block-pages__submenu-icon {
 	display: none;
 }
 
 .show-submenu-icons {
-	.wp-block-navigation-link__submenu-icon {
+	.wp-block-pages__submenu-icon {
 		display: block;
+		padding: 0.375em 1em 0.375em 0;
 	}
 }
 
@@ -23,6 +24,7 @@
 	.page_item_has_children {
 		display: flex;
 		position: relative;
+		background-color: inherit;
 
 		> a {
 			padding-right: 0.5em;
@@ -83,5 +85,9 @@
 				opacity: 1;
 			}
 		}
+	}
+
+	.children {
+		padding: 0;
 	}
 }

@@ -2,17 +2,17 @@
 	"apiVersion": 2,
 	"name": "core/pages",
 	"category": "widgets",
-	"attributes": {
-		"orientation": {
-			"type": "string"
-		},
-		"showSubmenuIcon": {
-			"type": "boolean",
-			"default": true
-		}
-	},
+	"usesContext": [
+		"textColor",
+		"customTextColor",
+		"backgroundColor",
+		"customBackgroundColor",
+		"fontSize",
+		"customFontSize",
+		"showSubmenuIcon"
+	],
 	"supports": {
-		"align": true,
+		"reusable": false,
 		"html": false
 	},
 	"editorStyle": "wp-block-pages-editor",

@@ -1,0 +1,7 @@
+.wp-block-navigation {
+	// Block wrapper gets the classes in the editor, and there's an extra div wrapper for now, so background styles need to be inherited.
+	.wp-blokc-pages > div,
+	.wp-block-page-list {
+		background-color: inherit;
+	}
+}
