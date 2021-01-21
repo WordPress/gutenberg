@@ -46,11 +46,6 @@ export {
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components
-export {
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	Preview,
-} from './page-template-picker';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
@@ -59,10 +54,8 @@ export { default as BlockStyles } from './block-styles';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
-export {
-	Block as __experimentalBlock,
-	useBlockProps,
-} from './block-list/block-wrapper';
+export { useBlockProps } from './block-list/use-block-props';
+export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
 
 // State Related Components

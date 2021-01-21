@@ -48,7 +48,7 @@ export function BlockPreview( {
 /**
  * BlockPreview renders a preview of a block or array of blocks.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-preview/README.md
  *
  * @param {Object} preview options for how the preview should be shown
  * @param {Array|Object} preview.blocks A block instance (object) or an array of blocks to be previewed.

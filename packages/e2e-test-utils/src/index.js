@@ -1,6 +1,8 @@
 export { activatePlugin } from './activate-plugin';
 export { activateTheme } from './activate-theme';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
+export { changeSiteTimezone } from './change-site-timezone';
+export { canvas } from './canvas';
 export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
 export { clickBlockToolbarButton } from './click-block-toolbar-button';
@@ -74,5 +76,6 @@ export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 export { showBlockToolbar } from './show-block-toolbar';
+export { openPreviewPage } from './preview';
 
 export * from './mocks';

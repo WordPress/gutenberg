@@ -50,6 +50,7 @@ function UncontrolledInnerBlocks( props ) {
 		marginHorizontal,
 		horizontalAlignment,
 		filterInnerBlocks,
+		blockWidth,
 		__experimentalLayout: layout = defaultLayout,
 	} = props;
 
@@ -84,6 +85,7 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
+			blockWidth={ blockWidth }
 		/>
 	);
 
@@ -150,6 +152,6 @@ InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
 ) );
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export default InnerBlocks;

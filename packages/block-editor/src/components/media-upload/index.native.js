@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import React from 'react';
-
-/**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
@@ -17,8 +13,8 @@ import {
 	capturePhoto,
 	captureVideo,
 	image,
-	video,
 	wordpress,
+	mobile,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -29,7 +25,7 @@ export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
-export class MediaUpload extends React.Component {
+export class MediaUpload extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
@@ -125,18 +121,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getChooseFromDeviceIcon() {
-		const { allowedTypes = [] } = this.props;
-
-		const isOneType = allowedTypes.length === 1;
-		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
-		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
-		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
-
-		if ( isImage || ! isOneType || isAnyType ) {
-			return image;
-		} else if ( isVideo ) {
-			return video;
-		}
+		return mobile;
 	}
 
 	onPickerPresent() {

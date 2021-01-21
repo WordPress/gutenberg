@@ -2,13 +2,18 @@
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-import { serialize, pasteHandler } from '@wordpress/blocks';
+import {
+	serialize,
+	pasteHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -21,10 +26,10 @@ export function useNotifyCopy() {
 		[]
 	);
 	const { getBlockType } = useSelect(
-		( select ) => select( 'core/blocks' ),
+		( select ) => select( blocksStore ),
 		[]
 	);
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return useCallback( ( eventType, selectedBlockClientIds ) => {
 		let notice = '';

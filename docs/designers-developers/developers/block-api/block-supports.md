@@ -86,7 +86,7 @@ supports: {
 - Default value: null
 - Subproperties:
   - `background`: type `boolean`, default value `true`
-  - `gradient`: type `boolean`, default value `false`
+  - `gradients`: type `boolean`, default value `false`
   - `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
@@ -98,7 +98,7 @@ Note that the `text` and `background` keys have a default value of `true`, so if
 ```js
 supports: {
     color: { // This also enables text and background UI controls.
-        gradient: true // Enable gradients UI control.
+        gradients: true // Enable gradients UI control.
     }
 }
 ```
@@ -109,7 +109,7 @@ It's possible to disable them individually:
 supports: {
     color: { // Text UI control is enabled.
         background: false, // Disable background UI control.
-        gradient: true // Enable gradients UI control.
+        gradients: true // Enable gradients UI control.
     }
 }
 ```
@@ -144,7 +144,7 @@ attributes: {
 }
 ```
 
-- When `gradient` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+- When `gradients` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -338,24 +338,6 @@ supports: {
 }
 ```
 
-When the block declares support for a specific spacing property, the attributes definition is extended to include some attributes.
+When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
-
-```js
-attributes: {
-    style: {
-        type: 'object',
-        default: {
-            spacing: {
-                padding: {
-                    top: 'value',
-                    right: 'value',
-                    bottom: 'value',
-                    left: 'value'
-                }
-            }
-        }
-    }
-}
-```
+- `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user.

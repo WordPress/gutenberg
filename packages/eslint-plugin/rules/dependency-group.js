@@ -8,7 +8,7 @@ module.exports = {
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
 			url:
-				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
+				'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
 		schema: [],
 		fixable: 'code',

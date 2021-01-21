@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { store as blocksStore } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
+
+/**
  * Internal dependencies
  */
 import { installBlockType, uninstallBlockType } from '../actions';
@@ -80,7 +86,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockTypes',
-				storeKey: 'core/blocks',
+				storeKey: blocksStore.name,
 				type: '@@data/SELECT',
 			} );
 
@@ -142,7 +148,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockTypes',
-				storeKey: 'core/blocks',
+				storeKey: blocksStore.name,
 				type: '@@data/SELECT',
 			} );
 
@@ -276,7 +282,7 @@ describe( 'actions', () => {
 			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
-				storeKey: 'core/notices',
+				storeKey: noticesStore,
 			} );
 
 			expect( generator.next() ).toEqual( {

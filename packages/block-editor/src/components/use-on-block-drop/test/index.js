@@ -21,6 +21,7 @@ jest.mock( '@wordpress/blocks/src/api/raw-handling', () => ( {
 describe( 'parseDropEvent', () => {
 	it( 'converts an event dataTransfer property from JSON to an object', () => {
 		const rawDataTransfer = {
+			blocks: null,
 			srcRootClientId: '123',
 			srcClientIds: [ 'abc' ],
 			srcIndex: 1,
@@ -53,12 +54,14 @@ describe( 'parseDropEvent', () => {
 		expect( parseDropEvent( event ) ).toEqual( {
 			srcRootClientId: null,
 			srcIndex: null,
+			blocks: null,
 			...rawDataTransfer,
 		} );
 	} );
 
 	it( 'returns an object with null values if the event dataTransfer can not be parsed', () => {
 		const expected = {
+			blocks: null,
 			srcRootClientId: null,
 			srcClientIds: null,
 			srcIndex: null,
@@ -77,6 +80,7 @@ describe( 'parseDropEvent', () => {
 
 	it( 'returns an object with null values if the event has no dataTransfer property', () => {
 		const expected = {
+			blocks: null,
 			srcRootClientId: null,
 			srcClientIds: null,
 			srcIndex: null,
@@ -301,6 +305,7 @@ describe( 'onBlockDrop', () => {
 describe( 'onFilesDrop', () => {
 	it( 'does nothing if hasUploadPermissions is false', () => {
 		const updateBlockAttributes = jest.fn();
+		const canInsertBlockType = noop;
 		const insertBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
@@ -311,6 +316,7 @@ describe( 'onFilesDrop', () => {
 			targetBlockIndex,
 			uploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		);
 		onFileDropHandler();
@@ -325,6 +331,7 @@ describe( 'onFilesDrop', () => {
 		findTransform.mockImplementation( noop );
 		const updateBlockAttributes = noop;
 		const insertBlocks = jest.fn();
+		const canInsertBlockType = noop;
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const uploadPermissions = true;
@@ -334,6 +341,7 @@ describe( 'onFilesDrop', () => {
 			targetBlockIndex,
 			uploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		);
 		onFileDropHandler();
@@ -350,6 +358,7 @@ describe( 'onFilesDrop', () => {
 		const transformation = { transform: jest.fn( () => blocks ) };
 		findTransform.mockImplementation( () => transformation );
 		const updateBlockAttributes = noop;
+		const canInsertBlockType = noop;
 		const insertBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
@@ -360,6 +369,7 @@ describe( 'onFilesDrop', () => {
 			targetBlockIndex,
 			uploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		);
 		const files = 'test';

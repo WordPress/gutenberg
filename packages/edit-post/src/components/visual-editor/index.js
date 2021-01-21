@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
+	PostTitle,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
@@ -25,14 +25,22 @@ import { useRef } from '@wordpress/element';
  */
 import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
+import { store as editPostStore } from '../../store';
 
 export default function VisualEditor() {
 	const ref = useRef();
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
+		const {
+			isEditingTemplate,
+			__experimentalGetPreviewDeviceType,
+		} = select( editPostStore );
+		return {
+			deviceType: __experimentalGetPreviewDeviceType(),
+			isTemplateMode: isEditingTemplate(),
+		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
-		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
+		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
 	const desktopCanvasStyles = {
@@ -57,13 +65,14 @@ export default function VisualEditor() {
 			<div
 				ref={ ref }
 				className="editor-styles-wrapper"
-				tabIndex="-1"
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
 				<WritingFlow>
-					<div className="edit-post-visual-editor__post-title-wrapper">
-						<PostTitle />
-					</div>
+					{ ! isTemplateMode && (
+						<div className="edit-post-visual-editor__post-title-wrapper">
+							<PostTitle />
+						</div>
+					) }
 					<BlockList />
 				</WritingFlow>
 			</div>

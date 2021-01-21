@@ -13,6 +13,7 @@ import * as actions from './actions';
 import * as resolvers from './resolvers';
 import * as locksSelectors from './locks/selectors';
 import * as locksActions from './locks/actions';
+import customControls from './controls';
 import { defaultEntities, getMethodName } from './entities';
 import { STORE_NAME } from './name';
 
@@ -58,7 +59,7 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 
 const storeConfig = {
 	reducer,
-	controls,
+	controls: { ...customControls, ...controls },
 	actions: { ...actions, ...entityActions, ...locksActions },
 	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
@@ -67,7 +68,7 @@ const storeConfig = {
 /**
  * Store definition for the code data namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */

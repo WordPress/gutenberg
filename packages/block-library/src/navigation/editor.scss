@@ -1,6 +1,3 @@
-$navigation-height: 60px;
-$navigation-item-height: 46px;
-
 // Undo default editor styles.
 .editor-styles-wrapper .wp-block-navigation ul,
 .editor-styles-wrapper .wp-block-navigation ol {
@@ -15,9 +12,10 @@ $navigation-item-height: 46px;
 
 // Polish the Appender.
 .wp-block-navigation .block-list-appender {
-	margin: 0;
-	display: flex;
-	align-items: center;
+	display: inline-flex;
+	align-self: center;
+	width: $icon-size;
+	height: $icon-size;
 }
 
 .wp-block-navigation.is-vertical .block-list-appender {
@@ -30,7 +28,7 @@ $navigation-item-height: 46px;
 
 // Ensure that an empty block has space around the appender.
 .wp-block-navigation__container {
-	min-height: $navigation-item-height;
+	min-height: $grid-unit-05 + $grid-unit-05 + $button-size;
 }
 
 // Ensure sub-menus stay open and visible when a nested block is selected.
@@ -161,6 +159,8 @@ $color-control-label-height: 20px;
 }
 
 .wp-block-navigation-placeholder {
+	min-height: $grid-unit-05 + $grid-unit-05 + $button-size;
+
 	.components-spinner {
 		margin-top: -4px;
 		margin-left: 4px;
@@ -211,4 +211,101 @@ $color-control-label-height: 20px;
 
 .wp-block-navigation .block-editor-button-block-appender {
 	justify-content: flex-start;
+}
+
+
+/**
+ * Setup state
+ */
+
+// Unselected state.
+.wp-block-navigation-placeholder__preview {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	transition: all 0.1s ease-in-out;
+	@include reduce-motion("transition");
+
+	// Style skeleton elements.
+	// Needs specificity.
+	.wp-block-navigation-link.wp-block-navigation-link {
+		border-radius: $radius-block-ui;
+		background: currentColor;
+		min-width: 72px;
+		height: $grid-unit-20;
+		margin: $grid-unit-15 $grid-unit-30 $grid-unit-15 0;
+	}
+
+	.wp-block-navigation-link.wp-block-navigation-link,
+	svg {
+		opacity: 0.3;
+	}
+
+	.is-selected & {
+		opacity: 0.2;
+	}
+}
+
+// Selected state.
+.wp-block-navigation-placeholder__controls {
+	padding: $grid-unit-05 $grid-unit-10;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	flex-direction: row;
+	align-items: center;
+	display: none;
+	position: relative;
+	z-index: 1;
+
+	// Show when selected.
+	.is-selected & {
+		display: flex;
+	}
+
+	// Vertical navigation.
+	.is-vertical & {
+		.wp-block-navigation-placeholder__actions {
+			flex-direction: column;
+		}
+	}
+
+	// Both selected and vertical.
+	.is-selected.is-vertical & {
+		display: inline-flex; // This makes the white box not take up all available space.
+	}
+
+	.wp-block-navigation-placeholder__icon {
+		margin-right: $grid-unit-15;
+		height: $button-size; // Prevents jumpiness.
+	}
+}
+
+// When block is vertical.
+.is-vertical .wp-block-navigation-placeholder,
+.is-vertical .wp-block-navigation-placeholder__preview,
+.is-vertical .wp-block-navigation-placeholder__controls {
+	min-height: $icon-size + ($grid-unit-20 + $grid-unit-05 + $grid-unit-15 + $grid-unit-15) * 3;
+}
+
+.is-vertical .wp-block-navigation-placeholder__preview,
+.is-vertical .wp-block-navigation-placeholder__controls {
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.wp-block-navigation-placeholder__actions {
+	display: flex;
+	font-size: $default-font-size;
+
+	.components-button.components-dropdown-menu__toggle.has-icon {
+		padding: ($grid-unit-15 / 2) $grid-unit-15;
+		display: flex;
+		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
+	}
 }

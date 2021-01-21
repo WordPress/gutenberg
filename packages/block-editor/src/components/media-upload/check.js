@@ -12,6 +12,6 @@ export function MediaUploadCheck( { fallback = null, children } ) {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md
  */
 export default MediaUploadCheck;

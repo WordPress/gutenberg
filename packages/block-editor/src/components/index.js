@@ -78,10 +78,8 @@ export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
-export {
-	Block as __experimentalBlock,
-	useBlockProps,
-} from './block-list/block-wrapper';
+export { useBlockProps } from './block-list/use-block-props';
+export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';
 export {
@@ -110,6 +108,7 @@ export { default as NavigableToolbar } from './navigable-toolbar';
 export {
 	default as ObserveTyping,
 	useTypingObserver as __unstableUseTypingObserver,
+	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
 } from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
@@ -120,6 +119,8 @@ export {
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
+export { default as useBlockDisplayInformation } from './use-block-display-information';
+export { default as __unstableIframe } from './iframe';
 
 /*
  * State Related Components

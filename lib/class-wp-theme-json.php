@@ -88,9 +88,10 @@ class WP_Theme_JSON {
 	 * }
 	 */
 	const SCHEMA = array(
-		'selector' => null,
-		'supports' => null,
 		'styles'   => array(
+			'border'     => array(
+				'radius' => null,
+			),
 			'color'      => array(
 				'background' => null,
 				'gradient'   => null,
@@ -116,6 +117,9 @@ class WP_Theme_JSON {
 			),
 		),
 		'settings' => array(
+			'border'     => array(
+				'customRadius' => null,
+			),
 			'color'      => array(
 				'custom'         => null,
 				'customGradient' => null,
@@ -128,15 +132,15 @@ class WP_Theme_JSON {
 				'units'         => null,
 			),
 			'typography' => array(
-				'customFontSize'   => null,
-				'customLineHeight' => null,
-				'dropCap'          => null,
-				'fontFamilies'     => null,
-				'fontSizes'        => null,
-				'fontStyles'       => null,
-				'fontWeights'      => null,
-				'textDecorations'  => null,
-				'textTransforms'   => null,
+				'customFontSize'        => null,
+				'customLineHeight'      => null,
+				'dropCap'               => null,
+				'fontFamilies'          => null,
+				'fontSizes'             => null,
+				'customFontStyle'       => null,
+				'customFontWeight'      => null,
+				'customTextDecorations' => null,
+				'customTextTransforms'  => null,
 			),
 			'custom'     => null,
 		),
@@ -219,50 +223,6 @@ class WP_Theme_JSON {
 			'css_var_infix' => 'font-family',
 			'classes'       => array(),
 		),
-		array(
-			'path'          => array( 'settings', 'typography', 'fontStyles' ),
-			'value_key'     => 'value',
-			'css_var_infix' => 'font-style',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'font-style',
-					'property_name' => 'font-style',
-				),
-			),
-		),
-		array(
-			'path'          => array( 'settings', 'typography', 'fontWeights' ),
-			'value_key'     => 'value',
-			'css_var_infix' => 'font-weight',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'font-weight',
-					'property_name' => 'font-weight',
-				),
-			),
-		),
-		array(
-			'path'          => array( 'settings', 'typography', 'textDecorations' ),
-			'value_key'     => 'value',
-			'css_var_infix' => 'text-decoration',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'text-decoration',
-					'property_name' => 'text-decoration',
-				),
-			),
-		),
-		array(
-			'path'          => array( 'settings', 'typography', 'textTransforms' ),
-			'value_key'     => 'slug',
-			'css_var_infix' => 'text-transform',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'text-transform',
-					'property_name' => 'text-transform',
-				),
-			),
-		),
 	);
 
 	/**
@@ -285,6 +245,10 @@ class WP_Theme_JSON {
 		'backgroundColor'          => array(
 			'value'   => array( 'color', 'background' ),
 			'support' => array( 'color' ),
+		),
+		'borderRadius'             => array(
+			'value'   => array( 'border', 'radius' ),
+			'support' => array( '__experimentalBorder', 'radius' ),
 		),
 		'color'                    => array(
 			'value'   => array( 'color', 'text' ),
@@ -310,21 +274,10 @@ class WP_Theme_JSON {
 			'value'   => array( 'typography', 'lineHeight' ),
 			'support' => array( 'lineHeight' ),
 		),
-		'paddingBottom'            => array(
-			'value'   => array( 'spacing', 'padding', 'bottom' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingLeft'              => array(
-			'value'   => array( 'spacing', 'padding', 'left' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingRight'             => array(
-			'value'   => array( 'spacing', 'padding', 'right' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingTop'               => array(
-			'value'   => array( 'spacing', 'padding', 'top' ),
-			'support' => array( 'spacing', 'padding' ),
+		'padding'                  => array(
+			'value'      => array( 'spacing', 'padding' ),
+			'support'    => array( 'spacing', 'padding' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'textDecoration'           => array(
 			'value'   => array( 'typography', 'textDecoration' ),
@@ -359,14 +312,12 @@ class WP_Theme_JSON {
 			// Filter out top-level keys that aren't valid according to the schema.
 			$context = array_intersect_key( $context, self::SCHEMA );
 
-			// Selector & Supports are always taken from metadata.
-			$this->contexts[ $key ]['selector'] = $metadata[ $key ]['selector'];
-			$this->contexts[ $key ]['supports'] = $metadata[ $key ]['supports'];
-
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
 			if ( isset( $context['styles'] ) ) {
+				$this->process_key( 'border', $context['styles'], self::SCHEMA['styles'] );
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'spacing', $context['styles'], self::SCHEMA['styles'] );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
 
 				if ( empty( $context['styles'] ) ) {
@@ -379,6 +330,7 @@ class WP_Theme_JSON {
 			// Process settings subtree.
 			$this->process_key( 'settings', $context, self::SCHEMA );
 			if ( isset( $context['settings'] ) ) {
+				$this->process_key( 'border', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
@@ -390,6 +342,64 @@ class WP_Theme_JSON {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns the kebab-cased name of a given property.
+	 *
+	 * @param string $property Property name to convert.
+	 * @return string kebab-cased name of the property
+	 */
+	private static function to_kebab_case( $property ) {
+		$mappings = self::get_case_mappings();
+		return $mappings['to_kebab_case'][ $property ];
+	}
+
+	/**
+	 * Returns the property name of a kebab-cased property.
+	 *
+	 * @param string $property Property name to convert in kebab-case.
+	 * @return string Name of the property
+	 */
+	private static function to_property( $property ) {
+		$mappings = self::get_case_mappings();
+		return $mappings['to_property'][ $property ];
+	}
+
+	/**
+	 * Returns a mapping on metadata properties to avoid having to constantly
+	 * transforms properties between camel case and kebab.
+	 *
+	 * @return array Containing three mappings
+	 *  "to_kebab_case" mapping properties in camel case to
+	 *    properties in kebab case e.g: "paddingTop" to "padding-top".
+	 *  "to_property" mapping properties in kebab case to
+	 *    the main properties in camel case e.g: "padding-top" to "padding".
+	 */
+	private static function get_case_mappings() {
+		static $case_mappings;
+		if ( null === $case_mappings ) {
+			$case_mappings = array(
+				'to_kebab_case' => array(),
+				'to_property'   => array(),
+			);
+			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
+				$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
+
+				$case_mappings['to_kebab_case'][ $key ]      = $kebab_case;
+				$case_mappings['to_property'][ $kebab_case ] = $key;
+				if ( self::has_properties( $metadata ) ) {
+					foreach ( $metadata['properties'] as $property ) {
+						$camel_case = $key . ucfirst( $property );
+						$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $camel_case ) );
+
+						$case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
+						$case_mappings['to_property'][ $kebab_case ]   = $key;
+					}
+				}
+			}
+		}
+		return $case_mappings;
 	}
 
 	/**
@@ -649,6 +659,21 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Whether the medatata contains a key named properties.
+	 *
+	 * @param array $metadata Description of the style property.
+	 *
+	 * @return boolean True if properties exists, false otherwise.
+	 */
+	private static function has_properties( $metadata ) {
+		if ( array_key_exists( 'properties', $metadata ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Given a context, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
@@ -661,24 +686,43 @@ class WP_Theme_JSON {
 	 *
 	 * Note that this modifies the $declarations in place.
 	 *
-	 * @param array $declarations Holds the existing declarations.
-	 * @param array $context Input context to process.
+	 * @param array $declarations     Holds the existing declarations.
+	 * @param array $context Input    context to process.
+	 * @param array $context_supports Supports information for this context.
 	 */
-	private static function compute_style_properties( &$declarations, $context ) {
-		if ( empty( $context['supports'] ) || empty( $context['styles'] ) ) {
+	private static function compute_style_properties( &$declarations, $context, $context_supports ) {
+		if ( empty( $context['styles'] ) ) {
 			return;
 		}
-
+		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			if ( ! in_array( $name, $context['supports'], true ) ) {
+			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
 			}
 
-			$value = self::get_property_value( $context['styles'], $metadata['value'] );
+			// Some properties can be shorthand properties, meaning that
+			// they contain multiple values instead of a single one.
+			if ( self::has_properties( $metadata ) ) {
+				foreach ( $metadata['properties'] as $property ) {
+					$properties[] = array(
+						'name'  => $name . ucfirst( $property ),
+						'value' => array_merge( $metadata['value'], array( $property ) ),
+					);
+				}
+			} else {
+				$properties[] = array(
+					'name'  => $name,
+					'value' => $metadata['value'],
+				);
+			}
+		}
+
+		foreach ( $properties as $prop ) {
+			$value = self::get_property_value( $context['styles'], $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
-				$declarations[]  = array(
-					'name'  => $kebabcased_name,
+				$kebab_cased_name = self::to_kebab_case( $prop['name'] );
+				$declarations[]   = array(
+					'name'  => $kebab_cased_name,
 					'value' => $value,
 				);
 			}
@@ -693,9 +737,9 @@ class WP_Theme_JSON {
 	 *
 	 * @param string $stylesheet Input stylesheet to add the presets to.
 	 * @param array  $context Context to process.
+	 * @param string $selector Selector wrapping the classes.
 	 */
-	private static function compute_preset_classes( &$stylesheet, $context ) {
-		$selector = $context['selector'];
+	private static function compute_preset_classes( &$stylesheet, $context, $selector ) {
 		if ( self::GLOBAL_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -830,23 +874,24 @@ class WP_Theme_JSON {
 	 *     --wp--custom--variable: value;
 	 *   }
 	 *
-	 * @param string $stylesheet Stylesheet to append new rules to.
-	 * @param array  $context Context to be processed.
-	 *
 	 * @return string The new stylesheet.
 	 */
-	private static function to_css_variables( $stylesheet, $context ) {
-		if ( empty( $context['selector'] ) ) {
-			return $stylesheet;
+	private function get_css_variables() {
+		$stylesheet = '';
+		$metadata   = $this->get_blocks_metadata();
+		foreach ( $this->contexts as $context_name => $context ) {
+			if ( empty( $metadata[ $context_name ]['selector'] ) ) {
+				continue;
+			}
+			$selector = $metadata[ $context_name ]['selector'];
+
+			$declarations = array();
+			self::compute_preset_vars( $declarations, $context );
+			self::compute_theme_vars( $declarations, $context );
+
+			// Attach the ruleset for style and custom properties.
+			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
-
-		$declarations = array();
-		self::compute_preset_vars( $declarations, $context );
-		self::compute_theme_vars( $declarations, $context );
-
-		// Attach the ruleset for style and custom properties.
-		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
-
 		return $stylesheet;
 	}
 
@@ -885,23 +930,26 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
-	 * @param string $stylesheet Stylesheet to append new rules to.
-	 * @param array  $context Context to be processed.
-	 *
 	 * @return string The new stylesheet.
 	 */
-	private static function to_block_styles( $stylesheet, $context ) {
-		if ( empty( $context['selector'] ) ) {
-			return $stylesheet;
+	private function get_block_styles() {
+		$stylesheet = '';
+		$metadata   = $this->get_blocks_metadata();
+		foreach ( $this->contexts as $context_name => $context ) {
+			if ( empty( $metadata[ $context_name ]['selector'] ) || empty( $metadata[ $context_name ]['supports'] ) ) {
+				continue;
+			}
+			$selector = $metadata[ $context_name ]['selector'];
+			$supports = $metadata[ $context_name ]['supports'];
+
+			$declarations = array();
+			self::compute_style_properties( $declarations, $context, $supports );
+
+			$stylesheet .= self::to_ruleset( $selector, $declarations );
+
+			// Attach the rulesets for the classes.
+			self::compute_preset_classes( $stylesheet, $context, $selector );
 		}
-
-		$declarations = array();
-		self::compute_style_properties( $declarations, $context );
-
-		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
-
-		// Attach the rulesets for the classes.
-		self::compute_preset_classes( $stylesheet, $context );
 
 		return $stylesheet;
 	}
@@ -945,11 +993,11 @@ class WP_Theme_JSON {
 	public function get_stylesheet( $type = 'all' ) {
 		switch ( $type ) {
 			case 'block_styles':
-				return array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+				return $this->get_block_styles();
 			case 'css_variables':
-				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' );
+				return $this->get_css_variables();
 			default:
-				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' ) . array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+				return $this->get_css_variables() . $this->get_block_styles();
 		}
 	}
 
@@ -960,13 +1008,8 @@ class WP_Theme_JSON {
 	 */
 	public function merge( $theme_json ) {
 		$incoming_data = $theme_json->get_raw_data();
-		$metadata      = $this->get_blocks_metadata();
 
 		foreach ( array_keys( $incoming_data ) as $context ) {
-			// Selector & Supports are always taken from metadata.
-			$this->contexts[ $context ]['selector'] = $metadata[ $context ]['selector'];
-			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
-
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
 				if ( ! isset( $incoming_data[ $context ][ $subtree ] ) ) {
 					continue;
@@ -992,6 +1035,119 @@ class WP_Theme_JSON {
 						$incoming_data[ $context ][ $subtree ][ $leaf ]
 					);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Removes insecure data from theme.json.
+	 */
+	public function remove_insecure_properties() {
+		$blocks_metadata = self::get_blocks_metadata();
+		foreach ( $this->contexts as $context_name => &$context ) {
+			// Escape the context key.
+			if ( empty( $blocks_metadata[ $context_name ] ) ) {
+				unset( $this->contexts[ $context_name ] );
+				continue;
+			}
+
+			$escaped_settings = null;
+			$escaped_styles   = null;
+
+			// Style escaping.
+			if ( ! empty( $context['styles'] ) ) {
+				$supports     = $blocks_metadata[ $context_name ]['supports'];
+				$declarations = array();
+				self::compute_style_properties( $declarations, $context, $supports );
+				foreach ( $declarations as $declaration ) {
+					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
+					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
+						if ( null === $escaped_styles ) {
+							$escaped_styles = array();
+						}
+						$property = self::to_property( $declaration['name'] );
+						$path     = self::PROPERTIES_METADATA[ $property ]['value'];
+						if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
+							$declaration_divided = explode( '-', $declaration['name'] );
+							$path[]              = $declaration_divided[1];
+							gutenberg_experimental_set(
+								$escaped_styles,
+								$path,
+								gutenberg_experimental_get( $context['styles'], $path )
+							);
+						} else {
+							gutenberg_experimental_set(
+								$escaped_styles,
+								$path,
+								gutenberg_experimental_get( $context['styles'], $path )
+							);
+						}
+					}
+				}
+			}
+
+			// Settings escaping.
+			// For now the ony allowed settings are presets.
+			if ( ! empty( $context['settings'] ) ) {
+				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+					$current_preset = gutenberg_experimental_get( $context, $preset_metadata['path'], null );
+					if ( null !== $current_preset ) {
+						$escaped_preset = array();
+						foreach ( $current_preset as $single_preset ) {
+							if (
+								esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
+								sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
+							) {
+								$value                  = $single_preset[ $preset_metadata['value_key'] ];
+								$single_preset_is_valid = null;
+								if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
+									$single_preset_is_valid = true;
+									foreach ( $preset_metadata['classes'] as $class_meta_data ) {
+										$property          = $class_meta_data['property_name'];
+										$style_to_validate = $property . ': ' . $value;
+										if ( esc_html( safecss_filter_attr( $style_to_validate ) ) !== $style_to_validate ) {
+											$single_preset_is_valid = false;
+											break;
+										}
+									}
+								} else {
+									$property               = $preset_metadata['css_var_infix'];
+									$style_to_validate      = $property . ': ' . $value;
+									$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
+								}
+								if ( $single_preset_is_valid ) {
+									$escaped_preset[] = $single_preset;
+								}
+							}
+						}
+						if ( count( $escaped_preset ) > 0 ) {
+							if ( null === $escaped_settings ) {
+								$escaped_settings = array();
+							}
+							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path'], $escaped_preset );
+						}
+					}
+				}
+				if ( null !== $escaped_settings ) {
+					$escaped_settings = $escaped_settings['settings'];
+				}
+			}
+
+			if ( null === $escaped_settings && null === $escaped_styles ) {
+				unset( $this->contexts[ $context_name ] );
+			} elseif ( null !== $escaped_settings && null !== $escaped_styles ) {
+				$context = array(
+					'styles'   => $escaped_styles,
+					'settings' => $escaped_settings,
+				);
+			} elseif ( null === $escaped_settings ) {
+				$context = array(
+					'styles' => $escaped_styles,
+				);
+			} else {
+				$context = array(
+					'settings' => $escaped_settings,
+				);
 			}
 		}
 	}

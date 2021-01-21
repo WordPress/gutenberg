@@ -170,7 +170,7 @@ function NavigationLinkEdit( {
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
-	// This can't be done in the useState call because it cconflicts
+	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
 		if ( ! url ) {
@@ -232,7 +232,7 @@ function NavigationLinkEdit( {
 
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
-			status: 'publish',
+			status: 'draft',
 		} );
 
 		return {
@@ -362,6 +362,7 @@ function NavigationLinkEdit( {
 								createBlock( 'core/navigation-link' )
 							)
 						}
+						aria-label={ __( 'Navigation link text' ) }
 						placeholder={ itemLabelPlaceholder }
 						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
@@ -388,12 +389,12 @@ function NavigationLinkEdit( {
 									if ( type === 'post' ) {
 										/* translators: %s: search term. */
 										format = __(
-											'Create post: <mark>%s</mark>'
+											'Create draft post: <mark>%s</mark>'
 										);
 									} else {
 										/* translators: %s: search term. */
 										format = __(
-											'Create page: <mark>%s</mark>'
+											'Create draft page: <mark>%s</mark>'
 										);
 									}
 									return createInterpolateElement(

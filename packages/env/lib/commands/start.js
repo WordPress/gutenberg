@@ -42,12 +42,18 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
  * @param {boolean} options.update  If true, update sources.
+ * @param {string}  options.xdebug  The Xdebug mode to set.
  */
-module.exports = async function start( { spinner, debug, update } ) {
+module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
-	const config = await initConfig( { spinner, debug } );
+	const config = await initConfig( {
+		spinner,
+		debug,
+		xdebug,
+		writeChanges: true,
+	} );
 
 	if ( ! config.detectedLocalConfig ) {
 		const { configDirectoryPath } = config;

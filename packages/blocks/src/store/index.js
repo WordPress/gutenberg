@@ -9,13 +9,12 @@ import { createReduxStore, register } from '@wordpress/data';
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
-
-const STORE_NAME = 'core/blocks';
+import { STORE_NAME } from './constants';
 
 /**
  * Store definition for the blocks namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */

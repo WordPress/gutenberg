@@ -383,6 +383,7 @@ describe( 'Blocks raw handling', () => {
 			'gutenberg',
 			'shortcode-matching',
 		].forEach( ( type ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
 				const HTML = readFile(
 					path.join( __dirname, `fixtures/${ type }-in.html` )
@@ -407,6 +408,7 @@ describe( 'Blocks raw handling', () => {
 				expect( serialized ).toBe( output );
 
 				if ( type !== 'gutenberg' ) {
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( console ).toHaveLogged();
 				}
 			} );

@@ -1,6 +1,3 @@
-$tree-border-width: 2px;
-$tree-item-height: 36px;
-
 .block-editor-block-navigation__label {
 	margin: 0 0 $grid-unit-15;
 	color: $gray-700;
@@ -10,7 +7,7 @@ $tree-item-height: 36px;
 }
 
 .block-editor-block-navigation__container {
-	padding: $grid-unit - $border-width;
+	min-width: 280px;
 }
 
 .block-editor-block-navigation-tree {
@@ -24,6 +21,13 @@ $tree-item-height: 36px;
 	// Use position relative for row animation.
 	position: relative;
 
+	&.is-selected .block-editor-block-navigation-block-contents,
+	&.is-selected:hover .block-editor-block-navigation-block-contents,
+	&.is-selected:focus .block-editor-block-navigation-block-contents {
+		background: $gray-900;
+		color: $white;
+	}
+
 	&.is-dragging {
 		display: none;
 	}
@@ -33,14 +37,20 @@ $tree-item-height: 36px;
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: $grid-unit-15 ($grid-unit-15 / 2);
-		margin-top: auto;
-		margin-bottom: auto;
+		padding: ($grid-unit-15 / 2);
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
 		position: relative;
 		white-space: nowrap;
+
+		&:hover {
+			background: $gray-100;
+		}
+
+		&:focus {
+			z-index: 1;
+		}
 
 		&.is-dropping-before::before {
 			content: "";
@@ -89,14 +99,6 @@ $tree-item-height: 36px;
 	.block-editor-block-icon {
 		align-self: flex-start;
 		margin-right: 6px;
-	}
-
-	&.is-selected .block-editor-block-icon svg,
-	&.is-selected:focus .block-editor-block-icon svg {
-		color: $white;
-		background: $gray-900;
-		box-shadow: 0 0 0 $border-width $gray-900;
-		border-radius: $border-width;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
@@ -225,64 +227,9 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation-appender__container {
 		display: flex;
 	}
-
-	.block-editor-block-navigation-block__contents-container {
-		min-height: $grid-unit-60;
-	}
-
-	.block-editor-block-navigator-descender-line {
-		position: relative;
-		flex-shrink: 0;
-		width: ( $button-size / 2 ) + 6px;
-
-		&:first-child {
-			width: ( $button-size / 2 );
-		}
-
-		&.has-item {
-			margin-right: 6px;
-		}
-
-		// Draw a vertical line using border-right.
-		&::before {
-			content: "";
-			display: block;
-			position: absolute;
-			top: 1px;
-			bottom: -2px;
-			right: -1px;
-			border-right: 2px solid $gray-600;
-		}
-
-		// If a vertical line has terminated, don't draw it.
-		&.is-terminated::before {
-			border-color: transparent;
-		}
-
-		// Make the last vertical line half-height.
-		&.has-item.is-last-row {
-			height: 26px;
-		}
-
-		// Draw a horizontal line using border-bottom.
-		&.has-item::after {
-			content: "";
-			display: block;
-			position: absolute;
-			top: 26px;
-			left: 100%;
-			width: 5px;
-			border-bottom: 2px solid $gray-600;
-		}
-	}
 }
 
-// Position the horizontal line in the middle of appender's height
-.block-editor-block-navigation-appender__cell .block-editor-block-navigator-descender-line {
-	&.has-item.is-last-row {
-		height: $grid-unit-20;
-		&::after {
-			top: 100%;
-		}
-	}
+.block-editor-block-navigator-indentation {
+	flex-shrink: 0;
+	width: 18px;
 }
