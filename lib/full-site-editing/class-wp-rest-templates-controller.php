@@ -336,8 +336,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
-				'wp_theme'           => $template->theme,
-				'template_part_type' => $template->template_part_type,
+				'wp_theme' => $template->theme,
 			);
 		} else {
 			$changes->ID          = $template->wp_id;
@@ -359,13 +358,23 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->post_excerpt = $template->description;
 		}
 
-		if ( isset( $request['template_part_type'] ) ) {
-			if ( is_array( $changes->tax_input ) ) {
-				$changes->tax_input['template_part_type'] = $request['template_part_type'];
-			} else {
-				$changes->tax_input = array(
-					'template_part_type' => $request['template_part_type'],
-				);
+		if ( 'wp_template_part' === $this->post_type ) {
+			$template_part_type = null;
+
+			if ( isset( $request['template_part_type'] ) ) {
+				$template_part_type = $request['template_part_type'];
+			} elseif ( null !== $template && ! $template->is_custom ) {
+				$template_part_type = $template->template_part_type;
+			}
+
+			if ( $template_part_type ) {
+				if ( is_array( $changes->tax_input ) ) {
+					$changes->tax_input['template_part_type'] = $template_part_type;
+				} else {
+					$changes->tax_input = array(
+						'template_part_type' => $template_part_type,
+					);
+				}
 			}
 		}
 
