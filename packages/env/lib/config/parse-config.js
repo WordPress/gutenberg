@@ -121,7 +121,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		return {
 			type: 'git',
 			url: `https://github.com/${ gitHubFields[ 1 ] }/${ gitHubFields[ 2 ] }.git`,
-			ref: gitHubFields[ 5 ] || 'master',
+			ref: gitHubFields[ 5 ] || 'trunk',
 			path: path.resolve(
 				workDirectoryPath,
 				gitHubFields[ 2 ],
