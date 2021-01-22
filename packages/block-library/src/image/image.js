@@ -318,7 +318,7 @@ export default function Image( {
 					<ToolbarGroup>
 						<ToolbarButton
 							icon={ textColor }
-							label={ __( 'Add text overlay' ) }
+							label={ __( 'Add text over image' ) }
 							onClick={ () =>
 								replaceBlocks(
 									currentId,
