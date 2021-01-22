@@ -101,7 +101,7 @@ describe( 'ColorPalette', () => {
 			} );
 
 			test( 'should call onToggle on click.', () => {
-				renderedToggleButton.simulate( 'click' );
+				renderedToggleButton.find( 'button' ).simulate( 'click' );
 
 				expect( onToggle ).toHaveBeenCalledTimes( 1 );
 			} );

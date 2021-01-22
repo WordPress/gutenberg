@@ -46,6 +46,7 @@ export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
 export { default as UnitControl } from './unit-control';
+export { default as Disabled } from './disabled';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -67,7 +68,6 @@ export {
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
-export { default as ModalHeaderBar } from './mobile/modal-header-bar';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
@@ -81,6 +81,8 @@ export { default as LinkSettingsNavigation } from './mobile/link-settings/link-s
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 export { default as InserterButton } from './mobile/inserter-button';
+export { setClipboard, getClipboard } from './mobile/clipboard';
+export { default as Preview } from './mobile/preview';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

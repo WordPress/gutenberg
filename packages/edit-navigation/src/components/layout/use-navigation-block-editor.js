@@ -21,11 +21,11 @@ export default function useNavigationBlockEditor( post ) {
 	);
 
 	const onChange = useCallback(
-		async ( updatedBlocks ) => {
-			await _onChange( updatedBlocks );
+		async ( ...args ) => {
+			await _onChange( ...args );
 			createMissingMenuItems( post );
 		},
-		[ blocks, _onChange ]
+		[ _onChange, post ]
 	);
 
 	return [ blocks, onInput, onChange ];

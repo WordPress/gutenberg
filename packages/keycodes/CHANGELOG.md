@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.18.0 (2021-01-05)
+
 ### Enhancement
 
 -   Include TypeScript type declarations ([#19520](https://github.com/WordPress/gutenberg/pull/19520))

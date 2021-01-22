@@ -9,6 +9,8 @@ import {
 	searchForBlock,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	toggleScreenOption,
+	toggleMoreMenu,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block variations', () => {
@@ -107,6 +109,16 @@ describe( 'Block variations', () => {
 	} );
 	// @see @wordpres/block-editor/src/components/use-block-display-information (`useBlockDisplayInformation` hook).
 	describe( 'testing block display information with matching variations', () => {
+		beforeEach( async () => {
+			await toggleScreenOption( 'Display block breadcrumbs', true );
+			await toggleMoreMenu();
+		} );
+
+		afterEach( async () => {
+			await toggleScreenOption( 'Display block breadcrumbs', false );
+			await toggleMoreMenu();
+		} );
+
 		const getActiveBreadcrumb = async () =>
 			page.evaluate(
 				() =>

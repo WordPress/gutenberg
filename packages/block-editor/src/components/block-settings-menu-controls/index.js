@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import { compact, isEmpty, map } from 'lodash';
+import { compact, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createSlotFill, MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToGroupButton from '../convert-to-group-buttons';
 
 const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 	'BlockSettingsMenuControls'
@@ -31,9 +36,14 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
-			{ ( fills ) =>
-				! isEmpty( fills ) && <MenuGroup>{ fills }</MenuGroup>
-			}
+			{ ( fills ) => {
+				return (
+					<MenuGroup>
+						{ fills }
+						<ConvertToGroupButton onClose={ fillProps?.onClose } />
+					</MenuGroup>
+				);
+			} }
 		</Slot>
 	);
 };
@@ -41,6 +51,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlot;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  */
 export default BlockSettingsMenuControls;

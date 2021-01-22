@@ -48,8 +48,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void replaceUnsupportedBlock(String content, String blockId);
     }
 
-    interface StarterPageTemplatesTooltipShownCallback {
-        void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown);
+    interface ReplaceMediaFilesEditedBlockCallback {
+        void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
@@ -167,11 +167,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void onShowXpostSuggestions(Consumer<String> onResult);
 
-    void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
-
-    void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
-
-    void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId);
+    void requestMediaFilesEditorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+                                                     ReadableArray mediaFiles,
+                                                     String blockId
+    );
 
     void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
 

@@ -13,16 +13,12 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
 import './batch-support';
-
-/**
- * Module Constants
- */
-const STORE_NAME = 'core/edit-widgets';
+import { STORE_NAME } from './constants';
 
 /**
  * Block editor data store configuration.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
  *
  * @type {Object}
  */
@@ -37,7 +33,7 @@ const storeConfig = {
 /**
  * Store definition for the edit widgets namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */

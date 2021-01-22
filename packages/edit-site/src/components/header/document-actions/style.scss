@@ -14,20 +14,22 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		transition: transform 0.2s;
-		@include reduce-motion(transition);
 
 		// See comment above about min-width
 		min-width: 0;
 
-		// Since part of the dropdown button width is blank space, visually,
-		// it looks off-center. This offsets that blank space.
-		margin-left: 12px;
+		.components-dropdown {
+			display: inline-flex;
+			margin-left: $grid-unit-05;
+
+			.components-button {
+				min-width: 0;
+				padding: 0;
+			}
+		}
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
-		display: flex;
-		justify-content: center;
 		margin: 0;
 
 		// See comment above about min-width
@@ -38,29 +40,36 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		max-width: 120px;
+
+		@include break-medium() {
+			max-width: 75px;
+		}
+
+		@include break-xlarge() {
+			max-width: 180px;
+		}
 	}
 
 	.edit-site-document-actions__secondary-item {
-		opacity: 0;
-		transform: translateY(0);
-		transition: transform 0.2s;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		text-align: center;
+		max-width: 0;
+		opacity: 0;
+		padding: 0;
+		transition: all ease 0.2s;
+		background: $gray-200;
+		border-radius: 2px;
 		@include reduce-motion(transition);
 	}
 
 	&.has-secondary-label {
-		transform: translateY(10px);
-
-		.edit-site-document-actions__title-wrapper {
-			transform: translateY(-12px);
-		}
-
 		.edit-site-document-actions__secondary-item {
 			opacity: 1;
-			transform: translateY(-16px);
+			padding: 0 4px;
+			max-width: 180px;
+			margin-left: 6px;
 		}
 	}
 }

@@ -287,18 +287,6 @@ export function showXpostSuggestions() {
 	return RNReactNativeGutenbergBridge.showXpostSuggestions();
 }
 
-export function requestStarterPageTemplatesTooltipShown( callback ) {
-	return RNReactNativeGutenbergBridge.requestStarterPageTemplatesTooltipShown(
-		callback
-	);
-}
-
-export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
-	return RNReactNativeGutenbergBridge.setStarterPageTemplatesTooltipShown(
-		tooltipShown
-	);
-}
-
 /**
  * Request the host app to show the block for editing its mediaFiles collection
  *

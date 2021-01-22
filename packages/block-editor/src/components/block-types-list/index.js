@@ -1,13 +1,11 @@
 /**
- * External dependencies
- */
-import { Composite, useCompositeState } from 'reakit';
-
-/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useEffect } from '@wordpress/element';
+import {
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,13 +21,6 @@ function BlockTypesList( {
 	isDraggable = true,
 } ) {
 	const composite = useCompositeState();
-	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
-
-	// This ensures the composite state refreshes when the list order changes.
-	useEffect( () => {
-		composite.unstable_sort();
-	}, [ composite.unstable_sort, orderId ] );
-
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but

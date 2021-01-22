@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
@@ -12,15 +13,57 @@ function formatTypesSelector( select ) {
 }
 
 /**
+ * Set of all interactive content tags.
+ *
+ * @see https://html.spec.whatwg.org/multipage/dom.html#interactive-content
+ */
+const interactiveContentTags = new Set( [
+	'a',
+	'audio',
+	'button',
+	'details',
+	'embed',
+	'iframe',
+	'input',
+	'label',
+	'select',
+	'textarea',
+	'video',
+] );
+
+/**
  * This hook provides RichText with the `formatTypes` and its derived props from
  * experimental format type settings.
  *
- * @param {Object} $0            Options
- * @param {string} $0.clientId   Block client ID.
- * @param {string} $0.identifier Block attribute.
+ * @param {Object} $0                               Options
+ * @param {string} $0.clientId                      Block client ID.
+ * @param {string} $0.identifier                    Block attribute.
+ * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formattings or not.
+ * @param {Array} $0.allowedFormats                 Allowed formats
  */
-export function useFormatTypes( { clientId, identifier } ) {
-	const formatTypes = useSelect( formatTypesSelector, [] );
+export function useFormatTypes( {
+	clientId,
+	identifier,
+	withoutInteractiveFormatting,
+	allowedFormats,
+} ) {
+	const allFormatTypes = useSelect( formatTypesSelector, [] );
+	const formatTypes = useMemo( () => {
+		return allFormatTypes.filter( ( { name, tagName } ) => {
+			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
+				return false;
+			}
+
+			if (
+				withoutInteractiveFormatting &&
+				interactiveContentTags.has( tagName )
+			) {
+				return false;
+			}
+
+			return true;
+		} );
+	}, [ allFormatTypes, allowedFormats, interactiveContentTags ] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {

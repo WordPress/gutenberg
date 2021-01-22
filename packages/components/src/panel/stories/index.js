@@ -49,6 +49,11 @@ export const multipleBodies = () => {
 						<Placeholder />
 					</PanelRow>
 				</PanelBody>
+				<PanelBody
+					title="Disabled Settings"
+					initialOpen={ false }
+					buttonProps={ { disabled: true } }
+				/>
 			</Panel>
 		</ScrollableContainer>
 	);

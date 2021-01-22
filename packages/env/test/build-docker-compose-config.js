@@ -73,4 +73,46 @@ describe( 'buildDockerComposeConfig', () => {
 			expect.arrayContaining( localSources )
 		);
 	} );
+
+	it( 'should not map the default phpunit uploads directory if the user has specified their own directory', () => {
+		const envConfig = {
+			...CONFIG,
+			mappings: {
+				'wp-content/uploads': {
+					path: '/path/to/wp-uploads',
+				},
+			},
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
+		const expectedVolumes = [
+			'tests-wordpress:/var/www/html',
+			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
+		];
+		expect( dockerConfig.services.phpunit.volumes ).toEqual(
+			expectedVolumes
+		);
+	} );
+
+	it( 'should map the default phpunit uploads directory even if the user has specified their own directory only for the development instance', () => {
+		const envConfig = {
+			...CONFIG,
+			mappings: {
+				'wp-content/uploads': {
+					path: '/path/to/wp-uploads',
+				},
+			},
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: CONFIG },
+		} );
+		const expectedVolumes = [
+			'tests-wordpress:/var/www/html',
+			'phpunit-uploads:/var/www/html/wp-content/uploads',
+		];
+		expect( dockerConfig.services.phpunit.volumes ).toEqual(
+			expectedVolumes
+		);
+	} );
 } );

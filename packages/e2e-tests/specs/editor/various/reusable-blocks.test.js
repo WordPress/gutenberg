@@ -13,6 +13,7 @@ import {
 	visitAdminPage,
 	toggleGlobalBlockInserter,
 	openDocumentSettingsSidebar,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 const reusableBlockNameInputSelector =
@@ -46,7 +47,7 @@ const createReusableBlock = async ( content, title ) => {
 	await insertBlock( 'Paragraph' );
 	await page.keyboard.type( content );
 
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 	await clickMenuItem( 'Add to Reusable blocks' );
 
 	// Wait for creation to finish
@@ -192,7 +193,7 @@ describe( 'Reusable blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Convert block to a reusable block
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
@@ -248,7 +249,7 @@ describe( 'Reusable blocks', () => {
 		await page.click( blockSelector );
 
 		// Delete the block, leaving the reusable block empty
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		const deleteButton = await page.waitForXPath(
 			'//button/span[text()="Remove block"]'
 		);
@@ -271,5 +272,59 @@ describe( 'Reusable blocks', () => {
 		await toggleGlobalBlockInserter();
 
 		expect( console ).not.toHaveErrored();
+	} );
+
+	it( 'Should show a proper message when the reusable block is missing', async () => {
+		// Insert a non-existant reusable block
+		await page.evaluate( () => {
+			const { createBlock } = window.wp.blocks;
+			const { dispatch } = window.wp.data;
+			dispatch( 'core/block-editor' ).resetBlocks( [
+				createBlock( 'core/block', { ref: 123456 } ),
+			] );
+		} );
+
+		await page.waitForXPath(
+			'//*[contains(@class, "block-editor-warning")]/*[text()="Block has been deleted or is unavailable."]'
+		);
+
+		// This happens when the 404 is returned.
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'should be able to insert a reusable block twice', async () => {
+		await createReusableBlock(
+			'Awesome Paragraph',
+			'Duplicated reusable block'
+		);
+		await saveAll();
+		await clearAllBlocks();
+		await insertReusableBlock( 'Duplicated reusable block' );
+		await insertReusableBlock( 'Duplicated reusable block' );
+		await saveDraft();
+		await page.reload();
+
+		// Replace the content of the  first paragraph
+		const paragraphBlock = await page.waitForSelector(
+			'.block-editor-block-list__block[data-type="core/paragraph"]'
+		);
+		paragraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' modified' );
+
+		// Wait for async mode to dispatch the update.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 1000 );
+
+		// Check that the content of the second reusable block has been updated.
+		const reusableBlocks = await page.$$( '.wp-block-block' );
+		reusableBlocks.forEach( async ( paragraph ) => {
+			const content = await paragraph.$eval(
+				'p',
+				( element ) => element.textContent
+			);
+			expect( content ).toEqual( 'Awesome Paragraph modified' );
+		} );
 	} );
 } );

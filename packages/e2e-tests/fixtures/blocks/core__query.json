@@ -5,9 +5,8 @@
         "isValid": true,
         "attributes": {
             "query": {
-                "inherit": true,
                 "perPage": null,
-                "pages": 1,
+                "pages": 0,
                 "offset": 0,
                 "postType": "post",
                 "categoryIds": [],
@@ -17,7 +16,8 @@
                 "author": "",
                 "search": "",
                 "exclude": [],
-                "sticky": ""
+                "sticky": "",
+                "inherit": true
             },
             "layout": {
                 "type": "list"

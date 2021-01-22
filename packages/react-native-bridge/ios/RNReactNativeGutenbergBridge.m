@@ -22,8 +22,6 @@ RCT_EXTERN_METHOD(logUserEvent:(NSString *)event properties:(NSDictionary *)prop
 RCT_EXTERN_METHOD(requestUnsupportedBlockFallback:(NSString *)content blockId:(NSString *)blockId blockName:(NSString *)blockName blockTitle:(NSString *)blockTitle)
 RCT_EXTERN_METHOD(showUserSuggestions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(showXpostSuggestions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)rejecter)
-RCT_EXTERN_METHOD(requestStarterPageTemplatesTooltipShown:(RCTResponseSenderBlock)callback)
-RCT_EXTERN_METHOD(setStarterPageTemplatesTooltipShown:(BOOL)tooltipShown)
 RCT_EXTERN_METHOD(requestMediaFilesEditorLoad:(NSArray<NSString *> *)mediaFiles blockId:(NSString *)blockId)
 RCT_EXTERN_METHOD(requestMediaFilesFailedRetryDialog:(NSArray<NSString *> *)mediaFiles)
 RCT_EXTERN_METHOD(requestMediaFilesUploadCancelDialog:(NSArray<NSString *> *)mediaFiles)

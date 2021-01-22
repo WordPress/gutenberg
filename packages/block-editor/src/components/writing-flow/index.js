@@ -81,7 +81,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  * @param {Element} target           Currently focused text field.
  * @param {boolean} isReverse        True if considering as the first field.
  * @param {Element} containerElement Element containing all blocks.
- * @param {boolean} onlyVertical     Wether to only consider tabbable elements
+ * @param {boolean} onlyVertical     Whether to only consider tabbable elements
  *                                   that are visually above or under the
  *                                   target.
  *

@@ -291,16 +291,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 	}
 
     @objc
-    func requestStarterPageTemplatesTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {
-        callback([self.delegate?.gutenbergDidRequestStarterPageTemplatesTooltipShown() ?? false])
-    }
-    
-    @objc
-    func setStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
-        self.delegate?.gutenbergDidRequestSetStarterPageTemplatesTooltipShown(tooltipShown)
-    }
-
-    @objc
     func requestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles, blockId: blockId)

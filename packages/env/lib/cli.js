@@ -48,7 +48,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 				'out' in error
 			) {
 				// Error is a docker-compose error. That means something docker-related failed.
-				// https://github.com/PDMLab/docker-compose/blob/master/src/index.ts
+				// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
 				spinner.fail( 'Error while running docker-compose command.' );
 				if ( error.out ) {
 					process.stdout.write( error.out );
@@ -131,7 +131,7 @@ module.exports = function cli() {
 		withSpinner( env.clean )
 	);
 	yargs.command(
-		'logs',
+		'logs [environment]',
 		'displays PHP and Docker logs for given WordPress environment.',
 		( args ) => {
 			args.positional( 'environment', {

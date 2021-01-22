@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Quote' ),
+	title: _x( 'Quote', 'block title' ),
 	description: __(
 		'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
 	),

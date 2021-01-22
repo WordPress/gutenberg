@@ -56,12 +56,14 @@ Every context has the same structure, divided in two sections: `settings` and `s
 {
   "some/context": {
     "settings": {
+      "border": [ ... ],
       "color": [ ... ],
       "custom": [ ... ],
       "spacing": [ ... ],
       "typography": [ ... ]
     },
     "styles": {
+      "border": { ... },
       "color": { ... },
       "typography": { ... }
     }
@@ -79,6 +81,9 @@ The settings section has the following structure and default values:
 {
   "some/context": {
     "settings": {
+      "border": {
+        "customRadius": false /* true to opt-in */
+      },
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
         "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
@@ -241,6 +246,9 @@ Each block declares which style properties it exposes. This has been coined as "
 {
   "some/context": {
     "styles": {
+      "border": {
+        "radius": "value"
+      },
       "color": {
         "background": "value",
         "gradient": "value",
@@ -309,6 +317,12 @@ h4 {
 }
 ```
 
+#### Border Properties
+
+| Context | Radius |
+| --- | --- |
+| Group | Yes |
+
 #### Color Properties
 
 These are the current color properties supported by blocks:
@@ -334,6 +348,7 @@ These are the current color properties supported by blocks:
 | Post Title | Yes | Yes | - | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
 | Site Title | Yes | Yes | - | Yes |
+| Social Links | Yes | - | - | Yes |
 | Template Part | Yes | Yes | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).

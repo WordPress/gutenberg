@@ -1,6 +1,6 @@
 [
 	{
-		"title": "Project Overview",
+		"title": "Getting started",
 		"slug": "handbook",
 		"markdown_source": "../docs/readme.md",
 		"parent": null
@@ -1467,6 +1467,12 @@
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/create-block-tutorial-template",
+		"slug": "packages-create-block-tutorial-template",
+		"markdown_source": "../packages/create-block-tutorial-template/README.md",
 		"parent": "packages"
 	},
 	{

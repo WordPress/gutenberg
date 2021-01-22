@@ -2,17 +2,19 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { CompositeItem } from 'reakit';
 
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { useMemo, useRef, memo } from '@wordpress/element';
+import {
+	Button,
+	__unstableCompositeItem as CompositeItem,
+} from '@wordpress/components';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -120,4 +122,4 @@ function InserterListItem( {
 	);
 }
 
-export default InserterListItem;
+export default memo( InserterListItem );

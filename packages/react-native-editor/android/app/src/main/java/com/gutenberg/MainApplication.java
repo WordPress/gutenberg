@@ -150,14 +150,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void setStarterPageTemplatesTooltipShown(boolean tooltipShown) {
-            }
-
-            @Override
-            public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
-            }
-
-            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:

@@ -35,7 +35,7 @@ export const image = {
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style } = activeObjectAttributes;
-	const [ width, setWidth ] = useState( style.replace( /\D/g, '' ) );
+	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
 	const anchorRef = useAnchorRef( {
 		ref: contentRef,
 		value,
@@ -47,6 +47,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			position="bottom center"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
+			className="block-editor-format-toolbar__image-popover"
 		>
 			<form
 				className="block-editor-format-toolbar__image-container-content"

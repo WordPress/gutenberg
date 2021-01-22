@@ -34,7 +34,6 @@ module.exports = {
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
 	],
-	plugins: [ 'import' ],
 	globals: {
 		wp: 'off',
 	},
@@ -52,6 +51,35 @@ module.exports = {
 			'error',
 			{
 				allowedTextDomain: 'default',
+			},
+		],
+		'@wordpress/no-unsafe-wp-apis': 'off',
+		'no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'lodash',
+						importNames: [ 'memoize' ],
+						message: 'Please use `memize` instead.',
+					},
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+					},
+					{
+						name: 'reakit',
+						message:
+							'Please use Reakit API through `@wordpress/components` instead.',
+					},
+					{
+						name: 'redux',
+						importNames: [ 'combineReducers' ],
+						message:
+							'Please use `combineReducers` from `@wordpress/data` instead.',
+					},
+				],
 			},
 		],
 		'no-restricted-syntax': [
@@ -81,17 +109,13 @@ module.exports = {
 			},
 			{
 				selector:
-					'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
-				message: 'Use `combineReducers` from `@wordpress/data`',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
-				message: 'Use memize instead of Lodash’s memoize',
-			},
-			{
-				selector:
 					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message:
+					'This method is deprecated. You should use the more explicit API methods available.',
+			},
+			{
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
@@ -124,14 +148,10 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ 'packages/**/*.js' ],
-			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				...developmentFiles,
-			],
+			files: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
 			rules: {
-				'import/no-extraneous-dependencies': 'error',
-				'import/no-unresolved': 'error',
+				'import/no-extraneous-dependencies': 'off',
+				'import/no-unresolved': 'off',
 			},
 		},
 		{

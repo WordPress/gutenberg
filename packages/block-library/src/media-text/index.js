@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { mediaAndText as icon } from '@wordpress/icons';
 
 /**
@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Media & Text' ),
+	title: _x( 'Media & Text', 'block title' ),
 	description: __( 'Set media and words side-by-side for a richer layout.' ),
 	icon,
 	keywords: [ __( 'image' ), __( 'video' ) ],
