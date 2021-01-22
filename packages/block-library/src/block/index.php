@@ -41,7 +41,10 @@ function render_block_core_block( $attributes ) {
 		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
 			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-		return $is_debug ? '[block rendering halted]' : '';
+		return $is_debug ?
+			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			__( '[block rendering halted]' ) :
+			'';
 	}
 
 	$seen_refs[] = $attributes['ref'];
