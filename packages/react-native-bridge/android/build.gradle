@@ -21,6 +21,9 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
+        // Allows embedding other dependencies into the AAR for this one
+        classpath 'com.kezong:fat-aar:1.2.20'
 
         if (buildGutenbergMobileJSBundle) {
             classpath 'com.github.node-gradle:gradle-node-plugin:3.0.0-rc2'
@@ -31,6 +34,9 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish' // this enables publishing via Bintray
+apply plugin: 'com.kezong.fat-aar'
 
 def buildGutenbergMobileJSBundle =
         System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
@@ -114,6 +120,11 @@ android {
     sourceSets {
         main {
             assets.srcDirs += buildAssetsFolder
+            assets.srcDirs += '../../../../src/block-support'
+            // Despite being in a folder called "resources", the files in
+            // unsupported-block-editor are accessed as assets by their
+            // consumers: the WordPressEditor library.
+            assets.srcDirs += '../../../../resources/unsupported-block-editor'
         }
     }
 }
@@ -137,7 +148,24 @@ repositories {
 }
 
 dependencies {
-    implementation project(':@wordpress_react-native-aztec')
+    // Embedding Aztec seems to break the build from source when running from
+    // the WordPress Android project. That shouldn't be the case. While we
+    // investigate, embed only when making a binary build.
+    //
+    // Note that this also means that we cannot run an `assemble` task for
+    // WordPress Android while building from source, because that would result
+    // in an unsupported "direct local AAR file dependency". That shouldn't be
+    // a blocker becuase CI runs `assemble` tasks and should always do so
+    // without building dependencies from source, for performance and
+    // correctness reasons (as building from source should only be used while
+    // developing changes, right?)
+    if (rootProject.ext.buildGutenbergFromSource) {
+        implementation project(':@wordpress_react-native-aztec')
+    } else {
+        // embed is a method from the fat-aar plugin that will the Aztec project
+        // dependency into the generated AAR
+        embed project(':@wordpress_react-native-aztec')
+    }
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
@@ -182,8 +210,18 @@ dependencies {
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
 
-    debugImplementation files(hermesPath + "hermes-debug.aar")
-    releaseImplementation files(hermesPath + "hermes-release.aar")
+    // We used to add the Hermes engine like this, but it creates problems with
+    // both direct AAR from Bintray usage and Gradle composite build.
+    //
+    // Leaving it here as a starting point for eventually embed it correctly
+    // here so that consumers don't have to do it.
+    //
+    // See:
+    // - https://github.com/wordpress-mobile/WordPress-Android/pull/13642
+    // - https://github.com/wordpress-mobile/gutenberg-mobile/issues/2973
+    //
+    // debugImplementation files(hermesPath + "hermes-debug.aar")
+    // releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
 boolean isBundleUpToDate() {
@@ -339,5 +377,64 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
             println "Executing extended clean task that also deletes node_modules folders"
         }
         delete nodeModulesFolders
+    }
+}
+
+// Allows to override the artifact version by passing a -PbintrayVersion
+// parameter when calling Gradle
+def getBintrayVersion() {
+  return project.properties['bintrayVersion'] ?: android.defaultConfig.versionName
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : System.getenv('BINTRAY_KEY')
+    publications = ['GutenbergMobilePublication']
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'react-native-gutenberg-bridge'
+        licenses = ['GPL-2.0']
+        userOrg = 'wordpress-mobile'
+        vcsUrl = 'https://github.com/wordpress-mobile/gutenberg-mobile.git'
+        version {
+            name = getBintrayVersion()
+            released  = new Date()
+        }
+    }
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            GutenbergMobilePublication(MavenPublication) {
+                artifact bundleReleaseAar
+
+                groupId 'com.github.wordpress-mobile.gutenberg-mobile'
+                artifactId 'react-native-gutenberg-bridge'
+                version getBintrayVersion()
+
+                addDependenciesToPom(pom)
+            }
+        }
+    }
+}
+
+// This is a workaround for adding the dependencies of the library. It's brought from the
+// plugin's README file: https://github.com/bintray/gradle-bintray-plugin/blob/1.8.5/README.md
+def addDependenciesToPom(pom) {
+    pom.withXml {
+        def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
+
+        // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
+        configurations.implementation.allDependencies.each {
+            // Ensure dependencies such as fileTree are not included.
+            if (it.name != 'unspecified') {
+                def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+            }
+        }
     }
 }
