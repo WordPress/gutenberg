@@ -10,20 +10,20 @@ import {
 
 const RenderedRefsContext = createContext( [] );
 
-export default function useNoRecursiveRenders( ref ) {
-	const previouslyRenderedRefs = useContext( RenderedRefsContext );
-	const hasAlreadyRendered = previouslyRenderedRefs.includes( ref );
-	const newRenderedRefs = useMemo( () => [ ...previouslyRenderedRefs, ref ], [
-		ref,
-		previouslyRenderedRefs,
-	] );
+export default function useNoRecursiveRenders( uniqueId ) {
+	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
+	const hasAlreadyRendered = previouslyRenderedBlocks.includes( uniqueId );
+	const newRenderedBlocks = useMemo(
+		() => [ ...previouslyRenderedBlocks, uniqueId ],
+		[ uniqueId, previouslyRenderedBlocks ]
+	);
 	const Provider = useCallback(
 		( { children } ) => (
-			<RenderedRefsContext.Provider value={ newRenderedRefs }>
+			<RenderedRefsContext.Provider value={ newRenderedBlocks }>
 				{ children }
 			</RenderedRefsContext.Provider>
 		),
-		[ newRenderedRefs ]
+		[ newRenderedBlocks ]
 	);
 	return [ hasAlreadyRendered, Provider ];
 }
