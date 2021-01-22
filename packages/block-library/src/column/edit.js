@@ -31,6 +31,7 @@ function ColumnEdit( {
 		verticalAlignment,
 		width,
 		templateLock = false,
+		allowedBlocks,
 	},
 	setAttributes,
 	clientId,
@@ -71,6 +72,7 @@ function ColumnEdit( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock,
+		allowedBlocks,
 		renderAppender: hasChildBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
