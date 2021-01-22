@@ -13,7 +13,7 @@
 		"jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
 		"scssfiles": "src/*.scss src/**/*.scss"
 	},
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

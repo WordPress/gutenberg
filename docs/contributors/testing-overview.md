@@ -380,7 +380,7 @@ To locally run the tests in debug mode, follow these steps:
 
 ### Native mobile end-to-end tests
 
-Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continious integration](docs/contributors/native-mobile.md#native-mobile-e2e-tests-in-continuous-integration). More information on running these tests locally can be found in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/__device-tests__).
+Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continious integration](docs/contributors/native-mobile.md#native-mobile-e2e-tests-in-continuous-integration). More information on running these tests locally can be found in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/__device-tests__).
 
 ## End-to-end Testing
 

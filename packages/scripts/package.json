@@ -9,7 +9,7 @@
 		"gutenberg",
 		"scripts"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/scripts/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

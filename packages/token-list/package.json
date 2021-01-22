@@ -9,7 +9,7 @@
 		"gutenberg",
 		"domtokenlist"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/token-list/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/token-list/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

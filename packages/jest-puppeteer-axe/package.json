@@ -12,7 +12,7 @@
 		"axe",
 		"accessibility"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/jest-puppeteer-axe/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-puppeteer-axe/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
