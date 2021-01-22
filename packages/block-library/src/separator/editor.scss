@@ -2,4 +2,17 @@
 	// Prevent margin collapsing so the area to select the separator is bigger.
 	padding-top: 0.1px;
 	padding-bottom: 0.1px;
+
+	// Remove margins to use actual height dimension while in editor.
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.block-library-separator__resize-container {
+	display: flex;
+	align-items: center;
+
+	.wp-block-separator {
+		flex: 1;
+	}
 }

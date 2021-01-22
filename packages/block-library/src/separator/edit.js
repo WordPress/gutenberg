@@ -14,8 +14,8 @@ import { withColors, useBlockProps } from '@wordpress/block-editor';
  */
 import SeparatorSettings from './separator-settings';
 
-const MIN_HEIGHT = 1;
-const MAX_HEIGHT = 300;
+const MIN_HEIGHT = 5;
+const MAX_HEIGHT = 500;
 
 function SeparatorEdit( props ) {
 	const {
@@ -25,19 +25,11 @@ function SeparatorEdit( props ) {
 		color,
 		setColor,
 		isSelected,
-		toggleSelection,
 	} = props;
 
-	const margin = height ? `${ height }px` : undefined;
-
-	const onResizeStop = ( event, direction, elt, delta ) => {
-		toggleSelection( true );
+	const onResizeStop = ( _event, _direction, elt ) => {
 		setAttributes( {
-			height: clamp(
-				Math.round( height + delta.height ),
-				MIN_HEIGHT,
-				MAX_HEIGHT
-			),
+			height: clamp( elt.clientHeight, MIN_HEIGHT, MAX_HEIGHT ),
 		} );
 	};
 
@@ -54,11 +46,14 @@ function SeparatorEdit( props ) {
 				enable={ {
 					top: false,
 					right: false,
-					bottom: true,
+					bottom: true, // Only enable bottom handle.
 					left: false,
+					topRight: false,
+					bottomRight: false,
+					bottomLeft: false,
+					topLeft: false,
 				} }
 				minHeight={ MIN_HEIGHT }
-				onResizeStart={ () => toggleSelection( false ) }
 				onResizeStop={ onResizeStop }
 				showHandle={ isSelected }
 			>
@@ -71,8 +66,6 @@ function SeparatorEdit( props ) {
 						style: {
 							backgroundColor: color.color,
 							color: color.color,
-							marginBottom: margin,
-							marginTop: margin,
 						},
 					} ) }
 				/>
