@@ -25,7 +25,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false },
+	attributes: {
+		verticalAlignment,
+		width,
+		templateLock = false,
+	},
 	setAttributes,
 	clientId,
 } ) {
