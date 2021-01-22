@@ -36,6 +36,9 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 					<DownloadableBlockListItem
 						key={ item.id }
 						onClick={ () => {
+							// Check if the block is registered (`getBlockType`
+							// will return an object). If so, insert the block.
+							// This prevents installing existing plugins.
 							if ( getBlockType( item.name ) ) {
 								onSelect( item );
 							} else {
