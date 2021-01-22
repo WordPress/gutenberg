@@ -40,6 +40,7 @@ export default function Layout( { blockEditorSettings } ) {
 	const {
 		menus,
 		hasLoadedMenus,
+		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
 		selectMenu,
@@ -69,10 +70,14 @@ export default function Layout( { blockEditorSettings } ) {
 							onSelectMenu={ selectMenu }
 							navigationPost={ navigationPost }
 						/>
-						{ ! navigationPost && (
-							<EmptyState isPending={ ! hasLoadedMenus } />
+
+						{ ! menus?.length && (
+							<EmptyState
+								isPending={ ! hasFinishedInitialLoad }
+							/>
 						) }
-						{ navigationPost && (
+
+						{ ( menus?.length || navigationPost ) && (
 							<BlockEditorProvider
 								value={ blocks }
 								onInput={ onInput }
