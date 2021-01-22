@@ -104,7 +104,7 @@ function Player( {
 			return __( 'Uploading…' );
 		}
 		if ( isUploadFailed ) {
-			return 'Failed to insert audio file. Please tap for options.';
+			return __( 'Failed to insert audio file. Please tap for options.' );
 		}
 		return (
 			extension +
