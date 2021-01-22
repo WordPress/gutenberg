@@ -24,7 +24,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { image as icon } from '@wordpress/icons';
+import { image as icon, textColor } from '@wordpress/icons';
 
 /* global wp */
 
@@ -284,6 +284,7 @@ export function ImageEdit( {
 			/>
 			<ToolbarGroup>
 				<ToolbarButton
+					icon={ textColor }
 					label={ __( 'Add text overlay' ) }
 					onClick={ () =>
 						replaceBlocks(
@@ -291,9 +292,7 @@ export function ImageEdit( {
 							switchToBlockType( imageBlock, 'core/cover' )
 						)
 					}
-				>
-					{ __( '[abc]' ) }
-				</ToolbarButton>
+				/>
 			</ToolbarGroup>
 		</BlockControls>
 	);
