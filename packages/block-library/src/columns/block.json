@@ -5,10 +5,7 @@
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
-		},
-		"allowedChildBlocks": {
-			"type": "array"
-		}		
+		}
 	},
 	"supports": {
 		"anchor": true,

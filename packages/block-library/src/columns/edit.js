@@ -52,7 +52,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment, allowedChildBlocks } = attributes;
+	const { verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -72,7 +72,6 @@ function ColumnsEditContainer( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		allowedChildBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 	} );
@@ -143,7 +142,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { allowedChildBlocks } = ownProps.attributes;
 			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
@@ -172,7 +170,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
 							width: newColumnWidth,
-							allowedBlocks: allowedChildBlocks,
 						} );
 					} ),
 				];
@@ -180,9 +177,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 				innerBlocks = [
 					...innerBlocks,
 					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column', {
-							allowedBlocks: allowedChildBlocks,
-						} );
 					} ),
 				];
 			} else {
