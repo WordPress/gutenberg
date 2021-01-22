@@ -94,9 +94,34 @@ function getHoverEventDurations( trace ) {
 	];
 }
 
+page.on( 'load', function () {
+	this.evaluate( () => {
+		const filters = [
+			'i18n.gettext',
+			'i18n.gettext_default',
+			'i18n.ngettext',
+			'i18n.ngettext_default',
+			'i18n.gettext_with_context',
+			'i18n.gettext_with_context_default',
+			'i18n.ngettext_with_context',
+			'i18n.ngettext_with_context_default',
+		];
+		filters.forEach( ( filter ) => {
+			wp.hooks.addFilter(
+				filter,
+				'e2e-tests',
+				( ...args ) => {
+					return args[ 0 ];
+				},
+				90
+			);
+		} );
+	} );
+} );
+
 jest.setTimeout( 1000000 );
 
-describe( 'Post Editor Performance', () => {
+describe( 'Post Editor Performance (with i18n filters)', () => {
 	it( 'Loading, typing and selecting blocks', async () => {
 		const results = {
 			load: [],
@@ -111,87 +136,8 @@ describe( 'Post Editor Performance', () => {
 		);
 
 		await createNewPost();
+
 		await page.evaluate( ( _html ) => {
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				90
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				91
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				92
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				93
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				94
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				95
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				96
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				97
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				98
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				99
-			);
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
 			const blocks = parse( _html );
@@ -300,89 +246,12 @@ describe( 'Post Editor Performance', () => {
 			}
 		}
 
+		// Save the draft so we don't get browser dialogs about leaving unsaved page.
+		await saveDraft();
+
 		// Measuring block selection performance
 		await createNewPost();
 		await page.evaluate( () => {
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				90
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				91
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				92
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				93
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				94
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				95
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				96
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				97
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				98
-			);
-			wp.hooks.addFilter(
-				'i18n.gettext',
-				'e2e-tests',
-				( ...args ) => {
-					return args[ 0 ];
-				},
-				99
-			);
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
 			const blocks = window.lodash
