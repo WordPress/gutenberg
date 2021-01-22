@@ -87,7 +87,9 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 		repo,
 		milestone,
 		state,
-		since: latestReleaseInSeries?.published_at,
+		...( latestReleaseInSeries && {
+			since: latestReleaseInSeries.published_at,
+		} ),
 	} );
 
 	/**
