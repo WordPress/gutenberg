@@ -71,9 +71,8 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 	 */
 	const releases = octokit.paginate.iterator( releaseOptions );
 
-	for await ( const r of releases ) {
-		const releasesPage = r.data;
-		latestReleaseInSeries = releasesPage.find( ( release ) =>
+	for await ( const releasesPage of releases ) {
+		latestReleaseInSeries = releasesPage.data.find( ( release ) =>
 			release.name.startsWith( series )
 		);
 
