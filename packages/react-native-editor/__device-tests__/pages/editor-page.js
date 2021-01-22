@@ -178,13 +178,16 @@ class EditorPage {
 		await this.driver.setClipboard( base64String, 'plaintext' );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.click();
 
 		if ( isAndroid() ) {
-			await this.driver.pressKeycode( 279 /* KEYCODE_PASTE */ );
+			// Attention! On Android `.type()` replaces the content of htmlContentView instead of appending
+			// contrary to what iOS is doing. On Android tried calling `driver.pressKeycode( 279 ) // KEYCODE_PASTE`
+			// before to paste, but for some reason it didn't work on GitHub Actions but worked only on Sauce Labs
+			await htmlContentView.type( html );
 		} else {
+			await htmlContentView.click();
 			await doubleTap( this.driver, htmlContentView );
-			// Sometimes double tap is not enough so we also long press
+			// Sometimes double tap is not enough for paste menu to appear, so we also long press
 			await longPressMiddleOfElement( this.driver, htmlContentView );
 
 			const pasteButton = this.driver.elementByXPath(
