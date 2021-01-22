@@ -80,7 +80,6 @@ function ColumnsEditContainer( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		allowedChildBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 	} );
@@ -195,9 +194,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 				innerBlocks = [
 					...innerBlocks,
 					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column', {
-							allowedBlocks: allowedChildBlocks,
-						} );
 					} ),
 				];
 			} else {
