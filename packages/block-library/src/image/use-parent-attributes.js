@@ -27,10 +27,19 @@ export default function useParentAttributes(
 		linkTo: parentLinkDestination,
 		linkTarget: parentLinkTarget,
 		sizeSlug: parentSizeSlug,
+		isGrouped,
 	} = context;
 
 	useEffect( () => {
-		if ( ! inheritedAttributes.linkDestination ) {
+		if ( ! isGrouped && inheritedAttributes ) {
+			setAttributes( {
+				inheritedAttributes: undefined,
+			} );
+		}
+	}, [ isGrouped, inheritedAttributes ] );
+
+	useEffect( () => {
+		if ( ! isGrouped || ! inheritedAttributes?.linkDestination ) {
 			return;
 		}
 		if ( image ) {
@@ -43,7 +52,7 @@ export default function useParentAttributes(
 	}, [ image, parentLinkDestination ] );
 
 	useEffect( () => {
-		if ( ! inheritedAttributes.linkTarget ) {
+		if ( ! isGrouped || ! inheritedAttributes?.linkTarget ) {
 			return;
 		}
 
@@ -53,7 +62,7 @@ export default function useParentAttributes(
 	}, [ parentLinkTarget ] );
 
 	useEffect( () => {
-		if ( ! inheritedAttributes.sizeSlug ) {
+		if ( ! isGrouped || ! inheritedAttributes.sizeSlug ) {
 			return;
 		}
 
