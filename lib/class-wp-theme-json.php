@@ -944,26 +944,38 @@ class WP_Theme_JSON {
 	 */
 	private function get_block_styles() {
 		$stylesheet = '';
-		if ( ! isset( $this->theme_json['styles'] ) ) {
+		if ( ! isset( $this->theme_json['styles'] ) && ! isset( $this->theme_json['settings'] ) ) {
 			return $stylesheet;
 		}
 
 		$metadata = $this->get_blocks_metadata();
-		foreach ( $this->theme_json['styles'] as $block_selector => $styles ) {
-			if ( empty( $metadata[ $block_selector ]['selector'] ) || empty( $metadata[ $block_selector ]['supports'] ) ) {
+		foreach ( $metadata as $block_selector => $metadata ) {
+			if ( empty( $metadata['selector'] ) || empty( $metadata['supports'] ) ) {
 				continue;
 			}
 
-			$selector = $metadata[ $block_selector ]['selector'];
-			$supports = $metadata[ $block_selector ]['supports'];
+			$selector = $metadata['selector'];
+			$supports = $metadata['supports'];
 
 			$declarations = array();
-			self::compute_style_properties( $declarations, $styles, $supports );
+			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
+				self::compute_style_properties(
+					$declarations,
+					$this->theme_json['styles'][ $block_selector ],
+					$supports
+				);
+			}
 
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 
 			// Attach the rulesets for the classes.
-			self::compute_preset_classes( $stylesheet, $this->theme_json['settings'][ $block_selector ], $selector );
+			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
+				self::compute_preset_classes(
+					$stylesheet,
+					$this->theme_json['settings'][ $block_selector ],
+					$selector
+				);
+			}
 		}
 
 		return $stylesheet;
