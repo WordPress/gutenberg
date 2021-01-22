@@ -25,6 +25,10 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  */
 export const getNavigationPostForMenu = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
+		if ( menuId === null ) {
+			return;
+		}
+
 		// When the record is unavailable, calling getEditedEntityRecord triggers a http
 		// request via it's related resolver. Let's return nothing until getNavigationPostForMenu
 		// resolver marks the record as resolved.
