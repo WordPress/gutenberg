@@ -8,6 +8,7 @@
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n"/>
+	<rule ref="WordPress-Extra"/>
 	<config name="text_domain" value="gutenberg,default"/>
 
 	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
