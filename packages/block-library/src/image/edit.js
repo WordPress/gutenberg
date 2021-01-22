@@ -8,13 +8,8 @@ import { get, omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { switchToBlockType } from '@wordpress/blocks';
-import {
-	ToolbarGroup,
-	ToolbarButton,
-	withNotices,
-} from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { withNotices } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -24,7 +19,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { image as icon, textColor } from '@wordpress/icons';
+import { image as icon } from '@wordpress/icons';
 
 /* global wp */
 
@@ -85,7 +80,6 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	clientId,
 } ) {
 	const {
 		url = '',
@@ -113,13 +107,6 @@ export function ImageEdit( {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
 	} );
-
-	const imageBlock = useSelect( ( select ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		return getBlock( clientId );
-	} );
-
-	const { replaceBlocks } = useDispatch( 'core/block-editor' );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -282,18 +269,6 @@ export function ImageEdit( {
 				value={ align }
 				onChange={ updateAlignment }
 			/>
-			<ToolbarGroup>
-				<ToolbarButton
-					icon={ textColor }
-					label={ __( 'Add text overlay' ) }
-					onClick={ () =>
-						replaceBlocks(
-							clientId,
-							switchToBlockType( imageBlock, 'core/cover' )
-						)
-					}
-				/>
-			</ToolbarGroup>
 		</BlockControls>
 	);
 	const src = isExternal ? url : undefined;
