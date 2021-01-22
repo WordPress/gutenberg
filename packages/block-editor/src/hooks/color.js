@@ -12,6 +12,7 @@ import { getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect, Platform } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -363,6 +364,34 @@ export function ColorEdit( props ) {
 	);
 }
 
+/*
+I expect this should either go somewhere else, already exists somewhere else and that should be used instead, or should be done differently.
+*/
+function hasThemeSupport( supportFlag ) {
+	return useSelect( ( select ) => {
+		const { getThemeSupports } = select( 'core' );
+		const themeSupports = getThemeSupports();
+
+		//TODO: The value of themeSupports appears to be cached in a way that I can't bust.
+		//It is pre-loaded in a <script id='wp-api-fetch-js-after'> and the value doesn't reflect
+		//what is CURRENTLY set by a theme (by adjusting values set by add_theme_support in functions.php).
+		//I have not been able to find the code that queues this 'wp-api-fetch-js-after' inline script
+		//to determine what's happening.
+		//Instead it appears to be some historical value. Even attempting this on a completely fresh
+		//WordPress installation didn't provide the values expected.
+		//Also attempted was to bump the version in the theme I am testing with, but to no avail.  The
+		//changed VERSION (via style.css) of the theme IS correctly expressed in that preloaded data...
+		//but the value of themeSupports is not.
+		console.log(
+			'theme supports ',
+			supportFlag,
+			themeSupports[ supportFlag ] !== undefined,
+			themeSupports
+		);
+
+		return themeSupports && themeSupports[ supportFlag ] !== undefined;
+	} );
+}
 /**
  * This adds inline styles for color palette colors.
  * Ideally, this is not needed and themes should load their palettes on the editor.
@@ -376,6 +405,13 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		const { backgroundColor, textColor } = attributes;
 		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 		if ( ! hasColorSupport( name ) ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const editorPaletteIncluded = hasThemeSupport(
+			'editor-palette-included'
+		);
+		if ( editorPaletteIncluded ) {
 			return <BlockListBlock { ...props } />;
 		}
 
