@@ -53,4 +53,4 @@ add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 
 After installing and activating this plugin, there is a new icon resembling a tack in the top-right of the editor. Upon clicking it, the plugin's sidebar will be opened:
 
-![Sidebar Up and Running](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/sidebar-up-and-running.png)
+![Sidebar Up and Running](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/sidebar-up-and-running.png)
