@@ -1,5 +1,8 @@
 // The scrim behind the modal window.
 .components-modal__screen-overlay {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	position: fixed;
 	top: 0;
 	right: 0;
@@ -16,11 +19,8 @@
 .components-modal__frame {
 	// On small screens the content needs to be full width because of limited
 	// space.
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+	width: 100%;
+	height: 100%;
 	box-sizing: border-box;
 	margin: 0;
 	border: $border-width solid $gray-300;
@@ -30,14 +30,11 @@
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
-		top: 50%;
-		right: auto;
-		bottom: auto;
-		left: 50%;
+		width: fit-content;
+		height: fit-content;
 		min-width: $modal-min-width;
 		max-width: calc(100% - #{ $grid-unit-20 } - #{ $grid-unit-20 });
 		max-height: 90%;
-		transform: translate(-50%, -50%);
 
 		// Animate the modal frame/contents appearing on the page.
 		animation: components-modal__appear-animation 0.1s ease-out;
