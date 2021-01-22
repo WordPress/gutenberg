@@ -36,6 +36,17 @@ input.components-combobox-control__input[type="text"] {
 	&:focus-within {
 		@include input-style__focus();
 	}
+
+	.components-spinner {
+		margin-top: auto;
+		margin-bottom: auto;
+		margin-right: 2px;
+		margin-left: $grid-unit-30;
+	}
+
+	.components-form-token-field__suggestions-list:empty {
+		border-top: none;
+	}
 }
 
 .components-combobox-control__reset.components-button {
