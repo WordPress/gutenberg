@@ -10,11 +10,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { Picker } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 
 const BlockTransformationsMenu = ( {
-	// Select
-	getBlockTransformItems,
 	// Dispatch
 	createSuccessNotice,
 	replaceBlocks,
@@ -22,16 +20,14 @@ const BlockTransformationsMenu = ( {
 	anchorNodeRef,
 	blockTitle,
 	pickerRef,
-	rootClientId,
+	possibleTransformations,
 	selectedBlock,
 	selectedBlockClientId,
 } ) => {
-	const options = getBlockTransformItems( selectedBlock, rootClientId ).map(
-		( item ) => ( {
-			label: item.title,
-			value: item.id,
-		} )
-	);
+	const options = possibleTransformations.map( ( item ) => ( {
+		label: item.title,
+		value: item.id,
+	} ) );
 
 	const getAnchor = () =>
 		anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined;
@@ -67,10 +63,6 @@ const BlockTransformationsMenu = ( {
 };
 
 export default compose(
-	withSelect( ( select ) => {
-		const { getBlockTransformItems } = select( 'core/block-editor' );
-		return { getBlockTransformItems };
-	} ),
 	withDispatch( ( dispatch ) => {
 		const { replaceBlocks } = dispatch( 'core/block-editor' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );

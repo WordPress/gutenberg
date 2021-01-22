@@ -43,6 +43,7 @@ const BlockActionsMenu = ( {
 	isLast,
 	rootClientId,
 	selectedBlockClientId,
+	selectedBlockPossibleTransformations,
 	// Dispatch
 	createSuccessNotice,
 	duplicateBlock,
@@ -184,7 +185,9 @@ const BlockActionsMenu = ( {
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
-		canTransformBlock && allOptions.transformButton,
+		canTransformBlock &&
+			selectedBlockPossibleTransformations.length &&
+			allOptions.transformButton,
 		allOptions.copyButton,
 		allOptions.cutButton,
 		isPasteEnabled && allOptions.pasteButton,
@@ -249,7 +252,7 @@ const BlockActionsMenu = ( {
 				anchorNodeRef={ anchorNodeRef }
 				blockTitle={ blockTitle }
 				pickerRef={ blockTransformationMenuPickerRef }
-				rootClientId={ rootClientId }
+				possibleTransformations={ selectedBlockPossibleTransformations }
 				selectedBlock={ getBlocksByClientId( selectedBlockClientId ) }
 				selectedBlockClientId={ selectedBlockClientId }
 			/>
@@ -264,6 +267,7 @@ export default compose(
 			getBlockRootClientId,
 			getBlockOrder,
 			getBlockName,
+			getBlockTransformItems,
 			getBlock,
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
@@ -290,6 +294,13 @@ export default compose(
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
 
+		const selectedBlockClientId = getSelectedBlockClientIds();
+		const selectedBlock = getBlocksByClientId( selectedBlockClientId );
+		const selectedBlockPossibleTransformations = getBlockTransformItems(
+			selectedBlock,
+			rootClientId
+		);
+
 		return {
 			blockTitle,
 			canInsertBlockType,
@@ -299,7 +310,8 @@ export default compose(
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
-			selectedBlockClientId: getSelectedBlockClientIds(),
+			selectedBlockClientId,
+			selectedBlockPossibleTransformations,
 		};
 	} ),
 	withDispatch(
