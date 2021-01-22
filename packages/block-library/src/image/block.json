@@ -2,7 +2,13 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
-	"usesContext": [ "allowResize", "linkTo", "linkTarget", "sizeSlug" ],
+	"usesContext": [
+		"allowResize",
+		"linkTo",
+		"linkTarget",
+		"sizeSlug",
+		"isGrouped"
+	],
 	"attributes": {
 		"align": {
 			"type": "string"
