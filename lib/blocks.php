@@ -187,7 +187,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold );
 
 		// The default maximum total size of inlined styles.
-		$max_inline_total_size = 15000;
+		$max_inline_total_size = 20000;
 
 		/**
 		 * The maximum size of all inlined styles (in bytes).
