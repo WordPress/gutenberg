@@ -135,7 +135,11 @@ export function setHomeTemplateId( homeTemplateId ) {
  */
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
-		page.path = `?p=${ page.context.postId }`;
+		if ( page.context?.postType === 'page' ) {
+			page.path = `/?page_id=${ page.context.postId }`;
+		} else {
+			page.path = `/?p=${ page.context.postId }`;
+		}
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
 		'core',
