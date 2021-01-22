@@ -17,6 +17,19 @@ function add( set, element ) {
 	return result;
 }
 
+/**
+ * A React hook for keeping track of blocks previously rendered up in the block
+ * tree. Blocks susceptible to recursiion can use this hook in their `Edit`
+ * function to prevent said recursion.
+ *
+ * @param {*} uniqueId Any value that acts as a unique identifier for a block instance.
+ *
+ * @return {[boolean, Function]} A tuple of:
+ *                               - a boolean describing whether the provided id
+ *                                 has already been rendered;
+ *                               - a React context provider to be used to wrap
+ *                                 other elements.
+ */
 export default function useNoRecursiveRenders( uniqueId ) {
 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
 	const hasAlreadyRendered = previouslyRenderedBlocks.has( uniqueId );
