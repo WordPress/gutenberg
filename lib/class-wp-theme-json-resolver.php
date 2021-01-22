@@ -181,8 +181,8 @@ class WP_Theme_JSON_Resolver {
 			'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
 			'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
 		);
-		if ( ! empty( $config['global']['settings']['color']['palette'] ) ) {
-			foreach ( $config['global']['settings']['color']['palette'] as &$color ) {
+		if ( ! empty( $config['settings']['global']['color']['palette'] ) ) {
+			foreach ( $config['settings']['global']['color']['palette'] as &$color ) {
 				$color['name'] = $default_colors_i18n[ $color['slug'] ];
 			}
 		}
@@ -201,8 +201,8 @@ class WP_Theme_JSON_Resolver {
 			'electric-grass'                       => __( 'Electric grass', 'gutenberg' ),
 			'midnight'                             => __( 'Midnight', 'gutenberg' ),
 		);
-		if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
-			foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
+		if ( ! empty( $config['settings']['global']['color']['gradients'] ) ) {
+			foreach ( $config['settings']['global']['color']['gradients'] as &$gradient ) {
 				$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
 			}
 		}
@@ -214,8 +214,8 @@ class WP_Theme_JSON_Resolver {
 			'large'  => __( 'Large', 'gutenberg' ),
 			'huge'   => __( 'Huge', 'gutenberg' ),
 		);
-		if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
-			foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
+		if ( ! empty( $config['settings']['global']['typography']['fontSizes'] ) ) {
+			foreach ( $config['settings']['global']['typography']['fontSizes'] as &$font_size ) {
 				$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 			}
 		}
