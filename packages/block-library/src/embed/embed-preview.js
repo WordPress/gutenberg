@@ -144,6 +144,9 @@ class EmbedPreview extends Component {
 						value={ caption }
 						onChange={ onCaptionChange }
 						inlineToolbar
+						__experimentalInlineToolbarLabel={ __(
+							'Caption format'
+						) }
 						__unstableOnSplitAtEnd={ () =>
 							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}

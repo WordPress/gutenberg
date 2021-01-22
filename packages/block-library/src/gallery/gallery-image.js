@@ -286,6 +286,9 @@ class GalleryImage extends Component {
 						}
 						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
+						__experimentalInlineToolbarLabel={ __(
+							'Image caption format'
+						) }
 					/>
 				) }
 			</figure>

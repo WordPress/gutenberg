@@ -193,6 +193,9 @@ function AudioEdit( {
 							setAttributes( { caption: value } )
 						}
 						inlineToolbar
+						__experimentalInlineToolbarLabel={ __(
+							'Audio caption format'
+						) }
 						__unstableOnSplitAtEnd={ () =>
 							insertBlocksAfter( createBlock( 'core/paragraph' ) )
 						}

@@ -528,6 +528,9 @@ export default function Image( {
 					}
 					isSelected={ captionFocused }
 					inlineToolbar
+					__experimentalInlineToolbarLabel={ __(
+						'Image caption format'
+					) }
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )
 					}

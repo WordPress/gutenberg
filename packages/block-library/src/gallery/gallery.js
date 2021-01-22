@@ -102,6 +102,9 @@ export const Gallery = ( props ) => {
 				unstableOnFocus={ onFocusGalleryCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
+				__experimentalInlineToolbarLabel={ __(
+					'Gallery caption format'
+				) }
 				__unstableOnSplitAtEnd={ () =>
 					insertBlocksAfter( createBlock( 'core/paragraph' ) )
 				}

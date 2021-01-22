@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
+import { Popover, Toolbar } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -9,7 +10,11 @@ import { Popover } from '@wordpress/components';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 
-const FormatToolbarContainer = ( { inline, anchorRef } ) => {
+const FormatToolbarContainer = ( {
+	inline,
+	anchorRef,
+	label = __( 'Format' ),
+} ) => {
 	if ( inline ) {
 		// Render in popover
 		return (
@@ -19,9 +24,12 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 				focusOnMount={ false }
 				anchorRef={ anchorRef }
 				className="block-editor-rich-text__inline-format-toolbar"
-				__unstableSlotName="block-toolbar"
+				// Render inline
+				__unstableSlotName={ null }
 			>
-				<FormatToolbar />
+				<Toolbar label={ label }>
+					<FormatToolbar />
+				</Toolbar>
 			</Popover>
 		);
 	}

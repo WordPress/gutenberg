@@ -105,6 +105,7 @@ function RichTextWrapper(
 		isSelected: originalIsSelected,
 		multiline,
 		inlineToolbar,
+		__experimentalInlineToolbarLabel: inlineToolbarLabel,
 		wrapperClassName,
 		autocompleters,
 		onReplace,
@@ -628,6 +629,7 @@ function RichTextWrapper(
 					{ children && children( { value, onChange, onFocus } ) }
 					{ nestedIsSelected && hasFormats && (
 						<FormatToolbarContainer
+							label={ inlineToolbarLabel }
 							inline={ inlineToolbar }
 							anchorRef={ ref.current }
 						/>
