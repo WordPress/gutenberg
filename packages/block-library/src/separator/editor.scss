@@ -8,11 +8,35 @@
 	margin-bottom: 0;
 }
 
-.block-library-separator__resize-container {
-	display: flex;
-	align-items: center;
+// Duplicate class selector is to help overcome theme specificity.
+.editor-styles-wrapper .wp-block-separator.wp-block-separator {
+	// Re-adding the border so its width can be inherited without themes
+	// such as 2021 removing the border.
+	border-bottom: 1px solid transparent;
+	position: relative;
 
-	.wp-block-separator {
-		flex: 1;
+	&::before {
+		position: absolute;
+		width: 100%;
+	}
+
+	&.has-background:not(.is-style-wide):not(.is-style-dots) {
+		// Needed to force clearing of alternate border style so editor version can be used.
+		background-color: initial !important;
+		height: auto;
+	}
+
+	&:not(.is-style-dots)::before {
+		content: "";
+		border-bottom-width: inherit;
+		border-bottom-style: solid;
+		border-bottom-color: currentColor;
+		top: calc(50% - 1px);
+	}
+
+	&.is-style-dots::before {
+		top: calc(50% - 0.5em);
+		left: 0;
+		right: 0;
 	}
 }

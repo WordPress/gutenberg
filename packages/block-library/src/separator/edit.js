@@ -7,69 +7,71 @@ import { clamp } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { HorizontalRule, ResizableBox } from '@wordpress/components';
+import { ResizableBox } from '@wordpress/components';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
 import SeparatorSettings from './separator-settings';
 
-const MIN_HEIGHT = 5;
+const MIN_HEIGHT = 10;
+const MIN_DOTS_HEIGHT = 30;
 const MAX_HEIGHT = 500;
 
 function SeparatorEdit( props ) {
 	const {
-		attributes: { height },
+		attributes,
 		setAttributes,
 		className,
 		color,
 		setColor,
 		isSelected,
 	} = props;
+	const { height } = attributes;
+	const hasDotsStyle = attributes.className?.indexOf( 'is-style-dots' ) >= 0;
 
 	const onResizeStop = ( _event, _direction, elt ) => {
-		setAttributes( {
-			height: clamp( elt.clientHeight, MIN_HEIGHT, MAX_HEIGHT ),
-		} );
+		const newHeight = Math.round( elt.clientHeight );
+		setAttributes( { height: clamp( newHeight, MIN_HEIGHT, MAX_HEIGHT ) } );
 	};
+
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			'has-background': color.color,
+			[ color.class ]: color.class,
+		} ),
+		style: {
+			backgroundColor: color.color,
+			color: color.color,
+		},
+	} );
 
 	return (
 		<>
-			<ResizableBox
-				className={ classnames(
-					'block-library-separator__resize-container',
-					{
-						'is-selected': isSelected,
-					}
-				) }
-				size={ { height } }
-				enable={ {
-					top: false,
-					right: false,
-					bottom: true, // Only enable bottom handle.
-					left: false,
-					topRight: false,
-					bottomRight: false,
-					bottomLeft: false,
-					topLeft: false,
-				} }
-				minHeight={ MIN_HEIGHT }
-				onResizeStop={ onResizeStop }
-				showHandle={ isSelected }
-			>
-				<HorizontalRule
-					{ ...useBlockProps( {
-						className: classnames( className, {
-							'has-background': color.color,
-							[ color.class ]: color.class,
-						} ),
-						style: {
-							backgroundColor: color.color,
-							color: color.color,
-						},
-					} ) }
+			<div { ...blockProps }>
+				<ResizableBox
+					className={ classnames(
+						'block-library-separator__resize-container',
+						{
+							'is-selected': isSelected,
+						}
+					) }
+					size={ { height } }
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true, // Only enable bottom handle.
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					minHeight={ hasDotsStyle ? MIN_DOTS_HEIGHT : MIN_HEIGHT }
+					onResizeStop={ onResizeStop }
+					showHandle={ isSelected }
 				/>
-			</ResizableBox>
+			</div>
 			<SeparatorSettings color={ color } setColor={ setColor } />
 		</>
 	);
