@@ -25,14 +25,16 @@ function render_block_core_block( $attributes ) {
 	}
 
 	if ( in_array( $attributes['ref'], $seen_refs, true ) ) {
-		trigger_error(
-			sprintf(
-				// translators: %s is the user-provided title of the reusable block.
-				__( 'Could not render Reusable Block <strong>%s</strong>: blocks cannot be rendered inside themselves.' ),
-				$reusable_block->post_title
-			),
-			E_USER_WARNING
-		);
+		if ( ! is_admin() ) {
+			trigger_error(
+				sprintf(
+					// translators: %s is the user-provided title of the reusable block.
+					__( 'Could not render Reusable Block <strong>%s</strong>: blocks cannot be rendered inside themselves.' ),
+					$reusable_block->post_title
+				),
+				E_USER_WARNING
+			);
+		}
 
 		return '[block rendering halted]';
 	}
