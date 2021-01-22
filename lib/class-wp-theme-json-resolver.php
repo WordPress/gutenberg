@@ -122,6 +122,10 @@ class WP_Theme_JSON_Resolver {
 	 *                                     Default 'default'.
 	 */
 	private static function translate_presets( &$theme_json_structure, $domain = 'default' ) {
+		if ( ! isset( $theme_json_structure['settings'] ) ) {
+			return;
+		}
+
 		$preset_to_translate = self::get_presets_to_translate();
 		foreach ( $theme_json_structure['settings'] as &$settings ) {
 			if ( empty( $settings ) ) {
