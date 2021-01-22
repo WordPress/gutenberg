@@ -2,41 +2,17 @@
 	// Prevent margin collapsing so the area to select the separator is bigger.
 	padding-top: 0.1px;
 	padding-bottom: 0.1px;
-
-	// Remove margins to use actual height dimension while in editor.
-	margin-top: 0;
-	margin-bottom: 0;
 }
 
-// Duplicate class selector is to help overcome theme specificity.
-.editor-styles-wrapper .wp-block-separator.wp-block-separator {
-	// Re-adding the border so its width can be inherited without themes
-	// such as 2021 removing the border.
-	border-bottom: 1px solid transparent;
+.block-library-separator__wrapper {
 	position: relative;
+}
 
-	&::before {
-		position: absolute;
-		width: 100%;
-	}
-
-	&.has-background:not(.is-style-wide):not(.is-style-dots) {
-		// Needed to force clearing of alternate border style so editor version can be used.
-		background-color: initial !important;
-		height: auto;
-	}
-
-	&:not(.is-style-dots)::before {
-		content: "";
-		border-bottom-width: inherit;
-		border-bottom-style: solid;
-		border-bottom-color: currentColor;
-		top: calc(50% - 1px);
-	}
-
-	&.is-style-dots::before {
-		top: calc(50% - 0.5em);
-		left: 0;
-		right: 0;
-	}
+.editor-styles-wrapper .wp-block-separator {
+	// Remove default margins and center within ResizableBox control.
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 100%;
 }
