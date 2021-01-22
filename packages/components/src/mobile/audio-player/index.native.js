@@ -54,6 +54,17 @@ function Player( {
 
 	const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
 
+	const iconDisabledStyle = getStylesFromColorScheme(
+		styles.iconDisabled,
+		styles.iconDisabledDark
+	);
+
+	const isIconDisabled = isUploadFailed || isUploadInProgress;
+
+	const dimmedIconStyle = isIconDisabled && iconDisabledStyle;
+
+	const finalIconStyle = Object.assign( {}, iconStyle, dimmedIconStyle );
+
 	const iconContainerStyle = getStylesFromColorScheme(
 		styles.iconContainer,
 		styles.iconContainerDark
@@ -81,7 +92,7 @@ function Player( {
 	return (
 		<View style={ containerStyle }>
 			<View style={ iconContainerStyle }>
-				<Icon icon={ audio } style={ iconStyle } size={ 24 } />
+				<Icon icon={ audio } style={ finalIconStyle } size={ 24 } />
 			</View>
 			<View style={ styles.titleContainer }>
 				<Text style={ titleStyle }>{ title }</Text>
