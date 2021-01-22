@@ -116,6 +116,7 @@ class NativeEditorProvider extends Component {
 					[ payload.mediaType === 'image'
 						? 'url'
 						: 'src' ]: payload.mediaUrl,
+					caption: payload.mediaCaption,
 				} );
 
 				const indexAfterSelected = this.props.selectedBlockIndex + 1;

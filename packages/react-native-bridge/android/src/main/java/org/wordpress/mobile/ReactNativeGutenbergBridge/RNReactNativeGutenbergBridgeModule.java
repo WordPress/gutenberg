@@ -55,6 +55,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_CAPTION = "mediaCaption";
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
     public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
@@ -122,11 +123,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_SHOW_NOTICE, writableMap);
     }
 
-    public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
+    public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType, String mediaCaption) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE, mediaType);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUri);
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_CAPTION, mediaCaption);
         emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
     }
 

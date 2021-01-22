@@ -623,9 +623,9 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
-    public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
+    public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType, String mediaCaption) {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
-                                            .appendNewMediaBlock(mediaId, mediaUri, mediaType);
+                                            .appendNewMediaBlock(mediaId, mediaUri, mediaType, mediaCaption);
     }
 
     public void setPreferredColorScheme(boolean isDarkMode) {
@@ -864,7 +864,7 @@ public class WPAndroidGlueCode {
         if (mIsEditorMounted) {
             if (!TextUtils.isEmpty(media.getUrl()) && media.getId() > 0) {
                 // send signal to JS
-                appendNewMediaBlock(media.getId(), media.getUrl(), media.getType());
+                appendNewMediaBlock(media.getId(), media.getUrl(), media.getType(), media.getCaption());
             }
         } else {
             // save the URL, we'll add it once Editor is mounted
@@ -882,7 +882,7 @@ public class WPAndroidGlueCode {
             Media media = entry.getValue();
             if (!TextUtils.isEmpty(media.getUrl()) && mediaId > 0) {
                 // send signal to JS
-                appendNewMediaBlock(mediaId, media.getUrl(), media.getType());
+                appendNewMediaBlock(mediaId, media.getUrl(), media.getType(), media.getCaption());
                 iter.remove();
             }
         }
