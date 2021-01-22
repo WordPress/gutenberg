@@ -128,12 +128,24 @@ export class MediaUploadProgress extends Component {
 		const progressBarStyle = [
 			styles.progressBar,
 			showSpinner || styles.progressBarHidden,
+			this.props.progressBarStyle,
 		];
 
 		return (
-			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
+			<View
+				style={ [
+					styles.mediaUploadProgress,
+					this.props.containerStyle,
+				] }
+				pointerEvents="box-none"
+			>
 				<View style={ progressBarStyle }>
-					{ showSpinner && <Spinner progress={ progress } /> }
+					{ showSpinner && (
+						<Spinner
+							progress={ progress }
+							style={ this.props.spinnerStyle }
+						/>
+					) }
 				</View>
 				{ renderContent( {
 					isUploadInProgress,

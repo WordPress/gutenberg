@@ -30,6 +30,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
@@ -136,6 +141,9 @@ function AudioEdit( {
 				onFinishMediaUploadWithSuccess={ onFileChange }
 				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
+				containerStyle={ styles.progressContainer }
+				progressBarStyle={ styles.progressBar }
+				spinnerStyle={ styles.spinner }
 				renderContent={ ( {
 					isUploadInProgress,
 					isUploadFailed,
