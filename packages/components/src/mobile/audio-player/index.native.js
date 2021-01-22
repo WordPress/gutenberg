@@ -96,9 +96,9 @@ function Player( {
 	let extension = '';
 
 	if ( fileName ) {
-		const [ _title, _extension ] = fileName.split( '.' );
-		title = _title;
-		extension = _extension.toUpperCase();
+		const parts = fileName.split( '.' );
+		extension = parts.pop().toUpperCase();
+		title = parts.join( '.' );
 	}
 
 	return (
