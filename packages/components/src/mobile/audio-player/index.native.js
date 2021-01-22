@@ -52,6 +52,23 @@ function Player( {
 		styles.containerDark
 	);
 
+	const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+
+	const iconContainerStyle = getStylesFromColorScheme(
+		styles.iconContainer,
+		styles.iconContainerDark
+	);
+
+	const titleStyle = getStylesFromColorScheme(
+		styles.title,
+		styles.titleDark
+	);
+
+	const subtitleStyle = getStylesFromColorScheme(
+		styles.subtitle,
+		styles.subtitleDark
+	);
+
 	let title = '';
 	let extension = '';
 
@@ -63,12 +80,12 @@ function Player( {
 
 	return (
 		<View style={ containerStyle }>
-			<View style={ styles.iconContainer }>
-				<Icon icon={ audio } style={ styles.icon } size={ 24 } />
+			<View style={ iconContainerStyle }>
+				<Icon icon={ audio } style={ iconStyle } size={ 24 } />
 			</View>
 			<View style={ styles.titleContainer }>
-				<Text style={ styles.title }>{ title }</Text>
-				<Text style={ styles.subtitle }>
+				<Text style={ titleStyle }>{ title }</Text>
+				<Text style={ subtitleStyle }>
 					{ isUploadInProgress && __( 'Uploading…' ) }
 					{ isUploadFailed && retryMessage }
 					{ ! isUploadInProgress &&

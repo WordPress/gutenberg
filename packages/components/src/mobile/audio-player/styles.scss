@@ -1,9 +1,13 @@
 .container {
-	background-color: $gray-light;
+	background-color: $light-ultra-dim;
 	padding: 12px;
 	border-radius: 4px;
 	flex-direction: row;
 	align-items: center;
+}
+
+.containerDark {
+	background-color: $dark-ultra-dim;
 }
 
 @mixin circle($width) {
@@ -13,13 +17,25 @@
 }
 
 .iconContainer {
-	background-color: $white;
+	background-color: $light-ultra-dim;
 	align-items: center;
 	justify-content: center;
 	@include circle(36px);
 }
 
+.iconContainerDark {
+	background-color: $dark-ultra-dim;
+}
+
 .icon {
+	color: $light-secondary;
+}
+
+.iconDark {
+	color: $dark-secondary;
+}
+
+.disabledIcon {
 	color: $black;
 }
 
@@ -31,11 +47,23 @@
 .title {
 	flex: 1;
 	font-size: 12;
+	color: $light-primary;
+}
+
+.titleDark {
+	color: $dark-primary;
 }
 
 .subtitle {
 	flex: 1;
 	font-size: 10;
+	color: $light-secondary;
+}
+
+.subtitleDark {
+	flex: 1;
+	font-size: 10;
+	color: $dark-secondary;
 }
 
 
