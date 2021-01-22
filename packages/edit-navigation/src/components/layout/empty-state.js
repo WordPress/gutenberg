@@ -4,9 +4,9 @@
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function EditorEmptyState( { isPending } ) {
+export default function EmptyState( { isPending } ) {
 	return (
-		<div>
+		<div className="edit-navigation__empty-state">
 			{ isPending && <Spinner /> }
 			{ ! isPending &&
 				__(

@@ -34,3 +34,11 @@
 		flex-grow: 1;
 	}
 }
+
+.edit-navigation__empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30vh;
+	font-size: 1.1rem;
+}

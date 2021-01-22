@@ -18,10 +18,10 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import EmptyState from './empty-state';
 import useNavigationEditor from './use-navigation-editor';
 import useNavigationBlockEditor from './use-navigation-block-editor';
 import useMenuNotifications from './use-menu-notifications';
-import EditorEmptyState from './editor-empty-state';
 import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
 import Header from '../header';
@@ -70,7 +70,7 @@ export default function Layout( { blockEditorSettings } ) {
 							navigationPost={ navigationPost }
 						/>
 						{ ! navigationPost && (
-							<EditorEmptyState isPending={ ! hasLoadedMenus } />
+							<EmptyState isPending={ ! hasLoadedMenus } />
 						) }
 						{ navigationPost && (
 							<BlockEditorProvider
