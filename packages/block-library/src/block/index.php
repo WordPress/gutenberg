@@ -19,12 +19,17 @@ function render_block_core_block( $attributes ) {
 		return '';
 	}
 
+	$reusable_block = get_post( $attributes['ref'] );
+	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
+		return '';
+	}
+
 	if ( in_array( $attributes['ref'], $seen_refs, true ) ) {
 		trigger_error(
 			sprintf(
-				// translators: %s is the block name, e.g. core/block.
-				__( 'Block <strong>%s</strong> cannot be rendered inside itself.' ),
-				'core/block'
+				// translators: %s is the user-provided title of the reusable block.
+				__( 'Could not render Reusable Block <strong>%s</strong>: blocks cannot be rendered inside themselves.' ),
+				$reusable_block->post_title
 			),
 			E_USER_WARNING
 		);
@@ -33,11 +38,6 @@ function render_block_core_block( $attributes ) {
 	}
 
 	$seen_refs[] = $attributes['ref'];
-
-	$reusable_block = get_post( $attributes['ref'] );
-	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
-		return '';
-	}
 
 	if ( 'publish' !== $reusable_block->post_status || ! empty( $reusable_block->post_password ) ) {
 		return '';
