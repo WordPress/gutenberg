@@ -176,8 +176,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			} else if ( isAddingColumn ) {
 				innerBlocks = [
 					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
-					} ),
+					...times( newColumns - previousColumns, () => {} ),
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
