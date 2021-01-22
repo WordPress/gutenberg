@@ -95,6 +95,11 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
+	if ( 'wp-i18n' === $handle ) {
+		$ltr    = 'rtl' === _x( 'ltr', 'text direction', 'default' ) ? 'rtl' : 'ltr';
+		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
+		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
+	}
 }
 
 /**
@@ -311,7 +316,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
+		array( 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
@@ -690,7 +695,7 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
 			$handles[] = $block_type->style;
 		}
