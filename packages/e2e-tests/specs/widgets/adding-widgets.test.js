@@ -64,7 +64,6 @@ describe( 'Widgets screen', () => {
 		return addParagraphBlock;
 	}
 
-	/*
 	async function expectInsertionPointIndicatorToBeBelowLastBlock(
 		widgetArea
 	) {
@@ -82,7 +81,6 @@ describe( 'Widgets screen', () => {
 			insertionPointIndicatorBoundingBox.y > lastBlockBoundingBox.y
 		).toBe( true );
 	}
-	*/
 
 	async function getInlineInserterButton() {
 		return await page.waitForSelector(
@@ -124,9 +122,9 @@ describe( 'Widgets screen', () => {
 		addParagraphBlock = await getParagraphBlockInGlobalInserter();
 		await addParagraphBlock.hover();
 
-		/*await expectInsertionPointIndicatorToBeBelowLastBlock(
+		await expectInsertionPointIndicatorToBeBelowLastBlock(
 			firstWidgetArea
-		);*/
+		);
 		await addParagraphBlock.click();
 
 		await page.keyboard.type( 'Second Paragraph' );
