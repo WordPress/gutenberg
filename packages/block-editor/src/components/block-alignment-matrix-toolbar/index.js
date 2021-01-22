@@ -19,6 +19,7 @@ export function BlockAlignmentMatrixToolbar( props ) {
 		label = __( 'Change matrix alignment' ),
 		onChange = noop,
 		value = 'center',
+		isDisabled,
 	} = props;
 
 	const icon = <AlignmentMatrixControl.Icon value={ value } />;
@@ -50,6 +51,7 @@ export function BlockAlignmentMatrixToolbar( props ) {
 							label={ label }
 							icon={ icon }
 							showTooltip
+							disabled={ isDisabled }
 						/>
 					</ToolbarGroup>
 				);
