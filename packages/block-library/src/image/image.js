@@ -31,7 +31,11 @@ import {
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getBlockType,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import { crop, textColor, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -138,6 +142,9 @@ export default function Image( {
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
+
+	// Check if the cover block is registered.
+	const coverBlockExists = !! getBlockType( 'core/cover' );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -307,7 +314,7 @@ export default function Image( {
 						onError={ onUploadError }
 					/>
 				) }
-				{ ! multiImageSelection && (
+				{ ! multiImageSelection && coverBlockExists && (
 					<ToolbarGroup>
 						<ToolbarButton
 							icon={ textColor }
