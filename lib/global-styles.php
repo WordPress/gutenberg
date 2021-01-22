@@ -162,6 +162,10 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		return;
+	}
+
 	$settings           = gutenberg_get_common_block_editor_settings();
 	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
 
@@ -196,45 +200,183 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['gradients'] );
 
 	$resolver = new WP_Theme_JSON_Resolver();
-	$all      = $resolver->get_origin( $theme_support_data );
-	$base     = $resolver->get_origin( $theme_support_data, 'theme' );
+	$origin   = 'theme';
+	if (
+		gutenberg_experimental_global_styles_has_theme_json_support() &&
+		gutenberg_is_fse_theme()
+	) {
+		// Only lookup for the user data if we need it.
+		$origin = 'user';
+	}
+	$tree = $resolver->get_origin( $theme_support_data, $origin );
 
 	// STEP 1: ADD FEATURES
-	// These need to be added to settings always.
-	$settings['__experimentalFeatures'] = $all->get_settings();
+	//
+	// These need to be always added to the editor settings,
+	// even for themes that don't support theme.json.
+	// An example of this is that the presets are configured
+	// from the theme support data.
+	$settings['__experimentalFeatures'] = $tree->get_settings();
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
-	// The client needs some information to be able to access/update the user styles.
-	// We only do this if the theme has support for theme.json, though,
-	// as an indicator that the theme will know how to combine this with its stylesheet.
+	//
+	// In the site editor, the user can change styles, so the client
+	// needs the ability to create them. Hence, we pass it some data
+	// for this: base styles (core+theme) and the ID of the user CPT.
 	$screen = get_current_screen();
 	if (
 		! empty( $screen ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
-		gutenberg_experimental_global_styles_has_theme_json_support()
+		gutenberg_experimental_global_styles_has_theme_json_support() &&
+		gutenberg_is_fse_theme()
 	) {
-		$settings['__experimentalGlobalStylesUserEntityId'] = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$settings['__experimentalGlobalStylesBaseStyles']   = $base->get_raw_data();
-	} else {
-		// STEP 3 - OTHERWISE, ADD STYLES
+		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
+		$base_styles = $resolver->get_origin( $theme_support_data, 'theme' )->get_raw_data();
+
+		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
+		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
+	} elseif ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		// STEP 3 - ADD STYLES IF THEME HAS SUPPORT
 		//
 		// If we are in a block editor context, but not in edit-site,
-		// we need to add the styles via the settings. This is because
-		// we want them processed as if they were added via add_editor_styles,
-		// which adds the editor wrapper class.
+		// we add the styles via the settings, so the editor knows that
+		// some of these should be added the wrapper class,
+		// as if they were added via add_editor_styles.
 		$settings['styles'][] = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $all, 'css_variables' ),
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'css_variables' ),
 			'__experimentalNoWrapper' => true,
 		);
 		$settings['styles'][] = array(
-			'css' => gutenberg_experimental_global_styles_get_stylesheet( $all, 'block_styles' ),
+			'css' => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'block_styles' ),
 		);
 	}
 
 	return $settings;
 }
 
-add_action( 'init', array( 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type' ) );
+/**
+ * Register CPT to store/access user data.
+ *
+ * @return array|undefined
+ */
+function gutenberg_experimental_global_styles_register_user_cpt() {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		return;
+	}
+
+	WP_Theme_JSON_Resolver::register_user_custom_post_type();
+}
+
+add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+
+
+/**
+ * Sanitizes global styles user content removing unsafe rules.
+ *
+ * @param string $content Post content to filter.
+ * @return string Filtered post content with unsafe rules removed.
+ */
+function gutenberg_global_styles_filter_post( $content ) {
+	$decoded_data        = json_decode( stripslashes( $content ), true );
+	$json_decoding_error = json_last_error();
+	if (
+		JSON_ERROR_NONE === $json_decoding_error &&
+		is_array( $decoded_data ) &&
+		isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
+		$decoded_data['isGlobalStylesUserThemeJSON']
+	) {
+		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
+		$theme_json = new WP_Theme_JSON( $decoded_data );
+		$theme_json->remove_insecure_properties();
+		$data_to_encode                                = $theme_json->get_raw_data();
+		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
+		return wp_json_encode( $data_to_encode );
+	}
+	return $content;
+}
+
+/**
+ * Adds the filters to filter global styles user theme.json.
+ */
+function gutenberg_global_styles_kses_init_filters() {
+	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+}
+
+/**
+ * Removes the filters to filter global styles user theme.json.
+ */
+function gutenberg_global_styles_kses_remove_filters() {
+	remove_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+}
+
+/**
+ * Register global styles kses filters if the user does not have unfiltered_html capability.
+ *
+ * @uses render_block_core_navigation()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
+ */
+function gutenberg_global_styles_kses_init() {
+	gutenberg_global_styles_kses_remove_filters();
+	if ( ! current_user_can( 'unfiltered_html' ) ) {
+		gutenberg_global_styles_kses_init_filters();
+	}
+}
+
+/**
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable kses, independently of the user capabilities.
+ * So in that case we call gutenberg_global_styles_kses_init_filters;
+ *
+ * @param string $arg Input argument of the filter.
+ * @return string Exactly what was passed as argument.
+ */
+function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
+	// force_filtered_html_on_import is true we need to init the global styles kses filters.
+	if ( $arg ) {
+		gutenberg_global_styles_kses_init_filters();
+	}
+	return $arg;
+}
+
+/**
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable kses, independently of the user capabilities.
+ * So in that case we call gutenberg_global_styles_kses_init_filters;
+ *
+ * @param bool $allow_css       Whether the CSS in the test string is considered safe.
+ * @param bool $css_test_string The CSS string to test..
+ * @return bool If $allow_css is true it returns true.
+ * If $allow_css is false and the CSS rule is referencing a WordPress css variable it returns true.
+ * Otherwise the function return false.
+ */
+function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $css_test_string ) {
+	if ( $allow_css ) {
+		return $allow_css;
+	}
+	$allowed_preset_attributes = array(
+		'background',
+		'background-color',
+		'color',
+		'font-family',
+		'font-size',
+	);
+	$parts                     = explode( ':', $css_test_string, 2 );
+
+	if ( ! in_array( trim( $parts[0] ), $allowed_preset_attributes, true ) ) {
+		return $allow_css;
+	}
+	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
+}
+
+
+add_action( 'init', 'gutenberg_global_styles_kses_init' );
+add_action( 'set_current_user', 'gutenberg_global_styles_kses_init' );
+add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filtered_html_on_import_filter', 999 );
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
+// This filter needs to be executed last.
+

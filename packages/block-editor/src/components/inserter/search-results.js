@@ -36,6 +36,7 @@ function InserterSearchResults( {
 	maxBlockPatterns,
 	maxBlockTypes,
 	showBlockDirectory = false,
+	isDraggable = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -116,6 +117,7 @@ function InserterSearchResults( {
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }
+						isDraggable={ isDraggable }
 					/>
 				</InserterPanel>
 			) }
@@ -138,6 +140,7 @@ function InserterSearchResults( {
 							shownPatterns={ currentShownPatterns }
 							blockPatterns={ filteredBlockPatterns }
 							onClickPattern={ onSelectBlockPattern }
+							isDraggable={ isDraggable }
 						/>
 					</div>
 				</InserterPanel>
@@ -150,6 +153,7 @@ function InserterSearchResults( {
 						onHover,
 						filterValue,
 						hasItems,
+						rootClientId: destinationRootClientId,
 					} }
 				>
 					{ ( fills ) => {

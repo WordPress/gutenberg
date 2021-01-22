@@ -11,7 +11,7 @@ const compose = ( f, g ) => x
     => f( g( x ) );
 ```
 
-Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
+Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
 
 Using compose:
 
@@ -155,7 +155,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `(Object|Function)`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -186,6 +186,65 @@ _Returns_
 
 -   `Function`: Debounced function.
 
+<a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
+
+Hook used to focus the first tabbable element on mount.
+
+_Usage_
+
+```js
+import { useFocusOnMount } from '@wordpress/compose';
+
+const WithFocusOnMount = () => {
+    const ref = useFocusOnMount()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+
+_Returns_
+
+-   `Function`: Ref callback.
+
+<a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
+
+When opening modals/sidebars/dialogs, the focus
+must move to the opened area and return to the
+previously focused element when closed.
+The current hook implements the returning behavior.
+
+_Usage_
+
+```js
+import { useFocusReturn } from '@wordpress/compose';
+
+const WithFocusReturn = () => {
+    const ref = useFocusReturn()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
+```
+
+_Parameters_
+
+-   _onFocusReturn_ `?Function`: Overrides the default return behavior.
+
+_Returns_
+
+-   `Function`: Element Ref.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
@@ -194,6 +253,12 @@ _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
 -   _prefix_ `string`: Prefix for the unique id.
+
+<a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
+
+Preferred over direct usage of `useLayoutEffect` when supporting
+server rendered components (SSR) because currently React
+throws a warning when using useLayoutEffect in that environment.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 

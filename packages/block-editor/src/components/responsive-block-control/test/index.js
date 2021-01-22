@@ -362,7 +362,7 @@ describe( 'Default and Responsive modes', () => {
 		expect( responsiveControlGroup ).toBeNull();
 	} );
 
-	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode ', () => {
+	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode', () => {
 		const spyRenderDefaultControl = jest.fn();
 
 		const mockRenderResponsiveControls = jest.fn( ( viewports ) => {

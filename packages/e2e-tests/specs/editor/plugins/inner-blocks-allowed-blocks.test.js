@@ -11,7 +11,7 @@ import {
 	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
+describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	const paragraphSelector =
 		'.block-editor-rich-text__editable[data-type="core/paragraph"]';
 	beforeAll( async () => {

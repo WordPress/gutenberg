@@ -41,7 +41,7 @@ export async function deleteTheme(
 
 	// Wait for the theme to be removed from the page.
 	// eslint-disable-next-line no-restricted-syntax
-	await page.waitFor(
+	await page.waitForFunction(
 		( themeSlug ) =>
 			! document.querySelector( `[data-slug="${ themeSlug }"]` ),
 		slug

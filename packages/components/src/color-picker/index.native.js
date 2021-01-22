@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
-import React from 'react';
 import HsvColorPicker from 'react-native-hsv-color-picker';
 import tinycolor from 'tinycolor2';
 /**

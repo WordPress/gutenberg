@@ -14,12 +14,20 @@ import {
 	FormTokenField,
 	SelectControl,
 	RangeControl,
+	ToggleControl,
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,6 +41,21 @@ const stickyOptions = [
 	{ label: __( 'Only' ), value: 'only' },
 ];
 
+const CreateNewPostLink = ( { type } ) => {
+	const newPostUrl = addQueryArgs( 'post-new.php', {
+		post_type: type,
+	} );
+	return (
+		<div className="wp-block-query__create-new-link">
+			{ createInterpolateElement(
+				__( '<a>Create a new post</a> for this feed.' ),
+				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				{ a: <a href={ newPostUrl } /> }
+			) }
+		</div>
+	);
+};
+
 export default function QueryInspectorControls( {
 	attributes: { query, layout },
 	setQuery,
@@ -44,6 +67,7 @@ export default function QueryInspectorControls( {
 		author: selectedAuthorId,
 		postType,
 		sticky,
+		inherit,
 	} = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
@@ -136,19 +160,32 @@ export default function QueryInspectorControls( {
 		}, 250 ),
 		[ querySearch, query.search ]
 	);
+
 	useEffect( () => {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+
 	return (
 		<InspectorControls>
+			<CreateNewPostLink type={ postType } />
 			<PanelBody title={ __( 'Settings' ) }>
-				<SelectControl
-					options={ postTypesSelectOptions }
-					value={ postType }
-					label={ __( 'Post Type' ) }
-					onChange={ onPostTypeChange }
+				<ToggleControl
+					label={ __( 'Inherit query from URL' ) }
+					help={ __(
+						'Disable the option to customize the query arguments. Leave enabled to inherit the global query depending on the URL.'
+					) }
+					checked={ !! inherit }
+					onChange={ ( value ) => setQuery( { inherit: !! value } ) }
 				/>
+				{ ! inherit && (
+					<SelectControl
+						options={ postTypesSelectOptions }
+						value={ postType }
+						label={ __( 'Post Type' ) }
+						onChange={ onPostTypeChange }
+					/>
+				) }
 				{ layout?.type === 'flex' && (
 					<>
 						<RangeControl
@@ -169,13 +206,17 @@ export default function QueryInspectorControls( {
 						) }
 					</>
 				) }
-				<QueryControls
-					{ ...{ order, orderBy } }
-					onOrderChange={ ( value ) => setQuery( { order: value } ) }
-					onOrderByChange={ ( value ) =>
-						setQuery( { orderBy: value } )
-					}
-				/>
+				{ ! inherit && (
+					<QueryControls
+						{ ...{ order, orderBy } }
+						onOrderChange={ ( value ) =>
+							setQuery( { order: value } )
+						}
+						onOrderByChange={ ( value ) =>
+							setQuery( { orderBy: value } )
+						}
+					/>
+				) }
 				{ showSticky && (
 					<SelectControl
 						label={ __( 'Sticky posts' ) }
@@ -185,45 +226,48 @@ export default function QueryInspectorControls( {
 					/>
 				) }
 			</PanelBody>
-			<PanelBody title={ __( 'Filters' ) }>
-				{ showCategories && categories?.terms?.length > 0 && (
-					<FormTokenField
-						label={ __( 'Categories' ) }
-						value={ ( query.categoryIds || [] ).map(
-							( categoryId ) => ( {
-								id: categoryId,
-								value: categories.mapById[ categoryId ].name,
+			{ ! inherit && (
+				<PanelBody title={ __( 'Filters' ) }>
+					{ showCategories && categories?.terms?.length > 0 && (
+						<FormTokenField
+							label={ __( 'Categories' ) }
+							value={ ( query.categoryIds || [] ).map(
+								( categoryId ) => ( {
+									id: categoryId,
+									value:
+										categories.mapById[ categoryId ].name,
+								} )
+							) }
+							suggestions={ categories.names }
+							onChange={ onCategoriesChange }
+						/>
+					) }
+					{ showTags && tags?.terms?.length > 0 && (
+						<FormTokenField
+							label={ __( 'Tags' ) }
+							value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
+								id: tagId,
+								value: tags.mapById[ tagId ].name,
+							} ) ) }
+							suggestions={ tags.names }
+							onChange={ onTagsChange }
+						/>
+					) }
+					<QueryControls
+						{ ...{ selectedAuthorId, authorList } }
+						onAuthorChange={ ( value ) =>
+							setQuery( {
+								author: value !== '' ? +value : undefined,
 							} )
-						) }
-						suggestions={ categories.names }
-						onChange={ onCategoriesChange }
+						}
 					/>
-				) }
-				{ showTags && tags?.terms?.length > 0 && (
-					<FormTokenField
-						label={ __( 'Tags' ) }
-						value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
-							id: tagId,
-							value: tags.mapById[ tagId ].name,
-						} ) ) }
-						suggestions={ tags.names }
-						onChange={ onTagsChange }
+					<TextControl
+						label={ __( 'Keyword' ) }
+						value={ querySearch }
+						onChange={ setQuerySearch }
 					/>
-				) }
-				<QueryControls
-					{ ...{ selectedAuthorId, authorList } }
-					onAuthorChange={ ( value ) =>
-						setQuery( {
-							author: value !== '' ? +value : undefined,
-						} )
-					}
-				/>
-				<TextControl
-					label={ __( 'Keyword' ) }
-					value={ querySearch }
-					onChange={ setQuerySearch }
-				/>
-			</PanelBody>
+				</PanelBody>
+			) }
 		</InspectorControls>
 	);
 }

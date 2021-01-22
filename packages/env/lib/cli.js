@@ -11,6 +11,7 @@ const terminalLink = require( 'terminal-link' );
  * Internal dependencies
  */
 const env = require( './env' );
+const parseXdebugMode = require( './parse-xdebug-mode' );
 
 // Colors
 const boldWhite = chalk.bold.white;
@@ -47,7 +48,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 				'out' in error
 			) {
 				// Error is a docker-compose error. That means something docker-related failed.
-				// https://github.com/PDMLab/docker-compose/blob/master/src/index.ts
+				// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
 				spinner.fail( 'Error while running docker-compose command.' );
 				if ( error.out ) {
 					process.stdout.write( error.out );
@@ -99,6 +100,12 @@ module.exports = function cli() {
 					'Download source updates and apply WordPress configuration.',
 				default: false,
 			} );
+			args.option( 'xdebug', {
+				describe:
+					'Enables Xdebug. If not passed, Xdebug is turned off. If no modes are set, uses "debug". You may set multiple Xdebug modes by passing them in a comma-separated list: `--xdebug=develop,coverage`. See https://xdebug.org/docs/all_settings#mode for information about Xdebug modes.',
+				coerce: parseXdebugMode,
+				type: 'string',
+			} );
 		},
 		withSpinner( env.start )
 	);
@@ -124,7 +131,7 @@ module.exports = function cli() {
 		withSpinner( env.clean )
 	);
 	yargs.command(
-		'logs',
+		'logs [environment]',
 		'displays PHP and Docker logs for given WordPress environment.',
 		( args ) => {
 			args.positional( 'environment', {

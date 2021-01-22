@@ -34,6 +34,11 @@ import save from './save';
  */
 registerBlockType( '{{namespace}}/{{slug}}', {
 	/**
+	 * @see https://make.wordpress.org/core/2020/11/18/block-api-version-2/
+	 */
+	apiVersion: {{apiVersion}},
+
+	/**
 	 * This is the display title for your block, which can be translated with `i18n` functions.
 	 * The block inserter will show this name.
 	 */
@@ -55,7 +60,7 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	{{/description}}
 	/**
 	 * Blocks are grouped into categories to help users browse and discover them.
-	 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
+	 * The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
 	 */
 	category: '{{category}}',
 

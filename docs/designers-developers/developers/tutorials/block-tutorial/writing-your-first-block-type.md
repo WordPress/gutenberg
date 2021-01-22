@@ -28,6 +28,7 @@ function gutenberg_examples_01_register_block() {
 	);
 
 	register_block_type( 'gutenberg-examples/example-01-basic-esnext', array(
+		'apiVersion' => 2,
 		'editor_script' => 'gutenberg-examples-01-esnext',
 	) );
 
@@ -37,7 +38,7 @@ add_action( 'init', 'gutenberg_examples_01_register_block' );
 
 Note the above example, shows using the [wp-scripts build step](/docs/designers-developers/developers/tutorials/javascript/js-build-setup/) that automatically sets dependencies and versions the file. 
 
-If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/master/01-basic/index.php) in Gutenberg Examples repository for full syntax.
+If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
 
 - __`wp-blocks`__ includes block type registration and related functions
 - __`wp-element`__ includes the [WordPress Element abstraction](/packages/element/README.md) for describing the structure of your blocks
@@ -51,6 +52,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 {% ESNext %}
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
 
 const blockStyle = {
 	backgroundColor: '#900',
@@ -59,22 +61,28 @@ const blockStyle = {
 };
 
 registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
+	apiVersion: 2,
 	title: 'Example: Basic (esnext)',
 	icon: 'universal-access-alt',
 	category: 'design',
 	example: {},
 	edit() {
-		return <div style={ blockStyle }>Hello World, step 1 (from the editor).</div>;
+		const blockProps = useBlockProps( { style: blockStyle } );
+
+		return <div { ...blockProps }>Hello World, step 1 (from the editor).</div>;
 	},
 	save() {
-		return <div style={ blockStyle }>Hello World, step 1 (from the frontend).</div>;
+		const blockProps = useBlockProps.save( { style: blockStyle } );
+
+		return <div { ...blockProps }>Hello World, step 1 (from the frontend).</div>;
 	},
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, element ) {
+( function( blocks, element, blockEditor ) {
 	var el = element.createElement;
+	var useBlockProps = blockEditor.useBlockProps;
 
 	var blockStyle = {
 		backgroundColor: '#900',
@@ -83,28 +91,32 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	};
 
 	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
+		apiVersion: 2,
 		title: 'Example: Basic',
 		icon: 'universal-access-alt',
 		category: 'design',
 		example: {},
 		edit: function() {
+			var blockProps = useBlockProps( { style: blockStyle } );
 			return el(
 				'p',
-				{ style: blockStyle },
+				blockProps,
 				'Hello World, step 1 (from the editor).'
 			);
 		},
 		save: function() {
+			var blockProps = useBlockProps.save( { style: blockStyle } );
 			return el(
 				'p',
-				{ style: blockStyle },
+				blockProps,
 				'Hello World, step 1 (from the frontend).'
 			);
 		},
 	} );
 }(
 	window.wp.blocks,
-	window.wp.element
+	window.wp.element,
+	window.wp.blockEditor
 ) );
 ```
 {% end %}

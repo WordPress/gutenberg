@@ -60,39 +60,6 @@ export const PRESET_METADATA = [
 		cssVarInfix: 'font-family',
 		classes: [],
 	},
-	{
-		path: [ 'settings', 'typography', 'fontStyles' ],
-		valueKey: 'value',
-		cssVarInfix: 'font-style',
-		classes: [ { classSuffix: 'font-style', propertyName: 'font-style' } ],
-	},
-	{
-		path: [ 'settings', 'typography', 'fontWeights' ],
-		valueKey: 'value',
-		cssVarInfix: 'font-weight',
-		classes: [
-			{ classSuffix: 'font-weight', propertyName: 'font-weight' },
-		],
-	},
-	{
-		path: [ 'settings', 'typography', 'textDecorations' ],
-		valueKey: 'value',
-		cssVarInfix: 'text-decoration',
-		classes: [
-			{
-				classSuffix: 'text-decoration',
-				propertyName: 'text-decoration',
-			},
-		],
-	},
-	{
-		path: [ 'settings', 'typography', 'textTransforms' ],
-		valueKey: 'slug',
-		cssVarInfix: 'text-transform',
-		classes: [
-			{ classSuffix: 'text-transform', propertyName: 'text-transform' },
-		],
-	},
 ];
 
 const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
