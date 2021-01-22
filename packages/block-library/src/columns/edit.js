@@ -80,6 +80,7 @@ function ColumnsEditContainer( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
+		allowedChildBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 	} );
