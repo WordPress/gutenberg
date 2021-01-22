@@ -8,13 +8,20 @@ import {
 	useMemo,
 } from '@wordpress/element';
 
-const RenderedRefsContext = createContext( [] );
+const RenderedRefsContext = createContext( new Set() );
+
+// Immutably add to a Set
+function add( set, element ) {
+	const result = new Set( set );
+	result.add( element );
+	return result;
+}
 
 export default function useNoRecursiveRenders( uniqueId ) {
 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
-	const hasAlreadyRendered = previouslyRenderedBlocks.includes( uniqueId );
+	const hasAlreadyRendered = previouslyRenderedBlocks.has( uniqueId );
 	const newRenderedBlocks = useMemo(
-		() => [ ...previouslyRenderedBlocks, uniqueId ],
+		() => add( previouslyRenderedBlocks, uniqueId ),
 		[ uniqueId, previouslyRenderedBlocks ]
 	);
 	const Provider = useCallback(
