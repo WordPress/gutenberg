@@ -69,7 +69,7 @@ function getBlockPresetClasses( blockSelector, blockPresets = {} ) {
 				presets.forEach( ( preset ) => {
 					const slug = preset.slug;
 					const value = preset[ valueKey ];
-					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+					const classSelectorToUse = ` .has-${ slug }-${ classSuffix }`;
 					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
 					declarations += `${ selectorToUse } {${ propertyName }: ${ value };}`;
 				} );
