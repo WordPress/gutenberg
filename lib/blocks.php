@@ -165,6 +165,8 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		return;
 	}
 
+	$original_block_name = $block_name;
+
 	$block_name = str_replace( 'core/', '', $block_name );
 
 	$style_path        = "build/block-library/blocks/$block_name/style.css";
@@ -181,10 +183,11 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		 *
 		 * If a stylesheet is below the defined threshold then it will get inlined instead of enqueued.
 		 *
-		 * @param int $threshold The file-size threshold, in bytes.
+		 * @param int    $threshold           The file-size threshold, in bytes.
+		 * @param string $original_block_name The block name (example: "core/paragraph").
 		 * @return int
 		 */
-		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold );
+		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold, $original_block_name );
 
 		// The default maximum total size of inlined styles.
 		$max_inline_total_size = 20000;
@@ -194,10 +197,11 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		 *
 		 * Inlining will stop if this size is reached.
 		 *
-		 * @param int $max_inline_total_size The maximum size of all inlined styles - in bytes.
+		 * @param int    $max_inline_total_size The maximum size of all inlined styles - in bytes.
+		 * @param string $original_block_name   The block name (example: "core/paragraph").
 		 * @return int
 		 */
-		$max_inline_total_size = apply_filters( 'block_styles_max_inline_total_size', $max_inline_total_size );
+		$max_inline_total_size = apply_filters( 'block_styles_max_inline_total_size', $max_inline_total_size, $original_block_name );
 
 		/**
 		 * Get the file size.
