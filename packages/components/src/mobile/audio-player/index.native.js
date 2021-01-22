@@ -11,7 +11,6 @@ import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { audio, warning } from '@wordpress/icons';
-import { PlainText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -24,7 +23,6 @@ function Player( {
 	isUploadInProgress,
 	fileName,
 	isUploadFailed,
-	retryMessage,
 } ) {
 	const onPressListen = () => {
 		if ( source ) {
@@ -60,11 +58,12 @@ function Player( {
 		styles.iconDisabledDark
 	);
 
-	const isIconDisabled = isUploadFailed || isUploadInProgress;
+	const isDisabled = isUploadFailed || isUploadInProgress;
 
-	const dimmedIconStyle = isIconDisabled && iconDisabledStyle;
-
-	const finalIconStyle = Object.assign( {}, iconStyle, dimmedIconStyle );
+	const finalIconStyle = {
+		...iconStyle,
+		...( isDisabled && iconDisabledStyle ),
+	};
 
 	const iconContainerStyle = getStylesFromColorScheme(
 		styles.iconContainer,
@@ -76,21 +75,20 @@ function Player( {
 		styles.titleDark
 	);
 
-	const subtitleStyle = getStylesFromColorScheme(
-		styles.subtitle,
-		styles.subtitleDark
-	);
-
 	const uploadFailedStyle = getStylesFromColorScheme(
 		styles.uploadFailed,
 		styles.uploadFailedDark
 	);
 
-	const uploadFailedTextStyle = Object.assign(
-		{},
-		styles.uploadFailedText,
-		uploadFailedStyle
+	const subtitleStyle = getStylesFromColorScheme(
+		styles.subtitle,
+		styles.subtitleDark
 	);
+
+	const finalSubtitleStyle = {
+		...subtitleStyle,
+		...( isUploadFailed && uploadFailedStyle ),
+	};
 
 	let title = '';
 	let extension = '';
@@ -101,6 +99,20 @@ function Player( {
 		title = parts.join( '.' );
 	}
 
+	const getSubtitleValue = () => {
+		if ( isUploadInProgress ) {
+			return __( 'Uploading…' );
+		}
+		if ( isUploadFailed ) {
+			return 'Failed to insert audio file. Please tap for options.';
+		}
+		return (
+			extension +
+			// translators: displays audio file extension. e.g. MP3 audio file
+			__( ' audio file' )
+		);
+	};
+
 	return (
 		<View style={ containerStyle }>
 			<View style={ iconContainerStyle }>
@@ -108,39 +120,34 @@ function Player( {
 			</View>
 			<View style={ styles.titleContainer }>
 				<Text style={ titleStyle }>{ title }</Text>
-				<Text style={ subtitleStyle }>
-					{ isUploadInProgress && __( 'Uploading…' ) }
-					{ ! isUploadInProgress &&
-						! isUploadFailed &&
-						// translators: displays audio file extension. e.g. MP3 audio file
-						extension + __( ' audio file' ) }
-				</Text>
-				{ isUploadFailed && (
-					<View style={ styles.errorContainer }>
+				<View style={ styles.subtitleContainer }>
+					{ isUploadFailed && (
 						<Icon
 							icon={ warning }
-							style={ uploadFailedStyle }
+							style={ {
+								...styles.errorIcon,
+								...uploadFailedStyle,
+							} }
 							size={ 16 }
 						/>
-						<PlainText
-							editable={ false }
-							value={ retryMessage }
-							style={ uploadFailedTextStyle }
-							multiline={ true }
-						/>
-					</View>
-				) }
+					) }
+					<Text style={ finalSubtitleStyle }>
+						{ getSubtitleValue() }
+					</Text>
+				</View>
 			</View>
-			<TouchableWithoutFeedback
-				accessibilityLabel={ __( 'Audio Player' ) }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ __(
-					'Double tap to listen the audio file'
-				) }
-				onPress={ onPressListen }
-			>
-				<Text style={ styles.buttonText }>{ __( 'Listen' ) }</Text>
-			</TouchableWithoutFeedback>
+			{ ! isDisabled && (
+				<TouchableWithoutFeedback
+					accessibilityLabel={ __( 'Audio Player' ) }
+					accessibilityRole={ 'button' }
+					accessibilityHint={ __(
+						'Double tap to listen the audio file'
+					) }
+					onPress={ onPressListen }
+				>
+					<Text style={ styles.buttonText }>{ __( 'Listen' ) }</Text>
+				</TouchableWithoutFeedback>
+			) }
 		</View>
 	);
 }

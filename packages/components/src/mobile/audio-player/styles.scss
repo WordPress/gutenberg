@@ -53,7 +53,6 @@
 }
 
 .title {
-	flex: 1;
 	font-size: 17;
 	color: $light-primary;
 }
@@ -62,8 +61,12 @@
 	color: $dark-primary;
 }
 
+.subtitleContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
 .subtitle {
-	flex: 1;
 	font-size: 12;
 	color: $light-secondary;
 }
@@ -78,9 +81,8 @@
 	color: $blue-wordpress;
 }
 
-.errorContainer {
-	flex-direction: row;
-	align-items: center;
+.errorIcon {
+	margin-right: 4px;
 }
 
 .uploadFailed {
@@ -89,8 +91,4 @@
 
 .uploadFailedDark {
 	color: $red-30;
-}
-
-.uploadFailedText {
-	font-size: 12;
 }
