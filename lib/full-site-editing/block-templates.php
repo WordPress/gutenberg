@@ -177,8 +177,8 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 			$theme_json,
 			true
 		);
-		if ( isset( $data['template-parts'][ $template_file['slug'] ]['type'] ) ) {
-			$template->template_part_type = $data['template-parts'][ $template_file['slug'] ]['type'];
+		if ( isset( $data['template-parts'][ $template_file['slug'] ]['section'] ) ) {
+			$template->section = $data['template-parts'][ $template_file['slug'] ]['section'];
 		}
 	}
 
@@ -218,9 +218,9 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->status      = $post->post_status;
 
 	if ( 'wp_template_part' === $post->post_type ) {
-		$type_terms                   = get_the_terms( $post, 'template_part_type' );
-		$template_part_type           = $type_terms[0]->name;
-		$template->template_part_type = $template_part_type;
+		$type_terms        = get_the_terms( $post, 'section' );
+		$section           = $type_terms[0]->name;
+		$template->section = $section;
 	}
 
 	return $template;

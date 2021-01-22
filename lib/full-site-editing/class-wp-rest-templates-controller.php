@@ -359,22 +359,10 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
-			$template_part_type = null;
-
-			if ( isset( $request['template_part_type'] ) ) {
-				$template_part_type = $request['template_part_type'];
+			if ( isset( $request['section'] ) ) {
+				$changes->tax_input['section'] = $request['section'];
 			} elseif ( null !== $template && ! $template->is_custom ) {
-				$template_part_type = $template->template_part_type;
-			}
-
-			if ( $template_part_type ) {
-				if ( is_array( $changes->tax_input ) ) {
-					$changes->tax_input['template_part_type'] = $template_part_type;
-				} else {
-					$changes->tax_input = array(
-						'template_part_type' => $template_part_type,
-					);
-				}
+				$changes->tax_input['section'] = $template->section;
 			}
 		}
 
@@ -407,7 +395,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		);
 
 		if ( 'wp_template_part' === $template->type ) {
-			$result['template_part_type'] = $template->template_part_type;
+			$result['section'] = $template->section;
 		}
 
 		$result = $this->add_additional_fields_to_object( $result, $request );
@@ -561,8 +549,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		);
 
 		if ( 'wp_template_part' === $this->post_type ) {
-			$schema['properties']['template_part_type'] = array(
-				'description' => __( 'Type of template part (header, footer, etc.)', 'gutenberg' ),
+			$schema['properties']['section'] = array(
+				'description' => __( 'Where the template part is intended for use (header, footer, etc.)', 'gutenberg' ),
 				'type'        => 'string',
 				'context'     => array( 'embed', 'view', 'edit' ),
 			);
