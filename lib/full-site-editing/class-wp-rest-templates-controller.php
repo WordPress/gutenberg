@@ -138,6 +138,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		if ( isset( $request['wp_id'] ) ) {
 			$query['wp_id'] = $request['wp_id'];
 		}
+		if ( isset( $request['section'] ) ) {
+			$query['section'] = $request['section'];
+		}
 		$templates = array();
 		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
 			$data        = $this->prepare_item_for_response( $template, $request );

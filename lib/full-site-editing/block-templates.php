@@ -85,6 +85,7 @@ function _gutenberg_get_template_files( $template_type ) {
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
 		foreach ( $theme_template_files as $template_file ) {
+			$template_info      = array();
 			$template_base_path = $template_base_paths[ $template_type ];
 			$template_slug      = substr(
 				$template_file,
@@ -93,11 +94,26 @@ function _gutenberg_get_template_files( $template_type ) {
 				// Subtract ending '.html'.
 				-5
 			);
-			$template_files[] = array(
-				'slug'  => $template_slug,
-				'path'  => $template_file,
-				'theme' => $theme_slug,
-				'type'  => $template_type,
+
+			if ( 'wp_template_part' === $template_type && is_readable( locate_template( 'experimental-theme.json' ) ) ) {
+				$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
+				$data       = json_decode(
+					$theme_json,
+					true
+				);
+				if ( isset( $data['template-parts'][ $template_slug ]['section'] ) ) {
+					$template_info['section'] = $data['template-parts'][ $template_slug ]['section'];
+				}
+			}
+
+			$template_files[] = array_merge(
+				$template_info,
+				array(
+					'slug'  => $template_slug,
+					'path'  => $template_file,
+					'theme' => $theme_slug,
+					'type'  => $template_type,
+				)
 			);
 		}
 	}
@@ -171,15 +187,8 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
 	}
 
-	if ( 'wp_template_part' === $template_type && is_readable( locate_template( 'experimental-theme.json' ) ) ) {
-		$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
-		$data       = json_decode(
-			$theme_json,
-			true
-		);
-		if ( isset( $data['template-parts'][ $template_file['slug'] ]['section'] ) ) {
-			$template->section = $data['template-parts'][ $template_file['slug'] ]['section'];
-		}
+	if ( 'wp_template_part' === $template_type && $template_file['section'] ) {
+		$template->section = $template_file['section'];
 	}
 
 	return $template;
@@ -254,6 +263,15 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		),
 	);
 
+	if ( 'wp_template_part' === $template_type && isset( $query['section'] ) ) {
+		$wp_query_args['tax_query'][]           = array(
+			'taxonomy' => 'section',
+			'field'    => 'name',
+			'terms'    => $query['section'],
+		);
+		$wp_query_args['tax_query']['relation'] = 'AND';
+	}
+
 	if ( isset( $query['slug__in'] ) ) {
 		$wp_query_args['post_name__in'] = $query['slug__in'];
 	}
@@ -284,8 +302,9 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 				true
 			);
 			$should_include = false === $is_custom && (
-				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true )
-			);
+				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true ) ) && (
+					! isset( $query['section'] ) || $template_file['section'] === $query['section']
+				);
 			if ( $should_include ) {
 				$query_result[] = _gutenberg_build_template_result_from_file( $template_file, $template_type );
 			}
