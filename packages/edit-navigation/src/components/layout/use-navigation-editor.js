@@ -54,6 +54,7 @@ export default function useNavigationEditor() {
 
 	return {
 		menus,
+		hasLoadedMenus,
 		selectedMenuId,
 		navigationPost,
 		selectMenu,
