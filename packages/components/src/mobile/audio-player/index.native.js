@@ -86,6 +86,12 @@ function Player( {
 		styles.uploadFailedDark
 	);
 
+	const uploadFailedTextStyle = Object.assign(
+		{},
+		styles.uploadFailedText,
+		uploadFailedStyle
+	);
+
 	let title = '';
 	let extension = '';
 
@@ -111,11 +117,15 @@ function Player( {
 				</Text>
 				{ isUploadFailed && (
 					<View style={ styles.errorContainer }>
-						<Icon icon={ warning } style={ uploadFailedStyle } />
+						<Icon
+							icon={ warning }
+							style={ uploadFailedStyle }
+							size={ 16 }
+						/>
 						<PlainText
 							editable={ false }
 							value={ retryMessage }
-							style={ uploadFailedStyle }
+							style={ uploadFailedTextStyle }
 							multiline={ true }
 						/>
 					</View>
