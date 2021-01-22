@@ -136,11 +136,11 @@ function AudioEdit( {
 				onFinishMediaUploadWithSuccess={ onFileChange }
 				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
-				renderContent={ (
+				renderContent={ ( {
 					isUploadInProgress,
 					isUploadFailed,
-					retryMessage
-				) => {
+					retryMessage,
+				} ) => {
 					return (
 						<>
 							{ ! isCaptionSelected && getBlockControls( open ) }
