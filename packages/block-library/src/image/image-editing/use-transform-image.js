@@ -17,7 +17,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		const value = select( 'core/block-editor' ).getSettings()
 			.mediaCrossOrigin;
 		return typeof value === 'string' &&
-			value.includes( '', 'anonymous', 'use-credentials' )
+			[ '', 'anonymous', 'use-credentials' ].includes( value )
 			? value
 			: undefined;
 	} );
