@@ -21,14 +21,8 @@ const navIcons = {
 	'space-between': justifySpaceBetween,
 };
 
-export function JustifyToolbar( {
-	handleItemsAlignment,
-	itemsJustification,
-	popoverProps,
-} ) {
-	const icon = itemsJustification
-		? navIcons[ itemsJustification ]
-		: navIcons.left;
+export function JustifyToolbar( { onChange, value, popoverProps } ) {
+	const icon = value ? navIcons[ value ] : navIcons.left;
 
 	return (
 		<ToolbarGroup
@@ -40,26 +34,26 @@ export function JustifyToolbar( {
 				{
 					icon: justifyLeft,
 					title: __( 'Justify items left' ),
-					isActive: 'left' === itemsJustification,
-					onClick: handleItemsAlignment( 'left' ),
+					isActive: 'left' === value,
+					onClick: onChange( 'left' ),
 				},
 				{
 					icon: justifyCenter,
 					title: __( 'Justify items center' ),
-					isActive: 'center' === itemsJustification,
-					onClick: handleItemsAlignment( 'center' ),
+					isActive: 'center' === value,
+					onClick: onChange( 'center' ),
 				},
 				{
 					icon: justifyRight,
 					title: __( 'Justify items right' ),
-					isActive: 'right' === itemsJustification,
-					onClick: handleItemsAlignment( 'right' ),
+					isActive: 'right' === value,
+					onClick: onChange( 'right' ),
 				},
 				{
 					icon: justifySpaceBetween,
 					title: __( 'Space between items' ),
-					isActive: 'space-between' === itemsJustification,
-					onClick: handleItemsAlignment( 'space-between' ),
+					isActive: 'space-between' === value,
+					onClick: onChange( 'space-between' ),
 				},
 			] }
 		/>

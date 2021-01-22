@@ -121,8 +121,8 @@ function Navigation( {
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
-						itemsJustification={ attributes.itemsJustification }
-						handleItemsAlignment={ handleItemsAlignment }
+						value={ attributes.itemsJustification }
+						onChange={ handleItemsAlignment }
 						popoverProps={ {
 							position: 'bottom right',
 							isAlternate: true,
