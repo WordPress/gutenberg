@@ -203,14 +203,41 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		 */
 		$max_inline_total_size = apply_filters( 'block_styles_max_inline_total_size', $max_inline_total_size, $original_block_name );
 
-		/**
-		 * Get the file size.
-		 *
-		 * Do a quick check and bypass the filesize() call if threshold was set to 0 using a filter.
-		 */
-		$stylesheet_size = ( $threshold ) ? filesize( gutenberg_dir_path() . $style_path ) : 1;
+		// If the $threshold was set to 0 via a filter then do not inline.
+		$should_inline_style = (bool) $threshold;
 
-		if ( $stylesheet_size > $threshold || $max_inline_total_size < $inline_pool_size + $stylesheet_size ) {
+		// Check if the file should be inlined based on its size.
+		if ( $should_inline_style ) {
+			// If an RTL language, get the RTL file path.
+			$style_path = is_rtl() ? "build/block-library/blocks/$block_name/style-rtl.css" : $style_path;
+
+			// Get the styles.
+			$styles = file_get_contents( gutenberg_dir_path() . $style_path );
+
+			// If SCRIPT_DEBUG is not defined, minify the styles by removing comments & whitespace.
+			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+				$styles = gutenberg_minify_styles( $styles );
+			}
+
+			// Get the styles size.
+			$styles_size = strlen( $styles );
+
+			// Do not inline the styles if their size is larger than the defined threshold,
+			// or if adding them will go above the defined total size for inline styles.
+			if ( $styles_size > $threshold || $max_inline_total_size < $inline_pool_size + $styles_size ) {
+				$should_inline_style = false;
+			}
+		}
+
+		if ( $should_inline_style ) {
+
+			// Register the style using `false` as src.
+			wp_register_style( "wp-block-{$block_name}", false, array(), false );
+
+			// Add inline styles to the registered style.
+			wp_add_inline_style( "wp-block-{$block_name}", $styles );
+			$inline_pool_size += $styles_size;
+		} else {
 
 			// Register the style.
 			wp_register_style(
@@ -222,31 +249,6 @@ function gutenberg_register_core_block_styles( $block_name ) {
 
 			// Replace stylesheet if RTL.
 			wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
-		} else {
-
-			// If an RTL language, get the modified file path.
-			$style_path = is_rtl() ? "build/block-library/blocks/$block_name/style-rtl.css" : $style_path;
-
-			// Register the style using `false` as src.
-			wp_register_style(
-				"wp-block-{$block_name}",
-				false,
-				array(),
-				filemtime( gutenberg_dir_path() . $style_path )
-			);
-
-			// Get the styles.
-			$inline_styles = file_get_contents( gutenberg_dir_path() . $style_path );
-
-			// If SCRIPT_DEBUG is not defined, minify the styles by removing comments & whitespace.
-			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
-				$inline_styles = gutenberg_minify_styles( $inline_styles );
-			}
-
-			$inline_pool_size += strlen( $inline_styles );
-
-			// Add inline styles to the registered style.
-			wp_add_inline_style( "wp-block-{$block_name}", $inline_styles );
 		}
 	}
 
