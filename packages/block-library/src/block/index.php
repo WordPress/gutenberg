@@ -20,7 +20,16 @@ function render_block_core_block( $attributes ) {
 	}
 
 	if ( in_array( $attributes['ref'], $seen_refs, true ) ) {
-		return 'nope';
+		trigger_error(
+			sprintf(
+				// translators: %s is the block name, e.g. core/block.
+				__( 'Block <strong>%s</strong> cannot be rendered inside itself.' ),
+				'core/block'
+			),
+			E_USER_WARNING
+		);
+
+		return '[block rendering halted]';
 	}
 
 	$seen_refs[] = $attributes['ref'];
