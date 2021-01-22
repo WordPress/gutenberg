@@ -10,7 +10,8 @@ import { View } from '@wordpress/primitives';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { audio } from '@wordpress/icons';
+import { audio, warning } from '@wordpress/icons';
+import { PlainText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -80,6 +81,11 @@ function Player( {
 		styles.subtitleDark
 	);
 
+	const uploadFailedStyle = getStylesFromColorScheme(
+		styles.uploadFailed,
+		styles.uploadFailedDark
+	);
+
 	let title = '';
 	let extension = '';
 
@@ -98,12 +104,22 @@ function Player( {
 				<Text style={ titleStyle }>{ title }</Text>
 				<Text style={ subtitleStyle }>
 					{ isUploadInProgress && __( 'Uploading…' ) }
-					{ isUploadFailed && retryMessage }
 					{ ! isUploadInProgress &&
 						! isUploadFailed &&
 						// translators: displays audio file extension. e.g. MP3 audio file
 						extension + __( ' audio file' ) }
 				</Text>
+				{ isUploadFailed && (
+					<View style={ styles.errorContainer }>
+						<Icon icon={ warning } style={ uploadFailedStyle } />
+						<PlainText
+							editable={ false }
+							value={ retryMessage }
+							style={ uploadFailedStyle }
+							multiline={ true }
+						/>
+					</View>
+				) }
 			</View>
 			<TouchableWithoutFeedback
 				accessibilityLabel={ __( 'Audio Player' ) }

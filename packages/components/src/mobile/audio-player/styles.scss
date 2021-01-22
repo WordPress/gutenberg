@@ -77,3 +77,16 @@
 	font-weight: 500;
 	color: $blue-wordpress;
 }
+
+.errorContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
+.uploadFailed {
+	color: $red-50;
+}
+
+.uploadFailedDark {
+	color: $red-30;
+}
