@@ -413,10 +413,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaFilesEditorLoad(
-                    ReadableArray mediaFiles,
-                    String blockId
-            ) {
+            public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
                 mOnMediaFilesCollectionBasedBlockEditorListener
                         .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
             }

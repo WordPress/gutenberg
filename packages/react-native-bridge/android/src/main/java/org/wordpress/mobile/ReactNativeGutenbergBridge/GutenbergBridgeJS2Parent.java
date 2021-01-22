@@ -48,10 +48,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void replaceUnsupportedBlock(String content, String blockId);
     }
 
-    interface ReplaceMediaFilesEditedBlockCallback {
-        void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
-    }
-
     // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
     enum LogLevel {
         TRACE(0),
@@ -167,10 +163,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void onShowXpostSuggestions(Consumer<String> onResult);
 
-    void requestMediaFilesEditorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
-                                                     ReadableArray mediaFiles,
-                                                     String blockId
-    );
+    void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId);
 
     void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
 
