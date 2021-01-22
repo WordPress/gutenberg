@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+#### Bug Fix
+* Add proper handling for single use blocks such as the more block [#28339]
+
 ## 1.44.1
 * [**] Fix crash in mobile paragraph blocks with custom font size [#28121]
 * [**] Add move to top bottom when long pressing block movers  [#27554]
