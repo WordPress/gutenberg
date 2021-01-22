@@ -29,6 +29,7 @@ function ColumnEdit( {
 		verticalAlignment,
 		width,
 		templateLock = false,
+		allowedBlocks,
 	},
 	setAttributes,
 	clientId,
