@@ -49,11 +49,13 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
 		if ( file_exists( $file_path ) ) {
-			return array(
-				'slug'  => $slug,
-				'path'  => $file_path,
-				'theme' => $theme_slug,
-				'type'  => $template_type,
+			return _gutenberg_add_template_part_section_info(
+				array(
+					'slug'  => $slug,
+					'path'  => $file_path,
+					'theme' => $theme_slug,
+					'type'  => $template_type,
+				)
 			);
 		}
 	}
@@ -85,7 +87,6 @@ function _gutenberg_get_template_files( $template_type ) {
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
 		foreach ( $theme_template_files as $template_file ) {
-			$template_info      = array();
 			$template_base_path = $template_base_paths[ $template_type ];
 			$template_slug      = substr(
 				$template_file,
@@ -95,19 +96,7 @@ function _gutenberg_get_template_files( $template_type ) {
 				-5
 			);
 
-			if ( 'wp_template_part' === $template_type && is_readable( locate_template( 'experimental-theme.json' ) ) ) {
-				$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
-				$data       = json_decode(
-					$theme_json,
-					true
-				);
-				if ( isset( $data['template-parts'][ $template_slug ]['section'] ) ) {
-					$template_info['section'] = $data['template-parts'][ $template_slug ]['section'];
-				}
-			}
-
-			$template_files[] = array_merge(
-				$template_info,
+			$template_files[] = _gutenberg_add_template_part_section_info(
 				array(
 					'slug'  => $template_slug,
 					'path'  => $template_file,
@@ -119,6 +108,28 @@ function _gutenberg_get_template_files( $template_type ) {
 	}
 
 	return $template_files;
+}
+
+/**
+ * Attempts to add the template part's section information from the
+ * experimental-theme.json file to the input array.
+ *
+ * @param array $template_info Template to add information to (requires 'type' and 'slug' fields).
+ *
+ * @return array Template.
+ */
+function _gutenberg_add_template_part_section_info( $template_info ) {
+	if ( 'wp_template_part' === $template_info['type'] && is_readable( locate_template( 'experimental-theme.json' ) ) ) {
+		$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
+		$data       = json_decode(
+			$theme_json,
+			true
+		);
+		if ( isset( $data['template-parts'][ $template_info['slug'] ]['section'] ) ) {
+			$template_info['section'] = $data['template-parts'][ $template_info['slug'] ]['section'];
+		}
+	}
+	return $template_info;
 }
 
 /**
