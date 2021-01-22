@@ -182,16 +182,20 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
+	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
 	const mySQLAddress = await exec(
 		`docker-compose -f ${ dockerComposeConfigPath } port mysql 3306`
 	);
 	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
 
-	spinner.text = 'Done! \n'
+	spinner.text = 'Done!'
+		.concat( '\n' )
 		.concat( `MySQL is listening on port ${ mySQLPort }` )
 		.concat( 'WordPress started' )
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
-		.concat( '\n' );
+		.concat( '\n' )
+		.concat( 'WordPress E2E testing site started' )
+		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' );
 };
 
 /**
