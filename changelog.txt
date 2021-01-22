@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 9.8.1 =
+
+### Bug Fixes
+
+- Cover Block:
+  - Revert "Cover: Fix matrix alignment issue. (#28361)" ([28364](https://github.com/WordPress/gutenberg/pull/28364))
+  - Fix visual regression. ([28404](https://github.com/WordPress/gutenberg/pull/28404))
+- FSE: fix iframe error in Firefox. ([28212](https://github.com/WordPress/gutenberg/pull/28212))
+
+
 = 9.8.0 =
 
 ### Enhancements
