@@ -695,7 +695,7 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
 			$handles[] = $block_type->style;
 		}

@@ -47,6 +47,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			position="bottom center"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
+			className="block-editor-format-toolbar__image-popover"
 		>
 			<form
 				className="block-editor-format-toolbar__image-container-content"

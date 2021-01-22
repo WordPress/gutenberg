@@ -6,8 +6,8 @@
  */
 
 /**
- * Parses wp_template content and injects the current theme's
- * stylesheet as a theme attribute into each wp_template_part
+ * Parses wp_template content and removes the theme attribute from
+ * each wp_template_part
  *
  * @param string $template_content serialized wp_template content.
  *
@@ -31,9 +31,9 @@ function _remove_theme_attribute_from_content( $template_content ) {
 		}
 
 		return $new_content;
-	} else {
-		return $template_content;
 	}
+
+	return $template_content;
 }
 
 
@@ -56,8 +56,7 @@ function gutenberg_edit_site_export() {
 	// Load templates into the zip file.
 	$templates = gutenberg_get_block_templates();
 	foreach ( $templates as $template ) {
-		$updated_content   = _remove_theme_attribute_from_content( $template->content );
-		$template->content = $updated_content;
+		$template->content = _remove_theme_attribute_from_content( $template->content );
 
 		$zip->addFromString(
 			'theme/block-templates/' . $template->slug . '.html',
