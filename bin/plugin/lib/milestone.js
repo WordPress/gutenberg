@@ -1,6 +1,7 @@
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
 /** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
+/** @typedef {import('@octokit/rest').ReposListReleasesResponse} ReposListReleasesResponse */
 
 /**
  * @typedef {"open"|"closed"|"all"} IssueState
@@ -51,11 +52,42 @@ async function getMilestoneByTitle( octokit, owner, repo, title ) {
  *                                                    milestone.
  */
 async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
+	const milestoneResponse = await octokit.issues.getMilestone( {
+		owner,
+		repo,
+		milestone_number: milestone,
+	} );
+	const series = milestoneResponse.data.title.replace( 'Gutenberg ', '' );
+
+	const releaseOptions = await octokit.repos.listReleases.endpoint.merge( {
+		owner,
+		repo,
+	} );
+
+	let latestReleaseInSeries;
+
+	/**
+	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
+	 */
+	const releases = octokit.paginate.iterator( releaseOptions );
+
+	for await ( const r of releases ) {
+		const releasesPage = r.data;
+		latestReleaseInSeries = releasesPage.find( ( release ) =>
+			release.name.startsWith( series )
+		);
+
+		if ( latestReleaseInSeries ) {
+			break;
+		}
+	}
+
 	const options = octokit.issues.listForRepo.endpoint.merge( {
 		owner,
 		repo,
 		milestone,
 		state,
+		since: latestReleaseInSeries?.published_at,
 	} );
 
 	/**
