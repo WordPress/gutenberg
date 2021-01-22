@@ -8,11 +8,17 @@
 	position: relative;
 }
 
-.editor-styles-wrapper .wp-block-separator {
+// Duplicate selector to overcome theme specificity.
+.editor-styles-wrapper .wp-block .wp-block-separator.wp-block-separator {
 	// Remove default margins and center within ResizableBox control.
+	left: 50%;
 	margin: 0;
 	position: absolute;
 	top: 50%;
-	transform: translateY(-50%);
 	width: 100%;
+	transform: translate(-50%, -50%);
+
+	&.is-style-dots {
+		border-top: none;
+	}
 }
