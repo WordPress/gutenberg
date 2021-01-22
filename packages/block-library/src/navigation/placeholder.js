@@ -97,29 +97,6 @@ function convertMenuItemsToBlocks( menuItems ) {
 	return mapMenuItemsToBlocks( menuTree );
 }
 
-/**
- * Convert pages to blocks.
- *
- * @param {Object[]} pages An array of pages.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertPagesToBlocks( pages ) {
-	if ( ! pages ) {
-		return null;
-	}
-
-	return pages.map( ( { title, type, link: url, id } ) =>
-		createBlock( 'core/navigation-link', {
-			type,
-			id,
-			url,
-			label: ! title.rendered ? __( '(no title)' ) : title.rendered,
-			opensInNewTab: false,
-		} )
-	);
-}
-
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
@@ -220,9 +197,9 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateAllPages = () => {
-		const blocks = convertPagesToBlocks( pages );
+		const block = [ createBlock( 'core/pages' ) ];
 		const selectNavigationBlock = true;
-		onCreate( blocks, selectNavigationBlock );
+		onCreate( block, selectNavigationBlock );
 	};
 
 	useEffect( () => {
