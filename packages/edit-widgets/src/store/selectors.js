@@ -62,7 +62,17 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 export const getWidgetAreaForWidgetId = createRegistrySelector(
 	( select ) => ( state, widgetId ) => {
 		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		return widgetAreas.find( ( widgetArea ) => widgetArea.id === widgetId );
+		return widgetAreas.find( ( widgetArea ) => {
+			const post = select( 'core' ).getEditedEntityRecord(
+				KIND,
+				POST_TYPE,
+				buildWidgetAreaPostId( widgetArea.id )
+			);
+			const blockWidgetIds = post.blocks.map(
+				( block ) => block.attributes.__internalWidgetId
+			);
+			return blockWidgetIds.includes( widgetId );
+		} );
 	}
 );
 
