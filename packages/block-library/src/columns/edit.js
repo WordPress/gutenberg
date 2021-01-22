@@ -52,7 +52,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, allowedChildBlocks } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -72,6 +72,7 @@ function ColumnsEditContainer( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
+		allowedChildBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 	} );
