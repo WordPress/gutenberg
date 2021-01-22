@@ -4,7 +4,6 @@
 import { v4 as uuid } from 'uuid';
 import {
 	every,
-	reduce,
 	castArray,
 	findIndex,
 	isObjectLike,
@@ -16,7 +15,6 @@ import {
 	isFunction,
 	isEmpty,
 	map,
-	pick,
 } from 'lodash';
 
 /**
@@ -32,7 +30,7 @@ import {
 	getBlockTypes,
 	getGroupingBlockName,
 } from './registration';
-import { normalizeBlockType } from './utils';
+import { normalizeBlockType, sanitizeBlockAttributes } from './utils';
 
 /**
  * Returns a block object given its type and attributes.
@@ -44,40 +42,7 @@ import { normalizeBlockType } from './utils';
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
-	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
-
-	if ( undefined === blockType ) {
-		throw new Error( `Block type '${ name }' is not registered.` );
-	}
-
-	// Ensure attributes contains only values defined by block type, and merge
-	// default values for missing attributes.
-	const sanitizedAttributes = reduce(
-		blockType.attributes,
-		( accumulator, schema, key ) => {
-			const value = attributes[ key ];
-
-			if ( undefined !== value ) {
-				accumulator[ key ] = value;
-			} else if ( schema.hasOwnProperty( 'default' ) ) {
-				accumulator[ key ] = schema.default;
-			}
-
-			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
-				// Ensure value passed is always an array, which we're expecting in
-				// the RichText component to handle the deprecated value.
-				if ( typeof accumulator[ key ] === 'string' ) {
-					accumulator[ key ] = [ accumulator[ key ] ];
-				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
-					accumulator[ key ] = [];
-				}
-			}
-
-			return accumulator;
-		},
-		{}
-	);
+	const sanitizedAttributes = sanitizeBlockAttributes( name, attributes );
 
 	const clientId = uuid();
 
@@ -135,19 +100,15 @@ export function createBlocksFromInnerBlocksTemplate(
 export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	const clientId = uuid();
 
-	const blockType = getBlockType( block.name );
-	let attributes = block.attributes;
-	if ( blockType ) {
-		attributes = pick( attributes, Object.keys( blockType.attributes ) );
-	}
+	const sanitizedAttributes = sanitizeBlockAttributes( block.name, {
+		...block.attributes,
+		...mergeAttributes,
+	} );
 
 	return {
 		...block,
 		clientId,
-		attributes: {
-			...attributes,
-			...mergeAttributes,
-		},
+		attributes: sanitizedAttributes,
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),

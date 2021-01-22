@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType } from '@wordpress/blocks';
+
+/**
  * External dependencies
  */
 import { create, act } from 'react-test-renderer';
@@ -19,6 +24,15 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 } );
 
 describe( 'useBlockSync hook', () => {
+	beforeAll( () => {
+		registerBlockType( 'test/test-block', {
+			title: 'Test block',
+			attributes: {
+				foo: { type: 'number' },
+			},
+		} );
+	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -101,7 +115,12 @@ describe( 'useBlockSync hook', () => {
 		);
 
 		const testBlocks = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		await act( async () => {
 			root.update(
@@ -131,7 +150,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		let root;
 		let registry;
@@ -282,7 +306,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		await act( async () => {
@@ -325,7 +354,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		let registry;
@@ -352,7 +386,14 @@ describe( 'useBlockSync hook', () => {
 
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( onChange ).toHaveBeenCalledWith(
-			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
+			[
+				{
+					name: 'test/test-block',
+					clientId: 'a',
+					innerBlocks: [],
+					attributes: { foo: 2 },
+				},
+			],
 			{ selectionEnd: {}, selectionStart: {} }
 		);
 		expect( onInput ).not.toHaveBeenCalled();
