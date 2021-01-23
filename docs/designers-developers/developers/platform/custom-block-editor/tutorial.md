@@ -45,7 +45,7 @@ With that in mind, let's start taking our first steps towards building this.
 
 ## Plugin setup and organization
 
-Our custom editor is going to be built as a WordPress Plugin. To keep things simple. we'll call this `Standalone Block Editor Demo` because that is what is does. Nice!
+Our custom editor is going to be built as a WordPress Plugin. To keep things simple. we'll call this `Standalone Block Editor Demo` because that is what it does. Nice!
 
 Let's take a look at our Plugin file structure:
 
