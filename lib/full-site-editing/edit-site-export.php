@@ -36,17 +36,18 @@ function _remove_theme_attribute_from_content( $template_content ) {
 	return $template_content;
 }
 
-
 /**
- * Output a ZIP file with an export of the current templates
- * and template parts from the site editor, and close the connection.
+ * Creates an export of the current templates and
+ * template parts from the site editor at the
+ * specified path in a ZIP file.
+ *
+ * @param string $filename path of the ZIP file.
  */
-function gutenberg_edit_site_export() {
-	// Create ZIP file and directories.
-	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
+function gutenberg_edit_site_export_create_zip( $filename ) {
 	if ( ! class_exists( 'ZipArchive' ) ) {
 		return new WP_Error( 'Zip Export not supported.' );
 	}
+
 	$zip = new ZipArchive();
 	$zip->open( $filename, ZipArchive::OVERWRITE );
 	$zip->addEmptyDir( 'theme' );
@@ -73,8 +74,19 @@ function gutenberg_edit_site_export() {
 		);
 	}
 
-	// Send back the ZIP file.
+	// Save changes to the zip file.
 	$zip->close();
+}
+
+/**
+ * Output a ZIP file with an export of the current templates
+ * and template parts from the site editor, and close the connection.
+ */
+function gutenberg_edit_site_export() {
+	// Create ZIP file in the temporary directory.
+	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
+	gutenberg_edit_site_export_create_zip( $filename );
+
 	header( 'Content-Type: application/zip' );
 	header( 'Content-Disposition: attachment; filename=edit-site-export.zip' );
 	header( 'Content-Length: ' . filesize( $filename ) );
