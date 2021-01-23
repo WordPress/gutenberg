@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+
+#### Bug Fix
+* Add proper handling for single use blocks such as the more block [#28339]
+
 ## 1.45.0
 * [*] Use react-native-url-polyfill in globals - [https://github.com/WordPress/gutenberg/pull/27867]
 * [*] Remove Old Layout Picker - [https://github.com/WordPress/gutenberg/pull/27640]
