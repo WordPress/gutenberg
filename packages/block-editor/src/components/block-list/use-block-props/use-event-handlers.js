@@ -142,5 +142,6 @@ export function useEventHandlers( ref, clientId ) {
 		insertDefaultBlock,
 		removeBlock,
 		selectBlock,
+		ref.current,
 	] );
 }
