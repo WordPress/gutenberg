@@ -125,7 +125,8 @@ function _gutenberg_add_template_part_section_info( $template_info ) {
 			$theme_json,
 			true
 		);
-		if ( isset( $data['template-parts'][ $template_info['slug'] ]['section'] ) ) {
+		if ( isset( $data['template-parts'][ $template_info['slug'] ]['section'] ) && in_array( $data['template-parts'][ $template_info['slug'] ]['section'], gutenberg_get_allowed_template_part_section_types(), true ) ) {
+
 			$template_info['section'] = $data['template-parts'][ $template_info['slug'] ]['section'];
 		}
 	}

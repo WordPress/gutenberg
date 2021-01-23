@@ -147,3 +147,22 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 	}
 }
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
+
+/**
+ * Returns a filtered list of allowed section types for template parts.
+ *
+ * @return array The supported template part section types.
+ */
+function gutenberg_get_allowed_template_part_section_types() {
+	$default_section_types = array(
+		'header',
+		'footer',
+	);
+
+	/**
+	 * Filters the list of allowed template part section types.
+	 *
+	 * @param array $default_section_types An array of supported section types.
+	 */
+	return apply_filters( 'default_template_part_section_types', $default_section_types );
+}

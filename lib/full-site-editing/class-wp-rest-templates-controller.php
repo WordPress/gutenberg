@@ -362,7 +362,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
-			if ( isset( $request['section'] ) ) {
+			if ( isset( $request['section'] ) && in_array( $request['section'], gutenberg_get_allowed_template_part_section_types(), true ) ) {
 				$changes->tax_input['section'] = $request['section'];
 			} elseif ( null !== $template && ! $template->is_custom ) {
 				$changes->tax_input['section'] = $template->section;
