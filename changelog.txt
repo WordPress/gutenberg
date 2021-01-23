@@ -3102,7 +3102,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 
 ### New APIs
 
-- A new [Block Context API](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-context.md) has been partially implemented, currently limited to block settings and editor APIs. PHP APIs will be implemented in the next plugin releases. ([21467](https://github.com/WordPress/gutenberg/pull/21467), [21868](https://github.com/WordPress/gutenberg/pull/21868), [21921](https://github.com/WordPress/gutenberg/pull/21921))
+- A new [Block Context API](https://github.com/WordPress/gutenberg/blob/HEAD/docs/designers-developers/developers/block-api/block-context.md) has been partially implemented, currently limited to block settings and editor APIs. PHP APIs will be implemented in the next plugin releases. ([21467](https://github.com/WordPress/gutenberg/pull/21467), [21868](https://github.com/WordPress/gutenberg/pull/21868), [21921](https://github.com/WordPress/gutenberg/pull/21921))
 - Add new "G2"-styled icons to the Icons package. ([21209](https://github.com/WordPress/gutenberg/pull/21209))
 
 ### Bug Fixes

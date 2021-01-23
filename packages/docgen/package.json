@@ -10,7 +10,7 @@
 		"jsdoc",
 		"documentation"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/docgen/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen/README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",

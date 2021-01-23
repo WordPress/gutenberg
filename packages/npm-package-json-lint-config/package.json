@@ -10,7 +10,7 @@
 		"npm-package-json-lint",
 		"config"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/npm-package-json-lint-config/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/npm-package-json-lint-config/README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",

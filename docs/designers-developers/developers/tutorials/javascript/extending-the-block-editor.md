@@ -39,7 +39,7 @@ Add a quote block, and in the right sidebar under Styles, you will see your new 
 Click the Fancy Quote to select and apply that style to your quote block:
 
 
-![Fancy Quote Style in Inspector](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-in-inspector.png)
+![Fancy Quote Style in Inspector](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/fancy-quote-in-inspector.png)
 
 
 Even if you Preview or Publish the post you will not see a visible change. However, if you look at the source, you will see the `is-style-fancy-quote` class name is now attached to your quote block.
@@ -63,4 +63,4 @@ add_action( 'enqueue_block_assets', 'myguten_stylesheet' );
 
 Now when you view in the editor and publish, you will see your Fancy Quote style, a delicious tomato color text:
 
-![Fancy Quote with Style](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-with-style.png)
+![Fancy Quote with Style](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/fancy-quote-with-style.png)

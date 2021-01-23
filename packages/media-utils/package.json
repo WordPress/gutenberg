@@ -10,7 +10,7 @@
 		"media",
 		"upload"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/master/packages/media-utils/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/media-utils/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
