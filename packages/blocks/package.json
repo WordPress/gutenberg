@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.25.1",
+	"version": "6.25.2",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/blocks/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -45,7 +45,7 @@
 		"rememo": "^3.0.0",
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
-		"tinycolor2": "^1.4.1",
+		"tinycolor2": "^1.4.2",
 		"uuid": "^8.3.0"
 	},
 	"publishConfig": {

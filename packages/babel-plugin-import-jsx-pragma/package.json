@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-plugin-import-jsx-pragma",
-	"version": "2.7.0",
+	"version": "3.0.0",
 	"description": "Babel transform plugin for automatically injecting an import to be used as the pragma for the React JSX Transform plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -14,7 +14,7 @@
 		"pragma",
 		"react"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-plugin-import-jsx-pragma/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-plugin-import-jsx-pragma/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

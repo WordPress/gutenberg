@@ -33,7 +33,7 @@ var deprecated = [ v3, v2, v1 ];
 ```
 {% end %}
 
-It is also recommended to keep [fixtures](https://github.com/WordPress/gutenberg/blob/master/packages/e2e-tests/fixtures/blocks/README.md) which contain the different versions of the block content to allow you to easily test that new deprecations and migrations are working across all previous versions of the block.
+It is also recommended to keep [fixtures](https://github.com/WordPress/gutenberg/blob/HEAD/packages/e2e-tests/fixtures/blocks/README.md) which contain the different versions of the block content to allow you to easily test that new deprecations and migrations are working across all previous versions of the block.
 
 Deprecations are defined on a block type as its `deprecated` property, an array of deprecation objects where each object takes the form:
 
@@ -305,4 +305,4 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
 In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 
-*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations.*
+*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations.*

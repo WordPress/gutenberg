@@ -9,7 +9,7 @@
 		"gutenberg",
 		"import"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/lazy-import/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/lazy-import/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

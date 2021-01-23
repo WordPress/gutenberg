@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.23.1",
+	"version": "3.24.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,7 +11,7 @@
 		"hoc",
 		"hooks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -37,7 +37,7 @@
 		"memize": "^1.1.0",
 		"mousetrap": "^1.6.5",
 		"react-merge-refs": "^1.0.0",
-		"react-resize-aware": "^3.0.1",
+		"react-resize-aware": "^3.1.0",
 		"use-memo-one": "^1.1.1"
 	},
 	"publishConfig": {

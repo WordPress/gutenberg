@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.8.0-rc.1",
+	"version": "9.8.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -19,7 +19,8 @@
 		"npm": ">=6.9.0"
 	},
 	"config": {
-		"GUTENBERG_PHASE": 2
+		"GUTENBERG_PHASE": 2,
+		"COMPONENT_SYSTEM_PHASE": 0
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
@@ -187,7 +188,7 @@
 		"react-native": "0.61.5",
 		"react-test-renderer": "16.13.1",
 		"rimraf": "3.0.2",
-		"rtlcss": "2.4.0",
+		"rtlcss": "2.6.2",
 		"sass": "1.26.11",
 		"sass-loader": "8.0.2",
 		"semver": "7.3.2",
@@ -218,6 +219,7 @@
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
+		"distclean": "rimraf node_modules packages/*/node_modules",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -238,10 +240,10 @@
 		"native": "npm run --prefix packages/react-native-editor",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
+		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",
-		"publish:dev": "npm run clean:package-types && npm run build:packages && lerna publish prerelease --preid rc --dist-tag next",
-		"publish:patch": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag patch",
-		"publish:prod": "npm run clean:package-types && npm run build:packages && lerna publish",
+		"publish:patch": "lerna publish --dist-tag patch",
+		"publish:prod": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test:create-block": "./bin/test-create-block.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",

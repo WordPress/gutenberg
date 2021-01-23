@@ -58,19 +58,27 @@ export default function PostTitleEdit( {
 	const { title, link } = post;
 
 	let titleElement = (
-		<PlainText
-			tagName={ TagName }
-			placeholder={ __( 'No Title' ) }
-			value={ title }
-			onChange={ ( value ) =>
-				editEntityRecord( 'postType', postType, postId, {
-					title: value,
-				} )
-			}
-			__experimentalVersion={ 2 }
-			{ ...( isLink ? {} : blockProps ) }
-		/>
+		<TagName { ...( isLink ? {} : blockProps ) }>
+			{ __( 'An example title' ) }
+		</TagName>
 	);
+
+	if ( postType && postId ) {
+		titleElement = (
+			<PlainText
+				tagName={ TagName }
+				placeholder={ __( 'No Title' ) }
+				value={ title }
+				onChange={ ( value ) =>
+					editEntityRecord( 'postType', postType, postId, {
+						title: value,
+					} )
+				}
+				__experimentalVersion={ 2 }
+				{ ...( isLink ? {} : blockProps ) }
+			/>
+		);
+	}
 
 	if ( isLink ) {
 		titleElement = (

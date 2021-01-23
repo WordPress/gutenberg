@@ -23,7 +23,7 @@ async function getLatestNPMVersion() {
 					// will return an abbreviated form of the package data which
 					// includes enough detail to determine the latest version.
 					//
-					// See: https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md
+					// See: https://github.com/npm/registry/blob/HEAD/docs/responses/package-metadata.md
 					Accept: 'application/vnd.npm.install-v1+json',
 				},
 			},
