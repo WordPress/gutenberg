@@ -95,7 +95,6 @@ function _gutenberg_get_template_files( $template_type ) {
 				// Subtract ending '.html'.
 				-5
 			);
-
 			$template_files[] = _gutenberg_add_template_part_section_info(
 				array(
 					'slug'  => $template_slug,
@@ -126,7 +125,6 @@ function _gutenberg_add_template_part_section_info( $template_info ) {
 			true
 		);
 		if ( isset( $data['template-parts'][ $template_info['slug'] ]['section'] ) && in_array( $data['template-parts'][ $template_info['slug'] ]['section'], gutenberg_get_allowed_template_part_section_types(), true ) ) {
-
 			$template_info['section'] = $data['template-parts'][ $template_info['slug'] ]['section'];
 		}
 	}
