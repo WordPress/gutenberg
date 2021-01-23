@@ -95,7 +95,7 @@ function getHoverEventDurations( trace ) {
 }
 
 page.on( 'load', function () {
-	this.evaluate( () => {
+	page.evaluate( () => {
 		const filters = [
 			'i18n.gettext',
 			'i18n.gettext_default',
