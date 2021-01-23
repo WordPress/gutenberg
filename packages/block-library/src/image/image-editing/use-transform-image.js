@@ -13,13 +13,10 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ aspect, setAspect ] = useState();
 	const [ defaultAspect, setDefaultAspect ] = useState();
 
-	const mediaCrossOrigin = useSelect( ( select ) => {
+	const mediaCrossOriginDomains = useSelect( ( select ) => {
 		const value = select( 'core/block-editor' ).getSettings()
-			.mediaCrossOrigin;
-		return typeof value === 'string' &&
-			[ '', 'anonymous', 'use-credentials' ].includes( value )
-			? value
-			: undefined;
+			.mediaCrossOriginDomains;
+		return typeof value === 'object' ? value : undefined;
 	} );
 
 	const initializeTransformValues = useCallback( () => {
@@ -99,10 +96,27 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 
 		const el = new window.Image();
 		el.src = url;
-		el.onload = editImage;
-		if ( typeof mediaCrossOrigin === 'string' ) {
-			el.crossOrigin = mediaCrossOrigin;
+
+		if ( mediaCrossOriginDomains ) {
+			const imageCrossOrigin =
+				mediaCrossOriginDomains[ window.location.hostname ];
+
+			// Only set the crossOrigin if there's a crossOrigin configuration defined in a block
+			// setting (imageCrossOriginDomains) for the current "target" domain. This allows different crossOrigin
+			// configurations based on different domains in the same WordPress app, effectivelly allowing a
+			// crossOrigin allowed-list per domain, i.e if for some reason the current site doesn't need to set it.
+			// The code here is a POC and could possibly be abstracted in the selector itself.
+			if (
+				imageCrossOrigin &&
+				[ '', 'anonymous', 'use-credentials' ].includes(
+					imageCrossOrigin
+				)
+			) {
+				el.crossOrigin = imageCrossOrigin;
+			}
 		}
+
+		el.onload = editImage;
 	}, [
 		rotation,
 		naturalWidth,

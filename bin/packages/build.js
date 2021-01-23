@@ -247,7 +247,9 @@ stream
 				console.error( error );
 			}
 
-			if ( ended && ++complete === files.length ) {
+			complete = complete + 1;
+
+			if ( ended && complete === files.length ) {
 				workerFarm.end( worker );
 			}
 		} )
