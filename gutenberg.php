@@ -1,19 +1,46 @@
 <?php
 /**
- * Plugin Name: Gutenberg
- * Plugin URI: https://github.com/WordPress/gutenberg
- * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Requires at least: 5.3
+ * Plugin Name: Gutenberg - Nightly
+ * Plugin URI: https://github.com/bph/gutenberg
+ * Description: Zip from master of Gutenberg GitHub repo: Gutenberg This is the development plugin for the new block editor in core. Ping @bph on WPSlack for questions. 
+ * Requires at least: 5.5
  * Requires PHP: 5.6
- * Version: 9.8.1
- * Author: Gutenberg Team
+ * Version: 9.9.0.20210116
+ * Author: Gutenberg Team and Birgit Pauli-Haack (Gutenberg Times)
  * Text Domain: gutenberg
+ * GitHub Plugin URI: bph/gutenberg
+ * Release Asset: true
  *
  * @package gutenberg
  */
 
+// GitHub Updater filters.
+add_filter(
+	'github_updater_override_dot_org',
+	function ( $overrides ) {
+		return array_merge(
+			$overrides,
+			array( 'gutenberg/gutenberg.php' )
+		);
+	}
+);
+add_filter(
+	'github_updater_release_asset_rollback',
+	function ( $rollback, $file ) {
+		if ( $file === plugin_basename( __FILE__ ) ) {
+			return [ 'gutenberg-nightly' ];
+		}
+	},
+	10,
+	2
+);
+add_filter( 'github_updater_no_release_asset_branches', '__return_true' );
+// End GitHub Updater filters.
+
+
 ### BEGIN AUTO-GENERATED DEFINES
-defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
+define( 'GUTENBERG_VERSION', '9.6.2.20201230' );
+define( 'GUTENBERG_GIT_COMMIT', 'd516050927e6f7d8c4d1917f37c46bab00daacec' );
 ### END AUTO-GENERATED DEFINES
 
 gutenberg_pre_init();
