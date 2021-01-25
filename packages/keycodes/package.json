@@ -9,7 +9,7 @@
 		"gutenberg",
 		"keycodes"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/keycodes/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/keycodes/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

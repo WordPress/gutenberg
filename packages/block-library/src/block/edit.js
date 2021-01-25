@@ -18,6 +18,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -26,11 +27,10 @@ import {
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
-/**
- * Internal dependencies
- */
-
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		ref
+	);
 	const { isMissing, hasResolved } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
@@ -83,6 +83,16 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	const blockProps = useBlockProps();
 
+	if ( hasAlreadyRendered ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
 	if ( isMissing ) {
 		return (
 			<div { ...blockProps }>
@@ -104,28 +114,30 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	}
 
 	return (
-		<div { ...blockProps }>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ () => convertBlockToStatic( clientId ) }
-					>
-						{ __( 'Convert to regular blocks' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody>
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<div className="block-library-block__reusable-block-container">
-				{ <div { ...innerBlocksProps } /> }
+		<RecursionProvider>
+			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => convertBlockToStatic( clientId ) }
+						>
+							{ __( 'Convert to regular blocks' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<PanelBody>
+						<TextControl
+							label={ __( 'Name' ) }
+							value={ title }
+							onChange={ setTitle }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<div className="block-library-block__reusable-block-container">
+					{ <div { ...innerBlocksProps } /> }
+				</div>
 			</div>
-		</div>
+		</RecursionProvider>
 	);
 }

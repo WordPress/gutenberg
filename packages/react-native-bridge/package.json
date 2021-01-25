@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/react-native-bridge",
-  "version": "1.44.1",
+  "version": "1.45.0",
   "description": "Native bridge library used to integrate the block editor into a native App.",
   "private": true,
   "author": "The WordPress Contributors",
@@ -8,7 +8,7 @@
   "keywords": [
     "react-native"
   ],
-  "homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-bridge/README.md",
+  "homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-bridge/README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/WordPress/gutenberg.git",

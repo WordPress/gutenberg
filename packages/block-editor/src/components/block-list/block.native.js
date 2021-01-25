@@ -97,7 +97,7 @@ class BlockListBlock extends Component {
 		this.getBlockWidth = this.getBlockWidth.bind( this );
 
 		this.state = {
-			blockWidth: 0,
+			blockWidth: this.props.blockWidth,
 		};
 
 		this.anchorNodeRef = createRef();
@@ -121,11 +121,19 @@ class BlockListBlock extends Component {
 
 	getBlockWidth( { nativeEvent } ) {
 		const { layout } = nativeEvent;
-		const { blockWidth } = this.state;
+		const { marginHorizontal, blockWidth } = this.props;
+
+		if ( ! blockWidth ) {
+			return;
+		}
+
+		const spacing = 2 * marginHorizontal;
 		const layoutWidth = Math.floor( layout.width );
 
-		if ( blockWidth !== layoutWidth ) {
-			this.setState( { blockWidth: layoutWidth } );
+		if ( blockWidth - spacing !== layoutWidth ) {
+			if ( this.state.blockWidth !== layoutWidth ) {
+				this.setState( { blockWidth: layoutWidth } );
+			}
 		}
 	}
 

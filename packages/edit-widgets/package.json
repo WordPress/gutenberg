@@ -10,7 +10,7 @@
 		"editor",
 		"widgets"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-widgets/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-widgets/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

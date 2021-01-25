@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.44.1",
+	"version": "1.45.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -13,7 +13,7 @@
 		"jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
 		"scssfiles": "src/*.scss src/**/*.scss"
 	},
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -49,6 +49,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/react-native-aztec": "file:../react-native-aztec",
 		"@wordpress/react-native-bridge": "file:../react-native-bridge",
+		"core-js": "^3.8.3",
 		"fast-average-color": "^4.3.0",
 		"jed": "^1.1.1",
 		"jsc-android": "^241213.1.0",

@@ -10,7 +10,7 @@
 		"github",
 		"action"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/project-management-automation/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

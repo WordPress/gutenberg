@@ -11,7 +11,7 @@
 		"hoc",
 		"hooks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
