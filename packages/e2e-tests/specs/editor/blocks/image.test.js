@@ -288,4 +288,34 @@ describe( 'Image', () => {
 		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
 		expect( updatedImageDataURL ).toMatchSnapshot();
 	} );
+
+	it( 'allows navigating through inline and block toolbars with keyboard', async () => {
+		await insertBlock( 'Image' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		await expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Bold' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		await expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Block: Image' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		await expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Image' );
+	} );
 } );
