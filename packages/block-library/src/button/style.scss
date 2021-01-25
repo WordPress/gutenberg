@@ -55,7 +55,9 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-100 {
-		width: calc(100% - #{ $button-margin });
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
 	}
 }
 
