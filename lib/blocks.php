@@ -166,13 +166,37 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	}
 
 	$original_block_name = $block_name;
+	$block_name          = str_replace( 'core/', '', $block_name );
 
-	$block_name = str_replace( 'core/', '', $block_name );
-
+	// Get the stylesheets paths.
 	$style_path        = "build/block-library/blocks/$block_name/style.css";
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	// If an RTL language, get the RTL file path.
+	$style_path = is_rtl() ? "build/block-library/blocks/$block_name/style-rtl.css" : $style_path;
+	// Get the file's absolute path.
+	$file_abs_path = gutenberg_dir_path() . $style_path;
 
-	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+	if ( file_exists( $file_abs_path ) ) {
+
+		$styles = false;
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$styles_size = filesize( $file_abs_path );
+		} else {
+			// Use a short transient to avoid constantly querying the files to get their contents, minify them etc to get their size.
+			$file_size_transient_name = md5( $file_abs_path ) . filemtime( $file_abs_path ) . '_size';
+			$styles_size              = get_site_transient( $file_size_transient_name );
+			if ( ! $styles_size ) {
+				// Get the styles.
+				$styles = file_get_contents( gutenberg_dir_path() . $style_path );
+				// Minify the styles by removing comments & whitespace.
+				$styles = gutenberg_minify_styles( $styles );
+				// Get the styles size.
+				$styles_size = strlen( $styles );
+				// Update the transient.
+				set_site_transient( $file_size_transient_name, $styles_size, HOUR_IN_SECONDS );
+			}
+		}
+
 		static $inline_pool_size = 0;
 
 		// The default threshold for inlining styles in the frontend (in bytes).
@@ -206,33 +230,19 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		// If the $threshold was set to 0 via a filter then do not inline.
 		$should_inline_style = (bool) $threshold;
 
-		// Check if the file should be inlined based on its size.
-		if ( $should_inline_style ) {
-			// If an RTL language, get the RTL file path.
-			$style_path = is_rtl() ? "build/block-library/blocks/$block_name/style-rtl.css" : $style_path;
-
-			// Get the styles.
-			$styles = file_get_contents( gutenberg_dir_path() . $style_path );
-
-			// If SCRIPT_DEBUG is not defined, minify the styles by removing comments & whitespace.
-			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
-				$styles = gutenberg_minify_styles( $styles );
-			}
-
-			// Get the styles size.
-			$styles_size = strlen( $styles );
-
-			// Do not inline the styles if their size is larger than the defined threshold,
-			// or if adding them will go above the defined total size for inline styles.
-			if ( $styles_size > $threshold || $max_inline_total_size < $inline_pool_size + $styles_size ) {
-				$should_inline_style = false;
-			}
+		// Do not inline the styles if their size is larger than the defined threshold,
+		// or if adding them will go above the defined total size for inline styles.
+		if ( $should_inline_style && ( $styles_size > $threshold || $max_inline_total_size < $inline_pool_size + $styles_size ) ) {
+			$should_inline_style = false;
 		}
 
 		if ( $should_inline_style ) {
 
 			// Register the style using `false` as src.
 			wp_register_style( "wp-block-{$block_name}", false, array(), false );
+
+			// If we don't have the $styles, get the file contents.
+			$styles = ( $styles ) ? $styles : file_get_contents( $file_abs_path );
 
 			// Add inline styles to the registered style.
 			wp_add_inline_style( "wp-block-{$block_name}", $styles );
