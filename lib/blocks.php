@@ -227,14 +227,14 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		 */
 		$max_inline_total_size = apply_filters( 'block_styles_max_inline_total_size', $max_inline_total_size, $original_block_name );
 
-		// If the $threshold was set to 0 via a filter then do not inline.
-		$should_inline_style = (bool) $threshold;
-
-		// Do not inline the styles if their size is larger than the defined threshold,
-		// or if adding them will go above the defined total size for inline styles.
-		if ( $should_inline_style && ( $styles_size > $threshold || $max_inline_total_size < $inline_pool_size + $styles_size ) ) {
-			$should_inline_style = false;
-		}
+		$should_inline_style = (
+			// Make sure the $threshold was not set to 0 using a filter.
+			$threshold &&
+			// Make sure the filesize is smaller than the threshold.
+			$styles_size <= $threshold &&
+			// Make sure adding the file will not cause the total inline style to go above the maximum defined value.
+			$max_inline_total_size >= $inline_pool_size + $styles_size
+		);
 
 		if ( $should_inline_style ) {
 
