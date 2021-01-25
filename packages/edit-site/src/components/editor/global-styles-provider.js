@@ -142,6 +142,9 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		if ( ! newUserStyles.isGlobalStylesUserThemeJSON ) {
 			newUserStyles = EMPTY_CONTENT;
 		}
+		// TODO: we probably want to check here that the shape is what we want
+		// This is, settings & styles are top-level keys, or perhaps a version.
+		// As to avoid merging trees that are different.
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
