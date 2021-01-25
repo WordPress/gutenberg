@@ -68,30 +68,29 @@ function Editor( {
 		const { getBlockTypes } = select( blocksStore );
 
 		let postObject = {
-			postType: currentPostObj?.type ?? postType,
-			postId: currentPostObj?.id ?? postId,
+			type: currentPostObj?.type ?? postType,
+			id: currentPostObj?.id ?? postId,
 		};
 
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-			postObject.postType
+			postObject.type
 		);
 		// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 		// to avoid the special case.
 		if ( isTemplate ) {
-			const posts = getEntityRecords( 'postType', postObject.postType, {
-				wp_id: postObject.postId,
+			const posts = getEntityRecords( 'postType', postObject.type, {
+				wp_id: postObject.id,
 			} );
 			postObject = posts?.[ 0 ];
 		} else {
 			postObject = getEntityRecord(
 				'postType',
-				postObject.postType,
-				postObject.postId
+				postObject.type,
+				postObject.id
 			);
 		}
 		const isFSETheme = getEditorSettings().isFSETheme;
-		const isViewable =
-			getPostType( postObject.postType )?.viewable ?? false;
+		const isViewable = getPostType( postObject.type )?.viewable ?? false;
 
 		return {
 			hasFixedToolbar:
