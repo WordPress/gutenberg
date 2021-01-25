@@ -34,10 +34,12 @@ describe( 'isURL', () => {
 		[ 'http://wordpress.org' ],
 		[ 'https://wordpress.org' ],
 		[ 'HTTPS://WORDPRESS.ORG' ],
+		[ 'HTtp://wordpress.org/mixed-case-protocol/ok-if-in-list' ],
 		[ 'https://wordpress.org/./foo' ],
 		[ 'https://wordpress.org/path?query#fragment' ],
 		[ 'https://localhost/foo#bar' ],
 		[ 'mailto:example@example.com' ],
+		[ 'Mailto:example@example.com' ],
 		[ 'ssh://user:password@127.0.0.1:8080' ],
 	] )( 'valid (true): %s', ( url ) => {
 		expect( isURL( url ) ).toBe( true );
@@ -50,6 +52,11 @@ describe( 'isURL', () => {
 		[ 'HTTP: HyperText Transfer Protocol' ],
 		[ 'URLs begin with a http:// prefix' ],
 		[ 'Go here: http://wordpress.org' ],
+		[ 'Note: Not a real scheme' ],
+
+		// Fails in node 12, but correct in node 15
+		[ 'Note:Not a mixed case scheme unless common' ],
+
 		[ 'http://' ],
 		[ '' ],
 	] )( 'invalid (false): %s', ( url ) => {
