@@ -13,12 +13,14 @@ import { getUrl, getImageSizeAttributes } from './utils';
  * from changed values supplied by parent block context.
  *
  * @param {Object} image                  Image.
+ * @param {Object} currentAttributes      Current values for inheritable attributes
  * @param {Object} context                Parent block context.
  * @param {Object} inheritedAttributes    Image block attribute that indicate which attributes are inherited from parent.
  * @param {Function} setAttributes        Image block setAttributes prop.
  */
 export default function useParentAttributes(
 	image,
+	currentAttributes,
 	context,
 	inheritedAttributes,
 	setAttributes
@@ -34,6 +36,21 @@ export default function useParentAttributes(
 		if ( ! isGrouped && inheritedAttributes ) {
 			setAttributes( {
 				inheritedAttributes: undefined,
+			} );
+			return;
+		}
+		if ( isGrouped && ! inheritedAttributes ) {
+			// Check current Image attributes to make sure we don't overwrite an custom
+			// links and targets. from Image blocks dragged into a new parent block with inheritable
+			// attributes
+			const { linkDestination, linkTarget, href } = currentAttributes;
+			setAttributes( {
+				inheritedAttributes: {
+					linkDestination:
+						linkDestination !== 'none' || href ? false : true,
+					linkTarget: linkTarget ? false : true,
+					sizeSlug: true,
+				},
 			} );
 		}
 	}, [ isGrouped, inheritedAttributes ] );
@@ -62,7 +79,7 @@ export default function useParentAttributes(
 	}, [ parentLinkTarget ] );
 
 	useEffect( () => {
-		if ( ! isGrouped || ! inheritedAttributes.sizeSlug ) {
+		if ( ! isGrouped || ! inheritedAttributes?.sizeSlug ) {
 			return;
 		}
 
