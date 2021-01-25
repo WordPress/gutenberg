@@ -191,10 +191,10 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	spinner.text = 'Done!'
 		.concat( '\n' )
 		.concat( `MySQL is listening on port ${ mySQLPort }` )
-		.concat( 'WordPress started' )
+		.concat( 'WordPress development site started' )
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
 		.concat( '\n' )
-		.concat( 'WordPress E2E testing site started' )
+		.concat( 'WordPress test site started' )
 		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' );
 };
 
