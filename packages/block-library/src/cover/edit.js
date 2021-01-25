@@ -330,8 +330,10 @@ function CoverEdit( {
 		? `${ minHeight }${ minHeightUnit }`
 		: minHeight;
 
+	const isImgElement = ! ( hasParallax || isRepeated );
+
 	const style = {
-		...( isImageBackground && ( hasParallax || isRepeated )
+		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: overlayColor.color,
@@ -342,7 +344,7 @@ function CoverEdit( {
 	const mediaStyle = {
 		objectPosition:
 			// prettier-ignore
-			focalPoint && ! hasParallax
+			focalPoint && isImgElement
 				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100) }%`
 				: undefined,
 	};
@@ -589,7 +591,7 @@ function CoverEdit( {
 						style={ { background: gradientValue } }
 					/>
 				) }
-				{ isImageBackground && ! hasParallax && (
+				{ isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"

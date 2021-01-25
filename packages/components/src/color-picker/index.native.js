@@ -86,7 +86,9 @@ function ColorPicker( {
 	useEffect( () => {
 		shouldEnableBottomSheetMaxHeight( false );
 		onHandleClosingBottomSheet( () => {
-			setColor( savedColor );
+			if ( savedColor ) {
+				setColor( savedColor );
+			}
 			if ( onBottomSheetClosed ) {
 				onBottomSheetClosed();
 			}

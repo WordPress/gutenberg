@@ -11,7 +11,7 @@
 		"shallow-equal",
 		"shallowequal"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/is-shallow-equal/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/is-shallow-equal/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

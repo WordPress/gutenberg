@@ -9,7 +9,7 @@
 		"gutenberg",
 		"autop"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/autop/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/autop/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

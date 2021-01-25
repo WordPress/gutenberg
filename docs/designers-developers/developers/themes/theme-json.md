@@ -322,6 +322,7 @@ h4 {
 | Context | Radius |
 | --- | --- |
 | Group | Yes |
+| Image | Yes |
 
 #### Color Properties
 

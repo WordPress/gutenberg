@@ -74,6 +74,12 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+
+		this.onLayout = this.onLayout.bind( this );
+
+		this.state = {
+			blockWidth: this.props.blockWidth || 0,
+		};
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -138,6 +144,18 @@ export class BlockList extends Component {
 		return this.extraData;
 	}
 
+	onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+		const layoutWidth = Math.floor( layout.width );
+
+		if ( blockWidth !== layoutWidth ) {
+			this.setState( {
+				blockWidth: layoutWidth,
+			} );
+		}
+	}
+
 	render() {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
@@ -197,6 +215,7 @@ export class BlockList extends Component {
 			<View
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
+				onLayout={ this.onLayout }
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -278,6 +297,7 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
+		const { blockWidth } = this.state;
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -296,6 +316,7 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
+				blockWidth={ blockWidth }
 			/>
 		);
 	}

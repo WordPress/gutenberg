@@ -11,7 +11,7 @@
 		"matchers",
 		"console"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/jest-console/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-console/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

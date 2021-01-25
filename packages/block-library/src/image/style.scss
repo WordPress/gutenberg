@@ -7,6 +7,10 @@
 		max-width: 100%;
 	}
 
+	&:not(.is-style-rounded) img {
+		border-radius: inherit;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
