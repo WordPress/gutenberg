@@ -2301,22 +2301,6 @@ describe( 'state', () => {
 			expect( state.selectionEnd ).toEqual( expected );
 		} );
 
-		it( 'should not select inserted block if updateSelection flag is false', () => {
-			const original = deepFreeze( {
-				selectionStart: { clientId: 'a' },
-				selectionEnd: { clientId: 'a' },
-			} );
-			const action = {
-				type: 'INSERT_BLOCKS',
-				blocks: [ { clientId: 'ribs' } ],
-				updateSelection: false,
-			};
-			const state = selection( original, action );
-
-			expect( state.selectionStart ).toBe( original.selectionStart );
-			expect( state.selectionEnd ).toBe( original.selectionEnd );
-		} );
-
 		it( 'should not update the state if the block moved is already selected', () => {
 			const original = deepFreeze( {
 				selectionStart: { clientId: 'ribs' },
@@ -2473,23 +2457,6 @@ describe( 'state', () => {
 
 			expect( state.selectionStart ).toEqual( expected.selectionStart );
 			expect( state.selectionEnd ).toEqual( expected.selectionEnd );
-		} );
-
-		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
-			const original = deepFreeze( {
-				selectionStart: { clientId: 'chicken' },
-				selectionEnd: { clientId: 'chicken' },
-			} );
-			const action = {
-				type: 'REPLACE_INNER_BLOCKS',
-				blocks: [ { clientId: 'another-block' } ],
-				rootClientId: 'parent',
-				updateSelection: false,
-			};
-			const state = selection( original, action );
-
-			expect( state.selectionStart ).toEqual( original.selectionStart );
-			expect( state.selectionEnd ).toEqual( original.selectionEnd );
 		} );
 
 		it( 'should keep the same selection on RESET_BLOCKS if the selected blocks continue to exist', () => {
