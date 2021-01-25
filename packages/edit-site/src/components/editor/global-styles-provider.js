@@ -174,7 +174,8 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const styleOrigin = 'user' === origin ? userStyles : mergedStyles;
+				const styleOrigin =
+					'user' === origin ? userStyles : mergedStyles;
 
 				const value = get(
 					styleOrigin?.styles?.[ context ],
