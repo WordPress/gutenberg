@@ -10,10 +10,10 @@ import { defaultColumnsNumber } from './shared';
 
 export default function save( { attributes } ) {
 	const {
+		imageCount,
 		caption,
 		columns = defaultColumnsNumber( imageCount ),
 		gutterSize,
-		imageCount,
 		imageCrop,
 	} = attributes;
 

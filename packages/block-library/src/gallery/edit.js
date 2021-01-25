@@ -84,9 +84,9 @@ function GalleryEdit( props ) {
 	} = props;
 
 	const {
+		imageCount,
 		columns = defaultColumnsNumber( imageCount ),
 		gutterSize,
-		imageCount,
 		imageCrop,
 		imageUploads,
 		linkTarget,
