@@ -197,8 +197,6 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			}
 		}
 
-		static $inline_pool_size = 0;
-
 		// The default threshold for inlining styles in the frontend (in bytes).
 		$threshold = 1500;
 
@@ -213,27 +211,11 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		 */
 		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold, $original_block_name );
 
-		// The default maximum total size of inlined styles.
-		$max_inline_total_size = 20000;
-
-		/**
-		 * The maximum size of all inlined styles (in bytes).
-		 *
-		 * Inlining will stop if this size is reached.
-		 *
-		 * @param int    $max_inline_total_size The maximum size of all inlined styles - in bytes.
-		 * @param string $original_block_name   The block name (example: "core/paragraph").
-		 * @return int
-		 */
-		$max_inline_total_size = apply_filters( 'block_styles_max_inline_total_size', $max_inline_total_size, $original_block_name );
-
 		$should_inline_style = (
 			// Make sure the $threshold was not set to 0 using a filter.
 			$threshold &&
 			// Make sure the filesize is smaller than the threshold.
-			$styles_size <= $threshold &&
-			// Make sure adding the file will not cause the total inline style to go above the maximum defined value.
-			$max_inline_total_size >= $inline_pool_size + $styles_size
+			$styles_size <= $threshold
 		);
 
 		if ( $should_inline_style ) {
@@ -246,7 +228,6 @@ function gutenberg_register_core_block_styles( $block_name ) {
 
 			// Add inline styles to the registered style.
 			wp_add_inline_style( "wp-block-{$block_name}", $styles );
-			$inline_pool_size += $styles_size;
 		} else {
 
 			// Register the style.
