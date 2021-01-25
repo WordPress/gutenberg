@@ -18,11 +18,13 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 
 function BlockPatternsCategory( {
+	rootClientId,
 	onInsert,
 	selectedCategory,
 	onClickCategory,
 } ) {
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
+		rootClientId,
 		onInsert
 	);
 
@@ -120,9 +122,15 @@ function BlockPatternsCategory( {
 	);
 }
 
-function BlockPatternsTabs( { onInsert, onClickCategory, selectedCategory } ) {
+function BlockPatternsTabs( {
+	rootClientId,
+	onInsert,
+	onClickCategory,
+	selectedCategory,
+} ) {
 	return (
 		<BlockPatternsCategory
+			rootClientId={ rootClientId }
 			selectedCategory={ selectedCategory }
 			onInsert={ onInsert }
 			onClickCategory={ onClickCategory }
