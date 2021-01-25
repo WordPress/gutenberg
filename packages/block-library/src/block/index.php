@@ -24,7 +24,7 @@ function render_block_core_block( $attributes ) {
 		return '';
 	}
 
-	if ( in_array( $attributes['ref'], $seen_refs, true ) ) {
+	if ( isset( $seen_refs[ $attributes['ref'] ] ) ) {
 		if ( ! is_admin() ) {
 			trigger_error(
 				sprintf(
@@ -47,13 +47,15 @@ function render_block_core_block( $attributes ) {
 			'';
 	}
 
-	$seen_refs[] = $attributes['ref'];
-
 	if ( 'publish' !== $reusable_block->post_status || ! empty( $reusable_block->post_password ) ) {
 		return '';
 	}
 
-	return do_blocks( $reusable_block->post_content );
+	$seen_refs[ $attributes['ref'] ] = true;
+
+	$result = do_blocks( $reusable_block->post_content );
+	unset( $seen_refs[ $attributes['ref'] ] );
+	return $result;
 }
 
 /**
