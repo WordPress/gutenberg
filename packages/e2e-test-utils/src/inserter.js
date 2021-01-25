@@ -55,6 +55,16 @@ export async function toggleGlobalBlockInserter() {
 }
 
 /**
+ * Moves focus to the selected block.
+ */
+async function focusSelectedBlock() {
+	const selectedBlock = await page.waitForSelector(
+		'.block-editor-block-list__block.is-selected'
+	);
+	await selectedBlock.focus();
+}
+
+/**
  * Retrieves the document container by css class and checks to make sure the document's active element is within it
  */
 async function waitForInserterCloseAndContentFocus() {
@@ -135,6 +145,7 @@ export async function insertBlock( searchTerm ) {
 		`//button//span[contains(text(), '${ searchTerm }')]`
 	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
@@ -151,6 +162,7 @@ export async function insertPattern( searchTerm ) {
 		`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
 	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
@@ -168,6 +180,7 @@ export async function insertReusableBlock( searchTerm ) {
 		`//button//span[contains(text(), '${ searchTerm }')]`
 	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 	// We should wait until the block is loaded
@@ -191,6 +204,7 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 		'.block-directory-downloadable-blocks-list li:first-child button'
 	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
