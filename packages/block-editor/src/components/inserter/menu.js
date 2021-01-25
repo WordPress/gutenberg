@@ -46,17 +46,24 @@ function InserterMenu( {
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
 		insertionIndex: __experimentalInsertionIndex,
 	} );
-	const { showPatterns, hasReusableBlocks } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalReusableBlocks,
-		} = select( 'core/block-editor' ).getSettings();
+	const { showPatterns, hasReusableBlocks } = useSelect(
+		( select ) => {
+			const { __experimentalGetAllowedPatterns, getSettings } = select(
+				'core/block-editor'
+			);
 
-		return {
-			showPatterns: !! __experimentalBlockPatterns?.length,
-			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
-		};
-	}, [] );
+			return {
+				showPatterns:
+					! destinationRootClientId ||
+					!! __experimentalGetAllowedPatterns(
+						destinationRootClientId
+					).length,
+				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
+					?.length,
+			};
+		},
+		[ destinationRootClientId ]
+	);
 
 	const onInsert = useCallback(
 		( blocks ) => {
