@@ -21,5 +21,5 @@ registerPlugin( 'pre-publish-panel-test', {
 
 ## Location
 
-![Prepublish panel](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-pre-publish-panel.png?raw=true)
+![Prepublish panel](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/plugin-pre-publish-panel.png?raw=true)
 
