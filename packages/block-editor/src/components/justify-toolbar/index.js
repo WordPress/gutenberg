@@ -21,7 +21,12 @@ const icons = {
 	'space-between': justifySpaceBetween,
 };
 
-export function JustifyToolbar( { onChange, value, popoverProps } ) {
+export function JustifyToolbar( {
+	isCollapsed,
+	onChange,
+	value,
+	popoverProps,
+} ) {
 	const icon = value ? icons[ value ] : icons.left;
 
 	return (
@@ -29,7 +34,7 @@ export function JustifyToolbar( { onChange, value, popoverProps } ) {
 			icon={ icon }
 			popoverProps={ popoverProps }
 			label={ __( 'Change items justification' ) }
-			isCollapsed
+			isCollapsed={ isCollapsed }
 			controls={ [
 				{
 					icon: justifyLeft,

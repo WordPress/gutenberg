@@ -28,12 +28,10 @@ _Note:_ In this example that we render `JustifyToolbar` as a child of the `Block
 
 ### Props
 
-#### `value`
-* **Type:** `String`
-* **Default:** `undefined`
-* **Options:**: `left`, `center`, `right`, `space-between`
+#### `isCollapsed`
+* **Type:** `boolean`
 
-The current value of the alignment setting. You may only choose from the `Options` listed above.
+Whether to display toolbar options in the dropdown menu.
 
 #### `onChange`
 * **Type:** `Function`
@@ -49,6 +47,12 @@ Properties of `popoverProps` object will be passed as props to the nested `Popov
 
 Use this object to modify props available for the `Popover` component that are not already exposed in the `DropdownMenu` component, e.g.: the direction in which the popover should open relative to its parent node set with `position` prop.
 
+#### `value`
+* **Type:** `String`
+* **Default:** `undefined`
+* **Options:**: `left`, `center`, `right`, `space-between`
+
+The current value of the alignment setting. You may only choose from the `Options` listed above.
 
 ## Related components
 
