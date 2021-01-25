@@ -162,13 +162,13 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		() => ( {
 			contexts,
 			getSetting: ( context, path ) =>
-				get( userStyles?.[ context ]?.settings, path ),
+				get( userStyles?.settings?.[ context ], path ),
 			setSetting: ( context, path, newValue ) => {
 				const newContent = { ...userStyles };
-				let contextSettings = newContent?.[ context ]?.settings;
+				let contextSettings = newContent?.settings?.[ context ];
 				if ( ! contextSettings ) {
 					contextSettings = {};
-					set( newContent, [ context, 'settings' ], contextSettings );
+					set( newContent, [ 'settings', context ], contextSettings );
 				}
 				set( contextSettings, path, newValue );
 				setContent( JSON.stringify( newContent ) );
