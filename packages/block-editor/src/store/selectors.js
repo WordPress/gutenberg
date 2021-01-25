@@ -15,6 +15,7 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
+	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1746,19 +1747,15 @@ export const __experimentalGetAllowedBlocks = createSelector(
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const allowedBlockNames = map(
-			__experimentalGetAllowedBlocks( state, rootClientId ),
-			( { name } ) => name
-		);
 
-		if ( ! rootClientId || ! allowedBlockNames.length ) {
+		if ( ! rootClientId ) {
 			return patterns;
 		}
 
-		const patternsAllowed = patterns.filter( ( pattern ) => {
-			const blocks = parse( pattern.content );
-			return blocks.every( ( { name } ) =>
-				allowedBlockNames.includes( name )
+		const patternsAllowed = filter( patterns, ( { content } ) => {
+			const blocks = parse( content );
+			return every( blocks, ( { name } ) =>
+				canInsertBlockType( state, name, rootClientId )
 			);
 		} );
 
@@ -1766,7 +1763,10 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
-		__experimentalGetAllowedBlocks( state, rootClientId ),
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
 	]
 );
 
