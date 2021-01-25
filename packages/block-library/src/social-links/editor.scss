@@ -68,10 +68,7 @@
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin: 0;
+	padding: 0;
 
 	&::before {
 		content: "";
@@ -82,10 +79,6 @@
 
 	.block-editor-inserter {
 		position: absolute;
-	}
-
-	.block-editor-button-block-appender.block-list-appender__toggle {
-		margin: 0;
 	}
 }
 

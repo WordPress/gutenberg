@@ -1,7 +1,12 @@
 // These styles are only applied to the appender when it appears inside of a block.
 // Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
-	margin: 0;
+	margin: 0 0 0 $grid-unit-10;
+	display: inline-flex;
+	align-self: center;
+	height: $icon-size;
+	width: $icon-size;
+	padding: 0;
 
 	.block-editor-default-block-appender {
 		margin: $grid-unit-10 0;
@@ -20,7 +25,6 @@
 .block-list-appender > .block-editor-inserter {
 	display: block;
 }
-
 
 // Hide the nested appender unless parent or child is selected.
 // This selector targets unselected blocks that have only a single nesting level.
