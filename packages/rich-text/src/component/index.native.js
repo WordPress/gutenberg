@@ -745,7 +745,7 @@ export class RichText extends Component {
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
 
 		if ( isSelected && ! prevIsSelected ) {
-			this._editor.focus();
+			this._editor?.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
 			this.onSelectionChange(
@@ -754,7 +754,7 @@ export class RichText extends Component {
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			InteractionManager.runAfterInteractions( () => {
-				this._editor.blur();
+				this._editor?.blur();
 			} );
 		}
 	}
