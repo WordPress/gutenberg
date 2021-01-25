@@ -188,14 +188,16 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	);
 	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
 
-	spinner.text = 'Done!'
-		.concat( '\n' )
-		.concat( `MySQL is listening on port ${ mySQLPort }` )
+	spinner.prefixText = `MySQL is listening on port ${ mySQLPort }`
 		.concat( 'WordPress development site started' )
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( 'WordPress test site started' )
-		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' );
+		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
+		.concat( '\n' )
+		.concat( '\n' );
+
+	spinner.text = 'Done!';
 };
 
 /**
