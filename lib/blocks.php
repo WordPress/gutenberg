@@ -180,7 +180,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 
 		$styles = false;
 		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$styles_size = filesize( $file_abs_path );
+			$styles_size = (int) filesize( $file_abs_path );
 		} else {
 			// Use a short transient to avoid constantly querying the files to get their contents, minify them etc to get their size.
 			$file_size_transient_name = md5( $file_abs_path ) . filemtime( $file_abs_path ) . '_size';
@@ -191,7 +191,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 				// Minify the styles by removing comments & whitespace.
 				$styles = gutenberg_minify_styles( $styles );
 				// Get the styles size.
-				$styles_size = strlen( $styles );
+				$styles_size = (int) strlen( $styles );
 				// Update the transient.
 				set_site_transient( $file_size_transient_name, $styles_size, HOUR_IN_SECONDS );
 			}
