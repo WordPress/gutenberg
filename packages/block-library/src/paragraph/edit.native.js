@@ -21,10 +21,13 @@ function ParagraphBlock( {
 	style,
 	clientId,
 } ) {
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	const { isRTL, block } = useSelect( ( select ) => {
+		const { getBlock, getSettings } = select( 'core/block-editor' );
+		return {
+			isRTL: !! getSettings().isRTL,
+			block: getBlock( clientId ),
+		};
 	}, [] );
-
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
@@ -55,24 +58,23 @@ function ParagraphBlock( {
 					} );
 				} }
 				onSplit={ ( value, keepId ) => {
+					if ( keepId ) {
+						return {
+							...block,
+							attributes: {
+								...block.attributes,
+								content: value || '',
+							},
+						};
+					}
 					if ( ! value ) {
-						return createBlock(
-							name,
-							undefined,
-							undefined,
-							keepId ? clientId : undefined
-						);
+						return createBlock( name );
 					}
 
-					return createBlock(
-						name,
-						{
-							...attributes,
-							content: value,
-						},
-						undefined,
-						keepId ? clientId : undefined
-					);
+					return createBlock( name, {
+						...attributes,
+						content: value,
+					} );
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

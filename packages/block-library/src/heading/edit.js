@@ -16,6 +16,8 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 
+import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -30,6 +32,11 @@ function HeadingEdit( {
 	clientId,
 } ) {
 	const { textAlign, content, level, placeholder } = attributes;
+	const block = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		[]
+	);
+
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -63,24 +70,24 @@ function HeadingEdit( {
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value, keepId ) => {
-					if ( ! value ) {
-						return createBlock(
-							'core/paragraph',
-							undefined,
-							undefined,
-							keepId ? clientId : undefined
-						);
+					if ( keepId ) {
+						return {
+							...block,
+							attributes: {
+								...block.attributes,
+								content: value || '',
+							},
+						};
 					}
 
-					return createBlock(
-						'core/heading',
-						{
-							...attributes,
-							content: value,
-						},
-						undefined,
-						keepId ? clientId : undefined
-					);
+					if ( ! value ) {
+						return createBlock( 'core/paragraph' );
+					}
+
+					return createBlock( 'core/heading', {
+						...attributes,
+						content: value,
+					} );
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
