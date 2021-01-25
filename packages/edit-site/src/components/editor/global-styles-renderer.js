@@ -146,7 +146,9 @@ export default ( blockData, tree, type = 'all' ) => {
 		( styles, { selector }, context ) => {
 			if ( type === 'all' || type === 'cssVariables' ) {
 				const variableDeclarations = [
-					...getBlockPresetsDeclarations( tree?.settings?.[ context ] ),
+					...getBlockPresetsDeclarations(
+						tree?.settings?.[ context ]
+					),
 					...flattenTree(
 						tree?.settings?.[ context ]?.custom,
 						'--wp--custom--',
