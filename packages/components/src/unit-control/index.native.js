@@ -38,6 +38,7 @@ function UnitControl( {
 	unit,
 	getStylesFromColorScheme,
 	decimalNum,
+	disabledUnits,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -90,6 +91,13 @@ function UnitControl( {
 			: undefined;
 
 	const renderUnitPicker = () => {
+		if ( disabledUnits ) {
+			return (
+				<View style={ styles.unitText }>
+					<Text>{ unit }</Text>
+				</View>
+			);
+		}
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton() }

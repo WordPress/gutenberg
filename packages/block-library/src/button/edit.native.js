@@ -20,6 +20,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
+	UnitControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -38,6 +39,31 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const MIN_WIDTH = 40;
+
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
+
+		// Update attributes
+		setAttributes( { width } );
+	}
+
+	return (
+		<PanelBody title={ __( 'Width Settings' ) }>
+			<UnitControl
+				label={ __( 'Width Settings' ) }
+				min={ 1 }
+				max={ 100 }
+				onChange={ handleChange }
+				decimalNum={ 1 }
+				value={ selectedWidth }
+				unit={ '%' }
+				disabledUnits={ true }
+			/>
+		</PanelBody>
+	);
+}
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -293,8 +319,9 @@ class ButtonEdit extends Component {
 			onReplace,
 			mergeBlocks,
 			parentWidth,
+			setAttributes,
 		} = this.props;
-		const { placeholder, text, borderRadius, url } = attributes;
+		const { placeholder, text, borderRadius, url, width } = attributes;
 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
@@ -313,13 +340,19 @@ class ButtonEdit extends Component {
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 		// different than empty string.
-		const minWidth =
+		let minWidth =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
 				? MIN_WIDTH
 				: placeholderTextWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
+		// console.log( minWidth, maxWidth, width )
+
+		if ( width ) {
+			minWidth = Math.floor( maxWidth * ( width / 100 ) );
+		}
+
 		const placeholderText =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
 				? ''
@@ -408,6 +441,10 @@ class ButtonEdit extends Component {
 							onChange={ this.onChangeBorderRadius }
 						/>
 					</PanelBody>
+					<WidthPanel
+						selectedWidth={ width }
+						setAttributes={ setAttributes }
+					/>
 					<PanelBody title={ __( 'Link Settings' ) }>
 						{ this.getLinkSettings( true ) }
 					</PanelBody>
