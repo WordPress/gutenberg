@@ -90,7 +90,7 @@ function Editor( {
 			);
 		}
 		const isFSETheme = getEditorSettings().isFSETheme;
-		const isViewable = getPostType( postType )?.viewable ?? false;
+		const isViewable = getPostType( postObject.postType )?.viewable ?? false;
 
 		return {
 			hasFixedToolbar:
