@@ -22,7 +22,6 @@ import { RawHTML } from '@wordpress/element';
  */
 import * as _selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
-import { POST_UPDATE_TRANSACTION_ID } from '../constants';
 
 const selectors = { ..._selectors };
 const selectorNames = Object.keys( selectors );
@@ -161,8 +160,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	getStateBeforeOptimisticTransaction,
-	isPublishingPost,
 	isPublishSidebarEnabled,
 	isPermalinkEditable,
 	getPermalink,
@@ -415,7 +412,6 @@ describe( 'selectors', () => {
 	describe( 'isEditedPostDirty', () => {
 		it( 'should return false when blocks state not dirty nor edits exist', () => {
 			const state = {
-				optimist: [],
 				editor: {
 					present: {
 						blocks: {
@@ -432,7 +428,6 @@ describe( 'selectors', () => {
 
 		it( 'should return true when blocks state dirty', () => {
 			const state = {
-				optimist: [],
 				editor: {
 					present: {
 						blocks: {
@@ -449,7 +444,6 @@ describe( 'selectors', () => {
 
 		it( 'should return true when edits exist', () => {
 			const state = {
-				optimist: [],
 				editor: {
 					present: {
 						blocks: {
@@ -2016,6 +2010,26 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostDateFloating( state ) ).toBe( true );
 		} );
+
+		it( 'should return false for private posts even if the edited status is "draft"', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'private',
+				},
+				editor: {
+					present: {
+						edits: {
+							status: 'draft',
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isSavingPost', () => {
@@ -2503,163 +2517,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getStateBeforeOptimisticTransaction', () => {
-		it( 'should return null if no transaction can be found', () => {
-			const beforeState = getStateBeforeOptimisticTransaction(
-				{
-					optimist: [],
-				},
-				'foo'
-			);
-
-			expect( beforeState ).toBe( null );
-		} );
-
-		it( 'should return null if a transaction with ID can be found, but lacks before state', () => {
-			const beforeState = getStateBeforeOptimisticTransaction(
-				{
-					optimist: [
-						{
-							action: {
-								optimist: {
-									id: 'foo',
-								},
-							},
-						},
-					],
-				},
-				'foo'
-			);
-
-			expect( beforeState ).toBe( null );
-		} );
-
-		it( 'should return the before state matching the given transaction id', () => {
-			const expectedBeforeState = {};
-			const beforeState = getStateBeforeOptimisticTransaction(
-				{
-					optimist: [
-						{
-							beforeState: expectedBeforeState,
-							action: {
-								optimist: {
-									id: 'foo',
-								},
-							},
-						},
-					],
-				},
-				'foo'
-			);
-
-			expect( beforeState ).toBe( expectedBeforeState );
-		} );
-	} );
-
-	describe( 'isPublishingPost', () => {
-		it( 'should return false if the post is not being saved', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [],
-				saving: {
-					requesting: false,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return false if the current post is not considered published', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'draft',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return false if the optimistic transaction cannot be found', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return false if the current post prior to request was already published', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [
-					{
-						beforeState: {
-							saving: {
-								requesting: false,
-							},
-							currentPost: {
-								status: 'publish',
-							},
-						},
-						action: {
-							optimist: {
-								id: POST_UPDATE_TRANSACTION_ID,
-							},
-						},
-					},
-				],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return true if the current post prior to request was not published', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [
-					{
-						beforeState: {
-							saving: {
-								requesting: false,
-							},
-							currentPost: {
-								status: 'draft',
-							},
-						},
-						action: {
-							optimist: {
-								id: POST_UPDATE_TRANSACTION_ID,
-							},
-						},
-					},
-				],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( true );
-		} );
-	} );
-
 	describe( 'isPermalinkEditable', () => {
 		it( 'should be false if there is no permalink', () => {
 			const state = {
@@ -2962,7 +2819,7 @@ describe( 'selectors', () => {
 			).toEqual( {} );
 		} );
 
-		it( 'returns the requested default template type ', () => {
+		it( 'returns the requested default template type', () => {
 			expect(
 				__experimentalGetDefaultTemplateType( state, 'index' )
 			).toEqual( {

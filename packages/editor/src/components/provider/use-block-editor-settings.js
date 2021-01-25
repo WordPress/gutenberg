@@ -6,7 +6,7 @@ import { map, pick, defaultTo, flatten, partialRight } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -130,7 +130,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			reusableBlocks: select( 'core' ).getEntityRecords(
 				'postType',
 				'wp_block',
-				{ per_page: -1 }
+				/**
+				 * Unbounded queries are not supported on native so as a workaround we set per_page with the maximum value.
+				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
+				 */
+				{ per_page: Platform.select( { web: -1, native: 100 } ) }
 			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),

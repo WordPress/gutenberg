@@ -33,7 +33,8 @@
 		flex-direction: row;
 		color: $gray-900;
 		box-shadow: none;
-		height: 24px;
+		height: $icon-size;
+		width: $icon-size;
 		padding: 0;
 		margin-left: $grid-unit-10;
 

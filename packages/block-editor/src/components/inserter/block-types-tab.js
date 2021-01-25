@@ -7,15 +7,12 @@ import { map, findIndex, flow, sortBy, groupBy, orderBy } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
-import ChildBlocks from './child-blocks';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 
@@ -32,17 +29,6 @@ export function BlockTypesTab( {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
 		onInsert
-	);
-
-	const hasChildItems = useSelect(
-		( select ) => {
-			const { getBlockName } = select( 'core/block-editor' );
-			const { getChildBlockNames } = select( blocksStore );
-			const rootBlockName = getBlockName( rootClientId );
-
-			return !! getChildBlockNames( rootBlockName ).length;
-		},
-		[ rootClientId ]
 	);
 
 	const suggestedItems = useMemo( () => {
@@ -94,56 +80,39 @@ export function BlockTypesTab( {
 
 	return (
 		<div>
-			{ hasChildItems && (
-				<ChildBlocks rootClientId={ rootClientId }>
+			{ showMostUsedBlocks && !! suggestedItems.length && (
+				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 					<BlockTypesList
-						// Pass along every block, as useBlockTypesState() and
-						// getInserterItems() will have already filtered out
-						// non-child blocks.
-						items={ items }
+						items={ suggestedItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
-						label={ __( 'Child Blocks' ) }
+						label={ _x( 'Most used', 'blocks' ) }
 					/>
-				</ChildBlocks>
+				</InserterPanel>
 			) }
 
-			{ showMostUsedBlocks &&
-				! hasChildItems &&
-				!! suggestedItems.length && (
-					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+			{ map( categories, ( category ) => {
+				const categoryItems = itemsPerCategory[ category.slug ];
+				if ( ! categoryItems || ! categoryItems.length ) {
+					return null;
+				}
+				return (
+					<InserterPanel
+						key={ category.slug }
+						title={ category.title }
+						icon={ category.icon }
+					>
 						<BlockTypesList
-							items={ suggestedItems }
+							items={ categoryItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
-							label={ _x( 'Most used', 'blocks' ) }
+							label={ category.title }
 						/>
 					</InserterPanel>
-				) }
+				);
+			} ) }
 
-			{ ! hasChildItems &&
-				map( categories, ( category ) => {
-					const categoryItems = itemsPerCategory[ category.slug ];
-					if ( ! categoryItems || ! categoryItems.length ) {
-						return null;
-					}
-					return (
-						<InserterPanel
-							key={ category.slug }
-							title={ category.title }
-							icon={ category.icon }
-						>
-							<BlockTypesList
-								items={ categoryItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ category.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
-
-			{ ! hasChildItems && !! uncategorizedItems.length && (
+			{ ! uncategorizedItems.length && (
 				<InserterPanel
 					className="block-editor-inserter__uncategorized-blocks-panel"
 					title={ __( 'Uncategorized' ) }
@@ -157,28 +126,27 @@ export function BlockTypesTab( {
 				</InserterPanel>
 			) }
 
-			{ ! hasChildItems &&
-				map( collections, ( collection, namespace ) => {
-					const collectionItems = itemsPerCollection[ namespace ];
-					if ( ! collectionItems || ! collectionItems.length ) {
-						return null;
-					}
+			{ map( collections, ( collection, namespace ) => {
+				const collectionItems = itemsPerCollection[ namespace ];
+				if ( ! collectionItems || ! collectionItems.length ) {
+					return null;
+				}
 
-					return (
-						<InserterPanel
-							key={ namespace }
-							title={ collection.title }
-							icon={ collection.icon }
-						>
-							<BlockTypesList
-								items={ collectionItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ collection.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
+				return (
+					<InserterPanel
+						key={ namespace }
+						title={ collection.title }
+						icon={ collection.icon }
+					>
+						<BlockTypesList
+							items={ collectionItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ collection.title }
+						/>
+					</InserterPanel>
+				);
+			} ) }
 		</div>
 	);
 }

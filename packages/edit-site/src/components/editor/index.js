@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useState,
-	useMemo,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -19,14 +13,13 @@ import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
-	__unstableUseEditorStyles as useEditorStyles,
-	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
 	ComplementaryArea,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -58,7 +51,6 @@ function Editor() {
 	const {
 		isFullscreenActive,
 		isInserterOpen,
-		deviceType,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -70,44 +62,33 @@ function Editor() {
 		const {
 			isFeatureActive,
 			isInserterOpened,
-			__experimentalGetPreviewDeviceType,
 			getSettings,
-			getTemplateId,
-			getTemplatePartId,
-			getTemplateType,
+			getEditedPostType,
+			getEditedPostId,
 			getPage,
 			isNavigationOpened,
 		} = select( 'core/edit-site' );
-		const _templateId = getTemplateId();
-		const _templatePartId = getTemplatePartId();
-		const _templateType = getTemplateType();
+		const postType = getEditedPostType();
+		const postId = getEditedPostId();
 
 		// The currently selected entity to display. Typically template or template part.
-		let _entityId;
-		if ( _templateType ) {
-			_entityId =
-				_templateType === 'wp_template' ? _templateId : _templatePartId;
-		}
-
 		return {
 			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
-			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! select(
-				'core/interface'
+				interfaceStore
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
-			templateType: _templateType,
+			templateType: postType,
 			page: getPage(),
-			template:
-				_templateType && _entityId
-					? select( 'core' ).getEntityRecord(
-							'postType',
-							_templateType,
-							_entityId
-					  )
-					: null,
-			entityId: _entityId,
+			template: postId
+				? select( 'core' ).getEntityRecord(
+						'postType',
+						postType,
+						postId
+				  )
+				: null,
+			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
 		};
 	}, [] );
@@ -123,8 +104,6 @@ function Editor() {
 		updateEditorSettings( { defaultTemplateTypes } );
 	}, [ defaultTemplateTypes ] );
 
-	const inlineStyles = useResizeCanvas( deviceType );
-
 	const [
 		isEntitiesSavedStatesOpen,
 		setIsEntitiesSavedStatesOpen,
@@ -137,13 +116,9 @@ function Editor() {
 		setIsEntitiesSavedStatesOpen( false );
 	}, [] );
 
-	// Set default query for misplaced Query Loop blocks, and
-	// provide the root `queryContext` for top-level Query Loop
-	// and Query Pagination blocks.
 	const blockContext = useMemo(
 		() => ( {
 			...page?.context,
-			query: page?.context.query || { categoryIds: [], tagIds: [] },
 			queryContext: [
 				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -171,9 +146,6 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const ref = useRef();
-
-	useEditorStyles( ref, settings.styles );
 
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
@@ -208,7 +180,6 @@ function Editor() {
 										<KeyboardShortcuts.Register />
 										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
-											ref={ ref }
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={
@@ -260,12 +231,8 @@ function Editor() {
 												/>
 											}
 											content={
-												<div
-													className="edit-site-visual-editor"
-													style={ inlineStyles }
-												>
+												<>
 													<Notices />
-													<Popover.Slot name="block-toolbar" />
 													{ template && (
 														<BlockEditor
 															setIsInserterOpen={
@@ -274,7 +241,7 @@ function Editor() {
 														/>
 													) }
 													<KeyboardShortcuts />
-												</div>
+												</>
 											}
 											actions={
 												<>

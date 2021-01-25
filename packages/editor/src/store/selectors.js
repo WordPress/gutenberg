@@ -20,6 +20,7 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
+	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
@@ -33,13 +34,11 @@ import { Platform } from '@wordpress/element';
 import { PREFERENCES_DEFAULTS } from './defaults';
 import {
 	EDIT_MERGE_PROPERTIES,
-	POST_UPDATE_TRANSACTION_ID,
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import serializeBlocks from './utils/serialize-blocks';
 import { cleanForSlug } from '../utils/url';
 
 /**
@@ -758,7 +757,12 @@ export function isEditedPostBeingScheduled( state ) {
 export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
-	const status = getEditedPostAttribute( state, 'status' );
+
+	// This should be the status of the persisted post
+	// It shouldn't use the "edited" status otherwise it breaks the
+	// infered post data floating status
+	// See https://github.com/WordPress/gutenberg/issues/28083
+	const status = getCurrentPost( state ).status;
 	if (
 		status === 'draft' ||
 		status === 'auto-draft' ||
@@ -992,7 +996,7 @@ export const getEditedPostContent = createRegistrySelector(
 			if ( typeof record.content === 'function' ) {
 				return record.content( record );
 			} else if ( record.blocks ) {
-				return serializeBlocks( record.blocks );
+				return __unstableSerializeAndClean( record.blocks );
 			} else if ( record.content ) {
 				return record.content;
 			}
@@ -1002,26 +1006,6 @@ export const getEditedPostContent = createRegistrySelector(
 );
 
 /**
- * Returns state object prior to a specified optimist transaction ID, or `null`
- * if the transaction corresponding to the given ID cannot be found.
- *
- * @param {Object} state         Current global application state.
- * @param {Object} transactionId Optimist transaction ID.
- *
- * @return {Object} Global application state prior to transaction.
- */
-export function getStateBeforeOptimisticTransaction( state, transactionId ) {
-	const transaction = find(
-		state.optimist,
-		( entry ) =>
-			entry.beforeState &&
-			get( entry.action, [ 'optimist', 'id' ] ) === transactionId
-	);
-
-	return transaction ? transaction.beforeState : null;
-}
-
-/**
  * Returns true if the post is being published, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1029,28 +1013,10 @@ export function getStateBeforeOptimisticTransaction( state, transactionId ) {
  * @return {boolean} Whether post is being published.
  */
 export function isPublishingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-
-	// Saving is optimistic, so assume that current post would be marked as
-	// published if publishing
-	if ( ! isCurrentPostPublished( state ) ) {
-		return false;
-	}
-
-	// Use post update transaction ID to retrieve the state prior to the
-	// optimistic transaction
-	const stateBeforeRequest = getStateBeforeOptimisticTransaction(
-		state,
-		POST_UPDATE_TRANSACTION_ID
-	);
-
-	// Consider as publishing when current post prior to request was not
-	// considered published
 	return (
-		!! stateBeforeRequest &&
-		! isCurrentPostPublished( null, stateBeforeRequest.currentPost )
+		isSavingPost( state ) &&
+		! isCurrentPostPublished( state ) &&
+		getEditedPostAttribute( state, 'status' ) === 'publish'
 	);
 }
 
@@ -1140,28 +1106,6 @@ export function getPermalinkParts( state ) {
 		postName,
 		suffix,
 	};
-}
-
-/**
- * Returns true if an optimistic transaction is pending commit, for which the
- * before state satisfies the given predicate function.
- *
- * @param {Object}   state     Editor state.
- * @param {Function} predicate Function given state, returning true if match.
- *
- * @return {boolean} Whether predicate matches for some history.
- */
-export function inSomeHistory( state, predicate ) {
-	const { optimist } = state;
-
-	// In recursion, optimist state won't exist. Assume exhausted options.
-	if ( ! optimist ) {
-		return false;
-	}
-
-	return optimist.some(
-		( { beforeState } ) => beforeState && predicate( beforeState )
-	);
 }
 
 /**
@@ -1270,20 +1214,6 @@ export function getEditorBlocks( state ) {
 }
 
 /**
- * Checks whether a post is an auto-draft ignoring the optimistic transaction.
- * This selector shouldn't be necessary. It's currently used as a workaround
- * to avoid template resolution for auto-drafts which has a backend bug.
- *
- * @param {Object} state State.
- * @return {boolean} Whether the post is "auto-draft" on the backend.
- */
-export function __unstableIsAutodraftPost( state ) {
-	const post = getCurrentPost( state );
-	const isSaving = isSavingPost( state );
-	return isSaving || post.status === 'auto-draft';
-}
-
-/**
  * A block selection object.
  *
  * @typedef {Object} WPBlockSelection
@@ -1338,6 +1268,32 @@ export function getEditorSettings( state ) {
 /*
  * Backward compatibility
  */
+
+/**
+ * Returns state object prior to a specified optimist transaction ID, or `null`
+ * if the transaction corresponding to the given ID cannot be found.
+ *
+ * @deprecated since Gutenberg 9.7.0.
+ */
+export function getStateBeforeOptimisticTransaction() {
+	deprecated( "select('core/editor').getStateBeforeOptimisticTransaction", {
+		hint: 'No state history is kept on this store anymore',
+	} );
+
+	return null;
+}
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @deprecated since Gutenberg 9.7.0.
+ */
+export function inSomeHistory() {
+	deprecated( "select('core/editor').inSomeHistory", {
+		hint: 'No state history is kept on this store anymore',
+	} );
+	return false;
+}
 
 function getBlockEditorSelector( name ) {
 	return createRegistrySelector( ( select ) => ( state, ...args ) => {

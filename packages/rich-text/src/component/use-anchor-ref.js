@@ -31,8 +31,10 @@ export function useAnchorRef( { ref, value, settings = {} } ) {
 	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
 
 	return useMemo( () => {
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
+		if ( ! ref.current ) return;
+		const {
+			ownerDocument: { defaultView },
+		} = ref.current;
 		const selection = defaultView.getSelection();
 
 		if ( ! selection.rangeCount ) {

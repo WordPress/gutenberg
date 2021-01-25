@@ -4,7 +4,6 @@
 	background-size: cover;
 	background-position: center center;
 	min-height: 430px;
-	height: 100%;
 	width: 100%;
 	display: flex;
 	justify-content: center;
@@ -167,17 +166,34 @@
 			width: auto;
 		}
 	}
+
+	// Extra specificity for in edit mode where other styles would override it otherwise.
+	img.wp-block-cover__image-background,
+	video.wp-block-cover__video-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		object-fit: cover;
+		outline: none;
+		border: none;
+		box-shadow: none;
+	}
 }
 
 .wp-block-cover__video-background {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translateX(-50%) translateY(-50%);
-	width: 100%;
-	height: 100%;
 	z-index: z-index(".wp-block-cover__video-background");
-	object-fit: cover;
+}
+
+.wp-block-cover__image-background {
+	z-index: z-index(".wp-block-cover__image-background");
 }
 
 // Styles bellow only exist to support older versions of the block.

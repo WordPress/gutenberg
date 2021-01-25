@@ -25,7 +25,6 @@ import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
 } from '../block-mover/button';
-import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
@@ -39,23 +38,26 @@ export default function BlockNavigationBlock( {
 	rowCount,
 	siblingBlockCount,
 	showBlockMovers,
-	terminatedLevels,
 	path,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
-	const isDragging = useSelect(
+	const { isDragging, blockParents } = useSelect(
 		( select ) => {
-			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
-				'core/block-editor'
-			);
+			const {
+				isBlockBeingDragged,
+				isAncestorBeingDragged,
+				getBlockParents,
+			} = select( 'core/block-editor' );
 
-			return (
-				isBlockBeingDragged( clientId ) ||
-				isAncestorBeingDragged( clientId )
-			);
+			return {
+				isDragging:
+					isBlockBeingDragged( clientId ) ||
+					isAncestorBeingDragged( clientId ),
+				blockParents: getBlockParents( clientId ),
+			};
 		},
 		[ clientId ]
 	);
@@ -108,11 +110,6 @@ export default function BlockNavigationBlock( {
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-block__contents-container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
 						<BlockNavigationBlockContents
 							block={ block }
 							onClick={ () => onClick( block.clientId ) }
@@ -179,9 +176,19 @@ export default function BlockNavigationBlock( {
 								<MenuGroup>
 									<MenuItem
 										onClick={ async () => {
-											// If clientId is already selected, it won't be focused (see block-wrapper.js)
-											// This removes the selection first to ensure the focus will always switch.
-											await selectEditorBlock( null );
+											if ( blockParents.length ) {
+												// If the block to select is inside a dropdown, we need to open the dropdown.
+												// Otherwise focus won't transfer to the block.
+												for ( const parent of blockParents ) {
+													await selectEditorBlock(
+														parent
+													);
+												}
+											} else {
+												// If clientId is already selected, it won't be focused (see block-wrapper.js)
+												// This removes the selection first to ensure the focus will always switch.
+												await selectEditorBlock( null );
+											}
 											await selectEditorBlock( clientId );
 											onClose();
 										} }

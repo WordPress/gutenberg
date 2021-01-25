@@ -1,50 +1,15 @@
 /**
  * Internal dependencies
  */
-import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-	isAndroid,
-	swipeDown,
-	clickMiddleOfElement,
-} from './helpers/utils';
+import { blockNames } from './pages/editor-page';
+import { isAndroid, swipeDown, clickMiddleOfElement } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
-
 describe( 'Gutenberg Editor tests for Block insertion', () => {
-	let driver;
-	let editorPage;
-	let allPassed = true;
-	const paragraphBlockName = 'Paragraph';
-
-	// Use reporter for setting status for saucelabs Job
-	if ( ! isLocalEnvironment() ) {
-		const reporter = {
-			specDone: async ( result ) => {
-				allPassed = allPassed && result.status !== 'failed';
-			},
-		};
-
-		jasmine.getEnv().addReporter( reporter );
-	}
-
-	beforeAll( async () => {
-		driver = await setupDriver();
-		editorPage = new EditorPage( driver );
-	} );
-
-	it( 'should be able to see visual editor', async () => {
-		// wait for the block editor to load
-		await expect( editorPage.getBlockList() ).resolves.toBe( true );
-	} );
-
 	it( 'should be able to insert block into post', async () => {
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -54,29 +19,33 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		// Should have 3 paragraph blocks at this point
 
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName,
+			blockNames.paragraph,
 			2
 		);
 		await paragraphBlockElement.click();
 
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName,
+			blockNames.paragraph,
 			3
 		);
 		await paragraphBlockElement.click();
 		await editorPage.sendTextToParagraphBlock( 3, testData.mediumText );
 
-		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
+		const html = await editorPage.getHtmlContent();
+
+		expect( testData.blockInsertionHtml.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 
 		// wait for the block editor to load and for accessibility ids to update
-		await driver.sleep( 3000 );
+		await editorPage.driver.sleep( 3000 );
 
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
 			paragraphBlockElement = await editorPage.getBlockAtPosition(
-				paragraphBlockName,
+				blockNames.paragraph,
 				3,
 				{
 					autoscroll: true,
@@ -84,37 +53,43 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			);
 
 			await paragraphBlockElement.click();
-			await editorPage.removeBlockAtPosition( paragraphBlockName, 3 );
+			await editorPage.removeBlockAtPosition( blockNames.paragraph, 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				// wait for accessibility ids to update
-				await driver.sleep( 1000 );
+				await editorPage.driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getBlockAtPosition(
-					paragraphBlockName,
+					blockNames.paragraph,
 					i,
 					{
 						autoscroll: true,
 					}
 				);
 				await paragraphBlockElement.click();
-				await editorPage.removeBlockAtPosition( paragraphBlockName, i );
+				await editorPage.removeBlockAtPosition(
+					blockNames.paragraph,
+					i
+				);
 			}
 		} else {
 			for ( let i = 4; i > 0; i-- ) {
 				// wait for accessibility ids to update
-				await driver.sleep( 1000 );
+				await editorPage.driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getBlockAtPosition(
-					paragraphBlockName
+					blockNames.paragraph
 				);
-				await clickMiddleOfElement( driver, paragraphBlockElement );
-				await editorPage.removeBlockAtPosition( paragraphBlockName );
+				await clickMiddleOfElement(
+					editorPage.driver,
+					paragraphBlockElement
+				);
+				await editorPage.removeBlockAtPosition( blockNames.paragraph );
 			}
 		}
 	} );
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -127,29 +102,24 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.dismissKeyboard();
 		}
 
-		await swipeDown( driver );
+		await swipeDown( editorPage.driver );
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );
 		await titleElement.click();
 		await titleElement.click();
 
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
-		await clickMiddleOfElement( driver, paragraphBlockElement );
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
 		await editorPage.sendTextToParagraphBlock( 1, testData.mediumText );
 		await paragraphBlockElement.click();
-		await editorPage.verifyHtmlContent(
-			testData.blockInsertionHtmlFromTitle
-		);
-	} );
+		const html = await editorPage.getHtmlContent();
 
-	afterAll( async () => {
-		if ( ! isLocalEnvironment() ) {
-			driver.sauceJobStatus( allPassed );
-		}
-		await stopDriver( driver );
+		expect( testData.blockInsertionHtmlFromTitle.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 	} );
 } );

@@ -46,11 +46,6 @@ export {
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components
-export {
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	Preview,
-} from './page-template-picker';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';

@@ -9,12 +9,7 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import {
-	BottomSheetSettings,
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	FloatingToolbar,
-} from '@wordpress/block-editor';
+import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
@@ -31,6 +26,7 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
+import { store as editPostStore } from '../../store';
 
 class Layout extends Component {
 	constructor() {
@@ -103,12 +99,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			isTemplatePickerAvailable,
-			isTemplatePickerVisible,
-			mode,
-		} = this.props;
+		const { getStylesFromColorScheme, mode } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -159,11 +150,6 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
-						{ isTemplatePickerAvailable && (
-							<__experimentalPageTemplatePicker
-								visible={ isTemplatePickerVisible }
-							/>
-						) }
 						{ Platform.OS === 'ios' && <FloatingToolbar /> }
 						<Header />
 						<BottomSheetSettings />
@@ -179,14 +165,11 @@ export default compose( [
 		const { __unstableIsEditorReady: isEditorReady } = select(
 			'core/editor'
 		);
-		const { getEditorMode } = select( 'core/edit-post' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getEditorMode } = select( editPostStore );
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
-			modalLayoutPicker: getSettings( 'capabilities' ).modalLayoutPicker,
 		};
 	} ),
 	withPreferredColorScheme,
-	__experimentalWithPageTemplatePicker,
 ] )( Layout );

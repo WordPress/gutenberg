@@ -408,7 +408,7 @@ save: function( props ) {
 
 Ideally, the attributes saved should be included in the markup. However, there are times when this is not practical, so if no attribute source is specified the attribute is serialized and saved to the block's comment delimiter.
 
-This example could be for a dynamic block, such as the [Latest Posts block](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/latest-posts/index.js), which renders the markup server-side. The save function is still required, however in this case it simply returns null since the block is not saving content from the editor.
+This example could be for a dynamic block, such as the [Latest Posts block](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/latest-posts/index.js), which renders the markup server-side. The save function is still required, however in this case it simply returns null since the block is not saving content from the editor.
 
 {% codetabs %}
 {% ESNext %}

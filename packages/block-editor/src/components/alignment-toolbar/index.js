@@ -6,10 +6,9 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
@@ -39,9 +38,9 @@ export function AlignmentToolbar( props ) {
 		value,
 		onChange,
 		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-		label = __( 'Change text alignment' ),
+		label = __( 'Align' ),
+		describedBy = __( 'Change text alignment' ),
 		isCollapsed = true,
-		isRTL,
 	} = props;
 
 	function applyOrUnset( align ) {
@@ -55,29 +54,29 @@ export function AlignmentToolbar( props ) {
 
 	function setIcon() {
 		if ( activeAlignment ) return activeAlignment.icon;
-		return isRTL ? alignRight : alignLeft;
+		return isRTL() ? alignRight : alignLeft;
 	}
-	return useMemo( () => {
-		return (
-			<ToolbarGroup
-				isCollapsed={ isCollapsed }
-				icon={ setIcon() }
-				label={ label }
-				popoverProps={ POPOVER_PROPS }
-				controls={ alignmentControls.map( ( control ) => {
-					const { align } = control;
-					const isActive = value === align;
 
-					return {
-						...control,
-						isActive,
-						role: isCollapsed ? 'menuitemradio' : undefined,
-						onClick: applyOrUnset( align ),
-					};
-				} ) }
-			/>
-		);
-	}, [ isCollapsed, isRTL, value, alignmentControls, label ] );
+	return (
+		<ToolbarGroup
+			isCollapsed={ isCollapsed }
+			icon={ setIcon() }
+			label={ label }
+			toggleProps={ { describedBy } }
+			popoverProps={ POPOVER_PROPS }
+			controls={ alignmentControls.map( ( control ) => {
+				const { align } = control;
+				const isActive = value === align;
+
+				return {
+					...control,
+					isActive,
+					role: isCollapsed ? 'menuitemradio' : undefined,
+					onClick: applyOrUnset( align ),
+				};
+			} ) }
+		/>
+	);
 }
 
 export default AlignmentToolbar;

@@ -9,23 +9,22 @@ import { has } from 'lodash';
 import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import {
-	STORE_NAME,
-	POST_UPDATE_TRANSACTION_ID,
-	TRASH_POST_NOTICE_ID,
-} from './constants';
+import { STORE_NAME, TRASH_POST_NOTICE_ID } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import serializeBlocks from './utils/serialize-blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -75,27 +74,6 @@ export function* setupEditor( post, edits, template ) {
 	) {
 		yield editPost( edits );
 	}
-}
-
-/**
- * Initiliazes an FSE template into the core-data store.
- * We could avoid this action entirely by having a fallback if the edit is undefined.
- *
- * @param {Object} template  Template object.
- */
-export function* __unstableSetupTemplate( template ) {
-	const blocks = parse( template.content.raw );
-	yield controls.dispatch(
-		'core',
-		'editEntityRecord',
-		'postType',
-		template.type,
-		template.id,
-		{
-			blocks,
-		},
-		{ __unstableShouldCreateUndoLevel: false }
-	);
 }
 
 /**
@@ -178,14 +156,15 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
  * Returns an action object used in signalling that a patch of updates for the
  * latest version of the post have been received.
  *
- * @param {Object} edits Updated post fields.
- *
  * @return {Object} Action object.
+ * @deprecated since Gutenberg 9.7.0.
  */
-export function updatePost( edits ) {
+export function updatePost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+		alternative: 'User the core entitires store instead',
+	} );
 	return {
-		type: 'UPDATE_POST',
-		edits,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -224,21 +203,6 @@ export function* editPost( edits, options ) {
 		edits,
 		options
 	);
-}
-
-/**
- * Returns action object produced by the updatePost creator augmented by
- * an optimist option that signals optimistically applying updates.
- *
- * @param {Object} edits  Updated post fields.
- *
- * @return {Object} Action object.
- */
-export function __experimentalOptimisticUpdatePost( edits ) {
-	return {
-		...updatePost( edits ),
-		optimist: { id: POST_UPDATE_TRANSACTION_ID },
-	};
 }
 
 /**
@@ -663,7 +627,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		// to make sure the edit makes the post dirty and creates
 		// a new undo level.
 		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			serializeBlocks( blocksForSerialization );
+			__unstableSerializeAndClean( blocksForSerialization );
 	}
 	yield* editPost( edits );
 }

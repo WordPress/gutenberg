@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { upperFirst } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -24,8 +23,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import * as navIcons from './icons';
+import {
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+	justifySpaceBetween,
+} from '@wordpress/icons';
 import NavigationPlaceholder from './placeholder';
+import PlaceholderPreview from './placeholder-preview';
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -38,9 +43,16 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
+	hasItemJustificationControls = attributes.orientation === 'horizontal',
 	hasListViewModal = true,
 } ) {
+	const navIcons = {
+		left: justifyLeft,
+		center: justifyCenter,
+		right: justifyRight,
+		'space-between': justifySpaceBetween,
+	};
+
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
@@ -81,6 +93,11 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
+			__experimentalLayout: {
+				type: 'default',
+				alignments: [],
+			},
+			placeholder: <PlaceholderPreview />,
 		}
 	);
 
@@ -110,6 +127,11 @@ function Navigation( {
 		};
 	}
 
+	const POPOVER_PROPS = {
+		position: 'bottom right',
+		isAlternate: true,
+	};
+
 	return (
 		<>
 			<BlockControls>
@@ -117,36 +139,43 @@ function Navigation( {
 					<ToolbarGroup
 						icon={
 							attributes.itemsJustification
-								? navIcons[
-										`justify${ upperFirst(
-											attributes.itemsJustification
-										) }Icon`
-								  ]
-								: navIcons.justifyLeftIcon
+								? navIcons[ attributes.itemsJustification ]
+								: navIcons.left
 						}
+						popoverProps={ POPOVER_PROPS }
 						label={ __( 'Change items justification' ) }
 						isCollapsed
 						controls={ [
 							{
-								icon: navIcons.justifyLeftIcon,
+								icon: justifyLeft,
 								title: __( 'Justify items left' ),
 								isActive:
 									'left' === attributes.itemsJustification,
 								onClick: handleItemsAlignment( 'left' ),
 							},
 							{
-								icon: navIcons.justifyCenterIcon,
+								icon: justifyCenter,
 								title: __( 'Justify items center' ),
 								isActive:
 									'center' === attributes.itemsJustification,
 								onClick: handleItemsAlignment( 'center' ),
 							},
 							{
-								icon: navIcons.justifyRightIcon,
+								icon: justifyRight,
 								title: __( 'Justify items right' ),
 								isActive:
 									'right' === attributes.itemsJustification,
 								onClick: handleItemsAlignment( 'right' ),
+							},
+							{
+								icon: justifySpaceBetween,
+								title: __( 'Space between items' ),
+								isActive:
+									'space-between' ===
+									attributes.itemsJustification,
+								onClick: handleItemsAlignment(
+									'space-between'
+								),
 							},
 						] }
 					/>
