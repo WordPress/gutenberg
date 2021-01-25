@@ -159,7 +159,7 @@ class WP_Theme_JSON_Resolver {
 			}
 
 			foreach ( $preset_to_translate as $preset ) {
-				$path               = $preset['path'];
+				$path               = array_slice( $preset['path'], 2 ) ;
 				$translatable_keys  = $preset['translatable_keys'];
 				$array_to_translate = gutenberg_experimental_get( $settings, $path, null );
 				if ( null === $array_to_translate ) {
