@@ -7,6 +7,7 @@ import { render } from '@testing-library/react';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import { __experimentalUseNoRecursiveRenders as useNoRecursiveRenders } from '@wordpress/block-editor';
 
 // Mimics a block's Edit component, such as ReusableBlockEdit, which is capable
 // of calling itself depending on its `ref` attribute.
@@ -36,11 +37,6 @@ function Edit( { attributes: { ref } } ) {
 		</RecursionProvider>
 	);
 }
-
-/**
- * Internal dependencies
- */
-import useNoRecursiveRenders from '../use-no-recursive-renders';
 
 describe( 'useNoRecursiveRenders', () => {
 	it( 'allows a single block to render', () => {
