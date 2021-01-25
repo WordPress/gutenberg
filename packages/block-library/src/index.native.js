@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
-import { sortBy } from 'lodash';
+import { difference, map, omit, remove, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -177,6 +177,78 @@ addFilter(
 		}
 
 		return settings;
+	}
+);
+
+const ineligibleTransformations = {
+	'core/paragraph': [ 'core/group', 'core/columns' ],
+};
+const supportedTransformations = [ 'core/paragraph', 'core/heading' ];
+
+const processedIneligibleTransformations = map(
+	ineligibleTransformations,
+	( toBlocks, fromBlock ) =>
+		toBlocks.map( ( toBlock ) => ( { to: toBlock, from: fromBlock } ) )
+).flatMap( ( el ) => el );
+
+/**
+ * Limits transformations to:
+ *   1. Blocks that support transformations
+ *   2. Blocks that aren't in the ineligibleTransformations set
+ *   3. Can only transform to blocks that are supported
+ *     TODO: this should be taken care of by whitelist, no?
+ */
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+		if ( ! settings.transforms ) {
+			return settings;
+		}
+
+		// unsupportedTransformations affect both 'from' and 'to'
+		// if block transform is not supported, it can neither from transformed from or transformed to
+		// and thus can be removed from transformation entirely
+		if ( ! supportedTransformations.includes( name ) ) {
+			return omit( settings, 'transforms' );
+		}
+
+		// ineligibleTransformationsForBlock affect 'from'
+		const ineligibleTransformationsForBlock = processedIneligibleTransformations.filter(
+			( el ) => el.to === name
+		);
+		if ( ! ineligibleTransformationsForBlock.length ) {
+			return settings;
+		}
+
+		const fromBlocks = ineligibleTransformationsForBlock.map(
+			( el ) => el.from
+		);
+		const wildcardTransformations = remove(
+			settings.transforms.from,
+			( fromTransformation ) => fromTransformation.blocks.includes( '*' )
+		);
+		wildcardTransformations.forEach( ( wildcardTransformation ) => {
+			wildcardTransformation.blocks = difference(
+				Object.keys( coreBlocks ),
+				fromBlocks
+			);
+		} );
+
+		return {
+			...settings,
+			transforms: {
+				...settings.transforms,
+				from: [
+					...settings.transforms.from,
+					...wildcardTransformations,
+					{
+						blocks: fromBlocks,
+						isMatch: () => false,
+					},
+				],
+			},
+		};
 	}
 );
 
