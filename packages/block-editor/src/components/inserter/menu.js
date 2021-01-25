@@ -46,19 +46,17 @@ function InserterMenu( {
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
 		insertionIndex: __experimentalInsertionIndex,
 	} );
-	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
+	const { showPatterns, hasReusableBlocks } = useSelect( ( select ) => {
 		const {
 			__experimentalBlockPatterns,
 			__experimentalReusableBlocks,
 		} = select( 'core/block-editor' ).getSettings();
 
 		return {
-			hasPatterns: !! __experimentalBlockPatterns?.length,
+			showPatterns: !! __experimentalBlockPatterns?.length,
 			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
 		};
 	}, [] );
-
-	const showPatterns = ! destinationRootClientId && hasPatterns;
 
 	const onInsert = useCallback(
 		( blocks ) => {
@@ -125,12 +123,18 @@ function InserterMenu( {
 	const patternsTab = useMemo(
 		() => (
 			<BlockPatternsTabs
+				rootClientId={ destinationRootClientId }
 				onInsert={ onInsertPattern }
 				onClickCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
 			/>
 		),
-		[ onInsertPattern, onClickPatternCategory, selectedPatternCategory ]
+		[
+			destinationRootClientId,
+			onInsertPattern,
+			onClickPatternCategory,
+			selectedPatternCategory,
+		]
 	);
 
 	const reusableBlocksTab = useMemo(
