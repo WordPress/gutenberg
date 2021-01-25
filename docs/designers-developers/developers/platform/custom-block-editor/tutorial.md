@@ -45,7 +45,7 @@ With that in mind, let's start taking our first steps towards building this.
 
 ## Plugin setup and organization
 
-Our custom editor is going to be built as a WordPress Plugin. To keep things simple. we'll call this `Standalone Block Editor Demo` because that is what is does. Nice!
+Our custom editor is going to be built as a WordPress Plugin. To keep things simple. we'll call this `Standalone Block Editor Demo` because that is what it does. Nice!
 
 Let's take a look at our Plugin file structure:
 
@@ -377,7 +377,7 @@ For the purposes of our simple project these features allow us to:
 * Update the `blocks` state in memory on `onInput` by calling the hook setter
   `updateBlocks(blocks)`.
 * Handle basic persistence of blocks into `localStorage` using `onChange`. This is [fired when block updates are considered
-  "committed"](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/provider#onchange).
+  "committed"](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/provider#onchange).
 
 It's also worth recalling that the component accepts a `settings` prop. This accepts the editor settings which we inlined as JSON within `init.php` earlier. This configures features such as custom colors, available image sizes and [much more](https://github.com/WordPress/gutenberg/tree/4c472c3443513d070a50ba1e96f3a476861447b3/packages/block-editor#SETTINGS_DEFAULTS).
 
@@ -499,7 +499,7 @@ Without Slot/Fill this setup would be extremely difficult to achieve.
 
 Aside:
 [`<BlockInspector>`](https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-editor/src/components/block-inspector/index.js)
- itself actually renders a `Slot` for [`<InspectorControls>`](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inspector-controls
+ itself actually renders a `Slot` for [`<InspectorControls>`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inspector-controls
 ). This is what allows you [render a `<InspectorControls>` component inside
 the `edit()` definition for your block](https://github.com/WordPress/gutenberg/blob/def076809d25e2ad680beda8b9205ab9dea45a0f/packages/block-library/src/paragraph/edit.js#L127) and have
 it display within Gutenberg's sidebar. I recommend looking into this component

@@ -330,8 +330,10 @@ function CoverEdit( {
 		? `${ minHeight }${ minHeightUnit }`
 		: minHeight;
 
+	const isImgElement = ! ( hasParallax || isRepeated );
+
 	const style = {
-		...( isImageBackground && ( hasParallax || isRepeated )
+		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: overlayColor.color,
@@ -342,7 +344,7 @@ function CoverEdit( {
 	const mediaStyle = {
 		objectPosition:
 			// prettier-ignore
-			focalPoint && ! hasParallax
+			focalPoint && isImgElement
 				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100) }%`
 				: undefined,
 	};
@@ -355,31 +357,29 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
+				<BlockAlignmentMatrixToolbar
+					label={ __( 'Change content position' ) }
+					value={ contentPosition }
+					onChange={ ( nextPosition ) =>
+						setAttributes( {
+							contentPosition: nextPosition,
+						} )
+					}
+					isDisabled={ ! hasBackground }
+				/>
 				<FullHeightAlignment
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
+					isDisabled={ ! hasBackground }
 				/>
-				{ hasBackground && (
-					<>
-						<BlockAlignmentMatrixToolbar
-							label={ __( 'Change content position' ) }
-							value={ contentPosition }
-							onChange={ ( nextPosition ) =>
-								setAttributes( {
-									contentPosition: nextPosition,
-								} )
-							}
-						/>
-
-						<MediaReplaceFlow
-							mediaId={ id }
-							mediaURL={ url }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*,video/*"
-							onSelect={ onSelectMedia }
-						/>
-					</>
-				) }
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+				/>
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
@@ -433,53 +433,49 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				{ hasBackground && (
-					<>
-						<PanelBody title={ __( 'Dimensions' ) }>
-							<CoverHeightInput
-								value={ temporaryMinHeight || minHeight }
-								unit={ minHeightUnit }
-								onChange={ ( newMinHeight ) =>
-									setAttributes( { minHeight: newMinHeight } )
-								}
-								onUnitChange={ ( nextUnit ) =>
-									setAttributes( {
-										minHeightUnit: nextUnit,
-									} )
-								}
-							/>
-						</PanelBody>
-						<PanelColorGradientSettings
-							title={ __( 'Overlay' ) }
-							initialOpen={ true }
-							settings={ [
-								{
-									colorValue: overlayColor.color,
-									gradientValue,
-									onColorChange: setOverlayColor,
-									onGradientChange: setGradient,
-									label: __( 'Color' ),
-								},
-							] }
-						>
-							{ !! url && (
-								<RangeControl
-									label={ __( 'Opacity' ) }
-									value={ dimRatio }
-									onChange={ ( newDimRation ) =>
-										setAttributes( {
-											dimRatio: newDimRation,
-										} )
-									}
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
-								/>
-							) }
-						</PanelColorGradientSettings>
-					</>
-				) }
+				<PanelBody title={ __( 'Dimensions' ) }>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</PanelBody>
+				<PanelColorGradientSettings
+					title={ __( 'Overlay' ) }
+					initialOpen={ true }
+					settings={ [
+						{
+							colorValue: overlayColor.color,
+							gradientValue,
+							onColorChange: setOverlayColor,
+							onGradientChange: setGradient,
+							label: __( 'Color' ),
+						},
+					] }
+				>
+					{ !! url && (
+						<RangeControl
+							label={ __( 'Opacity' ) }
+							value={ dimRatio }
+							onChange={ ( newDimRation ) =>
+								setAttributes( {
+									dimRatio: newDimRation,
+								} )
+							}
+							min={ 0 }
+							max={ 100 }
+							step={ 10 }
+							required
+						/>
+					) }
+				</PanelColorGradientSettings>
 			</InspectorControls>
 		</>
 	);
@@ -595,7 +591,7 @@ function CoverEdit( {
 						style={ { background: gradientValue } }
 					/>
 				) }
-				{ isImageBackground && ! hasParallax && (
+				{ isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"

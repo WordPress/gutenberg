@@ -9,7 +9,7 @@
 		"gutenberg",
 		"viewport"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/viewport/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/viewport/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

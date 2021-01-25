@@ -121,6 +121,7 @@ export { default as WritingFlow } from './writing-flow';
 export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
+export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 
 /*
  * State Related Components

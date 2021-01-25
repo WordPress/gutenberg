@@ -2,7 +2,7 @@
 
 The `PreviewOptions` component displays the list of different preview options available in the editor.
 
-It returns a [`DropdownMenu`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/dropdown-menu) component with these different options. The options currently available in the editor are Desktop, Mobile, Tablet and "Preview in new tab".
+It returns a [`DropdownMenu`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/dropdown-menu) component with these different options. The options currently available in the editor are Desktop, Mobile, Tablet and "Preview in new tab".
 
 ![Preview options dropdown menu](https://make.wordpress.org/core/files/2020/09/preview-options-dropdown-menu.png)
 

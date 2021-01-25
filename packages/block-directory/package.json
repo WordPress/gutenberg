@@ -9,7 +9,7 @@
 		"gutenberg",
 		"block directory"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-directory/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-directory/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

@@ -14,7 +14,7 @@
 		"pragma",
 		"react"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-plugin-import-jsx-pragma/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-plugin-import-jsx-pragma/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
