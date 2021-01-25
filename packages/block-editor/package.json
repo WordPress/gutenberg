@@ -10,7 +10,7 @@
 		"editor",
 		"blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

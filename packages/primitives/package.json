@@ -10,7 +10,7 @@
 		"mobile",
 		"platform"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/primitives/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/primitives/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

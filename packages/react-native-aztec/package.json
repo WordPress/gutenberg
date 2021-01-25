@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-aztec",
-	"version": "1.44.1",
+	"version": "1.45.0",
 	"description": "Aztec view for react-native.",
 	"private": true,
 	"author": "The WordPress Contributors",
@@ -9,7 +9,7 @@
 		"wordpress",
 		"react-native"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-aztec/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-aztec/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

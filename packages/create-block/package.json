@@ -10,7 +10,7 @@
 		"block",
 		"scaffold"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/create-block/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

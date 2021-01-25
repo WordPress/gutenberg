@@ -5,7 +5,6 @@
 	background-position: center center;
 	min-height: 430px;
 	width: 100%;
-	height: 100%; // This explicit height rule is necessary for the focal point picker to work.
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -167,14 +166,26 @@
 			width: auto;
 		}
 	}
-}
 
-.wp-block-cover__image-background,
-.wp-block-cover__video-background {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+	// Extra specificity for in edit mode where other styles would override it otherwise.
+	img.wp-block-cover__image-background,
+	video.wp-block-cover__video-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		object-fit: cover;
+		outline: none;
+		border: none;
+		box-shadow: none;
+	}
 }
 
 .wp-block-cover__video-background {
