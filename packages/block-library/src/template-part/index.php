@@ -13,6 +13,8 @@
  * @return string The render.
  */
 function render_block_core_template_part( $attributes ) {
+	static $seen_content = array();
+
 	$content = null;
 	$area    = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 
@@ -59,6 +61,31 @@ function render_block_core_template_part( $attributes ) {
 	if ( is_null( $content ) ) {
 		return 'Template Part Not Found';
 	}
+
+	if ( in_array( $content, $seen_content, true ) ) {
+		if ( ! is_admin() ) {
+			trigger_error(
+				sprintf(
+					// translators: %s is the user-provided title of the reusable block.
+					__( 'Could not render Template Part with the slug <strong>%s</strong>: blocks cannot be rendered inside themselves.' ),
+					$attributes['slug']
+				),
+				E_USER_WARNING
+			);
+		}
+
+		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+		// is set in `wp_debug_mode()`.
+		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
+			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+
+		return $is_debug ?
+			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			__( '[block rendering halted]' ) :
+			'';
+	}
+
+	$seen_content[] = $content;
 
 	// Run through the actions that are typically taken on the_content.
 	$content = do_blocks( $content );

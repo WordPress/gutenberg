@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	useBlockProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -32,6 +33,10 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
+
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		templatePartId
+	);
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
@@ -69,8 +74,7 @@ export default function TemplatePartEdit( {
 	);
 
 	const blockProps = useBlockProps();
-	const isPlaceholder = ! slug;
-	const isEntityAvailable = ! isPlaceholder && ! isMissing;
+	const isEntityAvailable = slug && ! isMissing;
 	const TagName = tagName || getTagBasedOnArea( area );
 
 	// We don't want to render a missing state if we have any inner blocks.
@@ -90,8 +94,18 @@ export default function TemplatePartEdit( {
 		);
 	}
 
+	if ( hasAlreadyRendered ) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</TagName>
+		);
+	}
+
 	return (
-		<>
+		<RecursionProvider>
 			<TemplatePartAdvancedControls
 				tagName={ tagName }
 				setAttributes={ setAttributes }
@@ -141,6 +155,6 @@ export default function TemplatePartEdit( {
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }
 			</TagName>
-		</>
+		</RecursionProvider>
 	);
 }
