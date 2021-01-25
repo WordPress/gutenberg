@@ -76,6 +76,32 @@ class WP_Theme_JSON_Resolver {
 	 * containing the a translatable path from theme.json and an array
 	 * of properties that are translatable.
 	 *
+	 * For example, given this input:
+	 *
+	 * {
+	 *   "settings": {
+	 *     "*": {
+	 *       "typography": {
+	 *         "fontSizes": [ "name" ],
+	 *         "fontStyles": [ "name" ]
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * will return this output:
+	 *
+	 * [
+	 *   0 => [
+	 *     'path' => [ 'settings', '*', 'typography', 'fontSizes' ],
+	 *     'translatable_keys' => [ 'name' ]
+	 *   ],
+	 *   1 => [
+	 *     'path' => [ 'settings', '*', 'typography', 'fontStyles' ],
+	 *     'translatable_keys' => [ 'name']
+	 *   ]
+	 * ]
+	 *
 	 * @param array $file_structure_partial A part of a theme.json i18n tree.
 	 * @param array $current_path           An array with a path on the theme.json i18n tree.
 	 *
