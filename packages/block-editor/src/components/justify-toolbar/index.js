@@ -14,7 +14,7 @@ import {
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
-const navIcons = {
+const icons = {
 	left: justifyLeft,
 	center: justifyCenter,
 	right: justifyRight,
@@ -22,7 +22,7 @@ const navIcons = {
 };
 
 export function JustifyToolbar( { onChange, value, popoverProps } ) {
-	const icon = value ? navIcons[ value ] : navIcons.left;
+	const icon = value ? icons[ value ] : icons.left;
 
 	return (
 		<ToolbarGroup
