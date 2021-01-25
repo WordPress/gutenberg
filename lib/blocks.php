@@ -200,7 +200,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		static $inline_pool_size = 0;
 
 		// The default threshold for inlining styles in the frontend (in bytes).
-		$threshold = 3000;
+		$threshold = 1500;
 
 		/**
 		 * The threshold for inlining styles instead of enqueueing them (in bytes).
