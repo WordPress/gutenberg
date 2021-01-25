@@ -51,7 +51,7 @@ function AudioEdit( {
 	const { id, autoplay, loop, preload, src } = attributes;
 
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const [ fileName, setFileName ] = useState( false );
+	const [ fileName, setFileName ] = useState( src && src.split( '/' ).pop() );
 
 	const onFileChange = ( { mediaId, mediaUrl } ) => {
 		setAttributes( { id: mediaId, src: mediaUrl } );
