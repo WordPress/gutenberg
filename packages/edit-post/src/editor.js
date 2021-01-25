@@ -64,20 +64,26 @@ function Editor( {
 			getEntityRecords,
 		} = select( 'core' );
 		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
+		const currentPostObj = getCurrentPost();
 		const { getBlockTypes } = select( blocksStore );
+
+		let postObject = {
+			postType: currentPostObj?.type ?? postType,
+			postId: currentPostObj?.id ?? postId,
+		};
+
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-			postType
+			postObject.postType
 		);
 		// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 		// to avoid the special case.
-		let postObject;
 		if ( isTemplate ) {
-			const posts = getEntityRecords( 'postType', postType, {
-				wp_id: postId,
+			const posts = getEntityRecords( 'postType', postObject.postType, {
+				wp_id: postObject.postId,
 			} );
 			postObject = posts?.[ 0 ];
 		} else {
-			postObject = getEntityRecord( 'postType', postType, postId );
+			postObject = getEntityRecord( 'postType', postObject.postType, postObject.postId );
 		}
 		const isFSETheme = getEditorSettings().isFSETheme;
 		const isViewable = getPostType( postType )?.viewable ?? false;
@@ -103,7 +109,7 @@ function Editor( {
 				isFSETheme &&
 				isViewable &&
 				postObject &&
-				getCurrentPost().status !== 'auto-draft'
+				currentPostObj.status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
 			post: postObject,
