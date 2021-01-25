@@ -170,11 +170,14 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = useCallback( ( value ) => {
-		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
-			setAttributes( { minHeight: value } );
-		}
-	}, [] );
+	const onHeightChange = useCallback(
+		( value ) => {
+			if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
+				setAttributes( { minHeight: value } );
+			}
+		},
+		[ minHeight ]
+	);
 
 	const onOpacityChange = useCallback( ( value ) => {
 		setAttributes( { dimRatio: value } );
@@ -203,7 +206,7 @@ const Cover = ( {
 	const onClearMedia = useCallback( () => {
 		setAttributes( { id: undefined, url: undefined } );
 		closeSettingsBottomSheet();
-	}, [] );
+	}, [ closeSettingsBottomSheet ] );
 
 	function setColor( color ) {
 		setAttributes( {
