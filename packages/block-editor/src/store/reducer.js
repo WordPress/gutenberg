@@ -1357,6 +1357,13 @@ export function isSelectionEnabled( state = true, action ) {
  * @return {?number} Initial position: -1 or undefined.
  */
 export function initialPosition( state, action ) {
+	const keepStateAction = [
+		'REMOVE_BLOCKS',
+		'START_TYPING',
+		'MARK_AUTOMATIC_CHANGE',
+		'MARK_AUTOMATIC_CHANGE_FINAL',
+	];
+
 	if (
 		action.type === 'REPLACE_BLOCKS' &&
 		typeof action.initialPosition === 'number'
@@ -1364,9 +1371,7 @@ export function initialPosition( state, action ) {
 		return action.initialPosition;
 	} else if ( action.type === 'SELECT_BLOCK' ) {
 		return action.initialPosition;
-	} else if ( action.type === 'REMOVE_BLOCKS' ) {
-		return state;
-	} else if ( action.type === 'START_TYPING' ) {
+	} else if ( keepStateAction.includes( action.type ) ) {
 		return state;
 	} else if (
 		action.type === 'INSERT_BLOCKS' ||
