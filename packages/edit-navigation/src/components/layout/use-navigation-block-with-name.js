@@ -17,6 +17,7 @@ export default function useNavigationBlockWithName( menuId ) {
 	] );
 
 	const { saveMenu } = useDispatch( 'core' );
+	const menuName = menu?.name ?? '(untitled menu)';
 
 	useEffect( () => {
 		if ( menu ) {
@@ -27,15 +28,16 @@ export default function useNavigationBlockWithName( menuId ) {
 					}
 					return (
 						<>
-							<BlockEdit { ...props } />
+							<BlockEdit { ...props } menuName={ menuName } />
 							<BlockControls>
 								<ToolbarGroup>
 									<EditInPlaceControl
-										label={ menu?.name ?? '(untitled menu)' }
+										label={ menuName }
 										onUpdate={ ( value ) => {
 											saveMenu( {
 												...menu,
-												name: value || '(untitled menu)',
+												name:
+													value || '(untitled menu)',
 											} );
 										} }
 									/>
@@ -51,9 +53,12 @@ export default function useNavigationBlockWithName( menuId ) {
 				'core/edit-navigation/with-menu-name',
 				withMenuName
 			);
-			return () => removeFilter( 'editor.BlockEdit', 'core/edit-navigation/with-menu-name',  withMenuName );
+			return () =>
+				removeFilter(
+					'editor.BlockEdit',
+					'core/edit-navigation/with-menu-name',
+					withMenuName
+				);
 		}
 	}, [ menuId ] );
-
-
 }
