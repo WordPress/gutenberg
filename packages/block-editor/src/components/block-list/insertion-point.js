@@ -179,8 +179,8 @@ function InsertionPointPopover( {
 	);
 
 	function onClick( event ) {
-		if ( event.target === ref.current ) {
-			selectBlock( clientId, -1 );
+		if ( event.target === ref.current && nextClientId ) {
+			selectBlock( nextClientId, -1 );
 		}
 	}
 
