@@ -178,11 +178,12 @@ public class Gutenberg: NSObject {
         sendEvent(event, body: data)
     }
 
-    public func appendMedia(id: Int32, url: URL, type: MediaType) {
+    public func appendMedia(id: Int32, url: URL, type: MediaType, caption: String? = nil) {
         let data: [String: Any] = [
             "mediaId"  : id,
             "mediaUrl" : url.absoluteString,
             "mediaType": type.rawValue,
+            "mediaCaption": caption,
         ]
         sendEvent(.mediaAppend, body: data)
     }
