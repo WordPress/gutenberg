@@ -10,6 +10,8 @@ import { clamp } from 'lodash';
 import { HorizontalRule, ResizableBox } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
+import { View } from '@wordpress/primitives';
+
 /**
  * Internal dependencies
  */
@@ -29,9 +31,14 @@ function SeparatorEdit( props ) {
 		setIsResizing( true );
 	};
 
+	const updateHeight = ( value ) => {
+		setAttributes( {
+			height: clamp( Math.round( value ), MIN_HEIGHT, MAX_HEIGHT ),
+		} );
+	};
+
 	const onResizeStop = ( _event, _direction, elt ) => {
-		const newHeight = Math.round( elt.clientHeight );
-		setAttributes( { height: clamp( newHeight, MIN_HEIGHT, MAX_HEIGHT ) } );
+		updateHeight( elt.clientHeight );
 		setIsResizing( false );
 	};
 
@@ -44,9 +51,9 @@ function SeparatorEdit( props ) {
 	// block selection.
 	return (
 		<>
-			<div
+			<View
 				{ ...blockProps }
-				className={ blockProps.className.replace(
+				className={ blockProps.className?.replace(
 					'wp-block-separator',
 					''
 				) }
@@ -90,8 +97,15 @@ function SeparatorEdit( props ) {
 						isVisible: isResizing,
 					} }
 				/>
-			</div>
-			<SeparatorSettings color={ color } setColor={ setColor } />
+			</View>
+			<SeparatorSettings
+				color={ color }
+				setColor={ setColor }
+				minHeight={ hasDotsStyle ? MIN_DOTS_HEIGHT : MIN_HEIGHT }
+				maxHeight={ MAX_HEIGHT }
+				height={ height }
+				updateHeight={ updateHeight }
+			/>
 		</>
 	);
 }
