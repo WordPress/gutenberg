@@ -83,7 +83,11 @@ function Editor( {
 			} );
 			postObject = posts?.[ 0 ];
 		} else {
-			postObject = getEntityRecord( 'postType', postObject.postType, postObject.postId );
+			postObject = getEntityRecord(
+				'postType',
+				postObject.postType,
+				postObject.postId
+			);
 		}
 		const isFSETheme = getEditorSettings().isFSETheme;
 		const isViewable = getPostType( postType )?.viewable ?? false;
