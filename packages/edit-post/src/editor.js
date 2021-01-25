@@ -75,6 +75,8 @@ function Editor( {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postObject.type
 		);
+		const isViewable = getPostType( postObject.type )?.viewable ?? false;
+
 		// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 		// to avoid the special case.
 		if ( isTemplate ) {
@@ -90,7 +92,6 @@ function Editor( {
 			);
 		}
 		const isFSETheme = getEditorSettings().isFSETheme;
-		const isViewable = getPostType( postObject.type )?.viewable ?? false;
 
 		return {
 			hasFixedToolbar:
