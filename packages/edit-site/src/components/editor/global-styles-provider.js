@@ -174,20 +174,20 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const styles = 'user' === origin ? userStyles : mergedStyles;
+				const styleOrigin = 'user' === origin ? userStyles : mergedStyles;
 
 				const value = get(
-					styles?.[ context ]?.styles,
+					styleOrigin?.styles?.[ context ],
 					STYLE_PROPERTY[ propertyName ].value
 				);
 				return getValueFromVariable( mergedStyles, context, value );
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
-				let contextStyles = newContent?.[ context ]?.styles;
+				let contextStyles = newContent?.styles?.[ context ];
 				if ( ! contextStyles ) {
 					contextStyles = {};
-					set( newContent, [ context, 'styles' ], contextStyles );
+					set( newContent, [ 'styles', context ], contextStyles );
 				}
 				set(
 					contextStyles,
