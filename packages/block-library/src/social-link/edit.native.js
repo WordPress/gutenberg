@@ -122,7 +122,7 @@ const SocialLinkEdit = ( {
 	const onEmptyURL = useCallback( () => {
 		animatedValue.setValue( 0 );
 		setHasUrl( false );
-	}, [] );
+	}, [ animatedValue ] );
 
 	function onIconPress() {
 		if ( isSelected ) {

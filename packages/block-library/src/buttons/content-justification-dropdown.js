@@ -65,7 +65,7 @@ export default function ContentJustificationDropdown( {
 					),
 			};
 		} );
-	}, [ allowedValues, value ] );
+	}, [ allowedValues, value, onChange ] );
 
 	return (
 		<DropdownMenu

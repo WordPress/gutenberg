@@ -14,7 +14,7 @@ const linkSettingsScreens = {
 	linkPicker: 'linkPicker',
 };
 
-const LinkSettingsNavigation = memo( ( props ) => {
+function LinkSettingsNavigation( props ) {
 	if ( ! props.withBottomSheet ) {
 		return <LinkSettingsScreen { ...props } />;
 	}
@@ -43,6 +43,6 @@ const LinkSettingsNavigation = memo( ( props ) => {
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
-} );
+}
 
-export default LinkSettingsNavigation;
+export default memo( LinkSettingsNavigation );
