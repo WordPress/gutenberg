@@ -45,7 +45,7 @@ exports[`Block Mover Picker should match snapshot 1`] = `
     leftAlign={true}
     onChange={[Function]}
     options={Array []}
-    title="Move block position"
+    title="Change block position"
   />
 </Fragment>
 `;
