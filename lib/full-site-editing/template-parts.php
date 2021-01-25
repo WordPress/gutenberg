@@ -157,6 +157,7 @@ function gutenberg_get_allowed_template_part_section_types() {
 	$default_section_types = array(
 		'header',
 		'footer',
+		'other',
 	);
 
 	/**
@@ -165,4 +166,19 @@ function gutenberg_get_allowed_template_part_section_types() {
 	 * @param array $default_section_types An array of supported section types.
 	 */
 	return apply_filters( 'default_template_part_section_types', $default_section_types );
+}
+
+/**
+ * Checks whether the input 'type' is a supported section type.
+ * Returns the input if supported, otherwise returns the 'other' type.
+ *
+ * @param string $type Template part section name
+ *
+ * @return string Input if supported, else 'other'.
+ */
+function gutenberg_filter_template_part_section_type( $type ) {
+	if ( in_array( $type, gutenberg_get_allowed_template_part_section_types(), true ) ) {
+		return $type;
+	}
+	return 'other';
 }
