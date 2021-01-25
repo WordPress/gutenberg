@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mapValues, mergeWith } from 'lodash';
+import { set, get, mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -232,10 +232,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					isGlobalStyles: true,
 				},
 			],
-			__experimentalFeatures: mapValues(
-				mergedStyles,
-				( value ) => value?.settings || {}
-			),
+			__experimentalFeatures: mergedStyles.settings,
 		} );
 	}, [ contexts, mergedStyles ] );
 
