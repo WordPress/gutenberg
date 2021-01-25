@@ -1736,6 +1736,41 @@ export const __experimentalGetAllowedBlocks = createSelector(
 );
 
 /**
+ * Returns the list of allowed patterns for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array?} The list of allowed block types.
+ */
+export const __experimentalGetAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const allowedBlockNames = map(
+			__experimentalGetAllowedBlocks( state, rootClientId ),
+			( { name } ) => name
+		);
+
+		if ( ! rootClientId || ! allowedBlockNames.length ) {
+			return patterns;
+		}
+
+		const patternsAllowed = patterns.filter( ( pattern ) => {
+			const blocks = parse( pattern.content );
+			return blocks.every( ( { name } ) =>
+				allowedBlockNames.includes( name )
+			);
+		} );
+
+		return patternsAllowed;
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		__experimentalGetAllowedBlocks( state, rootClientId ),
+	]
+);
+
+/**
  * Returns the Block List settings of a block, if any exist.
  *
  * @param {Object}  state    Editor state.
