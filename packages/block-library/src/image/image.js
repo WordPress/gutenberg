@@ -164,7 +164,14 @@ export default function Image( {
 		}
 	}, [ isSelected ] );
 
-	useParentAttributes( image, context, inheritedAttributes, setAttributes );
+	const currentAttributes = { linkDestination, linkTarget, href };
+	useParentAttributes(
+		image,
+		currentAttributes,
+		context,
+		inheritedAttributes,
+		setAttributes
+	);
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -208,8 +215,8 @@ export default function Image( {
 
 	function onSetHref( props ) {
 		if (
-			inheritedAttributes.linkDestination ||
-			inheritedAttributes.linkTarget
+			inheritedAttributes?.linkDestination ||
+			inheritedAttributes?.linkTarget
 		) {
 			setAttributes( {
 				inheritedAttributes: {
@@ -250,7 +257,7 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		if ( inheritedAttributes.sizeSlug ) {
+		if ( inheritedAttributes?.sizeSlug ) {
 			setAttributes( {
 				inheritedAttributes: {
 					...inheritedAttributes,
