@@ -122,12 +122,12 @@ class BlockListBlock extends Component {
 	getBlockWidth( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { marginHorizontal, blockWidth } = this.props;
-		const spacing = 2 * marginHorizontal;
 
 		if ( ! blockWidth ) {
 			return;
 		}
 
+		const spacing = 2 * marginHorizontal;
 		const layoutWidth = Math.floor( layout.width );
 
 		if ( blockWidth - spacing !== layoutWidth ) {
