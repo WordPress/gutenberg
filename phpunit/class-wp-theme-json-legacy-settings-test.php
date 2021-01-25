@@ -43,8 +43,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 	function test_legacy_settings_blank() {
 		$input    = array();
 		$expected = array(
-			'global' => array(
-				'settings' => array(),
+			'settings' => array(
+				'global' => array(),
 			),
 		);
 
@@ -56,8 +56,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 	function test_legacy_settings_no_theme_support() {
 		$input    = $this->get_editor_settings_no_theme_support();
 		$expected = array(
-			'global' => array(
-				'settings' => array(
+			'settings' => array(
+				'global' => array(
 					'color'      => array(
 						'custom'         => true,
 						'customGradient' => true,
@@ -88,7 +88,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
-		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['global']['spacing'] );
 	}
 
 	function test_legacy_settings_custom_units_can_be_enabled() {
@@ -101,7 +101,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
-		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['global']['spacing'] );
 	}
 
 	function test_legacy_settings_custom_units_can_be_filtered() {
@@ -114,7 +114,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
-		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['global']['spacing'] );
 	}
 
 	function test_legacy_settings_filled() {
@@ -148,8 +148,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'global' => array(
-				'settings' => array(
+			'settings' => array(
+				'global' => array(
 					'color'      => array(
 						'custom'         => false,
 						'customGradient' => false,
