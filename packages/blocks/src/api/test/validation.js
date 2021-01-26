@@ -171,6 +171,14 @@ describe( 'validation', () => {
 				'url(https://wordpress.org/img.png)'
 			);
 		} );
+
+		it( 'omits length units from zero values', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'44% 0% 18em 0em'
+			);
+
+			expect( normalizedValue ).toBe( '44% 0 18em 0' );
+		} );
 	} );
 
 	describe( 'getStyleProperties()', () => {
