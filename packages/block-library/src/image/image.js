@@ -222,9 +222,10 @@ export default function Image( {
 			setAttributes( {
 				inheritedAttributes: {
 					...inheritedAttributes,
-					linkDestination: props.linkDestination
-						? false
-						: inheritedAttributes.linkDestination,
+					linkDestination:
+						props.linkDestination || props.href
+							? false
+							: inheritedAttributes.linkDestination,
 					linkTarget:
 						props.linkTarget || props.linkTarget !== linkTarget
 							? false
