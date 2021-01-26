@@ -297,8 +297,8 @@ function RichTextWrapper(
 			const hasPastedBlocks = pastedBlocks.length > 0;
 			let lastPastedBlockIndex = -1;
 
-			// Consider the after value to bethe original it is not empty and
-			// the
+			// Consider the after value to be the original it is not empty and
+			// the before value *is* empty.
 			const isAfterOriginal = isEmpty( before ) && ! isEmpty( after );
 
 			// Create a block with the content before the caret if there's no pasted
