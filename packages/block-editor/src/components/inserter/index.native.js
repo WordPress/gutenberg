@@ -80,13 +80,13 @@ export class Inserter extends Component {
 		};
 
 		const addToBeginningOption = {
-			value: 'before',
+			value: 'start',
 			label: __( 'Add To Beginning' ),
 			icon: insertBefore,
 		};
 
 		const addToEndOption = {
-			value: 'after',
+			value: 'end',
 			label: __( 'Add To End' ),
 			icon: insertAfter,
 		};
@@ -95,12 +95,14 @@ export class Inserter extends Component {
 		if ( isAnyBlockSelected ) {
 			if ( isSelectedBlockReplaceable ) {
 				return [
+					addToBeginningOption,
 					addBeforeOption,
 					replaceCurrentOption,
 					addAfterOption,
+					addToEndOption,
 				];
 			}
-			return [ addBeforeOption, addAfterOption ];
+			return [ addToBeginningOption, addBeforeOption, addAfterOption, addToEndOption ];
 		}
 		return [ addToBeginningOption, addToEndOption ];
 	}
@@ -108,14 +110,22 @@ export class Inserter extends Component {
 	getInsertionIndex( insertionType ) {
 		const {
 			insertionIndexDefault,
+			insertionIndexStart,
 			insertionIndexBefore,
 			insertionIndexAfter,
+			insertionIndexEnd,
 		} = this.props;
+		if ( insertionType === 'start' ) {
+			return insertionIndexStart;
+		}
 		if ( insertionType === 'before' || insertionType === 'replace' ) {
 			return insertionIndexBefore;
 		}
 		if ( insertionType === 'after' ) {
 			return insertionIndexAfter;
+		}
+		if ( insertionType === 'end' ) {
+			return insertionIndexEnd;
 		}
 		return insertionIndexDefault;
 	}
@@ -290,7 +300,7 @@ export default compose( [
 		// `end` argument (id) can refer to the component which is removed
 		// due to pressing `undo` button, that's why we need to check
 		// if `getBlock( end) is valid, otherwise `null` is passed
-		const isAnyBlockSelected = ! isAppender && end && getBlock( end );
+		const isAnyBlockSelected = !isAppender && end && getBlock( end );
 		const destinationRootClientId = isAnyBlockSelected
 			? getBlockRootClientId( end )
 			: rootClientId;
@@ -335,19 +345,25 @@ export default compose( [
 			return endOfRootIndex;
 		}
 
+		const insertionIndexStart = 0;
+
 		const insertionIndexBefore = isAnyBlockSelected
 			? selectedBlockIndex
-			: 0;
+			: insertionIndexStart;
 
 		const insertionIndexAfter = isAnyBlockSelected
 			? selectedBlockIndex + 1
 			: endOfRootIndex;
+
+		const insertionIndexEnd = endOfRootIndex;
 
 		return {
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,
 			insertionIndexAfter,
+			insertionIndexStart,
+			insertionIndexEnd,
 			isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
 		};
