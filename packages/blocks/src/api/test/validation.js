@@ -8,6 +8,7 @@ import {
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
 	isEquivalentTextTokens,
+	getNormalizedLength,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -158,6 +159,32 @@ describe( 'validation', () => {
 			);
 
 			expect( isEqual ).toBe( true );
+		} );
+	} );
+
+	describe( 'getNormalizedLength()', () => {
+		it( 'omits unit from zero px length', () => {
+			const normalizedLength = getNormalizedLength( '0px' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero px length', () => {
+			const normalizedLength = getNormalizedLength( '50px' );
+
+			expect( normalizedLength ).toBe( '50px' );
+		} );
+
+		it( 'omits unit from zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '0%' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '50%' );
+
+			expect( normalizedLength ).toBe( '50%' );
 		} );
 	} );
 
