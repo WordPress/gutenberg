@@ -10,7 +10,7 @@
 		"data",
 		"redux"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/data/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

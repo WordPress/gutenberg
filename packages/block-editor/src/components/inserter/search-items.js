@@ -6,6 +6,7 @@ import { deburr, differenceWith, find, words } from 'lodash';
 // Default search helpers
 const defaultGetName = ( item ) => item.name || '';
 const defaultGetTitle = ( item ) => item.title;
+const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
@@ -126,6 +127,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const {
 		getName = defaultGetName,
 		getTitle = defaultGetTitle,
+		getDescription = defaultGetDescription,
 		getKeywords = defaultGetKeywords,
 		getCategory = defaultGetCategory,
 		getCollection = defaultGetCollection,
@@ -133,6 +135,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 
 	const name = getName( item );
 	const title = getTitle( item );
+	const description = getDescription( item );
 	const keywords = getKeywords( item );
 	const category = getCategory( item );
 	const collection = getCollection( item );
@@ -150,9 +153,14 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	} else if ( normalizedTitle.startsWith( normalizedSearchInput ) ) {
 		rank += 20;
 	} else {
-		const terms = [ name, title, ...keywords, category, collection ].join(
-			' '
-		);
+		const terms = [
+			name,
+			title,
+			description,
+			...keywords,
+			category,
+			collection,
+		].join( ' ' );
 		const normalizedSearchTerms = words( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,

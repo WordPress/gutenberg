@@ -9,7 +9,7 @@
 		"gutenberg",
 		"warning"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/warning/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/warning/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

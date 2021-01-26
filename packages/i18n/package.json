@@ -9,7 +9,7 @@
 		"gutenberg",
 		"i18n"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/i18n/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/i18n/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

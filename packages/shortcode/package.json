@@ -9,7 +9,7 @@
 		"gutenberg",
 		"shortcode"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/shortcode/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/shortcode/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

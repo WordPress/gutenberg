@@ -215,7 +215,7 @@ export function isValidCharacterReference( text ) {
  * implementation of `decodeEntities` from `html-entities`, in order to avoid
  * bundling a massive named character reference.
  *
- * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
+ * @see https://github.com/tildeio/simple-html-tokenizer/tree/HEAD/src/entity-parser.ts
  */
 export class DecodeEntityParser {
 	/**
