@@ -31,7 +31,7 @@ const DEFAULT_LOCALE_DATA = {
  * @see http://messageformat.github.io/Jed/
  */
 /**
- * @typedef {(domain?: string) => string} getFilterDomain
+ * @typedef {(domain?: string) => string} GetFilterDomain
  * Retrieve the domain to use when calling domain-specific filters.
  */
 /**
@@ -155,7 +155,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		return tannin.dcnpgettext( domain, context, single, plural, number );
 	};
 
-	/** @type {getFilterDomain} */
+	/** @type {GetFilterDomain} */
 	const getFilterDomain = ( domain ) => {
 		if ( typeof domain === 'undefined' ) {
 			return 'default';
