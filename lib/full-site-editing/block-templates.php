@@ -49,7 +49,7 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
 		if ( file_exists( $file_path ) ) {
-			return _gutenberg_add_template_part_section_info(
+			return _gutenberg_conditionally_add_template_part_section_info(
 				array(
 					'slug'  => $slug,
 					'path'  => $file_path,
@@ -95,7 +95,7 @@ function _gutenberg_get_template_files( $template_type ) {
 				// Subtract ending '.html'.
 				-5
 			);
-			$template_files[] = _gutenberg_add_template_part_section_info(
+			$template_files[] = _gutenberg_conditionally_add_template_part_section_info(
 				array(
 					'slug'  => $template_slug,
 					'path'  => $template_file,
@@ -117,7 +117,7 @@ function _gutenberg_get_template_files( $template_type ) {
  *
  * @return array Template.
  */
-function _gutenberg_add_template_part_section_info( $template_info ) {
+function _gutenberg_conditionally_add_template_part_section_info( $template_info ) {
 	if ( 'wp_template_part' === $template_info['type'] && is_readable( locate_template( 'experimental-theme.json' ) ) ) {
 		$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
 		$data       = json_decode(
