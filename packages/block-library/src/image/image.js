@@ -92,7 +92,7 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { allowResize = true, isListItem = false } = context;
+	const { allowResize = true, isGrouped = false } = context;
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -107,7 +107,7 @@ export default function Image( {
 				block: getSelectedBlock(),
 				currentId: getSelectedBlockClientId(),
 				image:
-					id && ( isSelected || isListItem ) ? getMedia( id ) : null,
+					id && ( isSelected || isGrouped ) ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -116,7 +116,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, isListItem ]
+		[ id, isSelected, isGrouped ]
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
