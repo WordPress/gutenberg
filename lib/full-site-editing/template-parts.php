@@ -172,7 +172,7 @@ function gutenberg_get_allowed_template_part_section_types() {
  * Checks whether the input 'type' is a supported section type.
  * Returns the input if supported, otherwise returns the 'other' type.
  *
- * @param string $type Template part section name
+ * @param string $type Template part section name.
  *
  * @return string Input if supported, else 'other'.
  */
