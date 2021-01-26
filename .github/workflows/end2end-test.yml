@@ -45,12 +45,8 @@ jobs:
 
     - name: Npm install and build
       run: |
-        npm ci
+        PUPPETEER_PRODUCT=${{ matrix.browser }} npm install
         FORCE_REDUCED_MOTION=true npm run build
-
-    - name: "Install Puppeteer with ${{ matrix.browser }}"
-      if: matrix.browser != 'chrome'
-      run: PUPPETEER_PRODUCT=${{ matrix.browser }} npm install puppeteer
 
     - name: Install WordPress
       run: |
