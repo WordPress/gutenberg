@@ -14,7 +14,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
- * @property {string} [mediaCrossOrigin] (''|'anonymous'|'use-credentials'|undefined) value for requesting media assets with CORS, allowing them to be used in a `<canvas>` as if they were loaded from the current origin.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes Allowed block types

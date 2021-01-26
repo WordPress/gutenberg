@@ -180,7 +180,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'isRTL',
 				'keepCaretInsideBlock',
 				'maxWidth',
-				'mediaCrossOrigin',
 				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',

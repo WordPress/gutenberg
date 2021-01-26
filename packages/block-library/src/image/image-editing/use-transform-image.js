@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ editedUrl, setEditedUrl ] = useState();
@@ -12,15 +12,6 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ rotation, setRotation ] = useState();
 	const [ aspect, setAspect ] = useState();
 	const [ defaultAspect, setDefaultAspect ] = useState();
-
-	const mediaCrossOrigin = useSelect( ( select ) => {
-		const value = select( 'core/block-editor' ).getSettings()
-			.mediaCrossOrigin;
-		return typeof value === 'string' &&
-			[ '', 'anonymous', 'use-credentials' ].includes( value )
-			? value
-			: undefined;
-	} );
 
 	const initializeTransformValues = useCallback( () => {
 		setPosition( { x: 0, y: 0 } );
@@ -100,8 +91,13 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		const el = new window.Image();
 		el.src = url;
 		el.onload = editImage;
-		if ( typeof mediaCrossOrigin === 'string' ) {
-			el.crossOrigin = mediaCrossOrigin;
+
+		const imgCrossOrigin = applyFilters(
+			'gutenberg.imageTransform.crossOrigin',
+			url
+		);
+		if ( typeof imgCrossOrigin === 'string' ) {
+			el.crossOrigin = imgCrossOrigin;
 		}
 	}, [
 		rotation,
