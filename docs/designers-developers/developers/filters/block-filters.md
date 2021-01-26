@@ -335,7 +335,7 @@ addFilter(
 	// the url to actual foreign media, useful if you want to decide
 	// the value of crossOrigin based upon it.
 	( crossOrigin, mediaSrc ) => {
-		if (mediaSrc.startsWith('https://my.cdn')) {
+		if ( mediaSrc.startsWith( 'https://example.com' ) ) {
 			return 'use-credentials';
 		}
 		return crossOrigin;
