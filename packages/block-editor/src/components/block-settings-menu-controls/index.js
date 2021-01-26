@@ -37,7 +37,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
 			{ ( fills ) => {
-				if ( fills.length > 0 ) {
+				if ( fills?.length > 0 ) {
 					return (
 						<MenuGroup>
 							{ fills }
