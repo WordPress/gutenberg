@@ -8,7 +8,6 @@ import { noop } from 'lodash';
  */
 import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -18,7 +17,6 @@ import { store as blockDirectoryStore } from '../../store';
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 	const { installBlockType } = useDispatch( blockDirectoryStore );
-	const { setIsInserterOpened } = useDispatch( editPostStore );
 
 	if ( ! items.length ) {
 		return null;
@@ -45,7 +43,6 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 								installBlockType( item ).then( ( success ) => {
 									if ( success ) {
 										onSelect( item );
-										setIsInserterOpened( false );
 									}
 								} );
 							}
