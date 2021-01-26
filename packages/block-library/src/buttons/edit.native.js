@@ -29,6 +29,7 @@ export default function ButtonsEdit( {
 	clientId,
 	isSelected,
 	setAttributes,
+	blockWidth,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
@@ -138,6 +139,7 @@ export default function ButtonsEdit( {
 				marginVertical={ spacing }
 				__experimentalLayout={ { type: 'default', alignments: [] } }
 				templateInsertUpdatesSelection
+				blockWidth={ blockWidth }
 			/>
 		</>
 	);

@@ -147,9 +147,11 @@ export class BlockList extends Component {
 	onLayout( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
+		const { isRootList } = this.props;
+
 		const layoutWidth = Math.floor( layout.width );
 
-		if ( blockWidth !== layoutWidth ) {
+		if ( isRootList && blockWidth !== layoutWidth ) {
 			this.setState( {
 				blockWidth: layoutWidth,
 			} );

@@ -30,6 +30,7 @@ function GroupEdit( {
 	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
 	mergedStyle,
+	blockWidth,
 } ) {
 	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
@@ -90,6 +91,7 @@ function GroupEdit( {
 			<InnerBlocks
 				renderAppender={ isSelected && renderAppender }
 				parentWidth={ width }
+				blockWidth={ blockWidth }
 			/>
 		</View>
 	);

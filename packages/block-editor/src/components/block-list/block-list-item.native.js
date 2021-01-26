@@ -152,6 +152,7 @@ export class BlockListItem extends Component {
 						parentWidth={ parentWidth }
 						{ ...restProps }
 						marginHorizontal={ this.getMarginHorizontal() }
+						blockWidth={ blockWidth }
 					/>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
