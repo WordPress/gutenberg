@@ -24,14 +24,14 @@ export default function useParentAttributes(
 	setAttributes
 ) {
 	const {
-		isListItem,
+		isGrouped,
 		linkTo: parentLinkDestination,
 		linkTarget: parentLinkTarget,
 		sizeSlug: parentSizeSlug,
 	} = context;
 
 	useEffect( () => {
-		if ( ! isListItem ) {
+		if ( ! isGrouped ) {
 			return;
 		}
 		if ( inheritedAttributes.linkDestination && image ) {
@@ -41,10 +41,10 @@ export default function useParentAttributes(
 				linkDestination: parentLinkDestination,
 			} );
 		}
-	}, [ image, parentLinkDestination, isListItem ] );
+	}, [ image, parentLinkDestination, isGrouped ] );
 
 	useEffect( () => {
-		if ( ! isListItem ) {
+		if ( ! isGrouped ) {
 			return;
 		}
 		if ( inheritedAttributes.linkTarget ) {
@@ -52,10 +52,10 @@ export default function useParentAttributes(
 				linkTarget: parentLinkTarget,
 			} );
 		}
-	}, [ parentLinkTarget, isListItem ] );
+	}, [ parentLinkTarget, isGrouped ] );
 
 	useEffect( () => {
-		if ( ! isListItem ) {
+		if ( ! isGrouped ) {
 			return;
 		}
 
@@ -69,5 +69,5 @@ export default function useParentAttributes(
 				...sizeAttributes,
 			} );
 		}
-	}, [ parentSizeSlug, isListItem ] );
+	}, [ parentSizeSlug, isGrouped ] );
 }
