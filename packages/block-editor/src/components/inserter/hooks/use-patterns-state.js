@@ -15,12 +15,12 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Retrieves the block patterns inserter state.
  *
- * @param {string=}  rootClientId Insertion's root client ID.
  * @param {Function} onInsert     function called when inserter a list of blocks.
+ * @param {string=}  rootClientId Insertion's root client ID.
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( rootClientId, onInsert ) => {
+const usePatternsState = ( onInsert, rootClientId ) => {
 	const { patternCategories, patterns } = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } = select(

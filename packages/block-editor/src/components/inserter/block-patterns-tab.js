@@ -24,8 +24,8 @@ function BlockPatternsCategory( {
 	onClickCategory,
 } ) {
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
-		rootClientId,
-		onInsert
+		onInsert,
+		rootClientId
 	);
 
 	// Remove any empty categories
