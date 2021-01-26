@@ -28,6 +28,11 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
+// Need to set before running `puppeteer/install`.
+if ( hasArgInCLI( '--puppeteer-product' ) ) {
+	process.env.PUPPETEER_PRODUCT = getArgFromCLI( '--puppeteer-product' );
+}
+
 const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
 	stdio: 'inherit',
 } );
@@ -63,10 +68,6 @@ if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
 if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_DEVTOOLS = 'true';
-}
-
-if ( hasArgInCLI( '--puppeteer-product' ) ) {
-	process.env.PUPPETEER_PRODUCT = getArgFromCLI( '--puppeteer-product' );
 }
 
 const configsMapping = {
