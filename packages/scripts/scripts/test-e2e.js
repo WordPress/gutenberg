@@ -65,6 +65,10 @@ if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
 	process.env.PUPPETEER_DEVTOOLS = 'true';
 }
 
+if ( hasArgInCLI( '--puppeteer-product' ) ) {
+	process.env.PUPPETEER_PRODUCT = getArgFromCLI( '--puppeteer-product' );
+}
+
 const configsMapping = {
 	WP_BASE_URL: '--wordpress-base-url',
 	WP_USERNAME: '--wordpress-username',

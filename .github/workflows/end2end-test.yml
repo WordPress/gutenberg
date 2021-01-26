@@ -11,13 +11,14 @@ on:
 
 jobs:
   admin:
-    name: Admin - ${{ matrix.part }}
+    name: Admin - ${{ matrix.part }} in ${{ matrix.browser }}
 
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
+        browser: ['chrome', 'firefox']
         part: [1, 2, 3, 4]
 
 
@@ -47,6 +48,10 @@ jobs:
         npm ci
         FORCE_REDUCED_MOTION=true npm run build
 
+    - name: "Install Puppeteer with ${{ matrix.browser }}"
+      if: matrix.browser != 'chrome'
+      run: PUPPETEER_PRODUCT=${{ matrix.browser }} npm install puppeteer
+
     - name: Install WordPress
       run: |
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
@@ -55,7 +60,7 @@ jobs:
     - name: Running the tests
       run: |
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
+        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests ) -- --puppeteer-product=${{ matrix.browser }}
 
     - name: Archive debug artifacts (screenshots, HTML snapshots)
       uses: actions/upload-artifact@v2
