@@ -71,19 +71,6 @@ export const searchBlockItems = (
 			find( categories, { slug: item.category } )?.title,
 		getCollection: ( item ) =>
 			collections[ item.name.split( '/' )[ 0 ] ]?.title,
-		getVariations: ( { variations = [] } ) =>
-			Array.from(
-				variations.reduce(
-					( accumulator, { title, keywords = [] } ) => {
-						accumulator.add( title );
-						keywords.forEach( ( keyword ) =>
-							accumulator.add( keyword )
-						);
-						return accumulator;
-					},
-					new Set()
-				)
-			),
 	};
 
 	return searchItems( items, searchInput, config );
