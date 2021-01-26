@@ -188,13 +188,13 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	);
 	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
 
-	spinner.prefixText = `MySQL is listening on port ${ mySQLPort }`
-		.concat( 'WordPress development site started' )
+	spinner.prefixText = 'WordPress development site started'
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( 'WordPress test site started' )
 		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
 		.concat( '\n' )
+		.concat( `MySQL is listening on port ${ mySQLPort }` )
 		.concat( '\n' );
 
 	spinner.text = 'Done!';
