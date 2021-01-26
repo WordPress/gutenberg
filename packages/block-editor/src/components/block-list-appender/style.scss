@@ -2,10 +2,8 @@
 // Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
 	margin: 0 0 0 $grid-unit-10;
-	display: inline-flex;
 	align-self: center;
 	height: $icon-size;
-	width: $icon-size;
 	padding: 0;
 
 	.block-editor-default-block-appender {
@@ -20,6 +18,11 @@
 		transition: all 0.1s ease;
 		@include reduce-motion("transition");
 	}
+}
+
+// For vertical flex containers, a 100% width ensures correct alignment.
+.is-vertical .block-list-appender {
+	width: 100%;
 }
 
 .block-list-appender > .block-editor-inserter {
