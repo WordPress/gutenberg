@@ -1,3 +1,6 @@
+// This variable is repeated across Button, Buttons, and Buttons editor styles.
+$blocks-block__margin: 0.5em;
+
 .wp-block-buttons {
 	display: flex;
 	flex-direction: row;
@@ -18,8 +21,8 @@
 	> .wp-block-button {
 		display: inline-block;
 		/*rtl:ignore*/
-		margin-right: $button-margin;
-		margin-bottom: $button-margin;
+		margin-right: $blocks-block__margin;
+		margin-bottom: $blocks-block__margin;
 
 		&:last-child {
 			/*rtl:ignore*/
@@ -46,7 +49,7 @@
 
 		> .wp-block-button {
 			/*rtl:ignore*/
-			margin-left: $button-margin;
+			margin-left: $blocks-block__margin;
 			/*rtl:ignore*/
 			margin-right: 0;
 
@@ -69,7 +72,7 @@
 		/*rtl:ignore*/
 		margin-left: 0;
 		/*rtl:ignore*/
-		margin-right: $button-margin;
+		margin-right: $blocks-block__margin;
 
 		&:last-child {
 			/*rtl:ignore*/
@@ -80,7 +83,7 @@
 		/*rtl:ignore*/
 		margin-right: 0;
 		/*rtl:ignore*/
-		margin-left: $button-margin;
+		margin-left: $blocks-block__margin;
 
 		&:first-child {
 			/*rtl:ignore*/
