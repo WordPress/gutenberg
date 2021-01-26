@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- Image block: Allow setting the `crossOrigin` ([#](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin), [#](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image)) attribute for the image editor's `<img>` element using the `media.crossOrigin` filter (to allow it to work with foreign-origin images).
+
 ## 2.27.0 (2020-12-17)
 
 ### Enhancement
