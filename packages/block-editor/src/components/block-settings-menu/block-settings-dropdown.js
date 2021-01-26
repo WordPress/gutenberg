@@ -141,7 +141,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert Before' ) }
+											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ flow(
@@ -150,7 +150,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert After' ) }
+											{ __( 'Insert after' ) }
 										</MenuItem>
 									</>
 								) }
@@ -158,7 +158,7 @@ export function BlockSettingsDropdown( {
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
-										{ __( 'Move To' ) }
+										{ __( 'Move to' ) }
 									</MenuItem>
 								) }
 								{ count === 1 && (

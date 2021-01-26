@@ -37,12 +37,16 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
 			{ ( fills ) => {
-				return (
-					<MenuGroup>
-						{ fills }
-						<ConvertToGroupButton onClose={ fillProps?.onClose } />
-					</MenuGroup>
-				);
+				if ( fills.length > 0 ) {
+					return (
+						<MenuGroup>
+							{ fills }
+							<ConvertToGroupButton
+								onClose={ fillProps?.onClose }
+							/>
+						</MenuGroup>
+					);
+				}
 			} }
 		</Slot>
 	);
