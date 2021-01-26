@@ -126,12 +126,14 @@ export class BlockList extends Component {
 			contentStyle,
 			renderAppender,
 		} = this.props;
+		const { blockWidth } = this.state;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
-			this.extraData.renderAppender !== renderAppender
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockWidth !== blockWidth
 		) {
 			this.extraData = {
 				parentWidth,
@@ -139,6 +141,7 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				blockWidth,
 			};
 		}
 		return this.extraData;
