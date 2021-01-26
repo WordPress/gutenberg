@@ -1736,6 +1736,17 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+const __experimentalGetParsedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return map( patterns, ( pattern ) => ( {
+			...pattern,
+			contentBlocks: parse( pattern.content ),
+		} ) );
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
 /**
  * Returns the list of allowed patterns for inner blocks children
  *
@@ -1746,15 +1757,14 @@ export const __experimentalGetAllowedBlocks = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
+		const patterns = __experimentalGetParsedPatterns( state );
 
 		if ( ! rootClientId ) {
 			return patterns;
 		}
 
-		const patternsAllowed = filter( patterns, ( { content } ) => {
-			const blocks = parse( content );
-			return every( blocks, ( { name } ) =>
+		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
+			return every( contentBlocks, ( { name } ) =>
 				canInsertBlockType( state, name, rootClientId )
 			);
 		} );
@@ -1763,10 +1773,10 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
 	]
 );
 
