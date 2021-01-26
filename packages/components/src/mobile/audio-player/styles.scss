@@ -1,6 +1,5 @@
 .container {
 	background-color: $light-ultra-dim;
-	padding: 12px 16px;
 	border-radius: 4px;
 	flex-direction: row;
 	align-items: center;
@@ -18,9 +17,10 @@
 
 .iconContainer {
 	background-color: $light-ultra-dim;
+	margin: 12px 16px;
 	align-items: center;
 	justify-content: center;
-	@include circle(36px);
+	@include circle(37px);
 }
 
 .iconContainerDark {
@@ -48,8 +48,16 @@
 }
 
 .titleContainer {
+	margin-right: 16px;
 	flex: 1;
-	margin: 0 12px;
+}
+
+.titleContainerIOS {
+	margin-top: -1px;
+}
+
+.titleContainerAndroid {
+	margin-top: -2px;
 }
 
 .title {
@@ -81,6 +89,14 @@
 	font-size: 17;
 	font-weight: 500;
 	color: $blue-wordpress;
+}
+
+.buttonTextIOS {
+	margin-top: 1px;
+}
+
+.buttonTextAndroid {
+	margin-top: -2px;
 }
 
 .errorIcon {

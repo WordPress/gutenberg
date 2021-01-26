@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { Text, TouchableWithoutFeedback, Linking, Alert } from 'react-native';
+import {
+	Text,
+	TouchableWithoutFeedback,
+	Linking,
+	Alert,
+	Platform,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -16,6 +22,8 @@ import { audio, warning } from '@wordpress/icons';
  * Internal dependencies
  */
 import styles from './styles.scss';
+
+const isIOS = Platform.OS === 'ios';
 
 function Player( {
 	getStylesFromColorScheme,
@@ -70,6 +78,11 @@ function Player( {
 		styles.iconContainerDark
 	);
 
+	const titleContainerStyle = {
+		...styles.titleContainer,
+		...( isIOS ? styles.titleContainerIOS : styles.titleContainerAndroid ),
+	};
+
 	const titleStyle = getStylesFromColorScheme(
 		styles.title,
 		styles.titleDark
@@ -88,6 +101,11 @@ function Player( {
 	const finalSubtitleStyle = {
 		...subtitleStyle,
 		...( isUploadFailed && uploadFailedStyle ),
+	};
+
+	const buttonTextStyle = {
+		...styles.buttonText,
+		...( isIOS ? styles.buttonTextIOS : styles.buttonTextAndroid ),
 	};
 
 	let title = '';
@@ -118,7 +136,7 @@ function Player( {
 			<View style={ iconContainerStyle }>
 				<Icon icon={ audio } style={ finalIconStyle } size={ 24 } />
 			</View>
-			<View style={ styles.titleContainer }>
+			<View style={ titleContainerStyle }>
 				<Text style={ titleStyle }>{ title }</Text>
 				<View style={ styles.subtitleContainer }>
 					{ isUploadFailed && (
@@ -145,7 +163,7 @@ function Player( {
 					) }
 					onPress={ onPressListen }
 				>
-					<Text style={ styles.buttonText }>{ __( 'Listen' ) }</Text>
+					<Text style={ buttonTextStyle }>{ __( 'Listen' ) }</Text>
 				</TouchableWithoutFeedback>
 			) }
 		</View>
