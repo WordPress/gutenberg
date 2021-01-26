@@ -44,9 +44,11 @@ export default function QuickInserter( {
 		onInsertBlocks
 	);
 
-	const [ patterns ] = usePatternsState( onInsertBlocks );
-	const showPatterns =
-		! destinationRootClientId && patterns.length && !! filterValue;
+	const [ patterns ] = usePatternsState(
+		onInsertBlocks,
+		destinationRootClientId
+	);
+	const showPatterns = patterns.length && !! filterValue;
 	const showSearch =
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
