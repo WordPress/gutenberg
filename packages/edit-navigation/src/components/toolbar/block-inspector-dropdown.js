@@ -9,6 +9,7 @@ import { BlockInspector } from '@wordpress/block-editor';
 export default function BlockInspectorDropdown() {
 	return (
 		<Dropdown
+			contentClassName={ 'edit-navigation-toolbar__component-popover' }
 			position="bottom left"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button

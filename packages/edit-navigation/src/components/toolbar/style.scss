@@ -40,3 +40,8 @@
 .edit-navigation-toolbar__save-button {
 	margin: 0 $grid-unit-10 0 auto;
 }
+
+
+.edit-navigation-toolbar__component-popover .components-popover__content {
+	width: $navigation-editor-toolbar-width;
+}

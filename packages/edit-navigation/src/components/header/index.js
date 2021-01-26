@@ -56,6 +56,9 @@ export default function Header( {
 				</h2>
 
 				<DropdownMenu
+					contentClassName={
+						'edit-navigation-header__component-popover'
+					}
 					icon={ null }
 					toggleProps={ {
 						showTooltip: false,
@@ -84,6 +87,9 @@ export default function Header( {
 
 				<Dropdown
 					position="bottom center"
+					contentClassName={
+						'edit-navigation-header__component-popover'
+					}
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
 							isTertiary
@@ -102,7 +108,7 @@ export default function Header( {
 				/>
 
 				<Dropdown
-					contentClassName="edit-navigation-header__manage-locations"
+					contentClassName="edit-navigation-header__manage-locations edit-navigation-header__component-popover"
 					position="bottom center"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button

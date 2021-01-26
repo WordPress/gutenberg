@@ -41,3 +41,7 @@
 	display: block;
 	margin: $grid-unit-20 auto;
 }
+
+.edit-navigation-header__component-popover .components-popover__content {
+	width: $navigation-editor-toolbar-width;
+}
