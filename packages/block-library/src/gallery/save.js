@@ -20,17 +20,17 @@ export default function save( { attributes } ) {
 	}`;
 
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
-			<ul className="blocks-gallery-grid">
+		<div { ...useBlockProps.save( { className } ) }>
+			<figure className="blocks-gallery-grid">
 				<InnerBlocks.Content />
-			</ul>
-			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content
-					tagName="figcaption"
-					className="blocks-gallery-caption"
-					value={ caption }
-				/>
-			) }
-		</figure>
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						tagName="figcaption"
+						className="blocks-gallery-caption"
+						value={ caption }
+					/>
+				) }
+			</figure>
+		</div>
 	);
 }
