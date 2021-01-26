@@ -94,6 +94,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 
 		const imgCrossOrigin = applyFilters(
 			'gutenberg.imageTransform.crossOrigin',
+			undefined,
 			url
 		);
 		if ( typeof imgCrossOrigin === 'string' ) {
