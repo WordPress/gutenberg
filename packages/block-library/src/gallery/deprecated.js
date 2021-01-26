@@ -191,7 +191,7 @@ const v1 = {
 				sizeSlug,
 				imageCount: imageBlocks.length,
 				allowResize: false,
-				isListItem: true,
+				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -475,7 +475,7 @@ const v3 = {
 				sizeSlug,
 				imageCount: imageBlocks.length,
 				allowResize: false,
-				isListItem: true,
+				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -571,7 +571,7 @@ const v4 = {
 				sizeSlug,
 				imageCount: imageBlocks.length,
 				allowResize: false,
-				isListItem: true,
+				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -761,7 +761,7 @@ const v5 = {
 				sizeSlug: attributes.sizeSlug,
 				imageCount: imageBlocks.length,
 				allowResize: false,
-				isListItem: true,
+				isGrouped: true,
 			},
 			imageBlocks,
 		];
@@ -1022,7 +1022,7 @@ const v6 = {
 				sizeSlug,
 				imageCount: imageBlocks.length,
 				allowResize: false,
-				isListItem: true,
+				isGrouped: true,
 			},
 			imageBlocks,
 		];
