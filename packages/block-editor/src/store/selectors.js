@@ -1402,6 +1402,7 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 	icon: variation.icon || item.icon,
 	title: variation.title || item.title,
 	description: variation.description || item.description,
+	category: variation.category || item.category,
 	// If `example` is explicitly undefined for the variation, the preview will not be shown.
 	example: variation.hasOwnProperty( 'example' )
 		? variation.example
