@@ -46,7 +46,7 @@ function ComboboxControl( {
 	label,
 	options,
 	onChange,
-	onFilterValueChange,
+	onFilterValueChange = () => {},
 	hideLabelFromVision,
 	help,
 	allowReset = true,
