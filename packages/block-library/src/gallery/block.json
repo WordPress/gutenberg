@@ -49,7 +49,10 @@
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
-		"isListItem": "isListItem"
+		"isListItem": "isListItem",
+		"linkTo": "linkTo",
+		"linkTarget": "linkTarget",
+		"sizeSlug": "sizeSlug"
 	},
 	"supports": {
 		"anchor": true,

@@ -2,15 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import {
-	isEqual,
-	isEmpty,
-	find,
-	concat,
-	differenceBy,
-	some,
-	every,
-} from 'lodash';
+import { isEmpty, concat, differenceBy, some, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +10,6 @@ import {
 import { compose } from '@wordpress/compose';
 import {
 	BaseControl,
-	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -31,7 +22,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
+import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -44,7 +35,7 @@ import { createBlobURL } from '@wordpress/blob';
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
-import { getHrefAndDestination, getImageSizeAttributes } from './utils';
+import { getHrefAndDestination } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
 import {
@@ -100,28 +91,7 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
-	const currentImageOptions = useMemo(
-		() => ( {
-			linkTarget,
-			linkTo,
-			sizeSlug,
-		} ),
-		[ linkTarget, linkTo, sizeSlug ]
-	);
-	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
-	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
-
-	useEffect( () => {
-		const currentOptionsState = ! isEqual(
-			currentImageOptions,
-			imageSettings
-		);
-		if ( currentOptionsState !== dirtyImageOptions ) {
-			setDirtyImageOptions( currentOptionsState );
-		}
-	}, [ currentImageOptions, imageSettings ] );
-
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
+	const { getSettings, preferredStyle } = useSelect( ( select ) => {
 		const settings = select( 'core/block-editor' ).getSettings();
 		const preferredStyleVariations =
 			settings.__experimentalPreferredStyleVariations;
@@ -187,9 +157,7 @@ function GalleryEdit( props ) {
 		getSettings
 	);
 
-	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
-		'core/block-editor'
-	);
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
 	/**
 	 * Determines the image attributes that should be applied to an image block
@@ -262,6 +230,11 @@ function GalleryEdit( props ) {
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
 				...buildImageAttributes( false, image ),
+				inheritedAttributes: {
+					linkDestination: true,
+					linkTarget: true,
+					sizeSlug: true,
+				},
 				id: image.id,
 			} );
 		} );
@@ -297,25 +270,6 @@ function GalleryEdit( props ) {
 
 	function toggleOpenInNewTab() {
 		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
-	}
-
-	function applyImageOptions() {
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
-				: null;
-			updateBlockAttributes( block.clientId, {
-				...getHrefAndDestination( image.data, linkTo ),
-				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
-				...getImageSizeAttributes( image.data, sizeSlug ),
-			} );
-		} );
-		setDirtyImageOptions( false );
-		setImageSettings( currentImageOptions );
-	}
-
-	function cancelImageOptions() {
-		setAttributes( imageSettings );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
@@ -430,20 +384,6 @@ function GalleryEdit( props ) {
 								{ __( 'Loading options…' ) }
 							</View>
 						</BaseControl>
-					) }
-					{ dirtyImageOptions && (
-						<View className={ 'gallery-settings-buttons' }>
-							<Button isPrimary onClick={ applyImageOptions }>
-								{ __( 'Apply to all images' ) }
-							</Button>
-							<Button
-								className={ 'cancel-apply-to-images' }
-								isLink
-								onClick={ cancelImageOptions }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-						</View>
 					) }
 				</PanelBody>
 			</InspectorControls>
