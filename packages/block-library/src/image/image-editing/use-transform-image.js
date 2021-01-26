@@ -93,7 +93,7 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		el.onload = editImage;
 
 		const imgCrossOrigin = applyFilters(
-			'gutenberg.imageTransform.crossOrigin',
+			'media.crossOrigin',
 			undefined,
 			url
 		);
