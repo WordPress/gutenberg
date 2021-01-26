@@ -20,7 +20,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
-	UnitControl,
+	SelectControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -43,23 +43,33 @@ const MIN_WIDTH = 40;
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
 		// Check if we are toggling the width off
-		const width = selectedWidth === newWidth ? undefined : newWidth;
-
+		let width = selectedWidth === newWidth ? undefined : newWidth;
+		if( newWidth === 'auto') {
+			width = undefined;
+		}
 		// Update attributes
 		setAttributes( { width } );
 	}
 
+	const options = [
+		{ value: 'auto', label: 'Auto'},
+		{ value: '25', label: '25%'},
+		{ value: '50', label: '50%'},
+		{ value: '75', label: '75%'},
+		{ value: '100', label: '100%'},
+	]
+
+	if ( ! selectedWidth ) {
+		selectedWidth = 'auto';
+	}
+
 	return (
 		<PanelBody title={ __( 'Width Settings' ) }>
-			<UnitControl
-				label={ __( 'Width Settings' ) }
-				min={ 1 }
-				max={ 100 }
-				onChange={ handleChange }
-				decimalNum={ 1 }
+			<SelectControl
+				label={ __( 'Width' ) }
 				value={ selectedWidth }
-				unit={ '%' }
-				disabledUnits={ true }
+				onChange={ handleChange }
+				options={ options }
 			/>
 		</PanelBody>
 	);
