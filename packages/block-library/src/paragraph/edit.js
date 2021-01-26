@@ -72,6 +72,7 @@ function ParagraphBlock( {
 	onReplace,
 	onRemove,
 	setAttributes,
+	clientId,
 } ) {
 	const {
 		align,
@@ -85,10 +86,14 @@ function ParagraphBlock( {
 	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
 	const ref = useRef();
 	const inlineFontSize = style?.fontSize;
-	const size = useSelect(
+	const { size, block } = useSelect(
 		( select ) => {
-			const { fontSizes } = select( 'core/block-editor' ).getSettings();
-			return getFontSize( fontSizes, fontSize, inlineFontSize ).size;
+			const { getBlock, getSettings } = select( 'core/block-editor' );
+			const { fontSizes } = getSettings();
+			return {
+				size: getFontSize( fontSizes, fontSize, inlineFontSize ).size,
+				block: getBlock( clientId ),
+			};
 		},
 		[ fontSize, inlineFontSize ]
 	);
@@ -147,7 +152,16 @@ function ParagraphBlock( {
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
 				}
-				onSplit={ ( value ) => {
+				onSplit={ ( value, keepId ) => {
+					if ( keepId ) {
+						return {
+							...block,
+							attributes: {
+								...block.attributes,
+								content: value || '',
+							},
+						};
+					}
 					if ( ! value ) {
 						return createBlock( name );
 					}
