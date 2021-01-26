@@ -24,50 +24,43 @@ export default function useParentAttributes(
 	setAttributes
 ) {
 	const {
-		isGrouped,
 		linkTo: parentLinkDestination,
 		linkTarget: parentLinkTarget,
 		sizeSlug: parentSizeSlug,
 	} = context;
 
 	useEffect( () => {
-		if ( ! isGrouped ) {
+		if ( ! inheritedAttributes.linkDestination ) {
 			return;
 		}
-		if ( inheritedAttributes.linkDestination && image ) {
+		if ( image ) {
 			const href = getUrl( image, parentLinkDestination );
 			setAttributes( {
 				href,
 				linkDestination: parentLinkDestination,
 			} );
 		}
-	}, [ image, parentLinkDestination, isGrouped ] );
+	}, [ image, parentLinkDestination ] );
 
 	useEffect( () => {
-		if ( ! isGrouped ) {
-			return;
-		}
-		if ( inheritedAttributes.linkTarget ) {
-			setAttributes( {
-				linkTarget: parentLinkTarget,
-			} );
-		}
-	}, [ parentLinkTarget, isGrouped ] );
-
-	useEffect( () => {
-		if ( ! isGrouped ) {
+		if ( ! inheritedAttributes.linkTarget ) {
 			return;
 		}
 
-		if ( inheritedAttributes.sizeSlug ) {
-			const sizeAttributes = getImageSizeAttributes(
-				image,
-				parentSizeSlug
-			);
+		setAttributes( {
+			linkTarget: parentLinkTarget,
+		} );
+	}, [ parentLinkTarget ] );
 
-			setAttributes( {
-				...sizeAttributes,
-			} );
+	useEffect( () => {
+		if ( ! inheritedAttributes.sizeSlug ) {
+			return;
 		}
-	}, [ parentSizeSlug, isGrouped ] );
+
+		const sizeAttributes = getImageSizeAttributes( image, parentSizeSlug );
+
+		setAttributes( {
+			...sizeAttributes,
+		} );
+	}, [ parentSizeSlug ] );
 }
