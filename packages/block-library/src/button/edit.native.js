@@ -44,7 +44,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
 		// Check if we are toggling the width off
 		let width = selectedWidth === newWidth ? undefined : newWidth;
-		if( newWidth === 'auto') {
+		if ( newWidth === 'auto' ) {
 			width = undefined;
 		}
 		// Update attributes
@@ -52,12 +52,12 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	}
 
 	const options = [
-		{ value: 'auto', label: 'Auto'},
-		{ value: '25', label: '25%'},
-		{ value: '50', label: '50%'},
-		{ value: '75', label: '75%'},
-		{ value: '100', label: '100%'},
-	]
+		{ value: 'auto', label: __( 'Auto' ) },
+		{ value: '25', label: '25%' },
+		{ value: '50', label: '50%' },
+		{ value: '75', label: '75%' },
+		{ value: '100', label: '100%' },
+	];
 
 	if ( ! selectedWidth ) {
 		selectedWidth = 'auto';
