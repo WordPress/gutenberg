@@ -67,10 +67,10 @@ export function useEventHandlers( ref, clientId ) {
 				selectBlock( clientId );
 			}
 
-			ref.current.addEventListener( 'focus', onFocus, true );
+			ref.current.addEventListener( 'focusin', onFocus );
 
 			return () => {
-				ref.current.removeEventListener( 'focus', onFocus, true );
+				ref.current.removeEventListener( 'focusin', onFocus );
 			};
 		}
 

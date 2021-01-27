@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/eslint-plugin --save-dev
 ```
 
-**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires `node` 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
 
 ## Usage
 

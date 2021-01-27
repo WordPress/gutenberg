@@ -19,14 +19,12 @@ module.exports = {
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
-		'<rootDir>/test/unit/config/register-context.js',
 	],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
-		'<rootDir>/wordpress/',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+.native.js$',

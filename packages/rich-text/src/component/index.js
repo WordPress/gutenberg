@@ -174,6 +174,8 @@ function RichText(
 	} = useFormatTypes( {
 		clientId,
 		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
@@ -1102,10 +1104,6 @@ function RichText(
 		<>
 			{ isSelected && (
 				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
 					value={ record.current }
 					onChange={ handleChange }
 					onFocus={ focus }

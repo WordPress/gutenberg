@@ -16,6 +16,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockManagerCategory from './category';
+import { store as editPostStore } from '../../store';
 
 function BlockManager( {
 	search,
@@ -104,7 +105,7 @@ export default compose( [
 			hasBlockSupport,
 			isMatchingSearchTerm,
 		} = select( blocksStore );
-		const { getPreference } = select( 'core/edit-post' );
+		const { getPreference } = select( editPostStore );
 		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
 		const numberOfHiddenBlocks =
 			isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;

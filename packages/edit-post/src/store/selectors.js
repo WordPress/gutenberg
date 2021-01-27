@@ -8,7 +8,7 @@ import { get, includes, some, flatten, values } from 'lodash';
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
-
+import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Returns the current editing mode.
  *
@@ -30,7 +30,7 @@ export function getEditorMode( state ) {
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar = select(
-			'core/interface'
+			interfaceStore
 		).getActiveComplementaryArea( 'core/edit-post' );
 		return includes(
 			[ 'edit-post/document', 'edit-post/block' ],
@@ -48,7 +48,7 @@ export const isEditorSidebarOpened = createRegistrySelector(
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar = select(
-			'core/interface'
+			interfaceStore
 		).getActiveComplementaryArea( 'core/edit-post' );
 		return (
 			!! activeGeneralSidebar &&
@@ -76,7 +76,7 @@ export const isPluginSidebarOpened = createRegistrySelector(
  */
 export const getActiveGeneralSidebarName = createRegistrySelector(
 	( select ) => () => {
-		return select( 'core/interface' ).getActiveComplementaryArea(
+		return select( interfaceStore ).getActiveComplementaryArea(
 			'core/edit-post'
 		);
 	}
@@ -201,7 +201,7 @@ export function isFeatureActive( state, feature ) {
  */
 export const isPluginItemPinned = createRegistrySelector(
 	( select ) => ( pluginName ) => {
-		return select( 'core/interface' ).isItemPinned(
+		return select( interfaceStore ).isItemPinned(
 			'core/edit-post',
 			pluginName
 		);

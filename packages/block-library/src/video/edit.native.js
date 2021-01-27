@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -49,7 +49,7 @@ const ICON_TYPE = {
 	UPLOAD: 'upload',
 };
 
-class VideoEdit extends React.Component {
+class VideoEdit extends Component {
 	constructor( props ) {
 		super( props );
 

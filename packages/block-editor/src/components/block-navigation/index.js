@@ -36,23 +36,14 @@ function BlockNavigation( {
 			<p className="block-editor-block-navigation__label">
 				{ __( 'List view' ) }
 			</p>
-			{ hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ [ rootBlock ] }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalFeatures={ __experimentalFeatures }
-					showNestedBlocks
-				/>
-			) }
-			{ ! hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ rootBlocks }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalFeatures={ __experimentalFeatures }
-				/>
-			) }
+
+			<BlockNavigationTree
+				blocks={ hasHierarchy ? [ rootBlock ] : rootBlocks }
+				selectedBlockClientId={ selectedBlockClientId }
+				selectBlock={ selectBlock }
+				__experimentalFeatures={ __experimentalFeatures }
+				showNestedBlocks
+			/>
 		</div>
 	);
 }

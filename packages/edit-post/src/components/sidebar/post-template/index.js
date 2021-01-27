@@ -18,20 +18,24 @@ function PostTemplate() {
 	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
-			__unstableIsAutodraftPost,
 			getCurrentPostType,
+			getCurrentPost,
 		} = select( editorStore );
-		const { __experimentalGetTemplateForLink } = select( coreStore );
+		const { __experimentalGetTemplateForLink, getPostType } = select(
+			coreStore
+		);
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
 		const isFSEEnabled = select( editorStore ).getEditorSettings()
 			.isFSETheme;
+		const isViewable =
+			getPostType( getCurrentPostType() )?.viewable ?? false;
 		return {
 			template:
 				isFSEEnabled &&
+				isViewable &&
 				link &&
-				! __unstableIsAutodraftPost() &&
-				getCurrentPostType() !== 'wp_template'
+				getCurrentPost().status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( link )
 					: null,
 			isEditing: isEditingTemplate(),

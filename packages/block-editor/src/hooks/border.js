@@ -46,7 +46,7 @@ export function hasBorderSupport( blockName ) {
 
 	// Further border properties to be added in future iterations.
 	// e.g. support && ( support.radius || support.width || support.style )
-	return true === support || ( support && support.radius );
+	return !! ( true === support || support?.radius );
 }
 
 /**
@@ -63,5 +63,5 @@ const useIsBorderDisabled = ( props = {} ) => {
 	//		useIsBorderWidthDisabled( props ),
 	// ];
 	const configs = [ useIsBorderRadiusDisabled( props ) ];
-	return configs.filter( Boolean ).length === configs.length;
+	return configs.every( Boolean );
 };

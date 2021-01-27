@@ -148,7 +148,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
 
 	log( '>> Building the ' + formats.success( branch ) + ' branch' );
 	await runShellScript(
-		'rm -rf node_modules && npm install && npm run build',
+		'rm -rf node_modules packages/*/node_modules && npm install && npm run build',
 		environmentDirectory
 	);
 }
@@ -205,8 +205,8 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {WPPerformanceCommandOptions} options Command options.
  * @param {string[]}                    branches Branches to compare
+ * @param {WPPerformanceCommandOptions} options Command options.
  */
 async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.

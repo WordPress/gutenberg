@@ -11,7 +11,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 	await clickMenuItem( buttonLabel );
 };
 

@@ -10,7 +10,7 @@ import { Component, createRef } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
-	WIDE_ALIGNMENTS,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -97,7 +97,7 @@ class BlockListBlock extends Component {
 		this.getBlockWidth = this.getBlockWidth.bind( this );
 
 		this.state = {
-			blockWidth: 0,
+			blockWidth: this.props.blockWidth,
 		};
 
 		this.anchorNodeRef = createRef();
@@ -121,10 +121,19 @@ class BlockListBlock extends Component {
 
 	getBlockWidth( { nativeEvent } ) {
 		const { layout } = nativeEvent;
-		const { blockWidth } = this.state;
+		const { marginHorizontal, blockWidth } = this.props;
 
-		if ( blockWidth !== layout.width ) {
-			this.setState( { blockWidth: layout.width } );
+		if ( ! blockWidth ) {
+			return;
+		}
+
+		const spacing = 2 * marginHorizontal;
+		const layoutWidth = Math.floor( layout.width );
+
+		if ( blockWidth - spacing !== layoutWidth ) {
+			if ( this.state.blockWidth !== layoutWidth ) {
+				this.setState( { blockWidth: layoutWidth } );
+			}
 		}
 	}
 
@@ -166,12 +175,12 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
+			name,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
 			return null;
 		}
-
 		const { blockWidth } = this.state;
 		const { align } = attributes;
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -179,10 +188,12 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-
+		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
-		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const isScreenWidthEqual = blockWidth === screenWidth;
+		const isScreenWidthWider = blockWidth < screenWidth;
+		const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 
 		return (
 			<TouchableWithoutFeedback
@@ -207,9 +218,13 @@ class BlockListBlock extends Component {
 								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
-									isFullWidth &&
-										blockWidth < screenWidth &&
+									isFullWidth( align ) &&
+										isScreenWidthWider &&
 										styles.borderFullWidth,
+									isFullWidth( align ) &&
+										isContainerRelated( name ) &&
+										isScreenWidthWider &&
+										styles.containerBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -237,7 +252,13 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<View
-							style={ styles.neutralToolbar }
+							style={ [
+								styles.neutralToolbar,
+								! isFullWidthToolbar &&
+									isContainerRelated( name ) &&
+									isWider( screenWidth, 'mobile' ) &&
+									styles.containerToolbar,
+							] }
 							ref={ this.anchorNodeRef }
 						>
 							{ isSelected && (
@@ -249,7 +270,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={ isFullWidth }
+									isFullWidth={ isFullWidthToolbar }
 								/>
 							) }
 						</View>

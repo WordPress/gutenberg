@@ -7,6 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+/**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
  * If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
  *
@@ -81,7 +86,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
 		};

@@ -102,8 +102,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                 }
             case .other, .any:
                  callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
-            default:
-                break
+            case .audio:
+                callback([MediaInfo(id: 5, url: "https://cldup.com/59IrU0WJtq.mp3", type: "audio", caption: "Summer presto")])
             }
         case .deviceLibrary:
             print("Gutenberg did request a device media picker, opening the device picker")
@@ -225,12 +225,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
-        return false;
-    }
-
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
-        print("Gutenberg requested setting tooltip flag")
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
     }
 
     func gutenbergDidRequestMediaSaveSync() {
@@ -298,6 +294,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,

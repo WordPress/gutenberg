@@ -15,6 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 	WIDE_ALIGNMENTS,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -73,6 +74,12 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+
+		this.onLayout = this.onLayout.bind( this );
+
+		this.state = {
+			blockWidth: this.props.blockWidth || 0,
+		};
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -137,6 +144,18 @@ export class BlockList extends Component {
 		return this.extraData;
 	}
 
+	onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+		const layoutWidth = Math.floor( layout.width );
+
+		if ( blockWidth !== layoutWidth ) {
+			this.setState( {
+				blockWidth: layoutWidth,
+			} );
+		}
+	}
+
 	render() {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
@@ -169,6 +188,8 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
+			contentResizeMode,
+			blockWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -185,10 +206,16 @@ export class BlockList extends Component {
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
+
+		const isContentStretch = contentResizeMode === 'stretch';
+		const isMultiBlocks = blockClientIds.length > 1;
+		const { isWider } = alignmentHelpers;
+
 		return (
 			<View
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
+				onLayout={ this.onLayout }
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -216,9 +243,13 @@ export class BlockList extends Component {
 					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
-					contentContainerStyle={
-						horizontal && styles.horizontalContentContainer
-					}
+					contentContainerStyle={ [
+						horizontal && styles.horizontalContentContainer,
+						isWider( blockWidth, 'medium' ) &&
+							( isContentStretch && isMultiBlocks
+								? styles.horizontalContentContainerStretch
+								: styles.horizontalContentContainerCenter ),
+					] }
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,
@@ -266,6 +297,7 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
+		const { blockWidth } = this.state;
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -284,6 +316,7 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
+				blockWidth={ blockWidth }
 			/>
 		);
 	}
@@ -301,6 +334,7 @@ export class BlockList extends Component {
 				<>
 					<TouchableWithoutFeedback
 						accessibilityLabel={ __( 'Add paragraph block' ) }
+						testID={ __( 'Add paragraph block' ) }
 						onPress={ () => {
 							this.addBlockToEndOfPost( paragraphBlock );
 						} }

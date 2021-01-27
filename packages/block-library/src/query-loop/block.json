@@ -6,7 +6,8 @@
 		"queryId",
 		"query",
 		"queryContext",
-		"layout"
+		"layout",
+		"templateSlug"
 	],
 	"supports": {
 		"reusable": false,

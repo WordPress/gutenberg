@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -71,6 +71,7 @@ function BlockPopover( {
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const blockNodes = useContext( BlockNodes );
+	const { stopTyping } = useDispatch( 'core/block-editor' );
 
 	// Controls when the side inserter on empty lines should
 	// be shown, including writing and selection modes.
@@ -94,6 +95,7 @@ function BlockPopover( {
 		'core/block-editor/focus-toolbar',
 		useCallback( () => {
 			setIsToolbarForced( true );
+			stopTyping( true );
 		}, [] ),
 		{
 			bindGlobal: true,
@@ -101,6 +103,12 @@ function BlockPopover( {
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
+
+	useEffect( () => {
+		if ( ! shouldShowContextualToolbar ) {
+			setIsToolbarForced( false );
+		}
+	}, [ shouldShowContextualToolbar ] );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
@@ -167,7 +175,13 @@ function BlockPopover( {
 		: 'top right left';
 	const stickyBoundaryElement = showEmptyBlockSideInserter
 		? undefined
-		: getScrollContainer( node ) || ownerDocument.body;
+		: // The sticky boundary element should be the boundary at which the
+		  // the block toolbar becomes sticky when the block scolls out of view.
+		  // In case of an iframe, this should be the iframe boundary, otherwise
+		  // the scroll container.
+		  ownerDocument.defaultView.frameElement ||
+		  getScrollContainer( node ) ||
+		  ownerDocument.body;
 
 	return (
 		<Popover
@@ -182,9 +196,6 @@ function BlockPopover( {
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
-			onFocusOutside={ () => {
-				setIsToolbarForced( false );
-			} }
 			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (

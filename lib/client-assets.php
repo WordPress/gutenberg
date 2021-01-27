@@ -95,6 +95,11 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
+	if ( 'wp-i18n' === $handle ) {
+		$ltr    = 'rtl' === _x( 'ltr', 'text direction', 'default' ) ? 'rtl' : 'ltr';
+		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
+		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
+	}
 }
 
 /**
@@ -234,6 +239,14 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		'4.17.19',
 		true
 	);
+
+	gutenberg_register_vendor_script(
+		$scripts,
+		'object-fit-polyfill',
+		'https://unpkg.com/objectFitPolyfill@2.3.0/dist/objectFitPolyfill.min.js',
+		array(),
+		'2.3.0'
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -303,7 +316,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
+		array( 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
@@ -579,7 +592,9 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_styles( $settings ) {
-	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$editor_styles_file = is_rtl() ?
+		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
+		gutenberg_dir_path() . 'build/editor/editor-styles.css';
 
 	/*
 	 * If, for whatever reason, the built editor styles do not exist, avoid
@@ -601,7 +616,9 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		 */
 
 		$default_styles = file_get_contents(
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+			is_rtl() ?
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
 		);
 
 		/*
@@ -640,7 +657,9 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
-	$editor_styles_file              = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$editor_styles_file              = is_rtl() ?
+		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
+		gutenberg_dir_path() . 'build/editor/editor-styles.css';
 	$settings['defaultEditorStyles'] = array(
 		array(
 			'css' => file_get_contents( $editor_styles_file ),
@@ -663,3 +682,66 @@ function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings )
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+
+/**
+ * Sets the editor styles to be consumed by JS.
+ */
+function gutenberg_extend_block_editor_styles_html() {
+	$handles = array(
+		'wp-block-editor',
+		'wp-block-library',
+		'wp-edit-blocks',
+	);
+
+	$block_registry = WP_Block_Type_Registry::get_instance();
+
+	foreach ( $block_registry->get_all_registered() as $block_type ) {
+		if ( ! empty( $block_type->style ) ) {
+			$handles[] = $block_type->style;
+		}
+
+		if ( ! empty( $block_type->editor_style ) ) {
+			$handles[] = $block_type->editor_style;
+		}
+	}
+
+	$handles = array_unique( $handles );
+	$done    = wp_styles()->done;
+
+	ob_start();
+
+	wp_styles()->done = array();
+	wp_styles()->do_items( $handles );
+	wp_styles()->done = $done;
+
+	$editor_styles = wp_json_encode( array( 'html' => ob_get_clean() ) );
+
+	echo "<script>window.__editorStyles = $editor_styles</script>";
+}
+add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
+
+/**
+ * Adds a polyfill for object-fit in environments which do not support it.
+ *
+ * The script registration occurs in `gutenberg_register_vendor_scripts`, which
+ * should be removed in coordination with this function.
+ *
+ * @see gutenberg_register_vendor_scripts
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
+ *
+ * @since 9.1.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_add_object_fit_polyfill( $scripts ) {
+	did_action( 'init' ) && $scripts->add_inline_script(
+		'wp-polyfill',
+		wp_get_script_polyfill(
+			$scripts,
+			array(
+				'"objectFit" in document.documentElement.style' => 'object-fit-polyfill',
+			)
+		)
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_add_object_fit_polyfill', 20 );

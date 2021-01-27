@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -20,11 +20,11 @@ import {
 	Icon,
 	PanelBody,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
 	WIDE_ALIGNMENTS,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -43,8 +43,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	external,
-	link,
 	image as placeholderIcon,
 	textColor,
 	replace,
@@ -63,7 +61,7 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
-export class ImageEdit extends React.Component {
+export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -338,6 +336,49 @@ export class ImageEdit extends React.Component {
 			: width;
 	}
 
+	getLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		const {
+			attributes: { href: url, ...unMappedAttributes },
+			setAttributes,
+		} = this.props;
+
+		const mappedAttributes = { ...unMappedAttributes, url };
+		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
+			href === undefined
+				? setAttributes( restAttributes )
+				: setAttributes( { ...restAttributes, href } );
+
+		const options = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
+
+		return (
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				attributes={ mappedAttributes }
+				onClose={ this.dismissSheet }
+				setAttributes={ setMappedAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				options={ options }
+				showIcon={ false }
+			/>
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -347,16 +388,7 @@ export class ImageEdit extends React.Component {
 			imageSizes,
 			clientId,
 		} = this.props;
-		const {
-			align,
-			url,
-			alt,
-			href,
-			id,
-			linkTarget,
-			sizeSlug,
-			className,
-		} = attributes;
+		const { align, url, alt, id, sizeSlug, className } = attributes;
 
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
@@ -387,27 +419,9 @@ export class ImageEdit extends React.Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) } />
 				<PanelBody style={ styles.panelBody }>
-					{ image && (
-						<BlockStyles clientId={ clientId } url={ url } />
-					) }
+					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
 				<PanelBody>
-					<TextControl
-						icon={ link }
-						label={ __( 'Link To' ) }
-						value={ href || '' }
-						valuePlaceholder={ __( 'Add URL' ) }
-						onChange={ this.onSetLinkDestination }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-					/>
-					<ToggleControl
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						checked={ linkTarget === '_blank' }
-						onChange={ this.onSetNewTab }
-					/>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
 							icon={ expand }
@@ -426,6 +440,9 @@ export class ImageEdit extends React.Component {
 						valuePlaceholder={ __( 'None' ) }
 						onChangeValue={ this.updateAlt }
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					{ this.getLinkSettings( true ) }
 				</PanelBody>
 			</InspectorControls>
 		);

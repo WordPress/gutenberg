@@ -1,7 +1,11 @@
 // These styles are only applied to the appender when it appears inside of a block.
 // Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
-	margin: $grid-unit-10 0;
+	margin: 0;
+
+	.block-editor-default-block-appender {
+		margin: $grid-unit-10 0;
+	}
 
 	// Animate appearance.
 	.block-list-appender__toggle {

@@ -17,6 +17,7 @@ export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbin
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outside';
 export { default as useInstanceId } from './hooks/use-instance-id';
+export { default as useIsomorphicLayoutEffect } from './hooks/use-isomorphic-layout-effect';
 export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';

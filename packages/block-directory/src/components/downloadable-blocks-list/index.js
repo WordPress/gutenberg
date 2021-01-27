@@ -7,6 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ import { store as blockDirectoryStore } from '../../store';
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 	const { installBlockType } = useDispatch( blockDirectoryStore );
-	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
+	const { setIsInserterOpened } = useDispatch( editPostStore );
 
 	if ( ! items.length ) {
 		return null;

@@ -57,7 +57,10 @@ function useDialog( options ) {
 			focusOnMountRef,
 			closeOnEscapeRef,
 		] ),
-		focusOutsideProps,
+		{
+			...focusOutsideProps,
+			tabIndex: '-1',
+		},
 	];
 }
 

@@ -19,6 +19,7 @@ import {
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 export const getWidgets = createRegistrySelector( ( select ) => () => {
 	const widgets = select( 'core' ).getEntityRecords(
@@ -38,7 +39,7 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
  */
 export const getWidget = createRegistrySelector(
 	( select ) => ( state, id ) => {
-		const widgets = select( 'core/edit-widgets' ).getWidgets();
+		const widgets = select( editWidgetsStoreName ).getWidgets();
 		return widgets[ id ];
 	}
 );
@@ -66,7 +67,7 @@ export const getWidgetIdForClientId = ( state, clientId ) => {
  */
 export const getWidgetAreaForClientId = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
-		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		for ( const widgetArea of widgetAreas ) {
 			const post = select( 'core' ).getEditedEntityRecord(
 				KIND,
@@ -83,7 +84,7 @@ export const getWidgetAreaForClientId = createRegistrySelector(
 
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
-		let widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		if ( ! widgetAreas ) {
 			return [];
 		}
@@ -119,7 +120,7 @@ export const getEditedWidgetAreas = createRegistrySelector(
 export const getReferenceWidgetBlocks = createRegistrySelector(
 	( select ) => ( state, referenceWidgetName = null ) => {
 		const results = [];
-		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		for ( const _widgetArea of widgetAreas ) {
 			const post = select( 'core' ).getEditedEntityRecord(
 				KIND,
@@ -142,7 +143,7 @@ export const getReferenceWidgetBlocks = createRegistrySelector(
 );
 
 export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
-	const widgetAreasIds = select( 'core/edit-widgets' )
+	const widgetAreasIds = select( editWidgetsStoreName )
 		.getWidgetAreas()
 		?.map( ( { id } ) => id );
 	if ( ! widgetAreasIds ) {
@@ -161,7 +162,7 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
 	}
 
 	const widgetIds = [
-		...Object.keys( select( 'core/edit-widgets' ).getWidgets() ),
+		...Object.keys( select( editWidgetsStoreName ).getWidgets() ),
 		undefined, // account for new widgets without an ID
 	];
 	for ( const id of widgetIds ) {

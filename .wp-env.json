@@ -3,7 +3,7 @@
 	"plugins": [
 		"."
 	],
-	"themes": [ "WordPress/theme-experiments/twentytwentyone-blocks" ],
+	"themes": [ "WordPress/theme-experiments/tt1-blocks" ],
 	"env": {
 		"tests": {
 			"mappings": {

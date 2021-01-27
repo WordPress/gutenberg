@@ -21,7 +21,10 @@ export async function changeSiteTimezone( timezone ) {
 		( element ) => element.options[ element.selectedIndex ].text
 	);
 	await page.select( '#timezone_string', timezone );
-	await page.click( '#submit' );
+	await Promise.all( [
+		page.click( '#submit' ),
+		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+	] );
 
 	await switchUserToTest();
 

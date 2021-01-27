@@ -96,11 +96,13 @@ _Usage_
 
 ```js
 const displayUrl = filterURLForDisplay( 'https://www.wordpress.org/gutenberg/' ); // wordpress.org/gutenberg
+const imageUrl = filterURLForDisplay( 'https://www.wordpress.org/wp-content/uploads/img.png', 20 ); // …ent/uploads/img.png
 ```
 
 _Parameters_
 
 -   _url_ `string`: Original URL.
+-   _maxLength_ `(number|null)`: URL length.
 
 _Returns_
 

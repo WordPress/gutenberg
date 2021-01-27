@@ -35,6 +35,7 @@ import {
 	ComplementaryArea,
 	FullscreenMode,
 	InterfaceSkeleton,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { close } from '@wordpress/icons';
@@ -55,6 +56,7 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import { store as editPostStore } from '../../store';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block library' ),
@@ -70,14 +72,14 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { settings } ) {
+function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		setIsInserterOpened,
-	} = useDispatch( 'core/edit-post' );
+	} = useDispatch( editPostStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -92,27 +94,28 @@ function Layout( { settings } ) {
 		isInserterOpened,
 		showIconLabels,
 		hasReducedUI,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		return {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
 			sidebarIsOpened: !! (
-				select( 'core/interface' ).getActiveComplementaryArea(
-					'core/edit-post'
-				) || select( 'core/edit-post' ).isPublishSidebarOpened()
+				select( interfaceStore ).getActiveComplementaryArea(
+					editPostStore.name
+				) || select( editPostStore ).isPublishSidebarOpened()
 			),
-			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+			isFullscreenActive: select( editPostStore ).isFeatureActive(
 				'fullscreenMode'
 			),
-			showMostUsedBlocks: select( 'core/edit-post' ).isFeatureActive(
+			showMostUsedBlocks: select( editPostStore ).isFeatureActive(
 				'mostUsedBlocks'
 			),
-			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations(
@@ -121,11 +124,14 @@ function Layout( { settings } ) {
 			nextShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
+			),
+			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
+				'showBlockBreadcrumbs'
 			),
 		};
 	}, [] );
@@ -170,7 +176,7 @@ function Layout( { settings } ) {
 	const ref = useRef();
 
 	useDrop( ref );
-	useEditorStyles( ref, settings.styles );
+	useEditorStyles( ref, styles );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
@@ -267,6 +273,7 @@ function Layout( { settings } ) {
 				}
 				footer={
 					! hasReducedUI &&
+					showBlockBreadcrumbs &&
 					! isMobileViewport &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (

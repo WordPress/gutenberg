@@ -5,8 +5,7 @@ import {
 	getMethodName,
 	defaultEntities,
 	getKindEntities,
-	getPostTypeTitle,
-	getPostTypePrePersistHandler,
+	prePersistPostType,
 } from '../entities';
 import { addEntities } from '../actions';
 
@@ -86,71 +85,13 @@ describe( 'getKindEntities', () => {
 	} );
 } );
 
-describe( 'getPostTypeTitle', () => {
-	it( 'should prefer the rendered value for titles for regular post types', async () => {
-		const record = {
-			id: 10,
-			title: {
-				rendered: 'My Title',
-			},
-		};
-		expect( getPostTypeTitle( 'post' )( record ) ).toBe( 'My Title' );
-	} );
-
-	it( "should fallback to the title if it's a string", async () => {
-		const record = {
-			id: 10,
-			title: 'My Title',
-		};
-		expect( getPostTypeTitle( 'post' )( record ) ).toBe( 'My Title' );
-	} );
-
-	it( 'should fallback to the id if no title provided', async () => {
-		const record = {
-			id: 10,
-		};
-		expect( getPostTypeTitle( 'post' )( record ) ).toBe( '10' );
-	} );
-
-	it( 'should prefer the rendered value for titles for templates', async () => {
-		const record = {
-			slug: 'single',
-			title: {
-				rendered: 'My Template',
-			},
-		};
-		expect( getPostTypeTitle( 'wp_template' )( record ) ).toBe(
-			'My Template'
-		);
-	} );
-
-	it( "should fallback to the title if it's a string for templates", async () => {
-		const record = {
-			slug: 'single',
-			title: 'My Template',
-		};
-		expect( getPostTypeTitle( 'wp_template' )( record ) ).toBe(
-			'My Template'
-		);
-	} );
-
-	it( 'should fallback to the slug if no title provided', async () => {
-		const record = {
-			slug: 'single',
-		};
-		expect( getPostTypeTitle( 'wp_template' )( record ) ).toBe( 'Single' );
-	} );
-} );
-
-describe( 'getPostTypePrePersistHandler', () => {
+describe( 'prePersistPostType', () => {
 	it( 'set the status to draft and empty the title when saving auto-draft posts', () => {
 		let record = {
 			status: 'auto-draft',
 		};
 		const edits = {};
-		expect(
-			getPostTypePrePersistHandler( 'post' )( record, edits )
-		).toEqual( {
+		expect( prePersistPostType( record, edits ) ).toEqual( {
 			status: 'draft',
 			title: '',
 		} );
@@ -158,17 +99,13 @@ describe( 'getPostTypePrePersistHandler', () => {
 		record = {
 			status: 'publish',
 		};
-		expect(
-			getPostTypePrePersistHandler( 'post' )( record, edits )
-		).toEqual( {} );
+		expect( prePersistPostType( record, edits ) ).toEqual( {} );
 
 		record = {
 			status: 'auto-draft',
 			title: 'Auto Draft',
 		};
-		expect(
-			getPostTypePrePersistHandler( 'post' )( record, edits )
-		).toEqual( {
+		expect( prePersistPostType( record, edits ) ).toEqual( {
 			status: 'draft',
 			title: '',
 		} );
@@ -177,45 +114,6 @@ describe( 'getPostTypePrePersistHandler', () => {
 			status: 'publish',
 			title: 'My Title',
 		};
-		expect(
-			getPostTypePrePersistHandler( 'post' )( record, edits )
-		).toEqual( {} );
-	} );
-
-	it( 'should set the status of templates to publish and fix the title', () => {
-		let record = {
-			status: 'auto-draft',
-			slug: 'single',
-		};
-		const edits = {};
-		expect(
-			getPostTypePrePersistHandler( 'wp_template' )( record, edits )
-		).toEqual( {
-			status: 'publish',
-			title: 'Single',
-		} );
-
-		record = {
-			status: 'auto-draft',
-		};
-		expect(
-			getPostTypePrePersistHandler( 'wp_template_part' )( record, edits )
-		).toEqual( {
-			status: 'publish',
-			title: '',
-		} );
-
-		record = {
-			status: 'auto-draft',
-			slug: 'single',
-			title: {
-				rendered: 'My title',
-			},
-		};
-		expect(
-			getPostTypePrePersistHandler( 'wp_template' )( record, edits )
-		).toEqual( {
-			status: 'publish',
-		} );
+		expect( prePersistPostType( record, edits ) ).toEqual( {} );
 	} );
 } );

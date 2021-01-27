@@ -11,19 +11,19 @@
 /packages/data-controls                         @nerrad
 
 # Blocks
-/packages/block-library                         @ajitbohra @talldan
+/packages/block-library                         @ajitbohra
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
 /packages/block-library/src/image               @ajlende
 
 # Editor
-/packages/annotations                           @atimmer @ellatrix
+/packages/annotations                           @atimmer
 /packages/autop
 /packages/block-editor                          @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @ellatrix
+/packages/blocks
 /packages/edit-post
 /packages/editor
 /packages/list-reusable-blocks
@@ -54,7 +54,7 @@
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
-/packages/e2e-tests                             @ntwb @nerrad @ajitbohra @talldan
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
@@ -88,10 +88,10 @@
 /packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
-/packages/keycodes                              @talldan @ellatrix
+/packages/keycodes
 /packages/priority-queue
 /packages/token-list
-/packages/url                                   @talldan
+/packages/url
 /packages/wordcount
 /packages/warning
 /packages/keyboard-shortcuts
@@ -116,6 +116,9 @@
 /lib                                            @timothybjacobs @spacedmonkey
 /lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
 /lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
+/lib/class-wp-theme-json.php                    @timothybjabocs @spacedmonkey @nosolosw
+/lib/class-wp-theme-json-resolver.php           @timothybjabocs @spacedmonkey @nosolosw
+/phpunit/class-wp-theme-json-test.php           @nosolosw
 
 # Native (Unowned)
 *.native.js                                     @ghost

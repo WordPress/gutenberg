@@ -118,7 +118,8 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( resetBlocks ).not.toHaveBeenCalled();
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', testBlocks );
+		// We can't check the args because the blocks are cloned.
+		expect( replaceInnerBlocks ).toHaveBeenCalled();
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
@@ -200,7 +201,6 @@ describe( 'useBlockSync hook', () => {
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
-
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];

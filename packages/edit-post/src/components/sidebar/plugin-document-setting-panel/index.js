@@ -15,6 +15,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
+import { store as editPostStore } from '../../../store';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
@@ -115,15 +116,15 @@ const PluginDocumentSettingPanel = compose(
 	} ),
 	withSelect( ( select, { panelName } ) => {
 		return {
-			opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
-			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+			opened: select( editPostStore ).isEditorPanelOpened( panelName ),
+			isEnabled: select( editPostStore ).isEditorPanelEnabled(
 				panelName
 			),
 		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onToggle() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+			return dispatch( editPostStore ).toggleEditorPanelOpened(
 				panelName
 			);
 		},

@@ -129,7 +129,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	// The added specificity is needed to override.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color) inset;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
 	}
 
 	&.is-selected {
@@ -165,13 +165,13 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-title {
 		max-width: 230px;
 		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
 	.block-editor-link-control__search-item-title {
 		display: block;
 		margin-bottom: 0.2em;
 		font-weight: 500;
+		position: relative;
 
 		mark {
 			font-weight: 700;

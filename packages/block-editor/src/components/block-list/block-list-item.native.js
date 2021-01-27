@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,11 +9,7 @@ import { View } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import {
-	ReadableContentView,
-	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
-} from '@wordpress/components';
+import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,63 +23,81 @@ const stretchStyle = {
 };
 
 export class BlockListItem extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onLayout = this.onLayout.bind( this );
-
-		this.state = {
-			blockWidth: 0,
-		};
-	}
-
-	onLayout( { nativeEvent } ) {
-		const { layout } = nativeEvent;
-		const { blockWidth } = this.state;
-
-		if ( blockWidth !== layout.width ) {
-			this.setState( { blockWidth: layout.width } );
-		}
-	}
-
 	getMarginHorizontal() {
 		const {
 			blockAlignment,
 			marginHorizontal,
 			parentBlockAlignment,
+			hasParents,
+			blockName,
+			parentBlockName,
+			parentWidth,
+			blockWidth,
 		} = this.props;
-		const { blockWidth } = this.state;
+		const {
+			isFullWidth,
+			isWideWidth,
+			isWider,
+			isContainerRelated,
+		} = alignmentHelpers;
 
-		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.full ) {
-			return 0;
+		if ( isFullWidth( blockAlignment ) ) {
+			if ( ! hasParents ) {
+				return 0;
+			}
+			return marginHorizontal;
 		}
-
-		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
+		if ( isWideWidth( blockAlignment ) ) {
 			return marginHorizontal;
 		}
 
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+
 		if (
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
-			blockWidth <= ALIGNMENT_BREAKPOINTS.medium
+			isFullWidth( parentBlockAlignment ) &&
+			! isWider( blockWidth, 'medium' )
 		) {
+			if (
+				isContainerRelated( blockName ) ||
+				isWider( screenWidth, 'mobile' )
+			) {
+				return marginHorizontal;
+			}
 			return marginHorizontal * 2;
+		}
+
+		if (
+			isContainerRelated( parentBlockName ) &&
+			! isContainerRelated( blockName )
+		) {
+			const isScreenWidthEqual = parentWidth === screenWidth;
+			if ( isScreenWidthEqual || isWider( screenWidth, 'mobile' ) ) {
+				return marginHorizontal * 2;
+			}
 		}
 
 		return marginHorizontal;
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const { blockAlignment, hasParents } = this.props;
-		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const {
+			blockAlignment,
+			blockName,
+			hasParents,
+			parentBlockName,
+		} = this.props;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 
 		return [
 			readableContentViewStyle,
-			isFullWidth &&
+			isFullWidth( blockAlignment ) &&
 				! hasParents && {
 					width: styles.fullAlignment.width,
 				},
-			isFullWidth &&
-				hasParents && {
+			! blockAlignment &&
+				hasParents &&
+				! isContainerRelated( parentBlockName ) &&
+				isContainerRelated( blockName ) && {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
@@ -98,15 +112,30 @@ export class BlockListItem extends Component {
 			shouldShowInsertionPointAfter,
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
+			parentWidth,
+			marginHorizontal,
+			blockName,
+			blockWidth,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
+		const { isContainerRelated } = alignmentHelpers;
+
+		if ( ! blockWidth ) {
+			return null;
+		}
 
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
-				style={ readableContentViewStyle }
+				style={ [
+					readableContentViewStyle,
+					isContainerRelated( blockName ) &&
+						parentWidth && {
+							maxWidth: parentWidth + 2 * marginHorizontal,
+						},
+				] }
 			>
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
@@ -120,6 +149,7 @@ export class BlockListItem extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						parentWidth={ parentWidth }
 						{ ...restProps }
 						marginHorizontal={ this.getMarginHorizontal() }
 					/>
@@ -169,7 +199,7 @@ export default compose( [
 			const isReadOnly = getSettings().readOnly;
 
 			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-			const { attributes } = block || {};
+			const { attributes, name } = block || {};
 			const { align } = attributes || {};
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
@@ -178,6 +208,7 @@ export default compose( [
 				: {};
 			const { align: parentBlockAlignment } =
 				parentBlock?.attributes || {};
+			const { name: parentBlockName } = parentBlock || {};
 
 			return {
 				shouldShowInsertionPointBefore,
@@ -186,6 +217,8 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
+				blockName: name,
+				parentBlockName,
 			};
 		}
 	),

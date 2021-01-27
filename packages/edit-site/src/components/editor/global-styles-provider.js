@@ -32,14 +32,15 @@ import {
 } from './utils';
 import getGlobalStyles from './global-styles-renderer';
 
-const EMPTY_CONTENT = '{}';
+const EMPTY_CONTENT = { isGlobalStylesUserThemeJSON: true };
+const EMPTY_CONTENT_STRING = JSON.stringify( EMPTY_CONTENT );
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
 	getSetting: ( context, path ) => {},
 	setSetting: ( context, path, newValue ) => {},
-	getStyleProperty: ( context, propertyName, origin ) => {},
-	setStyleProperty: ( context, propertyName, newValue ) => {},
+	getStyle: ( context, propertyName, origin ) => {},
+	setStyle: ( context, propertyName, newValue ) => {},
 	contexts: {},
 	/* eslint-enable no-unused-vars */
 } );
@@ -61,10 +62,10 @@ const useGlobalStylesEntityContent = () => {
 
 export const useGlobalStylesReset = () => {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
-	const canRestart = !! content && content !== EMPTY_CONTENT;
+	const canRestart = !! content && content !== EMPTY_CONTENT_STRING;
 	return [
 		canRestart,
-		useCallback( () => setContent( EMPTY_CONTENT ), [ setContent ] ),
+		useCallback( () => setContent( EMPTY_CONTENT_STRING ), [ setContent ] ),
 	];
 };
 
@@ -135,7 +136,12 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
-		const newUserStyles = content ? JSON.parse( content ) : {};
+		let newUserStyles = content ? JSON.parse( content ) : EMPTY_CONTENT;
+		// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
+		// If it is not true the content was not escaped and is not safe.
+		if ( ! newUserStyles.isGlobalStylesUserThemeJSON ) {
+			newUserStyles = EMPTY_CONTENT;
+		}
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
@@ -164,7 +170,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				set( contextSettings, path, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
-			getStyleProperty: ( context, propertyName, origin = 'merged' ) => {
+			getStyle: ( context, propertyName, origin = 'merged' ) => {
 				const styles = 'user' === origin ? userStyles : mergedStyles;
 
 				const value = get(
@@ -173,7 +179,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				);
 				return getValueFromVariable( mergedStyles, context, value );
 			},
-			setStyleProperty: ( context, propertyName, newValue ) => {
+			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
 				let contextStyles = newContent?.[ context ]?.styles;
 				if ( ! contextStyles ) {
@@ -208,7 +214,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					css: getGlobalStyles(
 						contexts,
 						mergedStyles,
-						STYLE_PROPERTY,
 						'cssVariables'
 					),
 					isGlobalStyles: true,
@@ -218,7 +223,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					css: getGlobalStyles(
 						contexts,
 						mergedStyles,
-						STYLE_PROPERTY,
 						'blockStyles'
 					),
 					isGlobalStyles: true,

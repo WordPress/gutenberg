@@ -169,7 +169,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Wether or not the element is empty.
+-   `boolean`: Whether or not the element is empty.
 
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 

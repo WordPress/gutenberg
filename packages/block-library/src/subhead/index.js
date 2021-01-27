@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { SVG, Path } from '@wordpress/components';
 
 /**
@@ -17,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Subheading (deprecated)' ),
+	title: _x( 'Subheading (deprecated)', 'block title' ),
 	description: __(
 		'This block is deprecated. Please use the Paragraph block instead.'
 	),

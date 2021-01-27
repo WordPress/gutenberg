@@ -29,6 +29,7 @@ public class MainActivity extends ReactActivity {
                 Bundle bundle = new Bundle();
                 Bundle capabilities = new Bundle();
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_XPOSTS, true);
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, true);
                 bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
                 return bundle;

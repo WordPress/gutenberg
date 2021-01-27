@@ -32,6 +32,7 @@ export default function NavigationMenu( props ) {
 		onSearch: setControlledSearch,
 		parentMenu,
 		search: controlledSearch,
+		isSearchDebouncing,
 		title,
 		titleAction,
 	} = props;
@@ -84,7 +85,7 @@ export default function NavigationMenu( props ) {
 				<NavigableMenu>
 					<ul aria-labelledby={ menuTitleId }>
 						{ children }
-						{ search && (
+						{ search && ! isSearchDebouncing && (
 							<NavigationSearchNoResultsFound search={ search } />
 						) }
 					</ul>

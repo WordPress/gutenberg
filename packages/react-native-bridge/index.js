@@ -279,20 +279,12 @@ export function logUserEvent( event, properties ) {
 	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
-export function addMention() {
-	return RNReactNativeGutenbergBridge.addMention();
+export function showUserSuggestions() {
+	return RNReactNativeGutenbergBridge.showUserSuggestions();
 }
 
-export function requestStarterPageTemplatesTooltipShown( callback ) {
-	return RNReactNativeGutenbergBridge.requestStarterPageTemplatesTooltipShown(
-		callback
-	);
-}
-
-export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
-	return RNReactNativeGutenbergBridge.setStarterPageTemplatesTooltipShown(
-		tooltipShown
-	);
+export function showXpostSuggestions() {
+	return RNReactNativeGutenbergBridge.showXpostSuggestions();
 }
 
 /**

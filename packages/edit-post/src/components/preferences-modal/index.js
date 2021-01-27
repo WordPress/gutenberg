@@ -8,8 +8,8 @@ import { get } from 'lodash';
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
+import { compose, useViewportMatch } from '@wordpress/compose';
 import {
 	PostTaxonomies,
 	PostExcerptCheck,
@@ -29,13 +29,31 @@ import {
 	EnableFeature,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
+import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/preferences';
 
 export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const { mode, isRichEditingEnabled, hasReducedUI } = useSelect(
+		( select ) => {
+			return {
+				mode: select( editPostStore ).getEditorMode(),
+				isRichEditingEnabled: select(
+					'core/editor'
+				).getEditorSettings().richEditingEnabled,
+				hasReducedUI: select( editPostStore ).isFeatureActive(
+					'reducedUI'
+				),
+			};
+		},
+		[]
+	);
+
 	if ( ! isModalActive ) {
 		return null;
 	}
+
 	return (
 		<Modal
 			className="edit-post-preferences-modal"
@@ -92,6 +110,18 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					help={ __( 'Make the editor look like your theme.' ) }
 					label={ __( 'Use theme styles' ) }
 				/>
+				{ ! hasReducedUI &&
+					! isMobileViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual' && (
+						<EnableFeature
+							featureName="showBlockBreadcrumbs"
+							help={ __(
+								'Shows block breadcrumbs at the bottom of the editor.'
+							) }
+							label={ __( 'Display block breadcrumbs' ) }
+						/>
+					) }
 			</Section>
 			<Section
 				title={ __( 'Document settings' ) }
@@ -154,15 +184,13 @@ export default compose(
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			isModalActive: select( 'core/edit-post' ).isModalActive(
-				MODAL_NAME
-			),
+			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		return {
-			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
+			closeModal: () => dispatch( editPostStore ).closeModal(),
 		};
 	} )
 )( PreferencesModal );

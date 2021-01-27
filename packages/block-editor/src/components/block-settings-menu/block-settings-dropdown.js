@@ -95,7 +95,7 @@ export function BlockSettingsDropdown( {
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
-					label={ __( 'More options' ) }
+					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons

@@ -1,4 +1,4 @@
-/* eslint-disable jest/no-try-expect */
+/* eslint-disable jest/no-try-expect, jest/no-conditional-expect */
 /**
  * External dependencies
  */
@@ -1115,4 +1115,4 @@ async function testPortNumberValidation( portName, value, envText = '' ) {
 	}
 	jest.clearAllMocks();
 }
-/* eslint-enable jest/no-try-expect */
+/* eslint-enable jest/no-try-expect, jest/no-conditional-expect */

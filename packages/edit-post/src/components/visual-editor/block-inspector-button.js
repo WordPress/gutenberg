@@ -12,6 +12,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
 		( select ) => ( {
@@ -19,13 +24,13 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
 			areAdvancedSettingsOpened:
-				select( 'core/edit-post' ).getActiveGeneralSidebarName() ===
+				select( editPostStore ).getActiveGeneralSidebarName() ===
 				'edit-post/block',
 		} ),
 		[]
 	);
 	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
+		editPostStore
 	);
 
 	const speakMessage = () => {

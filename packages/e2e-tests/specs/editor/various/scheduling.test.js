@@ -23,8 +23,9 @@ describe( 'Scheduling', () => {
 		} );
 	};
 
-	[ 'UTC-10', 'UTC', 'UTC+10' ].forEach( ( timezone ) => {
-		describe( timezone, () => {
+	describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
+		`Timezone %s`,
+		( timezone ) => {
 			let oldTimezone;
 			beforeEach( async () => {
 				oldTimezone = await changeSiteTimezone( timezone );
@@ -49,8 +50,8 @@ describe( 'Scheduling', () => {
 
 				expect( await getPublishButtonText() ).toBe( 'Schedule…' );
 			} );
-		} );
-	} );
+		}
+	);
 
 	it( 'Should keep date time UI focused when the previous and next month buttons are clicked', async () => {
 		await createNewPost();

@@ -87,16 +87,19 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
-<button
-  aria-expanded={true}
-  aria-haspopup="true"
-  aria-label="Custom color picker"
-  className="components-button is-link"
-  onClick={[MockFunction]}
-  type="button"
->
-  Custom color
-</button>
+<Fragment>
+  <button
+    aria-describedby={null}
+    aria-expanded={true}
+    aria-haspopup="true"
+    aria-label="Custom color picker"
+    className="components-button is-link"
+    onClick={[MockFunction]}
+    type="button"
+  >
+    Custom color
+  </button>
+</Fragment>
 `;
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
@@ -117,6 +120,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
       onClick={[Function]}
     >
       <button
+        aria-describedby={null}
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Custom color picker"
@@ -333,6 +337,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 }
               >
                 <button
+                  aria-describedby={null}
                   aria-label="Color: red"
                   aria-pressed={true}
                   className="components-button components-circular-option-picker__option is-pressed"
@@ -432,6 +437,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 }
               >
                 <button
+                  aria-describedby={null}
                   aria-label="Color: white"
                   aria-pressed={false}
                   className="components-button components-circular-option-picker__option"
@@ -491,6 +497,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 }
               >
                 <button
+                  aria-describedby={null}
                   aria-label="Color: blue"
                   aria-pressed={false}
                   className="components-button components-circular-option-picker__option"
@@ -547,6 +554,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onClick={[Function]}
               >
                 <button
+                  aria-describedby={null}
                   aria-expanded={false}
                   aria-haspopup="true"
                   aria-label="Custom color picker"
@@ -570,6 +578,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             onClick={[Function]}
           >
             <button
+              aria-describedby={null}
               className="components-button components-circular-option-picker__clear is-secondary is-small"
               onClick={[Function]}
               type="button"

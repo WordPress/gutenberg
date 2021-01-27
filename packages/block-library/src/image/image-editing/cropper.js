@@ -48,7 +48,7 @@ export default function ImageCropper( {
 				'is-applying': isInProgress,
 			} ) }
 			style={ {
-				width,
+				width: width || clientWidth,
 				height: editedHeight,
 			} }
 		>

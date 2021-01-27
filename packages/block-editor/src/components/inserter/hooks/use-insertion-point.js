@@ -5,6 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import { useCallback } from '@wordpress/element';
 
 /**
  * @typedef WPInserterConfig
@@ -96,45 +97,71 @@ function useInsertionPoint( {
 		hideInsertionPoint,
 	} = useDispatch( 'core/block-editor' );
 
-	const onInsertBlocks = ( blocks, meta ) => {
-		if (
-			! isAppender &&
-			selectedBlock &&
-			isUnmodifiedDefaultBlock( selectedBlock )
-		) {
-			replaceBlocks( selectedBlock.clientId, blocks, null, null, meta );
-		} else {
-			insertBlocks(
-				blocks,
-				destinationIndex,
-				destinationRootClientId,
-				selectBlockOnInsert,
-				meta
-			);
-		}
+	const onInsertBlocks = useCallback(
+		( blocks, meta ) => {
+			if (
+				! isAppender &&
+				selectedBlock &&
+				isUnmodifiedDefaultBlock( selectedBlock )
+			) {
+				replaceBlocks(
+					selectedBlock.clientId,
+					blocks,
+					null,
+					null,
+					meta
+				);
+			} else {
+				insertBlocks(
+					blocks,
+					destinationIndex,
+					destinationRootClientId,
+					selectBlockOnInsert,
+					meta
+				);
+			}
 
-		if ( ! selectBlockOnInsert ) {
-			// translators: %d: the name of the block that has been added
-			const message = _n(
-				'%d block added.',
-				'%d blocks added.',
-				blocks.length
-			);
-			speak( message );
-		}
+			if ( ! selectBlockOnInsert ) {
+				// translators: %d: the name of the block that has been added
+				const message = _n(
+					'%d block added.',
+					'%d blocks added.',
+					blocks.length
+				);
+				speak( message );
+			}
 
-		if ( onSelect ) {
-			onSelect();
-		}
-	};
+			if ( onSelect ) {
+				onSelect();
+			}
+		},
+		[
+			isAppender,
+			selectedBlock,
+			replaceBlocks,
+			insertBlocks,
+			destinationRootClientId,
+			destinationIndex,
+			selectBlockOnInsert,
+			onSelect,
+		]
+	);
 
-	const onToggleInsertionPoint = ( show ) => {
-		if ( show ) {
-			showInsertionPoint( destinationRootClientId, destinationIndex );
-		} else {
-			hideInsertionPoint();
-		}
-	};
+	const onToggleInsertionPoint = useCallback(
+		( show ) => {
+			if ( show ) {
+				showInsertionPoint( destinationRootClientId, destinationIndex );
+			} else {
+				hideInsertionPoint();
+			}
+		},
+		[
+			showInsertionPoint,
+			hideInsertionPoint,
+			destinationRootClientId,
+			destinationIndex,
+		]
+	);
 
 	return [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ];
 }

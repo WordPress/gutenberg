@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { postCommentsCount as icon } from '@wordpress/icons';
 
 /**
@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Comments Count' ),
+	title: _x( 'Post Comments Count', 'block title' ),
 	description: __( "Display a post's comments count." ),
 	icon,
 	edit,

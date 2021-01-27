@@ -34,12 +34,28 @@ const BlockMobileToolbar = ( {
 	isFullWidth,
 } ) => {
 	const [ fillsLength, setFillsLength ] = useState( null );
-	const wrapBlockSettings = blockWidth < BREAKPOINTS.wrapSettings;
-	const wrapBlockMover = blockWidth <= BREAKPOINTS.wrapMover;
+	const [ appenderWidth, setAppenderWidth ] = useState( 0 );
+	const spacingValue = styles.toolbar.marginLeft * 2;
+
+	function onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const layoutWidth = Math.floor( layout.width );
+		if ( layoutWidth !== appenderWidth ) {
+			setAppenderWidth( nativeEvent.layout.width );
+		}
+	}
+
+	const wrapBlockSettings =
+		blockWidth < BREAKPOINTS.wrapSettings ||
+		appenderWidth - spacingValue < BREAKPOINTS.wrapSettings;
+	const wrapBlockMover =
+		blockWidth <= BREAKPOINTS.wrapMover ||
+		appenderWidth - spacingValue <= BREAKPOINTS.wrapMover;
 
 	return (
 		<View
 			style={ [ styles.toolbar, isFullWidth && styles.toolbarFullWidth ] }
+			onLayout={ onLayout }
 		>
 			{ ! wrapBlockMover && (
 				<BlockMover

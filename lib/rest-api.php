@@ -11,141 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handle a failing oEmbed proxy request to try embedding as a shortcode.
- *
- * @see https://core.trac.wordpress.org/ticket/45447
- *
- * @since 2.3.0
- *
- * @param  WP_HTTP_Response|WP_Error $response The REST Request response.
- * @param  WP_REST_Server            $handler  ResponseHandler instance (usually WP_REST_Server).
- * @param  WP_REST_Request           $request  Request used to generate the response.
- * @return WP_HTTP_Response|object|WP_Error    The REST Request response.
- */
-function gutenberg_filter_oembed_result( $response, $handler, $request ) {
-	if ( ! is_wp_error( $response ) || 'oembed_invalid_url' !== $response->get_error_code() ||
-			'/oembed/1.0/proxy' !== $request->get_route() ) {
-		return $response;
-	}
-
-	// Try using a classic embed instead.
-	global $wp_embed;
-	$html = $wp_embed->shortcode( array(), $_GET['url'] );
-	if ( ! $html ) {
-		return $response;
-	}
-
-	global $wp_scripts;
-
-	// Check if any scripts were enqueued by the shortcode, and include them in
-	// the response.
-	$enqueued_scripts = array();
-	foreach ( $wp_scripts->queue as $script ) {
-		$enqueued_scripts[] = $wp_scripts->registered[ $script ]->src;
-	}
-
-	return array(
-		'provider_name' => __( 'Embed Handler', 'gutenberg' ),
-		'html'          => $html,
-		'scripts'       => $enqueued_scripts,
-	);
-}
-add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
-
-/**
- * Add fields required for site editing to the /themes endpoint.
- *
- * @todo Remove once Gutenberg's minimum required WordPress version is v5.5.
- * @see https://core.trac.wordpress.org/ticket/49906
- * @see https://core.trac.wordpress.org/changeset/47921
- *
- * @param WP_REST_Response $response The response object.
- * @param WP_Theme         $theme    Theme object used to create response.
- */
-function gutenberg_filter_rest_prepare_theme( $response, $theme ) {
-	$data   = $response->get_data();
-	$fields = array_keys( $data );
-
-	/**
-	 * The following is basically copied from Core's WP_REST_Themes_Controller::prepare_item_for_response()
-	 * (as of WP v5.5), with `rest_is_field_included()` replaced by `! in_array()`.
-	 * This makes sure that we add all the fields that are missing from Core.
-	 *
-	 * @see https://github.com/WordPress/WordPress/blob/019bc2d244c4d536338d2c634419583e928143df/wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php#L118-L167
-	 */
-	if ( ! in_array( 'stylesheet', $fields, true ) ) {
-		$data['stylesheet'] = $theme->get_stylesheet();
-	}
-
-	if ( ! in_array( 'template', $fields, true ) ) {
-		/**
-		 * Use the get_template() method, not the 'Template' header, for finding the template.
-		 * The 'Template' header is only good for what was written in the style.css, while
-		 * get_template() takes into account where WordPress actually located the theme and
-		 * whether it is actually valid.
-		 */
-		$data['template'] = $theme->get_template();
-	}
-
-	$plain_field_mappings = array(
-		'requires_php' => 'RequiresPHP',
-		'requires_wp'  => 'RequiresWP',
-		'textdomain'   => 'TextDomain',
-		'version'      => 'Version',
-	);
-
-	foreach ( $plain_field_mappings as $field => $header ) {
-		if ( ! in_array( $field, $fields, true ) ) {
-			$data[ $field ] = $theme->get( $header );
-		}
-	}
-
-	if ( ! in_array( 'screenshot', $fields, true ) ) {
-		// Using $theme->get_screenshot() with no args to get absolute URL.
-		$data['screenshot'] = $theme->get_screenshot() ? $theme->get_screenshot() : '';
-	}
-
-	$rich_field_mappings = array(
-		'author'      => 'Author',
-		'author_uri'  => 'AuthorURI',
-		'description' => 'Description',
-		'name'        => 'Name',
-		'tags'        => 'Tags',
-		'theme_uri'   => 'ThemeURI',
-	);
-
-	foreach ( $rich_field_mappings as $field => $header ) {
-		if ( ! in_array( $field, $fields, true ) ) {
-			$data[ $field ]['raw']      = $theme->display( $header, false, true );
-			$data[ $field ]['rendered'] = $theme->display( $header );
-		}
-	}
-
-	$response->set_data( $data );
-	return $response;
-}
-add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 2 );
-
-/**
- * Registers the block directory.
- *
- * @since 6.5.0
- */
-function gutenberg_register_rest_block_directory() {
-	$block_directory_controller = new WP_REST_Block_Directory_Controller();
-	$block_directory_controller->register_routes();
-}
-add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
-
-/**
- * Registers the Block types REST API routes.
- */
-function gutenberg_register_block_type() {
-	$block_types = new WP_REST_Block_Types_Controller();
-	$block_types->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_block_type' );
-/**
  * Registers the menu locations area REST API routes.
  */
 function gutenberg_register_rest_menu_location() {
@@ -162,16 +27,6 @@ function gutenberg_register_rest_customizer_nonces() {
 	$nav_menu_location->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
-
-
-/**
- * Registers the Plugins REST API routes.
- */
-function gutenberg_register_plugins_endpoint() {
-	$plugins = new WP_REST_Plugins_Controller();
-	$plugins->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
  * Registers the Sidebars & Widgets REST API routes.
@@ -306,25 +161,6 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
-
-/**
- * Registers the image editor.
- *
- * @since 7.x.0
- */
-function gutenberg_register_image_editor() {
-	global $wp_version;
-
-	// Strip '-src' from the version string. Messes up version_compare().
-	$version = str_replace( '-src', '', $wp_version );
-
-	// Only register routes for versions older than WP 5.5.
-	if ( version_compare( $version, '5.5-beta', '<' ) ) {
-		$image_editor = new WP_REST_Image_Editor_Controller();
-		$image_editor->register_routes();
-	}
-}
-add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
 
 /**
  * Registers the post format search handler.

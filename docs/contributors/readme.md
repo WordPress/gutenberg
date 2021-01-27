@@ -30,4 +30,4 @@ The Gutenberg project uses Github for managing code and tracking issues. Please 
 
 ## Guidelines
 
-See the [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) for the rules around contributing: This includes the code of conduct and licensing information.
+See the [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) for the rules around contributing: This includes the code of conduct and licensing information.

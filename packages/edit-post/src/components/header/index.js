@@ -21,6 +21,7 @@ import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import TemplateSaveButton from './template-save-button';
+import { store as editPostStore } from '../../store';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -32,18 +33,18 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isEditingTemplate,
 	} = useSelect(
 		( select ) => ( {
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isPublishSidebarOpened: select(
-				'core/edit-post'
+				editPostStore
 			).isPublishSidebarOpened(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+			isSaving: select( editPostStore ).isSavingMetaBoxes(),
+			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
 			),
-			isEditingTemplate: select( 'core/edit-post' ).isEditingTemplate(),
+			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
 		} ),
 		[]
 	);

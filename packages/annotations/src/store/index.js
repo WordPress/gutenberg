@@ -13,12 +13,12 @@ import * as actions from './actions';
 /**
  * Module Constants
  */
-const STORE_NAME = 'core/annotations';
+import { STORE_NAME } from './constants';
 
 /**
  * Store definition for the annotations namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */

@@ -12,6 +12,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { store as interfaceStore } from '../../store';
 import complementaryAreaContext from '../complementary-area-context';
 
 function ComplementaryAreaToggle( {
@@ -25,12 +26,12 @@ function ComplementaryAreaToggle( {
 	const ComponentToUse = as;
 	const isSelected = useSelect(
 		( select ) =>
-			select( 'core/interface' ).getActiveComplementaryArea( scope ) ===
+			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
 			identifier,
 		[ identifier ]
 	);
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
+		interfaceStore
 	);
 	return (
 		<ComponentToUse

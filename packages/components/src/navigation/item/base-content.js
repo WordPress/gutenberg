@@ -1,12 +1,10 @@
 /**
  * Internal dependencies
  */
-import { useRTL } from '../../utils';
 import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
 
 export default function NavigationItemBaseContent( props ) {
 	const { badge, title } = props;
-	const isRTL = useRTL();
 
 	return (
 		<>
@@ -14,7 +12,6 @@ export default function NavigationItemBaseContent( props ) {
 				<ItemTitleUI
 					className="components-navigation__item-title"
 					variant="body.small"
-					isRTL={ isRTL }
 					as="span"
 				>
 					{ title }
@@ -22,10 +19,7 @@ export default function NavigationItemBaseContent( props ) {
 			) }
 
 			{ badge && (
-				<ItemBadgeUI
-					className="components-navigation__item-badge"
-					isRTL={ isRTL }
-				>
+				<ItemBadgeUI className="components-navigation__item-badge">
 					{ badge }
 				</ItemBadgeUI>
 			) }

@@ -7,6 +7,7 @@ module.exports = {
 		require.resolve( './esnext.js' ),
 		require.resolve( './i18n.js' ),
 	],
+	plugins: [ 'import' ],
 	env: {
 		node: true,
 	},
@@ -14,6 +15,15 @@ module.exports = {
 		window: true,
 		document: true,
 		wp: 'readonly',
+	},
+	rules: {
+		'import/no-extraneous-dependencies': [
+			'error',
+			{
+				peerDependencies: true,
+			},
+		],
+		'import/no-unresolved': 'error',
 	},
 	overrides: [
 		{

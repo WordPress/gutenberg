@@ -25,6 +25,7 @@ import { useRef } from '@wordpress/element';
  */
 import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
+import { store as editPostStore } from '../../store';
 
 export default function VisualEditor() {
 	const ref = useRef();
@@ -32,14 +33,14 @@ export default function VisualEditor() {
 		const {
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
-		} = select( 'core/edit-post' );
+		} = select( editPostStore );
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isTemplateMode: isEditingTemplate(),
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
-		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
+		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
 	const desktopCanvasStyles = {

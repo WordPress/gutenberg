@@ -32,6 +32,7 @@ $z-layers: (
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
+	".wp-block-cover__image-background": 0, // Image background inside cover block.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
@@ -52,6 +53,9 @@ $z-layers: (
 
 	// Needs to be bellow media library that has a z-index of 160000.
 	"{core/video track editor popover}": 160000 - 10,
+
+	// Needs to be bellow media library that has a z-index of 160000.
+	".block-editor-format-toolbar__image-popover": 160000 - 10,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
@@ -144,12 +148,15 @@ $z-layers: (
 	// Make sure block manager sticky category titles appear above the options
 	".edit-post-manage-blocks-modal__category-title": 1,
 
+	// Needs to be higher than any other element as this is an overlay to catch all events
+	".components-tooltip .event-catcher": 100002,
+
 	// Needs to appear bellow other color circular picker related UI elements.
 	".components-circular-option-picker__option-wrapper::before": -1,
 
 	".components-circular-option-picker__option.is-pressed": 1,
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
-	".components-circular-option-picker__option.is-pressed + svg": 2
+	".components-circular-option-picker__option.is-pressed + svg": 2,
 );
 
 @function z-index( $key ) {

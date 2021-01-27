@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Module constants
  */
 const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
@@ -30,18 +35,17 @@ export function computePopoverXAxisPosition(
 	forcePosition
 ) {
 	const { width } = contentSize;
-	const isRTL = document.documentElement.dir === 'rtl';
 
 	// Correct xAxis for RTL support
-	if ( xAxis === 'left' && isRTL ) {
+	if ( xAxis === 'left' && isRTL() ) {
 		xAxis = 'right';
-	} else if ( xAxis === 'right' && isRTL ) {
+	} else if ( xAxis === 'right' && isRTL() ) {
 		xAxis = 'left';
 	}
 
-	if ( corner === 'left' && isRTL ) {
+	if ( corner === 'left' && isRTL() ) {
 		corner = 'right';
-	} else if ( corner === 'right' && isRTL ) {
+	} else if ( corner === 'right' && isRTL() ) {
 		corner = 'left';
 	}
 
@@ -107,7 +111,18 @@ export function computePopoverXAxisPosition(
 				chosenXAxis === 'left'
 					? leftAlignment.contentWidth
 					: rightAlignment.contentWidth;
-			contentWidth = chosenWidth !== width ? chosenWidth : null;
+
+			// Limit width of the content to the viewport width
+			if ( width > window.innerWidth ) {
+				contentWidth = window.innerWidth;
+			}
+
+			// If we can't find any alignment options that could fit
+			// our content, then let's fallback to the center of the viewport.
+			if ( chosenWidth !== width ) {
+				chosenXAxis = 'center';
+				centerAlignment.popoverLeft = window.innerWidth / 2;
+			}
 		}
 	}
 

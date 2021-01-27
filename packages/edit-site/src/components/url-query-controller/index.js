@@ -47,28 +47,19 @@ export default function URLQueryController() {
 
 function useCurrentPageContext() {
 	return useSelect( ( select ) => {
-		const {
-			getTemplateId,
-			getTemplatePartId,
-			getTemplateType,
-			getPage,
-		} = select( 'core/edit-site' );
+		const { getEditedPostType, getEditedPostId, getPage } = select(
+			'core/edit-site'
+		);
 
 		const page = getPage();
-		const templateType = getTemplateType();
-		const templateId = getTemplateId();
-		const templatePartId = getTemplatePartId();
-
-		let _postId, _postType;
+		let _postId = getEditedPostId(),
+			_postType = getEditedPostType();
+		// This doesn't seem right to me,
+		// we shouldn't be using the "page" and the "template" in the same way.
+		// This need to be investigated.
 		if ( page?.context?.postId && page?.context?.postType ) {
 			_postId = page.context.postId;
 			_postType = page.context.postType;
-		} else if ( templateType === 'wp_template' && templateId ) {
-			_postId = templateId;
-			_postType = templateType;
-		} else if ( templateType === 'wp_template_part' && templatePartId ) {
-			_postId = templatePartId;
-			_postType = templateType;
 		}
 
 		if ( _postId && _postType ) {

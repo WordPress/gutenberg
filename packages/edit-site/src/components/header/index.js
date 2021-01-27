@@ -36,9 +36,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 		const {
 			__experimentalGetPreviewDeviceType,
 			isFeatureActive,
-			getTemplateId,
-			getTemplatePartId,
-			getTemplateType,
+			getEditedPostType,
+			getEditedPostId,
 			isInserterOpened,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
@@ -46,9 +45,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 			'core/editor'
 		);
 
-		const postType = getTemplateType();
-		const postId =
-			postType === 'wp_template' ? getTemplateId() : getTemplatePartId();
+		const postType = getEditedPostType();
+		const postId = getEditedPostId();
 		const record = getEntityRecord( 'postType', postType, postId );
 		const _entityTitle =
 			'wp_template' === postType

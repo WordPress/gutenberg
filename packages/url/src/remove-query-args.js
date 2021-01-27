@@ -26,5 +26,6 @@ export function removeQueryArgs( url, ...args ) {
 	const query = getQueryArgs( url );
 	const baseURL = url.substr( 0, queryStringIndex );
 	args.forEach( ( arg ) => delete query[ arg ] );
-	return baseURL + '?' + buildQueryString( query );
+	const queryString = buildQueryString( query );
+	return queryString ? baseURL + '?' + queryString : baseURL;
 }

@@ -107,6 +107,7 @@ export default function QuickInserter( {
 					selectBlockOnInsert={ selectBlockOnInsert }
 					maxBlockPatterns={ showPatterns ? SHOWN_BLOCK_PATTERNS : 0 }
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
+					isDraggable={ false }
 				/>
 			</div>
 

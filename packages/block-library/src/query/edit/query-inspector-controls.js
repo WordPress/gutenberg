@@ -20,7 +20,14 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,6 +40,21 @@ const stickyOptions = [
 	{ label: __( 'Exclude' ), value: 'exclude' },
 	{ label: __( 'Only' ), value: 'only' },
 ];
+
+const CreateNewPostLink = ( { type } ) => {
+	const newPostUrl = addQueryArgs( 'post-new.php', {
+		post_type: type,
+	} );
+	return (
+		<div className="wp-block-query__create-new-link">
+			{ createInterpolateElement(
+				__( '<a>Create a new post</a> for this feed.' ),
+				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				{ a: <a href={ newPostUrl } /> }
+			) }
+		</div>
+	);
+};
 
 export default function QueryInspectorControls( {
 	attributes: { query, layout },
@@ -143,8 +165,10 @@ export default function QueryInspectorControls( {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+
 	return (
 		<InspectorControls>
+			<CreateNewPostLink type={ postType } />
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					label={ __( 'Inherit query from URL' ) }

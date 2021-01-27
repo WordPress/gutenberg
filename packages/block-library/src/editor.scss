@@ -50,12 +50,9 @@
 @import "./video/editor.scss";
 @import "./query-loop/editor.scss";
 @import "./query/editor.scss";
+@import "./query-pagination/editor.scss";
+@import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
-
-/**
- * Import styles from internal editor components used by the blocks.
- */
-@import "./block/edit-panel/editor.scss";
 
 :root .editor-styles-wrapper {
 	// Background colors.

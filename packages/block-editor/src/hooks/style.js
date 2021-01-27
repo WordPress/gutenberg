@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get, startsWith, mapValues } from 'lodash';
+import { capitalize, has, get, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -54,18 +54,21 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	const styleProperties = mapValues( STYLE_PROPERTY, ( prop ) => prop.value );
-	Object.entries( styleProperties ).forEach(
-		( [ styleKey, ...otherObjectKeys ] ) => {
-			const [ objectKeys ] = otherObjectKeys;
-
-			if ( has( styles, objectKeys ) ) {
-				output[ styleKey ] = compileStyleValue(
-					get( styles, objectKeys )
-				);
+	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
+		const path = STYLE_PROPERTY[ propKey ].value;
+		const subPaths = STYLE_PROPERTY[ propKey ].properties;
+		if ( has( styles, path ) ) {
+			if ( !! subPaths ) {
+				subPaths.forEach( ( suffix ) => {
+					output[
+						propKey + capitalize( suffix )
+					] = compileStyleValue( get( styles, [ ...path, suffix ] ) );
+				} );
+			} else {
+				output[ propKey ] = compileStyleValue( get( styles, path ) );
 			}
 		}
-	);
+	} );
 
 	return output;
 }

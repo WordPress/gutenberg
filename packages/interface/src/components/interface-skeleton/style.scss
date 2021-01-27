@@ -37,6 +37,7 @@ html.interface-interface-skeleton__html-container {
 	display: flex;
 	flex-direction: column;
 	flex: 0 1 100%;
+	overflow: hidden;
 }
 
 @include editor-left(".interface-interface-skeleton");
@@ -63,8 +64,10 @@ html.interface-interface-skeleton__html-container {
 	overscroll-behavior-y: none;
 
 	// Footer overlap prevention
-	@include break-medium() {
-		padding-bottom: $button-size-small + $border-width;
+	.has-footer & {
+		@include break-medium() {
+			padding-bottom: $button-size-small + $border-width;
+		}
 	}
 }
 
@@ -106,8 +109,9 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
+	overflow: auto;
+
 	@include break-medium() {
-		overflow: auto;
 		border-left: $border-width solid $gray-200;
 	}
 }

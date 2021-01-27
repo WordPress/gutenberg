@@ -276,17 +276,8 @@ function ComboboxControlWithState() {
 				onChange={ setValue }
 				label="Select a country"
 				options={ filteredOptions }
-				onFilterValueChange={ ( filter ) =>
-					setFilteredOptions(
-						countries
-							.filter( ( country ) =>
-								country.name
-									.toLowerCase()
-									.startsWith( filter.toLowerCase() )
-							)
-							.slice( 0, 20 )
-							.map( mapCountryOption )
-					)
+				onFilterValueChange={ () =>
+					setFilteredOptions( countries.map( mapCountryOption ) )
 				}
 			/>
 			<p>Value: { value }</p>

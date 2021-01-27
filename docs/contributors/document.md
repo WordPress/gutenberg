@@ -41,9 +41,9 @@ To update an existing page:
 
 To add a new documentation page requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/designers-developer/developers/tutorials/javascript/js-build-setup.md):
 
-1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder, use lower-case, no spaces, if needed a dash separator, and .md extension.
+1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and .md extension.
 2. Add content, all documents require one and only H1 tag, using markdown notation.
-3. Add item to the [toc.json](https://github.com/WordPress/gutenberg/blob/master/docs/toc.json) hierarchy, see existing entries for format.
+3. Add item to the [toc.json](https://github.com/WordPress/gutenberg/blob/HEAD/docs/toc.json) hierarchy, see existing entries for format.
 4. Run `npm run docs:build` to update `manifest.json`.
 5. Commit `manifest.json` with other files updated.
 

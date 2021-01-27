@@ -79,11 +79,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         break;
                     case VIDEO:
                         rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                        break;
                     case ANY:
                     case OTHER:
                         rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
-
+                    case AUDIO:
+                        rnMediaList.add(new Media(4, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
@@ -150,14 +153,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void setStarterPageTemplatesTooltipShown(boolean tooltipShown) {
-            }
-
-            @Override
-            public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
-            }
-
-            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
@@ -189,8 +184,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void onAddMention(Consumer<String> onSuccess) {
-                onSuccess.accept("matt");
+            public void onShowUserSuggestions(Consumer<String> onResult) {
+                onResult.accept("matt");
+            }
+
+            @Override
+            public void onShowXpostSuggestions(Consumer<String> onResult) {
+                onResult.accept("ma.tt");
             }
 
             @Override

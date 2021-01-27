@@ -516,7 +516,7 @@ test( 'remove all filter callbacks', () => {
 } );
 
 // Test doingAction, didAction, hasAction.
-test( 'Test doingAction, didAction and hasAction.', () => {
+test( 'doingAction, didAction and hasAction.', () => {
 	let actionCalls = 0;
 
 	addAction( 'another.action', 'my_callback', () => {} );
@@ -711,7 +711,7 @@ test( 'adding hooks as a mixin', () => {
 } );
 
 // Test context.
-test( 'Test `this` context via composition', () => {
+test( '`this` context via composition', () => {
 	const testObject = { test: 'test this' };
 
 	testObject.hooks = createHooks();

@@ -35,7 +35,32 @@ const getValueAndUnit = ( value, unit ) => {
 	return undefined;
 };
 
+const convertUnitToMobile = ( containerSize, globalStyles, value, unit ) => {
+	const { width, height } = containerSize;
+	const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
+	const { fontSize = 16 } = globalStyles || {};
+
+	switch ( valueUnit ) {
+		case 'rem':
+		case 'em':
+			return valueToConvert * fontSize;
+		case '%':
+			return Number( valueToConvert / 100 ) * width;
+		case 'px':
+			return Number( valueToConvert );
+		case 'vw':
+			const vw = width / 100;
+			return Math.round( valueToConvert * vw );
+		case 'vh':
+			const vh = height / 100;
+			return Math.round( valueToConvert * vh );
+		default:
+			return Number( valueToConvert / 100 ) * width;
+	}
+};
+
 const useConvertUnitToMobile = ( value, unit ) => {
+	const { globalStyles: styles } = useContext( GlobalStylesContext );
 	const [ windowSizes, setWindowSizes ] = useState(
 		Dimensions.get( 'window' )
 	);
@@ -47,36 +72,21 @@ const useConvertUnitToMobile = ( value, unit ) => {
 			Dimensions.removeEventListener( 'change', onDimensionsChange );
 		};
 	}, [] );
-	const { globalStyles: styles } = useContext( GlobalStylesContext );
 
 	const onDimensionsChange = useCallback( ( { window } ) => {
 		setWindowSizes( window );
 	}, [] );
 
 	return useMemo( () => {
-		const { width, height } = windowSizes;
-		const { fontSize = 16 } = styles || {};
-
 		const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
 
-		switch ( valueUnit ) {
-			case 'rem':
-			case 'em':
-				return valueToConvert * fontSize;
-			case '%':
-				return Number( valueToConvert / 100 ) * width;
-			case 'px':
-				return Number( valueToConvert );
-			case 'vw':
-				const vw = width / 100;
-				return Math.round( valueToConvert * vw );
-			case 'vh':
-				const vh = height / 100;
-				return Math.round( valueToConvert * vh );
-			default:
-				return Number( valueToConvert / 100 ) * width;
-		}
+		return convertUnitToMobile(
+			windowSizes,
+			styles,
+			valueToConvert,
+			valueUnit
+		);
 	}, [ windowSizes, value, unit ] );
 };
 
-export { useConvertUnitToMobile, getValueAndUnit };
+export { convertUnitToMobile, useConvertUnitToMobile, getValueAndUnit };

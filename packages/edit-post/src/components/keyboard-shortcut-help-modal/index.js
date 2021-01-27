@@ -22,6 +22,7 @@ import { compose } from '@wordpress/compose';
 import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
+import { store as editPostStore } from '../../store';
 
 const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
 
@@ -143,10 +144,10 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+		isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
 	} ) ),
 	withDispatch( ( dispatch, { isModalActive } ) => {
-		const { openModal, closeModal } = dispatch( 'core/edit-post' );
+		const { openModal, closeModal } = dispatch( editPostStore );
 
 		return {
 			toggleModal: () =>

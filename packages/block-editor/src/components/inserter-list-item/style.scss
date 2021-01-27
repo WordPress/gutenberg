@@ -62,6 +62,10 @@
 		transition: all 0.15s ease-out;
 		@include reduce-motion("transition");
 	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
+	}
 }
 
 .block-editor-block-types-list__item-title {

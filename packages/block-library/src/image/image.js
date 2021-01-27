@@ -32,10 +32,14 @@ import {
 	__experimentalDuotoneFilter as DuotoneFilter,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import { createBlock } from '@wordpress/blocks';
-import { crop, upload } from '@wordpress/icons';
+import {
+	createBlock,
+	getBlockType,
+	switchToBlockType,
+} from '@wordpress/blocks';
+import { crop, textColor, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -87,14 +91,19 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { image, multiImageSelection } = useSelect(
+	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
-			const { getMultiSelectedBlockClientIds, getBlockName } = select(
-				'core/block-editor'
-			);
+			const {
+				getMultiSelectedBlockClientIds,
+				getBlockName,
+				getSelectedBlock,
+				getSelectedBlockClientId,
+			} = select( 'core/block-editor' );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
+				block: getSelectedBlock(),
+				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
@@ -106,23 +115,20 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const {
-		imageEditing,
-		imageSizes,
-		isRTL,
-		maxWidth,
-		mediaUpload,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [
-			'imageEditing',
-			'imageSizes',
-			'isRTL',
-			'maxWidth',
-			'mediaUpload',
-		] );
-	} );
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
+		( select ) => {
+			const { getSettings } = select( 'core/block-editor' );
+			return pick( getSettings(), [
+				'imageEditing',
+				'imageSizes',
+				'maxWidth',
+				'mediaUpload',
+			] );
+		}
+	);
+	const { replaceBlocks, toggleSelection } = useDispatch(
+		'core/block-editor'
+	);
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
@@ -140,6 +146,9 @@ export default function Image( {
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
+
+	// Check if the cover block is registered.
+	const coverBlockExists = !! getBlockType( 'core/cover' );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -325,6 +334,20 @@ export default function Image( {
 						onError={ onUploadError }
 					/>
 				) }
+				{ ! multiImageSelection && coverBlockExists && (
+					<ToolbarGroup>
+						<ToolbarButton
+							icon={ textColor }
+							label={ __( 'Add text over image' ) }
+							onClick={ () =>
+								replaceBlocks(
+									currentId,
+									switchToBlockType( block, 'core/cover' )
+								)
+							}
+						/>
+					</ToolbarGroup>
+				) }
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
@@ -476,7 +499,7 @@ export default function Image( {
 			// When the image is centered, show both handles.
 			showRightHandle = true;
 			showLeftHandle = true;
-		} else if ( isRTL ) {
+		} else if ( isRTL() ) {
 			// In RTL mode the image is on the right by default.
 			// Show the right handle and hide the left handle only when it is
 			// aligned left. Otherwise always show the left handle.

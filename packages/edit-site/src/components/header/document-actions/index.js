@@ -90,21 +90,34 @@ export default function DocumentActions( {
 				ref={ titleRef }
 				className="edit-site-document-actions__title-wrapper"
 			>
-				<h1>
-					<VisuallyHidden>
+				<Text
+					variant="body.small"
+					className="edit-site-document-actions__title-prefix"
+				>
+					<VisuallyHidden as="span">
 						{ sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Edit %s:' ),
+							__( 'Editing %s:' ),
 							entityLabel
 						) }
 					</VisuallyHidden>
-					<Text
-						variant="subtitle.small"
-						className="edit-site-document-actions__title"
-					>
-						{ entityTitle }
-					</Text>
-				</h1>
+				</Text>
+
+				<Text
+					variant="body.small"
+					className="edit-site-document-actions__title"
+					as="h1"
+				>
+					{ entityTitle }
+				</Text>
+
+				<Text
+					variant="body.small"
+					className="edit-site-document-actions__secondary-item"
+				>
+					{ label ?? '' }
+				</Text>
+
 				{ dropdownContent && (
 					<Dropdown
 						popoverProps={ {
@@ -130,12 +143,6 @@ export default function DocumentActions( {
 					/>
 				) }
 			</div>
-			<Text
-				variant="body"
-				className="edit-site-document-actions__secondary-item"
-			>
-				{ label ?? '' }
-			</Text>
 		</div>
 	);
 }
