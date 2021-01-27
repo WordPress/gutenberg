@@ -1,10 +1,14 @@
 .interface-pinned-items {
+	display: flex;
+
 	// We intentionally hide pinned items (plugins) on mobile, and unhide them at desktop breakpoints.
 	// Otherwise the list can wreak havoc on the layout.
-	display: none;
+	.components-button:not(:first-child) {
+		display: none;
 
-	@include break-small() {
-		display: flex;
+		@include break-small() {
+			display: flex;
+		}
 	}
 
 	.components-button {
