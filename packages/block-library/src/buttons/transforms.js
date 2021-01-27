@@ -37,13 +37,17 @@ const transforms = {
 					{},
 					// Loop the selected buttons
 					buttons.map( ( attributes ) => {
-						// Remove any HTML tags.
+						// Remove any HTML tags
 						const div = document.createElement( 'div' );
 						div.innerHTML = attributes.content;
 						const text = div.textContent || div.innerText || '';
+						// Get first url
+						const link = div.querySelector( 'a' );
+						const url = link ? link.getAttribute( 'href' ) : null;
 						// Create singular button in the buttons block
 						return createBlock( 'core/button', {
 							text,
+							url,
 						} );
 					} )
 				),
