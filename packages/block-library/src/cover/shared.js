@@ -4,6 +4,7 @@
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
+import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -26,6 +27,7 @@ export const COVER_DEFAULT_HEIGHT = 300;
 export function backgroundImageStyles( url ) {
 	return url ? { backgroundImage: `url(${ url })` } : {};
 }
+export const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 
 const isWeb = Platform.OS === 'web';
 

@@ -36,7 +36,6 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MEDIA_TYPE_IMAGE,
-	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
@@ -56,6 +55,7 @@ import { getProtocol } from '@wordpress/url';
 import styles from './style.scss';
 import {
 	attributesFromMedia,
+	ALLOWED_MEDIA_TYPES,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_DEFAULT_HEIGHT,
@@ -65,7 +65,6 @@ import Controls from './controls';
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
@@ -447,6 +446,7 @@ const Cover = ( {
 				<Controls
 					attributes={ attributes }
 					didUploadFail={ didUploadFail }
+					hasOnlyColorBackground={ hasOnlyColorBackground }
 					isUploadInProgress={ isUploadInProgress }
 					onClearMedia={ onClearMedia }
 					onSelectMedia={ onSelectMedia }

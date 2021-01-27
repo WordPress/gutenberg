@@ -21,7 +21,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { useState, useCallback } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,6 +31,7 @@ import styles from './style.scss';
 import OverlayColorSettings from './overlay-color-settings';
 import FocalPointSettings from './focal-point-settings';
 import {
+	ALLOWED_MEDIA_TYPES,
 	COVER_MIN_HEIGHT,
 	COVER_MAX_HEIGHT,
 	COVER_DEFAULT_HEIGHT,
@@ -42,6 +43,7 @@ import {
 function Controls( {
 	attributes,
 	didUploadFail,
+	hasOnlyColorBackground,
 	isUploadInProgress,
 	onClearMedia,
 	onSelectMedia,
@@ -254,11 +256,26 @@ function Controls( {
 						/>
 					</>
 				) : (
-					<TextControl
-						label={ __( 'Add image or video' ) }
-						labelStyle={ addMediaButtonStyle }
-						leftAlign
-						onPress={ openMediaOptionsRef.current }
+					<MediaUpload
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						isReplacingMedia={ ! hasOnlyColorBackground }
+						onSelect={ onSelectMedia }
+						render={ ( {
+							open: openMediaOptions,
+							getMediaOptions,
+						} ) => {
+							return (
+								<>
+									{ getMediaOptions() }
+									<TextControl
+										label={ __( 'Add image or video' ) }
+										labelStyle={ addMediaButtonStyle }
+										leftAlign
+										onPress={ openMediaOptions }
+									/>
+								</>
+							);
+						} }
 					/>
 				) }
 			</PanelBody>
