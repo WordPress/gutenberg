@@ -2,34 +2,61 @@
  * External dependencies
  */
 import { compact, map } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../utils/transform-styles';
 
-export default function useEditorStyles( ref, styles ) {
-	useEffect( () => {
-		const updatedStyles = transformStyles(
-			styles,
-			'.editor-styles-wrapper'
-		);
+function syncDarkThemeBodyClassname( node ) {
+	const backgroundColor = window
+		.getComputedStyle( node, null )
+		.getPropertyValue( 'background-color' );
 
-		const { ownerDocument } = ref.current;
-		const nodes = map( compact( updatedStyles ), ( updatedCSS ) => {
-			const node = ownerDocument.createElement( 'style' );
-			node.innerHTML = updatedCSS;
-			ownerDocument.body.appendChild( node );
+	const { ownerDocument } = node;
+	const body = ownerDocument.getElementsByTagName( 'body' )[ 0 ];
 
-			return node;
-		} );
+	if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
+		body.classList.remove( 'is-dark-theme' );
+	} else {
+		body.classList.add( 'is-dark-theme' );
+	}
+}
 
-		return () =>
-			nodes.forEach( ( node ) => ownerDocument.body.removeChild( node ) );
-	}, [ ref, styles ] );
+export default function useEditorStyles( styles ) {
+	const nodes = useRef( [] );
+
+	return useCallback(
+		( node ) => {
+			if ( ! node ) {
+				nodes.current.forEach( ( styleElement ) =>
+					styleElement.ownerDocument.body.removeChild( styleElement )
+				);
+				return;
+			}
+
+			const updatedStyles = transformStyles(
+				styles,
+				'.editor-styles-wrapper'
+			);
+
+			const { ownerDocument } = node;
+			nodes.current = map( compact( updatedStyles ), ( updatedCSS ) => {
+				const styleElement = ownerDocument.createElement( 'style' );
+				styleElement.innerHTML = updatedCSS;
+				ownerDocument.body.appendChild( styleElement );
+
+				return styleElement;
+			} );
+
+			syncDarkThemeBodyClassname( node );
+		},
+		[ styles ]
+	);
 }

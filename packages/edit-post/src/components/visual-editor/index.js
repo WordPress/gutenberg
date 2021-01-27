@@ -21,7 +21,7 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
-	__experimentalUseDarkEditorStyle as useDarkEditorStyle,
+	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef, useCallback } from '@wordpress/element';
@@ -33,7 +33,7 @@ import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../store';
 
-export default function VisualEditor() {
+export default function VisualEditor( { styles } ) {
 	const ref = useRef();
 	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
 		const {
@@ -63,10 +63,10 @@ export default function VisualEditor() {
 	useClipboardHandler( ref );
 	useTypingObserver( ref );
 	useCanvasClickRedirect( ref );
-	const darkEditorRef = useDarkEditorStyle();
-	const mergedRefs = useCallback( mergeRefs( [ ref, darkEditorRef ] ), [
+	const editorStylesRef = useEditorStyles( styles );
+	const mergedRefs = useCallback( mergeRefs( [ ref, editorStylesRef ] ), [
 		ref,
-		darkEditorRef,
+		editorStylesRef,
 	] );
 
 	return (
