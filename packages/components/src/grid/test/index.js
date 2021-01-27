@@ -6,8 +6,8 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
-import { Grid } from '../index';
+import View from '../../view';
+import Grid from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

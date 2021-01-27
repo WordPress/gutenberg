@@ -1,2 +1,2 @@
-export { default as Grid } from './grid';
+export { default } from './grid';
 export * from './use-grid';

@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
-import { Grid } from '../index';
+import View from '../../view';
+import Grid from '../index';
 
 export default {
 	component: Grid,
