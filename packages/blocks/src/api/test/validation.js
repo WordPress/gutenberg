@@ -8,6 +8,7 @@ import {
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
 	isEquivalentTextTokens,
+	getNormalizedLength,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -161,6 +162,32 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'getNormalizedLength()', () => {
+		it( 'omits unit from zero px length', () => {
+			const normalizedLength = getNormalizedLength( '0px' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero px length', () => {
+			const normalizedLength = getNormalizedLength( '50px' );
+
+			expect( normalizedLength ).toBe( '50px' );
+		} );
+
+		it( 'omits unit from zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '0%' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '50%' );
+
+			expect( normalizedLength ).toBe( '50%' );
+		} );
+	} );
+
 	describe( 'getNormalizedStyleValue()', () => {
 		it( 'omits whitespace and quotes from url value', () => {
 			const normalizedValue = getNormalizedStyleValue(
@@ -170,6 +197,22 @@ describe( 'validation', () => {
 			expect( normalizedValue ).toBe(
 				'url(https://wordpress.org/img.png)'
 			);
+		} );
+
+		it( 'omits length units from zero values', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'44% 0% 18em 0em'
+			);
+
+			expect( normalizedValue ).toBe( '44% 0 18em 0' );
+		} );
+
+		it( 'leaves zero values in calc() expressions alone', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'calc(0em + 5px)'
+			);
+
+			expect( normalizedValue ).toBe( 'calc(0em + 5px)' );
 		} );
 	} );
 

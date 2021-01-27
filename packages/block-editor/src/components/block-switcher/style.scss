@@ -20,6 +20,10 @@
 	}
 }
 
+.block-editor-block-switcher__toggle-text {
+	margin-left: $grid-unit-10;
+}
+
 // Indent the popover to match the button position.
 .block-editor-block-switcher__popover {
 	margin-left: 6px;
