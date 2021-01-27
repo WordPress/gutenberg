@@ -190,6 +190,7 @@ export { default as tool } from './library/tool';
 export { default as trash } from './library/trash';
 export { default as typography } from './library/typography';
 export { default as undo } from './library/undo';
+export { default as ungroup } from './library/ungroup';
 export { default as update } from './library/update';
 export { default as upload } from './library/upload';
 export { default as verse } from './library/verse';

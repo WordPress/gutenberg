@@ -15,7 +15,9 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
 		"src/utils/**/*",
+		"src/view/**/*",
 		"src/visually-hidden/**/*"
 	],
 	"exclude": [
