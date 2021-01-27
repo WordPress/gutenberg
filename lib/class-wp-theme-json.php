@@ -118,7 +118,10 @@ class WP_Theme_JSON {
 		),
 		'settings' => array(
 			'border'     => array(
-				'customRadius' => null,
+				'customRadius'  => null,
+				'defaultRadius' => null,
+				'maxRadius'     => null,
+				'minRadius'     => null,
 			),
 			'color'      => array(
 				'custom'         => null,

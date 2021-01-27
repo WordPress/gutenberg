@@ -12,8 +12,8 @@ import useEditorFeature from '../components/use-editor-feature';
 import { BORDER_SUPPORT_KEY } from './border';
 import { cleanEmptyObject } from './utils';
 
-const MIN_BORDER_RADIUS_VALUE = 0;
-const MAX_BORDER_RADIUS_VALUE = 50;
+const DEFAULT_MIN_RADIUS = 0;
+const DEFAULT_MAX_RADIUS = 50;
 
 /**
  * Inspector control panel containing the border radius related configuration.
@@ -27,12 +27,16 @@ export function BorderRadiusEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const min = useEditorFeature( 'border.minRadius' ) || DEFAULT_MIN_RADIUS;
+	const max = useEditorFeature( 'border.maxRadius' ) || DEFAULT_MAX_RADIUS;
+	const defaultRadius = useEditorFeature( 'border.defaultRadius' );
+
 	if ( useIsBorderRadiusDisabled( props ) ) {
 		return null;
 	}
 
 	const onChange = ( newRadius ) => {
-		const newStyle = {
+		let newStyle = {
 			...style,
 			border: {
 				...style?.border,
@@ -40,16 +44,21 @@ export function BorderRadiusEdit( props ) {
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		if ( newRadius === undefined ) {
+			newStyle = cleanEmptyObject( newStyle );
+		}
+
+		setAttributes( { style: newStyle } );
 	};
 
 	return (
 		<RangeControl
 			value={ style?.border?.radius }
 			label={ __( 'Border radius' ) }
-			min={ MIN_BORDER_RADIUS_VALUE }
-			max={ MAX_BORDER_RADIUS_VALUE }
-			initialPosition={ 0 }
+			min={ min }
+			max={ max }
+			initialPosition={ defaultRadius || min }
+			resetFallbackValue={ defaultRadius }
 			allowReset
 			onChange={ onChange }
 		/>

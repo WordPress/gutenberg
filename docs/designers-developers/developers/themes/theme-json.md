@@ -56,7 +56,10 @@ The settings section has the following structure and default values:
   "settings": {
     "some/context": {
       "border": {
-        "customRadius": false /* true to opt-in */
+        "customRadius": false, /* true to opt-in */
+        "defaultRadius": 0, /* Optional, used as fallback when resetting border radius control */
+        "maxRadius": 50, /* Optional, sets maximum border radius, defaults to `50` */
+        "minRadius": 0 /* Optional, sets minimum border radius, defaults to `0` */
       },
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
