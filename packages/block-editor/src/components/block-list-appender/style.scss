@@ -22,7 +22,8 @@
 
 // For vertical flex containers, a 100% width ensures correct alignment.
 .is-vertical .block-list-appender {
-	width: 100%;
+	width: $icon-size;
+	margin-right: auto;
 }
 
 .block-list-appender > .block-editor-inserter {
