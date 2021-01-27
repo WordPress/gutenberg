@@ -1,5 +1,3 @@
-$blocks-button__height: 3.1em;
-
 // This variable is repeated across Button, Buttons, and Buttons editor styles.
 $blocks-block__margin: 0.5em;
 
@@ -8,8 +6,8 @@ $blocks-block__margin: 0.5em;
 .wp-block-button__link {
 	color: $white;
 	background-color: #32373c;
-	border: none;
-	border-radius: $blocks-button__height / 2;
+	border: 2px solid #32373c;
+	border-radius: 9999px; // 100% causes an oval, but any explicit but really high value retains the pill shape.
 	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
@@ -78,12 +76,12 @@ $blocks-block__margin: 0.5em;
 
 .is-style-outline > .wp-block-button__link,
 .wp-block-button__link.is-style-outline {
-	border: 2px solid;
+	border: 2px solid currentColor;
 }
 
 .is-style-outline > .wp-block-button__link:not(.has-text-color),
 .wp-block-button__link.is-style-outline:not(.has-text-color) {
-	color: #32373c;
+	color: currentColor;
 }
 
 .is-style-outline > .wp-block-button__link:not(.has-background),
