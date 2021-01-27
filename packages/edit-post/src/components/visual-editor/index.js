@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import mergeRefs from 'react-merge-refs';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -16,9 +21,10 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
+	__experimentalUseDarkEditorStyle as useDarkEditorStyle,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useRef, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,13 +63,18 @@ export default function VisualEditor() {
 	useClipboardHandler( ref );
 	useTypingObserver( ref );
 	useCanvasClickRedirect( ref );
+	const darkEditorRef = useDarkEditorStyle();
+	const mergedRefs = useCallback( mergeRefs( [ ref, darkEditorRef ] ), [
+		ref,
+		darkEditorRef,
+	] );
 
 	return (
 		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div
-				ref={ ref }
+				ref={ mergedRefs }
 				className="editor-styles-wrapper"
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
