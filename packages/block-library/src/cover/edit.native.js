@@ -93,6 +93,7 @@ const Cover = ( {
 	openGeneralSidebar,
 	closeSettingsBottomSheet,
 	selectBlock,
+	blockWidth,
 } ) => {
 	const {
 		backgroundType,
@@ -546,6 +547,7 @@ const Cover = ( {
 				<InnerBlocks
 					template={ INNER_BLOCKS_TEMPLATE }
 					templateInsertUpdatesSelection
+					blockWidth={ blockWidth }
 				/>
 			</View>
 
