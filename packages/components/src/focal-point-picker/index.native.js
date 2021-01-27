@@ -40,6 +40,9 @@ function FocalPointPicker( props ) {
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 	const [ tooltipVisible, setTooltipVisible ] = useState( false );
 
+	let locationPageOffsetX = useRef().current;
+	let locationPageOffsetY = useRef().current;
+
 	useEffect( () => {
 		requestFocalPointPickerTooltipShown( ( tooltipShown ) => {
 			if ( ! tooltipShown ) {
@@ -76,7 +79,14 @@ function FocalPointPicker( props ) {
 
 				onPanResponderGrant: ( event ) => {
 					shouldEnableBottomSheetScroll( false );
-					const { locationX: x, locationY: y } = event.nativeEvent;
+					const {
+						locationX: x,
+						locationY: y,
+						pageX,
+						pageY,
+					} = event.nativeEvent;
+					locationPageOffsetX = pageX - x;
+					locationPageOffsetY = pageY - y;
 					pan.setValue( { x, y } ); // Set cursor to tap location
 					pan.extractOffset(); // Set offset to current value
 				},
@@ -88,7 +98,15 @@ function FocalPointPicker( props ) {
 				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
 					pan.flattenOffset(); // Flatten offset into value
-					const { locationX: x, locationY: y } = event.nativeEvent;
+					const { pageX, pageY } = event.nativeEvent;
+					// Ideally, x and y below are merely locationX and locationY from the
+					// nativeEvent. However, we are required to compute these relative
+					// coordinates to workaround a bug affecting Android's PanResponder.
+					// Specifically, dragging the handle outside the bounds of the image
+					// results in inaccurate locationX and locationY coordinates to be
+					// reported. https://git.io/JtWmi
+					const x = pageX - locationPageOffsetX;
+					const y = pageY - locationPageOffsetY;
 					onChange( {
 						x: clamp( x / containerSize?.width, 0, 1 ),
 						y: clamp( y / containerSize?.height, 0, 1 ),
