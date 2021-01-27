@@ -465,7 +465,6 @@ describe( 'Links', () => {
 		// Confirm that submitting the input without any changes keeps the same
 		// value and moves focus back to the paragraph.
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '.' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
