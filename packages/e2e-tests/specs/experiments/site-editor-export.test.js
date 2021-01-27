@@ -18,6 +18,9 @@ import { siteEditor } from '../../experimental-features';
 async function waitForFileExists( filePath, timeout = 10000 ) {
 	const start = Date.now();
 	while ( ! fs.existsSync( filePath ) ) {
+		// Puppeteer doesn't have an API for managing file downloads.
+		// We are using `waitForTimeout` to add delays between check of file existence.
+		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 1000 );
 		if ( Date.now() - start > timeout ) {
 			throw Error( 'waitForFileExists timeout' );
