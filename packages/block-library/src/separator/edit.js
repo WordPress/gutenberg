@@ -8,7 +8,7 @@ import { clamp } from 'lodash';
  * WordPress dependencies
  */
 import { HorizontalRule, ResizableBox } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
 import { View } from '@wordpress/primitives';
 
@@ -16,33 +16,68 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SeparatorSettings from './separator-settings';
-
-const MIN_HEIGHT = 20;
-const MIN_DOTS_HEIGHT = 30;
-const MAX_HEIGHT = 500;
+import { getHeightConstraints } from './height-constraints';
 
 function SeparatorEdit( props ) {
 	const { attributes, setAttributes, color, setColor, isSelected } = props;
-	const { height } = attributes;
-	const hasDotsStyle = attributes.className?.indexOf( 'is-style-dots' ) >= 0;
+	const { height, heightUnit } = attributes;
 	const [ isResizing, setIsResizing ] = useState( false );
+
+	const hasDotsStyle = attributes.className?.indexOf( 'is-style-dots' ) >= 0;
+	const minimumHeightScale = hasDotsStyle ? 1.5 : 1;
+	const heightConstraints = getHeightConstraints( minimumHeightScale );
+	const currentMinHeight = heightConstraints[ heightUnit ].min;
+	const currentMaxHeight = heightConstraints[ heightUnit ].max;
+
+	useEffect( () => {
+		if ( height < currentMinHeight ) {
+			setAttributes( { height: currentMinHeight } );
+		}
+	}, [ hasDotsStyle, heightConstraints ] );
 
 	const onResizeStart = () => {
 		setIsResizing( true );
 	};
 
+	// Change handler for sidebar height control only.
 	const updateHeight = ( value ) => {
 		setAttributes( {
-			height: clamp( Math.round( value ), MIN_HEIGHT, MAX_HEIGHT ),
+			height: clamp(
+				parseFloat( value ), // Rounding or parsing as integer here isn't ideal for em and rem units.
+				currentMinHeight,
+				currentMaxHeight
+			),
+			heightUnit,
 		} );
 	};
 
+	const updateHeightUnit = ( value ) => {
+		setAttributes( {
+			height: heightConstraints[ value ].default,
+			heightUnit: value,
+		} );
+	};
+
+	// ResizableBox callback to set height and force pixel units.
 	const onResizeStop = ( _event, _direction, elt ) => {
-		updateHeight( elt.clientHeight );
+		setAttributes( {
+			height: clamp(
+				parseInt( elt.clientHeight, 10 ),
+				heightConstraints.px.min,
+				heightConstraints.px.max
+			),
+			heightUnit: 'px',
+		} );
 		setIsResizing( false );
 	};
 
+	// const minHeight = `${ currentMinHeight }${ heightUnit }`;
+	const cssHeight = `${ height }${ heightUnit }`;
 	const blockProps = useBlockProps();
+	const wrapperClasses = blockProps.className?.replace(
+		'wp-block-separator',
+		'wp-block-separator__wrapper'
+	);
 
 	// The block's className and styles are moved to the inner <hr> to retain
 	// the different styling approaches between themes. The use of bottom
@@ -53,10 +88,8 @@ function SeparatorEdit( props ) {
 		<>
 			<View
 				{ ...blockProps }
-				className={ blockProps.className?.replace(
-					'wp-block-separator',
-					''
-				) }
+				className={ wrapperClasses }
+				style={ { height: height ? cssHeight : undefined } }
 			>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
@@ -75,7 +108,10 @@ function SeparatorEdit( props ) {
 							'is-selected': isSelected,
 						}
 					) }
-					size={ { height } }
+					size={ {
+						height:
+							heightUnit === 'px' && height ? cssHeight : '100%',
+					} }
 					enable={ {
 						top: false,
 						right: false,
@@ -86,7 +122,7 @@ function SeparatorEdit( props ) {
 						bottomLeft: false,
 						topLeft: false,
 					} }
-					minHeight={ hasDotsStyle ? MIN_DOTS_HEIGHT : MIN_HEIGHT }
+					minHeight={ heightConstraints.px.min }
 					onResizeStart={ onResizeStart }
 					onResizeStop={ onResizeStop }
 					showHandle={ isSelected }
@@ -101,10 +137,12 @@ function SeparatorEdit( props ) {
 			<SeparatorSettings
 				color={ color }
 				setColor={ setColor }
-				minHeight={ hasDotsStyle ? MIN_DOTS_HEIGHT : MIN_HEIGHT }
-				maxHeight={ MAX_HEIGHT }
+				minHeight={ currentMinHeight }
+				maxHeight={ currentMaxHeight }
 				height={ height }
+				heightUnit={ heightUnit }
 				updateHeight={ updateHeight }
+				updateHeightUnit={ updateHeightUnit }
 			/>
 		</>
 	);

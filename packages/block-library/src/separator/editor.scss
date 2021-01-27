@@ -8,6 +8,12 @@
 	position: relative;
 }
 
+.editor-styles-wrapper {
+	.wp-block.wp-block-separator__wrapper {
+		margin: 0 auto;
+	}
+}
+
 // Duplicate selector to overcome theme specificity.
 .editor-styles-wrapper .wp-block .wp-block-separator.wp-block-separator {
 	// Remove default margins and center within ResizableBox control.

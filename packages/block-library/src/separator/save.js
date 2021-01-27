@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { getColorClassName, useBlockProps } from '@wordpress/block-editor';
 
 export default function separatorSave( { attributes } ) {
-	const { color, customColor, height } = attributes;
-	const margin = height ? `${ height / 2 }px` : undefined;
+	const { color, customColor, height, heightUnit } = attributes;
+	const margin = height ? `${ height / 2 }${ heightUnit }` : undefined;
 
 	// the hr support changing color using border-color, since border-color
 	// is not yet supported in the color palette, we use background-color

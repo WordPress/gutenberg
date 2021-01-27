@@ -11,6 +11,10 @@
 		},
 		"height": {
 			"type": "number"
+		},
+		"heightUnit": {
+			"type": "string",
+			"default": "px"
 		}
 	},
 	"supports": {
