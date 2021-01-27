@@ -125,6 +125,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		);
 		const { canUser } = select( coreStore );
 
+		// Prefetch and parse patterns.
+		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
+
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			reusableBlocks: select( 'core' ).getEntityRecords(
