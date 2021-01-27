@@ -17,13 +17,6 @@ import { getSaveContent } from '../serializer';
 import { normalizeBlockType } from '../utils';
 
 /**
- * CSS length units
- *
- * @type {Array}
- */
-const CSS_UNITS = [ '%', 'px', 'em', 'rem', 'vw', 'vh' ];
-
-/**
  * Globally matches any consecutive whitespace
  *
  * @type {RegExp}
@@ -341,10 +334,7 @@ export function isEquivalentTextTokens(
  * @return {string} Normalized CSS length value.
  */
 export function getNormalizedLength( value ) {
-	if ( CSS_UNITS.some( ( unit ) => value === '0' + unit ) ) {
-		return '0';
-	}
-	return value;
+	return 0 === parseFloat( value ) ? '0' : value;
 }
 
 /**
