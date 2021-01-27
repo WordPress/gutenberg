@@ -206,6 +206,14 @@ describe( 'validation', () => {
 
 			expect( normalizedValue ).toBe( '44% 0 18em 0' );
 		} );
+
+		it( 'leaves zero values in calc() expressions alone', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'calc(0em + 5px)'
+			);
+
+			expect( normalizedValue ).toBe( 'calc(0em + 5px)' );
+		} );
 	} );
 
 	describe( 'getStyleProperties()', () => {
