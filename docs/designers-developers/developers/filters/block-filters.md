@@ -319,6 +319,51 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-nam
 ```
 {% end %}
 
+Adding new properties to the block's wrapper component can be achieved by adding them to the `wrapperProps` property of the returned component.
+
+_Example:_
+
+{% codetabs %}
+{% ESNext %}
+```js
+const { createHigherOrderComponent } = wp.compose;
+
+const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
+		const wrapperProps = { 'data-your-property': 'your-value' };
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	};
+}, 'withClientIdClassName' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
+```
+{% ES5 %}
+```js
+var el = wp.element.createElement;
+
+var withClientIdClassName = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
+	return function( props ) {
+		var newProps = lodash.assign(
+			{},
+			props,
+			{
+				wrapperProps: {
+					'data-your-property': 'your-value'
+				}
+			}
+		);
+
+		return el(
+			BlockListBlock,
+			newProps
+		);
+	};
+}, 'withClientIdClassName' );
+
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
+```
+{% end %}
+
 ## Removing Blocks
 
 ### Using a deny list
