@@ -1,8 +1,17 @@
-.block-editor-block-patterns-list__item {
+.block-editor-block-patterns-list__list-item {
+	// width: 100%;
 
+	&.is-placeholder {
+		min-height: 100px;
+	}
+
+	&[draggable="true"] .block-editor-block-preview__container {
+		cursor: grab;
+	}
+}
+
+.block-editor-block-patterns-list__item {
 	border-radius: $radius-block-ui;
-	cursor: pointer;
-	margin-top: $grid-unit-20;
 	transition: all 0.05s ease-in-out;
 	position: relative;
 	border: $border-width solid transparent;
@@ -16,14 +25,6 @@
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
-	}
-
-	&.is-placeholder {
-		min-height: 100px;
-	}
-
-	&[draggable="true"] .block-editor-block-preview__container {
-		cursor: grab;
 	}
 }
 
