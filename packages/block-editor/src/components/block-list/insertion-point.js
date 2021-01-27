@@ -23,7 +23,11 @@ import { isRTL } from '@wordpress/i18n';
 import Inserter from '../inserter';
 import { getBlockDOMNode } from '../../utils/dom';
 
-function InsertionPointInserter( { clientId, setIsInserterForced } ) {
+function InsertionPointInserter( {
+	clientId,
+	rootClientId,
+	setIsInserterForced,
+} ) {
 	return (
 		<div
 			className={ classnames(
@@ -33,6 +37,7 @@ function InsertionPointInserter( { clientId, setIsInserterForced } ) {
 			<Inserter
 				position="bottom center"
 				clientId={ clientId }
+				rootClientId={ rootClientId }
 				__experimentalIsQuick
 				onToggle={ setIsInserterForced }
 				onSelectOrClose={ () => setIsInserterForced( false ) }
@@ -43,7 +48,7 @@ function InsertionPointInserter( { clientId, setIsInserterForced } ) {
 
 function InsertionPointPopover( {
 	clientId,
-	rootClientId,
+	selectedRootClientId,
 	isInserterShown,
 	isInserterForced,
 	setIsInserterForced,
@@ -59,6 +64,7 @@ function InsertionPointPopover( {
 		orientation,
 		isHidden,
 		nextClientId,
+		rootClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -73,7 +79,7 @@ function InsertionPointPopover( {
 			const { ownerDocument } = containerRef.current;
 			const targetRootClientId = clientId
 				? getBlockRootClientId( clientId )
-				: rootClientId;
+				: selectedRootClientId;
 			const blockOrder = getBlockOrder( targetRootClientId );
 			if ( ! blockOrder.length ) {
 				return {};
@@ -104,9 +110,10 @@ function InsertionPointPopover( {
 						  blockOrientation === 'vertical' &&
 						  next === selectedBlockClientId ),
 				orientation: blockOrientation,
+				rootClientId: targetRootClientId,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId, selectedRootClientId ]
 	);
 
 	const style = useMemo( () => {
@@ -224,6 +231,7 @@ function InsertionPointPopover( {
 					) }
 				{ ! isHidden && ( isInserterShown || isInserterForced ) && (
 					<InsertionPointInserter
+						rootClientId={ rootClientId }
 						clientId={ nextClientId }
 						setIsInserterForced={ setIsInserterForced }
 					/>
@@ -373,7 +381,7 @@ export default function useInsertionPoint( ref ) {
 				clientId={
 					isInserterVisible ? selectedClientId : inserterClientId
 				}
-				rootClientId={ selectedRootClientId }
+				selectedRootClientId={ selectedRootClientId }
 				isInserterShown={ isInserterShown }
 				isInserterForced={ isInserterForced }
 				setIsInserterForced={ ( value ) => {
