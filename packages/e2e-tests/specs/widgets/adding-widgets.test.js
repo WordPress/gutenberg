@@ -64,7 +64,6 @@ describe( 'Widgets screen', () => {
 		return addParagraphBlock;
 	}
 
-	/*
 	async function expectInsertionPointIndicatorToBeBelowLastBlock(
 		widgetArea
 	) {
@@ -82,7 +81,6 @@ describe( 'Widgets screen', () => {
 			insertionPointIndicatorBoundingBox.y > lastBlockBoundingBox.y
 		).toBe( true );
 	}
-	*/
 
 	async function getInlineInserterButton() {
 		return await page.waitForSelector(
@@ -124,9 +122,9 @@ describe( 'Widgets screen', () => {
 		addParagraphBlock = await getParagraphBlockInGlobalInserter();
 		await addParagraphBlock.hover();
 
-		/*await expectInsertionPointIndicatorToBeBelowLastBlock(
+		await expectInsertionPointIndicatorToBeBelowLastBlock(
 			firstWidgetArea
-		);*/
+		);
 		await addParagraphBlock.click();
 
 		await page.keyboard.type( 'Second Paragraph' );
@@ -302,6 +300,86 @@ describe( 'Widgets screen', () => {
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
+		</div></div>",
+		}
+	` );
+	} );
+
+	it( 'Should duplicate the widgets', async () => {
+		const firstWidgetArea = await page.$(
+			'[aria-label="Block: Widget Area"][role="group"]'
+		);
+
+		const addParagraphBlock = await getParagraphBlockInGlobalInserter();
+		await addParagraphBlock.click();
+
+		const firstParagraphBlock = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await page.keyboard.type( 'First Paragraph' );
+
+		// Trigger the toolbar to appear.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.up( 'Shift' );
+
+		const blockToolbar = await page.waitForSelector(
+			'[role="toolbar"][aria-label="Block tools"]'
+		);
+		const moreOptionsButton = await blockToolbar.$(
+			'button[aria-label="Options"]'
+		);
+		await moreOptionsButton.click();
+
+		const optionsMenu = await page.waitForSelector(
+			'[role="menu"][aria-label="Options"]'
+		);
+		const [ duplicateButton ] = await optionsMenu.$x(
+			'//*[@role="menuitem"][*[text()="Duplicate"]]'
+		);
+		await duplicateButton.click();
+
+		await page.waitForFunction(
+			( paragraph ) =>
+				paragraph.nextSibling &&
+				paragraph.nextSibling.matches( '[data-block]' ),
+			{},
+			firstParagraphBlock
+		);
+		const duplicatedParagraphBlock = await firstParagraphBlock.evaluateHandle(
+			( paragraph ) => paragraph.nextSibling
+		);
+
+		const firstParagraphBlockClientId = await firstParagraphBlock.evaluate(
+			( node ) => node.dataset.block
+		);
+		const duplicatedParagraphBlockClientId = await duplicatedParagraphBlock.evaluate(
+			( node ) => node.dataset.block
+		);
+
+		expect( firstParagraphBlockClientId ).not.toBe(
+			duplicatedParagraphBlockClientId
+		);
+		expect(
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node.textContent
+			)
+		).toBe( 'First Paragraph' );
+		expect(
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node === document.activeElement
+			)
+		).toBe( true );
+
+		await saveWidgets();
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
 		</div></div>",
 		}
 	` );
