@@ -53,6 +53,19 @@ The performed event after a click on a block pattern. In most cases, the pattern
 -   Type: `Function`
 -   Required: Yes
 
+#### isDraggable
+Enables drag and drop functionality to the available block patterns.
+
+-   Type: `boolean`
+-   Required: No
+
+#### label
+The aria label for the block patterns list.
+
+-   Type: `string`
+-   Required: No
+-   Default: `Patterns`
+
 ## Related components
 
 Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.

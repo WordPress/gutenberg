@@ -103,7 +103,6 @@ function BlockPatternsCategory( {
 		<>
 			{ !! currentCategoryPatterns.length && (
 				<PatternInserterPanel
-					title={ patternCategory.title }
 					selectedCategory={ patternCategory }
 					patternCategories={ populatedCategories }
 					onClickCategory={ onClickCategory }
@@ -112,6 +111,7 @@ function BlockPatternsCategory( {
 						shownPatterns={ currentShownPatterns }
 						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
+						label={ patternCategory.label }
 						isDraggable
 					/>
 				</PatternInserterPanel>

@@ -11,6 +11,7 @@ import {
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -82,6 +83,7 @@ function BlockPatternList( {
 	blockPatterns,
 	shownPatterns,
 	onClickPattern,
+	label = __( 'Patterns' ),
 } ) {
 	const composite = useCompositeState( { orientation: 'vertical' } );
 	return (
@@ -89,6 +91,7 @@ function BlockPatternList( {
 			{ ...composite }
 			role="listbox"
 			className="block-editor-block-patterns-list"
+			aria-label={ label }
 		>
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
