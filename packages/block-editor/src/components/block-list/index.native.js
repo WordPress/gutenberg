@@ -150,13 +150,13 @@ export class BlockList extends Component {
 	onLayout( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
-		const { isRootList } = this.props;
+		const { isRootList, maxWidth } = this.props;
 
 		const layoutWidth = Math.floor( layout.width );
 
 		if ( isRootList && blockWidth !== layoutWidth ) {
 			this.setState( {
-				blockWidth: layoutWidth,
+				blockWidth: Math.min( layoutWidth, maxWidth ),
 			} );
 		}
 	}
@@ -377,6 +377,7 @@ export default compose( [
 				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
 
+			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
 			const blockCount = getBlockCount( rootBlockId );
@@ -398,6 +399,7 @@ export default compose( [
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
+				maxWidth,
 			};
 		}
 	),
