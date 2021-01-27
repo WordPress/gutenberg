@@ -49,6 +49,7 @@ function ColumnEdit( {
 	selectedColumnIndex,
 	parentAlignment,
 	clientId,
+	blockWidth,
 } ) {
 	const { verticalAlignment, width } = attributes;
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
@@ -98,8 +99,8 @@ function ColumnEdit( {
 	};
 
 	const renderAppender = useCallback( () => {
-		const { width: blockWidth } = contentStyle[ clientId ];
-		const isScreenWidthEqual = blockWidth === screenWidth;
+		const { width: columnWidth } = contentStyle[ clientId ];
+		const isScreenWidthEqual = columnWidth === screenWidth;
 
 		if ( isSelected ) {
 			return (
@@ -181,6 +182,7 @@ function ColumnEdit( {
 				<InnerBlocks
 					renderAppender={ renderAppender }
 					parentWidth={ contentStyle[ clientId ].width }
+					blockWidth={ blockWidth }
 				/>
 			</View>
 		</>

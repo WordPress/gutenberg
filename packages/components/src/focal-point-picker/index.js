@@ -89,10 +89,19 @@ export class FocalPointPicker extends Component {
 			return bounds;
 		}
 
+		// Prevent division by zero when updateBounds runs in componentDidMount
+		if (
+			this.mediaRef.current.clientWidth === 0 ||
+			this.mediaRef.current.clientHeight === 0
+		) {
+			return bounds;
+		}
+
 		const dimensions = {
 			width: this.mediaRef.current.clientWidth,
 			height: this.mediaRef.current.clientHeight,
 		};
+
 		const pickerDimensions = this.pickerDimensions();
 
 		const widthRatio = pickerDimensions.width / dimensions.width;
