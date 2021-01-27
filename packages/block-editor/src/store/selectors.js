@@ -1402,6 +1402,7 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 	icon: variation.icon || item.icon,
 	title: variation.title || item.title,
 	description: variation.description || item.description,
+	category: variation.category || item.category,
 	// If `example` is explicitly undefined for the variation, the preview will not be shown.
 	example: variation.hasOwnProperty( 'example' )
 		? variation.example
@@ -1812,6 +1813,29 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 				? reusableBlock.content.raw
 				: reusableBlock.content
 		);
+	},
+	( state ) => [ getReusableBlocks( state ) ]
+);
+
+/**
+ * Returns the title of a given reusable block
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {string} The reusable block saved title.
+ */
+export const __experimentalGetReusableBlockTitle = createSelector(
+	( state, ref ) => {
+		const reusableBlock = find(
+			getReusableBlocks( state ),
+			( block ) => block.id === ref
+		);
+		if ( ! reusableBlock ) {
+			return null;
+		}
+
+		return reusableBlock.title?.raw;
 	},
 	( state ) => [ getReusableBlocks( state ) ]
 );

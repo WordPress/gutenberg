@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [**] Add support for setting heading anchors
 
 
 #### Bug Fix
