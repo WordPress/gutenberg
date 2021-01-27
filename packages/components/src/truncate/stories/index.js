@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Truncate } from '../index';
+import Truncate from '../index';
 
 export default {
 	component: Truncate,
