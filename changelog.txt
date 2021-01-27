@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 9.8.2 =
+
+### Bug Fixes
+
+- Cover Block: Prevent division by zero in FocalPointPicker ([28499](https://github.com/WordPress/gutenberg/pull/28499))
+- Block Validation: Allow unitless zero CSS lengths ([28501](https://github.com/WordPress/gutenberg/pull/28501))
+
+
+
 = 9.8.1 =
 
 ### Bug Fixes
