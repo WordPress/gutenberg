@@ -3,6 +3,7 @@
  */
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { getPathAndQueryString } from '@wordpress/url';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -135,11 +136,15 @@ export function setHomeTemplateId( homeTemplateId ) {
  */
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
-		if ( page.context?.postType === 'page' ) {
-			page.path = `/?page_id=${ page.context.postId }`;
-		} else {
-			page.path = `/?p=${ page.context.postId }`;
-		}
+		const entity = yield controls.resolveSelect(
+			'core',
+			'getEntityRecord',
+			'postType',
+			page.context.postType || 'post',
+			page.context.postId
+		);
+
+		page.path = getPathAndQueryString( entity.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
 		'core',
