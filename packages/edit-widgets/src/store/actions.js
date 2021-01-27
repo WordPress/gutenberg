@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -14,7 +9,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { STATE_SUCCESS } from './batch-processing/constants';
-import { dispatch, select, getWidgetToClientIdMapping } from './controls';
+import { dispatch, select } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
@@ -99,8 +94,6 @@ export function* saveWidgetAreas( widgetAreas ) {
 
 export function* saveWidgetArea( widgetAreaId ) {
 	const widgets = yield select( editWidgetsStoreName, 'getWidgets' );
-	const widgetIdToClientId = yield getWidgetToClientIdMapping();
-	const clientIdToWidgetId = invert( widgetIdToClientId );
 
 	const post = yield select(
 		'core',
@@ -128,7 +121,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
-		const widgetId = clientIdToWidgetId[ block.clientId ];
+		const widgetId = block.attributes.__internalWidgetId;
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
 		// We'll replace the null widgetId after save, but we track it here
@@ -222,12 +215,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 	for ( let i = 0; i < batch.sortedItemIds.length; i++ ) {
 		const itemId = batch.sortedItemIds[ i ];
 		const widget = batch.results[ itemId ];
-		const { clientId, position } = batchMeta[ i ];
+		const { position } = batchMeta[ i ];
 		if ( ! sidebarWidgetsIds[ position ] ) {
 			sidebarWidgetsIds[ position ] = widget.id;
-		}
-		if ( clientId !== widgetIdToClientId[ widget.id ] ) {
-			yield setWidgetIdForClientId( clientId, widget.id );
 		}
 	}
 
