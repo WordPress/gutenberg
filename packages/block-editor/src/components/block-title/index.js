@@ -44,14 +44,14 @@ export default function BlockTitle( { clientId } ) {
 				getBlockAttributes,
 				__experimentalGetReusableBlockTitle,
 			} = select( 'core/block-editor' );
-
-			const isReusable = isReusableBlock(
-				getBlockType( getBlockName( clientId ) )
-			);
-
+			const blockName = getBlockName( clientId );
+			if ( ! blockName ) {
+				return {};
+			}
+			const isReusable = isReusableBlock( getBlockType( blockName ) );
 			return {
 				attributes: getBlockAttributes( clientId ),
-				name: getBlockName( clientId ),
+				name: blockName,
 				reusableBlockTitle:
 					isReusable &&
 					__experimentalGetReusableBlockTitle(
