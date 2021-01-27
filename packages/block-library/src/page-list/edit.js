@@ -11,7 +11,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useSelect } from '@wordpress/data';
 
-export default function PagesEdit( { clientId } ) {
+export default function PageListEdit( { clientId } ) {
 	const navigationBlockAttributes = useSelect( ( select ) => {
 		const { getBlockAttributes, getBlockParentsByBlockName } = select(
 			'core/block-editor'
@@ -37,7 +37,7 @@ export default function PagesEdit( { clientId } ) {
 
 	return (
 		<div { ...blockProps }>
-			<ServerSideRender block="core/pages" />
+			<ServerSideRender block="core/page-list" />
 		</div>
 	);
 }

@@ -12,7 +12,7 @@
  * @param  array $context Navigation block context.
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_pages_build_css_colors( $context ) {
+function block_core_page_list_build_css_colors( $context ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -64,7 +64,7 @@ function block_core_pages_build_css_colors( $context ) {
  * @param  array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
-function block_core_pages_build_css_font_sizes( $context ) {
+function block_core_page_list_build_css_font_sizes( $context ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -86,19 +86,19 @@ function block_core_pages_build_css_font_sizes( $context ) {
 }
 
 /**
- * Renders the `core/pages` block on server.
+ * Renders the `core/page-list` block on server.
  *
  * @param array $attributes The block attributes.
  * @param array $content The saved content.
  * @param array $block The parsed block.
  *
- * @return string Returns the pages list/dropdown markup.
+ * @return string Returns the page list markup.
  */
-function render_block_core_pages( $attributes, $content, $block ) {
+function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
-	$walker = new Walker_Pages_Block;
+	$walker = new Walker_Page_List_Block;
 
 	$args = array(
 		'echo'     => false,
@@ -109,8 +109,8 @@ function render_block_core_pages( $attributes, $content, $block ) {
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 	$items_markup   = wp_list_pages( $args );
 
-	$colors          = block_core_pages_build_css_colors( $block->context );
-	$font_sizes      = block_core_pages_build_css_font_sizes( $block->context );
+	$colors          = block_core_page_list_build_css_colors( $block->context );
+	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes']
@@ -141,12 +141,12 @@ function render_block_core_pages( $attributes, $content, $block ) {
 /**
  * Registers the `core/pages` block on server.
  */
-function register_block_core_pages() {
+function register_block_core_page_list() {
 	register_block_type_from_metadata(
-		__DIR__ . '/pages',
+		__DIR__ . '/page-list',
 		array(
-			'render_callback' => 'render_block_core_pages',
+			'render_callback' => 'render_block_core_page_list',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_pages' );
+add_action( 'init', 'register_block_core_page_list' );

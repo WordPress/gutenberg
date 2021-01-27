@@ -79,7 +79,7 @@ function Navigation( {
 				'core/navigation-link',
 				'core/search',
 				'core/social-links',
-				'core/pages',
+				'core/page-list',
 			],
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:

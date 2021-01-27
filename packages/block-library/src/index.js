@@ -42,7 +42,7 @@ import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
-import * as pages from './pages';
+import * as pageList from './page-list';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
@@ -149,7 +149,7 @@ export const __experimentalGetCoreBlocks = () => [
 	missing,
 	more,
 	nextpage,
-	pages,
+	pageList,
 	preformatted,
 	pullquote,
 	rss,

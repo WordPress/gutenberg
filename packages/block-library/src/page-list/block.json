@@ -1,6 +1,6 @@
 {
 	"apiVersion": 2,
-	"name": "core/pages",
+	"name": "core/page-list",
 	"category": "widgets",
 	"usesContext": [
 		"textColor",
@@ -15,6 +15,6 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-pages-editor",
-	"style": "wp-block-pages"
+	"editorStyle": "wp-block-page-list-editor",
+	"style": "wp-block-page-list"
 }

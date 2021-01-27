@@ -124,5 +124,5 @@ require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
 
-/* Page Walker class extension for Pages Block */
-require_once __DIR__ . '/class-walker-pages-block.php';
+/* Page Walker class extension for Page List Block */
+require_once __DIR__ . '/class-walker-page-list-block.php';

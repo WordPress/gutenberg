@@ -197,7 +197,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateAllPages = () => {
-		const block = [ createBlock( 'core/pages' ) ];
+		const block = [ createBlock( 'core/page-list' ) ];
 		const selectNavigationBlock = true;
 		onCreate( block, selectNavigationBlock );
 	};

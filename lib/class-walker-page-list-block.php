@@ -1,14 +1,14 @@
 <?php
 /**
- * Walker_Pages_Block class.
+ * Walker_Page_List_Block class.
  *
  * @package gutenberg
  */
 
 /**
- * Class that adds submenu dropdown indicators to Pages block.
+ * Class that adds submenu dropdown indicators to Page List block.
  */
-class Walker_Pages_Block extends Walker_Page {
+class Walker_Page_List_Block extends Walker_Page {
 	/**
 	 * Outputs the beginning of the current level in the tree before elements are output.
 	 *
@@ -30,6 +30,6 @@ class Walker_Pages_Block extends Walker_Page {
 			$n = '';
 		}
 		$indent  = str_repeat( $t, $depth );
-		$output .= "<span class='wp-block-pages__submenu-icon'><svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' transform='rotate(90)'><path d='M8 5v14l11-7z'/><path d='M0 0h24v24H0z' fill='none'/></svg></span>{$n}{$indent}<ul class='children'>{$n}";
+		$output .= "<span class='wp-block-page-list__submenu-icon'><svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' transform='rotate(90)'><path d='M8 5v14l11-7z'/><path d='M0 0h24v24H0z' fill='none'/></svg></span>{$n}{$indent}<ul class='children'>{$n}";
 	}
 }
