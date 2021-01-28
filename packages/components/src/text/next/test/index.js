@@ -2,73 +2,67 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import { getFontSize, ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
-import { Text } from '../text';
+import Text from '../text';
 
 describe( 'Text', () => {
 	describe( 'snapshot tests', () => {
-		/**
-		 * We cannot make these assertions programatically for one of a few reasons, varying depending on the situation:
-		 * 1. The result is too complicated and we would create an even more fragile test than a snapshot
-		 * 2. A programatic test would depend too heavily on the internals of the component, thereby testing the implementation rather than the result
-		 * 3. The variable being tested does not resolve in `getComputedStyle` because it is a `var( --wp-g2-color-name )` style variable for which the computed style will be empty (because the theme is not applied in the test environment so the variable does not exist)
-		 *
-		 * I've noted for each test which reason I think applies for each.
-		 */
-
-		// Reason 1
 		test( 'should render correctly', () => {
 			const { container } = render(
 				<Text>Some people are worth melting for.</Text>
 			);
 			expect( container.firstChild ).toMatchSnapshot();
 		} );
+	} );
 
-		// Reason 2
-		test( 'should render optimizeReadabilityFor', () => {
-			const { container } = render(
-				<Text optimizeReadabilityFor="blue">
-					Some people are worth melting for.
-				</Text>
-			);
-			expect( container.firstChild ).toMatchSnapshot();
+	test( 'should render optimizeReadabilityFor', () => {
+		const { container } = render(
+			<Text optimizeReadabilityFor="blue">
+				Some people are worth melting for.
+			</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			color: ui.get( 'white' ),
 		} );
+	} );
 
-		// Reason 3
-		test( 'should render size', () => {
-			const { container } = render(
-				<Text size="title">Some people are worth melting for.</Text>
-			);
-			expect( container.firstChild ).toMatchSnapshot();
+	test( 'should render truncate', () => {
+		const { container } = render(
+			<Text truncate>Some people are worth melting for.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			textOverflow: 'ellipsis',
 		} );
+	} );
 
-		// Reason 3
-		test( 'should render custom size', () => {
-			const { container } = render(
-				<Text size={ 15 }>Some people are worth melting for.</Text>
-			);
-			expect( container.firstChild ).toMatchSnapshot();
+	test( 'should render size', () => {
+		const { container } = render(
+			<Text size="title">Some people are worth melting for.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			fontSize: getFontSize( 'title' ),
 		} );
+	} );
 
-		// Reason 3
-		test( 'should render truncate', () => {
-			const { container } = render(
-				<Text truncate>Some people are worth melting for.</Text>
-			);
-			expect( container.firstChild ).toMatchSnapshot();
+	test( 'should render custom size', () => {
+		const { container } = render(
+			<Text size={ 15 }>Some people are worth melting for.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			fontSize: getFontSize( 15 ),
 		} );
+	} );
 
-		// Reason 3
-		test( 'should render variant', () => {
-			const { container } = render(
-				<Text variant="muted">Some people are worth melting for.</Text>
-			);
-			expect(
-				window.getComputedStyle( container.firstChild )
-			).toMatchSnapshot();
+	test( 'should render variant', () => {
+		const { container } = render(
+			<Text variant="muted">Some people are worth melting for.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			color: ui.get( 'colorTextMuted' ),
 		} );
 	} );
 
@@ -83,18 +77,14 @@ describe( 'Text', () => {
 		const { container } = render(
 			<Text align="center">Some people are worth melting for.</Text>
 		);
-		expect(
-			window.getComputedStyle( container.firstChild ).textAlign
-		).toBe( 'center' );
+		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
 	} );
 
 	test( 'should render color', () => {
 		const { container } = render(
 			<Text color="orange">Some people are worth melting for.</Text>
 		);
-		expect( window.getComputedStyle( container.firstChild ).color ).toBe(
-			'orange'
-		);
+		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
 	} );
 
 	test( 'should render display', () => {
@@ -103,9 +93,9 @@ describe( 'Text', () => {
 				Some people are worth melting for.
 			</Text>
 		);
-		expect( window.getComputedStyle( container.firstChild ).display ).toBe(
-			'inline-flex'
-		);
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'inline-flex',
+		} );
 	} );
 
 	test( 'should render highlighted words', async () => {
@@ -147,35 +137,31 @@ describe( 'Text', () => {
 		const { container } = render(
 			<Text isBlock>Some people are worth melting for.</Text>
 		);
-		expect( window.getComputedStyle( container.firstChild ).display ).toBe(
-			'block'
-		);
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'block',
+		} );
 	} );
 
 	test( 'should render lineHeight', () => {
 		const { container } = render(
 			<Text lineHeight={ 1.5 }>Some people are worth melting for.</Text>
 		);
-		expect(
-			window.getComputedStyle( container.firstChild ).lineHeight
-		).toBe( '1.5' );
+		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
 	} );
 
 	test( 'should render upperCase', () => {
 		const { container } = render(
 			<Text upperCase>Some people are worth melting for.</Text>
 		);
-		expect(
-			window.getComputedStyle( container.firstChild ).textTransform
-		).toBe( 'uppercase' );
+		expect( container.firstChild ).toHaveStyle( {
+			textTransform: 'uppercase',
+		} );
 	} );
 
 	test( 'should render weight', () => {
 		const { container } = render(
 			<Text weight={ 700 }>Some people are worth melting for.</Text>
 		);
-		expect(
-			window.getComputedStyle( container.firstChild ).fontWeight
-		).toBe( '700' );
+		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
 	} );
 } );
