@@ -35,7 +35,7 @@ async function upload( selector ) {
 
 async function waitForImage( filename ) {
 	await page.waitForSelector(
-		`.wp-block-image img[src$="${ filename }.jpg"]`
+		`.wp-block-cover img[src$="${ filename }.jpg"]`
 	);
 }
 
