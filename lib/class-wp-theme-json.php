@@ -31,7 +31,7 @@ class WP_Theme_JSON {
 	 * How to address all the blocks
 	 * in the theme.json file.
 	 */
-	const ALL_BLOCKS_NAME = '*';
+	const ALL_BLOCKS_NAME = 'defaults';
 
 	/**
 	 * The CSS selector for the * block,

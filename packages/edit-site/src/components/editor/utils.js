@@ -8,7 +8,7 @@ import { get, find, forEach, camelCase, isString } from 'lodash';
 import { useSelect } from '@wordpress/data';
 
 /* Supporting data */
-export const ALL_BLOCKS_NAME = '*';
+export const ALL_BLOCKS_NAME = 'defaults';
 export const ALL_BLOCKS_SELECTOR = ':root';
 export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = ':root';
