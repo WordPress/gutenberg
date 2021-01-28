@@ -1,4 +1,12 @@
 /**
+ * External dependencies
+ */
+import path from 'path';
+import fs from 'fs';
+import os from 'os';
+import { v4 as uuid } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -6,6 +14,30 @@ import {
 	createNewPost,
 	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
+
+async function upload( selector ) {
+	await page.waitForSelector( selector );
+	const inputElement = await page.$( selector );
+	const testImagePath = path.join(
+		__dirname,
+		'..',
+		'..',
+		'..',
+		'assets',
+		'1024x768_e2e_test_image_size.jpg'
+	);
+	const filename = uuid();
+	const tmpFileName = path.join( os.tmpdir(), filename + '.jpg' );
+	fs.copyFileSync( testImagePath, tmpFileName );
+	await inputElement.uploadFile( tmpFileName );
+	return filename;
+}
+
+async function waitForImage( filename ) {
+	await page.waitForSelector(
+		`.wp-block-image img[src$="${ filename }.jpg"]`
+	);
+}
 
 describe( 'Cover', () => {
 	beforeEach( async () => {
@@ -89,6 +121,10 @@ describe( 'Cover', () => {
 	} );
 
 	it( 'renders correctly', async () => {
+		await insertBlock( 'Cover' );
+		const filename = await upload( '.wp-block-cover input[type="file"]' );
+		await waitForImage( filename );
+
 		const coverBlockElement = await page.$( '[aria-label="Block: Cover"]' );
 		const screenshot = await coverBlockElement.screenshot( {
 			path: 'cover-block.png',
