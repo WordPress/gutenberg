@@ -1,6 +1,8 @@
 .edit-navigation-header {
-	padding: $grid-unit-20;
-	background: #f1f1f1; // Need to find a variable for this
+	//padding: $grid-unit-20;
+	//background: #f1f1f1; // Need to find a variable for this
+	max-width: 500px;
+	margin: $grid-unit-20 auto;
 
 	.edit-navigation-header__title {
 		font-size: 23px;

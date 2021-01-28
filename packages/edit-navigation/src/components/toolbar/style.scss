@@ -1,16 +1,5 @@
 .edit-navigation-toolbar {
-	align-items: center;
-	background: $white;
-	border: $border-width solid $gray-300;
-	display: flex;
-	height: $grid-unit-60 * 2;
-	padding-bottom: $grid-unit-60;
 	position: relative;
-
-	@include break-medium() {
-		height: $grid-unit-60;
-		padding-bottom: 0;
-	}
 
 	.components-spinner {
 		left: 50%;
@@ -21,22 +10,27 @@
 	}
 }
 
-.edit-navigation-toolbar__block-tools {
-	border-bottom: none;
-	border-left: none;
-	border-right: none;
-	border-top: 1px solid $gray-300;
-	position: absolute;
-	top: $grid-unit-60;
-	width: 100%;
-
-	@include break-medium() {
-		border-top: none;
-		position: static;
-		width: auto;
+.edit-navigation-toolbar__menu-title {
+	small {
+		display: block;
+		font-size: 13px;
+		font-weight: normal;
 	}
 }
 
-.edit-navigation-toolbar__save-button {
-	margin: 0 $grid-unit-10 0 auto;
+.edit-navigation-toolbar__editor-tools {
+	display: flex;
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	.edit-navigation-toolbar__save-button {
+		margin-right: 6px;
+	}
+}
+
+.edit-navigation-toolbar__block-tools {
+	min-height: 48px;
+	background: $white;
+	overflow: hidden;
 }

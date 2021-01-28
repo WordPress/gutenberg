@@ -1,21 +1,12 @@
 // Overriding the wp-admin background and padding
 // to give the navigation editor more room to breathe.
 .gutenberg_page_gutenberg-navigation {
-	background: $white;
-
 	#wpcontent {
 		padding-left: 0;
 	}
 
-	#wpwrap,
-	#wpcontent,
-	#wpbody,
-	#wpbody-content,
-	.edit-navigation,
-	.components-drop-zone__provider,
-	.edit-navigation-layout {
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
+	.navigation-editor-wrapper {
+		max-width: 500px;
+		margin: auto;
 	}
 }

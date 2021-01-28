@@ -78,14 +78,16 @@ export default function Layout( { blockEditorSettings } ) {
 							<NavigationEditorShortcuts
 								saveBlocks={ savePost }
 							/>
-							<Toolbar
-								isPending={ ! hasLoadedMenus }
-								navigationPost={ navigationPost }
-							/>
-							<Editor
-								isPending={ ! hasLoadedMenus }
-								blocks={ blocks }
-							/>
+							<div className="navigation-editor-wrapper">
+								<Toolbar
+									isPending={ ! navigationPost }
+									navigationPost={ navigationPost }
+								/>
+								<Editor
+									isPending={ ! navigationPost }
+									blocks={ blocks }
+								/>
+							</div>
 							<InspectorAdditions
 								menuId={ selectedMenuId }
 								onDeleteMenu={ deleteMenu }
