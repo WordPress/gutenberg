@@ -24,15 +24,31 @@ export default function ContentCategoriesMenu() {
 		isDebouncing,
 	} = useDebouncedSearch();
 
-	const categories = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'taxonomy', 'category', {
-				search: searchQuery,
-			} ),
+	const { categories, isResolved } = useSelect(
+		( select ) => {
+			const { getEntityRecords, hasFinishedResolution } = select(
+				'core'
+			);
+			const getEntityRecordsArgs = [
+				'taxonomy',
+				'category',
+				{
+					search: searchQuery,
+				},
+			];
+			const hasResolvedPosts = hasFinishedResolution(
+				'getEntityRecords',
+				getEntityRecordsArgs
+			);
+			return {
+				pages: getEntityRecords( ...getEntityRecordsArgs ),
+				isResolved: hasResolvedPosts,
+			};
+		},
 		[ searchQuery ]
 	);
 
-	const isLoading = ! search && categories === null;
+	const isLoading = ! search && ! isResolved;
 	const shouldShowLoadingForDebouncing = search && isDebouncing;
 	const showLoading = isLoading || shouldShowLoadingForDebouncing;
 
@@ -44,6 +60,7 @@ export default function ContentCategoriesMenu() {
 			hasSearch={ true }
 			onSearch={ onSearch }
 			search={ search }
+			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
 			{ search && ! isDebouncing && (
 				<SearchResults items={ categories } search={ search } />
