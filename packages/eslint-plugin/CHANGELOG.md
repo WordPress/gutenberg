@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.1 (2021-01-28)
+
 ### Bug Fix
 
 -   Add missing `eslint-plugin-import` npm dependency ([#28545](https://github.com/WordPress/gutenberg/pull/28545)).
