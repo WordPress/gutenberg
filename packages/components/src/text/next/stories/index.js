@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import { boolean } from '@storybook/addon-knobs';
+
+/**
  * Internal dependencies
  */
 import Text from '../text';
+import OldText from '../../index';
 import { adapter } from '../index';
 
 export default {
@@ -53,25 +59,43 @@ export const highlight = () => {
 	);
 };
 
-const Adapted = ( props ) => <Text { ...adapter( props ) } />;
+const Adapted = ( { doAdapt, ...props } ) =>
+	doAdapt ? <Text { ...adapter( props ) } /> : <OldText { ...props } />;
 
-export const adapted = () => (
-	<>
-		<Adapted variant="title.large" as="h1">
-			Title Large
-		</Adapted>
-		<Adapted variant="title.medium" as="h2">
-			Title Medium
-		</Adapted>
-		<Adapted variant="title.small" as="h3">
-			Title Small
-		</Adapted>
-		<Adapted variant="subtitle">Subtitle</Adapted>
-		<Adapted variant="subtitle.small">Subtitle Small</Adapted>
-		<Adapted variant="body">Body</Adapted>
-		<Adapted variant="body.small">Body Small</Adapted>
-		<Adapted variant="button">Button</Adapted>
-		<Adapted variant="caption">Caption</Adapted>
-		<Adapted variant="label">Label</Adapted>
-	</>
-);
+export const adapted = () => {
+	const doAdapt = boolean( 'Use adapted component', false );
+	return (
+		<>
+			<Adapted variant="title.large" as="h1" doAdapt={ doAdapt }>
+				Title Large
+			</Adapted>
+			<Adapted variant="title.medium" as="h2" doAdapt={ doAdapt }>
+				Title Medium
+			</Adapted>
+			<Adapted variant="title.small" as="h3" doAdapt={ doAdapt }>
+				Title Small
+			</Adapted>
+			<Adapted variant="subtitle" doAdapt={ doAdapt }>
+				Subtitle
+			</Adapted>
+			<Adapted variant="subtitle.small" doAdapt={ doAdapt }>
+				Subtitle Small
+			</Adapted>
+			<Adapted variant="body" doAdapt={ doAdapt }>
+				Body
+			</Adapted>
+			<Adapted variant="body.small" doAdapt={ doAdapt }>
+				Body Small
+			</Adapted>
+			<Adapted variant="button" doAdapt={ doAdapt }>
+				Button
+			</Adapted>
+			<Adapted variant="caption" doAdapt={ doAdapt }>
+				Caption
+			</Adapted>
+			<Adapted variant="label" doAdapt={ doAdapt }>
+				Label
+			</Adapted>
+		</>
+	);
+};
