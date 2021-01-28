@@ -12,6 +12,9 @@
 
 	.components-panel {
 		border: none;
+		// Make a stacking context that keeps all descendents behind the sticky header
+		position: relative;
+		z-index: -1 + z-index(".components-panel__header");
 	}
 
 	.components-panel__header {
