@@ -72,7 +72,8 @@ function SeparatorEdit( props ) {
 	};
 
 	// const minHeight = `${ currentMinHeight }${ heightUnit }`;
-	const cssHeight = `${ height }${ heightUnit }`;
+	// const cssHeight = `${ height }${ heightUnit }`;
+	const cssHeight = height;
 	const blockProps = useBlockProps();
 	const wrapperClasses = blockProps.className?.replace(
 		'wp-block-separator',
@@ -89,7 +90,9 @@ function SeparatorEdit( props ) {
 			<View
 				{ ...blockProps }
 				className={ wrapperClasses }
-				style={ { height: height ? cssHeight : undefined } }
+				style={ {
+					height: height ? cssHeight : currentMinHeight,
+				} }
 			>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
