@@ -8,6 +8,7 @@ import {
 	Alert,
 	Platform,
 } from 'react-native';
+import { default as VideoPlayer } from 'react-native-video';
 
 /**
  * WordPress dependencies
@@ -22,6 +23,7 @@ import {
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
 import { getProtocol, safeDecodeURI } from '@wordpress/url';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,9 +40,15 @@ function Player( {
 	isSelected,
 } ) {
 	const { id, src } = attributes;
+	const [ paused, setPaused ] = useState( true );
 
 	const onPressListen = () => {
 		if ( src ) {
+			if ( isIOS && this.player ) {
+				this.player.presentFullscreenPlayer();
+				return;
+			}
+
 			Linking.canOpenURL( src )
 				.then( ( supported ) => {
 					if ( ! supported ) {
@@ -191,6 +199,23 @@ function Player( {
 							</Text>
 						</View>
 					</TouchableWithoutFeedback>
+				) }
+				{ isIOS && (
+					<VideoPlayer
+						source={ { uri: src } }
+						paused={ paused }
+						ref={ ( ref ) => {
+							this.player = ref;
+						} }
+						controls={ false }
+						ignoreSilentSwitch={ 'ignore' }
+						onFullscreenPlayerWillPresent={ () => {
+							setPaused( false );
+						} }
+						onFullscreenPlayerDidDismiss={ () => {
+							setPaused( true );
+						} }
+					/>
 				) }
 			</View>
 		</TouchableWithoutFeedback>
