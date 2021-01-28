@@ -125,6 +125,12 @@ describe( 'Cover', () => {
 		const filename = await upload( '.wp-block-cover input[type="file"]' );
 		await waitForImage( filename );
 
+		// Select the cover block.By default the child paragraph gets selected.
+		await page.click( 'button[aria-label="Outline"]' );
+		await page.click(
+			'.block-editor-block-navigation-block__contents-container button'
+		);
+
 		const coverBlockElement = await page.$( '[aria-label="Block: Cover"]' );
 		const screenshot = await coverBlockElement.screenshot( {
 			path: 'cover-block.png',
