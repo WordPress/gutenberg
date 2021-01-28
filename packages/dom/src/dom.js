@@ -484,6 +484,7 @@ export function isTextField( element ) {
 		'reset',
 		'submit',
 		'number',
+		'email',
 	];
 	return (
 		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
