@@ -18,6 +18,11 @@ export default function Toolbar( { isPending, navigationPost } ) {
 				<Spinner />
 			) : (
 				<>
+					<div className="edit-navigation-toolbar__editor-tools">
+						<SaveButton navigationPost={ navigationPost } />
+						<BlockInspectorDropdown />
+						<Popover.Slot name="block-toolbar" />
+					</div>
 					<NavigableToolbar
 						className="edit-navigation-toolbar__block-tools"
 						aria-label={ __( 'Block tools' ) }
@@ -27,9 +32,6 @@ export default function Toolbar( { isPending, navigationPost } ) {
 							__experimentalExpandedControl
 						/>
 					</NavigableToolbar>
-					<Popover.Slot name="block-toolbar" />
-					<BlockInspectorDropdown />
-					<SaveButton navigationPost={ navigationPost } />
 				</>
 			) }
 		</div>
