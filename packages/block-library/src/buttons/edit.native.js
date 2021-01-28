@@ -73,18 +73,13 @@ export default function ButtonsEdit( {
 	useEffect( () => {
 		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
-		const { isWider, isFullWidth } = alignmentHelpers;
+		const { isFullWidth } = alignmentHelpers;
 
 		if ( width ) {
 			const base = width - margins;
 			const isFullWidthBlock = isFullWidth( align );
-			const isWiderThanMobile = isWider( blockWidth, 'mobile' );
 
-			setMaxWidth(
-				isFullWidthBlock || isWiderThanMobile
-					? base - 2 * spacing
-					: base
-			);
+			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
 		}
 	}, [ sizes, align ] );
 
