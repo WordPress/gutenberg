@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 
@@ -65,16 +65,18 @@ function ControlPointKeyboardMove( { value: position, onChange, children } ) {
 	);
 }
 
-const ControlPointButton = forwardRef( function (
-	{ isOpen, position, color, onChange, ...additionalProps },
-	ref
-) {
+function ControlPointButton( {
+	isOpen,
+	position,
+	color,
+	onChange,
+	...additionalProps
+} ) {
 	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
 		<ControlPointKeyboardMove value={ position } onChange={ onChange }>
 			<Button
-				ref={ ref }
 				aria-label={ sprintf(
 					// translators: %1$s: gradient position e.g: 70, %2$s: gradient color code e.g: rgb(52,121,151).
 					__(
@@ -104,219 +106,156 @@ const ControlPointButton = forwardRef( function (
 			</VisuallyHidden>
 		</ControlPointKeyboardMove>
 	);
-} );
-
-function useMouseDragListener(
-	startMoveHandler,
-	updateMoveHandler,
-	stopMoveHandler,
-	element
-) {
-	const savedStartHandlerRef = useRef();
-	const savedUpdateHandlerRef = useRef();
-	const savedStopHandlerRef = useRef();
-	const isDraggingRef = useRef( false );
-
-	useEffect( () => {
-		savedStartHandlerRef.current = startMoveHandler;
-	}, [ startMoveHandler ] );
-
-	useEffect( () => {
-		savedUpdateHandlerRef.current = updateMoveHandler;
-	}, [ updateMoveHandler ] );
-
-	useEffect( () => {
-		savedStopHandlerRef.current = stopMoveHandler;
-	}, [ stopMoveHandler ] );
-
-	useEffect( () => {
-		if (
-			! (
-				element?.addEventListener &&
-				document?.documentElement?.addEventListener
-			)
-		) {
-			// TODO: Unsure if document check is needed.
-			return;
-		}
-
-		function onMouseMove( event ) {
-			if ( savedUpdateHandlerRef?.current ) {
-				savedUpdateHandlerRef.current( event );
-			}
-		}
-
-		function onMouseUp( event ) {
-			if ( ! isDraggingRef.current ) {
-				return;
-			}
-
-			if ( savedStopHandlerRef?.current ) {
-				savedStopHandlerRef.current( event );
-			}
-
-			document.documentElement.removeEventListener(
-				'mousemove',
-				onMouseMove
-			);
-			document.documentElement.removeEventListener(
-				'mouseup',
-				onMouseUp
-			);
-		}
-
-		function onMouseDown( event ) {
-			isDraggingRef.current = true;
-
-			if ( savedStartHandlerRef?.current ) {
-				savedStartHandlerRef.current( event );
-			}
-
-			document.documentElement.addEventListener( 'mouseup', onMouseUp );
-			document.documentElement.addEventListener(
-				'mousemove',
-				onMouseMove
-			);
-		}
-
-		element.addEventListener( 'mousedown', onMouseDown );
-
-		return () => {
-			if ( isDraggingRef.current ) {
-				document.documentElement.removeEventListener(
-					'mousemove',
-					onMouseMove
-				);
-				document.documentElement.removeEventListener(
-					'mouseup',
-					onMouseUp
-				);
-			}
-
-			element.removeEventListener( 'mousedown', onMouseDown );
-		};
-	}, [ element ] );
 }
 
-function ControlPoint( {
-	pointIndex,
-	point,
-	controlPoints,
+function ControlPoints( {
 	gradientPickerDomRef,
+	ignoreMarkerPosition,
+	value: controlPoints,
+	onChange,
 	onStartControlPointChange,
 	onStopControlPointChange,
-	onChange,
 } ) {
-	const initialPosition = point?.position;
-
 	const controlPointMoveState = useRef();
-	const controlPointRef = useRef();
 
-	useMouseDragListener(
-		function onMouseDown() {
-			onStartControlPointChange();
-			controlPointMoveState.current = {
-				initialPosition,
-				index: pointIndex,
-				significantMoveHappened: false,
-			};
-		},
-		function onMouseMove( event ) {
-			const relativePosition = getHorizontalRelativeGradientPosition(
-				event.clientX,
-				gradientPickerDomRef.current,
-				GRADIENT_MARKERS_WIDTH
-			);
+	const onMouseMove = ( event ) => {
+		const relativePosition = getHorizontalRelativeGradientPosition(
+			event.clientX,
+			gradientPickerDomRef.current,
+			GRADIENT_MARKERS_WIDTH
+		);
+		const {
+			initialPosition,
+			index,
+			significantMoveHappened,
+		} = controlPointMoveState.current;
+		if (
+			! significantMoveHappened &&
+			Math.abs( initialPosition - relativePosition ) >=
+				MINIMUM_SIGNIFICANT_MOVE
+		) {
+			controlPointMoveState.current.significantMoveHappened = true;
+		}
 
-			if (
-				! controlPointMoveState.current.significantMoveHappened &&
-				Math.abs(
-					controlPointMoveState.current.initialPosition -
-						relativePosition
-				) >= MINIMUM_SIGNIFICANT_MOVE
-			) {
-				controlPointMoveState.current.significantMoveHappened = true;
-			}
+		onChange(
+			updateControlPointPosition( controlPoints, index, relativePosition )
+		);
+	};
 
-			onChange(
-				updateControlPointPosition(
-					controlPoints,
-					controlPointMoveState.current.index,
-					relativePosition
-				)
-			);
-		},
-		function onMouseUp() {
+	const cleanEventListeners = () => {
+		if (
+			window &&
+			window.removeEventListener &&
+			controlPointMoveState.current &&
+			controlPointMoveState.current.listenersActivated
+		) {
+			window.removeEventListener( 'mousemove', onMouseMove );
+			window.removeEventListener( 'mouseup', cleanEventListeners );
 			onStopControlPointChange();
-		},
-		controlPointRef.current
-	);
+			controlPointMoveState.current.listenersActivated = false;
+		}
+	};
 
-	return (
-		<Dropdown
-			onClose={ onStopControlPointChange }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ControlPointButton
-					ref={ controlPointRef }
-					onClick={ () => {
-						if (
-							controlPointMoveState.current
-								.significantMoveHappened
-						) {
-							return;
-						}
-						if ( isOpen ) {
-							onStopControlPointChange();
-						} else {
-							onStartControlPointChange();
-						}
-						onToggle();
-					} }
-					isOpen={ isOpen }
-					position={ point.position }
-					color={ point.color }
-					onChange={ ( newPosition ) => {
-						onChange(
-							updateControlPointPosition(
-								controlPoints,
-								pointIndex,
-								newPosition
-							)
-						);
-					} }
+	useEffect( () => {
+		return () => {
+			cleanEventListeners();
+		};
+	}, [] );
+
+	return controlPoints.map( ( point, index ) => {
+		const initialPosition = point?.position;
+		return (
+			ignoreMarkerPosition !== initialPosition && (
+				<Dropdown
+					key={ index }
+					onClose={ onStopControlPointChange }
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<ControlPointButton
+							key={ index }
+							onClick={ () => {
+								if (
+									controlPointMoveState.current &&
+									controlPointMoveState.current
+										.significantMoveHappened
+								) {
+									return;
+								}
+								if ( isOpen ) {
+									onStopControlPointChange();
+								} else {
+									onStartControlPointChange();
+								}
+								onToggle();
+							} }
+							onMouseDown={ () => {
+								if ( window && window.addEventListener ) {
+									controlPointMoveState.current = {
+										initialPosition,
+										index,
+										significantMoveHappened: false,
+										listenersActivated: true,
+									};
+									onStartControlPointChange();
+									window.addEventListener(
+										'mousemove',
+										onMouseMove
+									);
+									window.addEventListener(
+										'mouseup',
+										cleanEventListeners
+									);
+								}
+							} }
+							isOpen={ isOpen }
+							position={ point.position }
+							color={ point.color.toRgbString() }
+							onChange={ ( newPosition ) => {
+								onChange(
+									updateControlPointPosition(
+										controlPoints,
+										index,
+										newPosition
+									)
+								);
+							} }
+						/>
+					) }
+					renderContent={ ( { onClose } ) => (
+						<>
+							<ColorPicker
+								color={ point.color }
+								onChangeComplete={ ( { color } ) => {
+									onChange(
+										updateControlPointColor(
+											controlPoints,
+											index,
+											color.toRgbString()
+										)
+									);
+								} }
+							/>
+							<Button
+								className="components-custom-gradient-picker__remove-control-point"
+								onClick={ () => {
+									onChange(
+										removeControlPoint(
+											controlPoints,
+											index
+										)
+									);
+									onClose();
+								} }
+								isLink
+							>
+								{ __( 'Remove Control Point' ) }
+							</Button>
+						</>
+					) }
+					popoverProps={ COLOR_POPOVER_PROPS }
 				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<>
-					<ColorPicker
-						color={ point.color }
-						onChangeComplete={ ( { color } ) => {
-							onChange(
-								updateControlPointColor(
-									controlPoints,
-									pointIndex,
-									color.toRgbString()
-								)
-							);
-						} }
-					/>
-					<Button
-						className="components-custom-gradient-picker__remove-control-point"
-						onClick={ () => {
-							onChange(
-								removeControlPoint( controlPoints, pointIndex )
-							);
-							onClose();
-						} }
-						isLink
-					>
-						{ __( 'Remove Control Point' ) }
-					</Button>
-				</>
-			) }
-			popoverProps={ COLOR_POPOVER_PROPS }
-		/>
-	);
+			)
+		);
+	} );
 }
 
 function InsertPoint( {
@@ -364,7 +303,7 @@ function InsertPoint( {
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									color.toRgbString()
+									color
 								)
 							);
 							setAlreadyInsertedPoint( true );
@@ -373,7 +312,7 @@ function InsertPoint( {
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									color.toRgbString()
+									color
 								)
 							);
 						}
@@ -384,8 +323,6 @@ function InsertPoint( {
 		/>
 	);
 }
+ControlPoints.InsertPoint = InsertPoint;
 
-export default {
-	ControlPoint,
-	InsertPoint,
-};
+export default ControlPoints;

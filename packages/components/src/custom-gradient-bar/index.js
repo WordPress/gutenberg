@@ -26,6 +26,7 @@ function customGradientBarReducer( state, action ) {
 			if ( state.id === 'IDLE' || state.id === 'MOVING_INSERTER' ) {
 				return {
 					id: 'MOVING_INSERTER',
+					insertPosition: action.insertPosition,
 				};
 			}
 			break;
@@ -40,6 +41,7 @@ function customGradientBarReducer( state, action ) {
 			if ( state.id === 'MOVING_INSERTER' ) {
 				return {
 					id: 'INSERTING_CONTROL_POINT',
+					insertPosition: state.insertPosition,
 				};
 			}
 			break;
@@ -76,19 +78,13 @@ export default function CustomGradientBar( {
 	onChange,
 } ) {
 	const gradientPickerDomRef = useRef();
-	const insertPositionRef = useRef();
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
 		customGradientBarReducerInitialState
 	);
-
-	function onMouseEnter() {
-		gradientBarStateDispatch( { type: 'MOVE_INSERTER' } );
-	}
-
-	function onMouseMove( event ) {
-		insertPositionRef.current = getHorizontalRelativeGradientPosition(
+	const onMouseEnterAndMove = ( event ) => {
+		const insertPosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientPickerDomRef.current,
 			INSERT_POINT_WIDTH
@@ -96,29 +92,29 @@ export default function CustomGradientBar( {
 
 		// If the insert point is close to an existing control point don't show it.
 		if (
-			gradientBarState.id === 'MOVING_INSERTER' &&
 			some( controlPoints, ( { position } ) => {
 				return (
-					Math.abs( insertPositionRef.current - position ) <
+					Math.abs( insertPosition - position ) <
 					MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT
 				);
 			} )
 		) {
-			gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
+			if ( gradientBarState.id === 'MOVING_INSERTER' ) {
+				gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
+			}
+			return;
 		}
-	}
 
-	function onMouseLeave() {
+		gradientBarStateDispatch( { type: 'MOVE_INSERTER', insertPosition } );
+	};
+
+	const onMouseLeave = () => {
 		gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
-	}
+	};
 
 	const isMovingInserter = gradientBarState.id === 'MOVING_INSERTER';
 	const isInsertingControlPoint =
 		gradientBarState.id === 'INSERTING_CONTROL_POINT';
-
-	const ignoreMarkerPosition = isInsertingControlPoint
-		? gradientBarState.insertPosition
-		: undefined;
 
 	return (
 		<div
@@ -127,15 +123,15 @@ export default function CustomGradientBar( {
 				'components-custom-gradient-picker__gradient-bar',
 				{ 'has-gradient': hasGradient }
 			) }
+			onMouseEnter={ onMouseEnterAndMove }
+			onMouseMove={ onMouseEnterAndMove }
 			style={ { background } }
-			onMouseEnter={ onMouseEnter }
-			onMouseMove={ onMouseMove }
 			onMouseLeave={ onMouseLeave }
 		>
 			<div className="components-custom-gradient-picker__markers-container">
 				{ ( isMovingInserter || isInsertingControlPoint ) && (
 					<ControlPoints.InsertPoint
-						insertPosition={ insertPositionRef.current }
+						insertPosition={ gradientBarState.insertPosition }
 						value={ controlPoints }
 						onChange={ onChange }
 						onOpenInserter={ () => {
@@ -150,30 +146,26 @@ export default function CustomGradientBar( {
 						} }
 					/>
 				) }
-				{ controlPoints.map( ( point, index ) => {
-					return (
-						ignoreMarkerPosition !== point?.position && (
-							<ControlPoints.ControlPoint
-								key={ index }
-								point={ point }
-								pointIndex={ index }
-								controlPoints={ controlPoints }
-								gradientPickerDomRef={ gradientPickerDomRef }
-								onStartControlPointChange={ () => {
-									gradientBarStateDispatch( {
-										type: 'START_CONTROL_CHANGE',
-									} );
-								} }
-								onStopControlPointChange={ () => {
-									gradientBarStateDispatch( {
-										type: 'STOP_CONTROL_CHANGE',
-									} );
-								} }
-								onChange={ onChange }
-							/>
-						)
-					);
-				} ) }
+				<ControlPoints
+					gradientPickerDomRef={ gradientPickerDomRef }
+					ignoreMarkerPosition={
+						isInsertingControlPoint
+							? gradientBarState.insertPosition
+							: undefined
+					}
+					value={ controlPoints }
+					onChange={ onChange }
+					onStartControlPointChange={ () => {
+						gradientBarStateDispatch( {
+							type: 'START_CONTROL_CHANGE',
+						} );
+					} }
+					onStopControlPointChange={ () => {
+						gradientBarStateDispatch( {
+							type: 'STOP_CONTROL_CHANGE',
+						} );
+					} }
+				/>
 			</div>
 		</div>
 	);
