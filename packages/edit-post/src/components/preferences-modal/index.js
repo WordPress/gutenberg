@@ -125,10 +125,7 @@ export default function PreferencesModal() {
 				name: 'appearance',
 				tabLabel: __( 'Appearance' ),
 				content: (
-					<Section
-						title={ __( 'Choose the way it looks' ) }
-						key="appearance"
-					>
+					<Section title={ __( 'Choose the way it looks' ) }>
 						<EnableFeature
 							featureName="showIconLabels"
 							help={ __(
@@ -152,7 +149,6 @@ export default function PreferencesModal() {
 				content: (
 					<Section
 						title={ __( 'Choose how you interact with blocks' ) }
-						key="blocks"
 					>
 						<EnableFeature
 							featureName="mostUsedBlocks"
