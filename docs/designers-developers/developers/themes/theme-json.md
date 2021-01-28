@@ -67,7 +67,7 @@ There are a few cases in whiche a single block can represent different HTML mark
 }
 ```
 
-Additionally, there are two other block selectors: `root` and `*`. The `root` block selector represents the root of the site. The `*` block selector represents "all blocks" and will be discussed below in detail.
+Additionally, there are two other block selectors: `root` and `defaults`. The `root` block selector represents the root of the site. The `defaults` block selector represents the defaults to be used by blocks if they don't declare anything.
 
 ### Settings
 
@@ -112,14 +112,14 @@ The settings section has the following structure and default values:
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`.
 
-The block settings declared under the `*` block selector affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and quickly configure all blocks at once. To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the `*` section. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.*.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+The block settings declared under the `defaults` block selector affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and quickly configure all blocks at once. To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the `defaults` section. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.defaults.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
 Let's say a theme author wants to enable custom colors only for the paragraph block. This is how it can be done:
 
 ```
 {
   "settings": {
-    "*": {
+    "defaults": {
       "color": {
         "custom": false // Disable it for all blocks.
       }
@@ -144,7 +144,7 @@ For example, for this input:
 ```json
 {
   "settings": {
-    "*": {
+    "defaults": {
       "color": {
         "palette": [
           {
@@ -208,7 +208,7 @@ For example, for this input:
 ```json
 {
   "settings": {
-    "*": {
+    "defaults": {
       "custom": {
         "base-font": 16,
         "line-height": {
@@ -320,7 +320,7 @@ h4 {
 }
 ```
 
-The `*` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
+The `defaults` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
 
 #### Border Properties
 
