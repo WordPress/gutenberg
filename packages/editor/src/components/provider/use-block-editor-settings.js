@@ -125,7 +125,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		);
 		const { canUser } = select( coreStore );
 
-		// Prefetch and parse patterns.
+		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
+		// the editor is loaded rather than degrading the performance of the inserter.
 		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
 
 		return {
