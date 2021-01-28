@@ -176,11 +176,16 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		if ( typeof hooks === 'undefined' ) {
 			return translation;
 		}
-		translation = String(
-			hooks.applyFilters( 'i18n.gettext', translation, text, domain )
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext',
+				translation,
+				text,
+				domain
+			)
 		);
-		return String(
-			hooks.applyFilters(
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext_' + getFilterDomain( domain ),
 				translation,
 				text,
@@ -203,8 +208,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		if ( typeof hooks === 'undefined' ) {
 			return translation;
 		}
-		translation = String(
-			hooks.applyFilters(
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext_with_context',
 				translation,
 				text,
@@ -212,8 +217,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 				domain
 			)
 		);
-		return String(
-			hooks.applyFilters(
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext_with_context_' + getFilterDomain( domain ),
 				translation,
 				text,
@@ -244,8 +249,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		 * @param {string} number      The number to compare against to use either the singular or plural form.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		translation = String(
-			hooks.applyFilters(
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.ngettext',
 				translation,
 				single,
@@ -254,8 +259,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 				domain
 			)
 		);
-		return String(
-			hooks.applyFilters(
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.ngettext_' + getFilterDomain( domain ),
 				translation,
 				single,
@@ -288,8 +293,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		 * @param {string} context     Context information for the translators.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		translation = String(
-			hooks.applyFilters(
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.ngettext_with_context',
 				translation,
 				single,
@@ -299,8 +304,9 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 				domain
 			)
 		);
-		return String(
-			hooks.applyFilters(
+
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
 				'i18n.ngettext_with_context_' + getFilterDomain( domain ),
 				translation,
 				single,
