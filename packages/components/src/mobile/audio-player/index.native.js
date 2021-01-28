@@ -17,6 +17,11 @@ import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { audio, warning } from '@wordpress/icons';
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -27,14 +32,15 @@ const isIOS = Platform.OS === 'ios';
 
 function Player( {
 	getStylesFromColorScheme,
-	source,
 	isUploadInProgress,
 	fileName,
 	isUploadFailed,
+	attributes,
+	isSelected,
 } ) {
 	const onPressListen = () => {
-		if ( source ) {
-			Linking.canOpenURL( source )
+		if ( attributes.src ) {
+			Linking.canOpenURL( attributes.src )
 				.then( ( supported ) => {
 					if ( ! supported ) {
 						Alert.alert(
@@ -42,7 +48,7 @@ function Player( {
 							__( 'No application can handle this request.' )
 						);
 					} else {
-						return Linking.openURL( source );
+						return Linking.openURL( attributes.src );
 					}
 				} )
 				.catch( () => {
@@ -131,42 +137,61 @@ function Player( {
 		);
 	};
 
+	function onAudioUploadCancelDialog() {
+		if ( isUploadInProgress ) {
+			requestImageUploadCancelDialog( attributes.id );
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.src ) === 'file:'
+		) {
+			requestImageFailedRetryDialog( attributes.id );
+		}
+	}
+
 	return (
-		<View style={ containerStyle }>
-			<View style={ iconContainerStyle }>
-				<Icon icon={ audio } style={ finalIconStyle } size={ 24 } />
-			</View>
-			<View style={ titleContainerStyle }>
-				<Text style={ titleStyle }>{ title }</Text>
-				<View style={ styles.subtitleContainer }>
-					{ isUploadFailed && (
-						<Icon
-							icon={ warning }
-							style={ {
-								...styles.errorIcon,
-								...uploadFailedStyle,
-							} }
-							size={ 16 }
-						/>
-					) }
-					<Text style={ finalSubtitleStyle }>
-						{ getSubtitleValue() }
-					</Text>
+		<TouchableWithoutFeedback
+			accessible={ ! isSelected }
+			disabled={ ! isSelected }
+			onPress={ onAudioUploadCancelDialog }
+		>
+			<View style={ containerStyle }>
+				<View style={ iconContainerStyle }>
+					<Icon icon={ audio } style={ finalIconStyle } size={ 24 } />
 				</View>
+				<View style={ titleContainerStyle }>
+					<Text style={ titleStyle }>{ title }</Text>
+					<View style={ styles.subtitleContainer }>
+						{ isUploadFailed && (
+							<Icon
+								icon={ warning }
+								style={ {
+									...styles.errorIcon,
+									...uploadFailedStyle,
+								} }
+								size={ 16 }
+							/>
+						) }
+						<Text style={ finalSubtitleStyle }>
+							{ getSubtitleValue() }
+						</Text>
+					</View>
+				</View>
+				{ ! isDisabled && (
+					<TouchableWithoutFeedback
+						accessibilityLabel={ __( 'Audio Player' ) }
+						accessibilityRole={ 'button' }
+						accessibilityHint={ __(
+							'Double tap to listen the audio file'
+						) }
+						onPress={ onPressListen }
+					>
+						<Text style={ buttonTextStyle }>
+							{ __( 'Listen' ) }
+						</Text>
+					</TouchableWithoutFeedback>
+				) }
 			</View>
-			{ ! isDisabled && (
-				<TouchableWithoutFeedback
-					accessibilityLabel={ __( 'Audio Player' ) }
-					accessibilityRole={ 'button' }
-					accessibilityHint={ __(
-						'Double tap to listen the audio file'
-					) }
-					onPress={ onPressListen }
-				>
-					<Text style={ buttonTextStyle }>{ __( 'Listen' ) }</Text>
-				</TouchableWithoutFeedback>
-			) }
-		</View>
+		</TouchableWithoutFeedback>
 	);
 }
 
