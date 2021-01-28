@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, set, flatten, omit, partialRight } from 'lodash';
+import { map, set, flatten, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,14 +39,12 @@ function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
 	return {
 		...settings,
 		supports: {
-			...omit( settings.supports, [
-				'anchor',
-				'customClassName',
-				'color',
-				'fontSize',
-			] ),
 			customClassName: false,
+			html: false,
+			inserter: true,
 		},
+		// Remove any block variations.
+		variations: undefined,
 	};
 }
 

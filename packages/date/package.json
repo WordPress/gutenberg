@@ -9,7 +9,7 @@
 		"gutenberg",
 		"date"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/date/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/date/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

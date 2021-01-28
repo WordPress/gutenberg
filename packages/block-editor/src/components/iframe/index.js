@@ -152,13 +152,13 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 				return false;
 			}
 
+			contentRef.current = contentDocument.body;
 			setIframeDocument( contentDocument );
 			setHead( contentDocument, head );
 			setBodyClassName( contentDocument );
 			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
-			contentRef.current = contentDocument.body;
 
 			return true;
 		}

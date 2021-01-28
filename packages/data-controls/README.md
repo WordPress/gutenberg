@@ -2,7 +2,7 @@
 
 The data controls module is a module intended to simplify implementation of common controls used with the [`@wordpress/data`](/packages/data/README.md) package.
 
-**Note:** It is assumed that the registry being used has the controls plugin enabled on it (see [more details on controls here](https://github.com/WordPress/gutenberg/tree/master/packages/data#controls))
+**Note:** It is assumed that the registry being used has the controls plugin enabled on it (see [more details on controls here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data#controls))
 
 ## Installation
 

@@ -3,6 +3,7 @@
 	.wp-block-navigation__container {
 		color: $gray-900;
 		background-color: $white;
+		min-width: 200px;
 	}
 }
 
@@ -17,4 +18,8 @@
 
 .items-justified-right > ul {
 	justify-content: flex-end;
+}
+
+.items-justified-space-between > ul {
+	justify-content: space-between;
 }

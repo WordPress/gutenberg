@@ -31,6 +31,10 @@ const DEFAULT_LOCALE_DATA = {
  * @see http://messageformat.github.io/Jed/
  */
 /**
+ * @typedef {(domain?: string) => string} GetFilterDomain
+ * Retrieve the domain to use when calling domain-specific filters.
+ */
+/**
  * @typedef {(text: string, domain?: string) => string} __
  *
  * Retrieve the translation of text.
@@ -70,6 +74,9 @@ const DEFAULT_LOCALE_DATA = {
  * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
  * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
  */
+/**
+ * @typedef {{ applyFilters: (hookName:string, ...args: unknown[]) => unknown}} ApplyFiltersInterface
+ */
 /* eslint-enable jsdoc/valid-types */
 
 /**
@@ -92,9 +99,10 @@ const DEFAULT_LOCALE_DATA = {
  *
  * @param {LocaleData} [initialData]    Locale data configuration.
  * @param {string}     [initialDomain]  Domain for which configuration applies.
+ * @param {ApplyFiltersInterface} [hooks]     Hooks implementation.
  * @return {I18n}                       I18n instance
  */
-export const createI18n = ( initialData, initialDomain ) => {
+export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/**
 	 * The underlying instance of Tannin to which exported functions interface.
 	 *
@@ -147,24 +155,167 @@ export const createI18n = ( initialData, initialDomain ) => {
 		return tannin.dcnpgettext( domain, context, single, plural, number );
 	};
 
+	/** @type {GetFilterDomain} */
+	const getFilterDomain = ( domain ) => {
+		if ( typeof domain === 'undefined' ) {
+			return 'default';
+		}
+		return domain;
+	};
+
 	/** @type {__} */
 	const __ = ( text, domain ) => {
-		return dcnpgettext( domain, undefined, text );
+		let translation = dcnpgettext( domain, undefined, text );
+		/**
+		 * Filters text with its translation.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} text        Text to translate.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext',
+				translation,
+				text,
+				domain
+			)
+		);
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext_' + getFilterDomain( domain ),
+				translation,
+				text,
+				domain
+			)
+		);
 	};
 
 	/** @type {_x} */
 	const _x = ( text, context, domain ) => {
-		return dcnpgettext( domain, context, text );
+		let translation = dcnpgettext( domain, context, text );
+		/**
+		 * Filters text with its translation based on context information.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} text        Text to translate.
+		 * @param {string} context     Context information for the translators.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext_with_context',
+				translation,
+				text,
+				context,
+				domain
+			)
+		);
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext_with_context_' + getFilterDomain( domain ),
+				translation,
+				text,
+				context,
+				domain
+			)
+		);
 	};
 
 	/** @type {_n} */
 	const _n = ( single, plural, number, domain ) => {
-		return dcnpgettext( domain, undefined, single, plural, number );
+		let translation = dcnpgettext(
+			domain,
+			undefined,
+			single,
+			plural,
+			number
+		);
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
+		/**
+		 * Filters the singular or plural form of a string.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} single      The text to be used if the number is singular.
+		 * @param {string} plural      The text to be used if the number is plural.
+		 * @param {string} number      The number to compare against to use either the singular or plural form.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext',
+				translation,
+				single,
+				plural,
+				number,
+				domain
+			)
+		);
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext_' + getFilterDomain( domain ),
+				translation,
+				single,
+				plural,
+				number,
+				domain
+			)
+		);
 	};
 
 	/** @type {_nx} */
 	const _nx = ( single, plural, number, context, domain ) => {
-		return dcnpgettext( domain, context, single, plural, number );
+		let translation = dcnpgettext(
+			domain,
+			context,
+			single,
+			plural,
+			number
+		);
+		if ( typeof hooks === 'undefined' ) {
+			return translation;
+		}
+		/**
+		 * Filters the singular or plural form of a string with gettext context.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} single      The text to be used if the number is singular.
+		 * @param {string} plural      The text to be used if the number is plural.
+		 * @param {string} number      The number to compare against to use either the singular or plural form.
+		 * @param {string} context     Context information for the translators.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext_with_context',
+				translation,
+				single,
+				plural,
+				number,
+				context,
+				domain
+			)
+		);
+
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext_with_context_' + getFilterDomain( domain ),
+				translation,
+				single,
+				plural,
+				number,
+				context,
+				domain
+			)
+		);
 	};
 
 	/** @type {IsRtl} */

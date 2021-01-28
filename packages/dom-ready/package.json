@@ -9,7 +9,7 @@
 		"gutenberg",
 		"dom-ready"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/dom-ready/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/dom-ready/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

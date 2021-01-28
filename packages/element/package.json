@@ -10,7 +10,7 @@
 		"element",
 		"react"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/element/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/element/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

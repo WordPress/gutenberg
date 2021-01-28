@@ -9,7 +9,7 @@
 		"gutenberg",
 		"i18n"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/i18n/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/i18n/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"@babel/runtime": "^7.12.5",
+		"@wordpress/hooks": "file:../hooks",
 		"gettext-parser": "^1.3.1",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",

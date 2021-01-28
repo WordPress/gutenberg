@@ -407,6 +407,6 @@ export function MediaPlaceholder( {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md
  */
 export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );

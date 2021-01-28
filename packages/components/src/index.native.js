@@ -46,6 +46,7 @@ export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
 export { default as UnitControl } from './unit-control';
+export { default as Disabled } from './disabled';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';

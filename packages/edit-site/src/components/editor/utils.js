@@ -26,7 +26,7 @@ export const GLOBAL_CONTEXT_SUPPORTS = [
 
 export const PRESET_METADATA = [
 	{
-		path: [ 'settings', 'color', 'palette' ],
+		path: [ 'color', 'palette' ],
 		valueKey: 'color',
 		cssVarInfix: 'color',
 		classes: [
@@ -38,7 +38,7 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
-		path: [ 'settings', 'color', 'gradients' ],
+		path: [ 'color', 'gradients' ],
 		valueKey: 'gradient',
 		cssVarInfix: 'gradient',
 		classes: [
@@ -49,13 +49,13 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
-		path: [ 'settings', 'typography', 'fontSizes' ],
+		path: [ 'typography', 'fontSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
 	},
 	{
-		path: [ 'settings', 'typography', 'fontFamilies' ],
+		path: [ 'typography', 'fontFamilies' ],
 		valueKey: 'fontFamily',
 		cssVarInfix: 'font-family',
 		classes: [],

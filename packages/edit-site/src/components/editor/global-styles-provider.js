@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mapValues, mergeWith } from 'lodash';
+import { set, get, mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -142,6 +142,9 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		if ( ! newUserStyles.isGlobalStylesUserThemeJSON ) {
 			newUserStyles = EMPTY_CONTENT;
 		}
+		// TODO: we probably want to check here that the shape is what we want
+		// This is, settings & styles are top-level keys, or perhaps a version.
+		// As to avoid merging trees that are different.
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
@@ -159,32 +162,33 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		() => ( {
 			contexts,
 			getSetting: ( context, path ) =>
-				get( userStyles?.[ context ]?.settings, path ),
+				get( userStyles?.settings?.[ context ], path ),
 			setSetting: ( context, path, newValue ) => {
 				const newContent = { ...userStyles };
-				let contextSettings = newContent?.[ context ]?.settings;
+				let contextSettings = newContent?.settings?.[ context ];
 				if ( ! contextSettings ) {
 					contextSettings = {};
-					set( newContent, [ context, 'settings' ], contextSettings );
+					set( newContent, [ 'settings', context ], contextSettings );
 				}
 				set( contextSettings, path, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const styles = 'user' === origin ? userStyles : mergedStyles;
+				const styleOrigin =
+					'user' === origin ? userStyles : mergedStyles;
 
 				const value = get(
-					styles?.[ context ]?.styles,
+					styleOrigin?.styles?.[ context ],
 					STYLE_PROPERTY[ propertyName ].value
 				);
 				return getValueFromVariable( mergedStyles, context, value );
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
-				let contextStyles = newContent?.[ context ]?.styles;
+				let contextStyles = newContent?.styles?.[ context ];
 				if ( ! contextStyles ) {
 					contextStyles = {};
-					set( newContent, [ context, 'styles' ], contextStyles );
+					set( newContent, [ 'styles', context ], contextStyles );
 				}
 				set(
 					contextStyles,
@@ -228,10 +232,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					isGlobalStyles: true,
 				},
 			],
-			__experimentalFeatures: mapValues(
-				mergedStyles,
-				( value ) => value?.settings || {}
-			),
+			__experimentalFeatures: mergedStyles.settings,
 		} );
 	}, [ contexts, mergedStyles ] );
 

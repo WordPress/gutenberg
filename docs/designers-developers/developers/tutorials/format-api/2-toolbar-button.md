@@ -1,6 +1,6 @@
 # Add a Button to the Toolbar
 
-Now that the format is available, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/rich-text#richtexttoolbarbutton) component to extend the format toolbar.
+Now that the format is available, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/rich-text#richtexttoolbarbutton) component to extend the format toolbar.
 
 Paste this code in `my-custom-format.js`:
 
@@ -59,7 +59,7 @@ registerFormatType(
 
 Let's check that everything is working as expected. Reload the post/page and select a text block. Make sure that the new button was added to the format toolbar, it uses the [editor-code dashicon](https://developer.wordpress.org/resource/dashicons/#editor-code), and the hover text is what you set in the title:
 
-![Toolbar with custom button](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/toolbar-with-custom-button.png)
+![Toolbar with custom button](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/toolbar-with-custom-button.png)
 
 You may also want to check that upon clicking the button the `toggle format` message is shown in your browser's console.
 

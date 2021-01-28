@@ -73,7 +73,7 @@ can be excluded from the bundle and provided by WordPress in the form of script 
 `wp_enqueue_script`)][https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress].
 
 The
-[`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/master/packages/dependency-extraction-webpack-plugin)
+[`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin)
 provides a webpack plugin to help extract WordPress dependencies from bundles. `@wordpress/scripts`
-[`build`](https://github.com/WordPress/gutenberg/tree/master/packages/scripts#build) script includes
+[`build`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#build) script includes
 the plugin by default.
