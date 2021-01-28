@@ -28,25 +28,40 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
-	 * The name of the global block.
+	 * How to address all the blocks
+	 * in the theme.json file.
+	 */
+	const ALL_BLOCKS_NAME = 'defaults';
+
+	/**
+	 * The CSS selector for the * block,
+	 * only using to generate presets.
 	 *
 	 * @var string
 	 */
-	const GLOBAL_NAME = 'global';
+	const ALL_BLOCKS_SELECTOR = ':root';
 
 	/**
-	 * The CSS selector for the global block.
+	 * How to address the root block
+	 * in the theme.json file.
 	 *
 	 * @var string
 	 */
-	const GLOBAL_SELECTOR = ':root';
+	const ROOT_BLOCK_NAME = 'root';
 
 	/**
-	 * The supported properties of the global block.
+	 * The CSS selector for the root block.
+	 *
+	 * @var string
+	 */
+	const ROOT_BLOCK_SELECTOR = ':root';
+
+	/**
+	 * The supported properties of the root block.
 	 *
 	 * @var array
 	 */
-	const GLOBAL_SUPPORTS = array(
+	const ROOT_BLOCK_SUPPORTS = array(
 		'--wp--style--color--link',
 		'background',
 		'backgroundColor',
@@ -457,7 +472,7 @@ class WP_Theme_JSON {
 	 * Example:
 	 *
 	 * {
-	 *   'global': {
+	 *   'root': {
 	 *     'selector': ':root'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
 	 *   },
@@ -475,9 +490,17 @@ class WP_Theme_JSON {
 		}
 
 		self::$blocks_metadata = array(
-			self::GLOBAL_NAME => array(
-				'selector' => self::GLOBAL_SELECTOR,
-				'supports' => self::GLOBAL_SUPPORTS,
+			self::ROOT_BLOCK_NAME => array(
+				'selector' => self::ROOT_BLOCK_SELECTOR,
+				'supports' => self::ROOT_BLOCK_SUPPORTS,
+			),
+			// By make supports an empty array
+			// this won't have any styles associated
+			// but still allows adding settings
+			// and generate presets.
+			self::ALL_BLOCKS_NAME => array(
+				'selector' => self::ALL_BLOCKS_SELECTOR,
+				'supports' => array(),
 			),
 		);
 
@@ -764,7 +787,7 @@ class WP_Theme_JSON {
 	 * @param string $selector Selector wrapping the classes.
 	 */
 	private static function compute_preset_classes( &$stylesheet, $settings, $selector ) {
-		if ( self::GLOBAL_SELECTOR === $selector ) {
+		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
@@ -1005,7 +1028,7 @@ class WP_Theme_JSON {
 	 * Example:
 	 *
 	 * {
-	 *   'global': {
+	 *   'root': {
 	 *     'color': {
 	 *       'custom': true
 	 *     }

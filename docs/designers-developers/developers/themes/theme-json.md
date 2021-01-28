@@ -34,6 +34,8 @@ By providing the block style properties in a structured way, the Block Editor ca
 
 ## Specification
 
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
+
 The `experimental-theme.json` file declares how a theme wants the editor configured (`settings`) as well as the style properties it sets (`styles`).
 
 ```
@@ -43,9 +45,29 @@ The `experimental-theme.json` file declares how a theme wants the editor configu
 }
 ```
 
-Each one of these sections is sub-divided into "contexts" that loosely map to a block. In general, one block will create one single context ―the paragraph block can be addressed via `core/paragraph`― but there are also cases where one block will create multiple contexts ―the heading block represents different HTML elements, h1 to h6, so it creates one context  for each such `core/heading/h1`, `core/heading/h2`, etc. Every context has the same inner structure.
+Both settings and styles can contain subsections for any registered block. As a general rule, the names of these subsections will be the block names ― we call them "block selectors". For example, the paragraph block ―whose name is `core/paragraph`― can be addressed in the settings using the key (or "block selector") `core/paragraph`:
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
+```
+{ 
+  "settings": {
+    "core/paragraph": { ... }
+  }
+}
+```
+
+There are a few cases in whiche a single block can represent different HTML markup. The heading block is one of these, as it represents h1 to h6 HTML elements. In these cases, the block will have as many block selectors as different markup variations ― `core/heading/h1`, `core/heading/h2`, etc, so they can be addressed separately:
+
+```
+{ 
+  "styles": {
+    "core/heading/h1": { ... },
+    // ...
+    "core/heading/h6": { ... },
+  }
+}
+```
+
+Additionally, there are two other block selectors: `root` and `defaults`. The `root` block selector represents the root of the site. The `defaults` block selector represents the defaults to be used by blocks if they don't declare anything.
 
 ### Settings
 
@@ -54,7 +76,7 @@ The settings section has the following structure and default values:
 ```
 {
   "settings": {
-    "some/context": {
+    "some/block": {
       "border": {
         "customRadius": false /* true to opt-in */
       },
@@ -88,39 +110,41 @@ The settings section has the following structure and default values:
 }
 ```
 
-To retain backward compatibility, `add_theme_support` declarations are retrofit in the proper categories. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.global.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`.
 
-Settings can also be controlled by context, providing a more fine-grained control over what exists via `add_theme_support`. As an example, let's say that a theme author wants to enable custom colors for the paragraph block exclusively. This is how it'd be done:
+The block settings declared under the `defaults` block selector affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and quickly configure all blocks at once. To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the `defaults` section. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.defaults.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
-```json
+Let's say a theme author wants to enable custom colors only for the paragraph block. This is how it can be done:
+
+```
 {
   "settings": {
-    "global": {
+    "defaults": {
       "color": {
-        "custom": false
+        "custom": false // Disable it for all blocks.
       }
     },
     "core/paragraph": {
       "color": {
-        "custom": true
+        "custom": true // Paragraph overrides the setting.
       }
     }
   }
 }
 ```
 
-Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
+Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
 
 #### Presets
 
-Presets are part of the settings section. At the moment, they only work within the `global` context. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
+Presets are part of the settings section. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
 
 For example, for this input:
 
 ```json
 {
   "settings": {
-    "global": {
+    "defaults": {
       "color": {
         "palette": [
           {
@@ -160,7 +184,7 @@ For example, for this input:
 }
 ```
 
-The output to be enqueued will be:
+The output will be:
 
 ```css
 :root {
@@ -173,18 +197,18 @@ The output to be enqueued will be:
 }
 ```
 
-The goal is that presets can be defined using this format, although, right now, the name property (used in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
+To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
 #### Free-form CSS Custom Properties
 
-In addition to create CSS Custom Properties for the presets, the theme.json also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/context>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
+In addition to create CSS Custom Properties for the presets, the `experimental-theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/block>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
 
 For example, for this input:
 
 ```json
 {
   "settings": {
-    "global": {
+    "defaults": {
       "custom": {
         "base-font": 16,
         "line-height": {
@@ -213,12 +237,12 @@ Note that, the name of the variable is created by adding `--` in between each ne
 
 ### Styles
 
-Each block declares which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
+Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
 
 ```json
 {
   "styles": {
-    "some/context": {
+    "some/block/selector": {
       "border": {
         "radius": "value"
       },
@@ -255,6 +279,11 @@ For example, an input like this:
 ```json
 {
   "styles": {
+    "root": {
+      "color": {
+        "text": "var(--wp--preset--color--primary)"
+      },
+    },
     "core/heading/h1": {
       "color": {
         "text": "var(--wp--preset--color--primary)"
@@ -278,6 +307,9 @@ For example, an input like this:
 will append the following style rules to the stylesheet:
 
 ```css
+:root {
+  color: var(--wp--preset--color--primary);
+}
 h1 {
   color: var(--wp--preset--color--primary);
   font-size: calc(1px * var(--wp--preset--font-size--huge));
@@ -288,9 +320,11 @@ h4 {
 }
 ```
 
+The `defaults` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
+
 #### Border Properties
 
-| Context | Radius |
+| Block | Radius |
 | --- | --- |
 | Group | Yes |
 | Image | Yes |
@@ -299,7 +333,7 @@ h4 {
 
 These are the current color properties supported by blocks:
 
-| Context | Background | Gradient | Link | Text |
+| Block | Background | Gradient | Link | Text |
 | --- | --- | --- | --- | --- |
 | Global | Yes | Yes | Yes | Yes |
 | Columns | Yes | Yes | Yes | Yes |
@@ -327,7 +361,7 @@ These are the current color properties supported by blocks:
 
 #### Spacing Properties
 
-| Context | Padding |
+| Block | Padding |
 | --- | --- |
 | Cover | Yes |
 | Group | Yes |
@@ -336,7 +370,7 @@ These are the current color properties supported by blocks:
 
 These are the current typography properties supported by blocks:
 
-| Context | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
+| Block | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | Code | - | Yes | - | - | - | - | - |

@@ -193,7 +193,8 @@ class WP_Theme_JSON_Resolver {
 			return self::$core;
 		}
 
-		$config = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
+		$config     = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
 		self::translate_presets( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
@@ -211,8 +212,8 @@ class WP_Theme_JSON_Resolver {
 			'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
 			'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
 		);
-		if ( ! empty( $config['settings']['global']['color']['palette'] ) ) {
-			foreach ( $config['settings']['global']['color']['palette'] as &$color ) {
+		if ( ! empty( $config['settings'][ $all_blocks ]['color']['palette'] ) ) {
+			foreach ( $config['settings'][ $all_blocks ]['color']['palette'] as &$color ) {
 				$color['name'] = $default_colors_i18n[ $color['slug'] ];
 			}
 		}
@@ -231,8 +232,8 @@ class WP_Theme_JSON_Resolver {
 			'electric-grass'                       => __( 'Electric grass', 'gutenberg' ),
 			'midnight'                             => __( 'Midnight', 'gutenberg' ),
 		);
-		if ( ! empty( $config['settings']['global']['color']['gradients'] ) ) {
-			foreach ( $config['settings']['global']['color']['gradients'] as &$gradient ) {
+		if ( ! empty( $config['settings'][ $all_blocks ]['color']['gradients'] ) ) {
+			foreach ( $config['settings'][ $all_blocks ]['color']['gradients'] as &$gradient ) {
 				$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
 			}
 		}
@@ -244,8 +245,8 @@ class WP_Theme_JSON_Resolver {
 			'large'  => __( 'Large', 'gutenberg' ),
 			'huge'   => __( 'Huge', 'gutenberg' ),
 		);
-		if ( ! empty( $config['settings']['global']['typography']['fontSizes'] ) ) {
-			foreach ( $config['settings']['global']['typography']['fontSizes'] as &$font_size ) {
+		if ( ! empty( $config['settings'][ $all_blocks ]['typography']['fontSizes'] ) ) {
+			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as &$font_size ) {
 				$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 			}
 		}
