@@ -16,6 +16,7 @@ public struct MediaInfo: Encodable {
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
+    case contactInfoBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts

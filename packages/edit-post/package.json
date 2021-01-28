@@ -52,6 +52,7 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
+		"react-merge-refs": "^1.0.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
