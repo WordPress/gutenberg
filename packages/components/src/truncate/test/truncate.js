@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { Truncate } from '../index';
+import Truncate from '..';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

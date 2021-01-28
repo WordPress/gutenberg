@@ -32,7 +32,9 @@ export default function ButtonsEdit( props ) {
 		clientId,
 		isSelected,
 		setAttributes,
+		blockWidth,
 	} = props;
+
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
@@ -144,6 +146,7 @@ export default function ButtonsEdit( props ) {
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }
 				templateInsertUpdatesSelection
+				blockWidth={ blockWidth }
 			/>
 		</>
 	);

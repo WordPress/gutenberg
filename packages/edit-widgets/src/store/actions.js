@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { dispatch as dataDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { STATE_SUCCESS } from './batch-processing/constants';
 import { dispatch, select } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
@@ -118,6 +116,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	);
 
 	const batchMeta = [];
+	const batchTasks = [];
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
@@ -153,18 +152,16 @@ export function* saveWidgetArea( widgetAreaId ) {
 				continue;
 			}
 
-			dataDispatch( 'core' ).saveEditedEntityRecord(
-				'root',
-				'widget',
-				widgetId,
-				widget
+			batchTasks.push( ( { saveEditedEntityRecord } ) =>
+				saveEditedEntityRecord( 'root', 'widget', widgetId )
 			);
 		} else {
-			// This is a new widget instance.
-			dataDispatch( 'core' ).saveEntityRecord( 'root', 'widget', {
-				...widget,
-				sidebar: widgetAreaId,
-			} );
+			batchTasks.push( ( { saveEntityRecord } ) =>
+				saveEntityRecord( 'root', 'widget', {
+					...widget,
+					sidebar: widgetAreaId,
+				} )
+			);
 		}
 
 		batchMeta.push( {
@@ -174,35 +171,31 @@ export function* saveWidgetArea( widgetAreaId ) {
 		} );
 	}
 
-	// HACK: Await any promise here so that rungen passes execution back to
-	// `saveEntityRecord` above. This prevents `processBatch` from being called
-	// here before `addToBatch` is called by `saveEntityRecord`.
-	// See https://github.com/WordPress/gutenberg/issues/27173.
-	yield {
-		type: 'AWAIT_PROMISE',
-		promise: Promise.resolve(),
-	};
+	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
 
-	const batch = yield dispatch(
-		'core/__experimental-batch-processing',
-		'processBatch',
-		'WIDGETS_API_FETCH',
-		'default'
-	);
+	const failedWidgetNames = [];
 
-	if ( batch.state !== STATE_SUCCESS ) {
-		const errors = batch.sortedItemIds.map( ( id ) => batch.errors[ id ] );
-		const failedWidgetNames = [];
+	for ( let i = 0; i < records.length; i++ ) {
+		const widget = records[ i ];
+		const { block, position } = batchMeta[ i ];
 
-		for ( let i = 0; i < errors.length; i++ ) {
-			if ( ! errors[ i ] ) {
-				continue;
-			}
-
-			const { block } = batchMeta[ i ];
+		const error = yield select(
+			'core',
+			'getLastEntitySaveError',
+			'root',
+			'widget',
+			widget.id
+		);
+		if ( error ) {
 			failedWidgetNames.push( block.attributes?.name || block?.name );
 		}
 
+		if ( ! sidebarWidgetsIds[ position ] ) {
+			sidebarWidgetsIds[ position ] = widget.id;
+		}
+	}
+
+	if ( failedWidgetNames.length ) {
 		throw new Error(
 			sprintf(
 				/* translators: %s: List of widget names */
@@ -210,15 +203,6 @@ export function* saveWidgetArea( widgetAreaId ) {
 				failedWidgetNames.join( ', ' )
 			)
 		);
-	}
-
-	for ( let i = 0; i < batch.sortedItemIds.length; i++ ) {
-		const itemId = batch.sortedItemIds[ i ];
-		const widget = batch.results[ itemId ];
-		const { position } = batchMeta[ i ];
-		if ( ! sidebarWidgetsIds[ position ] ) {
-			sidebarWidgetsIds[ position ] = widget.id;
-		}
 	}
 
 	yield dispatch(
