@@ -65,6 +65,13 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$settings['enableCustomUnits'];
 	}
 
+	if ( isset( $settings['enableCustomSpacing'] ) ) {
+		if ( ! isset( $theme_settings['settings']['global']['spacing'] ) ) {
+			$theme_settings['settings']['global']['spacing'] = array();
+		}
+		$theme_settings['settings']['global']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+	}
+
 	if ( isset( $settings['colors'] ) ) {
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
 			$theme_settings['settings'][ $all_blocks ]['color'] = array();
@@ -197,6 +204,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['enableCustomLineHeight'] );
 	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 
