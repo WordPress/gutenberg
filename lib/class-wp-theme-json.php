@@ -91,6 +91,9 @@ class WP_Theme_JSON {
 		'styles'   => array(
 			'border'     => array(
 				'radius' => null,
+				'color'  => null,
+				'style'  => null,
+				'width'  => null,
 			),
 			'color'      => array(
 				'background' => null,
@@ -119,6 +122,9 @@ class WP_Theme_JSON {
 		'settings' => array(
 			'border'     => array(
 				'customRadius' => null,
+				'customColor'  => null,
+				'customStyle'  => null,
+				'customWidth'  => null,
 			),
 			'color'      => array(
 				'custom'         => null,
@@ -249,6 +255,18 @@ class WP_Theme_JSON {
 		'borderRadius'             => array(
 			'value'   => array( 'border', 'radius' ),
 			'support' => array( '__experimentalBorder', 'radius' ),
+		),
+		'borderColor'             => array(
+			'value'   => array( 'border', 'color' ),
+			'support' => array( '__experimentalBorder', 'color' ),
+		),
+		'borderWidth'             => array(
+			'value'   => array( 'border', 'width' ),
+			'support' => array( '__experimentalBorder', 'width' ),
+		),
+		'borderStyle'             => array(
+			'value'   => array( 'border', 'style' ),
+			'support' => array( '__experimentalBorder', 'style' ),
 		),
 		'color'                    => array(
 			'value'   => array( 'color', 'text' ),
