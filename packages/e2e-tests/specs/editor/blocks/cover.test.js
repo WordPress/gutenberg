@@ -87,4 +87,12 @@ describe( 'Cover', () => {
 			)
 		).toBeGreaterThan( 100 );
 	} );
+
+	it( 'renders correctly', async () => {
+		const coverBlockElement = await page.$( '[aria-label="Block: Cover"]' );
+		const screenshot = await coverBlockElement.screenshot( {
+			path: 'cover-block.png',
+		} );
+		expect( screenshot ).toMatchImageSnapshot();
+	} );
 } );
