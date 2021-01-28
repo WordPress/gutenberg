@@ -3,7 +3,7 @@ const ALIGNMENTS = {
 	bottomLeft: { alignItems: 'flex-start', justifyContent: 'flex-end' },
 	bottomRight: { alignItems: 'flex-end', justifyContent: 'flex-end' },
 	center: { alignItems: 'center', justifyContent: 'center' },
-	edge: { alignItems: 'center', justifyContent: 'space-between' },
+	spaced: { alignItems: 'center', justifyContent: 'space-between' },
 	left: { alignItems: 'center', justifyContent: 'flex-start' },
 	right: { alignItems: 'center', justifyContent: 'flex-end' },
 	stretch: { alignItems: 'stretch' },

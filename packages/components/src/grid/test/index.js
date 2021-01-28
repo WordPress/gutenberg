@@ -87,6 +87,22 @@ describe( 'props', () => {
 		} );
 	} );
 
+	test( 'should render alignment spaced', () => {
+		const { container } = render(
+			<Grid alignment="spaced">
+				<View />
+				<View />
+				<View />
+			</Grid>
+		);
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+		} );
+	} );
+
 	test( 'should render justify', () => {
 		const { container } = render(
 			<Grid justify="flex-start">
