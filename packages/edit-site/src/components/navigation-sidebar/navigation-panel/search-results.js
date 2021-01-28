@@ -18,7 +18,7 @@ import { useSelect } from '@wordpress/data';
 import TemplateNavigationItem from './template-navigation-item';
 import ContentNavigationItem from './content-navigation-item';
 
-export default function SearchResults( { items, search } ) {
+export default function SearchResults( { items, search, noFilter } ) {
 	let itemType = null;
 	if ( items?.length > 0 ) {
 		if ( items[ 0 ].taxonomy ) {
@@ -68,6 +68,10 @@ export default function SearchResults( { items, search } ) {
 	const itemsFiltered = useMemo( () => {
 		if ( items === null || search.length === 0 ) {
 			return [];
+		}
+
+		if ( ! noFilter ) {
+			return items;
 		}
 
 		return items.filter( ( { slug } ) => {

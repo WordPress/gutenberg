@@ -81,7 +81,7 @@ export default function ContentPostsMenu() {
 			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
 			{ search && ! isDebouncing && (
-				<SearchResults items={ posts } search={ search } />
+				<SearchResults items={ posts } search={ search } noFilter />
 			) }
 
 			{ ! search && (

@@ -63,7 +63,11 @@ export default function ContentCategoriesMenu() {
 			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
 			{ search && ! isDebouncing && (
-				<SearchResults items={ categories } search={ search } />
+				<SearchResults
+					items={ categories }
+					search={ search }
+					noFilter
+				/>
 			) }
 
 			{ ! search &&
