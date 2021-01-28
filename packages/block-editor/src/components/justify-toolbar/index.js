@@ -21,13 +21,46 @@ const icons = {
 	'space-between': justifySpaceBetween,
 };
 
-export function JustifyToolbar( {
-	isCollapsed,
-	onChange,
-	value,
-	popoverProps,
-} ) {
+export function JustifyToolbar( props ) {
+	const {
+		allowedControls = [ 'left', 'center', 'right', 'space-between' ],
+		isCollapsed = true,
+		onChange,
+		value,
+		popoverProps,
+	} = props;
+
 	const icon = value ? icons[ value ] : icons.left;
+	const allControls = [
+		{
+			name: 'left',
+			icon: justifyLeft,
+			title: __( 'Justify items left' ),
+			isActive: 'left' === value,
+			onClick: onChange( 'left' ),
+		},
+		{
+			name: 'center',
+			icon: justifyCenter,
+			title: __( 'Justify items center' ),
+			isActive: 'center' === value,
+			onClick: onChange( 'center' ),
+		},
+		{
+			name: 'right',
+			icon: justifyRight,
+			title: __( 'Justify items right' ),
+			isActive: 'right' === value,
+			onClick: onChange( 'right' ),
+		},
+		{
+			name: 'space-between',
+			icon: justifySpaceBetween,
+			title: __( 'Space between items' ),
+			isActive: 'space-between' === value,
+			onClick: onChange( 'space-between' ),
+		},
+	];
 
 	return (
 		<ToolbarGroup
@@ -35,32 +68,9 @@ export function JustifyToolbar( {
 			popoverProps={ popoverProps }
 			label={ __( 'Change items justification' ) }
 			isCollapsed={ isCollapsed }
-			controls={ [
-				{
-					icon: justifyLeft,
-					title: __( 'Justify items left' ),
-					isActive: 'left' === value,
-					onClick: onChange( 'left' ),
-				},
-				{
-					icon: justifyCenter,
-					title: __( 'Justify items center' ),
-					isActive: 'center' === value,
-					onClick: onChange( 'center' ),
-				},
-				{
-					icon: justifyRight,
-					title: __( 'Justify items right' ),
-					isActive: 'right' === value,
-					onClick: onChange( 'right' ),
-				},
-				{
-					icon: justifySpaceBetween,
-					title: __( 'Space between items' ),
-					isActive: 'space-between' === value,
-					onClick: onChange( 'space-between' ),
-				},
-			] }
+			controls={ allControls.filter( ( elem ) =>
+				allowedControls.includes( elem.name )
+			) }
 		/>
 	);
 }

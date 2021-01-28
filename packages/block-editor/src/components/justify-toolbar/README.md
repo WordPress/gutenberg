@@ -28,10 +28,19 @@ _Note:_ In this example that we render `JustifyToolbar` as a child of the `Block
 
 ### Props
 
+#### `allowedControls`
+* **Type:** `string[]`
+* **Default:** `[ 'left', 'center', 'right', 'space-between' ]`
+
+An array of strings for what controls to show, by default it shows all.
+
+
 #### `isCollapsed`
 * **Type:** `boolean`
+* **Default:** `true`
 
 Whether to display toolbar options in the dropdown menu.
+
 
 #### `onChange`
 * **Type:** `Function`
