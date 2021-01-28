@@ -153,11 +153,12 @@ export class BlockList extends Component {
 		const { isRootList, maxWidth } = this.props;
 
 		const layoutWidth = Math.floor( layout.width );
-
 		if ( isRootList && blockWidth !== layoutWidth ) {
 			this.setState( {
 				blockWidth: Math.min( layoutWidth, maxWidth ),
 			} );
+		} else if ( ! isRootList && ! blockWidth ) {
+			this.setState( { blockWidth: Math.min( layoutWidth, maxWidth ) } );
 		}
 	}
 
