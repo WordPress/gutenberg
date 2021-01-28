@@ -8,17 +8,25 @@
 	}
 }
 
+.edit-post-post-template-modal {
+	background-color: $gray-100;
+
+	@include break-small {
+		width: 80vw;
+	}
+}
+
 .edit-post-post-template__value {
 	padding-left: 6px;
 }
 
 .edit-post-template-change-modal__items {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 100px);
+	grid-template-columns: repeat(auto-fill, minmax(150px, 200px));
+	grid-gap: $grid-unit-20;
 }
 
 .edit-post-template-change-modal__item {
-
 	border-radius: $radius-block-ui;
 	cursor: pointer;
 	margin-top: $grid-unit-20;
@@ -30,15 +38,12 @@
 		border: $border-width solid var(--wp-admin-theme-color);
 	}
 
-	&:focus {
+	&:focus,
+	&.is-selected {
 		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
-	}
-
-	&.is-placeholder {
-		min-height: 100px;
 	}
 
 	&[draggable="true"] .block-editor-block-preview__container {
@@ -47,7 +52,23 @@
 }
 
 .edit-post-template-change-modal__item-title {
-	padding: $grid-unit-05;
+	padding: $grid-unit-10 0;
 	font-size: 12px;
 	text-align: center;
+	font-weight: 500;
+}
+
+.edit-post-template-change-modal__item-preview {
+	overflow: hidden;
+	box-shadow: $shadow-popover;
+	background-color: $white;
+	height: 200px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.edit-post-template-change-modal__item.is-default & {
+		opacity: 0.4;
+		background: repeating-linear-gradient(-45deg, $gray-400, $gray-400 10px, $white 10px, $white 50px);
+	}
 }
