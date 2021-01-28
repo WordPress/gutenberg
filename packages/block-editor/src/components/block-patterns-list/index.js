@@ -3,7 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -44,14 +43,6 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 						{ ...composite }
 						className="block-editor-block-patterns-list__item"
 						onClick={ () => onClick( pattern, blocks ) }
-						onKeyDown={ ( event ) => {
-							if (
-								ENTER === event.keyCode ||
-								SPACE === event.keyCode
-							) {
-								onClick( pattern, blocks );
-							}
-						} }
 					>
 						<BlockPreview
 							blocks={ blocks }
@@ -83,9 +74,10 @@ function BlockPatternList( {
 	blockPatterns,
 	shownPatterns,
 	onClickPattern,
-	label = __( 'Patterns' ),
+	orientation,
+	label = __( 'Block Patterns' ),
 } ) {
-	const composite = useCompositeState( { orientation: 'vertical' } );
+	const composite = useCompositeState( { orientation } );
 	return (
 		<Composite
 			{ ...composite }

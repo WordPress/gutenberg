@@ -59,12 +59,18 @@ Enables drag and drop functionality to the available block patterns.
 -   Type: `boolean`
 -   Required: No
 
+#### orientation
+The orientation value determines which arrow keys can be used to move focus. Available options are (`vertical`|`horizontal`). If not provided all arrow keys work.
+
+-   Type: `string`
+-   Required: No
+
 #### label
 The aria label for the block patterns list.
 
 -   Type: `string`
 -   Required: No
--   Default: `Patterns`
+-   Default: `Block Patterns`
 
 ## Related components
 

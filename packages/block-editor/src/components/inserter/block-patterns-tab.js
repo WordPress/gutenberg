@@ -112,6 +112,7 @@ function BlockPatternsCategory( {
 						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
 						label={ patternCategory.label }
+						orientation="vertical"
 						isDraggable
 					/>
 				</PatternInserterPanel>

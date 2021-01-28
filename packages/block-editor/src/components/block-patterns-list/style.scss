@@ -1,5 +1,6 @@
 .block-editor-block-patterns-list__list-item {
-	// width: 100%;
+	cursor: pointer;
+	margin-top: $grid-unit-20;
 
 	&.is-placeholder {
 		min-height: 100px;
@@ -11,6 +12,7 @@
 }
 
 .block-editor-block-patterns-list__item {
+	height: 100%;
 	border-radius: $radius-block-ui;
 	transition: all 0.05s ease-in-out;
 	position: relative;
