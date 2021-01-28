@@ -108,6 +108,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
     >
       <NavigationItem>
         <Section
+          key="appearance"
           title="Choose the way it looks"
         >
           <WithSelect(WithDispatch(BaseOption))
@@ -131,6 +132,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
     >
       <NavigationItem>
         <Section
+          key="blocks"
           title="Choose how you interact with blocks"
         >
           <WithSelect(WithDispatch(BaseOption))
