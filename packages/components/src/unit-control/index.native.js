@@ -44,11 +44,11 @@ const UnitControl = memo(
 		const pickerRef = useRef();
 		const anchorNodeRef = useRef();
 
-		function onPickerPresent() {
+		const onPickerPresent = useCallback( () => {
 			if ( pickerRef?.current ) {
 				pickerRef.current.presentPicker();
 			}
-		}
+		}, [ pickerRef?.current ] );
 
 		const currentInputValue = currentInput === null ? value : currentInput;
 		const initialControlValue = isFinite( currentInputValue )
@@ -91,10 +91,13 @@ const UnitControl = memo(
 			unit,
 		] );
 
-		const getAnchor = () =>
-			anchorNodeRef?.current
-				? findNodeHandle( anchorNodeRef?.current )
-				: undefined;
+		const getAnchor = useCallback(
+			() =>
+				anchorNodeRef?.current
+					? findNodeHandle( anchorNodeRef?.current )
+					: undefined,
+			[ anchorNodeRef?.current ]
+		);
 
 		const renderUnitPicker = useCallback( () => {
 			return (
