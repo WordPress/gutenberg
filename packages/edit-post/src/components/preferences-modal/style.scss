@@ -12,7 +12,7 @@
 	}
 
 	.components-navigation {
-		background-color: #fff;
+		background-color: $white;
 		margin: -#{$grid-unit-10};
 		padding: $grid-unit-10;
 		.components-navigation__menu {
@@ -33,6 +33,11 @@
 				}
 				.components-toggle-control__label {
 					color: inherit;
+				}
+
+				svg {
+					// This element should already inherit the currentColor of its parent. But for whatever reason, it doesn't work.
+					fill: $gray-900;
 				}
 			}
 			.components-navigation__menu-title-heading {
