@@ -8,6 +8,7 @@ import {
 	Alert,
 	Platform,
 } from 'react-native';
+import { default as VideoPlayer } from 'react-native-video';
 
 /**
  * WordPress dependencies
@@ -17,6 +18,7 @@ import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { audio, warning } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,8 +34,15 @@ function Player( {
 	fileName,
 	isUploadFailed,
 } ) {
+	const [ paused, setPaused ] = useState( true );
+
 	const onPressListen = () => {
 		if ( source ) {
+			if ( isIOS && this.player ) {
+				this.player.presentFullscreenPlayer();
+				return;
+			}
+
 			Linking.canOpenURL( source )
 				.then( ( supported ) => {
 					if ( ! supported ) {
@@ -166,6 +175,21 @@ function Player( {
 					<Text style={ buttonTextStyle }>{ __( 'Listen' ) }</Text>
 				</TouchableWithoutFeedback>
 			) }
+			<VideoPlayer
+				source={ { uri: source } }
+				paused={ paused }
+				ref={ ( ref ) => {
+					this.player = ref;
+				} }
+				controls={ false }
+				ignoreSilentSwitch={ 'ignore' }
+				onFullscreenPlayerWillPresent={ () => {
+					setPaused( false );
+				} }
+				onFullscreenPlayerDidDismiss={ () => {
+					setPaused( true );
+				} }
+			/>
 		</View>
 	);
 }
