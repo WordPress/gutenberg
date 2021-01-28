@@ -8,11 +8,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Cover', () => {
-	beforeEach( async () => {
-		await createNewPost();
-	} );
-
 	it( 'can be resized using drag & drop', async () => {
+		await createNewPost();
 		await insertBlock( 'Cover' );
 		// Close the inserter
 		await page.click( '.edit-post-header-toolbar__inserter-toggle' );
