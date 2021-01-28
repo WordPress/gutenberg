@@ -101,13 +101,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 	}
 
 	// Things that didn't land in core yet, so didn't have a setting assigned.
-	if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = true;
-	}
-
 	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
 			$theme_settings['settings'][ $all_blocks ]['color'] = array();
