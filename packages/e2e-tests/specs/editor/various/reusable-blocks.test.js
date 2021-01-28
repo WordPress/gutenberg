@@ -47,7 +47,7 @@ const createReusableBlock = async ( content, title ) => {
 	await insertBlock( 'Paragraph' );
 	await page.keyboard.type( content );
 
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 	await clickMenuItem( 'Add to Reusable blocks' );
 
 	// Wait for creation to finish
@@ -77,16 +77,12 @@ const createReusableBlock = async ( content, title ) => {
 };
 
 describe( 'Reusable blocks', () => {
-	beforeAll( async () => {
-		await createNewPost();
-	} );
-
 	afterAll( async () => {
 		await trashAllPosts( 'wp_block' );
 	} );
 
 	beforeEach( async () => {
-		await clearAllBlocks();
+		await createNewPost();
 	} );
 
 	it( 'can be created with no title', async () => {
@@ -142,7 +138,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
-		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
+		await clickBlockToolbarButton( 'Convert to regular blocks' );
 
 		// Check that we have a paragraph block on the page
 		const paragraphBlock = await page.$(
@@ -193,7 +189,7 @@ describe( 'Reusable blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Convert block to a reusable block
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
@@ -219,7 +215,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block
-		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
+		await clickBlockToolbarButton( 'Convert to regular blocks' );
 
 		// Check that we have two paragraph blocks on the page
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -249,7 +245,7 @@ describe( 'Reusable blocks', () => {
 		await page.click( blockSelector );
 
 		// Delete the block, leaving the reusable block empty
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		const deleteButton = await page.waitForXPath(
 			'//button/span[text()="Remove block"]'
 		);
@@ -315,7 +311,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for async mode to dispatch the update.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 1000 );
+		await page.waitForTimeout( 1000 );
 
 		// Check that the content of the second reusable block has been updated.
 		const reusableBlocks = await page.$$( '.wp-block-block' );

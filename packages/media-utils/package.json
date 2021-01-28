@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "1.19.1",
+	"version": "1.19.2",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"media",
 		"upload"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/master/packages/media-utils/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/media-utils/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

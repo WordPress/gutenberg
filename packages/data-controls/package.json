@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data-controls",
-	"version": "1.20.1",
+	"version": "1.20.2",
 	"description": "A set of common controls for the @wordpress/data api.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"data",
 		"controls"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/data-controls/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/data-controls/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

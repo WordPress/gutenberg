@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString } from 'lodash';
+import { every, has, isFunction, isString, startCase, reduce } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -10,6 +10,7 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -140,6 +141,19 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
+	// Attempt to find entity title if block is a template part.
+	// Require slug to request, otherwise entity is uncreated and will throw 404.
+	if ( 'core/template-part' === blockType.name && attributes.slug ) {
+		const entity = select( 'core' ).getEntityRecord(
+			'postType',
+			'wp_template_part',
+			attributes.theme + '//' + attributes.slug
+		);
+		if ( entity ) {
+			return startCase( entity.title?.rendered || entity.slug );
+		}
+	}
+
 	const { __experimentalLabel: getLabel, title } = blockType;
 
 	const label = getLabel && getLabel( attributes, { context } );
@@ -230,5 +244,48 @@ export function getAccessibleBlockLabel(
 		/* translators: accessibility text. %s: The block title. */
 		__( '%s Block' ),
 		title
+	);
+}
+
+/**
+ * Ensure attributes contains only values defined by block type, and merge
+ * default values for missing attributes.
+ *
+ * @param {string} name       The block's name.
+ * @param {Object} attributes The block's attributes.
+ * @return {Object} The sanitized attributes.
+ */
+export function sanitizeBlockAttributes( name, attributes ) {
+	// Get the type definition associated with a registered block.
+	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
+	return reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
+
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
+			}
+
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
 	);
 }

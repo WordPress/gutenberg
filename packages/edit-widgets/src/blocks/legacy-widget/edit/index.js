@@ -192,12 +192,10 @@ function LegacyWidgetEdit( {
 
 export default withSelect( ( select, { clientId, attributes } ) => {
 	const { widgetClass, referenceWidgetName } = attributes;
-	let widgetId = select( editWidgetsStore ).getWidgetIdForClientId(
-		clientId
-	);
+	let widgetId = attributes.__internalWidgetId;
 	const widget = select( editWidgetsStore ).getWidget( widgetId );
-	const widgetArea = select( editWidgetsStore ).getWidgetAreaForClientId(
-		clientId
+	const widgetArea = select( editWidgetsStore ).getWidgetAreaForWidgetId(
+		widgetId
 	);
 	const editorSettings = select( 'core/block-editor' ).getSettings();
 	const { availableLegacyWidgets } = editorSettings;

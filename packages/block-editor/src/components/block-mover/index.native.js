@@ -117,7 +117,7 @@ export const BlockMover = ( {
 				ref={ pickerRef }
 				options={ blockPageMoverOptions }
 				onChange={ onPickerSelect }
-				title={ __( 'Move block position' ) }
+				title={ __( 'Change block position' ) }
 				leftAlign={ true }
 				hideCancelButton={ Platform.OS !== 'ios' }
 			/>

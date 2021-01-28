@@ -2,7 +2,7 @@
 
 <img src="https://user-images.githubusercontent.com/150562/94028603-df90bf00-fdb3-11ea-9e6f-eb15c5631d85.png" width="280" alt="inspector-advanced-controls">
 
-Inspector Advanced Controls appear under the _Advanced_ panel of a block's [InspectorControls](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md) -- that is, they appear as a specific set of controls within a block's settings panels. As the name suggests, `InspectorAdvancedControls` is meant for controls that most users aren't meant to interact with most of the time, such as adding an HTML anchor or custom CSS classes to a block.
+Inspector Advanced Controls appear under the _Advanced_ panel of a block's [InspectorControls](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) -- that is, they appear as a specific set of controls within a block's settings panels. As the name suggests, `InspectorAdvancedControls` is meant for controls that most users aren't meant to interact with most of the time, such as adding an HTML anchor or custom CSS classes to a block.
 
 ## Usage
 

@@ -66,12 +66,10 @@ async function runCleanLocalFoldersStep( folders, abortMessage ) {
  * @return {string} Name of the release branch.
  */
 function findReleaseBranchName( packageJsonPath ) {
-	const masterPackageJson = readJSONFile( packageJsonPath );
-	const masterParsedVersion = semver.parse( masterPackageJson.version );
+	const mainPackageJson = readJSONFile( packageJsonPath );
+	const mainParsedVersion = semver.parse( mainPackageJson.version );
 
-	return (
-		'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor
-	);
+	return 'release/' + mainParsedVersion.major + '.' + mainParsedVersion.minor;
 }
 
 /**

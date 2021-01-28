@@ -72,7 +72,8 @@ function InterfaceSkeleton(
 			className={ classnames(
 				className,
 				'interface-interface-skeleton',
-				regionsClassName
+				regionsClassName,
+				!! footer && 'has-footer'
 			) }
 		>
 			{ !! drawer && (

@@ -24,7 +24,7 @@ class EditorPage {
 	accessibilityIdXPathAttrib;
 	paragraphBlockName = 'Paragraph';
 	verseBlockName = 'Verse';
-	orderedListButtonName = 'Convert to ordered list';
+	orderedListButtonName = 'Ordered';
 
 	constructor( driver ) {
 		this.driver = driver;

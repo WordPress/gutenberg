@@ -566,7 +566,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
-		await clickBlockToolbarButton( 'Change text alignment' );
+		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Align text center' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

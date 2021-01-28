@@ -20,7 +20,10 @@ export default function TemplateNavigationItem( { item } ) {
 		( select ) =>
 			'wp_template' === item.type
 				? select( 'core/editor' ).__experimentalGetTemplateInfo( item )
-				: { title: item?.slug, description: '' },
+				: {
+						title: item?.title?.rendered || item?.slug,
+						description: '',
+				  },
 		[]
 	);
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
