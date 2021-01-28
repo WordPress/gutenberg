@@ -41,7 +41,7 @@ export default function ContentCategoriesMenu() {
 				getEntityRecordsArgs
 			);
 			return {
-				pages: getEntityRecords( ...getEntityRecordsArgs ),
+				categories: getEntityRecords( ...getEntityRecordsArgs ),
 				isResolved: hasResolvedPosts,
 			};
 		},
