@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, sortBy, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,6 +61,9 @@ export default function SearchResults( { items, search } ) {
 		},
 		[ items, itemType ]
 	);
+	const itemInfosMap = useMemo( () => keyBy( itemInfos, 'slug' ), [
+		itemInfos,
+	] );
 
 	const itemsFiltered = useMemo( () => {
 		if ( items === null || search.length === 0 ) {
@@ -68,9 +71,7 @@ export default function SearchResults( { items, search } ) {
 		}
 
 		return items.filter( ( { slug } ) => {
-			const { title, description } = itemInfos.find(
-				( info ) => info.slug === slug
-			);
+			const { title, description } = itemInfosMap[ slug ];
 
 			return (
 				normalizedSearch( slug, search ) ||
@@ -80,6 +81,19 @@ export default function SearchResults( { items, search } ) {
 		} );
 	}, [ items, itemInfos, search ] );
 
+	const itemsSorted = useMemo( () => {
+		if ( ! itemsFiltered ) {
+			return [];
+		}
+
+		return sortBy( itemsFiltered, [
+			( { slug } ) => {
+				const { title } = itemInfosMap[ slug ];
+				return ! normalizedSearch( title, search );
+			},
+		] );
+	}, [ itemsFiltered, search ] );
+
 	const ItemComponent =
 		itemType === 'wp_template' || itemType === 'wp_template_part'
 			? TemplateNavigationItem
@@ -87,7 +101,7 @@ export default function SearchResults( { items, search } ) {
 
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
-			{ map( itemsFiltered, ( item ) => (
+			{ map( itemsSorted, ( item ) => (
 				<ItemComponent
 					item={ item }
 					key={ `${ item.taxonomy || item.type }-${ item.id }` }
