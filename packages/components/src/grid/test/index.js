@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import { ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
@@ -17,7 +18,12 @@ describe( 'props', () => {
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			gridTemplateColumns: 'repeat(2,1fr)',
+			gap: `calc(${ ui.get( 'gridBase' ) } * 3)`,
+		} );
 	} );
 
 	test( 'should render gap', () => {
@@ -28,51 +34,72 @@ describe( 'props', () => {
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			gridTemplateColumns: 'repeat(3,1fr)',
+			gap: `calc(${ ui.get( 'gridBase' ) } * 4)`,
+		} );
 	} );
 
 	test( 'should render custom columns', () => {
 		const { container } = render(
-			<Grid columns="3">
+			<Grid columns="7">
 				<View />
 				<View />
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			gridTemplateColumns: 'repeat(7,1fr)',
+		} );
 	} );
 
 	test( 'should render custom rows', () => {
 		const { container } = render(
-			<Grid rows="3">
+			<Grid rows="7">
 				<View />
 				<View />
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			gridTemplateRows: 'repeat(7,1fr)',
+		} );
 	} );
 
 	test( 'should render align', () => {
 		const { container } = render(
-			<Grid align="flex-start" columns="3">
+			<Grid align="flex-start">
 				<View />
 				<View />
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			alignItems: 'flex-start',
+			display: 'grid',
+		} );
 	} );
 
 	test( 'should render justify', () => {
 		const { container } = render(
-			<Grid columns="3" justify="flex-start">
+			<Grid justify="flex-start">
 				<View />
 				<View />
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			justifyContent: 'flex-start',
+		} );
 	} );
 
 	test( 'should render isInline', () => {
@@ -83,7 +110,11 @@ describe( 'props', () => {
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'inline-grid',
+			gridTemplateColumns: 'repeat(3,1fr)',
+		} );
 	} );
 
 	test( 'should render custom templateColumns', () => {
@@ -94,7 +125,11 @@ describe( 'props', () => {
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			gridTemplateColumns: '1fr auto 1fr',
+		} );
 	} );
 
 	test( 'should render custom templateRows', () => {
@@ -105,6 +140,10 @@ describe( 'props', () => {
 				<View />
 			</Grid>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'grid',
+			gridTemplateRows: '1fr auto 1fr',
+		} );
 	} );
 } );
