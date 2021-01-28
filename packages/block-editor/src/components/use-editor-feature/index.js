@@ -46,7 +46,7 @@ const deprecatedFlags = {
 
 		return settings.enableCustomUnits;
 	},
-	'spacing.customSpacing': ( settings ) => settings.enableCustomSpacing,
+	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
 function blockAttributesMatch( blockAttributes, attributes ) {
