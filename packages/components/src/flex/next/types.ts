@@ -1,5 +1,4 @@
 import { CSSProperties } from 'react';
-import { PolymorphicComponent } from '@wp-g2/create-styles';
 import { ResponsiveCSSValue } from '../../utils/types';
 
 export type FlexDirection = ResponsiveCSSValue< CSSProperties[ 'flexDirection' ] >;

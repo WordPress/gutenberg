@@ -12,6 +12,14 @@ import { Block } from './styles/flex-styles';
  */
 import { forwardRef } from '@wordpress/element';
 
+/**
+ * @typedef {import('react').HTMLProps<HTMLDivElement>} Props
+ */
+
+/**
+ * @param {Props} props
+ * @param {import('react').Ref<HTMLDivElement>} ref
+ */
 function FlexBlock( { className, ...props }, ref ) {
 	const classes = classnames( 'components-flex__block', className );
 

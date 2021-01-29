@@ -20,18 +20,19 @@ import * as styles from './flex-styles';
 export function useFlex( props ) {
 	const {
 		align = 'center',
-		alignItems,
 		className,
 		direction: directionProp = 'row',
 		expanded = true,
 		gap = 2,
 		justify = 'space-between',
-		justifyContent,
 		wrap = false,
 		...otherProps
 	} = useContextSystem( props, 'Flex' );
 
-	const direction = useResponsiveValue( directionProp );
+	const directionAsArray = Array.isArray( directionProp )
+		? directionProp
+		: [ directionProp ];
+	const direction = useResponsiveValue( directionAsArray );
 
 	const isColumn =
 		typeof direction === 'string' && !! direction.includes( 'column' );
@@ -43,7 +44,9 @@ export function useFlex( props ) {
 
 		sx.Base = css( {
 			[ ui.createToken( 'FlexGap' ) ]: ui.space( gap ),
-			[ ui.createToken( 'FlexItemDisplay' ) ]: isColumn ? 'block' : null,
+			[ ui.createToken( 'FlexItemDisplay' ) ]: isColumn
+				? 'block'
+				: undefined,
 			[ ui.createToken( 'FlexItemMarginBottom' ) ]: isColumn
 				? ui.get( 'FlexGap' )
 				: 0,
@@ -51,10 +54,10 @@ export function useFlex( props ) {
 				! isColumn && ! isReverse ? ui.get( 'FlexGap' ) : 0,
 			[ ui.createToken( 'FlexItemMarginLeft' ) ]:
 				! isColumn && isReverse ? ui.get( 'FlexGap' ) : 0,
-			alignItems: alignItems || isColumn ? 'normal' : align,
+			alignItems: isColumn ? 'normal' : align,
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
-			justifyContent: justifyContent || justify,
+			justifyContent: justify,
 			height: isColumn && expanded ? '100%' : undefined,
 			width: ! isColumn && expanded ? '100%' : undefined,
 			/**
@@ -76,15 +79,14 @@ export function useFlex( props ) {
 			 * https://github.com/ItsJonQ/g2/pull/149
 			 */
 			'> *': {
-				minWidth: ! isColumn ? 0 : null,
-				minHeight: isColumn ? 0 : null,
+				minWidth: ! isColumn ? 0 : undefined,
+				minHeight: isColumn ? 0 : undefined,
 			},
 		} );
 
 		return cx( styles.Flex, sx.Base, className );
 	}, [
 		align,
-		alignItems,
 		className,
 		direction,
 		expanded,
@@ -92,7 +94,6 @@ export function useFlex( props ) {
 		isColumn,
 		isReverse,
 		justify,
-		justifyContent,
 		wrap,
 	] );
 
