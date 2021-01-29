@@ -5,17 +5,15 @@ import {
 	createNewPost,
 	insertBlock,
 	publishPost,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
 	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -186,10 +184,7 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			const query = addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 );
-			await visitAdminPage( 'admin.php', query );
+			await siteEditor.visit();
 
 			// Ensure we are on 'front-page' demo template.
 			await navigationPanel.open();
