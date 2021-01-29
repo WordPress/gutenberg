@@ -22,60 +22,61 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * @return array Config that adheres to the theme.json schema.
  */
 function gutenberg_experimental_global_styles_get_theme_support_settings( $settings ) {
-	$theme_settings                       = array();
-	$theme_settings['settings']           = array();
-	$theme_settings['settings']['global'] = array();
+	$all_blocks                                = WP_Theme_JSON::ALL_BLOCKS_NAME;
+	$theme_settings                            = array();
+	$theme_settings['settings']                = array();
+	$theme_settings['settings'][ $all_blocks ] = array();
 
 	// Deprecated theme supports.
 	if ( isset( $settings['disableCustomColors'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['color'] ) ) {
-			$theme_settings['settings']['global']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['settings']['global']['color']['custom'] = ! $settings['disableCustomColors'];
+		$theme_settings['settings'][ $all_blocks ]['color']['custom'] = ! $settings['disableCustomColors'];
 	}
 
 	if ( isset( $settings['disableCustomGradients'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['color'] ) ) {
-			$theme_settings['settings']['global']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['settings']['global']['color']['customGradient'] = ! $settings['disableCustomGradients'];
+		$theme_settings['settings'][ $all_blocks ]['color']['customGradient'] = ! $settings['disableCustomGradients'];
 	}
 
 	if ( isset( $settings['disableCustomFontSizes'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['typography'] ) ) {
-			$theme_settings['settings']['global']['typography'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
-		$theme_settings['settings']['global']['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
+		$theme_settings['settings'][ $all_blocks ]['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
 	}
 
 	if ( isset( $settings['enableCustomLineHeight'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['typography'] ) ) {
-			$theme_settings['settings']['global']['typography'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
-		$theme_settings['settings']['global']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+		$theme_settings['settings'][ $all_blocks ]['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
 	}
 
 	if ( isset( $settings['enableCustomUnits'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['spacing'] ) ) {
-			$theme_settings['settings']['global']['spacing'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
-		$theme_settings['settings']['global']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
+		$theme_settings['settings'][ $all_blocks ]['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
 			array( 'px', 'em', 'rem', 'vh', 'vw' ) :
 			$settings['enableCustomUnits'];
 	}
 
 	if ( isset( $settings['colors'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['color'] ) ) {
-			$theme_settings['settings']['global']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['settings']['global']['color']['palette'] = $settings['colors'];
+		$theme_settings['settings'][ $all_blocks ]['color']['palette'] = $settings['colors'];
 	}
 
 	if ( isset( $settings['gradients'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['color'] ) ) {
-			$theme_settings['settings']['global']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['settings']['global']['color']['gradients'] = $settings['gradients'];
+		$theme_settings['settings'][ $all_blocks ]['color']['gradients'] = $settings['gradients'];
 	}
 
 	if ( isset( $settings['fontSizes'] ) ) {
@@ -86,25 +87,25 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 				$font_size['size'] = $font_size['size'] . 'px';
 			}
 		}
-		if ( ! isset( $theme_settings['settings']['global']['typography'] ) ) {
-			$theme_settings['settings']['global']['typography'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
-		$theme_settings['settings']['global']['typography']['fontSizes'] = $font_sizes;
+		$theme_settings['settings'][ $all_blocks ]['typography']['fontSizes'] = $font_sizes;
 	}
 
 	// Things that didn't land in core yet, so didn't have a setting assigned.
 	if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['spacing'] ) ) {
-			$theme_settings['settings']['global']['spacing'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
-		$theme_settings['settings']['global']['spacing']['customPadding'] = true;
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = true;
 	}
 
 	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['color'] ) ) {
-			$theme_settings['settings']['global']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['settings']['global']['color']['link'] = true;
+		$theme_settings['settings'][ $all_blocks ]['color']['link'] = true;
 	}
 
 	return $theme_settings;

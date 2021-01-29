@@ -98,11 +98,11 @@ export default function useEditorFeature( featurePath ) {
 			}
 
 			// 1 - Use __experimental features, if available.
-			// We cascade to the global value if the block one is not available.
-			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
+			// We cascade to the all value if the block one is not available.
+			const defaultsPath = `__experimentalFeatures.defaults.${ featurePath }`;
 			const blockPath = `__experimentalFeatures.${ context }.${ featurePath }`;
 			const experimentalFeaturesResult =
-				get( settings, blockPath ) ?? get( settings, globalPath );
+				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
 				return experimentalFeaturesResult;
 			}

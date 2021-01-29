@@ -24,9 +24,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	GLOBAL_CONTEXT_NAME,
-	GLOBAL_CONTEXT_SELECTOR,
-	GLOBAL_CONTEXT_SUPPORTS,
+	ALL_BLOCKS_NAME,
+	ALL_BLOCKS_SELECTOR,
+	ROOT_BLOCK_NAME,
+	ROOT_BLOCK_SELECTOR,
+	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
 } from './utils';
@@ -81,9 +83,13 @@ const extractSupportKeys = ( supports ) => {
 
 const getContexts = ( blockTypes ) => {
 	const result = {
-		[ GLOBAL_CONTEXT_NAME ]: {
-			selector: GLOBAL_CONTEXT_SELECTOR,
-			supports: GLOBAL_CONTEXT_SUPPORTS,
+		[ ROOT_BLOCK_NAME ]: {
+			selector: ROOT_BLOCK_SELECTOR,
+			supports: ROOT_BLOCK_SUPPORTS,
+		},
+		[ ALL_BLOCKS_NAME ]: {
+			selector: ALL_BLOCKS_SELECTOR,
+			supports: [], // by being an empty array, the styles subtree will be ignored
 		},
 	};
 

@@ -5,7 +5,6 @@ import {
 	createNewPost,
 	insertBlock,
 	disablePrePublishChecks,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
 	getAllBlocks,
@@ -13,12 +12,11 @@ import {
 	clickBlockToolbarButton,
 	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
@@ -34,13 +32,7 @@ describe( 'Template Part', () => {
 
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
-			await visitAdminPage(
-				'admin.php',
-				addQueryArgs( '', {
-					page: 'gutenberg-edit-site',
-				} ).slice( 1 )
-			);
-			await page.waitForSelector( '.edit-site-visual-editor iframe' );
+			await siteEditor.visit();
 		} );
 
 		async function updateHeader( content ) {

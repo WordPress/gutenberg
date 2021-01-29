@@ -653,14 +653,15 @@ Toggles the More Menu.
 
 Undocumented declaration.
 
-<a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
+<a name="togglePreferencesOption" href="#togglePreferencesOption">#</a> **togglePreferencesOption**
 
-Toggles the screen option with the given label.
+Toggles a preference option with the given tab label and the option label.
 
 _Parameters_
 
--   _label_ `string`: The label of the screen option, e.g. 'Show Tips'.
--   _shouldBeChecked_ `?boolean`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
+-   _tabLabel_ `string`: The preferences tab label to click.
+-   _optionLabel_ `string`: The option label to search the button for.
+-   _shouldBeChecked_ `[boolean]`: If true, turns the option on. If false, off. If not provided, the option will be toggled.
 
 <a name="transformBlockTo" href="#transformBlockTo">#</a> **transformBlockTo**
 
