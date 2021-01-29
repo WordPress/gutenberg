@@ -6,3 +6,15 @@
 		min-width: 200px;
 	}
 }
+
+.items-justified-center > ul {
+	justify-content: center;
+}
+
+.items-justified-right > ul {
+	justify-content: flex-end;
+}
+
+.items-justified-space-between > ul {
+	justify-content: space-between;
+}

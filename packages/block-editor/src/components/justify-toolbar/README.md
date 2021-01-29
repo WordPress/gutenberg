@@ -2,7 +2,9 @@
 
 The `JustifyToolbar` component renders a toolbar that displays justify options for the selected block.
 
-This component is used in the Navigation block to set the flex justification for the elements, allowing for justify `left`, `center`, `right`, and `space-between`.
+This component is used to set the flex justification for the elements in the block, allowing to justify `left`, `center`, `right`, and `space-between`. In comparison, the alignment options are for the block itself.
+
+See the Navigation block for an example usage.
 
 ## Development guidelines
 
@@ -13,18 +15,28 @@ Renders an justification toolbar with options.
 ```jsx
 import { JustifyToolbar } from '@wordpress/block-editor';
 
-const MyJustifyToolbar = () => (
+const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
 	<BlockControls>
 		<JustifyToolbar
-			value={ textAlign }
-			onChange={ ( nextAlign ) => {
-				setAttributes( { textAlign: nextAlign } );
+			value={ attributes.justification }
+			onChange={ ( next ) => {
+				setAttributes( { justfication: next } );
 			} }
 		/>
 	</BlockControls>
 );
 ```
+
+**NOTE:** The justfify toolbar does not add any classes to your component, you must do this using the `setAttributes` function. The toolbar does define the following classnames you should use:
+
+	items-justified-left
+	items-justified-center
+	items-justified-right
+	items-justified-space-between
+
+
 _Note:_ In this example that we render `JustifyToolbar` as a child of the `BlockControls` component.
+
 
 ### Props
 

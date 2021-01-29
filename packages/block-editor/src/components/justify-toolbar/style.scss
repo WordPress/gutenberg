@@ -1,16 +1,16 @@
 // Justification.
-.items-justified-left > ul {
+.items-justified-left {
 	justify-content: flex-start;
 }
 
-.items-justified-center > ul {
+.items-justified-center {
 	justify-content: center;
 }
 
-.items-justified-right > ul {
+.items-justified-right {
 	justify-content: flex-end;
 }
 
-.items-justified-space-between > ul {
+.items-justified-space-between {
 	justify-content: space-between;
 }
