@@ -15,6 +15,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	Icon,
+	plusCircle,
 	plusCircleFilled,
 	insertAfter,
 	insertBefore,
@@ -64,7 +65,7 @@ export class Inserter extends Component {
 		const addBeforeOption = {
 			value: 'before',
 			label: __( 'Add Block Before' ),
-			icon: insertBefore,
+			icon: plusCircle,
 		};
 
 		const replaceCurrentOption = {
@@ -76,7 +77,7 @@ export class Inserter extends Component {
 		const addAfterOption = {
 			value: 'after',
 			label: __( 'Add Block After' ),
-			icon: insertAfter,
+			icon: plusCircle,
 		};
 
 		const addToBeginningOption = {
@@ -305,7 +306,7 @@ export default compose( [
 		// `end` argument (id) can refer to the component which is removed
 		// due to pressing `undo` button, that's why we need to check
 		// if `getBlock( end) is valid, otherwise `null` is passed
-		const isAnyBlockSelected = ! isAppender && end && getBlock( end );
+		const isAnyBlockSelected = !isAppender && end && getBlock( end );
 		const destinationRootClientId = isAnyBlockSelected
 			? getBlockRootClientId( end )
 			: rootClientId;
