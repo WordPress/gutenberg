@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 export type Props = {
 	/**
 	 * Renders the active (interaction) shadow value.
@@ -6,7 +8,7 @@ export type Props = {
 	/**
 	 * Renders the border-radius of the shadow.
 	 */
-	borderRadius?: number | string;
+	borderRadius?: CSSProperties[ 'borderRadius' ];
 	/**
 	 * Renders the focus (interaction) shadow value.
 	 */
