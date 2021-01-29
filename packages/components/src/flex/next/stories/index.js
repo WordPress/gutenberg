@@ -1,32 +1,29 @@
 /**
  * Internal dependencies
  */
-import { Placeholder, Spacer } from '../../index';
-import { Flex, FlexItem } from '../index';
+import Flex from '../flex';
+import FlexItem from '../flex-item';
+import View from '../../../view';
 
 export default {
 	component: Flex,
-	title: 'Components/Flex',
+	title: 'Components/G2/Flex',
 };
-
-const ItemView = ( props ) => <Placeholder { ...props } />;
 
 export const _default = () => {
 	return (
 		<>
-			<Spacer mb={ 4 }>
-				<Flex gap={ 3 }>
-					<ItemView>Item</ItemView>
-					<ItemView>Item</ItemView>
-				</Flex>
-			</Spacer>
+			<Flex gap={ 3 }>
+				<View>Item</View>
+				<View>Item</View>
+			</Flex>
 			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
-				<ItemView css={ { width: '180px' } }>Item</ItemView>
+				<View css={ { width: '180px' } }>Item</View>
 				<FlexItem isBlock>
-					<ItemView>Item</ItemView>
+					<View>Item</View>
 				</FlexItem>
-				<ItemView>Item</ItemView>
-				<ItemView>Item</ItemView>
+				<View>Item</View>
+				<View>Item</View>
 			</Flex>
 		</>
 	);

@@ -186,13 +186,13 @@ export type FlexItemProps = {
 	/**
 	 * The (CSS) display of the `FlexItem`.
 	 */
-	display: CSSProperties[ 'display' ];
+	display?: CSSProperties[ 'display' ];
 	/**
 	 * Determines if `FlexItem` should render as an adaptive full-width block.
 	 *
 	 * @default true
 	 */
-	isBlock: boolean;
+	isBlock?: boolean;
 };
 
 export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;

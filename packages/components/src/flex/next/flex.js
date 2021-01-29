@@ -12,7 +12,7 @@ import { useFlex } from './use-flex';
  *
  * @example
  * ```jsx
- * import { Flex, FlexItem, FlexBlock, Text, View } from `@wp-g2/components`
+ * import { Flex, FlexItem, FlexBlock, Text, View } from `@wordpress/components`
  *
  * function Example() {
  *   return (

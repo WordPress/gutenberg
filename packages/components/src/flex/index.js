@@ -12,6 +12,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Flex as BaseFlex } from './styles/flex-styles';
+import { withNextFlex } from './next';
 
 export { default as FlexBlock } from './block';
 export { default as FlexItem } from './item';
@@ -26,7 +27,7 @@ export { default as FlexItem } from './item';
  */
 /* eslint-enable jsdoc/valid-types */
 
-/** @typedef {OwnProps & import('react').HTMLProps<HTMLDivElement>} Props */
+/** @typedef {OwnProps & import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props */
 
 /**
  * @param {Props} props
@@ -58,6 +59,6 @@ function FlexComponent(
 	);
 }
 
-export const Flex = forwardRef( FlexComponent );
+export const Flex = withNextFlex( forwardRef( FlexComponent ) );
 
 export default Flex;

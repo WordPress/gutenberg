@@ -4,21 +4,22 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
- */
-import { Item } from './styles/flex-styles';
-
-/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
 
 /**
- * @typedef {import('react').HTMLProps<HTMLDivElement>} Props
+ * Internal dependencies
+ */
+import { Item } from './styles/flex-styles';
+import { withNextFlexItem } from './next';
+
+/**
+ * @typedef {import('react').RefAttributes<HTMLDivElement> & import('react').HTMLProps<HTMLDivElement>} Props
  */
 
 /**
- * @param {Props} param0
+ * @param {Props} props
  * @param {import('react').Ref<HTMLDivElement>} ref
  */
 function FlexItem( { className, ...props }, ref ) {
@@ -27,4 +28,4 @@ function FlexItem( { className, ...props }, ref ) {
 	return <Item { ...props } className={ classes } ref={ ref } />;
 }
 
-export default forwardRef( FlexItem );
+export default withNextFlexItem( forwardRef( FlexItem ) );
