@@ -130,7 +130,7 @@ describe( 'Cover', () => {
 			'.block-editor-block-navigation-block__contents-container button'
 		);
 
-		const coverBlockElement = await page.$( '[aria-label="Block: Cover"]' );
+		const coverBlockElement = await page.$( '.wp-block-cover' );
 		const screenshot = await coverBlockElement.screenshot();
 		expect( screenshot ).toMatchImageSnapshot();
 	} );
