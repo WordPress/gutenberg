@@ -24,8 +24,8 @@ module.exports = {
 			},
 		],
 		'import/no-unresolved': 'error',
-		'import/default': 'error',
-		'import/named': 'error',
+		'import/default': 'warn',
+		'import/named': 'warn',
 	},
 	overrides: [
 		{
