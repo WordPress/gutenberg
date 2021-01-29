@@ -141,6 +141,8 @@ export { default as postExcerpt } from './library/post-excerpt';
 export { default as postFeaturedImage } from './library/post-featured-image';
 export { default as postList } from './library/post-list';
 export { default as postTitle } from './library/post-title';
+export { default as postsNavigationPrevious } from './library/posts-navigation-previous';
+export { default as postsNavigationNext } from './library/posts-navigation-next';
 export { default as preformatted } from './library/preformatted';
 export { default as pullLeft } from './library/pull-left';
 export { default as pullRight } from './library/pull-right';

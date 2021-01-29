@@ -1,0 +1,20 @@
+[
+    {
+        "blockName": "core/posts-navigation",
+        "attrs": {
+            "type": "next"
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
