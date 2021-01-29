@@ -38,9 +38,11 @@ function Player( {
 	attributes,
 	isSelected,
 } ) {
+	const { id, src } = attributes;
+
 	const onPressListen = () => {
-		if ( attributes.src ) {
-			Linking.canOpenURL( attributes.src )
+		if ( src ) {
+			Linking.canOpenURL( src )
 				.then( ( supported ) => {
 					if ( ! supported ) {
 						Alert.alert(
@@ -48,7 +50,7 @@ function Player( {
 							__( 'No application can handle this request.' )
 						);
 					} else {
-						return Linking.openURL( attributes.src );
+						return Linking.openURL( src );
 					}
 				} )
 				.catch( () => {
@@ -139,12 +141,9 @@ function Player( {
 
 	function onAudioUploadCancelDialog() {
 		if ( isUploadInProgress ) {
-			requestImageUploadCancelDialog( attributes.id );
-		} else if (
-			attributes.id &&
-			getProtocol( attributes.src ) === 'file:'
-		) {
-			requestImageFailedRetryDialog( attributes.id );
+			requestImageUploadCancelDialog( id );
+		} else if ( id && getProtocol( src ) === 'file:' ) {
+			requestImageFailedRetryDialog( id );
 		}
 	}
 
