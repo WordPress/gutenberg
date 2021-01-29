@@ -69,7 +69,7 @@ describe( 'Missing block', () => {
 			);
 		} );
 
-		describe( 'Unsupported block editor', () => {
+		describe( 'Unsupported block editor (UBE)', () => {
 			beforeEach( () => {
 				// By default we set the web editor as available
 				storeConfig.selectors.getSettings.mockReturnValue( {
@@ -77,7 +77,7 @@ describe( 'Missing block', () => {
 				} );
 			} );
 
-			it( 'renders edit action if web editor is available', () => {
+			it( 'renders edit action if UBE is available', () => {
 				const component = getTestComponentWithContent();
 				const testInstance = component.root;
 				const bottomSheet = testInstance.findByType( BottomSheet );
@@ -89,7 +89,7 @@ describe( 'Missing block', () => {
 				);
 			} );
 
-			it( 'does not render edit action if is not available', () => {
+			it( 'does not render edit action if UBE is not available', () => {
 				storeConfig.selectors.getSettings.mockReturnValue( {
 					unsupportedBlockEditor: false,
 				} );
@@ -100,7 +100,7 @@ describe( 'Missing block', () => {
 				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
 			} );
 
-			it( 'does not render edit action if editing the block is not supported', () => {
+			it( 'does not render edit action if the block is incompatible with UBE', () => {
 				const component = getTestComponentWithContent( {
 					originalName: 'core/block',
 				} );

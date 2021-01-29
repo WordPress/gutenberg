@@ -32,7 +32,7 @@ import { applyFilters } from '@wordpress/hooks';
 import styles from './style.scss';
 
 // Blocks that can't be edited through the Unsupported block editor identified by their name.
-const UBE_UNSUPPORTED_BLOCKS = [ 'core/block' ];
+const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
@@ -284,7 +284,7 @@ export default compose( [
 			canEnableUnsupportedBlockEditor:
 				getSettings( 'capabilities' )
 					.canEnableUnsupportedBlockEditor === true,
-			isEditableInUnsupportedBlockEditor: ! UBE_UNSUPPORTED_BLOCKS.includes(
+			isEditableInUnsupportedBlockEditor: ! UBE_INCOMPATIBLE_BLOCKS.includes(
 				attributes.originalName
 			),
 		};
