@@ -1405,6 +1405,7 @@ function resetInsertionPoint( state, action, defaultValue ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'SELECT_BLOCK':
+		case 'SELECTION_CHANGE':
 		case 'REPLACE_INNER_BLOCKS':
 		case 'INSERT_BLOCKS':
 		case 'REMOVE_BLOCKS':

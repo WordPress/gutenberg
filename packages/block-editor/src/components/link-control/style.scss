@@ -151,7 +151,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-header {
 		display: block;
-		margin-right: $grid-unit-30;
+		margin-right: $grid-unit-10;
 		overflow: hidden;
 		white-space: nowrap;
 	}
@@ -163,8 +163,15 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
-		max-width: 230px;
 		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: $grid-unit-30;
+
+		.components-external-link__icon {
+			position: absolute;
+			right: 0;
+			margin-top: 0;
+		}
 	}
 
 	.block-editor-link-control__search-item-title {

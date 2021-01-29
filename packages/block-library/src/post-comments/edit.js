@@ -57,7 +57,11 @@ export default function PostCommentsEdit( {
 
 	if ( ! postType || ! postId ) {
 		return (
-			<Warning>{ __( 'Post comments block: no post found.' ) }</Warning>
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Post comments block: no post found.' ) }
+				</Warning>
+			</div>
 		);
 	}
 

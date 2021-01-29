@@ -236,14 +236,16 @@ class VideoEdit extends Component {
 					{ ! this.state.isCaptionSelected && (
 						<BlockControls>{ toolbarEditButton }</BlockControls>
 					) }
-					<InspectorControls>
-						<PanelBody title={ __( 'Video settings' ) }>
-							<VideoCommonSettings
-								setAttributes={ setAttributes }
-								attributes={ attributes }
-							/>
-						</PanelBody>
-					</InspectorControls>
+					{ isSelected && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Video settings' ) }>
+								<VideoCommonSettings
+									setAttributes={ setAttributes }
+									attributes={ attributes }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={

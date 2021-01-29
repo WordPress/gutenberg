@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useEditorFeature, GLOBAL_CONTEXT_NAME } from '../editor/utils';
+import { useEditorFeature, ALL_BLOCKS_NAME } from '../editor/utils';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -45,7 +45,7 @@ export default function ColorPalettePanel( {
 					'palette',
 				] ) ??
 				get( baseStyles, [
-					GLOBAL_CONTEXT_NAME,
+					ALL_BLOCKS_NAME,
 					'settings',
 					'color',
 					'palette',
