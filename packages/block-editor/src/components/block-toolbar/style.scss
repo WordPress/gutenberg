@@ -44,6 +44,21 @@
 	}
 }
 
+.block-editor-block-contextual-toolbar.with-offset {
+	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-15});
+}
+
+.block-editor-block-parent-selector {
+	position: absolute;
+	top: -$border-width;
+	left: calc(-#{$grid-unit-60} - #{$grid-unit-15} - #{$border-width});
+
+	// Top Toolbar.
+	.edit-post-header-toolbar__block-toolbar & {
+		display: none;
+	}
+}
+
 // Block controls.
 .block-editor-block-toolbar__block-controls {
 	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
@@ -88,22 +103,6 @@
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {
 		display: inline-flex;
-	}
-}
-
-.block-editor-block-toolbar__block-parent-selector-wrapper {
-	position: absolute;
-	top: -1px;
-	left: -1px;
-	opacity: 0;
-	transition: all 60ms linear;
-	z-index: -1; // This makes it slide out from underneath the toolbar.
-
-	@include reduce-motion("transition");
-
-	.is-showing-movers & {
-		opacity: 1;
-		transform: translateY(-($block-toolbar-height + $grid-unit-15));
 	}
 }
 

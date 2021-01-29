@@ -104,12 +104,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	return (
 		<div className={ classes }>
+			{ ! isMultiToolbar && (
+				<BlockParentSelector clientIds={ blockClientIds } />
+			) }
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
-						<BlockParentSelector clientIds={ blockClientIds } />
-					</div>
-				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 						<BlockSwitcher clientIds={ blockClientIds } />
