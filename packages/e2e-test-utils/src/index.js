@@ -70,7 +70,7 @@ export { switchUserToTest } from './switch-user-to-test';
 export { isThemeInstalled } from './theme-installed';
 export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
-export { toggleScreenOption } from './toggle-screen-option';
+export { togglePreferencesOption } from './toggle-preferences-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
