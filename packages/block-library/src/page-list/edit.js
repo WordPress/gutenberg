@@ -9,21 +9,9 @@ import classnames from 'classnames';
 
 import { useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
-import { useSelect } from '@wordpress/data';
 
-export default function PageListEdit( { clientId } ) {
-	const navigationBlockAttributes = useSelect( ( select ) => {
-		const { getBlockAttributes, getBlockParentsByBlockName } = select(
-			'core/block-editor'
-		);
-		const parentBlock = getBlockParentsByBlockName(
-			clientId,
-			'core/navigation'
-		)[ 0 ];
-		return getBlockAttributes( parentBlock );
-	} );
-	const showSubmenuIcon = !! navigationBlockAttributes?.showSubmenuIcon;
-	const { textColor, backgroundColor } = navigationBlockAttributes || {};
+export default function PageListEdit( { context } ) {
+	const { textColor, backgroundColor, showSubmenuIcon } = context || {};
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -31,7 +19,7 @@ export default function PageListEdit( { clientId } ) {
 			[ `has-${ textColor }-color` ]: !! textColor,
 			'has-background': !! backgroundColor,
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-			'show-submenu-icons': showSubmenuIcon,
+			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
 	} );
 

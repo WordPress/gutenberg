@@ -17,6 +17,7 @@ export { metadata, name };
 export const settings = {
 	title: _x( 'Page List', 'block title' ),
 	description: __( 'Display a list of all pages.' ),
+	keywords: [ __( 'menu' ), __( 'navigation' ) ],
 	icon,
 	example: {},
 	edit,
