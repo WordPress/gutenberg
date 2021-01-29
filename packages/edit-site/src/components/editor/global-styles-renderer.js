@@ -144,48 +144,41 @@ export default ( blockData, tree, type = 'all' ) => {
 	return reduce(
 		blockData,
 		( styles, { selector }, context ) => {
-			if ( type === 'all' || type === 'cssVariables' ) {
-				const variableDeclarations = [
-					...getBlockPresetsDeclarations(
-						tree?.settings?.[ context ]
-					),
-					...flattenTree(
-						tree?.settings?.[ context ]?.custom,
-						'--wp--custom--',
-						'--'
-					),
-				];
+			const variableDeclarations = [
+				...getBlockPresetsDeclarations( tree?.settings?.[ context ] ),
+				...flattenTree(
+					tree?.settings?.[ context ]?.custom,
+					'--wp--custom--',
+					'--'
+				),
+			];
 
-				if ( variableDeclarations.length > 0 ) {
-					styles.push(
-						`${ selector } { ${ variableDeclarations.join(
-							';'
-						) } }`
-					);
-				}
-			}
-			if ( type === 'all' || type === 'blockStyles' ) {
-				const blockStyleDeclarations = getBlockStylesDeclarations(
-					blockData[ context ].supports,
-					tree?.styles?.[ context ]
+			if ( variableDeclarations.length > 0 ) {
+				styles.push(
+					`${ selector } { ${ variableDeclarations.join( ';' ) } }`
 				);
-
-				if ( blockStyleDeclarations.length > 0 ) {
-					styles.push(
-						`${ selector } { ${ blockStyleDeclarations.join(
-							';'
-						) } }`
-					);
-				}
-
-				const presetClasses = getBlockPresetClasses(
-					selector,
-					tree?.settings?.[ context ]
-				);
-				if ( presetClasses ) {
-					styles.push( presetClasses );
-				}
 			}
+
+			const blockStyleDeclarations = getBlockStylesDeclarations(
+				blockData[ context ].supports,
+				tree?.styles?.[ context ]
+			);
+
+			if ( blockStyleDeclarations.length > 0 ) {
+				styles.push(
+					`${ selector } { ${ blockStyleDeclarations.join( ';' ) } }`
+				);
+			}
+
+			const presetClasses = getBlockPresetClasses(
+				selector,
+				tree?.settings?.[ context ]
+			);
+
+			if ( presetClasses ) {
+				styles.push( presetClasses );
+			}
+
 			return styles;
 		},
 		// Can this be converted to a context, as the global context?
