@@ -22,12 +22,34 @@ const DEFAULT_LOCALE_DATA = {
 	},
 };
 
+/*
+ * Regular expression that matches i18n hooks like `i18n.gettext`, `i18n.ngettext`,
+ * `i18n.gettext_domain` or `i18n.ngettext_with_context`
+ */
+const I18N_HOOK_REGEXP = /^i18n\.(n?)gettext(_|$)/;
+
+/**
+ * @typedef {(domain?: string) => LocaleData} GetLocaleData
+ *
+ * Returns locale data by domain in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
 /**
  * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
+ *
  * Merges locale data into the Tannin instance by domain. Accepts data in a
  * Jed-formatted JSON object shape.
  *
  * @see http://messageformat.github.io/Jed/
+ */
+/** @typedef {() => void} SubscribeCallback */
+/** @typedef {() => void} UnsubscribeCallback */
+/**
+ * @typedef {(callback: SubscribeCallback) => UnsubscribeCallback} Subscribe
+ *
+ * Subscribes to changes of locale data
  */
 /**
  * @typedef {(domain?: string) => string} GetFilterDomain
@@ -74,15 +96,20 @@ const DEFAULT_LOCALE_DATA = {
  * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
  */
 /**
- * @typedef {{ applyFilters: (hookName:string, ...args: unknown[]) => unknown}} ApplyFiltersInterface
+ * @typedef {(single: string, context?: string, domain?: string) => boolean} HasTranslation
+ *
+ * Check if there is a translation for a given string in singular form.
  */
+/** @typedef {import('@wordpress/hooks').Hooks} Hooks */
 
 /**
  * An i18n instance
  *
  * @typedef I18n
+ * @property {GetLocaleData} getLocaleData Returns locale data by domain in a Jed-formatted JSON object shape.
  * @property {SetLocaleData} setLocaleData Merges locale data into the Tannin instance by domain. Accepts data in a
  *                                         Jed-formatted JSON object shape.
+ * @property {Subscribe} subscribe         Subscribes to changes of Tannin locale data.
  * @property {__} __                       Retrieve the translation of text.
  * @property {_x} _x                       Retrieve translated string with gettext context.
  * @property {_n} _n                       Translates and retrieves the singular or plural form based on the supplied
@@ -90,6 +117,7 @@ const DEFAULT_LOCALE_DATA = {
  * @property {_nx} _nx                     Translates and retrieves the singular or plural form based on the supplied
  *                                         number, with gettext context.
  * @property {IsRtl} isRTL                 Check if current locale is RTL.
+ * @property {HasTranslation} hasTranslation Check if there is a translation for a given string.
  */
 
 /**
@@ -97,7 +125,7 @@ const DEFAULT_LOCALE_DATA = {
  *
  * @param {LocaleData} [initialData]    Locale data configuration.
  * @param {string}     [initialDomain]  Domain for which configuration applies.
- * @param {ApplyFiltersInterface} [hooks]     Hooks implementation.
+ * @param {Hooks} [hooks]     Hooks implementation.
  * @return {I18n}                       I18n instance
  */
 export const createI18n = ( initialData, initialDomain, hooks ) => {
@@ -108,8 +136,31 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	 */
 	const tannin = new Tannin( {} );
 
-	/** @type {SetLocaleData} */
-	const setLocaleData = ( data, domain = 'default' ) => {
+	const listeners = new Set();
+
+	const notifyListeners = () => {
+		listeners.forEach( ( listener ) => listener() );
+	};
+
+	/**
+	 * Subscribe to changes of locale data.
+	 *
+	 * @param {SubscribeCallback} callback Subscription callback.
+	 * @return {UnsubscribeCallback} Unsubscribe callback.
+	 */
+	const subscribe = ( callback ) => {
+		listeners.add( callback );
+		return () => listeners.delete( callback );
+	};
+
+	/** @type {GetLocaleData} */
+	const getLocaleData = ( domain = 'default' ) => tannin.data[ domain ];
+
+	/**
+	 * @param {LocaleData} [data]
+	 * @param {string} [domain]
+	 */
+	const doSetLocaleData = ( data, domain = 'default' ) => {
 		tannin.data[ domain ] = {
 			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
@@ -122,6 +173,12 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			...DEFAULT_LOCALE_DATA[ '' ],
 			...tannin.data[ domain ][ '' ],
 		};
+	};
+
+	/** @type {SetLocaleData} */
+	const setLocaleData = ( data, domain ) => {
+		doSetLocaleData( data, domain );
+		notifyListeners();
 	};
 
 	/**
@@ -147,7 +204,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		number
 	) => {
 		if ( ! tannin.data[ domain ] ) {
-			setLocaleData( undefined, domain );
+			// use `doSetLocaleData` to set silently, without notifying listeners
+			doSetLocaleData( undefined, domain );
 		}
 
 		return tannin.dcnpgettext( domain, context, single, plural, number );
@@ -320,16 +378,69 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		return 'rtl' === _x( 'ltr', 'text direction' );
 	};
 
+	/** @type {HasTranslation} */
+	const hasTranslation = ( single, context, domain ) => {
+		const key = context ? context + '\u0004' + single : single;
+		let result = !! tannin.data?.[ domain ?? 'default' ]?.[ key ];
+		if ( hooks ) {
+			/**
+			 * Filters the presence of a translation in the locale data.
+			 *
+			 * @param {boolean} hasTranslation Whether the translation is present or not..
+			 * @param {string} single The singular form of the translated text (used as key in locale data)
+			 * @param {string} context Context information for the translators.
+			 * @param {string} domain Text domain. Unique identifier for retrieving translated strings.
+			 */
+			result = /** @type { boolean } */ (
+				/** @type {*} */ hooks.applyFilters(
+					'i18n.has_translation',
+					result,
+					single,
+					context,
+					domain
+				)
+			);
+
+			result = /** @type { boolean } */ (
+				/** @type {*} */ hooks.applyFilters(
+					'i18n.has_translation_' + getFilterDomain( domain ),
+					result,
+					single,
+					context,
+					domain
+				)
+			);
+		}
+		return result;
+	};
+
 	if ( initialData ) {
 		setLocaleData( initialData, initialDomain );
 	}
 
+	if ( hooks ) {
+		/**
+		 * @param {string} hookName
+		 */
+		const onHookAddedOrRemoved = ( hookName ) => {
+			if ( I18N_HOOK_REGEXP.test( hookName ) ) {
+				notifyListeners();
+			}
+		};
+
+		hooks.addAction( 'hookAdded', 'core/i18n', onHookAddedOrRemoved );
+		hooks.addAction( 'hookRemoved', 'core/i18n', onHookAddedOrRemoved );
+	}
+
 	return {
+		getLocaleData,
 		setLocaleData,
+		subscribe,
 		__,
 		_x,
 		_n,
 		_nx,
 		isRTL,
+		hasTranslation,
 	};
 };
