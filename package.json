@@ -100,6 +100,7 @@
 		"@types/classnames": "2.2.10",
 		"@types/eslint": "6.8.0",
 		"@types/estree": "0.0.44",
+		"@types/highlight-words-core": "1.2.0",
 		"@types/lodash": "4.14.149",
 		"@types/npm-package-arg": "6.1.0",
 		"@types/prettier": "1.19.0",
