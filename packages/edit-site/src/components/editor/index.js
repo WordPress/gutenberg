@@ -71,6 +71,10 @@ function Editor() {
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
+		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
+		// the editor is loaded rather than degrading the performance of the inserter.
+		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
+
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
