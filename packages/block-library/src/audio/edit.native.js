@@ -154,11 +154,12 @@ function AudioEdit( {
 							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
 							<AudioPlayer
-								source={ attributes.src }
 								fileName={ fileName }
 								isUploadInProgress={ isUploadInProgress }
 								isUploadFailed={ isUploadFailed }
 								retryMessage={ retryMessage }
+								attributes={ attributes }
+								isSelected={ isSelected }
 							/>
 						</>
 					);
