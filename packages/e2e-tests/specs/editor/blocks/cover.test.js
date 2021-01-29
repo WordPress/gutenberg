@@ -13,6 +13,7 @@ import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	openPreviewPage,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -40,11 +41,8 @@ async function waitForImage( filename ) {
 }
 
 describe( 'Cover', () => {
-	beforeEach( async () => {
-		await createNewPost();
-	} );
-
 	it( 'can be resized using drag & drop', async () => {
+		await createNewPost();
 		await insertBlock( 'Cover' );
 		// Close the inserter
 		await page.click( '.edit-post-header-toolbar__inserter-toggle' );
@@ -120,7 +118,8 @@ describe( 'Cover', () => {
 		).toBeGreaterThan( 100 );
 	} );
 
-	it( 'renders correctly', async () => {
+	it( 'renders correctly in the editor', async () => {
+		await createNewPost();
 		await insertBlock( 'Cover' );
 		const filename = await upload( '.wp-block-cover input[type="file"]' );
 		await waitForImage( filename );
@@ -133,7 +132,16 @@ describe( 'Cover', () => {
 
 		const coverBlockElement = await page.$( '[aria-label="Block: Cover"]' );
 		const screenshot = await coverBlockElement.screenshot( {
-			path: 'cover-block.png',
+			path: 'cover-block-editor.png',
+		} );
+		expect( screenshot ).toMatchImageSnapshot();
+	} );
+
+	it( 'renders correctly on the frontend', async () => {
+		const previewPage = await openPreviewPage( page );
+		const coverBlockElement = await previewPage.$( '.wp-block-cover' );
+		const screenshot = await coverBlockElement.screenshot( {
+			path: 'cover-block-frontend.png',
 		} );
 		expect( screenshot ).toMatchImageSnapshot();
 	} );
