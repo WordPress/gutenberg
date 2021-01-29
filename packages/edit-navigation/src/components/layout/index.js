@@ -61,6 +61,7 @@ export default function Layout( { blockEditorSettings } ) {
 							menus={ menus }
 							selectedMenuId={ selectedMenuId }
 							onSelectMenu={ selectMenu }
+							navigationPost={ navigationPost }
 						/>
 
 						<BlockEditorProvider
