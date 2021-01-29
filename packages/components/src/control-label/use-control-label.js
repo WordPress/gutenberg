@@ -11,6 +11,17 @@ import { useFormGroupContextId } from '../form-group';
 import { useText } from '../text/next/use-text';
 import * as styles from './control-label-styles';
 
+/**
+ * @typedef OwnProps
+ * @property {boolean} [isBlock] Renders as with a CSS `display` of `block`.
+ * @property {'large'|'medium'|'small'} [size] The size of `ControlLabel`.
+ */
+
+/** @typedef {import('../text/next/types').Props & OwnProps} Props */
+
+/**
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'label'>} props
+ */
 export function useControlLabel( props ) {
 	const {
 		htmlFor: htmlForProp,

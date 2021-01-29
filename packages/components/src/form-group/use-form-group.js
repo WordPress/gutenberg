@@ -16,7 +16,7 @@ import * as styles from './form-group-styles';
 
 /**
  * @typedef OwnProps
- * @property {Pick<import('../text/types').Props, 'align'>} [alignLabel='left'] Adjusts the block alignment of children.
+ * @property {Pick<import('../text/next/types').Props, 'align'>} [alignLabel='left'] Adjusts the block alignment of children.
  * @property {boolean} [horizontal=true] Displays the label and form field horizontally.
  * @property {string} [label] Label of the form field.
  * @property {string} [help] Displays help content.
