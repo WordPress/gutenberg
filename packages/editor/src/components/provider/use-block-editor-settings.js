@@ -124,6 +124,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			editorStore
 		);
 		const { canUser } = select( coreStore );
+
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			reusableBlocks: select( 'core' ).getEntityRecords(
