@@ -11,7 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 * [**] Add support for setting heading anchors
-
+* [***] New Block: Audio
 
 #### Bug Fix
 * Add proper handling for single use blocks such as the more block [#28339]
