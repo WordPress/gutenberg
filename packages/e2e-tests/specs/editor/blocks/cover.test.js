@@ -131,18 +131,14 @@ describe( 'Cover', () => {
 		);
 
 		const coverBlockElement = await page.$( '[aria-label="Block: Cover"]' );
-		const screenshot = await coverBlockElement.screenshot( {
-			path: 'cover-block-editor.png',
-		} );
+		const screenshot = await coverBlockElement.screenshot();
 		expect( screenshot ).toMatchImageSnapshot();
 	} );
 
 	it( 'renders correctly on the frontend', async () => {
 		const previewPage = await openPreviewPage( page );
 		const coverBlockElement = await previewPage.$( '.wp-block-cover' );
-		const screenshot = await coverBlockElement.screenshot( {
-			path: 'cover-block-frontend.png',
-		} );
+		const screenshot = await coverBlockElement.screenshot();
 		expect( screenshot ).toMatchImageSnapshot();
 	} );
 } );
