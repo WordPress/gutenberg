@@ -16,6 +16,7 @@ import {
 	openPreviewPage,
 } from '@wordpress/e2e-test-utils';
 
+// Copied from image.test.js. TODO: Extract into @wordpress/e2e-test-utils.
 async function upload( selector ) {
 	await page.waitForSelector( selector );
 	const inputElement = await page.$( selector );
