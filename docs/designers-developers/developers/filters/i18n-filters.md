@@ -1,6 +1,6 @@
 # i18n Filters
 
-The i18n functions (`__()`, `_x()`, `_n()` and `_nx()`) provide translations of strings for use in your code. As with their server-side PHP equivalents, the values returned by these functions are filterable if you need to override them, using the following filters:
+The i18n functions (`__()`, `_x()`, `_n()` and `_nx()`) provide translations of strings for use in your code. The values returned by these functions are filterable if you need to override them, using the following filters:
 
 - `i18n.gettext`
 - `i18n.gettext_with_context`
