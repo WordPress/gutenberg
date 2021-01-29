@@ -111,10 +111,10 @@ function Player( {
 		...( isUploadFailed && uploadFailedStyle ),
 	};
 
-	const buttonTextStyle = {
-		...styles.buttonText,
-		...( isIOS ? styles.buttonTextIOS : styles.buttonTextAndroid ),
-	};
+	const buttonBackgroundStyle = getStylesFromColorScheme(
+		styles.buttonBackground,
+		styles.buttonBackgroundDark
+	);
 
 	let title = '';
 	let extension = '';
@@ -184,7 +184,11 @@ function Player( {
 						) }
 						onPress={ onPressListen }
 					>
-						<Text style={ buttonTextStyle }>{ __( 'OPEN' ) }</Text>
+						<View style={ buttonBackgroundStyle }>
+							<Text style={ styles.buttonText }>
+								{ __( 'OPEN' ) }
+							</Text>
+						</View>
 					</TouchableWithoutFeedback>
 				) }
 			</View>
