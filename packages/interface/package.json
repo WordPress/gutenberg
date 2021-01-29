@@ -38,7 +38,8 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.19",
+		"react-merge-refs": "^1.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

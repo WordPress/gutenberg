@@ -254,6 +254,7 @@ class MediaTextEdit extends Component {
 			isSelected,
 			isRTL,
 			wrapperProps,
+			blockWidth,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -379,7 +380,10 @@ class MediaTextEdit extends Component {
 							...innerBlockContainerStyle,
 						} }
 					>
-						<InnerBlocks template={ TEMPLATE } />
+						<InnerBlocks
+							template={ TEMPLATE }
+							blockWidth={ blockWidth }
+						/>
 					</View>
 				</View>
 			</>

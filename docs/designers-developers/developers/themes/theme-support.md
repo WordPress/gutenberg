@@ -8,7 +8,6 @@ There are a few new concepts to consider when building themes:
 - **Editor Text Size Palette** - A default set of sizes is provided, but themes can register their own and optionally lock users into picking from preselected sizes.
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
-- **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
 - **Block Tools** - Themes can opt-in to several block tools like line height, custom units.
 - **Core Block Patterns** - Themes can opt-out of the default block patterns.
 
@@ -315,17 +314,6 @@ add_theme_support( 'editor-styles' );
 ```
 
 You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside the block editor.
-
-### Dark backgrounds
-
-If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
-
-```php
-add_theme_support( 'editor-styles' );
-add_theme_support( 'dark-editor-style' );
-```
-
-Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
 
 ### Enqueuing the editor style
 

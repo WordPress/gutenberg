@@ -966,6 +966,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Grid",
+		"slug": "grid",
+		"markdown_source": "../packages/components/src/grid/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
@@ -1215,6 +1221,12 @@
 		"title": "TextHighlight",
 		"slug": "text-highlight",
 		"markdown_source": "../packages/components/src/text-highlight/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Next",
+		"slug": "next",
+		"markdown_source": "../packages/components/src/text/next/README.md",
 		"parent": "components"
 	},
 	{

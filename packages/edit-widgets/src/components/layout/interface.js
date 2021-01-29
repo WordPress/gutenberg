@@ -11,7 +11,7 @@ import {
 	__experimentalLibrary as Library,
 	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	InterfaceSkeleton,
@@ -51,9 +51,7 @@ function Interface( { blockEditorSettings } ) {
 		).getActiveComplementaryArea( editWidgetsStore ),
 		isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
 	} ) );
-	const ref = useRef();
-
-	useEditorStyles( ref, blockEditorSettings.styles );
+	const editorStylesRef = useEditorStyles( blockEditorSettings.styles );
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -74,7 +72,7 @@ function Interface( { blockEditorSettings } ) {
 
 	return (
 		<InterfaceSkeleton
-			ref={ ref }
+			ref={ editorStylesRef }
 			labels={ interfaceLabels }
 			header={ <Header /> }
 			secondarySidebar={
