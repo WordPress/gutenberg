@@ -185,4 +185,8 @@ export type Props = TruncateProps & {
 	 * Adjusts font-weight of the text.
 	 */
 	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
+	/**
+	 * Adjusts letter-spacing of the text.
+	 */
+	letterSpacing?: CSSProperties[ 'letterSpacing' ];
 };

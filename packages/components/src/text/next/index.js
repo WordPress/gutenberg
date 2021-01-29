@@ -5,8 +5,14 @@ import { __unstableWithNext as withNext } from '../../__next/context';
 import NextText from './text';
 import { text } from '../styles/text-mixins';
 
+// @ts-ignore
 const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
 
+/**
+ * @param {Object} props
+ * @param {keyof JSX.IntrinsicElements} props.as
+ * @param {import('../styles/text-mixins').TextVariant} props.variant
+ */
 export const adapter = ( { as, variant, ...restProps } ) => ( {
 	// as has not changed
 	as,
@@ -16,6 +22,11 @@ export const adapter = ( { as, variant, ...restProps } ) => ( {
 	...restProps,
 } );
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {import('react').ComponentType<{ as: keyof JSX.IntrinsicElements, variant: import('../styles/text-mixins').TextVariant }>} Current
+ */
+/* eslint-enable jsdoc/valid-types */
 export function withNextComponent( Current ) {
 	return withNext( Current, Text, 'WPComponentsText', adapter );
 }

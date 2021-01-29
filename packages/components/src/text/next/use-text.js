@@ -33,7 +33,7 @@ export function useText( props ) {
 		display,
 		highlightEscape = false,
 		highlightCaseSensitive = false,
-		highlightWords = [],
+		highlightWords = /** @type {string[]} */ ( [] ),
 		highlightSanitize,
 		isBlock = false,
 		letterSpacing,
@@ -55,7 +55,9 @@ export function useText( props ) {
 	if ( isHighlighter ) {
 		content = createHighlighterText( {
 			autoEscape: highlightEscape,
-			children,
+			// Disable reason: We need to disable this otherwise it erases the cast
+			// eslint-disable-next-line object-shorthand
+			children: /** @type {string} */ ( children ),
 			caseSensitive: highlightCaseSensitive,
 			searchWords: highlightWords,
 			sanitize: highlightSanitize,
@@ -74,7 +76,9 @@ export function useText( props ) {
 			color,
 			display,
 			fontSize: getFontSize( size ),
-			fontWeight: weight,
+			/* eslint-disable jsdoc/valid-types */
+			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
+			/* eslint-enable jsdoc/valid-types */
 			lineHeight,
 			letterSpacing,
 			textAlign: align,
@@ -169,6 +173,13 @@ export function useText( props ) {
 	};
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {Object} props
+ * @param {import('./types').Props['adjustLineHeightForInnerControls']} [props.adjustLineHeightForInnerControls]
+ * @param {import('react').CSSProperties['lineHeight']} [props.lineHeight]
+ */
+/* eslint-enable jsdoc/valid-types */
 function getLineHeight( { adjustLineHeightForInnerControls, lineHeight } ) {
 	if ( ! isNil( lineHeight ) ) return lineHeight;
 

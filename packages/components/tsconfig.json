@@ -18,7 +18,10 @@
 		"src/truncate/**/*",
 		"src/utils/**/*",
 		"src/view/**/*",
-		"src/visually-hidden/**/*"
+		"src/visually-hidden/**/*",
+		"src/text/**/*",
+		"src/grid/**/*",
+		"src/__next/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
