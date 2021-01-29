@@ -27,10 +27,9 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
-function Canvas( { body, styles } ) {
+function Canvas( { body } ) {
 	useBlockSelectionClearer( body );
 	useTypingObserver( body );
-	useEditorStyles( body, styles );
 
 	return (
 		<DropZoneProvider>
@@ -70,6 +69,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 
 	useMouseMoveTypingReset( ref );
+	// Ideally this should be moved to the place where the styles are applied (iframe)
+	const editorStylesRef = useEditorStyles( settings.styles );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
@@ -102,7 +103,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor" onWheel={ onWheel }>
+			<div
+				ref={ editorStylesRef }
+				className="edit-site-visual-editor"
+				onWheel={ onWheel }
+			>
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
