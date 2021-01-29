@@ -13,11 +13,14 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
+	Popover,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import SaveButton from './save-button';
+import BlockInspectorDropdown from './block-inspector-dropdown';
 import ManageLocations from './manage-locations';
 import AddMenuForm from './add-menu-form';
 
@@ -26,6 +29,7 @@ export default function Header( {
 	selectedMenuId,
 	onSelectMenu,
 	isPending,
+	navigationPost,
 } ) {
 	const selectedMenu = find( menus, { id: selectedMenuId } );
 	const menuName = selectedMenu ? selectedMenu.name : undefined;
@@ -46,15 +50,15 @@ export default function Header( {
 
 	return (
 		<div className="edit-navigation-header">
-			<h1 className="edit-navigation-header__title">
-				{ __( 'Navigation' ) }
-			</h1>
-
-			<div className="edit-navigation-header__actions">
-				<h2 className="edit-navigation-header__action_header">
+			<div className="edit-navigation-header__title-subtitle">
+				<h1 className="edit-navigation-header__title">
+					{ __( 'Navigation' ) }
+				</h1>
+				<h2 className="edit-navigation-header__subtitle">
 					{ actionHeaderText }
 				</h2>
-
+			</div>
+			<div className="edit-navigation-header__actions">
 				<DropdownMenu
 					icon={ null }
 					toggleProps={ {
@@ -65,7 +69,7 @@ export default function Header( {
 						__experimentalIsFocusable: true,
 					} }
 					popoverProps={ {
-						position: 'bottom center',
+						position: 'bottom left',
 					} }
 				>
 					{ () => (
@@ -83,7 +87,7 @@ export default function Header( {
 				</DropdownMenu>
 
 				<Dropdown
-					position="bottom center"
+					position="bottom left"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
 							isTertiary
@@ -103,7 +107,7 @@ export default function Header( {
 
 				<Dropdown
 					contentClassName="edit-navigation-header__manage-locations"
-					position="bottom center"
+					position="bottom left"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
 							isTertiary
@@ -115,6 +119,11 @@ export default function Header( {
 					) }
 					renderContent={ () => <ManageLocations /> }
 				/>
+
+				<SaveButton navigationPost={ navigationPost } />
+
+				<BlockInspectorDropdown />
+				<Popover.Slot name="block-toolbar" />
 			</div>
 		</div>
 	);

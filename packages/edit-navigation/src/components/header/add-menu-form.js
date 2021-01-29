@@ -58,7 +58,10 @@ export default function AddMenuForm( { menus, onCreate } ) {
 	};
 
 	return (
-		<form onSubmit={ createMenu }>
+		<form
+			onSubmit={ createMenu }
+			className="edit-navigation-header__add-menu-form"
+		>
 			<TextControl
 				// Disable reason: The name field should receive focus when
 				// component mounts.
