@@ -459,7 +459,7 @@
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
-		background: var(--wp-admin-theme-color);
+		background: $gray-900;
 		border-radius: $radius-block-ui;
 		color: $white;
 		padding: 0;
@@ -470,8 +470,15 @@
 
 		&:hover {
 			color: $white;
-			background: $gray-900;
+			background: var(--wp-admin-theme-color);
 		}
+	}
+}
+
+.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle.components-button.has-icon {
+	background: var(--wp-admin-theme-color);
+	&:hover {
+		background: $gray-900;
 	}
 }
 
