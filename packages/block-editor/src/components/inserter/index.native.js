@@ -306,7 +306,7 @@ export default compose( [
 		// `end` argument (id) can refer to the component which is removed
 		// due to pressing `undo` button, that's why we need to check
 		// if `getBlock( end) is valid, otherwise `null` is passed
-		const isAnyBlockSelected = !isAppender && end && getBlock( end );
+		const isAnyBlockSelected = ! isAppender && end && getBlock( end );
 		const destinationRootClientId = isAnyBlockSelected
 			? getBlockRootClientId( end )
 			: rootClientId;
