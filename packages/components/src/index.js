@@ -59,6 +59,7 @@ export {
 } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
+export { default as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { default as Flex } from './flex';
 export { default as FlexBlock } from './flex/block';
