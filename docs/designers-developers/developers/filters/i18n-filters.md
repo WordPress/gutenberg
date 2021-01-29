@@ -66,7 +66,7 @@ function myPluginGettextFilter( translation, text, domain ) {
 // Adding the filter
 wp.hooks.addFilter(
 		'i18n.gettext',
-		'my-plugin',
+		'my-plugin/override-add-to-reusable-blocks-label',
 		myPluginGettextFilter
 );
 ```
@@ -96,7 +96,7 @@ function myPluginGettextFilter( translation, text, domain ) {
 // Adding the filter
 wp.hooks.addFilter(
 		'i18n.gettext_woocommerce',
-		'my-plugin',
+		'my-plugin/override-fulfilled-all-orders-text',
 		myPluginGettextFilter
 );
 ```
