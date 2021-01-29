@@ -10,8 +10,8 @@
 .edit-navigation-editor__block-view {
 	padding: $grid-unit-20;
 	@include break-medium() {
-		height: 100%;
 		flex-grow: 1;
+		align-self: stretch;
 	}
 
 	.components-spinner {
