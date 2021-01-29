@@ -333,9 +333,10 @@ function CoverEdit( {
 	const style = {
 		...( isImageBackground && hasParallax
 			? backgroundImageStyles( url )
-			: {} ),
+			: {
+					backgroundImage: gradientValue ? gradientValue : undefined,
+			  } ),
 		backgroundColor: overlayColor.color,
-		background: gradientValue && ! url ? gradientValue : undefined,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
@@ -592,7 +593,7 @@ function CoverEdit( {
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
-						style={ { background: gradientValue } }
+						style={ { backgroundImage: gradientValue } }
 					/>
 				) }
 				{ isImageBackground && ! hasParallax && (
