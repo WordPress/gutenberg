@@ -33,16 +33,17 @@ import { createElement } from '@wordpress/element';
  * @property {string} [unhighlightClassName=''] Classname to apply to unhighlighted text.
  * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [unhighlightStyle] Style to apply to unhighlighted text.
  */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Maps props to lowercase names.
  *
- * @param {Record<string, unknown>} object Props to map.
- * @return {Record<string, unknown>} The mapped props.
+ * @template {Record<string, unknown>} T
+ * @param {T} object Props to map.
+ * @return {{[K in keyof T as Lowercase<string & K>]: T[K]}} The mapped props.
  */
+/* eslint-enable jsdoc/valid-types */
 const lowercaseProps = ( object ) => {
-	/** @type {Record<string, unknown>} */
+	/** @type {any} */
 	const mapped = {};
 	for ( const key in object ) {
 		mapped[ key.toLowerCase() ] = object[ key ];

@@ -14,7 +14,6 @@ export function ComponentSystemProvider( {
 	children,
 	value = {},
 } ) {
-	// @ts-ignore
 	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
 		const contextValue = { ...value };
 

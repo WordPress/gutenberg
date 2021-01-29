@@ -17,7 +17,6 @@ export function withNext(
 	namespace = 'Component',
 	adapter = ( p ) => /** @type {any} */ ( p )
 ) {
-	// @ts-ignore
 	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
 		/* eslint-disable jsdoc/no-undefined-types */
 		/**

@@ -33,7 +33,7 @@ export function useText( props ) {
 		display,
 		highlightEscape = false,
 		highlightCaseSensitive = false,
-		highlightWords = /** @type {string[]} */ ( [] ),
+		highlightWords,
 		highlightSanitize,
 		isBlock = false,
 		letterSpacing,
@@ -47,9 +47,9 @@ export function useText( props ) {
 		...otherProps
 	} = useContextSystem( props, 'Text' );
 
+	/** @type {import('react').ReactNode} */
 	let content = children;
-	const isHighlighter =
-		Array.isArray( highlightWords ) && highlightWords.length;
+	const isHighlighter = Array.isArray( highlightWords );
 	const isCaption = size === 'caption';
 
 	if ( isHighlighter ) {
