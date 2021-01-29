@@ -297,7 +297,13 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 		} = this.props;
-		const { placeholder, text, borderRadius, url } = attributes;
+		const {
+			placeholder,
+			text,
+			borderRadius,
+			url,
+			align = 'center',
+		} = attributes;
 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
@@ -360,7 +366,7 @@ class ButtonEdit extends Component {
 							...richTextStyle.richText,
 							color: textColor,
 						} }
-						textAlign="center"
+						textAlign={ align }
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
