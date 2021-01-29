@@ -33,7 +33,6 @@ const isIOS = Platform.OS === 'ios';
 function Player( {
 	getStylesFromColorScheme,
 	isUploadInProgress,
-	fileName,
 	isUploadFailed,
 	attributes,
 	isSelected,
@@ -119,7 +118,9 @@ function Player( {
 	let title = '';
 	let extension = '';
 
-	if ( fileName ) {
+	if ( src ) {
+		const decodedURI = decodeURI( src );
+		const fileName = decodedURI.split( '/' ).pop();
 		const parts = fileName.split( '.' );
 		extension = parts.pop().toUpperCase();
 		title = parts.join( '.' );

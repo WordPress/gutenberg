@@ -51,7 +51,6 @@ function AudioEdit( {
 	const { id, autoplay, loop, preload, src } = attributes;
 
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const [ fileName, setFileName ] = useState( src && src.split( '/' ).pop() );
 
 	const onFileChange = ( { mediaId, mediaUrl } ) => {
 		setAttributes( { id: mediaId, src: mediaUrl } );
@@ -87,8 +86,6 @@ function AudioEdit( {
 		// sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI
 		setAttributes( { src: media.url, id: media.id } );
-
-		setFileName( media.title );
 	}
 
 	function onAudioPress() {
@@ -154,7 +151,6 @@ function AudioEdit( {
 							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
 							<AudioPlayer
-								fileName={ fileName }
 								isUploadInProgress={ isUploadInProgress }
 								isUploadFailed={ isUploadFailed }
 								retryMessage={ retryMessage }
