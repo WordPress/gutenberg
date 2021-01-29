@@ -21,7 +21,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
-import { getProtocol } from '@wordpress/url';
+import { getProtocol, safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -119,7 +119,7 @@ function Player( {
 	let extension = '';
 
 	if ( src ) {
-		const decodedURI = decodeURI( src );
+		const decodedURI = safeDecodeURI( src );
 		const fileName = decodedURI.split( '/' ).pop();
 		const parts = fileName.split( '.' );
 		extension = parts.pop().toUpperCase();
