@@ -3,6 +3,7 @@
 	"plugins": [
 		"."
 	],
+	"phpVersion": "7.4",
 	"themes": [ "WordPress/theme-experiments/tt1-blocks" ],
 	"env": {
 		"tests": {
