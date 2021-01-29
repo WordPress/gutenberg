@@ -433,6 +433,7 @@ const ColumnsEdit = ( props ) => {
 		innerColumns = [],
 		hasParents,
 		parentBlockAlignment,
+		editorSidebarOpened,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -441,6 +442,8 @@ const ColumnsEdit = ( props ) => {
 				getBlockParents,
 				getBlockAttributes,
 			} = select( 'core/block-editor' );
+			const { isEditorSidebarOpened } = select( 'core/edit-post' );
+
 			const block = getBlock( clientId );
 			const innerBlocks = block?.innerBlocks;
 			const isContentEmpty = map(
@@ -455,6 +458,7 @@ const ColumnsEdit = ( props ) => {
 				innerColumns: innerBlocks,
 				hasParents: !! parents.length,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
+				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
 		},
 		[ clientId ]
@@ -479,6 +483,7 @@ const ColumnsEdit = ( props ) => {
 				innerColumns={ innerColumns }
 				hasParents={ hasParents }
 				parentBlockAlignment={ parentBlockAlignment }
+				editorSidebarOpened={ editorSidebarOpened }
 				{ ...props }
 			/>
 			<BlockVariationPicker
