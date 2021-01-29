@@ -319,6 +319,7 @@ export default function PreferencesModal() {
 			title={ __( 'Preferences' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
+			isFullscreen
 		>
 			{ modalContent }
 		</Modal>
