@@ -66,10 +66,10 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 	}
 
 	if ( isset( $settings['enableCustomSpacing'] ) ) {
-		if ( ! isset( $theme_settings['settings']['global']['spacing'] ) ) {
-			$theme_settings['settings']['global']['spacing'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
-		$theme_settings['settings']['global']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
 	}
 
 	if ( isset( $settings['colors'] ) ) {
