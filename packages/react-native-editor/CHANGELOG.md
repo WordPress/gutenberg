@@ -11,7 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 * [**] Add support for setting heading anchors
-* [**] Make inserter long-press options "add to beginning" and "add to end" always available.
+* [**] Make inserter long-press options "add to beginning" and "add to end" always available. [#28610]
 
 #### Bug Fix
 * Add proper handling for single use blocks such as the more block [#28339]
