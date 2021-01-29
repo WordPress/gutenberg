@@ -6,8 +6,10 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { View } from '../../View';
-import Flex, { FlexBlock, FlexItem } from '../index';
+import View from '../../../view';
+import Flex from '../flex';
+import FlexItem from '../flex-item';
+import FlexBlock from '../flex-block';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

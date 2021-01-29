@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render + wrap non Flex children 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -37,27 +37,27 @@ exports[`props should render + wrap non Flex children 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>*+*:not(marquee) {
+.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
   margin-left: calc(var(--wp-g2-grid-base) * 2);
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>* {
+.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 > * {
   min-width: 0;
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -77,43 +77,18 @@ exports[`props should render + wrap non Flex children 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
 .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none!important;
-    transition: none!important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none!important;
-  transition: none!important;
-}
-
-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -136,33 +111,58 @@ exports[`props should render + wrap non Flex children 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
 <div
-  class="components-flex wp-components-flex emotion-0"
+  class="components-flex wp-components-flex emotion-3"
   data-g2-c16t="true"
   data-g2-component="Flex"
 >
   <div
-    class="components-flex-item wp-components-flex-item emotion-1"
+    class="components-flex-item wp-components-flex-item emotion-0"
     data-g2-c16t="true"
     data-g2-component="FlexItem"
   />
   <div
-    class="emotion-2"
+    class="emotion-1"
   />
   <div />
   <div
-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-3"
+    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2"
     data-g2-c16t="true"
     data-g2-component="FlexBlock"
   />
@@ -171,6 +171,71 @@ exports[`props should render + wrap non Flex children 1`] = `
 
 exports[`props should render align 1`] = `
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: var(--wp-g2-flex-item-display);
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: var(--wp-g2-flex-item-display);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -206,103 +271,38 @@ exports[`props should render align 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none!important;
-    transition: none!important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none!important;
-  transition: none!important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>*+*:not(marquee) {
-  margin-left: calc(4px * 2);
-  margin-left: calc(var(--wp-g2-grid-base) * 2);
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>* {
-  min-width: 0;
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  display: var(--wp-g2-flex-item-display);
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none!important;
-    transition: none!important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none!important;
-  transition: none!important;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  display: var(--wp-g2-flex-item-display);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-@media (prefers-reduced-motion) {
   .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none!important;
-    transition: none!important;
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
 [data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none!important;
-  transition: none!important;
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
+  margin-left: calc(4px * 2);
+  margin-left: calc(var(--wp-g2-grid-base) * 2);
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
+  min-width: 0;
 }
 
 <div
-  class="components-flex wp-components-flex emotion-0"
+  class="components-flex wp-components-flex emotion-2"
   data-g2-c16t="true"
   data-g2-component="Flex"
 >
   <div
-    class="components-flex-item wp-components-flex-item emotion-1"
+    class="components-flex-item wp-components-flex-item emotion-0"
     data-g2-c16t="true"
     data-g2-component="FlexItem"
   />
   <div
-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2"
+    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
     data-g2-c16t="true"
     data-g2-component="FlexBlock"
   />
@@ -310,7 +310,7 @@ exports[`props should render align 1`] = `
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -346,27 +346,27 @@ exports[`props should render correctly 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>*+*:not(marquee) {
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
   margin-left: calc(var(--wp-g2-grid-base) * 2);
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>* {
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
   min-width: 0;
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -386,18 +386,18 @@ exports[`props should render correctly 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -420,29 +420,29 @@ exports[`props should render correctly 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
 <div
-  class="components-flex wp-components-flex emotion-0"
+  class="components-flex wp-components-flex emotion-2"
   data-g2-c16t="true"
   data-g2-component="Flex"
 >
   <div
-    class="components-flex-item wp-components-flex-item emotion-1"
+    class="components-flex-item wp-components-flex-item emotion-0"
     data-g2-c16t="true"
     data-g2-component="FlexItem"
   />
   <div
-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2"
+    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
     data-g2-c16t="true"
     data-g2-component="FlexBlock"
   />
@@ -451,6 +451,71 @@ exports[`props should render correctly 1`] = `
 
 exports[`props should render justify 1`] = `
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: var(--wp-g2-flex-item-display);
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: var(--wp-g2-flex-item-display);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -486,103 +551,38 @@ exports[`props should render justify 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none!important;
-    transition: none!important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none!important;
-  transition: none!important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>*+*:not(marquee) {
-  margin-left: calc(4px * 2);
-  margin-left: calc(var(--wp-g2-grid-base) * 2);
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>* {
-  min-width: 0;
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  display: var(--wp-g2-flex-item-display);
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none!important;
-    transition: none!important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none!important;
-  transition: none!important;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-  display: var(--wp-g2-flex-item-display);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-@media (prefers-reduced-motion) {
   .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none!important;
-    transition: none!important;
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
 [data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none!important;
-  transition: none!important;
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
+  margin-left: calc(4px * 2);
+  margin-left: calc(var(--wp-g2-grid-base) * 2);
+}
+
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
+  min-width: 0;
 }
 
 <div
-  class="components-flex wp-components-flex emotion-0"
+  class="components-flex wp-components-flex emotion-2"
   data-g2-c16t="true"
   data-g2-component="Flex"
 >
   <div
-    class="components-flex-item wp-components-flex-item emotion-1"
+    class="components-flex-item wp-components-flex-item emotion-0"
     data-g2-c16t="true"
     data-g2-component="FlexItem"
   />
   <div
-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2"
+    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
     data-g2-c16t="true"
     data-g2-component="FlexBlock"
   />
@@ -590,7 +590,7 @@ exports[`props should render justify 1`] = `
 `;
 
 exports[`props should render spacing 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -626,27 +626,27 @@ exports[`props should render spacing 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>*+*:not(marquee) {
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
   margin-left: calc(var(--wp-g2-grid-base) * 2);
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0>* {
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
   min-width: 0;
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -660,28 +660,28 @@ exports[`props should render spacing 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none!important;
-    transition: none!important;
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none!important;
-  transition: none!important;
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
 }
 
 <div
-  class="components-flex wp-components-flex emotion-0"
+  class="components-flex wp-components-flex emotion-2"
   data-g2-c16t="true"
   data-g2-component="Flex"
   spacing="5"
 >
   <div
-    class="emotion-1"
+    class="emotion-0"
   />
   <div
-    class="emotion-1"
+    class="emotion-0"
   />
 </div>
 `;
