@@ -65,13 +65,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$settings['enableCustomUnits'];
 	}
 
-	if ( isset( $settings['enableCustomSpacing'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
-	}
-
 	if ( isset( $settings['colors'] ) ) {
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
 			$theme_settings['settings'][ $all_blocks ]['color'] = array();
@@ -98,6 +91,22 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
 		$theme_settings['settings'][ $all_blocks ]['typography']['fontSizes'] = $font_sizes;
+	}
+
+	// This allows to make the plugin work with WordPress 5.7 beta
+	// as well as lower versions. The second check can be removed
+	// as soon as the minimum WordPress version for the plugin
+	// is bumped to 5.7.
+	if ( isset( $settings['enableCustomSpacing'] ) ) {
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
+		}
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+	} else if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
+		}
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = true;
 	}
 
 	// Things that didn't land in core yet, so didn't have a setting assigned.
