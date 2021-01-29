@@ -184,9 +184,7 @@ function Player( {
 						) }
 						onPress={ onPressListen }
 					>
-						<Text style={ buttonTextStyle }>
-							{ __( 'Listen' ) }
-						</Text>
+						<Text style={ buttonTextStyle }>{ __( 'OPEN' ) }</Text>
 					</TouchableWithoutFeedback>
 				) }
 			</View>
