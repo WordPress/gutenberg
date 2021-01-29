@@ -1,0 +1,188 @@
+[
+    {
+        "blockName": "core/cover",
+        "attrs": {
+            "url": "https://example.com/2020/08/dots_bg.png",
+            "id": 1933,
+            "dimRatio": 0,
+            "focalPoint": {
+                "x": "0.50",
+                "y": "0.40"
+            },
+            "minHeight": 48,
+            "minHeightUnit": "vw",
+            "align": "full"
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/columns",
+                "attrs": {
+                    "verticalAlignment": "center",
+                    "align": "wide"
+                },
+                "innerBlocks": [
+                    {
+                        "blockName": "core/column",
+                        "attrs": {
+                            "verticalAlignment": "center",
+                            "width": "35.5%"
+                        },
+                        "innerBlocks": [
+                            {
+                                "blockName": "core/paragraph",
+                                "attrs": {
+                                    "className": "margin-bottom-none",
+                                    "style": {
+                                        "color": {
+                                            "text": "#202020"
+                                        },
+                                        "typography": {
+                                            "fontSize": 18
+                                        }
+                                    }
+                                },
+                                "innerBlocks": [],
+                                "innerHTML": "\n\t\t\t\t<p\n\t\t\t\t\tclass=\"margin-bottom-none has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\tWelcome to\n\t\t\t\t</p>\n\t\t\t\t",
+                                "innerContent": [
+                                    "\n\t\t\t\t<p\n\t\t\t\t\tclass=\"margin-bottom-none has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\tWelcome to\n\t\t\t\t</p>\n\t\t\t\t"
+                                ]
+                            },
+                            {
+                                "blockName": "core/heading",
+                                "attrs": {
+                                    "className": "margin-top-half",
+                                    "style": {
+                                        "typography": {
+                                            "lineHeight": "1",
+                                            "fontSize": 77
+                                        },
+                                        "color": {
+                                            "text": "#202020"
+                                        }
+                                    }
+                                },
+                                "innerBlocks": [],
+                                "innerHTML": "\n\t\t\t\t<h2\n\t\t\t\t\tclass=\"margin-top-half has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 77px; line-height: 1\"\n\t\t\t\t>\n\t\t\t\t\tLifelong Learner\n\t\t\t\t</h2>\n\t\t\t\t",
+                                "innerContent": [
+                                    "\n\t\t\t\t<h2\n\t\t\t\t\tclass=\"margin-top-half has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 77px; line-height: 1\"\n\t\t\t\t>\n\t\t\t\t\tLifelong Learner\n\t\t\t\t</h2>\n\t\t\t\t"
+                                ]
+                            },
+                            {
+                                "blockName": "core/paragraph",
+                                "attrs": {
+                                    "style": {
+                                        "color": {
+                                            "text": "#202020"
+                                        },
+                                        "typography": {
+                                            "fontSize": 18
+                                        }
+                                    }
+                                },
+                                "innerBlocks": [],
+                                "innerHTML": "\n\t\t\t\t<p\n\t\t\t\t\tclass=\"has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\tThis is my little corner of the Internet, where I talk about\n\t\t\t\t\thomeschooling, planning, journaling, and more!\n\t\t\t\t</p>\n\t\t\t\t",
+                                "innerContent": [
+                                    "\n\t\t\t\t<p\n\t\t\t\t\tclass=\"has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\tThis is my little corner of the Internet, where I talk about\n\t\t\t\t\thomeschooling, planning, journaling, and more!\n\t\t\t\t</p>\n\t\t\t\t"
+                                ]
+                            },
+                            {
+                                "blockName": "core/paragraph",
+                                "attrs": {
+                                    "style": {
+                                        "color": {
+                                            "text": "#202020"
+                                        },
+                                        "typography": {
+                                            "fontSize": 18
+                                        }
+                                    }
+                                },
+                                "innerBlocks": [],
+                                "innerHTML": "\n\t\t\t\t<p\n\t\t\t\t\tclass=\"has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\t<em\n\t\t\t\t\t\t>New to the site?\n\t\t\t\t\t\t<a href=\"#\"><strong>Start here</strong></a></em\n\t\t\t\t\t>\n\t\t\t\t</p>\n\t\t\t\t",
+                                "innerContent": [
+                                    "\n\t\t\t\t<p\n\t\t\t\t\tclass=\"has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\t<em\n\t\t\t\t\t\t>New to the site?\n\t\t\t\t\t\t<a href=\"#\"><strong>Start here</strong></a></em\n\t\t\t\t\t>\n\t\t\t\t</p>\n\t\t\t\t"
+                                ]
+                            }
+                        ],
+                        "innerHTML": "\n\t\t\t<div\n\t\t\t\tclass=\"wp-block-column is-vertically-aligned-center\"\n\t\t\t\tstyle=\"flex-basis: 35.5%\"\n\t\t\t>\n\t\t\t\t\n\n\t\t\t\t\n\n\t\t\t\t\n\n\t\t\t\t\n\t\t\t</div>\n\t\t\t",
+                        "innerContent": [
+                            "\n\t\t\t<div\n\t\t\t\tclass=\"wp-block-column is-vertically-aligned-center\"\n\t\t\t\tstyle=\"flex-basis: 35.5%\"\n\t\t\t>\n\t\t\t\t",
+                            null,
+                            "\n\n\t\t\t\t",
+                            null,
+                            "\n\n\t\t\t\t",
+                            null,
+                            "\n\n\t\t\t\t",
+                            null,
+                            "\n\t\t\t</div>\n\t\t\t"
+                        ]
+                    },
+                    {
+                        "blockName": "core/column",
+                        "attrs": {
+                            "verticalAlignment": "center"
+                        },
+                        "innerBlocks": [
+                            {
+                                "blockName": "core/image",
+                                "attrs": {
+                                    "align": "center",
+                                    "id": 2693,
+                                    "width": 500,
+                                    "height": 500,
+                                    "sizeSlug": "large",
+                                    "className": "is-style-rounded"
+                                },
+                                "innerBlocks": [],
+                                "innerHTML": "\n\t\t\t\t<div class=\"wp-block-image is-style-rounded\">\n\t\t\t\t\t<figure class=\"aligncenter size-large is-resized\">\n\t\t\t\t\t\t<img\n\t\t\t\t\t\t\tsrc=\"https://example.com/2020/10/sai-de-silva-4-gfgb12hfa-unsplash-2-1.jpg?w=1024\"\n\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\tclass=\"wp-image-2693\"\n\t\t\t\t\t\t\twidth=\"500\"\n\t\t\t\t\t\t\theight=\"500\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</figure>\n\t\t\t\t</div>\n\t\t\t\t",
+                                "innerContent": [
+                                    "\n\t\t\t\t<div class=\"wp-block-image is-style-rounded\">\n\t\t\t\t\t<figure class=\"aligncenter size-large is-resized\">\n\t\t\t\t\t\t<img\n\t\t\t\t\t\t\tsrc=\"https://example.com/2020/10/sai-de-silva-4-gfgb12hfa-unsplash-2-1.jpg?w=1024\"\n\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\tclass=\"wp-image-2693\"\n\t\t\t\t\t\t\twidth=\"500\"\n\t\t\t\t\t\t\theight=\"500\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</figure>\n\t\t\t\t</div>\n\t\t\t\t"
+                                ]
+                            }
+                        ],
+                        "innerHTML": "\n\t\t\t<div class=\"wp-block-column is-vertically-aligned-center\">\n\t\t\t\t\n\t\t\t</div>\n\t\t\t",
+                        "innerContent": [
+                            "\n\t\t\t<div class=\"wp-block-column is-vertically-aligned-center\">\n\t\t\t\t",
+                            null,
+                            "\n\t\t\t</div>\n\t\t\t"
+                        ]
+                    }
+                ],
+                "innerHTML": "\n\t\t<div class=\"wp-block-columns alignwide are-vertically-aligned-center\">\n\t\t\t\n\n\t\t\t\n\t\t</div>\n\t\t",
+                "innerContent": [
+                    "\n\t\t<div class=\"wp-block-columns alignwide are-vertically-aligned-center\">\n\t\t\t",
+                    null,
+                    "\n\n\t\t\t",
+                    null,
+                    "\n\t\t</div>\n\t\t"
+                ]
+            },
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p></p>\n\t\t",
+                "innerContent": [
+                    "\n\t\t<p></p>\n\t\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"\n\t\tbackground-image: url( https://example.com/2020/08/dots_bg.png );\n\t\tmin-height: 48vw;\n\t\tbackground-position: 50% 40%;\n\t\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\n\t\t\n\t</div>\n</div>\n",
+        "innerContent": [
+            "\n<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"\n\t\tbackground-image: url( https://example.com/2020/08/dots_bg.png );\n\t\tmin-height: 48vw;\n\t\tbackground-position: 50% 40%;\n\t\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+            null,
+            "\n\n\t\t",
+            null,
+            "\n\t</div>\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
