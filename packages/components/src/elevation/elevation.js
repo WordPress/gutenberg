@@ -17,7 +17,7 @@ import { useElevation } from './use-elevation';
 function Elevation( props, forwardedRef ) {
 	const otherProps = useElevation( props );
 
-	return <View { ...otherProps } ref={ forwardedRef } />;
+	return <View aria-hidden { ...otherProps } ref={ forwardedRef } />;
 }
 
 /**
