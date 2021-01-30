@@ -48,6 +48,7 @@ Renders a new item in the block settings menu.
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -63,30 +64,29 @@ function MyPluginBlockSettingsMenuItem() {
 		{
 			allowedBlocks: [ 'core/paragraph' ],
 			icon: 'dashicon-name',
-			label: __( 'Menu item text' ),
+			label: \_\_( 'Menu item text' ),
 			onClick: doOnClick,
 		}
 	);
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
 
-const doOnClick = ( ) => {
-    // To be called when the user clicks the menu item.
-};
+    const doOnClick = ( ) => {
+        // To be called when the user clicks the menu item.
+    };
 
-const MyPluginBlockSettingsMenuItem = () => (
-    <PluginBlockSettingsMenuItem
-		allowedBlocks={ [ 'core/paragraph' ] }
-		icon='dashicon-name'
-		label={ __( 'Menu item text' ) }
-		onClick={ doOnClick } />
-);
-```
+    const MyPluginBlockSettingsMenuItem = () => (
+        <PluginBlockSettingsMenuItem
+    		allowedBlocks={ [ 'core/paragraph' ] }
+    		icon='dashicon-name'
+    		label={ __( 'Menu item text' ) }
+    		onClick={ doOnClick } />
+    );
 
 _Parameters_
 
@@ -108,6 +108,7 @@ Renders items below the Status & Availability panel in the Document Sidebar.
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var el = wp.element.createElement;
@@ -122,28 +123,27 @@ function MyDocumentSettingPlugin() {
 			className: 'my-document-setting-plugin',
 			title: 'My Panel',
 		},
-		__( 'My Document Setting Panel' )
+		\_\_( 'My Document Setting Panel' )
 	);
 }
 
 registerPlugin( 'my-document-setting-plugin', {
 		render: MyDocumentSettingPlugin
 } );
-```
 
-```jsx
-// Using ESNext syntax
-import { registerPlugin } from '@wordpress/plugins';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { registerPlugin } from '@wordpress/plugins';
+    import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
-const MyDocumentSettingTest = () => (
-		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
-		<p>My Document Setting Panel</p>
-	</PluginDocumentSettingPanel>
-);
+    const MyDocumentSettingTest = () => (
+    		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+    		<p>My Document Setting Panel</p>
+    	</PluginDocumentSettingPanel>
+    );
 
- registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
-```
+     registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
 
 _Parameters_
 
@@ -164,6 +164,7 @@ The text within the component appears as the menu item label.
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -181,30 +182,29 @@ function MyButtonMoreMenuItem() {
 			icon: moreIcon,
 			onClick: onButtonClick,
 		},
-		__( 'My button title' )
+		\_\_( 'My button title' )
 	);
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginMoreMenuItem } from '@wordpress/edit-post';
-import { more } from '@wordpress/icons';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PluginMoreMenuItem } from '@wordpress/edit-post';
+    import { more } from '@wordpress/icons';
 
-function onButtonClick() {
-	alert( 'Button clicked.' );
-}
+    function onButtonClick() {
+    	alert( 'Button clicked.' );
+    }
 
-const MyButtonMoreMenuItem = () => (
-	<PluginMoreMenuItem
-		icon={ more }
-		onClick={ onButtonClick }
-	>
-		{ __( 'My button title' ) }
-	</PluginMoreMenuItem>
-);
-```
+    const MyButtonMoreMenuItem = () => (
+    	<PluginMoreMenuItem
+    		icon={ more }
+    		onClick={ onButtonClick }
+    	>
+    		{ __( 'My button title' ) }
+    	</PluginMoreMenuItem>
+    );
 
 _Parameters_
 
@@ -225,6 +225,7 @@ Renders provided content to the post-publish panel in the publish flow
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -235,29 +236,28 @@ function MyPluginPostPublishPanel() {
 		PluginPostPublishPanel,
 		{
 			className: 'my-plugin-post-publish-panel',
-			title: __( 'My panel title' ),
+			title: **( 'My panel title' ),
 			initialOpen: true,
 		},
-		__( 'My panel content' )
+		**( 'My panel content' )
 	);
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PluginPostPublishPanel } from '@wordpress/edit-post';
 
-const MyPluginPostPublishPanel = () => (
-	<PluginPostPublishPanel
-		className="my-plugin-post-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-        { __( 'My panel content' ) }
-	</PluginPostPublishPanel>
-);
-```
+    const MyPluginPostPublishPanel = () => (
+    	<PluginPostPublishPanel
+    		className="my-plugin-post-publish-panel"
+    		title={ __( 'My panel title' ) }
+    		initialOpen={ true }
+    	>
+            { __( 'My panel content' ) }
+    	</PluginPostPublishPanel>
+    );
 
 _Parameters_
 
@@ -279,6 +279,7 @@ and not its location, which may change in future iterations.
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -290,24 +291,23 @@ function MyPluginPostStatusInfo() {
 		{
 			className: 'my-plugin-post-status-info',
 		},
-		__( 'My post status info' )
+		\_\_( 'My post status info' )
 	)
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPostStatusInfo } from '@wordpress/edit-post';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
-const MyPluginPostStatusInfo = () => (
-	<PluginPostStatusInfo
-		className="my-plugin-post-status-info"
-	>
-		{ __( 'My post status info' ) }
-	</PluginPostStatusInfo>
-);
-```
+    const MyPluginPostStatusInfo = () => (
+    	<PluginPostStatusInfo
+    		className="my-plugin-post-status-info"
+    	>
+    		{ __( 'My post status info' ) }
+    	</PluginPostStatusInfo>
+    );
 
 _Parameters_
 
@@ -326,6 +326,7 @@ Renders provided content to the pre-publish side panel in the publish flow
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -336,29 +337,28 @@ function MyPluginPrePublishPanel() {
 		PluginPrePublishPanel,
 		{
 			className: 'my-plugin-pre-publish-panel',
-			title: __( 'My panel title' ),
+			title: **( 'My panel title' ),
 			initialOpen: true,
 		},
-		__( 'My panel content' )
+		**( 'My panel content' )
 	);
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PluginPrePublishPanel } from '@wordpress/edit-post';
 
-const MyPluginPrePublishPanel = () => (
-	<PluginPrePublishPanel
-		className="my-plugin-pre-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-	    { __( 'My panel content' ) }
-	</PluginPrePublishPanel>
-);
-```
+    const MyPluginPrePublishPanel = () => (
+    	<PluginPrePublishPanel
+    		className="my-plugin-pre-publish-panel"
+    		title={ __( 'My panel title' ) }
+    		initialOpen={ true }
+    	>
+    	    { __( 'My panel content' ) }
+    	</PluginPrePublishPanel>
+    );
 
 _Parameters_
 
@@ -387,6 +387,7 @@ _Related_
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -406,31 +407,30 @@ function MyPluginSidebar() {
 			el(
 				PanelBody,
 				{},
-				__( 'My sidebar content' )
+				\_\_( 'My sidebar content' )
 			)
 	);
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { PluginSidebar } from '@wordpress/edit-post';
-import { more } from '@wordpress/icons';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PanelBody } from '@wordpress/components';
+    import { PluginSidebar } from '@wordpress/edit-post';
+    import { more } from '@wordpress/icons';
 
-const MyPluginSidebar = () => (
-	<PluginSidebar
-		name="my-sidebar"
-		title="My sidebar title"
-		icon={ more }
-	>
-		<PanelBody>
-			{ __( 'My sidebar content' ) }
-		</PanelBody>
-	</PluginSidebar>
-);
-```
+    const MyPluginSidebar = () => (
+    	<PluginSidebar
+    		name="my-sidebar"
+    		title="My sidebar title"
+    		icon={ more }
+    	>
+    		<PanelBody>
+    			{ __( 'My sidebar content' ) }
+    		</PanelBody>
+    	</PluginSidebar>
+    );
 
 _Parameters_
 
@@ -449,6 +449,7 @@ The text within the component appears as the menu item label.
 
 _Usage_
 
+<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var __ = wp.i18n.__;
@@ -462,26 +463,25 @@ function MySidebarMoreMenuItem() {
 			target: 'my-sidebar',
 			icon: moreIcon,
 		},
-		__( 'My sidebar title' )
+		\_\_( 'My sidebar title' )
 	)
 }
-```
 
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
-import { more } from '@wordpress/icons';
+    <caption>ESNext</caption>
+    ```jsx
+    // Using ESNext syntax
+    import { __ } from '@wordpress/i18n';
+    import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+    import { more } from '@wordpress/icons';
 
-const MySidebarMoreMenuItem = () => (
-	<PluginSidebarMoreMenuItem
-		target="my-sidebar"
-		icon={ more }
-	>
-		{ __( 'My sidebar title' ) }
-	</PluginSidebarMoreMenuItem>
-);
-```
+    const MySidebarMoreMenuItem = () => (
+    	<PluginSidebarMoreMenuItem
+    		target="my-sidebar"
+    		icon={ more }
+    	>
+    		{ __( 'My sidebar title' ) }
+    	</PluginSidebarMoreMenuItem>
+    );
 
 _Parameters_
 
