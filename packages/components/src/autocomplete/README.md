@@ -97,6 +97,14 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
 -   Type: `Boolean`
 -   Required: No
 
+#### popoverProps
+
+Properties of `popoverProps` object will be passed as props to the nested `Popover` component.
+Use this object to modify props available for the `Popover` component that are not already exposed in the `AutocompleterUI` component, e.g.: the direction in which the popover should open relative to its parent node set with `position` prop.
+
+-   Type: `Object`
+-   Required: No
+
 ## Usage
 
 The following is a contrived completer for fresh fruit.
