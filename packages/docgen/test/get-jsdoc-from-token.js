@@ -14,46 +14,49 @@ describe( 'JSDoc', () => {
 					},
 				],
 			} )
-		).toEqual( {
-			description: 'A function that adds two parameters.',
+		).toMatchObject( {
+			description: 'A function that adds two parameters.\n',
 			tags: [
 				{
-					title: 'deprecated',
-					description: 'Use native addition instead.',
+					tag: 'deprecated',
+					name: 'Use',
+					description: 'native addition instead.',
 				},
 				{
-					title: 'since',
-					description: 'v2',
+					tag: 'since',
+					name: 'v2',
 				},
 				{
-					title: 'see',
-					description: 'addition',
+					tag: 'see',
+					name: 'addition',
 				},
 				{
-					title: 'link',
-					description:
+					tag: 'link',
+					name:
 						'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators',
 				},
 				{
-					title: 'param',
+					tag: 'param',
 					description: 'The first param to add.',
 					type: 'number',
 					name: 'firstParam',
+					optional: false,
 				},
 				{
-					title: 'param',
+					tag: 'param',
 					description: 'The second param to add.',
 					type: 'number',
 					name: 'secondParam',
 				},
 				{
-					title: 'example',
+					tag: 'example',
 					description:
 						'```js\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```',
 				},
 				{
-					title: 'return',
-					description: 'The result of adding the two params.',
+					tag: 'return',
+					name: 'The',
+					description: 'result of adding the two params.',
 					type: 'number',
 				},
 			],
@@ -68,13 +71,14 @@ describe( 'JSDoc', () => {
 					},
 				],
 			} )
-		).toEqual( {
+		).toMatchObject( {
 			description:
-				'Constant to document the meaning of life,\nthe universe and everything else.',
+				'Constant to document the meaning of life,\nthe universe and everything else.\n',
 			tags: [
 				{
-					title: 'type',
-					description: null,
+					tag: 'type',
+					name: '',
+					description: '',
 					type: 'number',
 				},
 			],
@@ -89,16 +93,15 @@ describe( 'JSDoc', () => {
 					},
 				],
 			} )
-		).toEqual( {
+		).toMatchObject( {
 			description:
 				'Function invoking callback after delay with current timestamp in milliseconds since epoch.',
 			tags: [
 				{
-					title: 'param',
-					errors: [ 'unexpected token' ],
+					tag: 'param',
 					description: 'Callback function.',
 					name: 'callback',
-					type: null,
+					type: '(timestamp:number)=>void',
 				},
 			],
 		} );
