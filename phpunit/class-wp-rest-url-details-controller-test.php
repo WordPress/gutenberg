@@ -320,7 +320,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'__return_null'
 		);
 
-		// Force cache to return a known value.
+		// Force cache to return a known value as the remote URL http response body.
 		add_filter(
 			"pre_transient_$transient_name",
 			function() {
