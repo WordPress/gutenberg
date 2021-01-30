@@ -81,6 +81,7 @@ class NavigableContainer extends Component {
 		if ( this.props.onKeyDown ) {
 			this.props.onKeyDown( event );
 		}
+		const eventTarget = event.target;
 
 		const { getFocusableContext } = this;
 		const {
@@ -122,7 +123,13 @@ class NavigableContainer extends Component {
 		const nextIndex = cycle
 			? cycleValue( index, focusables.length, offset )
 			: index + offset;
-		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
+
+		// if an event target is an input-like type we don't want to loose focus, when using arrow keys
+		const isEditable = [ 'textarea', 'input' ].includes(
+			eventTarget.localName
+		);
+
+		if ( ! isEditable && nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
 		}
