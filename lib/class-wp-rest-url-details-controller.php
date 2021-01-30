@@ -103,7 +103,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$cached_response = $this->get_cache( $cache_key );
 
 		if ( ! empty( $cached_response ) ) {
-			$remote_url_response = json_decode( $cached_response, true );
+			$remote_url_response = $cached_response;
 		} else {
 			$remote_url_response = $this->get_remote_url( $url );
 
@@ -239,10 +239,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Utility function to cache a given data set at a given cache key.
 	 *
 	 * @param string $key the cache key under which to store the value.
-	 * @param array  $data the data to be stored at the given cache key.
+	 * @param string $data the data to be stored at the given cache key.
 	 * @return void
 	 */
-	private function set_cache( $key, $data = array() ) {
+	private function set_cache( $key, $data = '' ) {
 		if ( ! is_array( $data ) ) {
 			return;
 		}
@@ -259,6 +259,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 */
 		$cache_expiration = apply_filters( 'rest_url_details_cache_expiration', $ttl );
 
-		return set_transient( $key, wp_json_encode( $data ), $cache_expiration );
+		return set_transient( $key, $data, $cache_expiration );
 	}
 }

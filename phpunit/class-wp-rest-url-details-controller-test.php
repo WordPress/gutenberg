@@ -324,9 +324,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		add_filter(
 			"pre_transient_$transient_name",
 			function() {
-				return wp_json_encode(
-					'<html><head><title>This value from cache.</title></head></html>'
-				);
+				return '<html><head><title>This value from cache.</title></head></html>';
 			}
 		);
 
