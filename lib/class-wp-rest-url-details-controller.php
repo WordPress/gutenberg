@@ -86,7 +86,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * response.
 	 *
 	 * @param WP_REST_REQUEST $request Full details about the request.
-	 * @return String|WP_Error The title text or an error.
+	 * @return WP_REST_Response|WP_Error The parsed details as a response object or an error.
 	 */
 	public function parse_url_details( $request ) {
 
@@ -103,43 +103,25 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$cached_response = $this->get_cache( $cache_key );
 
 		if ( ! empty( $cached_response ) ) {
-			$response = rest_ensure_response( json_decode( $cached_response, true ) );
+			$remote_url_response = json_decode( $cached_response, true );
+		} else {
+			$remote_url_response = $this->get_remote_url( $url );
 
-			/** This filter is documented in lib/class-wp-rest-url-details-controller.php#147 */
-			return apply_filters( 'rest_prepare_url_details', $response, $url, $request );
+			// Exit if we don't have a valid body or it's empty.
+			if ( is_wp_error( $remote_url_response ) || empty( $remote_url_response ) ) {
+				return $remote_url_response;
+			}
+
+			// Cache the valid response.
+			$this->set_cache( $cache_key, $remote_url_response );
 		}
 
-		$response_body = $this->get_remote_url( $url );
-
-		// Exit if we don't have a valid body or it's empty.
-		if ( is_wp_error( $response_body ) || empty( $response_body ) ) {
-			return $response_body;
-		}
-
-		/**
-		 * Filters the data returned for a given URL.
-		 *
-		 * Can be used to modify the data retrieved for a given URL.
-		 * For example, you may wish to retrieve additional information
-		 * from the response body at a given URL over and above the `<title>`.
-		 *
-		 * @param array $data The default data retrieved for the given URL.
-		 * @param array $response_body The response body (HTML) for the given URL.
-		 * @param string $url The attempted URL.
-		 */
-		$data = apply_filters(
-			'rest_url_details_url_data',
+		$data = $this->add_additional_fields_to_object(
 			array(
-				'title' => $this->get_title( $response_body ),
+				'title' => $this->get_title( $remote_url_response ),
 			),
-			$response_body,
-			$url
+			$request
 		);
-
-		$data = $this->add_additional_fields_to_object( $data, $request );
-
-		// Cache the valid response.
-		$this->set_cache( $cache_key, $data );
 
 		// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
@@ -150,8 +132,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 * @param WP_REST_Response $response The response object.
 		 * @param string           $url      The requested URL.
 		 * @param WP_REST_Request  $request  Request object.
+		 * @param array            $remote_url_response HTTP response body from the remote URL.
 		 */
-		return apply_filters( 'rest_prepare_url_details', $response, $url, $request );
+		return apply_filters( 'rest_prepare_url_details', $response, $url, $request, $remote_url_response );
 	}
 
 	/**
@@ -181,7 +164,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Retrieves the document title from a remote URL.
 	 *
 	 * @param string $url The website url whose HTML we want to access.
-	 * @return string|WP_Error The URL's document title on success, WP_Error on failure.
+	 * @return array|WP_Error the HTTP response from the remote URL or error.
 	 */
 	private function get_remote_url( $url ) {
 
