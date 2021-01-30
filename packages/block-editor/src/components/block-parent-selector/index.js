@@ -54,6 +54,8 @@ export default function BlockParentSelector() {
 		};
 	}, [] );
 
+	// Allows highlighting the parent block outline when focusing or hovering
+	// the parent block selector within the child.
 	const nodeRef = useRef();
 	const { gestures: showMoversGestures } = useShowMoversGestures( {
 		ref: nodeRef,
