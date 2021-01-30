@@ -52,11 +52,6 @@
 	position: absolute;
 	top: -$border-width;
 	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-
-	// Top Toolbar.
-	.edit-post-header-toolbar__block-toolbar & {
-		display: none;
-	}
 }
 
 // Block controls.
