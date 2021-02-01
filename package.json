@@ -158,6 +158,7 @@
 		"enzyme": "3.11.0",
 		"equivalent-key-map": "0.2.2",
 		"eslint-plugin-eslint-comments": "3.1.2",
+		"eslint-plugin-import": "2.22.1",
 		"execa": "4.0.2",
 		"fast-glob": "2.2.7",
 		"glob": "7.1.2",
