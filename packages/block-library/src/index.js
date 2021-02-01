@@ -72,7 +72,7 @@ import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
 import * as queryPaginationPrevious from './query-pagination-previous';
-import * as postNavigation from './post-navigation';
+import * as postNavigationLink from './post-navigation-link';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
@@ -237,7 +237,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postFeaturedImage,
 								postHierarchicalTerms,
 								postTags,
-								postNavigation,
+								postNavigationLink,
 						  ]
 						: [] ),
 				].forEach( registerBlock );

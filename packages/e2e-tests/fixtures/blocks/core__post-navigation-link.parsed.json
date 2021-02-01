@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/post-navigation",
+        "blockName": "core/post-navigation-link",
         "attrs": {
             "type": "next"
         },
