@@ -285,3 +285,16 @@ export function updateSettings( settings ) {
 		settings,
 	};
 }
+
+/**
+ * Sets whether the block navigation panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the block navigation. If false, closes it.
+ *                         It does not toggle the state, but sets it directly.
+ */
+export function setIsBlockNavigationOpened( isOpen ) {
+	return {
+		type: 'SET_IS_BLOCK_NAVIGATION_OPENED',
+		isOpen,
+	};
+}
