@@ -6,7 +6,7 @@
 
 ## Usage
 
-```jsx live
+```jsx
 import { Text, View } from '@wordpress/components/ui';
 
 function Example() {
@@ -40,8 +40,8 @@ The Style system provides a bunch of style presets, which come from `@wp-g2/styl
 
 Presets can style a `View` by passing an `Array` of them into the `css` prop.
 
-```jsx live
-import { Text, View } from '@wp-g2/components';
+```jsx
+import { Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {

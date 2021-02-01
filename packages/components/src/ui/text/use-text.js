@@ -13,7 +13,7 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useTruncate } from '../../ui/truncate';
+import { useTruncate } from '../truncate';
 import { getOptimalTextShade } from '../../utils/colors';
 import * as styles from './text-styles';
 import { createHighlighterText } from './text-utils';
@@ -21,7 +21,7 @@ import { createHighlighterText } from './text-utils';
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'span'>} props
  */
-export function useText( props ) {
+export default function useText( props ) {
 	const {
 		adjustLineHeightForInnerControls,
 		align,

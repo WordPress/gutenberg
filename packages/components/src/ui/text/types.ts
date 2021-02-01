@@ -1,4 +1,4 @@
-import type { Props as TruncateProps } from '../../ui/truncate/use-truncate';
+import type { Props as TruncateProps } from '../truncate/use-truncate';
 import type { CSSProperties, ReactNode } from 'react';
 
 type TextAdjustLineHeightForInnerControls =
@@ -26,7 +26,7 @@ type Highlighted = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Text } from `@wp-g2/components`
+	 * import { Text } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return (
@@ -55,7 +55,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Text } from `@wp-g2/components`
+	 * import { Text } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 * 	return (
@@ -72,7 +72,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Text, TextInput } from `@wp-g2/components`
+	 * import { Text, TextInput } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 * 	return (
@@ -123,7 +123,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Text, View } from `@wp-g2/components`
+	 * import { Text, View } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   const backgroundColor = "blue"
@@ -144,7 +144,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Text } from `@wp-g2/components`
+	 * import { Text } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return <Text size="largeTitle">Where the north wind meets the sea...</Text>
@@ -158,7 +158,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	 * @example
 	 *
 	 * ```jsx
-	 * import { Text } from `@wp-g2/components`
+	 * import { Text } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return (
@@ -182,7 +182,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Text } from `@wp-g2/components`
+	 * import { Text } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return <Text variant="muted">Where the north wind meets the sea...</Text>

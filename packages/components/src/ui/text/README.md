@@ -1,4 +1,4 @@
-# Text
+# Text (Experimental)
 
 `Text` is a core component that renders text in the library, using the library's typography system.
 
@@ -6,8 +6,8 @@
 
 `Text` can be used to render any text-content, like an HTML `p` or `span`.
 
-```jsx live
-import { Text } from '@wp-g2/components';
+```jsx
+import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return <Text>Where the north wind meets the sea</Text>;
@@ -22,8 +22,8 @@ function Example() {
 
 Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
 
-```jsx live
-import { Text, TextInput } from '@wp-g2/components';
+```jsx
+import { Text, TextInput } from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -40,8 +40,8 @@ function Example() {
 
 Adjusts the text alignment.
 
-```jsx live
-import { Text } from '@wp-g2/components';
+```jsx
+import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -105,12 +105,12 @@ Array of search words. String search terms are automatically cast to RegExps unl
 
 Letters or words within `Text` can be highlighted using `highlightWords`.
 
-```jsx live
-import { Text } from '@wp-g2/components';
+```jsx
+import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return (
-		<Text highlightWords={['the']}>
+		<Text highlightWords={ [ 'the' ] }>
 			Where the north wind meets the sea, there's a river full of memory.
 			Sleep, my darling, safe and sound, for in this river all is found.
 			In her waters, deep and true, lay the answers and a path for you.
@@ -156,15 +156,15 @@ Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` 
 
 The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
 
-```jsx live
-import { Text, View } from '@wp-g2/components';
+```jsx
+import { Text, View } from '@wordpress/components/ui';
 
 function Example() {
 	const backgroundColor = 'blue';
 
 	return (
-		<View css={{ backgroundColor }}>
-			<Text optimizeReadabilityFor={backgroundColor}>
+		<View css={ { backgroundColor } }>
+			<Text optimizeReadabilityFor={ backgroundColor }>
 				Where the north wind meets the sea, there's a river full of
 				memory.
 			</Text>
@@ -179,8 +179,8 @@ function Example() {
 
 Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
 
-```jsx live
-import { Text } from '@wp-g2/components';
+```jsx
+import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return <Text size="largeTitle">Where the north wind meets the sea...</Text>;
@@ -193,8 +193,8 @@ function Example() {
 
 Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
 
-```jsx live
-import { Text } from '@wp-g2/components';
+```jsx
+import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -220,8 +220,8 @@ Uppercases the text content.
 
 Adjusts style variation of the text.
 
-```jsx live
-import { Text } from '@wp-g2/components';
+```jsx
+import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return <Text variant="muted">Where the north wind meets the sea...</Text>;

@@ -4,7 +4,7 @@
 
 ## Usage
 
-```jsx live
+```jsx
 import { Truncate } from '@wordpress/components/ui';
 
 function Example() {
@@ -50,8 +50,8 @@ Determines the max characters when `truncate` is set.
 
 Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
 
-```jsx live
-import { Truncate } from '@wp-g2/components';
+```jsx
+import { Truncate } from '@wordpress/components/ui';
 
 function Example() {
 	return (

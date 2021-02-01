@@ -1,16 +1,16 @@
 /**
  * Internal dependencies
  */
-import { withNext } from '../../ui/context';
-import NextText from './text';
-import { text } from '../styles/text-mixins';
+import { withNext } from '../ui/context';
+import { Text as NextText } from '../ui/text';
+import { text } from './styles/text-mixins';
 
 const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
 
 /**
  * @typedef AdaptedTextProps
  * @property {keyof JSX.IntrinsicElements} as Styled components `as` prop.
- * @property {import('../styles/text-mixins').TextVariant} variant The variant to render.
+ * @property {import('./styles/text-mixins').TextVariant} variant The variant to render.
  * @property {import('react').ReactNode} children Children to render.
  * @property {string} [className] Classname to render on the element.
  */
