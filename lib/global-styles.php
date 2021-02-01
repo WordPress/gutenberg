@@ -102,7 +102,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
 		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
-	} else if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
+	} elseif ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
 			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}

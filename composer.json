@@ -20,7 +20,7 @@
 		"wp-coding-standards/wpcs": "^2.2",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"wp-phpunit/wp-phpunit": "^5.4",
-		"phpunit/phpunit": "^7.5.20",
+		"phpunit/phpunit": "^8.5",
 		"spatie/phpunit-watcher": "^1.23"
 	},
 	"require": {
