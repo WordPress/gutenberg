@@ -37,23 +37,23 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
 
 		// Set up template part post.
-		$template_part_args = array(
+		$template_part_args       = array(
 			'post_type'    => 'wp_template_part',
 			'post_name'    => 'my_template_part',
 			'post_title'   => 'My Template Part',
 			'post_content' => 'Content',
 			'post_excerpt' => 'Description of my template part',
 			'tax_input'    => array(
-				'wp_theme' => array(
+				'wp_theme'            => array(
 					get_stylesheet(),
 				),
-				'section' => array(
-					'header'
-				)
+				'wp_template_section' => array(
+					'header',
+				),
 			),
 		);
 		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
-		wp_set_post_terms( self::$template_part_post->ID, 'header', 'section' );
+		wp_set_post_terms( self::$template_part_post->ID, 'header', 'wp_template_section' );
 		wp_set_post_terms( self::$template_part_post->ID, get_stylesheet(), 'wp_theme' );
 	}
 
@@ -78,8 +78,6 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'Single', $template->title );
 		$this->assertEquals( 'Used when a single entry that is not a Page is queried', $template->description );
 		$this->assertEquals( 'wp_template', $template->type );
-
-		// Test template part.
 	}
 
 	function test_gutenberg_build_template_result_from_post() {

@@ -69,7 +69,7 @@ function gutenberg_register_template_part_section_taxonomy() {
 	}
 
 	register_taxonomy(
-		'section',
+		'wp_template_section',
 		array( 'wp_template_part' ),
 		array(
 			'public'            => false,

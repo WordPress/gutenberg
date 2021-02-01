@@ -123,7 +123,8 @@ function _gutenberg_get_template_files( $template_type ) {
 
 			if ( 'wp_template_part' === $template_type ) {
 				$template_files[] = _gutenberg_conditionally_add_template_part_section_info(
-					$new_template_item, $template_part_data
+					$new_template_item,
+					$template_part_data
 				);
 			} else {
 				$template_files[] = $new_template_item;
@@ -140,9 +141,9 @@ function _gutenberg_get_template_files( $template_type ) {
  * @return array Template part data from theme.json or empty array if not found.
  */
 function _gutenberg_get_template_part_info_from_theme_json() {
-	if( is_readable( locate_template( 'experimental-theme.json' ) ) ){
+	if ( is_readable( locate_template( 'experimental-theme.json' ) ) ) {
 		$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
-		$data = json_decode(
+		$data       = json_decode(
 			$theme_json,
 			true
 		);
@@ -274,7 +275,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->status      = $post->post_status;
 
 	if ( 'wp_template_part' === $post->post_type ) {
-		$type_terms        = get_the_terms( $post, 'section' );
+		$type_terms        = get_the_terms( $post, 'wp_template_section' );
 		$section           = $type_terms[0]->name;
 		$template->section = $section;
 	}
@@ -312,7 +313,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 
 	if ( 'wp_template_part' === $template_type && isset( $query['section'] ) ) {
 		$wp_query_args['tax_query'][]           = array(
-			'taxonomy' => 'section',
+			'taxonomy' => 'wp_template_section',
 			'field'    => 'name',
 			'terms'    => $query['section'],
 		);
