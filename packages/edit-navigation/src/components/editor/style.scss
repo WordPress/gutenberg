@@ -2,16 +2,42 @@
 	background: $white;
 	border: 1px solid $gray-300;
 	border-radius: 2px;
-	margin-top: 12px;
+	margin: 12px 0 0 0;
 
-	.block-editor-block-list__block {
-		margin: 0;
-	}
-}
-
-.edit-navigation-editor__block-view {
 	.components-spinner {
 		display: block;
 		margin: 10px auto;
+	}
+
+
+	// The following attempts to adapt the layout of the Navigation
+	// and Link blocks to work better in the context of the Navigation Screen.
+	.block-editor-block-list__block {
+		margin: 0;
+		padding: 18px;
+		font-size: 15px;
+	}
+
+	// This _should_ force the vertical variation
+	.wp-block-navigation__container {
+		display: block;
+	}
+
+	.wp-block-navigation-link {
+		padding: 9px 12px;
+		border-radius: 2px;
+
+		&:hover {
+			box-shadow: 0 0 0 1px $gray-300;
+		}
+
+		// The following is a really stupid way to fix the focus outlines
+		&:focus-within,
+		&:hover:focus-within {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+		&.block-editor-block-list__block:not([contenteditable]):focus::after {
+			display: none;
+		}
 	}
 }
