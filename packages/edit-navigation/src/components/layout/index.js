@@ -10,6 +10,7 @@ import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockInspector,
 } from '@wordpress/block-editor';
 
 /**
@@ -79,7 +80,7 @@ export default function Layout( { blockEditorSettings } ) {
 							<NavigationEditorShortcuts
 								saveBlocks={ savePost }
 							/>
-							<div className="navigation-editor-wrapper">
+							<div className="navigation-editor-canvas">
 								<Toolbar
 									isPending={ ! navigationPost }
 									navigationPost={ navigationPost }
@@ -94,6 +95,8 @@ export default function Layout( { blockEditorSettings } ) {
 								onDeleteMenu={ deleteMenu }
 							/>
 						</BlockEditorProvider>
+
+						<BlockInspector bubblesVirtually={ false } />
 					</div>
 
 					<Popover.Slot />
