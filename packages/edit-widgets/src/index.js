@@ -20,6 +20,7 @@ import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
+import createCustomizerControl from './create-customizer-control';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -56,13 +57,9 @@ export function initializeCustomizer( id, settings ) {
 	registerBlock( createLegacyWidget( settings ) );
 	registerBlock( widgetArea );
 
-	// The code executes before the target DOM has been attached, so we use a hacky timeout to delay the render
-	setTimeout( () => {
-		render(
-			<Layout blockEditorSettings={ settings } isInCustomizer />,
-			document.getElementById( id )
-		);
-	}, 0 );
+	window.wp.customize.controlConstructor.sidebar_block_editor = createCustomizerControl(
+		{ settings }
+	);
 }
 
 /**
