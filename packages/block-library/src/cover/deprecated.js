@@ -74,6 +74,9 @@ const deprecated = [
 			minHeight: {
 				type: 'number',
 			},
+			minHeightUnit: {
+				type: 'string',
+			},
 			gradient: {
 				type: 'string',
 			},

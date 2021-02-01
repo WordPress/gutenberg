@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- Fix a regression where the Cover block migration would not work with custom units for `minHeight` ([#28627](https://github.com/WordPress/gutenberg/pull/28627))
+
 ## 2.27.0 (2020-12-17)
 
 ### Enhancement
