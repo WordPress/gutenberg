@@ -144,10 +144,10 @@ describe( 'Multi-entity editor states', () => {
 		// Wait for blocks to load.
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
+		expect( await isEntityDirty( 'Index' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', 'Front Page' );
+		await clickTemplateItem( 'Templates', 'Index' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'
@@ -155,7 +155,7 @@ describe( 'Multi-entity editor states', () => {
 		);
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
+		expect( await isEntityDirty( 'Index' ) ).toBe( false );
 
 		removeErrorMocks();
 	} );
