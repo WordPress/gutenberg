@@ -1212,12 +1212,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Next",
-		"slug": "next",
-		"markdown_source": "../packages/components/src/text/next/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Text",
 		"slug": "text",
 		"markdown_source": "../packages/components/src/text/README.md",
