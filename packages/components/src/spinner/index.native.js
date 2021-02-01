@@ -13,5 +13,5 @@ export default function Spinner( props ) {
 
 	const width = progress + '%';
 
-	return <View style={ [ style.spinner, { width } ] } />;
+	return <View style={ [ style.spinner, { width }, props.style ] } />;
 }
