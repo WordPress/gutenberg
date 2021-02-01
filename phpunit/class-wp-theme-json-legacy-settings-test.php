@@ -86,7 +86,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		$input = gutenberg_get_common_block_editor_settings();
 
 		$expected = array(
-			'units' => array( array() ),
+			'units'         => array( array() ),
+			'customPadding' => false,
 		);
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
@@ -100,7 +101,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		$input = gutenberg_get_common_block_editor_settings();
 
 		$expected = array(
-			'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'customPadding' => false,
 		);
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
@@ -114,7 +116,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		$input = gutenberg_get_common_block_editor_settings();
 
 		$expected = array(
-			'units' => array( 'rem', 'em' ),
+			'units'         => array( 'rem', 'em' ),
+			'customPadding' => false,
 		);
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );

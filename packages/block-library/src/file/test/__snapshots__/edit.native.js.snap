@@ -3,10 +3,17 @@
 exports[`File block renders file error state without crashing 1`] = `
 <View
   pointerEvents="box-none"
+  style={
+    Array [
+      undefined,
+      undefined,
+    ]
+  }
 >
   <View
     style={
       Array [
+        undefined,
         undefined,
         undefined,
       ]
@@ -195,10 +202,17 @@ exports[`File block renders file error state without crashing 1`] = `
 exports[`File block renders file without crashing 1`] = `
 <View
   pointerEvents="box-none"
+  style={
+    Array [
+      undefined,
+      undefined,
+    ]
+  }
 >
   <View
     style={
       Array [
+        undefined,
         undefined,
         undefined,
       ]
