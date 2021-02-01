@@ -11,6 +11,9 @@
 ### Bug Fix
 
 -   Add missing `eslint-plugin-import` npm dependency ([#28545](https://github.com/WordPress/gutenberg/pull/28545)).
+
+## 8.0.0 (2021-01-21)
+
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
