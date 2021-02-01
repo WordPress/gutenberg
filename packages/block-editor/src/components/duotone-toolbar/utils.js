@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import tinycolor from 'tinycolor2';
+
+/**
  * Object representation for a color
  *
  * @typedef {Object} RGBColor
@@ -162,19 +167,7 @@ export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
 }
 
 /**
- * Convert a hex color to perceived brightness.
- *
- * @param {string} color Hex color
- *
- * @return {number} Perceived brightness of the color
- */
-export function toBrightness( color ) {
-	const { r, g, b } = hex2rgb( color );
-	return r * 0.299 + g * 0.587 + b * 0.114;
-}
-
-/**
- * Calculate the bightest and darkest values from a color palette.
+ * Calculate the brightest and darkest values from a color palette.
  *
  * @param {Object[]} palette Color palette for the theme.
  *
@@ -187,7 +180,7 @@ export function getDefaultColors( palette ) {
 	return palette
 		.map( ( { color } ) => ( {
 			color,
-			brightness: toBrightness( color ),
+			brightness: tinycolor( color ).getBrightness() / 255,
 		} ) )
 		.reduce(
 			( [ min, max ], current ) => {
