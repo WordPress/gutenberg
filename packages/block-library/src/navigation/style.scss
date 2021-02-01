@@ -1,9 +1,48 @@
 // Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
+.wp-block-navigation:not( .has-background ) .wp-block-navigation__container {
 	.wp-block-navigation__container {
 		color: $gray-900;
 		background-color: $white;
 		min-width: 200px;
+	}
+}
+
+.wp-block-navigation {
+	display: flex;
+}
+
+.wp-block-navigation:not( .wrapping ) > .nav-button {
+	display: none;
+}
+
+.wp-block-navigation .nav-toggle {
+	display: none;
+}
+
+.wp-block-navigation .nav-toggle:not( :checked ) ~ .nav-wrapped-items {
+	display: none;
+}
+
+.wp-block-navigation input.toggle:checked ~ nav {
+	overflow: visible;
+}
+
+.wp-block-navigation .nav-button {
+	background-color: #000;
+	color: #fff;
+}
+
+.wp-block-navigation__container {
+	display: flex;
+	height: 61.6px;
+	overflow: hidden;
+	background-color: rgba( 0, 255, 0, 0.2 );
+	flex-grow: 1;
+	align-items: center;
+
+	& > li {
+		flex-grow: 1;
+		background-color: rgba( 255, 0, 0, 0.2 );
 	}
 }
 

@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -29,6 +30,7 @@ import {
 	justifyRight,
 	justifySpaceBetween,
 } from '@wordpress/icons';
+import useAutohide from './use-autohide';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 
@@ -57,12 +59,18 @@ function Navigation( {
 		! hasExistingNavItems
 	);
 
+	const navElement = useRef( null );
+	const wrappedElementsContainer = useRef( null );
+
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+
+	const [ isWrapping ] = useAutohide( navElement, wrappedElementsContainer );
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
+			wrapping: isWrapping,
 		} ),
 	} );
 
@@ -99,6 +107,15 @@ function Navigation( {
 			},
 			placeholder: <PlaceholderPreview />,
 		}
+	);
+
+	const mergedNavRefs = useCallback(
+		mergeRefs( [ blockProps.ref, navElement ] ),
+		[ blockProps.ref, navElement ]
+	);
+	const mergedInnerBlocksRefs = useCallback(
+		mergeRefs( [ innerBlocksProps.ref, wrappedElementsContainer ] ),
+		[ innerBlocksProps.ref, wrappedElementsContainer ]
 	);
 
 	if ( isPlaceholderShown ) {
@@ -200,8 +217,20 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav { ...blockProps }>
-				<ul { ...innerBlocksProps } />
+			<nav { ...blockProps } ref={ mergedNavRefs }>
+				<input
+					className="nav-toggle"
+					name="nav-toggle"
+					type="checkbox"
+				/>
+				<ul { ...innerBlocksProps } ref={ mergedInnerBlocksRefs } />
+				<ul
+					ref={ wrappedElementsContainer }
+					className="nav-wrapped-items"
+				/>
+				<label htmlFor="nav-toggle" className="nav-button">
+					More
+				</label>
 			</nav>
 		</>
 	);
