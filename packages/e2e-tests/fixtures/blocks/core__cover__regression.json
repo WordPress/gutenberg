@@ -4,7 +4,7 @@
         "name": "core/cover",
         "isValid": false,
         "attributes": {
-            "url": "https://example.com/2020/08/dots_bg.png",
+            "url": "https://some-domain.tlk/some-background-image.png",
             "id": 1933,
             "hasParallax": false,
             "isRepeated": false,
@@ -21,138 +21,6 @@
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
-                "name": "core/columns",
-                "isValid": true,
-                "attributes": {
-                    "verticalAlignment": "center",
-                    "align": "wide"
-                },
-                "innerBlocks": [
-                    {
-                        "clientId": "_clientId_0",
-                        "name": "core/column",
-                        "isValid": true,
-                        "attributes": {
-                            "verticalAlignment": "center",
-                            "width": "35.5%"
-                        },
-                        "innerBlocks": [
-                            {
-                                "clientId": "_clientId_0",
-                                "name": "core/paragraph",
-                                "isValid": true,
-                                "attributes": {
-                                    "content": "\n\t\t\t\t\tWelcome to\n\t\t\t\t",
-                                    "dropCap": false,
-                                    "className": "margin-bottom-none",
-                                    "style": {
-                                        "color": {
-                                            "text": "#202020"
-                                        },
-                                        "typography": {
-                                            "fontSize": 18
-                                        }
-                                    }
-                                },
-                                "innerBlocks": [],
-                                "originalContent": "<p\n\t\t\t\t\tclass=\"margin-bottom-none has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\tWelcome to\n\t\t\t\t</p>"
-                            },
-                            {
-                                "clientId": "_clientId_1",
-                                "name": "core/heading",
-                                "isValid": true,
-                                "attributes": {
-                                    "content": "\n\t\t\t\t\tLifelong Learner\n\t\t\t\t",
-                                    "level": 2,
-                                    "className": "margin-top-half",
-                                    "style": {
-                                        "typography": {
-                                            "lineHeight": "1",
-                                            "fontSize": 77
-                                        },
-                                        "color": {
-                                            "text": "#202020"
-                                        }
-                                    }
-                                },
-                                "innerBlocks": [],
-                                "originalContent": "<h2\n\t\t\t\t\tclass=\"margin-top-half has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 77px; line-height: 1\"\n\t\t\t\t>\n\t\t\t\t\tLifelong Learner\n\t\t\t\t</h2>"
-                            },
-                            {
-                                "clientId": "_clientId_2",
-                                "name": "core/paragraph",
-                                "isValid": true,
-                                "attributes": {
-                                    "content": "\n\t\t\t\t\tThis is my little corner of the Internet, where I talk about\n\t\t\t\t\thomeschooling, planning, journaling, and more!\n\t\t\t\t",
-                                    "dropCap": false,
-                                    "style": {
-                                        "color": {
-                                            "text": "#202020"
-                                        },
-                                        "typography": {
-                                            "fontSize": 18
-                                        }
-                                    }
-                                },
-                                "innerBlocks": [],
-                                "originalContent": "<p\n\t\t\t\t\tclass=\"has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\tThis is my little corner of the Internet, where I talk about\n\t\t\t\t\thomeschooling, planning, journaling, and more!\n\t\t\t\t</p>"
-                            },
-                            {
-                                "clientId": "_clientId_3",
-                                "name": "core/paragraph",
-                                "isValid": true,
-                                "attributes": {
-                                    "content": "\n\t\t\t\t\t<em>New to the site?\n\t\t\t\t\t\t<a href=\"#\"><strong>Start here</strong></a></em>\n\t\t\t\t",
-                                    "dropCap": false,
-                                    "style": {
-                                        "color": {
-                                            "text": "#202020"
-                                        },
-                                        "typography": {
-                                            "fontSize": 18
-                                        }
-                                    }
-                                },
-                                "innerBlocks": [],
-                                "originalContent": "<p\n\t\t\t\t\tclass=\"has-text-color\"\n\t\t\t\t\tstyle=\"color: #202020; font-size: 18px\"\n\t\t\t\t>\n\t\t\t\t\t<em\n\t\t\t\t\t\t>New to the site?\n\t\t\t\t\t\t<a href=\"#\"><strong>Start here</strong></a></em\n\t\t\t\t\t>\n\t\t\t\t</p>"
-                            }
-                        ],
-                        "originalContent": "<div\n\t\t\t\tclass=\"wp-block-column is-vertically-aligned-center\"\n\t\t\t\tstyle=\"flex-basis: 35.5%\"\n\t\t\t>\n\t\t\t\t\n\n\t\t\t\t\n\n\t\t\t\t\n\n\t\t\t\t\n\t\t\t</div>"
-                    },
-                    {
-                        "clientId": "_clientId_1",
-                        "name": "core/column",
-                        "isValid": true,
-                        "attributes": {
-                            "verticalAlignment": "center"
-                        },
-                        "innerBlocks": [
-                            {
-                                "clientId": "_clientId_0",
-                                "name": "core/image",
-                                "isValid": true,
-                                "attributes": {
-                                    "align": "center",
-                                    "url": "https://example.com/2020/10/sai-de-silva-4-gfgb12hfa-unsplash-2-1.jpg?w=1024",
-                                    "alt": "",
-                                    "caption": "",
-                                    "id": 2693,
-                                    "width": 500,
-                                    "height": 500,
-                                    "sizeSlug": "large",
-                                    "className": "is-style-rounded"
-                                },
-                                "innerBlocks": [],
-                                "originalContent": "<div class=\"wp-block-image is-style-rounded\">\n\t\t\t\t\t<figure class=\"aligncenter size-large is-resized\">\n\t\t\t\t\t\t<img\n\t\t\t\t\t\t\tsrc=\"https://example.com/2020/10/sai-de-silva-4-gfgb12hfa-unsplash-2-1.jpg?w=1024\"\n\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\tclass=\"wp-image-2693\"\n\t\t\t\t\t\t\twidth=\"500\"\n\t\t\t\t\t\t\theight=\"500\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</figure>\n\t\t\t\t</div>"
-                            }
-                        ],
-                        "originalContent": "<div class=\"wp-block-column is-vertically-aligned-center\">\n\t\t\t\t\n\t\t\t</div>"
-                    }
-                ],
-                "originalContent": "<div class=\"wp-block-columns alignwide are-vertically-aligned-center\">\n\t\t\t\n\n\t\t\t\n\t\t</div>"
-            },
-            {
-                "clientId": "_clientId_1",
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
@@ -163,6 +31,6 @@
                 "originalContent": "<p></p>"
             }
         ],
-        "originalContent": "<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"\n\t\tbackground-image: url( https://example.com/2020/08/dots_bg.png );\n\t\tmin-height: 48vw;\n\t\tbackground-position: 50% 40%;\n\t\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\n\t\t\n\t</div>\n</div>"
+        "originalContent": "<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"\n\t\tbackground-image: url( https://some-domain.tlk/some-background-image.png );\n\t\tmin-height: 48vw;\n\t\tbackground-position: 50% 40%;\n\t\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
     }
 ]
