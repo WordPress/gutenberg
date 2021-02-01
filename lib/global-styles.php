@@ -93,14 +93,23 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 		$theme_settings['settings'][ $all_blocks ]['typography']['fontSizes'] = $font_sizes;
 	}
 
-	// Things that didn't land in core yet, so didn't have a setting assigned.
-	if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
+	// This allows to make the plugin work with WordPress 5.7 beta
+	// as well as lower versions. The second check can be removed
+	// as soon as the minimum WordPress version for the plugin
+	// is bumped to 5.7.
+	if ( isset( $settings['enableCustomSpacing'] ) ) {
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
+		}
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+	} else if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
 			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
 		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = true;
 	}
 
+	// Things that didn't land in core yet, so didn't have a setting assigned.
 	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
 			$theme_settings['settings'][ $all_blocks ]['color'] = array();
@@ -197,6 +206,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['enableCustomLineHeight'] );
 	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 

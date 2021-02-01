@@ -378,7 +378,7 @@ add_theme_support( 'responsive-embeds' );
 
 ## Spacing control
 
-Using the Gutenberg plugin (version 8.3 or later), some blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
+Some blocks can have padding controls. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support('custom-spacing');
