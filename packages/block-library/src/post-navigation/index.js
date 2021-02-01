@@ -15,7 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: _x(
-		'Posts Navigation Link',
+		'Post Navigation Link',
 		'name of the block that displays the next or previous post link that is adjacent to the current post'
 	),
 	description: __(

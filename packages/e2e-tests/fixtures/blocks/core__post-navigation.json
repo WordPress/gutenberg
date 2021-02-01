@@ -1,7 +1,7 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/posts-navigation",
+        "name": "core/post-navigation",
         "isValid": true,
         "attributes": {
             "type": "next",

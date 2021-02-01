@@ -1,12 +1,12 @@
 <?php
 /**
- * Server-side rendering of the `core/posts-navigation` block.
+ * Server-side rendering of the `core/post-navigation` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/posts-navigation` block on the server.
+ * Renders the `core/post-navigation` block on the server.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -14,7 +14,7 @@
  *
  * @return string Returns the next or previous post link that is adjacent to the current post.
  */
-function render_block_core_posts_navigation( $attributes, $content, $block ) {
+function render_block_core_post_navigation( $attributes, $content, $block ) {
 	if ( ! is_singular() ) {
 		return '';
 	}
@@ -25,7 +25,7 @@ function render_block_core_posts_navigation( $attributes, $content, $block ) {
 	if ( ! in_array( $navigation_type, array( 'next', 'previous' ), true ) ) {
 		return '';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "posts-navigation-$navigation_type" ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "post-navigation-$navigation_type" ) );
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link', 'gutenberg' ) : _x( 'Previous', 'label for previous post link', 'gutenberg' );
@@ -59,14 +59,14 @@ function render_block_core_posts_navigation( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/posts-navigation` block on the server.
+ * Registers the `core/post-navigation` block on the server.
  */
-function register_block_core_posts_navigation() {
+function register_block_core_post_navigation() {
 	register_block_type_from_metadata(
-		__DIR__ . '/posts-navigation',
+		__DIR__ . '/post-navigation',
 		array(
-			'render_callback' => 'render_block_core_posts_navigation',
+			'render_callback' => 'render_block_core_post_navigation',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_posts_navigation' );
+add_action( 'init', 'register_block_core_post_navigation' );
