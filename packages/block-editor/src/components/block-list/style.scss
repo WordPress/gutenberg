@@ -406,23 +406,24 @@
 	position: absolute;
 	background: var(--wp-admin-theme-color);
 
-	animation: block-editor-inserter__toggle__fade-in-animation 0.3s ease;
+	// Provide a muted animation that isn't too noisy.
+	animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 
 	.block-editor-block-list__insertion-point.is-vertical > & {
-		top: calc(50% - #{ $border-width });
-		height: var(--wp-admin-border-width-focus);
-		left: 0;
+		top: 50%;
 		right: 0;
+		left: 0;
+		height: $border-width;
 	}
 
 	.block-editor-block-list__insertion-point.is-horizontal > & {
 		top: 0;
-		height: 100%;
-		left: calc(50% - #{ $border-width });
 		right: 0;
-		width: var(--wp-admin-border-width-focus);
+		left: 50%;
+		height: 100%;
+		width: $border-width;
 	}
 }
 
@@ -469,7 +470,15 @@
 
 		&:hover {
 			color: $white;
+			background: var(--wp-admin-theme-color);
 		}
+	}
+}
+
+.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle.components-button.has-icon {
+	background: var(--wp-admin-theme-color);
+	&:hover {
+		background: $gray-900;
 	}
 }
 
@@ -488,7 +497,7 @@
 	0% {
 		opacity: 0;
 	}
-	80% {
+	60% {
 		opacity: 0;
 	}
 	100% {
@@ -499,11 +508,9 @@
 @keyframes block-editor-inserter__toggle__fade-in-animation {
 	from {
 		opacity: 0;
-		transform: scale(0);
 	}
 	to {
 		opacity: 1;
-		transform: scale(1);
 	}
 }
 

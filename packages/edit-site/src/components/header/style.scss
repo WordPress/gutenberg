@@ -107,7 +107,7 @@ body.is-navigation-sidebar-open {
 		display: none;
 
 		@include break-medium() {
-			display: block;
+			display: inline-flex;
 		}
 	}
 

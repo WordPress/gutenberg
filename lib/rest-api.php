@@ -11,6 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Registers the block pattern directory.
+ */
+function gutenberg_register_rest_pattern_directory() {
+	$block_directory_controller = new WP_REST_Pattern_Directory_Controller();
+	$block_directory_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
+
+/**
  * Registers the menu locations area REST API routes.
  */
 function gutenberg_register_rest_menu_location() {

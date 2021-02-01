@@ -2,7 +2,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../deprecated" },
@@ -15,8 +16,13 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
 		"src/utils/**/*",
-		"src/visually-hidden/**/*"
+		"src/view/**/*",
+		"src/visually-hidden/**/*",
+		"src/text/**/*",
+		"src/grid/**/*",
+		"src/__next/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",

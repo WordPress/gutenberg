@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect, useRef } from '@wordpress/element';
+import { forwardRef, useCallback, useEffect, useRef } from '@wordpress/element';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -40,10 +41,7 @@ function InterfaceSkeleton(
 	ref
 ) {
 	const fallbackRef = useRef();
-
-	ref = ref || fallbackRef;
-
-	const regionsClassName = useNavigateRegions( ref, shortcuts );
+	const regionsClassName = useNavigateRegions( fallbackRef, shortcuts );
 
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
@@ -68,7 +66,10 @@ function InterfaceSkeleton(
 
 	return (
 		<div
-			ref={ ref }
+			ref={ useCallback( mergeRefs( [ ref, fallbackRef ] ), [
+				ref,
+				fallbackRef,
+			] ) }
 			className={ classnames(
 				className,
 				'interface-interface-skeleton',

@@ -40,6 +40,7 @@ function SocialLinksEdit( {
 	attributes,
 	activeInnerBlocks,
 	getBlock,
+	blockWidth,
 } ) {
 	const [ initialCreation, setInitialCreation ] = useState( true );
 	const shouldRenderFooterAppender = isSelected || isInnerIconSelected;
@@ -101,6 +102,7 @@ function SocialLinksEdit( {
 			filterInnerBlocks={
 				! shouldRenderFooterAppender && filterInnerBlocks
 			}
+			blockWidth={ blockWidth }
 		/>
 	);
 }

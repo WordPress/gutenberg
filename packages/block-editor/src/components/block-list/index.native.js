@@ -74,6 +74,12 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+
+		this.onLayout = this.onLayout.bind( this );
+
+		this.state = {
+			blockWidth: this.props.blockWidth || 0,
+		};
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -120,12 +126,14 @@ export class BlockList extends Component {
 			contentStyle,
 			renderAppender,
 		} = this.props;
+		const { blockWidth } = this.state;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
-			this.extraData.renderAppender !== renderAppender
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockWidth !== blockWidth
 		) {
 			this.extraData = {
 				parentWidth,
@@ -133,9 +141,24 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				blockWidth,
 			};
 		}
 		return this.extraData;
+	}
+
+	onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+		const { isRootList, maxWidth } = this.props;
+
+		const layoutWidth = Math.floor( layout.width );
+
+		if ( isRootList && blockWidth !== layoutWidth ) {
+			this.setState( {
+				blockWidth: Math.min( layoutWidth, maxWidth ),
+			} );
+		}
 	}
 
 	render() {
@@ -197,6 +220,7 @@ export class BlockList extends Component {
 			<View
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
+				onLayout={ this.onLayout }
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -278,6 +302,7 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
+		const { blockWidth } = this.state;
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -296,6 +321,7 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
+				blockWidth={ blockWidth }
 			/>
 		);
 	}
@@ -351,6 +377,7 @@ export default compose( [
 				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
 
+			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
 			const blockCount = getBlockCount( rootBlockId );
@@ -372,6 +399,7 @@ export default compose( [
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
+				maxWidth,
 			};
 		}
 	),
