@@ -23,6 +23,24 @@ import { isRTL } from '@wordpress/i18n';
 import Inserter from '../inserter';
 import { getBlockDOMNode } from '../../utils/dom';
 
+function offsetIframe( rect, ownerDocument ) {
+	const { defaultView } = ownerDocument;
+	const { frameElement } = defaultView;
+
+	if ( ! frameElement ) {
+		return rect;
+	}
+
+	const iframeRect = frameElement.getBoundingClientRect();
+
+	return new defaultView.DOMRect(
+		rect.left + iframeRect.left,
+		rect.top + iframeRect.top,
+		rect.width,
+		rect.height
+	);
+}
+
 function InsertionPointInserter( {
 	clientId,
 	rootClientId,
@@ -146,9 +164,15 @@ function InsertionPointPopover( {
 	}, [ previousElement, nextElement ] );
 
 	const getAnchorRect = useCallback( () => {
-		const previousRect = previousElement.getBoundingClientRect();
+		const previousRect = offsetIframe(
+			previousElement.getBoundingClientRect(),
+			previousElement.ownerDocument
+		);
 		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
+			? offsetIframe(
+					nextElement.getBoundingClientRect(),
+					nextElement.ownerDocument
+			  )
 			: null;
 		if ( orientation === 'vertical' ) {
 			return {
