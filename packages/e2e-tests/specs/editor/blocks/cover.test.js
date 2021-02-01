@@ -129,10 +129,11 @@ describe( 'Cover', () => {
 			'.wp-block-cover [data-type="core/paragraph"]',
 			'Cover Block'
 		);
-		// Select the cover block. By default the child paragraph gets selected.
-		await page.click( 'button[aria-label="Outline"]' );
-		await page.click(
-			'.block-editor-block-navigation-block__contents-container button'
+
+		// Unselect the cover block (to remove the 'selected' highlight frame).
+		await page.$eval(
+			'.wp-block-cover [data-type="core/paragraph"]',
+			( e ) => e.blur()
 		);
 
 		const coverBlockElement = await page.$( '.wp-block-cover' );
