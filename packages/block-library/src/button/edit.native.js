@@ -428,11 +428,9 @@ export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const {
-			getBlockCount,
-			getBlockRootClientId,
-			getSettings,
-		} = select( 'core/block-editor' );
+		const { getBlockCount, getBlockRootClientId, getSettings } = select(
+			'core/block-editor'
+		);
 		const { maxWidth } = getSettings();
 
 		const parentId = getBlockRootClientId( clientId );
