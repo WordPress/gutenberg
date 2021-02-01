@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { __unstableWithNext as withNext } from '../../__next/context';
+import { withNext } from '../../ui/context';
 import NextText from './text';
 import { text } from '../styles/text-mixins';
 
