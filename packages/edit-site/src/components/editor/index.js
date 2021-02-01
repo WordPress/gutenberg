@@ -10,11 +10,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import {
-	BlockContextProvider,
-	BlockBreadcrumb,
-	__experimentalLibrary as Library,
-} from '@wordpress/block-editor';
+import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -24,11 +20,6 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { close } from '@wordpress/icons';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,6 +32,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
+import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import { store as editSiteStore } from '../../store';
 
 const interfaceLabels = {
@@ -155,12 +147,6 @@ function Editor( { initialSettings } ) {
 		}
 	}, [ isNavigationOpen ] );
 
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-	} );
-
 	// Don't render the Editor until the settings are set and loaded
 	if ( ! settings?.siteUrl ) {
 		return null;
@@ -198,34 +184,9 @@ function Editor( { initialSettings } ) {
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={
-												isInserterOpen ? (
-													<div
-														ref={
-															inserterDialogRef
-														}
-														{ ...inserterDialogProps }
-														className="edit-site-editor__inserter-panel"
-													>
-														<div className="edit-site-editor__inserter-panel-header">
-															<Button
-																icon={ close }
-																onClick={ () =>
-																	setIsInserterOpened(
-																		false
-																	)
-																}
-															/>
-														</div>
-														<div className="edit-site-editor__inserter-panel-content">
-															<Library
-																showInserterHelpPanel
-																shouldFocusBlock={
-																	isMobile
-																}
-															/>
-														</div>
-													</div>
-												) : null
+												isInserterOpen && (
+													<InserterSidebar />
+												)
 											}
 											sidebar={
 												sidebarIsOpened && (
