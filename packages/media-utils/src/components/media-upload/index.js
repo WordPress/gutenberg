@@ -376,9 +376,18 @@ class MediaUpload extends Component {
 
 	onOpen() {
 		this.updateCollection();
-		if ( ! this.props.value ) {
+
+		// For a media uploader that selects only a single item (e.g. the image
+		// block ), `this.props.value` is a number that represents the `id` of
+		// the media. For galleries, the value is an array of ids. This early
+		// return statement should handle both when no media is present.
+		if (
+			! this.props.value ||
+			( this.props.gallery && this.props.value?.length )
+		) {
 			return;
 		}
+
 		if ( ! this.props.gallery ) {
 			const selection = this.frame.state().get( 'selection' );
 			castArray( this.props.value ).forEach( ( id ) => {
