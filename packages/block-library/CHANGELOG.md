@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.28.0 (2021-02-01)
+
 ### New Features
 
 - Allow setting the `crossOrigin` attribute so the `useTransformImage` hook can use cross-origin sources ([#28255](https://github.com/WordPress/gutenberg/pull/28255/)).
