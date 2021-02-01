@@ -7,7 +7,11 @@ import { clamp } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { HorizontalRule, ResizableBox } from '@wordpress/components';
+import {
+	HorizontalRule,
+	ResizableBox,
+	useConvertUnitToMobile,
+} from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
 import { View } from '@wordpress/primitives';
@@ -71,11 +75,15 @@ function SeparatorEdit( props ) {
 		setIsResizing( false );
 	};
 
-	const cssHeight = `${ height }${ heightUnit }`;
 	const blockProps = useBlockProps();
 	const wrapperClasses = blockProps.className?.replace(
 		'wp-block-separator',
 		'wp-block-separator__wrapper'
+	);
+
+	const convertedHeightValue = useConvertUnitToMobile(
+		height || currentMinHeight,
+		heightUnit
 	);
 
 	// The block's className and styles are moved to the inner <hr> to retain
@@ -88,7 +96,7 @@ function SeparatorEdit( props ) {
 			<View
 				{ ...blockProps }
 				className={ wrapperClasses }
-				style={ { height: height ? cssHeight : undefined } }
+				style={ { height: convertedHeightValue } }
 			>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
@@ -108,8 +116,7 @@ function SeparatorEdit( props ) {
 						}
 					) }
 					size={ {
-						height:
-							heightUnit === 'px' && height ? cssHeight : '100%',
+						height: heightUnit === 'px' && height ? height : '100%',
 					} }
 					enable={ {
 						top: false,
