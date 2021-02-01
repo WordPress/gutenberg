@@ -7,7 +7,7 @@ import { identity } from 'lodash';
 /**
  * Internal dependencies
  */
-import { View } from '../ui/view';
+import { View } from '../view';
 
 /* eslint-disable jsdoc/require-returns-description */
 /**

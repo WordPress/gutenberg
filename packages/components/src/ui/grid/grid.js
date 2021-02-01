@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../../utils/create-component';
+import { createComponent } from '../utils';
 import useGrid from './use-grid';
 
 /**

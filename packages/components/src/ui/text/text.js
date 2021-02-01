@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../../utils';
+import { createComponent } from '../utils';
 import useText from './use-text';
 
 export default createComponent( {

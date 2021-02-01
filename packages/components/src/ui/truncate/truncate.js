@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../../utils';
+import { createComponent } from '../utils';
 import useTruncate from './use-truncate';
 
 export default createComponent( {
