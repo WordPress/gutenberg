@@ -189,7 +189,10 @@ class ButtonEdit extends Component {
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: parentWidth,
+				maxWidth: Math.min(
+					parentWidth,
+					this.props.maxWidth - 2 * spacing
+				),
 			} );
 		} else if ( ! parentWidth && width && isWidthChanged ) {
 			this.setState( { maxWidth: width - spacing } );
@@ -290,7 +293,13 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 		} = this.props;
-		const { placeholder, text, borderRadius, url } = attributes;
+		const {
+			placeholder,
+			text,
+			borderRadius,
+			url,
+			align = 'center',
+		} = attributes;
 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
@@ -353,7 +362,7 @@ class ButtonEdit extends Component {
 							...richTextStyle.richText,
 							color: textColor,
 						} }
-						textAlign="center"
+						textAlign={ align }
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
@@ -419,9 +428,12 @@ export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getBlockCount, getBlockRootClientId } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlockCount,
+			getBlockRootClientId,
+			getSettings,
+		} = select( 'core/block-editor' );
+		const { maxWidth } = getSettings();
 
 		const parentId = getBlockRootClientId( clientId );
 		const numOfButtons = getBlockCount( parentId );
@@ -429,6 +441,7 @@ export default compose( [
 		return {
 			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			numOfButtons,
+			maxWidth,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

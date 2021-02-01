@@ -24,7 +24,7 @@ import {
 	useGlobalStylesReset,
 } from '../editor/global-styles-provider';
 import DefaultSidebar from './default-sidebar';
-import { GLOBAL_CONTEXT_NAME } from '../editor/utils';
+import { ROOT_BLOCK_NAME } from '../editor/utils';
 import {
 	default as TypographyPanel,
 	useHasTypographyPanel,
@@ -136,7 +136,7 @@ function GlobalStylesBlockPanels( {
 	);
 
 	return map( panels, ( { context, name, wrapperPanelTitle } ) => {
-		if ( name === GLOBAL_CONTEXT_NAME ) {
+		if ( name === ROOT_BLOCK_NAME ) {
 			return null;
 		}
 		return (
@@ -168,7 +168,7 @@ export default function GlobalStylesSidebar( {
 	} = useGlobalStylesContext();
 	const [ canRestart, onReset ] = useGlobalStylesReset();
 
-	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT_NAME ] ) {
+	if ( typeof contexts !== 'object' || ! contexts?.[ ROOT_BLOCK_NAME ] ) {
 		// No sidebar is shown.
 		return null;
 	}
@@ -197,7 +197,7 @@ export default function GlobalStylesSidebar( {
 		>
 			<TabPanel
 				tabs={ [
-					{ name: 'global', title: __( 'Global' ) },
+					{ name: 'root', title: __( 'Root' ) },
 					{ name: 'block', title: __( 'By Block Type' ) },
 				] }
 			>
@@ -218,8 +218,8 @@ export default function GlobalStylesSidebar( {
 						<GlobalStylesPanel
 							hasWrapper={ false }
 							context={ {
-								...contexts[ GLOBAL_CONTEXT_NAME ],
-								name: GLOBAL_CONTEXT_NAME,
+								...contexts[ ROOT_BLOCK_NAME ],
+								name: ROOT_BLOCK_NAME,
 							} }
 							getStyle={ getStyle }
 							setStyle={ setStyle }

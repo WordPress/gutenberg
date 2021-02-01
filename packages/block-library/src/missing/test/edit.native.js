@@ -9,7 +9,9 @@ import { Text } from 'react-native';
  */
 import { BottomSheet, Icon } from '@wordpress/components';
 import { help, plugins } from '@wordpress/icons';
+import { storeConfig } from '@wordpress/block-editor';
 jest.mock( '@wordpress/blocks' );
+jest.mock( '@wordpress/block-editor/src/store/selectors' );
 
 /**
  * Internal dependencies
@@ -27,6 +29,10 @@ const getTestComponentWithContent = ( attributes = defaultAttributes ) => {
 };
 
 describe( 'Missing block', () => {
+	beforeEach( () => {
+		storeConfig.selectors.getSettings.mockReturnValue( {} );
+	} );
+
 	it( 'renders without crashing', () => {
 		const component = getTestComponentWithContent();
 		const rendered = component.toJSON();
@@ -61,6 +67,47 @@ describe( 'Missing block', () => {
 					defaultAttributes.originalName +
 					"' is not fully-supported"
 			);
+		} );
+
+		describe( 'Unsupported block editor (UBE)', () => {
+			beforeEach( () => {
+				// By default we set the web editor as available
+				storeConfig.selectors.getSettings.mockReturnValue( {
+					unsupportedBlockEditor: true,
+				} );
+			} );
+
+			it( 'renders edit action if UBE is available', () => {
+				const component = getTestComponentWithContent();
+				const testInstance = component.root;
+				const bottomSheet = testInstance.findByType( BottomSheet );
+				const bottomSheetCells = bottomSheet.props.children[ 1 ];
+				expect( bottomSheetCells ).toBeTruthy();
+				expect( bottomSheetCells.props.children.length ).toBe( 2 );
+				expect( bottomSheetCells.props.children[ 0 ].props.label ).toBe(
+					'Edit using web editor'
+				);
+			} );
+
+			it( 'does not render edit action if UBE is not available', () => {
+				storeConfig.selectors.getSettings.mockReturnValue( {
+					unsupportedBlockEditor: false,
+				} );
+
+				const component = getTestComponentWithContent();
+				const testInstance = component.root;
+				const bottomSheet = testInstance.findByType( BottomSheet );
+				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
+			} );
+
+			it( 'does not render edit action if the block is incompatible with UBE', () => {
+				const component = getTestComponentWithContent( {
+					originalName: 'core/block',
+				} );
+				const testInstance = component.root;
+				const bottomSheet = testInstance.findByType( BottomSheet );
+				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
+			} );
 		} );
 	} );
 

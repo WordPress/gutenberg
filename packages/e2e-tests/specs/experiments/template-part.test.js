@@ -5,7 +5,6 @@ import {
 	createNewPost,
 	insertBlock,
 	disablePrePublishChecks,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
 	getAllBlocks,
@@ -13,12 +12,11 @@ import {
 	clickBlockToolbarButton,
 	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
@@ -34,13 +32,7 @@ describe( 'Template Part', () => {
 
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
-			await visitAdminPage(
-				'admin.php',
-				addQueryArgs( '', {
-					page: 'gutenberg-edit-site',
-				} ).slice( 1 )
-			);
-			await page.waitForSelector( '.edit-site-visual-editor iframe' );
+			await siteEditor.visit();
 		} );
 
 		async function updateHeader( content ) {
@@ -61,11 +53,11 @@ describe( 'Template Part', () => {
 				'.edit-site-save-button__button:not(.is-busy)'
 			);
 
-			// Switch back to the front page template.
+			// Switch back to the Index template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 		}
 
