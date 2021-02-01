@@ -147,7 +147,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', 'Front Page' );
+		await clickTemplateItem( 'Templates', 'Index' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'
