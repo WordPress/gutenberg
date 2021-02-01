@@ -76,6 +76,30 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//index' )
 		);
+
+		// Test template parts.
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/template-parts' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals(
+			array(
+				'id'          => 'tt1-blocks//header',
+				'theme'       => 'tt1-blocks',
+				'slug'        => 'header',
+				'title'       => array(
+					'raw'      => 'header',
+					'rendered' => 'header',
+				),
+				'description' => '',
+				'status'      => 'publish',
+				'is_custom'   => false,
+				'type'        => 'wp_template_part',
+				'wp_id'       => null,
+				'section'     => null,
+			),
+			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
+		);
 	}
 
 	public function test_get_item() {
@@ -100,6 +124,31 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'is_custom'   => false,
 				'type'        => 'wp_template',
 				'wp_id'       => null,
+			),
+			$data
+		);
+
+		// Test template parts.
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/template-parts/tt1-blocks//header' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		unset( $data['content'] );
+		unset( $data['_links'] );
+		$this->assertEquals(
+			array(
+				'id'          => 'tt1-blocks//header',
+				'theme'       => 'tt1-blocks',
+				'slug'        => 'header',
+				'title'       => array(
+					'raw'      => 'header',
+					'rendered' => 'header',
+				),
+				'description' => '',
+				'status'      => 'publish',
+				'is_custom'   => false,
+				'type'        => 'wp_template_part',
+				'wp_id'       => null,
+				'section'     => null,
 			),
 			$data
 		);
@@ -140,6 +189,43 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 			),
 			$data
 		);
+
+		// Test template parts.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/template-parts' );
+		$request->set_body_params(
+			array(
+				'slug'        => 'my_custom_template_part',
+				'title'       => 'My Template Part',
+				'description' => 'Just a description of a template part',
+				'content'     => 'Content',
+				'section'     => 'header',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		unset( $data['_links'] );
+		unset( $data['wp_id'] );
+
+		$this->assertEquals(
+			array(
+				'id'          => 'tt1-blocks//my_custom_template_part',
+				'theme'       => 'tt1-blocks',
+				'slug'        => 'my_custom_template_part',
+				'title'       => array(
+					'raw'      => 'My Template Part',
+					'rendered' => 'My Template Part',
+				),
+				'description' => 'Just a description of a template part',
+				'status'      => 'publish',
+				'is_custom'   => true,
+				'type'        => 'wp_template_part',
+				'content'     => array(
+					'raw' => 'Content',
+				),
+				'section'     => 'header',
+			),
+			$data
+		);
 	}
 
 	public function test_update_item() {
@@ -153,6 +239,18 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'My new Index Title', $data['title']['raw'] );
+		$this->assertEquals( true, $data['is_custom'] );
+
+		// Test template parts.
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/template-parts/tt1-blocks//header' );
+		$request->set_body_params(
+			array(
+				'section' => 'something unsupported',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( 'other', $data['section'] );
 		$this->assertEquals( true, $data['is_custom'] );
 	}
 
