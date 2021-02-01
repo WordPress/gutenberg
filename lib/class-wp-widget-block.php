@@ -39,6 +39,7 @@ class WP_Widget_Block extends WP_Widget {
 		);
 		parent::__construct( 'block', __( 'Block', 'gutenberg' ), $widget_ops, $control_ops );
 		add_action( 'is_wide_widget_in_customizer', array( $this, 'set_is_wide_widget_in_customizer' ), 10, 2 );
+		add_action( 'customize_controls_print_footer_scripts', array( $this, 'output_widget_control_templates' ) );
 	}
 
 	/**
@@ -127,4 +128,12 @@ class WP_Widget_Block extends WP_Widget {
 		return $is_wide;
 	}
 
+	/**
+	 * Renders the widget form control templates into the DOM.
+	 */
+	public function output_widget_control_templates() {
+		?>
+		<div id="widgets-left"><!-- compatibility with JS which looks for widget templates here --></div>
+		<?php
+	}
 }

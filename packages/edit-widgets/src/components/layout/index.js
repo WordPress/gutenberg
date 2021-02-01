@@ -12,13 +12,16 @@ import Sidebar from '../sidebar';
 import Interface from './interface';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 
-function Layout( { blockEditorSettings } ) {
+function Layout( { blockEditorSettings, isInCustomizer } ) {
 	return (
 		<WidgetAreasBlockEditorProvider
 			blockEditorSettings={ blockEditorSettings }
 		>
-			<Interface blockEditorSettings={ blockEditorSettings } />
-			<Sidebar />
+			<Interface
+				blockEditorSettings={ blockEditorSettings }
+				isInCustomizer={ isInCustomizer }
+			/>
+			<Sidebar isInCustomizer={ isInCustomizer } />
 			<Popover.Slot />
 			<PluginArea />
 			<UnsavedChangesWarning />

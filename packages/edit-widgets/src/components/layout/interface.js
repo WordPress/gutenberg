@@ -37,7 +37,7 @@ const interfaceLabels = {
 	sidebar: __( 'Widgets settings' ),
 };
 
-function Interface( { blockEditorSettings } ) {
+function Interface( { blockEditorSettings, isInCustomizer } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const { setIsInserterOpened, closeGeneralSidebar } = useDispatch(
@@ -45,12 +45,15 @@ function Interface( { blockEditorSettings } ) {
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const { hasSidebarEnabled, isInserterOpened } = useSelect( ( select ) => ( {
-		hasSidebarEnabled: !! select(
-			interfaceStore
-		).getActiveComplementaryArea( editWidgetsStore.name ),
-		isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
-	} ) );
+	const { hasSidebarEnabled, isInserterOpened } = useSelect(
+		( select ) => ( {
+			hasSidebarEnabled: !! select(
+				interfaceStore
+			).getActiveComplementaryArea( editWidgetsStore.name ),
+			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+		} ),
+		[]
+	);
 	const editorStylesRef = useEditorStyles( blockEditorSettings.styles );
 
 	// Inserter and Sidebars are mutually exclusive

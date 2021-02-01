@@ -15,7 +15,7 @@ function WidgetPreview( { widgetAreaId, attributes, hidden, ...props } ) {
 	const HEIGHT_MARGIN = 20;
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
 	const iframeRef = useRef();
-	const currentUrl = document.location.href;
+	const currentUrl = `${ document.location.protocol }//${ document.location.host }/wp-admin/themes.php?page=gutenberg-widgets`;
 	const iframeUrl = addQueryArgs( currentUrl, {
 		'widget-preview': {
 			...attributes,

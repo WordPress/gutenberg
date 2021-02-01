@@ -44,6 +44,27 @@ export function initialize( id, settings ) {
 	);
 }
 
+export function initializeCustomizer( id, settings ) {
+	const coreBlocks = __experimentalGetCoreBlocks().filter(
+		( block ) => ! [ 'core/more' ].includes( block.name )
+	);
+	registerCoreBlocks( coreBlocks );
+
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		__experimentalRegisterExperimentalCoreBlocks();
+	}
+	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
+
+	// The code executes before the target DOM has been attached, so we use a hacky timeout to delay the render
+	setTimeout( () => {
+		render(
+			<Layout blockEditorSettings={ settings } isInCustomizer />,
+			document.getElementById( id )
+		);
+	}, 0 );
+}
+
 /**
  * Function to register an individual block.
  *
