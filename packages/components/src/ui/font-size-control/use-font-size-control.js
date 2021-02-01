@@ -13,7 +13,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as styles from './font-size-control-styles';
+import * as styles from './styles';
 import {
 	getInputValue,
 	getSelectOptions,
@@ -21,9 +21,9 @@ import {
 	hasUnit,
 	isCustomSelectedItem,
 	isCustomValue,
-} from './font-size-control-utils';
+} from './utils';
 
-export function useFontSizeControl( props ) {
+export default function useFontSizeControl( props ) {
 	const {
 		disableCustomFontSizes,
 		fontSizes = [],

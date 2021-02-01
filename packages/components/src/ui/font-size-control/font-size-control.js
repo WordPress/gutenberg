@@ -12,9 +12,9 @@ import { View, VisuallyHidden, VStack } from '@wp-g2/components';
 /**
  * Internal dependencies
  */
-import FontSizeControlSelect from './font-size-control-select';
-import FontSizeControlSlider from './font-size-control-slider';
-import { useFontSizeControl } from './use-font-size-control';
+import FontSizeControlSelect from './select';
+import FontSizeControlSlider from './slider';
+import useFontSizeControl from './use-font-size-control';
 
 function FontSizeControl( props, forwardedRef ) {
 	const {

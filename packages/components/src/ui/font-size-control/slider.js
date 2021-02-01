@@ -18,7 +18,7 @@ import {
 	TextInput,
 	VStack,
 } from '@wp-g2/components';
-import { getSliderTemplateColumns } from './font-size-control-utils';
+import { getSliderTemplateColumns } from './utils';
 
 function FontSizeControlSlider( props ) {
 	const {

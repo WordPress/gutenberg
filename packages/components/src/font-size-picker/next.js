@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { withNext } from '../../ui/context';
-import FontSizeControl from './font-size-control';
+import { withNext } from '../ui/context';
+import { FontSizeControl } from '../ui/font-size-control';
 
 const FontSizePicker =
 	process.env.COMPONENT_SYSTEM_PHASE === 1

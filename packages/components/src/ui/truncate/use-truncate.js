@@ -12,12 +12,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as styles from './truncate-styles';
-import {
-	TRUNCATE_ELLIPSIS,
-	TRUNCATE_TYPE,
-	truncateContent,
-} from './truncate-utils';
+import * as styles from './styles';
+import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 
 /**
  * @typedef Props

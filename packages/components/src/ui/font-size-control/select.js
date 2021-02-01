@@ -20,7 +20,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getSelectTemplateColumns } from './font-size-control-utils';
+import { getSelectTemplateColumns } from './utils';
 
 function renderItem( { name, style } ) {
 	return <span style={ style }>{ name }</span>;

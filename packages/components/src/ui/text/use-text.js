@@ -15,8 +15,8 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
  */
 import { useTruncate } from '../truncate';
 import { getOptimalTextShade } from '../../utils/colors';
-import * as styles from './text-styles';
-import { createHighlighterText } from './text-utils';
+import * as styles from './styles';
+import { createHighlighterText } from './utils';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'span'>} props
