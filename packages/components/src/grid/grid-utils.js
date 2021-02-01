@@ -12,8 +12,14 @@ const ALIGNMENTS = {
 	topRight: { alignItems: 'flex-start', justifyContent: 'flex-end' },
 };
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {keyof typeof ALIGNMENTS | undefined} alignment
+ * @return {{ alignItems?: import('react').CSSProperties['alignItems'], justifyContent?: import('react').CSSProperties['justifyContent']}} CSS props for alignment
+ */
 export function getAlignmentProps( alignment ) {
-	const alignmentProps = ALIGNMENTS[ alignment ] || {};
+	const alignmentProps = alignment ? ALIGNMENTS[ alignment ] : {};
 
 	return alignmentProps;
 }
+/* eslint-enable jsdoc/valid-types */
