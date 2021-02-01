@@ -493,3 +493,56 @@ The `--` as a separator has two functions:
 
 - Readibility, for human understanding.
 - Be able to parse back a variable name such as `--wp--preset--color--black` into its semantic parts. This way, machines can know that this is a value bounded to the color preset with the slug "black".
+
+### How settings under "custom" create new CSS Custom Properties
+
+The algorithm to create CSS Variables out of the settings under the "custom" key works this way:
+
+This is for clarity, but also because we want a mechanism to parse back a variable name such `--wp--custom--line-height--body` to its object form in theme.json. We use the same separation for presets.
+
+For an object like this:
+
+```json
+{
+  "settings": {
+    "defaults": {
+      "custom": {
+        "lineHeight": {
+          "body": 1.7
+        },
+        "font-primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
+      },
+    },
+  },
+}
+```
+
+The generated CSS Custom Properties are:
+
+```css
+:root {
+  --wp--custom--line-height--body: 1.7;
+  --wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
+}
+```
+
+A few notes about this process:
+
+- `camelCased` keys are transformed into its `kebab-case` form, as to follow the CSS property naming schema. Example: `lineHeight` is transformed into `line-height`.
+- Keys at different depth levels are separated by `--`. That's why `line-height` and `body` are separated by `--`.
+- You shouldn't use `--` in the names of the keys within the `custom` object. Example, don't do this:
+
+
+```json
+{
+  "settings": {
+    "defaults": {
+      "custom": {
+        "line--height": {
+          "body": 1.7
+        },
+      },
+    },
+  },
+}
+```
