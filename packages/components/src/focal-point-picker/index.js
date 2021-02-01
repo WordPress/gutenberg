@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -50,8 +49,9 @@ export class FocalPointPicker extends Component {
 		this.updateValue = this.updateValue.bind( this );
 	}
 	componentDidMount() {
-		document.addEventListener( 'mouseup', this.handleOnMouseUp );
-		window.addEventListener( 'resize', this.updateBounds );
+		const ownerDoc = this.containerRef.current.ownerDocument;
+		ownerDoc.addEventListener( 'mouseup', this.handleOnMouseUp );
+		ownerDoc.defaultView.addEventListener( 'resize', this.updateBounds );
 
 		/*
 		 * Set initial bound values.
@@ -67,6 +67,7 @@ export class FocalPointPicker extends Component {
 				isDragging: false,
 			} );
 		}
+		if ( this.state.isDragging ) return;
 		/*
 		 * Handles cases where the incoming value changes.
 		 * An example is the values resetting based on an UNDO action.
@@ -79,8 +80,9 @@ export class FocalPointPicker extends Component {
 		}
 	}
 	componentWillUnmount() {
-		document.removeEventListener( 'mouseup', this.handleOnMouseUp );
-		window.removeEventListener( 'resize', this.updateBounds );
+		const ownerDoc = this.containerRef.current.ownerDocument;
+		ownerDoc.removeEventListener( 'mouseup', this.handleOnMouseUp );
+		ownerDoc.defaultView.removeEventListener( 'resize', this.updateBounds );
 	}
 	calculateBounds() {
 		const bounds = INITIAL_BOUNDS;
@@ -121,7 +123,6 @@ export class FocalPointPicker extends Component {
 		return bounds;
 	}
 	updateValue( nextValue = {} ) {
-		const { onChange } = this.props;
 		const { x, y } = nextValue;
 
 		const nextPercentage = {
@@ -129,9 +130,7 @@ export class FocalPointPicker extends Component {
 			y: parseFloat( y ).toFixed( 2 ),
 		};
 
-		this.setState( { percentages: nextPercentage }, () => {
-			onChange( nextPercentage );
-		} );
+		this.setState( { percentages: nextPercentage } );
 	}
 	updateBounds() {
 		this.setState( {
@@ -140,50 +139,35 @@ export class FocalPointPicker extends Component {
 	}
 	handleOnClick( event ) {
 		event.persist();
+		this.containerRef.current.focus();
+		this.props.onDragStart?.( event );
 		this.setState( { isDragging: true }, () => {
 			this.onMouseMove( event );
 		} );
 	}
-	handleOnMouseUp() {
-		this.setState( { isDragging: false } );
+	handleOnMouseUp( event ) {
+		event.persist?.();
+		this.props.onDragEnd?.( event );
+		this.setState( { isDragging: false }, () => {
+			this.props.onChange( this.state.percentages );
+		} );
 	}
 	handleOnKeyDown( event ) {
 		const { keyCode, shiftKey } = event;
 		if ( ! [ UP, DOWN, LEFT, RIGHT ].includes( keyCode ) ) return;
 
-		const { x, y } = this.state.percentages;
-
 		event.preventDefault();
 
-		// Normalizing values for incrementing/decrementing based on arrow keys
-		let nextX = parseFloat( x );
-		let nextY = parseFloat( y );
+		const next = { ...this.state.percentages };
 		const step = shiftKey ? 0.1 : 0.01;
+		const delta = keyCode === UP || keyCode === LEFT ? -1 * step : step;
+		const axis = keyCode === UP || keyCode === DOWN ? 'y' : 'x';
+		const value = parseFloat( next[ axis ] ) + delta;
 
-		switch ( event.keyCode ) {
-			case UP:
-				nextY = nextY - step;
-				break;
-			case DOWN:
-				nextY = nextY + step;
-				break;
-			case LEFT:
-				nextX = nextX - step;
-				break;
-			case RIGHT:
-				nextX = nextX + step;
-				break;
-		}
+		next[ axis ] = roundClamp( value, 0, 1, step );
 
-		nextX = roundClamp( nextX, 0, 1, step );
-		nextY = roundClamp( nextY, 0, 1, step );
-
-		const percentages = {
-			x: nextX,
-			y: nextY,
-		};
-
-		this.updateValue( percentages );
+		this.updateValue( next );
+		this.props.onChange( next );
 	}
 	onMouseMove( event ) {
 		const { isDragging, bounds } = this.state;
@@ -227,6 +211,7 @@ export class FocalPointPicker extends Component {
 		};
 
 		this.updateValue( nextPercentage );
+		this.props.onDrag?.( event, nextPercentage );
 	}
 	pickerDimensions() {
 		const containerNode = this.containerRef.current;
@@ -251,8 +236,10 @@ export class FocalPointPicker extends Component {
 		};
 	}
 	iconCoordinates() {
-		const { value } = this.props;
-		const { bounds } = this.state;
+		const {
+			percentages: { x, y },
+			bounds,
+		} = this.state;
 
 		if ( bounds.left === undefined || bounds.top === undefined ) {
 			return {
@@ -261,17 +248,11 @@ export class FocalPointPicker extends Component {
 			};
 		}
 
-		const pickerDimensions = this.pickerDimensions();
-		const iconCoordinates = {
-			left:
-				value.x * ( pickerDimensions.width - bounds.left * 2 ) +
-				bounds.left,
-			top:
-				value.y * ( pickerDimensions.height - bounds.top * 2 ) +
-				bounds.top,
+		const { width, height } = this.pickerDimensions();
+		return {
+			left: x * ( width - bounds.left * 2 ) + bounds.left,
+			top: y * ( height - bounds.top * 2 ) + bounds.top,
 		};
-
-		return iconCoordinates;
 	}
 	// Callback method for the withFocusOutside higher-order component
 	handleFocusOutside() {
@@ -286,8 +267,6 @@ export class FocalPointPicker extends Component {
 			help,
 			instanceId,
 			label,
-			onDragStart,
-			onDragEnd,
 			url,
 		} = this.props;
 		const { bounds, isDragging, percentages } = this.state;
@@ -310,14 +289,6 @@ export class FocalPointPicker extends Component {
 				<MediaWrapper className="components-focal-point-picker-wrapper">
 					<MediaContainer
 						className="components-focal-point-picker"
-						onDragStart={ ( event ) => {
-							this.setState( { isDragging: true } );
-							onDragStart( event );
-						} }
-						onDrop={ ( event ) => {
-							this.setState( { isDragging: false } );
-							onDragEnd( event );
-						} }
 						onKeyDown={ this.handleOnKeyDown }
 						onMouseDown={ this.handleOnClick }
 						onMouseMove={ this.onMouseMove }
@@ -345,7 +316,10 @@ export class FocalPointPicker extends Component {
 				</MediaWrapper>
 				<Controls
 					percentages={ percentages }
-					onChange={ this.updateValue }
+					onChange={ ( value ) => {
+						this.updateValue( value );
+						this.props.onChange( value );
+					} }
 				/>
 			</BaseControl>
 		);
@@ -354,9 +328,6 @@ export class FocalPointPicker extends Component {
 
 FocalPointPicker.defaultProps = {
 	autoPlay: true,
-	onDragStart: noop,
-	onDragEnd: noop,
-	onChange: noop,
 	value: {
 		x: 0.5,
 		y: 0.5,
