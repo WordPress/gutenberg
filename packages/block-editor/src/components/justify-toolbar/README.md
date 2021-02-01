@@ -56,6 +56,7 @@ Whether to display toolbar options in the dropdown menu.
 
 #### `onChange`
 * **Type:** `Function`
+* **Required:** Yes
 
 A callback function invoked when the toolbar's justification value is changed via an interaction with any of the toolbar's buttons. Called with the new alignment value (ie: `left`, `center`, `right`, `space-between`, `undefined`) as the only argument.
 
