@@ -14,7 +14,9 @@ This is documentation for the current direction and work in progress about how t
     - Settings
     - Styles
 - FAQ
-  - Naming schema of CSS Custom Properties
+  - The naming schema of CSS Custom Properties
+  - How settings under "custom" create new CSS Custom Properties
+
 ## Rationale
 
 The Block Editor API has evolved at different velocities and there are some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
