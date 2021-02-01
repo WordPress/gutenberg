@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Clipboard, TouchableWithoutFeedback, Text } from 'react-native';
-import React from 'react';
 
 /**
  * WordPress dependencies
@@ -28,7 +27,7 @@ import {
 	ToolbarGroup,
 	PanelBody,
 	ToggleControl,
-	BottomSheet,
+	TextControl,
 	SelectControl,
 	Icon,
 } from '@wordpress/components';
@@ -264,12 +263,15 @@ export class FileEdit extends Component {
 		);
 
 		const isCopyUrlDisabled = isUploadFailed || isUploadInProgress;
-		const dimmedStyle = isCopyUrlDisabled && styles.disabledButton;
-		const finalButtonStyle = Object.assign(
-			{},
-			actionButtonStyle,
-			dimmedStyle
+
+		const dimmedActionButtonStyle = this.props.getStylesFromColorScheme(
+			styles.dimmedActionButton,
+			styles.dimmedActionButtonDark
 		);
+
+		const finalButtonStyle = isCopyUrlDisabled
+			? dimmedActionButtonStyle
+			: actionButtonStyle;
 
 		return (
 			<InspectorControls>
@@ -298,7 +300,7 @@ export class FileEdit extends Component {
 							onChange={ this.onChangeDownloadButtonVisibility }
 						/>
 					) }
-					<BottomSheet.Cell
+					<TextControl
 						disabled={ isCopyUrlDisabled }
 						label={
 							this.state.isUrlCopied
@@ -456,12 +458,13 @@ export class FileEdit extends Component {
 										openMediaOptions
 									) }
 								{ getMediaOptions() }
-								{ this.getInspectorControls(
-									attributes,
-									media,
-									isUploadInProgress,
-									isUploadFailed
-								) }
+								{ isSelected &&
+									this.getInspectorControls(
+										attributes,
+										media,
+										isUploadInProgress,
+										isUploadFailed
+									) }
 								<View style={ styles.container }>
 									<RichText
 										withoutInteractiveFormatting

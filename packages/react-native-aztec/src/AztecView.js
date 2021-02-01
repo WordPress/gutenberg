@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import ReactNative, {
 	requireNativeComponent,
 	UIManager,
@@ -12,11 +11,12 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
-class AztecView extends React.Component {
+class AztecView extends Component {
 	constructor() {
 		super( ...arguments );
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );

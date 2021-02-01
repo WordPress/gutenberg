@@ -9,7 +9,7 @@
 		"gutenberg",
 		"annotations"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/annotations/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/annotations/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

@@ -164,6 +164,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 	// https://github.com/docker-library/wordpress/issues/256
 	const cliUser = '33:33';
 
+	// If the user mounted their own uploads folder, we should not override it in the phpunit service.
+	const isMappingTestUploads = testsMounts.some( ( mount ) =>
+		mount.endsWith( ':/var/www/html/wp-content/uploads' )
+	);
+
 	return {
 		version: '3.7',
 		services: {
@@ -215,7 +220,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 				depends_on: [ 'tests-wordpress' ],
 				volumes: [
 					...testsMounts,
-					'phpunit-uploads:/var/www/html/wp-content/uploads',
+					...( ! isMappingTestUploads
+						? [ 'phpunit-uploads:/var/www/html/wp-content/uploads' ]
+						: [] ),
 				],
 				environment: {
 					LOCAL_DIR: 'html',

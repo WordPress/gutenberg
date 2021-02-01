@@ -40,6 +40,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Widgets_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Pattern_Directory_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-pattern-directory-controller.php';
+	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
 	}
@@ -105,6 +108,7 @@ require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/class-wp-theme-json.php';
 require __DIR__ . '/class-wp-theme-json-resolver.php';
 require __DIR__ . '/global-styles.php';
+require __DIR__ . '/query-utils.php';
 
 if ( ! class_exists( 'WP_Block_Supports' ) ) {
 	require_once __DIR__ . '/class-wp-block-supports.php';

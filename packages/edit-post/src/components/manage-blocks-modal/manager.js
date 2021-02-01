@@ -27,9 +27,9 @@ function BlockManager( {
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
 } ) {
-	// Filtering occurs here (as opposed to `withSelect`) to avoid wasted
-	// wasted renders by consequence of `Array#filter` producing a new
-	// value reference on each call.
+	// Filtering occurs here (as opposed to `withSelect`) to avoid
+	// wasted renders by consequence of `Array#filter` producing
+	// a new value reference on each call.
 	blockTypes = blockTypes.filter(
 		( blockType ) =>
 			hasBlockSupport( blockType, 'inserter', true ) &&

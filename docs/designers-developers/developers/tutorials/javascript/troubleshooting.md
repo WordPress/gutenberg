@@ -19,7 +19,7 @@ To open the JavaScript console, find the correct key combination for your broswe
 
 Your first step in debugging should be to check the JavaScript console for any errors. Here is an example, which shows a syntax error on line 6:
 
-![console error](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-console-log-error.png)
+![console error](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/js-tutorial-console-log-error.png)
 
 ### Display your message in console log
 
@@ -61,7 +61,7 @@ Add a test message to confirm your JavaScript is loading, add a `console.log("He
 
 The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the JavaScript tutorial example, if `myguten.js` script is enqueued without declaring the `wp-blocks` dependency, the console log will show:
 
-<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
 
 You can correct by checking your `wp_enqueue_script` function includes all packages listed that are used:
 

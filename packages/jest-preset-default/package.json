@@ -12,7 +12,7 @@
 		"react",
 		"enzyme"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/jest-preset-default/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-preset-default/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

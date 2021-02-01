@@ -10,7 +10,7 @@
 		"e2e",
 		"utils"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/e2e-test-utils/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-test-utils/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

@@ -10,7 +10,7 @@
 			"type": "object",
 			"default": {
 				"perPage": null,
-				"pages": 1,
+				"pages": 0,
 				"offset": 0,
 				"postType": "post",
 				"categoryIds": [],

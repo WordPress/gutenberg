@@ -10,7 +10,7 @@
 		"stylelint-config-wordpress",
 		"wordpress"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/stylelint-config/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/stylelint-config/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

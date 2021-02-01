@@ -63,8 +63,6 @@ import { cloneBlock } from '@wordpress/blocks';
  *                                change has been made in the block-editor blocks
  *                                for the given clientId. When this is called,
  *                                controlling sources do not become dirty.
- * @param {boolean} props.__unstableCloneValue Whether or not to clone each of
- *                                the blocks provided in the value prop.
  */
 export default function useBlockSync( {
 	clientId = null,
@@ -73,7 +71,6 @@ export default function useBlockSync( {
 	selectionEnd: controlledSelectionEnd,
 	onChange = noop,
 	onInput = noop,
-	__unstableCloneValue = true,
 } ) {
 	const registry = useRegistry();
 
@@ -101,12 +98,9 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			let storeBlocks = controlledBlocks;
-			if ( __unstableCloneValue ) {
-				storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlock( block )
-				);
-			}
+			const storeBlocks = controlledBlocks.map( ( block ) =>
+				cloneBlock( block )
+			);
 			if ( subscribed.current ) {
 				pendingChanges.current.incoming = storeBlocks;
 			}

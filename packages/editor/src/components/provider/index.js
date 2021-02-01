@@ -16,7 +16,6 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
-import ConvertToGroupButtons from '../convert-to-group-buttons';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 
@@ -120,7 +119,6 @@ function EditorProvider( {
 					>
 						{ children }
 						<ReusableBlocksMenuItems />
-						<ConvertToGroupButtons />
 					</BlockEditorProvider>
 				</BlockContextProvider>
 			</EntityProvider>

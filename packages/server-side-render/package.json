@@ -10,7 +10,7 @@
 		"server-side",
 		"render"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/server-side-render/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/server-side-render/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

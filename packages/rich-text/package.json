@@ -9,7 +9,7 @@
 		"gutenberg",
 		"rich-text"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/rich-text/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/rich-text/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

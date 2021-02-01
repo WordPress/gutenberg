@@ -9,7 +9,7 @@
 		"create block",
 		"block template"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/docs/designers-developers/developers/tutorials/create-block",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/docs/designers-developers/developers/tutorials/create-block",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

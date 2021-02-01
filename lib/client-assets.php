@@ -88,11 +88,11 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 * `WP_Dependencies::set_translations` will fall over on itself if setting
 	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
 	 * as a dependency of itself, exhausting memory. The same applies for the
-	 * polyfill script, which is a dependency _of_ `wp-i18n`.
+	 * polyfill and hooks scripts, which are dependencies _of_ `wp-i18n`.
 	 *
 	 * See: https://core.trac.wordpress.org/ticket/46089
 	 */
-	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
+	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
 	if ( 'wp-i18n' === $handle ) {
@@ -316,7 +316,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
+		array( 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
@@ -695,7 +695,7 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
 			$handles[] = $block_type->style;
 		}

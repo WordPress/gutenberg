@@ -10,7 +10,7 @@
 		"editor",
 		"post"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-post/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -52,6 +52,7 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
+		"react-merge-refs": "^1.0.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

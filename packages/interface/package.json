@@ -10,7 +10,7 @@
 		"interface",
 		"components"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/interface/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/interface/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -38,7 +38,8 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.19",
+		"react-merge-refs": "^1.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

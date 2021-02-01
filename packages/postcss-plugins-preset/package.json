@@ -12,7 +12,7 @@
 		"plugins",
 		"preset"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-plugins-preset/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/postcss-plugins-preset/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

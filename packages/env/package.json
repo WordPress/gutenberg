@@ -10,7 +10,7 @@
 		"environment",
 		"docker"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/env#readme",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",

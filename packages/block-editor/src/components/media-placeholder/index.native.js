@@ -12,6 +12,7 @@ import {
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_AUDIO,
 } from '@wordpress/block-editor';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -65,6 +66,7 @@ function MediaPlaceholder( props ) {
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 	const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+	const isAudio = isOneType && allowedTypes.includes( MEDIA_TYPE_AUDIO );
 
 	let placeholderTitle = labels.title;
 	if ( placeholderTitle === undefined ) {
@@ -73,6 +75,8 @@ function MediaPlaceholder( props ) {
 			placeholderTitle = __( 'Image' );
 		} else if ( isVideo ) {
 			placeholderTitle = __( 'Video' );
+		} else if ( isAudio ) {
+			placeholderTitle = __( 'Audio' );
 		}
 	}
 
@@ -82,6 +86,8 @@ function MediaPlaceholder( props ) {
 			instructions = __( 'ADD IMAGE' );
 		} else if ( isVideo ) {
 			instructions = __( 'ADD VIDEO' );
+		} else if ( isAudio ) {
+			instructions = __( 'ADD AUDIO' );
 		} else {
 			instructions = __( 'ADD IMAGE OR VIDEO' );
 		}
@@ -92,6 +98,8 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select an image' );
 	} else if ( isVideo ) {
 		accessibilityHint = __( 'Double tap to select a video' );
+	} else if ( isAudio ) {
+		accessibilityHint = __( 'Double tap to select an audio file' );
 	}
 
 	const emptyStateTitleStyle = getStylesFromColorScheme(

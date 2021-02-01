@@ -10,7 +10,7 @@
 		"webpack",
 		"dependency"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/dependency-extraction-webpack-plugin/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

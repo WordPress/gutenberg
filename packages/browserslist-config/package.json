@@ -10,7 +10,7 @@
 		"browserslist",
 		"browserslist-config"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/browserslist-config/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/browserslist-config/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

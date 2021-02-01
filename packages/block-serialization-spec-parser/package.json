@@ -11,7 +11,7 @@
 		"spec",
 		"parser"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-serialization-spec-parser/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-serialization-spec-parser/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

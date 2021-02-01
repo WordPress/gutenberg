@@ -14,7 +14,7 @@
 		"colors",
 		"themes"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-themes/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/postcss-themes/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

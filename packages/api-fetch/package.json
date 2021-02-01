@@ -10,7 +10,7 @@
 		"rest-api",
 		"fetch"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/api-fetch/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/api-fetch/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

@@ -1,6 +1,6 @@
 [
 	{
-		"title": "Project Overview",
+		"title": "Getting started",
 		"slug": "handbook",
 		"markdown_source": "../docs/readme.md",
 		"parent": null
@@ -966,6 +966,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Grid",
+		"slug": "grid",
+		"markdown_source": "../packages/components/src/grid/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
@@ -1218,6 +1224,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Next",
+		"slug": "next",
+		"markdown_source": "../packages/components/src/text/next/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Text",
 		"slug": "text",
 		"markdown_source": "../packages/components/src/text/README.md",
@@ -1278,9 +1290,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "Truncate",
+		"slug": "truncate",
+		"markdown_source": "../packages/components/src/truncate/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "UnitControl",
 		"slug": "unit-control",
 		"markdown_source": "../packages/components/src/unit-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "View",
+		"slug": "view",
+		"markdown_source": "../packages/components/src/view/README.md",
 		"parent": "components"
 	},
 	{

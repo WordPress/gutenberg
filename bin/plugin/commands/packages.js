@@ -210,7 +210,9 @@ async function updatePackages(
 				);
 
 				log(
-					`   - ${ packageName }: ${ version } -> ${ nextVersion }`
+					`   - ${ packageName }: ${ version } -> ${
+						isPrerelease ? nextVersion + '-next.0' : nextVersion
+					}`
 				);
 			}
 		)
@@ -272,23 +274,33 @@ async function publishPackagesToNpm(
 		cwd: gitWorkingDirectoryPath,
 	} );
 
-	log(
-		'>> Bumping version of public packages changed since the last release.'
-	);
-	const version = isPrerelease
-		? 'prerelease --preid next'
-		: minimumVersionBump;
-	await command( `npx lerna version ${ version } --no-private`, {
-		cwd: gitWorkingDirectoryPath,
-		stdio: 'inherit',
-	} );
+	if ( isPrerelease ) {
+		log( '>> Publishing modified packages to npm.' );
+		await command(
+			`npx lerna publish --canary ${ minimumVersionBump } --preid next`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
+	} else {
+		log(
+			'>> Bumping version of public packages changed since the last release.'
+		);
+		await command(
+			`npx lerna version ${ minimumVersionBump } --no-private`,
+			{
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			}
+		);
 
-	log( '>> Publishing packages to npm.' );
-	const distTag = isPrerelease ? ' --dist-tag next' : '';
-	await command( `npx lerna publish from-package${ distTag }`, {
-		cwd: gitWorkingDirectoryPath,
-		stdio: 'inherit',
-	} );
+		log( '>> Publishing modified packages to npm.' );
+		await command( `npx lerna publish from-package`, {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
+	}
 }
 
 /**
@@ -299,15 +311,14 @@ async function publishPackagesToNpm(
  * @return {Promise<Object>} Github release object.
  */
 async function prepareForPackageRelease( isPrerelease ) {
-	// This is a variable that contains the abort message shown when the script is aborted.
-	let abortMessage = 'Aborting!';
-	const temporaryFolders = [];
-	await askForConfirmation( 'Ready to go? ' );
+	await askForConfirmation( 'Ready to go?' );
 
 	// Cloning the Git repository.
+	const abortMessage = 'Aborting!';
 	const gitWorkingDirectoryPath = await runGitRepositoryCloneStep(
 		abortMessage
 	);
+	const temporaryFolders = [];
 	temporaryFolders.push( gitWorkingDirectoryPath );
 
 	// Checking out the WordPress release branch and doing sync with the last plugin release.
@@ -334,23 +345,19 @@ async function prepareForPackageRelease( isPrerelease ) {
 		abortMessage
 	);
 
-	abortMessage = `Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`;
 	await runPushGitChangesStep(
 		gitWorkingDirectoryPath,
 		releaseBranch,
-		abortMessage
+		`Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`
 	);
 
-	abortMessage = `Aborting! Make sure to finish publishing to npm manually.`;
 	await publishPackagesToNpm(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
-		isPrerelease,
-		abortMessage
+		isPrerelease
 	);
 
-	abortMessage = 'Aborting! The publishing is finished though.';
-	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
+	await runCleanLocalFoldersStep( temporaryFolders, 'Cleaning failed.' );
 }
 
 /**
