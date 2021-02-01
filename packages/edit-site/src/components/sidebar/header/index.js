@@ -14,7 +14,7 @@ import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 
 const SettingsHeader = ( { sidebarName } ) => {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const openDocumentSettings = () =>
+	const openTemplateSettings = () =>
 		enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 	const openBlockSettings = () =>
 		enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
@@ -38,7 +38,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 		<ul>
 			<li>
 				<Button
-					onClick={ openDocumentSettings }
+					onClick={ openTemplateSettings }
 					className={ `edit-site-sidebar__panel-tab ${ templateActiveClass }` }
 					aria-label={ templateAriaLabel }
 					// translators: Data label for the Template Settings Sidebar tab.
