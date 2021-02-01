@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -19,13 +19,12 @@ const SettingsHeader = ( { sidebarName } ) => {
 	const openBlockSettings = () =>
 		enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 
-	const templateLabel = __( 'Template' );
-
-	const [ documentAriaLabel, documentActiveClass ] =
+	const [ templateAriaLabel, templateActiveClass ] =
 		sidebarName === SIDEBAR_TEMPLATE
-			? // translators: ARIA label for the Template sidebar tab, selected. %s: Template label.
-			  [ sprintf( __( '%s (selected)' ), templateLabel ), 'is-active' ]
-			: [ templateLabel, '' ];
+			? // translators: ARIA label for the Template sidebar tab, selected.
+			  [ __( 'Template (selected)' ), 'is-active' ]
+			: // translators: ARIA label for the Template Settings Sidebar tab, not selected.
+			  [ __( 'Template' ), '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] =
 		sidebarName === SIDEBAR_BLOCK
@@ -40,11 +39,15 @@ const SettingsHeader = ( { sidebarName } ) => {
 			<li>
 				<Button
 					onClick={ openDocumentSettings }
-					className={ `edit-site-sidebar__panel-tab ${ documentActiveClass }` }
-					aria-label={ documentAriaLabel }
-					data-label={ templateLabel }
+					className={ `edit-site-sidebar__panel-tab ${ templateActiveClass }` }
+					aria-label={ templateAriaLabel }
+					// translators: Data label for the Template Settings Sidebar tab.
+					data-label={ __( 'Template' ) }
 				>
-					{ templateLabel }
+					{
+						// translators: Text label for the Template Settings Sidebar tab.
+						__( 'Template' )
+					}
 				</Button>
 			</li>
 			<li>
