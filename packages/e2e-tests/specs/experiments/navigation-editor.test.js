@@ -204,7 +204,13 @@ describe( 'Navigation editor', () => {
 		);
 		await addAllPagesButton.click();
 
+		await page.waitForXPath( '//a[contains(., "Sample Page")]' );
+
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
+
+		const allPageItems = await page.$$( '.page_item' );
+
+		expect( allPageItems.length ).toBe( 1 );
 	} );
 
 	it( 'displays the first menu from the REST response when at least one menu exists', async () => {
