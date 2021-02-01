@@ -96,6 +96,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'is_custom'   => false,
 				'type'        => 'wp_template_part',
 				'wp_id'       => null,
+				// TODO - update null to 'header' once tt1-blocks theme.json updated for template part section info.
 				'section'     => null,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
@@ -148,6 +149,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'is_custom'   => false,
 				'type'        => 'wp_template_part',
 				'wp_id'       => null,
+				// TODO - update null to 'header' once tt1-blocks theme.json updated for template part section info.
 				'section'     => null,
 			),
 			$data
