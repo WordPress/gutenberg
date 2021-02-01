@@ -1,6 +1,6 @@
 .edit-navigation-editor {
 	background: $white;
-	border: 1px solid $gray-300;
+	border: 1px solid #1e1e1e;
 	border-radius: 2px;
 	margin: 12px 0 0 0;
 
@@ -14,7 +14,7 @@
 	// and Link blocks to work better in the context of the Navigation Screen.
 	.block-editor-block-list__block {
 		margin: 0;
-		padding: 18px;
+		padding: 12px;
 		font-size: 15px;
 	}
 
@@ -24,7 +24,7 @@
 	}
 
 	.wp-block-navigation-link {
-		padding: 9px 12px;
+		padding: 12px;
 		border-radius: 2px;
 
 		&:hover {
@@ -39,5 +39,15 @@
 		&.block-editor-block-list__block:not([contenteditable]):focus::after {
 			display: none;
 		}
+	}
+
+	.wp-block-navigation-link__content {
+		padding: 0;
+	}
+
+	.block-list-appender {
+		// These numbers make no sense, but look right. I think the block-list-appender
+		// has a bunch of errant styles competing for attention.
+		margin: 6px 0 9px 3px;
 	}
 }
