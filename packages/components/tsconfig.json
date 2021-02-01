@@ -14,7 +14,6 @@
 	"include": [
 		"src/animate/**/*",
 		"src/base-control/**/*",
-		"src/control-label/**/*",
 		"src/dashicon/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
