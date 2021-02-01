@@ -160,3 +160,14 @@ export function isNavigationOpened( state ) {
 export function isInserterOpened( state ) {
 	return state.blockInserterPanel;
 }
+
+/**
+ * Returns the current opened/closed state of the block navigation panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the block navigation panel should be open; false if closed.
+ */
+export function isBlockNavigationOpened( state ) {
+	return state.blockNavigationPanel;
+}
