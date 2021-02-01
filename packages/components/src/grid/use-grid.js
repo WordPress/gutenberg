@@ -34,8 +34,10 @@ export function useGrid( props ) {
 		...otherProps
 	} = useContextSystem( props, 'Grid' );
 
-	const column = useResponsiveValue( columns );
-	const row = useResponsiveValue( rows );
+	const columnsAsArray = Array.isArray( columns ) ? columns : [ columns ];
+	const column = useResponsiveValue( columnsAsArray );
+	const rowsAsArray = Array.isArray( rows ) ? rows : [ rows ];
+	const row = useResponsiveValue( rowsAsArray );
 
 	const gridTemplateColumns =
 		templateColumns || ( !! columns && `repeat(${ column }, 1fr)` );
@@ -49,12 +51,12 @@ export function useGrid( props ) {
 			alignItems: align,
 			display: isInline ? 'inline-grid' : 'grid',
 			gap,
-			gridTemplateColumns,
-			gridTemplateRows,
+			gridTemplateColumns: gridTemplateColumns || undefined,
+			gridTemplateRows: gridTemplateRows || undefined,
 			gridRowGap: rowGap,
 			gridColumnGap: columnGap,
 			justifyContent: justify,
-			verticalAlign: isInline ? 'middle' : null,
+			verticalAlign: isInline ? 'middle' : undefined,
 			...alignmentProps,
 		} );
 
