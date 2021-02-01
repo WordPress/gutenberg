@@ -2,6 +2,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: flex-start;
+	align-items: center;
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>
@@ -90,7 +91,8 @@
 	@include reduce-motion("transition");
 
 	// Dimensions.
-	height: auto;
+	// Height value has to be fit-content otherwise the social icons will be oblong instead of circle when selecting Small or Normal Size in the Block Editor.
+	height: fit-content;
 
 	a {
 		display: block;

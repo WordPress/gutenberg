@@ -11,8 +11,10 @@
 	transform: none;
 }
 
+// Align social links vertically to Page-Links text when using vertical Navigation block.
 .editor-styles-wrapper .wp-block-social-links {
 	padding: 0;
+	padding-left: 0.5em;
 }
 
 // Placeholder/setup state.
