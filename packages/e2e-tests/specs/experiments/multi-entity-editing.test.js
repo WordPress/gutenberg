@@ -144,7 +144,7 @@ describe( 'Multi-entity editor states', () => {
 		// Wait for blocks to load.
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
+		expect( await isEntityDirty( 'index' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
 		await clickTemplateItem( 'Templates', 'Index' );
@@ -155,7 +155,7 @@ describe( 'Multi-entity editor states', () => {
 		);
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
+		expect( await isEntityDirty( 'index' ) ).toBe( false );
 
 		removeErrorMocks();
 	} );
