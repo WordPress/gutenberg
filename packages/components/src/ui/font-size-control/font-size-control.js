@@ -1,13 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * External dependencies
  */
 import { contextConnect } from '@wp-g2/context';
-import { View, VisuallyHidden, VStack } from '@wp-g2/components';
+import { VisuallyHidden, VStack } from '@wp-g2/components';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,6 +15,7 @@ import { View, VisuallyHidden, VStack } from '@wp-g2/components';
 import FontSizeControlSelect from './select';
 import FontSizeControlSlider from './slider';
 import useFontSizeControl from './use-font-size-control';
+import { View } from '../view';
 
 function FontSizeControl( props, forwardedRef ) {
 	const {

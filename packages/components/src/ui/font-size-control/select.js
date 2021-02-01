@@ -1,26 +1,26 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * External dependencies
  */
 import { noop } from 'lodash';
 import { contextConnect, useContextSystem } from '@wp-g2/context';
 import {
-	Grid,
 	TextInput,
 	SelectDropdown,
 	FormGroup,
 	Button,
-	View,
 } from '@wp-g2/components';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { getSelectTemplateColumns } from './utils';
+import { Grid } from '../grid';
+import { View } from '../view';
 
 function renderItem( { name, style } ) {
 	return <span style={ style }>{ name }</span>;
