@@ -1,16 +1,22 @@
 /**
+ * External dependencies
+ */
+import { number } from '@storybook/addon-knobs';
+
+/**
  * Internal dependencies
  */
 import Truncate from '../truncate';
 
 export default {
 	component: Truncate,
-	title: 'Components/Experimental/Truncate',
+	title: 'G2 Components (Experimental)/Truncate',
 };
 
 export const _default = () => {
+	const numberOfLines = number( 'numberOfLines', 2 );
 	return (
-		<Truncate numberOfLines={ 2 }>
+		<Truncate numberOfLines={ numberOfLines }>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
 			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
 			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.

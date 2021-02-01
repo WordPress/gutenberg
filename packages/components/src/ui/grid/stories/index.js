@@ -11,7 +11,7 @@ import Grid from '../grid';
 
 export default {
 	component: Grid,
-	title: 'Components/Experimental/Grid',
+	title: 'G2 Components (Experimental)/Grid',
 };
 
 const Item = ( props ) => (
