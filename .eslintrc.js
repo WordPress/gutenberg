@@ -54,6 +54,8 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'import/default': 'error',
+		'import/named': 'error',
 		'no-restricted-imports': [
 			'error',
 			{
@@ -152,6 +154,7 @@ module.exports = {
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
+				'import/named': 'off',
 			},
 		},
 		{

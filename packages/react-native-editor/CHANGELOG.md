@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 * [**] Add support for setting heading anchors
+* [**] Disable Unsupported Block Editor for Reusable blocks
 
 
 #### Bug Fix

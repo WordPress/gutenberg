@@ -52,4 +52,4 @@ class TokenFieldWrapper extends Component {
 	}
 }
 
-module.exports = TokenFieldWrapper;
+export default TokenFieldWrapper;
