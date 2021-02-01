@@ -4,6 +4,7 @@
 import { View, Easing } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+
 /**
  * WordPress dependencies
  */
