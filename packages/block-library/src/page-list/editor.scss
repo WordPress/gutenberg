@@ -4,16 +4,19 @@
 	.wp-block-page-list {
 		background-color: inherit;
 	}
-	// Make links unclickable in the editor
-	.page_item a {
-		pointer-events: none;
-	}
 	// Make the dropdown background white if there's no background color set.
 	&:not(.has-background) {
 		.children {
 			color: $gray-900;
 			background-color: $white;
 		}
+	}
+}
+
+.wp-block-page-list {
+	// Make links unclickable in the editor
+	.page_item a {
+		pointer-events: none;
 	}
 }
 

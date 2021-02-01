@@ -118,8 +118,6 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] );
 	$css_classes     = trim( implode( ' ', $classes ) );
 
-	$css_classes .= ' wp-block-page-list';
-
 	if ( $block->context && $block->context['showSubmenuIcon'] ) {
 		$css_classes .= ' show-submenu-icons';
 	}
