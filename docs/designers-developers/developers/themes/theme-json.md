@@ -13,7 +13,8 @@ This is documentation for the current direction and work in progress about how t
 - Specification
     - Settings
     - Styles
-
+- FAQ
+  - Naming schema of CSS Custom Properties
 ## Rationale
 
 The Block Editor API has evolved at different velocities and there are some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
@@ -91,8 +92,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
       "custom": {
         "line-height": {
           "body": 1.7,
-          "heading": 1.3,
-          "page-title": 1.1
+          "heading": 1.3
         },
       },
     },
@@ -104,7 +104,6 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 :root {
   --wp--custom--line-height--body: 1.7;
   --wp--custom--line-height--heading: 1.3;
-  --wp--custom--line-height--page-title: 1.1;
 }
 ```
 {% end %}
@@ -470,3 +469,27 @@ These are the current typography properties supported by blocks:
 | Verse | Yes | Yes | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
+
+## Frequently Asked Questions
+
+### The naming schema of CSS Custom Properties
+
+One thing you may have noticed is the naming schema used for the CSS Custom Properties the system creates, including the use of double hyphen, `--`, to separate the different "concepts". Take the following examples.
+
+**Presets** such as `--wp--preset--color--black` can be divided into the following chunks:
+
+- `--wp`: prefix to namespace the CSS variable.
+- `preset `: indicates is a CSS variable that belongs to the presets.
+- `color`: indicates which preset category the variable belongs to. It can be `color`, `font-size`, `gradients`.
+- `black`: the `slug` of the particular preset value.
+
+**Custom** properties such as `--wp--custom--line-height--body`, which can be divided into the following chunks:
+
+- `--wp`: prefix to namespace the CSS variable.
+- `custom`: indicates is a "free-form" CSS variable created by the theme.
+- `line-height--body`: the result of converting the "custom" object keys into a string.
+
+The `--` as a separator has two functions:
+
+- Readibility, for human understanding.
+- Be able to parse back a variable name such as `--wp--preset--color--black` into its semantic parts. This way, machines can know that this is a value bounded to the color preset with the slug "black".
