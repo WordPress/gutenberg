@@ -11,9 +11,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { navigationMenu, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -25,17 +24,6 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
-
-const MenuIcon = (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-		width="24"
-		height="24"
-	>
-		<Path d="M13.8 5.2H3v1.5h10.8V5.2zm-3.6 12v1.5H21v-1.5H10.2zm7.2-6H6.6v1.5h10.8v-1.5z" />
-	</SVG>
-);
 
 export default function Header( { openEntitiesSavedStates } ) {
 	const inserterButton = useRef();
@@ -129,7 +117,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 										! isBlockNavigationOpen
 									)
 								}
-								icon={ MenuIcon }
+								icon={ navigationMenu }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'Outline' ) }
 							/>
