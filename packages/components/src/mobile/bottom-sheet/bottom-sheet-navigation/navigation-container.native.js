@@ -4,7 +4,6 @@
 import { View, Easing } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 /**
  * WordPress dependencies
  */
@@ -80,7 +79,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 	};
 
 	const setHeight = useCallback(
-		( height, layout ) => {
+		( height ) => {
 			// The screen is fullHeight or changing from fullScreen to the default mode
 			if (
 				( typeof currentHeight === 'string' &&
@@ -93,8 +92,8 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				return;
 			}
 
-			if ( currentHeight !== height && height > 1 ) {
-				if ( animate && layout && currentHeight === 1 ) {
+			if ( height > 1 ) {
+				if ( currentHeight === 1 ) {
 					setCurrentHeight( height );
 				} else if ( animate ) {
 					performLayoutAnimation( ANIMATION_DURATION );
