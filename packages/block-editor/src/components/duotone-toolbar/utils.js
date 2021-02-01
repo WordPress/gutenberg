@@ -73,28 +73,33 @@ export function rgb2hex( color = {} ) {
  * Generate a duotone gradient from a list of colors.
  *
  * @param {string[]} colors CSS color strings.
+ * @param {string}   angle  CSS gradient angle.
  *
  * @return {string} CSS gradient string for the duotone swatch.
  */
-export function getGradientFromCSSColors( colors = [] ) {
+export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
 	const l = 100 / colors.length;
 
 	const stops = colors
 		.map( ( c, i ) => `${ c } ${ i * l }%, ${ c } ${ ( i + 1 ) * l }%` )
 		.join( ', ' );
 
-	return `linear-gradient( 135deg, ${ stops } )`;
+	return `linear-gradient( ${ angle }, ${ stops } )`;
 }
 
 /**
  * Create a CSS gradient for duotone swatches.
  *
  * @param {RGBValues} values R, G, and B values.
+ * @param {string}   angle  CSS gradient angle.
  *
  * @return {string} CSS gradient string for the duotone swatch.
  */
-export function getGradientFromValues( values = { r: [], g: [], b: [] } ) {
-	return getGradientFromCSSColors( getHexColorsFromValues( values ) );
+export function getGradientFromValues(
+	values = { r: [], g: [], b: [] },
+	angle
+) {
+	return getGradientFromCSSColors( getHexColorsFromValues( values ), angle );
 }
 
 /**

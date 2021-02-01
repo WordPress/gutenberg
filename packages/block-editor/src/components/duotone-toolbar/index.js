@@ -39,7 +39,10 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 					icon={
 						value ? (
 							<Swatch
-								fill={ getGradientFromValues( value.values ) }
+								fill={ getGradientFromValues(
+									value.values,
+									'135deg'
+								) }
 							/>
 						) : (
 							noFilter

@@ -30,7 +30,10 @@ function DuotonePickerPopover( {
 				options={ duotonePalette.map( ( option ) => {
 					const isSelected = option.slug === value?.slug;
 					const style = {
-						background: getGradientFromCSSColors( option.colors ),
+						background: getGradientFromCSSColors(
+							option.colors,
+							'135deg'
+						),
 						color: 'transparent',
 					};
 					const code = sprintf(
