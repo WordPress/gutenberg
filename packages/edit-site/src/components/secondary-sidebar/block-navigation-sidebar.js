@@ -1,29 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import { __experimentalBlockNavigationTree as BlockNavigationTree } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
 
 export default function BlockNavigationSidebar() {
+	const { rootBlocks, selectedBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, __unstableGetBlockTree } = select(
+			'core/block-editor'
+		);
+		return {
+			rootBlocks: __unstableGetBlockTree(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	} );
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { setIsBlockNavigationOpened } = useDispatch( 'core/edit-site' );
 
-	const isMobile = useViewportMatch( 'medium', '<' );
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsBlockNavigationOpened( false ),
-	} );
-
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="edit-site-editor__block-navigation-panel"
-		>
+		<div className="edit-site-editor__block-navigation-panel">
 			<div className="edit-site-editor__block-navigation-panel-header">
 				<Button
 					icon={ close }
@@ -31,13 +28,11 @@ export default function BlockNavigationSidebar() {
 				/>
 			</div>
 			<div className="edit-site-editor__block-navigation-panel-content">
-				<Library
-					showInserterHelpPanel
-					onSelect={ () => {
-						if ( isMobile ) {
-							setIsBlockNavigationOpened( false );
-						}
-					} }
+				<BlockNavigationTree
+					blocks={ rootBlocks }
+					selectBlock={ selectBlock }
+					selectedBlockClientId={ selectedBlockClientId }
+					showNestedBlocks
 				/>
 			</div>
 		</div>
