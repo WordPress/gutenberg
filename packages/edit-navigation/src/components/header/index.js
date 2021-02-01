@@ -20,7 +20,6 @@ import {
  * Internal dependencies
  */
 import SaveButton from './save-button';
-import BlockInspectorDropdown from './block-inspector-dropdown';
 import ManageLocations from './manage-locations';
 import AddMenuForm from './add-menu-form';
 
@@ -122,7 +121,6 @@ export default function Header( {
 
 				<SaveButton navigationPost={ navigationPost } />
 
-				<BlockInspectorDropdown />
 				<Popover.Slot name="block-toolbar" />
 			</div>
 		</div>
