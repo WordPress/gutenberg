@@ -81,7 +81,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	);
 
 	// Account for the cases where the block toolbar is rendered within the
-	// header are and not contextually to the block.
+	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
