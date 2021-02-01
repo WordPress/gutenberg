@@ -53,11 +53,11 @@ describe( 'Template Part', () => {
 				'.edit-site-save-button__button:not(.is-busy)'
 			);
 
-			// Switch back to the front page template.
+			// Switch back to the Index template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 		}
 
