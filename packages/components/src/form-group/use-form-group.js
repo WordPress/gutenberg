@@ -14,17 +14,15 @@ import { cx } from '@wp-g2/styles';
  */
 import * as styles from './form-group-styles';
 
+/** @typedef {Pick<import('./form-group-content').Props, 'help' | 'horizontal' | 'labelHidden' | 'label' | 'truncate'>} FormGroupContentProps */
+
 /**
  * @typedef OwnProps
- * @property {Pick<import('../text/next/types').Props, 'align'>} [alignLabel='left'] Adjusts the block alignment of children.
- * @property {boolean} [horizontal=true] Displays the label and form field horizontally.
- * @property {string} [label] Label of the form field.
- * @property {string} [help] Displays help content.
- * @property {boolean} [labelHidden=false] Visually hides the label.
- * @property {boolean} [truncate=false] Truncates the label text content.
+ * @property {Pick<import('./form-group-content').Props, 'align'>} [alignLabel='left'] Adjusts the block alignment of children.
+ * @property {import('react').ReactNode} [children] Displays the content for `FormGroup`.
  */
 
-/** @typedef {import('../grid/types').Props & OwnProps} Props */
+/** @typedef {import('../grid/types').Props & FormGroupContentProps & OwnProps} Props */
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'div'>} props

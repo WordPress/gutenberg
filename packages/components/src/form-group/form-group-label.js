@@ -9,6 +9,17 @@ import { memo } from '@wordpress/element';
 import ControlLabel from '../control-label';
 import VisuallyHidden from '../visually-hidden';
 
+/**
+ * @typedef OwnProps
+ * @property {boolean} [labelHidden] Visually renders the label.
+ * @property {string} [id] The id of the FormGroup.
+ */
+
+/** @typedef {import('../control-label/use-control-label').Props & OwnProps} Props */
+
+/**
+ * @param {Props} props
+ */
 function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
 	if ( ! children ) return null;
 
