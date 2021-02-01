@@ -4,7 +4,7 @@
 import tinycolor from 'tinycolor2';
 
 /**
- * Object representation for a color
+ * Object representation for a color.
  *
  * @typedef {Object} RGBColor
  * @property {number} r Red component of the color in the range [0,1].
@@ -13,6 +13,8 @@ import tinycolor from 'tinycolor2';
  */
 
 /**
+ * Arrays of values in convenient format for SVG feComponentTransfer.
+ *
  * @typedef {Object} RGBValues
  * @property {number[]} r Array of red components of the colors in the range [0,1].
  * @property {number[]} g Array of green components of the colors in the range [0,1].
