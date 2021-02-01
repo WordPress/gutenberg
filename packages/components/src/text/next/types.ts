@@ -1,4 +1,4 @@
-import type { Props as TruncateProps } from '../../truncate/use-truncate';
+import type { Props as TruncateProps } from '../../ui/truncate/use-truncate';
 import type { CSSProperties, ReactNode } from 'react';
 
 type TextAdjustLineHeightForInnerControls =

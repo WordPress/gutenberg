@@ -6,12 +6,12 @@ import { number } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import View from '../../view';
-import Grid from '../index';
+import { View } from '../../view';
+import Grid from '../grid';
 
 export default {
 	component: Grid,
-	title: 'Components/Grid',
+	title: 'Components/Experimental/Grid',
 };
 
 const Item = ( props ) => (

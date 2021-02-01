@@ -12,12 +12,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getAlignmentProps } from './grid-utils';
+import { getAlignmentProps } from './utils';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
  */
-export function useGrid( props ) {
+export default function useGrid( props ) {
 	const {
 		align,
 		alignment,

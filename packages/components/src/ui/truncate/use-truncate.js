@@ -30,7 +30,7 @@ import {
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'span'>} props
  */
-export function useTruncate( props ) {
+export default function useTruncate( props ) {
 	const {
 		className,
 		children,

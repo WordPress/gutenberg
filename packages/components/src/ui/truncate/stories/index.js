@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import Truncate from '../index';
+import Truncate from '../truncate';
 
 export default {
 	component: Truncate,
-	title: 'Components/Truncate',
+	title: 'Components/Experimental/Truncate',
 };
 
 export const _default = () => {

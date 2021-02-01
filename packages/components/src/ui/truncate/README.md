@@ -1,11 +1,11 @@
-# Truncate
+# Truncate (Experimental)
 
 `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
 
 ## Usage
 
 ```jsx live
-import { Truncate } from '@wp-g2/components';
+import { Truncate } from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -55,7 +55,7 @@ import { Truncate } from '@wp-g2/components';
 
 function Example() {
 	return (
-		<Truncate numberOfLines={2}>
+		<Truncate numberOfLines={ 2 }>
 			Where the north wind meets the sea, there's a river full of memory.
 			Sleep, my darling, safe and sound, for in this river all is found.
 			In her waters, deep and true, lay the answers and a path for you.

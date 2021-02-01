@@ -966,12 +966,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Grid",
-		"slug": "grid",
-		"markdown_source": "../packages/components/src/grid/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
@@ -1071,12 +1065,6 @@
 		"title": "MenuItemsChoice",
 		"slug": "menu-items-choice",
 		"markdown_source": "../packages/components/src/menu-items-choice/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "BottomSheetNavigation",
-		"slug": "bottom-sheet-navigation",
-		"markdown_source": "../packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/README.md",
 		"parent": "components"
 	},
 	{
@@ -1290,21 +1278,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Truncate",
-		"slug": "truncate",
-		"markdown_source": "../packages/components/src/truncate/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "UnitControl",
 		"slug": "unit-control",
 		"markdown_source": "../packages/components/src/unit-control/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "View",
-		"slug": "view",
-		"markdown_source": "../packages/components/src/view/README.md",
 		"parent": "components"
 	},
 	{

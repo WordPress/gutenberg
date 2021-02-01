@@ -1,4 +1,4 @@
-# View
+# View (Experimental)
 
 `View` is a core component that renders everything in the library. It is the principle component in the entire library. Note that `View` is not exported from components, it's fully internal.
 
@@ -7,7 +7,7 @@
 ## Usage
 
 ```jsx live
-import { Text, View } from '@wp-g2/components';
+import { Text, View } from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -47,13 +47,13 @@ import { ui } from '@wp-g2/styles';
 function Example() {
 	return (
 		<View
-			css={[
-				ui.padding(5),
+			css={ [
+				ui.padding( 5 ),
 				ui.background.blue,
-				ui.hover(ui.background.red, ui.scale(1.02)),
-				ui.active(ui.background.yellow, ui.scale(0.8)),
+				ui.hover( ui.background.red, ui.scale( 1.02 ) ),
+				ui.active( ui.background.yellow, ui.scale( 0.8 ) ),
 				ui.animation.bounce,
-			]}
+			] }
 		>
 			<Text>Into The Unknown</Text>
 		</View>
