@@ -11,13 +11,16 @@
  */
 class Block_Templates_Test extends WP_UnitTestCase {
 	private static $post;
+	private static $template_part_post;
 
 	public static function wpSetUpBeforeClass() {
 		switch_theme( 'tt1-blocks' );
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_theme_taxonomy();
+		gutenberg_register_template_part_section_taxonomy();
 
+		// Set up template post.
 		$args       = array(
 			'post_type'    => 'wp_template',
 			'post_name'    => 'my_template',
@@ -32,6 +35,26 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		);
 		self::$post = self::factory()->post->create_and_get( $args );
 		wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
+
+		// Set up template part post.
+		$template_part_args = array(
+			'post_type'    => 'wp_template_part',
+			'post_name'    => 'my_template_part',
+			'post_title'   => 'My Template Part',
+			'post_content' => 'Content',
+			'post_excerpt' => 'Description of my template part',
+			'tax_input'    => array(
+				'wp_theme' => array(
+					get_stylesheet(),
+				),
+				'section' => array(
+					'header'
+				)
+			),
+		);
+		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
+		wp_set_post_terms( self::$template_part_post->ID, 'header', 'section' );
+		wp_set_post_terms( self::$template_part_post->ID, get_stylesheet(), 'wp_theme' );
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -55,6 +78,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'Single', $template->title );
 		$this->assertEquals( 'Used when a single entry that is not a Page is queried', $template->description );
 		$this->assertEquals( 'wp_template', $template->type );
+
+		// Test template part.
 	}
 
 	function test_gutenberg_build_template_result_from_post() {
@@ -72,6 +97,22 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'My Template', $template->title );
 		$this->assertEquals( 'Description of my template', $template->description );
 		$this->assertEquals( 'wp_template', $template->type );
+
+		// Test template part.
+		$template_part = _gutenberg_build_template_result_from_post(
+			self::$template_part_post,
+			'wp_template_part'
+		);
+		$this->assertNotWPError( $template_part );
+		$this->assertEquals( get_stylesheet() . '//my_template_part', $template_part->id );
+		$this->assertEquals( get_stylesheet(), $template_part->theme );
+		$this->assertEquals( 'my_template_part', $template_part->slug );
+		$this->assertEquals( 'publish', $template_part->status );
+		$this->assertEquals( true, $template_part->is_custom );
+		$this->assertEquals( 'My Template Part', $template_part->title );
+		$this->assertEquals( 'Description of my template part', $template_part->description );
+		$this->assertEquals( 'wp_template_part', $template_part->type );
+		$this->assertEquals( 'header', $template_part->section );
 	}
 
 	function test_inject_theme_attribute_in_content() {
