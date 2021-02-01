@@ -45,6 +45,7 @@ function gutenberg_get_common_block_editor_settings() {
 		'disableCustomGradients'                => get_theme_support( 'disable-custom-gradients' ),
 		'enableCustomLineHeight'                => get_theme_support( 'custom-line-height' ),
 		'enableCustomUnits'                     => get_theme_support( 'custom-units' ),
+		'enableCustomSpacing'                   => get_theme_support( 'custom-spacing' ),
 		'imageSizes'                            => $available_image_sizes,
 		'isRTL'                                 => is_rtl(),
 		'maxUploadFileSize'                     => $max_upload_size,

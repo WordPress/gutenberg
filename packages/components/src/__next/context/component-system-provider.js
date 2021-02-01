@@ -1,8 +1,14 @@
 /**
  * External dependencies
  */
-import { ContextSystemProvider } from '@wp-g2/components';
+import { ContextSystemProvider } from '@wp-g2/context';
 
+/**
+ * @param {Object} props
+ * @param {string[]} [props.__unstableNextInclude]
+ * @param {import('react').ReactNode} props.children
+ * @param {any} props.value
+ */
 export function ComponentSystemProvider( {
 	__unstableNextInclude = [],
 	children,
