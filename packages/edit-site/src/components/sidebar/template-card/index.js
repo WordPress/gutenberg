@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
-import { page } from '@wordpress/icons';
+import { layout } from '@wordpress/icons';
 
 export default function TemplateCard() {
 	const { title, description } = useSelect( ( select ) => {
@@ -25,7 +25,7 @@ export default function TemplateCard() {
 
 	return (
 		<div className="edit-site-template-card">
-			<Icon icon={ page } />
+			<Icon className="edit-site-template-card__icon" icon={ layout } />
 			<div className="edit-site-template-card__content">
 				<h2 className="edit-site-template-card__title">{ title }</h2>
 				<span className="edit-site-template-card__description">

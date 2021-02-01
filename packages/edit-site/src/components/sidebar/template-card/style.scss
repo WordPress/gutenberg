@@ -3,14 +3,6 @@
 	align-items: flex-start;
 }
 
-.edit-site-template-card__icon {
-	border: $border-width solid $gray-300;
-	padding: 7px;
-	margin-right: 10px;
-	height: 36px;
-	width: 36px;
-}
-
 .edit-site-template-card__content {
 	flex-grow: 1;
 }
@@ -26,7 +18,7 @@
 	font-size: $default-font-size;
 }
 
-.edit-site-template-card svg {
+.edit-site-template-card__icon {
 	margin-left: -2px;
 	margin-right: 10px;
 	padding: 0 3px;
