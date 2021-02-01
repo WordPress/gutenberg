@@ -41,7 +41,74 @@ Some of the advantages are:
 
 ### CSS Custom Properties
 
-Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) become CSS Custom Properties, and will be enqueued by the system for themes to use in both the front-end and the editors. There's also a mechanism to create your own CSS Custom Properties.
+There are some areas of styling that would benefit from having shared values that can change across a site instantly.
+
+To address this need, we've started to experiment with CSS Custom Properties, aka CSS Variables, in some places:
+
+- **Presets**: [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
+
+{% codetabs %}
+{% Input: theme.json %}
+```json
+{
+  "settings": {
+    "defaults": {
+      "color": {
+        "palette": [
+          {
+            "name": "Black",
+            "slug": "black",
+            "color": "#000000"
+          },
+          {
+            "name": "White",
+            "slug": "white",
+            "color": "#ffffff"
+          }
+        ],
+      },
+    },
+  },
+}
+```
+{% Output: CSS %}
+```css
+:root {
+  --wp--preset--color--black: #000000;
+  --wp--preset--color--white: #ffffff;
+}
+```
+{% end %}
+
+- **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
+
+{% codetabs %}
+{% Input: theme.json %}
+```json
+{
+  "settings": {
+    "defaults": {
+      "custom": {
+        "line-height": {
+          "body": 1.7,
+          "heading": 1.3,
+          "page-title": 1.1
+        },
+      },
+    },
+  },
+}
+```
+{% Output: CSS %}
+```css
+:root {
+  --wp--custom--line-height--body: 1.7;
+  --wp--custom--line-height--heading: 1.3;
+  --wp--custom--line-height--page-title: 1.1;
+}
+```
+{% end %}
+
 ## Specification
 
 This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
