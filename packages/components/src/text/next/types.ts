@@ -1,5 +1,5 @@
 import type { Props as TruncateProps } from '../../truncate/use-truncate';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 type TextAdjustLineHeightForInnerControls =
 	| boolean
@@ -20,7 +20,36 @@ type TextVariant = 'muted';
 
 type TextWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
-export type Props = TruncateProps & {
+type Highlighted = {
+		/**
+	 * Letters or words within `Text` can be highlighted using `highlightWords`.
+	 *
+	 * @example
+	 * ```jsx
+	 * import { Text } from `@wp-g2/components`
+	 *
+	 * function Example() {
+	 *   return (
+	 *     <Text highlightWords={["the"]}>
+	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+	 *       my darling, safe and sound, for in this river all is found. In her waters,
+	 *       deep and true, lay the answers and a path for you. Dive down deep into her
+	 *       sound, but not too far or you'll be drowned
+	 *     </Text>
+	 *   )
+	 * }
+	 * ```
+	 */
+	highlightWords?: string[];
+	children: string;
+}
+
+type Unhighlighted = {
+	highlightWords?: undefined;
+	children: ReactNode;
+}
+
+export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
 	/**
 	 * Adjusts the text alignment.
 	 *
@@ -77,26 +106,6 @@ export type Props = TruncateProps & {
 	 * Determines if `highlightWords` should be case sensitive.
 	 */
 	highlightCaseSensitive?: boolean;
-	/**
-	 * Letters or words within `Text` can be highlighted using `highlightWords`.
-	 *
-	 * @example
-	 * ```jsx
-	 * import { Text } from `@wp-g2/components`
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <Text highlightWords={["the"]}>
-	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
-	 *       my darling, safe and sound, for in this river all is found. In her waters,
-	 *       deep and true, lay the answers and a path for you. Dive down deep into her
-	 *       sound, but not too far or you'll be drowned
-	 *     </Text>
-	 *   )
-	 * }
-	 * ```
-	 */
-	highlightWords?: string[];
 	/**
 	 * Array of search words. String search terms are automatically cast to RegExps unless `highlightEscape` is true.
 	 */
@@ -185,4 +194,8 @@ export type Props = TruncateProps & {
 	 * Adjusts font-weight of the text.
 	 */
 	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
+	/**
+	 * Adjusts letter-spacing of the text.
+	 */
+	letterSpacing?: CSSProperties[ 'letterSpacing' ];
 };
