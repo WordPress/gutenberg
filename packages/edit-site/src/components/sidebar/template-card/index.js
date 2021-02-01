@@ -23,6 +23,10 @@ export default function TemplateCard() {
 		return info;
 	}, [] );
 
+	if ( ! title && ! description ) {
+		return null;
+	}
+
 	return (
 		<div className="edit-site-template-card">
 			<Icon className="edit-site-template-card__icon" icon={ layout } />
