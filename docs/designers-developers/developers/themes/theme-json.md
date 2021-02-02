@@ -497,7 +497,7 @@ The `--` as a separator has two functions:
 - Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
 - Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
-## Why using `--` as a separator?
+### Why using `--` as a separator?
 
 We could have used any other separator, such as a single `-`.
 
