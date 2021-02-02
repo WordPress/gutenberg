@@ -271,15 +271,15 @@ class WP_Theme_JSON {
 			'value'   => array( 'border', 'radius' ),
 			'support' => array( '__experimentalBorder', 'radius' ),
 		),
-		'borderColor'             => array(
+		'borderColor'              => array(
 			'value'   => array( 'border', 'color' ),
 			'support' => array( '__experimentalBorder', 'color' ),
 		),
-		'borderWidth'             => array(
+		'borderWidth'              => array(
 			'value'   => array( 'border', 'width' ),
 			'support' => array( '__experimentalBorder', 'width' ),
 		),
-		'borderStyle'             => array(
+		'borderStyle'              => array(
 			'value'   => array( 'border', 'style' ),
 			'support' => array( '__experimentalBorder', 'style' ),
 		),

@@ -71,7 +71,6 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
-export { default as __experimentalGrid } from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
@@ -130,9 +129,7 @@ export {
 	TreeGridItem as __experimentalTreeGridItem,
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
-export { default as __experimentalTruncate } from './truncate';
 export { default as __experimentalUnitControl } from './unit-control';
-export { default as __experimentalView } from './view';
 export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
@@ -161,6 +158,6 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 
 // Component System
 export {
-	__unstableWithNext,
-	__unstableComponentSystemProvider,
-} from './__next/context';
+	withNext as __unstableWithNext,
+	ComponentSystemProvider as __unstableComponentSystemProvider,
+} from './ui/context';
