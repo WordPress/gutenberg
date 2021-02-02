@@ -13,7 +13,7 @@ const variations = [
 		name: 'post-navigation-link-next',
 		title: __( 'Next post link' ),
 		description: __(
-			'Displays the next post link that is adjacent to the current post.'
+			'Displays the post link that follows the current post.'
 		),
 		icon: postNavigationLinkNext,
 		attributes: { type: 'next' },
@@ -23,7 +23,7 @@ const variations = [
 		name: 'post-navigation-link-previous',
 		title: __( 'Previous post link' ),
 		description: __(
-			'Displays the previous post link that is adjacent to the current post.'
+			'Displays the post link that precedes the current post.'
 		),
 		icon: postNavigationLinkPrevious,
 		attributes: { type: 'previous' },
