@@ -21,15 +21,13 @@ const icons = {
 	'space-between': justifySpaceBetween,
 };
 
-export function JustifyToolbar( props ) {
-	const {
-		allowedControls = [ 'left', 'center', 'right', 'space-between' ],
-		isCollapsed = true,
-		onChange,
-		value,
-		popoverProps,
-	} = props;
-
+export function JustifyToolbar( {
+	allowedControls = [ 'left', 'center', 'right', 'space-between' ],
+	isCollapsed = true,
+	onChange,
+	value,
+	popoverProps,
+} ) {
 	const icon = value ? icons[ value ] : icons.left;
 	const allControls = [
 		{
