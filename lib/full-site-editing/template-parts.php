@@ -61,9 +61,9 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
- * Registers the 'template_part_type' taxonomy.
+ * Registers the 'wp_template_section' taxonomy.
  */
-function gutenberg_register_template_part_section_taxonomy() {
+function gutenberg_register_wp_template_section_taxonomy() {
 	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}
@@ -87,7 +87,7 @@ function gutenberg_register_template_part_section_taxonomy() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_register_template_part_section_taxonomy' );
+add_action( 'init', 'gutenberg_register_wp_template_section_taxonomy' );
 
 /**
  * Fixes the label of the 'wp_template_part' admin menu entry.
