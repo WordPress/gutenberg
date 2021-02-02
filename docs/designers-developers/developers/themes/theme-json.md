@@ -218,8 +218,10 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 Presets are part of the settings section. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
 
-For example, for this input:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -262,9 +264,7 @@ For example, for this input:
   }
 }
 ```
-
-The output will be:
-
+{% Output %}
 ```css
 :root {
   --wp--preset--color--strong-magenta: #a156b4;
@@ -275,6 +275,7 @@ The output will be:
   --wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);
 }
 ```
+{% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
@@ -282,8 +283,10 @@ To maintain backward compatibility, the presets declared via `add_theme_support`
 
 In addition to create CSS Custom Properties for the presets, the `experimental-theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/block>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
 
-For example, for this input:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -300,9 +303,7 @@ For example, for this input:
   }
 }
 ```
-
-The output will be:
-
+{% Output %}
 ```css
 :root {
   --wp--custom--base-font: 16;
@@ -311,6 +312,7 @@ The output will be:
   --wp--custom--line-height--large: 1.8;
 }
 ```
+{% end %}
 
 Note that, the name of the variable is created by adding `--` in between each nesting level.
 
@@ -353,8 +355,10 @@ Each block declares which style properties it exposes via the [block supports me
 }
 ```
 
-For example, an input like this:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "styles": {
@@ -382,9 +386,7 @@ For example, an input like this:
   }
 }
 ```
-
-will append the following style rules to the stylesheet:
-
+{% Output %}
 ```css
 :root {
   color: var(--wp--preset--color--primary);
@@ -398,6 +400,7 @@ h4 {
   font-size: calc(1px * var(--wp--preset--font-size--normal));
 }
 ```
+{% end %}
 
 The `defaults` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
 
@@ -511,8 +514,10 @@ The algorithm to create CSS Variables out of the settings under the "custom" key
 
 This is for clarity, but also because we want a mechanism to parse back a variable name such `--wp--custom--line-height--body` to its object form in theme.json. We use the same separation for presets.
 
-For an object like this:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -527,21 +532,20 @@ For an object like this:
   },
 }
 ```
-
-The generated CSS Custom Properties are:
-
+{% Output %}
 ```css
 :root {
   --wp--custom--line-height--body: 1.7;
   --wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
 }
 ```
+{% end %}
 
 A few notes about this process:
 
 - `camelCased` keys are transformed into its `kebab-case` form, as to follow the CSS property naming schema. Example: `lineHeight` is transformed into `line-height`.
 - Keys at different depth levels are separated by `--`. That's why `line-height` and `body` are separated by `--`.
-- You shouldn't use `--` in the names of the keys within the `custom` object. Example, don't do this:
+- You shouldn't use `--` in the names of the keys within the `custom` object. Example, **don't do** this:
 
 
 ```json
