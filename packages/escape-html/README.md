@@ -25,7 +25,9 @@ named references (i.e. ambiguous ampersand) are are still permitted.
 
 _Related_
 
--   <https://w3c.github.io/html/syntax.html#character-references-> <https://w3c.github.io/html/syntax.html#ambiguous-ampersand-> <https://w3c.github.io/html/syntax.html#named-character-references>
+-   <https://w3c.github.io/html/syntax.html#character-references>
+-   <https://w3c.github.io/html/syntax.html#ambiguous-ampersand>
+-   <https://w3c.github.io/html/syntax.html#named-character-references>
 
 _Parameters_
 
