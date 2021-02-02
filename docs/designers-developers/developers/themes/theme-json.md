@@ -52,7 +52,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 - **Presets**: [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
 
 {% codetabs %}
-{% Input: theme.json %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -75,7 +75,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
   },
 }
 ```
-{% Output: CSS %}
+{% Output %}
 ```css
 :root {
   --wp--preset--color--black: #000000;
@@ -87,7 +87,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 - **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
 
 {% codetabs %}
-{% Input: theme.json %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -102,7 +102,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
   },
 }
 ```
-{% Output: CSS %}
+{% Output %}
 ```css
 :root {
   --wp--custom--line-height--body: 1.7;
