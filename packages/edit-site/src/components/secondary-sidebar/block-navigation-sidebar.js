@@ -6,6 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
+import { useFocusOnMount } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -30,6 +31,7 @@ export default function BlockNavigationSidebar() {
 	} );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsBlockNavigationOpened } = useDispatch( 'core/edit-site' );
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	useShortcut(
 		'core/edit-site/toggle-block-navigation',
@@ -57,7 +59,10 @@ export default function BlockNavigationSidebar() {
 					onClick={ () => setIsBlockNavigationOpened( false ) }
 				/>
 			</div>
-			<div className="edit-site-editor__block-navigation-panel-content">
+			<div
+				className="edit-site-editor__block-navigation-panel-content"
+				ref={ focusOnMountRef }
+			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
 					selectBlock={ selectBlock }
