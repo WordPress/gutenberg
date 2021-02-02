@@ -13,10 +13,10 @@ jobs:
       files: ${{ steps.make-files-list.outputs.files }}
     steps:
       - uses: actions/checkout@v2
-
-      - uses: actions/checkout@v2
         with:
           ref: master
+
+      - uses: actions/checkout@v2
 
       - id: make-files-list
         name: Make list of files that changed
