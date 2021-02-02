@@ -124,12 +124,11 @@ class BlockListBlock extends Component {
 	getBlockWidth( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
+		const layoutWidth = Math.floor( layout.width );
 
-		if ( ! blockWidth ) {
+		if ( ! blockWidth || ! layoutWidth ) {
 			return;
 		}
-
-		const layoutWidth = Math.floor( layout.width );
 
 		if ( blockWidth !== layoutWidth ) {
 			this.setState( { blockWidth: layoutWidth } );

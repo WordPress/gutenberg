@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -15,6 +15,7 @@ import {
 	withNotices,
 	ToolbarButton,
 	ToolbarGroup,
+	AudioPlayer,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -28,6 +29,11 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -70,7 +76,6 @@ function AudioEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	// const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
 			// in this case there was an error and we should continue in the editing state
@@ -133,17 +138,26 @@ function AudioEdit( {
 				onFinishMediaUploadWithSuccess={ onFileChange }
 				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
-				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+				containerStyle={ styles.progressContainer }
+				progressBarStyle={ styles.progressBar }
+				spinnerStyle={ styles.spinner }
+				renderContent={ ( {
+					isUploadInProgress,
+					isUploadFailed,
+					retryMessage,
+				} ) => {
 					return (
-						<View>
+						<>
 							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
-							<Text>
-								⏯ Audio Player goes here.{ ' ' }
-								{ isUploadInProgress && 'Uploading...' }
-								{ isUploadFailed && 'ERROR' }
-							</Text>
-						</View>
+							<AudioPlayer
+								isUploadInProgress={ isUploadInProgress }
+								isUploadFailed={ isUploadFailed }
+								retryMessage={ retryMessage }
+								attributes={ attributes }
+								isSelected={ isSelected }
+							/>
+						</>
 					);
 				} }
 			/>
