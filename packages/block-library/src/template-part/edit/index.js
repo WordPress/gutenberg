@@ -78,28 +78,26 @@ export default function TemplatePartEdit( {
 		);
 	}
 
-	const inspectorAdvancedControls = (
-		<InspectorAdvancedControls>
-			<SelectControl
-				label={ __( 'HTML element' ) }
-				options={ [
-					{ label: __( 'Default (<div>)' ), value: 'div' },
-					{ label: '<header>', value: 'header' },
-					{ label: '<main>', value: 'main' },
-					{ label: '<section>', value: 'section' },
-					{ label: '<article>', value: 'article' },
-					{ label: '<aside>', value: 'aside' },
-					{ label: '<footer>', value: 'footer' },
-				] }
-				value={ TagName }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
-			/>
-		</InspectorAdvancedControls>
-	);
-
 	return (
 		<>
-			{ inspectorAdvancedControls }
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
