@@ -165,82 +165,23 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		return;
 	}
 
-	$original_block_name = $block_name;
-	$block_name          = str_replace( 'core/', '', $block_name );
+	$block_name = str_replace( 'core/', '', $block_name );
 
-	// Get the stylesheets paths.
 	$style_path        = "build/block-library/blocks/$block_name/style.css";
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
-	// If an RTL language, get the RTL file path.
-	$style_path = is_rtl() ? "build/block-library/blocks/$block_name/style-rtl.css" : $style_path;
-	// Get the file's absolute path.
-	$file_abs_path = gutenberg_dir_path() . $style_path;
 
-	if ( file_exists( $file_abs_path ) ) {
-
-		$styles = false;
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			$styles_size = (int) filesize( $file_abs_path );
-		} else {
-			// Use a short transient to avoid constantly querying the files to get their contents, minify them etc to get their size.
-			$file_size_transient_name = md5( $file_abs_path ) . filemtime( $file_abs_path ) . '_size';
-			$styles_size              = get_site_transient( $file_size_transient_name );
-			if ( ! $styles_size ) {
-				// Get the styles.
-				$styles = file_get_contents( gutenberg_dir_path() . $style_path );
-				// Minify the styles by removing comments & whitespace.
-				$styles = gutenberg_minify_styles( $styles );
-				// Get the styles size.
-				$styles_size = (int) strlen( $styles );
-				// Update the transient.
-				set_site_transient( $file_size_transient_name, $styles_size, HOUR_IN_SECONDS );
-			}
-		}
-
-		// The default threshold for inlining styles in the frontend (in bytes).
-		$threshold = 1500;
-
-		/**
-		 * The threshold for inlining styles instead of enqueueing them (in bytes).
-		 *
-		 * If a stylesheet is below the defined threshold then it will get inlined instead of enqueued.
-		 *
-		 * @param int    $threshold           The file-size threshold, in bytes.
-		 * @param string $original_block_name The block name (example: "core/paragraph").
-		 * @return int
-		 */
-		$threshold = apply_filters( 'block_styles_inline_size_threshold', $threshold, $original_block_name );
-
-		$should_inline_style = (
-			// Make sure the $threshold was not set to 0 using a filter.
-			$threshold &&
-			// Make sure the filesize is smaller than the threshold.
-			$styles_size <= $threshold
+	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_register_style(
+			"wp-block-{$block_name}",
+			gutenberg_url( $style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $style_path )
 		);
+		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
 
-		if ( $should_inline_style ) {
-
-			// Register the style using `false` as src.
-			wp_register_style( "wp-block-{$block_name}", false, array(), false );
-
-			// If we don't have the $styles, get the file contents.
-			$styles = ( $styles ) ? $styles : file_get_contents( $file_abs_path );
-
-			// Add inline styles to the registered style.
-			wp_add_inline_style( "wp-block-{$block_name}", $styles );
-		} else {
-
-			// Register the style.
-			wp_register_style(
-				"wp-block-{$block_name}",
-				gutenberg_url( $style_path ),
-				array(),
-				filemtime( gutenberg_dir_path() . $style_path )
-			);
-
-			// Replace stylesheet if RTL.
-			wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
-		}
+		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
+		global $wp_styles;
+		$wp_styles->registered[ "wp-block-{$block_name}" ]->path = gutenberg_dir_path() . $style_path;
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
@@ -253,6 +194,104 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
 	}
 }
+
+/**
+ * Change the way block styles get loaded depending on their size.
+ *
+ * Optimizes performance and sustainability of block styles.
+ *
+ * @return void
+ */
+function gutenberg_optimize_block_styles_loading() {
+
+	$total_inline_limit = 15000;
+	/**
+	 * The maximum size of inlined styles in bytes.
+	 *
+	 * @param int    $total_inline_limit The file-size threshold, in bytes.
+	 * @return int
+	 */
+	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
+
+	global $wp_styles;
+	$styles = array();
+
+	// Build an array of styles that have a path defined.
+	foreach ( $wp_styles->queue as $handle ) {
+		if (
+			isset( $wp_styles->registered[ $handle ] ) &&
+			isset( $wp_styles->registered[ $handle ]->path ) &&
+			file_exists( $wp_styles->registered[ $handle ]->path )
+		) {
+			$path = $wp_styles->registered[ $handle ]->path;
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$block_styles = false;
+				$styles_size  = (int) filesize( $path );
+			} else {
+				// Get the styles.
+				$block_styles = file_get_contents( $path );
+				// Minify the styles by removing comments & whitespace.
+				$block_styles = gutenberg_minify_styles( $block_styles );
+				// Get the styles size.
+				$styles_size = (int) strlen( $block_styles );
+			}
+
+			$styles[] = array(
+				'handle' => $handle,
+				'path'   => $path,
+				'size'   => $styles_size,
+				'css'    => $block_styles,
+			);
+		}
+	}
+
+	// Reorder styles array based on size.
+	if ( ! empty( $styles ) ) {
+		usort(
+			$styles,
+			function( $a, $b ) {
+				if ( $a['size'] === $b['size'] ) {
+					return 0;
+				}
+				return ( $a['size'] < $b['size'] ) ? -1 : 1;
+			}
+		);
+
+		/**
+		 * The total inlined size.
+		 *
+		 * On each iteration of the loop, if a style gets added inline the value of this var increases
+		 * to reflect the total size of inlined styles.
+		 */
+		$total_inline_size = 0;
+
+		// Loop styles.
+		foreach ( $styles as $stylesheet ) {
+
+			// Make sure that adding this style won't go over the maximum defined value.
+			if ( $total_inline_size + $stylesheet['size'] < $total_inline_limit ) {
+
+				// Get the styles.
+				$stylesheet_contents = false === $stylesheet['css'] || null === $stylesheet['css']
+					? file_get_contents( $stylesheet['path'] )
+					: $stylesheet['css'];
+
+				// Make sure that "after" is defined in order to add inline styles.
+				if ( ! isset( $wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] ) ) {
+					$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] = array();
+				}
+
+				// Set `src` to `false` and add styles inline.
+				$wp_styles->registered[ $stylesheet['handle'] ]->src              = false;
+				$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'][] = $stylesheet_contents;
+
+				// Add the styles size to the $total_inline_size var.
+				$total_inline_size += (int) $stylesheet['size'];
+			}
+		}
+	}
+}
+add_action( 'wp_head', 'gutenberg_optimize_block_styles_loading', 1 );
 
 /**
  * Minify styles.
