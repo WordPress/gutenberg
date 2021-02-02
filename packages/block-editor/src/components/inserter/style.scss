@@ -170,7 +170,9 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
+		// Make a stacking context that keeps all descendents behind the sticky tabs
 		position: relative;
+		z-index: 0;
 	}
 }
 
