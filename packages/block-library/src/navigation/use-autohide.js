@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 
-export function useAutohide( navElement, wrappedElementsContainer ) {
+export default function useAutohide( navElement, wrappedElementsContainer ) {
 	const [ isWrapping, setIsWrapping ] = useState( false );
 
 	useEffect( () => {
