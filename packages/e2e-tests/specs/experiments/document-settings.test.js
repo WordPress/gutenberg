@@ -1,17 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	visitAdminPage,
-	trashAllPosts,
-	activateTheme,
-} from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
+import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 async function getDocumentSettingsTitle() {
 	const titleElement = await page.waitForSelector(
@@ -42,13 +37,7 @@ describe( 'Document Settings', () => {
 	} );
 
 	beforeEach( async () => {
-		await visitAdminPage(
-			'admin.php',
-			addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 )
-		);
-		await page.waitForSelector( '.edit-site-visual-editor' );
+		await siteEditor.visit();
 	} );
 
 	describe( 'when a template is selected from the navigation sidebar', () => {
