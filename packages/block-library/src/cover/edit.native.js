@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	TouchableWithoutFeedback,
+	InteractionManager,
+} from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -89,6 +93,8 @@ const Cover = ( {
 	openGeneralSidebar,
 	closeSettingsBottomSheet,
 	isSelected,
+	selectBlock,
+	blockWidth,
 } ) => {
 	const {
 		backgroundType,
@@ -133,8 +139,6 @@ const Cover = ( {
 		isCustomColorPickerShowing,
 		setCustomColorPickerShowing,
 	] = useState( false );
-
-	const [ customColor, setCustomColor ] = useState( '' );
 
 	const openMediaOptionsRef = useRef();
 
@@ -219,10 +223,9 @@ const Cover = ( {
 	}
 
 	function openColorPicker() {
-		if ( isParentSelected ) {
-			setCustomColorPickerShowing( true );
-			openGeneralSidebar();
-		}
+		selectBlock();
+		setCustomColorPickerShowing( true );
+		openGeneralSidebar();
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -292,6 +295,12 @@ const Cover = ( {
 		} );
 	}, [] );
 
+	const onBottomSheetClosed = useCallback( () => {
+		InteractionManager.runAfterInteractions( () => {
+			setCustomColorPickerShowing( false );
+		} );
+	}, [] );
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -358,10 +367,7 @@ const Cover = ( {
 						shouldEnableBottomSheetMaxHeight={
 							shouldEnableBottomSheetMaxHeight
 						}
-						setColor={ ( color ) => {
-							setCustomColor( color );
-							setColor( color );
-						} }
+						setColor={ setColor }
 						onNavigationBack={ closeSettingsBottomSheet }
 						onHandleClosingBottomSheet={
 							onHandleClosingBottomSheet
@@ -369,9 +375,7 @@ const Cover = ( {
 						onHandleHardwareButtonPress={
 							onHandleHardwareButtonPress
 						}
-						onBottomSheetClosed={ () => {
-							setCustomColorPickerShowing( false );
-						} }
+						onBottomSheetClosed={ onBottomSheetClosed }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
@@ -473,9 +477,10 @@ const Cover = ( {
 				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
-					backgroundColor={ customColor }
+					backgroundColor={ customOverlayColor }
 					hideContent={
-						customColor !== '' && customColor !== undefined
+						customOverlayColor !== '' &&
+						customOverlayColor !== undefined
 					}
 					icon={ placeholderIcon }
 					labels={ {
@@ -548,6 +553,7 @@ const Cover = ( {
 				<InnerBlocks
 					template={ INNER_BLOCKS_TEMPLATE }
 					templateInsertUpdatesSelection
+					blockWidth={ blockWidth }
 				/>
 			</View>
 
@@ -600,14 +606,16 @@ export default compose( [
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	withDispatch( ( dispatch, { clientId } ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const { selectBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
 				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
+			selectBlock: () => selectBlock( clientId ),
 		};
 	} ),
 	withPreferredColorScheme,

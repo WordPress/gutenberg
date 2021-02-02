@@ -1,6 +1,6 @@
 {
-	"global": {
-		"settings": {
+	"settings": {
+		"defaults": {
 			"color": {
 				"palette": [
 					{

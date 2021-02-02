@@ -10,7 +10,7 @@
 		"icons",
 		"dashicon"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/icons/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/icons/README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",

@@ -9,6 +9,7 @@ function BlockFullHeightAlignmentToolbar( {
 	isActive,
 	label = __( 'Toggle full height' ),
 	onToggle,
+	isDisabled,
 } ) {
 	return (
 		<ToolbarGroup>
@@ -17,6 +18,7 @@ function BlockFullHeightAlignmentToolbar( {
 				icon={ fullscreen }
 				label={ label }
 				onClick={ () => onToggle( ! isActive ) }
+				disabled={ isDisabled }
 			/>
 		</ToolbarGroup>
 	);

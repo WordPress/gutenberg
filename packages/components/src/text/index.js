@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { text } from './styles/text-mixins';
+import { withNextComponent } from './next';
 
 const Text = styled.p(
 	`
@@ -16,4 +17,4 @@ const Text = styled.p(
 	text
 );
 
-export default Text;
+export default withNextComponent( Text );

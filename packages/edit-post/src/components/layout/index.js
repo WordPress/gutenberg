@@ -17,7 +17,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
-	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -94,6 +93,7 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		showIconLabels,
 		hasReducedUI,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
@@ -128,6 +128,9 @@ function Layout( { styles } ) {
 			),
 			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
+			),
+			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
+				'showBlockBreadcrumbs'
 			),
 		};
 	}, [] );
@@ -172,7 +175,6 @@ function Layout( { styles } ) {
 	const ref = useRef();
 
 	useDrop( ref );
-	useEditorStyles( ref, styles );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
@@ -256,7 +258,7 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor />
+							<VisualEditor styles={ styles } />
 						) }
 						<div className="edit-post-layout__metaboxes">
 							<MetaBoxes location="normal" />
@@ -269,6 +271,7 @@ function Layout( { styles } ) {
 				}
 				footer={
 					! hasReducedUI &&
+					showBlockBreadcrumbs &&
 					! isMobileViewport &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (

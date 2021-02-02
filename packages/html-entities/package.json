@@ -10,7 +10,7 @@
 		"html",
 		"entities"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/html-entities/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/html-entities/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

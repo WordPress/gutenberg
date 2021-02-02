@@ -44,6 +44,7 @@ function BlockForType( {
 	onReplace,
 	parentWidth,
 	wrapperProps,
+	blockWidth,
 } ) {
 	const defaultColors = useEditorFeature( 'color.palette' ) || [];
 
@@ -79,6 +80,7 @@ function BlockForType( {
 							parentWidth={ parentWidth }
 							contentStyle={ contentStyle }
 							onDeleteBlock={ onDeleteBlock }
+							blockWidth={ blockWidth }
 						/>
 						<View onLayout={ getBlockWidth } />
 					</GlobalStylesContext.Provider>
@@ -97,7 +99,7 @@ class BlockListBlock extends Component {
 		this.getBlockWidth = this.getBlockWidth.bind( this );
 
 		this.state = {
-			blockWidth: 0,
+			blockWidth: this.props.blockWidth - 2 * this.props.marginHorizontal,
 		};
 
 		this.anchorNodeRef = createRef();
@@ -124,18 +126,24 @@ class BlockListBlock extends Component {
 		const { blockWidth } = this.state;
 		const layoutWidth = Math.floor( layout.width );
 
+		if ( ! blockWidth || ! layoutWidth ) {
+			return;
+		}
+
 		if ( blockWidth !== layoutWidth ) {
 			this.setState( { blockWidth: layoutWidth } );
 		}
 	}
 
 	getBlockForType() {
+		const { blockWidth } = this.state;
 		return (
 			<BlockForType
 				{ ...this.props }
 				onBlockFocus={ this.onFocus }
 				insertBlocksAfter={ this.insertBlocksAfter }
 				getBlockWidth={ this.getBlockWidth }
+				blockWidth={ blockWidth }
 			/>
 		);
 	}
