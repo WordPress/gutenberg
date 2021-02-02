@@ -31,21 +31,19 @@
 }
 
 .edit-site-editor__block-navigation-panel-header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
+	align-items: center;
+	border-bottom: $border-width solid $gray-300;
 	display: flex;
-	justify-content: flex-end;
-
-	@include break-medium() {
-		display: none;
-	}
+	justify-content: space-between;
+	height: $grid-unit-60;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-05;
 }
 
 .edit-site-editor__block-navigation-panel-content {
+	overflow-y: auto;
+	padding: $grid-unit-10;
+
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
-
-	@include break-medium() {
-		height: 100%;
-	}
 }
