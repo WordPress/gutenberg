@@ -18,6 +18,7 @@ export { default as blockTable } from './library/block-table';
 export { default as box } from './library/box';
 export { default as brush } from './library/brush';
 export { default as button } from './library/button';
+export { default as buttons } from './library/buttons';
 export { default as calendar } from './library/calendar';
 export { default as camera } from './library/camera';
 export { default as cancelCircleFilled } from './library/cancel-circle-filled';

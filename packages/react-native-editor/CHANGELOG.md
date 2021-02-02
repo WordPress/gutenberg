@@ -10,8 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [***] New Block: Audio
 * [**] Add support for setting heading anchors
-
+* [**] Disable Unsupported Block Editor for Reusable blocks
 
 #### Bug Fix
 * Add proper handling for single use blocks such as the more block [#28339]

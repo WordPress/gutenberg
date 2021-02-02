@@ -7,8 +7,8 @@ const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
-	// Don't expose documentation for mobile only components just yet.
-	ignore: '**/mobile/*/README.md',
+	// Don't expose documentation for mobile only and G2 components just yet.
+	ignore: [ '**/src/mobile/**/README.md', '**/src/ui/**/README.md' ],
 } );
 const packagePaths = glob( 'packages/*/package.json' ).map(
 	( fileName ) => fileName.split( '/' )[ 1 ]

@@ -83,6 +83,7 @@ export { default as ImageEditingButton } from './mobile/image/image-editing-butt
 export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as Preview } from './mobile/preview';
+export { default as AudioPlayer } from './mobile/audio-player';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

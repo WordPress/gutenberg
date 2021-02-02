@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,10 +17,12 @@ import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
 
 function BlockContextualToolbar( { focusOnMount, ...props } ) {
-	const { blockType } = useSelect( ( select ) => {
-		const { getBlockName, getSelectedBlockClientIds } = select(
-			'core/block-editor'
-		);
+	const { blockType, hasParents } = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientIds,
+		} = select( 'core/block-editor' );
 		const { getBlockType } = select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -23,6 +30,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
+			hasParents: getBlockParents( selectedBlockClientId ).length,
 		};
 	}, [] );
 	if ( blockType ) {
@@ -30,11 +38,17 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 			return null;
 		}
 	}
+
+	// Shifts the toolbar to make room for the parent block selector.
+	const classes = classnames( 'block-editor-block-contextual-toolbar', {
+		'has-parent': hasParents,
+	} );
+
 	return (
 		<div className="block-editor-block-contextual-toolbar-wrapper">
 			<NavigableToolbar
 				focusOnMount={ focusOnMount }
-				className="block-editor-block-contextual-toolbar"
+				className={ classes }
 				/* translators: accessibility text for the block toolbar */
 				aria-label={ __( 'Block tools' ) }
 				{ ...props }
