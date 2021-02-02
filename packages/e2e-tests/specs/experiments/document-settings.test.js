@@ -57,23 +57,23 @@ describe( 'Document Settings', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.clickItemByText( 'Index' );
 
 			// Evaluate the document settings title
 			const actual = await getDocumentSettingsTitle();
 
-			expect( actual ).toEqual( 'Front Page' );
+			expect( actual ).toEqual( 'Index' );
 		} );
 
 		describe( 'and a template part is clicked in the template', () => {
 			it( "should display the selected template part's name in the document header", async () => {
 				// Click on a template part in the template
-				await page.waitForSelector(
-					'.site-header[data-type="core/template-part"]'
-				);
-				await page.click(
-					'.site-header[data-type="core/template-part"]'
-				);
+				const frame = await page
+					.frames()
+					.find( ( f ) => f.name() === 'editor-canvas' );
+
+				const header = await frame.$( '.site-header' );
+				await header.click();
 
 				// Evaluate the document settings secondary title
 				const actual = await getDocumentSettingsSecondaryTitle();
