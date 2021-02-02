@@ -55,6 +55,16 @@ function KeyboardShortcutsRegister() {
 				character: 'z',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/toggle-block-navigation',
+			category: 'global',
+			description: __( 'Open the block list view.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'o',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;
