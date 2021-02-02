@@ -41,7 +41,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
-		'with-offset': hasParents,
+		'has-parent': hasParents,
 	} );
 
 	return (
