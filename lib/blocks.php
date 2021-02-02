@@ -204,7 +204,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
  */
 function gutenberg_optimize_block_styles_loading() {
 
-	$total_inline_limit = 15000;
+	$total_inline_limit = 20000;
 	/**
 	 * The maximum size of inlined styles in bytes.
 	 *
