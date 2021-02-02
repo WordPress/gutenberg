@@ -18,7 +18,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_theme_taxonomy();
-		gutenberg_register_template_part_section_taxonomy();
+		gutenberg_register_wp_template_section_taxonomy();
 
 		// Set up template post.
 		$args       = array(
