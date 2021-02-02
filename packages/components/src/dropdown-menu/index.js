@@ -9,6 +9,7 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  */
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	icon = 'menu',
+	icon = menu,
 	label,
 	popoverProps,
 	toggleProps,

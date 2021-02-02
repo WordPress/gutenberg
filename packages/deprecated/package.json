@@ -9,7 +9,7 @@
 		"gutenberg",
 		"deprecated"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/deprecated/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/deprecated/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

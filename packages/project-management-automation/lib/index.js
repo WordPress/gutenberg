@@ -13,12 +13,10 @@ const firstTimeContributorLabel = require( './tasks/first-time-contributor-label
 const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
-
 /**
  * Automation task function.
  *
- * @typedef {(payload:any,octokit:GitHub)=>void} WPAutomationTask
+ * @typedef {( payload: any, octokit: GitHub ) => void} WPAutomationTask
  */
 
 /**

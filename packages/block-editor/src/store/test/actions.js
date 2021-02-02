@@ -21,7 +21,10 @@ import {
 
 import * as selectors from '../selectors';
 import reducer from '../reducer';
-import actions, {
+import * as actions from '../actions';
+import '../..';
+
+const {
 	clearSelectedBlock,
 	enterFormattedText,
 	exitFormattedText,
@@ -55,8 +58,7 @@ import actions, {
 	updateSettings,
 	selectionChange,
 	validateBlocksToTemplate,
-} from '../actions';
-import '../..';
+} = actions;
 
 describe( 'actions', () => {
 	const defaultBlockSettings = {

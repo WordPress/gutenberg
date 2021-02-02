@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "1.24.1",
+	"version": "1.24.2",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"annotations"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/annotations/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/annotations/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

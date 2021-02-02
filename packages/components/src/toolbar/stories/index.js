@@ -51,7 +51,7 @@ export const _default = () => {
 						<DropdownMenu
 							hasArrowIndicator
 							icon={ alignLeft }
-							label="Change text alignment"
+							label="Align"
 							controls={ [
 								{
 									icon: alignLeft,
@@ -93,7 +93,7 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup
 				icon={ more }
-				label="Change text alignment"
+				label="Align"
 				isCollapsed
 				controls={ [
 					{

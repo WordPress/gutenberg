@@ -9,7 +9,7 @@
 		"gutenberg",
 		"wordcount"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/wordcount/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/wordcount/README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",

@@ -10,6 +10,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+
+/**
+ * Registers the REST API routes for URL Details.
+ *
+ * @since 5.0.0
+ */
+function gutenberg_register_url_details_routes() {
+	$url_details_controller = new WP_REST_URL_Details_Controller();
+	$url_details_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_url_details_routes' );
+
+/**
+ * Registers the block pattern directory.
+ */
+function gutenberg_register_rest_pattern_directory() {
+	$block_directory_controller = new WP_REST_Pattern_Directory_Controller();
+	$block_directory_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
+
 /**
  * Registers the menu locations area REST API routes.
  */

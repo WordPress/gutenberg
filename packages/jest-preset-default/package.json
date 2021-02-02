@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "6.6.0",
+	"version": "7.0.0",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,7 +12,7 @@
 		"react",
 		"enzyme"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/jest-preset-default/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-preset-default/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

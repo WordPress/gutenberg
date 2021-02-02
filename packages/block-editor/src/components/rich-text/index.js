@@ -731,7 +731,7 @@ ForwardedRichTextContainer.Content.defaultProps = {
 };
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 export default ForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';

@@ -1,14 +1,14 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import React from 'react';
+import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 
-const RangeControl = React.memo(
+const RangeControl = memo(
 	( {
 		className,
 		currentInput,

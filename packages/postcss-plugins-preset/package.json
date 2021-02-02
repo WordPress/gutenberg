@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-plugins-preset",
-	"version": "1.6.0",
+	"version": "2.0.0",
 	"description": "PostCSS sharable plugins preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,7 +12,7 @@
 		"plugins",
 		"preset"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-plugins-preset/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/postcss-plugins-preset/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
