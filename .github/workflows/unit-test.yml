@@ -8,20 +8,22 @@ on:
 jobs:
   diff-files-list:
     name: Make a list of files that were changed
+    if: github.event.pull_request
     runs-on: ubuntu-latest
     outputs:
       files: ${{ steps.make-files-list.outputs.files }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: master
-
-      - uses: actions/checkout@v2
 
       - id: make-files-list
         name: Make list of files that changed
         run: |
-          echo ::set-output name=files::$(git diff --name-only $(git merge-base master $(git rev-parse --abbrev-ref HEAD)))
+          curl \
+            -H "Accept: application/vnd.github.v3+json" \
+            -o diff-files.json \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files
+          echo ::set-output name=files::$(jq --raw-output '.[] .filename' diff-files.json)
+          rm diff-files.json
 
   unit-js:
     name: JavaScript
