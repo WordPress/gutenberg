@@ -268,26 +268,28 @@ function gutenberg_optimize_block_styles_loading() {
 		// Loop styles.
 		foreach ( $styles as $stylesheet ) {
 
-			// Make sure that adding this style won't go over the maximum defined value.
-			if ( $total_inline_size + $stylesheet['size'] < $total_inline_limit ) {
-
-				// Get the styles.
-				$stylesheet_contents = false === $stylesheet['css'] || null === $stylesheet['css']
-					? file_get_contents( $stylesheet['path'] )
-					: $stylesheet['css'];
-
-				// Make sure that "after" is defined in order to add inline styles.
-				if ( ! isset( $wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] ) ) {
-					$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] = array();
-				}
-
-				// Set `src` to `false` and add styles inline.
-				$wp_styles->registered[ $stylesheet['handle'] ]->src              = false;
-				$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'][] = $stylesheet_contents;
-
-				// Add the styles size to the $total_inline_size var.
-				$total_inline_size += (int) $stylesheet['size'];
+			// Size check.
+			if ( $total_inline_size + $stylesheet['size'] > $total_inline_limit ) {
+				// Exit the loop, all subsequent stylesheets will be larger since we previously ordered them by size.
+				break;
 			}
+
+			// Get the styles.
+			$stylesheet_contents = false === $stylesheet['css'] || null === $stylesheet['css']
+				? file_get_contents( $stylesheet['path'] )
+				: $stylesheet['css'];
+
+			// Make sure that "after" is defined in order to add inline styles.
+			if ( ! isset( $wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] = array();
+			}
+
+			// Set `src` to `false` and add styles inline.
+			$wp_styles->registered[ $stylesheet['handle'] ]->src              = false;
+			$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'][] = $stylesheet_contents;
+
+			// Add the styles size to the $total_inline_size var.
+			$total_inline_size += (int) $stylesheet['size'];
 		}
 	}
 }
