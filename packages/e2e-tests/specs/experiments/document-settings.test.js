@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
+import {
+	canvas,
+	trashAllPosts,
+	activateTheme,
+} from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
@@ -57,11 +61,7 @@ describe( 'Document Settings', () => {
 		describe( 'and a template part is clicked in the template', () => {
 			it( "should display the selected template part's name in the document header", async () => {
 				// Click on a template part in the template
-				const frame = await page
-					.frames()
-					.find( ( f ) => f.name() === 'editor-canvas' );
-
-				const header = await frame.$( '.site-header' );
+				const header = await canvas().$( '.site-header' );
 				await header.click();
 
 				// Evaluate the document settings secondary title
