@@ -275,9 +275,7 @@ function gutenberg_optimize_block_styles_loading() {
 			}
 
 			// Get the styles.
-			$stylesheet_contents = false === $stylesheet['css'] || null === $stylesheet['css']
-				? file_get_contents( $stylesheet['path'] )
-				: $stylesheet['css'];
+			$stylesheet['css'] = $stylesheet['css'] ? $stylesheet['css'] : file_get_contents( $stylesheet['path'] );
 
 			// Make sure that "after" is defined in order to add inline styles.
 			if ( ! isset( $wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] ) ) {
@@ -286,7 +284,7 @@ function gutenberg_optimize_block_styles_loading() {
 
 			// Set `src` to `false` and add styles inline.
 			$wp_styles->registered[ $stylesheet['handle'] ]->src              = false;
-			$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'][] = $stylesheet_contents;
+			$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'][] = $stylesheet['css'];
 
 			// Add the styles size to the $total_inline_size var.
 			$total_inline_size += (int) $stylesheet['size'];
