@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
 import { __experimentalBlockNavigationTree as BlockNavigationTree } from '@wordpress/block-editor';
-import { close } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { closeSmall } from '@wordpress/icons';
 
 export default function BlockNavigationSidebar() {
 	const { rootBlocks, selectedBlockClientId } = useSelect( ( select ) => {
@@ -22,8 +23,9 @@ export default function BlockNavigationSidebar() {
 	return (
 		<div className="edit-site-editor__block-navigation-panel">
 			<div className="edit-site-editor__block-navigation-panel-header">
+				<strong>{ __( 'List view' ) }</strong>
 				<Button
-					icon={ close }
+					icon={ closeSmall }
 					onClick={ () => setIsBlockNavigationOpened( false ) }
 				/>
 			</div>
