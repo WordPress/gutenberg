@@ -19,17 +19,15 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 		selectedBlockElement.focus();
 	};
 
-	return (
-		selectedBlockClientId && (
-			<Button
-				isSecondary
-				className="block-editor-skip-to-selected-block"
-				onClick={ onClick }
-			>
-				{ __( 'Skip to the selected block' ) }
-			</Button>
-		)
-	);
+	return selectedBlockClientId ? (
+		<Button
+			isSecondary
+			className="block-editor-skip-to-selected-block"
+			onClick={ onClick }
+		>
+			{ __( 'Skip to the selected block' ) }
+		</Button>
+	) : null;
 };
 
 export default withSelect( ( select ) => {

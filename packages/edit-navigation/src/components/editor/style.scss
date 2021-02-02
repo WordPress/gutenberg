@@ -1,5 +1,5 @@
 .edit-navigation-editor {
-	margin: $grid-unit-20;
+	flex-grow: 1;
 
 	@include break-medium() {
 		align-items: flex-start;
@@ -8,8 +8,10 @@
 }
 
 .edit-navigation-editor__block-view {
+	padding: $grid-unit-20;
 	@include break-medium() {
 		flex-grow: 1;
+		align-self: stretch;
 	}
 
 	.components-spinner {
@@ -20,16 +22,12 @@
 
 .edit-navigation-editor__list-view {
 	border-top: 1px solid $gray-300;
-	margin-top: $grid-unit-20;
-	padding-top: $grid-unit-20;
+	padding: $grid-unit-20;
 
 	@include break-medium() {
 		border-left: 1px solid $gray-300;
 		border-top: none;
-		margin-left: $grid-unit-20;
 		margin-top: 0;
-		padding-left: $grid-unit-20;
-		padding-top: 0;
 		width: 300px;
 	}
 
