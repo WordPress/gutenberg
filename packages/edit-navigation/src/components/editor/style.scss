@@ -2,7 +2,7 @@
 	background: $white;
 	border: 1px solid #1e1e1e;
 	border-radius: 2px;
-	margin: 12px 0 0 0;
+	margin: 18px 0 0 0;
 
 	.components-spinner {
 		display: block;
@@ -28,6 +28,7 @@
 		display: block;
 		align-items: baseline;
 		padding: 0;
+		cursor: text;
 
 		// The following is a really stupid way to fix the focus outlines
 		&.is-selected > .wp-block-navigation-link__content,
@@ -57,17 +58,14 @@
 	// There's a bunch of stuff to override just to get submenus to
 	// as a normal block element.
 	.wp-block-navigation-link.has-child {
-		> .wp-block-navigation-link__content {
-			//padding-right: inherit;
-		}
-
 		.wp-block-navigation__container {
 			border: none;
 			opacity: 1;
 			position: relative;
 			visibility: visible;
-			margin: 2px 0 2px 18px;
-			width: calc(100% - 18px);
+			margin: 2px 0;
+			padding-left: 18px;
+			width: 100%;
 			left: 0;
 		}
 	}
