@@ -64,9 +64,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		};
 	}, [] );
 
+	// Handles highlighting the current block outline on hover or focus of the
+	// block type toolbar area.
 	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
-
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
@@ -79,6 +80,8 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		}
 	);
 
+	// Account for the cases where the block toolbar is rendered within the
+	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
@@ -104,12 +107,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	return (
 		<div className={ classes }>
+			{ ! isMultiToolbar && ! displayHeaderToolbar && (
+				<BlockParentSelector clientIds={ blockClientIds } />
+			) }
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
-						<BlockParentSelector clientIds={ blockClientIds } />
-					</div>
-				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 						<BlockSwitcher clientIds={ blockClientIds } />
