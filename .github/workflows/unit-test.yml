@@ -13,8 +13,6 @@ jobs:
     outputs:
       files: ${{ steps.make-files-list.outputs.files }}
     steps:
-      - uses: actions/checkout@v2
-
       - id: make-files-list
         name: Make list of files that changed
         run: |
