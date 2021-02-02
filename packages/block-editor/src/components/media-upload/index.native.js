@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import React from 'react';
-
-/**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
@@ -23,13 +19,14 @@ import {
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_TYPE_AUDIO = 'audio';
 export const MEDIA_TYPE_ANY = 'any';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
-export class MediaUpload extends React.Component {
+export class MediaUpload extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
@@ -87,7 +84,12 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_ANY ],
+			types: [
+				MEDIA_TYPE_IMAGE,
+				MEDIA_TYPE_VIDEO,
+				MEDIA_TYPE_AUDIO,
+				MEDIA_TYPE_ANY,
+			],
 			icon: wordpress,
 			mediaLibrary: true,
 		};
@@ -155,6 +157,7 @@ export class MediaUpload extends React.Component {
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAudio = isOneType && allowedTypes.includes( MEDIA_TYPE_AUDIO );
 		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
 
 		const isImageOrVideo =
@@ -183,8 +186,19 @@ export class MediaUpload extends React.Component {
 			} else {
 				pickerTitle = __( 'Choose image or video' );
 			}
+		} else if ( isAudio ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace audio' );
+			} else {
+				pickerTitle = __( 'Choose audio' );
+			}
 		} else if ( isAnyType ) {
 			pickerTitle = __( 'Choose file' );
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace file' );
+			} else {
+				pickerTitle = __( 'Choose file' );
+			}
 		}
 
 		const getMediaOptions = () => (

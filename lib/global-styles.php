@@ -22,60 +22,61 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * @return array Config that adheres to the theme.json schema.
  */
 function gutenberg_experimental_global_styles_get_theme_support_settings( $settings ) {
-	$theme_settings                       = array();
-	$theme_settings['global']             = array();
-	$theme_settings['global']['settings'] = array();
+	$all_blocks                                = WP_Theme_JSON::ALL_BLOCKS_NAME;
+	$theme_settings                            = array();
+	$theme_settings['settings']                = array();
+	$theme_settings['settings'][ $all_blocks ] = array();
 
 	// Deprecated theme supports.
 	if ( isset( $settings['disableCustomColors'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
-			$theme_settings['global']['settings']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['custom'] = ! $settings['disableCustomColors'];
+		$theme_settings['settings'][ $all_blocks ]['color']['custom'] = ! $settings['disableCustomColors'];
 	}
 
 	if ( isset( $settings['disableCustomGradients'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
-			$theme_settings['global']['settings']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['customGradient'] = ! $settings['disableCustomGradients'];
+		$theme_settings['settings'][ $all_blocks ]['color']['customGradient'] = ! $settings['disableCustomGradients'];
 	}
 
 	if ( isset( $settings['disableCustomFontSizes'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
-			$theme_settings['global']['settings']['typography'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
-		$theme_settings['global']['settings']['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
+		$theme_settings['settings'][ $all_blocks ]['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
 	}
 
 	if ( isset( $settings['enableCustomLineHeight'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
-			$theme_settings['global']['settings']['typography'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
-		$theme_settings['global']['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+		$theme_settings['settings'][ $all_blocks ]['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
 	}
 
 	if ( isset( $settings['enableCustomUnits'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
-			$theme_settings['global']['settings']['spacing'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
-		$theme_settings['global']['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
+		$theme_settings['settings'][ $all_blocks ]['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
 			array( 'px', 'em', 'rem', 'vh', 'vw' ) :
 			$settings['enableCustomUnits'];
 	}
 
 	if ( isset( $settings['colors'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
-			$theme_settings['global']['settings']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['palette'] = $settings['colors'];
+		$theme_settings['settings'][ $all_blocks ]['color']['palette'] = $settings['colors'];
 	}
 
 	if ( isset( $settings['gradients'] ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
-			$theme_settings['global']['settings']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['gradients'] = $settings['gradients'];
+		$theme_settings['settings'][ $all_blocks ]['color']['gradients'] = $settings['gradients'];
 	}
 
 	if ( isset( $settings['fontSizes'] ) ) {
@@ -86,25 +87,34 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 				$font_size['size'] = $font_size['size'] . 'px';
 			}
 		}
-		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
-			$theme_settings['global']['settings']['typography'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
 		}
-		$theme_settings['global']['settings']['typography']['fontSizes'] = $font_sizes;
+		$theme_settings['settings'][ $all_blocks ]['typography']['fontSizes'] = $font_sizes;
+	}
+
+	// This allows to make the plugin work with WordPress 5.7 beta
+	// as well as lower versions. The second check can be removed
+	// as soon as the minimum WordPress version for the plugin
+	// is bumped to 5.7.
+	if ( isset( $settings['enableCustomSpacing'] ) ) {
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
+		}
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+	} elseif ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
+		}
+		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = true;
 	}
 
 	// Things that didn't land in core yet, so didn't have a setting assigned.
-	if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
-			$theme_settings['global']['settings']['spacing'] = array();
-		}
-		$theme_settings['global']['settings']['spacing']['customPadding'] = true;
-	}
-
 	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
-			$theme_settings['global']['settings']['color'] = array();
+		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
+			$theme_settings['settings'][ $all_blocks ]['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['link'] = true;
+		$theme_settings['settings'][ $all_blocks ]['color']['link'] = true;
 	}
 
 	return $theme_settings;
@@ -196,6 +206,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['enableCustomLineHeight'] );
 	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 
@@ -271,3 +282,112 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+
+
+/**
+ * Sanitizes global styles user content removing unsafe rules.
+ *
+ * @param string $content Post content to filter.
+ * @return string Filtered post content with unsafe rules removed.
+ */
+function gutenberg_global_styles_filter_post( $content ) {
+	$decoded_data        = json_decode( stripslashes( $content ), true );
+	$json_decoding_error = json_last_error();
+	if (
+		JSON_ERROR_NONE === $json_decoding_error &&
+		is_array( $decoded_data ) &&
+		isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
+		$decoded_data['isGlobalStylesUserThemeJSON']
+	) {
+		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
+		$theme_json = new WP_Theme_JSON( $decoded_data );
+		$theme_json->remove_insecure_properties();
+		$data_to_encode                                = $theme_json->get_raw_data();
+		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
+		return wp_json_encode( $data_to_encode );
+	}
+	return $content;
+}
+
+/**
+ * Adds the filters to filter global styles user theme.json.
+ */
+function gutenberg_global_styles_kses_init_filters() {
+	add_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+}
+
+/**
+ * Removes the filters to filter global styles user theme.json.
+ */
+function gutenberg_global_styles_kses_remove_filters() {
+	remove_filter( 'content_save_pre', 'gutenberg_global_styles_filter_post' );
+}
+
+/**
+ * Register global styles kses filters if the user does not have unfiltered_html capability.
+ *
+ * @uses render_block_core_navigation()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
+ */
+function gutenberg_global_styles_kses_init() {
+	gutenberg_global_styles_kses_remove_filters();
+	if ( ! current_user_can( 'unfiltered_html' ) ) {
+		gutenberg_global_styles_kses_init_filters();
+	}
+}
+
+/**
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable kses, independently of the user capabilities.
+ * So in that case we call gutenberg_global_styles_kses_init_filters;
+ *
+ * @param string $arg Input argument of the filter.
+ * @return string Exactly what was passed as argument.
+ */
+function gutenberg_global_styles_force_filtered_html_on_import_filter( $arg ) {
+	// force_filtered_html_on_import is true we need to init the global styles kses filters.
+	if ( $arg ) {
+		gutenberg_global_styles_kses_init_filters();
+	}
+	return $arg;
+}
+
+/**
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable kses, independently of the user capabilities.
+ * So in that case we call gutenberg_global_styles_kses_init_filters;
+ *
+ * @param bool $allow_css       Whether the CSS in the test string is considered safe.
+ * @param bool $css_test_string The CSS string to test..
+ * @return bool If $allow_css is true it returns true.
+ * If $allow_css is false and the CSS rule is referencing a WordPress css variable it returns true.
+ * Otherwise the function return false.
+ */
+function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $css_test_string ) {
+	if ( $allow_css ) {
+		return $allow_css;
+	}
+	$allowed_preset_attributes = array(
+		'background',
+		'background-color',
+		'color',
+		'font-family',
+		'font-size',
+	);
+	$parts                     = explode( ':', $css_test_string, 2 );
+
+	if ( ! in_array( trim( $parts[0] ), $allowed_preset_attributes, true ) ) {
+		return $allow_css;
+	}
+	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
+}
+
+
+add_action( 'init', 'gutenberg_global_styles_kses_init' );
+add_action( 'set_current_user', 'gutenberg_global_styles_kses_init' );
+add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filtered_html_on_import_filter', 999 );
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
+// This filter needs to be executed last.
+

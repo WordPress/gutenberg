@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { groupBy, deburr } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -7,15 +12,14 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/components';
+import {
+	__unstableComposite as Composite,
+	__unstableCompositeItem as CompositeItem,
+	Icon,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * External dependencies
- */
-import { groupBy, deburr } from 'lodash';
-import { Composite, useCompositeState, CompositeItem } from 'reakit';
 
 function PreviewPlaceholder() {
 	return (
@@ -32,7 +36,11 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const { id, slug, wp_theme_slug: theme } = templatePart;
+	const {
+		slug,
+		theme,
+		title: { rendered: title },
+	} = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -40,19 +48,19 @@ function TemplatePartItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { postId: id, slug, theme } );
+		setAttributes( { slug, theme } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
 				__( 'Template Part "%s" inserted.' ),
-				slug
+				title || slug
 			),
 			{
 				type: 'snackbar',
 			}
 		);
 		onClose();
-	}, [ id, slug, theme ] );
+	}, [ slug, theme ] );
 
 	return (
 		<CompositeItem
@@ -66,12 +74,12 @@ function TemplatePartItem( {
 				}
 			} }
 			tabIndex={ 0 }
-			aria-label={ templatePart.slug }
+			aria-label={ title || slug }
 			{ ...composite }
 		>
 			<BlockPreview blocks={ blocks } />
 			<div className="wp-block-template-part__selection-preview-item-title">
-				{ templatePart.slug }
+				{ title || slug }
 			</div>
 		</CompositeItem>
 	);
@@ -100,16 +108,12 @@ function TemplatePartsByTheme( {
 	composite,
 } ) {
 	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'wp_theme_slug' ) );
+		return Object.values( groupBy( templateParts, 'theme' ) );
 	}, [ templateParts ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
 	return templatePartsByTheme.map( ( templatePartList ) => (
-		<PanelGroup
-			key={ templatePartList[ 0 ].wp_theme_slug }
-			// Falsy theme implies custom template part.
-			title={ templatePartList[ 0 ].wp_theme_slug || __( 'Custom' ) }
-		>
+		<PanelGroup key={ templatePartList[ 0 ].theme }>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
 					<TemplatePartItem
@@ -139,7 +143,7 @@ function TemplatePartSearchResults( {
 		// Remove diacritics and convert to lowercase to normalize.
 		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { slug, wp_theme_slug: theme } ) =>
+			( { slug, theme } ) =>
 				slug.toLowerCase().includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
 				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
@@ -163,12 +167,10 @@ function TemplatePartSearchResults( {
 			// Second prioritize index found in theme.
 			// Since diacritics can be used in theme names, remove them for the comparison.
 			return (
-				deburr( a.wp_theme_slug )
+				deburr( a.theme )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue ) -
-				deburr( b.wp_theme_slug )
-					.toLowerCase()
-					.indexOf( normalizedFilterValue )
+				deburr( b.theme ).toLowerCase().indexOf( normalizedFilterValue )
 			);
 		} );
 		return searchResults;
@@ -179,7 +181,7 @@ function TemplatePartSearchResults( {
 	return filteredTPs.map( ( templatePart ) => (
 		<PanelGroup
 			key={ templatePart.id }
-			title={ templatePart.wp_theme_slug || __( 'Custom' ) }
+			title={ templatePart.theme || __( 'Custom' ) }
 		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
@@ -203,20 +205,12 @@ export default function TemplatePartPreviews( {
 } ) {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
-		const publishedTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				status: [ 'publish' ],
-				per_page: -1,
-			} ) || [];
-
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-		const themeTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				theme: currentTheme,
-				status: [ 'auto-draft' ],
-				per_page: -1,
-			} ) || [];
-		return [ ...themeTemplateParts, ...publishedTemplateParts ];
+		return (
+			select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			) || []
+		);
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {

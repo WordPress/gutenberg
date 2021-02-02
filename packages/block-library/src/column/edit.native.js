@@ -49,6 +49,7 @@ function ColumnEdit( {
 	selectedColumnIndex,
 	parentAlignment,
 	clientId,
+	blockWidth,
 } ) {
 	const { verticalAlignment, width } = attributes;
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
@@ -98,8 +99,8 @@ function ColumnEdit( {
 	};
 
 	const renderAppender = useCallback( () => {
-		const { width: blockWidth } = contentStyle[ clientId ];
-		const isScreenWidthEqual = blockWidth === screenWidth;
+		const { width: columnWidth } = contentStyle[ clientId ];
+		const isScreenWidthEqual = columnWidth === screenWidth;
 
 		if ( isSelected ) {
 			return (
@@ -137,41 +138,56 @@ function ColumnEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						min={ 1 }
-						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
-						onChange={ onChange }
-						onComplete={ onChangeWidth }
-						onUnitChange={ onChangeUnit }
-						decimalNum={ 1 }
-						value={ getWidths( columns )[ selectedColumnIndex ] }
-						unit={ widthUnit }
-						units={ CSS_UNITS }
-						preview={
-							<ColumnsPreview
-								columnWidths={ getWidths( columns, false ) }
-								selectedColumnIndex={ selectedColumnIndex }
+			{ isSelected && (
+				<>
+					<BlockControls>
+						<BlockVerticalAlignmentToolbar
+							onChange={ updateAlignment }
+							value={ verticalAlignment }
+						/>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Column settings' ) }>
+							<UnitControl
+								label={ __( 'Width' ) }
+								min={ 1 }
+								max={
+									isPercentageUnit( widthUnit )
+										? 100
+										: undefined
+								}
+								onChange={ onChange }
+								onComplete={ onChangeWidth }
+								onUnitChange={ onChangeUnit }
+								decimalNum={ 1 }
+								value={
+									getWidths( columns )[ selectedColumnIndex ]
+								}
+								unit={ widthUnit }
+								units={ CSS_UNITS }
+								preview={
+									<ColumnsPreview
+										columnWidths={ getWidths(
+											columns,
+											false
+										) }
+										selectedColumnIndex={
+											selectedColumnIndex
+										}
+									/>
+								}
 							/>
-						}
-					/>
-				</PanelBody>
-				<PanelBody>
-					<FooterMessageControl
-						label={ __(
-							'Note: Column layout may vary between themes and screen sizes'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
+						</PanelBody>
+						<PanelBody>
+							<FooterMessageControl
+								label={ __(
+									'Note: Column layout may vary between themes and screen sizes'
+								) }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</>
+			) }
 			<View
 				style={ [
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
@@ -181,6 +197,7 @@ function ColumnEdit( {
 				<InnerBlocks
 					renderAppender={ renderAppender }
 					parentWidth={ contentStyle[ clientId ].width }
+					blockWidth={ blockWidth }
 				/>
 			</View>
 		</>

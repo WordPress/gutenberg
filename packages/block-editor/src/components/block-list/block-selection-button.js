@@ -223,6 +223,12 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 				if ( navigateDown ) {
 					nextTabbable = focus.tabbable.findNext( blockElement );
+
+					if ( ! nextTabbable ) {
+						nextTabbable =
+							blockElement.ownerDocument.defaultView.frameElement;
+						nextTabbable = focus.tabbable.findNext( nextTabbable );
+					}
 				} else {
 					nextTabbable = focus.tabbable.findPrevious( blockElement );
 				}

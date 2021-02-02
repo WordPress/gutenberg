@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq } from 'lodash';
+import { castArray, uniq, truncate } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,11 @@ import {
 	ToolbarGroup,
 	ToolbarItem,
 } from '@wordpress/components';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import {
+	switchToBlockType,
+	store as blocksStore,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
 
@@ -29,11 +33,19 @@ import BlockStylesMenu from './block-styles-menu';
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
-	const { possibleBlockTransformations, hasBlockStyles, icon } = useSelect(
+	const {
+		possibleBlockTransformations,
+		hasBlockStyles,
+		icon,
+		blockTitle,
+	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockTransformItems } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockRootClientId,
+				getBlockTransformItems,
+				__experimentalGetReusableBlockTitle,
+			} = select( blockEditorStore );
+
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
@@ -43,8 +55,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const styles =
 				_isSingleBlockSelected && getBlockStyles( firstBlockName );
 			let _icon;
+			let reusableBlockTitle;
 			if ( _isSingleBlockSelected ) {
 				_icon = blockInformation?.icon; // Take into account active block variations.
+				reusableBlockTitle =
+					isReusableBlock( blocks[ 0 ] ) &&
+					__experimentalGetReusableBlockTitle(
+						blocks[ 0 ].attributes.ref
+					);
 			} else {
 				const isSelectionOfSameType =
 					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
@@ -54,6 +72,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
+
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -61,10 +80,15 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
+				blockTitle:
+					reusableBlockTitle || getBlockType( firstBlockName ).title,
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
+
+	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
+
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
@@ -74,13 +98,16 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				<ToolbarButton
 					disabled
 					className="block-editor-block-switcher__no-switcher-icon"
-					title={ __( 'Block icon' ) }
+					title={ blockTitle }
 					icon={ <BlockIcon icon={ icon } showColors /> }
 				/>
 			</ToolbarGroup>
 		);
 	}
-	const blockSwitcherLabel =
+
+	const blockSwitcherLabel = blockTitle;
+
+	const blockSwitcherDescription =
 		1 === blocks.length
 			? __( 'Change block type or style' )
 			: sprintf(
@@ -106,13 +133,25 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={
-							<BlockIcon
-								icon={ icon }
-								className="block-editor-block-switcher__toggle"
-								showColors
-							/>
+							<>
+								<BlockIcon
+									icon={ icon }
+									className="block-editor-block-switcher__toggle"
+									showColors
+								/>
+								{ isReusable && (
+									<span className="block-editor-block-switcher__toggle-text">
+										{ truncate( blockTitle, {
+											length: 35,
+										} ) }
+									</span>
+								) }
+							</>
 						}
-						toggleProps={ toggleProps }
+						toggleProps={ {
+							describedBy: blockSwitcherDescription,
+							...toggleProps,
+						} }
 						menuProps={ { orientation: 'both' } }
 					>
 						{ ( { onClose } ) =>
@@ -155,9 +194,13 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		[ clientIds ]
 	);
 
-	return !! blocks?.length ? (
+	if ( ! blocks.length || blocks.some( ( block ) => ! block ) ) {
+		return null;
+	}
+
+	return (
 		<BlockSwitcherDropdownMenu clientIds={ clientIds } blocks={ blocks } />
-	) : null;
+	);
 };
 
 export default BlockSwitcher;

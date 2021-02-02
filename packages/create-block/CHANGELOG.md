@@ -1,6 +1,12 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+### Bug Fix
+
+-   Extract the package name from the value passed as an external template ([#28383](https://github.com/WordPress/gutenberg/pull/28383)).
+
+## 2.0.0 (2021-01-21)
 
 ### Breaking Changes
 
@@ -9,6 +15,8 @@
 ### New Features
 
 -   Add support for handling static assets with the `assetsPath` field in the external template configuration ([#28038](https://github.com/WordPress/gutenberg/pull/28038)).
+-   Allow using locally installed packages with templates ([#28105](https://github.com/WordPress/gutenberg/pull/28105)).
+-   Add new CLI option `--wp-env` that lets users override the setting that template defines for integration with `@wordpress/env` package ([#28234](https://github.com/WordPress/gutenberg/pull/28234)).
 
 ### Internal
 
@@ -18,7 +26,7 @@
 
 ### New Feature
 
--   Adds the `npmPackages` field to the template configuration. It allows listing remote npm packages that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+-   Adds the `npmDependencies` field to the template configuration. It allows listing remote npm dependencies that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 -   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 
 ### Bug Fix

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.25.1",
+	"version": "9.25.2",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"editor"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/editor/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -59,7 +59,6 @@
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"refx": "^3.0.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

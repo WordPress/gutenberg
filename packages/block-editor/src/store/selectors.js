@@ -157,7 +157,7 @@ export const getBlock = createSelector(
 	},
 	( state, clientId ) => [
 		// Normally, we'd have both `getBlockAttributes` dependencies and
-		// `getBlocks` (children) dependancies here but for performance reasons
+		// `getBlocks` (children) dependencies here but for performance reasons
 		// we use a denormalized cache key computed in the reducer that takes both
 		// the attributes and inner blocks into account. The value of the cache key
 		// is being changed whenever one of these dependencies is out of date.
@@ -370,7 +370,7 @@ export function getBlockCount( state, rootClientId ) {
  * @return {WPBlockSelection} Selection start information.
  */
 export function getSelectionStart( state ) {
-	return state.selectionStart;
+	return state.selection.selectionStart;
 }
 
 /**
@@ -382,7 +382,7 @@ export function getSelectionStart( state ) {
  * @return {WPBlockSelection} Selection end information.
  */
 export function getSelectionEnd( state ) {
-	return state.selectionEnd;
+	return state.selection.selectionEnd;
 }
 
 /**
@@ -395,7 +395,7 @@ export function getSelectionEnd( state ) {
  * @return {?string} Client ID of block selection start.
  */
 export function getBlockSelectionStart( state ) {
-	return state.selectionStart.clientId;
+	return state.selection.selectionStart.clientId;
 }
 
 /**
@@ -408,7 +408,7 @@ export function getBlockSelectionStart( state ) {
  * @return {?string} Client ID of block selection end.
  */
 export function getBlockSelectionEnd( state ) {
-	return state.selectionEnd.clientId;
+	return state.selection.selectionEnd.clientId;
 }
 
 /**
@@ -426,7 +426,7 @@ export function getSelectedBlockCount( state ) {
 		return multiSelectedBlockCount;
 	}
 
-	return state.selectionStart.clientId ? 1 : 0;
+	return state.selection.selectionStart.clientId ? 1 : 0;
 }
 
 /**
@@ -437,7 +437,7 @@ export function getSelectedBlockCount( state ) {
  * @return {boolean} Whether a single block is selected.
  */
 export function hasSelectedBlock( state ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 	return (
 		!! selectionStart.clientId &&
 		selectionStart.clientId === selectionEnd.clientId
@@ -453,7 +453,7 @@ export function hasSelectedBlock( state ) {
  * @return {?string} Selected block client ID.
  */
 export function getSelectedBlockClientId( state ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 	const { clientId } = selectionStart;
 
 	if ( ! clientId || clientId !== selectionEnd.clientId ) {
@@ -709,7 +709,7 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
-		const { selectionStart, selectionEnd } = state;
+		const { selectionStart, selectionEnd } = state.selection;
 
 		if (
 			selectionStart.clientId === undefined ||
@@ -745,8 +745,8 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.selectionStart.clientId,
-		state.selectionEnd.clientId,
+		state.selection.selectionStart.clientId,
+		state.selection.selectionEnd.clientId,
 	]
 );
 
@@ -759,7 +759,7 @@ export const getSelectedBlockClientIds = createSelector(
  * @return {Array} Multi-selected block client IDs.
  */
 export function getMultiSelectedBlockClientIds( state ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId === selectionEnd.clientId ) {
 		return EMPTY_ARRAY;
@@ -870,8 +870,8 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.selectionStart.clientId,
-		state.selectionEnd.clientId,
+		state.selection.selectionStart.clientId,
+		state.selection.selectionEnd.clientId,
 	]
 );
 /**
@@ -887,7 +887,7 @@ export const isAncestorMultiSelected = createSelector(
  * @return {?string} Client ID of block beginning multi-selection.
  */
 export function getMultiSelectedBlocksStartClientId( state ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId === selectionEnd.clientId ) {
 		return null;
@@ -909,7 +909,7 @@ export function getMultiSelectedBlocksStartClientId( state ) {
  * @return {?string} Client ID of block ending multi-selection.
  */
 export function getMultiSelectedBlocksEndClientId( state ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId === selectionEnd.clientId ) {
 		return null;
@@ -956,7 +956,7 @@ export function getBlockIndex( state, clientId, rootClientId ) {
  * @return {boolean} Whether block is selected and multi-selection exists.
  */
 export function isBlockSelected( state, clientId ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId !== selectionEnd.clientId ) {
 		return false;
@@ -1014,7 +1014,7 @@ export function isBlockWithinSelection( state, clientId ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state ) {
-	const { selectionStart, selectionEnd } = state;
+	const { selectionStart, selectionEnd } = state.selection;
 	return selectionStart.clientId !== selectionEnd.clientId;
 }
 
@@ -1157,7 +1157,10 @@ export function isCaretWithinFormattedText( state ) {
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
 
-	const { insertionPoint, selectionEnd } = state;
+	const {
+		insertionPoint,
+		selection: { selectionEnd },
+	} = state;
 	if ( insertionPoint !== null ) {
 		return insertionPoint;
 	}
@@ -1233,9 +1236,11 @@ export function getTemplateLock( state, rootClientId ) {
  * This function is not exported and not memoized because using a memoized selector
  * inside another memoized selector is just a waste of time.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object}         state        Editor state.
+ * @param {string|Object}  blockName    The block type object, e.g., the response
+ *                                      from the block directory; or a string name of
+ *                                      an installed block type, e.g.' core/paragraph'.
+ * @param {?string}        rootClientId Optional root client ID of block list.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
@@ -1260,7 +1265,13 @@ const canInsertBlockTypeUnmemoized = (
 		return defaultResult;
 	};
 
-	const blockType = getBlockType( blockName );
+	let blockType;
+	if ( blockName && 'object' === typeof blockName ) {
+		blockType = blockName;
+		blockName = blockType.name;
+	} else {
+		blockType = getBlockType( blockName );
+	}
 	if ( ! blockType ) {
 		return false;
 	}
@@ -1391,6 +1402,7 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 	icon: variation.icon || item.icon,
 	title: variation.title || item.title,
 	description: variation.description || item.description,
+	category: variation.category || item.category,
 	// If `example` is explicitly undefined for the variation, the preview will not be shown.
 	example: variation.hasOwnProperty( 'example' )
 		? variation.example
@@ -1806,6 +1818,29 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 );
 
 /**
+ * Returns the title of a given reusable block
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {string} The reusable block saved title.
+ */
+export const __experimentalGetReusableBlockTitle = createSelector(
+	( state, ref ) => {
+		const reusableBlock = find(
+			getReusableBlocks( state ),
+			( block ) => block.id === ref
+		);
+		if ( ! reusableBlock ) {
+			return null;
+		}
+
+		return reusableBlock.title?.raw;
+	},
+	( state ) => [ getReusableBlocks( state ) ]
+);
+
+/**
  * Returns true if the most recent block change is be considered ignored, or
  * false otherwise. An ignored change is one not to be committed by
  * BlockEditorProvider, neither via `onChange` nor `onInput`.
@@ -1944,8 +1979,8 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		return null;
 	},
 	( state, validBlockNames ) => [
-		state.selectionStart.clientId,
-		state.selectionEnd.clientId,
+		state.selection.selectionStart.clientId,
+		state.selection.selectionEnd.clientId,
 		validBlockNames,
 	]
 );

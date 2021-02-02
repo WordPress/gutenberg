@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.16.1",
+	"version": "1.16.2",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"editor",
 		"site"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-site/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-site/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { pressKeyWithModifier } from './press-key-with-modifier';
+import { canvas } from './canvas';
 
 // This selector is written to support the current and old inserter markup
 // because the performance tests need to be able to run across versions.
@@ -57,12 +58,11 @@ export async function toggleGlobalBlockInserter() {
  * Retrieves the document container by css class and checks to make sure the document's active element is within it
  */
 async function waitForInserterCloseAndContentFocus() {
-	await page.waitForFunction( () =>
-		document.body
-			.querySelector(
-				'.interface-interface-skeleton__content .block-editor-block-list__layout'
-			)
-			.contains( document.activeElement )
+	await canvas().waitForFunction(
+		() =>
+			document.activeElement.closest(
+				'.block-editor-block-list__layout'
+			) !== null
 	);
 }
 

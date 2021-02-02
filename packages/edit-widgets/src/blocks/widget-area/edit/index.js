@@ -1,15 +1,14 @@
 /**
- * External dependencies
- */
-import { DisclosureContent } from 'reakit/Disclosure';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
-import { Panel, PanelBody } from '@wordpress/components';
+import {
+	__unstableDisclosureContent as DisclosureContent,
+	Panel,
+	PanelBody,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies

@@ -12,7 +12,7 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { get, pickBy, debounce } from 'lodash';
+import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -32,6 +32,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
@@ -46,7 +47,6 @@ import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
-import { store as richTextStore } from '../store';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -114,6 +114,9 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
+		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -269,6 +272,13 @@ export class RichText extends Component {
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
+	}
+
+	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
+	convertFontSizeFromString( fontSize ) {
+		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
+			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
+			: fontSize;
 	}
 
 	/*
@@ -799,7 +809,6 @@ export class RichText extends Component {
 			maxWidth,
 			formatTypes,
 			parentBlockStyles,
-			withoutInteractiveFormatting,
 			accessibilityLabel,
 			disableEditingMenu = false,
 		} = this.props;
@@ -936,7 +945,9 @@ export class RichText extends Component {
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
-						this.props.fontSize || ( style && style.fontSize )
+						this.props.fontSize ||
+						( style &&
+							this.convertFontSizeFromString( style.fontSize ) )
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
@@ -953,9 +964,6 @@ export class RichText extends Component {
 						<FormatEdit
 							formatTypes={ formatTypes }
 							value={ record }
-							withoutInteractiveFormatting={
-								withoutInteractiveFormatting
-							}
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
@@ -977,6 +985,16 @@ RichText.defaultProps = {
 	tagName: 'div',
 };
 
+const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const { formatTypes } = useFormatTypes( {
+		clientId: props.clientId,
+		identifier: props.identifier,
+		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+	} );
+
+	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
+};
+
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockParents, getBlock, getSettings } = select(
@@ -988,7 +1006,6 @@ export default compose( [
 			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
 
 		return {
-			formatTypes: select( richTextStore ).getFormatTypes(),
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
@@ -996,4 +1013,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withFormatTypes,
 ] )( RichText );

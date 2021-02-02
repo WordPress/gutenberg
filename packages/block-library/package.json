@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.27.1",
+	"version": "2.27.2",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-library/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -61,8 +61,7 @@
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^3.0.0",
-		"reakit": "1.3.4",
-		"tinycolor2": "^1.4.1"
+		"tinycolor2": "^1.4.2"
 	},
 	"publishConfig": {
 		"access": "public"

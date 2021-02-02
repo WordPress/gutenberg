@@ -50,7 +50,7 @@ export function QueryContent( {
 		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.exclude, postId ] );
+	}, [ query.perPage, query.exclude, query.inherit, postId ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {

@@ -54,6 +54,36 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'import/default': 'error',
+		'import/named': 'error',
+		'no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'lodash',
+						importNames: [ 'memoize' ],
+						message: 'Please use `memize` instead.',
+					},
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+					},
+					{
+						name: 'reakit',
+						message:
+							'Please use Reakit API through `@wordpress/components` instead.',
+					},
+					{
+						name: 'redux',
+						importNames: [ 'combineReducers' ],
+						message:
+							'Please use `combineReducers` from `@wordpress/data` instead.',
+					},
+				],
+			},
+		],
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
@@ -81,17 +111,13 @@ module.exports = {
 			},
 			{
 				selector:
-					'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
-				message: 'Use `combineReducers` from `@wordpress/data`',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
-				message: 'Use memize instead of Lodash’s memoize',
-			},
-			{
-				selector:
 					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message:
+					'This method is deprecated. You should use the more explicit API methods available.',
+			},
+			{
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
@@ -128,6 +154,7 @@ module.exports = {
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
+				'import/named': 'off',
 			},
 		},
 		{

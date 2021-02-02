@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "1.25.1",
+	"version": "2.0.1",
 	"description": "End-To-End (E2E) tests for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"e2e",
 		"tests"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/e2e-tests/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-tests/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

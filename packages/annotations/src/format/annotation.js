@@ -7,7 +7,10 @@ import { applyFormat, removeFormat } from '@wordpress/rich-text';
 const FORMAT_NAME = 'core/annotation';
 
 const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
-const STORE_NAME = 'core/annotations';
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME } from '../store/constants';
 
 /**
  * Applies given annotations to the given record.

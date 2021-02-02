@@ -52,6 +52,14 @@ export class FocalPointPicker extends Component {
 	componentDidMount() {
 		document.addEventListener( 'mouseup', this.handleOnMouseUp );
 		window.addEventListener( 'resize', this.updateBounds );
+
+		/*
+		 * Set initial bound values.
+		 *
+		 * This is necessary for Safari:
+		 * https://github.com/WordPress/gutenberg/issues/25814
+		 */
+		this.updateBounds();
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
@@ -59,7 +67,7 @@ export class FocalPointPicker extends Component {
 				isDragging: false,
 			} );
 		}
-		/**
+		/*
 		 * Handles cases where the incoming value changes.
 		 * An example is the values resetting based on an UNDO action.
 		 */
@@ -81,10 +89,19 @@ export class FocalPointPicker extends Component {
 			return bounds;
 		}
 
+		// Prevent division by zero when updateBounds runs in componentDidMount
+		if (
+			this.mediaRef.current.clientWidth === 0 ||
+			this.mediaRef.current.clientHeight === 0
+		) {
+			return bounds;
+		}
+
 		const dimensions = {
 			width: this.mediaRef.current.clientWidth,
 			height: this.mediaRef.current.clientHeight,
 		};
+
 		const pickerDimensions = this.pickerDimensions();
 
 		const widthRatio = pickerDimensions.width / dimensions.width;
@@ -172,6 +189,9 @@ export class FocalPointPicker extends Component {
 		const { isDragging, bounds } = this.state;
 
 		if ( ! isDragging ) return;
+
+		// Prevents text-selection when dragging.
+		event.preventDefault();
 
 		const { shiftKey } = event;
 		const pickerDimensions = this.pickerDimensions();

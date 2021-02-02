@@ -61,6 +61,7 @@ export {
 	getSaveElement,
 	getSaveContent,
 	getBlockProps as __unstableGetBlockProps,
+	__unstableSerializeAndClean,
 } from './serializer';
 
 // Validation is the process of comparing a block source with its output before

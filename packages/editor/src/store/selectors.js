@@ -20,6 +20,7 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
+	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
@@ -38,7 +39,6 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import serializeBlocks from './utils/serialize-blocks';
 import { cleanForSlug } from '../utils/url';
 
 /**
@@ -757,7 +757,12 @@ export function isEditedPostBeingScheduled( state ) {
 export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
-	const status = getEditedPostAttribute( state, 'status' );
+
+	// This should be the status of the persisted post
+	// It shouldn't use the "edited" status otherwise it breaks the
+	// infered post data floating status
+	// See https://github.com/WordPress/gutenberg/issues/28083
+	const status = getCurrentPost( state ).status;
 	if (
 		status === 'draft' ||
 		status === 'auto-draft' ||
@@ -991,7 +996,7 @@ export const getEditedPostContent = createRegistrySelector(
 			if ( typeof record.content === 'function' ) {
 				return record.content( record );
 			} else if ( record.blocks ) {
-				return serializeBlocks( record.blocks );
+				return __unstableSerializeAndClean( record.blocks );
 			} else if ( record.content ) {
 				return record.content;
 			}

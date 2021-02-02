@@ -55,17 +55,6 @@ export function isProcessingPost( postId ) {
 }
 
 /**
- * Selects widgetId -> clientId mapping (necessary for saving widgets).
- *
- * @return {Object} Action.
- */
-export function getWidgetToClientIdMapping() {
-	return {
-		type: 'GET_WIDGET_TO_CLIENT_ID_MAPPING',
-	};
-}
-
-/**
  * Resolves navigation post for given menuId.
  *
  * @see selectors.js
@@ -142,6 +131,8 @@ export function dispatch( registryName, actionName, ...args ) {
 }
 
 const controls = {
+	AWAIT_PROMISE: ( { promise } ) => promise,
+
 	SELECT: createRegistryControl(
 		( registry ) => ( { registryName, selectorName, args } ) => {
 			return registry.select( registryName )[ selectorName ]( ...args );
@@ -160,12 +151,6 @@ const controls = {
 	IS_PROCESSING_POST: createRegistryControl(
 		( registry ) => ( { postId } ) => {
 			return getState( registry ).processingQueue[ postId ]?.inProgress;
-		}
-	),
-
-	GET_WIDGET_TO_CLIENT_ID_MAPPING: createRegistryControl(
-		( registry ) => () => {
-			return getState( registry ).mapping || {};
 		}
 	),
 
