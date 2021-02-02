@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `JustifyToolbar` component abstracted out of the Navigation block so can be used elsewhere.
+
 ## 5.2.0 (2020-12-17)
 
 ### New Feature
