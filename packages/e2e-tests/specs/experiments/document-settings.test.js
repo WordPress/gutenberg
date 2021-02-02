@@ -35,8 +35,6 @@ describe( 'Document Settings', () => {
 		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
