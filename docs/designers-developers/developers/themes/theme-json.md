@@ -493,8 +493,16 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 The `--` as a separator has two functions:
 
-- Readibility, for human understanding.
-- Be able to parse back a variable name such as `--wp--preset--color--black` into its semantic parts. This way, machines can know that this is a value bounded to the color preset with the slug "black".
+- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+
+## Why using `--` as a separator?
+
+We could have used any other separator, such as a single `-`.
+
+However, that'd have been problematic, as it'd have been impossible to tell how `--wp-custom-line-height-template-header` should be converted back into an object, unless we force theme authors not to use `-` in their variable names.
+
+By reserving `--` as a category separator and let theme authors use `-` for word-boundaries, the naming is clearer: `--wp--custom--line-height--template-header`.
 
 ### How settings under "custom" create new CSS Custom Properties
 
