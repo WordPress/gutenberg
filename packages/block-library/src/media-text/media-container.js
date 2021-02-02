@@ -17,6 +17,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,15 +40,20 @@ export function imageFillStyles( url, focalPoint ) {
 		: {};
 }
 
-function ResizableBoxContainer( { isSelected, isStackedOnMobile, ...props } ) {
-	const isMobile = useViewportMatch( 'small', '<' );
-	return (
-		<ResizableBox
-			showHandle={ isSelected && ( ! isMobile || ! isStackedOnMobile ) }
-			{ ...props }
-		/>
-	);
-}
+const ResizableBoxContainer = forwardRef(
+	( { isSelected, isStackedOnMobile, ...props }, ref ) => {
+		const isMobile = useViewportMatch( 'small', '<' );
+		return (
+			<ResizableBox
+				ref={ ref }
+				showHandle={
+					isSelected && ( ! isMobile || ! isStackedOnMobile )
+				}
+				{ ...props }
+			/>
+		);
+	}
+);
 
 function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	return (
@@ -90,7 +96,7 @@ function PlaceholderContainer( {
 	);
 }
 
-function MediaContainer( props ) {
+function MediaContainer( props, ref ) {
 	const {
 		className,
 		commitWidthChange,
@@ -154,6 +160,7 @@ function MediaContainer( props ) {
 				axis="x"
 				isSelected={ isSelected }
 				isStackedOnMobile={ isStackedOnMobile }
+				ref={ ref }
 			>
 				<ToolbarEditButton
 					onSelectMedia={ onSelectMedia }
@@ -168,4 +175,4 @@ function MediaContainer( props ) {
 	return <PlaceholderContainer { ...props } />;
 }
 
-export default withNotices( MediaContainer );
+export default withNotices( forwardRef( MediaContainer ) );
