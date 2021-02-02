@@ -6,6 +6,7 @@ import { useEffect } from '@wordpress/element';
 export function useInlineWarning( { ref } ) {
 	useEffect( () => {
 		if ( process.env.NODE_ENV === 'development' ) {
+			if ( ! ref.current ) return;
 			const target = ref.current;
 			const { defaultView } = target.ownerDocument;
 			const computedStyle = defaultView.getComputedStyle( target );

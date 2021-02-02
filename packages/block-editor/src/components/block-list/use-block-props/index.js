@@ -3,11 +3,12 @@
  */
 import classnames from 'classnames';
 import { omit } from 'lodash';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useContext } from '@wordpress/element';
+import { useRef, useEffect, useContext, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 
@@ -92,7 +93,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
 	useFocusFirstElement( ref, clientId );
-	useEventHandlers( ref, clientId );
+	const eventHandlersRef = useEventHandlers( ref, clientId );
 
 	// Block Reordering animation
 	useMovingAnimation(
@@ -107,10 +108,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 
+	const mergedRefs = useCallback( mergeRefs( [ ref, eventHandlersRef ] ), [
+		ref,
+		eventHandlersRef,
+	] );
 	return {
 		...wrapperProps,
 		...props,
-		ref,
+		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		tabIndex: 0,
 		role: 'group',
