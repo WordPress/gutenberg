@@ -18,22 +18,20 @@
 		font-size: 15px;
 	}
 
-	// This _should_ force the vertical variation
+	// This _should_ force the vertical variation. Should we just force the screen
+	// to load the vertical variant, instead of forcing it like this?
 	.wp-block-navigation__container {
 		display: block;
 	}
 
 	.wp-block-navigation-link {
-		padding: 12px;
-		border-radius: 2px;
-
-		&:hover {
-			box-shadow: 0 0 0 1px $gray-300;
-		}
+		display: block;
+		align-items: baseline;
+		padding: 0;
 
 		// The following is a really stupid way to fix the focus outlines
-		&:focus-within,
-		&:hover:focus-within {
+		&.is-selected > .wp-block-navigation-link__content,
+		&.is-selected:hover > .wp-block-navigation-link__content {
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 		&.block-editor-block-list__block:not([contenteditable]):focus::after {
@@ -42,7 +40,36 @@
 	}
 
 	.wp-block-navigation-link__content {
-		padding: 0;
+		padding: 12px;
+		border-radius: 2px;
+
+		&:hover {
+			box-shadow: 0 0 0 1px $gray-300;
+		}
+	}
+
+	// Hide the submenu icons
+	.wp-block-navigation-link__submenu-icon {
+		display: none;
+	}
+
+	// Submenus
+	// There's a bunch of stuff to override just to get submenus to
+	// as a normal block element.
+	.wp-block-navigation-link.has-child {
+		> .wp-block-navigation-link__content {
+			//padding-right: inherit;
+		}
+
+		.wp-block-navigation__container {
+			border: none;
+			opacity: 1;
+			position: relative;
+			visibility: visible;
+			margin: 2px 0 2px 18px;
+			width: calc(100% - 18px);
+			left: 0;
+		}
 	}
 
 	.block-list-appender {
