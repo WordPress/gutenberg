@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.18.0 (2021-02-2)
+
+### Enhancements
+
+- Allow the return values of i18n functions to be filtered ([#27966](https://github.com/WordPress/gutenberg/pull/27966))
+
 ## 3.17.0 (2020-12-17)
 
 ### Enhancements
