@@ -2,10 +2,8 @@
  * Internal dependencies
  */
 import { withNext } from '../ui/context';
-import { Text as NextText } from '../ui/text';
+import { Text } from '../ui/text';
 import { text } from './styles/text-mixins';
-
-const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
 
 /**
  * @typedef AdaptedTextProps

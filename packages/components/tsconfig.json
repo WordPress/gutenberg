@@ -15,13 +15,16 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/text/**/*",
 		"src/tip/**/*",
-		"src/ui/**/*",
+		"src/ui/context/**/*",
+		"src/ui/grid/**/*",
+		"src/ui/text/**/*",
+		"src/ui/truncate/**/*",
+		"src/ui/utils/**/*",
+		"src/ui/view/**/*",
 		"src/utils/**/*",
 		"src/visually-hidden/**/*",
-		"src/text/**/*",
-		"src/grid/**/*",
-		"src/__next/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
@@ -30,6 +33,5 @@
 		"src/**/react-native-*",
 		"src/**/stories",
 		"src/**/test",
-		"src/ui/font-size-control"
 	]
 }
