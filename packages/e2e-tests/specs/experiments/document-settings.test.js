@@ -14,21 +14,19 @@ import { addQueryArgs } from '@wordpress/url';
 import { navigationPanel } from '../../experimental-features';
 
 async function getDocumentSettingsTitle() {
-	await page.waitForSelector( '.edit-site-document-actions__title' );
-
-	return page.$eval(
-		'.edit-site-document-actions__title',
-		( el ) => el.innerText
+	const titleElement = await page.waitForSelector(
+		'.edit-site-document-actions__title'
 	);
+
+	return titleElement.evaluate( ( el ) => el.innerText );
 }
 
 async function getDocumentSettingsSecondaryTitle() {
-	await page.waitForSelector( '.edit-site-document-actions__secondary-item' );
-
-	return page.$eval(
-		'.edit-site-document-actions__secondary-item',
-		( el ) => el.innerText
+	const secondaryTitleElement = await page.waitForSelector(
+		'.edit-site-document-actions__secondary-item'
 	);
+
+	return secondaryTitleElement.evaluate( ( el ) => el.innerText );
 }
 
 describe( 'Document Settings', () => {
