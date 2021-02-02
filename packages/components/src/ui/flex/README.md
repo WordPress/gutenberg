@@ -7,7 +7,7 @@
 `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
 
 ```jsx live
-import { Flex, FlexItem, FlexBlock, Text, View } from '@wp-g2/components';
+import { Flex, FlexItem, FlexBlock, Text, View } from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -44,7 +44,7 @@ In the example below, `flex-start` will align the children content to the top.
 The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 
 ```jsx live
-import { Flex, Text, View } from '@wp-g2/components';
+import { Flex, Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {
@@ -68,7 +68,7 @@ function Example() {
 Expands to the maximum available width (if horizontal) or height (if vertical).
 
 ```jsx live
-import { Flex, Text, View } from '@wp-g2/components';
+import { Flex, Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {
@@ -92,7 +92,7 @@ function Example() {
 Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
 
 ```jsx live
-import { Flex, Text, View } from '@wp-g2/components';
+import { Flex, Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {
@@ -123,7 +123,7 @@ In the example below, `flex-start` will align the children content to the left.
 Determines if children should wrap.
 
 ```jsx live
-import { Flex, Text, View } from '@wp-g2/components';
+import { Flex, Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {

@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react';
-import { ResponsiveCSSValue } from '../../utils/types';
+import { ResponsiveCSSValue } from '../utils/types';
 
 export type FlexDirection = ResponsiveCSSValue< CSSProperties[ 'flexDirection' ] >;
 
@@ -13,7 +13,7 @@ export type FlexProps = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Flex, Text, View } from `@wp-g2/components`
+	 * import { Flex, Text, View } from `@wordpress/components/ui`
 	 * import { ui } from `@wp-g2/styles`
 	 *
 	 * function Example() {
@@ -42,7 +42,7 @@ export type FlexProps = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Flex, Text, View } from `@wp-g2/components`
+	 * import { Flex, Text, View } from `@wordpress/components/ui`
 	 * import { ui } from `@wp-g2/styles`
 	 *
 	 * function Example() {
@@ -67,7 +67,7 @@ export type FlexProps = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Flex, Text, View } from `@wp-g2/components`
+	 * import { Flex, Text, View } from `@wordpress/components/ui`
 	 * import { ui } from `@wp-g2/styles`
 	 *
 	 * function Example() {
@@ -92,7 +92,7 @@ export type FlexProps = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Flex, Text, View } from `@wp-g2/components`
+	 * import { Flex, Text, View } from `@wordpress/components/ui`
 	 * import { ui } from `@wp-g2/styles`
 	 *
 	 * function Example() {
@@ -118,7 +118,7 @@ export type FlexProps = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Flex, Text, View } from `@wp-g2/components`
+	 * import { Flex, Text, View } from `@wordpress/components/ui`
 	 * import { ui } from `@wp-g2/styles`
 	 *
 	 * function Example() {
@@ -147,7 +147,7 @@ export type FlexProps = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Flex, Text, View } from `@wp-g2/components`
+	 * import { Flex, Text, View } from `@wordpress/components/ui`
 	 * import { ui } from `@wp-g2/styles`
 	 *
 	 * function Example() {

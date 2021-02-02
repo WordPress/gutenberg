@@ -3,11 +3,11 @@
  */
 import Flex from '../flex';
 import FlexItem from '../flex-item';
-import View from '../../../view';
+import { View } from '../../view';
 
 export default {
 	component: Flex,
-	title: 'Components/G2/Flex',
+	title: 'G2 Components (Experimental)/Flex',
 };
 
 export const _default = () => {

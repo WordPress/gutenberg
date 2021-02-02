@@ -1,14 +1,12 @@
 /**
  * Internal dependencies
  */
-import { __unstableWithNext as withNext } from '../../__next/context';
-import NextFlex from './flex';
-import NextFlexBlock from './flex-block';
-import NextFlexItem from './flex-item';
-
-export * from './use-flex';
-export * from './use-flex-block';
-export * from './use-flex-item';
+import { withNext } from '../ui/context';
+import {
+	Flex as NextFlex,
+	FlexItem as NextFlexItem,
+	FlexBlock as NextFlexBlock,
+} from '../ui/flex';
 
 const Flex = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlex : undefined;
 const FlexBlock =
@@ -17,8 +15,8 @@ const FlexItem =
 	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlexItem : undefined;
 
 /**
- * @param {import('../index').Props} props Current props.
- * @return {import('./types').FlexProps} Next props.
+ * @param {import('./index').Props} props Current props.
+ * @return {import('../ui/flex/types').FlexProps} Next props.
  */
 const flexAdapter = ( { isReversed, ...restProps } ) => ( {
 	// There's no equivalent for `direction` on the original component so we can just translate `isReversed` to it
@@ -29,8 +27,8 @@ const flexAdapter = ( { isReversed, ...restProps } ) => ( {
 } );
 
 /**
- * @param {import('../item').Props} props Current props.
- * @return {import('./types').FlexItemProps} Next props.
+ * @param {import('./item').Props} props Current props.
+ * @return {import('../ui/flex/types').FlexItemProps} Next props.
  */
 const flexItemAdapter = ( props ) => ( {
 	...props,
@@ -40,8 +38,8 @@ const flexItemAdapter = ( props ) => ( {
 } );
 
 /**
- * @param {import('../block').Props} props Current props.
- * @return {import('./types').FlexBlockProps} Next props.
+ * @param {import('./block').Props} props Current props.
+ * @return {import('../ui/flex/types').FlexBlockProps} Next props.
  */
 const flexBlockAdapter = ( props ) => ( {
 	...props,
@@ -51,7 +49,7 @@ const flexBlockAdapter = ( props ) => ( {
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('react').ForwardRefExoticComponent<import('../index').Props>} Current
+ * @param {import('react').ForwardRefExoticComponent<import('./index').Props>} Current
  */
 /* eslint-enable jsdoc/valid-types */
 export function withNextFlex( Current ) {
@@ -60,7 +58,7 @@ export function withNextFlex( Current ) {
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('react').ForwardRefExoticComponent<import('../item').Props>} Current
+ * @param {import('react').ForwardRefExoticComponent<import('./item').Props>} Current
  */
 /* eslint-enable jsdoc/valid-types */
 export function withNextFlexItem( Current ) {
@@ -69,7 +67,7 @@ export function withNextFlexItem( Current ) {
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('react').ForwardRefExoticComponent<import('../block').Props>} Current
+ * @param {import('react').ForwardRefExoticComponent<import('./block').Props>} Current
  */
 /* eslint-enable jsdoc/valid-types */
 export function withNextFlexBlock( Current ) {
