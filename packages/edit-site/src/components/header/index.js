@@ -13,6 +13,7 @@ import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
 import { navigationMenu, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -35,6 +36,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 		templateType,
 		isInserterOpen,
 		isBlockNavigationOpen,
+		blockNavigationShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -48,6 +50,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
 			'core/editor'
 		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -65,6 +68,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 			templateType: postType,
 			isInserterOpen: isInserterOpened(),
 			isBlockNavigationOpen: isBlockNavigationOpened(),
+			blockNavigationShortcut: getShortcutRepresentation(
+				'core/edit-site/toggle-block-navigation'
+			),
 		};
 	}, [] );
 
@@ -110,16 +116,17 @@ export default function Header( { openEntitiesSavedStates } ) {
 							<UndoButton />
 							<RedoButton />
 							<Button
-								isPressed={ isBlockNavigationOpen }
 								className="edit-site-header-toolbar__block-navigation-toggle"
+								icon={ navigationMenu }
+								isPressed={ isBlockNavigationOpen }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'Outline' ) }
 								onClick={ () =>
 									setIsBlockNavigationOpened(
 										! isBlockNavigationOpen
 									)
 								}
-								icon={ navigationMenu }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'Outline' ) }
+								shortcut={ blockNavigationShortcut }
 							/>
 						</>
 					) }
