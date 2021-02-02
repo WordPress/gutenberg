@@ -35,6 +35,7 @@ const ImageComponent = ( {
 	editButton = true,
 	focalPoint,
 	height: imageHeight,
+	highlightSelected = true,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
@@ -186,14 +187,16 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
-					<View
-						style={ [
-							styles.imageBorder,
-							{ height: containerSize?.height },
-						] }
-					/>
-				) }
+				{ isSelected &&
+					highlightSelected &&
+					! ( isUploadInProgress || isUploadFailed ) && (
+						<View
+							style={ [
+								styles.imageBorder,
+								{ height: containerSize?.height },
+							] }
+						/>
+					) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>

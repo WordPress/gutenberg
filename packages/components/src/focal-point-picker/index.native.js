@@ -203,6 +203,7 @@ function FocalPointPicker( props ) {
 						{ ! isVideo && (
 							<Image
 								editButton={ false }
+								highlightSelected={ false }
 								isSelected={ ! displayPlaceholder }
 								height="100%"
 								url={ url }

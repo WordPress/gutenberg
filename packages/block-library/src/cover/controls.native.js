@@ -191,6 +191,7 @@ function Controls( {
 								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 									<Image
 										editButton={ ! displayPlaceholder }
+										highlightSelected={ false }
 										isSelected={ ! displayPlaceholder }
 										isUploadFailed={ didUploadFail }
 										isUploadInProgress={
