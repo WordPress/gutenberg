@@ -51,7 +51,6 @@ function Controls( {
 	setAttributes,
 } ) {
 	const {
-		backgroundColor,
 		backgroundType,
 		dimRatio,
 		hasParallax,
@@ -113,6 +112,10 @@ function Controls( {
 
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 
+	const mediaBackground = usePreferredColorSchemeStyle(
+		styles.mediaBackground,
+		styles.mediaBackgroundDark
+	);
 	const imagePreviewStyles = [
 		displayPlaceholder && styles.imagePlaceholder,
 	];
@@ -179,8 +182,10 @@ function Controls( {
 				{ url ? (
 					<>
 						<BottomSheet.Cell
-							style={ backgroundColor }
-							cellContainerStyle={ styles.mediaPreview }
+							cellContainerStyle={ [
+								styles.mediaPreview,
+								mediaBackground,
+							] }
 						>
 							<View style={ styles.mediaInner }>
 								{ IMAGE_BACKGROUND_TYPE === backgroundType && (

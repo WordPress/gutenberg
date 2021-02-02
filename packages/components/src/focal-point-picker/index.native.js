@@ -120,9 +120,9 @@ function FocalPointPicker( props ) {
 		[ containerSize ]
 	);
 
-	const backgroundColor = usePreferredColorSchemeStyle(
-		styles.backgroundSolid,
-		styles.backgroundSolidDark
+	const mediaBackground = usePreferredColorSchemeStyle(
+		styles.mediaBackground,
+		styles.mediaBackgroundDark
 	);
 	const imagePreviewStyles = [
 		displayPlaceholder && styles.mediaPlaceholder,
@@ -194,7 +194,7 @@ function FocalPointPicker( props ) {
 	return (
 		<View style={ styles.container }>
 			<Tooltip onPress={ onTooltipPress } visible={ tooltipVisible }>
-				<View style={ [ styles.media, backgroundColor ] }>
+				<View style={ [ styles.media, mediaBackground ] }>
 					<View
 						{ ...panResponder.panHandlers }
 						onLayout={ onMediaLayout }
