@@ -343,15 +343,16 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
-			$is_custom      = array_search(
+			$is_not_custom      = false === array_search(
 				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
-			$should_include = false === $is_custom && (
-				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true ) ) && (
-					! isset( $query['section'] ) || $template_file['section'] === $query['section']
-				);
+			$fits_slug_query    =
+				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true );
+			$fits_section_query =
+				! isset( $query['section'] ) || $template_file['section'] === $query['section'];
+			$should_include     = $is_not_custom && $fits_slug_query && $fits_section_query;
 			if ( $should_include ) {
 				$query_result[] = _gutenberg_build_template_result_from_file( $template_file, $template_type );
 			}
