@@ -241,6 +241,7 @@ function Controls( {
 							</View>
 						</BottomSheet.Cell>
 						<FocalPointSettings
+							disabled={ hasParallax }
 							focalPoint={
 								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
 							}

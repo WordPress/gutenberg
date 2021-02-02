@@ -11,11 +11,17 @@ import { Icon, BottomSheet } from '@wordpress/components';
 import { blockSettingsScreens } from '@wordpress/block-editor';
 import { chevronRight } from '@wordpress/icons';
 
-function FocalPointSettings( { focalPoint, onFocalPointChange, url } ) {
+function FocalPointSettings( {
+	disabled,
+	focalPoint,
+	onFocalPointChange,
+	url,
+} ) {
 	const navigation = useNavigation();
 	return (
 		<BottomSheet.Cell
 			customActionButton
+			disabled={ disabled }
 			leftAlign
 			label={ __( 'Edit focal point' ) }
 			onPress={ () => {
