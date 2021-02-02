@@ -67,9 +67,8 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 					$new_template_item,
 					$template_part_data
 				);
-			} else {
-				return $new_template_item;
 			}
+			return $new_template_item;
 		}
 	}
 
