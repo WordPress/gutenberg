@@ -15,6 +15,7 @@ This is documentation for the current direction and work in progress about how t
     - Styles
 - FAQ
   - The naming schema of CSS Custom Properties
+  - Why using -- as a separator?
   - How settings under "custom" create new CSS Custom Properties
 
 ## Rationale
