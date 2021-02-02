@@ -10,12 +10,10 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-* [***] New Block: Audio
-* [**] Add support for setting heading anchors
-* [**] Disable Unsupported Block Editor for Reusable blocks
-
-#### Bug Fix
-* Add proper handling for single use blocks such as the more block [#28339]
+* [***] New Block: Audio [#27401, #27467, #28594]
+* [**] Add support for setting heading anchors [#27935]
+* [**] Disable Unsupported Block Editor for Reusable blocks [#28552]
+* [**] Add proper handling for single use blocks such as the more block [#28339]
 
 ## 1.45.0
 * [*] Use react-native-url-polyfill in globals - [https://github.com/WordPress/gutenberg/pull/27867]
