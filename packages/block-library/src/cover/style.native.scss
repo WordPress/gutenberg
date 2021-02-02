@@ -164,13 +164,14 @@
 }
 
 .focalPointHint {
+	box-shadow: 0 0 0.5px rgba( 0, 0, 0, 0.5 );
 	fill: $white;
 	left: 50%;
-	margin: -25px 0 0 -25px;
-	opacity: 0.66;
+	margin: -16px 0 0 -16px;
+	opacity: 0.8;
 	position: absolute;
 	top: 50%;
-	width: 50px;
+	width: 32px;
 }
 
 .colorPaletteWrapper {
