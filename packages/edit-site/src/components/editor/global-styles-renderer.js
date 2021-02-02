@@ -140,7 +140,7 @@ function getBlockStylesDeclarations( blockSupports, blockStyles = {} ) {
 	);
 }
 
-export default ( blockData, tree, type = 'all' ) => {
+export default ( blockData, tree ) => {
 	return reduce(
 		blockData,
 		( styles, { selector }, context ) => {
@@ -181,10 +181,6 @@ export default ( blockData, tree, type = 'all' ) => {
 
 			return styles;
 		},
-		// Can this be converted to a context, as the global context?
-		// See comment in the server.
-		type === 'all' || type === 'blockStyles'
-			? [ LINK_COLOR_DECLARATION ]
-			: []
+		[ LINK_COLOR_DECLARATION ]
 	).join( '' );
 };
