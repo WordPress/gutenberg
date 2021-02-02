@@ -1,10 +1,17 @@
 // These styles are only applied to the appender when it appears inside of a block.
 // Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
-	margin: 0 0 0 $grid-unit-10;
 	align-self: center;
-	height: $icon-size;
 	padding: 0;
+	list-style: none;
+
+	// Add a little left margin when used horizontally.
+	margin: 0 0 0 $grid-unit-10;
+
+	// ... unless it's the only child.
+	&:first-child {
+		margin-left: 0;
+	}
 
 	.block-editor-default-block-appender {
 		margin: $grid-unit-10 0;
@@ -24,6 +31,8 @@
 .is-vertical .block-list-appender {
 	width: $icon-size;
 	margin-right: auto;
+	margin-top: $grid-unit-15;
+	margin-left: $grid-unit-15;
 }
 
 .block-list-appender > .block-editor-inserter {
