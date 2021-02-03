@@ -219,4 +219,38 @@ describe( 'Navigation editor', () => {
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
+
+	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
+		await visitNavigationEditor();
+
+		// Select a link block with nested links in a submenu.
+		const parentLinkXPath =
+			'//li[@aria-label="Block: Link" and contains(.,"WordPress.org")]';
+		const linkBlock = await page.waitForXPath( parentLinkXPath );
+		await linkBlock.click();
+
+		// There should be a submenu link visible.
+		//
+		// Submenus are hidden using `visibility: hidden` and shown using
+		// `visibility: visible` so the visible/hidden options must be used
+		// when selecting the elements.
+		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Link"]`;
+		const submenuLinkVisible = await page.waitForXPath( submenuLinkXPath, {
+			visible: true,
+		} );
+		expect( submenuLinkVisible ).toBeDefined();
+
+		// Click the editor canvas.
+		await page.click( '.edit-navigation-editor__block-view' );
+
+		// There should be a submenu in the DOM, but it should be hidden.
+		const submenuLinkHidden = await page.waitForXPath( submenuLinkXPath, {
+			hidden: true,
+		} );
+		expect( submenuLinkHidden ).toBeDefined();
+	} );
 } );

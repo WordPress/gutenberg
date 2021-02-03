@@ -99,10 +99,7 @@ exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <p>rock music approaches at high velocity.</p>
 <!-- /wp:paragraph -->`;
 
-exports.unsupportedBlockHtml = `<!-- wp:audio -->
-<figure class="wp-block-audio"><audio controls src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav"></audio></figure>
-<!-- /wp:audio -->
-`;
+exports.unsupportedBlockHtml = `<!-- wp:jetpack/gif {"giphyUrl":"https://giphy.com/embed/3orieS4jfHJaKwkeli","searchText":"example"} /-->`;
 
 exports.columnsWithDifferentUnitsHtml = `<!-- wp:columns -->
 <div class="wp-block-columns"><!-- wp:column {"width":"35%"} -->

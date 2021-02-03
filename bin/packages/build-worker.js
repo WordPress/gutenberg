@@ -111,7 +111,8 @@ const BUILD_TASK_BY_EXTENSION = {
 					// Editor styles should be excluded from the default CSS vars output.
 					.concat(
 						file.includes( 'common.scss' ) ||
-							! file.includes( 'block-library' )
+							( ! file.includes( 'block-library' ) &&
+								! file.includes( 'editor-styles.scss' ) )
 							? [ 'default-custom-properties' ]
 							: []
 					)

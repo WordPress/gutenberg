@@ -19,6 +19,7 @@ import {
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_TYPE_AUDIO = 'audio';
 export const MEDIA_TYPE_ANY = 'any';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
@@ -83,7 +84,12 @@ export class MediaUpload extends Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_ANY ],
+			types: [
+				MEDIA_TYPE_IMAGE,
+				MEDIA_TYPE_VIDEO,
+				MEDIA_TYPE_AUDIO,
+				MEDIA_TYPE_ANY,
+			],
 			icon: wordpress,
 			mediaLibrary: true,
 		};
@@ -151,6 +157,7 @@ export class MediaUpload extends Component {
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAudio = isOneType && allowedTypes.includes( MEDIA_TYPE_AUDIO );
 		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
 
 		const isImageOrVideo =
@@ -179,8 +186,19 @@ export class MediaUpload extends Component {
 			} else {
 				pickerTitle = __( 'Choose image or video' );
 			}
+		} else if ( isAudio ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace audio' );
+			} else {
+				pickerTitle = __( 'Choose audio' );
+			}
 		} else if ( isAnyType ) {
 			pickerTitle = __( 'Choose file' );
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace file' );
+			} else {
+				pickerTitle = __( 'Choose file' );
+			}
 		}
 
 		const getMediaOptions = () => (

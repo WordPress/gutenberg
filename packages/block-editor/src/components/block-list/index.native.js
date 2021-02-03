@@ -126,12 +126,14 @@ export class BlockList extends Component {
 			contentStyle,
 			renderAppender,
 		} = this.props;
+		const { blockWidth } = this.state;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
-			this.extraData.renderAppender !== renderAppender
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockWidth !== blockWidth
 		) {
 			this.extraData = {
 				parentWidth,
@@ -139,6 +141,7 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				blockWidth,
 			};
 		}
 		return this.extraData;
@@ -147,12 +150,15 @@ export class BlockList extends Component {
 	onLayout( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
-		const layoutWidth = Math.floor( layout.width );
+		const { isRootList, maxWidth } = this.props;
 
-		if ( blockWidth !== layoutWidth ) {
+		const layoutWidth = Math.floor( layout.width );
+		if ( isRootList && blockWidth !== layoutWidth ) {
 			this.setState( {
-				blockWidth: layoutWidth,
+				blockWidth: Math.min( layoutWidth, maxWidth ),
 			} );
+		} else if ( ! isRootList && ! blockWidth ) {
+			this.setState( { blockWidth: Math.min( layoutWidth, maxWidth ) } );
 		}
 	}
 
@@ -372,6 +378,7 @@ export default compose( [
 				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
 
+			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
 			const blockCount = getBlockCount( rootBlockId );
@@ -393,6 +400,7 @@ export default compose( [
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
+				maxWidth,
 			};
 		}
 	),

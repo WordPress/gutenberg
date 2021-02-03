@@ -26,7 +26,7 @@ import {
 	PanelBody,
 	RangeControl,
 	UnitControl,
-	BottomSheet,
+	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
@@ -92,7 +92,9 @@ const Cover = ( {
 	setAttributes,
 	openGeneralSidebar,
 	closeSettingsBottomSheet,
+	isSelected,
 	selectBlock,
+	blockWidth,
 } ) => {
 	const {
 		backgroundType,
@@ -172,11 +174,14 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = useCallback( ( value ) => {
-		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
-			setAttributes( { minHeight: value } );
-		}
-	}, [] );
+	const onHeightChange = useCallback(
+		( value ) => {
+			if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
+				setAttributes( { minHeight: value } );
+			}
+		},
+		[ minHeight ]
+	);
 
 	const onOpacityChange = useCallback( ( value ) => {
 		setAttributes( { dimRatio: value } );
@@ -205,7 +210,7 @@ const Cover = ( {
 	const onClearMedia = useCallback( () => {
 		setAttributes( { id: undefined, url: undefined } );
 		closeSettingsBottomSheet();
-	}, [] );
+	}, [ closeSettingsBottomSheet ] );
 
 	function setColor( color ) {
 		setAttributes( {
@@ -280,7 +285,7 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	const onChangeUnit = ( nextUnit ) => {
+	const onChangeUnit = useCallback( ( nextUnit ) => {
 		setAttributes( {
 			minHeightUnit: nextUnit,
 			minHeight:
@@ -288,7 +293,7 @@ const Cover = ( {
 					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
 					: CONTAINER_HEIGHT,
 		} );
-	};
+	}, [] );
 
 	const onBottomSheetClosed = useCallback( () => {
 		InteractionManager.runAfterInteractions( () => {
@@ -299,7 +304,10 @@ const Cover = ( {
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
-				attributes={ attributes }
+				overlayColor={ attributes.overlayColor }
+				customOverlayColor={ attributes.customOverlayColor }
+				gradient={ attributes.gradient }
+				customGradient={ attributes.customGradient }
 				setAttributes={ setAttributes }
 			/>
 			{ url ? (
@@ -329,10 +337,9 @@ const Cover = ( {
 					key={ minHeightUnit }
 				/>
 			</PanelBody>
-
 			{ url ? (
 				<PanelBody title={ __( 'Media' ) }>
-					<BottomSheet.Cell
+					<TextControl
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
@@ -512,7 +519,7 @@ const Cover = ( {
 
 	return (
 		<View style={ styles.backgroundContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ isImage &&
 				url &&
@@ -546,6 +553,7 @@ const Cover = ( {
 				<InnerBlocks
 					template={ INNER_BLOCKS_TEMPLATE }
 					templateInsertUpdatesSelection
+					blockWidth={ blockWidth }
 				/>
 			</View>
 

@@ -136,6 +136,7 @@ public class WPAndroidGlueCode {
         void onMediaLibraryVideoButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryMediaButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryFileButtonClicked(boolean allowMultipleSelection);
+        void onMediaLibraryAudioButtonClicked(boolean allowMultipleSelection);
         void onUploadPhotoButtonClicked(boolean allowMultipleSelection);
         void onCapturePhotoButtonClicked();
         void onUploadVideoButtonClicked(boolean allowMultipleSelection);
@@ -146,6 +147,7 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         ArrayList<MediaOption> onGetOtherMediaFileOptions();
+        ArrayList<MediaOption> onGetOtherMediaAudioFileOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
@@ -232,14 +234,24 @@ public class WPAndroidGlueCode {
                 mMediaPickedByUserOnBlock = true;
                 mAppendsMultipleSelectedToSiblingBlocks = !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
-                if (mediaType == MediaType.IMAGE) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.VIDEO) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.MEDIA) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.ANY) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryFileButtonClicked(allowMultipleSelection);
+                switch (mediaType) {
+                    case IMAGE:
+                        mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
+                        break;
+                    case VIDEO:
+                        mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
+                        break;
+                    case MEDIA:
+                        mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
+                        break;
+                    case AUDIO:
+                        mOnMediaLibraryButtonListener.onMediaLibraryAudioButtonClicked(allowMultipleSelection);
+                        break;
+                    case ANY:
+                        mOnMediaLibraryButtonListener.onMediaLibraryFileButtonClicked(allowMultipleSelection);
+                        break;
+                    case OTHER:
+                        break;
                 }
             }
 
@@ -346,12 +358,21 @@ public class WPAndroidGlueCode {
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback,
                                                    MediaType mediaType) {
-                if (mediaType == MediaType.IMAGE || mediaType == MediaType.MEDIA) {
-                    ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
-                } else if (mediaType == MediaType.ANY) {
-                    ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
+                switch (mediaType){
+                    case IMAGE:
+                    case MEDIA:
+                        ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
+                        break;
+                    case ANY:
+                        ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
+                        break;
+                    case AUDIO:
+                        ArrayList<MediaOption> otherMediaAudioFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaAudioFileOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaAudioFileOptions);
+                        break;
+
                 }
             }
 

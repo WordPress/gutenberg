@@ -56,9 +56,9 @@ Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
 
--   common
--   formatting
--   layout
+-   text
+-   media
+-   design
 -   widgets
 -   embed
 
@@ -259,6 +259,7 @@ An object describing a variation defined for the block type can contain the foll
 -   `name` (type `string`) – The unique and machine-readable name.
 -   `title` (type `string`) – A human-readable variation title.
 -   `description` (optional, type `string`) – A detailed variation description.
+-   `category` (optional, type `string`) - A category classification, used in search interfaces to arrange block types by category.
 -   `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
 -   `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
 -   `attributes` (optional, type `Object`) – Values that override block attributes.

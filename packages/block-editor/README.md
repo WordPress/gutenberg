@@ -394,13 +394,17 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls-advanced/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+<a name="JustifyToolbar" href="#JustifyToolbar">#</a> **JustifyToolbar**
+
+Undocumented declaration.
 
 <a name="LineHeightControl" href="#LineHeightControl">#</a> **LineHeightControl**
 
