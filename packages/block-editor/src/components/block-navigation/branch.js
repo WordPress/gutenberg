@@ -26,6 +26,7 @@ export default function BlockNavigationBranch( props ) {
 		level = 1,
 		terminatedLevels = [],
 		path = [],
+		highlightBlocksOnHover,
 	} = props;
 
 	const isTreeRoot = ! parentBlockClientId;
@@ -67,6 +68,7 @@ export default function BlockNavigationBranch( props ) {
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
+							highlightBlocksOnHover={ highlightBlocksOnHover }
 						/>
 						{ ( hasNestedBlocks || hasNestedAppender ) && (
 							<BlockNavigationBranch
@@ -80,6 +82,9 @@ export default function BlockNavigationBranch( props ) {
 								level={ level + 1 }
 								terminatedLevels={ updatedTerminatedLevels }
 								path={ updatedPath }
+								highlightBlocksOnHover={
+									highlightBlocksOnHover
+								}
 							/>
 						) }
 					</Fragment>

@@ -65,6 +65,7 @@ export default function BlockNavigationSidebar() {
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
+					highlightBlocksOnHover
 					selectBlock={ selectBlock }
 					selectedBlockClientId={ selectedBlockClientId }
 					showNestedBlocks
