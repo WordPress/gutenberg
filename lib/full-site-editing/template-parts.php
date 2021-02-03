@@ -89,6 +89,20 @@ function gutenberg_register_wp_template_section_taxonomy() {
 }
 add_action( 'init', 'gutenberg_register_wp_template_section_taxonomy' );
 
+// Definte constants for supported WP_TEMPLATE_SECTION taxonomy.
+if ( ! defined( 'WP_TEMPLATE_SECTION_HEADER' ) ) {
+	define( 'WP_TEMPLATE_SECTION_HEADER', 'header' );
+}
+if ( ! defined( 'WP_TEMPLATE_SECTION_FOOTER' ) ) {
+	define( 'WP_TEMPLATE_SECTION_FOOTER', 'footer' );
+}
+if ( ! defined( 'WP_TEMPLATE_SECTION_SIDEBAR' ) ) {
+	define( 'WP_TEMPLATE_SECTION_SIDEBAR', 'sidebar' );
+}
+if ( ! defined( 'WP_TEMPLATE_SECTION_OTHER' ) ) {
+	define( 'WP_TEMPLATE_SECTION_OTHER', 'other' );
+}
+
 /**
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
@@ -155,9 +169,10 @@ add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_pa
  */
 function gutenberg_get_allowed_template_part_section_types() {
 	$default_section_types = array(
-		'header',
-		'footer',
-		'other',
+		WP_TEMPLATE_SECTION_HEADER,
+		WP_TEMPLATE_SECTION_FOOTER,
+		WP_TEMPLATE_SECTION_SIDEBAR,
+		WP_TEMPLATE_SECTION_OTHER,
 	);
 
 	/**
@@ -165,7 +180,7 @@ function gutenberg_get_allowed_template_part_section_types() {
 	 *
 	 * @param array $default_section_types An array of supported section types.
 	 */
-	return apply_filters( 'default_template_part_section_types', $default_section_types );
+	return apply_filters( 'default_wp_template_section_types', $default_section_types );
 }
 
 /**
@@ -180,5 +195,5 @@ function gutenberg_filter_template_part_section_type( $type ) {
 	if ( in_array( $type, gutenberg_get_allowed_template_part_section_types(), true ) ) {
 		return $type;
 	}
-	return 'other';
+	return WP_TEMPLATE_SECTION_OTHER;
 }
