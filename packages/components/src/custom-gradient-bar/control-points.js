@@ -229,7 +229,7 @@ function ControlPoints( {
 										updateControlPointColor(
 											controlPoints,
 											index,
-											color.toRgbString()
+											color
 										)
 									);
 								} }
