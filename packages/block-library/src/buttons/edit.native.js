@@ -12,7 +12,11 @@ import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToolbarItem,
+	alignmentHelpers,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -25,10 +29,11 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification },
+	attributes: { contentJustification, align },
 	clientId,
 	isSelected,
 	setAttributes,
+	blockWidth,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
@@ -68,10 +73,15 @@ export default function ButtonsEdit( {
 	useEffect( () => {
 		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
+		const { isFullWidth } = alignmentHelpers;
+
 		if ( width ) {
-			setMaxWidth( width - margins );
+			const base = width - margins;
+			const isFullWidthBlock = isFullWidth( align );
+
+			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
 		}
-	}, [ sizes ] );
+	}, [ sizes, align ] );
 
 	const onAddNextButton = debounce( ( selectedId ) => {
 		const order = getBlockOrder( clientId );
@@ -138,6 +148,7 @@ export default function ButtonsEdit( {
 				marginVertical={ spacing }
 				__experimentalLayout={ { type: 'default', alignments: [] } }
 				templateInsertUpdatesSelection
+				blockWidth={ blockWidth }
 			/>
 		</>
 	);

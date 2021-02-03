@@ -20,7 +20,7 @@ import { CSS_UNITS } from './utils';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useCallback, useMemo, memo } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -43,11 +43,11 @@ function UnitControl( {
 	const pickerRef = useRef();
 	const anchorNodeRef = useRef();
 
-	function onPickerPresent() {
+	const onPickerPresent = useCallback( () => {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
 		}
-	}
+	}, [ pickerRef?.current ] );
 
 	const currentInputValue = currentInput === null ? value : currentInput;
 	const initialControlValue = isFinite( currentInputValue )
@@ -59,17 +59,15 @@ function UnitControl( {
 		styles.unitButtonTextDark
 	);
 
-	const renderUnitButton = () => {
-		const accessibilityHint =
-			Platform.OS === 'ios'
-				? __( 'Double tap to open Action Sheet with available options' )
-				: __(
-						'Double tap to open Bottom Sheet with available options'
-				  );
+	/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
+	const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
 
-		/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
-		const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
+	const accessibilityHint =
+		Platform.OS === 'ios'
+			? __( 'Double tap to open Action Sheet with available options' )
+			: __( 'Double tap to open Bottom Sheet with available options' );
 
+	const renderUnitButton = useMemo( () => {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ onPickerPresent }
@@ -82,17 +80,26 @@ function UnitControl( {
 				</View>
 			</TouchableWithoutFeedback>
 		);
-	};
+	}, [
+		onPickerPresent,
+		accessibilityLabel,
+		accessibilityHint,
+		unitButtonTextStyle,
+		unit,
+	] );
 
-	const getAnchor = () =>
-		anchorNodeRef?.current
-			? findNodeHandle( anchorNodeRef?.current )
-			: undefined;
+	const getAnchor = useCallback(
+		() =>
+			anchorNodeRef?.current
+				? findNodeHandle( anchorNodeRef?.current )
+				: undefined,
+		[ anchorNodeRef?.current ]
+	);
 
-	const renderUnitPicker = () => {
+	const renderUnitPicker = useCallback( () => {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
-				{ renderUnitButton() }
+				{ renderUnitButton }
 				<Picker
 					ref={ pickerRef }
 					options={ units }
@@ -103,7 +110,7 @@ function UnitControl( {
 				/>
 			</View>
 		);
-	};
+	}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
 	return (
 		<>
@@ -141,4 +148,4 @@ function UnitControl( {
 	);
 }
 
-export default withPreferredColorScheme( UnitControl );
+export default memo( withPreferredColorScheme( UnitControl ) );

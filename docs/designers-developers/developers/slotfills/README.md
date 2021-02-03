@@ -33,7 +33,7 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 SlotFills are created using `createSlotFill`. This creates two components, `Slot` and `Fill` which are then used to create a new component that is exported on the `wp.plugins` global.
 
-**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js#L54))
+**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js#L54))
 
 ```js
 /**
@@ -65,7 +65,7 @@ This new Slot is then exposed in the editor. The example below is from core and 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
 Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed between the `<PostAuthor/>` and `<PostTrash/>` components.
 
-See [core code](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
+See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
 
 ```js
 const PostStatus = ( { isOpened, onTogglePanel } ) => (

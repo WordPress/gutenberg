@@ -1,6 +1,6 @@
 [
 	{
-		"title": "Project Overview",
+		"title": "Getting started",
 		"slug": "handbook",
 		"markdown_source": "../docs/readme.md",
 		"parent": null
@@ -1065,12 +1065,6 @@
 		"title": "MenuItemsChoice",
 		"slug": "menu-items-choice",
 		"markdown_source": "../packages/components/src/menu-items-choice/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "BottomSheetNavigation",
-		"slug": "bottom-sheet-navigation",
-		"markdown_source": "../packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/README.md",
 		"parent": "components"
 	},
 	{

@@ -110,11 +110,10 @@ function _gutenberg_get_template_files( $template_type ) {
  * stylesheet as a theme attribute into each wp_template_part
  *
  * @param string $template_content serialized wp_template content.
- * @param string $theme the active theme's stylesheet.
  *
  * @return string Updated wp_template content.
  */
-function _inject_theme_attribute_in_content( $template_content, $theme ) {
+function _inject_theme_attribute_in_content( $template_content ) {
 	$has_updated_content = false;
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
@@ -122,10 +121,9 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 	foreach ( $template_blocks as $key => $block ) {
 		if (
 			'core/template-part' === $block['blockName'] &&
-			! isset( $block['attrs']['theme'] ) &&
-			wp_get_theme()->get_stylesheet() === $theme
+			! isset( $block['attrs']['theme'] )
 		) {
-			$template_blocks[ $key ]['attrs']['theme'] = $theme;
+			$template_blocks[ $key ]['attrs']['theme'] = wp_get_theme()->get_stylesheet();
 			$has_updated_content                       = true;
 		}
 	}
@@ -136,9 +134,9 @@ function _inject_theme_attribute_in_content( $template_content, $theme ) {
 		}
 
 		return $new_content;
-	} else {
-		return $template_content;
 	}
+
+	return $template_content;
 }
 
 /**
@@ -155,7 +153,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$theme                  = wp_get_theme()->get_stylesheet();
 
 	if ( 'wp_template' === $template_type ) {
-		$template_content = _inject_theme_attribute_in_content( $template_content, $theme );
+		$template_content = _inject_theme_attribute_in_content( $template_content );
 	}
 
 	$template            = new WP_Block_Template();

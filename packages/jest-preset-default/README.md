@@ -33,7 +33,7 @@ npm install @wordpress/jest-preset-default --save-dev
 -   `snapshotSerializers` - makes it possible to use snapshot tests on `Enzyme` wrappers.
 -   `testMatch`- includes `/test/` subfolder in addition to the glob patterns Jest uses to detect test files. It detects only test files containing `.js` (or `.ts`) suffix. It doesn't match files with `.spec.js` suffix.
 -   `timers` - use of [fake timers](https://jestjs.io/docs/en/timer-mocks.html) for functions such as `setTimeout` is enabled.
--   `transform` - keeps the default [babel-jest](https://github.com/facebook/jest/tree/master/packages/babel-jest) transformer.
+-   `transform` - keeps the default [babel-jest](https://github.com/facebook/jest/tree/HEAD/packages/babel-jest) transformer.
 -   `verbose` - each individual test won't be reported during the run.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -81,6 +81,9 @@ module.exports = {
 					compress: {
 						passes: 2,
 					},
+					mangle: {
+						reserved: [ '__', '_n', '_nx', '_x' ],
+					},
 				},
 				extractComments: false,
 			} ),
@@ -117,6 +120,13 @@ module.exports = {
 			'process.env.GUTENBERG_PHASE': JSON.stringify(
 				parseInt(
 					process.env.npm_package_config_GUTENBERG_PHASE,
+					10
+				) || 1
+			),
+			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
+			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
+				parseInt(
+					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
 					10
 				) || 1
 			),

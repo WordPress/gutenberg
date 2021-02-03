@@ -1,5 +1,5 @@
 .wp-block-cover {
-	position: relative;
+	height: 100%; // This explicit height rule is necessary for the focal point picker to work.
 
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.
@@ -42,12 +42,6 @@
 
 	.wp-block-cover__placeholder-background-options {
 		width: 100%;
-	}
-
-	// Fix object-fit when block is full width in the editor.
-	.wp-block-cover__image-background {
-		width: inherit;
-		height: inherit;
 	}
 }
 

@@ -152,33 +152,29 @@ describe( 'Tooltip', () => {
 			}, TOOLTIP_DELAY );
 		} );
 
-		it( 'should ignore mouseenter on disabled elements', () => {
-			// Mount: Issues with using `setState` asynchronously with shallow-
-			// rendered components: https://github.com/airbnb/enzyme/issues/450
-			const originalMouseEnter = jest.fn();
+		it( 'should show tooltip when an element is disabled', () => {
 			const wrapper = mount(
-				<Tooltip text="Help text">
-					<button
-						onMouseEnter={ originalMouseEnter }
-						onFocus={ originalMouseEnter }
-						disabled
-					>
-						<span>Hover Me!</span>
-					</button>
+				<Tooltip text="Show helpful text here">
+					<button disabled>Click me</button>
 				</Tooltip>
 			);
+			const button = wrapper.find( 'button[disabled]' );
+			const buttonNode = button.at( 0 ).getDOMNode();
+			const buttonRect = buttonNode.getBoundingClientRect();
+			const eventCatcher = wrapper.find( '.event-catcher' );
+			const eventCatcherNode = eventCatcher.at( 0 ).getDOMNode();
+			const eventCatcherRect = eventCatcherNode.getBoundingClientRect();
+			expect( buttonRect ).toEqual( eventCatcherRect );
 
-			wrapper.find( 'button' ).simulate( 'mouseenter', {
-				// Enzyme does not accurately emulate event targets
-				// See: https://github.com/airbnb/enzyme/issues/218
-				currentTarget: wrapper.find( 'button' ).getDOMNode(),
-				target: wrapper.find( 'button > span' ).getDOMNode(),
+			eventCatcher.simulate( 'mouseenter', {
+				type: 'mouseenter',
+				currentTarget: {},
 			} );
 
-			expect( originalMouseEnter ).not.toHaveBeenCalled();
-
-			const popover = wrapper.find( 'Popover' );
-			expect( popover ).toHaveLength( 0 );
+			setTimeout( () => {
+				const popover = wrapper.find( 'Popover' );
+				expect( popover ).toHaveLength( 1 );
+			}, TOOLTIP_DELAY );
 		} );
 
 		it( 'should cancel pending setIsOver on mouseleave', () => {

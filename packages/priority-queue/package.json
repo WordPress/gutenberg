@@ -10,7 +10,7 @@
 		"browser",
 		"async"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/priority-queue/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/priority-queue/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

@@ -18,7 +18,7 @@ describe( 'invalid blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 
 		// Change to HTML mode and close the options
 		await clickMenuItem( 'Edit as HTML' );

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "2.24.1",
+	"version": "2.24.2",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"plugins"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/plugins/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/plugins/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

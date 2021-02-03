@@ -6,4 +6,16 @@
 	#wpcontent {
 		padding-left: 0;
 	}
+
+	#wpwrap,
+	#wpcontent,
+	#wpbody,
+	#wpbody-content,
+	.edit-navigation,
+	.components-drop-zone__provider,
+	.edit-navigation-layout {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
 }

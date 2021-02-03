@@ -46,6 +46,7 @@ export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
 export { default as UnitControl } from './unit-control';
+export { default as Disabled } from './disabled';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -82,6 +83,7 @@ export { default as ImageEditingButton } from './mobile/image/image-editing-butt
 export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as Preview } from './mobile/preview';
+export { default as AudioPlayer } from './mobile/audio-player';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
