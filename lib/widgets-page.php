@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg widgets page.
+ * Bootstrapping the Gutenberg widgets page.
  *
  * @package gutenberg
  */
@@ -41,7 +41,7 @@ function gutenberg_widgets_init( $hook ) {
 		return;
 	}
 
-	$initializer_name = $hook === 'gutenberg_customizer' ? 'initializeCustomizer' : 'initialize';
+	$initializer_name = 'gutenberg_customizer' === $hook ? 'initializeCustomizer' : 'initialize';
 
 	$settings = array_merge(
 		gutenberg_get_common_block_editor_settings(),

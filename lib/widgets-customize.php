@@ -1,4 +1,9 @@
 <?php
+/**
+ * Bootstrapping the Gutenberg widgets editor in the customizer.
+ *
+ * @package gutenberg
+ */
 
 /**
  * The sanitization function for incoming values for the `gutenberg_widget_blocks` setting.
@@ -15,10 +20,24 @@ function gutenberg_customize_sanitize( $value ) {
  *
  * Adds a section to the Customizer for editing widgets with Gutenberg.
  *
- * @param \WP_Customize_Manager $wp_customize An instance of the class that controls most of the Theme Customization API for WordPress 3.4 and newer.
+ * @param \WP_Customize_Manager $manager An instance of the class that controls most of the Theme Customization API for WordPress 3.4 and newer.
  */
 function gutenberg_widgets_customize_register( $manager ) {
+	if ( ! gutenberg_use_widgets_block_editor() ) {
+		return;
+	}
+
 	require_once __DIR__ . '/class-wp-sidebar-block-editor-control.php';
+
+	// Remove the original "Widgets" section.
+	foreach ( $manager->sections() as $section ) {
+		if (
+			$section instanceof WP_Customize_Sidebar_Section
+		) {
+			$manager->remove_section( $section->id );
+			break;
+		}
+	}
 
 	$manager->add_setting(
 		'gutenberg_widget_blocks',
@@ -48,24 +67,6 @@ function gutenberg_widgets_customize_register( $manager ) {
 }
 
 /**
- * Removes the core 'Widgets' panel from the Customizer if block based widgets are enabled.
- *
- * @param array $components Core Customizer components list.
- * @return array (Maybe) modified components list.
- */
-function gutenberg_remove_widgets_panel( $components ) {
-	if ( ! gutenberg_use_widgets_block_editor() ) {
-		return $components;
-	}
-
-	$i = array_search( 'widgets', $components, true );
-	if ( false !== $i ) {
-		unset( $components[ $i ] );
-	}
-	return $components;
-}
-
-/**
  * Filters the Customizer widget settings arguments.
  * This is needed because the Customizer registers settings for the raw registered widgets, without going through the `sidebars_widgets` filter.
  * The `WP_Customize_Widgets` class expects sidebars to have an array of widgets registered, not a post ID.
@@ -87,9 +88,7 @@ function filter_widget_customizer_setting_args( $args, $id = null ) {
 	return $args;
 }
 
-if (gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' )) {
+if ( gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' ) && gutenberg_use_widgets_block_editor() ) {
 	add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
-	add_filter( 'customize_loaded_components', 'gutenberg_remove_widgets_panel' );
 	add_filter( 'widget_customizer_setting_args', 'filter_widget_customizer_setting_args' );
 }
-
