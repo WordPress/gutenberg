@@ -13,7 +13,7 @@ const { Fill, Slot } = createSlotFill( 'BottomSheetSubSheet' );
 
 const BottomSheetSubSheet = ( {
 	children,
-	button,
+	navigationButton,
 	showSheet,
 	isFullScreen,
 } ) => {
@@ -29,7 +29,7 @@ const BottomSheetSubSheet = ( {
 					</BottomSheetConsumer>
 				</Fill>
 			) }
-			{ Children.count( children ) > 0 && button }
+			{ Children.count( children ) > 0 && navigationButton }
 		</>
 	);
 };
