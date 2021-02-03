@@ -123,6 +123,9 @@ function gutenberg_edit_site_init( $hook ) {
 		'/wp/v2/themes?status=active',
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
+
+	$preload_paths = apply_filters( 'edit_site_editor_preload_paths', $preload_paths );
+
 	$preload_data  = array_reduce(
 		$preload_paths,
 		'rest_preload_api_request',

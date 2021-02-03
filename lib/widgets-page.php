@@ -59,6 +59,9 @@ function gutenberg_widgets_init( $hook ) {
 		'/wp/v2/sidebars?context=edit&per_page=-1',
 		'/wp/v2/widgets?context=edit&per_page=-1',
 	);
+
+	$preload_paths = apply_filters( 'widgets_editor_preload_paths', $preload_paths );
+
 	$preload_data  = array_reduce(
 		$preload_paths,
 		'rest_preload_api_request',
