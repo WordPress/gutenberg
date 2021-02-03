@@ -4,6 +4,7 @@
 	box-sizing: border-box;
 }
 
+@import "../../interface/src/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/error-boundary/style.scss";
 @import "./components/header/style.scss";
