@@ -258,27 +258,39 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Returns the theme's origin config.
+	 * Returns the theme's data.
 	 *
-	 * It uses the theme support data if
-	 * the theme hasn't declared any via theme.json.
+	 * Data from theme.json can be augmented via the
+	 * $theme_support_data variable. This is useful, for example,
+	 * to backfill the gaps in theme.json that a theme has declared
+	 * via add_theme_supports.
+	 *
+	 * Note that if the same data is present in theme.json
+	 * and in $theme_support_data, the theme.json's is not overwritten.
 	 *
 	 * @param array $theme_support_data Theme support data in theme.json format.
 	 *
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
-	private function get_theme_origin( $theme_support_data = array() ) {
-		$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
-		self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+	public function get_theme_data( $theme_support_data = array() ) {
+		if ( null === $this->theme ) {
+			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
+			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			$this->theme = new WP_Theme_JSON( $theme_json_data );
+		}
+
+		if ( empty( $theme_support_data ) ) {
+			return $this->theme;
+		}
 
 		/*
 		 * We want the presets and settings declared in theme.json
 		 * to override the ones declared via add_theme_support.
 		 */
-		$this->theme = new WP_Theme_JSON( $theme_support_data );
-		$this->theme->merge( new WP_Theme_JSON( $theme_json_data ) );
+		$with_theme_supports = new WP_Theme_JSON( $theme_support_data );
+		$with_theme_supports->merge( $this->theme );
 
-		return $this->theme;
+		return $with_theme_supports;
 	}
 
 	/**
@@ -395,7 +407,7 @@ class WP_Theme_JSON_Resolver {
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_origin( $theme_support_data ) );
+			$result->merge( $this->get_theme_data( $theme_support_data ) );
 			$result->merge( self::get_user_origin() );
 			return $result;
 		}
@@ -403,7 +415,7 @@ class WP_Theme_JSON_Resolver {
 		if ( ( 'theme' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_origin( $theme_support_data ) );
+			$result->merge( $this->get_theme_data( $theme_support_data ) );
 			return $result;
 		}
 
@@ -412,7 +424,7 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		if ( 'theme' === $origin ) {
-			return $this->get_theme_origin( $theme_support_data );
+			return $this->get_theme_data( $theme_support_data );
 		}
 
 		return self::get_core_origin();
