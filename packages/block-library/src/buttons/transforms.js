@@ -40,7 +40,7 @@ const transforms = {
 						// Remove any HTML tags
 						const div = document.createElement( 'div' );
 						div.innerHTML = attributes.content;
-						const text = div.textContent || div.innerText || '';
+						const text = div.innerText || '';
 						// Get first url
 						const link = div.querySelector( 'a' );
 						const url = link ? link.getAttribute( 'href' ) : null;
@@ -51,6 +51,16 @@ const transforms = {
 						} );
 					} )
 				),
+			isMatch: ( paragraphs ) => {
+				const buttons = paragraphs.filter( ( attributes ) => {
+					const div = document.createElement( 'div' );
+					div.innerHTML = attributes.content;
+					const text = div.innerText || '';
+					return text.length <= 30;
+				} );
+
+				return buttons.length === paragraphs.length;
+			},
 		},
 	],
 };
