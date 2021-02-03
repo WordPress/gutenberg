@@ -7,6 +7,8 @@
 }
 
 .edit-navigation-layout {
+	flex-grow: 1;
+
 	.navigation-editor-canvas {
 		max-width: 500px;
 		margin-top: $grid-unit-40;

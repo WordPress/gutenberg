@@ -2,15 +2,17 @@
  * WordPress dependencies
  */
 import {
+	BlockEditorKeyboardShortcuts,
+	BlockEditorProvider,
+	__unstableUseBlockSelectionClearer,
+} from '@wordpress/block-editor';
+import {
 	DropZoneProvider,
 	Popover,
 	SlotFillProvider,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	BlockEditorKeyboardShortcuts,
-	BlockEditorProvider,
-} from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
@@ -46,6 +48,8 @@ const interfaceLabels = {
 export default function Layout( { blockEditorSettings } ) {
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 	const savePost = () => saveNavigationPost( navigationPost );
+	const canvasRef = useRef();
+	__unstableUseBlockSelectionClearer( canvasRef );
 
 	const {
 		menus,
@@ -101,7 +105,10 @@ export default function Layout( { blockEditorSettings } ) {
 							}
 							content={
 								<>
-									<div className="edit-navigation-layout">
+									<div
+										className="edit-navigation-layout"
+										ref={ canvasRef }
+									>
 										<div className="navigation-editor-canvas">
 											<Toolbar
 												isPending={ ! navigationPost }
