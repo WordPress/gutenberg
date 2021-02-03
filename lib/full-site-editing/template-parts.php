@@ -195,5 +195,9 @@ function gutenberg_filter_template_part_section_type( $type ) {
 	if ( in_array( $type, gutenberg_get_allowed_template_part_section_types(), true ) ) {
 		return $type;
 	}
+	$warning_message  = '"' . $type . '"';
+	$warning_message .= __( ' is not a supported wp_template_section type and has been added as ', 'gutenberg' );
+	$warning_message .= '"' . WP_TEMPLATE_SECTION_OTHER . '".';
+	trigger_error( $warning_message, E_USER_NOTICE );
 	return WP_TEMPLATE_SECTION_OTHER;
 }
