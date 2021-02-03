@@ -12,9 +12,13 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
-export let store = {};
+export let store = null;
 
 export default function registerEditSiteStore( initialState ) {
+	if ( store !== null ) {
+		return;
+	}
+
 	const _store = createReduxStore( STORE_NAME, {
 		reducer,
 		actions,
