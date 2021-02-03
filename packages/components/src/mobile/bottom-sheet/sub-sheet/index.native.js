@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { SafeAreaView } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
@@ -21,12 +26,14 @@ const BottomSheetSubSheet = ( {
 		<>
 			{ showSheet && (
 				<Fill>
-					<BottomSheetConsumer>
-						{ ( { setIsFullScreen } ) => {
-							setIsFullScreen( isFullScreen );
-							return children;
-						} }
-					</BottomSheetConsumer>
+				    <SafeAreaView>
+				        <BottomSheetConsumer>
+                            { ( { setIsFullScreen } ) => {
+								setIsFullScreen( isFullScreen );
+								return children;
+							} }
+						</BottomSheetConsumer>
+					</SafeAreaView>
 				</Fill>
 			) }
 			{ Children.count( children ) > 0 && navigationButton }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -69,7 +69,7 @@ const BottomSheetSelectControl = ( {
 			}
 			showSheet={ showSubSheet }
 		>
-			<SafeAreaView>
+			<>
 				<NavigationHeader
 					screen={ label }
 					leftButtonOnPress={ goBack }
@@ -101,7 +101,7 @@ const BottomSheetSelectControl = ( {
 						</Cell>
 					) ) }
 				</View>
-			</SafeAreaView>
+			</>
 		</SubSheet>
 	);
 };
