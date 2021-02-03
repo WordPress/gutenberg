@@ -96,8 +96,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	const page = yield controls.select( editSiteStore, 'getPage' );
-	yield controls.dispatch( editSiteStore, 'setPage', page );
+	const page = yield controls.select( editSiteStore.name, 'getPage' );
+	yield controls.dispatch( editSiteStore.name, 'setPage', page );
 }
 
 /**
@@ -186,7 +186,10 @@ export function* showHomepage() {
 		'site'
 	);
 
-	const { siteUrl } = yield controls.select( editSiteStore, 'getSettings' );
+	const { siteUrl } = yield controls.select(
+		editSiteStore.name,
+		'getSettings'
+	);
 
 	const page = {
 		path: siteUrl,
