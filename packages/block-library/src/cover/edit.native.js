@@ -118,24 +118,20 @@ const Cover = ( {
 		mediaUploadSync();
 		AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
-			handleScreenReaderToggled
+			setIsScreenReaderEnabled
 		);
 
-		AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
-			setIsScreenReaderEnabled( enabled );
-		} );
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			setIsScreenReaderEnabled
+		);
 
 		return () => {
 			AccessibilityInfo.removeEventListener(
 				'screenReaderChanged',
-				handleScreenReaderToggled
+				setIsScreenReaderEnabled
 			);
 		};
 	}, [] );
-
-	const handleScreenReaderToggled = ( enabled ) => {
-		setIsScreenReaderEnabled( enabled );
-	};
 
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
