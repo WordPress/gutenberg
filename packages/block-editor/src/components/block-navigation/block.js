@@ -45,7 +45,6 @@ export default function BlockNavigationBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
 	const { isDragging, blockParents } = useSelect(
 		( select ) => {
@@ -72,17 +71,16 @@ export default function BlockNavigationBlock( {
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
 		'block-editor-block-navigation-block__mover-cell',
-		{ 'is-visible': hasVisibleMovers }
+		{ 'is-visible': isHovered }
 	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
-		{ 'is-visible': hasVisibleMovers }
+		{ 'is-visible': isHovered }
 	);
 	useEffect( () => {
 		if ( withExperimentalFeatures && isSelected ) {
@@ -91,20 +89,13 @@ export default function BlockNavigationBlock( {
 	}, [ withExperimentalFeatures, isSelected ] );
 
 	const highlightBlock = highlightBlocksOnHover ? toggleBlockHighlight : noop;
-	const handleMouseEnter = () => {
+
+	const onMouseEnter = () => {
 		setIsHovered( true );
 		highlightBlock( clientId, true );
 	};
-	const handleMouseLeave = () => {
+	const onMouseLeave = () => {
 		setIsHovered( false );
-		highlightBlock( clientId, false );
-	};
-	const handleFocus = () => {
-		setIsFocused( true );
-		highlightBlock( clientId, true );
-	};
-	const handleBlur = () => {
-		setIsFocused( false );
 		highlightBlock( clientId, false );
 	};
 
@@ -114,10 +105,10 @@ export default function BlockNavigationBlock( {
 				'is-selected': isSelected,
 				'is-dragging': isDragging,
 			} ) }
-			onMouseEnter={ handleMouseEnter }
-			onMouseLeave={ handleMouseLeave }
-			onFocus={ handleFocus }
-			onBlur={ handleBlur }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
