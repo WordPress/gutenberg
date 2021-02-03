@@ -4,14 +4,16 @@
 }
 
 // Link Preview
-// Once a link has been set this displays the URL
-// along with buttons to visit and edit the link.
+// Once a link has been set this buttons edit or
+// visit the URL.
 .block-editor-link-control__link {
 	display: flex;
 	align-items: center;
 }
 
-.block-editor-link-control__link-url {
+// A button that displays the URL. When pressed
+// the UI switches to editing the URL.
+.block-editor-link-control__link-edit {
 	white-space: nowrap;
 	min-width: 80px;
 	max-width: 280px;
@@ -21,48 +23,18 @@
 	display: inline-block;
 }
 
+// Since the button's label is hidden, there's
+// no need to have any margin on the icon SVG.
 .components-button.has-icon.has-text svg {
 	margin-right: 0;
 }
 
-.block-editor-link-control__link-visit.has-icon {
-	margin-right: 6px;
-}
 
+// The divider separates the edit button from
+// the visit button.
 .block-editor-link-control__link-divider {
 	width: 1px;
 	height: 48px;
 	margin: -6px 6px;
 	background: $gray-900;
 }
-
-/*
-// Selected Item
-block-editor-link-control__search-item.is-current
-	a.block-editor-link-control__search-item-title
-		svg.components-external-link__icon
-
-	button.block-editor-link-control__search-item-action
-
-	fieldset.block-editor-link-control__settings
-
-// Search UI
-block-editor-link-control__search-input-wrapper
-	form
-		input.block-editor-link-control__search-input
-
-		block-editor-link-control__search-results-wrapper
-			block-editor-link-control__search-results
-				button.block-editor-link-control__search-item.is-url
-					svg.block-editor-link-control__search-item-icon
-
-					block-editor-link-control__search-item-header
-						block-editor-link-control__search-item-title
-						block-editor-link-control__search-item-info
-
-					block-editor-link-control__search-item-type
-
-		block-editor-link-control__search-actions
-			block-editor-link-control__search-submit
-
-*/

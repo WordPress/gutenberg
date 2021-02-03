@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { edit } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,24 +30,25 @@ export default function LinkPreview( { value, onEditClick } ) {
 			} ) }
 		>
 			<Button
-				target="_blank"
-				label={ __( 'Visit URL' ) }
-				showToolTip={ true }
-				className="block-editor-link-control__link-url"
-				href={ value.url }
+				label={ __( 'Edit link URL' ) }
+				onClick={ () => onEditClick() }
+				className="block-editor-link-control__link-edit"
 			>
+				<VisuallyHidden>{ __( 'Edit link URL:' ) }</VisuallyHidden>
 				{ displayURL }
 			</Button>
 
 			<div className="block-editor-link-control__link-divider"></div>
 
 			<Button
-				icon={ edit }
-				label={ __( 'Edit' ) }
-				onClick={ () => onEditClick() }
-				className="block-editor-link-control__link-action"
+				icon={ external }
+				target="_blank"
+				label={ __( 'Visit URL' ) }
+				showToolTip={ true }
+				className="block-editor-link-control__link-visit"
+				href={ value.url }
 			>
-				<VisuallyHidden>{ __( 'Edit' ) }</VisuallyHidden>
+				<VisuallyHidden>{ __( 'Visit URL' ) }</VisuallyHidden>
 			</Button>
 
 			<ViewerSlot fillProps={ value } />
