@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq, truncate } from 'lodash';
+import { castArray, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import {
 	switchToBlockType,
 	store as blocksStore,
 	isReusableBlock,
+	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
@@ -27,6 +28,7 @@ import { stack } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
+import BlockTitle from '../block-title';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
 
@@ -88,6 +90,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	);
 
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
+	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
@@ -139,11 +142,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
-								{ isReusable && (
+								{ ( isReusable || isTemplate ) && (
 									<span className="block-editor-block-switcher__toggle-text">
-										{ truncate( blockTitle, {
-											length: 35,
-										} ) }
+										<BlockTitle clientId={ clientIds } />
 									</span>
 								) }
 							</>
