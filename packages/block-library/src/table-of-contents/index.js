@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import metadata from './block.json';
 import edit from './edit';
+import icon from './icon';
 
 const { name } = metadata;
 
@@ -18,7 +19,7 @@ export const settings = {
 	description: __(
 		'Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.'
 	),
-	icon: 'list-view',
+	icon,
 	keywords: [ __( 'outline' ), __( 'summary' ) ],
 	edit,
 };
