@@ -4,6 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { applyFilters, hasFilter } from '@wordpress/hooks';
 
 const blocksTab = {
 	name: 'blocks',
@@ -28,7 +29,7 @@ function InserterTabs( {
 	onSelect,
 } ) {
 	const tabs = useMemo( () => {
-		const tempTabs = [ blocksTab ];
+		let tempTabs = [ blocksTab ];
 
 		if ( showPatterns ) {
 			tempTabs.push( patternsTab );
@@ -37,7 +38,12 @@ function InserterTabs( {
 		if ( showReusableBlocks ) {
 			tempTabs.push( reusableBlocksTab );
 		}
-
+		if ( hasFilter( 'editor.BlockInserterTabs.order' ) ) {
+			tempTabs = applyFilters(
+				'editor.BlockInserterTabs.order',
+				tempTabs
+			);
+		}
 		return tempTabs;
 	}, [
 		blocksTab,
