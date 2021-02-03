@@ -204,7 +204,7 @@ function LinkControl( {
 
 			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
 				<>
-					<div className="block-editor-link-control__search-input-wrapper">
+					<div className="block-editor-link-control__search">
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__search-input"
@@ -223,14 +223,12 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 						>
-							<div className="block-editor-link-control__search-actions">
-								<Button
-									type="submit"
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-								/>
-							</div>
+							<Button
+								type="submit"
+								label={ __( 'Submit' ) }
+								icon={ keyboardReturn }
+								className="block-editor-link-control__search-submit"
+							/>
 						</LinkControlSearchInput>
 					</div>
 					{ errorMessage && (
