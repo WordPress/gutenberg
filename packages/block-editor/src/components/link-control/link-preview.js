@@ -47,9 +47,7 @@ export default function LinkPreview( { value, onEditClick } ) {
 				showToolTip={ true }
 				className="block-editor-link-control__link-visit"
 				href={ value.url }
-			>
-				<VisuallyHidden>{ __( 'Visit URL' ) }</VisuallyHidden>
-			</Button>
+			/>
 
 			<ViewerSlot fillProps={ value } />
 		</div>
