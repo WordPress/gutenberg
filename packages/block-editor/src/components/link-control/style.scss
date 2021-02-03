@@ -3,7 +3,47 @@
 	padding: 6px;
 }
 
-// Link Preview
+
+// ## Link Search
+// When creating or editing a URL the primary UI
+// is a search input. It pulls double duty allowing
+// users to search site entities or type a URL.
+.block-editor-link-control__search {
+	position: relative;
+
+	.block-editor-link-control__search-input {
+		.components-base-control__field {
+			margin: 0;
+		}
+
+		input.block-editor-url-input__input[type="text"] {
+			padding: $grid-unit-15;
+			border-radius: $radius-block-ui;
+			background: $gray-100;
+
+			&:focus {
+				background: $white;
+				box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
+			}
+		}
+	}
+
+	.block-editor-link-control__search-submit {
+		position: absolute;
+		top: 4px;
+		right: 4px;
+
+		// I think the submit icon is mis-aligned.
+		svg {
+			position: relative;
+			top: -2px;
+			right: 2px;
+		}
+	}
+}
+
+
+// ## Link Preview
 // Once a link has been set this buttons edit or
 // visit the URL.
 .block-editor-link-control__link {
@@ -22,13 +62,6 @@
 	text-overflow: ellipsis;
 	display: inline-block;
 }
-
-// Since the button's label is hidden, there's
-// no need to have any margin on the icon SVG.
-.components-button.has-icon.has-text svg {
-	margin-right: 0;
-}
-
 
 // The divider separates the edit button from
 // the visit button.
