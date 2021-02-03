@@ -42,7 +42,6 @@ A component that renders all plugin fills in a hidden div.
 
 _Usage_
 
-<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var el = wp.element.createElement;
@@ -56,18 +55,19 @@ function Layout() {
 		PluginArea
 	);
 }
+```
 
-    <caption>ESNext</caption>
-    ```js
-    // Using ESNext syntax
-    import { PluginArea } from '@wordpress/plugins';
+```js
+// Using ESNext syntax
+import { PluginArea } from '@wordpress/plugins';
 
-    const Layout = () => (
-    	<div>
-    		Content of the page
-    		<PluginArea />
-    	</div>
-    );
+const Layout = () => (
+	<div>
+		Content of the page
+		<PluginArea />
+	</div>
+);
+```
 
 _Returns_
 
@@ -79,7 +79,6 @@ Registers a plugin to the editor.
 
 _Usage_
 
-<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var el = wp.element.createElement;
@@ -114,34 +113,35 @@ registerPlugin( 'plugin-name', {
 	icon: moreIcon,
 	render: Component,
 } );
+```
 
-    <caption>ESNext</caption>
-    ```js
-    // Using ESNext syntax
-    import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
-    import { registerPlugin } from '@wordpress/plugins';
-    import { more } from '@wordpress/icons';
+```js
+// Using ESNext syntax
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { registerPlugin } from '@wordpress/plugins';
+import { more } from '@wordpress/icons';
 
-    const Component = () => (
-    	<>
-    		<PluginSidebarMoreMenuItem
-    			target="sidebar-name"
-    		>
-    			My Sidebar
-    		</PluginSidebarMoreMenuItem>
-    		<PluginSidebar
-    			name="sidebar-name"
-    			title="My Sidebar"
-    		>
-    			Content of the sidebar
-    		</PluginSidebar>
-    	</>
-    );
+const Component = () => (
+	<>
+		<PluginSidebarMoreMenuItem
+			target="sidebar-name"
+		>
+			My Sidebar
+		</PluginSidebarMoreMenuItem>
+		<PluginSidebar
+			name="sidebar-name"
+			title="My Sidebar"
+		>
+			Content of the sidebar
+		</PluginSidebar>
+	</>
+);
 
-    registerPlugin( 'plugin-name', {
-    	icon: more,
-    	render: Component,
-    } );
+registerPlugin( 'plugin-name', {
+	icon: more,
+	render: Component,
+} );
+```
 
 _Parameters_
 
@@ -158,19 +158,19 @@ Unregisters a plugin by name.
 
 _Usage_
 
-<caption>ES5</caption>
 ```js
 // Using ES5 syntax
 var unregisterPlugin = wp.plugins.unregisterPlugin;
 
 unregisterPlugin( 'plugin-name' );
+```
 
-    <caption>ESNext</caption>
-    ```js
-    // Using ESNext syntax
-    import { unregisterPlugin } from '@wordpress/plugins';
+```js
+// Using ESNext syntax
+import { unregisterPlugin } from '@wordpress/plugins';
 
-    unregisterPlugin( 'plugin-name' );
+unregisterPlugin( 'plugin-name' );
+```
 
 _Parameters_
 

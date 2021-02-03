@@ -62,7 +62,6 @@ const PluginDocumentSettingFill = ( {
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var el = wp.element.createElement;
@@ -87,7 +86,6 @@ const PluginDocumentSettingFill = ( {
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { registerPlugin } from '@wordpress/plugins';

@@ -13,7 +13,6 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -33,7 +32,6 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
