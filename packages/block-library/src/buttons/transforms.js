@@ -43,7 +43,7 @@ const transforms = {
 						const text = div.innerText || '';
 						// Get first url
 						const link = div.querySelector( 'a' );
-						const url = link ? link.getAttribute( 'href' ) : null;
+						const url = link?.getAttribute( 'href' );
 						// Create singular button in the buttons block
 						return createBlock( 'core/button', {
 							text,
@@ -52,14 +52,13 @@ const transforms = {
 					} )
 				),
 			isMatch: ( paragraphs ) => {
-				const buttons = paragraphs.filter( ( attributes ) => {
+				return paragraphs.every( ( attributes ) => {
 					const div = document.createElement( 'div' );
 					div.innerHTML = attributes.content;
 					const text = div.innerText || '';
 					const links = div.querySelectorAll( 'a' );
 					return text.length <= 30 && links.length <= 1;
 				} );
-				return buttons.length === paragraphs.length;
 			},
 		},
 	],
