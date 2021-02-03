@@ -56,9 +56,9 @@ const transforms = {
 					const div = document.createElement( 'div' );
 					div.innerHTML = attributes.content;
 					const text = div.innerText || '';
-					return text.length <= 30;
+					const links = div.querySelectorAll( 'a' );
+					return text.length <= 30 && links.length <= 1;
 				} );
-
 				return buttons.length === paragraphs.length;
 			},
 		},
