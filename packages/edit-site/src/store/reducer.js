@@ -117,7 +117,7 @@ export function homeTemplateId( state, action ) {
  * Reducer for information about the navigation panel, such as its active menu
  * and whether it should be opened or closed.
  *
- * Note: this reducer interacts with the inserter and block navigation panels reducers
+ * Note: this reducer interacts with the inserter and list view panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
  * @param {Object} state Current state.
@@ -146,7 +146,7 @@ export function navigationPanel(
 				isOpen: action.isOpen,
 			};
 		case 'SET_IS_INSERTER_OPENED':
-		case 'SET_IS_BLOCK_NAVIGATION_OPENED':
+		case 'SET_IS_LIST_VIEW_OPENED':
 			return {
 				...state,
 				menu: state.isOpen && action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
@@ -159,7 +159,7 @@ export function navigationPanel(
 /**
  * Reducer to set the block inserter panel open or closed.
  *
- * Note: this reducer interacts with the navigation and block navigation panels reducers
+ * Note: this reducer interacts with the navigation and list view panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
  * @param {Object} state Current state.
@@ -170,7 +170,7 @@ export function blockInserterPanel( state = false, action ) {
 		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
 			return false;
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
-		case 'SET_IS_BLOCK_NAVIGATION_OPENED':
+		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
 			return action.isOpen;
@@ -179,7 +179,7 @@ export function blockInserterPanel( state = false, action ) {
 }
 
 /**
- * Reducer to set the block navigation panel open or closed.
+ * Reducer to set the list view panel open or closed.
  *
  * Note: this reducer interacts with the navigation and inserter panels reducers
  * to make sure that only one of the three panels is open at the same time.
@@ -187,14 +187,14 @@ export function blockInserterPanel( state = false, action ) {
  * @param {Object} state Current state.
  * @param {Object} action Dispatched action.
  */
-export function blockNavigationPanel( state = false, action ) {
+export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
 			return false;
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
 		case 'SET_IS_INSERTER_OPENED':
 			return action.isOpen ? false : state;
-		case 'SET_IS_BLOCK_NAVIGATION_OPENED':
+		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen;
 	}
 	return state;
@@ -208,5 +208,5 @@ export default combineReducers( {
 	homeTemplateId,
 	navigationPanel,
 	blockInserterPanel,
-	blockNavigationPanel,
+	listViewPanel,
 } );

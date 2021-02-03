@@ -9,7 +9,7 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { useCallback, forwardRef } from '@wordpress/element';
-import { navigationMenu } from '@wordpress/icons';
+import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,12 +44,12 @@ function BlockNavigationDropdownToggle( {
 		<Button
 			{ ...props }
 			ref={ innerRef }
-			icon={ navigationMenu }
+			icon={ listView }
 			aria-expanded={ isOpen }
 			aria-haspopup="true"
 			onClick={ isEnabled ? onToggle : undefined }
 			/* translators: button label text should, if possible, be under 16 characters. */
-			label={ __( 'Outline' ) }
+			label={ __( 'List view' ) }
 			className="block-editor-block-navigation"
 			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }

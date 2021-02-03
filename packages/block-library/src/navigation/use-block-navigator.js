@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 import { ToolbarButton, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { navigationMenu } from '@wordpress/icons';
+import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,7 +19,7 @@ export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 			className="components-toolbar__control"
 			label={ __( 'Open block navigator' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }
-			icon={ navigationMenu }
+			icon={ listView }
 		/>
 	);
 

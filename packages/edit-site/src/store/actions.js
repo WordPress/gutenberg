@@ -287,14 +287,14 @@ export function updateSettings( settings ) {
 }
 
 /**
- * Sets whether the block navigation panel should be open.
+ * Sets whether the list view panel should be open.
  *
- * @param {boolean} isOpen If true, opens the block navigation. If false, closes it.
+ * @param {boolean} isOpen If true, opens the list view. If false, closes it.
  *                         It does not toggle the state, but sets it directly.
  */
-export function setIsBlockNavigationOpened( isOpen ) {
+export function setIsListViewOpened( isOpen ) {
 	return {
-		type: 'SET_IS_BLOCK_NAVIGATION_OPENED',
+		type: 'SET_IS_LIST_VIEW_OPENED',
 		isOpen,
 	};
 }
