@@ -15,6 +15,7 @@ import {
 	MenuItemsChoice,
 	Popover,
 } from '@wordpress/components';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -120,6 +121,8 @@ export default function Header( {
 				/>
 
 				<SaveButton navigationPost={ navigationPost } />
+
+				<PinnedItems.Slot scope="core/edit-navigation" />
 
 				<Popover.Slot name="block-toolbar" />
 			</div>

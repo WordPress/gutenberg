@@ -7,15 +7,11 @@
 }
 
 .edit-navigation-layout {
-	margin-right: 280px;
-
-	.edit-navigation-header {
-		// Stuff
-	}
-
 	.navigation-editor-canvas {
 		max-width: 500px;
-		margin: auto;
+		margin-top: $grid-unit-40;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.block-editor-block-inspector__no-blocks,
