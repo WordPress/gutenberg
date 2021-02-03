@@ -8,6 +8,7 @@ import { find } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -103,6 +104,7 @@ export default function Header( {
 
 					<SaveButton navigationPost={ navigationPost } />
 
+					<PinnedItems.Slot scope="core/edit-navigation" />
 					<Popover.Slot name="block-toolbar" />
 				</div>
 			) }
