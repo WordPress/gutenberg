@@ -1,5 +1,6 @@
 .edit-navigation-toolbar {
 	position: relative;
+	display: inline-block;
 
 	.components-spinner {
 		left: 50%;
@@ -33,4 +34,8 @@
 	min-height: 48px;
 	background: $white;
 	overflow: hidden;
+
+	&:not(.has-block-selection) {
+		border: none;
+	}
 }
