@@ -60,6 +60,10 @@ export function useFlex( props ) {
 			justifyContent: justify,
 			height: isColumn && expanded ? '100%' : undefined,
 			width: ! isColumn && expanded ? '100%' : undefined,
+			marginBottom: wrap ? `calc(${ ui.space( gap ) } * -1)` : undefined,
+		} );
+
+		sx.Items = css( {
 			/**
 			 * Workaround to optimize DOM rendering.
 			 * We'll enhance alignment with naive parent flex assumptions.
@@ -74,17 +78,29 @@ export function useFlex( props ) {
 				marginLeft:
 					! isColumn && ! isReverse ? ui.space( gap ) : undefined,
 			},
-			/**
-			 * Improves stability of width/height rendering.
-			 * https://github.com/ItsJonQ/g2/pull/149
-			 */
-			'> *': {
-				minWidth: ! isColumn ? 0 : undefined,
-				minHeight: isColumn ? 0 : undefined,
+		} );
+
+		sx.WrapItems = css( {
+			'> *:not(marquee)': {
+				marginBottom: ui.space( gap ),
+				marginLeft:
+					! isColumn && isReverse ? ui.space( gap ) : undefined,
+				marginRight:
+					! isColumn && ! isReverse ? ui.space( gap ) : undefined,
+			},
+			'> *:last-child:not(marquee)': {
+				marginLeft: ! isColumn && isReverse ? 0 : undefined,
+				marginRight: ! isColumn && ! isReverse ? 0 : undefined,
 			},
 		} );
 
-		return cx( styles.Flex, sx.Base, className );
+		return cx(
+			styles.Flex,
+			sx.Base,
+			wrap ? sx.WrapItems : sx.Items,
+			isColumn ? styles.ItemsColumn : styles.ItemsRow,
+			className
+		);
 	}, [
 		align,
 		className,
