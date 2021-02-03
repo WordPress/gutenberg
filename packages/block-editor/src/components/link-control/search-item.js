@@ -7,9 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 import { Button, TextHighlight } from '@wordpress/components';
-import { Icon, globe } from '@wordpress/icons';
 
 export const LinkControlSearchItem = ( {
 	itemProps,
@@ -30,12 +28,6 @@ export const LinkControlSearchItem = ( {
 				'is-entity': ! isURL,
 			} ) }
 		>
-			{ isURL && (
-				<Icon
-					className="block-editor-link-control__search-item-icon"
-					icon={ globe }
-				/>
-			) }
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
@@ -52,7 +44,6 @@ export const LinkControlSearchItem = ( {
 							safeDecodeURI( suggestion.url )
 						) ||
 							'' ) }
-					{ isURL && __( 'Press ENTER to add this link' ) }
 				</span>
 			</span>
 			{ shouldShowType && suggestion.type && (
