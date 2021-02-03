@@ -4,6 +4,15 @@
 import tinycolor from 'tinycolor2';
 
 /**
+ * Tinycolor object representation for a color.
+ *
+ * @typedef {Object} TinyColor
+ * @property {number} _r Red component of the color in the range [0,255].
+ * @property {number} _g Green component of the color in the range [0,255].
+ * @property {number} _b Blue component of the color in the range [0,255].
+ */
+
+/**
  * Object representation for a color.
  *
  * @typedef {Object} RGBColor
@@ -20,61 +29,6 @@ import tinycolor from 'tinycolor2';
  * @property {number[]} g Array of green components of the colors in the range [0,1].
  * @property {number[]} b Array of blue components of the colors in the range [0,1].
  */
-
-/**
- * Convert a CSS hex string to an RGB object, discarding any alpha component.
- *
- * @param {string} color CSS hex string.
- *
- * @return {RGBColor} RGB values.
- */
-export function hex2rgb( color = '' ) {
-	let r = '0x00';
-	let g = '0x00';
-	let b = '0x00';
-
-	switch ( color.length ) {
-		// Parse #RRGGBBAA and #RRGGBB strings.
-		case 9:
-		case 7:
-			r = '0x' + color[ 1 ] + color[ 2 ];
-			g = '0x' + color[ 3 ] + color[ 4 ];
-			b = '0x' + color[ 5 ] + color[ 6 ];
-			break;
-		// Parse #RGBA and #RGB strings.
-		case 5:
-		case 4:
-			r = '0x' + color[ 1 ] + color[ 1 ];
-			g = '0x' + color[ 2 ] + color[ 2 ];
-			b = '0x' + color[ 3 ] + color[ 3 ];
-			break;
-	}
-
-	return {
-		r: r / 0xff,
-		g: g / 0xff,
-		b: b / 0xff,
-	};
-}
-
-/**
- * Convert an RGB object to a CSS hex string.
- *
- * @param {RGBColor} color RGB values.
- *
- * @return {string} CSS hex string.
- */
-export function rgb2hex( color = {} ) {
-	const r = color.r * 0xff;
-	const g = color.g * 0xff;
-	const b = color.b * 0xff;
-
-	// Disable reason: Joining the RGB components into a single number.
-	// eslint-disable-next-line no-bitwise
-	const num = ( r << 16 ) | ( g << 8 ) | b;
-
-	return `#${ num.toString( 16 ).padStart( 6, '0' ) }`;
-}
 
 /**
  * Generate a duotone gradient from a list of colors.
@@ -110,16 +64,33 @@ export function getGradientFromValues(
 }
 
 /**
+ * Converts a tinycolor object to a simple RGBColor.
+ *
+ * @param {TinyColor} color Tinycolor object.
+ *
+ * @return {RGBColor} RGB color with values in the range [0,1]
+ */
+export function tinycolorToRgb( color ) {
+	// Access values directly to skip rounding that tinycolor.toRgb() does.
+	return {
+		r: color._r / 255,
+		g: color._g / 255,
+		b: color._b / 255,
+	};
+}
+
+/**
  * Convert a list of colors to an object of R, G, and B values.
  *
- * @param {RGBColor[]} colors Array of RBG color objects.
+ * @param {TinyColor[]} colors Array of RBG color objects.
  *
  * @return {RGBValues} R, G, and B values.
  */
-export function getValuesFromColors( colors = [] ) {
+function getValuesFromColors( colors = [] ) {
 	const values = { r: [], g: [], b: [] };
 
-	colors.forEach( ( { r, g, b } ) => {
+	colors.forEach( ( color ) => {
+		const { r, g, b } = tinycolorToRgb( color );
 		values.r.push( r );
 		values.g.push( g );
 		values.b.push( b );
@@ -136,7 +107,7 @@ export function getValuesFromColors( colors = [] ) {
  * @return {RGBValues} R, G, and B values.
  */
 export function getValuesFromHexColors( colors = [] ) {
-	return getValuesFromColors( colors.map( hex2rgb ) );
+	return getValuesFromColors( colors.map( tinycolor ) );
 }
 
 /**
@@ -144,16 +115,16 @@ export function getValuesFromHexColors( colors = [] ) {
  *
  * @param {RGBValues} values R, G, and B values.
  *
- * @return {RGBColor[]} RGB color array.
+ * @return {TinyColor[]} RGB color array.
  */
 export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
 	// R, G, and B should all be the same length, so we only need to map over one.
 	return values.r.map( ( x, i ) => {
-		return {
-			r: values.r[ i ],
-			g: values.g[ i ],
-			b: values.b[ i ],
-		};
+		return tinycolor( {
+			r: values.r[ i ] * 255,
+			g: values.g[ i ] * 255,
+			b: values.b[ i ] * 255,
+		} );
 	} );
 }
 
@@ -165,7 +136,27 @@ export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
  * @return {string[]} Hex color array.
  */
 export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
-	return getColorsFromValues( values ).map( rgb2hex );
+	return getColorsFromValues( values ).map( ( c ) =>
+		tinycolor( c ).toHexString()
+	);
+}
+
+export function getColorStopsFromValues( values = { r: [], g: [], b: [] } ) {
+	const colors = getColorsFromValues( values );
+	return colors.map( ( c, i ) => ( {
+		position: ( i * 100 ) / ( colors.length - 1 ),
+		color: c,
+	} ) );
+}
+
+export function getValuesFromColorStops( colors = [] ) {
+	return getValuesFromColors( colors.map( ( { color } ) => color ) );
+}
+
+export function getCustomDuotoneIdFromColorStops( colors = [] ) {
+	return getCustomDuotoneIdFromHexColors(
+		colors.map( ( { color } ) => tinycolor( color ).toHexString() )
+	);
 }
 
 /**
