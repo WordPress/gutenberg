@@ -6,18 +6,16 @@
 	}
 	// Make the dropdown background white if there's no background color set.
 	&:not(.has-background) {
-		.children {
+		.submenu-container {
 			color: $gray-900;
 			background-color: $white;
 		}
 	}
 }
 
-.wp-block-page-list {
-	// Make links unclickable in the editor
-	.page_item a {
-		pointer-events: none;
-	}
+// Make links unclickable in the editor
+.wp-block-pages-list__item__link {
+	pointer-events: none;
 }
 
 .wp-block-page-list .components-placeholder {

@@ -6,6 +6,10 @@
 	.wp-block-page-list__submenu-icon {
 		display: block;
 		padding: 0.375em 1em 0.375em 0;
+
+		svg {
+			fill: currentColor;
+		}
 	}
 }
 
@@ -15,13 +19,13 @@
 		display: flex;
 		flex-wrap: wrap;
 	}
-	.page_item a {
+	.wp-block-pages-list__item__link {
 		display: block;
 		color: inherit;
 		padding: 0.5em 1em;
 	}
 
-	.page_item_has_children {
+	.wp-block-pages-list__item.has-child {
 		display: flex;
 		position: relative;
 		background-color: inherit;
@@ -29,7 +33,7 @@
 		> a {
 			padding-right: 0.5em;
 		}
-		> .children {
+		> .submenu-container {
 			border: $border-width solid rgba(0, 0, 0, 0.15);
 			background-color: inherit;
 			color: inherit;
@@ -46,7 +50,7 @@
 				left: 1.5em;
 
 				// Nested submenus sit to the left on large breakpoints
-				.children {
+				.submenu-container {
 					left: 100%;
 					top: -1px;
 
@@ -71,7 +75,7 @@
 		&:hover {
 			cursor: pointer;
 
-			> .children {
+			> .submenu-container {
 				visibility: visible;
 				opacity: 1;
 			}
@@ -80,14 +84,14 @@
 		&:focus-within {
 			cursor: pointer;
 
-			> .children {
+			> .submenu-container {
 				visibility: visible;
 				opacity: 1;
 			}
 		}
 	}
 
-	.children {
+	.submenu-container {
 		padding: 0;
 	}
 }

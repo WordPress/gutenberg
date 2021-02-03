@@ -86,28 +86,95 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 }
 
 /**
- * Renders the `core/page-list` block on server.
+ * Outputs Page list markup from an array of pages with nested children.
  *
- * @param array $attributes The block attributes.
- * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param array $nested_pages The array of nested pages.
+ * @param bool  $render_submenu_icon Whether to render a submenu icon for nested lists.
  *
- * @return string Returns the page list markup.
+ * @return string List markup.
  */
+function render_nested_page_list( $nested_pages ) {
+	if ( empty( $nested_pages ) ) {
+		return;
+	}
+	$markup = '';
+	foreach ( (array) $nested_pages as $page ) {
+		$css_class = array( 'wp-block-pages-list__item' );
+		if ( isset( $page['children'] ) ) {
+			$css_class[] = 'has-child';
+		}
+		$markup .= '<li class="' . implode( ' ', $css_class ) . '">';
+		$markup .= '<a class="wp-block-pages-list__item__link" href="' . $page['link'] . '">' . $page['title'] . '</a>';
+		if ( isset( $page['children'] ) ) {
+			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span>';
+			$markup .= '<ul class="submenu-container">' . render_nested_page_list( $page['children'] ) . '</ul>';
+		}
+		$markup .= '</li>';
+	}
+	return $markup;
+}
+
+/**
+ * Outputs nested array of pages
+ *
+ * @param array $current_level The level being iterated through.
+ * @param array $children The children grouped by parent post ID.
+ *
+ * @return array The nested array of pages.
+ */
+function nest_pages( $current_level, $children ) {
+	if ( empty( $current_level ) ) {
+		return;
+	}
+	$nested_array = array();
+	foreach ( (array) $current_level as $key => $current ) {
+		if ( isset( $children[ $key ] ) ) {
+			$current['children'] = nest_pages( $children[ $key ], $children );
+		}
+		$nested_array[] = $current;
+	}
+	return $nested_array;
+}
+
+	/**
+	 * Renders the `core/page-list` block on server.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @param array $content The saved content.
+	 * @param array $block The parsed block.
+	 *
+	 * @return string Returns the page list markup.
+	 */
 function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
-	$walker = new Walker_Page_List_Block;
+	$all_pages = get_pages();
 
-	$args = array(
-		'echo'     => false,
-		'title_li' => '',
-		'walker'   => $walker,
-	);
+	$top_level_pages = array();
+
+	$pages_with_children = array();
+
+	foreach ( (array) $all_pages as $page ) {
+		if ( $page->post_parent ) {
+			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
+				'title' => $page->post_title,
+				'link'  => get_permalink( $page->ID ),
+			);
+		} else {
+			$top_level_pages[ $page->ID ] = array(
+				'title' => $page->post_title,
+				'link'  => get_permalink( $page->ID ),
+			);
+
+		}
+	}
+
+	$nested_pages = nest_pages( $top_level_pages, $pages_with_children );
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
-	$items_markup   = wp_list_pages( $args );
+
+	$items_markup = render_nested_page_list( $nested_pages );
 
 	$colors          = block_core_page_list_build_css_colors( $block->context );
 	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
@@ -136,9 +203,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	);
 }
 
-/**
- * Registers the `core/pages` block on server.
- */
+	/**
+	 * Registers the `core/pages` block on server.
+	 */
 function register_block_core_page_list() {
 	register_block_type_from_metadata(
 		__DIR__ . '/page-list',
@@ -147,4 +214,4 @@ function register_block_core_page_list() {
 		)
 	);
 }
-add_action( 'init', 'register_block_core_page_list' );
+	add_action( 'init', 'register_block_core_page_list' );
