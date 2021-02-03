@@ -57,7 +57,7 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-site/toggle-block-navigation',
+			name: 'core/edit-site/toggle-list-view',
 			category: 'global',
 			description: __( 'Open the block list view.' ),
 			keyCombination: {

@@ -24,13 +24,13 @@
 	}
 }
 
-.edit-site-editor__block-navigation-panel {
+.edit-site-editor__list-view-panel {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
 }
 
-.edit-site-editor__block-navigation-panel-header {
+.edit-site-editor__list-view-panel-header {
 	align-items: center;
 	border-bottom: $border-width solid $gray-300;
 	display: flex;
@@ -40,7 +40,7 @@
 	padding-right: $grid-unit-05;
 }
 
-.edit-site-editor__block-navigation-panel-content {
+.edit-site-editor__list-view-panel-content {
 	overflow-y: auto;
 	padding: $grid-unit-10;
 

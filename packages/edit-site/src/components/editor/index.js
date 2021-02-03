@@ -33,7 +33,7 @@ import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
-import BlockNavigationSidebar from '../secondary-sidebar/block-navigation-sidebar';
+import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import { store as editSiteStore } from '../../store';
 
 const interfaceLabels = {
@@ -189,7 +189,7 @@ function Editor( { initialSettings } ) {
 													{ isInserterOpen && (
 														<InserterSidebar />
 													) }
-													<BlockNavigationSidebar />
+													<ListViewSidebar />
 												</>
 											}
 											sidebar={

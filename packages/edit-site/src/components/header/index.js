@@ -11,7 +11,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { navigationMenu, plus } from '@wordpress/icons';
+import { listView, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -35,8 +35,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 		template,
 		templateType,
 		isInserterOpen,
-		isBlockNavigationOpen,
-		blockNavigationShortcut,
+		isListViewOpen,
+		listViewShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -44,7 +44,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
-			isBlockNavigationOpened,
+			isListViewOpened,
 		} = select( editSiteStore );
 		const { getEntityRecord } = select( 'core' );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
@@ -67,9 +67,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 			template: record,
 			templateType: postType,
 			isInserterOpen: isInserterOpened(),
-			isBlockNavigationOpen: isBlockNavigationOpened(),
-			blockNavigationShortcut: getShortcutRepresentation(
-				'core/edit-site/toggle-block-navigation'
+			isListViewOpen: isListViewOpened(),
+			listViewShortcut: getShortcutRepresentation(
+				'core/edit-site/toggle-list-view'
 			),
 		};
 	}, [] );
@@ -77,7 +77,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
-		setIsBlockNavigationOpened,
+		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -116,17 +116,15 @@ export default function Header( { openEntitiesSavedStates } ) {
 							<UndoButton />
 							<RedoButton />
 							<Button
-								className="edit-site-header-toolbar__block-navigation-toggle"
-								icon={ navigationMenu }
-								isPressed={ isBlockNavigationOpen }
+								className="edit-site-header-toolbar__list-view-toggle"
+								icon={ listView }
+								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'Outline' ) }
+								label={ __( 'List View' ) }
 								onClick={ () =>
-									setIsBlockNavigationOpened(
-										! isBlockNavigationOpen
-									)
+									setIsListViewOpened( ! isListViewOpen )
 								}
-								shortcut={ blockNavigationShortcut }
+								shortcut={ listViewShortcut }
 							/>
 						</>
 					) }

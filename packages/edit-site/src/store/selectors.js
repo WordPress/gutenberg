@@ -162,12 +162,12 @@ export function isInserterOpened( state ) {
 }
 
 /**
- * Returns the current opened/closed state of the block navigation panel.
+ * Returns the current opened/closed state of the list view panel.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} True if the block navigation panel should be open; false if closed.
+ * @return {boolean} True if the list view panel should be open; false if closed.
  */
-export function isBlockNavigationOpened( state ) {
-	return state.blockNavigationPanel;
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
 }
