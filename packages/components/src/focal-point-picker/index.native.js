@@ -108,8 +108,10 @@ function FocalPointPicker( props ) {
 					const x = pageX - locationPageOffsetX;
 					const y = pageY - locationPageOffsetY;
 					onChange( {
-						x: clamp( x / containerSize?.width, 0, 1 ),
-						y: clamp( y / containerSize?.height, 0, 1 ),
+						x: clamp( x / containerSize?.width, 0, 1 ).toFixed( 2 ),
+						y: clamp( y / containerSize?.height, 0, 1 ).toFixed(
+							2
+						),
 					} );
 					// Slider (child of RangeCell) is uncontrolled, so we must increment a
 					// key to re-mount and sync the pan gesture values to the sliders
@@ -188,8 +190,10 @@ function FocalPointPicker( props ) {
 		setVideoNaturalSize( { height, width } );
 		setDisplayPlaceholder( false );
 	};
-	const onXCoordinateChange = ( x ) => onChange( { x: x / 100 } );
-	const onYCoordinateChange = ( y ) => onChange( { y: y / 100 } );
+	const onXCoordinateChange = ( x ) =>
+		onChange( { x: ( x / 100 ).toFixed( 2 ) } );
+	const onYCoordinateChange = ( y ) =>
+		onChange( { y: ( y / 100 ).toFixed( 2 ) } );
 
 	return (
 		<View style={ styles.container }>

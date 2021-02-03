@@ -3,7 +3,6 @@
  */
 import { SafeAreaView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { isFinite } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,11 +34,10 @@ const FocalPointSettingsMemo = memo(
 		}
 
 		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
-		function setPosition( { x, y } ) {
+		function setPosition( coordinates ) {
 			setDraftFocalPoint( ( prevState ) => ( {
 				...prevState,
-				...( isFinite( x ) ? { x } : {} ),
-				...( isFinite( y ) ? { y } : {} ),
+				...coordinates,
 			} ) );
 		}
 
