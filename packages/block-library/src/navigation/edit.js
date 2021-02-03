@@ -11,6 +11,7 @@ import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
+	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
@@ -23,12 +24,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import {
-	justifyLeft,
-	justifyCenter,
-	justifyRight,
-	justifySpaceBetween,
-} from '@wordpress/icons';
+
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 
@@ -46,13 +42,6 @@ function Navigation( {
 	hasItemJustificationControls = attributes.orientation === 'horizontal',
 	hasListViewModal = true,
 } ) {
-	const navIcons = {
-		left: justifyLeft,
-		center: justifyCenter,
-		right: justifyRight,
-		'space-between': justifySpaceBetween,
-	};
-
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
@@ -127,57 +116,17 @@ function Navigation( {
 		};
 	}
 
-	const POPOVER_PROPS = {
-		position: 'bottom right',
-		isAlternate: true,
-	};
-
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
-					<ToolbarGroup
-						icon={
-							attributes.itemsJustification
-								? navIcons[ attributes.itemsJustification ]
-								: navIcons.left
-						}
-						popoverProps={ POPOVER_PROPS }
-						label={ __( 'Change items justification' ) }
-						isCollapsed
-						controls={ [
-							{
-								icon: justifyLeft,
-								title: __( 'Justify items left' ),
-								isActive:
-									'left' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'left' ),
-							},
-							{
-								icon: justifyCenter,
-								title: __( 'Justify items center' ),
-								isActive:
-									'center' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'center' ),
-							},
-							{
-								icon: justifyRight,
-								title: __( 'Justify items right' ),
-								isActive:
-									'right' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'right' ),
-							},
-							{
-								icon: justifySpaceBetween,
-								title: __( 'Space between items' ),
-								isActive:
-									'space-between' ===
-									attributes.itemsJustification,
-								onClick: handleItemsAlignment(
-									'space-between'
-								),
-							},
-						] }
+					<JustifyToolbar
+						value={ attributes.itemsJustification }
+						onChange={ handleItemsAlignment }
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
 					/>
 				) }
 				{ hasListViewModal && (

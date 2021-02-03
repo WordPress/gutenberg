@@ -376,9 +376,17 @@ class MediaUpload extends Component {
 
 	onOpen() {
 		this.updateCollection();
-		if ( ! this.props.value ) {
+
+		// Handle both this.props.value being either (number[]) multiple ids
+		// (for galleries) or a (number) singular id (e.g. image block).
+		const hasMedia = Array.isArray( this.props.value )
+			? !! this.props.value?.length
+			: !! this.props.value;
+
+		if ( ! hasMedia ) {
 			return;
 		}
+
 		if ( ! this.props.gallery ) {
 			const selection = this.frame.state().get( 'selection' );
 			castArray( this.props.value ).forEach( ( id ) => {
