@@ -14,18 +14,18 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
-	getFontSize,
+	//getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+/*import { useSelect } from '@wordpress/data';
+import { useEffect, useRef, useState } from '@wordpress/element';*/
 import { formatLtr } from '@wordpress/icons';
 
-function getComputedStyle( node, pseudo ) {
+/*function getComputedStyle( node, pseudo ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node, pseudo );
-}
+}*/
 
 const name = 'core/paragraph';
 
@@ -50,7 +50,7 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	);
 }
 
-function useDropCapMinHeight( ref, isDisabled, dependencies ) {
+/*function useDropCapMinHeight( ref, isDisabled, dependencies ) {
 	const [ minHeight, setMinHeight ] = useState();
 
 	useEffect( () => {
@@ -65,7 +65,7 @@ function useDropCapMinHeight( ref, isDisabled, dependencies ) {
 	}, [ isDisabled, ...dependencies ] );
 
 	return minHeight;
-}
+}*/
 
 function ParagraphBlock( {
 	attributes,
@@ -81,11 +81,11 @@ function ParagraphBlock( {
 		direction,
 		dropCap,
 		placeholder,
-		fontSize,
-		style,
+		//fontSize,
+		//style,
 	} = attributes;
 	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
-	const ref = useRef();
+	/*const ref = useRef();
 	const inlineFontSize = style?.fontSize;
 	const size = useSelect(
 		( select ) => {
@@ -95,14 +95,14 @@ function ParagraphBlock( {
 		[ fontSize, inlineFontSize ]
 	);
 	const hasDropCap = isDropCapFeatureEnabled && dropCap;
-	const minHeight = useDropCapMinHeight( ref, ! hasDropCap, [ size ] );
+	const minHeight = useDropCapMinHeight( ref, ! hasDropCap, [ size ] ); */
 	const blockProps = useBlockProps( {
-		ref,
+		//ref,
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
-		style: { direction, minHeight },
+		style: { direction },
 	} );
 
 	return (
