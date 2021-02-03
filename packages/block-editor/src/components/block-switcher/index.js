@@ -42,11 +42,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		blockTitle,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlockTransformItems,
-				__experimentalGetReusableBlockTitle,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getBlockTransformItems } = select(
+				blockEditorStore
+			);
 
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
@@ -57,14 +55,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const styles =
 				_isSingleBlockSelected && getBlockStyles( firstBlockName );
 			let _icon;
-			let reusableBlockTitle;
 			if ( _isSingleBlockSelected ) {
 				_icon = blockInformation?.icon; // Take into account active block variations.
-				reusableBlockTitle =
-					isReusableBlock( blocks[ 0 ] ) &&
-					__experimentalGetReusableBlockTitle(
-						blocks[ 0 ].attributes.ref
-					);
 			} else {
 				const isSelectionOfSameType =
 					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
@@ -82,8 +74,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle:
-					reusableBlockTitle || getBlockType( firstBlockName ).title,
+				blockTitle: getBlockType( firstBlockName ).title,
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]

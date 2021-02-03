@@ -20,6 +20,6 @@ export { metadata, name };
 export const settings = {
 	title: _x( 'Template Part', 'block title' ),
 	keywords: [ __( 'template part' ) ],
-	__experimentalLabel: ( { title: slug } ) => startCase( slug ),
+	__experimentalLabel: ( { slug } ) => startCase( slug ),
 	edit,
 };
