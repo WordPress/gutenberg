@@ -89,7 +89,6 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  * Outputs Page list markup from an array of pages with nested children.
  *
  * @param array $nested_pages The array of nested pages.
- * @param bool  $render_submenu_icon Whether to render a submenu icon for nested lists.
  *
  * @return string List markup.
  */

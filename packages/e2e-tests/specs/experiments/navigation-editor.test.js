@@ -208,7 +208,7 @@ describe( 'Navigation editor', () => {
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 
-		const allPageItems = await page.$$( '.page_item' );
+		const allPageItems = await page.$$( '.wp-block-pages-list__item' );
 
 		expect( allPageItems.length ).toBe( 1 );
 	} );
