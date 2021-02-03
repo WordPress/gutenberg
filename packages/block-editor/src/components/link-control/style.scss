@@ -43,6 +43,53 @@
 }
 
 
+// ## Search Results
+/*
+block-editor-link-control__search-results-wrapper
+	block-editor-link-control__search-results-label
+
+	block-editor-link-control__search-results
+		block-editor-link-control__search-item (is-url|is-entity)
+			block-editor-link-control__search-item-icon
+
+			block-editor-link-control__search-item-header
+				block-editor-link-control__search-item-title
+				block-editor-link-control__search-item-info
+
+			block-editor-link-control__search-item-type
+*/
+.block-editor-link-control__search-results {
+	mark {
+		background: none;
+		font-weight: 600;
+	}
+}
+
+.block-editor-link-control__search-item {
+	height: auto;
+	width: 100%;
+	text-align: left;
+	border-radius: $radius-block-ui;
+	padding: $grid-unit-15;
+	display: flex;
+}
+
+.block-editor-link-control__search-item-header {
+	flex-grow: 1;
+}
+
+.block-editor-link-control__search-item-title {
+	display: block;
+	font-size: 13px;
+}
+
+.block-editor-link-control__search-item-info {
+	display: block;
+	font-size: 12px;
+	color: $gray-700;
+}
+
+
 // ## Link Preview
 // Once a link has been set this buttons edit or
 // visit the URL.
