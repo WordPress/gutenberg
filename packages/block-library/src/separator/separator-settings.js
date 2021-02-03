@@ -11,33 +11,73 @@ import {
 /**
  * Internal dependencies
  */
-import { HEIGHT_CSS_UNITS } from './shared';
+import { CSS_UNITS, parseUnit } from './shared';
 
 const SeparatorSettings = ( props ) => {
 	const {
 		color,
 		setColor,
-		height,
-		heightUnit,
-		minHeight,
-		maxHeight,
-		updateHeight,
-		updateHeightUnit,
+		marginConstraints,
+		marginUnit,
+		separatorStyles: style,
+		setAttributes,
 	} = props;
+	const { top, bottom } = style?.spacing?.margin || {};
+	const topUnit = parseUnit( top );
+	const bottomUnit = parseUnit( bottom );
+
+	const updateMargins = ( margins ) => {
+		setAttributes( {
+			style: {
+				...style,
+				spacing: {
+					...style?.spacing,
+					margin: margins,
+				},
+			},
+		} );
+	};
+
+	const createHandleMarginChange = ( side ) => ( value ) => {
+		updateMargins( {
+			...style?.spacing?.margin,
+			[ side ]: value,
+		} );
+	};
+
+	const onUnitChange = ( unit ) => {
+		const defaultValue = marginConstraints[ unit ].default;
+		updateMargins( {
+			top: defaultValue,
+			bottom: defaultValue,
+		} );
+	};
 
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Separator settings' ) }>
 				<UnitControl
-					label={ __( 'Height' ) }
-					min={ minHeight }
-					max={ maxHeight }
-					onChange={ updateHeight }
-					onUnitChange={ updateHeightUnit }
-					value={ `${ height }${ heightUnit }` }
-					unit={ heightUnit }
-					units={ HEIGHT_CSS_UNITS }
-					step={ heightUnit === 'px' ? '1' : '0.25' }
+					label={ __( 'Top margin' ) }
+					min={ marginConstraints[ topUnit ].min }
+					max={ marginConstraints[ topUnit ].max }
+					onChange={ createHandleMarginChange( 'top' ) }
+					value={ style?.spacing?.margin?.top }
+					unit={ marginUnit } // Needed to force unit selection to update after box resizing.
+					units={ CSS_UNITS }
+					onUnitChange={ onUnitChange }
+					step={ topUnit === 'px' ? '1' : '0.25' }
+					style={ { marginBottom: '8px' } }
+				/>
+				<UnitControl
+					label={ __( 'Bottom margin' ) }
+					min={ marginConstraints[ bottomUnit ].min }
+					max={ marginConstraints[ bottomUnit ].max }
+					onChange={ createHandleMarginChange( 'bottom' ) }
+					value={ style?.spacing?.margin?.bottom }
+					unit={ marginUnit } // Needed to force unit selection to update after box resizing.
+					units={ CSS_UNITS }
+					onUnitChange={ onUnitChange }
+					step={ bottomUnit === 'px' ? '1' : '0.25' }
 				/>
 			</PanelBody>
 			<PanelColorSettings

@@ -9,12 +9,8 @@
 		"customColor": {
 			"type": "string"
 		},
-		"height": {
-			"type": "number"
-		},
-		"heightUnit": {
-			"type": "string",
-			"default": "px"
+		"style": {
+			"type": "object"
 		}
 	},
 	"supports": {

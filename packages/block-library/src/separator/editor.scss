@@ -16,15 +16,16 @@
 
 // Duplicate selector to overcome theme specificity.
 .editor-styles-wrapper .wp-block .wp-block-separator.wp-block-separator {
-	// Remove default margins and center within ResizableBox control.
-	left: 50%;
 	margin: 0;
 	position: absolute;
-	top: 50%;
 	width: 100%;
-	transform: translate(-50%, -50%);
 
 	&.is-style-dots {
 		border-top: none;
 	}
+}
+
+// Counter the added height of the dots style's pseudo after element
+.wp-block-separator__wrapper.is-style-dots .is-style-dots {
+	transform: translateY(-0.75em);
 }

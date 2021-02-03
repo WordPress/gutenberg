@@ -16,62 +16,88 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SeparatorSettings from './separator-settings';
-import { getHeightConstraints } from './shared';
+import { getMarginConstraints, parseUnit } from './shared';
 
 function SeparatorEdit( props ) {
 	const { attributes, setAttributes, color, setColor, isSelected } = props;
-	const { height, heightUnit } = attributes;
+	const { className, style } = attributes;
 	const [ isResizing, setIsResizing ] = useState( false );
 
-	const hasDotsStyle = attributes.className?.indexOf( 'is-style-dots' ) >= 0;
-	const minimumHeightScale = hasDotsStyle ? 1.5 : 1;
-	const heightConstraints = getHeightConstraints( minimumHeightScale );
-	const currentMinHeight = heightConstraints[ heightUnit ].min;
-	const currentMaxHeight = heightConstraints[ heightUnit ].max;
+	const { top: marginTop, bottom: marginBottom } =
+		style?.spacing?.margin || {};
+	const marginUnit = parseUnit( marginTop || marginBottom );
+	const marginTopValue = parseFloat( marginTop || 0 );
+	const marginBottomValue = parseFloat( marginBottom || 0 );
 
+	// Given different display method, dots block style has larger min height requirement.
+	const hasDotsStyle = className?.indexOf( 'is-style-dots' ) >= 0;
+	const minimumMarginScale = hasDotsStyle ? 1.5 : 1;
+	const marginConstraints = getMarginConstraints( minimumMarginScale );
+	const currentMinMargin = marginConstraints[ marginUnit ].min;
+
+	// Ensure when changing block style that any change in minimum height is
+	// enforced against existing top and bottom margins.
 	useEffect( () => {
-		if ( height < currentMinHeight ) {
-			setAttributes( { height: currentMinHeight } );
+		if (
+			marginTopValue < currentMinMargin ||
+			marginBottomValue < currentMinMargin
+		) {
+			const topValue = Math.max( marginTopValue, currentMinMargin );
+			const bottomValue = Math.max( marginBottomValue, currentMinMargin );
+
+			setAttributes( {
+				style: {
+					...style,
+					spacing: {
+						...style?.spacing,
+						margin: {
+							top: `${ topValue }${ marginUnit }`,
+							bottom: `${ bottomValue }${ marginUnit }`,
+						},
+					},
+				},
+			} );
 		}
-	}, [ hasDotsStyle, heightConstraints ] );
-
-	const onResizeStart = () => {
-		setIsResizing( true );
-	};
-
-	// Change handler for sidebar height control only.
-	const updateHeight = ( value ) => {
-		setAttributes( {
-			height: clamp(
-				parseFloat( value ), // Rounding or parsing as integer here isn't ideal for em and rem units.
-				currentMinHeight,
-				currentMaxHeight
-			),
-			heightUnit,
-		} );
-	};
-
-	const updateHeightUnit = ( value ) => {
-		setAttributes( {
-			height: heightConstraints[ value ].default,
-			heightUnit: value,
-		} );
-	};
+	}, [ hasDotsStyle ] ); // Only restricting on dots style as min/max enforced on change otherwise.
 
 	// ResizableBox callback to set height and force pixel units.
 	const onResizeStop = ( _event, _direction, elt ) => {
+		const { min, max } = marginConstraints.px;
+		const newHeight = clamp( parseInt( elt.clientHeight, 10 ) );
+
+		// Split the resizable box's height between margins by default.
+		let top = Math.floor( newHeight / 2 );
+		let bottom = Math.ceil( newHeight / 2 );
+
+		// Handle existing ratio between top and bottom margins if available.
+		if ( marginTop && marginBottom ) {
+			const totalMargin = marginTopValue + marginBottomValue;
+			top = newHeight * ( marginTopValue / totalMargin );
+			bottom = newHeight * ( marginBottomValue / totalMargin );
+		}
+
+		// Enforce min and max margins.
+		top = clamp( Math.round( top ), min, max );
+		bottom = clamp( Math.round( bottom ), min, max );
+
 		setAttributes( {
-			height: clamp(
-				parseInt( elt.clientHeight, 10 ),
-				heightConstraints.px.min,
-				heightConstraints.px.max
-			),
-			heightUnit: 'px',
+			style: {
+				...style,
+				spacing: {
+					...style?.spacing,
+					margin: {
+						top: `${ top }px`,
+						bottom: `${ bottom }px`,
+					},
+				},
+			},
 		} );
 		setIsResizing( false );
 	};
 
-	const cssHeight = `${ height }${ heightUnit }`;
+	const height =
+		parseFloat( marginTop || 0 ) + parseFloat( marginBottom || 0 );
+	const cssHeight = `${ height }${ marginUnit }`;
 	const blockProps = useBlockProps();
 	const wrapperClasses = blockProps.className?.replace(
 		'wp-block-separator',
@@ -98,6 +124,8 @@ function SeparatorEdit( props ) {
 					style={ {
 						backgroundColor: color.color,
 						color: color.color,
+						marginTop: marginTop || currentMinMargin,
+						marginBottom: marginBottom || currentMinMargin,
 					} }
 				/>
 				<ResizableBox
@@ -109,7 +137,7 @@ function SeparatorEdit( props ) {
 					) }
 					size={ {
 						height:
-							heightUnit === 'px' && height ? cssHeight : '100%',
+							marginUnit === 'px' && height ? cssHeight : '100%',
 					} }
 					enable={ {
 						top: false,
@@ -121,8 +149,8 @@ function SeparatorEdit( props ) {
 						bottomLeft: false,
 						topLeft: false,
 					} }
-					minHeight={ heightConstraints.px.min }
-					onResizeStart={ onResizeStart }
+					minHeight={ marginConstraints.px.min * 2 } // Height will account for top and bottom margin.
+					onResizeStart={ () => setIsResizing( true ) }
 					onResizeStop={ onResizeStop }
 					showHandle={ isSelected }
 					__experimentalShowTooltip={ true }
@@ -136,12 +164,10 @@ function SeparatorEdit( props ) {
 			<SeparatorSettings
 				color={ color }
 				setColor={ setColor }
-				minHeight={ currentMinHeight }
-				maxHeight={ currentMaxHeight }
-				height={ height }
-				heightUnit={ heightUnit }
-				updateHeight={ updateHeight }
-				updateHeightUnit={ updateHeightUnit }
+				marginConstraints={ marginConstraints }
+				marginUnit={ marginUnit }
+				separatorStyles={ style }
+				setAttributes={ setAttributes }
 			/>
 		</>
 	);
