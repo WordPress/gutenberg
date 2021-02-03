@@ -15,7 +15,6 @@ import { focus } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
@@ -103,7 +102,6 @@ import { ViewerFill } from './viewer-slot';
 function LinkControl( {
 	searchInputPlaceholder,
 	value,
-	settings,
 	onChange = noop,
 	noDirectEntry = false,
 	showSuggestions = true,
@@ -253,12 +251,6 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 				/>
 			) }
-
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
 		</div>
 	);
 }
