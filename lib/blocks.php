@@ -208,7 +208,7 @@ function gutenberg_optimize_block_styles_loading() {
 	/**
 	 * The maximum size of inlined styles in bytes.
 	 *
-	 * @param int    $total_inline_limit The file-size threshold, in bytes.
+	 * @param int $total_inline_limit The file-size threshold, in bytes.
 	 * @return int
 	 */
 	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
@@ -223,22 +223,20 @@ function gutenberg_optimize_block_styles_loading() {
 			isset( $wp_styles->registered[ $handle ]->path ) &&
 			file_exists( $wp_styles->registered[ $handle ]->path )
 		) {
-			$path = $wp_styles->registered[ $handle ]->path;
-			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-				$block_styles = false;
-				$styles_size  = (int) filesize( $path );
-			} else {
-				// Get the styles.
-				$block_styles = file_get_contents( $path );
-				// Minify the styles by removing comments & whitespace.
-				$block_styles = gutenberg_minify_styles( $block_styles );
+			$block_styles = false;
+			$styles_size  = (int) filesize( $wp_styles->registered[ $handle ]->path );
+
+			// Minify styles and get their minified size if SCRIPT_DEBUG is not enabled.
+			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+				// Get the styles and minify them by removing comments & whitespace.
+				$block_styles = gutenberg_minify_styles( file_get_contents( $wp_styles->registered[ $handle ]->path ) );
 				// Get the styles size.
 				$styles_size = (int) strlen( $block_styles );
 			}
 
 			$styles[] = array(
 				'handle' => $handle,
-				'path'   => $path,
+				'path'   => $wp_styles->registered[ $handle ]->path,
 				'size'   => $styles_size,
 				'css'    => $block_styles,
 			);
@@ -268,19 +266,13 @@ function gutenberg_optimize_block_styles_loading() {
 		// Loop styles.
 		foreach ( $styles as $stylesheet ) {
 
-			// Size check.
+			// Size check. Since styles are ordered by size, we can break the loop.
 			if ( $total_inline_size + $stylesheet['size'] > $total_inline_limit ) {
-				// Exit the loop, all subsequent stylesheets will be larger since we previously ordered them by size.
 				break;
 			}
 
-			// Get the styles.
+			// Get the styles if we don't already have them.
 			$stylesheet['css'] = $stylesheet['css'] ? $stylesheet['css'] : file_get_contents( $stylesheet['path'] );
-
-			// Make sure that "after" is defined in order to add inline styles.
-			if ( ! isset( $wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] ) ) {
-				$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'] = array();
-			}
 
 			// Set `src` to `false` and add styles inline.
 			$wp_styles->registered[ $stylesheet['handle'] ]->src              = false;
