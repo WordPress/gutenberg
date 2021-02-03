@@ -2,7 +2,6 @@
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: flex-start;
-	align-items: center;
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>
@@ -22,7 +21,7 @@
 	.wp-social-link {
 		// This needs specificity to override some themes.
 		&.wp-social-link.wp-social-link {
-			margin: 4px 8px 4px 0;
+			margin: auto 8px auto 0;
 		}
 
 		// By setting the font size, we can scale icons and paddings consistently based on that.
@@ -91,8 +90,7 @@
 	@include reduce-motion("transition");
 
 	// Dimensions.
-	// Height value has to be fit-content otherwise the social icons will be oblong instead of circle when selecting Small or Normal Size in the Block Editor.
-	height: fit-content;
+	height: auto;
 
 	a {
 		display: block;
