@@ -217,12 +217,7 @@ function gutenberg_optimize_block_styles_loading() {
 
 	// Build an array of styles that have a path defined.
 	foreach ( $wp_styles->queue as $handle ) {
-		if (
-			isset( $wp_styles->registered[ $handle ] ) &&
-			isset( $wp_styles->registered[ $handle ]->extra ) &&
-			isset( $wp_styles->registered[ $handle ]->extra['path'] ) &&
-			file_exists( $wp_styles->registered[ $handle ]->extra['path'] )
-		) {
+		if ( wp_styles()->get_data( $handle, 'path' ) ) {
 			$block_styles = false;
 			$styles_size  = (int) filesize( $wp_styles->registered[ $handle ]->extra['path'] );
 
