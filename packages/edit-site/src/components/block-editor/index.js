@@ -112,6 +112,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
+					editorStyles={ settings.styles }
 					head={ window.__editorStyles.html }
 					ref={ ref }
 					contentRef={ contentRef }

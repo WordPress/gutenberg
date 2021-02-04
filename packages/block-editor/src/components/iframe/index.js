@@ -2,6 +2,7 @@
  * External dependencies
  */
 import mergeRefs from 'react-merge-refs';
+import { compact, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,9 +11,15 @@ import {
 	useState,
 	createPortal,
 	useCallback,
+	useEffect,
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import transformStyles from '../../utils/transform-styles';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -136,8 +143,26 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function updateEditorStyles( doc, styles ) {
+	if ( ! doc ) {
+		return;
+	}
+
+	const updatedStyles = transformStyles( styles, '.editor-styles-wrapper' );
+
+	map( compact( updatedStyles ), ( updatedStyle ) => {
+		const styleElement = doc.createElement( 'style' );
+		styleElement.innerHTML = updatedStyle;
+		doc.body.appendChild( styleElement );
+	} );
+}
+
+function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
+
+	useEffect( () => {
+		updateEditorStyles( iframeDocument, editorStyles );
+	}, [ editorStyles ] );
 
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
@@ -157,6 +182,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setHead( contentDocument, head );
 			setBodyClassName( contentDocument );
 			styleSheetsCompat( contentDocument );
+			updateEditorStyles( contentDocument, editorStyles );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 
