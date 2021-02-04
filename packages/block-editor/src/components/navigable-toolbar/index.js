@@ -161,7 +161,7 @@ function NavigableToolbar( {
 		ref,
 		focusOnMount,
 		isAccessibleToolbar,
-		initialIndex,
+		defaultIndex: initialIndex,
 		onIndexChange,
 		shortcutTarget,
 	} );
