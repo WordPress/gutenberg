@@ -78,7 +78,7 @@ function Editor() {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			sidebarIsOpened: !! select(
 				interfaceStore
-			).getActiveComplementaryArea( editSiteStore ),
+			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
 			templateType: postType,
 			page: getPage(),
