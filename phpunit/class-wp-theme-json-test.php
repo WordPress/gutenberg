@@ -736,4 +736,22 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
+
+	function test_get_page_templates() {
+		$theme_json = new WP_Theme_JSON( array(
+			'pageTemplates' => array(
+				'page-home' => array(
+					'title' => 'Some title'
+				),
+			),
+		) );
+
+		$page_templates = $theme_json->get_page_templates();
+
+		$this->assertEqualSetsWithIndex( $page_templates, array(
+			'page-home' => array(
+				'title' => 'Some title',
+			),
+		) );
+	}
 }
