@@ -14,12 +14,24 @@
 	.block-editor-link-control__search-input {
 		.components-base-control__field {
 			margin: 0;
+
+			// A spinner appears while searching to let you
+			// know something is happening.
+			.components-spinner {
+				position: absolute;
+				top: 12px;
+				right: 42px;
+				z-index: 1;
+			}
 		}
 
 		input.block-editor-url-input__input[type="text"] {
-			padding: $grid-unit-15;
 			border-radius: $radius-block-ui;
 			background: $gray-100;
+			max-width: 50vw;
+			padding: 6px 42px 6px 12px;
+			font-size: 13px;
+			line-height: 24px;
 
 			&:focus {
 				background: $white;
@@ -30,8 +42,8 @@
 
 	.block-editor-link-control__search-submit {
 		position: absolute;
-		top: 4px;
-		right: 4px;
+		top: 1px;
+		right: 1px;
 
 		// I think the submit icon is mis-aligned.
 		svg {
@@ -44,21 +56,19 @@
 
 
 // ## Search Results
-/*
-block-editor-link-control__search-results-wrapper
-	block-editor-link-control__search-results-label
-
-	block-editor-link-control__search-results
-		block-editor-link-control__search-item (is-url|is-entity)
-			block-editor-link-control__search-item-icon
-
-			block-editor-link-control__search-item-header
-				block-editor-link-control__search-item-title
-				block-editor-link-control__search-item-info
-
-			block-editor-link-control__search-item-type
-*/
 .block-editor-link-control__search-results {
+	// When the list of results gets too long
+	// make sure it can scroll.
+	max-height: 280px;
+	overflow-y: auto;
+
+	// When loading (which should be rare) fade the results.
+	&.is-loading {
+		opacity: 0.2;
+	}
+
+	// As you search your exact input will be highlighted
+	// with the mark tag.
 	mark {
 		background: none;
 		font-weight: 600;
@@ -70,23 +80,55 @@ block-editor-link-control__search-results-wrapper
 	width: 100%;
 	text-align: left;
 	border-radius: $radius-block-ui;
-	padding: $grid-unit-15;
+	padding: $grid-unit-10 $grid-unit-10 $grid-unit-10 $grid-unit-15;
 	display: flex;
+
+	&:first-child {
+		padding-top: $grid-unit-10;
+	}
+
+	&.is-selected {
+		background: $gray-100;
+	}
 }
 
 .block-editor-link-control__search-item-header {
 	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	max-width: 280px;
+
+	.block-editor-link-control__search-item-title {
+		display: block;
+		font-size: 13px;
+
+		.is-url &,
+		.is-url & mark {
+			font-weight: normal;
+		}
+	}
+
+	.block-editor-link-control__search-item-info {
+		display: block;
+		font-size: 12px;
+		color: $gray-700;
+	}
 }
 
-.block-editor-link-control__search-item-title {
-	display: block;
-	font-size: 13px;
-}
-
-.block-editor-link-control__search-item-info {
-	display: block;
+.block-editor-link-control__search-item-type {
 	font-size: 12px;
-	color: $gray-700;
+	padding: 4px 8px;
+	background: $gray-100;
+	color: $gray-900;
+	border-radius: $radius-block-ui;
+	margin-left: $grid-unit-15;
+	text-transform: capitalize;
+
+	.is-selected & {
+		background: $white;
+	}
 }
 
 
@@ -102,12 +144,14 @@ block-editor-link-control__search-results-wrapper
 // the UI switches to editing the URL.
 .block-editor-link-control__link-edit {
 	white-space: nowrap;
-	min-width: 80px;
-	max-width: 280px;
-	line-height: 24px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: inline-block;
+	max-width: 280px;
+	min-width: 180px;
+	text-align: left;
+	line-height: 24px;
+	background: $gray-100;
 }
 
 // The divider separates the edit button from
