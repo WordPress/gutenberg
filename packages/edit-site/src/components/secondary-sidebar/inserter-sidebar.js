@@ -10,8 +10,13 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+
 export default function InserterSidebar() {
-	const { setIsInserterOpened } = useDispatch( 'core/edit-site' );
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
