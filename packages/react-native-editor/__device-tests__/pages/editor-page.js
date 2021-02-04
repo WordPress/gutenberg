@@ -136,14 +136,24 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
-	async scrollAndReturnElement( accessibilityLabel ) {
+	// iOS loads the block list more eagerly compared to Android.
+	// This makes this function return elements without scrolling on iOS.
+	// So we are keeping this Android only.
+	async androidScrollAndReturnElement( accessibilityLabel ) {
 		const elements = await this.driver.elementsByXPath(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
 			await swipeUp( this.driver, undefined, 200 );
-			return this.scrollAndReturnElement( accessibilityLabel );
+			return this.androidScrollAndReturnElement( accessibilityLabel );
 		}
+		return elements[ elements.length - 1 ];
+	}
+
+	async getLastElementByXPath( accessibilityLabel ) {
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
+		);
 		return elements[ elements.length - 1 ];
 	}
 
