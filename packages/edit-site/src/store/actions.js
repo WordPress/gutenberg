@@ -8,7 +8,7 @@ import { getPathAndQueryString } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from './';
+import { STORE_NAME as editSiteStoreName } from './constants';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -96,8 +96,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	const page = yield controls.select( editSiteStore.name, 'getPage' );
-	yield controls.dispatch( editSiteStore.name, 'setPage', page );
+	const page = yield controls.select( editSiteStoreName, 'getPage' );
+	yield controls.dispatch( editSiteStoreName, 'setPage', page );
 }
 
 /**
@@ -187,7 +187,7 @@ export function* showHomepage() {
 	);
 
 	const { siteUrl } = yield controls.select(
-		editSiteStore.name,
+		editSiteStoreName,
 		'getSettings'
 	);
 
