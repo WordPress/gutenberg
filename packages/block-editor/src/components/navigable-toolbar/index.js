@@ -82,25 +82,35 @@ function useIsAccessibleToolbar( ref ) {
 	return isAccessibleToolbar;
 }
 
-function useToolbarFocus(
+function useToolbarFocus( {
 	ref,
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
-	onIndexChange
-) {
+	onIndexChange,
+	shortcutTarget,
+} ) {
 	// Make sure we don't use modified versions of this prop
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
 
 	const focusToolbar = useCallback( () => {
-		focusFirstTabbableIn( ref.current );
-	}, [] );
+		const performFocus = () => focusFirstTabbableIn( ref.current );
+		// If shortcutTarget is passed (for example, on the nested image caption
+		// toolbar), we must ensure this toolbar gets focused. Without this delay,
+		// the block toolbar would have been focused instead.
+		if ( shortcutTarget ) {
+			window.requestAnimationFrame( performFocus );
+		} else {
+			performFocus();
+		}
+	}, [ shortcutTarget ] );
 
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
-		bindGlobal: true,
+		bindGlobal: ! shortcutTarget,
 		eventName: 'keydown',
+		target: shortcutTarget,
 	} );
 
 	useEffect( () => {
@@ -141,18 +151,20 @@ function NavigableToolbar( {
 	focusOnMount,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
+	__unstableShortcutTarget: shortcutTarget,
 	...props
 } ) {
 	const ref = useRef();
 	const isAccessibleToolbar = useIsAccessibleToolbar( ref );
 
-	useToolbarFocus(
+	useToolbarFocus( {
 		ref,
 		focusOnMount,
 		isAccessibleToolbar,
 		initialIndex,
-		onIndexChange
-	);
+		onIndexChange,
+		shortcutTarget,
+	} );
 
 	if ( isAccessibleToolbar ) {
 		return (

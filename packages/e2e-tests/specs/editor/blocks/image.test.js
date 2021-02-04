@@ -47,6 +47,7 @@ async function waitForImage( filename ) {
 async function getSrc( elementHandle ) {
 	return elementHandle.evaluate( ( node ) => node.src );
 }
+
 async function getDataURL( elementHandle ) {
 	return elementHandle.evaluate( ( node ) => {
 		const canvas = document.createElement( 'canvas' );
@@ -56,6 +57,14 @@ async function getDataURL( elementHandle ) {
 		context.drawImage( node, 0, 0 );
 		return canvas.toDataURL( 'image/jpeg' );
 	} );
+}
+
+async function expectAriaLabelToHaveFocus( label ) {
+	await expect(
+		await page.evaluate( () =>
+			document.activeElement.getAttribute( 'aria-label' )
+		)
+	).toBe( label );
 }
 
 describe( 'Image', () => {
@@ -295,27 +304,23 @@ describe( 'Image', () => {
 		await waitForImage( fileName );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-
-		await expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Bold' );
+		// First image caption toolbar item
+		await expectAriaLabelToHaveFocus( 'Bold' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-
-		await expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Block: Image' );
+		await expectAriaLabelToHaveFocus( 'Block: Image' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
+		// First image block toolbar item
+		await expectAriaLabelToHaveFocus( 'Image' );
 
-		await expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Image' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
+		// Second image caption toolbar item
+		await expectAriaLabelToHaveFocus( 'Italic' );
+
+		await page.keyboard.press( 'Tab' );
+		await expectAriaLabelToHaveFocus( 'Image caption text' );
 	} );
 } );

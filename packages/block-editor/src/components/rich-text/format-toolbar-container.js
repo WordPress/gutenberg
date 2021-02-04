@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Popover, Toolbar } from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import NavigableToolbar from '../navigable-toolbar';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 
@@ -22,14 +23,17 @@ const FormatToolbarContainer = ( {
 				noArrow
 				position="top center"
 				focusOnMount={ false }
-				anchorRef={ anchorRef }
+				anchorRef={ anchorRef.current }
 				className="block-editor-rich-text__inline-format-toolbar"
 				// Render inline
 				__unstableSlotName={ null }
 			>
-				<Toolbar label={ label }>
+				<NavigableToolbar
+					label={ label }
+					__unstableShortcutTarget={ anchorRef }
+				>
 					<FormatToolbar />
-				</Toolbar>
+				</NavigableToolbar>
 			</Popover>
 		);
 	}

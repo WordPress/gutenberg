@@ -631,7 +631,7 @@ function RichTextWrapper(
 						<FormatToolbarContainer
 							label={ inlineToolbarLabel }
 							inline={ inlineToolbar }
-							anchorRef={ ref.current }
+							anchorRef={ ref }
 						/>
 					) }
 					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
