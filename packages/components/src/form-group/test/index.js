@@ -15,6 +15,8 @@ const TextInput = ( { id: idProp, ...props } ) => {
 	return <input type="text" id={ id } { ...props } />;
 };
 
+// We're intentionally using a string literal for the ID to ensure
+// the htmlFor and id properties of the label and inputs are bound correctly.
 /* eslint-disable no-restricted-syntax */
 describe( 'props', () => {
 	test( 'should render correctly', () => {
