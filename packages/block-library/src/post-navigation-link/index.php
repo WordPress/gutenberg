@@ -25,7 +25,11 @@ function render_block_core_post_navigation_link( $attributes, $content, $block )
 	if ( ! in_array( $navigation_type, array( 'next', 'previous' ), true ) ) {
 		return '';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "post-navigation-link-$navigation_type" ) );
+	$classes = "post-navigation-link-$navigation_type";
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= " has-text-align-{$attributes['textAlign']}";
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link', 'gutenberg' ) : _x( 'Previous', 'label for previous post link', 'gutenberg' );
@@ -44,18 +48,15 @@ function render_block_core_post_navigation_link( $attributes, $content, $block )
 		}
 		$link = '%title';
 	}
-
-	// Add the wrapper attributes through `next_post_link` or `previous_post_link` hook.
-	$filter_link_attributes = function( $link ) use ( $wrapper_attributes ) {
-		return str_replace( 'href=', "$wrapper_attributes href=", $link );
-	};
-	// The dynamic portion of the hook name and the function name, `$navigation_type`,
+	// The dynamic portion of the function name, `$navigation_type`,
 	// refers to the type of adjacency, 'next' or 'previous'.
 	$get_link_function = "get_{$navigation_type}_post_link";
-	add_filter( "{$navigation_type}_post_link", $filter_link_attributes );
-	$content = $get_link_function( $format, $link );
-	remove_filter( "{$navigation_type}_post_link", $filter_link_attributes );
-	return $content;
+	$content           = $get_link_function( $format, $link );
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		$content
+	);
 }
 
 /**

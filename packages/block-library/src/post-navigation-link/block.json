@@ -3,6 +3,9 @@
 	"name": "core/post-navigation-link",
 	"category": "design",
 	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
 		"type": {
 			"type": "string",
 			"default": "next"

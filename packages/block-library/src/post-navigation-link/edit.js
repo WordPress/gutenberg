@@ -1,16 +1,23 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import {
 	InspectorControls,
 	RichText,
+	BlockControls,
+	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 export default function PostNavigationNextEdit( {
-	attributes: { type, label, showTitle },
+	attributes: { type, label, showTitle, textAlign },
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
@@ -18,6 +25,11 @@ export default function PostNavigationNextEdit( {
 	const ariaLabel = isNext
 		? __( 'Next post link' )
 		: __( 'Previous post link' );
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	return (
 		<>
 			<InspectorControls>
@@ -36,7 +48,15 @@ export default function PostNavigationNextEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...useBlockProps() }>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<div { ...blockProps }>
 				<RichText
 					tagName="a"
 					aria-label={ ariaLabel }
