@@ -1,6 +1,6 @@
 // The general wrapper, in which everything else resides.
 .block-editor-link-control {
-	padding: 6px;
+	padding: ($grid-unit-15 / 2);
 }
 
 
@@ -138,32 +138,27 @@
 
 
 // ## Link Preview
-// Once a link has been set this buttons edit or
-// visit the URL.
+// When clicking an existing link, the preview popover
+// shows the current link with actions to edit and visit.
 .block-editor-link-control__link {
 	display: flex;
 	align-items: center;
 }
 
-// A button that displays the URL. When pressed
-// the UI switches to editing the URL.
-.block-editor-link-control__link-edit {
+.block-editor-link-control__link-current-url {
+	margin: 0 $grid-unit-20 0 $grid-unit-15;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: inline-block;
 	max-width: 280px;
-	min-width: 180px;
-	text-align: left;
-	line-height: 24px;
-	background: $gray-100;
+	cursor: default;
 }
 
-// The divider separates the edit button from
-// the visit button.
-.block-editor-link-control__link-divider {
-	width: 1px;
-	height: 48px;
-	margin: -6px 6px;
-	background: $gray-900;
+.block-editor-link-control__link-edit {
+	margin-right: $grid-unit-05;
+}
+
+.block-editor-link-control__link-visit.components-button.is-tertiary {
+	padding: ($grid-unit-15 / 2) $grid-unit-15;
 }
