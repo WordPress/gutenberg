@@ -153,6 +153,12 @@ module.exports = {
 				message:
 					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
+			{
+				selector:
+					'CallExpression[callee.name=/^(select|dispatch|useDispatch)$/][arguments.0.type="Literal"]',
+				message:
+					'Do not use string literals for accessing stores ; import the store and use the store object instead',
+			},
 		],
 	},
 	overrides: [
