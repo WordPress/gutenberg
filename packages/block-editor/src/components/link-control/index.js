@@ -198,7 +198,8 @@ function LinkControl( {
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
-					<Spinner />{ __( 'Creating page' ) }…
+					<Spinner />
+					{ __( 'Creating page' ) }…
 				</div>
 			) }
 
