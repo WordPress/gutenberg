@@ -6,6 +6,10 @@ import { get, find, forEach, camelCase, isString } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
 export const ALL_BLOCKS_NAME = 'defaults';
@@ -90,7 +94,7 @@ export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`
 
 export function useEditorFeature( featurePath, blockName = ALL_BLOCKS_NAME ) {
 	const settings = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).getSettings();
+		return select( editSiteStore ).getSettings();
 	} );
 	return (
 		get(

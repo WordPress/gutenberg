@@ -26,6 +26,7 @@ import { DropZoneProvider, Popover } from '@wordpress/components';
 import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
+import { store as editSiteStore } from '../../store';
 
 function Canvas( { body } ) {
 	useBlockSelectionClearer( body );
@@ -48,7 +49,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getEditedPostType,
 				getPage,
 				__experimentalGetPreviewDeviceType,
-			} = select( 'core/edit-site' );
+			} = select( editSiteStore );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -62,7 +63,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage } = useDispatch( editSiteStore );
 
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useRef();

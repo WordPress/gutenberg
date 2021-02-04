@@ -24,6 +24,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
+import { store as editSiteStore } from '../../store';
 
 export default function Header( { openEntitiesSavedStates } ) {
 	const inserterButton = useRef();
@@ -41,7 +42,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
-		} = select( 'core/edit-site' );
+		} = select( editSiteStore );
 		const { getEntityRecord } = select( 'core' );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
 			'core/editor'
@@ -68,7 +69,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
-	} = useDispatch( 'core/edit-site' );
+	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
