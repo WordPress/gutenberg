@@ -104,7 +104,7 @@ class WP_Theme_JSON {
 	 */
 	const SCHEMA = array(
 		'pageTemplates' => null,
-		'styles'   => array(
+		'styles'        => array(
 			'border'     => array(
 				'radius' => null,
 				'color'  => null,
@@ -135,7 +135,7 @@ class WP_Theme_JSON {
 				'textTransform'  => null,
 			),
 		),
-		'settings' => array(
+		'settings'      => array(
 			'border'     => array(
 				'customRadius' => null,
 				'customColor'  => null,
