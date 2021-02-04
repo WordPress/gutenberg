@@ -1517,7 +1517,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				// If a block variation match is found change the name to be the same with the
 				// one that is used for block variations in the Inserter (`getItemFromVariation`).
 				let id = match?.name
-					? `${ blockName }-${ match.name }`
+					? `${ blockName }/${ match.name }`
 					: blockName;
 				const insert = { name: id };
 				if ( isReusableBlock( block ) ) {

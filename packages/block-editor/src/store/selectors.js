@@ -1398,7 +1398,7 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * @return {Function} Function to transform a block variation to inserter item
  */
 const getItemFromVariation = ( state, item ) => ( variation ) => {
-	const variationId = `${ item.id }-${ variation.name }`;
+	const variationId = `${ item.id }/${ variation.name }`;
 	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
 	return {
 		...item,

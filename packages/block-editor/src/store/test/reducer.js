@@ -2673,8 +2673,8 @@ describe( 'state', () => {
 					time: 123456,
 				} );
 
-				const orangeVariationName = `${ blockWithVariations }-orange`;
-				const appleVariationName = `${ blockWithVariations }-apple`;
+				const orangeVariationName = `${ blockWithVariations }/orange`;
+				const appleVariationName = `${ blockWithVariations }/apple`;
 				expect( state ).toEqual( {
 					insertUsage: expect.objectContaining( {
 						[ orangeVariationName ]: {
