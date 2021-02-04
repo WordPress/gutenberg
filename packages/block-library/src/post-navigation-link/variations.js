@@ -2,30 +2,27 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	postNavigationLinkNext,
-	postNavigationLinkPrevious,
-} from '@wordpress/icons';
+import { next, previous } from '@wordpress/icons';
 
 const variations = [
 	{
 		isDefault: true,
-		name: 'post-navigation-link-next',
-		title: __( 'Next post link' ),
+		name: 'post-next',
+		title: __( 'Next post' ),
 		description: __(
 			'Displays the post link that follows the current post.'
 		),
-		icon: postNavigationLinkNext,
+		icon: next,
 		attributes: { type: 'next' },
 		scope: [ 'inserter', 'transform' ],
 	},
 	{
-		name: 'post-navigation-link-previous',
-		title: __( 'Previous post link' ),
+		name: 'post-previous',
+		title: __( 'Previous post' ),
 		description: __(
 			'Displays the post link that precedes the current post.'
 		),
-		icon: postNavigationLinkPrevious,
+		icon: previous,
 		attributes: { type: 'previous' },
 		scope: [ 'inserter', 'transform' ],
 	},

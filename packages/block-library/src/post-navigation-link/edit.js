@@ -16,15 +16,13 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function PostNavigationNextEdit( {
+export default function PostNavigationLinkEdit( {
 	attributes: { type, label, showTitle, textAlign },
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
 	const placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
-	const ariaLabel = isNext
-		? __( 'Next post link' )
-		: __( 'Previous post link' );
+	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
