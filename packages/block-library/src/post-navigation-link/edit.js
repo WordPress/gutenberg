@@ -46,6 +46,7 @@ export default function PostNavigationNextEdit( {
 					onChange={ ( newLabel ) =>
 						setAttributes( { label: newLabel } )
 					}
+					keepPlaceholderOnFocus
 				/>
 			</div>
 		</>
