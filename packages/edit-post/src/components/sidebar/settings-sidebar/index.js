@@ -12,6 +12,9 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
+import PostVisibility from '../post-visibility';
+import PostSchedule from '../post-schedule';
+import PostFormat from '../post-format';
 import LastRevision from '../last-revision';
 import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
@@ -72,6 +75,9 @@ const SettingsSidebar = () => {
 			{ sidebarName === 'edit-post/document' && (
 				<>
 					<PostStatus />
+					<PostVisibility />
+					<PostSchedule />
+					<PostFormat />
 					<PluginDocumentSettingPanel.Slot />
 					<LastRevision />
 					<PostLink />

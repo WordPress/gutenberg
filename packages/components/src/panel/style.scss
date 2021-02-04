@@ -77,6 +77,10 @@
 .components-panel__body-toggle.components-button {
 	position: relative;
 	padding: $grid-unit-20;
+
+	// Stop text from overlapping the expand/collapse icon.
+	padding-right: $grid-unit-60;
+
 	outline: none;
 	width: 100%;
 	font-weight: 500;

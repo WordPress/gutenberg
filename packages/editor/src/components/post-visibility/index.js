@@ -66,7 +66,12 @@ export class PostVisibility extends Component {
 	}
 
 	render() {
-		const { visibility, password, instanceId } = this.props;
+		const {
+			visibility,
+			password,
+			instanceId,
+			showLegend = true,
+		} = this.props;
 
 		const visibilityHandlers = {
 			public: {
@@ -88,9 +93,11 @@ export class PostVisibility extends Component {
 				key="visibility-selector"
 				className="editor-post-visibility__dialog-fieldset"
 			>
-				<legend className="editor-post-visibility__dialog-legend">
-					{ __( 'Post Visibility' ) }
-				</legend>
+				{ showLegend && (
+					<legend className="editor-post-visibility__dialog-legend">
+						{ __( 'Post Visibility' ) }
+					</legend>
+				) }
 				{ visibilityOptions.map( ( { value, label, info } ) => (
 					<div
 						key={ value }

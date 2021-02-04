@@ -44,7 +44,8 @@ export const POST_FORMATS = [
 
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
-	const postFormatSelectorId = `post-format-selector-${ instanceId }`;
+	const formatSelectorId = `post-format-selector-${ instanceId }`;
+	const descriptionId = `editor-post-format__description-${ instanceId }`;
 
 	const { currentFormatId, listedFormats, suggestedFormat } = useSelect(
 		( select ) => {
@@ -96,20 +97,25 @@ export default function PostFormat() {
 		<PostFormatCheck>
 			<div className="editor-post-format">
 				<div className="editor-post-format__content">
-					<label htmlFor={ postFormatSelectorId }>
+					<label htmlFor={ formatSelectorId }>
 						{ __( 'Post Format' ) }
 					</label>
 					<SelectControl
 						value={ currentFormatId }
 						onChange={ updatePostFormat }
-						id={ postFormatSelectorId }
+						id={ formatSelectorId }
 						options={ listedFormats.map( ( format ) => ( {
 							label: format.caption,
 							value: format.id,
 						} ) ) }
+						aria-describedby={ descriptionId }
 					/>
 				</div>
-
+				<p id={ descriptionId }>
+					{ __(
+						'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.'
+					) }
+				</p>
 				{ suggestedFormat && (
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
