@@ -115,6 +115,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					head={ window.__editorStyles.html }
 					ref={ ref }
 					contentRef={ contentRef }
+					settingsStyles={ settings.styles }
 				>
 					<Canvas body={ contentRef } styles={ settings.styles } />
 				</Iframe>

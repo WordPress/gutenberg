@@ -11,6 +11,7 @@ import {
 	createPortal,
 	useCallback,
 	forwardRef,
+	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -136,7 +137,10 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function Iframe(
+	{ contentRef, children, head, settingsStyles, ...props },
+	ref
+) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
 	const setRef = useCallback( ( node ) => {
@@ -172,6 +176,12 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setDocumentIfReady();
 		} );
 	}, [] );
+
+	useEffect( () => {
+		if ( contentRef.current ) {
+			styleSheetsCompat( contentRef.current.ownerDocument );
+		}
+	}, [ settingsStyles ] );
 
 	return (
 		<iframe
