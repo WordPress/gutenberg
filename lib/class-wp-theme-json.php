@@ -104,6 +104,7 @@ class WP_Theme_JSON {
 	 */
 	const SCHEMA = array(
 		'customTemplates' => null,
+		'templateParts'   => null,
 		'styles'          => array(
 			'border'     => array(
 				'radius' => null,
@@ -1062,6 +1063,18 @@ class WP_Theme_JSON {
 		} else {
 			return $this->theme_json['customTemplates'];
 		}
+	}
+
+	/**
+	 * Returns the template part data of current theme.
+	 *
+	 * @return array
+	 */
+	public function get_template_part_data() {
+		if ( ! isset( $this->theme_json['templateParts'] ) ) {
+			return array();
+		}
+		return $this->theme_json['templateParts'];
 	}
 
 	/**

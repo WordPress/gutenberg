@@ -135,22 +135,16 @@ function _gutenberg_get_template_files( $template_type ) {
 }
 
 /**
- * Attempts to read the theme.json and return the 'template-parts' field.
+ * Attempts to get template parts data from theme.json.
  *
  * @return array Template part data from theme.json or empty array if not found.
  */
 function _gutenberg_get_template_part_info_from_theme_json() {
-	if ( is_readable( locate_template( 'experimental-theme.json' ) ) ) {
-		$theme_json = file_get_contents( locate_template( 'experimental-theme.json' ) );
-		$data       = json_decode(
-			$theme_json,
-			true
-		);
+	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+		$resolver           = new WP_Theme_JSON_Resolver();
+		$template_part_data = $resolver->get_theme_origin()->get_template_part_data();
+		return $template_part_data;
 	}
-	if ( isset( $data['template-parts'] ) ) {
-		return $data['template-parts'];
-	}
-
 	return array();
 }
 
