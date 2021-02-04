@@ -74,6 +74,8 @@ export const createQueue = () => {
 
 	let isRunning = false;
 
+	let count = 0;
+
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
@@ -93,14 +95,13 @@ export const createQueue = () => {
 			}
 
 			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
+			console.log( 'looking for ' + nextElement.id );
 			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 				nextElement
 			) );
-
-			if ( typeof callback === 'function' ) {
-				callback();
-			}
-
+			console.log( 'run', nextElement.id );
+			callback();
+			console.log( 'deleting from elementMap ' + nextElement.id );
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );
 
@@ -116,10 +117,24 @@ export const createQueue = () => {
 	 * @param {WPPriorityQueueCallback} item    Callback function.
 	 */
 	const add = ( element, item ) => {
+		element.id = count;
+		count++;
+
 		if ( ! elementsMap.has( element ) ) {
+			console.log( 'adding ' + element.id + ' to waiting list' );
 			waitingList.push( element );
 		}
+
+		console.log( 'adding ' + element.id + ' to elementMap' );
 		elementsMap.set( element, item );
+		const testAdd = elementsMap.get( element );
+
+		if ( ! testAdd ) {
+			console.log( 'add failed for ' + element.id );
+		} else {
+			console.log( 'add succeeded for ' + element.id );
+		}
+
 		if ( ! isRunning ) {
 			isRunning = true;
 			requestIdleCallback( runWaitingList );
@@ -140,7 +155,7 @@ export const createQueue = () => {
 		if ( ! elementsMap.has( element ) ) {
 			return false;
 		}
-
+		console.log( 'flushing ' + element.id );
 		const index = waitingList.indexOf( element );
 		waitingList.splice( index, 1 );
 		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
