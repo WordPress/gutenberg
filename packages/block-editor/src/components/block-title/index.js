@@ -66,10 +66,9 @@ export default function BlockTitle( { clientId } ) {
 	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
 	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
-	// Label will fallback to the title if no label is defined for the
-	// current label context. We do not want "Paragraph: Paragraph".
-	// If label is defined we prioritize it over possible possible
-	// block variation match title.
+	// Label will fallback to the title if no label is defined for the current
+	// label context. If the label is defined we prioritize it over possible
+	// possible block variation title match.
 	if ( label !== blockType.title ) {
 		return truncate( label, { length: 35 } );
 	}
