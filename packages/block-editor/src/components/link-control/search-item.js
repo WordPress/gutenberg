@@ -36,14 +36,9 @@ export const LinkControlSearchItem = ( {
 					/>
 				</span>
 				<span
-					aria-hidden={ ! isURL }
 					className="block-editor-link-control__search-item-info"
 				>
-					{ ! isURL &&
-						( filterURLForDisplay(
-							safeDecodeURI( suggestion.url )
-						) ||
-							'' ) }
+					{ filterURLForDisplay( safeDecodeURI( suggestion.url ) ) }
 				</span>
 			</span>
 			{ shouldShowType && suggestion.type && (

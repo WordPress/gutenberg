@@ -114,6 +114,10 @@ export default function LinkControlSearchResults( {
 						return null;
 					}
 
+					if ( directLinkEntryTypes.includes( suggestion.type.toLowerCase() ) ) {
+						return null;
+					}
+
 					return (
 						<LinkControlSearchItem
 							key={ `${ suggestion.id }-${ suggestion.type }` }
