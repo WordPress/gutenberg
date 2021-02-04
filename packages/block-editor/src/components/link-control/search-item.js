@@ -35,9 +35,7 @@ export const LinkControlSearchItem = ( {
 						highlight={ searchTerm }
 					/>
 				</span>
-				<span
-					className="block-editor-link-control__search-item-info"
-				>
+				<span className="block-editor-link-control__search-item-info">
 					{ filterURLForDisplay( safeDecodeURI( suggestion.url ) ) }
 				</span>
 			</span>

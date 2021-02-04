@@ -114,7 +114,11 @@ export default function LinkControlSearchResults( {
 						return null;
 					}
 
-					if ( directLinkEntryTypes.includes( suggestion.type.toLowerCase() ) ) {
+					if (
+						directLinkEntryTypes.includes(
+							suggestion.type.toLowerCase()
+						)
+					) {
 						return null;
 					}
 
