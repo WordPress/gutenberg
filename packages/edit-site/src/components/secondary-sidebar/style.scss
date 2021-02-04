@@ -28,6 +28,9 @@
 	height: 100%;
 	display: flex;
 	flex-direction: column;
+
+	// Matches Inspector
+	width: 281px;
 }
 
 .edit-site-editor__list-view-panel-header {
@@ -42,7 +45,6 @@
 
 .edit-site-editor__list-view-panel-content {
 	overflow-y: auto;
-	padding: $grid-unit-10;
 
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
