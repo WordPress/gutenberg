@@ -40,6 +40,23 @@ function gutenberg_navigation_init( $hook ) {
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
+	// Preload block editor paths.
+	// most of these are copied from edit-forms-blocks.php.
+	$preload_paths = array();
+
+	$preload_paths = apply_filters( 'navigation_editor_preload_paths', $preload_paths );
+
+	$preload_data  = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf( 'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
+		'after'
+	);
+
 	wp_add_inline_script(
 		'wp-edit-navigation',
 		sprintf(
