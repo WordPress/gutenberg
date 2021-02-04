@@ -93,6 +93,10 @@ describe( 'Font Size Picker', () => {
 
 		await page.keyboard.press( 'Enter' );
 
+		// Disable reason: Wait for changes to apply.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 1000 );
+
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
