@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useInstanceId } from '@wordpress/compose';
-
-/**
  * External dependencies
  */
 import { useContextSystem } from '@wp-g2/context';
@@ -13,19 +8,10 @@ import { cx } from '@wp-g2/styles';
  * Internal dependencies
  */
 import * as styles from './form-group-styles';
-
-/** @typedef {Pick<import('./form-group-content').Props, 'help' | 'horizontal' | 'labelHidden' | 'label' | 'truncate'>} FormGroupContentProps */
-
-/**
- * @typedef OwnProps
- * @property {Pick<import('./form-group-content').Props, 'align'>} [alignLabel='left'] Adjusts the block alignment of children.
- * @property {import('react').ReactNode} [children] Displays the content for `FormGroup`.
- */
-
-/** @typedef {import('../grid/types').Props & FormGroupContentProps & OwnProps} Props */
+import { useInstanceId } from '../utils';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'div'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
  */
 export function useFormGroup( props ) {
 	const {

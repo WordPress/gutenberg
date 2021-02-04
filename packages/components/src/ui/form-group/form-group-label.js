@@ -10,15 +10,8 @@ import { ControlLabel } from '../control-label';
 import VisuallyHidden from '../../visually-hidden';
 
 /**
- * @typedef OwnProps
- * @property {boolean} [labelHidden] Visually renders the label.
- * @property {string} [id] The id of the FormGroup.
- */
-
-/** @typedef {import('../control-label/use-control-label').Props & OwnProps} Props */
-
-/**
- * @param {Props} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props
+ * @return {JSX.Element | null} The form group's label.
  */
 function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
 	if ( ! children ) return null;

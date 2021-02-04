@@ -5,16 +5,21 @@ import { css, getHighDpi, ui } from '@wp-g2/styles';
 
 const lineHeight = `calc(${ ui.get( 'fontSize' ) } * 1.2)`;
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {Parameters<typeof ui.get>[0]} size The padding size.
+ */
+/* eslint-enable jsdoc/valid-types */
 function getPadding( size ) {
 	return `calc((${ ui.get( size ) } - ${ lineHeight }) / 2)`;
 }
 
-const highDpiAdjust = getHighDpi( css`
+const highDpiAdjust = getHighDpi`
 	> * {
 		position: relative;
 		top: 0.5px;
 	}
-` );
+`;
 
 export const ControlLabel = css`
 	display: inline-block;
@@ -34,6 +39,11 @@ export const ControlLabel = css`
 export const large = css`
 	padding-bottom: ${ getPadding( 'controlHeightLarge' ) };
 	padding-top: ${ getPadding( 'controlHeightLarge' ) };
+`;
+
+export const medium = css`
+	padding-bottom: ${ getPadding( 'controlHeight' ) };
+	padding-top: ${ getPadding( 'controlHeight' ) };
 `;
 
 export const small = css`

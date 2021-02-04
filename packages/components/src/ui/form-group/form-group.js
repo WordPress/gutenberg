@@ -12,7 +12,7 @@ import FormGroupContent from './form-group-content';
 import { useFormGroup } from './use-form-group';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./use-form-group').Props, 'div'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function FormGroup( props, forwardedRef ) {

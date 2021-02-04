@@ -4,8 +4,10 @@
 import { createComponent } from '../utils';
 import { useControlLabel } from './use-control-label';
 
-export default createComponent( {
+const ControlLabel = createComponent( {
 	as: 'label',
 	useHook: useControlLabel,
 	name: 'ControlLabel',
 } );
+
+export default ControlLabel;
