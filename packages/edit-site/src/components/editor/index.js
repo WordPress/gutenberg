@@ -99,7 +99,7 @@ function Editor( { initialSettings } ) {
 	);
 	useEffect( () => {
 		updateSettings( initialSettings );
-	}, [ initialSettings ] );
+	}, [] );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
 	// so that they can be selected with core/editor selectors in any editor.
