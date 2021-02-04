@@ -145,6 +145,7 @@ function _gutenberg_get_template_part_info_from_theme_json() {
 		$template_part_data = $resolver->get_theme_origin()->get_template_part_data();
 		return $template_part_data;
 	}
+
 	return array();
 }
 
@@ -160,6 +161,7 @@ function _gutenberg_add_template_part_section_info( $template_info, $theme_data 
 	if ( isset( $theme_data[ $template_info['slug'] ]['section'] ) ) {
 		$template_info['section'] = gutenberg_filter_template_part_section_type( $theme_data[ $template_info['slug'] ]['section'] );
 	}
+
 	return $template_info;
 }
 
