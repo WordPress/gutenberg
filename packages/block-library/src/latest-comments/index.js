@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { comment as icon } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Latest Comments' ),
+	title: _x( 'Latest Comments', 'block title' ),
 	description: __( 'Display a list of your most recent comments.' ),
 	icon,
 	keywords: [ __( 'recent comments' ) ],

@@ -19,7 +19,8 @@ function InserterLibrary( {
 	isAppender,
 	showInserterHelpPanel,
 	showMostUsedBlocks = false,
-	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect = noop,
 } ) {
 	const destinationRootClientId = useSelect(
@@ -41,7 +42,10 @@ function InserterLibrary( {
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
-			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+			__experimentalSelectBlockOnInsert={
+				__experimentalSelectBlockOnInsert
+			}
+			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 		/>
 	);
 }

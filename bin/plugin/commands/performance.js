@@ -28,34 +28,45 @@ const config = require( '../config' );
  * @typedef WPRawPerformanceResults
  *
  * @property {number[]} load             Load Time.
- * @property {number[]} domcontentloaded DOM Contentloaded time.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
+ * @property {number[]} inserterOpen     Average time to open global inserter.
+ * @property {number[]} inserterHover    Average time to move mouse between two block item in the inserter.
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load             Load Time.
- * @property {number} domcontentloaded DOM Contentloaded time.
- * @property {number} type             Average type time.
- * @property {number} minType          Minium type time.
- * @property {number} maxType          Maximum type time.
- * @property {number} focus            Average block selection time.
- * @property {number} minFocus         Min block selection time.
- * @property {number} maxFocus         Max block selection time.
+ * @property {number} load              Load Time.
+ * @property {number} type              Average type time.
+ * @property {number} minType           Minium type time.
+ * @property {number} maxType           Maximum type time.
+ * @property {number} focus             Average block selection time.
+ * @property {number} minFocus          Min block selection time.
+ * @property {number} maxFocus          Max block selection time.
+ * @property {number} inserterOpen      Average time to open global inserter.
+ * @property {number} minInserterOpen   Min time to open global inserter.
+ * @property {number} maxInserterOpen   Max time to open global inserter.
+ * @property {number} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {number} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {number} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string=} load             Load Time.
- * @property {string=} domcontentloaded DOM Contentloaded time.
- * @property {string=} type             Average type time.
- * @property {string=} minType          Minium type time.
- * @property {string=} maxType          Maximum type time.
- * @property {string=} focus            Average block selection time.
- * @property {string=} minFocus         Min block selection time.
- * @property {string=} maxFocus         Max block selection time.
+ * @property {string=} load              Load Time.
+ * @property {string=} type              Average type time.
+ * @property {string=} minType           Minium type time.
+ * @property {string=} maxType           Maximum type time.
+ * @property {string=} focus             Average block selection time.
+ * @property {string=} minFocus          Min block selection time.
+ * @property {string=} maxFocus          Max block selection time.
+ * @property {string=} inserterOpen      Average time to open global inserter.
+ * @property {string=} minInserterOpen   Min time to open global inserter.
+ * @property {string=} maxInserterOpen   Max time to open global inserter.
+ * @property {string=} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {string=} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {string=} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -106,13 +117,18 @@ function formatTime( number ) {
 function curateResults( results ) {
 	return {
 		load: average( results.load ),
-		domcontentloaded: average( results.domcontentloaded ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
 		focus: average( results.focus ),
 		minFocus: Math.min( ...results.focus ),
 		maxFocus: Math.max( ...results.focus ),
+		inserterOpen: average( results.inserterOpen ),
+		minInserterOpen: Math.min( ...results.inserterOpen ),
+		maxInserterOpen: Math.max( ...results.inserterOpen ),
+		inserterHover: average( results.inserterHover ),
+		minInserterHover: Math.min( ...results.inserterHover ),
+		maxInserterHover: Math.max( ...results.inserterHover ),
 	};
 }
 
@@ -132,7 +148,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
 
 	log( '>> Building the ' + formats.success( branch ) + ' branch' );
 	await runShellScript(
-		'rm -rf node_modules && npm install && npm run build',
+		'rm -rf node_modules packages/*/node_modules && npm install && npm run build',
 		environmentDirectory
 	);
 }
@@ -164,13 +180,18 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 	const medians = mapValues(
 		{
 			load: results.map( ( r ) => r.load ),
-			domcontentloaded: results.map( ( r ) => r.domcontentloaded ),
 			type: results.map( ( r ) => r.type ),
 			minType: results.map( ( r ) => r.minType ),
 			maxType: results.map( ( r ) => r.maxType ),
 			focus: results.map( ( r ) => r.focus ),
 			minFocus: results.map( ( r ) => r.minFocus ),
 			maxFocus: results.map( ( r ) => r.maxFocus ),
+			inserterOpen: results.map( ( r ) => r.inserterOpen ),
+			minInserterOpen: results.map( ( r ) => r.minInserterOpen ),
+			maxInserterOpen: results.map( ( r ) => r.maxInserterOpen ),
+			inserterHover: results.map( ( r ) => r.inserterHover ),
+			minInserterHover: results.map( ( r ) => r.minInserterHover ),
+			maxInserterHover: results.map( ( r ) => r.maxInserterHover ),
 		},
 		median
 	);
@@ -184,8 +205,8 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {WPPerformanceCommandOptions} options Command options.
  * @param {string[]}                    branches Branches to compare
+ * @param {WPPerformanceCommandOptions} options Command options.
  */
 async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.
@@ -241,7 +262,7 @@ async function runPerformanceTests( branches, options ) {
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
-	const testSuites = [ 'post-editor', 'site-editor' ];
+	const testSuites = [ 'post-editor', 'i18n-filters', 'site-editor' ];
 
 	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
 	let results = {};
@@ -273,7 +294,21 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> 🎉 Results.\n' );
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
-		console.table( results[ testSuite ] );
+
+		/** @type {Record<string, Record<string, string>>} */
+		const invertedResult = {};
+		Object.entries( results[ testSuite ] ).reduce(
+			( acc, [ key, val ] ) => {
+				for ( const entry of Object.keys( val ) ) {
+					if ( ! acc[ entry ] ) acc[ entry ] = {};
+					// @ts-ignore
+					acc[ entry ][ key ] = val[ entry ];
+				}
+				return acc;
+			},
+			invertedResult
+		);
+		console.table( invertedResult );
 	}
 }
 

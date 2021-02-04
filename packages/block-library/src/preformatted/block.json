@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "core/preformatted",
 	"category": "text",
 	"attributes": {
@@ -12,6 +13,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"lightBlockWrapper": true
-	}
+		"fontSize": true
+	},
+	"style": "wp-block-preformatted"
 }

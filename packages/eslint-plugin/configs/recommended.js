@@ -8,7 +8,8 @@ const { cosmiconfigSync } = require( 'cosmiconfig' );
  */
 const defaultPrettierConfig = require( '@wordpress/prettier-config' );
 
-const { config: localPrettierConfig } = cosmiconfigSync( 'prettier' ).search();
+const { config: localPrettierConfig } =
+	cosmiconfigSync( 'prettier' ).search() || {};
 const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 
 module.exports = {

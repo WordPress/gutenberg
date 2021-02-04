@@ -7,7 +7,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── README.md
     ├── SECURITY.md
     ├── CONTRIBUTING.md
-    ├── CONTRIBUTORS.md
     ├── CODE_OF_CONDUCT.md
     │
     ├── .editorconfig

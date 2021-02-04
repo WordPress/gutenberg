@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { AccessibilityInfo, Platform } from 'react-native';
+import { delay } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -20,6 +26,8 @@ import {
 import styles from './style.scss';
 import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
+
+const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
@@ -130,6 +138,25 @@ export class Inserter extends Component {
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
+		this.onInserterToggledAnnouncement( isOpen );
+	}
+
+	onInserterToggledAnnouncement( isOpen ) {
+		AccessibilityInfo.fetch().done( ( isEnabled ) => {
+			if ( isEnabled ) {
+				const isIOS = Platform.OS === 'ios';
+				const announcement = isOpen
+					? __( 'Scrollable block menu opened. Select a block.' )
+					: __( 'Scrollable block menu closed.' );
+				delay(
+					() =>
+						AccessibilityInfo.announceForAccessibility(
+							announcement
+						),
+					isIOS ? VOICE_OVER_ANNOUNCEMENT_DELAY : 0
+				);
+			}
+		} );
 	}
 
 	/**

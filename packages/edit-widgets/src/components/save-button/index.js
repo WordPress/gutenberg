@@ -8,11 +8,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
 	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
 		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
-			'core/edit-widgets'
+			editWidgetsStore
 		);
 
 		return {
@@ -20,7 +21,7 @@ function SaveButton() {
 			isSaving: isSavingWidgetAreas(),
 		};
 	}, [] );
-	const { saveEditedWidgetAreas } = useDispatch( 'core/edit-widgets' );
+	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	return (
 		<Button
@@ -30,7 +31,7 @@ function SaveButton() {
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
 			disabled={ ! hasEditedWidgetAreaIds }
 		>
-			{ __( 'Update' ) }
+			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
 	);
 }

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
-import { controls as dataControls } from '@wordpress/data-controls';
+import { createReduxStore, register } from '@wordpress/data';
+import { controls } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -10,20 +10,26 @@ import { controls as dataControls } from '@wordpress/data-controls';
 import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
-import controls from './controls';
-import { STORE_KEY } from './constants';
+import { STORE_NAME } from './constants';
+
+export let store = null;
 
 export default function registerEditSiteStore( initialState ) {
-	const store = registerStore( STORE_KEY, {
+	if ( store !== null ) {
+		return;
+	}
+
+	const _store = createReduxStore( STORE_NAME, {
 		reducer,
 		actions,
 		selectors,
-		controls: { ...dataControls, ...controls },
+		controls,
 		persist: [ 'preferences' ],
 		initialState,
 	} );
+	register( _store );
 
-	store.dispatch( actions.showHomepage() );
+	store = _store;
 
-	return store;
+	return _store;
 }

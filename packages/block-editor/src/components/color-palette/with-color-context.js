@@ -7,23 +7,32 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 
-export default createHigherOrderComponent(
-	withSelect( ( select, ownProps ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
+/**
+ * Internal dependencies
+ */
+import useEditorFeature from '../use-editor-feature';
+
+export default createHigherOrderComponent( ( WrappedComponent ) => {
+	return ( props ) => {
+		const colorsFeature = useEditorFeature( 'color.palette' );
+		const disableCustomColorsFeature = ! useEditorFeature( 'color.custom' );
 		const colors =
-			ownProps.colors === undefined ? settings.colors : ownProps.colors;
-
+			props.colors === undefined ? colorsFeature : props.colors;
 		const disableCustomColors =
-			ownProps.disableCustomColors === undefined
-				? settings.disableCustomColors
-				: ownProps.disableCustomColors;
-		return {
-			colors,
-			disableCustomColors,
-			hasColorsToChoose: ! isEmpty( colors ) || ! disableCustomColors,
-		};
-	} ),
-	'withColorContext'
-);
+			props.disableCustomColors === undefined
+				? disableCustomColorsFeature
+				: props.disableCustomColors;
+		const hasColorsToChoose = ! isEmpty( colors ) || ! disableCustomColors;
+		return (
+			<WrappedComponent
+				{ ...{
+					...props,
+					colors,
+					disableCustomColors,
+					hasColorsToChoose,
+				} }
+			/>
+		);
+	};
+}, 'withColorContext' );

@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtils {
 
@@ -34,5 +36,18 @@ public class FileUtils {
             read = br.readLine();
         }
         return sb.toString();
+    }
+
+    public static List<String> getAssetFileList(Activity activity, String path) {
+        ArrayList<String> pathList = new ArrayList<>();
+        try {
+            String [] list = activity.getAssets().list(path);
+            for (String file : list) {
+                pathList.add(path + "/" + file);
+            }
+        } catch (IOException e) {
+            AppLog.e(AppLog.T.EDITOR, e);
+        }
+        return pathList;
     }
 }

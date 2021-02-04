@@ -1,16 +1,21 @@
 /**
  * Internal dependencies
  */
+import registerEditSiteStore from '..';
 import {
 	isFeatureActive,
 	getCanUserCreateMedia,
 	getSettings,
 	getHomeTemplateId,
-	getTemplateId,
-	getTemplatePartId,
-	getTemplateType,
+	getEditedPostType,
+	getEditedPostId,
 	getPage,
+	getNavigationPanelActiveMenu,
+	isNavigationOpened,
+	isInserterOpened,
 } from '../selectors';
+
+registerEditSiteStore();
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
@@ -80,6 +85,7 @@ describe( 'selectors', () => {
 			const state = { settings: {}, preferences: {} };
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				outlineMode: true,
 				focusMode: false,
 				hasFixedToolbar: false,
 				__experimentalSetIsInserterOpened: setInserterOpened,
@@ -98,6 +104,7 @@ describe( 'selectors', () => {
 			};
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				outlineMode: true,
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
@@ -114,31 +121,56 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getTemplateId', () => {
+	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
-			const state = { templateId: {} };
-			expect( getTemplateId( state ) ).toBe( state.templateId );
+			const state = { editedPost: { id: 10 } };
+			expect( getEditedPostId( state ) ).toBe( 10 );
 		} );
 	} );
 
-	describe( 'getTemplatePartId', () => {
-		it( 'returns the template part ID', () => {
-			const state = { templatePartId: {} };
-			expect( getTemplatePartId( state ) ).toBe( state.templatePartId );
-		} );
-	} );
-
-	describe( 'getTemplateType', () => {
+	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { templateType: {} };
-			expect( getTemplateType( state ) ).toBe( state.templateType );
+			const state = { editedPost: { type: 'wp_template' } };
+			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
 		} );
 	} );
 
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
-			const state = { page: {} };
-			expect( getPage( state ) ).toBe( state.page );
+			const page = {};
+			const state = { editedPost: { page } };
+			expect( getPage( state ) ).toBe( page );
+		} );
+	} );
+
+	describe( 'getNavigationPanelActiveMenu', () => {
+		it( 'returns the current navigation menu', () => {
+			const state = {
+				navigationPanel: { menu: 'test-menu', isOpen: false },
+			};
+			expect( getNavigationPanelActiveMenu( state ) ).toBe( 'test-menu' );
+		} );
+	} );
+
+	describe( 'isNavigationOpened', () => {
+		it( 'returns the navigation panel isOpened state', () => {
+			const state = {
+				navigationPanel: { menu: 'test-menu', isOpen: false },
+			};
+			expect( isNavigationOpened( state ) ).toBe( false );
+			state.navigationPanel.isOpen = true;
+			expect( isNavigationOpened( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

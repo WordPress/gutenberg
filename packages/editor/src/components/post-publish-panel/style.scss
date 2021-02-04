@@ -17,7 +17,7 @@
 	padding-left: $grid-unit-20;
 	padding-right: $grid-unit-20;
 	height: $header-height + $border-width;
-	border-bottom: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-300;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
@@ -95,7 +95,7 @@
 }
 
 .post-publish-panel__postpublish .components-panel__body {
-	border-bottom: $border-width solid $gray-100;
+	border-bottom: $border-width solid $gray-200;
 	border-top: none;
 }
 
@@ -129,7 +129,7 @@
 
 	input[readonly] {
 		padding: 10px;
-		background: $gray-200;
+		background: $gray-300;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}

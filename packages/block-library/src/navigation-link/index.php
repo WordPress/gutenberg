@@ -104,6 +104,14 @@ function block_core_navigation_link_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
+	// Don't render the block's subtree if it is a draft.
+	if ( isset( $attributes['id'] ) && is_numeric( $attributes['id'] ) ) {
+		$post = get_post( $attributes['id'] );
+		if ( 'publish' !== $post->post_status ) {
+			return '';
+		}
+	}
+
 	// Don't render the block's subtree if it has no label.
 	if ( empty( $attributes['label'] ) ) {
 		return '';
@@ -127,8 +135,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	};
 
-	$html = '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
-		( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $css_classes . ( $has_submenu ? ' has-child' : '' ) .
+				( $is_active ? ' current-menu-item' : '' ),
+			'style' => $style_attribute,
+		)
+	);
+	$html               = '<li ' . $wrapper_attributes . '>' .
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.
@@ -140,11 +154,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$html .= ' target="_blank"  ';
 	}
 
-	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['rel'] ) ) {
 		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
 	} elseif ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {
 		$html .= ' rel="nofollow"';
+	}
+
+	if ( isset( $attributes['title'] ) ) {
+		$html .= ' title="' . esc_attr( $attributes['title'] ) . '"';
 	}
 
 	// End appending HTML attributes to anchor tag.

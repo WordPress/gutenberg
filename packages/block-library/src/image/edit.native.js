@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -20,10 +20,11 @@ import {
 	Icon,
 	PanelBody,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
+	WIDE_ALIGNMENTS,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -34,18 +35,18 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	BlockStyles,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { getProtocol } from '@wordpress/url';
+import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	external,
-	link,
 	image as placeholderIcon,
 	textColor,
 	replace,
+	expand,
 } from '@wordpress/icons';
 
 /**
@@ -60,7 +61,7 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
-export class ImageEdit extends React.Component {
+export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -94,7 +95,6 @@ export class ImageEdit extends React.Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -234,7 +234,15 @@ export class ImageEdit extends React.Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
+		const extraUpdatedAttributes = Object.values(
+			WIDE_ALIGNMENTS.alignments
+		).includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		this.props.setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
 	}
 
 	onSetLinkDestination( href ) {
@@ -319,19 +327,68 @@ export class ImageEdit extends React.Component {
 		);
 	}
 
+	getWidth() {
+		const { attributes } = this.props;
+		const { align, width } = attributes;
+
+		return Object.values( WIDE_ALIGNMENTS.alignments ).includes( align )
+			? '100%'
+			: width;
+	}
+
+	getLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		const {
+			attributes: { href: url, ...unMappedAttributes },
+			setAttributes,
+		} = this.props;
+
+		const mappedAttributes = { ...unMappedAttributes, url };
+		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
+			href === undefined
+				? setAttributes( restAttributes )
+				: setAttributes( { ...restAttributes, href } );
+
+		const options = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
+
+		return (
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				attributes={ mappedAttributes }
+				onClose={ this.dismissSheet }
+				setAttributes={ setMappedAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				options={ options }
+				showIcon={ false }
+			/>
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
-		const { attributes, isSelected, image, imageSizes } = this.props;
 		const {
-			align,
-			url,
-			width,
-			alt,
-			href,
-			id,
-			linkTarget,
-			sizeSlug,
-		} = attributes;
+			attributes,
+			isSelected,
+			image,
+			imageSizes,
+			clientId,
+		} = this.props;
+		const { align, url, alt, id, sizeSlug, className } = attributes;
 
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
@@ -360,26 +417,14 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
-					<TextControl
-						icon={ link }
-						label={ __( 'Link To' ) }
-						value={ href || '' }
-						valuePlaceholder={ __( 'Add URL' ) }
-						onChange={ this.onSetLinkDestination }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-					/>
-					<ToggleControl
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						checked={ linkTarget === '_blank' }
-						onChange={ this.onSetNewTab }
-					/>
+				<PanelBody title={ __( 'Image settings' ) } />
+				<PanelBody style={ styles.panelBody }>
+					<BlockStyles clientId={ clientId } url={ url } />
+				</PanelBody>
+				<PanelBody>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
-							icon={ 'editor-expand' }
+							icon={ expand }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) =>
@@ -395,6 +440,9 @@ export class ImageEdit extends React.Component {
 						valuePlaceholder={ __( 'None' ) }
 						onChangeValue={ this.updateAlt }
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					{ this.getLinkSettings( true ) }
 				</PanelBody>
 			</InspectorControls>
 		);
@@ -468,7 +516,8 @@ export class ImageEdit extends React.Component {
 										openMediaOptions={ openMediaOptions }
 										retryMessage={ retryMessage }
 										url={ url }
-										width={ width }
+										shapeStyle={ styles[ className ] }
+										width={ this.getWidth() }
 									/>
 								);
 							} }
@@ -509,9 +558,16 @@ export default compose( [
 			isSelected,
 		} = props;
 		const { imageSizes } = getSettings();
+		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 
 		const shouldGetMedia =
-			id && isSelected && getProtocol( url ) !== 'file:';
+			( isSelected && isNotFileUrl ) ||
+			// Edge case to update the image after uploading if the block gets unselected
+			// Check if it's the original image and not the resized one with queryparams
+			( ! isSelected &&
+				isNotFileUrl &&
+				url &&
+				! hasQueryArg( url, 'w' ) );
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,

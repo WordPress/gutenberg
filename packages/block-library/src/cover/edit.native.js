@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	TouchableWithoutFeedback,
+	InteractionManager,
+} from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -21,13 +25,15 @@ import {
 	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
-	BottomSheet,
+	UnitControl,
+	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Gradient,
 	ColorPalette,
 	ColorPicker,
 	BottomSheetConsumer,
+	useConvertUnitToMobile,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -40,11 +46,12 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState, useRef } from '@wordpress/element';
-import { cover as icon, replace, image } from '@wordpress/icons';
+import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -56,6 +63,7 @@ import {
 	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	CSS_UNITS,
 } from './shared';
 import OverlayColorSettings from './overlay-color-settings';
 
@@ -83,8 +91,10 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
-	settings,
 	closeSettingsBottomSheet,
+	isSelected,
+	selectBlock,
+	blockWidth,
 } ) => {
 	const {
 		backgroundType,
@@ -95,13 +105,22 @@ const Cover = ( {
 		id,
 		style,
 		customOverlayColor,
+		minHeightUnit = 'px',
 	} = attributes;
+
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const convertedMinHeight = useConvertUnitToMobile(
+		minHeight || COVER_DEFAULT_HEIGHT,
+		minHeightUnit
+	);
+
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
+	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
 	const coverDefaultPalette = {
-		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -120,8 +139,6 @@ const Cover = ( {
 		isCustomColorPickerShowing,
 		setCustomColorPickerShowing,
 	] = useState( false );
-
-	const [ customColor, setCustomColor ] = useState( '' );
 
 	const openMediaOptionsRef = useRef();
 
@@ -157,15 +174,18 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = ( value ) => {
-		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
-			setAttributes( { minHeight: value } );
-		}
-	};
+	const onHeightChange = useCallback(
+		( value ) => {
+			if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
+				setAttributes( { minHeight: value } );
+			}
+		},
+		[ minHeight ]
+	);
 
-	const onOpactiyChange = ( value ) => {
+	const onOpacityChange = useCallback( ( value ) => {
 		setAttributes( { dimRatio: value } );
-	};
+	}, [] );
 
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
@@ -187,10 +207,10 @@ const Cover = ( {
 		setIsVideoLoading( false );
 	};
 
-	const onClearMedia = () => {
+	const onClearMedia = useCallback( () => {
 		setAttributes( { id: undefined, url: undefined } );
 		closeSettingsBottomSheet();
-	};
+	}, [ closeSettingsBottomSheet ] );
 
 	function setColor( color ) {
 		setAttributes( {
@@ -203,10 +223,9 @@ const Cover = ( {
 	}
 
 	function openColorPicker() {
-		if ( isParentSelected ) {
-			setCustomColorPickerShowing( true );
-			openGeneralSidebar();
-		}
+		selectBlock();
+		setCustomColorPickerShowing( true );
+		openGeneralSidebar();
 	}
 
 	const backgroundColor = getStylesFromColorScheme(
@@ -266,10 +285,29 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
+	const onChangeUnit = useCallback( ( nextUnit ) => {
+		setAttributes( {
+			minHeightUnit: nextUnit,
+			minHeight:
+				nextUnit === 'px'
+					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
+					: CONTAINER_HEIGHT,
+		} );
+	}, [] );
+
+	const onBottomSheetClosed = useCallback( () => {
+		InteractionManager.runAfterInteractions( () => {
+			setCustomColorPickerShowing( false );
+		} );
+	}, [] );
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
-				attributes={ attributes }
+				overlayColor={ attributes.overlayColor }
+				customOverlayColor={ attributes.customOverlayColor }
+				gradient={ attributes.gradient }
+				customGradient={ attributes.customGradient }
 				setAttributes={ setAttributes }
 			/>
 			{ url ? (
@@ -279,26 +317,29 @@ const Cover = ( {
 						minimumValue={ 0 }
 						maximumValue={ 100 }
 						value={ dimRatio }
-						onChange={ onOpactiyChange }
+						onChange={ onOpacityChange }
 						style={ styles.rangeCellContainer }
 						separatorType={ 'topFullWidth' }
 					/>
 				</PanelBody>
 			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
-				<RangeControl
-					label={ __( 'Minimum height in pixels' ) }
-					minimumValue={ COVER_MIN_HEIGHT }
-					maximumValue={ COVER_MAX_HEIGHT }
+				<UnitControl
+					label={ __( 'Minimum height' ) }
+					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
+					max={ COVER_MAX_HEIGHT }
+					unit={ minHeightUnit }
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
+					onUnitChange={ onChangeUnit }
+					units={ CSS_UNITS }
 					style={ styles.rangeCellContainer }
+					key={ minHeightUnit }
 				/>
 			</PanelBody>
-
 			{ url ? (
 				<PanelBody title={ __( 'Media' ) }>
-					<BottomSheet.Cell
+					<TextControl
 						leftAlign
 						label={ __( 'Clear Media' ) }
 						labelStyle={ styles.clearMediaButton }
@@ -326,10 +367,7 @@ const Cover = ( {
 						shouldEnableBottomSheetMaxHeight={
 							shouldEnableBottomSheetMaxHeight
 						}
-						setColor={ ( color ) => {
-							setCustomColor( color );
-							setColor( color );
-						} }
+						setColor={ setColor }
 						onNavigationBack={ closeSettingsBottomSheet }
 						onHandleClosingBottomSheet={
 							onHandleClosingBottomSheet
@@ -337,9 +375,7 @@ const Cover = ( {
 						onHandleHardwareButtonPress={
 							onHandleHardwareButtonPress
 						}
-						onBottomSheetClosed={ () => {
-							setCustomColorPickerShowing( false );
-						} }
+						onBottomSheetClosed={ onBottomSheetClosed }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
@@ -410,6 +446,7 @@ const Cover = ( {
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
+							width={ styles.image.width }
 						/>
 					</View>
 				) }
@@ -440,9 +477,10 @@ const Cover = ( {
 				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
 					height={ styles.mediaPlaceholderEmptyStateContainer.height }
-					backgroundColor={ customColor }
+					backgroundColor={ customOverlayColor }
 					hideContent={
-						customColor !== '' && customColor !== undefined
+						customOverlayColor !== '' &&
+						customOverlayColor !== undefined
 					}
 					icon={ placeholderIcon }
 					labels={ {
@@ -453,19 +491,26 @@ const Cover = ( {
 					onFocus={ onFocus }
 				>
 					<View style={ styles.colorPaletteWrapper }>
-						<ColorPalette
-							customColorIndicatorStyles={
-								styles.paletteColorIndicator
-							}
-							customIndicatorWrapperStyles={
-								styles.paletteCustomIndicatorWrapper
-							}
-							setColor={ setColor }
-							onCustomPress={ openColorPicker }
-							defaultSettings={ coverDefaultPalette }
-							shouldShowCustomLabel={ false }
-							shouldShowCustomVerticalSeparator={ false }
-						/>
+						<BottomSheetConsumer>
+							{ ( { shouldEnableBottomSheetScroll } ) => (
+								<ColorPalette
+									customColorIndicatorStyles={
+										styles.paletteColorIndicator
+									}
+									customIndicatorWrapperStyles={
+										styles.paletteCustomIndicatorWrapper
+									}
+									setColor={ setColor }
+									onCustomPress={ openColorPicker }
+									defaultSettings={ coverDefaultPalette }
+									shouldShowCustomLabel={ false }
+									shouldShowCustomVerticalSeparator={ false }
+									shouldEnableBottomSheetScroll={
+										shouldEnableBottomSheetScroll
+									}
+								/>
+							) }
+						</BottomSheetConsumer>
 					</View>
 				</MediaPlaceholder>
 			</View>
@@ -474,7 +519,7 @@ const Cover = ( {
 
 	return (
 		<View style={ styles.backgroundContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ isImage &&
 				url &&
@@ -503,9 +548,13 @@ const Cover = ( {
 
 			<View
 				pointerEvents="box-none"
-				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
-				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
+				<InnerBlocks
+					template={ INNER_BLOCKS_TEMPLATE }
+					templateInsertUpdatesSelection
+					blockWidth={ blockWidth }
+				/>
 			</View>
 
 			<View pointerEvents="none" style={ styles.overlayContainer }>
@@ -535,10 +584,7 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon
-							icon={ 'warning' }
-							{ ...styles.uploadFailedIcon }
-						/>
+						<Icon icon={ warning } { ...styles.uploadFailedIcon } />
 					</View>
 				</View>
 			) }
@@ -560,14 +606,16 @@ export default compose( [
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	withDispatch( ( dispatch, { clientId } ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const { selectBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
 				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
+			selectBlock: () => selectBlock( clientId ),
 		};
 	} ),
 	withPreferredColorScheme,

@@ -4,9 +4,21 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import { BlockAlignmentToolbar } from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
+useSelect.mockImplementation( () => ( { wideControlsEnabled: false } ) );
 
 describe( 'BlockAlignmentToolbar', () => {
 	const alignment = 'left';

@@ -8,19 +8,22 @@ import {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, useDispatch } from '@wordpress/data';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
 	BottomSheet,
 	FooterMessageControl,
+	InserterButton,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
@@ -28,22 +31,9 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import MenuItem from '../inserter/menu-item';
 import styles from './style.scss';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-
-function createBlocksFromInnerBlocksTemplate( innerBlocksTemplate ) {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-}
 
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
@@ -81,8 +71,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	const onVariationSelect = ( variation ) => {
 		replaceInnerBlocks(
 			clientId,
-			createBlocksFromInnerBlocksTemplate( variation.innerBlocks ),
-			false
+			createBlocksFromInnerBlocksTemplate( variation.innerBlocks )
 		);
 		onClose();
 	};
@@ -103,7 +92,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			>
 				{ variations.map( ( v ) => {
 					return (
-						<MenuItem
+						<InserterButton
 							item={ v }
 							key={ v.name }
 							onSelect={ () => onVariationSelect( v ) }
@@ -124,7 +113,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 
 export default compose(
 	withSelect( ( select, {} ) => {
-		const { getBlockVariations } = select( 'core/blocks' );
+		const { getBlockVariations } = select( blocksStore );
 
 		return {
 			date: getBlockVariations( 'core/columns', 'block' ),

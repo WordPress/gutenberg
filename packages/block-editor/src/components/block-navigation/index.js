@@ -36,23 +36,14 @@ function BlockNavigation( {
 			<p className="block-editor-block-navigation__label">
 				{ __( 'List view' ) }
 			</p>
-			{ hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ [ rootBlock ] }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalFeatures={ __experimentalFeatures }
-					showNestedBlocks
-				/>
-			) }
-			{ ! hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ rootBlocks }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalFeatures={ __experimentalFeatures }
-				/>
-			) }
+
+			<BlockNavigationTree
+				blocks={ hasHierarchy ? [ rootBlock ] : rootBlocks }
+				selectedBlockClientId={ selectedBlockClientId }
+				selectBlock={ selectBlock }
+				__experimentalFeatures={ __experimentalFeatures }
+				showNestedBlocks
+			/>
 		</div>
 	);
 }
@@ -62,16 +53,15 @@ export default compose(
 		const {
 			getSelectedBlockClientId,
 			getBlockHierarchyRootClientId,
-			getBlock,
-			getBlocks,
+			__unstableGetBlockWithBlockTree,
+			__unstableGetBlockTree,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			rootBlocks: getBlocks( '', { includeControlledInnerBlocks: true } ),
+			rootBlocks: __unstableGetBlockTree(),
 			rootBlock: selectedBlockClientId
-				? getBlock(
-						getBlockHierarchyRootClientId( selectedBlockClientId ),
-						{ includeControlledInnerBlocks: true }
+				? __unstableGetBlockWithBlockTree(
+						getBlockHierarchyRootClientId( selectedBlockClientId )
 				  )
 				: null,
 			selectedBlockClientId,

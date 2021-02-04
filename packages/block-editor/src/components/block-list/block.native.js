@@ -1,19 +1,24 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { GlobalStylesContext } from '@wordpress/components';
+import {
+	GlobalStylesContext,
+	getMergedGlobalStyles,
+	alignmentHelpers,
+} from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
+import { __experimentalUseEditorFeature as useEditorFeature } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,6 +27,68 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+
+function BlockForType( {
+	attributes,
+	clientId,
+	contentStyle,
+	getBlockWidth,
+	insertBlocksAfter,
+	isSelected,
+	mergeBlocks,
+	name,
+	onBlockFocus,
+	onCaretVerticalPositionChange,
+	onChange,
+	onDeleteBlock,
+	onReplace,
+	parentWidth,
+	wrapperProps,
+	blockWidth,
+} ) {
+	const defaultColors = useEditorFeature( 'color.palette' ) || [];
+
+	return (
+		<GlobalStylesContext.Consumer>
+			{ ( globalStyle ) => {
+				const mergedStyle = getMergedGlobalStyles(
+					globalStyle,
+					wrapperProps.style,
+					attributes,
+					defaultColors
+				);
+
+				return (
+					<GlobalStylesContext.Provider value={ mergedStyle }>
+						<BlockEdit
+							name={ name }
+							isSelected={ isSelected }
+							attributes={ attributes }
+							setAttributes={ onChange }
+							onFocus={ onBlockFocus }
+							onReplace={ onReplace }
+							insertBlocksAfter={ insertBlocksAfter }
+							mergeBlocks={ mergeBlocks }
+							onCaretVerticalPositionChange={
+								onCaretVerticalPositionChange
+							}
+							// Block level styles
+							wrapperProps={ wrapperProps }
+							// inherited styles merged with block level styles
+							mergedStyle={ mergedStyle }
+							clientId={ clientId }
+							parentWidth={ parentWidth }
+							contentStyle={ contentStyle }
+							onDeleteBlock={ onDeleteBlock }
+							blockWidth={ blockWidth }
+						/>
+						<View onLayout={ getBlockWidth } />
+					</GlobalStylesContext.Provider>
+				);
+			} }
+		</GlobalStylesContext.Consumer>
+	);
+}
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -32,7 +99,7 @@ class BlockListBlock extends Component {
 		this.getBlockWidth = this.getBlockWidth.bind( this );
 
 		this.state = {
-			blockWidth: 0,
+			blockWidth: this.props.blockWidth - 2 * this.props.marginHorizontal,
 		};
 
 		this.anchorNodeRef = createRef();
@@ -57,48 +124,27 @@ class BlockListBlock extends Component {
 	getBlockWidth( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
+		const layoutWidth = Math.floor( layout.width );
 
-		if ( blockWidth !== layout.width ) {
-			this.setState( { blockWidth: layout.width } );
+		if ( ! blockWidth || ! layoutWidth ) {
+			return;
+		}
+
+		if ( blockWidth !== layoutWidth ) {
+			this.setState( { blockWidth: layoutWidth } );
 		}
 	}
 
 	getBlockForType() {
+		const { blockWidth } = this.state;
 		return (
-			<GlobalStylesContext.Consumer>
-				{ ( globalStyle ) => {
-					const mergedStyle = {
-						...globalStyle,
-						...this.props.wrapperProps.style,
-					};
-					return (
-						<GlobalStylesContext.Provider value={ mergedStyle }>
-							<BlockEdit
-								name={ this.props.name }
-								isSelected={ this.props.isSelected }
-								attributes={ this.props.attributes }
-								setAttributes={ this.props.onChange }
-								onFocus={ this.onFocus }
-								onReplace={ this.props.onReplace }
-								insertBlocksAfter={ this.insertBlocksAfter }
-								mergeBlocks={ this.props.mergeBlocks }
-								onCaretVerticalPositionChange={
-									this.props.onCaretVerticalPositionChange
-								}
-								// Block level styles
-								wrapperProps={ this.props.wrapperProps }
-								// inherited styles merged with block level styles
-								mergedStyle={ mergedStyle }
-								clientId={ this.props.clientId }
-								parentWidth={ this.props.parentWidth }
-								contentStyle={ this.props.contentStyle }
-								onDeleteBlock={ this.props.onDeleteBlock }
-							/>
-							<View onLayout={ this.getBlockWidth } />
-						</GlobalStylesContext.Provider>
-					);
-				} }
-			</GlobalStylesContext.Consumer>
+			<BlockForType
+				{ ...this.props }
+				onBlockFocus={ this.onFocus }
+				insertBlocksAfter={ this.insertBlocksAfter }
+				getBlockWidth={ this.getBlockWidth }
+				blockWidth={ blockWidth }
+			/>
 		);
 	}
 
@@ -129,21 +175,25 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
+			name,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
 			return null;
 		}
-
 		const { blockWidth } = this.state;
-
+		const { align } = attributes;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
 			order + 1
 		);
-
+		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const isScreenWidthEqual = blockWidth === screenWidth;
+		const isScreenWidthWider = blockWidth < screenWidth;
+		const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 
 		return (
 			<TouchableWithoutFeedback
@@ -165,8 +215,16 @@ class BlockListBlock extends Component {
 					>
 						{ isSelected && (
 							<View
+								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
+									isFullWidth( align ) &&
+										isScreenWidthWider &&
+										styles.borderFullWidth,
+									isFullWidth( align ) &&
+										isContainerRelated( name ) &&
+										isScreenWidthWider &&
+										styles.containerBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -194,7 +252,13 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<View
-							style={ styles.neutralToolbar }
+							style={ [
+								styles.neutralToolbar,
+								! isFullWidthToolbar &&
+									isContainerRelated( name ) &&
+									isWider( screenWidth, 'mobile' ) &&
+									styles.containerToolbar,
+							] }
 							ref={ this.anchorNodeRef }
 						>
 							{ isSelected && (
@@ -206,6 +270,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
+									isFullWidth={ isFullWidthToolbar }
 								/>
 							) }
 						</View>

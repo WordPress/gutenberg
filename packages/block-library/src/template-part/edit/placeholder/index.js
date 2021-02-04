@@ -2,41 +2,54 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { cleanForSlug } from '@wordpress/url';
-import { Placeholder, Dropdown, Button } from '@wordpress/components';
+import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
-import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import TemplatePartPreviews from './template-part-previews';
+import TemplatePartSelection from '../selection';
 
-export default function TemplatePartPlaceholder( { setAttributes } ) {
+export default function TemplatePartPlaceholder( {
+	setAttributes,
+	innerBlocks,
+} ) {
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const onCreate = useCallback( async () => {
-		const title = 'Untitled Template Part';
-		const slug = cleanForSlug( title );
+		const title = __( 'Untitled Template Part' );
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
 			{
 				title,
-				status: 'publish',
-				slug,
-				meta: { theme: 'custom' },
+				slug: 'template-part',
+				content: serialize( innerBlocks ),
 			}
 		);
 		setAttributes( {
-			postId: templatePart.id,
 			slug: templatePart.slug,
-			theme: templatePart.meta.theme,
+			theme: templatePart.theme,
 		} );
 	}, [ setAttributes ] );
 
-	const [ filterValue, setFilterValue ] = useState( '' );
+	// If there are inner blocks present, the content for creation is clear.
+	// Therefore immediately create the template part with the given inner blocks as its content.
+	useEffect( () => {
+		if ( innerBlocks.length ) {
+			onCreate();
+		}
+	}, [] );
+	if ( innerBlocks.length ) {
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
+	}
+
 	return (
 		<Placeholder
 			icon={ blockDefault }
@@ -62,19 +75,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 						</Button>
 					</>
 				) }
-				renderContent={ () => (
-					<>
-						<SearchForm
-							onChange={ setFilterValue }
-							className="wp-block-template-part__placeholder-preview-search-form"
-						/>
-						<div className="wp-block-template-part__placeholder-preview-container">
-							<TemplatePartPreviews
-								setAttributes={ setAttributes }
-								filterValue={ filterValue }
-							/>
-						</div>
-					</>
+				renderContent={ ( { onClose } ) => (
+					<TemplatePartSelection
+						setAttributes={ setAttributes }
+						onClose={ onClose }
+					/>
 				) }
 			/>
 		</Placeholder>

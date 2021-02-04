@@ -4,7 +4,10 @@
 import { Button, Dropdown, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { useCallback, forwardRef } from '@wordpress/element';
 
 /**
@@ -40,7 +43,7 @@ function BlockNavigationDropdownToggle( {
 	);
 	const shortcut = useSelect(
 		( select ) =>
-			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
 				'core/edit-post/toggle-block-navigation'
 			),
 		[]
@@ -52,8 +55,10 @@ function BlockNavigationDropdownToggle( {
 			ref={ innerRef }
 			icon={ MenuIcon }
 			aria-expanded={ isOpen }
+			aria-haspopup="true"
 			onClick={ isEnabled ? onToggle : undefined }
-			label={ __( 'Block navigation' ) }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			label={ __( 'Outline' ) }
 			className="block-editor-block-navigation"
 			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }

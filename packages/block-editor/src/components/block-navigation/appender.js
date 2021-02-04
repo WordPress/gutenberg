@@ -1,15 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockNavigationLeaf from './leaf';
-import DescenderLines from './descender-lines';
+import Indentation from './indentation';
 import Inserter from '../inserter';
 
 export default function BlockNavigationAppender( {
@@ -17,9 +23,21 @@ export default function BlockNavigationAppender( {
 	position,
 	level,
 	rowCount,
-	terminatedLevels,
 	path,
 } ) {
+	const isDragging = useSelect(
+		( select ) => {
+			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+				'core/block-editor'
+			);
+
+			return (
+				isBlockBeingDragged( parentBlockClientId ) ||
+				isAncestorBeingDragged( parentBlockClientId )
+			);
+		},
+		[ parentBlockClientId ]
+	);
 	const instanceId = useInstanceId( BlockNavigationAppender );
 	const descriptionId = `block-navigation-appender-row__description_${ instanceId }`;
 
@@ -32,6 +50,7 @@ export default function BlockNavigationAppender( {
 
 	return (
 		<BlockNavigationLeaf
+			className={ classnames( { 'is-dragging': isDragging } ) }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -43,11 +62,7 @@ export default function BlockNavigationAppender( {
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-appender__container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
+						<Indentation level={ level } />
 						<Inserter
 							rootClientId={ parentBlockClientId }
 							__experimentalIsQuick

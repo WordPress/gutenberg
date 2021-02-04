@@ -30,4 +30,17 @@ describe( 'conservativeMapItem', () => {
 		expect( result.b ).toBe( nextItem.b );
 		expect( result ).toEqual( { a: [ {} ], b: [ 2 ] } );
 	} );
+
+	it( 'merges to the original item', () => {
+		const item = { a: [ 1 ], b: [ 2 ] };
+		const nextItem = { c: [ 3 ], d: [ 4 ] };
+		const result = conservativeMapItem( item, nextItem );
+
+		expect( result ).not.toBe( item );
+		expect( result.a ).toBe( item.a );
+		expect( result.b ).toBe( item.b );
+		expect( result.c ).toBe( nextItem.c );
+		expect( result.d ).toBe( nextItem.d );
+		expect( result ).toEqual( { a: [ 1 ], b: [ 2 ], c: [ 3 ], d: [ 4 ] } );
+	} );
 } );

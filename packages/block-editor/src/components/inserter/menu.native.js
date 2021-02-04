@@ -14,16 +14,24 @@ import { pick } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { createBlock, rawHandler } from '@wordpress/blocks';
+import {
+	createBlock,
+	rawHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	InserterButton,
+	getClipboard,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import MenuItem from './menu-item.native';
 
 const MIN_COL_NUM = 3;
 
@@ -62,8 +70,8 @@ export class InserterMenu extends Component {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
-		} = styles.modalItem;
-		const { width: itemWidth } = styles.modalIconWrapper;
+		} = InserterButton.Styles.modalItem;
+		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
@@ -108,11 +116,52 @@ export class InserterMenu extends Component {
 		this.setState( { numberOfColumns, itemWidth, maxWidth } );
 	}
 
+	/**
+	 * Processes the inserter items to check
+	 * if there's any copied block in the clipboard
+	 * to add it as an extra item
+	 */
+	getItems() {
+		const {
+			items: initialItems,
+			canInsertBlockType,
+			destinationRootClientId,
+			getBlockType,
+		} = this.props;
+
+		// Filter out reusable blocks (they will be added in another tab)
+		const items = initialItems.filter(
+			( { name } ) => name !== 'core/block'
+		);
+
+		const clipboard = getClipboard();
+		const clipboardBlock =
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
+		const shouldAddClipboardBlock =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
+
+		return shouldAddClipboardBlock
+			? [
+					{
+						...pick( getBlockType( clipboardBlock.name ), [
+							'name',
+							'icon',
+						] ),
+						id: 'clipboard',
+						initialAttributes: clipboardBlock.attributes,
+						innerBlocks: clipboardBlock.innerBlocks,
+					},
+					...items,
+			  ]
+			: items;
+	}
+
 	renderItem( { item } ) {
 		const { itemWidth, maxWidth } = this.state;
 		const { onSelect } = this.props;
 		return (
-			<MenuItem
+			<InserterButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }
@@ -122,19 +171,19 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { items } = this.props;
 		const { numberOfColumns } = this.state;
+		const items = this.getItems();
 
 		return (
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.onClose }
 				hideHeader
-				isChildrenScrollable
+				hasNavigation
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( { listProps } ) => (
+						{ ( { listProps, safeAreaBottomInset } ) => (
 							<FlatList
 								onLayout={ this.onLayout }
 								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
@@ -151,6 +200,14 @@ export class InserterMenu extends Component {
 								keyExtractor={ ( item ) => item.name }
 								renderItem={ this.renderItem }
 								{ ...listProps }
+								contentContainerStyle={ [
+									...listProps.contentContainerStyle,
+									{
+										paddingBottom:
+											safeAreaBottomInset ||
+											styles.list.paddingBottom,
+									},
+								] }
 							/>
 						) }
 					</BottomSheetConsumer>
@@ -170,8 +227,7 @@ export default compose(
 			getSettings,
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
-		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
-		const { getClipboard } = select( 'core/editor' );
+		const { getChildBlockNames, getBlockType } = select( blocksStore );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -188,31 +244,14 @@ export default compose(
 		const {
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		} = getSettings();
-		const clipboard = getClipboard();
-		const clipboardBlock =
-			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
-		const shouldAddClipboardBlock =
-			clipboardBlock &&
-			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: shouldAddClipboardBlock
-				? [
-						{
-							...pick( getBlockType( clipboardBlock.name ), [
-								'name',
-								'icon',
-							] ),
-							id: 'clipboard',
-							initialAttributes: clipboardBlock.attributes,
-							innerBlocks: clipboardBlock.innerBlocks,
-						},
-						...getInserterItems( destinationRootClientId ),
-				  ]
-				: getInserterItems( destinationRootClientId ),
+			items: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
 			shouldInsertAtTheTop,
+			getBlockType,
+			canInsertBlockType,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

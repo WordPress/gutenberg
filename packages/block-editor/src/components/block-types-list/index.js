@@ -1,19 +1,16 @@
 /**
- * External dependencies
- */
-import { Composite, useCompositeState } from 'reakit';
-
-/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useEffect } from '@wordpress/element';
+import {
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import InserterListItem from '../inserter-list-item';
-import { includeVariationsInInserterItems } from '../inserter/utils';
 
 function BlockTypesList( {
 	items = [],
@@ -21,20 +18,9 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 	label,
-	limit,
+	isDraggable = true,
 } ) {
 	const composite = useCompositeState();
-	const normalizedItems = includeVariationsInInserterItems( items, limit );
-	const orderId = normalizedItems.reduce(
-		( acc, item ) => acc + '--' + item.id,
-		''
-	);
-
-	// This ensures the composite state refreshes when the list order changes.
-	useEffect( () => {
-		composite.unstable_sort();
-	}, [ composite.unstable_sort, orderId ] );
-
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -47,23 +33,16 @@ function BlockTypesList( {
 			className="block-editor-block-types-list"
 			aria-label={ label }
 		>
-			{ normalizedItems.map( ( item ) => {
+			{ items.map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }
+						item={ item }
 						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
-						onClick={ () => {
-							onSelect( item );
-							onHover( null );
-						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
+						onSelect={ onSelect }
+						onHover={ onHover }
 						composite={ composite }
+						isDraggable={ isDraggable }
 					/>
 				);
 			} ) }

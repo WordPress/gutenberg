@@ -81,7 +81,7 @@ describe( 'FormTokenField', () => {
 		return map(
 			filter(
 				div.firstChild.childNodes,
-				( childNode ) => childNode.nodeType !== window.Node.COMMENT_NODE
+				( childNode ) => childNode.nodeType !== childNode.COMMENT_NODE
 			),
 			( childNode ) => childNode.textContent
 		);
@@ -241,7 +241,7 @@ describe( 'FormTokenField', () => {
 
 			// before sending a hover event, we need to wait for
 			// SuggestionList#_scrollingIntoView to become false
-			jest.runTimersToTime( 100 );
+			jest.advanceTimersByTime( 100 );
 
 			TestUtils.Simulate.mouseEnter( hoverSuggestion );
 			expect( getSelectedSuggestion() ).toEqual( [ 'wi', 'th' ] );

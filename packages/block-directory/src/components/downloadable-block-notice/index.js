@@ -5,10 +5,15 @@ import { __ } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockDirectoryStore } from '../../store';
+
 export const DownloadableBlockNotice = ( { block, onClick } ) => {
 	const errorNotice = useSelect(
 		( select ) =>
-			select( 'core/block-directory' ).getErrorNoticeForBlock( block.id ),
+			select( blockDirectoryStore ).getErrorNoticeForBlock( block.id ),
 		[ block ]
 	);
 

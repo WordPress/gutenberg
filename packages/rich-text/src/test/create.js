@@ -38,6 +38,7 @@ describe( 'create', () => {
 				return;
 			}
 
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				const element = createElement( document, html );
 				const range = createRange( element );
@@ -66,6 +67,7 @@ describe( 'create', () => {
 			html,
 			value: expectedValue,
 		} ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				if ( formatName ) {
 					registerFormatType( formatName, formatType );

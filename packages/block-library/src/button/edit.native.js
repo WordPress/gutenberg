@@ -19,7 +19,7 @@ import {
 	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
-	LinkSettings,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -37,6 +37,7 @@ import getColorAndStyleProps from './color-props';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
+const MIN_WIDTH = 40;
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -192,7 +193,10 @@ class ButtonEdit extends Component {
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: parentWidth,
+				maxWidth: Math.min(
+					parentWidth,
+					this.props.maxWidth - 2 * spacing
+				),
 			} );
 		} else if ( ! parentWidth && width && isWidthChanged ) {
 			this.setState( { maxWidth: width - spacing } );
@@ -241,12 +245,13 @@ class ButtonEdit extends Component {
 		};
 
 		return (
-			<LinkSettings
+			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				attributes={ attributes }
 				onClose={ this.dismissSheet }
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
+				hasPicker
 				actions={ actions }
 				options={ options }
 				showIcon={ ! isCompatibleWithSettings }
@@ -292,7 +297,13 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 		} = this.props;
-		const { placeholder, text, borderRadius, url } = attributes;
+		const {
+			placeholder,
+			text,
+			borderRadius,
+			url,
+			align = 'center',
+		} = attributes;
 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
@@ -313,7 +324,7 @@ class ButtonEdit extends Component {
 		// different than empty string.
 		const minWidth =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
-				? 1
+				? MIN_WIDTH
 				: placeholderTextWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
@@ -355,7 +366,7 @@ class ButtonEdit extends Component {
 							...richTextStyle.richText,
 							color: textColor,
 						} }
-						textAlign="center"
+						textAlign={ align }
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
@@ -372,7 +383,6 @@ class ButtonEdit extends Component {
 						__unstableMobileNoFocusOnMount={ ! isSelected }
 						selectionColor={ textColor }
 						onBlur={ () => {
-							this.onToggleButtonFocus( false );
 							this.onSetMaxWidth();
 						} }
 						onReplace={ onReplace }
@@ -426,7 +436,9 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlockCount,
 			getBlockRootClientId,
+			getSettings,
 		} = select( 'core/block-editor' );
+		const { maxWidth } = getSettings();
 
 		const parentId = getBlockRootClientId( clientId );
 		const selectedId = getSelectedBlockClientId();
@@ -436,6 +448,7 @@ export default compose( [
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			numOfButtons,
+			maxWidth,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

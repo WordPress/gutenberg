@@ -10,6 +10,7 @@ import memoize from 'memize';
 import { Disabled } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
+import { useBlockProps } from '@wordpress/block-editor';
 
 const getYearMonth = memoize( ( date ) => {
 	if ( ! date ) {
@@ -36,11 +37,13 @@ export default function CalendarEdit( { attributes } ) {
 	}, [] );
 
 	return (
-		<Disabled>
-			<ServerSideRender
-				block="core/calendar"
-				attributes={ { ...attributes, ...getYearMonth( date ) } }
-			/>
-		</Disabled>
+		<div { ...useBlockProps() }>
+			<Disabled>
+				<ServerSideRender
+					block="core/calendar"
+					attributes={ { ...attributes, ...getYearMonth( date ) } }
+				/>
+			</Disabled>
+		</div>
 	);
 }

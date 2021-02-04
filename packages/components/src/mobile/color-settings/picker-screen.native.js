@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { useRoute, useNavigation } from '@react-navigation/native';
-import React from 'react';
 
 /**
  * WordPress dependencies

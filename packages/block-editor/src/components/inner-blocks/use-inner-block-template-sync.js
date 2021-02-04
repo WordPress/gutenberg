@@ -69,5 +69,5 @@ export default function useInnerBlockTemplateSync(
 				}
 			}
 		}
-	}, [ innerBlocks, templateLock, clientId ] );
+	}, [ innerBlocks, template, templateLock, clientId ] );
 }

@@ -1,4 +1,9 @@
 .wp-block-rss {
+	// This needs extra specificity due to the reset mixin on the parent: https://github.com/WordPress/gutenberg/blob/a250e9e5fe00dd5195624f96a3d924e7078951c3/packages/edit-post/src/style.scss#L54
+	&.wp-block-rss {
+		box-sizing: border-box;
+	}
+
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 2em;
@@ -14,7 +19,7 @@
 		list-style: none;
 
 		li {
-			margin: 0 16px 16px 0;
+			margin: 0 1em 1em 0;
 			width: 100%;
 		}
 	}
@@ -22,7 +27,7 @@
 	@include break-small {
 		@for $i from 2 through 6 {
 			&.columns-#{ $i } li {
-				width: calc(( 100% / #{ $i } ) - 16px);
+				width: calc(( 100% / #{ $i } ) - 1em);
 			}
 		}
 	}
@@ -31,6 +36,6 @@
 .wp-block-rss__item-publish-date,
 .wp-block-rss__item-author {
 	display: block;
-	color: $dark-gray-300;
-	font-size: $default-font-size;
+	color: #555;
+	font-size: 0.8125em;
 }

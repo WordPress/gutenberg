@@ -12,6 +12,7 @@ const inquirer = require( 'inquirer' );
  */
 const sleep = util.promisify( setTimeout );
 const rimraf = util.promisify( require( 'rimraf' ) );
+const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
  * Internal dependencies
@@ -41,12 +42,18 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
  * @param {boolean} options.update  If true, update sources.
+ * @param {string}  options.xdebug  The Xdebug mode to set.
  */
-module.exports = async function start( { spinner, debug, update } ) {
+module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
-	const config = await initConfig( { spinner, debug } );
+	const config = await initConfig( {
+		spinner,
+		debug,
+		xdebug,
+		writeChanges: true,
+	} );
 
 	if ( ! config.detectedLocalConfig ) {
 		const { configDirectoryPath } = config;
@@ -58,12 +65,17 @@ module.exports = async function start( { spinner, debug, update } ) {
 
 	// Check if the hash of the config has changed. If so, run configuration.
 	const configHash = md5( config );
-	const workDirectoryPath = config.workDirectoryPath;
+	const { workDirectoryPath, dockerComposeConfigPath } = config;
 	const shouldConfigureWp =
 		update ||
 		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
 			workDirectoryPath,
 		} ) );
+
+	const dockerComposeConfig = {
+		config: dockerComposeConfigPath,
+		log: config.debug,
+	};
 
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
@@ -78,13 +90,39 @@ module.exports = async function start( { spinner, debug, update } ) {
 	 */
 	if ( shouldConfigureWp ) {
 		await stop( { spinner, debug } );
+		// Update the images before starting the services again.
+		spinner.text = 'Updating docker images.';
+
+		const directoryHash = path.basename( workDirectoryPath );
+
+		// Note: when the base docker image is updated, we want that operation to
+		// also update WordPress. Since we store wordpress/tests-wordpress files
+		// as docker volumes, simply updating the image will not change those
+		// files. Thus, we need to remove those volumes in order for the files
+		// to be updated when pulling the new images.
+		const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
+
+		try {
+			if ( config.debug ) {
+				spinner.text = `Removing the WordPress volumes: ${ volumesToRemove }`;
+			}
+			await exec( `docker volume rm ${ volumesToRemove }` );
+		} catch {
+			// Note: we do not care about this error condition because it will
+			// mostly happen when the volume already exists. This error would not
+			// stop wp-env from working correctly.
+		}
+
+		await dockerCompose.pullAll( dockerComposeConfig );
 		spinner.text = 'Downloading sources.';
 	}
 
 	await Promise.all( [
 		dockerCompose.upOne( 'mysql', {
-			config: config.dockerComposeConfigPath,
-			log: config.debug,
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
 		} ),
 		shouldConfigureWp && downloadSources( config, spinner ),
 	] );
@@ -96,8 +134,10 @@ module.exports = async function start( { spinner, debug, update } ) {
 	spinner.text = 'Starting WordPress.';
 
 	await dockerCompose.upMany( [ 'wordpress', 'tests-wordpress' ], {
-		config: config.dockerComposeConfigPath,
-		log: config.debug,
+		...dockerComposeConfig,
+		commandOptions: shouldConfigureWp
+			? [ '--build', '--force-recreate' ]
+			: [],
 	} );
 
 	// Only run WordPress install/configuration when config has changed.
@@ -141,7 +181,23 @@ module.exports = async function start( { spinner, debug, update } ) {
 		} );
 	}
 
-	spinner.text = 'WordPress started.';
+	const siteUrl = config.env.development.config.WP_SITEURL;
+	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
+	const mySQLAddress = await exec(
+		`docker-compose -f ${ dockerComposeConfigPath } port mysql 3306`
+	);
+	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
+
+	spinner.prefixText = 'WordPress development site started'
+		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
+		.concat( '\n' )
+		.concat( 'WordPress test site started' )
+		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
+		.concat( '\n' )
+		.concat( `MySQL is listening on port ${ mySQLPort }` )
+		.concat( '\n' );
+
+	spinner.text = 'Done!';
 };
 
 /**

@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
@@ -22,16 +18,10 @@ export default function DefaultStylePicker( { blockName } ) {
 			const preferredStyleVariations =
 				settings.__experimentalPreferredStyleVariations;
 			return {
-				preferredStyle: get( preferredStyleVariations, [
-					'value',
-					blockName,
-				] ),
-				onUpdatePreferredStyleVariations: get(
-					preferredStyleVariations,
-					[ 'onChange' ],
-					null
-				),
-				styles: select( 'core/blocks' ).getBlockStyles( blockName ),
+				preferredStyle: preferredStyleVariations?.value?.[ blockName ],
+				onUpdatePreferredStyleVariations:
+					preferredStyleVariations?.onChange ?? null,
+				styles: select( blocksStore ).getBlockStyles( blockName ),
 			};
 		},
 		[ blockName ]

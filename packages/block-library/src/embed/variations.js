@@ -56,12 +56,15 @@ const variations = [
 		attributes: { providerNameSlug: 'youtube', responsive: true },
 	},
 	{
+		// Deprecate Facebook Embed per FB policy
+		// See: https://developers.facebook.com/docs/plugins/oembed-legacy
 		name: 'facebook',
 		title: 'Facebook',
 		icon: embedFacebookIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Facebook post.' ),
-		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
+		scope: [ 'block' ],
+		patterns: [],
 		attributes: {
 			providerNameSlug: 'facebook',
 			previewable: false,
@@ -69,12 +72,15 @@ const variations = [
 		},
 	},
 	{
+		// Deprecate Instagram per FB policy
+		// See: https://developers.facebook.com/docs/instagram/oembed-legacy
 		name: 'instagram',
 		title: 'Instagram',
 		icon: embedInstagramIcon,
 		keywords: [ __( 'image' ), __( 'social' ) ],
 		description: __( 'Embed an Instagram post.' ),
-		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
+		scope: [ 'block' ],
+		patterns: [],
 		attributes: { providerNameSlug: 'instagram', responsive: true },
 	},
 	{
@@ -332,5 +338,17 @@ const variations = [
 		attributes: { providerNameSlug: 'amazon-kindle' },
 	},
 ];
+
+/**
+ * Add `isActive` function to all `embed` variations, if not defined.
+ * `isActive` function is used to find a variation match from a created
+ *  Block by providing its attributes.
+ */
+variations.forEach( ( variation ) => {
+	if ( variation.isActive ) return;
+	variation.isActive = ( blockAttributes, variationAttributes ) =>
+		blockAttributes.providerNameSlug ===
+		variationAttributes.providerNameSlug;
+} );
 
 export default variations;

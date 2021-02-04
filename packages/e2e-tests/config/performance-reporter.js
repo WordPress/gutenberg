@@ -28,16 +28,15 @@ class PerformanceReporter {
 		}
 
 		const results = readFileSync( filepath, 'utf8' );
-		const { load, domcontentloaded, type, focus } = JSON.parse( results );
+		const { load, type, focus, inserterOpen, inserterHover } = JSON.parse(
+			results
+		);
 
 		if ( load && load.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Loading Time:' ) }
-Average time to load: ${ success( round( average( load ) ) + 'ms' ) }
-Average time to DOM content load: ${ success(
-				round( average( domcontentloaded ) ) + 'ms'
-			) }` );
+Average time to load: ${ success( round( average( load ) ) + 'ms' ) }` );
 		}
 
 		if ( type && type.length ) {
@@ -63,6 +62,36 @@ Slowest time to select a block: ${ success(
 			) }
 Fastest time to select a block: ${ success(
 				round( Math.min( ...focus ) ) + 'ms'
+			) }` );
+		}
+
+		if ( inserterOpen && inserterOpen.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Opening Global Inserter Performance:' ) }
+Average time to open global inserter: ${ success(
+				round( average( inserterOpen ) ) + 'ms'
+			) }
+Slowest time to open global inserter: ${ success(
+				round( Math.max( ...inserterOpen ) ) + 'ms'
+			) }
+Fastest time to open global inserter: ${ success(
+				round( Math.min( ...inserterOpen ) ) + 'ms'
+			) }` );
+		}
+
+		if ( inserterHover && inserterHover.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Inserter Block Item Hover Performance:' ) }
+Average time to move mouse between two block item in the inserter: ${ success(
+				round( average( inserterHover ) ) + 'ms'
+			) }
+Slowest time to move mouse between two block item in the inserter: ${ success(
+				round( Math.max( ...inserterHover ) ) + 'ms'
+			) }
+Fastest time to move mouse between two block item in the inserter: ${ success(
+				round( Math.min( ...inserterHover ) ) + 'ms'
 			) }` );
 		}
 

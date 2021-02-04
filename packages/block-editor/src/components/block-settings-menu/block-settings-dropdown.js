@@ -6,7 +6,7 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -18,6 +18,7 @@ import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -45,9 +46,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select(
-			'core/keyboard-shortcuts'
-		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
 			duplicate: getShortcutRepresentation(
 				'core/block-editor/duplicate'
@@ -74,6 +73,9 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
+	const removeBlockLabel =
+		count === 1 ? __( 'Remove block' ) : __( 'Remove blocks' );
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -93,7 +95,7 @@ export function BlockSettingsDropdown( {
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
-					label={ __( 'More options' ) }
+					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons
@@ -139,7 +141,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert Before' ) }
+											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ flow(
@@ -148,7 +150,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert After' ) }
+											{ __( 'Insert after' ) }
 										</MenuItem>
 									</>
 								) }
@@ -156,7 +158,7 @@ export function BlockSettingsDropdown( {
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
-										{ __( 'Move To' ) }
+										{ __( 'Move to' ) }
 									</MenuItem>
 								) }
 								{ count === 1 && (
@@ -185,11 +187,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ _n(
-											'Remove Block',
-											'Remove Blocks',
-											count
-										) }
+										{ removeBlockLabel }
 									</MenuItem>
 								) }
 							</MenuGroup>

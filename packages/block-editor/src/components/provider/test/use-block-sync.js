@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType } from '@wordpress/blocks';
+
+/**
  * External dependencies
  */
 import { create, act } from 'react-test-renderer';
@@ -19,6 +24,15 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 } );
 
 describe( 'useBlockSync hook', () => {
+	beforeAll( () => {
+		registerBlockType( 'test/test-block', {
+			title: 'Test block',
+			attributes: {
+				foo: { type: 'number' },
+			},
+		} );
+	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -97,12 +111,16 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith(
 			'test', // It should use the given client ID.
-			fakeBlocks, // It should use the controlled blocks value.
-			false // It shoudl not update the selection state.
+			fakeBlocks // It should use the controlled blocks value.
 		);
 
 		const testBlocks = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		await act( async () => {
 			root.update(
@@ -119,11 +137,8 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( resetBlocks ).not.toHaveBeenCalled();
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith(
-			'test',
-			testBlocks,
-			false
-		);
+		// We can't check the args because the blocks are cloned.
+		expect( replaceInnerBlocks ).toHaveBeenCalled();
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
@@ -135,7 +150,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		let root;
 		let registry;
@@ -205,7 +225,6 @@ describe( 'useBlockSync hook', () => {
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
-
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
@@ -287,7 +306,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		await act( async () => {
@@ -315,7 +339,7 @@ describe( 'useBlockSync hook', () => {
 			);
 		} );
 
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [], false );
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -330,7 +354,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		let registry;
@@ -357,7 +386,14 @@ describe( 'useBlockSync hook', () => {
 
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( onChange ).toHaveBeenCalledWith(
-			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
+			[
+				{
+					name: 'test/test-block',
+					clientId: 'a',
+					innerBlocks: [],
+					attributes: { foo: 2 },
+				},
+			],
 			{ selectionEnd: {}, selectionStart: {} }
 		);
 		expect( onInput ).not.toHaveBeenCalled();

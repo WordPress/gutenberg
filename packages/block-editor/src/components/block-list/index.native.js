@@ -14,6 +14,8 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
+	WIDE_ALIGNMENTS,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -53,6 +55,7 @@ export class BlockList extends Component {
 		this.extraData = {
 			parentWidth: this.props.parentWidth,
 			renderFooterAppender: this.props.renderFooterAppender,
+			renderAppender: this.props.renderAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
 			contentStyle: this.props.contentstyle,
 		};
@@ -71,6 +74,12 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+
+		this.onLayout = this.onLayout.bind( this );
+
+		this.state = {
+			blockWidth: this.props.blockWidth || 0,
+		};
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -115,21 +124,42 @@ export class BlockList extends Component {
 			renderFooterAppender,
 			onDeleteBlock,
 			contentStyle,
+			renderAppender,
 		} = this.props;
+		const { blockWidth } = this.state;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
-			this.extraData.contentStyle !== contentStyle
+			this.extraData.contentStyle !== contentStyle ||
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockWidth !== blockWidth
 		) {
 			this.extraData = {
 				parentWidth,
 				renderFooterAppender,
 				onDeleteBlock,
 				contentStyle,
+				renderAppender,
+				blockWidth,
 			};
 		}
 		return this.extraData;
+	}
+
+	onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+		const { isRootList, maxWidth } = this.props;
+
+		const layoutWidth = Math.floor( layout.width );
+		if ( isRootList && blockWidth !== layoutWidth ) {
+			this.setState( {
+				blockWidth: Math.min( layoutWidth, maxWidth ),
+			} );
+		} else if ( ! isRootList && ! blockWidth ) {
+			this.setState( { blockWidth: Math.min( layoutWidth, maxWidth ) } );
+		}
 	}
 
 	render() {
@@ -164,6 +194,8 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
+			contentResizeMode,
+			blockWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -180,10 +212,16 @@ export class BlockList extends Component {
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
+
+		const isContentStretch = contentResizeMode === 'stretch';
+		const isMultiBlocks = blockClientIds.length > 1;
+		const { isWider } = alignmentHelpers;
+
 		return (
 			<View
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
+				onLayout={ this.onLayout }
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -211,9 +249,13 @@ export class BlockList extends Component {
 					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
-					contentContainerStyle={
-						horizontal && styles.horizontalContentContainer
-					}
+					contentContainerStyle={ [
+						horizontal && styles.horizontalContentContainer,
+						isWider( blockWidth, 'medium' ) &&
+							( isContentStretch && isMultiBlocks
+								? styles.horizontalContentContainerStretch
+								: styles.horizontalContentContainerCenter ),
+					] }
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,
@@ -260,8 +302,8 @@ export class BlockList extends Component {
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
-			__experimentalItemCallback,
 		} = this.props;
+		const { blockWidth } = this.state;
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -280,7 +322,7 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
-				__experimentalRenderCallback={ __experimentalItemCallback }
+				blockWidth={ blockWidth }
 			/>
 		);
 	}
@@ -298,6 +340,7 @@ export class BlockList extends Component {
 				<>
 					<TouchableWithoutFeedback
 						accessibilityLabel={ __( 'Add paragraph block' ) }
+						testID={ __( 'Add paragraph block' ) }
 						onPress={ () => {
 							this.addBlockToEndOfPost( paragraphBlock );
 						} }
@@ -335,6 +378,7 @@ export default compose( [
 				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
 
+			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
 			const blockCount = getBlockCount( rootBlockId );
@@ -350,11 +394,13 @@ export default compose( [
 			return {
 				blockClientIds,
 				blockCount,
-				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+				isBlockInsertionPointVisible:
+					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
 				isReadOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
+				maxWidth,
 			};
 		}
 	),
@@ -387,7 +433,13 @@ class EmptyListComponent extends Component {
 
 		return (
 			<View style={ styles.defaultAppender }>
-				<ReadableContentView>
+				<ReadableContentView
+					align={
+						renderAppender
+							? WIDE_ALIGNMENTS.alignments.full
+							: undefined
+					}
+				>
 					<BlockListAppender
 						rootClientId={ rootClientId }
 						renderAppender={ renderAppender }

@@ -18,7 +18,7 @@ const Example = () => {
 
 	return (
 		<BoxControl
-			value={ value }
+			values={ values }
 			onChange={ ( nextValues ) => setValues( nextValues ) }
 		/>
 	);
@@ -48,7 +48,7 @@ const Example = () => {
 	return (
 		<>
 			<BoxControl
-				value={ value }
+				values={ values }
 				onChange={ ( nextValues ) => setValues( nextValues ) }
 			/>
 			<Visualizer>
@@ -80,7 +80,7 @@ const Example = () => {
 	return (
 		<>
 			<BoxControl
-				value={ value }
+				values={ values }
 				onChange={ ( nextValues ) => setValues( nextValues ) }
 			/>
 			<div style={ { position: 'relative' } }>

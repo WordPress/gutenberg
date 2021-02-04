@@ -4,26 +4,39 @@
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
 
+/**
+ * @param {import('..').OwnProps} props
+ */
 const alignStyle = ( { align } ) => {
+	if ( align === undefined ) return '';
+
 	const aligns = {
 		top: 'flex-start',
 		bottom: 'flex-end',
 	};
-	const value = aligns[ align ] || align;
+
+	const value = aligns[ /** @type {'top' | 'bottom'} */ ( align ) ] || align;
 
 	return css( {
 		alignItems: value,
 	} );
 };
 
+/**
+ * @param {import('..').OwnProps} props
+ */
 const justifyStyle = ( { justify, isReversed } ) => {
 	const justifies = {
 		left: 'flex-start',
 		right: 'flex-end',
 	};
-	let value = justifies[ justify ] || justify;
+	let value =
+		justifies[ /** @type {'left' | 'right'} */ ( justify ) ] || justify;
 
-	if ( isReversed && justifies[ justify ] ) {
+	if (
+		isReversed &&
+		justifies[ /** @type {'left' | 'right'} */ ( justify ) ]
+	) {
 		value = justify === 'left' ? justifies.right : justifies.left;
 	}
 
@@ -32,23 +45,29 @@ const justifyStyle = ( { justify, isReversed } ) => {
 	} );
 };
 
+/**
+ * @param {import('..').OwnProps} Props
+ */
 const gapStyle = ( { gap, isReversed } ) => {
 	const base = 4;
 	const value = typeof gap === 'number' ? base * gap : base;
 	const dir = isReversed ? 'left' : 'right';
-	const padding = `padding-${ dir }`;
+	const margin = `margin-${ dir }`;
 
 	return css`
 		> * {
-			${ padding }: ${ value }px;
+			${ margin }: ${ value }px;
 
 			&:last-child {
-				${ padding }: 0;
+				${ margin }: 0;
 			}
 		}
 	`;
 };
 
+/**
+ * @param {import('..').OwnProps} props
+ */
 const reversedStyles = ( { isReversed } ) => {
 	if ( ! isReversed ) return '';
 
@@ -60,11 +79,12 @@ const reversedStyles = ( { isReversed } ) => {
 export const Flex = styled.div`
 	box-sizing: border-box;
 	display: flex;
+	width: 100%;
 
-	${ alignStyle };
-	${ justifyStyle };
-	${ gapStyle };
-	${ reversedStyles };
+	${ alignStyle }
+	${ justifyStyle }
+	${ reversedStyles }
+	${ gapStyle }
 `;
 
 export const Item = styled.div`

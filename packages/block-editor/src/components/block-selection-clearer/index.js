@@ -1,78 +1,43 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 
-class BlockSelectionClearer extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.bindContainer = this.bindContainer.bind( this );
-		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind(
-			this
-		);
-	}
-
-	bindContainer( ref ) {
-		this.container = ref;
-	}
-
-	/**
-	 * Clears the selected block on focus if the container is the target of the
-	 * focus. This assumes no other descendents have received focus until event
-	 * has bubbled to the container.
-	 *
-	 * @param {FocusEvent} event Focus event.
-	 */
-	clearSelectionIfFocusTarget( event ) {
-		const {
-			hasSelectedBlock,
-			hasMultiSelection,
-			clearSelectedBlock,
-		} = this.props;
-
-		const hasSelection = hasSelectedBlock || hasMultiSelection;
-		if ( event.target === this.container && hasSelection ) {
-			clearSelectedBlock();
-		}
-	}
-
-	render() {
-		return (
-			<div
-				tabIndex={ -1 }
-				onFocus={ this.clearSelectionIfFocusTarget }
-				ref={ this.bindContainer }
-				{ ...omit( this.props, [
-					'clearSelectedBlock',
-					'hasSelectedBlock',
-					'hasMultiSelection',
-				] ) }
-			/>
-		);
-	}
-}
-
-export default compose( [
-	withSelect( ( select ) => {
+export function useBlockSelectionClearer( ref ) {
+	const hasSelection = useSelect( ( select ) => {
 		const { hasSelectedBlock, hasMultiSelection } = select(
 			'core/block-editor'
 		);
 
-		return {
-			hasSelectedBlock: hasSelectedBlock(),
-			hasMultiSelection: hasMultiSelection(),
+		return hasSelectedBlock() || hasMultiSelection();
+	} );
+	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+
+	useEffect( () => {
+		if ( ! hasSelection ) {
+			return;
+		}
+
+		function onMouseDown( event ) {
+			// Only handle clicks on the canvas, not the content.
+			if ( event.target.closest( '.wp-block' ) ) {
+				return;
+			}
+
+			clearSelectedBlock();
+		}
+
+		ref.current.addEventListener( 'mousedown', onMouseDown );
+
+		return () => {
+			ref.current.removeEventListener( 'mousedown', onMouseDown );
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
-		return { clearSelectedBlock };
-	} ),
-] )( BlockSelectionClearer );
+	}, [ hasSelection, clearSelectedBlock ] );
+}
+
+export default function BlockSelectionClearer( props ) {
+	const ref = useRef();
+	useBlockSelectionClearer( ref );
+	return <div ref={ ref } { ...props } />;
+}

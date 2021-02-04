@@ -37,7 +37,7 @@ const transforms = {
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
+			blocks: [ 'core/paragraph', 'core/heading' ],
 			transform: ( blockAttributes ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
@@ -153,6 +153,23 @@ const transforms = {
 					__UNSTABLE_LINE_SEPARATOR
 				).map( ( piece ) =>
 					createBlock( 'core/paragraph', {
+						content: toHTMLString( { value: piece } ),
+					} )
+				),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/heading' ],
+			transform: ( { values } ) =>
+				split(
+					create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ),
+					__UNSTABLE_LINE_SEPARATOR
+				).map( ( piece ) =>
+					createBlock( 'core/heading', {
 						content: toHTMLString( { value: piece } ),
 					} )
 				),

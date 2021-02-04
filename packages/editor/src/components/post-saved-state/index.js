@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button } from '@wordpress/components';
+import {
+	__unstableGetAnimateClassName as getAnimateClassName,
+	Button,
+} from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -23,15 +26,19 @@ import PostSwitchToDraftButton from '../post-switch-to-draft-button';
  * Component showing whether the post is saved or not and providing save
  * buttons.
  *
- * @param {Object}   props               Component props.
+ * @param {Object} props               Component props.
  * @param {?boolean} props.forceIsDirty  Whether to force the post to be marked
- *                                       as dirty.
+ * as dirty.
  * @param {?boolean} props.forceIsSaving Whether to force the post to be marked
- *                                       as being saved.
- *
+ * as being saved.
+ * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
  * @return {import('@wordpress/element').WPComponent} The component.
  */
-export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
+export default function PostSavedState( {
+	forceIsDirty,
+	forceIsSaving,
+	showIconLabels = false,
+} ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
 	const isLargeViewport = useViewportMatch( 'small' );
 
@@ -69,8 +76,7 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
-					getCurrentPost()?.[ '_links' ]?.[ 'wp:action-publish' ] ??
-					false,
+					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 			};
 		},
 		[ forceIsDirty, forceIsSaving ]
@@ -97,19 +103,20 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 		// TODO: Classes generation should be common across all return
 		// paths of this function, including proper naming convention for
 		// the "Save Draft" button.
-		const classes = classnames( 'editor-post-saved-state', 'is-saving', {
-			'is-autosaving': isAutosaving,
-		} );
+		const classes = classnames(
+			'editor-post-saved-state',
+			'is-saving',
+			getAnimateClassName( { type: 'loading' } ),
+			{
+				'is-autosaving': isAutosaving,
+			}
+		);
 
 		return (
-			<Animate type="loading">
-				{ ( { className: animateClassName } ) => (
-					<span className={ classnames( classes, animateClassName ) }>
-						<Icon icon={ cloud } />
-						{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
-					</span>
-				) }
-			</Animate>
+			<span className={ classes }>
+				<Icon icon={ cloud } />
+				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+			</span>
 		);
 	}
 
@@ -137,7 +144,11 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 		return null;
 	}
 
+	/* translators: button label text should, if possible, be under 16 characters. */
 	const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
+
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const shortLabel = __( 'Save' );
 
 	if ( ! isLargeViewport ) {
 		return (
@@ -147,7 +158,9 @@ export default function PostSavedState( { forceIsDirty, forceIsSaving } ) {
 				onClick={ () => savePost() }
 				shortcut={ displayShortcut.primary( 's' ) }
 				icon={ cloudUpload }
-			/>
+			>
+				{ showIconLabels && shortLabel }
+			</Button>
 		);
 	}
 

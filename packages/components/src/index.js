@@ -12,7 +12,10 @@ export {
 
 // Components
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
-export { default as Animate } from './animate';
+export {
+	default as Animate,
+	getAnimateClassName as __unstableGetAnimateClassName,
+} from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -27,20 +30,33 @@ export { default as CardHeader } from './card/header';
 export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
+export { default as __experimentalColorEdit } from './color-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
+export { default as ComboboxControl } from './combobox-control';
+export {
+	Composite as __unstableComposite,
+	CompositeGroup as __unstableCompositeGroup,
+	CompositeItem as __unstableCompositeItem,
+	useCompositeState as __unstableUseCompositeState,
+} from './composite';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
-export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
+export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
 export { default as Draggable } from './draggable';
 export {
 	default as DropZone,
 	useDropZone as __unstableUseDropZone,
 } from './drop-zone';
-export { default as DropZoneProvider } from './drop-zone/provider';
+export {
+	default as DropZoneProvider,
+	DropZoneContextProvider as __unstableDropZoneContextProvider,
+	useDrop as __unstableUseDrop,
+} from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
@@ -67,6 +83,11 @@ export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
+export { default as __experimentalNavigation } from './navigation';
+export { default as __experimentalNavigationBackButton } from './navigation/back-button';
+export { default as __experimentalNavigationGroup } from './navigation/group';
+export { default as __experimentalNavigationItem } from './navigation/item';
+export { default as __experimentalNavigationMenu } from './navigation/menu';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
@@ -120,7 +141,10 @@ export {
 } from './slot-fill';
 
 // Higher-Order Components
-export { default as navigateRegions } from './higher-order/navigate-regions';
+export {
+	default as navigateRegions,
+	useNavigateRegions as __unstableUseNavigateRegions,
+} from './higher-order/navigate-regions';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
@@ -131,3 +155,9 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Component System
+export {
+	withNext as __unstableWithNext,
+	ComponentSystemProvider as __unstableComponentSystemProvider,
+} from './ui/context';

@@ -12,7 +12,6 @@ import {
 	keys,
 	isEqual,
 	isEmpty,
-	get,
 	identity,
 	difference,
 	omitBy,
@@ -23,7 +22,7 @@ import {
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { isReusableBlock } from '@wordpress/blocks';
+import { getBlockVariations } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -411,11 +410,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = get(
-				state,
-				[ 'isPersistentChange' ],
-				true
-			);
+			const nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -1131,20 +1126,20 @@ export function isTyping( state = false, action ) {
 }
 
 /**
- * Reducer returning dragging state.
+ * Reducer returning dragged block client id.
  *
- * @param {boolean} state  Current state.
+ * @param {string[]} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {string[]} Updated state.
  */
-export function isDraggingBlocks( state = false, action ) {
+export function draggedBlocks( state = [], action ) {
 	switch ( action.type ) {
 		case 'START_DRAGGING_BLOCKS':
-			return true;
+			return action.clientIds;
 
 		case 'STOP_DRAGGING_BLOCKS':
-			return false;
+			return [];
 	}
 
 	return state;
@@ -1179,7 +1174,7 @@ export function isCaretWithinFormattedText( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-function selection( state = {}, action ) {
+function selectionHelper( state = {}, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK': {
 			if ( state.clientId ) {
@@ -1242,53 +1237,78 @@ function selection( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block selection's start.
+ * Reducer returning the selection state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {boolean} Updated state.
  */
-export function selectionStart( state = {}, action ) {
+export function selection( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
 			return {
-				clientId: action.clientId,
-				attributeKey: action.attributeKey,
-				offset: action.startOffset,
+				selectionStart: {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.startOffset,
+				},
+				selectionEnd: {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.endOffset,
+				},
 			};
 		case 'RESET_SELECTION':
-			return action.selectionStart;
-		case 'MULTI_SELECT':
-			return { clientId: action.start };
-	}
-
-	return selection( state, action );
-}
-
-/**
- * Reducer returning the block selection's end.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function selectionEnd( state = {}, action ) {
-	switch ( action.type ) {
-		case 'SELECTION_CHANGE':
+			const { selectionStart, selectionEnd } = action;
 			return {
-				clientId: action.clientId,
-				attributeKey: action.attributeKey,
-				offset: action.endOffset,
+				selectionStart,
+				selectionEnd,
 			};
-		case 'RESET_SELECTION':
-			return action.selectionEnd;
 		case 'MULTI_SELECT':
-			return { clientId: action.end };
+			const { start, end } = action;
+			return {
+				selectionStart: { clientId: start },
+				selectionEnd: { clientId: end },
+			};
+		case 'RESET_BLOCKS':
+			const startClientId = state?.selectionStart?.clientId;
+			const endClientId = state?.selectionEnd?.clientId;
+
+			// Do nothing if there's no selected block.
+			if ( ! startClientId && ! endClientId ) {
+				return state;
+			}
+
+			// If the start of the selection won't exist after reset, remove selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === startClientId
+				)
+			) {
+				return {
+					selectionStart: {},
+					selectionEnd: {},
+				};
+			}
+
+			// If the end of the selection won't exist after reset, collapse selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === endClientId
+				)
+			) {
+				return {
+					...state,
+					selectionEnd: state.selectionStart,
+				};
+			}
 	}
 
-	return selection( state, action );
+	return {
+		selectionStart: selectionHelper( state.selectionStart, action ),
+		selectionEnd: selectionHelper( state.selectionEnd, action ),
+	};
 }
 
 /**
@@ -1373,9 +1393,32 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point visibility, either null if there
- * is not an explicit insertion point assigned, or an object of its `index` and
- * `rootClientId`.
+ * A helper for resetting the insertion point state.
+ *
+ * @param {Object} state        Current state.
+ * @param {Object} action       Dispatched action.
+ * @param {*}      defaultValue The default value for the reducer.
+ *
+ * @return {*} Either the default value if a reset is required, or the state.
+ */
+function resetInsertionPoint( state, action, defaultValue ) {
+	switch ( action.type ) {
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'SELECT_BLOCK':
+		case 'SELECTION_CHANGE':
+		case 'REPLACE_INNER_BLOCKS':
+		case 'INSERT_BLOCKS':
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+			return defaultValue;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the insertion point position, consisting of the
+ * rootClientId and an index.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -1384,15 +1427,33 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
+		case 'SET_INSERTION_POINT':
+		case 'SHOW_INSERTION_POINT': {
 			const { rootClientId, index } = action;
 			return { rootClientId, index };
-
-		case 'HIDE_INSERTION_POINT':
-			return null;
+		}
 	}
 
-	return state;
+	return resetInsertionPoint( state, action, null );
+}
+
+/**
+ * Reducer returning the visibility of the insertion point.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function insertionPointVisibility( state = false, action ) {
+	switch ( action.type ) {
+		case 'SHOW_INSERTION_POINT':
+			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
+	}
+
+	return resetInsertionPoint( state, action, false );
 }
 
 /**
@@ -1448,11 +1509,20 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'INSERT_BLOCKS':
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
-				let id = block.name;
-				const insert = { name: block.name };
-				if ( isReusableBlock( block ) ) {
-					insert.ref = block.attributes.ref;
-					id += '/' + block.attributes.ref;
+				const { attributes, name: blockName } = block;
+				const variations = getBlockVariations( blockName );
+				const match = variations?.find( ( variation ) =>
+					variation.isActive?.( attributes, variation.attributes )
+				);
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
+				let id = match?.name
+					? `${ blockName }/${ match.name }`
+					: blockName;
+				const insert = { name: id };
+				if ( blockName === 'core/block' ) {
+					insert.ref = attributes.ref;
+					id += '/' + attributes.ref;
 				}
 
 				return {
@@ -1550,6 +1620,10 @@ export function hasBlockMovingClientId( state = null, action ) {
 		return action.hasBlockMovingClientId;
 	}
 
+	if ( action.type === 'SET_NAVIGATION_MODE' ) {
+		return null;
+	}
+
 	return state;
 }
 
@@ -1614,6 +1688,7 @@ export function automaticChangeStatus( state, action ) {
 			return;
 		// Undoing an automatic change should still be possible after mouse
 		// move.
+		case 'START_TYPING':
 		case 'STOP_TYPING':
 			return state;
 	}
@@ -1653,16 +1728,16 @@ export function highlightedBlock( state, action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	isDraggingBlocks,
+	draggedBlocks,
 	isCaretWithinFormattedText,
-	selectionStart,
-	selectionEnd,
+	selection,
 	isMultiSelecting,
 	isSelectionEnabled,
 	initialPosition,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
+	insertionPointVisibility,
 	template,
 	settings,
 	preferences,

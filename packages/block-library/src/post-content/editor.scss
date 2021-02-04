@@ -1,0 +1,11 @@
+.wp-block-post-content__placeholder {
+	height: 100px;
+	border: 1px dashed;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	span {
+		font-style: italic;
+	}
+}

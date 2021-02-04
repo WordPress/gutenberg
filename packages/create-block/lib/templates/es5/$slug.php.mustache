@@ -26,7 +26,7 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	$dir = dirname( __FILE__ );
+	$dir = __DIR__;
 
 	$index_js = 'index.js';
 	wp_register_script(
@@ -57,10 +57,13 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		filemtime( "$dir/$style_css" )
 	);
 
-	register_block_type( '{{namespace}}/{{slug}}', array(
-		'editor_script' => '{{namespace}}-{{slug}}-block-editor',
-		'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
-		'style'         => '{{namespace}}-{{slug}}-block',
-	) );
+	register_block_type(
+		'{{namespace}}/{{slug}}',
+		array(
+			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
+			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
+			'style'         => '{{namespace}}-{{slug}}-block',
+		)
+	);
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

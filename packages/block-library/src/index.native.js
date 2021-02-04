@@ -58,7 +58,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-import * as classic from './classic';
+import * as classic from './freeform';
 import * as group from './group';
 import * as buttons from './buttons';
 import * as socialLink from './social-link';
@@ -149,6 +149,7 @@ const registerBlockVariations = ( block ) => {
 			...settings,
 			icon: v.icon(),
 			title: v.title,
+			variations: [],
 		} );
 	} );
 };
@@ -157,6 +158,7 @@ const registerBlockVariations = ( block ) => {
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
+// eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
@@ -191,6 +193,7 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
+	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
 		heading,
@@ -219,7 +222,10 @@ export const registerCoreBlocks = () => {
 		cover,
 		socialLink,
 		socialLinks,
-		iOSOnly( pullquote ),
+		pullquote,
+		file,
+		audio,
+		devOnly( reusableBlock ),
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

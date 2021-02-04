@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -17,20 +18,25 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
+	elementId,
 } ) => {
-	const { srcRootClientId, isDraggable } = useSelect(
+	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getTemplateLock } = select(
-				'core/block-editor'
-			);
+			const {
+				getBlockRootClientId,
+				getTemplateLock,
+				getBlockName,
+			} = select( 'core/block-editor' );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
+			const blockName = getBlockName( clientIds[ 0 ] );
 
 			return {
 				srcRootClientId: rootClientId,
 				isDraggable: 'all' !== templateLock,
+				icon: getBlockType( blockName )?.icon,
 			};
 		},
 		[ clientIds ]
@@ -68,10 +74,10 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ `block-${ clientIds[ 0 ] }` }
+			elementId={ elementId }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks();
+				startDraggingBlocks( clientIds );
 				isDragging.current = true;
 
 				startScrolling( event );
@@ -92,14 +98,14 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip clientIds={ clientIds } />
+				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
-					isDraggable: true,
-					onDraggableStart,
-					onDraggableEnd,
+					draggable: true,
+					onDragStart: onDraggableStart,
+					onDragEnd: onDraggableEnd,
 				} );
 			} }
 		</Draggable>

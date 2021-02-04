@@ -64,6 +64,8 @@ _Parameters_
 -   _name_ `string`: Name of the deleted entity.
 -   _recordId_ `string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
+-   _options_ `[Object]`: Delete options.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a control descriptor.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
@@ -145,7 +147,8 @@ _Parameters_
 -   _name_ `string`: Name of the received entity.
 -   _records_ `(Array|Object)`: Records received.
 -   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _edits_ `?Object`: Edits to reset.
 
 _Returns_
 
@@ -229,6 +232,7 @@ _Parameters_
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a control descriptor.
 
 <a name="undo" href="#undo">#</a> **undo**
 
@@ -271,6 +275,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `Object`: Data state.
+-   _query_ `(Object|undefined)`: Optional object of query parameters to include with request.
 
 _Returns_
 
@@ -389,7 +394,9 @@ _Returns_
 
 <a name="getEntityRecord" href="#getEntityRecord">#</a> **getEntityRecord**
 
-Returns the Entity's record object by key.
+Returns the Entity's record object by key. Returns `null` if the value is not
+yet received, undefined if the value entity is known to not exist, or the
+entity object if it exists and is received.
 
 _Parameters_
 
@@ -397,6 +404,7 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `number`: Record's key
+-   _query_ `?Object`: Optional query.
 
 _Returns_
 
@@ -584,6 +592,22 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the entity record has edits or not.
+
+<a name="hasEntityRecords" href="#hasEntityRecords">#</a> **hasEntityRecords**
+
+Returns true if records have been received for the given set of parameters,
+or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `?Object`: Optional terms query.
+
+_Returns_
+
+-   `boolean`: Whether entity records have been received.
 
 <a name="hasFetchedAutosaves" href="#hasFetchedAutosaves">#</a> **hasFetchedAutosaves**
 

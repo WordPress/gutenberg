@@ -6,7 +6,7 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, withFocusReturn } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
@@ -30,18 +30,24 @@ const PLACEHOLDER_PHRASES = {
 	// 0 is a back up, but should never be observed.
 	0: __( 'There are no changes.' ),
 	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	1: __( 'Changes have been made to your %s.' ),
+	1: __( 'The following changes have been made to your %s.' ),
 	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	2: __( 'Changes have been made to your %1$s and %2$s.' ),
+	2: __( 'The following changes have been made to your %1$s and %2$s.' ),
 	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	3: __( 'Changes have been made to your %1$s, %2$s, and %3$s.' ),
+	3: __(
+		'The following changes have been made to your %1$s, %2$s, and %3$s.'
+	),
 	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	4: __( 'Changes have been made to your %1$s, %2$s, %3$s, and %4$s.' ),
+	4: __(
+		'The following changes have been made to your %1$s, %2$s, %3$s, and %4$s.'
+	),
 	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	5: __( 'Changes have been made to your %1$s, %2$s, %3$s, %4$s, and %5$s.' ),
+	5: __(
+		'The following changes have been made to your %1$s, %2$s, %3$s, %4$s, and %5$s.'
+	),
 };
 
-export default function EntitiesSavedStates( { isOpen, close } ) {
+function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
 			dirtyEntityRecords: select(
@@ -69,7 +75,7 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 	const placeholderPhrase =
 		PLACEHOLDER_PHRASES[ entityNamesForPrompt.length ] ||
 		// Fallback for edge case that should not be observed (more than 5 entity types edited).
-		__( 'Changes have been made to multiple entity types.' );
+		__( 'The following changes have been made to multiple entities.' );
 	// eslint-disable-next-line @wordpress/valid-sprintf
 	const promptPhrase = sprintf( placeholderPhrase, ...entityNamesForPrompt );
 
@@ -114,9 +120,6 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 		} );
 	};
 
-	const [ isReviewing, setIsReviewing ] = useState( false );
-	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
-
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -146,31 +149,21 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
 				<p>{ promptPhrase }</p>
-				<p>
-					<Button
-						onClick={ toggleIsReviewing }
-						isLink
-						className="entities-saved-states__review-changes-button"
-					>
-						{ isReviewing
-							? __( 'Hide changes.' )
-							: __( 'Review changes.' ) }
-					</Button>
-				</p>
 			</div>
 
-			{ isReviewing &&
-				partitionedSavables.map( ( list ) => {
-					return (
-						<EntityTypeList
-							key={ list[ 0 ].name }
-							list={ list }
-							closePanel={ dismissPanel }
-							unselectedEntities={ unselectedEntities }
-							setUnselectedEntities={ setUnselectedEntities }
-						/>
-					);
-				} ) }
+			{ partitionedSavables.map( ( list ) => {
+				return (
+					<EntityTypeList
+						key={ list[ 0 ].name }
+						list={ list }
+						closePanel={ dismissPanel }
+						unselectedEntities={ unselectedEntities }
+						setUnselectedEntities={ setUnselectedEntities }
+					/>
+				);
+			} ) }
 		</div>
 	) : null;
 }
+
+export default withFocusReturn( EntitiesSavedStates );

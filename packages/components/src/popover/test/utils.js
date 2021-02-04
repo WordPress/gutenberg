@@ -154,7 +154,7 @@ describe( 'computePopoverXAxisPosition', () => {
 		} );
 	} );
 
-	it( "should set a maxWidth if there's not enough space in any direction", () => {
+	it( "should center popover if there's not enough space in any direction", () => {
 		const anchorRect = {
 			top: 10,
 			left: 400,
@@ -172,9 +172,33 @@ describe( 'computePopoverXAxisPosition', () => {
 		expect(
 			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
 		).toEqual( {
-			contentWidth: 614,
-			popoverLeft: 410,
-			xAxis: 'right',
+			contentWidth: null,
+			popoverLeft: 512,
+			xAxis: 'center',
+		} );
+	} );
+
+	it( 'should set the content width to the viewport width if content is too wide', () => {
+		const anchorRect = {
+			top: 10,
+			left: 400,
+			bottom: 30,
+			right: 420,
+			width: 20,
+			height: 20,
+		};
+
+		const contentSize = {
+			width: 1500,
+			height: 300,
+		};
+
+		expect(
+			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
+		).toEqual( {
+			contentWidth: 1024,
+			popoverLeft: 512,
+			xAxis: 'center',
 		} );
 	} );
 } );

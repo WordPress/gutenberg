@@ -115,7 +115,10 @@ export function useShowMoversGestures( {
 	const registerRef = useRef( false );
 
 	const isFocusedWithin = () => {
-		return ref?.current && ref.current.contains( document.activeElement );
+		return (
+			ref?.current &&
+			ref.current.contains( ref.current.ownerDocument.activeElement )
+		);
 	};
 
 	useEffect( () => {

@@ -53,7 +53,7 @@ export default function Notice( { children, onRemove, isDismissible } ) {
 }
 ```
 
-A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/master/packages/base-styles/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by isolating shared components as a reusable interface, reducing the surface area of similar UI elements by adapting a limited set of common components to support a varied set of use-cases.
+A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/base-styles/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by isolating shared components as a reusable interface, reducing the surface area of similar UI elements by adapting a limited set of common components to support a varied set of use-cases.
 
 #### SCSS File Naming Conventions for Blocks
 
@@ -65,7 +65,7 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
-JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://reactjs.org/docs/introducing-jsx.html). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/master/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration. 
+JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://reactjs.org/docs/introducing-jsx.html). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
 While the [staged process](https://tc39.es/process-document/) for introducing a new JavaScript language feature offers an opportunity to use new features before they are considered complete, **the Gutenberg project and the `@wordpress/babel-preset-default` configuration will only target support for proposals which have reached Stage 4 ("Finished")**.
 
@@ -144,6 +144,7 @@ While an experimental API may often stabilize into a publicly-available API, the
 
 When possible, use [shorthand notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#New_notations_in_ECMAScript_2015) when defining object property values:
 
+<!-- prettier-ignore -->
 ```js
 const a = 10;
 
@@ -172,9 +173,10 @@ String literals should be declared with single-quotes _unless_ the string itself
 
 In general, avoid backslash-escaping quotes:
 
+<!-- prettier-ignore -->
 ```js
 // Bad:
-const name = 'Matt';
+const name = "Matt";
 // Good:
 const name = 'Matt';
 
@@ -190,6 +192,7 @@ const oddString = "She said 'This is odd.'";
 
 You should use ES6 Template Strings over string concatenation whenever possible:
 
+<!-- prettier-ignore -->
 ```js
 const name = 'Stacey';
 
@@ -203,13 +206,13 @@ alert( `My name is ${ name }.` );
 
 [Optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) is a new language feature introduced in version 2020 of the ECMAScript specification. While the feature can be very convenient for property access on objects which are potentially null-ish (`null` or `undefined`), there are a number of common pitfalls to be aware of when using optional chaining. These may be issues that linting and/or type-checking can help protect against at some point in the future. In the meantime, you will want to be cautious of the following items:
 
-- When negating (`!`) the result of a value which is evaluated with optional chaining, you should be observant that in the case that optional chaining reaches a point where it cannot proceed, it will produce a [falsy value](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) that will be transformed to `true` when negated. In many cases, this is not an expected result.
-   - Example: `const hasFocus = ! nodeRef.current?.contains( document.activeElement );` will yield `true` if `nodeRef.current` is not assigned.
-   - See related issue: [#21984](https://github.com/WordPress/gutenberg/issues/21984)
-   - See similar ESLint rule: [`no-unsafe-negation`](https://eslint.org/docs/rules/no-unsafe-negation)
-- When assigning a boolean value, observe that optional chaining may produce values which are [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) (`undefined`, `null`), but not strictly `false`. This can become an issue when the value is passed around in a way where it is expected to be a boolean (`true` or `false`). While it's a common occurrence for booleans—since booleans are often used in ways where the logic considers truthiness and falsyness broadly—these issues can also occur for other optional chaining when eagerly assuming a type resulting from the end of the property access chain. [Type-checking](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#typescript) may help in preventing these sorts of errors.
-   - Example: `document.body.classList.toggle( 'has-focus', nodeRef.current?.contains( document.activeElement ) );` may wrongly _add_ the class, since [the second argument is optional](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle). If `undefined` is passed, it would not unset the class as it would when `false` is passed.
-   - Example: `<input value={ state.selected?.value.trim() } />` may inadvertently cause warnings in React by toggling between [controlled and uncontrolled inputs](https://reactjs.org/docs/uncontrolled-components.html). This is an easy trap to fall into when eagerly assuming that a result of `trim()` will always return a string value, overlooking the fact the optional chaining may have caused evaluation to abort earlier with a value of `undefined`.
+-   When negating (`!`) the result of a value which is evaluated with optional chaining, you should be observant that in the case that optional chaining reaches a point where it cannot proceed, it will produce a [falsy value](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) that will be transformed to `true` when negated. In many cases, this is not an expected result.
+    -   Example: `const hasFocus = ! nodeRef.current?.contains( document.activeElement );` will yield `true` if `nodeRef.current` is not assigned.
+    -   See related issue: [#21984](https://github.com/WordPress/gutenberg/issues/21984)
+    -   See similar ESLint rule: [`no-unsafe-negation`](https://eslint.org/docs/rules/no-unsafe-negation)
+-   When assigning a boolean value, observe that optional chaining may produce values which are [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) (`undefined`, `null`), but not strictly `false`. This can become an issue when the value is passed around in a way where it is expected to be a boolean (`true` or `false`). While it's a common occurrence for booleans—since booleans are often used in ways where the logic considers truthiness and falsyness broadly—these issues can also occur for other optional chaining when eagerly assuming a type resulting from the end of the property access chain. [Type-checking](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#typescript) may help in preventing these sorts of errors.
+    -   Example: `document.body.classList.toggle( 'has-focus', nodeRef.current?.contains( document.activeElement ) );` may wrongly _add_ the class, since [the second argument is optional](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle). If `undefined` is passed, it would not unset the class as it would when `false` is passed.
+    -   Example: `<input value={ state.selected?.value.trim() } />` may inadvertently cause warnings in React by toggling between [controlled and uncontrolled inputs](https://reactjs.org/docs/uncontrolled-components.html). This is an easy trap to fall into when eagerly assuming that a result of `trim()` will always return a string value, overlooking the fact the optional chaining may have caused evaluation to abort earlier with a value of `undefined`.
 
 ### `@wordpress/element` (React) Components
 
@@ -217,7 +220,7 @@ It is preferred to implement all components as [function components](https://rea
 
 ## JavaScript Documentation using JSDoc
 
-Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/master/packages/docgen).
+Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
 
 For additional guidance, consult the following resources:
 
@@ -263,7 +266,7 @@ Note the use of quotes when defining a set of string literals. As in the [JavaSc
 
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#import-types) to import type declarations from other files or third-party dependencies.
 
-Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#imports).
+Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/coding-guidelines.md#imports).
 
 ```js
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
@@ -372,7 +375,7 @@ Similarly, use the `undefined` type only if you're expecting an explicit value o
  */
 ```
 
-If a parameter is optional, use the [square-bracket notation](https://jsdoc.app/tags-param.html#optional-parameters-and-default-values). If an optional parameter has a default value which can be expressed as a [default parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters) in the function expression, it is not necesssary to include the value in JSDoc. If the function parameter has an effective default value which requires complex logic and cannot be expressed using the default parameters syntax, you can choose to include the default value in the JSDoc.
+If a parameter is optional, use the [square-bracket notation](https://jsdoc.app/tags-param.html#optional-parameters-and-default-values). If an optional parameter has a default value which can be expressed as a [default parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters) in the function expression, it is not necessary to include the value in JSDoc. If the function parameter has an effective default value which requires complex logic and cannot be expressed using the default parameters syntax, you can choose to include the default value in the JSDoc.
 
 ```js
 /**

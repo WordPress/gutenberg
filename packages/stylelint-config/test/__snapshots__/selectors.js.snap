@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`flags warnings with invalid selectors css snapshot matches warnings 1`] = `
+Array [
+  Object {
+    "column": 15,
+    "line": 18,
+    "rule": "declaration-property-unit-allowed-list",
+    "severity": "error",
+    "text": "Unexpected unit \\"%\\" for property \\"line-height\\" (declaration-property-unit-allowed-list)",
+  },
+  Object {
+    "column": 1,
+    "line": 25,
+    "rule": "selector-class-pattern",
+    "severity": "error",
+    "text": "Selector should use lowercase and separate words with hyphens (selector-class-pattern)",
+  },
+  Object {
+    "column": 1,
+    "line": 1,
+    "rule": "selector-id-pattern",
+    "severity": "error",
+    "text": "Selector should use lowercase and separate words with hyphens (selector-id-pattern)",
+  },
+  Object {
+    "column": 1,
+    "line": 5,
+    "rule": "selector-id-pattern",
+    "severity": "error",
+    "text": "Selector should use lowercase and separate words with hyphens (selector-id-pattern)",
+  },
+  Object {
+    "column": 4,
+    "line": 9,
+    "rule": "selector-id-pattern",
+    "severity": "error",
+    "text": "Selector should use lowercase and separate words with hyphens (selector-id-pattern)",
+  },
+  Object {
+    "column": 1,
+    "line": 21,
+    "rule": "selector-id-pattern",
+    "severity": "error",
+    "text": "Selector should use lowercase and separate words with hyphens (selector-id-pattern)",
+  },
+  Object {
+    "column": 10,
+    "line": 29,
+    "rule": "selector-pseudo-element-colon-notation",
+    "severity": "error",
+    "text": "Expected double colon pseudo-element notation (selector-pseudo-element-colon-notation)",
+  },
+  Object {
+    "column": 12,
+    "line": 17,
+    "rule": "string-quotes",
+    "severity": "error",
+    "text": "Expected double quotes (string-quotes)",
+  },
+]
+`;

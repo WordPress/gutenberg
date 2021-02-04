@@ -9,12 +9,11 @@
 @import "./button/editor.scss";
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
-@import "./code/editor.scss";
 @import "./columns/editor.scss";
 @import "./cover/editor.scss";
 @import "./embed/editor.scss";
 @import "./file/editor.scss";
-@import "./classic/editor.scss";
+@import "./freeform/editor.scss";
 @import "./gallery/editor.scss";
 @import "./group/editor.scss";
 @import "./heading/editor.scss";
@@ -22,13 +21,14 @@
 @import "./image/editor.scss";
 @import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./legacy-widget/editor.scss";
+@import "./list/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
+@import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
@@ -48,14 +48,11 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
-@import "./widget-area/editor.scss";
 @import "./query-loop/editor.scss";
 @import "./query/editor.scss";
-
-/**
- * Import styles from internal editor components used by the blocks.
- */
-@import "./block/edit-panel/editor.scss";
+@import "./query-pagination/editor.scss";
+@import "./query-pagination-numbers/editor.scss";
+@import "./post-featured-image/editor.scss";
 
 :root .editor-styles-wrapper {
 	// Background colors.

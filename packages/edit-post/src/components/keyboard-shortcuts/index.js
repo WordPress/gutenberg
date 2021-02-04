@@ -3,8 +3,16 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
 	const {
@@ -18,8 +26,8 @@ function KeyboardShortcuts() {
 		return {
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
-			getEditorMode: select( 'core/edit-post' ).getEditorMode,
-			isEditorSidebarOpened: select( 'core/edit-post' )
+			getEditorMode: select( editPostStore ).getEditorMode,
+			isEditorSidebarOpened: select( editPostStore )
 				.isEditorSidebarOpened,
 			richEditingEnabled: settings.richEditingEnabled,
 			codeEditingEnabled: settings.codeEditingEnabled,
@@ -31,8 +39,8 @@ function KeyboardShortcuts() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-	} = useDispatch( 'core/edit-post' );
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	} = useDispatch( editPostStore );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	useEffect( () => {
 		registerShortcut( {

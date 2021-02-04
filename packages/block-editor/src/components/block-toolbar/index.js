@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,19 +21,15 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
-import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures } from './utils';
-import ExpandedBlockControlsContainer from './expanded-block-controls-container';
 
-export default function BlockToolbar( {
-	hideDragHandle,
-	__experimentalExpandedControl = false,
-} ) {
+export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
 		blockClientId,
 		blockType,
 		hasFixedToolbar,
+		hasReducedUI,
 		isValid,
 		isVisual,
 	} = useSelect( ( select ) => {
@@ -47,6 +44,7 @@ export default function BlockToolbar( {
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
+		const settings = getSettings();
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -54,7 +52,8 @@ export default function BlockToolbar( {
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
-			hasFixedToolbar: getSettings().hasFixedToolbar,
+			hasFixedToolbar: settings.hasFixedToolbar,
+			hasReducedUI: settings.hasReducedUI,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -65,18 +64,24 @@ export default function BlockToolbar( {
 		};
 	}, [] );
 
+	// Handles highlighting the current block outline on hover or focus of the
+	// block type toolbar area.
 	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
 	const nodeRef = useRef();
-
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
 			onChange( isFocused ) {
+				if ( isFocused && hasReducedUI ) {
+					return;
+				}
 				toggleBlockHighlight( blockClientId, isFocused );
 			},
 		}
 	);
 
+	// Account for the cases where the block toolbar is rendered within the
+	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
@@ -100,39 +105,22 @@ export default function BlockToolbar( {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
-	const Wrapper = __experimentalExpandedControl
-		? ExpandedBlockControlsContainer
-		: 'div';
-
 	return (
-		<Wrapper className={ classes }>
+		<div className={ classes }>
+			{ ! isMultiToolbar && ! displayHeaderToolbar && (
+				<BlockParentSelector clientIds={ blockClientIds } />
+			) }
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
-						<BlockParentSelector clientIds={ blockClientIds } />
-					</div>
-				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<BlockSwitcher clientIds={ blockClientIds } />
+					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+						<BlockSwitcher clientIds={ blockClientIds } />
+						<BlockMover
+							clientIds={ blockClientIds }
+							hideDragHandle={ hideDragHandle || hasReducedUI }
+						/>
+					</ToolbarGroup>
 				) }
 			</div>
-			{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-				<BlockDraggable
-					clientIds={ blockClientIds }
-					cloneClassname="block-editor-block-toolbar__drag-clone"
-				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
-						<div
-							className="block-editor-block-toolbar__drag-handle-area"
-							draggable={ isDraggable && ! hideDragHandle }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-						>
-							<BlockMover clientIds={ blockClientIds } />
-						</div>
-					) }
-				</BlockDraggable>
-			) }
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
@@ -146,6 +134,6 @@ export default function BlockToolbar( {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</Wrapper>
+		</div>
 	);
 }

@@ -20,6 +20,7 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
+import { defaultLayout, LayoutProvider } from './layout';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -49,7 +50,8 @@ function UncontrolledInnerBlocks( props ) {
 		marginHorizontal,
 		horizontalAlignment,
 		filterInnerBlocks,
-		__experimentalItemCallback,
+		blockWidth,
+		__experimentalLayout: layout = defaultLayout,
 	} = props;
 
 	const block = useSelect(
@@ -83,7 +85,7 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
-			__experimentalItemCallback={ __experimentalItemCallback }
+			blockWidth={ blockWidth }
 		/>
 	);
 
@@ -93,9 +95,11 @@ function UncontrolledInnerBlocks( props ) {
 		const context = getBlockContext( block.attributes, blockType );
 
 		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
+			<LayoutProvider value={ layout }>
+				<BlockContextProvider value={ context }>
+					{ blockList }
+				</BlockContextProvider>
+			</LayoutProvider>
 		);
 	}
 
@@ -148,6 +152,6 @@ InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
 ) );
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export default InnerBlocks;

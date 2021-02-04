@@ -5,7 +5,7 @@ const { writeFile } = require( 'fs' ).promises;
 const { snakeCase } = require( 'lodash' );
 const makeDir = require( 'make-dir' );
 const { render } = require( 'mustache' );
-const { dirname } = require( 'path' );
+const { dirname, join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -13,11 +13,13 @@ const { dirname } = require( 'path' );
 const initBlockJSON = require( './init-block-json' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );
+const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 
 module.exports = async (
 	blockTemplate,
 	{
+		apiVersion,
 		namespace,
 		slug,
 		title,
@@ -29,6 +31,8 @@ module.exports = async (
 		licenseURI,
 		version,
 		wpScripts,
+		wpEnv,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
@@ -40,8 +44,9 @@ module.exports = async (
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
-	const { outputTemplates } = blockTemplate;
+	const { outputTemplates, outputAssets } = blockTemplate;
 	const view = {
+		apiVersion,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
@@ -55,18 +60,19 @@ module.exports = async (
 		license,
 		licenseURI,
 		textdomain: slug,
+		wpScripts,
+		npmDependencies,
 		editorScript,
 		editorStyle,
 		style,
-		wpScripts,
 	};
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ outputFile.replace(
-				/\$slug/g,
-				slug
-			) }`;
+			const outputFilePath = join(
+				slug,
+				outputFile.replace( /\$slug/g, slug )
+			);
 			await makeDir( dirname( outputFilePath ) );
 			writeFile(
 				outputFilePath,
@@ -75,11 +81,23 @@ module.exports = async (
 		} )
 	);
 
+	await Promise.all(
+		Object.keys( outputAssets ).map( async ( outputFile ) => {
+			const outputFilePath = join( slug, 'assets', outputFile );
+			await makeDir( dirname( outputFilePath ) );
+			writeFile( outputFilePath, outputAssets[ outputFile ] );
+		} )
+	);
+
 	await initBlockJSON( view );
 	await initPackageJSON( view );
 
 	if ( wpScripts ) {
 		await initWPScripts( view );
+	}
+
+	if ( wpEnv ) {
+		await initWPEnv( view );
 	}
 
 	info( '' );
@@ -107,11 +125,22 @@ module.exports = async (
 		info( '' );
 		code( '  $ npm run packages-update' );
 		info( '    Updates WordPress packages to the latest version.' );
+	}
+	info( '' );
+	info( 'To enter the folder type:' );
+	info( '' );
+	code( `  $ cd ${ slug }` );
+	if ( wpScripts ) {
 		info( '' );
-		info( 'You can start by typing:' );
+		info( 'You can start development with:' );
 		info( '' );
-		code( `  $ cd ${ slug }` );
-		code( `  $ npm start` );
+		code( '  $ npm start' );
+	}
+	if ( wpEnv ) {
+		info( '' );
+		info( 'You can start WordPress with:' );
+		info( '' );
+		code( '  $ npx wp-env start' );
 	}
 	info( '' );
 	info( 'Code is Poetry' );

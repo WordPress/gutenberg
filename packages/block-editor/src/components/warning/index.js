@@ -62,4 +62,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md
+ */
 export default Warning;

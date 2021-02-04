@@ -2,21 +2,23 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
-class UnsavedChangesWarning extends Component {
-	constructor() {
-		super( ...arguments );
-		this.warnIfUnsavedChanges = this.warnIfUnsavedChanges.bind( this );
-	}
-
-	componentDidMount() {
-		window.addEventListener( 'beforeunload', this.warnIfUnsavedChanges );
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'beforeunload', this.warnIfUnsavedChanges );
-	}
+/**
+ * Warns the user if there are unsaved changes before leaving the editor.
+ * Compatible with Post Editor and Site Editor.
+ *
+ * @return {WPComponent} The component.
+ */
+export default function UnsavedChangesWarning() {
+	const isDirty = useSelect( ( select ) => {
+		return () => {
+			const { __experimentalGetDirtyEntityRecords } = select( 'core' );
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			return dirtyEntityRecords.length > 0;
+		};
+	}, [] );
 
 	/**
 	 * Warns the user if there are unsaved changes before leaving the editor.
@@ -25,9 +27,7 @@ class UnsavedChangesWarning extends Component {
 	 *
 	 * @return {?string} Warning prompt message, if unsaved changes exist.
 	 */
-	warnIfUnsavedChanges( event ) {
-		const { isDirty } = this.props;
-
+	const warnIfUnsavedChanges = ( event ) => {
 		// We need to call the selector directly in the listener to avoid race
 		// conditions with `BrowserURL` where `componentDidUpdate` gets the
 		// new value of `isEditedPostDirty` before this component does,
@@ -38,11 +38,15 @@ class UnsavedChangesWarning extends Component {
 			);
 			return event.returnValue;
 		}
-	}
+	};
 
-	render() {
-		return null;
-	}
+	useEffect( () => {
+		window.addEventListener( 'beforeunload', warnIfUnsavedChanges );
+
+		return () => {
+			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
+		};
+	}, [] );
+
+	return null;
 }
-
-export default UnsavedChangesWarning;

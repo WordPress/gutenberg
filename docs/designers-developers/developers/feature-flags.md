@@ -71,7 +71,7 @@ if ( 2 === 2 ) {
 }
 ```
 
- The condition will alway evaluates to `true`, so can be removed leaving just the code in the body:
+ The condition will always evaluates to `true`, so can be removed leaving just the code in the body:
  ```js
  phaseTwoFeature();
  ```
