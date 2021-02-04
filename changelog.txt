@@ -1,5 +1,17 @@
 == Changelog ==
 
+= 9.8.4 =
+
+### Bug Fixes
+
+- Cover Block:
+  - Fix issues causing the cover block to black out with a fixed background ([28565](https://github.com/WordPress/gutenberg/pull/28565))
+  - Fix embed position ([28653](https://github.com/WordPress/gutenberg/pull/28653))
+- Pinned items:
+  - Fix regression with pinned plugin items on mobile ([28521](https://github.com/WordPress/gutenberg/pull/28521))
+  - Pinned items regression followup ([28526](https://github.com/WordPress/gutenberg/pull/28526))
+
+
 = 9.8.3 =
 
 ### Bug Fixes
