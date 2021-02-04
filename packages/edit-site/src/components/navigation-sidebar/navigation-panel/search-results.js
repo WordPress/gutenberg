@@ -70,7 +70,7 @@ export default function SearchResults( { items, search, noFilter } ) {
 			return [];
 		}
 
-		if ( ! noFilter ) {
+		if ( noFilter ) {
 			return items;
 		}
 
