@@ -178,7 +178,7 @@ module.exports = async ( file, callback ) => {
 	const task = BUILD_TASK_BY_EXTENSION[ extension ];
 
 	if ( ! task ) {
-		return;
+		callback( new Error( `No handler for extension: ${ extension }` ) );
 	}
 
 	try {
