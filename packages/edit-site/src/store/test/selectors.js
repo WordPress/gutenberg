@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import registerEditSiteStore from '..';
 import {
 	isFeatureActive,
 	getCanUserCreateMedia,
@@ -14,8 +13,6 @@ import {
 	isNavigationOpened,
 	isInserterOpened,
 } from '../selectors';
-
-registerEditSiteStore();
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
