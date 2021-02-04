@@ -37,7 +37,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 / 2);
+		padding: $grid-unit-10 $grid-unit-15;
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
@@ -104,8 +104,7 @@
 	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell,
 	.block-editor-block-navigation-block__contents-cell {
-		padding-top: 0;
-		padding-bottom: 0;
+		padding: 0;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
@@ -212,6 +211,12 @@
 		&:active {
 			color: $white;
 		}
+	}
+}
+
+.block-editor-block-navigation-block-select-button {
+	&:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 }
 
