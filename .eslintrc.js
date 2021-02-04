@@ -2,6 +2,8 @@
  * External dependencies
  */
 const { escapeRegExp } = require( 'lodash' );
+const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -27,6 +29,11 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.js',
 	'**/@(storybook|stories)/**/*.js',
 ];
+
+// All files from packages that have types provided with TypeScript.
+const typedFiles = glob( 'packages/*/package.json' )
+	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
 module.exports = {
 	root: true,
@@ -200,6 +207,13 @@ module.exports = {
 			files: [ 'bin/**/*.js' ],
 			rules: {
 				'no-console': 'off',
+			},
+		},
+		{
+			files: typedFiles,
+			rules: {
+				'jsdoc/no-undefined-types': 'off',
+				'jsdoc/valid-types': 'off',
 			},
 		},
 	],
