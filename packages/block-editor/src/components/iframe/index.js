@@ -3,6 +3,7 @@
  */
 import mergeRefs from 'react-merge-refs';
 import { compact, map } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -148,8 +149,16 @@ function updateEditorStyles( doc, styles ) {
 		return;
 	}
 
-	const updatedStyles = transformStyles( styles, '.editor-styles-wrapper' );
+	const backgroundColor = window
+		.getComputedStyle( doc.body, null )
+		.getPropertyValue( 'background-color' );
+	if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
+		doc.body.classList.remove( 'is-dark-theme' );
+	} else {
+		doc.body.classList.add( 'is-dark-theme' );
+	}
 
+	const updatedStyles = transformStyles( styles, '.editor-styles-wrapper' );
 	map( compact( updatedStyles ), ( updatedStyle ) => {
 		const styleElement = doc.createElement( 'style' );
 		styleElement.innerHTML = updatedStyle;
