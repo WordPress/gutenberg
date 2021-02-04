@@ -864,12 +864,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "ControlLabel",
-		"slug": "control-label",
-		"markdown_source": "../packages/components/src/control-label/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
@@ -957,12 +951,6 @@
 		"title": "FormFileUpload",
 		"slug": "form-file-upload",
 		"markdown_source": "../packages/components/src/form-file-upload/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "FormGroup",
-		"slug": "form-group",
-		"markdown_source": "../packages/components/src/form-group/README.md",
 		"parent": "components"
 	},
 	{

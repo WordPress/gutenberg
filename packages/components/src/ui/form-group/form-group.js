@@ -6,8 +6,8 @@ import { contextConnect } from '@wp-g2/context';
 /**
  * Internal dependencies
  */
-import Grid from '../grid';
-import View from '../view';
+import { Grid } from '../grid';
+import { View } from '../view';
 import FormGroupContent from './form-group-content';
 import { useFormGroup } from './use-form-group';
 

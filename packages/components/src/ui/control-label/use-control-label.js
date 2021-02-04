@@ -8,7 +8,7 @@ import { cx } from '@wp-g2/styles';
  * Internal dependencies
  */
 import { useFormGroupContextId } from '../form-group';
-import { useText } from '../text/next/use-text';
+import { useText } from '../text';
 import * as styles from './control-label-styles';
 
 /**
@@ -17,7 +17,7 @@ import * as styles from './control-label-styles';
  * @property {'large'|'medium'|'small'} [size] The size of `ControlLabel`.
  */
 
-/** @typedef {import('../text/next/types').Props & OwnProps} Props */
+/** @typedef {import('../text/types').Props & OwnProps} Props */
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'label'>} props
