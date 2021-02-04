@@ -6,13 +6,13 @@ import { contextConnect, useContextSystem } from '@wp-g2/context';
 /**
  * @template {{}} TCurrentProps
  * @template {{}} TNextProps
- * @param {import('react').ComponentType<TCurrentProps>} CurrentComponent
+ * @param {import('react').ForwardRefExoticComponent<TCurrentProps>} CurrentComponent
  * @param {import('react').ComponentType<TNextProps>} NextComponent
  * @param {string} namespace
  * @param {(props: TCurrentProps) => TNextProps} adapter
  */
 export function withNext(
-	CurrentComponent = () => null,
+	CurrentComponent,
 	NextComponent = () => null,
 	namespace = 'Component',
 	adapter = ( p ) => /** @type {any} */ ( p )
