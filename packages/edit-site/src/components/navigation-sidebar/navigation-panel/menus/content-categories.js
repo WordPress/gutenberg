@@ -65,7 +65,7 @@ export default function ContentCategoriesMenu() {
 				<SearchResults
 					items={ categories }
 					search={ search }
-					noFilter
+					disableFilter
 				/>
 			) }
 

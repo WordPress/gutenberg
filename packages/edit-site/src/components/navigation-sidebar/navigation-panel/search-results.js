@@ -18,7 +18,7 @@ import { useSelect } from '@wordpress/data';
 import TemplateNavigationItem from './template-navigation-item';
 import ContentNavigationItem from './content-navigation-item';
 
-export default function SearchResults( { items, search, noFilter } ) {
+export default function SearchResults( { items, search, disableFilter } ) {
 	let itemType = null;
 	if ( items?.length > 0 ) {
 		if ( items[ 0 ].taxonomy ) {
@@ -70,7 +70,7 @@ export default function SearchResults( { items, search, noFilter } ) {
 			return [];
 		}
 
-		if ( noFilter ) {
+		if ( disableFilter ) {
 			return items;
 		}
 

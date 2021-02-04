@@ -62,7 +62,11 @@ export default function ContentPagesMenu() {
 			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
 			{ search && ! isDebouncing && (
-				<SearchResults items={ pages } search={ search } noFilter />
+				<SearchResults
+					items={ pages }
+					search={ search }
+					disableFilter
+				/>
 			) }
 
 			{ ! search &&
