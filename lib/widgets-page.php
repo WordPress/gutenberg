@@ -37,11 +37,11 @@ function gutenberg_widgets_init( $hook ) {
 		);
 		return;
 	}
-	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', 'gutenberg_customizer' ), true ) ) {
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
 		return;
 	}
 
-	$initializer_name = 'gutenberg_customizer' === $hook ? 'initializeCustomizer' : 'initialize';
+	$initializer_name = 'initialize';
 
 	$settings = array_merge(
 		gutenberg_get_common_block_editor_settings(),
