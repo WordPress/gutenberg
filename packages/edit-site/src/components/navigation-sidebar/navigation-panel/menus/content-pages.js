@@ -48,9 +48,8 @@ export default function ContentPagesMenu() {
 		[ searchQuery ]
 	);
 
-	const isLoading = ! search && ! isResolved;
 	const shouldShowLoadingForDebouncing = search && isDebouncing;
-	const showLoading = isLoading || shouldShowLoadingForDebouncing;
+	const showLoading = ! isResolved || shouldShowLoadingForDebouncing;
 
 	return (
 		<NavigationMenu
