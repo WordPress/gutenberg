@@ -22,7 +22,7 @@ import {
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { isReusableBlock, getBlockVariations } from '@wordpress/blocks';
+import { getBlockVariations } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -1520,7 +1520,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					? `${ blockName }/${ match.name }`
 					: blockName;
 				const insert = { name: id };
-				if ( isReusableBlock( block ) ) {
+				if ( blockName === 'core/block' ) {
 					insert.ref = attributes.ref;
 					id += '/' + attributes.ref;
 				}
