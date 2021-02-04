@@ -21,7 +21,12 @@ const HR = ( { getStylesFromColorScheme, style, ...props } ) => {
 		: {};
 
 	return (
-		<View style={ styles.container }>
+		<View
+			style={ {
+				marginTop: style?.marginTop,
+				marginBottom: style?.marginBottom,
+			} }
+		>
 			<Hr
 				{ ...props }
 				lineStyle={ {

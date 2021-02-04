@@ -39,8 +39,9 @@ function SeparatorEdit( props ) {
 	// enforced against existing top and bottom margins.
 	useEffect( () => {
 		if (
-			marginTopValue < currentMinMargin ||
-			marginBottomValue < currentMinMargin
+			( marginTopValue || marginBottomValue ) &&
+			( marginTopValue < currentMinMargin ||
+				marginBottomValue < currentMinMargin )
 		) {
 			const topValue = Math.max( marginTopValue, currentMinMargin );
 			const bottomValue = Math.max( marginBottomValue, currentMinMargin );

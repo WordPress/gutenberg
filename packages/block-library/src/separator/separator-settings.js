@@ -61,7 +61,7 @@ const SeparatorSettings = ( props ) => {
 					min={ marginConstraints[ topUnit ].min }
 					max={ marginConstraints[ topUnit ].max }
 					onChange={ createHandleMarginChange( 'top' ) }
-					value={ style?.spacing?.margin?.top }
+					value={ top }
 					unit={ marginUnit } // Needed to force unit selection to update after box resizing.
 					units={ CSS_UNITS }
 					onUnitChange={ onUnitChange }
@@ -73,7 +73,7 @@ const SeparatorSettings = ( props ) => {
 					min={ marginConstraints[ bottomUnit ].min }
 					max={ marginConstraints[ bottomUnit ].max }
 					onChange={ createHandleMarginChange( 'bottom' ) }
-					value={ style?.spacing?.margin?.bottom }
+					value={ bottom }
 					unit={ marginUnit } // Needed to force unit selection to update after box resizing.
 					units={ CSS_UNITS }
 					onUnitChange={ onUnitChange }
