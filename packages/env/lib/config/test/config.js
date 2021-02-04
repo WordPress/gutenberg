@@ -366,6 +366,7 @@ describe( 'readConfig', () => {
 							'WordPress/gutenberg',
 							'WordPress/gutenberg#master',
 							'WordPress/gutenberg#5.0',
+							'WordPress/theme-experiments/tt1-blocks#f3d2c0d',
 						],
 					} )
 				)
@@ -393,6 +394,16 @@ describe( 'readConfig', () => {
 						ref: '5.0',
 						path: expect.stringMatching( /^\/.*gutenberg$/ ),
 						basename: 'gutenberg',
+					},
+					{
+						type: 'git',
+						url:
+							'https://github.com/WordPress/theme-experiments.git',
+						ref: 'f3d2c0d',
+						path: expect.stringMatching(
+							/^\/.*theme-experiments\/tt1-blocks$/
+						),
+						basename: 'tt1-blocks',
 					},
 				],
 			};
