@@ -148,10 +148,11 @@ export default function createReduxStore( key, options ) {
 				selectors = result.selectors;
 			}
 
+			const resolveSelectors = mapResolveSelectors( selectors, store );
+
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
-			const getResolveSelectors = () =>
-				mapResolveSelectors( selectors, store );
+			const getResolveSelectors = () => resolveSelectors;
 
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
@@ -185,7 +186,7 @@ export default function createReduxStore( key, options ) {
 				selectors,
 				resolvers,
 				getSelectors,
-				__experimentalGetResolveSelectors: getResolveSelectors,
+				getResolveSelectors,
 				getActions,
 				subscribe,
 			};

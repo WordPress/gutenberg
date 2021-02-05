@@ -3,6 +3,12 @@
  */
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { getPathAndQueryString } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME as editSiteStoreName } from './constants';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -90,8 +96,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	const page = yield controls.select( 'core/edit-site', 'getPage' );
-	yield controls.dispatch( 'core/edit-site', 'setPage', page );
+	const page = yield controls.select( editSiteStoreName, 'getPage' );
+	yield controls.dispatch( editSiteStoreName, 'setPage', page );
 }
 
 /**
@@ -135,7 +141,15 @@ export function setHomeTemplateId( homeTemplateId ) {
  */
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
-		page.path = `?p=${ page.context.postId }`;
+		const entity = yield controls.resolveSelect(
+			'core',
+			'getEntityRecord',
+			'postType',
+			page.context.postType || 'post',
+			page.context.postId
+		);
+
+		page.path = getPathAndQueryString( entity.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
 		'core',
@@ -173,7 +187,7 @@ export function* showHomepage() {
 	);
 
 	const { siteUrl } = yield controls.select(
-		'core/edit-site',
+		editSiteStoreName,
 		'getSettings'
 	);
 

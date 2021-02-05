@@ -3,27 +3,17 @@
  */
 import {
 	insertBlock,
-	visitAdminPage,
 	createNewPost,
 	publishPost,
 	trashAllPosts,
 	activateTheme,
 	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
-
-const visitSiteEditor = async () => {
-	const query = addQueryArgs( '', {
-		page: 'gutenberg-edit-site',
-	} ).slice( 1 );
-	await visitAdminPage( 'admin.php', query );
-	await page.waitForSelector( '.edit-site-visual-editor iframe' );
-};
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 const clickTemplateItem = async ( menus, itemName ) => {
 	await navigationPanel.open();
@@ -138,12 +128,12 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
-		await visitSiteEditor();
+		await siteEditor.visit();
 		expect( await openEntitySavePanel() ).toBe( false );
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		await visitSiteEditor();
+		await siteEditor.visit();
 		await clickTemplateItem( 'Template Parts', 'header' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
@@ -154,10 +144,10 @@ describe( 'Multi-entity editor states', () => {
 		// Wait for blocks to load.
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
+		expect( await isEntityDirty( 'Index' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', 'Front Page' );
+		await clickTemplateItem( 'Templates', 'Index' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'
@@ -165,7 +155,7 @@ describe( 'Multi-entity editor states', () => {
 		);
 		await canvas().waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
+		expect( await isEntityDirty( 'Index' ) ).toBe( false );
 
 		removeErrorMocks();
 	} );
@@ -194,7 +184,7 @@ describe( 'Multi-entity editor states', () => {
 				true
 			);
 			await saveAllEntities();
-			await visitSiteEditor();
+			await siteEditor.visit();
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(

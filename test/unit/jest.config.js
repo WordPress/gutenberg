@@ -20,6 +20,7 @@ module.exports = {
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 	],
+	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
 		'/.git/',

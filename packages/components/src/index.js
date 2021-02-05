@@ -131,7 +131,6 @@ export {
 	TreeGridItem as __experimentalTreeGridItem,
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
-export { default as __experimentalTruncate } from './truncate';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
@@ -161,6 +160,6 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 
 // Component System
 export {
-	__unstableWithNext,
-	__unstableComponentSystemProvider,
-} from './__next/context';
+	withNext as __unstableWithNext,
+	ComponentSystemProvider as __unstableComponentSystemProvider,
+} from './ui/context';
