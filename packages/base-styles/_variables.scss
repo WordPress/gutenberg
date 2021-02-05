@@ -3,6 +3,7 @@
  *
  * Please use variables from this sheet to ensure consistency across the UI.
  * Don't add to this sheet unless you're pretty sure the value will be reused in many places.
+ * For example, don't add rules to this sheet that affect block visuals. It's purely for UI.
  */
 
 @import "./colors";
@@ -43,7 +44,6 @@ $grid-unit-60: 6 * $grid-unit;		// 48px
  */
 
 $icon-size: 24px;
-$button-margin: 0.5em;
 $button-size: 36px;
 $button-size-small: 24px;
 $header-height: 60px;
