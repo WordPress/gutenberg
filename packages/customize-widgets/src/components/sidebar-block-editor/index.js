@@ -17,12 +17,10 @@ import {
 /**
  * Internal dependencies
  */
-import useCustomizeSidebarBlockEditor from './use-customize-sidebar-block-editor';
+import useSidebarBlockEditor from './use-sidebar-block-editor';
 
 export default function CustomizeSidebarBlockEditor( { sidebar } ) {
-	const [ blocks, onInput, onChange ] = useCustomizeSidebarBlockEditor(
-		sidebar
-	);
+	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 
 	return (
 		<SlotFillProvider>

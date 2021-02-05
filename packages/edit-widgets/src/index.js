@@ -20,9 +20,6 @@ import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
-import CustomizerControl from './customizer-control';
-
-let registered = false;
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -45,27 +42,6 @@ export function initialize( id, settings ) {
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);
-}
-
-export function initializeCustomizer( settings ) {
-	if ( registered ) {
-		return;
-	}
-
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
-	);
-	registerCoreBlocks( coreBlocks );
-
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
-	}
-	registerBlock( createLegacyWidget( settings ) );
-	registerBlock( widgetArea );
-
-	window.wp.customize.controlConstructor.sidebar_block_editor = CustomizerControl;
-
-	registered = true;
 }
 
 /**

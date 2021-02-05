@@ -43,6 +43,7 @@ function blockToWidget( block, existingWidget = null ) {
 function widgetToBlock( widget, existingBlock = null ) {
 	let block;
 
+	// FIXME: We'll never get it here with blocks, we need to update this.
 	if ( widget.widgetClass === 'WP_Widget_Block' ) {
 		const parsedBlocks = parse( widget.instance.content );
 		block = parsedBlocks.length
@@ -86,7 +87,7 @@ function initState( sidebar ) {
 	return state;
 }
 
-export default function useCustomizeSidebarBlockEditor( sidebar ) {
+export default function useSidebarBlockEditor( sidebar ) {
 	// TODO: Could/should optimize these data structures so that there's less
 	// array traversal. In particular, setBlocks() is a really hot path.
 

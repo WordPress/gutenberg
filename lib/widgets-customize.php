@@ -37,7 +37,6 @@ function gutenberg_widgets_customize_register( $manager ) {
 	}
 
 	$sidebars_widgets = array_merge(
-		array( 'wp_inactive_widgets' => array() ),
 		array_fill_keys( array_keys( $wp_registered_sidebars ), array() ),
 		wp_get_sidebars_widgets()
 	);

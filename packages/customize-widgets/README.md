@@ -1,0 +1,6 @@
+- Package name
+- Package description
+- Installation details
+- Usage example
+- API documentation, if applicable ([more info](#maintaining-api-documentation))
+- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
