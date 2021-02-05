@@ -25,6 +25,10 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  * @return {void}
  */
 export function* getNavigationPostForMenu( menuId ) {
+	if ( ! menuId ) {
+		return;
+	}
+
 	const stubPost = createStubPost( menuId );
 	// Persist an empty post to warm up the state
 	yield persistPost( stubPost );
