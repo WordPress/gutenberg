@@ -1,6 +1,6 @@
-# InspectorControlsSubSheet
+# BottomSheetSubSheet
 
-Inspector Controls Sub Sheet allows for adding controls inside the React Native bottom sheet settings. 
+BottomSheetSubSheet allows for adding controls inside the React Native bottom sheet settings. 
 
 ### Usage
 
