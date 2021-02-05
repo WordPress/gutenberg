@@ -25,13 +25,10 @@ function collectAllNodesFromHocFunctions( context, node ) {
 	const hocReferences = getReferences( context, hocSpecifiers );
 
 	const hocFunctionVariables = hocReferences.reduce(
-		( acc, reference ) =>
-			reference.identifier.parent &&
-			reference.identifier.parent.arguments.length > 0
+		( acc, { identifier: { parent } } ) =>
+			parent && parent.arguments && parent.arguments.length > 0
 				? acc.concat(
-						context.getDeclaredVariables(
-							reference.identifier.parent.arguments[ 0 ]
-						)
+						context.getDeclaredVariables( parent.arguments[ 0 ] )
 				  )
 				: acc,
 		[]
