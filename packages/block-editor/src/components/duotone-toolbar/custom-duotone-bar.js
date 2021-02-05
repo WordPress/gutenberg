@@ -13,13 +13,14 @@ import {
 	getValuesFromColorStops,
 } from './utils';
 
-export default function CustomGradientPicker( { value, onChange } ) {
+export default function CustomDuotoneBar( { value, onChange } ) {
 	const background = getGradientFromValues( value?.values );
 	const controlPoints = getColorStopsFromValues( value?.values );
 	const hasGradient = !! background;
 	return (
 		<div className="components-custom-duotone-picker">
 			<CustomGradientBar
+				disableInserter
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }
