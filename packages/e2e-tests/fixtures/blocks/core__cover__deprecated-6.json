@@ -35,6 +35,7 @@
         "name": "core/cover",
         "isValid": true,
         "attributes": {
+            "align": "full",
             "url": "https://example.com/some-background-image.png",
             "id": 1933,
             "hasParallax": false,
