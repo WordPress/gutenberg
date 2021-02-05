@@ -14,7 +14,7 @@ import { create, act } from 'react-test-renderer';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore } from '../../../store';
 
 const TestWrapper = withRegistryProvider( ( props ) => {
 	if ( props.setRegistry ) {
