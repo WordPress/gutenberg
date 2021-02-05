@@ -61,6 +61,7 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'@wordpress/no-store-string-literals': 'warn',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -152,18 +153,6 @@ module.exports = {
 					'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
 				message:
 					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=/^(select|dispatch|useDispatch)$/][arguments.0.type="Literal"]',
-				message:
-					'Do not use string literals for accessing stores ; import the store and use the store object instead',
-			},
-			{
-				selector:
-					'CallExpression[callee.object.name=/^controls|registry$/][callee.property.name=/^(select|dispatch)$/][arguments.0.type="Literal"]',
-				message:
-					'Do not use string literals for accessing stores ; import the store and use the store object instead',
 			},
 		],
 	},
