@@ -196,13 +196,13 @@ function gutenberg_register_core_block_styles( $block_name ) {
 }
 
 /**
- * Change the way block styles get loaded depending on their size.
+ * Change the way styles get loaded depending on their size.
  *
- * Optimizes performance and sustainability of block styles.
+ * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
  *
  * @return void
  */
-function gutenberg_optimize_block_styles_loading() {
+function gutenberg_maybe_inline_styles() {
 
 	$total_inline_limit = 20000;
 	/**
@@ -225,7 +225,7 @@ function gutenberg_optimize_block_styles_loading() {
 			// Minify styles and get their minified size if SCRIPT_DEBUG is not enabled.
 			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
 				// Get the styles and minify them by removing comments & whitespace.
-				$block_styles = gutenberg_minify_styles( file_get_contents( $wp_styles->registered[ $handle ]->extra['path'] ) );
+				$block_styles = gutenberg_get_minified_styles( file_get_contents( $wp_styles->registered[ $handle ]->extra['path'] ) );
 				// Get the styles size.
 				$styles_size = strlen( $block_styles );
 			}
@@ -276,7 +276,7 @@ function gutenberg_optimize_block_styles_loading() {
 		}
 	}
 }
-add_action( 'wp_head', 'gutenberg_optimize_block_styles_loading', 1 );
+add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Minify styles.
@@ -286,7 +286,7 @@ add_action( 'wp_head', 'gutenberg_optimize_block_styles_loading', 1 );
  * @param string $styles The styles to be minified.
  * @return string
  */
-function gutenberg_minify_styles( $styles ) {
+function gutenberg_get_minified_styles( $styles ) {
 	$re1 = '(?sx)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|/\\* (?> .*? \\*/ )';
 	$re2 = '(?six)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|\\s*+ ; \\s*+ ( } ) \\s*+|\\s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\\b ) \\s*+|( [[(:] ) \\s++|\\s++ ( [])] )|\\s++ ( : ) \\s*+(?!(?>[^{}"\']++|"(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')*+{)|^ \\s++ | \\s++ \\z|(\\s)\\s+';
 
