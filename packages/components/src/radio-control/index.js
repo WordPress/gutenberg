@@ -54,7 +54,7 @@ export default function RadioControl( {
 							aria-describedby={
 								!! help ? `${ id }__help` : undefined
 							}
-							{...props}
+							{ ...props }
 						/>
 						<label htmlFor={ `${ id }-${ index }` }>
 							{ option.label }
