@@ -24,7 +24,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @var WP_Theme_JSON
 	 */
-	private $theme = null;
+	private static $theme = null;
 
 	/**
 	 * Container for data coming from the user.
@@ -273,14 +273,14 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
 	public function get_theme_data( $theme_support_data = array() ) {
-		if ( null === $this->theme ) {
+		if ( null === self::$theme ) {
 			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
 			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			$this->theme = new WP_Theme_JSON( $theme_json_data );
+			self::$theme = new WP_Theme_JSON( $theme_json_data );
 		}
 
 		if ( empty( $theme_support_data ) ) {
-			return $this->theme;
+			return self::$theme;
 		}
 
 		/*
@@ -288,7 +288,7 @@ class WP_Theme_JSON_Resolver {
 		 * to override the ones declared via add_theme_support.
 		 */
 		$with_theme_supports = new WP_Theme_JSON( $theme_support_data );
-		$with_theme_supports->merge( $this->theme );
+		$with_theme_supports->merge( self::$theme );
 
 		return $with_theme_supports;
 	}
