@@ -27,7 +27,10 @@ const ImageEditingButton = ( {
 			source={ { uri: url } }
 			openReplaceMediaOptions={ openMediaOptions }
 			render={ ( { open, mediaOptions } ) => (
-				<TouchableWithoutFeedback onPress={ open }>
+				<TouchableWithoutFeedback
+					accessibilityLabel="Edit image"
+					onPress={ open }
+				>
 					<View style={ styles.editContainer }>
 						<View style={ styles.edit }>
 							{ mediaOptions() }
