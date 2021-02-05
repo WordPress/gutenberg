@@ -48,4 +48,13 @@
 
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
+	.block-editor-block-navigation-block-contents {
+		border-radius: 0;
+	}
+	.block-editor-block-navigation-block-select-button {
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
 }
