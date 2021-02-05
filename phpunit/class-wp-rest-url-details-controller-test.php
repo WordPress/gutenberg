@@ -128,7 +128,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// the filter `pre_http_request`.
 		$this->assertEquals(
 			array(
-				'title' => 'Example Website &mdash; - with encoded content.',
+				'title' => 'Example Website — with encoded content.',
 			),
 			$data
 		);
@@ -387,7 +387,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// data we provided via the filter.
 		$this->assertEquals(
 			array(
-				'title'    => 'Example Website &mdash; - with encoded content.',
+				'title'    => 'Example Website — with encoded content.',
 				'og_title' => 'This was manually added to the data via filter',
 			),
 			$data
