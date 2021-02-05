@@ -62,14 +62,14 @@ class ButtonEdit extends Component {
 			placeholderTextWidth: 0,
 		};
 
-		this.actions = [
+		this.linkSettingsActions = [
 			{
 				label: __( 'Remove link' ),
 				onPress: this.onClearSettings,
 			},
 		];
 
-		this.baseOptions = {
+		this.linkSettingsOptions = {
 			url: {
 				label: __( 'Button Link URL' ),
 				placeholder: __( 'Add URL' ),
@@ -85,11 +85,11 @@ class ButtonEdit extends Component {
 			},
 		};
 
-		this.modOptions = {
-			...this.baseOptions,
+		this.noFocusLinkSettingOptions = {
+			...this.linkSettingsOptions,
 			url: {
-			  ...this.baseOptions.url,
-			  autoFocus: false,
+				...this.linkSettingsOptions.url,
+				autoFocus: false,
 			},
 		};
 	}
@@ -262,11 +262,11 @@ class ButtonEdit extends Component {
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
 				hasPicker
-				actions={ this.actions }
+				actions={ this.linkSettingsActions }
 				options={
 					isCompatibleWithSettings
-						? this.baseOptions
-						: this.modOptions
+						? this.linkSettingsOptions
+						: this.noFocusLinkSettingOptions
 				}
 				showIcon={ ! isCompatibleWithSettings }
 			/>

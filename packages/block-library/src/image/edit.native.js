@@ -94,7 +94,7 @@ export class ImageEdit extends Component {
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
 
-		this.options = {
+		this.linkSettingsOptions = {
 			url: {
 				label: __( 'Image Link URL' ),
 				placeholder: __( 'Add URL' ),
@@ -385,7 +385,7 @@ export class ImageEdit extends Component {
 				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
-				options={ this.options }
+				options={ this.linkSettingsOptions }
 				showIcon={ false }
 			/>
 		);
