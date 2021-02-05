@@ -208,7 +208,7 @@ function ControlPoints( {
 							} }
 							isOpen={ isOpen }
 							position={ point.position }
-							color={ point.color.toRgbString() }
+							color={ point.color }
 							onChange={ ( newPosition ) => {
 								onChange(
 									updateControlPointPosition(
@@ -229,7 +229,7 @@ function ControlPoints( {
 										updateControlPointColor(
 											controlPoints,
 											index,
-											color
+											color.toRgbString()
 										)
 									);
 								} }
@@ -303,7 +303,7 @@ function InsertPoint( {
 								addControlPoint(
 									controlPoints,
 									insertPosition,
-									color
+									color.toRgbString()
 								)
 							);
 							setAlreadyInsertedPoint( true );
@@ -312,7 +312,7 @@ function InsertPoint( {
 								updateControlPointColorByPosition(
 									controlPoints,
 									insertPosition,
-									color
+									color.toRgbString()
 								)
 							);
 						}

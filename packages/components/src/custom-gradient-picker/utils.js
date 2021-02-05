@@ -96,7 +96,3 @@ export function getStopCssColor( colorStop ) {
 			return 'transparent';
 	}
 }
-
-export function getStopColor( colorStop ) {
-	return tinycolor( getStopCssColor( colorStop ) );
-}
