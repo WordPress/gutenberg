@@ -238,15 +238,12 @@ function gutenberg_optimize_block_styles_loading() {
 		}
 	}
 
-	// Reorder styles array based on size.
 	if ( ! empty( $styles ) ) {
+		// Reorder styles array based on size.
 		usort(
 			$styles,
 			function( $a, $b ) {
-				if ( $a['size'] === $b['size'] ) {
-					return 0;
-				}
-				return ( $a['size'] < $b['size'] ) ? -1 : 1;
+				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
 			}
 		);
 
