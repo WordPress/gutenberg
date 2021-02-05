@@ -27,6 +27,13 @@ class WP_Theme_JSON_Resolver {
 	private static $theme = null;
 
 	/**
+	 * Whether or not the theme supports theme.json.
+	 *
+	 * @var boolean
+	 */
+	private static $theme_has_support = null;
+
+	/**
 	 * Container for data coming from the user.
 	 *
 	 * @var WP_Theme_JSON
@@ -476,6 +483,19 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		return self::$user_custom_post_type_id;
+	}
+
+	/**
+	 * Whether the current theme has a theme.json file.
+	 *
+	 * @return boolean
+	 */
+	public static function theme_has_support() {
+		if ( ! isset( self::$theme_has_support ) ) {
+			self::$theme_has_support = is_readable( locate_template( 'experimental-theme.json' ) );
+		}
+
+		return self::$theme_has_support;
 	}
 
 }
