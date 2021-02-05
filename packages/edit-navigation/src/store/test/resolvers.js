@@ -24,6 +24,12 @@ jest.mock( '@wordpress/blocks', () => {
 } );
 
 describe( 'getNavigationPostForMenu', () => {
+	it( 'returns early when a menuId is not provided', () => {
+		const generator = getNavigationPostForMenu( null );
+		expect( generator.next().value ).toBeUndefined();
+		expect( generator.next().done ).toBe( true );
+	} );
+
 	it( 'gets navigation post for menu id', () => {
 		const menuId = 123;
 
