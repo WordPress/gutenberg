@@ -11,7 +11,13 @@
  * @return boolean
  */
 function gutenberg_experimental_global_styles_has_theme_json_support() {
-	return is_readable( locate_template( 'experimental-theme.json' ) );
+	static $is_readable;
+
+	if ( ! isset( $is_readable ) ) {
+		$is_readable = is_readable( locate_template( 'experimental-theme.json' ) );
+	}
+
+	return $is_readable;
 }
 
 /**
