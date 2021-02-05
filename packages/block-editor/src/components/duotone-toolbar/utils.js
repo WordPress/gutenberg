@@ -82,7 +82,7 @@ export function tinycolorToRgb( color ) {
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
- * @param {TinyColor[]} colors Array of RBG color objects.
+ * @param {string[]} colors Array of RBG color strings.
  *
  * @return {RGBValues} R, G, and B values.
  */
@@ -90,7 +90,7 @@ function getValuesFromColors( colors = [] ) {
 	const values = { r: [], g: [], b: [] };
 
 	colors.forEach( ( color ) => {
-		const { r, g, b } = tinycolorToRgb( color );
+		const { r, g, b } = tinycolorToRgb( tinycolor( color ) );
 		values.r.push( r );
 		values.g.push( g );
 		values.b.push( b );
@@ -107,7 +107,9 @@ function getValuesFromColors( colors = [] ) {
  * @return {RGBValues} R, G, and B values.
  */
 export function getValuesFromHexColors( colors = [] ) {
-	return getValuesFromColors( colors.map( tinycolor ) );
+	return getValuesFromColors(
+		colors.map( ( color ) => tinycolor( color ).toRgbString() )
+	);
 }
 
 /**
@@ -115,7 +117,7 @@ export function getValuesFromHexColors( colors = [] ) {
  *
  * @param {RGBValues} values R, G, and B values.
  *
- * @return {TinyColor[]} RGB color array.
+ * @return {string[]} RGB stringcolor array.
  */
 export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
 	// R, G, and B should all be the same length, so we only need to map over one.
@@ -124,7 +126,7 @@ export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
 			r: values.r[ i ] * 255,
 			g: values.g[ i ] * 255,
 			b: values.b[ i ] * 255,
-		} );
+		} ).toRgbString();
 	} );
 }
 
