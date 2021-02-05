@@ -22,7 +22,7 @@ import {
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';
-import '../..';
+import { store as blockEditorStore } from '../../store';
 
 const {
 	clearSelectedBlock,
@@ -180,7 +180,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getBlockRootClientId',
 					'chicken'
 				)
@@ -188,7 +188,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-block',
 					undefined
@@ -203,7 +203,7 @@ describe( 'actions', () => {
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getBlockCount' )
+				controls.select( blockEditorStore, 'getBlockCount' )
 			);
 
 			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
@@ -232,12 +232,12 @@ describe( 'actions', () => {
 			);
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getSettings' )
+				controls.select( blockEditorStore, 'getSettings' )
 			);
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getBlockRootClientId',
 					'chicken'
 				)
@@ -245,7 +245,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					undefined
@@ -254,7 +254,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next( true ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken',
 					undefined
@@ -289,7 +289,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getBlockRootClientId',
 					'chicken'
 				)
@@ -297,7 +297,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					undefined
@@ -306,7 +306,7 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next( true ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken',
 					undefined
@@ -321,7 +321,7 @@ describe( 'actions', () => {
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getBlockCount' )
+				controls.select( blockEditorStore, 'getBlockCount' )
 			);
 
 			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
@@ -390,7 +390,7 @@ describe( 'actions', () => {
 
 			expect( insertBlockGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-block',
 					'testclientid'
@@ -435,7 +435,7 @@ describe( 'actions', () => {
 			);
 
 			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getSettings' )
+				controls.select( blockEditorStore, 'getSettings' )
 			);
 
 			expect(
@@ -449,7 +449,7 @@ describe( 'actions', () => {
 				} ).value
 			).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					'testrootid'
@@ -458,7 +458,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken',
 					'testrootid'
@@ -467,7 +467,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken-ribs',
 					'testrootid'
@@ -515,7 +515,7 @@ describe( 'actions', () => {
 			);
 
 			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getSettings' )
+				controls.select( blockEditorStore, 'getSettings' )
 			);
 
 			expect(
@@ -528,7 +528,7 @@ describe( 'actions', () => {
 				} ).value
 			).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					'testrootid'
@@ -579,7 +579,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					'testrootid'
@@ -588,7 +588,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken',
 					'testrootid'
@@ -597,7 +597,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( false ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken-ribs',
 					'testrootid'
@@ -640,7 +640,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					'testrootid'
@@ -649,7 +649,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( false ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken',
 					'testrootid'
@@ -691,7 +691,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-ribs',
 					'testrootid'
@@ -700,7 +700,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( true ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken',
 					'testrootid'
@@ -709,7 +709,7 @@ describe( 'actions', () => {
 
 			expect( insertBlocksGenerator.next( false ).value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlockType',
 					'core/test-chicken-ribs',
 					'testrootid'
@@ -776,12 +776,12 @@ describe( 'actions', () => {
 
 			expect( result ).toEqual( [
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getBlockRootClientId',
 					clientId
 				),
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getTemplateLock',
 					undefined
 				),
@@ -790,7 +790,7 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds,
 				},
-				controls.select( 'core/block-editor', 'getBlockCount' ),
+				controls.select( blockEditorStore, 'getBlockCount' ),
 			] );
 		} );
 	} );
@@ -805,11 +805,7 @@ describe( 'actions', () => {
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
+				controls.select( blockEditorStore, 'getTemplateLock', 'ribs' )
 			);
 
 			expect(
@@ -834,11 +830,7 @@ describe( 'actions', () => {
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
+				controls.select( blockEditorStore, 'getTemplateLock', 'ribs' )
 			);
 
 			expect( moveBlockToPositionGenerator.next( 'all' ) ).toEqual( {
@@ -856,11 +848,7 @@ describe( 'actions', () => {
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
+				controls.select( blockEditorStore, 'getTemplateLock', 'ribs' )
 			);
 
 			expect( moveBlockToPositionGenerator.next( 'insert' ) ).toEqual( {
@@ -878,16 +866,12 @@ describe( 'actions', () => {
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
+				controls.select( blockEditorStore, 'getTemplateLock', 'ribs' )
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlocks',
 					[ 'chicken' ],
 					'chicken-ribs'
@@ -917,16 +901,12 @@ describe( 'actions', () => {
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
+				controls.select( blockEditorStore, 'getTemplateLock', 'ribs' )
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'canInsertBlocks',
 					[ 'chicken' ],
 					'chicken-ribs'
@@ -950,11 +930,7 @@ describe( 'actions', () => {
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
+				controls.select( blockEditorStore, 'getTemplateLock', 'ribs' )
 			);
 
 			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
@@ -977,12 +953,12 @@ describe( 'actions', () => {
 
 			expect( result ).toEqual( [
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getBlockRootClientId',
 					clientId
 				),
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getTemplateLock',
 					undefined
 				),
@@ -991,7 +967,7 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
-				controls.select( 'core/block-editor', 'getBlockCount' ),
+				controls.select( blockEditorStore, 'getBlockCount' ),
 			] );
 		} );
 
@@ -1002,17 +978,17 @@ describe( 'actions', () => {
 
 			expect( result ).toEqual( [
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getBlockRootClientId',
 					clientId
 				),
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getTemplateLock',
 					undefined
 				),
 				controls.select(
-					'core/block-editor',
+					blockEditorStore,
 					'getPreviousBlockClientId',
 					'myclientid'
 				),
@@ -1020,7 +996,7 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
-				controls.select( 'core/block-editor', 'getBlockCount' ),
+				controls.select( blockEditorStore, 'getBlockCount' ),
 			] );
 		} );
 	} );
@@ -1310,7 +1286,7 @@ describe( 'actions', () => {
 			expect( fulfillment.next( blockB ).value ).toEqual( {
 				args: [],
 				selectorName: 'getSelectionStart',
-				storeKey: 'core/block-editor',
+				storeKey: blockEditorStore,
 				type: '@@data/SELECT',
 			} );
 			// getSelectionStart
@@ -1388,7 +1364,7 @@ describe( 'actions', () => {
 			expect( fulfillment.next( blockB ).value ).toEqual( {
 				args: [],
 				selectorName: 'getSelectionStart',
-				storeKey: 'core/block-editor',
+				storeKey: blockEditorStore,
 				type: '@@data/SELECT',
 			} );
 			expect(
@@ -1426,7 +1402,7 @@ describe( 'actions', () => {
 	describe( 'validateBlocksToTemplate', () => {
 		let store;
 		beforeEach( () => {
-			store = createRegistry().registerStore( 'core/block-editor', {
+			store = createRegistry().registerStore( blockEditorStore, {
 				actions,
 				selectors,
 				reducer,
