@@ -18,7 +18,6 @@ import { __ } from '@wordpress/i18n';
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
 import BlockSelectionButton from '../block-list/block-selection-button.native';
-import { store as blockEditorStore } from '../../store';
 
 const EASE_IN_DURATION = 250;
 const EASE_OUT_DURATION = 80;
@@ -109,7 +108,7 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockCount,
 			getSettings,
-		} = select( blockEditorStore );
+		} = select( 'core/block-editor' );
 
 		const selectedClientId = getSelectedBlockClientId();
 
@@ -125,7 +124,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( blockEditorStore );
+		const { selectBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			onNavigateUp( clientId, initialPosition ) {

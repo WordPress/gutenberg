@@ -14,7 +14,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { store as blockEditorStore } from '../../store';
 
 const BlockCaption = ( {
 	accessible,
@@ -45,7 +44,7 @@ const BlockCaption = ( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } = select(
-			blockEditorStore
+			'core/block-editor'
 		);
 		const { caption } = getBlockAttributes( clientId ) || {};
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
@@ -61,7 +60,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { updateBlockAttributes } = dispatch( blockEditorStore );
+		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
 		return {
 			onChange: ( caption ) => {
 				updateBlockAttributes( clientId, { caption } );

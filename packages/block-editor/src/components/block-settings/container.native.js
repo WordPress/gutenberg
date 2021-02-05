@@ -13,7 +13,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './container.native.scss';
-import { store as blockEditorStore } from '../../store';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -63,15 +62,15 @@ function BottomSheetSettings( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( blockEditorStore );
-		const { getSettings } = select( blockEditorStore );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+		const { getSettings } = select( 'core/block-editor' );
 		return {
 			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { closeGeneralSidebar } = dispatch( blockEditorStore );
+		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
 			closeGeneralSidebar,

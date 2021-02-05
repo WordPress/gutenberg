@@ -14,7 +14,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import styles from './style.scss';
-import { store as blockEditorStore } from '../../store';
 
 function BlockListAppender( {
 	blockClientIds,
@@ -49,7 +48,7 @@ function BlockListAppender( {
 
 export default withSelect( ( select, { rootClientId } ) => {
 	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
-		blockEditorStore
+		'core/block-editor'
 	);
 
 	return {
