@@ -61,7 +61,7 @@ export default function Header( {
 						showTooltip: false,
 						children: __( 'Select menu' ),
 						isTertiary: true,
-						disabled: ! menus,
+						disabled: ! menus?.length,
 						__experimentalIsFocusable: true,
 					} }
 					popoverProps={ {

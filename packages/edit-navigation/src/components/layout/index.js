@@ -37,6 +37,7 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost,
 		selectMenu,
 		deleteMenu,
+		hasLoadedMenus,
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
@@ -56,7 +57,7 @@ export default function Layout( { blockEditorSettings } ) {
 
 					<div className="edit-navigation-layout">
 						<Header
-							isPending={ ! navigationPost }
+							isPending={ ! hasLoadedMenus }
 							menus={ menus }
 							selectedMenuId={ selectedMenuId }
 							onSelectMenu={ selectMenu }
@@ -78,11 +79,11 @@ export default function Layout( { blockEditorSettings } ) {
 								saveBlocks={ savePost }
 							/>
 							<Toolbar
-								isPending={ ! navigationPost }
+								isPending={ ! hasLoadedMenus }
 								navigationPost={ navigationPost }
 							/>
 							<Editor
-								isPending={ ! navigationPost }
+								isPending={ ! hasLoadedMenus }
 								blocks={ blocks }
 							/>
 							<InspectorAdditions
