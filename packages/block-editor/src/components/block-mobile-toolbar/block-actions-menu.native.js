@@ -29,6 +29,7 @@ import { useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { getMoversSetup } from '../block-mover/mover-description';
+import { store as blockEditorStore } from '../../store';
 
 const BlockActionsMenu = ( {
 	onDelete,
@@ -247,7 +248,7 @@ export default compose(
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
 			canInsertBlockType,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
@@ -290,10 +291,10 @@ export default compose(
 				removeBlocks,
 				insertBlock,
 				replaceBlocks,
-			} = dispatch( 'core/block-editor' );
+			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { getBlockSelectionEnd, getBlock } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const { createSuccessNotice } = dispatch( 'core/notices' );
 
