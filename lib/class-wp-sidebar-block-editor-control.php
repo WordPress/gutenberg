@@ -37,5 +37,6 @@ class WP_Sidebar_Block_Editor_Control extends WP_Customize_Control {
 	 * Render the widgets block editor container.
 	 */
 	public function render_content() {
+		// Render nothing.
 	}
 }
