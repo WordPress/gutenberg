@@ -41,6 +41,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
+import { store as editSiteStore } from '../../store';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -67,7 +68,7 @@ function Editor() {
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
-		} = select( 'core/edit-site' );
+		} = select( editSiteStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -77,7 +78,7 @@ function Editor() {
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			sidebarIsOpened: !! select(
 				interfaceStore
-			).getActiveComplementaryArea( 'core/edit-site' ),
+			).getActiveComplementaryArea( editSiteStore.name ),
 			settings: getSettings(),
 			templateType: postType,
 			page: getPage(),
@@ -93,7 +94,7 @@ function Editor() {
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
-	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
+	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
 	// so that they can be selected with core/editor selectors in any editor.

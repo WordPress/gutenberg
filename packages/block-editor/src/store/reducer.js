@@ -22,7 +22,7 @@ import {
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { isReusableBlock } from '@wordpress/blocks';
+import { getBlockVariations } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -1509,11 +1509,20 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'INSERT_BLOCKS':
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
-				let id = block.name;
-				const insert = { name: block.name };
-				if ( isReusableBlock( block ) ) {
-					insert.ref = block.attributes.ref;
-					id += '/' + block.attributes.ref;
+				const { attributes, name: blockName } = block;
+				const variations = getBlockVariations( blockName );
+				const match = variations?.find( ( variation ) =>
+					variation.isActive?.( attributes, variation.attributes )
+				);
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
+				let id = match?.name
+					? `${ blockName }/${ match.name }`
+					: blockName;
+				const insert = { name: id };
+				if ( blockName === 'core/block' ) {
+					insert.ref = attributes.ref;
+					id += '/' + attributes.ref;
 				}
 
 				return {

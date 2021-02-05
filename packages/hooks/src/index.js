@@ -36,6 +36,8 @@ import createHooks from './createHooks';
  * @typedef {import('./createHooks').Hooks} Hooks
  */
 
+export const defaultHooks = createHooks();
+
 const {
 	addAction,
 	addFilter,
@@ -55,7 +57,7 @@ const {
 	didFilter,
 	actions,
 	filters,
-} = createHooks();
+} = defaultHooks;
 
 export {
 	createHooks,
