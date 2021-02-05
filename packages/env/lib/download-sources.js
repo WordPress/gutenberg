@@ -142,9 +142,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 
 	log( 'Fetching the specified ref.' );
 	const remote = await repository.getRemote( 'origin' );
-	const oid = NodeGit.Oid.fromString( source.ref );
-	const ref = NodeGit.Commit.lookupPrefix( repository, oid, 6 );
-	await remote.fetch( ref, gitFetchOptions.fetchOpts );
+	await remote.fetch( source.ref, gitFetchOptions.fetchOpts );
 	await remote.disconnect();
 	try {
 		log( 'Checking out the specified ref.' );
@@ -153,14 +151,16 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 				.getReference( 'FETCH_HEAD' )
 				// Sometimes git doesn't update FETCH_HEAD for things
 				// like tags so we try another method here.
-				.catch( repository.getReference.bind( repository, ref ) ),
+				.catch(
+					repository.getReference.bind( repository, source.ref )
+				),
 			{
 				checkoutStrategy: NodeGit.Checkout.STRATEGY.FORCE,
 			}
 		);
 	} catch ( error ) {
 		log( 'Ref needs to be set as detached.' );
-		await repository.setHeadDetached( ref );
+		await repository.setHeadDetached( source.ref );
 	}
 
 	onProgress( 1 );
