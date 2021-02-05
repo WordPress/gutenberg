@@ -760,4 +760,27 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 	}
+
+	function test_get_template_part_data() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'templateParts' => array(
+					'header' => array(
+						'section' => 'Some section',
+					),
+				),
+			)
+		);
+
+		$template_parts = $theme_json->get_template_part_data();
+
+		$this->assertEqualSetsWithIndex(
+			$template_parts,
+			array(
+				'header' => array(
+					'section' => 'Some section',
+				),
+			)
+		);
+	}
 }
