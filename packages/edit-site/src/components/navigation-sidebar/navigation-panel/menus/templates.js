@@ -11,7 +11,7 @@ import {
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 
 /**
@@ -22,12 +22,10 @@ import TemplatesPostsMenu from './templates-posts';
 import {
 	MENU_ROOT,
 	MENU_TEMPLATES,
-	MENU_TEMPLATES_ALL,
 	MENU_TEMPLATES_PAGES,
 	MENU_TEMPLATES_POSTS,
 	TEMPLATES_GENERAL,
 } from '../constants';
-import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
@@ -65,10 +63,6 @@ export default function TemplatesMenu() {
 			{ ! search && (
 				<>
 					<NavigationItem
-						navigateToMenu={ MENU_TEMPLATES_ALL }
-						title={ _x( 'All', 'all templates' ) }
-					/>
-					<NavigationItem
 						navigateToMenu={ MENU_TEMPLATES_PAGES }
 						title={ __( 'Pages' ) }
 						hideIfTargetMenuEmpty
@@ -93,7 +87,6 @@ export default function TemplatesMenu() {
 
 			<TemplatesPostsMenu templates={ templates } />
 			<TemplatesPagesMenu templates={ templates } />
-			<TemplatesAllMenu templates={ templates } />
 		</NavigationMenu>
 	);
 }

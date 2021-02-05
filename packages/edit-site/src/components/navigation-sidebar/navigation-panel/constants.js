@@ -25,6 +25,5 @@ export const MENU_CONTENT_PAGES = 'content-pages';
 export const MENU_CONTENT_POSTS = 'content-posts';
 export const MENU_TEMPLATE_PARTS = 'template-parts';
 export const MENU_TEMPLATES = 'templates';
-export const MENU_TEMPLATES_ALL = 'templates-all';
 export const MENU_TEMPLATES_PAGES = 'templates-pages';
 export const MENU_TEMPLATES_POSTS = 'templates-posts';
