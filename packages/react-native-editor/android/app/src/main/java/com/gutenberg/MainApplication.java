@@ -85,7 +85,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
                     case AUDIO:
-                        rnMediaList.add(new Media(4, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        rnMediaList.add(new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
                         break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
