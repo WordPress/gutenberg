@@ -195,7 +195,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
@@ -215,6 +214,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
                 Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void mediaFilesBlockReplaceSync(
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show();
             }
 
             @Override

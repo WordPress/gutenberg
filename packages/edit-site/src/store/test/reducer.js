@@ -22,9 +22,6 @@ import {
 	setIsNavigationPanelOpened,
 	setIsInserterOpened,
 } from '../actions';
-import registerEditSiteStore from '..';
-
-registerEditSiteStore();
 
 describe( 'state', () => {
 	describe( 'preferences()', () => {

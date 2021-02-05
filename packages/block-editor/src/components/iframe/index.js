@@ -2,6 +2,8 @@
  * External dependencies
  */
 import mergeRefs from 'react-merge-refs';
+import { compact, map } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -10,9 +12,15 @@ import {
 	useState,
 	createPortal,
 	useCallback,
+	useEffect,
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import transformStyles from '../../utils/transform-styles';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -136,8 +144,34 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function updateEditorStyles( doc, styles ) {
+	if ( ! doc ) {
+		return;
+	}
+
+	const backgroundColor = window
+		.getComputedStyle( doc.body, null )
+		.getPropertyValue( 'background-color' );
+	if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
+		doc.body.classList.remove( 'is-dark-theme' );
+	} else {
+		doc.body.classList.add( 'is-dark-theme' );
+	}
+
+	const updatedStyles = transformStyles( styles, '.editor-styles-wrapper' );
+	map( compact( updatedStyles ), ( updatedStyle ) => {
+		const styleElement = doc.createElement( 'style' );
+		styleElement.innerHTML = updatedStyle;
+		doc.body.appendChild( styleElement );
+	} );
+}
+
+function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
+
+	useEffect( () => {
+		updateEditorStyles( iframeDocument, editorStyles );
+	}, [ editorStyles ] );
 
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
@@ -157,6 +191,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setHead( contentDocument, head );
 			setBodyClassName( contentDocument );
 			styleSheetsCompat( contentDocument );
+			updateEditorStyles( contentDocument, editorStyles );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 
