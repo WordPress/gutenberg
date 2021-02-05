@@ -47,10 +47,6 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 		get_template()   => get_template_directory(),
 	);
 
-	if ( 'wp_template_part' === $template_type ) {
-		$template_part_data = _gutenberg_get_template_part_info_from_theme_json();
-	}
-
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
 		if ( file_exists( $file_path ) ) {
@@ -63,10 +59,7 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 			);
 
 			if ( 'wp_template_part' === $template_type ) {
-				return _gutenberg_add_template_part_section_info(
-					$new_template_item,
-					$template_part_data
-				);
+				return _gutenberg_add_template_part_section_info( $new_template_item );
 			}
 			return $new_template_item;
 		}
@@ -97,10 +90,6 @@ function _gutenberg_get_template_files( $template_type ) {
 
 	$template_files = array();
 
-	if ( 'wp_template_part' === $template_type ) {
-		$template_part_data = _gutenberg_get_template_part_info_from_theme_json();
-	}
-
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
 		foreach ( $theme_template_files as $template_file ) {
@@ -121,10 +110,7 @@ function _gutenberg_get_template_files( $template_type ) {
 			);
 
 			if ( 'wp_template_part' === $template_type ) {
-				$template_files[] = _gutenberg_add_template_part_section_info(
-					$new_template_item,
-					$template_part_data
-				);
+				$template_files[] = _gutenberg_add_template_part_section_info( $new_template_item );
 			} else {
 				$template_files[] = $new_template_item;
 			}
@@ -135,30 +121,21 @@ function _gutenberg_get_template_files( $template_type ) {
 }
 
 /**
- * Attempts to get template parts data from theme.json.
- *
- * @return array Template part data from theme.json or empty array if not found.
- */
-function _gutenberg_get_template_part_info_from_theme_json() {
-	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
-		$template_part_data = WP_Theme_JSON_Resolver::get_theme_data()->get_template_part_data();
-		return $template_part_data;
-	}
-
-	return array();
-}
-
-/**
  * Attempts to add the template part's section information to the input template.
  *
  * @param array $template_info Template to add information to (requires 'type' and 'slug' fields).
- * @param array $theme_data Template part information from theme.json.
  *
  * @return array Template.
  */
-function _gutenberg_add_template_part_section_info( $template_info, $theme_data ) {
+function _gutenberg_add_template_part_section_info( $template_info ) {
+	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
+		$theme_data = WP_Theme_JSON_Resolver::get_theme_data()->get_template_part_data();
+	}
+
 	if ( isset( $theme_data[ $template_info['slug'] ]['section'] ) ) {
 		$template_info['section'] = gutenberg_filter_template_part_section_type( $theme_data[ $template_info['slug'] ]['section'] );
+	} else {
+		$template_info['section'] = WP_TEMPLATE_SECTION_UNCATEGORIZED;
 	}
 
 	return $template_info;

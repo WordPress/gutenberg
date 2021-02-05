@@ -48,12 +48,12 @@ class Block_Templates_Test extends WP_UnitTestCase {
 					get_stylesheet(),
 				),
 				'wp_template_section' => array(
-					'header',
+					WP_TEMPLATE_SECTION_SIDEBAR,
 				),
 			),
 		);
 		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
-		wp_set_post_terms( self::$template_part_post->ID, 'header', 'wp_template_section' );
+		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_SECTION_SIDEBAR, 'wp_template_section' );
 		wp_set_post_terms( self::$template_part_post->ID, get_stylesheet(), 'wp_theme' );
 	}
 
@@ -82,8 +82,9 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		// Test template parts.
 		$template_part = _gutenberg_build_template_result_from_file(
 			array(
-				'slug' => 'header',
-				'path' => __DIR__ . '/fixtures/template.html',
+				'slug'    => 'header',
+				'path'    => __DIR__ . '/fixtures/template.html',
+				'section' => WP_TEMPLATE_SECTION_HEADER,
 			),
 			'wp_template_part'
 		);
@@ -95,8 +96,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'header', $template_part->title );
 		$this->assertEquals( '', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
-		// TODO - update null to 'header' once tt1-blocks theme.json updated for template part section info.
-		$this->assertEquals( null, $template_part->section );
+		$this->assertEquals( WP_TEMPLATE_SECTION_HEADER, $template_part->section );
 	}
 
 	function test_gutenberg_build_template_result_from_post() {
@@ -129,7 +129,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'My Template Part', $template_part->title );
 		$this->assertEquals( 'Description of my template part', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
-		$this->assertEquals( 'header', $template_part->section );
+		$this->assertEquals( WP_TEMPLATE_SECTION_SIDEBAR, $template_part->section );
 	}
 
 	function test_inject_theme_attribute_in_content() {
@@ -184,8 +184,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( false, $template->is_custom );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		// TODO - update null to 'header' once tt1-blocks theme.json updated for template part section info.
-		$this->assertEquals( null, $template->section );
+		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part section info.
+		$this->assertEquals( WP_TEMPLATE_SECTION_UNCATEGORIZED, $template->section );
 	}
 
 	/**
@@ -210,7 +210,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( true, $template->is_custom );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		$this->assertEquals( 'header', $template->section );
+		$this->assertEquals( WP_TEMPLATE_SECTION_SIDEBAR, $template->section );
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template' ), $template_ids );
 
 		// Filter template part by section.
-		$templates    = gutenberg_get_block_templates( array( 'section' => 'header' ), 'wp_template_part' );
+		$templates    = gutenberg_get_block_templates( array( 'section' => WP_TEMPLATE_SECTION_SIDEBAR ), 'wp_template_part' );
 		$template_ids = get_template_ids( $templates );
 		// TODO - update following array result once tt1-blocks theme.json is updated for section info.
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template_part' ), $template_ids );

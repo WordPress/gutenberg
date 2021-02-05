@@ -366,6 +366,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				$changes->tax_input['wp_template_section'] = gutenberg_filter_template_part_section_type( $request['section'] );
 			} elseif ( null !== $template && ! $template->is_custom && $template->section ) {
 				$changes->tax_input['wp_template_section'] = gutenberg_filter_template_part_section_type( $template->section );
+			} elseif ( ! $template->section ) {
+				$changes->tax_input['wp_template_section'] = WP_TEMPLATE_SECTION_UNCATEGORIZED;
 			}
 		}
 
