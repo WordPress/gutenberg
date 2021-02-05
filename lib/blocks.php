@@ -256,22 +256,22 @@ function gutenberg_optimize_block_styles_loading() {
 		$total_inline_size = 0;
 
 		// Loop styles.
-		foreach ( $styles as $stylesheet ) {
+		foreach ( $styles as $style ) {
 
 			// Size check. Since styles are ordered by size, we can break the loop.
-			if ( $total_inline_size + $stylesheet['size'] > $total_inline_limit ) {
+			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
 				break;
 			}
 
 			// Get the styles if we don't already have them.
-			$stylesheet['css'] = $stylesheet['css'] ? $stylesheet['css'] : file_get_contents( $stylesheet['path'] );
+			$style['css'] = $style['css'] ? $style['css'] : file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $stylesheet['handle'] ]->src              = false;
-			$wp_styles->registered[ $stylesheet['handle'] ]->extra['after'][] = $stylesheet['css'];
+			$wp_styles->registered[ $style['handle'] ]->src              = false;
+			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
 
 			// Add the styles size to the $total_inline_size var.
-			$total_inline_size += (int) $stylesheet['size'];
+			$total_inline_size += (int) $style['size'];
 		}
 	}
 }
