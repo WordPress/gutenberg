@@ -109,6 +109,7 @@ function ControlPointButton( {
 }
 
 function ControlPoints( {
+	disableRemove,
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	value: controlPoints,
@@ -234,21 +235,23 @@ function ControlPoints( {
 									);
 								} }
 							/>
-							<Button
-								className="components-custom-gradient-picker__remove-control-point"
-								onClick={ () => {
-									onChange(
-										removeControlPoint(
-											controlPoints,
-											index
-										)
-									);
-									onClose();
-								} }
-								isLink
-							>
-								{ __( 'Remove Control Point' ) }
-							</Button>
+							{ ! disableRemove && (
+								<Button
+									className="components-custom-gradient-picker__remove-control-point"
+									onClick={ () => {
+										onChange(
+											removeControlPoint(
+												controlPoints,
+												index
+											)
+										);
+										onClose();
+									} }
+									isLink
+								>
+									{ __( 'Remove Control Point' ) }
+								</Button>
+							) }
 						</>
 					) }
 					popoverProps={ COLOR_POPOVER_PROPS }

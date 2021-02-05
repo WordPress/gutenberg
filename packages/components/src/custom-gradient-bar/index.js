@@ -149,6 +149,7 @@ export default function CustomGradientBar( {
 						/>
 					) }
 				<ControlPoints
+					disableRemove={ disableInserter }
 					gradientPickerDomRef={ gradientPickerDomRef }
 					ignoreMarkerPosition={
 						isInsertingControlPoint
