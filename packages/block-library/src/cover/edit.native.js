@@ -177,9 +177,6 @@ const Cover = ( {
 		}
 	}, [ setAttributes ] );
 
-	// sync with local media store
-	useEffect( mediaUploadSync, [] );
-
 	// initialize uploading flag to false, awaiting sync
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
 
