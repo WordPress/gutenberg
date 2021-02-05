@@ -1,52 +1,51 @@
 .edit-navigation-editor {
 	background: $white;
-	border: 1px solid #1e1e1e;
-	border-radius: 2px;
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
 	margin-top: $grid-unit-50 * 2;
 
 	.components-spinner {
 		display: block;
-		margin: 10px auto;
+		margin: $grid-unit-15 auto;
 	}
-
 
 	// The following attempts to adapt the layout of the Navigation
 	// and Link blocks to work better in the context of the Navigation Screen.
-	.block-editor-block-list__block {
+	.wp-block-navigation {
 		margin: 0;
-		padding: 12px;
 		font-size: 15px;
-	}
-
-	// This _should_ force the vertical variation. Should we just force the screen
-	// to load the vertical variant, instead of forcing it like this?
-	.wp-block-navigation__container {
-		display: block;
+		padding: $grid-unit-15;
 	}
 
 	.wp-block-navigation-link {
 		display: block;
-		align-items: baseline;
-		padding: 0;
-		cursor: text;
 
-		// The following is a really stupid way to fix the focus outlines
+		// The following attempts to fix the focus outlines
 		&.is-selected > .wp-block-navigation-link__content,
 		&.is-selected:hover > .wp-block-navigation-link__content {
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
+
 		&.block-editor-block-list__block:not([contenteditable]):focus::after {
 			display: none;
 		}
 	}
 
 	.wp-block-navigation-link__content {
-		padding: 12px;
-		border-radius: 2px;
+		padding: 0;
+		margin-bottom: 6px;//$grid-unit-05;
+		border-radius: $radius-block-ui;
 
 		&:hover {
-			box-shadow: 0 0 0 1px $gray-300;
+			box-shadow: 0 0 0 $border-width $gray-300;
 		}
+	}
+
+	.wp-block-navigation-link__label {
+		padding: $grid-unit-15;
+
+		// Without this, Links with submenus display a pointer.
+		cursor: text;
 	}
 
 	// Hide the submenu icons
@@ -58,21 +57,38 @@
 	// There's a bunch of stuff to override just to get submenus to
 	// as a normal block element.
 	.wp-block-navigation-link.has-child {
-		.wp-block-navigation__container {
-			border: none;
+		cursor: default;
+	}
+
+	// Highlight the parent while editing a child block.
+	.wp-block-navigation-link.has-child.is-editing {
+		box-shadow: 0 0 0 1px $gray-400;
+		border-radius: $radius-block-ui;
+		padding: $grid-unit-05;
+		margin: 0 0 $grid-unit-05 -$grid-unit-05;
+
+		> .wp-block-navigation__container {
 			opacity: 1;
-			position: relative;
 			visibility: visible;
-			margin: 2px 0;
-			padding-left: 18px;
+			position: relative;
+			background: transparent;
+			top: auto;
+			left: auto;
+			padding-left: $grid-unit-15;
+			min-width: auto;
 			width: 100%;
-			left: 0;
+			border: none;
+			display: block;
+
+			&::before {
+				display: none;
+			}
 		}
 	}
 
-	.block-list-appender {
-		// These numbers make no sense, but look right. I think the block-list-appender
-		// has a bunch of errant styles competing for attention.
-		margin: 6px 0 9px 3px;
+	// Add Buttons
+	.block-editor-button-block-appender.block-list-appender__toggle {
+		margin: 0;
+		padding: 0;
 	}
 }
