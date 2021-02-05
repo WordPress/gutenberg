@@ -23,7 +23,7 @@ export default function save( { attributes } ) {
 
 	const style = {
 		'--gallery-block--gutter-size':
-			gutterSize !== undefined && `${ gutterSize }px`,
+			gutterSize !== undefined ? `${ gutterSize }px` : undefined,
 	};
 
 	return (
