@@ -2,7 +2,7 @@
 	background: $white;
 	border: 1px solid #1e1e1e;
 	border-radius: 2px;
-	margin: 18px 0 0 0;
+	margin-top: $grid-unit-50 * 2;
 
 	.components-spinner {
 		display: block;

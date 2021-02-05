@@ -23,7 +23,6 @@ import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
 import Header from '../header';
 import Notices from '../notices';
-import Toolbar from '../toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
@@ -71,7 +70,6 @@ export default function Layout( { blockEditorSettings } ) {
 							settings={ {
 								...blockEditorSettings,
 								templateLock: 'all',
-								hasFixedToolbar: true,
 							} }
 							useSubRegistry={ false }
 						>
@@ -80,10 +78,6 @@ export default function Layout( { blockEditorSettings } ) {
 								saveBlocks={ savePost }
 							/>
 							<div className="navigation-editor-canvas">
-								<Toolbar
-									isPending={ ! navigationPost }
-									navigationPost={ navigationPost }
-								/>
 								<Editor
 									isPending={ ! navigationPost }
 									blocks={ blocks }
