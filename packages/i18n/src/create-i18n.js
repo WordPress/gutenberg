@@ -24,9 +24,9 @@ const DEFAULT_LOCALE_DATA = {
 
 /*
  * Regular expression that matches i18n hooks like `i18n.gettext`, `i18n.ngettext`,
- * `i18n.gettext_domain` or `i18n.ngettext_with_context`
+ * `i18n.gettext_domain` or `i18n.ngettext_with_context` or `i18n.has_translation`.
  */
-const I18N_HOOK_REGEXP = /^i18n\.(n?)gettext(_|$)/;
+const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
 
 /**
  * @typedef {(domain?: string) => LocaleData} GetLocaleData
