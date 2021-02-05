@@ -57,10 +57,7 @@ function ComplementaryAreaTab( { identifier, label, isActive } ) {
 	);
 }
 
-export default function Sidebar( { isInCustomizer } ) {
-	const isSideBarActiveByDefault =
-		SIDEBAR_ACTIVE_BY_DEFAULT && ! isInCustomizer;
-
+export default function Sidebar() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const {
 		currentArea,
@@ -171,7 +168,7 @@ export default function Sidebar( { isInCustomizer } ) {
 			scope="core/edit-widgets"
 			identifier={ currentArea }
 			icon={ cog }
-			isActiveByDefault={ isSideBarActiveByDefault }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
 				<WidgetAreas

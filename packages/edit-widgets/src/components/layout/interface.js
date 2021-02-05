@@ -37,7 +37,7 @@ const interfaceLabels = {
 	sidebar: __( 'Widgets settings' ),
 };
 
-function Interface( { blockEditorSettings, isInCustomizer } ) {
+function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const { setIsInserterOpened, closeGeneralSidebar } = useDispatch(
