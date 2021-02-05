@@ -21,6 +21,8 @@ $blocks-block__margin: 0.5em;
 	> .wp-block-button {
 		display: inline-block;
 		/*rtl:ignore*/
+		margin-left: 0;
+		/*rtl:ignore*/
 		margin-right: $blocks-block__margin;
 		margin-bottom: $blocks-block__margin;
 
