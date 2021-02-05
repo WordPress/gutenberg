@@ -124,20 +124,20 @@ const ImageComponent = ( {
 	const customWidth =
 		imageData?.width < containerSize?.width
 			? imageData?.width
-			: styles.wide.width;
+			: styles.wide?.width;
 
 	const imageContainerStyles = [
 		styles.imageContent,
 		{
 			width:
-				imageWidth === styles.wide.width ||
+				imageWidth === styles.wide?.width ||
 				( imageData &&
 					imageWidth > 0 &&
 					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},
-		resizeMode && { width: styles.wide.width },
+		resizeMode && { width: styles.wide?.width },
 		focalPoint && styles.focalPointContainer,
 	];
 

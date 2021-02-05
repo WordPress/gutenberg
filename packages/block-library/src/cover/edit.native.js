@@ -478,15 +478,17 @@ const Cover = ( {
 	return (
 		<View style={ styles.backgroundContainer }>
 			{ isSelected && (
-				<Controls
-					attributes={ attributes }
-					didUploadFail={ didUploadFail }
-					hasOnlyColorBackground={ hasOnlyColorBackground }
-					isUploadInProgress={ isUploadInProgress }
-					onClearMedia={ onClearMedia }
-					onSelectMedia={ onSelectMedia }
-					setAttributes={ setAttributes }
-				/>
+				<InspectorControls>
+					<Controls
+						attributes={ attributes }
+						didUploadFail={ didUploadFail }
+						hasOnlyColorBackground={ hasOnlyColorBackground }
+						isUploadInProgress={ isUploadInProgress }
+						onClearMedia={ onClearMedia }
+						onSelectMedia={ onSelectMedia }
+						setAttributes={ setAttributes }
+					/>
+				</InspectorControls>
 			) }
 
 			<View

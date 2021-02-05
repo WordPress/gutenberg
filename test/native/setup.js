@@ -131,3 +131,14 @@ jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
 // undefined." The private module referenced could possibly be replaced with
 // a React ref instead. We could then remove this internal mock.
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
+
+jest.doMock(
+	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
+	() => {
+		return {
+			addEventListener: jest.fn(),
+			removeEventListener: jest.fn(),
+			isScreenReaderEnabled: jest.fn( () => Promise.resolve() ),
+		};
+	}
+);

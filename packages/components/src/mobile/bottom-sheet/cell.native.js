@@ -25,7 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
-import TouchableRipple from './ripple.native.js';
+import TouchableRipple from './ripple';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
