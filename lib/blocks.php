@@ -219,14 +219,14 @@ function gutenberg_optimize_block_styles_loading() {
 	foreach ( $wp_styles->queue as $handle ) {
 		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
 			$block_styles = false;
-			$styles_size  = (int) filesize( $wp_styles->registered[ $handle ]->extra['path'] );
+			$styles_size  = filesize( $wp_styles->registered[ $handle ]->extra['path'] );
 
 			// Minify styles and get their minified size if SCRIPT_DEBUG is not enabled.
 			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
 				// Get the styles and minify them by removing comments & whitespace.
 				$block_styles = gutenberg_minify_styles( file_get_contents( $wp_styles->registered[ $handle ]->extra['path'] ) );
 				// Get the styles size.
-				$styles_size = (int) strlen( $block_styles );
+				$styles_size = strlen( $block_styles );
 			}
 
 			$styles[] = array(
