@@ -445,7 +445,7 @@ After:
 ### Enhancements
 
 - Improve the Reusable Blocks UI by relying on multi entity save flow. ([27887](https://github.com/WordPress/gutenberg/pull/27887)) ([27885](https://github.com/WordPress/gutenberg/pull/27885))
-- Show the insertion point indicator bellow the inbetween inserter. ([27842](https://github.com/WordPress/gutenberg/pull/27842))
+- Show the insertion point indicator below the inbetween inserter. ([27842](https://github.com/WordPress/gutenberg/pull/27842))
 - Add block transforms previews. ([27861](https://github.com/WordPress/gutenberg/pull/27861))
 - URL: RemoveQueryArgs should remove the ? char after removing all args. ([27812](https://github.com/WordPress/gutenberg/pull/27812))
 - Deburr the input of the Post Author and Parent Page controls when filitering results. ([26611](https://github.com/WordPress/gutenberg/pull/26611))
