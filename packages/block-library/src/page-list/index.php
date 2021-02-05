@@ -98,12 +98,15 @@ function render_nested_page_list( $nested_pages ) {
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class = array( 'wp-block-pages-list__item' );
+		$css_class = 'wp-block-pages-list__item';
 		if ( isset( $page['children'] ) ) {
-			$css_class[] = 'has-child';
+			$css_class .= ' has-child';
 		}
-		$markup .= '<li class="' . implode( ' ', $css_class ) . '">';
-		$markup .= '<a class="wp-block-pages-list__item__link" href="' . $page['link'] . '">' . $page['title'] . '</a>';
+		$markup .= '<li class="' . $css_class . '">';
+		$markup .= '<a class="wp-block-pages-list__item__link" href="' . esc_url( $page['link'] ) . '">' . wp_kses(
+			$page['title'],
+			wp_kses_allowed_html( 'post' )
+		) . '</a>';
 		if ( isset( $page['children'] ) ) {
 			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span>';
 			$markup .= '<ul class="submenu-container">' . render_nested_page_list( $page['children'] ) . '</ul>';
@@ -125,14 +128,12 @@ function nest_pages( $current_level, $children ) {
 	if ( empty( $current_level ) ) {
 		return;
 	}
-	$nested_array = array();
 	foreach ( (array) $current_level as $key => $current ) {
 		if ( isset( $children[ $key ] ) ) {
-			$current['children'] = nest_pages( $children[ $key ], $children );
+			$current_level[ $key ]['children'] = nest_pages( $children[ $key ], $children );
 		}
-		$nested_array[] = $current;
 	}
-	return $nested_array;
+	return $current_level;
 }
 
 	/**
