@@ -142,9 +142,8 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 
 	log( 'Fetching the specified ref.' );
 	const remote = await repository.getRemote( 'origin' );
-	const oid = await NodeGit.Oid.fromString( source.ref );
-	const commit = await NodeGit.Commit.lookupPrefix( repository, oid, 6 );
-	const ref = commit.sha();
+	const oid = NodeGit.Oid.fromString( source.ref );
+	const ref = NodeGit.Commit.lookupPrefix( repository, oid, 6 );
 	await remote.fetch( ref, gitFetchOptions.fetchOpts );
 	await remote.disconnect();
 	try {
