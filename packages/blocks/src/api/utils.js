@@ -11,6 +11,7 @@ import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -144,7 +145,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
 	// Attempt to find entity title if block is a template part.
 	// Require slug to request, otherwise entity is uncreated and will throw 404.
 	if ( 'core/template-part' === blockType.name && attributes.slug ) {
-		const entity = select( 'core' ).getEntityRecord(
+		const entity = select( coreStore ).getEntityRecord(
 			'postType',
 			'wp_template_part',
 			attributes.theme + '//' + attributes.slug
