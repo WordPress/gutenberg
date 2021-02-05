@@ -455,31 +455,6 @@ const Cover = ( {
 				/>
 			) }
 
-			{ isImage &&
-				url &&
-				openMediaOptionsRef.current &&
-				isParentSelected &&
-				! isUploadInProgress &&
-				! didUploadFail && (
-					<View style={ styles.imageEditButton }>
-						<ImageEditingButton
-							onSelectMediaUploadOption={ onSelectMedia }
-							openMediaOptions={ openMediaOptionsRef.current }
-							pickerOptions={ [
-								{
-									destructiveButton: true,
-									id: 'clearMedia',
-									label: __( 'Clear Media' ),
-									onPress: onClearMedia,
-									separated: true,
-									value: 'clearMedia',
-								},
-							] }
-							url={ url }
-						/>
-					</View>
-				) }
-
 			<View
 				pointerEvents="box-none"
 				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
@@ -511,6 +486,31 @@ const Cover = ( {
 					return renderContent( getMediaOptions );
 				} }
 			/>
+
+			{ isImage &&
+				url &&
+				openMediaOptionsRef.current &&
+				isParentSelected &&
+				! isUploadInProgress &&
+				! didUploadFail && (
+					<View style={ styles.imageEditButton }>
+						<ImageEditingButton
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptionsRef.current }
+							pickerOptions={ [
+								{
+									destructiveButton: true,
+									id: 'clearMedia',
+									label: __( 'Clear Media' ),
+									onPress: onClearMedia,
+									separated: true,
+									value: 'clearMedia',
+								},
+							] }
+							url={ url }
+						/>
+					</View>
+				) }
 
 			{ shouldShowFailure && (
 				<View
