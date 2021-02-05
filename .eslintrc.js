@@ -159,6 +159,12 @@ module.exports = {
 				message:
 					'Do not use string literals for accessing stores ; import the store and use the store object instead',
 			},
+			{
+				selector:
+					'CallExpression[callee.object.name=/^controls|registry$/][callee.property.name=/^(select|dispatch)$/][arguments.0.type="Literal"]',
+				message:
+					'Do not use string literals for accessing stores ; import the store and use the store object instead',
+			},
 		],
 	},
 	overrides: [
