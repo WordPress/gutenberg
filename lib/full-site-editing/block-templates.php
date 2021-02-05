@@ -140,9 +140,8 @@ function _gutenberg_get_template_files( $template_type ) {
  * @return array Template part data from theme.json or empty array if not found.
  */
 function _gutenberg_get_template_part_info_from_theme_json() {
-	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		$resolver           = new WP_Theme_JSON_Resolver();
-		$template_part_data = $resolver->get_theme_origin()->get_template_part_data();
+	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
+		$template_part_data = WP_Theme_JSON_Resolver::get_theme_data()->get_template_part_data();
 		return $template_part_data;
 	}
 
