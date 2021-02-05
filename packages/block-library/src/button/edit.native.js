@@ -87,8 +87,10 @@ class ButtonEdit extends Component {
 
 		this.modOptions = {
 			...this.baseOptions,
-			...this.baseOptions.url,
-			autoFocus: false,
+			url: {
+			  ...this.baseOptions.url,
+			  autoFocus: false,
+			},
 		};
 	}
 
