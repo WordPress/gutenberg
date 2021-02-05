@@ -14,6 +14,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useEditorFeature, ALL_BLOCKS_NAME } from '../editor/utils';
+import { store as editSiteStore } from '../../store';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -35,7 +36,7 @@ export default function ColorPalettePanel( {
 	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {
-			const baseStyles = select( 'core/edit-site' ).getSettings()
+			const baseStyles = select( editSiteStore ).getSettings()
 				.__experimentalGlobalStylesBaseStyles;
 			const basePalette =
 				get( baseStyles, [

@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 * [***] New Block: Audio
 * [**] Add support for setting heading anchors
+* [**] Make inserter long-press options "add to beginning" and "add to end" always available. [#28610]
 * [**] Disable Unsupported Block Editor for Reusable blocks
 
 #### Bug Fix
