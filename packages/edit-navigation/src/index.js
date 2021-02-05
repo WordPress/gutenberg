@@ -11,6 +11,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -46,6 +47,24 @@ function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
 		variations: undefined,
 	};
 }
+
+const removeNavigationBlockEditUnsupportedFeatures = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		if ( props.name !== 'core/navigation' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		return (
+			<BlockEdit
+				{ ...props }
+				hasSubmenuIndicatorSetting={ false }
+				hasItemJustificationControls={ false }
+				hasListViewModal={ false }
+			/>
+		);
+	},
+	'removeNavigationBlockEditUnsupportedFeatures'
+);
 
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
@@ -136,6 +155,12 @@ export function initialize( id, settings ) {
 		'core/edit-navigation/remove-navigation-block-settings-unsupported-features',
 		removeNavigationBlockSettingsUnsupportedFeatures
 	);
+
+	addFilter(
+			'editor.BlockEdit',
+			'core/edit-navigation/remove-navigation-block-edit-unsupported-features',
+			removeNavigationBlockEditUnsupportedFeatures
+		);
 
 	registerCoreBlocks();
 
