@@ -48,7 +48,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		name: option.name,
 		size: option.size,
 		style: {
-			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+			fontSize: `min( ${ option.size }px, ${ MAX_FONT_SIZE_DISPLAY } )`,
 		},
 	} ) );
 }
