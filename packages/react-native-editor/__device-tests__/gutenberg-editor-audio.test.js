@@ -17,7 +17,7 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 
 		block.click();
 
-		if ( isAndroid ) {
+		if ( isAndroid() ) {
 			await editorPage.driver.sleep( 5000 );
 		} else {
 			await editorPage.driver.sleep( 1000 );
