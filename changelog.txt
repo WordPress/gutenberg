@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 9.9.0-rc.1 =
+= 9.9.0 =
 
 ### Enhancements
 
@@ -92,6 +92,8 @@ After:
 - Fix for: [Interface Skeleton] Limit the editor width to prevent some blocks to grow infinitely wide. ([27695](https://github.com/WordPress/gutenberg/pull/27695))
 - Button component: Add margin around the dash icon. ([27461](https://github.com/WordPress/gutenberg/pull/27461))
 - Fix issue where resetBlocks can result in an incorrect block selection. ([21598](https://github.com/WordPress/gutenberg/pull/21598))
+- Fix Cover block position. ([28653](https://github.com/WordPress/gutenberg/pull/28653))
+- Add minHeightUnit to latest core/cover deprecation. ([28627](https://github.com/WordPress/gutenberg/pull/28627))
 
 ### Experiments
 
@@ -219,12 +221,7 @@ After:
 - Show text labels in block toolbars when option is set. ([26135](https://github.com/WordPress/gutenberg/pull/26135))
 - Block Directory: Filter out disallowed blocks before showing available blocks. ([25926](https://github.com/WordPress/gutenberg/pull/25926))
 
-
-
-
 = 9.8.4 =
-
-### Bug Fixes
 
 - Cover Block:
   - Fix issues causing the cover block to black out with a fixed background ([28565](https://github.com/WordPress/gutenberg/pull/28565))
@@ -232,7 +229,6 @@ After:
 - Pinned items:
   - Fix regression with pinned plugin items on mobile ([28521](https://github.com/WordPress/gutenberg/pull/28521))
   - Pinned items regression followup ([28526](https://github.com/WordPress/gutenberg/pull/28526))
-
 
 = 9.8.3 =
 
