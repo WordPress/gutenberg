@@ -1,5 +1,8 @@
 $blocks-button__height: 3.1em;
 
+// This variable is repeated across Button, Buttons, and Buttons editor styles.
+$blocks-block__margin: 0.5em;
+
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
@@ -43,15 +46,15 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-25 {
-		width: calc(25% - #{ $button-margin });
+		width: calc(25% - #{ $blocks-block__margin });
 	}
 
 	&.wp-block-button__width-50 {
-		width: calc(50% - #{ $button-margin });
+		width: calc(50% - #{ $blocks-block__margin });
 	}
 
 	&.wp-block-button__width-75 {
-		width: calc(75% - #{ $button-margin });
+		width: calc(75% - #{ $blocks-block__margin });
 	}
 
 	&.wp-block-button__width-100 {

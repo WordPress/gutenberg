@@ -186,11 +186,11 @@ describe( 'Multi-entity save flow', () => {
 			// Navigate to site editor.
 			await siteEditor.visit();
 
-			// Ensure we are on 'front-page' demo template.
+			// Ensure we are on 'index' template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.

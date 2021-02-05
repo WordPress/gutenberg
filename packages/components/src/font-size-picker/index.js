@@ -9,7 +9,7 @@ import { isNumber, isString } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
 import VisuallyHidden from '../visually-hidden';
-import { withNextComponent } from './next/';
+import { withNextComponent } from './next';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -177,4 +177,4 @@ function FontSizePicker(
 	);
 }
 
-export default withNextComponent( FontSizePicker );
+export default withNextComponent( forwardRef( FontSizePicker ) );

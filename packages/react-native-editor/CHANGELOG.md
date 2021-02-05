@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [**] Make inserter long-press options "add to beginning" and "add to end" always available. [#28610]
 
 ## 1.46.0
 * [***] New Block: Audio [#27401, #27467, #28594]

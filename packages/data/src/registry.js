@@ -112,17 +112,17 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( storeNameOrDefinition ) {
+	function resolveSelect( storeNameOrDefinition ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
 		__experimentalListeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
-			return store.__experimentalGetResolveSelectors();
+			return store.getResolveSelectors();
 		}
 
-		return parent && parent.__experimentalResolveSelect( storeName );
+		return parent && parent.resolveSelect( storeName );
 	}
 
 	/**
@@ -218,7 +218,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
-		__experimentalResolveSelect,
+		resolveSelect,
 		dispatch,
 		use,
 		register,
