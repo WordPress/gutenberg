@@ -1,3 +1,16 @@
+.block-editor-block-inspector__no-blocks,
+.block-editor-block-inspector {
+	width: 280px;
+	background: $white;
+	border-left: 1px solid $gray-300;
+	position: fixed;
+	top: 32px;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	overflow: auto;
+}
+
 .edit-navigation-inspector-additions__delete-menu-panel {
 	text-align: center;
 }
