@@ -30,8 +30,8 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		expect( html.toLowerCase() ).toBe(
 			`<!-- wp:list -->
-		<ul><li>  a</li></ul>
-		<!-- /wp:list -->`
+<ul><li>  a</li></ul>
+<!-- /wp:list -->`
 		);
 
 		// Remove list block to reset editor to clean state
