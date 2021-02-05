@@ -157,10 +157,10 @@ export function initialize( id, settings ) {
 	);
 
 	addFilter(
-			'editor.BlockEdit',
-			'core/edit-navigation/remove-navigation-block-edit-unsupported-features',
-			removeNavigationBlockEditUnsupportedFeatures
-		);
+		'editor.BlockEdit',
+		'core/edit-navigation/remove-navigation-block-edit-unsupported-features',
+		removeNavigationBlockEditUnsupportedFeatures
+	);
 
 	registerCoreBlocks();
 
