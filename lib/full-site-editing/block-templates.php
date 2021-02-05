@@ -46,11 +46,9 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 		get_stylesheet() => get_stylesheet_directory(),
 		get_template()   => get_template_directory(),
 	);
-
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
 		if ( file_exists( $file_path ) ) {
-
 			$new_template_item = array(
 				'slug'  => $slug,
 				'path'  => $file_path,
@@ -89,7 +87,6 @@ function _gutenberg_get_template_files( $template_type ) {
 	);
 
 	$template_files = array();
-
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
 		foreach ( $theme_template_files as $template_file ) {
@@ -101,7 +98,6 @@ function _gutenberg_get_template_files( $template_type ) {
 				// Subtract ending '.html'.
 				-5
 			);
-
 			$new_template_item = array(
 				'slug'  => $template_slug,
 				'path'  => $template_file,
