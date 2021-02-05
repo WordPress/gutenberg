@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockNavigationTree from './tree';
+import { store as blockEditorStore } from '../../store';
 
 function BlockNavigation( {
 	rootBlock,
@@ -55,7 +56,7 @@ export default compose(
 			getBlockHierarchyRootClientId,
 			__unstableGetBlockWithBlockTree,
 			__unstableGetBlockTree,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			rootBlocks: __unstableGetBlockTree(),
@@ -70,7 +71,7 @@ export default compose(
 	withDispatch( ( dispatch, { onSelect = noop } ) => {
 		return {
 			selectBlock( clientId ) {
-				dispatch( 'core/block-editor' ).selectBlock( clientId );
+				dispatch( blockEditorStore ).selectBlock( clientId );
 				onSelect( clientId );
 			},
 		};

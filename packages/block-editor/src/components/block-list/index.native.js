@@ -25,6 +25,7 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item.native';
+import { store as blockEditorStore } from '../../store';
 
 const BlockListContext = createContext();
 
@@ -366,7 +367,7 @@ export default compose( [
 				isBlockInsertionPointVisible,
 				getSettings,
 				getBlockHierarchyRootClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			const isStackedHorizontally = orientation === 'horizontal';
 
@@ -406,7 +407,7 @@ export default compose( [
 	),
 	withDispatch( ( dispatch ) => {
 		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		return {
@@ -457,7 +458,7 @@ const EmptyListComponentCompose = compose( [
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );

@@ -19,10 +19,11 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/get-paste-event-data';
+import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
 	const { getBlockName } = useSelect(
-		( select ) => select( 'core/block-editor' ),
+		( select ) => select( blockEditorStore ),
 		[]
 	);
 	const { getBlockType } = useSelect(
@@ -82,9 +83,9 @@ export function useClipboardHandler( ref ) {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
-	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
+	} = useSelect( ( select ) => select( blockEditorStore ), [] );
 	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 	const notifyCopy = useNotifyCopy();
 
