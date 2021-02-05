@@ -26,8 +26,9 @@ describe( 'Gutenberg Editor File Block tests', () => {
 		await editorPage.chooseMediaLibrary();
 
 		const html = await editorPage.getHtmlContent();
-		expect( testData.fileBlockPlaceholder.toLowerCase() ).toBe(
-			html.toLowerCase()
+
+		expect( html.toLowerCase() ).toBe(
+			testData.fileBlockPlaceholder.toLowerCase()
 		);
 	} );
 } );

@@ -26,8 +26,9 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 		await editorPage.chooseMediaLibrary();
 
 		const html = await editorPage.getHtmlContent();
-		expect( testData.audioBlockPlaceholder.toLowerCase() ).toBe(
-			html.toLowerCase()
+
+		expect( html.toLowerCase() ).toBe(
+			testData.audioBlockPlaceholder.toLowerCase()
 		);
 	} );
 } );
