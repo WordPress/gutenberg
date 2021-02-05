@@ -6,21 +6,6 @@
  */
 
 /**
- * Whether the current theme has a theme.json file.
- *
- * @return boolean
- */
-function gutenberg_experimental_global_styles_has_theme_json_support() {
-	static $is_readable;
-
-	if ( ! isset( $is_readable ) ) {
-		$is_readable = is_readable( locate_template( 'experimental-theme.json' ) );
-	}
-
-	return $is_readable;
-}
-
-/**
  * Returns the theme presets registered via add_theme_support, if any.
  *
  * @param array $settings Existing editor settings.
@@ -155,7 +140,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	$stylesheet = $tree->get_stylesheet( $type );
 
-	if ( ( 'all' === $type || 'block_styles' === $type ) && gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
 		// To support all themes, we added in the block-library stylesheet
 		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
 		// so that existing link colors themes used didn't break.
@@ -178,7 +163,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
 		return;
 	}
 
@@ -219,7 +204,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$resolver = new WP_Theme_JSON_Resolver();
 	$origin   = 'theme';
 	if (
-		gutenberg_experimental_global_styles_has_theme_json_support() &&
+		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_is_fse_theme()
 	) {
 		// Only lookup for the user data if we need it.
@@ -245,7 +230,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		! empty( $screen ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
-		gutenberg_experimental_global_styles_has_theme_json_support() &&
+		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_is_fse_theme()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
@@ -253,7 +238,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
-	} elseif ( gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	} elseif ( WP_Theme_JSON_Resolver::theme_has_support() ) {
 		// STEP 3 - ADD STYLES IF THEME HAS SUPPORT
 		//
 		// If we are in a block editor context, but not in edit-site,
@@ -278,7 +263,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * @return array|undefined
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
+	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
 		return;
 	}
 
