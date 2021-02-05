@@ -32,7 +32,6 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import { store as blockEditorStore } from '../../store';
 
 const MIN_COL_NUM = 3;
 
@@ -227,7 +226,7 @@ export default compose(
 			getBlockSelectionEnd,
 			getSettings,
 			canInsertBlockType,
-		} = select( blockEditorStore );
+		} = select( 'core/block-editor' );
 		const { getChildBlockNames, getBlockType } = select( blocksStore );
 
 		let destinationRootClientId = rootClientId;
@@ -264,13 +263,13 @@ export default compose(
 			clearSelectedBlock,
 			insertBlock,
 			insertDefaultBlock,
-		} = dispatch( blockEditorStore );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			showInsertionPoint() {
 				if ( ownProps.shouldReplaceBlock ) {
 					const { getBlockOrder, getBlockCount } = select(
-						blockEditorStore
+						'core/block-editor'
 					);
 
 					const count = getBlockCount();

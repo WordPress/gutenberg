@@ -9,13 +9,10 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
-
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
-import { store as blockEditorStore } from '../../store';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -65,15 +62,15 @@ function BottomSheetSettings( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( editPostStore );
-		const { getSettings } = select( blockEditorStore );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+		const { getSettings } = select( 'core/block-editor' );
 		return {
 			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { closeGeneralSidebar } = dispatch( editPostStore );
+		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
 			closeGeneralSidebar,

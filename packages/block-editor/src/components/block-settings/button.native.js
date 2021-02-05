@@ -5,7 +5,6 @@ import { createSlotFill, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { store as editPostStore } from '@wordpress/edit-post';
 
 const { Fill, Slot } = createSlotFill( 'SettingsToolbarButton' );
 
@@ -24,7 +23,7 @@ const SettingsButtonFill = ( props ) => (
 );
 
 const SettingsToolbarButton = withDispatch( ( dispatch ) => {
-	const { openGeneralSidebar } = dispatch( editPostStore );
+	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 
 	return {
 		openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),

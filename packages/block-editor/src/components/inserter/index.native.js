@@ -27,7 +27,6 @@ import {
 import styles from './style.scss';
 import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
-import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
@@ -301,7 +300,7 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
-		} = select( blockEditorStore );
+		} = select( 'core/block-editor' );
 
 		const end = getBlockSelectionEnd();
 		// `end` argument (id) can refer to the component which is removed
@@ -321,7 +320,7 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const { getSettings } = select( blockEditorStore );
+			const { getSettings } = select( 'core/block-editor' );
 
 			const {
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,

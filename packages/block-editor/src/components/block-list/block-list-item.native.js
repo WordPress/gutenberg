@@ -17,7 +17,6 @@ import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
-import { store as blockEditorStore } from '../../store';
 
 const stretchStyle = {
 	flex: 1,
@@ -175,7 +174,7 @@ export default compose( [
 				getSettings,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
-			} = select( blockEditorStore );
+			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
 			const insertionPoint = getBlockInsertionPoint();

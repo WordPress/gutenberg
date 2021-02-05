@@ -25,14 +25,10 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
-import { store as editPostStore } from '@wordpress/edit-post';
-import { store as noticesStore } from '@wordpress/notices';
-
 /**
  * Internal dependencies
  */
 import { getMoversSetup } from '../block-mover/mover-description';
-import { store as blockEditorStore } from '../../store';
 
 const BlockActionsMenu = ( {
 	onDelete,
@@ -251,7 +247,7 @@ export default compose(
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
 			canInsertBlockType,
-		} = select( blockEditorStore );
+		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
@@ -294,12 +290,12 @@ export default compose(
 				removeBlocks,
 				insertBlock,
 				replaceBlocks,
-			} = dispatch( blockEditorStore );
-			const { openGeneralSidebar } = dispatch( editPostStore );
+			} = dispatch( 'core/block-editor' );
+			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { getBlockSelectionEnd, getBlock } = select(
-				blockEditorStore
+				'core/block-editor'
 			);
-			const { createSuccessNotice } = dispatch( noticesStore );
+			const { createSuccessNotice } = dispatch( 'core/notices' );
 
 			return {
 				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),

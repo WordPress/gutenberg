@@ -17,7 +17,6 @@ import styles from './style.scss';
 import BlockMover from '../block-mover';
 import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
-import { store as blockEditorStore } from '../../store';
 
 // Defined breakpoints are used to get a point when
 // `settings` and `mover` controls should be wrapped into `BlockActionsMenu`
@@ -89,14 +88,14 @@ const BlockMobileToolbar = ( {
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockIndex } = select( blockEditorStore );
+		const { getBlockIndex } = select( 'core/block-editor' );
 
 		return {
 			order: getBlockIndex( clientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
-		const { removeBlock } = dispatch( blockEditorStore );
+		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {
 			onDelete:
 				onDelete || ( () => removeBlock( clientId, rootClientId ) ),
