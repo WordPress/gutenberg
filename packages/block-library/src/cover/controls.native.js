@@ -182,10 +182,12 @@ function Controls( {
 				{ url ? (
 					<>
 						<BottomSheet.Cell
+							accessible={ false }
 							cellContainerStyle={ [
 								styles.mediaPreview,
 								mediaBackground,
 							] }
+							onLongPress={ openMediaOptionsRef.current }
 						>
 							<View style={ styles.mediaInner }>
 								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
