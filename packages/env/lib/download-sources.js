@@ -3,10 +3,10 @@
  * External dependencies
  */
 const util = require( 'util' );
-const NodeGit = require( 'nodegit' );
 const fs = require( 'fs' );
 const got = require( 'got' );
 const path = require( 'path' );
+const simpleGit = require( 'simple-git' );
 
 /**
  * Promisified dependencies
@@ -97,73 +97,41 @@ async function downloadSource( source, options ) {
  * @param {boolean}  options.debug      True if debug mode is enabled.
  */
 async function downloadGitSource( source, { onProgress, spinner, debug } ) {
-	const log = debug
-		? ( message ) => {
-				spinner.info( `NodeGit: ${ message }` );
-				spinner.start();
-		  }
-		: () => {};
-	onProgress( 0 );
+	// const log = debug
+	// 	? ( message ) => {
+	// 			spinner.info( `NodeGit: ${ message }`);
+	// 			spinner.start();
+	// 	  }
+	// 	: () => {};
+	// onProgress( 0 );
 
-	const gitFetchOptions = {
-		fetchOpts: {
-			callbacks: {
-				transferProgress( progress ) {
-					// Fetches are finished when all objects are received and indexed,
-					// so received objects plus indexed objects should equal twice
-					// the total number of objects when done.
-					onProgress(
-						( progress.receivedObjects() +
-							progress.indexedObjects() ) /
-							( progress.totalObjects() * 2 )
-					);
-				},
-				certificateCheck: () => 0,
-				credentials: ( url, userName ) => {
-					try {
-						return NodeGit.Cred.sshKeyFromAgent( userName );
-					} catch {
-						return NodeGit.Cred.defaultNew();
-					}
-				},
-			},
-		},
-	};
+	spinner.info( 'Cloning or getting the repo.' );
+	spinner.info( source.url );
+	spinner.info( source.clonePath );
 
-	log( 'Cloning or getting the repo.' );
-	const repository = await NodeGit.Clone(
-		source.url,
-		source.clonePath,
-		gitFetchOptions
-	).catch( () => {
-		log( 'Repo already exists, get it.' );
-		return NodeGit.Repository.open( source.clonePath );
-	} );
-
-	log( 'Fetching the specified ref.' );
-	const remote = await repository.getRemote( 'origin' );
-	await remote.fetch( source.ref, gitFetchOptions.fetchOpts );
-	await remote.disconnect();
-	try {
-		log( 'Checking out the specified ref.' );
-		await repository.checkoutRef(
-			await repository
-				.getReference( 'FETCH_HEAD' )
-				// Sometimes git doesn't update FETCH_HEAD for things
-				// like tags so we try another method here.
-				.catch(
-					repository.getReference.bind( repository, source.ref )
-				),
-			{
-				checkoutStrategy: NodeGit.Checkout.STRATEGY.FORCE,
+	await simpleGit()
+		.clone( source.url, source.clonePath, {
+			'--depth': '1',
+		} )
+		.catch( ( e ) => {
+			// If the repo has already been cloned, continue to fetch it instead of failing.
+			if ( ! e.message.includes( 'is not an empty directory' ) ) {
+				throw e;
 			}
-		);
-	} catch ( error ) {
-		log( 'Ref needs to be set as detached.' );
-		await repository.setHeadDetached( source.ref );
-	}
+		} );
 
-	onProgress( 1 );
+	const git = simpleGit( { baseDir: source.clonePath } );
+
+	spinner.info( 'Fetching the specified ref.' );
+	// const remote = await repository.getRemote( 'origin' );
+	// await remote.fetch( source.ref, gitFetchOptions.fetchOpts );
+	await git.fetch();
+	await git.checkout( source.ref );
+	// TODO: do we need to use `FETCH_HEAD`?
+	// TODO: do we need to use "setHeadDetached"?
+
+	// TODO: handle progress.
+	// onProgress( 1 );
 }
 
 /**
@@ -178,7 +146,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 	const log = debug
 		? ( message ) => {
-				spinner.info( `NodeGit: ${ message }` );
+				spinner.info( message );
 				spinner.start();
 		  }
 		: () => {};
