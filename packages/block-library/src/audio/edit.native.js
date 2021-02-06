@@ -148,7 +148,9 @@ function AudioEdit( {
 				} ) => {
 					return (
 						<>
-							{ ! isCaptionSelected && getBlockControls( open ) }
+							{ ! isCaptionSelected &&
+								! isUploadInProgress &&
+								getBlockControls( open ) }
 							{ getMediaOptions() }
 							<AudioPlayer
 								isUploadInProgress={ isUploadInProgress }
