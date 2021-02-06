@@ -177,7 +177,7 @@ function ColumnsEditContainer( {
 		onChangeWidth( nextWidth, valueUnit, columnId );
 	};
 
-	const getColumnsSliders = () => {
+	const getColumnsSliders = useMemo( () => {
 		if ( ! editorSidebarOpened || ! isSelected ) {
 			return null;
 		}
@@ -219,39 +219,48 @@ function ColumnsEditContainer( {
 				/>
 			);
 		} );
-	};
+	}, [ editorSidebarOpened, isSelected, innerColumns ] );
+
+	const onChangeColumnsNum = useCallback(
+		( value ) => {
+			updateColumns( columnCount, value );
+		},
+		[ columnCount ]
+	);
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Columns Settings' ) }>
-					<RangeControl
-						label={ __( 'Number of columns' ) }
-						icon={ columns }
-						value={ columnCount }
-						onChange={ ( value ) =>
-							updateColumns( columnCount, value )
-						}
-						min={ MIN_COLUMNS_NUM }
-						max={ columnCount + 1 }
-						type="stepper"
-					/>
-					{ getColumnsSliders() }
-				</PanelBody>
-				<PanelBody>
-					<FooterMessageControl
-						label={ __(
-							'Note: Column layout may vary between themes and screen sizes'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
+			{ isSelected && (
+				<>
+					<InspectorControls>
+						<PanelBody title={ __( 'Columns Settings' ) }>
+							<RangeControl
+								label={ __( 'Number of columns' ) }
+								icon={ columns }
+								value={ columnCount }
+								onChange={ onChangeColumnsNum }
+								min={ MIN_COLUMNS_NUM }
+								max={ columnCount + 1 }
+								type="stepper"
+							/>
+							{ getColumnsSliders }
+						</PanelBody>
+						<PanelBody>
+							<FooterMessageControl
+								label={ __(
+									'Note: Column layout may vary between themes and screen sizes'
+								) }
+							/>
+						</PanelBody>
+					</InspectorControls>
+					<BlockControls>
+						<BlockVerticalAlignmentToolbar
+							onChange={ updateAlignment }
+							value={ verticalAlignment }
+						/>
+					</BlockControls>
+				</>
+			) }
 			<View style={ isSelected && styles.innerBlocksSelected }>
 				{ resizeListener }
 				{ width && (

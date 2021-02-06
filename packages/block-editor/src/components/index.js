@@ -42,6 +42,7 @@ export {
 } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export { default as JustifyToolbar } from './justify-toolbar';
 export { default as __experimentalLinkControl } from './link-control';
 export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
 export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
