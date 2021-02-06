@@ -320,7 +320,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
 
 extension Gutenberg.MediaSource {
     static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Choose from device", types: [.any])
-    static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Choose from device", types: [.image, .video, .audio, .other])
+    static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
 }
 
 //MARK: - Navigation bar
