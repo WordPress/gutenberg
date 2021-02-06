@@ -346,4 +346,18 @@ export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
 	);
 }
 
+/**
+ * Request the host app to listen to mediaFiles collection based block replacement signals
+ * in case such an event was enqueued
+ *
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
+ * @param {string} blockClientId the clientId of the block.
+ */
+export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
+	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
+		mediaFiles,
+		blockClientId
+	);
+}
+
 export default RNReactNativeGutenbergBridge;
