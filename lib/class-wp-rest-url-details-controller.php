@@ -249,7 +249,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			}
 		}
 
-		return $title;
+		return wp_strip_all_tags( $title );
 	}
 
 	/**
