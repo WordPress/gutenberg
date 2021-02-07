@@ -129,7 +129,7 @@ function SelectControl(
 								>
 									{ option.value.map( ( groupedOption, groupedOptionIndex ) => {
 										const key =
-											groupOption.id ||
+											groupedOption.id ||
 											`${ groupedOption.label }-${ groupedOption.value }-${ groupedOptionIndex }`;
 
 										return (
