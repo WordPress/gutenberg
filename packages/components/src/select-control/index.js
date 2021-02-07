@@ -126,6 +126,7 @@ function SelectControl(
 								<optgroup 
 									key={ key }
 									label={ option.label }
+									disabled={ option.disabled }
 								>
 									{ option.value.map( ( groupedOption, groupedOptionIndex ) => {
 										const key =
