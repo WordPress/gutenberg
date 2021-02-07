@@ -81,7 +81,7 @@ function SelectControl(
 		<DownArrowWrapper>
 			<Icon icon={ chevronDown } size={ 18 } />
 		</DownArrowWrapper>
-		} : <></>;
+		} : { <></> };
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
