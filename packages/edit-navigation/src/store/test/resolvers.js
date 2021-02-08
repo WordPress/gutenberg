@@ -120,7 +120,9 @@ describe( 'getNavigationPostForMenu', () => {
 			type: 'page',
 			blocks: [
 				{
-					attributes: {},
+					attributes: {
+						orientation: 'vertical',
+					},
 					clientId: expect.stringMatching( /client-id-\d+/ ),
 					innerBlocks: [
 						{
