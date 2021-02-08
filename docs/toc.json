@@ -104,6 +104,36 @@
             ] }
         ] }
     ] },
+    { "docs/designers-developers/designers/README.md": [
+		{ "docs/designers-developers/designers/block-design.md": [] },
+		{ "docs/designers-developers/designers/user-interface.md": [] },
+		{ "docs/designers-developers/designers/design-resources.md": [] },
+		{ "docs/designers-developers/designers/animation.md": [] }
+    ] },
+    { "docs/contributors/readme.md": [
+		{ "docs/contributors/develop.md": [
+			{ "docs/contributors/getting-started.md": [] },
+			{ "docs/contributors/git-workflow.md": [] },
+			{ "docs/contributors/coding-guidelines.md": [] },
+			{ "docs/contributors/testing-overview.md": [] },
+			{ "docs/contributors/grammar.md": [] },
+			{ "docs/contributors/scripts.md": [] },
+			{ "docs/contributors/managing-packages.md": [] },
+			{ "docs/contributors/release.md": [] },
+			{ "docs/contributors/native-mobile.md": [] },
+			{ "docs/contributors/getting-started-native-mobile.md": [] }
+		] },
+		{ "docs/contributors/design.md": [
+			{ "docs/contributors/the-block.md": [] },
+			{ "docs/contributors/reference.md": [] }
+		] },
+		{ "docs/contributors/document.md": [
+			{ "docs/contributors/copy-guide.md": [] }
+		] },
+		{ "docs/contributors/triage.md": [] },
+		{ "docs/contributors/localizing.md": [] },
+		{ "docs/contributors/repository-management.md": [] }
+    ] },
     { "docs/architecture/readme.md": [
 		{ "docs/architecture/key-concepts.md": [] },
 		{ "docs/architecture/data-flow.md": [] },
@@ -135,35 +165,5 @@
         { "docs/appendix/versions-in-wordpress.md": [] },
         { "docs/appendix/history.md": [] },
 		{ "docs/appendix/outreach.md": [] }
-    ] },
-    { "docs/contributors/readme.md": [
-		{ "docs/contributors/develop.md": [
-			{ "docs/contributors/getting-started.md": [] },
-			{ "docs/contributors/git-workflow.md": [] },
-			{ "docs/contributors/coding-guidelines.md": [] },
-			{ "docs/contributors/testing-overview.md": [] },
-			{ "docs/contributors/grammar.md": [] },
-			{ "docs/contributors/scripts.md": [] },
-			{ "docs/contributors/managing-packages.md": [] },
-			{ "docs/contributors/release.md": [] },
-			{ "docs/contributors/native-mobile.md": [] },
-			{ "docs/contributors/getting-started-native-mobile.md": [] }
-		] },
-		{ "docs/contributors/design.md": [
-			{ "docs/contributors/the-block.md": [] },
-			{ "docs/contributors/reference.md": [] }
-		] },
-		{ "docs/contributors/document.md": [
-			{ "docs/contributors/copy-guide.md": [] }
-		] },
-		{ "docs/contributors/triage.md": [] },
-		{ "docs/contributors/localizing.md": [] },
-		{ "docs/contributors/repository-management.md": [] }
-    ] },
-    { "docs/designers-developers/designers/README.md": [
-		{ "docs/designers-developers/designers/block-design.md": [] },
-		{ "docs/designers-developers/designers/user-interface.md": [] },
-		{ "docs/designers-developers/designers/design-resources.md": [] },
-		{ "docs/designers-developers/designers/animation.md": [] }
-	] }
+    ] }
 ]
