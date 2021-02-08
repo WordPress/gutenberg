@@ -396,7 +396,6 @@ export default compose(
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,
-			getBlockRootClientId,
 			getBlockParents,
 			getSettings,
 		} = select( 'core/block-editor' );
@@ -404,15 +403,11 @@ export default compose(
 		const parents = getBlockParents( clientId, true );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected =
-			selectedBlockClientId &&
-			selectedBlockClientId === getBlockRootClientId( clientId );
 		const isAncestorSelected =
 			selectedBlockClientId && parents.includes( selectedBlockClientId );
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
-			isParentSelected,
 			isAncestorSelected,
 			isRTL: getSettings().isRTL,
 		};

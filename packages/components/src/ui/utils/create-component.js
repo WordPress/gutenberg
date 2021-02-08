@@ -9,14 +9,14 @@ import { identity } from 'lodash';
  */
 import { View } from '../view';
 
-/* eslint-disable jsdoc/require-returns-description */
 /**
+ * Factory that creates a React component.
+ *
  * @template {import('reakit-utils/types').As} T
  * @template {import('@wp-g2/create-styles').ViewOwnProps<{}, T>} P
- * @param {import('./types').Options<T, P>} options
- * @return {import('@wp-g2/create-styles').PolymorphicComponent<T, import('@wp-g2/create-styles').PropsFromViewOwnProps<P>>}
+ * @param {import('./types').Options<T, P>} options Options to customize the component.
+ * @return {import('@wp-g2/create-styles').PolymorphicComponent<T, import('@wp-g2/create-styles').PropsFromViewOwnProps<P>>} New React component.
  */
-/* eslint-enable jsdoc/require-returns-description */
 /* eslint-disable jsdoc/no-undefined-types */
 export const createComponent = ( {
 	as,

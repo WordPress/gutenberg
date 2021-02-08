@@ -5,7 +5,7 @@ ActionItem
 
 ## ActionItem.Slot
 
-The props not referred bellow are passed to the container component.
+The props not referred below are passed to the container component.
 
 ## Props
 
@@ -33,7 +33,7 @@ Defaults to `ButtonGroup` and `Button`can be changed to `MenuGroup` and `MenuIte
 
 ## ActionItem
 
-The props not referred bellow are passed to the item component.
+The props not referred below are passed to the item component.
 
 ### name
 

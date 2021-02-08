@@ -33,7 +33,7 @@ npm ci
 ## Run
 
 ```
-npm run native start
+npm run native start:reset
 ```
 
 Runs the packager (Metro) in development mode. The packager stays running to serve the app bundle to the clients that request it.
@@ -72,7 +72,7 @@ To see a list of all of your available iOS devices, use `xcrun simctl list devic
 
 ### Troubleshooting
 
-Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to clean various caches before starting the packager. To do that, run the script: `npm run native start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `npm run native clean:install` script can be handy.
+Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to stop the metro bunder process and restart it with `npm run native start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `npm run native clean:install` script can be handy.
 
 ## Developing with Visual Studio Code
 

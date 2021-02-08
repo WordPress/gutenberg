@@ -15,6 +15,7 @@ import { useSelect } from '@wordpress/data';
  */
 import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
+import { store as blockEditorStore } from '../../store';
 
 function BlockContextualToolbar( { focusOnMount, ...props } ) {
 	const { blockType, hasParents } = useSelect( ( select ) => {
@@ -22,7 +23,7 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 			getBlockName,
 			getBlockParents,
 			getSelectedBlockClientIds,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { getBlockType } = select( blocksStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];

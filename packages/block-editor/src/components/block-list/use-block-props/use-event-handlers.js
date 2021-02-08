@@ -11,6 +11,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { SelectionStart } from '../../writing-flow';
+import { store as blockEditorStore } from '../../../store';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -33,7 +34,7 @@ export function useEventHandlers( ref, clientId ) {
 				isBlockSelected,
 				getBlockRootClientId,
 				getBlockIndex,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			return {
 				isSelected: isBlockSelected( clientId ),
@@ -44,7 +45,7 @@ export function useEventHandlers( ref, clientId ) {
 		[ clientId ]
 	);
 	const { insertDefaultBlock, removeBlock, selectBlock } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	useEffect( () => {

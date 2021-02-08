@@ -107,7 +107,6 @@ function ColumnsEditContainer( {
 	useEffect( () => {
 		if ( columnCount === 0 ) {
 			const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
-
 			updateColumns( columnCount, newColumnCount );
 		}
 	}, [] );
@@ -455,6 +454,7 @@ const ColumnsEdit = ( props ) => {
 			} = select( 'core/block-editor' );
 			const { isEditorSidebarOpened } = select( 'core/edit-post' );
 			const innerBlocks = getBlocks( clientId );
+
 			const isContentEmpty = map(
 				innerBlocks,
 				( innerBlock ) => innerBlock.innerBlocks.length
@@ -472,7 +472,7 @@ const ColumnsEdit = ( props ) => {
 				innerWidths: innerColumnsWidths,
 				hasParents: !! parents.length,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
-				editorSidebarOpened: isEditorSidebarOpened(),
+				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
 		},
 		[ clientId ]
@@ -494,6 +494,10 @@ const ColumnsEdit = ( props ) => {
 		}
 	}, [] );
 
+	const onClose = useCallback( () => {
+		setIsVisible( false );
+	}, [] );
+
 	return (
 		<>
 			<ColumnsEditContainerWrapper
@@ -506,7 +510,7 @@ const ColumnsEdit = ( props ) => {
 			/>
 			<BlockVariationPicker
 				variations={ variations }
-				onClose={ () => setIsVisible( false ) }
+				onClose={ onClose }
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>

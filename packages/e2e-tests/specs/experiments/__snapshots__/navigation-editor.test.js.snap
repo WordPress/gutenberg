@@ -1,17 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Navigation editor allows creation of a menu 1`] = `
-"<!-- wp:navigation -->
-<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/page/home\\"} /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/page/about\\"} /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/page/contact\\"} /-->
+"<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} -->
+<!-- wp:page-list /-->
 <!-- /wp:navigation -->"
 `;
 
 exports[`Navigation editor displays the first menu from the REST response when at least one menu exists 1`] = `
-"<!-- wp:navigation -->
+"<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} /-->
 
 <!-- wp:navigation-link {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/?page_id=41\\",\\"title\\":\\"\\",\\"className\\":\\"\\"} -->

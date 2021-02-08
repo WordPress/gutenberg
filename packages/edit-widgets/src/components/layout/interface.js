@@ -48,7 +48,7 @@ function Interface( { blockEditorSettings } ) {
 	const { hasSidebarEnabled, isInserterOpened } = useSelect( ( select ) => ( {
 		hasSidebarEnabled: !! select(
 			interfaceStore
-		).getActiveComplementaryArea( editWidgetsStore ),
+		).getActiveComplementaryArea( editWidgetsStore.name ),
 		isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
 	} ) );
 	const editorStylesRef = useEditorStyles( blockEditorSettings.styles );

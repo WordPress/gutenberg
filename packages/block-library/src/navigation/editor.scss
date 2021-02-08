@@ -10,18 +10,6 @@
 	margin: 0;
 }
 
-// Polish the Appender.
-.wp-block-navigation .block-list-appender {
-	display: inline-flex;
-	align-self: center;
-	width: $icon-size;
-	height: $icon-size;
-}
-
-.wp-block-navigation.is-vertical .block-list-appender {
-	margin: $grid-unit-10;
-}
-
 .wp-block-navigation__inserter-content {
 	padding: $grid-unit-20;
 }
