@@ -1070,7 +1070,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array
 	 */
-	public function get_template_part_data() {
+	public function get_template_parts() {
 		if ( ! isset( $this->theme_json['templateParts'] ) ) {
 			return array();
 		}
