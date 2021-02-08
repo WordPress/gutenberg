@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        persist-credentials: false
+        persist-credentials: true
 
     - name: Cache node modules
       uses: actions/cache@v2
@@ -61,7 +61,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        persist-credentials: false
+        persist-credentials: true
 
     - name: Cache node modules
       uses: actions/cache@v2
