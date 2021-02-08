@@ -17,10 +17,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { BottomSheet } from '@wordpress/components';
-/**
- * Internal dependencies
- */
-import NavigationHeader from '../bottom-sheet/navigation-header';
 
 const ExampleControl = () => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
@@ -32,7 +28,7 @@ const ExampleControl = () => {
 	};
 
 	const openSubSheet = () => {
-		navigation.navigate( InspectorControlsSubSheet.screenName );
+		navigation.navigate( BottomSheet.SubSheet.screenName );
 		setShowSubSheet( true );
 	};
 
@@ -52,15 +48,15 @@ const ExampleControl = () => {
 			}
 			showSheet={ showSubSheet }
 		>
-			<SafeAreaView>
-				<NavigationHeader
+			<>
+				<BottomSheet.NavigationHeader
 					screen={ 'Howdy' }
 					leftButtonOnPress={ goBack }
 				/>
 				<View paddingHorizontal={ 16 }>
 					<Text>{ 'World' }</Text>
 				</View>
-			</SafeAreaView>
+			</>
 		</BottomSheet.SubSheet>
 	);
 };
