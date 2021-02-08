@@ -630,7 +630,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 

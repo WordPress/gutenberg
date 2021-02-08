@@ -299,7 +299,7 @@ with the same node.
 
 _Parameters_
 
--   _refs_ `Array<(RefObject|RefCallback)>`: The refs to be merged.
+-   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
 
 _Returns_
 
