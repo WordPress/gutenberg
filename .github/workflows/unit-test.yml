@@ -1,13 +1,11 @@
 name: Unit Tests
 
+# Since Unit Tests are required to pass for each PR,
+# we cannot disable them for documentation-only changes.
 on:
   pull_request:
-    paths-ignore:
-    - '**.md'
   push:
     branches: [master, wp-trunk]
-    paths-ignore:
-    - '**.md'
 
 jobs:
   unit-js:

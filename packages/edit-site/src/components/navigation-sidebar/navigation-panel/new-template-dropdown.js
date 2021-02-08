@@ -21,6 +21,7 @@ import { Icon, plus } from '@wordpress/icons';
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
 import { TEMPLATES_NEW_OPTIONS } from './constants';
+import { store as editSiteStore } from '../../../store';
 
 export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
@@ -36,7 +37,7 @@ export default function NewTemplateDropdown() {
 			templates: templateEntities,
 		};
 	}, [] );
-	const { addTemplate } = useDispatch( 'core/edit-site' );
+	const { addTemplate } = useDispatch( editSiteStore );
 
 	const createTemplate = ( slug ) => {
 		const closestAvailableTemplate = getClosestAvailableTemplate(

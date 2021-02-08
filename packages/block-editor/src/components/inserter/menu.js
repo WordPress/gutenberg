@@ -18,6 +18,7 @@ import ReusableBlocksTab from './reusable-blocks-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
+import { store as blockEditorStore } from '../../store';
 
 function InserterMenu( {
 	rootClientId,
@@ -49,7 +50,7 @@ function InserterMenu( {
 	const { showPatterns, hasReusableBlocks } = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			return {

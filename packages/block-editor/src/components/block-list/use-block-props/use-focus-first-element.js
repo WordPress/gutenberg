@@ -14,6 +14,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../../utils/dom';
+import { store as blockEditorStore } from '../../../store';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -33,7 +34,7 @@ function useInitialPosition( clientId ) {
 				isMultiSelecting,
 				isNavigationMode,
 				isBlockSelected,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			if ( ! isBlockSelected( clientId ) ) {
 				return;

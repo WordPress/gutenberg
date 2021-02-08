@@ -1,12 +1,13 @@
-$blocks-button__height: 3.1em;
+// This variable is repeated across Button, Buttons, and Buttons editor styles.
+$blocks-block__margin: 0.5em;
 
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
 	color: $white;
 	background-color: #32373c;
-	border: none;
-	border-radius: $blocks-button__height / 2;
+	border: 2px solid #32373c;
+	border-radius: 9999px; // 100% causes an oval, but any explicit but really high value retains the pill shape.
 	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
@@ -43,15 +44,15 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-25 {
-		width: calc(25% - #{ $button-margin });
+		width: calc(25% - #{ $blocks-block__margin });
 	}
 
 	&.wp-block-button__width-50 {
-		width: calc(50% - #{ $button-margin });
+		width: calc(50% - #{ $blocks-block__margin });
 	}
 
 	&.wp-block-button__width-75 {
-		width: calc(75% - #{ $button-margin });
+		width: calc(75% - #{ $blocks-block__margin });
 	}
 
 	&.wp-block-button__width-100 {
@@ -75,12 +76,12 @@ $blocks-button__height: 3.1em;
 
 .is-style-outline > .wp-block-button__link,
 .wp-block-button__link.is-style-outline {
-	border: 2px solid;
+	border: 2px solid currentColor;
 }
 
 .is-style-outline > .wp-block-button__link:not(.has-text-color),
 .wp-block-button__link.is-style-outline:not(.has-text-color) {
-	color: #32373c;
+	color: currentColor;
 }
 
 .is-style-outline > .wp-block-button__link:not(.has-background),

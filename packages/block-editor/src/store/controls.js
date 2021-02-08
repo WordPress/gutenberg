@@ -3,6 +3,11 @@
  */
 import { createRegistryControl } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../store';
+
 export const __unstableMarkAutomaticChangeFinalControl = function () {
 	return {
 		type: 'MARK_AUTOMATIC_CHANGE_FINAL_CONTROL',
@@ -24,7 +29,7 @@ const controls = {
 			} = window;
 			requestIdleCallback( () =>
 				registry
-					.dispatch( 'core/block-editor' )
+					.dispatch( blockEditorStore )
 					.__unstableMarkAutomaticChangeFinal()
 			);
 		}

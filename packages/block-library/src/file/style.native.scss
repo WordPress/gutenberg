@@ -18,6 +18,10 @@
 	padding-right: $grid-unit-20;
 }
 
+.disabledButton {
+	opacity: 0.45;
+}
+
 .uploadFailedText {
 	color: #fff;
 	font-size: 14;

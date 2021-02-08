@@ -32,6 +32,7 @@ import { focus } from '@wordpress/dom';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Returns true if the user is using windows.
@@ -54,7 +55,7 @@ function selector( select ) {
 		getClientIdsOfDescendants,
 		canInsertBlockType,
 		getBlockName,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
@@ -94,7 +95,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
@@ -111,9 +112,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		[ clientId, rootClientId ]
 	);
 	const { index, name, attributes, blockMovingMode, orientation } = selected;
-	const { setNavigationMode, removeBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
 	// Focus the breadcrumb in navigation mode.
@@ -142,7 +141,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		clearSelectedBlock,
 		setBlockMovingClientId,
 		moveBlockToPosition,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;

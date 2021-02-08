@@ -33,6 +33,7 @@ import {
 	getPresetVariable,
 } from './utils';
 import getGlobalStyles from './global-styles-renderer';
+import { store as editSiteStore } from '../../store';
 
 const EMPTY_CONTENT = { isGlobalStylesUserThemeJSON: true };
 const EMPTY_CONTENT_STRING = JSON.stringify( EMPTY_CONTENT );
@@ -134,10 +135,10 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const { blockTypes, settings } = useSelect( ( select ) => {
 		return {
 			blockTypes: select( blocksStore ).getBlockTypes(),
-			settings: select( 'core/edit-site' ).getSettings(),
+			settings: select( editSiteStore ).getSettings(),
 		};
 	} );
-	const { updateSettings } = useDispatch( 'core/edit-site' );
+	const { updateSettings } = useDispatch( editSiteStore );
 
 	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 

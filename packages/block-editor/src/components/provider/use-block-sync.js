@@ -11,6 +11,11 @@ import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
  * A function to call when the block value has been updated in the block-editor
  * store.
  *
@@ -80,8 +85,8 @@ export default function useBlockSync( {
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-	} = registry.dispatch( 'core/block-editor' );
-	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
+	} = registry.dispatch( blockEditorStore );
+	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -161,7 +166,7 @@ export default function useBlockSync( {
 			getSelectionEnd,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
-		} = registry.select( 'core/block-editor' );
+		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
 		let isPersistent = isLastBlockChangePersistent();
