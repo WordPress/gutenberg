@@ -171,7 +171,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
 
 	$resolver = new WP_Theme_JSON_Resolver();
-	$all      = $resolver->get_origin( $theme_support_data );
+	$all      = $resolver->get_merged_data( $theme_support_data );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -210,7 +210,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
-	$tree = $resolver->get_origin( $theme_support_data, $origin );
+	$tree = $resolver->get_merged_data( $theme_support_data, $origin );
 
 	// STEP 1: ADD FEATURES
 	//
@@ -234,7 +234,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_is_fse_theme()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = $resolver->get_origin( $theme_support_data, 'theme' )->get_raw_data();
+		$base_styles = $resolver->get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
