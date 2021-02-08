@@ -26,6 +26,11 @@
 		opacity: 0.1;
 	}
 
+	// Show more opaque in dark themes.
+	.is-dark-theme .is-selected & {
+		opacity: 0.4;
+	}
+
 	// Use the first link to set the height.
 	> .wp-social-link {
 		// Use !important to keep the selector simple.
