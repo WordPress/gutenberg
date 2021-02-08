@@ -120,6 +120,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 			'--depth': '1',
 			'--no-single-branch': null,
 		} );
+		await git.cwd( source.clonePath );
 	}
 
 	log( 'Fetching the specified ref.' );
