@@ -103,8 +103,8 @@ class WP_Theme_JSON {
 	 * }
 	 */
 	const SCHEMA = array(
-		'pageTemplates' => null,
-		'styles'        => array(
+		'customTemplates' => null,
+		'styles'          => array(
 			'border'     => array(
 				'radius' => null,
 				'color'  => null,
@@ -135,7 +135,7 @@ class WP_Theme_JSON {
 				'textTransform'  => null,
 			),
 		),
-		'settings'      => array(
+		'settings'        => array(
 			'border'     => array(
 				'customRadius' => null,
 				'customColor'  => null,
@@ -1056,11 +1056,11 @@ class WP_Theme_JSON {
 	 *
 	 * @return array
 	 */
-	public function get_page_templates() {
-		if ( ! isset( $this->theme_json['pageTemplates'] ) ) {
+	public function get_custom_templates() {
+		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
 			return array();
 		} else {
-			return $this->theme_json['pageTemplates'];
+			return $this->theme_json['customTemplates'];
 		}
 	}
 
