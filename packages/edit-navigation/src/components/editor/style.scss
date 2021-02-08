@@ -9,8 +9,8 @@
 		margin: $grid-unit-15 auto;
 	}
 
-	// The following attempts to adapt the layout of the Navigation
-	// and Link blocks to work better in the context of the Navigation Screen.
+	// Adapt the layout of the Navigation and Link blocks
+	// to work better in the context of the Navigation Screen.
 	.wp-block-navigation {
 		margin: 0;
 		font-size: 15px;
@@ -20,7 +20,7 @@
 	.wp-block-navigation-link {
 		display: block;
 
-		// The following attempts to fix the focus outlines
+		// Fix focus outlines
 		&.is-selected > .wp-block-navigation-link__content,
 		&.is-selected:hover > .wp-block-navigation-link__content {
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -33,7 +33,7 @@
 
 	.wp-block-navigation-link__content {
 		padding: 0;
-		margin-bottom: 6px;//$grid-unit-05;
+		margin-bottom: 6px;
 		border-radius: $radius-block-ui;
 
 		&:hover {
