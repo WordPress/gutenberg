@@ -29,21 +29,6 @@ const menusFixture = [
 	},
 ];
 
-const pagesFixture = [
-	{
-		title: 'Home',
-		slug: 'home',
-	},
-	{
-		title: 'About',
-		slug: 'about',
-	},
-	{
-		title: 'Contact',
-		slug: 'contact',
-	},
-];
-
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
 const REST_MENUS_ROUTES = [
@@ -53,10 +38,6 @@ const REST_MENUS_ROUTES = [
 const REST_MENU_ITEMS_ROUTES = [
 	'/__experimental/menu-items',
 	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
-];
-const REST_PAGES_ROUTES = [
-	'/wp/v2/pages',
-	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
 
 /**
@@ -99,28 +80,12 @@ function assignMockMenuIds( menus ) {
 		: [];
 }
 
-function createMockPages( pages ) {
-	return pages.map( ( { title, slug }, index ) => ( {
-		id: index + 1,
-		type: 'page',
-		link: `https://this/is/a/test/page/${ slug }`,
-		title: {
-			rendered: title,
-			raw: title,
-		},
-	} ) );
-}
-
 function getMenuMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_MENUS_ROUTES, responsesByMethod );
 }
 
 function getMenuItemMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_MENU_ITEMS_ROUTES, responsesByMethod );
-}
-
-function getPagesMocks( responsesByMethod ) {
-	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -143,8 +108,6 @@ describe( 'Navigation editor', () => {
 	} );
 
 	it( 'allows creation of a menu', async () => {
-		const pagesResponse = createMockPages( pagesFixture );
-
 		const menuResponse = {
 			id: 4,
 			description: '',
@@ -158,7 +121,6 @@ describe( 'Navigation editor', () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: [] } ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: pagesResponse } ),
 		] );
 		await visitNavigationEditor();
 
@@ -172,7 +134,6 @@ describe( 'Navigation editor', () => {
 				POST: menuResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: pagesResponse } ),
 		] );
 
 		// Add a new menu.
