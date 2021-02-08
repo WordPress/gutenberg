@@ -2,7 +2,12 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { View, Platform, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	LayoutAnimation,
+	Platform,
+	TouchableWithoutFeedback,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -291,6 +296,24 @@ export class BlockList extends Component {
 		);
 	}
 
+	setAnimation = () => {
+		LayoutAnimation.configureNext( {
+			duration: 250,
+			update: {
+				type: LayoutAnimation.Types.easeInEaseOut,
+				springDamping: 0.7,
+			},
+		} );
+		LayoutAnimation.configureNext( {
+			duration: 250,
+			create: {
+				type: LayoutAnimation.Types.easeIn,
+				property: LayoutAnimation.Properties.scaleY,
+				springDamping: 0.7,
+			},
+		} );
+	};
+
 	renderItem( { item: clientId } ) {
 		const {
 			contentResizeMode,
@@ -304,6 +327,7 @@ export class BlockList extends Component {
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 		const { blockWidth } = this.state;
+		this.setAnimation();
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
