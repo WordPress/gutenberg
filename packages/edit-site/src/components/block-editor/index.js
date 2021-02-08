@@ -70,9 +70,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 
 	useMouseMoveTypingReset( ref );
-	// This updates the host document styles.
-	// It is necessary to make sure the preset CSS Custom Properties
-	// are in scope for the sidebar UI controls that use them.
+	// Ideally this should be moved to the place where the styles are applied (iframe)
 	const editorStylesRef = useEditorStyles( settings.styles );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
@@ -114,7 +112,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
-					editorStyles={ settings.styles }
 					head={ window.__editorStyles.html }
 					ref={ ref }
 					contentRef={ contentRef }
