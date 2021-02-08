@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import mergeRefs from 'react-merge-refs';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -114,7 +119,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					style={ resizedCanvasStyles }
 					head={ window.__editorStyles.html }
 					ref={ ref }
-					contentRef={ contentRef }
+					contentRef={ useCallback(
+						mergeRefs( [ contentRef, editorStylesRef ] ),
+						[]
+					) }
 				>
 					<Canvas body={ contentRef } styles={ settings.styles } />
 				</Iframe>

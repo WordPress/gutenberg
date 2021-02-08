@@ -142,19 +142,24 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 
 		function setDocumentIfReady() {
 			const { contentDocument } = node;
-			const { readyState } = contentDocument;
+			const { readyState, body } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
-			contentRef.current = contentDocument.body;
 			setIframeDocument( contentDocument );
 			setHead( contentDocument, head );
 			setBodyClassName( contentDocument );
 			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
+
+			if ( typeof contentRef === 'function' ) {
+				contentRef( body );
+			} else if ( contentRef ) {
+				contentRef.current = body;
+			}
 
 			return true;
 		}

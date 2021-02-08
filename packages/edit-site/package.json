@@ -52,6 +52,7 @@
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",
 		"lodash": "^4.17.19",
+		"react-merge-refs": "^1.0.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
