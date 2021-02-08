@@ -212,8 +212,7 @@ describe( 'DOM', () => {
 				width: 50,
 				height: 50,
 			};
-			const iframe = document.createElement( 'iframe' );
-			const offsettedRect = offsetIframe( rect, iframe.ownerDocument );
+			const offsettedRect = offsetIframe( rect, parent.ownerDocument );
 
 			expect( offsettedRect ).toEqual( rect );
 		} );
