@@ -44,9 +44,9 @@ export function SidebarComplementaryAreaFills() {
 		<>
 			<DefaultSidebar
 				identifier={ sidebarName }
-				title={ __( 'Block Inspector' ) }
+				title={ __( 'Settings' ) }
 				icon={ cog }
-				closeLabel={ __( 'Close block inspector sidebar' ) }
+				closeLabel={ __( 'Close settings sidebar' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar__panel-tabs"
 			>
