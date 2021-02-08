@@ -480,7 +480,11 @@ const ColumnsEdit = ( props ) => {
 
 	const memoizedInnerWidths = useMemo( () => {
 		return innerWidths;
-	}, [ JSON.stringify( innerWidths ) ] );
+	}, [
+		// The JSON.stringify is used because innerWidth is always a new reference.
+		// The innerBlocks is a new reference after each attribute change of any nested block.
+		JSON.stringify( innerWidths ),
+	] );
 
 	const [ isVisible, setIsVisible ] = useState( false );
 
