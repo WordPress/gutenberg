@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { I18nManager } from 'react-native';
+import { I18nManager, UIManager } from 'react-native';
 
 /**
  * Internal dependencies
@@ -24,6 +24,9 @@ const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
 	// eslint-disable-next-line no-console
 	console.disableYellowBox = true;
+
+	UIManager.setLayoutAnimationEnabledExperimental &&
+		UIManager.setLayoutAnimationEnabledExperimental( true );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 };
