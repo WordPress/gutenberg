@@ -761,7 +761,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_get_template_part_data() {
+	function test_get_template_parts {
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'templateParts' => array(
