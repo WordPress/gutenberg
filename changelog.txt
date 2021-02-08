@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 9.9.1 =
+
+### Bug fixes
+
+- Global Styles: enqueue preset classes in the front-end.
+- Global Styles: load styles in iframed site editor.
+
+
 = 9.9.0 =
 
 ### Enhancements
