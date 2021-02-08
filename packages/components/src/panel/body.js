@@ -3,12 +3,11 @@
  */
 import classnames from 'classnames';
 import { noop } from 'lodash';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -77,7 +76,7 @@ export function PanelBody(
 	} );
 
 	return (
-		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
+		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				icon={ icon }
 				isOpened={ isOpened }
