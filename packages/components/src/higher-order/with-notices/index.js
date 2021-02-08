@@ -24,8 +24,8 @@ import NoticeList from '../../notice/list';
 export default createHigherOrderComponent( ( OriginalComponent ) => {
 	let isForwardRef;
 	const { render } = OriginalComponent;
-	// Returns a forwardRef if OriginalComponent is a forwardRef
-	if ( typeof render === 'function' && render.length === 2 ) {
+	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
+	if ( typeof render === 'function' ) {
 		isForwardRef = true;
 		return forwardRef( Component );
 	}
