@@ -1362,6 +1362,8 @@ export function initialPosition( state, action ) {
 		'START_TYPING',
 		'MARK_AUTOMATIC_CHANGE',
 		'MARK_AUTOMATIC_CHANGE_FINAL',
+		'SHOW_INSERTION_POINT',
+		'HIDE_INSERTION_POINT',
 	];
 
 	if (

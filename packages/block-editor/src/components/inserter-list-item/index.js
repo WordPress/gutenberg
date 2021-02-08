@@ -83,7 +83,7 @@ function InserterListItem( {
 						disabled={ item.isDisabled }
 						onClick={ ( event ) => {
 							event.preventDefault();
-							onSelect( item );
+							onSelect( item, event.metaKey );
 							onHover( null );
 						} }
 						onFocus={ () => {

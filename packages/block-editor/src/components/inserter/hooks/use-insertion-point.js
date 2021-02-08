@@ -106,7 +106,7 @@ function useInsertionPoint( {
 	} = useDispatch( blockEditorStore );
 
 	const onInsertBlocks = useCallback(
-		( blocks, meta ) => {
+		( blocks, meta, shouldForceFocusBlock = false ) => {
 			const selectedBlock = getSelectedBlock();
 
 			if (
@@ -118,7 +118,7 @@ function useInsertionPoint( {
 					selectedBlock.clientId,
 					blocks,
 					null,
-					shouldFocusBlock ? 0 : undefined,
+					shouldFocusBlock || shouldForceFocusBlock ? 0 : undefined,
 					meta
 				);
 			} else {
@@ -126,7 +126,7 @@ function useInsertionPoint( {
 					blocks,
 					destinationIndex,
 					destinationRootClientId,
-					shouldFocusBlock,
+					shouldFocusBlock || shouldForceFocusBlock,
 					meta
 				);
 			}
@@ -153,6 +153,7 @@ function useInsertionPoint( {
 			destinationRootClientId,
 			destinationIndex,
 			onSelect,
+			shouldFocusBlock,
 		]
 	);
 

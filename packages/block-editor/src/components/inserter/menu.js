@@ -67,8 +67,8 @@ function InserterMenu( {
 	);
 
 	const onInsert = useCallback(
-		( blocks ) => {
-			onInsertBlocks( blocks );
+		( blocks, meta, shouldForceFocusBlock ) => {
+			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
 			onSelect();
 		},
 		[ onInsertBlocks, onSelect ]
