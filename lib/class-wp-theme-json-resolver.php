@@ -351,7 +351,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds user data.
 	 */
-	private static function get_user_origin() {
+	public static function get_user_data() {
 		if ( null !== self::$user ) {
 			return self::$user;
 		}
@@ -415,7 +415,7 @@ class WP_Theme_JSON_Resolver {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_data() );
 			$result->merge( $this->get_theme_data( $theme_support_data ) );
-			$result->merge( self::get_user_origin() );
+			$result->merge( self::get_user_data() );
 			return $result;
 		}
 
@@ -427,7 +427,7 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		if ( 'user' === $origin ) {
-			return self::get_user_origin();
+			return self::get_user_data();
 		}
 
 		if ( 'theme' === $origin ) {
