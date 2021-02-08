@@ -8,6 +8,11 @@ import {
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
 /**
@@ -211,7 +216,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		return {
 			canInsertBlockType: _canInsertBlockType,
@@ -226,7 +231,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		moveBlocksToPosition,
 		updateBlockAttributes,
 		clearSelectedBlock,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	return {
 		onDrop: onBlockDrop(

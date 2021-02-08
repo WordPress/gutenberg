@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import { store as blockEditorStore } from '../../store';
 
 function InserterLibrary( {
 	rootClientId,
@@ -25,7 +26,7 @@ function InserterLibrary( {
 } ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( 'core/block-editor' );
+			const { getBlockRootClientId } = select( blockEditorStore );
 
 			return (
 				rootClientId || getBlockRootClientId( clientId ) || undefined
