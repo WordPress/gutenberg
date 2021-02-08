@@ -10,13 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import Cell from '../bottom-sheet/cell';
-import NavigationHeader from '../bottom-sheet/navigation-header';
-import SubSheet from '../bottom-sheet/sub-sheet';
+import { BottomSheet } from '@wordpress/components';
 
 const BottomSheetSelectControl = ( {
 	label,
@@ -44,14 +38,14 @@ const BottomSheetSelectControl = ( {
 	};
 
 	const openSubSheet = () => {
-		navigation.navigate( SubSheet.screenName );
+		navigation.navigate( BottomSheet.SubSheet.screenName );
 		setShowSubSheet( true );
 	};
 
 	return (
-		<SubSheet
+		<BottomSheet.SubSheet
 			navigationButton={
-				<Cell
+				<BottomSheet.Cell
 					label={ label }
 					separatorType="none"
 					value={ selectedOption.label }
@@ -65,18 +59,18 @@ const BottomSheetSelectControl = ( {
 					) }
 				>
 					<Icon icon={ chevronRight }></Icon>
-				</Cell>
+				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }
 		>
 			<>
-				<NavigationHeader
+				<BottomSheet.NavigationHeader
 					screen={ label }
 					leftButtonOnPress={ goBack }
 				/>
 				<View paddingHorizontal={ 16 }>
 					{ items.map( ( item, index ) => (
-						<Cell
+						<BottomSheet.Cell
 							customActionButton
 							separatorType="none"
 							label={ item.label }
@@ -98,11 +92,11 @@ const BottomSheetSelectControl = ( {
 							{ item.value === selectedValue && (
 								<Icon icon={ check }></Icon>
 							) }
-						</Cell>
+						</BottomSheet.Cell>
 					) ) }
 				</View>
 			</>
-		</SubSheet>
+		</BottomSheet.SubSheet>
 	);
 };
 
