@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import mergeRefs from 'react-merge-refs';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -24,6 +19,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { DropZoneProvider, Popover } from '@wordpress/components';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -118,10 +114,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					style={ resizedCanvasStyles }
 					head={ window.__editorStyles.html }
 					ref={ ref }
-					contentRef={ useCallback(
-						mergeRefs( [ contentRef, editorStylesRef ] ),
-						[]
-					) }
+					contentRef={ useMergeRefs( [
+						contentRef,
+						editorStylesRef,
+					] ) }
 				>
 					<Canvas body={ contentRef } />
 				</Iframe>
