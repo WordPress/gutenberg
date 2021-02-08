@@ -26,6 +26,11 @@
 	}
 }
 
+// foo
+.is-missing-link {
+	border: solid 1px red;
+}
+
 // Styles for submenu flyout
 .has-child {
 	> .wp-block-navigation-link__content {
@@ -159,4 +164,10 @@
 			transform: rotate(90deg);
 		}
 	}
+}
+
+.wp-block-navigation-link__popover-link-input {
+	max-width: 360px;
+	min-width: auto;
+	width: 90vw;
 }
