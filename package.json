@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.9.0-rc.1",
+	"version": "9.9.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -20,7 +20,7 @@
 	},
 	"config": {
 		"GUTENBERG_PHASE": 2,
-		"COMPONENT_SYSTEM_PHASE": 0
+		"COMPONENT_SYSTEM_PHASE": 1
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",

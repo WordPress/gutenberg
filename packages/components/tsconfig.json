@@ -15,10 +15,10 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/flex/**/*",
 		"src/tip/**/*",
-		"src/truncate/**/*",
+		"src/ui/**/*",
 		"src/utils/**/*",
-		"src/view/**/*",
 		"src/visually-hidden/**/*",
 		"src/text/**/*",
 		"src/grid/**/*",
@@ -30,6 +30,7 @@
 		"src/**/*.native.js",
 		"src/**/react-native-*",
 		"src/**/stories",
-		"src/**/test"
+		"src/**/test",
+		"src/ui/font-size-control"
 	]
 }

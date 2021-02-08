@@ -17,4 +17,5 @@ const Text = styled.p(
 	text
 );
 
+// @ts-ignore Text _is_ forwarded ref but the styled component definition doesn't include $$typeof so we'll just ignore it here
 export default withNextComponent( Text );

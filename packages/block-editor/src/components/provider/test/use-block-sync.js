@@ -14,6 +14,7 @@ import { create, act } from 'react-test-renderer';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
+import { store as blockEditorStore } from '../../../store';
 
 const TestWrapper = withRegistryProvider( ( props ) => {
 	if ( props.setRegistry ) {
@@ -175,11 +176,11 @@ describe( 'useBlockSync hook', () => {
 		} );
 
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		const newBlockValue = registry
-			.select( 'core/block-editor' )
+			.select( blockEditorStore )
 			.getBlocks( 'test' );
 		replaceInnerBlocks.mockClear();
 
@@ -247,10 +248,10 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a non-persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.__unstableMarkNextChangeAsNotPersistent();
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( onInput ).toHaveBeenCalledWith(
@@ -286,7 +287,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( onChange ).toHaveBeenCalledWith(
@@ -381,7 +382,7 @@ describe( 'useBlockSync hook', () => {
 		replaceInnerBlocks.mockClear();
 
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
@@ -424,7 +425,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		const updatedBlocks1 = [
@@ -459,7 +460,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
 		// The first callback should not have been called.
@@ -516,7 +517,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
 		// The first callback should never be called in this scenario.

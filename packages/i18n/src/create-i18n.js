@@ -22,7 +22,6 @@ const DEFAULT_LOCALE_DATA = {
 	},
 };
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
  * Merges locale data into the Tannin instance by domain. Accepts data in a
@@ -77,7 +76,6 @@ const DEFAULT_LOCALE_DATA = {
 /**
  * @typedef {{ applyFilters: (hookName:string, ...args: unknown[]) => unknown}} ApplyFiltersInterface
  */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * An i18n instance
@@ -156,16 +154,15 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {GetFilterDomain} */
-	const getFilterDomain = ( domain ) => {
-		if ( typeof domain === 'undefined' ) {
-			return 'default';
-		}
-		return domain;
-	};
+	const getFilterDomain = ( domain = 'default' ) => domain;
 
 	/** @type {__} */
 	const __ = ( text, domain ) => {
 		let translation = dcnpgettext( domain, undefined, text );
+		if ( ! hooks ) {
+			return translation;
+		}
+
 		/**
 		 * Filters text with its translation.
 		 *
@@ -173,9 +170,6 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		 * @param {string} text        Text to translate.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		if ( typeof hooks === 'undefined' ) {
-			return translation;
-		}
 		translation = /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext',
@@ -197,6 +191,10 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/** @type {_x} */
 	const _x = ( text, context, domain ) => {
 		let translation = dcnpgettext( domain, context, text );
+		if ( ! hooks ) {
+			return translation;
+		}
+
 		/**
 		 * Filters text with its translation based on context information.
 		 *
@@ -205,9 +203,6 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		 * @param {string} context     Context information for the translators.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		if ( typeof hooks === 'undefined' ) {
-			return translation;
-		}
 		translation = /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext_with_context',
@@ -237,9 +232,10 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			plural,
 			number
 		);
-		if ( typeof hooks === 'undefined' ) {
+		if ( ! hooks ) {
 			return translation;
 		}
+
 		/**
 		 * Filters the singular or plural form of a string.
 		 *
@@ -280,9 +276,10 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			plural,
 			number
 		);
-		if ( typeof hooks === 'undefined' ) {
+		if ( ! hooks ) {
 			return translation;
 		}
+
 		/**
 		 * Filters the singular or plural form of a string with gettext context.
 		 *

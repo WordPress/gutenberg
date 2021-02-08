@@ -32,11 +32,12 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const isIOS = Platform.OS === 'ios';
 
 	const cancelButtonStyle = usePreferredColorSchemeStyle(

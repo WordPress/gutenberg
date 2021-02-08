@@ -124,19 +124,21 @@ export default function ButtonsEdit( {
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<ContentJustificationDropdown
-								toggleProps={ toggleProps }
-								value={ contentJustification }
-								onChange={ onChangeContentJustification }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
-			</BlockControls>
+			{ isSelected && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<ContentJustificationDropdown
+									toggleProps={ toggleProps }
+									value={ contentJustification }
+									onChange={ onChangeContentJustification }
+								/>
+							) }
+						</ToolbarItem>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }

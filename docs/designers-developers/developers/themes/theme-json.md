@@ -2,35 +2,114 @@
 
 > **These features are still experimental**. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 >
-> Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please, be welcome to share yours in the weekly #core-editor chats as well as async via the Github issues and Pull Requests.
+> Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please, be welcomed to share yours in the weekly #core-editor chats as well as async via the Github issues and Pull Requests.
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
 - Rationale
     - Settings can be controlled per block
-    - CSS Custom Properties: presets & custom
     - Some block styles are managed
+    - CSS Custom Properties: presets & custom
 - Specification
     - Settings
     - Styles
+- FAQ
+  - The naming schema of CSS Custom Properties
+  - Why using -- as a separator?
+  - How settings under "custom" create new CSS Custom Properties
 
 ## Rationale
 
-The Block Editor surface API has evolved at different velocities, and it's now at a point where is showing some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
+The Block Editor API has evolved at different velocities and there are some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
 
-This describes the current efforts to consolidate the various APIs into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
+This describes the current efforts to consolidate the various APIs related to styles into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
 
 ### Settings can be controlled per block
 
-The Block Editor already allows the control of specific settings such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control at a block level.
+The Block Editor already allows the control of specific settings such as alignment, drop cap, presets available, etc. All of these work at the block level. By using the `experimental-theme.json` we aim to allow themes to control these at a block level.
 
-### CSS Custom Properties
+Examples of what can be achieved are:
 
-Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) become CSS Custom Properties, and will be enqueued by the system for themes to use in both the front-end and the editors. There's also a mechanism to create your own CSS Custom Properties.
+- Use a particular preset for a block (e.g.: table) but the common one for the rest of blocks.
+- Enable font size UI controls for all blocks that support it but the headings block.
+- etc.
 
 ### Some block styles are managed
 
-By providing the block style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS), reducing the amount of CSS loaded in the page and preventing specificity wars due to the competing needs of the components involved (themes, blocks, plugins).
+By using the `experimental-theme.json` file to set style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS). For example, if a theme and a user set the font size for paragraphs, we only enqueue the style coming from the user and not the theme's.
+
+Some of the advantages are:
+
+- Reduce the amount of CSS enqueued. 
+- Prevent specificity wars.
+
+### CSS Custom Properties
+
+There are some areas of styling that would benefit from having shared values that can change across a site instantly.
+
+To address this need, we've started to experiment with CSS Custom Properties, aka CSS Variables, in some places:
+
+- **Presets**: [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
+
+{% codetabs %}
+{% Input %}
+```json
+{
+  "settings": {
+    "defaults": {
+      "color": {
+        "palette": [
+          {
+            "name": "Black",
+            "slug": "black",
+            "color": "#000000"
+          },
+          {
+            "name": "White",
+            "slug": "white",
+            "color": "#ffffff"
+          }
+        ],
+      },
+    },
+  },
+}
+```
+{% Output %}
+```css
+:root {
+  --wp--preset--color--black: #000000;
+  --wp--preset--color--white: #ffffff;
+}
+```
+{% end %}
+
+- **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
+
+{% codetabs %}
+{% Input %}
+```json
+{
+  "settings": {
+    "defaults": {
+      "custom": {
+        "line-height": {
+          "body": 1.7,
+          "heading": 1.3
+        },
+      },
+    },
+  },
+}
+```
+{% Output %}
+```css
+:root {
+  --wp--custom--line-height--body: 1.7;
+  --wp--custom--line-height--heading: 1.3;
+}
+```
+{% end %}
 
 ## Specification
 
@@ -48,7 +127,7 @@ The `experimental-theme.json` file declares how a theme wants the editor configu
 Both settings and styles can contain subsections for any registered block. As a general rule, the names of these subsections will be the block names ― we call them "block selectors". For example, the paragraph block ―whose name is `core/paragraph`― can be addressed in the settings using the key (or "block selector") `core/paragraph`:
 
 ```
-{ 
+{
   "settings": {
     "core/paragraph": { ... }
   }
@@ -58,7 +137,7 @@ Both settings and styles can contain subsections for any registered block. As a 
 There are a few cases in whiche a single block can represent different HTML markup. The heading block is one of these, as it represents h1 to h6 HTML elements. In these cases, the block will have as many block selectors as different markup variations ― `core/heading/h1`, `core/heading/h2`, etc, so they can be addressed separately:
 
 ```
-{ 
+{
   "styles": {
     "core/heading/h1": { ... },
     // ...
@@ -139,8 +218,10 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 Presets are part of the settings section. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
 
-For example, for this input:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -183,9 +264,7 @@ For example, for this input:
   }
 }
 ```
-
-The output will be:
-
+{% Output %}
 ```css
 :root {
   --wp--preset--color--strong-magenta: #a156b4;
@@ -196,6 +275,7 @@ The output will be:
   --wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);
 }
 ```
+{% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
@@ -203,8 +283,10 @@ To maintain backward compatibility, the presets declared via `add_theme_support`
 
 In addition to create CSS Custom Properties for the presets, the `experimental-theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/block>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
 
-For example, for this input:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "settings": {
@@ -221,9 +303,7 @@ For example, for this input:
   }
 }
 ```
-
-The output will be:
-
+{% Output %}
 ```css
 :root {
   --wp--custom--base-font: 16;
@@ -232,6 +312,7 @@ The output will be:
   --wp--custom--line-height--large: 1.8;
 }
 ```
+{% end %}
 
 Note that, the name of the variable is created by adding `--` in between each nesting level.
 
@@ -274,8 +355,10 @@ Each block declares which style properties it exposes via the [block supports me
 }
 ```
 
-For example, an input like this:
+For example:
 
+{% codetabs %}
+{% Input %}
 ```json
 {
   "styles": {
@@ -303,9 +386,7 @@ For example, an input like this:
   }
 }
 ```
-
-will append the following style rules to the stylesheet:
-
+{% Output %}
 ```css
 :root {
   color: var(--wp--preset--color--primary);
@@ -319,6 +400,7 @@ h4 {
   font-size: calc(1px * var(--wp--preset--font-size--normal));
 }
 ```
+{% end %}
 
 The `defaults` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
 
@@ -393,3 +475,89 @@ These are the current typography properties supported by blocks:
 | Verse | Yes | Yes | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
+
+## Frequently Asked Questions
+
+### The naming schema of CSS Custom Properties
+
+One thing you may have noticed is the naming schema used for the CSS Custom Properties the system creates, including the use of double hyphen, `--`, to separate the different "concepts". Take the following examples.
+
+**Presets** such as `--wp--preset--color--black` can be divided into the following chunks:
+
+- `--wp`: prefix to namespace the CSS variable.
+- `preset `: indicates is a CSS variable that belongs to the presets.
+- `color`: indicates which preset category the variable belongs to. It can be `color`, `font-size`, `gradients`.
+- `black`: the `slug` of the particular preset value.
+
+**Custom** properties such as `--wp--custom--line-height--body`, which can be divided into the following chunks:
+
+- `--wp`: prefix to namespace the CSS variable.
+- `custom`: indicates is a "free-form" CSS variable created by the theme.
+- `line-height--body`: the result of converting the "custom" object keys into a string.
+
+The `--` as a separator has two functions:
+
+- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+
+### Why using `--` as a separator?
+
+We could have used any other separator, such as a single `-`.
+
+However, that'd have been problematic, as it'd have been impossible to tell how `--wp-custom-line-height-template-header` should be converted back into an object, unless we force theme authors not to use `-` in their variable names.
+
+By reserving `--` as a category separator and let theme authors use `-` for word-boundaries, the naming is clearer: `--wp--custom--line-height--template-header`.
+
+### How settings under "custom" create new CSS Custom Properties
+
+The algorithm to create CSS Variables out of the settings under the "custom" key works this way:
+
+This is for clarity, but also because we want a mechanism to parse back a variable name such `--wp--custom--line-height--body` to its object form in theme.json. We use the same separation for presets.
+
+For example:
+
+{% codetabs %}
+{% Input %}
+```json
+{
+  "settings": {
+    "defaults": {
+      "custom": {
+        "lineHeight": {
+          "body": 1.7
+        },
+        "font-primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
+      },
+    },
+  },
+}
+```
+{% Output %}
+```css
+:root {
+  --wp--custom--line-height--body: 1.7;
+  --wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
+}
+```
+{% end %}
+
+A few notes about this process:
+
+- `camelCased` keys are transformed into its `kebab-case` form, as to follow the CSS property naming schema. Example: `lineHeight` is transformed into `line-height`.
+- Keys at different depth levels are separated by `--`. That's why `line-height` and `body` are separated by `--`.
+- You shouldn't use `--` in the names of the keys within the `custom` object. Example, **don't do** this:
+
+
+```json
+{
+  "settings": {
+    "defaults": {
+      "custom": {
+        "line--height": {
+          "body": 1.7
+        },
+      },
+    },
+  },
+}
+```
