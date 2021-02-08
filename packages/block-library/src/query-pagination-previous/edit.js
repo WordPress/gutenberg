@@ -8,23 +8,16 @@ export default function QueryPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
 } ) {
-	const placeholder = __( 'Previous Page' );
 	return (
-		<>
-			<div { ...useBlockProps() }>
-				{
-					<RichText
-						tagName="a"
-						aria-label={ __( 'Previous page link' ) }
-						placeholder={ placeholder }
-						value={ label }
-						allowedFormats={ [ 'core/bold', 'core/italic' ] }
-						onChange={ ( newLabel ) =>
-							setAttributes( { label: newLabel } )
-						}
-					/>
-				}
-			</div>
-		</>
+		<RichText
+			tagName="a"
+			aria-label={ __( 'Previous page link' ) }
+			placeholder={ __( 'Previous Page' ) }
+			value={ label }
+			withoutInteractiveFormatting
+			keepPlaceholderOnFocus
+			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
+			{ ...useBlockProps() }
+		/>
 	);
 }

@@ -8,23 +8,16 @@ export default function QueryPaginationNextEdit( {
 	attributes: { label },
 	setAttributes,
 } ) {
-	const placeholder = __( 'Next Page' );
 	return (
-		<>
-			<div { ...useBlockProps() }>
-				{
-					<RichText
-						tagName="a"
-						aria-label={ __( 'Next page link' ) }
-						placeholder={ placeholder }
-						value={ label }
-						allowedFormats={ [ 'core/bold', 'core/italic' ] }
-						onChange={ ( newLabel ) =>
-							setAttributes( { label: newLabel } )
-						}
-					/>
-				}
-			</div>
-		</>
+		<RichText
+			tagName="a"
+			aria-label={ __( 'Next page link' ) }
+			placeholder={ __( 'Next Page' ) }
+			value={ label }
+			withoutInteractiveFormatting
+			keepPlaceholderOnFocus
+			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
+			{ ...useBlockProps() }
+		/>
 	);
 }
