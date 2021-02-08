@@ -16,30 +16,13 @@ import {
 } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
+import { offsetIframe } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
 import { getBlockDOMNode } from '../../utils/dom';
-
-function offsetIframe( rect, ownerDocument ) {
-	const { defaultView } = ownerDocument;
-	const { frameElement } = defaultView;
-
-	if ( ! frameElement ) {
-		return rect;
-	}
-
-	const iframeRect = frameElement.getBoundingClientRect();
-
-	return new defaultView.DOMRect(
-		rect.left + iframeRect.left,
-		rect.top + iframeRect.top,
-		rect.width,
-		rect.height
-	);
-}
 
 function InsertionPointInserter( {
 	clientId,
