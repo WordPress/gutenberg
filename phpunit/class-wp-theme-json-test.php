@@ -217,12 +217,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet() {
-		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
-		// See schema at WP_Theme_JSON::SCHEMA.
+		$root_name       = WP_Theme_JSON::ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON::ALL_BLOCKS_NAME;
+
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					$root_name   => array(
+					$all_blocks_name => array(
 						'color'      => array(
 							'text'    => 'value',
 							'palette' => array(

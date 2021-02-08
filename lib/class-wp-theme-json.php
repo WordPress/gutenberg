@@ -991,7 +991,7 @@ class WP_Theme_JSON {
 
 		$metadata = $this->get_blocks_metadata();
 		foreach ( $metadata as $block_selector => $metadata ) {
-			if ( empty( $metadata['selector'] ) || empty( $metadata['supports'] ) ) {
+			if ( empty( $metadata['selector'] ) ) {
 				continue;
 			}
 
