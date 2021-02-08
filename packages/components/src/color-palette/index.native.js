@@ -76,7 +76,7 @@ function ColorPalette( {
 	const customIndicatorColor = isGradientSegment
 		? activeColor
 		: customSwatchGradients;
-	const isCustomGradientColor = isGradientColor;
+	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 
 	useEffect( () => {
 		setShouldShowCustomIndicator(
@@ -227,7 +227,7 @@ function ColorPalette( {
 			{ colors.map( ( color ) => {
 				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
 				return (
-					<View key={ color }>
+					<View key={ `${ color }-${ isSelected( color ) }` }>
 						<TouchableWithoutFeedback
 							onPress={ () => onColorPress( color ) }
 							accessibilityRole={ 'button' }
