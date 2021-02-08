@@ -186,11 +186,12 @@ export function registerBlockType( name, settings ) {
 		supports: {},
 		styles: [],
 		save: () => null,
+		...settings,
+		// Use the existing definition from the server as a source of truth.
 		...pickBy(
 			get( serverSideBlockDefinitions, name, {} ),
 			( value ) => ! isNil( value )
 		),
-		...settings,
 	};
 
 	if ( typeof name !== 'string' ) {

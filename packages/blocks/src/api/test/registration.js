@@ -350,6 +350,58 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should prefer values returned from the server', () => {
+			const blockName = 'core/test-block-prefer-server-values';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					title: 'Server',
+					description: 'Set on the server',
+					icon: 'server',
+					attributes: {
+						foo: {
+							type: 'string',
+							default: 'server',
+						},
+					},
+					keywords: [ 'server' ],
+				},
+			} );
+
+			const blockType = {
+				title: 'Client',
+				description: 'Set on the client',
+				icon: 'client',
+				attributes: {
+					foo: {
+						type: 'string',
+						default: 'client',
+					},
+				},
+				keywords: [ 'client' ],
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'Server',
+				description: 'Set on the server',
+				icon: {
+					src: 'server',
+				},
+				attributes: {
+					foo: {
+						type: 'string',
+						default: 'server',
+					},
+				},
+				providesContext: {},
+				usesContext: [],
+				keywords: [ 'server' ],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,
