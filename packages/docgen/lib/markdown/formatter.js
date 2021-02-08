@@ -108,9 +108,9 @@ module.exports = (
 				'Related',
 				getSymbolTagsByName( symbol, 'see', 'link' ),
 				( tag ) =>
-					`\n- ${ cleanSpaces(
-						`${ tag.name } ${ tag.description }`
-					) }`,
+					`\n- ${ tag.name.trim() }${
+						tag.description ? ' ' : ''
+					}${ tag.description.trim() }`,
 				docs
 			);
 			formatExamples( getSymbolTagsByName( symbol, 'example' ), docs );

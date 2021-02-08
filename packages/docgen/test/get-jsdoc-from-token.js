@@ -44,14 +44,14 @@ describe( 'JSDoc', () => {
 				},
 				{
 					tag: 'param',
-					description: 'The second param to add.',
+					description: 'The second param to add.\n',
 					type: 'number',
 					name: 'secondParam',
 				},
 				{
 					tag: 'example',
 					description:
-						'```js\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```',
+						' \n\n```js\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```\n',
 				},
 				{
 					tag: 'return',

@@ -27,7 +27,10 @@ module.exports = ( token ) => {
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
 				return {
 					...tag,
-					description: tag.description.trim(),
+					description:
+						tag.description === '\n'
+							? tag.description.trim()
+							: tag.description,
 				};
 			} );
 		}
