@@ -105,5 +105,9 @@ describe( 'JSDoc', () => {
 				},
 			],
 		} );
+
+		expect(
+			getJSDocFromToken( { leadingComments: [ { value: '' } ] } )
+		).toBeUndefined();
 	} );
 } );

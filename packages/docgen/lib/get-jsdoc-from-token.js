@@ -23,12 +23,14 @@ module.exports = ( token ) => {
 		jsdoc = commentParser.parse( `/*${ comments }*/`, {
 			spacing: 'preserve',
 		} )[ 0 ];
-		jsdoc.tags = jsdoc.tags.map( ( tag ) => {
-			return {
-				...tag,
-				description: tag.description.trim(),
-			};
-		} );
+		if ( jsdoc ) {
+			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
+				return {
+					...tag,
+					description: tag.description.trim(),
+				};
+			} );
+		}
 	}
 	return jsdoc;
 };
