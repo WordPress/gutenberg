@@ -4,6 +4,7 @@ Sometimes you need to get the value something had on the previous render. `usePr
 
 ## Usage
 
+Save previous value on every rerender
 ```jsx
 /**
  * WordPress dependencies
@@ -15,6 +16,39 @@ function MyCustomElement() {
 	const [ myNumber, setMyNumber ] = useState( 5 );
 	const [ lastChange, setLastChange ] = useState( 'none' );
 	const prevNumber = usePrevious( myNumber );
+
+	useEffect( () => {
+		// On the first render, prevNumber will be undefined.
+		if ( prevNumber !== undefined ) {
+			if ( myNumber > prevNumber ) {
+				setLastChange( 'up' );
+			} else if ( myNumber < prevNumber ) {
+				setLastChange( 'down' );
+			}
+		}
+	}, [ myNumber ] );
+
+	return (
+		<p>
+			My number is { myNumber }. Last change: { lastChange }
+		</p>
+	);
+}
+```
+
+Save previous value on every change of dependencies
+```jsx
+/**
+ * WordPress dependencies
+ */
+import { usePrevious } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
+
+function MyCustomElement({userAction}) {
+	const [ myNumber, setMyNumber ] = useState( 5 );
+	const [ lastChange, setLastChange ] = useState( 'none' );
+	// prevNumber is saved on every userAction update
+	const prevNumber = usePrevious( myNumber, [userAction] );
 
 	useEffect( () => {
 		// On the first render, prevNumber will be undefined.

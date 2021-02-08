@@ -290,10 +290,11 @@ Based on <https://usehooks.com/usePrevious/>.
 _Parameters_
 
 -   _value_ `T`: The value to track.
+-   _optionalDependencyList_ `Array<T>`: of dependencies describing on change of which parameter a value should be cached. By default previous value is saved every time the value changes.
 
 _Returns_
 
--   `(T|undefined)`: The value from the previous render.
+-   `(T|undefined)`: The value cached, when no optional dependencies provided, previous value is equal to value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
