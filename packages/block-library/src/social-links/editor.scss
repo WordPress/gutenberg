@@ -22,7 +22,7 @@
 	transition: all 0.1s ease-in-out;
 	@include reduce-motion("transition");
 
-	.is-selected & {
+	.is-selected > & {
 		opacity: 0.1;
 	}
 
@@ -40,7 +40,7 @@
 	// Wrap the remaining placeholders in a container so the plus can overlap.
 	> .wp-block-social-links__social-placeholder-icons {
 		display: flex;
-		position: absolute;
+		//position: absolute;
 	}
 
 	& + .block-list-appender,
@@ -67,6 +67,10 @@
 }
 
 // Polish the Appender.
+.wp-block-social-links .wp-block-social-links__social-placeholder + .block-list-appender {
+	position: absolute;
+}
+
 .wp-block-social-links .block-list-appender {
 	padding: 0;
 

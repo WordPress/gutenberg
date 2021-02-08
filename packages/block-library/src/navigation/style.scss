@@ -1,9 +1,14 @@
-// Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
-	.wp-block-navigation__container {
-		color: $gray-900;
-		background-color: $white;
-		min-width: 200px;
+.wp-block-navigation__container {
+	// Vertically align child blocks, like Social Links or Search.
+	align-items: center;
+
+	// Default background and font color
+	&:not(.has-background) .wp-block-navigation__container {
+		.wp-block-navigation__container {
+			color: $gray-900;
+			background-color: $white;
+			min-width: 200px;
+		}
 	}
 }
 
