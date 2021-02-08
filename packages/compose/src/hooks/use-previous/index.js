@@ -26,7 +26,7 @@ export default function usePrevious(
 	// Store current value in ref.
 	useEffect( () => {
 		ref.current = value;
-	}, optionalDependencyList ); // Re-run when value changes.
+	}, optionalDependencyList ); // Re-run when any dependency changes.
 
 	// Return previous value (happens before update in useEffect above).
 	return ref.current;
