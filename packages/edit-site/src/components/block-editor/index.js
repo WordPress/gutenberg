@@ -73,10 +73,9 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useRef();
 	const contentRef = useRef();
+	const editorStylesRef = useEditorStyles( settings.styles );
 
 	useMouseMoveTypingReset( ref );
-	// Ideally this should be moved to the place where the styles are applied (iframe)
-	const editorStylesRef = useEditorStyles( settings.styles );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
@@ -124,7 +123,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						[]
 					) }
 				>
-					<Canvas body={ contentRef } styles={ settings.styles } />
+					<Canvas body={ contentRef } />
 				</Iframe>
 			</div>
 		</BlockEditorProvider>
