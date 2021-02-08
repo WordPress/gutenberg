@@ -16,7 +16,7 @@ import {
 	sendActionButtonPressedAction,
 	actionButtons,
 } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, Icon, TextControl } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -201,13 +201,13 @@ export class UnsupportedBlockEdit extends Component {
 					canEnableUnsupportedBlockEditor ) &&
 					isEditableInUnsupportedBlockEditor && (
 						<>
-							<BottomSheet.Cell
+							<TextControl
 								label={ missingBlockActionButton }
 								separatorType="topFullWidth"
 								onPress={ this.requestFallback }
 								labelStyle={ actionButtonStyle }
 							/>
-							<BottomSheet.Cell
+							<TextControl
 								label={ __( 'Dismiss' ) }
 								separatorType="topFullWidth"
 								onPress={ this.toggleSheet }

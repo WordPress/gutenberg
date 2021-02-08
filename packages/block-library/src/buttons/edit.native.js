@@ -117,19 +117,21 @@ export default function ButtonsEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<ContentJustificationDropdown
-								toggleProps={ toggleProps }
-								value={ contentJustification }
-								onChange={ onChangeContentJustification }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
-			</BlockControls>
+			{ isSelected && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<ContentJustificationDropdown
+									toggleProps={ toggleProps }
+									value={ contentJustification }
+									onChange={ onChangeContentJustification }
+								/>
+							) }
+						</ToolbarItem>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }

@@ -167,9 +167,7 @@ const controls = {
 
 	RESOLVE_MENU_ITEMS: createRegistryControl(
 		( registry ) => ( { query } ) => {
-			return registry
-				.__experimentalResolveSelect( 'core' )
-				.getMenuItems( query );
+			return registry.resolveSelect( 'core' ).getMenuItems( query );
 		}
 	),
 };

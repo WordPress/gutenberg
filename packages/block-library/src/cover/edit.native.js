@@ -5,6 +5,7 @@ import {
 	View,
 	TouchableWithoutFeedback,
 	InteractionManager,
+	AccessibilityInfo,
 } from 'react-native';
 import Video from 'react-native-video';
 
@@ -107,8 +108,31 @@ const Cover = ( {
 		customOverlayColor,
 		minHeightUnit = 'px',
 	} = attributes;
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
+		false
+	);
 
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	useEffect( () => {
+		// sync with local media store
+		mediaUploadSync();
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			setIsScreenReaderEnabled
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			setIsScreenReaderEnabled
+		);
+
+		return () => {
+			AccessibilityInfo.removeEventListener(
+				'screenReaderChanged',
+				setIsScreenReaderEnabled
+			);
+		};
+	}, [] );
 
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
@@ -153,9 +177,6 @@ const Cover = ( {
 			setAttributes( { childrenStyles: styles.defaultColor } );
 		}
 	}, [ setAttributes ] );
-
-	// sync with local media store
-	useEffect( mediaUploadSync, [] );
 
 	// initialize uploading flag to false, awaiting sync
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
@@ -490,7 +511,12 @@ const Cover = ( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
 				>
-					<View style={ styles.colorPaletteWrapper }>
+					<View
+						style={ styles.colorPaletteWrapper }
+						pointerEvents={
+							isScreenReaderEnabled ? 'none' : 'auto'
+						}
+					>
 						<BottomSheetConsumer>
 							{ ( { shouldEnableBottomSheetScroll } ) => (
 								<ColorPalette

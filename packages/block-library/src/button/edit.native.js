@@ -61,6 +61,37 @@ class ButtonEdit extends Component {
 			isButtonFocused: true,
 			placeholderTextWidth: 0,
 		};
+
+		this.linkSettingsActions = [
+			{
+				label: __( 'Remove link' ),
+				onPress: this.onClearSettings,
+			},
+		];
+
+		this.linkSettingsOptions = {
+			url: {
+				label: __( 'Button Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: true,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
+
+		this.noFocusLinkSettingOptions = {
+			...this.linkSettingsOptions,
+			url: {
+				...this.linkSettingsOptions.url,
+				autoFocus: false,
+			},
+		};
 	}
 
 	componentDidMount() {
@@ -221,39 +252,22 @@ class ButtonEdit extends Component {
 	getLinkSettings( isCompatibleWithSettings ) {
 		const { isLinkSheetVisible } = this.state;
 		const { attributes, setAttributes } = this.props;
-		const actions = [
-			{
-				label: __( 'Remove link' ),
-				onPress: this.onClearSettings,
-			},
-		];
-
-		const options = {
-			url: {
-				label: __( 'Button Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: ! isCompatibleWithSettings,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
-			},
-		};
-
 		return (
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				attributes={ attributes }
+				url={ attributes.url }
+				rel={ attributes.rel }
+				linkTarget={ attributes.linkTarget }
 				onClose={ this.dismissSheet }
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
 				hasPicker
-				actions={ actions }
-				options={ options }
+				actions={ this.linkSettingsActions }
+				options={
+					isCompatibleWithSettings
+						? this.linkSettingsOptions
+						: this.noFocusLinkSettingOptions
+				}
 				showIcon={ ! isCompatibleWithSettings }
 			/>
 		);
@@ -392,35 +406,35 @@ class ButtonEdit extends Component {
 				</ColorBackground>
 
 				{ isSelected && (
-					<BlockControls>
-						<ToolbarGroup>
-							<ToolbarButton
-								title={ __( 'Edit link' ) }
-								icon={ link }
-								onClick={ this.onShowLinkSettings }
-								isActive={ url }
-							/>
-						</ToolbarGroup>
-					</BlockControls>
+					<>
+						<BlockControls>
+							<ToolbarGroup>
+								<ToolbarButton
+									title={ __( 'Edit link' ) }
+									icon={ link }
+									onClick={ this.onShowLinkSettings }
+									isActive={ url }
+								/>
+							</ToolbarGroup>
+						</BlockControls>
+						{ this.getLinkSettings( false ) }
+						<ColorEdit { ...this.props } />
+						<InspectorControls>
+							<PanelBody title={ __( 'Border Settings' ) }>
+								<RangeControl
+									label={ __( 'Border Radius' ) }
+									minimumValue={ MIN_BORDER_RADIUS_VALUE }
+									maximumValue={ MAX_BORDER_RADIUS_VALUE }
+									value={ borderRadiusValue }
+									onChange={ this.onChangeBorderRadius }
+								/>
+							</PanelBody>
+							<PanelBody title={ __( 'Link Settings' ) }>
+								{ this.getLinkSettings( true ) }
+							</PanelBody>
+						</InspectorControls>
+					</>
 				) }
-
-				{ this.getLinkSettings( false ) }
-
-				<ColorEdit { ...this.props } />
-				<InspectorControls>
-					<PanelBody title={ __( 'Border Settings' ) }>
-						<RangeControl
-							label={ __( 'Border Radius' ) }
-							minimumValue={ MIN_BORDER_RADIUS_VALUE }
-							maximumValue={ MAX_BORDER_RADIUS_VALUE }
-							value={ borderRadiusValue }
-							onChange={ this.onChangeBorderRadius }
-						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Link Settings' ) }>
-						{ this.getLinkSettings( true ) }
-					</PanelBody>
-				</InspectorControls>
 			</View>
 		);
 	}

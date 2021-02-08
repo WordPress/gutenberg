@@ -84,12 +84,17 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$query_args   = array();
-		$category_ids = $request['category'];
-		$search_term  = $request['search'];
+		$query_args  = array();
+		$category_id = $request['category'];
+		$keyword_id  = $request['keyword'];
+		$search_term = $request['search'];
 
-		if ( $category_ids ) {
-			$query_args['pattern-categories'] = $category_ids;
+		if ( $category_id ) {
+			$query_args['pattern-categories'] = $category_id;
+		}
+
+		if ( $keyword_id ) {
+			$query_args['pattern-keywords'] = $keyword_id;
 		}
 
 		if ( $search_term ) {
@@ -272,6 +277,12 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 
 		$query_params['category'] = array(
 			'description' => __( 'Limit results to those matching a category ID.', 'gutenberg' ),
+			'type'        => 'integer',
+			'minimum'     => 1,
+		);
+
+		$query_params['keyword'] = array(
+			'description' => __( 'Limit results to those matching a keyword ID.', 'gutenberg' ),
 			'type'        => 'integer',
 			'minimum'     => 1,
 		);

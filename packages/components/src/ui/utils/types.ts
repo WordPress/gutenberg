@@ -7,3 +7,5 @@ export type Options<T extends As, P extends ViewOwnProps<{}, T>> = {
 	useHook: (props: P) => any;
 	memo?: boolean;
 };
+
+export type ResponsiveCSSValue<T> = Array<T | undefined> | T;

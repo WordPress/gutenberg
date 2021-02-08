@@ -86,8 +86,14 @@ describe( 'Font Size Picker', () => {
 		);
 
 		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+
+		// Disable reason: Wait for changes to apply.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 100 );
+
 		await pressKeyTimes( 'ArrowDown', 2 );
 		await page.keyboard.press( 'Enter' );
+
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
@@ -113,6 +119,10 @@ describe( 'Font Size Picker', () => {
 		await pressKeyTimes( 'ArrowRight', 5 );
 		await pressKeyTimes( 'Backspace', 5 );
 		await page.keyboard.press( 'Enter' );
+
+		// Disable reason: Wait for changes to apply.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 1000 );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

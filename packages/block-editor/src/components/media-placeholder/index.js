@@ -26,6 +26,7 @@ import { keyboardReturn } from '@wordpress/icons';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
+import { store as blockEditorStore } from '../../store';
 
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
@@ -76,7 +77,7 @@ export function MediaPlaceholder( {
 	children,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
 	const [ src, setSrc ] = useState( '' );

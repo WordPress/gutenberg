@@ -4,6 +4,11 @@
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
+
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
@@ -20,7 +25,7 @@ export function useIsHovered( ref ) {
 		const {
 			isNavigationMode: selectIsNavigationMode,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		return {
 			isNavigationMode: selectIsNavigationMode(),

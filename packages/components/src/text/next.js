@@ -29,7 +29,7 @@ export const adapter = ( { as, variant, ...restProps } ) => ( {
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('react').ComponentType<AdaptedTextProps>} Current
+ * @param {import('react').ForwardRefExoticComponent<AdaptedTextProps>} Current
  */
 /* eslint-enable jsdoc/valid-types */
 export function withNextComponent( Current ) {

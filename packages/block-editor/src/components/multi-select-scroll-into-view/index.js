@@ -14,6 +14,7 @@ import { getScrollContainer } from '@wordpress/dom';
  * Internal dependencies
  */
 import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 export function useScrollMultiSelectionIntoView( ref ) {
 	const selectionEnd = useSelect( ( select ) => {
@@ -21,7 +22,7 @@ export function useScrollMultiSelectionIntoView( ref ) {
 			getBlockSelectionEnd,
 			hasMultiSelection,
 			isMultiSelecting,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const blockSelectionEnd = getBlockSelectionEnd();
 

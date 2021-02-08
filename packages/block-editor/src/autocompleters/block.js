@@ -19,6 +19,7 @@ import { useMemo } from '@wordpress/element';
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
 import BlockIcon from '../components/block-icon';
+import { store as blockEditorStore } from '../store';
 
 const SHOWN_BLOCK_TYPES = 9;
 
@@ -42,7 +43,7 @@ function createBlockCompleter() {
 						getSelectedBlockClientId,
 						getBlockName,
 						getBlockInsertionPoint,
-					} = select( 'core/block-editor' );
+					} = select( blockEditorStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
 					return {
 						selectedBlockName: selectedBlockClientId

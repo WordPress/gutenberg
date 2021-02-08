@@ -7,7 +7,7 @@ import { View, Animated, Easing, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { BlockControls } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import {
 	ToolbarGroup,
 	ToolbarButton,
@@ -111,18 +111,18 @@ const SocialLinkEdit = ( {
 		] ).start( () => setHasUrl( true ) );
 	}
 
-	function onCloseSettingsSheet() {
+	const onCloseSettingsSheet = useCallback( () => {
 		setIsLinkSheetVisible( false );
-	}
+	}, [] );
 
-	function onOpenSettingsSheet() {
+	const onOpenSettingsSheet = useCallback( () => {
 		setIsLinkSheetVisible( true );
-	}
+	}, [] );
 
-	function onEmptyURL() {
+	const onEmptyURL = useCallback( () => {
 		animatedValue.setValue( 0 );
 		setHasUrl( false );
-	}
+	}, [ animatedValue ] );
 
 	function onIconPress() {
 		if ( isSelected ) {
@@ -147,30 +147,35 @@ const SocialLinkEdit = ( {
 	return (
 		<View>
 			{ isSelected && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							title={ sprintf(
-								// translators: %s: social link name e.g: "Instagram".
-								__( 'Add link to %s' ),
-								socialLinkName
-							) }
-							icon={ link }
-							onClick={ onOpenSettingsSheet }
-							isActive={ url }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								title={ sprintf(
+									// translators: %s: social link name e.g: "Instagram".
+									__( 'Add link to %s' ),
+									socialLinkName
+								) }
+								icon={ link }
+								onClick={ onOpenSettingsSheet }
+								isActive={ url }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<LinkSettingsNavigation
+						isVisible={ isLinkSheetVisible }
+						url={ attributes.url }
+						label={ attributes.label }
+						rel={ attributes.rel }
+						onEmptyURL={ onEmptyURL }
+						onClose={ onCloseSettingsSheet }
+						setAttributes={ setAttributes }
+						options={ linkSettingsOptions }
+						withBottomSheet
+					/>
+				</>
 			) }
-			<LinkSettingsNavigation
-				isVisible={ isLinkSheetVisible }
-				attributes={ attributes }
-				onEmptyURL={ onEmptyURL }
-				onClose={ onCloseSettingsSheet }
-				setAttributes={ setAttributes }
-				options={ linkSettingsOptions }
-				withBottomSheet={ true }
-			/>
+
 			<TouchableWithoutFeedback
 				onPress={ onIconPress }
 				accessibilityRole={ 'button' }
