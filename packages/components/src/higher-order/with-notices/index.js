@@ -53,10 +53,10 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 			 * @param {string} msg  Error message of the notice.
 			 */
 			createErrorNotice: ( msg ) => {
-				this.createNotice(
-					{ status: 'error', content: msg },
-					setNoticeList
-				);
+				noticeOperations.createNotice( {
+					status: 'error',
+					content: msg,
+				} );
 			},
 
 			/**
