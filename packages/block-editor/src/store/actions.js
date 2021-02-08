@@ -25,6 +25,7 @@ import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import { __unstableMarkAutomaticChangeFinalControl } from '../store/controls';
+import { STORE_NAME as blockEditorStoreName } from './constants';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -33,7 +34,10 @@ import { __unstableMarkAutomaticChangeFinalControl } from '../store/controls';
  * replacement, etc).
  */
 function* ensureDefaultBlock() {
-	const count = yield controls.select( 'core/block-editor', 'getBlockCount' );
+	const count = yield controls.select(
+		blockEditorStoreName,
+		'getBlockCount'
+	);
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
@@ -67,11 +71,11 @@ export function* resetBlocks( blocks ) {
  */
 export function* validateBlocksToTemplate( blocks ) {
 	const template = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplate'
 	);
 	const templateLock = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplateLock'
 	);
 
@@ -84,7 +88,7 @@ export function* validateBlocksToTemplate( blocks ) {
 
 	// Update if validity has changed.
 	const isValidTemplate = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'isValidTemplate'
 	);
 
@@ -200,7 +204,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  */
 export function* selectPreviousBlock( clientId ) {
 	const previousBlockClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getPreviousBlockClientId',
 		clientId
 	);
@@ -219,7 +223,7 @@ export function* selectPreviousBlock( clientId ) {
  */
 export function* selectNextBlock( clientId ) {
 	const nextBlockClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getNextBlockClientId',
 		clientId
 	);
@@ -266,7 +270,7 @@ export function* multiSelect( start, end ) {
 	};
 
 	const blockCount = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getSelectedBlockCount'
 	);
 
@@ -358,10 +362,10 @@ export function* replaceBlocks(
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield controls.select( 'core/block-editor', 'getSettings' )
+		yield controls.select( blockEditorStoreName, 'getSettings' )
 	);
 	const rootClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockRootClientId',
 		first( clientIds )
 	);
@@ -369,7 +373,7 @@ export function* replaceBlocks(
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
 		const canInsertBlock = yield controls.select(
-			'core/block-editor',
+			blockEditorStoreName,
 			'canInsertBlockType',
 			block.name,
 			rootClientId
@@ -442,7 +446,7 @@ export function* moveBlocksToPosition(
 	index
 ) {
 	const templateLock = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplateLock',
 		fromRootClientId
 	);
@@ -475,7 +479,7 @@ export function* moveBlocksToPosition(
 	}
 
 	const canInsertBlocks = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'canInsertBlocks',
 		clientIds,
 		toRootClientId
@@ -553,12 +557,12 @@ export function* insertBlocks(
 ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield controls.select( 'core/block-editor', 'getSettings' )
+		yield controls.select( blockEditorStoreName, 'getSettings' )
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
 		const isValid = yield controls.select(
-			'core/block-editor',
+			blockEditorStoreName,
 			'canInsertBlockType',
 			block.name,
 			rootClientId
@@ -654,9 +658,9 @@ export function* synchronizeTemplate() {
 	yield {
 		type: 'SYNCHRONIZE_TEMPLATE',
 	};
-	const blocks = yield controls.select( 'core/block-editor', 'getBlocks' );
+	const blocks = yield controls.select( blockEditorStoreName, 'getBlocks' );
 	const template = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplate'
 	);
 	const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
@@ -679,7 +683,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 
 	const [ clientIdA, clientIdB ] = blocks;
 	const blockA = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlock',
 		clientIdA
 	);
@@ -692,13 +696,13 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 	}
 
 	const blockB = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlock',
 		clientIdB
 	);
 	const blockBType = getBlockType( blockB.name );
 	const { clientId, attributeKey, offset } = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getSelectionStart'
 	);
 	const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
@@ -845,12 +849,12 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 
 	clientIds = castArray( clientIds );
 	const rootClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
 	const isLocked = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplateLock',
 		rootClientId
 	);
@@ -863,7 +867,7 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		previousBlockId = yield selectPreviousBlock( clientIds[ 0 ] );
 	} else {
 		previousBlockId = yield controls.select(
-			'core/block-editor',
+			blockEditorStoreName,
 			'getPreviousBlockClientId',
 			clientIds[ 0 ]
 		);
@@ -1193,12 +1197,12 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 		return;
 	}
 	const blocks = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlocksByClientId',
 		clientIds
 	);
 	const rootClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
@@ -1218,7 +1222,7 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 	}
 
 	const lastSelectedIndex = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockIndex',
 		last( castArray( clientIds ) ),
 		rootClientId
@@ -1249,12 +1253,12 @@ export function* insertBeforeBlock( clientId ) {
 		return;
 	}
 	const rootClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockRootClientId',
 		clientId
 	);
 	const isLocked = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplateLock',
 		rootClientId
 	);
@@ -1263,7 +1267,7 @@ export function* insertBeforeBlock( clientId ) {
 	}
 
 	const firstSelectedIndex = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockIndex',
 		clientId,
 		rootClientId
@@ -1281,12 +1285,12 @@ export function* insertAfterBlock( clientId ) {
 		return;
 	}
 	const rootClientId = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockRootClientId',
 		clientId
 	);
 	const isLocked = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getTemplateLock',
 		rootClientId
 	);
@@ -1295,7 +1299,7 @@ export function* insertAfterBlock( clientId ) {
 	}
 
 	const firstSelectedIndex = yield controls.select(
-		'core/block-editor',
+		blockEditorStoreName,
 		'getBlockIndex',
 		clientId,
 		rootClientId

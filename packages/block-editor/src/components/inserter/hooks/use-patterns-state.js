@@ -13,6 +13,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
+
+/**
  * Retrieves the block patterns inserter state.
  *
  * @param {Function} onInsert function called when inserter a list of blocks.
@@ -24,7 +29,7 @@ const usePatternsState = ( onInsert ) => {
 		const {
 			__experimentalBlockPatterns,
 			__experimentalBlockPatternCategories,
-		} = select( 'core/block-editor' ).getSettings();
+		} = select( blockEditorStore ).getSettings();
 		return {
 			patterns: __experimentalBlockPatterns,
 			patternCategories: __experimentalBlockPatternCategories,

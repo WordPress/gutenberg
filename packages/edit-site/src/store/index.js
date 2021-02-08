@@ -12,24 +12,14 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
-export let store = null;
+export const storeConfig = {
+	reducer,
+	actions,
+	selectors,
+	controls,
+	persist: [ 'preferences' ],
+};
 
-export default function registerEditSiteStore( initialState ) {
-	if ( store !== null ) {
-		return;
-	}
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
-	const _store = createReduxStore( STORE_NAME, {
-		reducer,
-		actions,
-		selectors,
-		controls,
-		persist: [ 'preferences' ],
-		initialState,
-	} );
-	register( _store );
-
-	store = _store;
-
-	return _store;
-}
+register( store );

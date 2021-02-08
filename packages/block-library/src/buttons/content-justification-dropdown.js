@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { justifyLeft, justifyCenter, justifyRight } from '@wordpress/icons';
 
@@ -44,21 +45,25 @@ export default function ContentJustificationDropdown( {
 	toggleProps,
 	value,
 } ) {
+	const controls = useMemo( () => {
+		return allowedValues.map( ( allowedValue ) => {
+			return {
+				...CONTROLS[ allowedValue ],
+				isActive: value === allowedValue,
+				role: 'menuitemradio',
+				onClick: () =>
+					onChange(
+						value === allowedValue ? undefined : allowedValue
+					),
+			};
+		} );
+	}, [ allowedValues, value, onChange ] );
+
 	return (
 		<DropdownMenu
 			icon={ CONTROLS[ value ]?.icon ?? DEFAULT_ICON }
 			label={ __( 'Change content justification' ) }
-			controls={ allowedValues.map( ( allowedValue ) => {
-				return {
-					...CONTROLS[ allowedValue ],
-					isActive: value === allowedValue,
-					role: 'menuitemradio',
-					onClick: () =>
-						onChange(
-							value === allowedValue ? undefined : allowedValue
-						),
-				};
-			} ) }
+			controls={ controls }
 			toggleProps={ toggleProps }
 		/>
 	);

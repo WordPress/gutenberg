@@ -20,6 +20,7 @@ export default function SaveButton( { navigationPost } ) {
 			onClick={ () => {
 				saveNavigationPost( navigationPost );
 			} }
+			disabled={ ! navigationPost }
 		>
 			{ __( 'Save' ) }
 		</Button>

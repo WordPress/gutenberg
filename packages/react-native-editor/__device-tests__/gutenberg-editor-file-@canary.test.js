@@ -17,7 +17,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 
 		block.click();
 
-		if ( isAndroid ) {
+		if ( isAndroid() ) {
 			await editorPage.driver.sleep( 5000 );
 		} else {
 			await editorPage.driver.sleep( 1000 );
@@ -26,8 +26,9 @@ describe( 'Gutenberg Editor File Block tests', () => {
 		await editorPage.chooseMediaLibrary();
 
 		const html = await editorPage.getHtmlContent();
-		expect( testData.fileBlockPlaceholder.toLowerCase() ).toBe(
-			html.toLowerCase()
+
+		expect( html.toLowerCase() ).toBe(
+			testData.fileBlockPlaceholder.toLowerCase()
 		);
 	} );
 } );
