@@ -5,12 +5,14 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
+	InspectorControls,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
 	Dropdown,
+	PanelBody,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
@@ -80,6 +82,13 @@ export default function TemplatePartEdit( {
 
 	return (
 		<>
+			<InspectorControls>
+				<PanelBody>
+					{ isEntityAvailable && (
+						<TemplatePartNamePanel postId={ templatePartId } />
+					) }
+				</PanelBody>
+			</InspectorControls>
 			<InspectorAdvancedControls>
 				<SelectControl
 					label={ __( 'HTML element' ) }
@@ -108,7 +117,6 @@ export default function TemplatePartEdit( {
 				{ isEntityAvailable && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
-							<TemplatePartNamePanel postId={ templatePartId } />
 							<Dropdown
 								className="wp-block-template-part__preview-dropdown-button"
 								contentClassName="wp-block-template-part__preview-dropdown-content"
