@@ -15,7 +15,7 @@ export default function TemplatePartNamePanel( { postId } ) {
 
 	return (
 		<TextControl
-			label={ __( 'Title' ) }
+			label={ __( 'Template title' ) }
 			value={ title }
 			onChange={ ( value ) => {
 				setTitle( value );
