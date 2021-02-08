@@ -25,6 +25,7 @@ import {
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
+	BottomSheet,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -245,6 +246,8 @@ export class ImageEdit extends Component {
 		} );
 	}
 
+	onSetFeatured() {}
+
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
@@ -443,6 +446,13 @@ export class ImageEdit extends Component {
 				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
+				</PanelBody>
+				<PanelBody>
+					<BottomSheet.Cell
+						label={ __( 'Set as Featured Image' ) }
+						labelStyle={ styles.setFeaturedButton }
+						onPress={ this.onSetFeatured }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		);
