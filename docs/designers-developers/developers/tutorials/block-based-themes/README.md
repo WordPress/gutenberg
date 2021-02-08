@@ -180,8 +180,6 @@ The HTML comments starts with `wp:template-part` which is the name of the templa
 <!-- wp:template-part {"slug":"footer"} /-->
 ```
 
-If you used a block template part slug, adjust the value for the "slug" key.
-
 Eventually, you will be able to create and combine templates and template parts directly in the site editor.
 
 ### Experimental-theme.json - Global styles
