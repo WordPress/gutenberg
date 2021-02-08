@@ -132,7 +132,7 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
 	const setRef = useCallback( ( node ) => {
@@ -148,18 +148,18 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 				return false;
 			}
 
-			setIframeDocument( contentDocument );
-			setHead( contentDocument, head );
-			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
-			bubbleEvents( contentDocument );
-			setBodyClassName( contentDocument );
-
 			if ( typeof contentRef === 'function' ) {
 				contentRef( body );
 			} else if ( contentRef ) {
 				contentRef.current = body;
 			}
+
+			setHead( contentDocument, headHTML );
+			setBodyClassName( contentDocument );
+			styleSheetsCompat( contentDocument );
+			bubbleEvents( contentDocument );
+			setBodyClassName( contentDocument );
+			setIframeDocument( contentDocument );
 
 			return true;
 		}
@@ -183,6 +183,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			name="editor-canvas"
 		>
 			{ iframeDocument && createPortal( children, iframeDocument.body ) }
+			{ iframeDocument && createPortal( head, iframeDocument.head ) }
 		</iframe>
 	);
 }

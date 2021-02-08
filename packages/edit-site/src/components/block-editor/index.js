@@ -15,11 +15,10 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableUseEditorStyles as useEditorStyles,
+	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { DropZoneProvider, Popover } from '@wordpress/components';
-import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -69,7 +68,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useRef();
 	const contentRef = useRef();
-	const editorStylesRef = useEditorStyles( settings.styles );
 
 	useMouseMoveTypingReset( ref );
 
@@ -104,20 +102,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div
-				ref={ editorStylesRef }
-				className="edit-site-visual-editor"
-				onWheel={ onWheel }
-			>
+			<div className="edit-site-visual-editor" onWheel={ onWheel }>
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
-					head={ window.__editorStyles.html }
+					headHTML={ window.__editorStyles.html }
+					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
-					contentRef={ useMergeRefs( [
-						contentRef,
-						editorStylesRef,
-					] ) }
+					contentRef={ contentRef }
 				>
 					<Canvas body={ contentRef } />
 				</Iframe>
