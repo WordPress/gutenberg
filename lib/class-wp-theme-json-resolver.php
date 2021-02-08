@@ -279,7 +279,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
-	public function get_theme_data( $theme_support_data = array() ) {
+	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
 			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -411,13 +411,13 @@ class WP_Theme_JSON_Resolver {
 		if ( 'theme' === $origin ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_data() );
-			$result->merge( $this->get_theme_data( $theme_support_data ) );
+			$result->merge( self::get_theme_data( $theme_support_data ) );
 			return $result;
 		}
 
 		$result = new WP_Theme_JSON();
 		$result->merge( self::get_core_data() );
-		$result->merge( $this->get_theme_data( $theme_support_data ) );
+		$result->merge( self::get_theme_data( $theme_support_data ) );
 		$result->merge( self::get_user_data() );
 		return $result;
 	}
