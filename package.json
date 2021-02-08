@@ -20,7 +20,7 @@
 	},
 	"config": {
 		"GUTENBERG_PHASE": 2,
-		"COMPONENT_SYSTEM_PHASE": 0
+		"COMPONENT_SYSTEM_PHASE": 1
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
