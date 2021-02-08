@@ -415,9 +415,8 @@ function CoverEdit( {
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
-								onDrag={ ( event, value ) => {
-									imperativeFocalPointPreview( value );
-								} }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
 								onChange={ ( newFocalPoint ) =>
 									setAttributes( {
 										focalPoint: newFocalPoint,

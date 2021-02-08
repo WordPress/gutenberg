@@ -257,9 +257,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onChange={ ( value ) =>
 						setAttributes( { focalPoint: value } )
 					}
-					onDrag={ ( event, value ) =>
-						imperativeFocalPointPreview( value )
-					}
+					onDragStart={ imperativeFocalPointPreview }
+					onDrag={ imperativeFocalPointPreview }
 				/>
 			) }
 			{ mediaType === 'image' && (
