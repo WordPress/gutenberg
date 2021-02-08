@@ -407,7 +407,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
+	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
 		if ( 'theme' === $origin ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_data() );
