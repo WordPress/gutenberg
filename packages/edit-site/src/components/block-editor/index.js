@@ -26,11 +26,11 @@ import { DropZoneProvider, Popover } from '@wordpress/components';
 import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
+import { store as editSiteStore } from '../../store';
 
-function Canvas( { body, styles } ) {
+function Canvas( { body } ) {
 	useBlockSelectionClearer( body );
 	useTypingObserver( body );
-	useEditorStyles( body, styles );
 
 	return (
 		<DropZoneProvider>
@@ -49,7 +49,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getEditedPostType,
 				getPage,
 				__experimentalGetPreviewDeviceType,
-			} = select( 'core/edit-site' );
+			} = select( editSiteStore );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -63,13 +63,17 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage } = useDispatch( editSiteStore );
 
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useRef();
 	const contentRef = useRef();
 
 	useMouseMoveTypingReset( ref );
+	// This updates the host document styles.
+	// It is necessary to make sure the preset CSS Custom Properties
+	// are in scope for the sidebar UI controls that use them.
+	const editorStylesRef = useEditorStyles( settings.styles );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
@@ -102,10 +106,15 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor" onWheel={ onWheel }>
+			<div
+				ref={ editorStylesRef }
+				className="edit-site-visual-editor"
+				onWheel={ onWheel }
+			>
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
+					editorStyles={ settings.styles }
 					head={ window.__editorStyles.html }
 					ref={ ref }
 					contentRef={ contentRef }

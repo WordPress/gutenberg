@@ -106,6 +106,40 @@ function _gutenberg_get_template_files( $template_type ) {
 }
 
 /**
+ * Parses wp_template content and injects the current theme's
+ * stylesheet as a theme attribute into each wp_template_part
+ *
+ * @param string $template_content serialized wp_template content.
+ *
+ * @return string Updated wp_template content.
+ */
+function _inject_theme_attribute_in_content( $template_content ) {
+	$has_updated_content = false;
+	$new_content         = '';
+	$template_blocks     = parse_blocks( $template_content );
+
+	foreach ( $template_blocks as $key => $block ) {
+		if (
+			'core/template-part' === $block['blockName'] &&
+			! isset( $block['attrs']['theme'] )
+		) {
+			$template_blocks[ $key ]['attrs']['theme'] = wp_get_theme()->get_stylesheet();
+			$has_updated_content                       = true;
+		}
+	}
+
+	if ( $has_updated_content ) {
+		foreach ( $template_blocks as $block ) {
+			$new_content .= serialize_block( $block );
+		}
+
+		return $new_content;
+	}
+
+	return $template_content;
+}
+
+/**
  * Build a unified template object based on a theme file.
  *
  * @param array $template_file Theme file.
@@ -115,12 +149,17 @@ function _gutenberg_get_template_files( $template_type ) {
  */
 function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
 	$default_template_types = gutenberg_get_default_template_types();
+	$template_content       = file_get_contents( $template_file['path'] );
+	$theme                  = wp_get_theme()->get_stylesheet();
 
-	$theme               = wp_get_theme()->get_stylesheet();
+	if ( 'wp_template' === $template_type ) {
+		$template_content = _inject_theme_attribute_in_content( $template_content );
+	}
+
 	$template            = new WP_Block_Template();
 	$template->id        = $theme . '//' . $template_file['slug'];
 	$template->theme     = $theme;
-	$template->content   = file_get_contents( $template_file['path'] );
+	$template->content   = $template_content;
 	$template->slug      = $template_file['slug'];
 	$template->is_custom = false;
 	$template->type      = $template_type;

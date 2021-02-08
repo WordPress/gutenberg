@@ -115,14 +115,14 @@ const SocialLinkEdit = ( {
 		setIsLinkSheetVisible( false );
 	}, [] );
 
-	function onOpenSettingsSheet() {
+	const onOpenSettingsSheet = useCallback( () => {
 		setIsLinkSheetVisible( true );
-	}
+	}, [] );
 
 	const onEmptyURL = useCallback( () => {
 		animatedValue.setValue( 0 );
 		setHasUrl( false );
-	}, [] );
+	}, [ animatedValue ] );
 
 	function onIconPress() {
 		if ( isSelected ) {

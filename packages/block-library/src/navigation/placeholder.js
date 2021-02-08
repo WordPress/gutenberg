@@ -22,12 +22,13 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronDown, search } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import createDataTree from './create-data-tree';
+import PlaceholderPreview from './placeholder-preview';
 
 /**
  * A recursive function that maps menu item nodes to blocks.
@@ -94,29 +95,6 @@ function convertMenuItemsToBlocks( menuItems ) {
 
 	const menuTree = createDataTree( menuItems );
 	return mapMenuItemsToBlocks( menuTree );
-}
-
-/**
- * Convert pages to blocks.
- *
- * @param {Object[]} pages An array of pages.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertPagesToBlocks( pages ) {
-	if ( ! pages ) {
-		return null;
-	}
-
-	return pages.map( ( { title, type, link: url, id } ) =>
-		createBlock( 'core/navigation-link', {
-			type,
-			id,
-			url,
-			label: ! title.rendered ? __( '(no title)' ) : title.rendered,
-			opensInNewTab: false,
-		} )
-	);
 }
 
 function NavigationPlaceholder( { onCreate }, ref ) {
@@ -219,9 +197,9 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateAllPages = () => {
-		const blocks = convertPagesToBlocks( pages );
+		const block = [ createBlock( 'core/page-list' ) ];
 		const selectNavigationBlock = true;
-		onCreate( blocks, selectNavigationBlock );
+		onCreate( block, selectNavigationBlock );
 	};
 
 	useEffect( () => {
@@ -235,12 +213,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	return (
 		<div className="wp-block-navigation-placeholder">
-			<div className="wp-block-navigation-placeholder__preview">
-				<span className="wp-block-navigation-link"></span>
-				<span className="wp-block-navigation-link"></span>
-				<span className="wp-block-navigation-link"></span>
-				<Icon icon={ search } />
-			</div>
+			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
 				{ isLoading && (

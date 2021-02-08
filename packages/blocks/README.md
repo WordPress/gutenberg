@@ -534,6 +534,20 @@ _Returns_
 
 -   `boolean`: Whether the given block is a reusable block.
 
+<a name="isTemplatePart" href="#isTemplatePart">#</a> **isTemplatePart**
+
+Determines whether or not the given block is a template part. This is a
+special block type that allows composing a page template out of reusable
+design elements.
+
+_Parameters_
+
+-   _blockOrType_ `Object`: Block or Block Type to test.
+
+_Returns_
+
+-   `boolean`: Whether the given block is a template part.
+
 <a name="isUnmodifiedDefaultBlock" href="#isUnmodifiedDefaultBlock">#</a> **isUnmodifiedDefaultBlock**
 
 Determines whether the block is a default block
@@ -765,7 +779,7 @@ Store definition for the blocks namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 _Type_
 

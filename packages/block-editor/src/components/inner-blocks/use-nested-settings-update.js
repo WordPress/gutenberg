@@ -6,6 +6,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
  * This hook is a side effect which updates the block-editor store when changes
  * happen to inner block settings. The given props are transformed into a
  * settings object, and if that is different from the current settings object in
@@ -30,18 +35,18 @@ export default function useNestedSettingsUpdate(
 	captureToolbars,
 	orientation
 ) {
-	const { updateBlockListSettings } = useDispatch( 'core/block-editor' );
+	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	const { blockListSettings, parentLock } = useSelect(
 		( select ) => {
 			const rootClientId = select(
-				'core/block-editor'
+				blockEditorStore
 			).getBlockRootClientId( clientId );
 			return {
 				blockListSettings: select(
-					'core/block-editor'
+					blockEditorStore
 				).getBlockListSettings( clientId ),
-				parentLock: select( 'core/block-editor' ).getTemplateLock(
+				parentLock: select( blockEditorStore ).getTemplateLock(
 					rootClientId
 				),
 			};

@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
 function BlockMover( {
 	isFirst,
@@ -40,8 +41,7 @@ function BlockMover( {
 		return null;
 	}
 
-	const dragHandleLabel =
-		clientIds.length === 1 ? __( 'Drag block' ) : __( 'Drag blocks' );
+	const dragHandleLabel = __( 'Drag' );
 
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the buttons while it has focus causes the screen to change
@@ -103,7 +103,7 @@ export default withSelect( ( select, { clientIds } ) => {
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const normalizedClientIds = castArray( clientIds );
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );

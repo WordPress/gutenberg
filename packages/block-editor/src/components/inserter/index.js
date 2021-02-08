@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
  */
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
+import { store as blockEditorStore } from '../../store';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -141,7 +142,9 @@ class Inserter extends Component {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ onClose }
+					onSelect={ () => {
+						onClose();
+					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
@@ -152,7 +155,9 @@ class Inserter extends Component {
 
 		return (
 			<InserterMenu
-				onSelect={ onClose }
+				onSelect={ () => {
+					onClose();
+				} }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
@@ -168,6 +173,7 @@ class Inserter extends Component {
 			hasSingleBlockType,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
+			onSelectOrClose,
 		} = this.props;
 
 		if ( hasSingleBlockType ) {
@@ -187,6 +193,7 @@ class Inserter extends Component {
 				headerTitle={ __( 'Add a block' ) }
 				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
+				onClose={ onSelectOrClose }
 			/>
 		);
 	}
@@ -198,7 +205,7 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { getBlockVariations } = select( blocksStore );
 
 		rootClientId =
@@ -228,7 +235,12 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
-				const { rootClientId, clientId, isAppender } = ownProps;
+				const {
+					rootClientId,
+					clientId,
+					isAppender,
+					onSelectOrClose,
+				} = ownProps;
 				const {
 					hasSingleBlockType,
 					allowedBlockType,
@@ -244,7 +256,7 @@ export default compose( [
 						getBlockIndex,
 						getBlockSelectionEnd,
 						getBlockOrder,
-					} = select( 'core/block-editor' );
+					} = select( blockEditorStore );
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
@@ -261,7 +273,7 @@ export default compose( [
 					return getBlockOrder( rootClientId ).length;
 				}
 
-				const { insertBlock } = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( blockEditorStore );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
@@ -271,6 +283,10 @@ export default compose( [
 					rootClientId,
 					selectBlockOnInsert
 				);
+
+				if ( onSelectOrClose ) {
+					onSelectOrClose();
+				}
 
 				if ( ! selectBlockOnInsert ) {
 					const message = sprintf(

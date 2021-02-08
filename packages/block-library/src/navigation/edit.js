@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { upperFirst } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -12,6 +11,7 @@ import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
+	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
@@ -24,8 +24,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import * as navIcons from './icons';
+
 import NavigationPlaceholder from './placeholder';
+import PlaceholderPreview from './placeholder-preview';
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -38,7 +39,7 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
+	hasItemJustificationControls = attributes.orientation === 'horizontal',
 	hasListViewModal = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
@@ -67,6 +68,7 @@ function Navigation( {
 				'core/navigation-link',
 				'core/search',
 				'core/social-links',
+				'core/page-list',
 			],
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
@@ -81,6 +83,11 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
+			__experimentalLayout: {
+				type: 'default',
+				alignments: [],
+			},
+			placeholder: <PlaceholderPreview />,
 		}
 	);
 
@@ -114,41 +121,13 @@ function Navigation( {
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
-					<ToolbarGroup
-						icon={
-							attributes.itemsJustification
-								? navIcons[
-										`justify${ upperFirst(
-											attributes.itemsJustification
-										) }Icon`
-								  ]
-								: navIcons.justifyLeftIcon
-						}
-						label={ __( 'Change items justification' ) }
-						isCollapsed
-						controls={ [
-							{
-								icon: navIcons.justifyLeftIcon,
-								title: __( 'Justify items left' ),
-								isActive:
-									'left' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'left' ),
-							},
-							{
-								icon: navIcons.justifyCenterIcon,
-								title: __( 'Justify items center' ),
-								isActive:
-									'center' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'center' ),
-							},
-							{
-								icon: navIcons.justifyRightIcon,
-								title: __( 'Justify items right' ),
-								isActive:
-									'right' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'right' ),
-							},
-						] }
+					<JustifyToolbar
+						value={ attributes.itemsJustification }
+						onChange={ handleItemsAlignment }
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
 					/>
 				) }
 				{ hasListViewModal && (

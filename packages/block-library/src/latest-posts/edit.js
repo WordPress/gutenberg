@@ -450,7 +450,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = __experimentalGetSettings().formats.date;
 
 	return (
-		<>
+		<div>
 			{ inspectorControls }
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
@@ -576,6 +576,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 				} ) }
 			</ul>
-		</>
+		</div>
 	);
 }

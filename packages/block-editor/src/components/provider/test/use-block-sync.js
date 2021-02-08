@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType } from '@wordpress/blocks';
+
+/**
  * External dependencies
  */
 import { create, act } from 'react-test-renderer';
@@ -9,6 +14,7 @@ import { create, act } from 'react-test-renderer';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
+import { store as blockEditorStore } from '../../../store';
 
 const TestWrapper = withRegistryProvider( ( props ) => {
 	if ( props.setRegistry ) {
@@ -19,6 +25,15 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 } );
 
 describe( 'useBlockSync hook', () => {
+	beforeAll( () => {
+		registerBlockType( 'test/test-block', {
+			title: 'Test block',
+			attributes: {
+				foo: { type: 'number' },
+			},
+		} );
+	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -101,7 +116,12 @@ describe( 'useBlockSync hook', () => {
 		);
 
 		const testBlocks = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		await act( async () => {
 			root.update(
@@ -131,7 +151,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		let root;
 		let registry;
@@ -151,11 +176,11 @@ describe( 'useBlockSync hook', () => {
 		} );
 
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		const newBlockValue = registry
-			.select( 'core/block-editor' )
+			.select( blockEditorStore )
 			.getBlocks( 'test' );
 		replaceInnerBlocks.mockClear();
 
@@ -223,10 +248,10 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a non-persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.__unstableMarkNextChangeAsNotPersistent();
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( onInput ).toHaveBeenCalledWith(
@@ -262,7 +287,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( onChange ).toHaveBeenCalledWith(
@@ -282,7 +307,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		await act( async () => {
@@ -325,7 +355,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		let registry;
@@ -347,12 +382,19 @@ describe( 'useBlockSync hook', () => {
 		replaceInnerBlocks.mockClear();
 
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( onChange ).toHaveBeenCalledWith(
-			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
+			[
+				{
+					name: 'test/test-block',
+					clientId: 'a',
+					innerBlocks: [],
+					attributes: { foo: 2 },
+				},
+			],
 			{ selectionEnd: {}, selectionStart: {} }
 		);
 		expect( onInput ).not.toHaveBeenCalled();
@@ -383,7 +425,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		const updatedBlocks1 = [
@@ -418,7 +460,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
 		// The first callback should not have been called.
@@ -475,7 +517,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
 		// The first callback should never be called in this scenario.

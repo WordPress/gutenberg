@@ -22,7 +22,7 @@ import {
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { isReusableBlock } from '@wordpress/blocks';
+import { getBlockVariations } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -1174,7 +1174,7 @@ export function isCaretWithinFormattedText( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-function selection( state = {}, action ) {
+function selectionHelper( state = {}, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK': {
 			if ( state.clientId ) {
@@ -1237,53 +1237,78 @@ function selection( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block selection's start.
+ * Reducer returning the selection state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {boolean} Updated state.
  */
-export function selectionStart( state = {}, action ) {
+export function selection( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
 			return {
-				clientId: action.clientId,
-				attributeKey: action.attributeKey,
-				offset: action.startOffset,
+				selectionStart: {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.startOffset,
+				},
+				selectionEnd: {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.endOffset,
+				},
 			};
 		case 'RESET_SELECTION':
-			return action.selectionStart;
-		case 'MULTI_SELECT':
-			return { clientId: action.start };
-	}
-
-	return selection( state, action );
-}
-
-/**
- * Reducer returning the block selection's end.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function selectionEnd( state = {}, action ) {
-	switch ( action.type ) {
-		case 'SELECTION_CHANGE':
+			const { selectionStart, selectionEnd } = action;
 			return {
-				clientId: action.clientId,
-				attributeKey: action.attributeKey,
-				offset: action.endOffset,
+				selectionStart,
+				selectionEnd,
 			};
-		case 'RESET_SELECTION':
-			return action.selectionEnd;
 		case 'MULTI_SELECT':
-			return { clientId: action.end };
+			const { start, end } = action;
+			return {
+				selectionStart: { clientId: start },
+				selectionEnd: { clientId: end },
+			};
+		case 'RESET_BLOCKS':
+			const startClientId = state?.selectionStart?.clientId;
+			const endClientId = state?.selectionEnd?.clientId;
+
+			// Do nothing if there's no selected block.
+			if ( ! startClientId && ! endClientId ) {
+				return state;
+			}
+
+			// If the start of the selection won't exist after reset, remove selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === startClientId
+				)
+			) {
+				return {
+					selectionStart: {},
+					selectionEnd: {},
+				};
+			}
+
+			// If the end of the selection won't exist after reset, collapse selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === endClientId
+				)
+			) {
+				return {
+					...state,
+					selectionEnd: state.selectionStart,
+				};
+			}
 	}
 
-	return selection( state, action );
+	return {
+		selectionStart: selectionHelper( state.selectionStart, action ),
+		selectionEnd: selectionHelper( state.selectionEnd, action ),
+	};
 }
 
 /**
@@ -1380,6 +1405,7 @@ function resetInsertionPoint( state, action, defaultValue ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'SELECT_BLOCK':
+		case 'SELECTION_CHANGE':
 		case 'REPLACE_INNER_BLOCKS':
 		case 'INSERT_BLOCKS':
 		case 'REMOVE_BLOCKS':
@@ -1483,11 +1509,20 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'INSERT_BLOCKS':
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
-				let id = block.name;
-				const insert = { name: block.name };
-				if ( isReusableBlock( block ) ) {
-					insert.ref = block.attributes.ref;
-					id += '/' + block.attributes.ref;
+				const { attributes, name: blockName } = block;
+				const variations = getBlockVariations( blockName );
+				const match = variations?.find( ( variation ) =>
+					variation.isActive?.( attributes, variation.attributes )
+				);
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
+				let id = match?.name
+					? `${ blockName }/${ match.name }`
+					: blockName;
+				const insert = { name: id };
+				if ( blockName === 'core/block' ) {
+					insert.ref = attributes.ref;
+					id += '/' + attributes.ref;
 				}
 
 				return {
@@ -1695,8 +1730,7 @@ export default combineReducers( {
 	isTyping,
 	draggedBlocks,
 	isCaretWithinFormattedText,
-	selectionStart,
-	selectionEnd,
+	selection,
 	isMultiSelecting,
 	isSelectionEnabled,
 	initialPosition,

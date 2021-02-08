@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import NavigationEntityItems from '../navigation-entity-items';
 import { MENU_CONTENT_POSTS, MENU_ROOT } from '../constants';
+import { store as editSiteStore } from '../../../../store';
 
 export default function ContentPostsMenu() {
 	const showOnFront = useSelect(
@@ -22,7 +23,7 @@ export default function ContentPostsMenu() {
 		[]
 	);
 
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage } = useDispatch( editSiteStore );
 
 	const onActivateFrontItem = () => {
 		setPage( {

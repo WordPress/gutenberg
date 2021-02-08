@@ -24,7 +24,14 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @var WP_Theme_JSON
 	 */
-	private $theme = null;
+	private static $theme = null;
+
+	/**
+	 * Whether or not the theme supports theme.json.
+	 *
+	 * @var boolean
+	 */
+	private static $theme_has_support = null;
 
 	/**
 	 * Container for data coming from the user.
@@ -76,6 +83,32 @@ class WP_Theme_JSON_Resolver {
 	 * containing the a translatable path from theme.json and an array
 	 * of properties that are translatable.
 	 *
+	 * For example, given this input:
+	 *
+	 * {
+	 *   "settings": {
+	 *     "*": {
+	 *       "typography": {
+	 *         "fontSizes": [ "name" ],
+	 *         "fontStyles": [ "name" ]
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * will return this output:
+	 *
+	 * [
+	 *   0 => [
+	 *     'path' => [ 'settings', '*', 'typography', 'fontSizes' ],
+	 *     'translatable_keys' => [ 'name' ]
+	 *   ],
+	 *   1 => [
+	 *     'path' => [ 'settings', '*', 'typography', 'fontStyles' ],
+	 *     'translatable_keys' => [ 'name']
+	 *   ]
+	 * ]
+	 *
 	 * @param array $file_structure_partial A part of a theme.json i18n tree.
 	 * @param array $current_path           An array with a path on the theme.json i18n tree.
 	 *
@@ -110,7 +143,6 @@ class WP_Theme_JSON_Resolver {
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
 			$theme_json_i18n = self::theme_json_i18_file_structure_to_preset_paths( $file_structure );
-
 		}
 		return $theme_json_i18n;
 	}
@@ -123,29 +155,37 @@ class WP_Theme_JSON_Resolver {
 	 *                                     Default 'default'.
 	 */
 	private static function translate_presets( &$theme_json_structure, $domain = 'default' ) {
+		if ( ! isset( $theme_json_structure['settings'] ) ) {
+			return;
+		}
+
 		$preset_to_translate = self::get_presets_to_translate();
-		foreach ( $theme_json_structure as &$context_value ) {
-			if ( empty( $context_value ) ) {
+		foreach ( $theme_json_structure['settings'] as &$settings ) {
+			if ( empty( $settings ) ) {
 				continue;
 			}
+
 			foreach ( $preset_to_translate as $preset ) {
-				$path               = $preset['path'];
+				$path               = array_slice( $preset['path'], 2 );
 				$translatable_keys  = $preset['translatable_keys'];
-				$array_to_translate = gutenberg_experimental_get( $context_value, $path, null );
+				$array_to_translate = gutenberg_experimental_get( $settings, $path, null );
 				if ( null === $array_to_translate ) {
 					continue;
 				}
+
 				foreach ( $array_to_translate as &$item_to_translate ) {
 					foreach ( $translatable_keys as $translatable_key ) {
 						if ( empty( $item_to_translate[ $translatable_key ] ) ) {
 							continue;
 						}
+
 						// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
 						$item_to_translate[ $translatable_key ] = translate( $item_to_translate[ $translatable_key ], $domain );
 						// phpcs:enable
 					}
 				}
-				gutenberg_experimental_set( $context_value, $path, $array_to_translate );
+
+				gutenberg_experimental_set( $settings, $path, $array_to_translate );
 			}
 		}
 	}
@@ -160,7 +200,8 @@ class WP_Theme_JSON_Resolver {
 			return self::$core;
 		}
 
-		$config = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
+		$config     = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
 		self::translate_presets( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
@@ -178,8 +219,8 @@ class WP_Theme_JSON_Resolver {
 			'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
 			'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
 		);
-		if ( ! empty( $config['global']['settings']['color']['palette'] ) ) {
-			foreach ( $config['global']['settings']['color']['palette'] as &$color ) {
+		if ( ! empty( $config['settings'][ $all_blocks ]['color']['palette'] ) ) {
+			foreach ( $config['settings'][ $all_blocks ]['color']['palette'] as &$color ) {
 				$color['name'] = $default_colors_i18n[ $color['slug'] ];
 			}
 		}
@@ -198,8 +239,8 @@ class WP_Theme_JSON_Resolver {
 			'electric-grass'                       => __( 'Electric grass', 'gutenberg' ),
 			'midnight'                             => __( 'Midnight', 'gutenberg' ),
 		);
-		if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
-			foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
+		if ( ! empty( $config['settings'][ $all_blocks ]['color']['gradients'] ) ) {
+			foreach ( $config['settings'][ $all_blocks ]['color']['gradients'] as &$gradient ) {
 				$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
 			}
 		}
@@ -211,8 +252,8 @@ class WP_Theme_JSON_Resolver {
 			'large'  => __( 'Large', 'gutenberg' ),
 			'huge'   => __( 'Huge', 'gutenberg' ),
 		);
-		if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
-			foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
+		if ( ! empty( $config['settings'][ $all_blocks ]['typography']['fontSizes'] ) ) {
+			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as &$font_size ) {
 				$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 			}
 		}
@@ -224,27 +265,39 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Returns the theme's origin config.
+	 * Returns the theme's data.
 	 *
-	 * It uses the theme support data if
-	 * the theme hasn't declared any via theme.json.
+	 * Data from theme.json can be augmented via the
+	 * $theme_support_data variable. This is useful, for example,
+	 * to backfill the gaps in theme.json that a theme has declared
+	 * via add_theme_supports.
+	 *
+	 * Note that if the same data is present in theme.json
+	 * and in $theme_support_data, the theme.json's is not overwritten.
 	 *
 	 * @param array $theme_support_data Theme support data in theme.json format.
 	 *
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
-	private function get_theme_origin( $theme_support_data = array() ) {
-		$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
-		self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+	public function get_theme_data( $theme_support_data = array() ) {
+		if ( null === self::$theme ) {
+			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
+			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			self::$theme = new WP_Theme_JSON( $theme_json_data );
+		}
+
+		if ( empty( $theme_support_data ) ) {
+			return self::$theme;
+		}
 
 		/*
 		 * We want the presets and settings declared in theme.json
 		 * to override the ones declared via add_theme_support.
 		 */
-		$this->theme = new WP_Theme_JSON( $theme_support_data );
-		$this->theme->merge( new WP_Theme_JSON( $theme_json_data ) );
+		$with_theme_supports = new WP_Theme_JSON( $theme_support_data );
+		$with_theme_supports->merge( self::$theme );
 
-		return $this->theme;
+		return $with_theme_supports;
 	}
 
 	/**
@@ -361,7 +414,7 @@ class WP_Theme_JSON_Resolver {
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_origin( $theme_support_data ) );
+			$result->merge( $this->get_theme_data( $theme_support_data ) );
 			$result->merge( self::get_user_origin() );
 			return $result;
 		}
@@ -369,7 +422,7 @@ class WP_Theme_JSON_Resolver {
 		if ( ( 'theme' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_origin( $theme_support_data ) );
+			$result->merge( $this->get_theme_data( $theme_support_data ) );
 			return $result;
 		}
 
@@ -378,7 +431,7 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		if ( 'theme' === $origin ) {
-			return $this->get_theme_origin( $theme_support_data );
+			return $this->get_theme_data( $theme_support_data );
 		}
 
 		return self::get_core_origin();
@@ -430,6 +483,19 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		return self::$user_custom_post_type_id;
+	}
+
+	/**
+	 * Whether the current theme has a theme.json file.
+	 *
+	 * @return boolean
+	 */
+	public static function theme_has_support() {
+		if ( ! isset( self::$theme_has_support ) ) {
+			self::$theme_has_support = is_readable( locate_template( 'experimental-theme.json' ) );
+		}
+
+		return self::$theme_has_support;
 	}
 
 }

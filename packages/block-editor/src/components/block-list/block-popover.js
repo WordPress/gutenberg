@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -29,6 +29,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './';
 import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 function selector( select ) {
 	const {
@@ -39,7 +40,7 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	return {
 		isNavigationMode: isNavigationMode(),
 		isMultiSelecting: isMultiSelecting(),
@@ -71,6 +72,7 @@ function BlockPopover( {
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const blockNodes = useContext( BlockNodes );
+	const { stopTyping } = useDispatch( blockEditorStore );
 
 	// Controls when the side inserter on empty lines should
 	// be shown, including writing and selection modes.
@@ -94,6 +96,7 @@ function BlockPopover( {
 		'core/block-editor/focus-toolbar',
 		useCallback( () => {
 			setIsToolbarForced( true );
+			stopTyping( true );
 		}, [] ),
 		{
 			bindGlobal: true,
@@ -101,6 +104,12 @@ function BlockPopover( {
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
+
+	useEffect( () => {
+		if ( ! shouldShowContextualToolbar ) {
+			setIsToolbarForced( false );
+		}
+	}, [ shouldShowContextualToolbar ] );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
@@ -188,9 +197,6 @@ function BlockPopover( {
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
-			onFocusOutside={ () => {
-				setIsToolbarForced( false );
-			} }
 			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
@@ -260,7 +266,7 @@ function wrapperSelector( select ) {
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
 		__experimentalGetBlockListSettingsForBlocks,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();

@@ -45,4 +45,4 @@ const LinkSettingsNavigation = memo( ( props ) => {
 	);
 } );
 
-export default LinkSettingsNavigation;
+export default memo( LinkSettingsNavigation );

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/primitives",
-	"version": "1.11.0",
+	"version": "1.11.1",
 	"description": "WordPress cross-platform primitives.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"mobile",
 		"platform"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/primitives/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/primitives/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

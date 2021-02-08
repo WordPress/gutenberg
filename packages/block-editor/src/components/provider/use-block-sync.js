@@ -11,6 +11,11 @@ import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
  * A function to call when the block value has been updated in the block-editor
  * store.
  *
@@ -63,8 +68,6 @@ import { cloneBlock } from '@wordpress/blocks';
  *                                change has been made in the block-editor blocks
  *                                for the given clientId. When this is called,
  *                                controlling sources do not become dirty.
- * @param {boolean} props.__unstableCloneValue Whether or not to clone each of
- *                                the blocks provided in the value prop.
  */
 export default function useBlockSync( {
 	clientId = null,
@@ -73,7 +76,6 @@ export default function useBlockSync( {
 	selectionEnd: controlledSelectionEnd,
 	onChange = noop,
 	onInput = noop,
-	__unstableCloneValue = true,
 } ) {
 	const registry = useRegistry();
 
@@ -83,8 +85,8 @@ export default function useBlockSync( {
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-	} = registry.dispatch( 'core/block-editor' );
-	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
+	} = registry.dispatch( blockEditorStore );
+	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -101,12 +103,9 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			let storeBlocks = controlledBlocks;
-			if ( __unstableCloneValue ) {
-				storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlock( block )
-				);
-			}
+			const storeBlocks = controlledBlocks.map( ( block ) =>
+				cloneBlock( block )
+			);
 			if ( subscribed.current ) {
 				pendingChanges.current.incoming = storeBlocks;
 			}
@@ -167,7 +166,7 @@ export default function useBlockSync( {
 			getSelectionEnd,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
-		} = registry.select( 'core/block-editor' );
+		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
 		let isPersistent = isLastBlockChangePersistent();

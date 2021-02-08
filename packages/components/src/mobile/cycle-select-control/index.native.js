@@ -38,4 +38,4 @@ const CycleSelectControl = memo(
 	}
 );
 
-export default CycleSelectControl;
+export default memo( CycleSelectControl );

@@ -19,15 +19,12 @@ import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
 import getBlockContext from './get-block-context';
-
-/**
- * Internal dependencies
- */
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { defaultLayout, LayoutProvider } from './layout';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -70,7 +67,7 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useSelect(
 		( select ) => {
-			const block = select( 'core/block-editor' ).getBlock( clientId );
+			const block = select( blockEditorStore ).getBlock( clientId );
 			const blockType = getBlockType( block.name );
 
 			if ( ! blockType || ! blockType.providesContext ) {
@@ -137,7 +134,7 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  *                         the ref if one is defined.
  * @param {Object} options Optional. Inner blocks options.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const fallbackRef = useRef();
@@ -150,7 +147,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isNavigationMode,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const enableClickThrough = isNavigationMode() || isSmallScreen;
 			return (
 				getBlockName( clientId ) !== 'core/template' &&
@@ -197,6 +194,6 @@ ForwardedInnerBlocks.Content = withBlockContentContext(
 );
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export default ForwardedInnerBlocks;

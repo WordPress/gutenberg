@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import React from 'react';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +34,7 @@ const options = [
 	},
 ];
 
-const QueryControls = React.memo(
+const QueryControls = memo(
 	( {
 		categoriesList,
 		selectedCategoryId,

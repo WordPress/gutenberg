@@ -24,7 +24,7 @@ class EditorPage {
 	accessibilityIdXPathAttrib;
 	paragraphBlockName = 'Paragraph';
 	verseBlockName = 'Verse';
-	orderedListButtonName = 'Convert to ordered list';
+	orderedListButtonName = 'Ordered';
 
 	constructor( driver ) {
 		this.driver = driver;
@@ -588,6 +588,7 @@ const blockNames = {
 	spacer: 'Spacer',
 	verse: 'Verse',
 	file: 'File',
+	audio: 'Audio',
 };
 
 module.exports = { initializeEditorPage, blockNames };

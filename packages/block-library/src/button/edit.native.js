@@ -62,14 +62,14 @@ class ButtonEdit extends Component {
 			placeholderTextWidth: 0,
 		};
 
-		this.actions = [
+		this.linkSettingsActions = [
 			{
 				label: __( 'Remove link' ),
 				onPress: this.onClearSettings,
 			},
 		];
 
-		this.baseOptions = {
+		this.linkSettingsOptions = {
 			url: {
 				label: __( 'Button Link URL' ),
 				placeholder: __( 'Add URL' ),
@@ -85,10 +85,12 @@ class ButtonEdit extends Component {
 			},
 		};
 
-		this.modOptions = {
-			...this.baseOptions,
-			...this.baseOptions.url,
-			autoFocus: false,
+		this.noFocusLinkSettingOptions = {
+			...this.linkSettingsOptions,
+			url: {
+				...this.linkSettingsOptions.url,
+				autoFocus: false,
+			},
 		};
 	}
 
@@ -222,7 +224,10 @@ class ButtonEdit extends Component {
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: parentWidth,
+				maxWidth: Math.min(
+					parentWidth,
+					this.props.maxWidth - 2 * spacing
+				),
 			} );
 		} else if ( ! parentWidth && width && isWidthChanged ) {
 			this.setState( { maxWidth: width - spacing } );
@@ -257,11 +262,11 @@ class ButtonEdit extends Component {
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
 				hasPicker
-				actions={ this.actions }
+				actions={ this.linkSettingsActions }
 				options={
 					isCompatibleWithSettings
-						? this.baseOptions
-						: this.modOptions
+						? this.linkSettingsOptions
+						: this.noFocusLinkSettingOptions
 				}
 				showIcon={ ! isCompatibleWithSettings }
 			/>
@@ -306,7 +311,13 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 		} = this.props;
-		const { placeholder, text, borderRadius, url } = attributes;
+		const {
+			placeholder,
+			text,
+			borderRadius,
+			url,
+			align = 'center',
+		} = attributes;
 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
@@ -369,7 +380,7 @@ class ButtonEdit extends Component {
 							...richTextStyle.richText,
 							color: textColor,
 						} }
-						textAlign="center"
+						textAlign={ align }
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
@@ -439,7 +450,9 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlockCount,
 			getBlockRootClientId,
+			getSettings,
 		} = select( 'core/block-editor' );
+		const { maxWidth } = getSettings();
 
 		const parentId = getBlockRootClientId( clientId );
 		const selectedId = getSelectedBlockClientId();
@@ -449,6 +462,7 @@ export default compose( [
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			numOfButtons,
+			maxWidth,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

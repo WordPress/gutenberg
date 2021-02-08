@@ -1,14 +1,23 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import BlockView from './block-view';
-import ListView from './list-view';
+import { BlockList, ObserveTyping, WritingFlow } from '@wordpress/block-editor';
+import { Spinner } from '@wordpress/components';
 
-export default function Editor( { isPending, blocks } ) {
+export default function Editor( { isPending } ) {
 	return (
 		<div className="edit-navigation-editor">
-			<BlockView isPending={ isPending } />
-			<ListView isPending={ isPending } blocks={ blocks } />
+			{ isPending ? (
+				<Spinner />
+			) : (
+				<div className="editor-styles-wrapper">
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList />
+						</ObserveTyping>
+					</WritingFlow>
+				</div>
+			) }
 		</div>
 	);
 }

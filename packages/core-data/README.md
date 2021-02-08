@@ -64,6 +64,8 @@ _Parameters_
 -   _name_ `string`: Name of the deleted entity.
 -   _recordId_ `string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
+-   _options_ `[Object]`: Delete options.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a control descriptor.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
@@ -230,6 +232,7 @@ _Parameters_
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a control descriptor.
 
 <a name="undo" href="#undo">#</a> **undo**
 

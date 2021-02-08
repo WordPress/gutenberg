@@ -18,10 +18,11 @@ import { _x } from '@wordpress/i18n';
 import { getActiveStyle, replaceActiveStyle } from './utils';
 import StylePreview from './preview';
 import containerStyles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 function BlockStyles( { clientId, url } ) {
 	const selector = ( select ) => {
-		const { getBlock } = select( 'core/block-editor' );
+		const { getBlock } = select( blockEditorStore );
 		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
 		return {
@@ -32,7 +33,7 @@ function BlockStyles( { clientId, url } ) {
 
 	const { styles, className } = useSelect( selector, [ clientId ] );
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const renderedStyles = find( styles, 'isDefault' )
 		? styles

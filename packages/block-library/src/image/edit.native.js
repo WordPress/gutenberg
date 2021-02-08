@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -61,7 +61,7 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
-export class ImageEdit extends React.Component {
+export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -94,7 +94,7 @@ export class ImageEdit extends React.Component {
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
 
-		this.options = {
+		this.linkSettingsOptions = {
 			url: {
 				label: __( 'Image Link URL' ),
 				placeholder: __( 'Add URL' ),
@@ -385,7 +385,7 @@ export class ImageEdit extends React.Component {
 				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
-				options={ this.options }
+				options={ this.linkSettingsOptions }
 				showIcon={ false }
 			/>
 		);
