@@ -8,13 +8,12 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { withInstanceId } from '@wordpress/compose';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import withFocusOutside from '../higher-order/with-focus-outside';
 import BaseControl from '../base-control';
 import Controls from './controls';
 import FocalPoint from './focal-point';
@@ -40,18 +39,26 @@ export class FocalPointPicker extends Component {
 		this.containerRef = createRef();
 		this.mediaRef = createRef();
 
-		this.handleOnClick = this.handleOnClick.bind( this );
-		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
-		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
-		this.onMouseMove = this.onMouseMove.bind( this );
+		this.onMouseDown = this.startDrag.bind( this );
+		this.onMouseUp = this.stopDrag.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onMouseMove = this.doDrag.bind( this );
+		this.ifDraggingStop = () => {
+			if ( this.state.isDragging ) {
+				this.stopDrag();
+			}
+		};
+		this.onChangeAtControls = ( value ) => {
+			this.updateValue( value );
+			this.props.onChange( value );
+		};
 
 		this.updateBounds = this.updateBounds.bind( this );
 		this.updateValue = this.updateValue.bind( this );
 	}
 	componentDidMount() {
-		const ownerDoc = this.containerRef.current.ownerDocument;
-		ownerDoc.addEventListener( 'mouseup', this.handleOnMouseUp );
-		ownerDoc.defaultView.addEventListener( 'resize', this.updateBounds );
+		const { defaultView } = this.containerRef.current.ownerDocument;
+		defaultView.addEventListener( 'resize', this.updateBounds );
 
 		/*
 		 * Set initial bound values.
@@ -63,26 +70,25 @@ export class FocalPointPicker extends Component {
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
-			this.setState( {
-				isDragging: false,
-			} );
+			this.ifDraggingStop();
 		}
-		if ( this.state.isDragging ) return;
 		/*
 		 * Handles cases where the incoming value changes.
 		 * An example is the values resetting based on an UNDO action.
 		 */
-		if (
-			this.props.value.x !== this.state.percentages.x ||
-			this.props.value.y !== this.state.percentages.y
-		) {
+		const {
+			isDragging,
+			percentages: { x, y },
+		} = this.state;
+		const { value } = this.props;
+		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
 			this.setState( { percentages: this.props.value } );
 		}
 	}
 	componentWillUnmount() {
-		const ownerDoc = this.containerRef.current.ownerDocument;
-		ownerDoc.removeEventListener( 'mouseup', this.handleOnMouseUp );
-		ownerDoc.defaultView.removeEventListener( 'resize', this.updateBounds );
+		const { defaultView } = this.containerRef.current.ownerDocument;
+		defaultView.removeEventListener( 'resize', this.updateBounds );
+		this.ifDraggingStop();
 	}
 	calculateBounds() {
 		const bounds = INITIAL_BOUNDS;
@@ -137,22 +143,30 @@ export class FocalPointPicker extends Component {
 			bounds: this.calculateBounds(),
 		} );
 	}
-	handleOnClick( event ) {
+	startDrag( event ) {
 		event.persist();
 		this.containerRef.current.focus();
-		this.props.onDragStart?.( event );
-		this.setState( { isDragging: true }, () => {
-			this.onMouseMove( event );
-		} );
+		this.setState( { isDragging: true } );
+		const { ownerDocument } = this.containerRef.current;
+		ownerDocument.addEventListener( 'mouseup', this.onMouseUp );
+		ownerDocument.addEventListener( 'mousemove', this.onMouseMove );
+		const value = this.getValueFromPoint(
+			{ x: event.pageX, y: event.pageY },
+			event.shiftKey
+		);
+		this.updateValue( value );
+		this.props.onDragStart?.( value, event );
 	}
-	handleOnMouseUp( event ) {
-		event.persist?.();
-		this.props.onDragEnd?.( event );
+	stopDrag( event ) {
+		const { ownerDocument } = this.containerRef.current;
+		ownerDocument.removeEventListener( 'mouseup', this.onMouseUp );
+		ownerDocument.removeEventListener( 'mousemove', this.onMouseMove );
 		this.setState( { isDragging: false }, () => {
 			this.props.onChange( this.state.percentages );
 		} );
+		this.props.onDragEnd?.( event );
 	}
-	handleOnKeyDown( event ) {
+	onKeyDown( event ) {
 		const { keyCode, shiftKey } = event;
 		if ( ! [ UP, DOWN, LEFT, RIGHT ].includes( keyCode ) ) return;
 
@@ -169,28 +183,32 @@ export class FocalPointPicker extends Component {
 		this.updateValue( next );
 		this.props.onChange( next );
 	}
-	onMouseMove( event ) {
-		const { isDragging, bounds } = this.state;
-
-		if ( ! isDragging ) return;
-
+	doDrag( event ) {
 		// Prevents text-selection when dragging.
 		event.preventDefault();
+		const value = this.getValueFromPoint(
+			{ x: event.pageX, y: event.pageY },
+			event.shiftKey
+		);
+		this.updateValue( value );
+		this.props.onDrag?.( value, event );
+	}
+	getValueFromPoint( point, byTenths ) {
+		const { bounds } = this.state;
 
-		const { shiftKey } = event;
 		const pickerDimensions = this.pickerDimensions();
-		const cursorPosition = {
-			left: event.pageX - pickerDimensions.left,
-			top: event.pageY - pickerDimensions.top,
+		const relativePoint = {
+			left: point.x - pickerDimensions.left,
+			top: point.y - pickerDimensions.top,
 		};
 
 		const left = Math.max(
 			bounds.left,
-			Math.min( cursorPosition.left, bounds.right )
+			Math.min( relativePoint.left, bounds.right )
 		);
 		const top = Math.max(
 			bounds.top,
-			Math.min( cursorPosition.top, bounds.bottom )
+			Math.min( relativePoint.top, bounds.bottom )
 		);
 
 		let nextX =
@@ -200,18 +218,12 @@ export class FocalPointPicker extends Component {
 			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
 
 		// Enables holding shift to jump values by 10%
-		const step = shiftKey ? 0.1 : 0.01;
+		const step = byTenths ? 0.1 : 0.01;
 
 		nextX = roundClamp( nextX, 0, 1, step );
 		nextY = roundClamp( nextY, 0, 1, step );
 
-		const nextPercentage = {
-			x: nextX,
-			y: nextY,
-		};
-
-		this.updateValue( nextPercentage );
-		this.props.onDrag?.( event, nextPercentage );
+		return { x: nextX, y: nextY };
 	}
 	pickerDimensions() {
 		const containerNode = this.containerRef.current;
@@ -237,8 +249,8 @@ export class FocalPointPicker extends Component {
 	}
 	iconCoordinates() {
 		const {
-			percentages: { x, y },
 			bounds,
+			percentages: { x, y },
 		} = this.state;
 
 		if ( bounds.left === undefined || bounds.top === undefined ) {
@@ -253,12 +265,6 @@ export class FocalPointPicker extends Component {
 			left: x * ( width - bounds.left * 2 ) + bounds.left,
 			top: y * ( height - bounds.top * 2 ) + bounds.top,
 		};
-	}
-	// Callback method for the withFocusOutside higher-order component
-	handleFocusOutside() {
-		this.setState( {
-			isDragging: false,
-		} );
 	}
 	render() {
 		const {
@@ -289,10 +295,9 @@ export class FocalPointPicker extends Component {
 				<MediaWrapper className="components-focal-point-picker-wrapper">
 					<MediaContainer
 						className="components-focal-point-picker"
-						onKeyDown={ this.handleOnKeyDown }
-						onMouseDown={ this.handleOnClick }
-						onMouseMove={ this.onMouseMove }
-						onMouseUp={ this.handleOnMouseUp }
+						onKeyDown={ this.onKeyDown }
+						onMouseDown={ this.onMouseDown }
+						onBlur={ this.ifDraggingStop }
 						ref={ this.containerRef }
 						role="button"
 						tabIndex="-1"
@@ -316,10 +321,7 @@ export class FocalPointPicker extends Component {
 				</MediaWrapper>
 				<Controls
 					percentages={ percentages }
-					onChange={ ( value ) => {
-						this.updateValue( value );
-						this.props.onChange( value );
-					} }
+					onChange={ this.onChangeAtControls }
 				/>
 			</BaseControl>
 		);
@@ -335,6 +337,4 @@ FocalPointPicker.defaultProps = {
 	url: null,
 };
 
-export default compose( [ withInstanceId, withFocusOutside ] )(
-	FocalPointPicker
-);
+export default withInstanceId( FocalPointPicker );
