@@ -34,6 +34,9 @@ const renderQueue = createQueue();
  * @param {Array}    deps        If provided, this memoizes the mapSelect so the
  *                               same `mapSelect` is invoked on every state
  *                               change unless the dependencies change.
+ * @param {String}    caller       If provided, this memoizes the mapSelect so the
+ *                               same `mapSelect` is invoked on every state
+ *                               change unless the dependencies change.
  *
  * @example
  * ```js
@@ -62,7 +65,7 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( _mapSelect, deps ) {
+export default function useSelect( _mapSelect, deps, caller ) {
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
@@ -163,14 +166,40 @@ export default function useSelect( _mapSelect, deps ) {
 		// catch any possible state changes during mount before the subscription
 		// could be set.
 		if ( latestIsAsync.current ) {
-			renderQueue.add( queueContext, onStoreChange );
+			if ( caller === 'gallery-get-media' ) {
+				console.log( 'Add to queue during mount', queueContext );
+				renderQueue.add(
+					queueContext,
+					onStoreChange,
+					'gallery-get-media'
+				);
+			} else {
+				renderQueue.add(
+					queueContext,
+					onStoreChange,
+					'something-else'
+				);
+			}
 		} else {
 			onStoreChange();
 		}
 
 		const onChange = () => {
 			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
+				if ( caller === 'gallery-get-media' ) {
+					console.log( 'Add to queue on change', queueContext );
+					renderQueue.add(
+						queueContext,
+						onStoreChange,
+						'gallery-get-media'
+					);
+				} else {
+					renderQueue.add(
+						queueContext,
+						onStoreChange,
+						'something-else'
+					);
+				}
 			} else {
 				onStoreChange();
 			}

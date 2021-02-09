@@ -74,6 +74,8 @@ export const createQueue = () => {
 
 	let isRunning = false;
 
+	let count = 0;
+
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
@@ -92,10 +94,13 @@ export const createQueue = () => {
 				return;
 			}
 
-			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
+			const nextElement = /** @type {any} */ ( waitingList.shift() );
 			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 				nextElement
 			) );
+			if ( nextElement.id ) {
+				console.log( 'running-callback', nextElement );
+			}
 			callback();
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );
@@ -106,14 +111,28 @@ export const createQueue = () => {
 	/**
 	 * Add a callback to the queue for a given context.
 	 *
-	 * @type {WPPriorityQueueAdd}
+	 * @type {any}
 	 *
-	 * @param {WPPriorityQueueContext}  element Context object.
+	 * @param {any}  element Context object.
 	 * @param {WPPriorityQueueCallback} item    Callback function.
+	 * @param {any} caller    Callback function.
 	 */
-	const add = ( element, item ) => {
+	const add = ( element, item, caller ) => {
+		if ( caller === 'gallery-get-media' && ! element.id ) {
+			element.id = count;
+			console.log( 'new gallery element', caller, element );
+			count++;
+		}
 		if ( ! elementsMap.has( element ) ) {
+			if ( element.id ) {
+				console.log( 'adding to waitingList', element );
+			}
 			waitingList.push( element );
+		} else if ( element.id && elementsMap.has( element ) ) {
+			console.log(
+				'in elementMap already so not adding to waiting list',
+				element
+			);
 		}
 		elementsMap.set( element, item );
 		if ( ! isRunning ) {

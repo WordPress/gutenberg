@@ -123,7 +123,7 @@ function GalleryEdit( props ) {
 			} ) ),
 		[ innerBlockImages ]
 	);
-
+	// const imageData = undefined;
 	const imageData = useSelect(
 		( select ) => {
 			if (
@@ -149,7 +149,8 @@ function GalleryEdit( props ) {
 
 			return imageData;
 		},
-		[ innerBlockImages ]
+		[ innerBlockImages ],
+		'gallery-get-media'
 	);
 
 	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
