@@ -37,6 +37,9 @@ jobs:
         with:
           node-version: 14.x
 
+      - name: Install latest NPM version
+        run: npm install -g npm@latest
+
       - name: Build Gutenberg plugin ZIP file
         run: ./bin/build-plugin-zip.sh
         env:
