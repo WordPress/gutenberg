@@ -102,10 +102,17 @@ function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
  */
 export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
 	return getColorsFromValues( values ).map( ( tcolor ) =>
-		tcolor.toHexString()
+		tcolor.toRgbString()
 	);
 }
 
+/**
+ * Convert a color values object to an array of color stops.
+ *
+ * @param {RGBValues} values R, G, and B values.
+ *
+ * @return {Object[]} Color stop information.
+ */
 export function getColorStopsFromValues( values = { r: [], g: [], b: [] } ) {
 	const colors = getColorsFromValues( values );
 	return colors.map( ( tcolor, i ) => ( {
@@ -114,13 +121,27 @@ export function getColorStopsFromValues( values = { r: [], g: [], b: [] } ) {
 	} ) );
 }
 
-export function getValuesFromColorStops( colors = [] ) {
-	return getValuesFromColors( colors.map( ( { color } ) => color ) );
+/**
+ * Convert a color values object to an array of color stops.
+ *
+ * @param {Object[]} colorStops Color stop information.
+ *
+ * @return {RGBValues} R, G, and B values.
+ */
+export function getValuesFromColorStops( colorStops = [] ) {
+	return getValuesFromColors( colorStops.map( ( { color } ) => color ) );
 }
 
-export function getCustomDuotoneIdFromColorStops( colors = [] ) {
+/**
+ * Convert a color stops array to a custom duotone id.
+ *
+ * @param {Object[]} colorStops Color stop information.
+ *
+ * @return {string} Custom duotone id.
+ */
+export function getCustomDuotoneIdFromColorStops( colorStops = [] ) {
 	return getCustomDuotoneIdFromHexColors(
-		colors.map( ( { color } ) => tinycolor( color ).toHexString() )
+		colorStops.map( ( { color } ) => tinycolor( color ).toHexString() )
 	);
 }
 
@@ -152,6 +173,13 @@ export function getDefaultColors( palette ) {
 		.map( ( { color } ) => color );
 }
 
+/**
+ * Gets a duotone id from custom hex colors.
+ *
+ * @param {string[]} colors Hex color array.
+ *
+ * @return {string} Custom duotone id.
+ */
 export function getCustomDuotoneIdFromHexColors( colors ) {
 	return `duotone-filter-custom-${ colors
 		.map( ( hex ) => hex.slice( 1 ).toLowerCase() )
