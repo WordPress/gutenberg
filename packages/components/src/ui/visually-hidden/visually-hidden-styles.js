@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@wp-g2/styles';
+import { css, ui } from '@wp-g2/styles';
 
 export const VisuallyHidden = css`
 	border: 0;
@@ -17,7 +17,7 @@ export const VisuallyHidden = css`
 	word-wrap: normal !important;
 
 	&:focus {
-		background-color: $gray-300;
+		background-color: ${ ui.get( 'lightGray300' ) };
 		clip: auto !important;
 		clip-path: none;
 		color: #444;

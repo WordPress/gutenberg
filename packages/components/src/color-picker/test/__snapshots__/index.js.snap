@@ -585,6 +585,19 @@ exports[`ColorPicker should render color picker 1`] = `
   font-weight: normal;
   font-weight: var(--wp-g2-font-weight);
   margin: 0;
+  border: 0;
+  -webkit-clip: rect( 1px,1px,1px,1px );
+  clip: rect( 1px,1px,1px,1px );
+  -webkit-clip-path: inset( 50% );
+  -webkit-clip-path: inset( 50% );
+  clip-path: inset( 50% );
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal !important;
 }
 
 @media (prefers-reduced-motion) {
@@ -597,6 +610,27 @@ exports[`ColorPicker should render color picker 1`] = `
 [data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
+}
+
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:focus {
+  background-color: #edeff0;
+  background-color: var(--wp-g2-light-gray-300);
+  -webkit-clip: auto !important;
+  clip: auto !important;
+  -webkit-clip-path: none;
+  clip-path: none;
+  color: #444;
+  display: block;
+  font-size: 1em;
+  height: auto;
+  left: 5px;
+  line-height: normal;
+  padding: 15px 23px 14px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  top: 5px;
+  width: auto;
+  z-index: 100000;
 }
 
 .emotion-6 {
@@ -658,19 +692,6 @@ exports[`ColorPicker should render color picker 1`] = `
         <div
           className="components-visually-hidden wp-components-visually-hidden emotion-0"
           id="color-picker-saturation-0"
-          style={
-            Object {
-              "border": 0,
-              "clip": "rect(0 0 0 0)",
-              "height": "1px",
-              "margin": "-1px",
-              "overflow": "hidden",
-              "padding": 0,
-              "position": "absolute",
-              "whiteSpace": "nowrap",
-              "width": "1px",
-            }
-          }
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
@@ -731,19 +752,6 @@ exports[`ColorPicker should render color picker 1`] = `
               <p
                 className="components-visually-hidden wp-components-visually-hidden emotion-0"
                 id="components-color-picker__hue-description-0"
-                style={
-                  Object {
-                    "border": 0,
-                    "clip": "rect(0 0 0 0)",
-                    "height": "1px",
-                    "margin": "-1px",
-                    "overflow": "hidden",
-                    "padding": 0,
-                    "position": "absolute",
-                    "whiteSpace": "nowrap",
-                    "width": "1px",
-                  }
-                }
               >
                 Move the arrow left or right to change hue.
               </p>
