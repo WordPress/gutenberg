@@ -15,6 +15,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -85,6 +86,14 @@ function InserterListItem( {
 							event.preventDefault();
 							onSelect( item, event.metaKey );
 							onHover( null );
+						} }
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER ) {
+								event.preventDefault();
+								onSelect( item, event.metaKey );
+								onHover( null );
+							}
 						} }
 						onFocus={ () => {
 							if ( isDragging.current ) {
