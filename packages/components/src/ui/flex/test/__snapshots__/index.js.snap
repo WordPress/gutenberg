@@ -31,19 +31,19 @@ exports[`props should render align 1`] = `
 - - First value
 - + Second value
 -
-- @@ -1,11 +1,11 @@
--   Object {
--     \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--     \\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
--     \\"--wp-g2-flex-item-margin-left\\": \\"0\\",
--     \\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
-- -   \\"align-items\\": \\"flex-start\\",
-- +   \\"align-items\\": \\"center\\",
--     \\"box-sizing\\": \\"border-box\\",
--     \\"display\\": \\"flex\\",
--     \\"flex-direction\\": \\"row\\",
--     \\"font-family\\": \\"var(--wp-g2-font-family)\\",
--     \\"font-weight\\": \\"var(--wp-g2-font-weight)\\","
+- @@ -10,11 +10,11 @@
+-   	\\"margin-left\\": \\"0px\\",
+-   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+-   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
+-   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
+-   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
+- - 	\\"align-items\\": \\"flex-start\\",
+- + 	\\"align-items\\": \\"center\\",
+-   	\\"flex-direction\\": \\"row\\",
+-   	\\"justify-content\\": \\"space-between\\",
+-   	\\"width\\": \\"100%\\",
+-   	\\"visibility\\": \\"visible\\"
+-   }"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -195,19 +195,17 @@ exports[`props should render justify 1`] = `
 - - First value
 - + Second value
 -
-- @@ -7,11 +7,11 @@
--     \\"box-sizing\\": \\"border-box\\",
--     \\"display\\": \\"flex\\",
--     \\"flex-direction\\": \\"row\\",
--     \\"font-family\\": \\"var(--wp-g2-font-family)\\",
--     \\"font-weight\\": \\"var(--wp-g2-font-weight)\\",
-- -   \\"justify-content\\": \\"flex-start\\",
-- +   \\"justify-content\\": \\"space-between\\",
--     \\"margin\\": \\"0px\\",
--     \\"margin-bottom\\": \\"0px\\",
--     \\"margin-left\\": \\"0px\\",
--     \\"margin-right\\": \\"0px\\",
--     \\"margin-top\\": \\"0px\\","
+- @@ -12,9 +12,9 @@
+-   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
+-   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
+-   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
+-   	\\"align-items\\": \\"center\\",
+-   	\\"flex-direction\\": \\"row\\",
+- - 	\\"justify-content\\": \\"flex-start\\",
+- + 	\\"justify-content\\": \\"space-between\\",
+-   	\\"width\\": \\"100%\\",
+-   	\\"visibility\\": \\"visible\\"
+-   }"
 `;
 
 exports[`props should render spacing 1`] = `
@@ -219,13 +217,17 @@ exports[`props should render spacing 1`] = `
 - - First value
 - + Second value
 -
-- @@ -1,7 +1,7 @@
--   Object {
-- -   \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
-- +   \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--     \\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
--     \\"--wp-g2-flex-item-margin-left\\": \\"0\\",
--     \\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
--     \\"align-items\\": \\"center\\",
--     \\"box-sizing\\": \\"border-box\\","
+- @@ -6,11 +6,11 @@
+-   	\\"margin\\": \\"0px\\",
+-   	\\"margin-top\\": \\"0px\\",
+-   	\\"margin-right\\": \\"0px\\",
+-   	\\"margin-bottom\\": \\"0px\\",
+-   	\\"margin-left\\": \\"0px\\",
+- - 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
+- + 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+-   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
+-   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
+-   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
+-   	\\"align-items\\": \\"center\\",
+-   	\\"flex-direction\\": \\"row\\","
 `;
