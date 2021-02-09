@@ -6,7 +6,7 @@ import { Text } from '@wp-g2/components';
 /**
  * Internal dependencies
  */
-import FormGroup, { useFormGroupContextId } from '../index';
+import { FormGroup, useFormGroupContextId } from '../index';
 
 // @todo: Refactor this after adding next TextInput component.
 const TextInput = ( { id: idProp, ...props } ) => {

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import ControlLabel from '../index';
+import { ControlLabel } from '../index';
 
 export default {
 	component: ControlLabel,
