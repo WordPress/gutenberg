@@ -48,6 +48,32 @@ jobs:
           name: gutenberg-plugin
           path: ./gutenberg.zip
 
+  comment-on-pr:
+    name: Leave a comment with a link to the plugin build on the PR
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+    - uses: actions/github-script@v3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const artifacts = await github.actions.listWorkflowRunArtifacts( {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId
+          } );
+          const pluginArtifact = artifacts.find( artifact => (
+            artifact.name === 'gutenberg-plugin'
+          ) );
+          const pluginUrl = pluginArtifact.archive_download_url;
+          github.issues.createComment( {
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'The plugin zip for this PR is available for download from ' + pluginUrl
+          } )
+
   create-release:
     name: Create Release Draft and Attach Asset
     needs: build
