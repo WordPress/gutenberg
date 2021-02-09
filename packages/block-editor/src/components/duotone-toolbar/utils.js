@@ -4,15 +4,6 @@
 import tinycolor from 'tinycolor2';
 
 /**
- * Tinycolor object representation for a color.
- *
- * @typedef {Object} TinyColor
- * @property {number} _r Red component of the color in the range [0,255].
- * @property {number} _g Green component of the color in the range [0,255].
- * @property {number} _b Blue component of the color in the range [0,255].
- */
-
-/**
  * Object representation for a color.
  *
  * @typedef {Object} RGBColor
@@ -64,36 +55,21 @@ export function getGradientFromValues(
 }
 
 /**
- * Converts a tinycolor object to a simple RGBColor.
- *
- * @param {TinyColor} color Tinycolor object.
- *
- * @return {RGBColor} RGB color with values in the range [0,1]
- */
-export function tinycolorToRgb( color ) {
-	// Access values directly to skip rounding that tinycolor.toRgb() does.
-	return {
-		r: color._r / 255,
-		g: color._g / 255,
-		b: color._b / 255,
-	};
-}
-
-/**
  * Convert a list of colors to an object of R, G, and B values.
  *
  * @param {string[]} colors Array of RBG color strings.
  *
  * @return {RGBValues} R, G, and B values.
  */
-function getValuesFromColors( colors = [] ) {
+export function getValuesFromColors( colors = [] ) {
 	const values = { r: [], g: [], b: [] };
 
 	colors.forEach( ( color ) => {
-		const { r, g, b } = tinycolorToRgb( tinycolor( color ) );
-		values.r.push( r );
-		values.g.push( g );
-		values.b.push( b );
+		// Access values directly to skip rounding that tinycolor.toRgb() does.
+		const tcolor = tinycolor( color );
+		values.r.push( tcolor._r / 255 );
+		values.g.push( tcolor._g / 255 );
+		values.b.push( tcolor._b / 255 );
 	} );
 
 	return values;
