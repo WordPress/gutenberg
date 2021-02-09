@@ -210,34 +210,30 @@ function Controls( {
 										height="100%"
 										style={ imagePreviewStyles }
 										width={ styles.image.width }
-									>
-										{ focalPointHint }
-									</Image>
+									/>
 								) }
 								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-									<>
-										<Video
-											muted
-											paused
-											disableFocus
-											onLoad={ ( event ) => {
-												const {
-													height,
-													width,
-												} = event.naturalSize;
-												setVideoNaturalSize( {
-													height,
-													width,
-												} );
-												setDisplayPlaceholder( false );
-											} }
-											resizeMode={ 'cover' }
-											source={ { uri: url } }
-											style={ videoPreviewStyles }
-										/>
-										{ focalPointHint }
-									</>
+									<Video
+										muted
+										paused
+										disableFocus
+										onLoad={ ( event ) => {
+											const {
+												height,
+												width,
+											} = event.naturalSize;
+											setVideoNaturalSize( {
+												height,
+												width,
+											} );
+											setDisplayPlaceholder( false );
+										} }
+										resizeMode={ 'cover' }
+										source={ { uri: url } }
+										style={ videoPreviewStyles }
+									/>
 								) }
+								{ displayPlaceholder ? null : focalPointHint }
 							</View>
 						</BottomSheet.Cell>
 						<FocalPointSettings
