@@ -14,5 +14,8 @@
 				"gradients": [ { "name": "Gradient name" } ]
 			}
 		}
+	},
+	"customTemplates": {
+		"*": { "title": "Title of the CPT" }
 	}
 }
