@@ -16,7 +16,7 @@ const ruleTester = new RuleTester( {
 } );
 
 const valid = [
-	// HOC / Callback functions
+	// Callback functions
 	`import { createRegistrySelector } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; createRegistrySelector(( select ) => { select(store); });`,
 	`import { useSelect } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; useSelect(( select ) => { select(store); });`,
 	`import { withSelect } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; withSelect(( select ) => { select(store); });`,
@@ -38,7 +38,7 @@ const valid = [
 ];
 
 const invalid = [
-	// HOC / Callback functions
+	// Callback functions
 	`import { createRegistrySelector } from '@wordpress/data'; createRegistrySelector(( select ) => { select( 'core' ); });`,
 	`import { useSelect } from '@wordpress/data'; useSelect(( select ) => { select( 'core' ); });`,
 	`import { withSelect } from '@wordpress/data'; withSelect(( select ) => { select( 'core' ); });`,
