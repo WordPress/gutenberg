@@ -102,7 +102,7 @@ function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
  */
 export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
 	return getColorsFromValues( values ).map( ( tcolor ) =>
-		tcolor.toRgbString()
+		tcolor.toHexString()
 	);
 }
 
