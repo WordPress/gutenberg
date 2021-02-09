@@ -29,6 +29,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-npm-
 
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
+
     - run: npm ci
 
     - name: Prepare build cache key

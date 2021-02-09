@@ -12,6 +12,9 @@ jobs:
       with:
         fetch-depth: 1
 
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
+
     - uses: preactjs/compressed-size-action@v2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
