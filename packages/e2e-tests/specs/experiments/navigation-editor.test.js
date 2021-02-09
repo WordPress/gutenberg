@@ -183,7 +183,7 @@ describe( 'Navigation editor', () => {
 	} );
 
 	// Regressed—to be reimplemented.
-	it.skip( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
+	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
 			...getMenuItemMocks( { GET: menuItemsFixture } ),
