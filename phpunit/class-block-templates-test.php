@@ -18,7 +18,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_theme_taxonomy();
-		gutenberg_register_wp_template_section_taxonomy();
+		gutenberg_register_wp_template_part_area_taxonomy();
 
 		// Set up template post.
 		$args       = array(
@@ -44,16 +44,16 @@ class Block_Templates_Test extends WP_UnitTestCase {
 			'post_content' => 'Content',
 			'post_excerpt' => 'Description of my template part',
 			'tax_input'    => array(
-				'wp_theme'            => array(
+				'wp_theme'              => array(
 					get_stylesheet(),
 				),
-				'wp_template_section' => array(
-					WP_TEMPLATE_SECTION_SIDEBAR,
+				'wp_template_part_area' => array(
+					WP_TEMPLATE_PART_AREA_SIDEBAR,
 				),
 			),
 		);
 		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
-		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_SECTION_SIDEBAR, 'wp_template_section' );
+		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_PART_AREA_SIDEBAR, 'wp_template_part_area' );
 		wp_set_post_terms( self::$template_part_post->ID, get_stylesheet(), 'wp_theme' );
 	}
 
@@ -82,9 +82,9 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		// Test template parts.
 		$template_part = _gutenberg_build_template_result_from_file(
 			array(
-				'slug'    => 'header',
-				'path'    => __DIR__ . '/fixtures/template.html',
-				'section' => WP_TEMPLATE_SECTION_HEADER,
+				'slug' => 'header',
+				'path' => __DIR__ . '/fixtures/template.html',
+				'area' => WP_TEMPLATE_PART_AREA_HEADER,
 			),
 			'wp_template_part'
 		);
@@ -96,7 +96,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'header', $template_part->title );
 		$this->assertEquals( '', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
-		$this->assertEquals( WP_TEMPLATE_SECTION_HEADER, $template_part->section );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
 	function test_gutenberg_build_template_result_from_post() {
@@ -129,7 +129,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'My Template Part', $template_part->title );
 		$this->assertEquals( 'Description of my template part', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
-		$this->assertEquals( WP_TEMPLATE_SECTION_SIDEBAR, $template_part->section );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_SIDEBAR, $template_part->area );
 	}
 
 	function test_inject_theme_attribute_in_content() {
@@ -184,8 +184,8 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( false, $template->is_custom );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part section info.
-		$this->assertEquals( WP_TEMPLATE_SECTION_UNCATEGORIZED, $template->section );
+		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $template->area );
 	}
 
 	/**
@@ -210,7 +210,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( true, $template->is_custom );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		$this->assertEquals( WP_TEMPLATE_SECTION_SIDEBAR, $template->section );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_SIDEBAR, $template->area );
 	}
 
 	/**
@@ -244,10 +244,10 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$template_ids = get_template_ids( $templates );
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template' ), $template_ids );
 
-		// Filter template part by section.
-		$templates    = gutenberg_get_block_templates( array( 'section' => WP_TEMPLATE_SECTION_SIDEBAR ), 'wp_template_part' );
+		// Filter template part by area.
+		$templates    = gutenberg_get_block_templates( array( 'area' => WP_TEMPLATE_PART_AREA_SIDEBAR ), 'wp_template_part' );
 		$template_ids = get_template_ids( $templates );
-		// TODO - update following array result once tt1-blocks theme.json is updated for section info.
+		// TODO - update following array result once tt1-blocks theme.json is updated for area info.
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template_part' ), $template_ids );
 	}
 }

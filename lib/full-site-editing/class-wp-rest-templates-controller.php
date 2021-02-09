@@ -138,8 +138,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		if ( isset( $request['wp_id'] ) ) {
 			$query['wp_id'] = $request['wp_id'];
 		}
-		if ( isset( $request['section'] ) ) {
-			$query['section'] = $request['section'];
+		if ( isset( $request['area'] ) ) {
+			$query['area'] = $request['area'];
 		}
 		$templates = array();
 		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
@@ -362,12 +362,12 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
-			if ( isset( $request['section'] ) ) {
-				$changes->tax_input['wp_template_section'] = gutenberg_filter_template_part_section_type( $request['section'] );
-			} elseif ( null !== $template && ! $template->is_custom && $template->section ) {
-				$changes->tax_input['wp_template_section'] = gutenberg_filter_template_part_section_type( $template->section );
-			} elseif ( ! $template->section ) {
-				$changes->tax_input['wp_template_section'] = WP_TEMPLATE_SECTION_UNCATEGORIZED;
+			if ( isset( $request['area'] ) ) {
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $request['area'] );
+			} elseif ( null !== $template && ! $template->is_custom && $template->area ) {
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $template->area );
+			} elseif ( ! $template->area ) {
+				$changes->tax_input['wp_template_part_area'] = WP_TEMPLAT_PART_AREA_UNCATEGORIZED;
 			}
 		}
 
@@ -400,7 +400,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		);
 
 		if ( 'wp_template_part' === $template->type ) {
-			$result['section'] = $template->section;
+			$result['area'] = $template->area;
 		}
 
 		$result = $this->add_additional_fields_to_object( $result, $request );
@@ -554,7 +554,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		);
 
 		if ( 'wp_template_part' === $this->post_type ) {
-			$schema['properties']['section'] = array(
+			$schema['properties']['area'] = array(
 				'description' => __( 'Where the template part is intended for use (header, footer, etc.)', 'gutenberg' ),
 				'type'        => 'string',
 				'context'     => array( 'embed', 'view', 'edit' ),

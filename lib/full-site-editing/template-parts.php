@@ -61,22 +61,22 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
- * Registers the 'wp_template_section' taxonomy.
+ * Registers the 'wp_template_part_area' taxonomy.
  */
-function gutenberg_register_wp_template_section_taxonomy() {
+function gutenberg_register_wp_template_part_area_taxonomy() {
 	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}
 
 	register_taxonomy(
-		'wp_template_section',
+		'wp_template_part_area',
 		array( 'wp_template_part' ),
 		array(
 			'public'            => false,
 			'hierarchical'      => false,
 			'labels'            => array(
-				'name'          => __( 'Template Sections', 'gutenberg' ),
-				'singular_name' => __( 'Template Section', 'gutenberg' ),
+				'name'          => __( 'Template Part Areas', 'gutenberg' ),
+				'singular_name' => __( 'Template Part Area', 'gutenberg' ),
 			),
 			'query_var'         => false,
 			'rewrite'           => false,
@@ -87,20 +87,20 @@ function gutenberg_register_wp_template_section_taxonomy() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_register_wp_template_section_taxonomy' );
+add_action( 'init', 'gutenberg_register_wp_template_part_area_taxonomy' );
 
-// Definte constants for supported WP_TEMPLATE_SECTION taxonomy.
-if ( ! defined( 'WP_TEMPLATE_SECTION_HEADER' ) ) {
-	define( 'WP_TEMPLATE_SECTION_HEADER', 'header' );
+// Definte constants for supported wp_template_part_area taxonomy.
+if ( ! defined( 'WP_TEMPLATE_PART_AREA_HEADER' ) ) {
+	define( 'WP_TEMPLATE_PART_AREA_HEADER', 'header' );
 }
-if ( ! defined( 'WP_TEMPLATE_SECTION_FOOTER' ) ) {
-	define( 'WP_TEMPLATE_SECTION_FOOTER', 'footer' );
+if ( ! defined( 'WP_TEMPLATE_PART_AREA_FOOTER' ) ) {
+	define( 'WP_TEMPLATE_PART_AREA_FOOTER', 'footer' );
 }
-if ( ! defined( 'WP_TEMPLATE_SECTION_SIDEBAR' ) ) {
-	define( 'WP_TEMPLATE_SECTION_SIDEBAR', 'sidebar' );
+if ( ! defined( 'WP_TEMPLATE_PART_AREA_SIDEBAR' ) ) {
+	define( 'WP_TEMPLATE_PART_AREA_SIDEBAR', 'sidebar' );
 }
-if ( ! defined( 'WP_TEMPLATE_SECTION_UNCATEGORIZED' ) ) {
-	define( 'WP_TEMPLATE_SECTION_UNCATEGORIZED', 'uncategorized' );
+if ( ! defined( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED' ) ) {
+	define( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED', 'uncategorized' );
 }
 
 /**
@@ -163,41 +163,41 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
 
 /**
- * Returns a filtered list of allowed section types for template parts.
+ * Returns a filtered list of allowed area types for template parts.
  *
- * @return array The supported template part section types.
+ * @return array The supported template part area types.
  */
-function gutenberg_get_allowed_template_part_section_types() {
-	$default_section_types = array(
-		WP_TEMPLATE_SECTION_HEADER,
-		WP_TEMPLATE_SECTION_FOOTER,
-		WP_TEMPLATE_SECTION_SIDEBAR,
-		WP_TEMPLATE_SECTION_UNCATEGORIZED,
+function gutenberg_get_allowed_template_part_area_types() {
+	$default_area_types = array(
+		WP_TEMPLATE_PART_AREA_HEADER,
+		WP_TEMPLATE_PART_AREA_FOOTER,
+		WP_TEMPLATE_PART_AREA_SIDEBAR,
+		WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
 	);
 
 	/**
-	 * Filters the list of allowed template part section types.
+	 * Filters the list of allowed template part area types.
 	 *
-	 * @param array $default_section_types An array of supported section types.
+	 * @param array $default_area_types An array of supported area types.
 	 */
-	return apply_filters( 'default_wp_template_section_types', $default_section_types );
+	return apply_filters( 'default_wp_template_part_area_types', $default_area_types );
 }
 
 /**
- * Checks whether the input 'type' is a supported section type.
+ * Checks whether the input 'type' is a supported area type.
  * Returns the input if supported, otherwise returns the 'other' type.
  *
- * @param string $type Template part section name.
+ * @param string $type Template part area name.
  *
  * @return string Input if supported, else 'other'.
  */
-function gutenberg_filter_template_part_section_type( $type ) {
-	if ( in_array( $type, gutenberg_get_allowed_template_part_section_types(), true ) ) {
+function gutenberg_filter_template_part_area_type( $type ) {
+	if ( in_array( $type, gutenberg_get_allowed_template_part_area_types(), true ) ) {
 		return $type;
 	}
 	$warning_message  = '"' . $type . '"';
-	$warning_message .= __( ' is not a supported wp_template_section type and has been added as ', 'gutenberg' );
-	$warning_message .= '"' . WP_TEMPLATE_SECTION_UNCATEGORIZED . '".';
+	$warning_message .= __( ' is not a supported wp_template_part_area type and has been added as ', 'gutenberg' );
+	$warning_message .= '"' . WP_TEMPLATE_PART_AREA_UNCATEGORIZED . '".';
 	trigger_error( $warning_message, E_USER_NOTICE );
-	return WP_TEMPLATE_SECTION_UNCATEGORIZED;
+	return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 }

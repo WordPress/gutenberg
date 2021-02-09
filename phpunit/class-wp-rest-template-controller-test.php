@@ -16,7 +16,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_theme_taxonomy();
-		gutenberg_register_wp_template_section_taxonomy();
+		gutenberg_register_wp_template_part_area_taxonomy();
 		self::$admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -97,8 +97,8 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'is_custom'   => false,
 				'type'        => 'wp_template_part',
 				'wp_id'       => null,
-				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part section info.
-				'section'     => WP_TEMPLATE_SECTION_UNCATEGORIZED,
+				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
+				'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
 		);
@@ -150,8 +150,8 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'is_custom'   => false,
 				'type'        => 'wp_template_part',
 				'wp_id'       => null,
-				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part section info.
-				'section'     => WP_TEMPLATE_SECTION_UNCATEGORIZED,
+				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
+				'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
 			),
 			$data
 		);
@@ -201,7 +201,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'title'       => 'My Template Part',
 				'description' => 'Just a description of a template part',
 				'content'     => 'Content',
-				'section'     => 'header',
+				'area'        => 'header',
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
@@ -225,7 +225,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'content'     => array(
 					'raw' => 'Content',
 				),
-				'section'     => 'header',
+				'area'        => 'header',
 			),
 			$data
 		);
@@ -248,12 +248,12 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/template-parts/tt1-blocks//header' );
 		$request->set_body_params(
 			array(
-				'section' => 'something unsupported',
+				'area' => 'something unsupported',
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEquals( WP_TEMPLATE_SECTION_UNCATEGORIZED, $data['section'] );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $data['area'] );
 		$this->assertEquals( true, $data['is_custom'] );
 	}
 

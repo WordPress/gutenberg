@@ -247,7 +247,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 						'misc'       => 'value',
 					),
-					'core/group' => array(
+					'core/group'     => array(
 						'custom' => array(
 							'base-font'   => 16,
 							'line-height' => array(
@@ -766,7 +766,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			array(
 				'templateParts' => array(
 					'header' => array(
-						'section' => 'Some section',
+						'area' => 'Some area',
 					),
 				),
 			)
@@ -778,7 +778,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			$template_parts,
 			array(
 				'header' => array(
-					'section' => 'Some section',
+					'area' => 'Some area',
 				),
 			)
 		);
