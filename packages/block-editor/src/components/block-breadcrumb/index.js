@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -16,15 +17,13 @@ import BlockTitle from '../block-title';
  * @return {WPElement} Block Breadcrumb.
  */
 function BlockBreadcrumb() {
-	const { selectBlock, clearSelectedBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
 			getBlockParents,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),

@@ -8,6 +8,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -85,7 +86,7 @@ export default compose( [
 		} = select( blockDirectoryStore );
 		const { canInsertBlockType } = select( blockEditorStore );
 
-		const hasPermission = select( 'core' ).canUser(
+		const hasPermission = select( coreStore ).canUser(
 			'read',
 			'block-directory/search'
 		);

@@ -15,6 +15,7 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
+	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1738,6 +1739,50 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockTypes(),
+	]
+);
+
+const __experimentalGetParsedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return map( patterns, ( pattern ) => ( {
+			...pattern,
+			contentBlocks: parse( pattern.content ),
+		} ) );
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
+/**
+ * Returns the list of allowed patterns for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array?} The list of allowed block types.
+ */
+export const __experimentalGetAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = __experimentalGetParsedPatterns( state );
+
+		if ( ! rootClientId ) {
+			return patterns;
+		}
+
+		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
+			return every( contentBlocks, ( { name } ) =>
+				canInsertBlockType( state, name, rootClientId )
+			);
+		} );
+
+		return patternsAllowed;
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
 	]
 );
 

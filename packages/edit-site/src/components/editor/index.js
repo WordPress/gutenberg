@@ -48,7 +48,7 @@ const interfaceLabels = {
 	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor() {
+function Editor( { initialSettings } ) {
 	const {
 		isFullscreenActive,
 		isInserterOpen,
@@ -72,6 +72,10 @@ function Editor() {
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
+		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
+		// the editor is loaded rather than degrading the performance of the inserter.
+		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
+
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
@@ -94,7 +98,12 @@ function Editor() {
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
-	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
+		editSiteStore
+	);
+	useEffect( () => {
+		updateSettings( initialSettings );
+	}, [] );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
 	// so that they can be selected with core/editor selectors in any editor.
@@ -151,6 +160,11 @@ function Editor() {
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
+
+	// Don't render the Editor until the settings are set and loaded
+	if ( ! settings?.siteUrl ) {
+		return null;
+	}
 
 	return (
 		<>
