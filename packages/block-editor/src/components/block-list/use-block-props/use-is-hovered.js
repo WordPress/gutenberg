@@ -33,6 +33,21 @@ export function useIsHovered( ref ) {
 		};
 	}, [] );
 
+	const hasInnerBlocks = useSelect(
+		( select ) => {
+			if ( ref?.current?.dataset ) {
+				return (
+					select( 'core/block-editor' ).getBlocks(
+						ref?.current?.dataset?.block
+					).length > 0
+				);
+			}
+
+			return false;
+		},
+		[ ref?.current?.dataset ]
+	);
+
 	useEffect( () => {
 		function addListener( eventType, value ) {
 			function listener( event ) {
@@ -40,6 +55,7 @@ export function useIsHovered( ref ) {
 					return;
 				}
 
+				event.stopPropagation();
 				event.preventDefault();
 				setHovered( value );
 			}
@@ -51,7 +67,10 @@ export function useIsHovered( ref ) {
 		}
 
 		if ( isHovered ) {
-			return addListener( 'mouseleave', false );
+			if ( ! hasInnerBlocks ) {
+				return addListener( 'mouseleave', false );
+			}
+			return addListener( 'mouseout', false );
 		}
 
 		if ( isOutlineMode || isNavigationMode ) {
