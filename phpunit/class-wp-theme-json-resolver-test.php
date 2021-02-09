@@ -9,7 +9,7 @@
 class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
 	function test_presets_are_extracted() {
-		$actual   = WP_Theme_JSON_Resolver::get_presets_to_translate();
+		$actual = WP_Theme_JSON_Resolver::get_presets_to_translate();
 
 		$expected = array(
 			array(
@@ -18,7 +18,7 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 				'context' => 'Font size name',
 			),
 			array(
-				'path'             => array( 'settings', '*', 'typography', 'fontStyles' ),
+				'path'    => array( 'settings', '*', 'typography', 'fontStyles' ),
 				'key'     => 'name',
 				'context' => 'Font style name',
 			),
@@ -56,5 +56,4 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $actual );
 	}
-
 }
