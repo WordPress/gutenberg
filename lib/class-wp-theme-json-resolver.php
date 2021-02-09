@@ -120,7 +120,7 @@ class WP_Theme_JSON_Resolver {
 		$result = array();
 		foreach ( $file_structure_partial as $property => $partial_child ) {
 			if ( is_numeric( $property ) ) {
-				foreach( $partial_child as $key => $context ) {
+				foreach ( $partial_child as $key => $context ) {
 					return array(
 						array(
 							'path'    => $current_path,
@@ -186,11 +186,7 @@ class WP_Theme_JSON_Resolver {
 					}
 
 					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
-					$item_to_translate[ $key ] = translate_with_gettext_context(
-						$item_to_translate[ $key ],
-						$context,
-						$domain
-					);
+					$item_to_translate[ $key ] = translate_with_gettext_context( $item_to_translate[ $key ], $context, $domain );
 					// phpcs:enable
 				}
 
