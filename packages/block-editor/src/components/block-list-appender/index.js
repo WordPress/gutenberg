@@ -16,6 +16,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+import { store as blockEditorStore } from '../../store';
 
 // A Context to store the map of the appender map.
 export const AppenderNodesContext = createContext();
@@ -110,7 +111,7 @@ export default withSelect( ( select, { rootClientId } ) => {
 		canInsertBlockType,
 		getTemplateLock,
 		getSelectedBlockClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),

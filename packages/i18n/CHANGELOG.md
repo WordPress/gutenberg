@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Export the default `I18n` instance as `defaultI18n`, in addition to already exported bound methods.
+- Add new `getLocaleData` method to get the internal Tannin locale data object.
+- Add new `subscribe` method to subscribe to changes in the internal locale data.
+- Add new `hasTranslation` method to determine whether a translation for a string is available.
+
 ## 3.17.0 (2020-12-17)
 
 ### Enhancements

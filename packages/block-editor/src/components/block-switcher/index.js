@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, uniq, truncate } from 'lodash';
+import { castArray, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import {
 	switchToBlockType,
 	store as blocksStore,
 	isReusableBlock,
+	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
@@ -27,6 +28,7 @@ import { stack } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
+import BlockTitle from '../block-title';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
 
@@ -40,11 +42,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		blockTitle,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlockTransformItems,
-				__experimentalGetReusableBlockTitle,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getBlockTransformItems } = select(
+				blockEditorStore
+			);
 
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
@@ -55,14 +55,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const styles =
 				_isSingleBlockSelected && getBlockStyles( firstBlockName );
 			let _icon;
-			let reusableBlockTitle;
 			if ( _isSingleBlockSelected ) {
 				_icon = blockInformation?.icon; // Take into account active block variations.
-				reusableBlockTitle =
-					isReusableBlock( blocks[ 0 ] ) &&
-					__experimentalGetReusableBlockTitle(
-						blocks[ 0 ].attributes.ref
-					);
 			} else {
 				const isSelectionOfSameType =
 					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
@@ -80,14 +74,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle:
-					reusableBlockTitle || getBlockType( firstBlockName ).title,
+				blockTitle: getBlockType( firstBlockName ).title,
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
 	);
 
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
+	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
 	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
@@ -139,11 +133,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
-								{ isReusable && (
+								{ ( isReusable || isTemplate ) && (
 									<span className="block-editor-block-switcher__toggle-text">
-										{ truncate( blockTitle, {
-											length: 35,
-										} ) }
+										<BlockTitle clientId={ clientIds } />
 									</span>
 								) }
 							</>

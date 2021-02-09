@@ -9,6 +9,7 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 	const onClick = () => {
@@ -33,7 +34,7 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 export default withSelect( ( select ) => {
 	return {
 		selectedBlockClientId: select(
-			'core/block-editor'
+			blockEditorStore
 		).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );
