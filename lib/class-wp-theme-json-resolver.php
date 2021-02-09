@@ -153,19 +153,21 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Translates a theme.json structure.
+	 * Given a theme.json structure modifies it in place
+	 * to update certain values by its translated strings
+	 * according to the language set by the user.
 	 *
-	 * @param array  $theme_json_structure A theme.json structure that is going to be translatable.
-	 * @param string $domain               Optional. Text domain. Unique identifier for retrieving translated strings.
-	 *                                     Default 'default'.
+	 * @param array  $theme_json The theme.json to translate.
+	 * @param string $domain    Optional. Text domain. Unique identifier for retrieving translated strings.
+	 *                          Default 'default'.
 	 */
-	private static function translate( &$theme_json_structure, $domain = 'default' ) {
-		if ( ! isset( $theme_json_structure['settings'] ) ) {
+	private static function translate( &$theme_json, $domain = 'default' ) {
+		if ( ! isset( $theme_json['settings'] ) ) {
 			return;
 		}
 
 		$preset_to_translate = self::get_presets_to_translate();
-		foreach ( $theme_json_structure['settings'] as &$settings ) {
+		foreach ( $theme_json['settings'] as &$settings ) {
 			if ( empty( $settings ) ) {
 				continue;
 			}
