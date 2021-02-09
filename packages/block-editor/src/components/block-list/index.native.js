@@ -382,16 +382,14 @@ export default compose( [
 			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
-			const blockCount = getBlockCount( rootBlockId );
-
 			const rootBlockId = getBlockHierarchyRootClientId(
 				selectedBlockClientId
 			);
+			const blockCount = getBlockCount( rootBlockId );
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
-
 			return {
 				blockClientIds,
 				blockCount,

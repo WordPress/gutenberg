@@ -1,6 +1,11 @@
 /* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
 
 /**
+ * WordPress dependencies
+ */
+import { createHooks } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { createI18n } from '..';
@@ -192,61 +197,164 @@ describe( 'createI18n', () => {
 } );
 
 describe( 'i18n filters', () => {
+	function createHooksWithI18nFilters() {
+		const hooks = createHooks();
+		hooks.addFilter(
+			'i18n.gettext',
+			'test',
+			( translation ) => translation + '/i18n.gettext'
+		);
+		hooks.addFilter(
+			'i18n.gettext_default',
+			'test',
+			( translation ) => translation + '/i18n.gettext_default'
+		);
+		hooks.addFilter(
+			'i18n.gettext_domain',
+			'test',
+			( translation ) => translation + '/i18n.gettext_domain'
+		);
+
+		hooks.addFilter(
+			'i18n.ngettext',
+			'test',
+			( translation ) => translation + '/i18n.ngettext'
+		);
+		hooks.addFilter(
+			'i18n.ngettext_default',
+			'test',
+			( translation ) => translation + '/i18n.ngettext_default'
+		);
+		hooks.addFilter(
+			'i18n.ngettext_domain',
+			'test',
+			( translation ) => translation + '/i18n.ngettext_domain'
+		);
+
+		hooks.addFilter(
+			'i18n.gettext_with_context',
+			'test',
+			( translation, text, context ) =>
+				translation + `/i18n.gettext_with_${ context }`
+		);
+		hooks.addFilter(
+			'i18n.gettext_with_context_default',
+			'test',
+			( translation, text, context ) =>
+				translation + `/i18n.gettext_with_${ context }_default`
+		);
+		hooks.addFilter(
+			'i18n.gettext_with_context_domain',
+			'test',
+			( translation, text, context ) =>
+				translation + `/i18n.gettext_with_${ context }_domain`
+		);
+
+		hooks.addFilter(
+			'i18n.ngettext_with_context',
+			'test',
+			( translation, single, plural, number, context ) =>
+				translation + `/i18n.ngettext_with_${ context }`
+		);
+		hooks.addFilter(
+			'i18n.ngettext_with_context_default',
+			'test',
+			( translation, single, plural, number, context ) =>
+				translation + `/i18n.ngettext_with_${ context }_default`
+		);
+		hooks.addFilter(
+			'i18n.ngettext_with_context_domain',
+			'test',
+			( translation, single, plural, number, context ) =>
+				translation + `/i18n.ngettext_with_${ context }_domain`
+		);
+		hooks.addFilter(
+			'i18n.has_translation',
+			'test',
+			( hasTranslation, single, context, domain ) => {
+				if (
+					single === 'Always' &&
+					! context &&
+					( domain ?? 'default' ) === 'default'
+				) {
+					return true;
+				}
+
+				return hasTranslation;
+			}
+		);
+		return hooks;
+	}
+
 	test( '__() calls filters', () => {
-		const i18n = createI18n( undefined, undefined, {
-			applyFilters: ( filter, translation ) => translation + filter,
-		} );
+		const hooks = createHooksWithI18nFilters();
+		const i18n = createI18n( undefined, undefined, hooks );
+
 		expect( i18n.__( 'hello' ) ).toEqual(
-			'helloi18n.gettexti18n.gettext_default'
+			'hello/i18n.gettext/i18n.gettext_default'
 		);
 		expect( i18n.__( 'hello', 'domain' ) ).toEqual(
-			'helloi18n.gettexti18n.gettext_domain'
+			'hello/i18n.gettext/i18n.gettext_domain'
 		);
 	} );
+
 	test( '_x() calls filters', () => {
-		const i18n = createI18n( undefined, undefined, {
-			applyFilters: ( filter, translation ) => translation + filter,
-		} );
-		expect( i18n._x( 'hello', 'context' ) ).toEqual(
-			'helloi18n.gettext_with_contexti18n.gettext_with_context_default'
+		const hooks = createHooksWithI18nFilters();
+		const i18n = createI18n( undefined, undefined, hooks );
+
+		expect( i18n._x( 'hello', 'ctx' ) ).toEqual(
+			'hello/i18n.gettext_with_ctx/i18n.gettext_with_ctx_default'
 		);
-		expect( i18n._x( 'hello', 'context', 'domain' ) ).toEqual(
-			'helloi18n.gettext_with_contexti18n.gettext_with_context_domain'
+		expect( i18n._x( 'hello', 'ctx', 'domain' ) ).toEqual(
+			'hello/i18n.gettext_with_ctx/i18n.gettext_with_ctx_domain'
 		);
 	} );
+
 	test( '_n() calls filters', () => {
-		const i18n = createI18n( undefined, undefined, {
-			applyFilters: ( filter, translation ) => translation + filter,
-		} );
+		const hooks = createHooksWithI18nFilters();
+		const i18n = createI18n( undefined, undefined, hooks );
+
 		expect( i18n._n( 'hello', 'hellos', 1 ) ).toEqual(
-			'helloi18n.ngettexti18n.ngettext_default'
+			'hello/i18n.ngettext/i18n.ngettext_default'
 		);
 		expect( i18n._n( 'hello', 'hellos', 1, 'domain' ) ).toEqual(
-			'helloi18n.ngettexti18n.ngettext_domain'
+			'hello/i18n.ngettext/i18n.ngettext_domain'
 		);
 		expect( i18n._n( 'hello', 'hellos', 2 ) ).toEqual(
-			'hellosi18n.ngettexti18n.ngettext_default'
+			'hellos/i18n.ngettext/i18n.ngettext_default'
 		);
 		expect( i18n._n( 'hello', 'hellos', 2, 'domain' ) ).toEqual(
-			'hellosi18n.ngettexti18n.ngettext_domain'
+			'hellos/i18n.ngettext/i18n.ngettext_domain'
 		);
 	} );
+
 	test( '_nx() calls filters', () => {
-		const i18n = createI18n( undefined, undefined, {
-			applyFilters: ( filter, translation ) => translation + filter,
-		} );
-		expect( i18n._nx( 'hello', 'hellos', 1, 'context' ) ).toEqual(
-			'helloi18n.ngettext_with_contexti18n.ngettext_with_context_default'
+		const hooks = createHooksWithI18nFilters();
+		const i18n = createI18n( undefined, undefined, hooks );
+
+		expect( i18n._nx( 'hello', 'hellos', 1, 'ctx' ) ).toEqual(
+			'hello/i18n.ngettext_with_ctx/i18n.ngettext_with_ctx_default'
 		);
-		expect( i18n._nx( 'hello', 'hellos', 1, 'context', 'domain' ) ).toEqual(
-			'helloi18n.ngettext_with_contexti18n.ngettext_with_context_domain'
+		expect( i18n._nx( 'hello', 'hellos', 1, 'ctx', 'domain' ) ).toEqual(
+			'hello/i18n.ngettext_with_ctx/i18n.ngettext_with_ctx_domain'
 		);
-		expect( i18n._nx( 'hello', 'hellos', 2, 'context' ) ).toEqual(
-			'hellosi18n.ngettext_with_contexti18n.ngettext_with_context_default'
+		expect( i18n._nx( 'hello', 'hellos', 2, 'ctx' ) ).toEqual(
+			'hellos/i18n.ngettext_with_ctx/i18n.ngettext_with_ctx_default'
 		);
-		expect( i18n._nx( 'hello', 'hellos', 2, 'context', 'domain' ) ).toEqual(
-			'hellosi18n.ngettext_with_contexti18n.ngettext_with_context_domain'
+		expect( i18n._nx( 'hello', 'hellos', 2, 'ctx', 'domain' ) ).toEqual(
+			'hellos/i18n.ngettext_with_ctx/i18n.ngettext_with_ctx_domain'
 		);
+	} );
+
+	test( 'hasTranslation() calls filters', () => {
+		const hooks = createHooksWithI18nFilters();
+		const { hasTranslation } = createI18n( frenchLocale, undefined, hooks );
+
+		expect( hasTranslation( 'hello' ) ).toBe( true );
+		expect( hasTranslation( 'hello', 'not a greeting' ) ).toBe( false );
+		expect( hasTranslation( 'Always' ) ).toBe( true );
+		expect( hasTranslation( 'Always', 'other context' ) ).toBe( false );
+		expect( hasTranslation( 'Always', undefined, 'domain' ) ).toBe( false );
 	} );
 } );
 

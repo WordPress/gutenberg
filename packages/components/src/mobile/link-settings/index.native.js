@@ -108,7 +108,9 @@ function LinkSettings( {
 	const prevEditorSidebarOpened = prevEditorSidebarOpenedRef.current;
 
 	useEffect( () => {
-		setUrlInputValue( url || '' );
+		if ( url !== urlInputValue ) {
+			setUrlInputValue( url || '' );
+		}
 	}, [ url ] );
 
 	useEffect( () => {
@@ -134,9 +136,12 @@ function LinkSettings( {
 		if ( ! urlValue && onEmptyURL ) {
 			onEmptyURL();
 		}
-		setAttributes( {
-			url: prependHTTP( urlValue ),
-		} );
+
+		if ( prependHTTP( urlValue ) !== url ) {
+			setAttributes( {
+				url: prependHTTP( urlValue ),
+			} );
+		}
 	}, [ urlValue ] );
 
 	const onChangeURL = useCallback(
@@ -154,11 +159,18 @@ function LinkSettings( {
 	}, [] );
 
 	const onSetAttributes = useCallback( () => {
-		setAttributes( {
-			url: prependHTTP( urlInputValue ),
-			label: labelInputValue,
-			rel: linkRelInputValue,
-		} );
+		const newURL = prependHTTP( urlInputValue );
+		if (
+			url !== newURL ||
+			labelInputValue !== label ||
+			linkRelInputValue !== rel
+		) {
+			setAttributes( {
+				url: newURL,
+				label: labelInputValue,
+				rel: linkRelInputValue,
+			} );
+		}
 	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
 
 	const onCloseSettingsSheet = useCallback( () => {

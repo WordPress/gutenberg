@@ -371,7 +371,7 @@ export default compose( [
 			insertionIndexAfter,
 			insertionIndexStart,
 			insertionIndexEnd,
-			isAnyBlockSelected,
+			isAnyBlockSelected: !! isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
 		};
 	} ),

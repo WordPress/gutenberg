@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,7 @@ import {
 	useFocusReturn,
 	useFocusOnMount,
 	useConstrainedTabbing,
+	useMergeRefs,
 } from '@wordpress/compose';
 
 /**
@@ -57,7 +57,7 @@ function ModalFrameContent( {
 			<div
 				className={ classnames( 'components-modal__frame', className ) }
 				style={ style }
-				ref={ mergeRefs( [
+				ref={ useMergeRefs( [
 					constrainedTabbingRef,
 					focusReturnRef,
 					focusOnMountRef,

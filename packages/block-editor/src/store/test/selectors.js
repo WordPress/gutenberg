@@ -71,6 +71,7 @@ const {
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetParsedReusableBlock,
+	__experimentalGetAllowedPatterns,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3347,6 +3348,58 @@ describe( 'selectors', () => {
 					'core/navigation-link',
 				] )
 			).toEqual( 'client-id-03' );
+		} );
+	} );
+
+	describe( '__experimentalGetAllowedPatterns', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+					block2: { name: 'core/test-block-b' },
+				},
+				attributes: {
+					block1: {},
+					block2: {},
+				},
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+				block2: {
+					allowedBlocks: [],
+				},
+			},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						title: 'pattern with a',
+						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
+					},
+					{
+						title: 'pattern with b',
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+				],
+			},
+		};
+
+		it( 'should return all patterns for root level', () => {
+			expect(
+				__experimentalGetAllowedPatterns( state, null )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'should return patterns that consists of blocks allowed for the specified client ID', () => {
+			expect(
+				__experimentalGetAllowedPatterns( state, 'block1' )
+			).toHaveLength( 1 );
+
+			expect(
+				__experimentalGetAllowedPatterns( state, 'block2' )
+			).toHaveLength( 0 );
 		} );
 	} );
 } );
