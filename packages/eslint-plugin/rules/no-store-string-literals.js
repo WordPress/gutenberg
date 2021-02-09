@@ -11,8 +11,8 @@ function getReferences( context, specifiers ) {
 	return references;
 }
 
-function collectAllNodesFromHocFunctions( context, node ) {
-	const hocSpecifiers = node.specifiers.filter(
+function collectAllNodesFromCallbackFunctions( context, node ) {
+	const functionSpecifiers = node.specifiers.filter(
 		( specifier ) =>
 			specifier.imported &&
 			[
@@ -22,9 +22,9 @@ function collectAllNodesFromHocFunctions( context, node ) {
 				'withDispatch',
 			].includes( specifier.imported.name )
 	);
-	const hocReferences = getReferences( context, hocSpecifiers );
+	const functionReferences = getReferences( context, functionSpecifiers );
 
-	const hocFunctionVariables = hocReferences.reduce(
+	const functionArgumentVariables = functionReferences.reduce(
 		( acc, { identifier: { parent } } ) =>
 			parent && parent.arguments && parent.arguments.length > 0
 				? acc.concat(
@@ -33,11 +33,11 @@ function collectAllNodesFromHocFunctions( context, node ) {
 				: acc,
 		[]
 	);
-	const hocFunctionReferences = hocFunctionVariables.reduce(
+	const functionArgumentReferences = functionArgumentVariables.reduce(
 		( acc, variable ) => acc.concat( variable.references ),
 		[]
 	);
-	const possibleCallExpressionNodes = hocFunctionReferences
+	const possibleCallExpressionNodes = functionArgumentReferences
 		.filter( ( reference ) => reference.identifier.parent )
 		.map( ( reference ) => reference.identifier.parent );
 
@@ -100,7 +100,7 @@ module.exports = {
 					return;
 				}
 
-				const hocFunctionNodes = collectAllNodesFromHocFunctions(
+				const callbackFunctionNodes = collectAllNodesFromCallbackFunctions(
 					context,
 					node
 				);
@@ -113,9 +113,11 @@ module.exports = {
 					node
 				);
 
-				const allNodes = hocFunctionNodes
-					.concat( directNodes )
-					.concat( objectPropertyCallNodes );
+				const allNodes = [
+					...callbackFunctionNodes,
+					...directNodes,
+					...objectPropertyCallNodes,
+				];
 				allNodes
 					.filter(
 						( callNode ) =>
