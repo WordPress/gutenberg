@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useState, useLayoutEffect } from '@wordpress/element';
-import { getRectangleFromRange, offsetIframe } from '@wordpress/dom';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -24,7 +24,7 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { computePopoverPosition } from './utils';
+import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
