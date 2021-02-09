@@ -1371,7 +1371,10 @@ export function initialPosition( state, action ) {
 		typeof action.initialPosition === 'number'
 	) {
 		return action.initialPosition;
-	} else if ( action.type === 'SELECT_BLOCK' ) {
+	} else if (
+		action.type === 'SELECT_BLOCK' ||
+		action.type === 'RESET_SELECTION'
+	) {
 		return action.initialPosition;
 	} else if ( keepStateAction.includes( action.type ) ) {
 		return state;

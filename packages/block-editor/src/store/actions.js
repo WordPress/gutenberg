@@ -113,16 +113,22 @@ export function* validateBlocksToTemplate( blocks ) {
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {WPBlockSelection} selectionStart The selection start.
- * @param {WPBlockSelection} selectionEnd   The selection end.
+ * @param {WPBlockSelection} selectionStart  The selection start.
+ * @param {WPBlockSelection} selectionEnd    The selection end.
+ * @param {0|-1|undefined}   initialPosition Initial block position.
  *
  * @return {Object} Action object.
  */
-export function resetSelection( selectionStart, selectionEnd ) {
+export function resetSelection(
+	selectionStart,
+	selectionEnd,
+	initialPosition
+) {
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
 		selectionEnd,
+		initialPosition,
 	};
 }
 

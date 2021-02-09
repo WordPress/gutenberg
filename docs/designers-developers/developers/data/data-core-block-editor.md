@@ -1309,6 +1309,7 @@ _Parameters_
 
 -   _selectionStart_ `WPBlockSelection`: The selection start.
 -   _selectionEnd_ `WPBlockSelection`: The selection end.
+-   _initialPosition_ `(||undefined)`: Initial block position.
 
 _Returns_
 
