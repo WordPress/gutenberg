@@ -13,7 +13,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, align, id, anchor } ) =>
+			transform: ( { caption, url, align, id, anchor, duotone } ) =>
 				createBlock(
 					'core/cover',
 					{
@@ -21,6 +21,7 @@ const transforms = {
 						align,
 						id,
 						anchor,
+						duotone,
 					},
 					[
 						createBlock( 'core/paragraph', {
@@ -33,7 +34,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { caption, src, align, id, anchor } ) =>
+			transform: ( { caption, src, align, id, anchor, duotone } ) =>
 				createBlock(
 					'core/cover',
 					{
@@ -42,6 +43,7 @@ const transforms = {
 						id,
 						backgroundType: VIDEO_BACKGROUND_TYPE,
 						anchor,
+						duotone,
 					},
 					[
 						createBlock( 'core/paragraph', {
@@ -76,13 +78,14 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor } ) =>
+			transform: ( { title, url, align, id, anchor, duotone } ) =>
 				createBlock( 'core/image', {
 					caption: title,
 					url,
 					align,
 					id,
 					anchor,
+					duotone,
 				} ),
 		},
 		{
@@ -108,13 +111,14 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor } ) =>
+			transform: ( { title, url, align, id, anchor, duotone } ) =>
 				createBlock( 'core/video', {
 					caption: title,
 					src: url,
 					id,
 					align,
 					anchor,
+					duotone,
 				} ),
 		},
 	],
