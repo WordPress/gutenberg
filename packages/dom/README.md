@@ -258,20 +258,6 @@ _Returns_
 
 -   `boolean`: True if at the vertical edge, false if not.
 
-<a name="offsetIframe" href="#offsetIframe">#</a> **offsetIframe**
-
-Offsets the given rect by the position of the iframe that contains the element.
-If the owner document is not in an iframe then it returns with the original rect.
-
-_Parameters_
-
--   _rect_ `DOMRect`: bounds of the element
--   _ownerDocument_ `Document`: document of the element
-
-_Returns_
-
--   `DOMRect`: offsetted bounds
-
 <a name="placeCaretAtHorizontalEdge" href="#placeCaretAtHorizontalEdge">#</a> **placeCaretAtHorizontalEdge**
 
 Places the caret at start or end of a given element.

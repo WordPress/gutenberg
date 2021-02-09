@@ -16,7 +16,6 @@ import {
 } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
-import { offsetIframe } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -148,15 +147,9 @@ function InsertionPointPopover( {
 	}, [ previousElement, nextElement ] );
 
 	const getAnchorRect = useCallback( () => {
-		const previousRect = offsetIframe(
-			previousElement.getBoundingClientRect(),
-			previousElement.ownerDocument
-		);
+		const previousRect = previousElement.getBoundingClientRect();
 		const nextRect = nextElement
-			? offsetIframe(
-					nextElement.getBoundingClientRect(),
-					nextElement.ownerDocument
-			  )
+			? nextElement.getBoundingClientRect()
 			: null;
 		if ( orientation === 'vertical' ) {
 			return {

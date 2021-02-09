@@ -53,7 +53,10 @@ function computeAnchorRect(
 			return;
 		}
 
-		return getAnchorRect( anchorRefFallback.current );
+		return offsetIframe(
+			getAnchorRect( anchorRefFallback.current ),
+			anchorRefFallback.current.ownerDocument
+		);
 	}
 
 	if ( anchorRef !== false ) {
