@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../no-store-string-literals';
+import rule from '../data-no-store-string-literals';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -60,11 +60,11 @@ const invalid = [
 ];
 const errors = [
 	{
-		message: `Do not use string literals ( 'core' ) for accessing stores ; import the store and use the store object or store name constant instead`,
+		message: `Do not use string literals ( 'core' ) for accessing @wordpress/data stores. Pass the store definition instead`,
 	},
 ];
 
-ruleTester.run( 'no-store-string-literals', rule, {
+ruleTester.run( 'data-no-store-string-literals', rule, {
 	valid: valid.map( ( code ) => ( { code } ) ),
 	invalid: invalid.map( ( code ) => ( { code, errors } ) ),
 } );

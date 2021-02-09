@@ -90,7 +90,7 @@ module.exports = {
 		type: 'problem',
 		schema: [],
 		messages: {
-			doNotUseStringLiteral: `Do not use string literals ( '{{ argument }}' ) for accessing stores ; import the store and use the store object or store name constant instead`,
+			doNotUseStringLiteral: `Do not use string literals ( '{{ argument }}' ) for accessing @wordpress/data stores. Pass the store definition instead`,
 		},
 	},
 	create( context ) {

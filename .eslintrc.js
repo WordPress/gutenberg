@@ -61,7 +61,7 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
-		'@wordpress/no-store-string-literals': 'warn',
+		'@wordpress/data-no-store-string-literals': 'warn',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
