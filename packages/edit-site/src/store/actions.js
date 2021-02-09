@@ -81,15 +81,17 @@ export function* addTemplate( template ) {
 		template
 	);
 
-	yield controls.dispatch(
-		'core',
-		'editEntityRecord',
-		'postType',
-		'wp_template',
-		newTemplate.id,
-		{ blocks: parse( template.content ) },
-		{ undoIgnore: true }
-	);
+	if ( template.content ) {
+		yield controls.dispatch(
+			'core',
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			newTemplate.id,
+			{ blocks: parse( template.content ) },
+			{ undoIgnore: true }
+		);
+	}
 
 	return {
 		type: 'SET_TEMPLATE',
