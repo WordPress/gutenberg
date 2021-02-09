@@ -26,30 +26,19 @@ describe( 'Block variations', () => {
 		await deactivatePlugin( 'gutenberg-test-block-variations' );
 	} );
 
-	const expectInserterItem = async (
-		blockName,
-		blockTitle,
-		variationName = null
-	) => {
-		const inserterItemSelector = [
-			'.editor-block-list-item',
-			blockName.replace( 'core/', '' ),
-			variationName,
-		]
-			.filter( Boolean )
-			.join( '-' );
-		const inserterItem = await page.$( inserterItemSelector );
+	const expectInserterItem = async ( blockTitle ) => {
+		const inserterItem = await page.$x(
+			`//button[contains(@class, 'block-editor-block-types-list__item')]//span[text()="${ blockTitle }"]`
+		);
 		expect( inserterItem ).toBeDefined();
-		expect(
-			await inserterItem.$x( `//span[text()="${ blockTitle }"]` )
-		).toHaveLength( 1 );
+		expect( inserterItem ).toHaveLength( 1 );
 	};
 
 	test( 'Search for the overridden default Quote block', async () => {
 		await searchForBlock( 'Quote' );
 
 		expect( await page.$( '.editor-block-list-item-quote' ) ).toBeNull();
-		expectInserterItem( 'quote', 'Large Quote', 'large' );
+		expectInserterItem( 'Large Quote' );
 	} );
 
 	test( 'Insert the overridden default Quote block variation', async () => {
@@ -78,9 +67,9 @@ describe( 'Block variations', () => {
 	test( 'Search for the Paragraph block with 2 additional variations', async () => {
 		await searchForBlock( 'Paragraph' );
 
-		expectInserterItem( 'core/paragraph', 'Paragraph' );
-		expectInserterItem( 'core/paragraph', 'Success Message', 'success' );
-		expectInserterItem( 'core/paragraph', 'Warning Message', 'warning' );
+		expectInserterItem( 'Paragraph' );
+		expectInserterItem( 'Success Message' );
+		expectInserterItem( 'Warning Message' );
 	} );
 
 	test( 'Insert the Success Message block variation', async () => {

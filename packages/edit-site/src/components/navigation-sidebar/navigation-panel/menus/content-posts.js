@@ -16,6 +16,7 @@ import { MENU_CONTENT_POSTS, MENU_ROOT } from '../constants';
 import ContentNavigationItem from '../content-navigation-item';
 import SearchResults from '../search-results';
 import useDebouncedSearch from '../use-debounced-search';
+import { store as editSiteStore } from '../../../../store';
 
 export default function ContentPostsMenu() {
 	const {
@@ -53,7 +54,7 @@ export default function ContentPostsMenu() {
 		[ searchQuery ]
 	);
 
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage } = useDispatch( editSiteStore );
 
 	const onActivateFrontItem = useCallback( () => {
 		setPage( {

@@ -16,6 +16,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import UngroupIcon from './icon';
+import { store as blockEditorStore } from '../../store';
 
 export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 	if ( ! isUngroupable ) {
@@ -35,7 +36,7 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlock } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		const { getGroupingBlockName } = select( blocksStore );
@@ -59,7 +60,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, innerBlocks, onToggle = noop } ) => {
-		const { replaceBlocks } = dispatch( 'core/block-editor' );
+		const { replaceBlocks } = dispatch( blockEditorStore );
 
 		return {
 			onConvertFromGroup() {

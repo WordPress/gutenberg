@@ -591,6 +591,29 @@ components via a consumer.
 See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
 example.
 
+<a name="resolveSelect" href="#resolveSelect">#</a> **resolveSelect**
+
+Given the name of a registered store, returns an object containing the store's
+selectors pre-bound to state so that you only need to supply additional arguments,
+and modified so that they return promises that resolve to their eventual values,
+after any resolvers have ran.
+
+_Usage_
+
+```js
+import { resolveSelect } from '@wordpress/data';
+
+resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+```
+
+_Parameters_
+
+-   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+
+_Returns_
+
+-   `Object`: Object containing the store's promise-wrapped selectors.
+
 <a name="select" href="#select">#</a> **select**
 
 Given the name or definition of a registered store, returns an object of the store's selectors.

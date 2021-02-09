@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg widgets page.
+ * Bootstrapping the Gutenberg widgets page.
  *
  * @package gutenberg
  */

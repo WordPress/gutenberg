@@ -444,6 +444,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		filemtime( gutenberg_dir_path() . 'build/block-directory/style.css' )
 	);
 	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-customize-widgets',
+		gutenberg_url( 'build/customize-widgets/style.css' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		filemtime( gutenberg_dir_path() . 'build/customize-widgets/style.css' )
+	);
+	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 

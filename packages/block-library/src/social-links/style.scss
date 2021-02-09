@@ -21,7 +21,7 @@
 	.wp-social-link {
 		// This needs specificity to override some themes.
 		&.wp-social-link.wp-social-link {
-			margin: 4px 8px 4px 0;
+			margin: auto 8px auto 0;
 		}
 
 		// By setting the font size, we can scale icons and paddings consistently based on that.

@@ -131,6 +131,31 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 *
 	 * @since 5.8.0
 	 */
+	public function test_get_items_by_keyword() {
+		wp_set_current_user( self::$contributor_id );
+		self::mock_successful_response( 'browse-keyword', true );
+
+		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request->set_query_params( array( 'keyword' => 11 ) );
+		$response = rest_do_request( $request );
+		$patterns = $response->get_data();
+
+		$this->assertNotWPError( $response->as_error() );
+		$this->assertSame( 200, $response->status );
+		$this->assertGreaterThan( 0, count( $patterns ) );
+
+		array_walk( $patterns, array( $this, 'assertPatternMatchesSchema' ) );
+
+		foreach ( $patterns as $pattern ) {
+			$this->assertContains( 'core', $pattern['keywords'] );
+		}
+	}
+
+	/**
+	 * @covers WP_REST_Pattern_Directory_Controller::get_items
+	 *
+	 * @since 5.8.0
+	 */
 	public function test_get_items_search() {
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'search', true );
@@ -302,6 +327,11 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 			case 'browse-category':
 				// Response from https://api.wordpress.org/patterns/1.0/?pattern-categories=2.
 				$response = file_get_contents( __DIR__ . '/fixtures/rest-api/pattern-directory/browse-category-2.json' );
+				break;
+
+			case 'browse-keyword':
+				// Response from https://api.wordpress.org/patterns/1.0/?pattern-keywords=11.
+				$response = file_get_contents( __DIR__ . '/fixtures/rest-api/pattern-directory/browse-keyword-11.json' );
 				break;
 
 			case 'search':
