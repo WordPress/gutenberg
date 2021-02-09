@@ -166,13 +166,13 @@ class WP_Theme_JSON_Resolver {
 			return;
 		}
 
-		$preset_to_translate = self::get_presets_to_translate();
+		$presets = self::get_presets_to_translate();
 		foreach ( $theme_json['settings'] as &$settings ) {
 			if ( empty( $settings ) ) {
 				continue;
 			}
 
-			foreach ( $preset_to_translate as $preset ) {
+			foreach ( $presets as $preset ) {
 				$path    = array_slice( $preset['path'], 2 );
 				$key     = $preset['key'];
 				$context = $preset['context'];
