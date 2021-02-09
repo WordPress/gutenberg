@@ -633,6 +633,19 @@ exports[`ColorPicker should render color picker 1`] = `
         <div
           className="components-visually-hidden"
           id="color-picker-saturation-0"
+          style={
+            Object {
+              "border": 0,
+              "clip": "rect(0 0 0 0)",
+              "height": "1px",
+              "margin": "-1px",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "absolute",
+              "whiteSpace": "nowrap",
+              "width": "1px",
+            }
+          }
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
@@ -693,6 +706,19 @@ exports[`ColorPicker should render color picker 1`] = `
               <p
                 className="components-visually-hidden"
                 id="components-color-picker__hue-description-0"
+                style={
+                  Object {
+                    "border": 0,
+                    "clip": "rect(0 0 0 0)",
+                    "height": "1px",
+                    "margin": "-1px",
+                    "overflow": "hidden",
+                    "padding": 0,
+                    "position": "absolute",
+                    "whiteSpace": "nowrap",
+                    "width": "1px",
+                  }
+                }
               >
                 Move the arrow left or right to change hue.
               </p>
