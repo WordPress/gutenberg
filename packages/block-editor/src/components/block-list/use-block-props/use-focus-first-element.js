@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -79,21 +74,10 @@ export function useFocusFirstElement( ref, clientId ) {
 			return;
 		}
 
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable.find( ref.current ).filter(
-			( node ) =>
-				isTextField( node ) &&
-				// Exclude inner blocks and block appenders
-				isInsideRootBlock( ref.current, node ) &&
-				! node.closest( '.block-list-appender' )
-		);
-
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
 
-		placeCaretAtHorizontalEdge( target, isReverse );
+		placeCaretAtHorizontalEdge( ref.current, isReverse );
 	}, [ initialPosition ] );
 }
