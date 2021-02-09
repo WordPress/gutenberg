@@ -337,13 +337,17 @@
 	}
 }
 
-// Extra specificity needed to override default element margins like lists (ul).
-.block-editor-block-list__layout .wp-block {
+.wp-block {
+	// The following margin-CSS is editor-only, it is meant to center all blocks, when combined with a max-width, in a column.
 	margin-left: auto;
 	margin-right: auto;
-}
 
-.wp-block {
+	// Prevent inheritance.
+	.wp-block {
+		margin-left: initial;
+		margin-right: initial;
+	}
+
 	// Alignments.
 	&[data-align="left"],
 	&[data-align="right"] {
