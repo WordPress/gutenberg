@@ -28,6 +28,7 @@ export default function CustomDuotoneBar( { value, onChange } ) {
 		<div className="components-custom-duotone-picker">
 			<CustomGradientBar
 				disableInserter
+				disableAlpha
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }

@@ -77,6 +77,7 @@ export default function CustomGradientBar( {
 	value: controlPoints,
 	onChange,
 	disableInserter = false,
+	disableAlpha = false,
 } ) {
 	const gradientPickerDomRef = useRef();
 
@@ -133,6 +134,7 @@ export default function CustomGradientBar( {
 				{ ! disableInserter &&
 					( isMovingInserter || isInsertingControlPoint ) && (
 						<ControlPoints.InsertPoint
+							disableAlpha={ disableAlpha }
 							insertPosition={ gradientBarState.insertPosition }
 							value={ controlPoints }
 							onChange={ onChange }
@@ -149,6 +151,7 @@ export default function CustomGradientBar( {
 						/>
 					) }
 				<ControlPoints
+					disableAlpha={ disableAlpha }
 					disableRemove={ disableInserter }
 					gradientPickerDomRef={ gradientPickerDomRef }
 					ignoreMarkerPosition={

@@ -110,6 +110,7 @@ function ControlPointButton( {
 
 function ControlPoints( {
 	disableRemove,
+	disableAlpha,
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	value: controlPoints,
@@ -224,6 +225,7 @@ function ControlPoints( {
 					renderContent={ ( { onClose } ) => (
 						<>
 							<ColorPicker
+								disableAlpha={ disableAlpha }
 								color={ point.color }
 								onChangeComplete={ ( { color } ) => {
 									onChange(
@@ -267,6 +269,7 @@ function InsertPoint( {
 	onOpenInserter,
 	onCloseInserter,
 	insertPosition,
+	disableAlpha,
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
@@ -300,6 +303,7 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
+					disableAlpha={ disableAplha }
 					onChangeComplete={ ( { color } ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(
