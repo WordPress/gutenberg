@@ -89,8 +89,8 @@ class WP_Theme_JSON_Resolver {
 	 *   "settings": {
 	 *     "*": {
 	 *       "typography": {
-	 *         "fontSizes": [ "name" ],
-	 *         "fontStyles": [ "name" ]
+	 *         "fontSizes": [ { "name": "Font size name" } ],
+	 *         "fontStyles": [ { "name": "Font size name" } ]
 	 *       }
 	 *     }
 	 *   }
@@ -100,12 +100,14 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * [
 	 *   0 => [
-	 *     'path' => [ 'settings', '*', 'typography', 'fontSizes' ],
-	 *     'translatable_keys' => [ 'name' ]
+	 *     'path'    => [ 'settings', '*', 'typography', 'fontSizes' ],
+	 *     'key'     => 'name',
+	 *     'context' => 'Font size name'
 	 *   ],
 	 *   1 => [
-	 *     'path' => [ 'settings', '*', 'typography', 'fontStyles' ],
-	 *     'translatable_keys' => [ 'name']
+	 *     'path'    => [ 'settings', '*', 'typography', 'fontStyles' ],
+	 *     'key'     => 'name',
+	 *     'context' => 'Font style name'
 	 *   ]
 	 * ]
 	 *
@@ -118,12 +120,15 @@ class WP_Theme_JSON_Resolver {
 		$result = array();
 		foreach ( $file_structure_partial as $property => $partial_child ) {
 			if ( is_numeric( $property ) ) {
-				return array(
-					array(
-						'path'              => $current_path,
-						'translatable_keys' => $file_structure_partial,
-					),
-				);
+				foreach ( $partial_child as $key => $context ) {
+					return array(
+						array(
+							'path'    => $current_path,
+							'key'     => $key,
+							'context' => $context,
+						),
+					);
+				}
 			}
 			$result = array_merge(
 				$result,
@@ -138,7 +143,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
 	 */
-	private static function get_presets_to_translate() {
+	public static function get_presets_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
@@ -166,23 +171,23 @@ class WP_Theme_JSON_Resolver {
 			}
 
 			foreach ( $preset_to_translate as $preset ) {
-				$path               = array_slice( $preset['path'], 2 );
-				$translatable_keys  = $preset['translatable_keys'];
+				$path    = array_slice( $preset['path'], 2 );
+				$key     = $preset['key'];
+				$context = $preset['context'];
+
 				$array_to_translate = gutenberg_experimental_get( $settings, $path, null );
 				if ( null === $array_to_translate ) {
 					continue;
 				}
 
 				foreach ( $array_to_translate as &$item_to_translate ) {
-					foreach ( $translatable_keys as $translatable_key ) {
-						if ( empty( $item_to_translate[ $translatable_key ] ) ) {
-							continue;
-						}
-
-						// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
-						$item_to_translate[ $translatable_key ] = translate( $item_to_translate[ $translatable_key ], $domain );
-						// phpcs:enable
+					if ( empty( $item_to_translate[ $key ] ) ) {
+						continue;
 					}
+
+					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
+					$item_to_translate[ $key ] = translate_with_gettext_context( $item_to_translate[ $key ], $context, $domain );
+					// phpcs:enable
 				}
 
 				gutenberg_experimental_set( $settings, $path, $array_to_translate );
