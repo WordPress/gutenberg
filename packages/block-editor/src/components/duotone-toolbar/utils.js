@@ -22,6 +22,34 @@ import tinycolor from 'tinycolor2';
  */
 
 /**
+ * Calculate the brightest and darkest values from a color palette.
+ *
+ * @param {Object[]} palette Color palette for the theme.
+ *
+ * @return {string[]} Tuple of the darkest color and brightest color.
+ */
+export function getDefaultColors( palette ) {
+	// A default dark and light color are required.
+	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
+
+	return palette
+		.map( ( { color } ) => ( {
+			color,
+			brightness: tinycolor( color ).getBrightness() / 255,
+		} ) )
+		.reduce(
+			( [ min, max ], current ) => {
+				return [
+					current.brightness <= min.brightness ? current : min,
+					current.brightness >= max.brightness ? current : max,
+				];
+			},
+			[ { brightness: 1 }, { brightness: 0 } ]
+		)
+		.map( ( { color } ) => color );
+}
+
+/**
  * Generate a duotone gradient from a list of colors.
  *
  * @param {string[]} colors CSS color strings.
@@ -97,19 +125,6 @@ function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
 }
 
 /**
- * Convert a color values object to an array of colors.
- *
- * @param {RGBValues} values R, G, and B values.
- *
- * @return {string[]} Hex color array.
- */
-export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
-	return getColorsFromValues( values ).map( ( tcolor ) =>
-		tcolor.toHexString()
-	);
-}
-
-/**
  * Convert a color values object to an array of color stops.
  *
  * @param {RGBValues} values R, G, and B values.
@@ -136,44 +151,16 @@ export function getValuesFromColorStops( colorStops = [] ) {
 }
 
 /**
- * Convert a color stops array to a custom duotone id.
+ * Convert a color values object to an array of colors.
  *
- * @param {Object[]} colorStops Color stop information.
+ * @param {RGBValues} values R, G, and B values.
  *
- * @return {string} Custom duotone id.
+ * @return {string[]} Hex color array.
  */
-export function getCustomDuotoneIdFromColorStops( colorStops = [] ) {
-	return getCustomDuotoneIdFromHexColors(
-		colorStops.map( ( { color } ) => tinycolor( color ).toHexString() )
+export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
+	return getColorsFromValues( values ).map( ( tcolor ) =>
+		tcolor.toHexString()
 	);
-}
-
-/**
- * Calculate the brightest and darkest values from a color palette.
- *
- * @param {Object[]} palette Color palette for the theme.
- *
- * @return {string[]} Tuple of the darkest color and brightest color.
- */
-export function getDefaultColors( palette ) {
-	// A default dark and light color are required.
-	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
-
-	return palette
-		.map( ( { color } ) => ( {
-			color,
-			brightness: tinycolor( color ).getBrightness() / 255,
-		} ) )
-		.reduce(
-			( [ min, max ], current ) => {
-				return [
-					current.brightness <= min.brightness ? current : min,
-					current.brightness >= max.brightness ? current : max,
-				];
-			},
-			[ { brightness: 1 }, { brightness: 0 } ]
-		)
-		.map( ( { color } ) => color );
 }
 
 /**
@@ -187,4 +174,17 @@ export function getCustomDuotoneIdFromHexColors( colors ) {
 	return `duotone-filter-custom-${ colors
 		.map( ( hex ) => hex.slice( 1 ).toLowerCase() )
 		.join( '-' ) }`;
+}
+
+/**
+ * Convert a color stops array to a custom duotone id.
+ *
+ * @param {Object[]} colorStops Color stop information.
+ *
+ * @return {string} Custom duotone id.
+ */
+export function getCustomDuotoneIdFromColorStops( colorStops = [] ) {
+	return getCustomDuotoneIdFromHexColors(
+		colorStops.map( ( { color } ) => tinycolor( color ).toHexString() )
+	);
 }
