@@ -51,7 +51,10 @@ export function getGradientFromValues(
 	values = { r: [], g: [], b: [] },
 	angle
 ) {
-	return getGradientFromCSSColors( getHexColorsFromValues( values ), angle );
+	return getGradientFromCSSColors(
+		getColorsFromValues( values ).map( ( tcolor ) => tcolor.toRgbString() ),
+		angle
+	);
 }
 
 /**
