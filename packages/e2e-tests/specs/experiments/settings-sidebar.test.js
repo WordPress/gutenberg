@@ -57,9 +57,7 @@ describe( 'Settings sidebar', () => {
 	describe( 'Template tab', () => {
 		it( 'should open template tab by default if no block is selected', async () => {
 			await toggleSidebar();
-			expect( console ).toHaveWarnedWith(
-				'RichText cannot be used with an inline container. Please use a different tagName.'
-			);
+
 			expect( await getActiveTabLabel() ).toEqual(
 				'Template (selected)'
 			);
@@ -68,25 +66,23 @@ describe( 'Settings sidebar', () => {
 		it( "should show the currently selected template's title and description", async () => {
 			await toggleSidebar();
 
-			expect( await getTemplateCard() ).toMatchObject( {
-				title: 'Index',
-				description:
-					'The default template which is used when no other template can be found',
-			} );
-
+			const templateCardBeforeNavigation = await getTemplateCard();
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( '404' );
 			await navigationPanel.close();
+			const templateCardAfterNavigation = await getTemplateCard();
 
-			expect( await getTemplateCard() ).toMatchObject( {
+			expect( templateCardBeforeNavigation ).toMatchObject( {
+				title: 'Index',
+				description:
+					'The default template which is used when no other template can be found',
+			} );
+			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: '404',
 				description: 'Used when the queried content cannot be found',
 			} );
-			expect( console ).toHaveWarnedWith(
-				'RichText cannot be used with an inline container. Please use a different tagName.'
-			);
 		} );
 	} );
 
