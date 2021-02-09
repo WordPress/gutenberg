@@ -2,7 +2,8 @@
 	background: $white;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
-	margin-top: $grid-unit-50 * 2;
+	max-width: 420px;
+	margin: auto;
 
 	.components-spinner {
 		display: block;

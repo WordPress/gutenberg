@@ -7,10 +7,12 @@
 }
 
 .edit-navigation-layout {
+	display: flex;
+	flex-direction: column;
 	margin-right: 280px;
 
 	.navigation-editor-canvas {
-		max-width: 420px;
-		margin: auto;
+		// Provide space for the floating block toolbar.
+		padding-top: $grid-unit-50 * 2;
 	}
 }
