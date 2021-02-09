@@ -138,7 +138,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
 	 */
-	private static function get_presets_to_translate() {
+	public static function get_presets_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
