@@ -50,6 +50,7 @@ function ColorPalette( {
 		'linear-gradient(240deg, rgba(0,255,0,.8) 0%, rgba(0,255,0,0) 70.71%)',
 		'linear-gradient(360deg, rgba(0,0,255,.8) 0%, rgba(0,0,255,0) 70.71%)',
 	];
+	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 
 	const [
 		shouldShowCustomIndicator,
@@ -76,7 +77,6 @@ function ColorPalette( {
 	const customIndicatorColor = isGradientSegment
 		? activeColor
 		: customSwatchGradients;
-	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 
 	useEffect( () => {
 		setShouldShowCustomIndicator(
