@@ -303,7 +303,7 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
-					disableAlpha={ disableAplha }
+					disableAlpha={ disableAlpha }
 					onChangeComplete={ ( { color } ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(
