@@ -9,3 +9,41 @@
 .wp-block-query__create-new-link {
 	padding: 0 $grid-unit-20 $grid-unit-20 56px;
 }
+
+.wp-block-query {
+	.components-placeholder {
+		h6 {
+			margin: 0 auto 10px;
+		}
+		.components-placeholder__instructions {
+			font-size: 14px;
+		}
+		.block-setup-navigation {
+			padding: 10px 0 0;
+		}
+		.block-attributes-setup-container {
+			padding: 20px;
+			.components-base-control__help {
+				margin: 10px auto;
+			}
+		}
+		.layout-step-container {
+			.block-patterns-picker-container {
+				padding-top: 10px;
+				border-top: 1px solid $gray-200;
+				.block-patterns-picker-container__grid {
+					box-sizing: border-box;
+					display: grid;
+					grid-template-columns: repeat(3, 1fr);
+					outline: none;
+					grid-gap: $grid-unit-10;
+					max-height: 200px;
+					overflow: auto;
+					.block-editor-block-preview__container {
+						cursor: pointer;
+					}
+				}
+			}
+		}
+	}
+}

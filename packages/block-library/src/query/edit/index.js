@@ -7,6 +7,7 @@ import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -17,7 +18,7 @@ import {
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
-import QueryPlaceholder from './query-placeholder';
+import QueryBlockSetup from './query-block-setup';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
@@ -93,8 +94,7 @@ const QueryEdit = ( props ) => {
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
-
+	const Component = hasInnerBlocks ? QueryContent : QueryBlockSetup;
 	return <Component { ...props } />;
 };
 

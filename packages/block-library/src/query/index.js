@@ -22,6 +22,9 @@ export const settings = {
 	edit,
 	save,
 	variations,
+	isMatchingBlockPattern: ( pattern ) => {
+		return pattern.categories?.includes( 'core/query' );
+	},
 };
 
 export { useQueryContext } from './edit';

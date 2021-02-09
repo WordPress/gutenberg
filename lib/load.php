@@ -128,3 +128,120 @@ require __DIR__ . '/block-supports/align.php';
 require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
+
+
+// Demo query patterns.
+register_block_pattern_category(
+	'core/query',
+	array( 'label' => __( 'Core Query block', 'gutenberg' ) )
+);
+register_block_pattern(
+	'test/query',
+	array(
+		'title'      => __( 'Query Pattern one', 'gutenberg' ),
+		'categories' => array( 'core/query' ),
+		'content'    => '<!-- wp:post-featured-image /-->
+		<!-- wp:columns -->
+		<div class="wp-block-columns"><!-- wp:column -->
+		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /--></div>
+		<!-- /wp:column -->
+		<!-- wp:column -->
+		<div class="wp-block-column">
+		<!-- wp:post-date /-->
+		<!-- wp:post-author {"showAvatar":false} /-->
+		</div>
+		<!-- /wp:column --></div>
+		<!-- /wp:columns -->',
+	)
+);
+
+register_block_pattern(
+	'test/query-2',
+	array(
+		'title'      => __( 'Query Pattern two', 'gutenberg' ),
+		'categories' => array( 'core/query' ),
+		'content'    => '<!-- wp:columns -->
+		<div class="wp-block-columns"><!-- wp:column -->
+		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /-->
+		<!-- wp:separator {"align":"center","className":"is-style-twentytwentyone-separator-thick"} -->
+		<hr class="wp-block-separator aligncenter is-style-twentytwentyone-separator-thick"/>
+		<!-- /wp:separator -->
+		<!-- wp:post-date /-->
+		<!-- wp:post-author {"showAvatar":false} /--></div>
+		<!-- /wp:column -->
+		<!-- wp:column -->
+		<div class="wp-block-column">
+		<!-- wp:post-featured-image /-->
+		</div>
+		<!-- /wp:column --></div>
+		<!-- /wp:columns -->',
+	)
+);
+
+register_block_pattern(
+	'test/query-3',
+	array(
+		'title'      => __( 'Query Pattern three', 'gutenberg' ),
+		'categories' => array( 'core/query' ),
+		'content'    => '<!-- wp:post-title {"isLink":true} /-->
+		<!-- wp:separator {"align":"center","className":"is-style-twentytwentyone-separator-thick"} -->
+		<hr class="wp-block-separator aligncenter is-style-twentytwentyone-separator-thick"/>
+		<!-- /wp:separator -->
+		<!-- wp:columns -->
+		<div class="wp-block-columns"><!-- wp:column -->
+		<div class="wp-block-column"><!-- wp:post-date /-->
+		<!-- wp:post-author {"showAvatar":false} /--></div>
+		<!-- /wp:column -->
+		<!-- wp:column -->
+		<div class="wp-block-column"><!-- wp:post-hierarchical-terms {"term":"category","textAlign":"right"} /-->
+		</div>
+		<!-- /wp:column --></div>
+		<!-- /wp:columns -->',
+	)
+);
+
+register_block_pattern(
+	'test/query-4',
+	array(
+		'title'      => __( 'Query Pattern four', 'gutenberg' ),
+		'categories' => array( 'core/query' ),
+		'content'    => '<!-- wp:columns -->
+		<div class="wp-block-columns"><!-- wp:column -->
+		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /-->
+		<!-- wp:separator {"align":"center","className":"is-style-twentytwentyone-separator-thick"} -->
+		<hr class="wp-block-separator aligncenter is-style-twentytwentyone-separator-thick"/>
+		<!-- /wp:separator -->
+		<!-- wp:post-date /-->
+		<!-- wp:post-author {"showAvatar":false} /--></div>
+		<!-- /wp:column -->
+		<!-- wp:column -->
+		<div class="wp-block-column">
+		<!-- wp:post-featured-image /-->
+		</div>
+		<!-- /wp:column --></div>
+		<!-- /wp:columns -->',
+	)
+);
+
+register_block_pattern(
+	'test/query-5',
+	array(
+		'title'      => __( 'Query Pattern two', 'gutenberg' ),
+		'categories' => array( 'core/query' ),
+		'content'    => '<!-- wp:columns -->
+		<div class="wp-block-columns"><!-- wp:column -->
+		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /-->
+		<!-- wp:separator {"align":"center","className":"is-style-twentytwentyone-separator-thick"} -->
+		<hr class="wp-block-separator aligncenter is-style-twentytwentyone-separator-thick"/>
+		<!-- /wp:separator -->
+		<!-- wp:post-date /-->
+		<!-- wp:post-author {"showAvatar":false} /--></div>
+		<!-- /wp:column -->
+		<!-- wp:column -->
+		<div class="wp-block-column">
+		<!-- wp:post-excerpt /-->
+		</div>
+		<!-- /wp:column --></div>
+		<!-- /wp:columns -->',
+	)
+);

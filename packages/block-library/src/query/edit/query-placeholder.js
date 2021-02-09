@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useBlockProps,
 	__experimentalBlockVariationPicker,
+	store as blockEditorStore,
 	__experimentalGetMatchingVariation as getMatchingVariation,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
