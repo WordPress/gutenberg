@@ -6,7 +6,7 @@
  * @package Gutenberg
  */
 
-class WP_Theme_JSON_Test extends WP_UnitTestCase {
+class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
     function test_presets_are_extracted() {
         $actual   = WP_Theme_JSON_Resolver::get_presets_to_translate();
