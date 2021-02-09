@@ -84,7 +84,7 @@ export default function Layout( { blockEditorSettings } ) {
 								saveBlocks={ savePost }
 							/>
 							<div
-								className="navigation-editor-canvas"
+								className="edit-navigation-layout__canvas"
 								ref={ canvasRef }
 							>
 								<Editor

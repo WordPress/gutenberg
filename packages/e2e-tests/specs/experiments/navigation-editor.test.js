@@ -182,7 +182,6 @@ describe( 'Navigation editor', () => {
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
-	// Regressed—to be reimplemented.
 	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
@@ -208,7 +207,7 @@ describe( 'Navigation editor', () => {
 		expect( submenuLinkVisible ).toBeDefined();
 
 		// Click the editor canvas.
-		await page.click( '.edit-navigation-editor__block-view' );
+		await page.click( '.edit-navigation-layout__canvas' );
 
 		// There should be a submenu in the DOM, but it should be hidden.
 		const submenuLinkHidden = await page.waitForXPath( submenuLinkXPath, {
