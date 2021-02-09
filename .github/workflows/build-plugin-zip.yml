@@ -63,6 +63,7 @@ jobs:
             repo: context.repo.repo,
             run_id: context.runId
           } );
+          console.log( artifacts );
           const pluginArtifact = artifacts.find( artifact => (
             artifact.name === 'gutenberg-plugin'
           ) );
