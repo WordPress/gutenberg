@@ -583,13 +583,13 @@ export class FileEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { attributes } = props;
+		const { attributes, isSelected } = props;
 		const { id, href } = attributes;
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
 			media: isNotFileHref ? select( 'core' ).getMedia( id ) : undefined,
-			isSidebarOpened: isEditorSidebarOpened(),
+			isSidebarOpened: isSelected && isEditorSidebarOpened(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -15,8 +15,10 @@ function WidgetPreview( { widgetAreaId, attributes, hidden, ...props } ) {
 	const HEIGHT_MARGIN = 20;
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
 	const iframeRef = useRef();
-	const currentUrl = document.location.href;
-	const iframeUrl = addQueryArgs( currentUrl, {
+	const widgetScreenUrl = addQueryArgs( 'theme.php', {
+		page: 'gutenberg-widgets',
+	} );
+	const iframeUrl = addQueryArgs( widgetScreenUrl, {
 		'widget-preview': {
 			...attributes,
 			sidebarId: widgetAreaId,

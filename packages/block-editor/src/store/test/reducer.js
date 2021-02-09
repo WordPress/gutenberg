@@ -2622,6 +2622,80 @@ describe( 'state', () => {
 				},
 			} );
 		} );
+		describe( 'block variations handling', () => {
+			const blockWithVariations = 'core/test-block-with-variations';
+			beforeAll( () => {
+				const variations = [
+					{
+						name: 'apple',
+						attributes: { fruit: 'apple' },
+					},
+					{ name: 'orange', attributes: { fruit: 'orange' } },
+				].map( ( variation ) => ( {
+					...variation,
+					isActive: ( blockAttributes, variationAttributes ) =>
+						blockAttributes?.fruit === variationAttributes.fruit,
+				} ) );
+				registerBlockType( blockWithVariations, {
+					save: noop,
+					edit: noop,
+					title: 'Fruit with variations',
+					variations,
+				} );
+			} );
+			afterAll( () => {
+				unregisterBlockType( blockWithVariations );
+			} );
+			it( 'should return proper results with both found or not found block variation matches', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						{
+							clientId: 'no match',
+							name: blockWithVariations,
+						},
+						{
+							clientId: 'not a variation match',
+							name: blockWithVariations,
+							attributes: { fruit: 'not in a variation' },
+						},
+						{
+							clientId: 'orange',
+							name: blockWithVariations,
+							attributes: { fruit: 'orange' },
+						},
+						{
+							clientId: 'apple',
+							name: blockWithVariations,
+							attributes: { fruit: 'apple' },
+						},
+					],
+					time: 123456,
+				} );
+
+				const orangeVariationName = `${ blockWithVariations }/orange`;
+				const appleVariationName = `${ blockWithVariations }/apple`;
+				expect( state ).toEqual( {
+					insertUsage: expect.objectContaining( {
+						[ orangeVariationName ]: {
+							time: 123456,
+							count: 1,
+							insert: { name: orangeVariationName },
+						},
+						[ appleVariationName ]: {
+							time: 123456,
+							count: 1,
+							insert: { name: appleVariationName },
+						},
+						[ blockWithVariations ]: {
+							time: 123456,
+							count: 2,
+							insert: { name: blockWithVariations },
+						},
+					} ),
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'blocksMode', () => {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
 
 /**
@@ -12,15 +12,14 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
-export default function registerEditSiteStore( initialState ) {
-	const store = registerStore( STORE_NAME, {
-		reducer,
-		actions,
-		selectors,
-		controls,
-		persist: [ 'preferences' ],
-		initialState,
-	} );
+export const storeConfig = {
+	reducer,
+	actions,
+	selectors,
+	controls,
+	persist: [ 'preferences' ],
+};
 
-	return store;
-}
+export const store = createReduxStore( STORE_NAME, storeConfig );
+
+register( store );

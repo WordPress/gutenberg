@@ -123,6 +123,7 @@ export {
 	hasBlockSupport,
 	getBlockVariations,
 	isReusableBlock,
+	isTemplatePart,
 	getChildBlockNames,
 	hasChildBlocks,
 	hasChildBlocksWithInserterSupport,

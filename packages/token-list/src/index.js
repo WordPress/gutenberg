@@ -27,9 +27,6 @@ export default class TokenList {
 		/* eslint-enable no-unused-expressions */
 	}
 
-	// Disable reason: JSDoc lint doesn't understand TypeScript types
-	/* eslint-disable jsdoc/valid-types */
-
 	/**
 	 * @param {Parameters<Array<string>['entries']>} args
 	 */
@@ -57,8 +54,6 @@ export default class TokenList {
 	values( ...args ) {
 		return this._valueAsArray.values( ...args );
 	}
-
-	/* eslint-enable jsdoc/valid-types */
 
 	/**
 	 * Returns the associated set as string.

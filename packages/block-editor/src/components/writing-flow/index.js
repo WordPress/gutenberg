@@ -43,6 +43,7 @@ import {
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 import useMultiSelection from './use-multi-selection';
+import { store as blockEditorStore } from '../../store';
 
 export const SelectionStart = createContext();
 
@@ -195,7 +196,7 @@ function selector( select ) {
 		getBlockSelectionStart,
 		isMultiSelecting,
 		getSettings,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectionStartClientId = getMultiSelectedBlocksStartClientId();
@@ -267,7 +268,7 @@ export default function WritingFlow( { children } ) {
 		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	function onMouseDown( event ) {

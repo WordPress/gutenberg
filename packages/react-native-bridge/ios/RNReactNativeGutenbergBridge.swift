@@ -328,6 +328,15 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func mediaFilesBlockReplaceSync() {
+        DispatchQueue.main.async {
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync()
+            }
+        }
+    }
+
+    @objc
     func actionButtonPressed(_ buttonType: String) {
         guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
             return

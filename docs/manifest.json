@@ -1482,6 +1482,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/customize-widgets",
+		"slug": "packages-customize-widgets",
+		"markdown_source": "../packages/customize-widgets/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data-controls",
 		"slug": "packages-data-controls",
 		"markdown_source": "../packages/data-controls/README.md",
