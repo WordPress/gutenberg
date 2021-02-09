@@ -20,6 +20,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { BlockControls, BlockAlignmentToolbar } from '../components';
+import { store as blockEditorStore } from '../store';
 
 /**
  * An array which includes all possible valid alignments,
@@ -162,8 +163,7 @@ export const withDataAlign = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const { align } = attributes;
 		const hasWideEnabled = useSelect(
-			( select ) =>
-				!! select( 'core/block-editor' ).getSettings().alignWide,
+			( select ) => !! select( blockEditorStore ).getSettings().alignWide,
 			[]
 		);
 

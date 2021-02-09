@@ -14,6 +14,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { Icon, edit as editIcon } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 const selectIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
@@ -27,10 +32,10 @@ const selectIcon = (
 
 function ToolSelector( props, ref ) {
 	const isNavigationTool = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+	const { setNavigationMode } = useDispatch( blockEditorStore );
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import mergeRefs from 'react-merge-refs';
 import { compact, map } from 'lodash';
 import tinycolor from 'tinycolor2';
 
@@ -16,6 +15,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -211,7 +211,7 @@ function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
 	return (
 		<iframe
 			{ ...props }
-			ref={ useCallback( mergeRefs( [ ref, setRef ] ), [] ) }
+			ref={ useMergeRefs( [ ref, setRef ] ) }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"

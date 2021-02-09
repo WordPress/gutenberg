@@ -6,13 +6,18 @@ import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
 export function useTypewriter( ref ) {
 	const hasSelectedBlock = useSelect( ( select ) =>
-		select( 'core/block-editor' ).hasSelectedBlock()
+		select( blockEditorStore ).hasSelectedBlock()
 	);
 
 	useEffect( () => {

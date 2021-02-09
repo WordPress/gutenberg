@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "12.0.2",
+	"version": "12.0.6",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -59,7 +59,6 @@
 		"moment": "^2.22.1",
 		"re-resizable": "^6.4.0",
 		"react-dates": "^17.1.1",
-		"react-merge-refs": "^1.0.0",
 		"react-resize-aware": "^3.1.0",
 		"react-spring": "^8.0.20",
 		"react-use-gesture": "^9.0.0",
