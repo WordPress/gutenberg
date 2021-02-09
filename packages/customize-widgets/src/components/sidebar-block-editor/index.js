@@ -19,7 +19,7 @@ import {
  */
 import useSidebarBlockEditor from './use-sidebar-block-editor';
 
-export default function CustomizeSidebarBlockEditor( { sidebar } ) {
+export default function SidebarBlockEditor( { sidebar } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 
 	return (
