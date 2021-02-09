@@ -9,7 +9,7 @@
 .edit-navigation-layout {
 	display: flex;
 	flex-direction: column;
-	margin-right: 280px;
+	margin-right: $sidebar-width;
 
 	.navigation-editor-canvas {
 		// Provide space for the floating block toolbar.
