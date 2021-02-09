@@ -58,11 +58,12 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const artifacts = await github.actions.listWorkflowRunArtifacts( {
+          const artifactsResponse = await github.actions.listWorkflowRunArtifacts( {
             owner: context.repo.owner,
             repo: context.repo.repo,
             run_id: context.runId
           } );
+          const artifacts = artifactsResponse.data.artifacts;
           console.log( artifacts );
           const pluginArtifact = artifacts.find( artifact => (
             artifact.name === 'gutenberg-plugin'
