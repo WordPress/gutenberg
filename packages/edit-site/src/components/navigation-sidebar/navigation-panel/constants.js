@@ -28,3 +28,5 @@ export const MENU_TEMPLATES = 'templates';
 export const MENU_TEMPLATES_ALL = 'templates-all';
 export const MENU_TEMPLATES_PAGES = 'templates-pages';
 export const MENU_TEMPLATES_POSTS = 'templates-posts';
+
+export const SEARCH_DEBOUNCE_IN_MS = 75;
