@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Elevation from '../index';
+import { Elevation } from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

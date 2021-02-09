@@ -5,16 +5,19 @@ import { number } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import Elevation from '../index';
-import View from '../../view';
+import { Elevation } from '../index';
+import { View } from '../../view';
 
 export default {
 	component: Elevation,
-	title: 'Components/Elevation',
+	title: 'G2 Components (Experimental)/Elevation',
 };
 
 export const _default = () => {
 	const value = number( 'value', 5 );
+	const hover = number( 'hover', undefined );
+	const focus = number( 'focus', undefined );
+	const active = number( 'active', undefined );
 
 	return (
 		<View
@@ -25,7 +28,13 @@ export const _default = () => {
 				maxWidth: 400,
 			} }
 		>
-			<Elevation isInteractive value={ value } />
+			<Elevation
+				isInteractive
+				value={ value }
+				hover={ hover }
+				focus={ focus }
+				active={ active }
+			/>
 		</View>
 	);
 };

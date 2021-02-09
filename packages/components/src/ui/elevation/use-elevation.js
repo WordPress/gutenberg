@@ -3,7 +3,7 @@
  */
 import { useContextSystem } from '@wp-g2/context';
 import { css, cx, getBoxShadow, ui } from '@wp-g2/styles';
-import { is } from '@wp-g2/utils';
+import { isNil } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,8 +23,8 @@ export function useElevation( props ) {
 		active,
 		borderRadius = 'inherit',
 		className,
-		focus = false,
-		hover = false,
+		focus,
+		hover,
 		isInteractive = false,
 		offset = 0,
 		value = 0,
@@ -32,12 +32,14 @@ export function useElevation( props ) {
 	} = useContextSystem( props, 'Elevation' );
 
 	const classes = useMemo( () => {
-		let hoverValue = !! hover ? hover : value * 2;
-		let activeValue = !! active ? hover : value / 2;
+		/** @type {number | undefined} */
+		let hoverValue = ! isNil( hover ) ? hover : value * 2;
+		/** @type {number | undefined} */
+		let activeValue = ! isNil( active ) ? active : value / 2;
 
 		if ( ! isInteractive ) {
-			hoverValue = !! hover ? hover : undefined;
-			activeValue = !! active ? active : undefined;
+			hoverValue = ! isNil( hover ) ? hover : undefined;
+			activeValue = ! isNil( active ) ? active : undefined;
 		}
 
 		const transition = `box-shadow ${ ui.get(
@@ -57,31 +59,36 @@ export function useElevation( props ) {
 			transition,
 		} );
 
-		sx.hover = css`
-			*:hover > & {
-				box-shadow: ${ getBoxShadow( hoverValue ) };
-			}
-		`;
+		if ( ! isNil( hoverValue ) ) {
+			sx.hover = css`
+				*:hover > & {
+					box-shadow: ${ getBoxShadow( hoverValue ) };
+				}
+			`;
+		}
 
-		sx.active = css`
-			*:active > & {
-				box-shadow: ${ getBoxShadow( activeValue ) };
-			}
-		`;
+		if ( ! isNil( activeValue ) ) {
+			sx.active = css`
+				*:active > & {
+					box-shadow: ${ getBoxShadow( activeValue ) };
+				}
+			`;
+		}
 
-		sx.focus = css`
-			*:focus > & {
-				box-shadow: ${ getBoxShadow( focus ) };
-			}
-		`;
+		if ( ! isNil( focus ) ) {
+			sx.focus = css`
+				*:focus > & {
+					box-shadow: ${ getBoxShadow( focus ) };
+				}
+			`;
+		}
 
 		return cx(
 			styles.Elevation,
-			sx.Elevation,
 			sx.Base,
-			is.defined( hoverValue ) && sx.hover,
-			is.defined( activeValue ) && sx.active,
-			is.defined( focus ) && sx.focus,
+			sx.hover && sx.hover,
+			sx.active && sx.active,
+			sx.focus && sx.focus,
 			className
 		);
 	}, [

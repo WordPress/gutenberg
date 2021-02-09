@@ -6,12 +6,12 @@ import { contextConnect } from '@wp-g2/context';
 /**
  * Internal dependencies
  */
-import View from '../view';
+import { View } from '../view';
 import { useElevation } from './use-elevation';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<'div', import('./types').Props>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Elevation( props, forwardedRef ) {
@@ -27,15 +27,12 @@ function Elevation( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Elevation, Surface, Text, View } from `@wp-g2/components`
- * import { ui } from `@wp-g2/styles`
- *
  * function Example() {
  *   return (
- *     <View css={[ui.padding(5)]}>
- *       <Surface css={[ui.padding(5)]}>
+ *     <View css={ [ ui.padding( 5 ) ] }>
+ *       <Surface css={ [ ui.padding( 5 ) ] }>
  *         <Text>Into The Unknown</Text>
- *         <Elevation value={5} />
+ *         <Elevation value={ 5 } />
  *       </Surface>
  *     </View>
  *   );
