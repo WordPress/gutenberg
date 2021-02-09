@@ -399,9 +399,9 @@ class WP_Theme_JSON_Resolver {
 	 * for the paragraph block, and the theme has done it as well,
 	 * the user preference wins.
 	 *
-	 * @param array   $theme_support_data Existing block editor settings.
-	 *                                    Empty array by default.
-	 * @param string  $origin To what level should we merge data.
+	 * @param array  $theme_support_data Existing block editor settings.
+	 *                                   Empty array by default.
+	 * @param string $origin To what level should we merge data.
 	 *                       Valid values are 'theme' or 'user'.
 	 *                       Default is 'user'.
 	 *
