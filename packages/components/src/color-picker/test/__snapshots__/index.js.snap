@@ -574,20 +574,45 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
 `;
 
 exports[`ColorPicker should render color picker 1`] = `
-.emotion-4 {
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
-.emotion-0 {
+.emotion-2 {
   display: inline-block;
   margin-bottom: 8px;
 }
@@ -631,7 +656,7 @@ exports[`ColorPicker should render color picker 1`] = `
           type="button"
         />
         <div
-          className="components-visually-hidden"
+          className="components-visually-hidden wp-components-visually-hidden emotion-0"
           id="color-picker-saturation-0"
           style={
             Object {
@@ -704,7 +729,7 @@ exports[`ColorPicker should render color picker 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-visually-hidden"
+                className="components-visually-hidden wp-components-visually-hidden emotion-0"
                 id="components-color-picker__hue-description-0"
                 style={
                   Object {
@@ -734,13 +759,13 @@ exports[`ColorPicker should render color picker 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
-              className="components-base-control__label emotion-0 emotion-1"
+              className="components-base-control__label emotion-2 emotion-3"
               htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal
