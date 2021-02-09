@@ -366,7 +366,7 @@ describe( 'readConfig', () => {
 							'WordPress/gutenberg',
 							'WordPress/gutenberg#master',
 							'WordPress/gutenberg#5.0',
-							'WordPress/theme-experiments/tt1-blocks#f3d2c0d',
+							'WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.3',
 						],
 					} )
 				)
@@ -399,7 +399,7 @@ describe( 'readConfig', () => {
 						type: 'git',
 						url:
 							'https://github.com/WordPress/theme-experiments.git',
-						ref: 'f3d2c0d',
+						ref: 'tt1-blocks@0.4.3',
 						path: expect.stringMatching(
 							/^\/.*theme-experiments\/tt1-blocks$/
 						),
