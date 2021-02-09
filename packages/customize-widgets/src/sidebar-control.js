@@ -11,7 +11,7 @@ import SidebarAdapter from './components/sidebar-block-editor/sidebar-adapter';
 
 const { wp } = window;
 
-const CustomizeControl = wp.customize.Control.extend( {
+const SidebarControl = wp.customize.Control.extend( {
 	ready() {
 		render(
 			<SidebarBlockEditor
@@ -22,4 +22,4 @@ const CustomizeControl = wp.customize.Control.extend( {
 	},
 } );
 
-export default CustomizeControl;
+export default SidebarControl;

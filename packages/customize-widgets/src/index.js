@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import CustomizeControl from './customize-control';
+import SidebarControl from './sidebar-control';
 
 const { wp } = window;
 
@@ -56,7 +56,7 @@ export function initialize() {
 		},
 	} );
 
-	wp.customize.controlConstructor.sidebar_block_editor = CustomizeControl;
+	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
 }
 
 initialize();
