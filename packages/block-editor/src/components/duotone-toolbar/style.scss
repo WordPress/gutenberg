@@ -47,3 +47,7 @@
 		border-top: $border-width solid $gray-900;
 	}
 }
+
+.block-editor-duotone-toolbar__popover > .components-popover__content {
+	width: 340px;
+}
