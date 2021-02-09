@@ -39,7 +39,6 @@ function gutenberg_widgets_customize_register( $manager ) {
 		$manager->add_setting(
 			"sidebars_widgets[$sidebar_id]",
 			array(
-				'type'       => 'gutenberg_widget_blocks',
 				'capability' => 'edit_theme_options',
 				'transport'  => 'postMessage',
 			)
