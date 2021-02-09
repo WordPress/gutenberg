@@ -227,36 +227,31 @@ describe( 'DOM', () => {
 			parent.appendChild( iframe );
 			// JSDom doesn't have a layout engine
 			// so we need to mock getBoundingClientRect and DOMRect.
-			iframe.getBoundingClientRect = () => ( {
+			iframe.getBoundingClientRect = jest.fn( () => ( {
 				width: 100,
 				height: 100,
 				top: iframeTop,
 				left: iframeLeft,
-			} );
-			iframe.contentWindow.DOMRect = function (
-				left,
-				top,
-				width,
-				height
-			) {
-				return {
+			} ) );
+			iframe.contentWindow.DOMRect = jest.fn(
+				( left, top, width, height ) => ( {
 					left,
 					top,
 					right: left + width,
 					bottom: top + height,
 					width,
 					height,
-				};
-			};
+				} )
+			);
 
 			const child = document.createElement( 'div' );
 			iframe.contentWindow.document.body.appendChild( child );
-			child.getBoundingClientRect = () => ( {
+			child.getBoundingClientRect = jest.fn( () => ( {
 				width: 100,
 				height: 100,
 				top: childTop,
 				left: childLeft,
-			} );
+			} ) );
 
 			const rect = child.getBoundingClientRect();
 			const offsettedRect = offsetIframe( rect, child.ownerDocument );
