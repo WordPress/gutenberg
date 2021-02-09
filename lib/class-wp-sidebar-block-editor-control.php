@@ -19,13 +19,6 @@ class WP_Sidebar_Block_Editor_Control extends WP_Customize_Control {
 	public $type = 'sidebar_block_editor';
 
 	/**
-	 * The current sidebar ID.
-	 *
-	 * @var string
-	 */
-	public $sidebar_id;
-
-	/**
 	 * Enqueue the scripts and styles.
 	 */
 	public function enqueue() {
