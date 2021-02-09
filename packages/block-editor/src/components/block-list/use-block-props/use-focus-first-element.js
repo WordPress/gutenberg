@@ -62,7 +62,7 @@ export function useFocusFirstElement( ref, clientId ) {
 	const initialPosition = useInitialPosition( clientId );
 
 	useEffect( () => {
-		if ( initialPosition === undefined ) {
+		if ( initialPosition === undefined || initialPosition === null ) {
 			return;
 		}
 
