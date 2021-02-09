@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import ControlLabel from '../index';
+import { ControlLabel } from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

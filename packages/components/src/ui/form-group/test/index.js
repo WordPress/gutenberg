@@ -6,8 +6,8 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import ControlLabel from '../../control-label';
-import FormGroup, { useFormGroupContextId } from '../index';
+import { ControlLabel } from '../../control-label';
+import { FormGroup, useFormGroupContextId } from '../index';
 
 // @todo: Refactor this after adding next TextInput component.
 const TextInput = ( { id: idProp, ...props } ) => {
