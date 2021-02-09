@@ -11,15 +11,15 @@ import SidebarAdapter from './components/sidebar-block-editor/sidebar-adapter';
 
 const { wp } = window;
 
-const SidebarControl = wp.customize.Control.extend( {
-	ready() {
-		render(
-			<SidebarBlockEditor
-				sidebar={ new SidebarAdapter( this.setting, wp.customize ) }
-			/>,
-			this.container[ 0 ]
-		);
-	},
-} );
-
-export default SidebarControl;
+export default function createSidebarControl() {
+	return wp.customize.Control.extend( {
+		ready() {
+			render(
+				<SidebarBlockEditor
+					sidebar={ new SidebarAdapter( this.setting, wp.customize ) }
+				/>,
+				this.container[ 0 ]
+			);
+		},
+	} );
+}
