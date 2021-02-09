@@ -52,10 +52,6 @@ exports[`props should render active 1`] = `
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
 }
 
-*:focus > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-shadow: 0 false 0px 0 rgba(0 ,0,0,0);
-}
-
 <div
   aria-hidden="true"
   class="components-elevation wp-components-elevation emotion-0"
@@ -106,10 +102,6 @@ exports[`props should render correctly 1`] = `
 [data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
-}
-
-*:focus > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-shadow: 0 false 0px 0 rgba(0 ,0,0,0);
 }
 
 <div
@@ -166,10 +158,6 @@ exports[`props should render hover 1`] = `
 
 *:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
-}
-
-*:focus > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-shadow: 0 false 0px 0 rgba(0 ,0,0,0);
 }
 
 <div
@@ -232,10 +220,6 @@ exports[`props should render isInteractive 1`] = `
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
 }
 
-*:focus > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-shadow: 0 false 0px 0 rgba(0 ,0,0,0);
-}
-
 <div
   aria-hidden="true"
   class="components-elevation wp-components-elevation emotion-0"
@@ -296,10 +280,6 @@ exports[`props should render offset 1`] = `
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
 }
 
-*:focus > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-shadow: 0 false 0px 0 rgba(0 ,0,0,0);
-}
-
 <div
   aria-hidden="true"
   class="components-elevation wp-components-elevation emotion-0"
@@ -350,10 +330,6 @@ exports[`props should render value 1`] = `
 [data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
-}
-
-*:focus > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-shadow: 0 false 0px 0 rgba(0 ,0,0,0);
 }
 
 <div
