@@ -9,7 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import CustomDuotoneBar from './custom-duotone-bar';
 import CustomDuotonePicker from './custom-duotone-picker';
-import { getGradientFromCSSColors, getValuesFromHexColors } from './utils';
+import { getGradientFromCSSColors, getValuesFromColors } from './utils';
 
 function DuotonePickerPopover( {
 	value,
@@ -57,7 +57,7 @@ function DuotonePickerPopover( {
 							style={ style }
 							onClick={ () => {
 								const newValue = {
-									values: getValuesFromHexColors(
+									values: getValuesFromColors(
 										option.colors
 									),
 									id: `duotone-filter-${ option.slug }`,

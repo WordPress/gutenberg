@@ -14,7 +14,7 @@ import {
 	getCustomDuotoneIdFromHexColors,
 	getDefaultColors,
 	getHexColorsFromValues,
-	getValuesFromHexColors,
+	getValuesFromColors,
 } from './utils';
 
 function CustomColorOption( { label, value, colors, onChange } ) {
@@ -94,7 +94,7 @@ function CustomDuotonePicker( { colorPalette, value, onChange } ) {
 				onChange(
 					newColors.length >= 2
 						? {
-								values: getValuesFromHexColors( newColors ),
+								values: getValuesFromColors( newColors ),
 								id: getCustomDuotoneIdFromHexColors(
 									newColors
 								),

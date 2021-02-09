@@ -76,33 +76,20 @@ export function getValuesFromColors( colors = [] ) {
 }
 
 /**
- * Convert a list of hex colors to an object of R, G, and B values.
- *
- * @param {string[]} colors Array of CSS hex color strings.
- *
- * @return {RGBValues} R, G, and B values.
- */
-export function getValuesFromHexColors( colors = [] ) {
-	return getValuesFromColors(
-		colors.map( ( color ) => tinycolor( color ).toRgbString() )
-	);
-}
-
-/**
  * Convert a color values object to an array of colors.
  *
  * @param {RGBValues} values R, G, and B values.
  *
- * @return {string[]} RGB stringcolor array.
+ * @return {Object[]} Tinycolor object array.
  */
-export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
+function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
 	// R, G, and B should all be the same length, so we only need to map over one.
 	return values.r.map( ( x, i ) => {
 		return tinycolor( {
 			r: values.r[ i ] * 255,
 			g: values.g[ i ] * 255,
 			b: values.b[ i ] * 255,
-		} ).toRgbString();
+		} );
 	} );
 }
 
@@ -114,16 +101,16 @@ export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
  * @return {string[]} Hex color array.
  */
 export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
-	return getColorsFromValues( values ).map( ( c ) =>
-		tinycolor( c ).toHexString()
+	return getColorsFromValues( values ).map( ( tcolor ) =>
+		tcolor.toHexString()
 	);
 }
 
 export function getColorStopsFromValues( values = { r: [], g: [], b: [] } ) {
 	const colors = getColorsFromValues( values );
-	return colors.map( ( c, i ) => ( {
+	return colors.map( ( tcolor, i ) => ( {
 		position: ( i * 100 ) / ( colors.length - 1 ),
-		color: c,
+		color: tcolor.toRgbString(),
 	} ) );
 }
 
