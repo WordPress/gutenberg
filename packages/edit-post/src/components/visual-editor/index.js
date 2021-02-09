@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import mergeRefs from 'react-merge-refs';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -24,7 +19,8 @@ import {
 	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -64,17 +60,13 @@ export default function VisualEditor( { styles } ) {
 	useTypingObserver( ref );
 	useCanvasClickRedirect( ref );
 	const editorStylesRef = useEditorStyles( styles );
-	const mergedRefs = useCallback( mergeRefs( [ ref, editorStylesRef ] ), [
-		ref,
-		editorStylesRef,
-	] );
 
 	return (
 		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div
-				ref={ mergedRefs }
+				ref={ useMergeRefs( [ ref, editorStylesRef ] ) }
 				className="editor-styles-wrapper"
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>

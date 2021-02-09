@@ -17,6 +17,7 @@ import {
  * Internal dependencies
  */
 import useBlockDisplayInformation from '../use-block-display-information';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -43,7 +44,7 @@ export default function BlockTitle( { clientId } ) {
 				getBlockName,
 				getBlockAttributes,
 				__experimentalGetReusableBlockTitle,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
 			if ( ! blockName ) {
 				return {};

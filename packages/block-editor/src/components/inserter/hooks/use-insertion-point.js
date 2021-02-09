@@ -8,6 +8,11 @@ import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
+
+/**
  * @typedef WPInserterConfig
  *
  * @property {string=}   rootClientId        If set, insertion will be into the
@@ -48,7 +53,7 @@ function useInsertionPoint( {
 				getBlockIndex,
 				getBlockOrder,
 				getBlockInsertionPoint,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			let _destinationRootClientId, _destinationIndex;
 
@@ -95,7 +100,7 @@ function useInsertionPoint( {
 		insertBlocks,
 		showInsertionPoint,
 		hideInsertionPoint,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta ) => {
