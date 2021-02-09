@@ -1189,9 +1189,14 @@ function selectionHelper( state = {}, action ) {
 			}
 
 			return { clientId: action.clientId };
-		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
+		case 'REPLACE_INNER_BLOCKS': {
+			if ( ! action.updateSelection || ! action.blocks.length ) {
+				return state;
+			}
+
+			return { clientId: action.blocks[ 0 ].clientId };
+		}
 		case 'INSERT_BLOCKS': {
-			// REPLACE_INNER_BLOCKS can be called with an empty array.
 			if ( ! action.blocks.length ) {
 				return state;
 			}
