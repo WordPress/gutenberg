@@ -29,30 +29,6 @@ import save from './save';
  */
 registerBlockType( '{{namespace}}/{{slug}}', {
 	/**
-	 * Attributes are the way a block stores data, they define how a block is parsed
-	 * to extract data from the saved content. When the block loads it will look
-	 * at the saved content for the block, look for the `div` tag, take the text portion,
-	 * and store the content in an `attributes.message` variable.
-	 *
-	 *  @see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/
-	 */
-	attributes: {
-		message: {
-			type: 'string',
-			source: 'text',
-			selector: 'div',
-		},
-	},
-
-	/**
-	 * Optional block extended support features.
-	 */
-	supports: {
-		// Removes support for an HTML mode.
-		html: false,
-	},
-
-	/**
 	 * Used to construct a preview for the block to be shown in the block inserter.
 	 */
 	example: {

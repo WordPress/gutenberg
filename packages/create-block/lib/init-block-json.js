@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { omitBy } = require( 'lodash' );
+const { isEmpty, omitBy } = require( 'lodash' );
 const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
 
@@ -17,6 +17,8 @@ module.exports = async ( {
 	title,
 	description,
 	category,
+	attributes,
+	supports,
 	dashicon,
 	textdomain,
 	editorScript,
@@ -37,15 +39,14 @@ module.exports = async ( {
 					category,
 					icon: dashicon,
 					description,
+					attributes,
+					supports,
 					textdomain,
-					supports: {
-						html: false,
-					},
 					editorScript,
 					editorStyle,
 					style,
 				},
-				( value ) => ! value
+				isEmpty
 			),
 			null,
 			'\t'
