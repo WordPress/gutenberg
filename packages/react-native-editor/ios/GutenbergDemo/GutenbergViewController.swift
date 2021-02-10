@@ -233,6 +233,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
+    func gutenbergDidRequestMediaFilesBlockReplaceSync() {
+        print(#function)
+    }
+
     func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
         print(#function)
     }

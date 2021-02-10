@@ -49,7 +49,6 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceMediaFilesEditedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -94,7 +93,6 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
-    private ReplaceMediaFilesEditedBlockCallback mReplaceMediaFilesEditedBlockCallback;
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
     private boolean mIsEditorMounted;
 
@@ -159,6 +157,7 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaCollection(ArrayList<Object> mediaFiles);
         void onRetryUploadForMediaCollection(ArrayList<Object> mediaFiles);
         void onCancelSaveForMediaCollection(ArrayList<Object> mediaFiles);
+        void onMediaFilesBlockReplaceSync(ArrayList<Object> mediaFiles, String blockId);
     }
 
     public interface OnImageFullscreenPreviewListener {
@@ -441,12 +440,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
-                    ReadableArray mediaFiles,
-                    String blockId
-            ) {
-                mReplaceMediaFilesEditedBlockCallback = replaceMediaFilesEditedBlockCallback;
+            public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
                 mOnMediaFilesCollectionBasedBlockEditorListener
                         .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
             }
@@ -469,6 +463,13 @@ public class WPAndroidGlueCode {
             public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
                 mOnMediaFilesCollectionBasedBlockEditorListener.onCancelSaveForMediaCollection(
                         mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onMediaFilesBlockReplaceSync(
+                    mediaFiles.toArrayList(), blockId
                 );
             }
 
@@ -975,11 +976,8 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public void replaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
-        if (mReplaceMediaFilesEditedBlockCallback != null) {
-            mReplaceMediaFilesEditedBlockCallback.replaceMediaFilesEditedBlock(mediaFiles, blockId);
-            mReplaceMediaFilesEditedBlockCallback = null;
-        }
+    public void replaceMediaFilesEditedBlock(final String mediaFiles, final String blockId) {
+        mDeferredEventEmitter.onReplaceMediaFilesEditedBlock(mediaFiles, blockId);
     }
 
     private boolean isMediaSelectedCallbackRegistered() {

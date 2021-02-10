@@ -15,6 +15,7 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
+	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1393,27 +1394,33 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
 /**
  * Return a function to be used to tranform a block variation to an inserter item
  *
+ * @param {Object} state Global State
  * @param {Object} item Denormalized inserter item
  * @return {Function} Function to transform a block variation to inserter item
  */
-const getItemFromVariation = ( item ) => ( variation ) => ( {
-	...item,
-	id: `${ item.id }-${ variation.name }`,
-	icon: variation.icon || item.icon,
-	title: variation.title || item.title,
-	description: variation.description || item.description,
-	category: variation.category || item.category,
-	// If `example` is explicitly undefined for the variation, the preview will not be shown.
-	example: variation.hasOwnProperty( 'example' )
-		? variation.example
-		: item.example,
-	initialAttributes: {
-		...item.initialAttributes,
-		...variation.attributes,
-	},
-	innerBlocks: variation.innerBlocks,
-	keywords: variation.keywords || item.keywords,
-} );
+const getItemFromVariation = ( state, item ) => ( variation ) => {
+	const variationId = `${ item.id }/${ variation.name }`;
+	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	return {
+		...item,
+		id: variationId,
+		icon: variation.icon || item.icon,
+		title: variation.title || item.title,
+		description: variation.description || item.description,
+		category: variation.category || item.category,
+		// If `example` is explicitly undefined for the variation, the preview will not be shown.
+		example: variation.hasOwnProperty( 'example' )
+			? variation.example
+			: item.example,
+		initialAttributes: {
+			...item.initialAttributes,
+			...variation.attributes,
+		},
+		innerBlocks: variation.innerBlocks,
+		keywords: variation.keywords || item.keywords,
+		frecency: calculateFrecency( time, count ),
+	};
+};
 
 /**
  * Returns the calculated frecency.
@@ -1588,7 +1595,7 @@ export const getInserterItems = createSelector(
 		for ( const item of blockTypeInserterItems ) {
 			const { variations = [] } = item;
 			if ( variations.length ) {
-				const variationMapper = getItemFromVariation( item );
+				const variationMapper = getItemFromVariation( state, item );
 				blockVariations.push( ...variations.map( variationMapper ) );
 			}
 		}
@@ -1732,6 +1739,50 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockTypes(),
+	]
+);
+
+const __experimentalGetParsedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return map( patterns, ( pattern ) => ( {
+			...pattern,
+			contentBlocks: parse( pattern.content ),
+		} ) );
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
+/**
+ * Returns the list of allowed patterns for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array?} The list of allowed block types.
+ */
+export const __experimentalGetAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = __experimentalGetParsedPatterns( state );
+
+		if ( ! rootClientId ) {
+			return patterns;
+		}
+
+		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
+			return every( contentBlocks, ( { name } ) =>
+				canInsertBlockType( state, name, rootClientId )
+			);
+		} );
+
+		return patternsAllowed;
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
 	]
 );
 

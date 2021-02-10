@@ -8,6 +8,8 @@ import {
 	trashAllPosts,
 	activateTheme,
 	canvas,
+	openDocumentSettingsSidebar,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -37,7 +39,17 @@ const createTemplatePart = async (
 			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
 			: '.wp-block-template-part .block-editor-block-list__layout'
 	);
-	await page.focus( '.wp-block-template-part__name-panel input' );
+	await openDocumentSettingsSidebar();
+
+	const nameInputSelector =
+		'.block-editor-block-inspector .components-text-control__input';
+	const nameInput = await page.waitForSelector( nameInputSelector );
+	await nameInput.click();
+
+	// Select all of the text in the title field.
+	await pressKeyWithModifier( 'primary', 'a' );
+
+	// Give the reusable block a title
 	await page.keyboard.type( templatePartName );
 };
 

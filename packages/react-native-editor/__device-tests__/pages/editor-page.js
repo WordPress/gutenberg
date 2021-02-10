@@ -588,6 +588,7 @@ const blockNames = {
 	spacer: 'Spacer',
 	verse: 'Verse',
 	file: 'File',
+	audio: 'Audio',
 };
 
 module.exports = { initializeEditorPage, blockNames };

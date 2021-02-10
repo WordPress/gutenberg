@@ -28,6 +28,7 @@ import {
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -50,7 +51,7 @@ export default function BlockNavigationBlock( {
 				isBlockBeingDragged,
 				isAncestorBeingDragged,
 				getBlockParents,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			return {
 				isDragging:
@@ -62,9 +63,7 @@ export default function BlockNavigationBlock( {
 		[ clientId ]
 	);
 
-	const { selectBlock: selectEditorBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const { selectBlock: selectEditorBlock } = useDispatch( blockEditorStore );
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;

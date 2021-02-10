@@ -5,6 +5,7 @@
 ![Quick view of the block editor](https://make.wordpress.org/core/files/2021/01/quick-view-of-the-block-editor.png)
 
 **Legend :**
+
 1. Block Inserter
 2. Block editor content area
 3. Settings Sidebar
@@ -15,13 +16,17 @@ Blocks treat Paragraphs, Headings, Media, and Embeds all as components that, whe
 
 The Editor offers rich new value to users with visual, drag-and-drop creation tools and powerful developer enhancements with modern vendor packages, reusable components, rich APIs and hooks to modify and extend the editor through Custom Blocks, Custom Block Styles and Plugins.
 
+[Learn to use the block editor](https://wordpress.org/support/article/wordpress-editor/) to create media-rich posts and pages.
+
 ## Quick links
 
-### [Create a Block Tutorial](/docs/designers-developers/developers/tutorials/create-block/readme.md)
-Learn how to create your first block for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
+### Create a Block Tutorial
 
-### [Develop for the block editor](https://developer.wordpress.org/block-editor/developers/)
-Whether you want to extend the functionality of the block editor, or create a plugin based on it, you will find here all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
+[Learn how to create your first block](/docs/designers-developers/developers/tutorials/create-block/readme.md) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
+
+### Develop for the block editor
+
+Whether you want to extend the functionality of the block editor, or create a plugin based on it, [see the developer documentation](/docs/designers-developers/developers/README.md) to find all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
 - [Gutenberg Architecture](/docs/architecture/readme.md)
 - [Block Style Variations](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations)
@@ -31,5 +36,7 @@ Whether you want to extend the functionality of the block editor, or create a pl
 - [Block Editor Accessibility](/docs/designers-developers/developers/accessibility.md)
 - [Internationalization](/docs/designers-developers/developers/internationalization.md)
 
-### [Contribute to the block editor](/docs/contributors/readme.md)
-Everything you need to know to start contributing to the block editor. Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
+### Contribute to the block editor
+
+Everything you need to know to [start contributing to the block editor](/docs/contributors/readme.md) . Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
+

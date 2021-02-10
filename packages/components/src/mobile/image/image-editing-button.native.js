@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableWithoutFeedback, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,6 +15,11 @@ import { Icon } from '@wordpress/components';
 import { MediaEdit } from '../media-edit';
 import SvgIconCustomize from './icon-customize';
 import styles from './style.scss';
+
+const accessibilityHint =
+	Platform.OS === 'ios'
+		? __( 'Double tap to open Action Sheet to edit or replace the image' )
+		: __( 'Double tap to open Bottom Sheet to edit or replace the image' );
 
 const ImageEditingButton = ( {
 	onSelectMediaUploadOption,
@@ -28,7 +34,9 @@ const ImageEditingButton = ( {
 			openReplaceMediaOptions={ openMediaOptions }
 			render={ ( { open, mediaOptions } ) => (
 				<TouchableWithoutFeedback
+					accessibilityHint={ accessibilityHint }
 					accessibilityLabel="Edit image"
+					accessibilityRole={ 'button' }
 					onPress={ open }
 				>
 					<View style={ styles.editContainer }>

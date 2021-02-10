@@ -14,6 +14,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './container.native.scss';
+import { store as blockEditorStore } from '../../store';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -71,7 +72,7 @@ function BottomSheetSettings( {
 export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),

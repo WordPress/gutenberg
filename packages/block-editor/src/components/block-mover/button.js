@@ -24,6 +24,7 @@ import {
 	chevronDown,
 } from '@wordpress/icons';
 import { getBlockMoverDescription } from './mover-description';
+import { store as blockEditorStore } from '../../store';
 
 const getArrowIcon = ( direction, orientation ) => {
 	if ( direction === 'up' ) {
@@ -79,7 +80,7 @@ const BlockMoverButton = forwardRef(
 					getBlockOrder,
 					getBlock,
 					getBlockListSettings,
-				} = select( 'core/block-editor' );
+				} = select( blockEditorStore );
 				const normalizedClientIds = castArray( clientIds );
 				const firstClientId = first( normalizedClientIds );
 				const blockRootClientId = getBlockRootClientId( firstClientId );
@@ -112,7 +113,7 @@ const BlockMoverButton = forwardRef(
 		);
 
 		const { moveBlocksDown, moveBlocksUp } = useDispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 		const moverFunction =
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;

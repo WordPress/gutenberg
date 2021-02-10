@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, startCase, reduce } from 'lodash';
+import { every, has, isFunction, isString, reduce } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -10,7 +10,6 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -141,19 +140,6 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
-	// Attempt to find entity title if block is a template part.
-	// Require slug to request, otherwise entity is uncreated and will throw 404.
-	if ( 'core/template-part' === blockType.name && attributes.slug ) {
-		const entity = select( 'core' ).getEntityRecord(
-			'postType',
-			'wp_template_part',
-			attributes.theme + '//' + attributes.slug
-		);
-		if ( entity ) {
-			return startCase( entity.title?.rendered || entity.slug );
-		}
-	}
-
 	const { __experimentalLabel: getLabel, title } = blockType;
 
 	const label = getLabel && getLabel( attributes, { context } );

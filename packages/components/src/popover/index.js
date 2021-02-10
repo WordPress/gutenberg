@@ -2,17 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useState,
-	useLayoutEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -23,6 +17,7 @@ import {
 	__experimentalUseFocusOutside as useFocusOutside,
 	useConstrainedTabbing,
 	useFocusReturn,
+	useMergeRefs,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -492,13 +487,12 @@ const Popover = ( {
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
-	const allRefs = [
+	const mergedRefs = useMergeRefs( [
 		containerRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
-	];
-	const mergedRefs = useCallback( mergeRefs( allRefs ), allRefs );
+	] );
 
 	// Event handlers
 	const maybeClose = ( event ) => {

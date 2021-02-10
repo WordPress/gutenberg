@@ -24,7 +24,14 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @var WP_Theme_JSON
 	 */
-	private $theme = null;
+	private static $theme = null;
+
+	/**
+	 * Whether or not the theme supports theme.json.
+	 *
+	 * @var boolean
+	 */
+	private static $theme_has_support = null;
 
 	/**
 	 * Container for data coming from the user.
@@ -82,8 +89,8 @@ class WP_Theme_JSON_Resolver {
 	 *   "settings": {
 	 *     "*": {
 	 *       "typography": {
-	 *         "fontSizes": [ "name" ],
-	 *         "fontStyles": [ "name" ]
+	 *         "fontSizes": [ { "name": "Font size name" } ],
+	 *         "fontStyles": [ { "name": "Font size name" } ]
 	 *       }
 	 *     }
 	 *   }
@@ -93,12 +100,14 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * [
 	 *   0 => [
-	 *     'path' => [ 'settings', '*', 'typography', 'fontSizes' ],
-	 *     'translatable_keys' => [ 'name' ]
+	 *     'path'    => [ 'settings', '*', 'typography', 'fontSizes' ],
+	 *     'key'     => 'name',
+	 *     'context' => 'Font size name'
 	 *   ],
 	 *   1 => [
-	 *     'path' => [ 'settings', '*', 'typography', 'fontStyles' ],
-	 *     'translatable_keys' => [ 'name']
+	 *     'path'    => [ 'settings', '*', 'typography', 'fontStyles' ],
+	 *     'key'     => 'name',
+	 *     'context' => 'Font style name'
 	 *   ]
 	 * ]
 	 *
@@ -111,12 +120,15 @@ class WP_Theme_JSON_Resolver {
 		$result = array();
 		foreach ( $file_structure_partial as $property => $partial_child ) {
 			if ( is_numeric( $property ) ) {
-				return array(
-					array(
-						'path'              => $current_path,
-						'translatable_keys' => $file_structure_partial,
-					),
-				);
+				foreach ( $partial_child as $key => $context ) {
+					return array(
+						array(
+							'path'    => $current_path,
+							'key'     => $key,
+							'context' => $context,
+						),
+					);
+				}
 			}
 			$result = array_merge(
 				$result,
@@ -131,7 +143,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
 	 */
-	private static function get_presets_to_translate() {
+	public static function get_presets_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
@@ -159,23 +171,23 @@ class WP_Theme_JSON_Resolver {
 			}
 
 			foreach ( $preset_to_translate as $preset ) {
-				$path               = array_slice( $preset['path'], 2 );
-				$translatable_keys  = $preset['translatable_keys'];
+				$path    = array_slice( $preset['path'], 2 );
+				$key     = $preset['key'];
+				$context = $preset['context'];
+
 				$array_to_translate = gutenberg_experimental_get( $settings, $path, null );
 				if ( null === $array_to_translate ) {
 					continue;
 				}
 
 				foreach ( $array_to_translate as &$item_to_translate ) {
-					foreach ( $translatable_keys as $translatable_key ) {
-						if ( empty( $item_to_translate[ $translatable_key ] ) ) {
-							continue;
-						}
-
-						// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
-						$item_to_translate[ $translatable_key ] = translate( $item_to_translate[ $translatable_key ], $domain );
-						// phpcs:enable
+					if ( empty( $item_to_translate[ $key ] ) ) {
+						continue;
 					}
+
+					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
+					$item_to_translate[ $key ] = translate_with_gettext_context( $item_to_translate[ $key ], $context, $domain );
+					// phpcs:enable
 				}
 
 				gutenberg_experimental_set( $settings, $path, $array_to_translate );
@@ -188,7 +200,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds core data.
 	 */
-	private static function get_core_origin() {
+	public static function get_core_data() {
 		if ( null !== self::$core ) {
 			return self::$core;
 		}
@@ -258,27 +270,39 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Returns the theme's origin config.
+	 * Returns the theme's data.
 	 *
-	 * It uses the theme support data if
-	 * the theme hasn't declared any via theme.json.
+	 * Data from theme.json can be augmented via the
+	 * $theme_support_data variable. This is useful, for example,
+	 * to backfill the gaps in theme.json that a theme has declared
+	 * via add_theme_supports.
+	 *
+	 * Note that if the same data is present in theme.json
+	 * and in $theme_support_data, the theme.json's is not overwritten.
 	 *
 	 * @param array $theme_support_data Theme support data in theme.json format.
 	 *
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
-	private function get_theme_origin( $theme_support_data = array() ) {
-		$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
-		self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+	public static function get_theme_data( $theme_support_data = array() ) {
+		if ( null === self::$theme ) {
+			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
+			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			self::$theme = new WP_Theme_JSON( $theme_json_data );
+		}
+
+		if ( empty( $theme_support_data ) ) {
+			return self::$theme;
+		}
 
 		/*
 		 * We want the presets and settings declared in theme.json
 		 * to override the ones declared via add_theme_support.
 		 */
-		$this->theme = new WP_Theme_JSON( $theme_support_data );
-		$this->theme->merge( new WP_Theme_JSON( $theme_json_data ) );
+		$with_theme_supports = new WP_Theme_JSON( $theme_support_data );
+		$with_theme_supports->merge( self::$theme );
 
-		return $this->theme;
+		return $with_theme_supports;
 	}
 
 	/**
@@ -332,7 +356,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds user data.
 	 */
-	private static function get_user_origin() {
+	public static function get_user_data() {
 		if ( null !== self::$user ) {
 			return self::$user;
 		}
@@ -365,57 +389,42 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * There are three sources of data for a site:
-	 * core, theme, and user.
+	 * There are three sources of data (origins) for a site:
+	 * core, theme, and user. The user's has higher priority
+	 * than the theme's, and the theme's higher than core's.
 	 *
-	 * The main function of the resolver is to
-	 * merge all this data following this algorithm:
-	 * theme overrides core, and user overrides
-	 * data coming from either theme or core.
+	 * Unlike the getters {@link get_core_data},
+	 * {@link get_theme_data}, and {@link get_user_data},
+	 * this method returns data after it has been merged
+	 * with the previous origins. This means that if the same piece of data
+	 * is declared in different origins (user, theme, and core),
+	 * the last origin overrides the previous.
 	 *
-	 * user data > theme data > core data
+	 * For example, if the user has set a background color
+	 * for the paragraph block, and the theme has done it as well,
+	 * the user preference wins.
 	 *
-	 * The main use case for the resolver is to return
-	 * the merged data up to the user level.However,
-	 * there are situations in which we need the
-	 * data merged up to a different level (theme)
-	 * or no merged at all.
-	 *
-	 * @param array   $theme_support_data Existing block editor settings.
-	 *                                    Empty array by default.
-	 * @param string  $origin The source of data the consumer wants.
-	 *                       Valid values are 'core', 'theme', 'user'.
+	 * @param array  $theme_support_data Existing block editor settings.
+	 *                                   Empty array by default.
+	 * @param string $origin To what level should we merge data.
+	 *                       Valid values are 'theme' or 'user'.
 	 *                       Default is 'user'.
-	 * @param boolean $merged Whether the data should be merged
-	 *                        with the previous origins (the default).
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public function get_origin( $theme_support_data = array(), $origin = 'user', $merged = true ) {
-		if ( ( 'user' === $origin ) && $merged ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_origin( $theme_support_data ) );
-			$result->merge( self::get_user_origin() );
-			return $result;
-		}
-
-		if ( ( 'theme' === $origin ) && $merged ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_origin( $theme_support_data ) );
-			return $result;
-		}
-
-		if ( 'user' === $origin ) {
-			return self::get_user_origin();
-		}
-
+	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
 		if ( 'theme' === $origin ) {
-			return $this->get_theme_origin( $theme_support_data );
+			$result = new WP_Theme_JSON();
+			$result->merge( self::get_core_data() );
+			$result->merge( self::get_theme_data( $theme_support_data ) );
+			return $result;
 		}
 
-		return self::get_core_origin();
+		$result = new WP_Theme_JSON();
+		$result->merge( self::get_core_data() );
+		$result->merge( self::get_theme_data( $theme_support_data ) );
+		$result->merge( self::get_user_data() );
+		return $result;
 	}
 
 	/**
@@ -464,6 +473,19 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		return self::$user_custom_post_type_id;
+	}
+
+	/**
+	 * Whether the current theme has a theme.json file.
+	 *
+	 * @return boolean
+	 */
+	public static function theme_has_support() {
+		if ( ! isset( self::$theme_has_support ) ) {
+			self::$theme_has_support = is_readable( locate_template( 'experimental-theme.json' ) );
+		}
+
+		return self::$theme_has_support;
 	}
 
 }
