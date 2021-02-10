@@ -164,6 +164,16 @@ function Controls( {
 										isUploadInProgress={
 											isUploadInProgress
 										}
+										mediaPickerOptions={ [
+											{
+												destructiveButton: true,
+												id: 'clearMedia',
+												label: __( 'Clear Media' ),
+												onPress: onClearMedia,
+												separated: true,
+												value: 'clearMedia',
+											},
+										] }
 										onImageDataLoad={ () => {
 											setDisplayPlaceholder( false );
 										} }
