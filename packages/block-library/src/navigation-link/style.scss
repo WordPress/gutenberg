@@ -9,6 +9,10 @@
 	}
 }
 
+.wp-block-navigation-link:not(.has-link) {
+	border: solid 1px #f00;
+}
+
 .wp-block-navigation__container {
 	// Reset the default list styles
 	list-style: none;
@@ -24,10 +28,6 @@
 	.is-vertical & {
 		display: block;
 	}
-}
-
-.wp-block-navigation-link__missing-url {
-	border: solid 1px red;
 }
 
 // Styles for submenu flyout
@@ -163,10 +163,4 @@
 			transform: rotate(90deg);
 		}
 	}
-}
-
-.wp-block-navigation-link__popover-link-input {
-	max-width: 360px;
-	min-width: auto;
-	width: 90vw;
 }
