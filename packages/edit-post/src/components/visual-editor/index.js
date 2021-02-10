@@ -16,11 +16,10 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
-	__unstableUseEditorStyles as useEditorStyles,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -59,14 +58,14 @@ export default function VisualEditor( { styles } ) {
 	useClipboardHandler( ref );
 	useTypingObserver( ref );
 	useCanvasClickRedirect( ref );
-	const editorStylesRef = useEditorStyles( styles );
 
 	return (
 		<div className="edit-post-visual-editor">
+			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div
-				ref={ useMergeRefs( [ ref, editorStylesRef ] ) }
+				ref={ ref }
 				className="editor-styles-wrapper"
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
