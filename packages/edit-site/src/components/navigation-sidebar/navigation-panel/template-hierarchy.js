@@ -12,6 +12,8 @@ const TEMPLATE_PARENTS = {
 	home: 'index',
 	404: 'index',
 	search: 'index',
+
+	'front-page': 'home',
 };
 
 /**
