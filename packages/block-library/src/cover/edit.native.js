@@ -6,6 +6,7 @@ import {
 	TouchableWithoutFeedback,
 	InteractionManager,
 	AccessibilityInfo,
+	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
 
@@ -274,8 +275,18 @@ const Cover = ( {
 		</BlockControls>
 	);
 
+	const accessibilityHint =
+		Platform.OS === 'ios'
+			? __( 'Double tap to open Action Sheet to add image or video' )
+			: __( 'Double tap to open Bottom Sheet to add image or video' );
+
 	const addMediaButton = () => (
-		<TouchableWithoutFeedback onPress={ openMediaOptionsRef.current }>
+		<TouchableWithoutFeedback
+			accessibilityHint={ accessibilityHint }
+			accessibilityLabel={ __( 'Add image or video' ) }
+			accessibilityRole="button"
+			onPress={ openMediaOptionsRef.current }
+		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>
 					<Icon
