@@ -42,7 +42,7 @@ class Picker extends Component {
 				}
 				const selected = options[ buttonIndex - 1 ];
 
-				if ( isBottomSheetOpened ) {
+				if ( selected.requiresModal && isBottomSheetOpened ) {
 					onHandleClosingBottomSheet( () => {
 						onChange( selected.value );
 					} );

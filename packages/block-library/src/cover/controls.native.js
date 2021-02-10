@@ -47,7 +47,6 @@ function Controls( {
 	isUploadInProgress,
 	onClearMedia,
 	onSelectMedia,
-	openMediaOptionsRef,
 	setAttributes,
 } ) {
 	const {
@@ -141,123 +140,115 @@ function Controls( {
 		/>
 	);
 
+	const renderMediaSection = ( {
+		open: openMediaOptions,
+		getMediaOptions,
+	} ) => (
+		<>
+			{ getMediaOptions() }
+			{ url ? (
+				<>
+					<BottomSheet.Cell
+						accessible={ false }
+						cellContainerStyle={ [
+							styles.mediaPreview,
+							mediaBackground,
+						] }
+						onLongPress={ openMediaOptions }
+					>
+						<View style={ styles.mediaInner }>
+							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+								<Image
+									editButton={ ! displayPlaceholder }
+									highlightSelected={ false }
+									isSelected={ ! displayPlaceholder }
+									isUploadFailed={ didUploadFail }
+									isUploadInProgress={ isUploadInProgress }
+									mediaPickerOptions={ [
+										{
+											destructiveButton: true,
+											id: 'clearMedia',
+											label: __( 'Clear Media' ),
+											onPress: onClearMedia,
+											separated: true,
+											value: 'clearMedia',
+										},
+									] }
+									onImageDataLoad={ () => {
+										setDisplayPlaceholder( false );
+									} }
+									onSelectMediaUploadOption={ onSelectMedia }
+									openMediaOptions={ openMediaOptions }
+									url={ url }
+									height="100%"
+									style={ imagePreviewStyles }
+									width={ styles.image.width }
+								/>
+							) }
+							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+								<Video
+									muted
+									paused
+									disableFocus
+									onLoad={ ( event ) => {
+										const {
+											height,
+											width,
+										} = event.naturalSize;
+										setVideoNaturalSize( {
+											height,
+											width,
+										} );
+										setDisplayPlaceholder( false );
+									} }
+									resizeMode={ 'cover' }
+									source={ { uri: url } }
+									style={ videoPreviewStyles }
+								/>
+							) }
+							{ displayPlaceholder ? null : focalPointHint }
+						</View>
+					</BottomSheet.Cell>
+					<FocalPointSettings
+						disabled={ hasParallax }
+						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
+						onFocalPointChange={ setFocalPoint }
+						url={ url }
+					/>
+					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+						<ToggleControl
+							label={ __( 'Fixed background' ) }
+							checked={ hasParallax }
+							onChange={ toggleParallax }
+						/>
+					) }
+					<TextControl
+						leftAlign
+						label={ __( 'Clear Media' ) }
+						labelStyle={ styles.clearMediaButton }
+						onPress={ onClearMedia }
+					/>
+				</>
+			) : (
+				<TextControl
+					label={ __( 'Add image or video' ) }
+					labelStyle={ addMediaButtonStyle }
+					leftAlign
+					onPress={ openMediaOptions }
+				/>
+			) }
+		</>
+	);
+
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Media' ) }>
-				{ url ? (
-					<>
-						<BottomSheet.Cell
-							accessible={ false }
-							cellContainerStyle={ [
-								styles.mediaPreview,
-								mediaBackground,
-							] }
-							onLongPress={ openMediaOptionsRef.current }
-						>
-							<View style={ styles.mediaInner }>
-								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-									<Image
-										editButton={ ! displayPlaceholder }
-										highlightSelected={ false }
-										isSelected={ ! displayPlaceholder }
-										isUploadFailed={ didUploadFail }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										mediaPickerOptions={ [
-											{
-												destructiveButton: true,
-												id: 'clearMedia',
-												label: __( 'Clear Media' ),
-												onPress: onClearMedia,
-												separated: true,
-												value: 'clearMedia',
-											},
-										] }
-										onImageDataLoad={ () => {
-											setDisplayPlaceholder( false );
-										} }
-										onSelectMediaUploadOption={
-											onSelectMedia
-										}
-										openMediaOptions={
-											openMediaOptionsRef.current
-										}
-										url={ url }
-										height="100%"
-										style={ imagePreviewStyles }
-										width={ styles.image.width }
-									/>
-								) }
-								{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-									<Video
-										muted
-										paused
-										disableFocus
-										onLoad={ ( event ) => {
-											const {
-												height,
-												width,
-											} = event.naturalSize;
-											setVideoNaturalSize( {
-												height,
-												width,
-											} );
-											setDisplayPlaceholder( false );
-										} }
-										resizeMode={ 'cover' }
-										source={ { uri: url } }
-										style={ videoPreviewStyles }
-									/>
-								) }
-								{ displayPlaceholder ? null : focalPointHint }
-							</View>
-						</BottomSheet.Cell>
-						<FocalPointSettings
-							disabled={ hasParallax }
-							focalPoint={
-								focalPoint || IMAGE_DEFAULT_FOCAL_POINT
-							}
-							onFocalPointChange={ setFocalPoint }
-							url={ url }
-						/>
-						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-							<ToggleControl
-								label={ __( 'Fixed background' ) }
-								checked={ hasParallax }
-								onChange={ toggleParallax }
-							/>
-						) }
-						<TextControl
-							leftAlign
-							label={ __( 'Clear Media' ) }
-							labelStyle={ styles.clearMediaButton }
-							onPress={ onClearMedia }
-						/>
-					</>
-				) : (
-					<MediaUpload
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						isReplacingMedia={ ! hasOnlyColorBackground }
-						onSelect={ onSelectMedia }
-						render={ ( {
-							open: openMediaOptions,
-							getMediaOptions,
-						} ) => {
-							return (
-								<>
-									{ getMediaOptions() }
-									<TextControl
-										label={ __( 'Add image or video' ) }
-										labelStyle={ addMediaButtonStyle }
-										leftAlign
-										onPress={ openMediaOptions }
-									/>
-								</>
-							);
-						} }
-					/>
-				) }
+				<MediaUpload
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					isReplacingMedia={ ! hasOnlyColorBackground }
+					onSelect={ onSelectMedia }
+					render={ renderMediaSection }
+				/>
 			</PanelBody>
 
 			<OverlayColorSettings

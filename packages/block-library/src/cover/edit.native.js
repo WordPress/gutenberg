@@ -450,7 +450,6 @@ const Cover = ( {
 					isUploadInProgress={ isUploadInProgress }
 					onClearMedia={ onClearMedia }
 					onSelectMedia={ onSelectMedia }
-					openMediaOptionsRef={ openMediaOptionsRef }
 					setAttributes={ setAttributes }
 				/>
 			) }
