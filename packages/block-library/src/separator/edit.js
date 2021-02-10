@@ -98,6 +98,7 @@ function SeparatorEdit( props ) {
 
 	const height =
 		parseFloat( marginTop || 0 ) + parseFloat( marginBottom || 0 );
+	const minCSSHeight = `${ marginConstraints.px.min * 2 }${ marginUnit }`;
 	const cssHeight = `${ height }${ marginUnit }`;
 	const blockProps = useBlockProps();
 	const wrapperClasses = blockProps.className?.replace(
@@ -115,7 +116,7 @@ function SeparatorEdit( props ) {
 			<View
 				{ ...blockProps }
 				className={ wrapperClasses }
-				style={ { height: height ? cssHeight : undefined } }
+				style={ { height: height ? cssHeight : minCSSHeight } }
 			>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
