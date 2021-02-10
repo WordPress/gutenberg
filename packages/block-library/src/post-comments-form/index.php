@@ -29,9 +29,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	// Enqueue the comment-reply script.
-	global $wp_scripts;
-	$wp_scripts->in_footer[] = 'comment-reply';
-	$wp_scripts->queue[]     = 'comment-reply';
+	wp_enqueue_script( 'comment-reply' );
 
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $form );
 }
