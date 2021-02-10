@@ -1,12 +1,9 @@
 {
 	"core": "WordPress/WordPress",
 	"plugins": [
-		".",
-		"./esnext-exampl"
+		"."
 	],
-	"themes": [
-		"WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.3"
-	],
+	"themes": [ "WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.3" ],
 	"env": {
 		"tests": {
 			"mappings": {
