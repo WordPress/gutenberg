@@ -1189,15 +1189,9 @@ function selectionHelper( state = {}, action ) {
 			}
 
 			return { clientId: action.clientId };
-		case 'REPLACE_INNER_BLOCKS': {
-			if ( ! action.updateSelection || ! action.blocks.length ) {
-				return state;
-			}
-
-			return { clientId: action.blocks[ 0 ].clientId };
-		}
+		case 'REPLACE_INNER_BLOCKS':
 		case 'INSERT_BLOCKS': {
-			if ( ! action.blocks.length ) {
+			if ( ! action.updateSelection || ! action.blocks.length ) {
 				return state;
 			}
 
@@ -1387,7 +1381,7 @@ export function initialPosition( state, action ) {
 		action.type === 'INSERT_BLOCKS' ||
 		action.type === 'REPLACE_INNER_BLOCKS'
 	) {
-		return action.updateSelection ? 0 : undefined;
+		return action.initialPosition;
 	}
 
 	// Reset the state by default (for any action not handled).

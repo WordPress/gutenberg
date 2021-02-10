@@ -84,12 +84,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
 	const onTransform = ( name ) =>
-		replaceBlocks(
-			clientIds,
-			switchToBlockType( blocks, name ),
-			undefined,
-			0
-		);
+		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (

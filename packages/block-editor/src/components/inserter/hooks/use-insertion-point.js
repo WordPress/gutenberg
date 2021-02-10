@@ -126,7 +126,8 @@ function useInsertionPoint( {
 					blocks,
 					destinationIndex,
 					destinationRootClientId,
-					shouldFocusBlock || shouldForceFocusBlock,
+					true,
+					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
 			}

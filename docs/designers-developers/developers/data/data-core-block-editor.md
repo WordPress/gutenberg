@@ -1139,6 +1139,7 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+-   _initialPosition_ `(||null)`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
@@ -1272,7 +1273,7 @@ _Parameters_
 -   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
--   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
+-   _initialPosition_ `(||null)`: Index of caret after in the selected block after the operation.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
@@ -1285,6 +1286,7 @@ _Parameters_
 -   _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
 -   _blocks_ `Array<Object>`: Block objects to insert as new InnerBlocks
 -   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
+-   _initialPosition_ `(||null)`: Initial block position.
 
 _Returns_
 
@@ -1309,7 +1311,7 @@ _Parameters_
 
 -   _selectionStart_ `WPBlockSelection`: The selection start.
 -   _selectionEnd_ `WPBlockSelection`: The selection end.
--   _initialPosition_ `(||undefined)`: Initial block position.
+-   _initialPosition_ `(||null)`: Initial block position.
 
 _Returns_
 
@@ -1325,7 +1327,7 @@ reflects a reverse selection.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `?number`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `(||null)`: Optional initial position. Pass as -1 to reflect reverse selection.
 
 _Returns_
 

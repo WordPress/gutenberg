@@ -376,7 +376,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			const { clientId, rootClientId } = ownProps;
 			const { getBlockIndex } = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
-			insertBlocks( blocks, index + 1, rootClientId, 0 );
+			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
@@ -398,7 +398,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect, initialPosition = 0 ) {
+		onReplace( blocks, indexToSelect, initialPosition ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
