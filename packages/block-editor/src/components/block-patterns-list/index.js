@@ -39,7 +39,7 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 				>
 					<CompositeItem
 						role="option"
-						as={ 'div' }
+						as="div"
 						{ ...composite }
 						className="block-editor-block-patterns-list__item"
 						onClick={ () => onClick( pattern, blocks ) }
