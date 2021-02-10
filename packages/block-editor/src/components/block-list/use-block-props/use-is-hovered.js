@@ -48,35 +48,45 @@ export function useIsHovered( ref ) {
 		[ ref?.current?.dataset ]
 	);
 
-	useEffect( () => {
-		function addListener( eventType, value ) {
-			function listener( event ) {
-				if ( event.defaultPrevented ) {
-					return;
-				}
-
-				event.stopPropagation();
-				event.preventDefault();
-				setHovered( value );
+	function addHoverListener( eventType, value ) {
+		function listener( event ) {
+			if ( event.defaultPrevented ) {
+				return;
 			}
 
-			ref.current.addEventListener( eventType, listener );
-			return () => {
-				ref.current.removeEventListener( eventType, listener );
-			};
+			event.preventDefault();
+			setHovered( value );
 		}
 
-		if ( isHovered ) {
-			if ( ! hasInnerBlocks ) {
-				return addListener( 'mouseleave', false );
-			}
-			return addListener( 'mouseout', false );
+		ref.current.addEventListener( eventType, listener );
+		return [ eventType, listener ];
+	}
+
+	function addHoverListeners() {
+		const hoverListeners = [];
+
+		if ( ! hasInnerBlocks ) {
+			hoverListeners.push( addHoverListener( 'mouseleave', false ) );
+		} else {
+			hoverListeners.push( addHoverListener( 'mouseout', false ) );
 		}
 
 		if ( isOutlineMode || isNavigationMode ) {
-			return addListener( 'mouseover', true );
+			hoverListeners.push( addHoverListener( 'mouseover', true ) );
 		}
-	}, [ isNavigationMode, isOutlineMode, isHovered, setHovered ] );
+
+		return hoverListeners;
+	}
+
+	useEffect( () => {
+		const hoverListeners = addHoverListeners();
+
+		return () => {
+			hoverListeners.forEach( ( [ eventType, listener ] ) =>
+				ref.current.removeEventListener( eventType, listener )
+			);
+		};
+	}, [ isOutlineMode, isNavigationMode, hasInnerBlocks ] );
 
 	return isHovered;
 }
