@@ -1823,7 +1823,7 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
- * Returns the block List settings for an array of blocks, if any exist.
+ * Returns the block list settings for an array of blocks, if any exist.
  *
  * @param {Object} state     Editor state.
  * @param {Array}  clientIds Block client IDs.
