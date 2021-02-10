@@ -303,7 +303,6 @@ export default function NavigationLinkEdit( {
 			[ `has-${ textColor }-color` ]: !! textColor,
 			'has-background': !! backgroundColor || !! style?.color?.background,
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-			'is-missing-link': ! url,
 		} ),
 		style: {
 			color: style?.color?.text,
@@ -392,56 +391,57 @@ export default function NavigationLinkEdit( {
 			</InspectorControls>
 			<li { ...blockProps }>
 				<div className="wp-block-navigation-link__content">
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-link__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( 'core/navigation-link' )
-							)
-						}
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						keepPlaceholderOnFocus
-						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
-						onClick={ () => {
-							if ( ! url ) {
-								setIsLinkOpen( true );
+					{ ! url ? (
+						<span
+							className="wp-block-navigation-link__missing-url"
+							onClick={ () => {
+								if ( ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
+						>
+							{ __( 'Missing URL' ) }
+						</span>
+					) : (
+						<RichText
+							ref={ ref }
+							identifier="label"
+							className="wp-block-navigation-link__label"
+							value={ label }
+							onChange={ ( labelValue ) =>
+								setAttributes( { label: labelValue } )
 							}
-						} }
-					/>
+							onMerge={ mergeBlocks }
+							onReplace={ onReplace }
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/navigation-link' )
+								)
+							}
+							aria-label={ __( 'Navigation link text' ) }
+							placeholder={ itemLabelPlaceholder }
+							keepPlaceholderOnFocus
+							withoutInteractiveFormatting
+							allowedFormats={ [
+								'core/bold',
+								'core/italic',
+								'core/image',
+								'core/strikethrough',
+							] }
+							onClick={ () => {
+								if ( ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
+						/>
+					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 							className="wp-block-navigation-link__popover-link-input"
 						>
-							<InputControl
-								label={ __( 'Text' ) }
-								onChange={ ( label ) =>
-									setAttributes( { label } )
-								}
-							/>
-							<InputControl
-								label={ __( 'URL' ) }
-								onChange={ ( url ) =>
-									setAttributes( { url: encodeURI( url ) } )
-								}
-							/>
-							{ /* <LinkControl
+							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
@@ -500,7 +500,7 @@ export default function NavigationLinkEdit( {
 										id,
 									} )
 								}
-							/> */ }
+							/>
 						</Popover>
 					) }
 				</div>
