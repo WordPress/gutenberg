@@ -20,6 +20,9 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$post_ID = $block->context['postId'];
 
 	$featured_image = get_the_post_thumbnail( $post_ID );
+	if ( ! $featured_image ) {
+		return '';
+	}
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$featured_image = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $featured_image );

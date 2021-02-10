@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "5.2.2",
+	"version": "5.2.6",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,7 +60,6 @@
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"react-merge-refs": "^1.0.0",
 		"react-spring": "^8.0.19",
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",

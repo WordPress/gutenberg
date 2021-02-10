@@ -103,7 +103,8 @@ class WP_Theme_JSON {
 	 * }
 	 */
 	const SCHEMA = array(
-		'styles'   => array(
+		'customTemplates' => null,
+		'styles'          => array(
 			'border'     => array(
 				'radius' => null,
 				'color'  => null,
@@ -134,7 +135,7 @@ class WP_Theme_JSON {
 				'textTransform'  => null,
 			),
 		),
-		'settings' => array(
+		'settings'        => array(
 			'border'     => array(
 				'customRadius' => null,
 				'customColor'  => null,
@@ -271,15 +272,15 @@ class WP_Theme_JSON {
 			'value'   => array( 'border', 'radius' ),
 			'support' => array( '__experimentalBorder', 'radius' ),
 		),
-		'borderColor'             => array(
+		'borderColor'              => array(
 			'value'   => array( 'border', 'color' ),
 			'support' => array( '__experimentalBorder', 'color' ),
 		),
-		'borderWidth'             => array(
+		'borderWidth'              => array(
 			'value'   => array( 'border', 'width' ),
 			'support' => array( '__experimentalBorder', 'width' ),
 		),
-		'borderStyle'             => array(
+		'borderStyle'              => array(
 			'value'   => array( 'border', 'style' ),
 			'support' => array( '__experimentalBorder', 'style' ),
 		),
@@ -991,7 +992,7 @@ class WP_Theme_JSON {
 
 		$metadata = $this->get_blocks_metadata();
 		foreach ( $metadata as $block_selector => $metadata ) {
-			if ( empty( $metadata['selector'] ) || empty( $metadata['supports'] ) ) {
+			if ( empty( $metadata['selector'] ) ) {
 				continue;
 			}
 
@@ -1047,6 +1048,19 @@ class WP_Theme_JSON {
 			return array();
 		} else {
 			return $this->theme_json['settings'];
+		}
+	}
+
+	/**
+	 * Returns the page templates of the current theme.
+	 *
+	 * @return array
+	 */
+	public function get_custom_templates() {
+		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
+			return array();
+		} else {
+			return $this->theme_json['customTemplates'];
 		}
 	}
 

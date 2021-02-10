@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.1 (2021-02-01)
+
 ### Bug Fix
 
 -   Extract the package name from the value passed as an external template ([#28383](https://github.com/WordPress/gutenberg/pull/28383)).

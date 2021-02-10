@@ -1,11 +1,21 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { _n } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
 
 /**
  * @typedef WPInserterConfig
@@ -48,7 +58,7 @@ function useInsertionPoint( {
 				getBlockIndex,
 				getBlockOrder,
 				getBlockInsertionPoint,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			let _destinationRootClientId, _destinationIndex;
 
@@ -95,7 +105,7 @@ function useInsertionPoint( {
 		insertBlocks,
 		showInsertionPoint,
 		hideInsertionPoint,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta ) => {
@@ -122,11 +132,14 @@ function useInsertionPoint( {
 			}
 
 			if ( ! selectBlockOnInsert ) {
-				// translators: %d: the name of the block that has been added
-				const message = _n(
-					'%d block added.',
-					'%d blocks added.',
-					blocks.length
+				const message = sprintf(
+					// translators: %d: the name of the block that has been added
+					_n(
+						'%d block added.',
+						'%d blocks added.',
+						castArray( blocks ).length
+					),
+					castArray( blocks ).length
 				);
 				speak( message );
 			}

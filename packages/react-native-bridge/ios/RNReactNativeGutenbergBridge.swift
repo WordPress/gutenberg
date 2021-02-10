@@ -291,28 +291,28 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 	}
 
     @objc
-    func requestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+    func requestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles, blockId: blockId)
         }
     }
 
     @objc
-    func requestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+    func requestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles)
         }
     }
 
     @objc
-    func requestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+    func requestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles)
         }
     }
 
     @objc
-    func requestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+    func requestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles)
         }
@@ -323,6 +323,15 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         DispatchQueue.main.async {
             if self.hasObservers {
                 self.delegate?.gutenbergDidRequestMediaSaveSync()
+            }
+        }
+    }
+
+    @objc
+    func mediaFilesBlockReplaceSync() {
+        DispatchQueue.main.async {
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync()
             }
         }
     }
