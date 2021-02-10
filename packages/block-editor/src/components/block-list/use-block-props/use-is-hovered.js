@@ -21,31 +21,22 @@ import { store as blockEditorStore } from '../../../store';
 export function useIsHovered( ref ) {
 	const [ isHovered, setHovered ] = useState( false );
 
-	const { isNavigationMode, isOutlineMode } = useSelect( ( select ) => {
-		const {
-			isNavigationMode: selectIsNavigationMode,
-			getSettings,
-		} = select( blockEditorStore );
-
-		return {
-			isNavigationMode: selectIsNavigationMode(),
-			isOutlineMode: getSettings().outlineMode,
-		};
-	}, [] );
-
-	const hasInnerBlocks = useSelect(
+	const { hasInnerBlocks, isNavigationMode, isOutlineMode } = useSelect(
 		( select ) => {
-			if ( ref?.current?.dataset ) {
-				return (
-					select( 'core/block-editor' ).getBlocks(
-						ref?.current?.dataset?.block
-					).length > 0
-				);
-			}
+			const {
+				isNavigationMode: selectIsNavigationMode,
+				getBlocks,
+				getSettings,
+			} = select( blockEditorStore );
 
-			return false;
+			return {
+				hasInnerBlocks: !! getBlocks( ref?.current?.dataset?.block )
+					.length,
+				isNavigationMode: selectIsNavigationMode(),
+				isOutlineMode: getSettings().outlineMode,
+			};
 		},
-		[ ref?.current?.dataset ]
+		[]
 	);
 
 	function addHoverListener( eventType, value ) {
