@@ -13,6 +13,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useMemo } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -55,11 +56,27 @@ function getTemplateLocation( template ) {
 	return MENU_TEMPLATES_GENERAL;
 }
 
-function getUnusedTemplates( templates ) {
-	const existingSlugs = templates.map( ( { slug } ) => slug );
-	return templates.filter( ( { slug } ) =>
-		isTemplateSuperseded( slug, existingSlugs )
+function getUnusedTemplates( templates, showOnFront ) {
+	const unusedTemplates = [];
+	const templateSlugs = templates.map( ( { slug } ) => slug );
+
+	// `home` template is unused if it is superseded by `front-page`
+	// or show on front is set to show a page rather than blog posts.
+	const homeTemplateExists = templateSlugs.includes( 'home' );
+	if ( homeTemplateExists && showOnFront !== 'posts' ) {
+		unusedTemplates.push(
+			templates.find( ( { slug } ) => slug === 'home' )
+		);
+	}
+
+	const usedTemplateSlugs = templateSlugs.filter(
+		( slug ) => ! unusedTemplates.find( ( template ) => slug === template )
 	);
+	const supersededTemplates = templates.filter( ( { slug } ) =>
+		isTemplateSuperseded( slug, usedTemplateSlugs )
+	);
+
+	return [ ...supersededTemplates, ...unusedTemplates ];
 }
 
 function getTemplatesLocation( templates ) {
@@ -75,17 +92,21 @@ export default function TemplatesMenu() {
 		setSearch( value );
 	} );
 
-	const templates = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template' ),
-		[]
-	);
+	const { templates, showOnFront } = useSelect( ( select ) => {
+		const { getEntityRecords, getEditedEntityRecord } = select( coreStore );
+		const _templates = getEntityRecords( 'postType', 'wp_template', {
+			per_page: -1,
+		} );
+		const _showOnFront = getEditedEntityRecord( 'root', 'site' )
+			.show_on_front;
+		return { templates: _templates, showOnFront: _showOnFront };
+	}, [] );
 	const templatesWithLocation = useMemo( () => {
 		if ( ! templates ) {
 			return null;
 		}
 
-		const unusedTemplates = getUnusedTemplates( templates );
+		const unusedTemplates = getUnusedTemplates( templates, showOnFront );
 		const templateLocations = getTemplatesLocation( templates );
 
 		return templates.map( ( template ) => {
