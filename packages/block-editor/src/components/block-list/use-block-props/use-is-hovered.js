@@ -21,23 +21,17 @@ import { store as blockEditorStore } from '../../../store';
 export function useIsHovered( ref ) {
 	const [ isHovered, setHovered ] = useState( false );
 
-	const { hasInnerBlocks, isNavigationMode, isOutlineMode } = useSelect(
-		( select ) => {
-			const {
-				isNavigationMode: selectIsNavigationMode,
-				getBlocks,
-				getSettings,
-			} = select( blockEditorStore );
+	const { isNavigationMode, isOutlineMode } = useSelect( ( select ) => {
+		const {
+			isNavigationMode: selectIsNavigationMode,
+			getSettings,
+		} = select( blockEditorStore );
 
-			return {
-				hasInnerBlocks: !! getBlocks( ref?.current?.dataset?.block )
-					.length,
-				isNavigationMode: selectIsNavigationMode(),
-				isOutlineMode: getSettings().outlineMode,
-			};
-		},
-		[]
-	);
+		return {
+			isNavigationMode: selectIsNavigationMode(),
+			isOutlineMode: getSettings().outlineMode,
+		};
+	}, [] );
 
 	function addHoverListener( eventType, value ) {
 		function listener( event ) {
@@ -56,11 +50,7 @@ export function useIsHovered( ref ) {
 	function addHoverListeners() {
 		const hoverListeners = [];
 
-		if ( ! hasInnerBlocks ) {
-			hoverListeners.push( addHoverListener( 'mouseleave', false ) );
-		} else {
-			hoverListeners.push( addHoverListener( 'mouseout', false ) );
-		}
+		hoverListeners.push( addHoverListener( 'mouseout', false ) );
 
 		if ( isOutlineMode || isNavigationMode ) {
 			hoverListeners.push( addHoverListener( 'mouseover', true ) );
@@ -77,7 +67,7 @@ export function useIsHovered( ref ) {
 				ref.current.removeEventListener( eventType, listener )
 			);
 		};
-	}, [ isOutlineMode, isNavigationMode, hasInnerBlocks ] );
+	}, [ isOutlineMode, isNavigationMode ] );
 
 	return isHovered;
 }
