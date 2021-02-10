@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { findIndex } from 'lodash';
+import { find } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -284,21 +284,13 @@ function wrapperSelector( select ) {
 		blockParentsClientIds
 	);
 
-	// Find the index of the first Block with the `captureDescendantsToolbars` prop defined
-	// This will be the top most ancestor because getBlockParents() returns tree from top -> bottom
-	const topmostAncestorWithCaptureDescendantsToolbarsIndex = findIndex(
-		ancestorBlockListSettings,
-		[ '__experimentalCaptureToolbars', true ]
+	// Get the clientId of the topmost parent with the capture toolbars setting.
+	const capturingClientId = find(
+		blockParentsClientIds,
+		( ancestorClientId ) =>
+			ancestorBlockListSettings[ ancestorClientId ]
+				?.__experimentalCaptureToolbars
 	);
-
-	let capturingClientId;
-
-	if ( topmostAncestorWithCaptureDescendantsToolbarsIndex !== -1 ) {
-		capturingClientId =
-			blockParentsClientIds[
-				topmostAncestorWithCaptureDescendantsToolbarsIndex
-			];
-	}
 
 	return {
 		clientId,
