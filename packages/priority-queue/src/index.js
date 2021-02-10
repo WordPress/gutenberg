@@ -97,7 +97,11 @@ export const createQueue = () => {
 				nextElement
 			) );
 			callback();
-			elementsMap.delete( nextElement );
+			// Check that element hasn't been added back to the waitList before deleting in the event of
+			// callback being slow to complete.
+			if ( waitingList.indexOf( nextElement ) === -1 ) {
+				elementsMap.delete( nextElement );
+			}
 		} while ( hasTimeRemaining() );
 
 		requestIdleCallback( runWaitingList );
@@ -115,9 +119,7 @@ export const createQueue = () => {
 		if ( ! elementsMap.has( element ) ) {
 			waitingList.push( element );
 		}
-
 		elementsMap.set( element, item );
-
 		if ( ! isRunning ) {
 			isRunning = true;
 			requestIdleCallback( runWaitingList );
@@ -138,6 +140,7 @@ export const createQueue = () => {
 		if ( ! elementsMap.has( element ) ) {
 			return false;
 		}
+
 		const index = waitingList.indexOf( element );
 		waitingList.splice( index, 1 );
 		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
