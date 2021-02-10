@@ -7,6 +7,12 @@
 		// several times, so care needs to be taken.
 		background-color: $white;
 		color: $gray-900;
+	}
+}
+
+.wp-block-navigation .wp-block-navigation__container {
+	.wp-block-navigation__container {
+		align-items: unset;
 		min-width: 200px;
 	}
 }
