@@ -63,6 +63,7 @@ jobs:
             repo: context.repo.repo,
             run_id: context.runId
           } );
+          console.log( artifactsResponse );
           const artifacts = artifactsResponse.data.artifacts;
           console.log( artifacts );
           const pluginArtifact = artifacts.find( artifact => (
