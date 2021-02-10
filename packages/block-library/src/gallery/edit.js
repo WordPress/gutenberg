@@ -110,9 +110,13 @@ function GalleryEdit( props ) {
 		};
 	}, [] );
 
-	const innerBlockImages = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlock( clientId )?.innerBlocks;
-	} );
+	const innerBlockImages = useSelect(
+		( select ) => {
+			return select( 'core/block-editor' ).getBlock( clientId )
+				?.innerBlocks;
+		},
+		[ clientId ]
+	);
 
 	const images = useMemo(
 		() =>
