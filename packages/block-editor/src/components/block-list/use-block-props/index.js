@@ -10,6 +10,7 @@ import { omit } from 'lodash';
 import { useRef, useEffect, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -92,7 +93,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
 	useFocusFirstElement( ref, clientId );
-	useEventHandlers( ref, clientId );
 
 	// Block Reordering animation
 	useMovingAnimation(
@@ -110,7 +110,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	return {
 		...wrapperProps,
 		...props,
-		ref,
+		ref: useMergeRefs( [ ref, useEventHandlers( clientId ) ] ),
 		id: `block-${ clientId }${ htmlSuffix }`,
 		tabIndex: 0,
 		role: 'group',

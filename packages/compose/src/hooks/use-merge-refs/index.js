@@ -41,8 +41,13 @@ export default function useMergeRefs( refs ) {
 				ref !== previousRef &&
 				didElementChange.current === false
 			) {
-				previousRef( null );
-				ref( element.current );
+				if ( typeof previousRef.cleanup === 'function' ) {
+					previousRef.cleanup();
+				} else {
+					previousRef( null );
+				}
+
+				ref.cleanup = ref( element.current );
 			}
 		} );
 
@@ -65,7 +70,11 @@ export default function useMergeRefs( refs ) {
 		// Update the latest refs.
 		refsToUpdate.forEach( ( ref ) => {
 			if ( typeof ref === 'function' ) {
-				ref( value );
+				if ( ! value && typeof ref.cleanup === 'function' ) {
+					ref.cleanup();
+				} else {
+					ref.cleanup = ref( value );
+				}
 			} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
 				ref.current = value;
 			}
