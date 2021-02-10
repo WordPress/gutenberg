@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const formatter = require( '../markdown/formatter' );
+const formatter = require( '../lib/markdown/formatter' );
 
 describe( 'Formatter', () => {
 	it( 'returns markdown', () => {

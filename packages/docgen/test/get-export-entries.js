@@ -7,7 +7,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const getExportEntries = require( '../get-export-entries' );
+const getExportEntries = require( '../lib/get-export-entries' );
 
 describe( 'Export entries', () => {
 	it( 'default class (anonymous)', () => {

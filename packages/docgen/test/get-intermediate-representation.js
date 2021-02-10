@@ -7,7 +7,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const getIntermediateRepresentation = require( '../get-intermediate-representation' );
+const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
 
 describe( 'Intermediate Representation', () => {
 	it( 'undocumented', () => {
