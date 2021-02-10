@@ -595,7 +595,7 @@ export function* insertBlocks(
 			rootClientId,
 			time: Date.now(),
 			updateSelection,
-			initialPosition: updateSelection ? initialPosition : undefined,
+			initialPosition: updateSelection ? initialPosition : null,
 			meta,
 		};
 	}
@@ -936,7 +936,7 @@ export function replaceInnerBlocks(
 		rootClientId,
 		blocks,
 		updateSelection,
-		initialPosition: updateSelection ? initialPosition : undefined,
+		initialPosition: updateSelection ? initialPosition : null,
 		time: Date.now(),
 	};
 }
