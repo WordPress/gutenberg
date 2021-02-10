@@ -30,9 +30,6 @@ import {
 } from './shared';
 
 const blockAttributes = {
-	align: {
-		type: 'string',
-	},
 	url: {
 		type: 'string',
 	},
@@ -91,6 +88,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
@@ -222,6 +222,9 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+		supports: {
+			align: true,
+		},
 		save( { attributes } ) {
 			const {
 				backgroundType,
@@ -324,6 +327,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
