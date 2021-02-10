@@ -9,7 +9,12 @@
             "caption": "",
             "href": "https://wordpress.org/",
             "linkClass": "custom-link",
-            "linkDestination": "custom"
+            "linkDestination": "custom",
+            "inheritedAttributes": {
+                "linkTo": false,
+                "linkTarget": false,
+                "sizeSlug": false
+            }
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>"
