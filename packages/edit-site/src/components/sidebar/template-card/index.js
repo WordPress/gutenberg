@@ -4,15 +4,20 @@
 import { useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { layout } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../../store';
 
 export default function TemplateCard() {
 	const { title, description } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select(
-			'core/edit-site'
-		);
-		const { getEntityRecord } = select( 'core' );
+		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
+		const { getEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			'core/editor'
+			editorStore
 		);
 
 		const postType = getEditedPostType();

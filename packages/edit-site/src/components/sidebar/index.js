@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { cog, typography } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -30,7 +31,7 @@ export function SidebarComplementaryAreaFills() {
 
 		if ( ! [ SIDEBAR_BLOCK, SIDEBAR_TEMPLATE ].includes( sidebar ) ) {
 			sidebar = SIDEBAR_TEMPLATE;
-			if ( select( 'core/block-editor' ).getBlockSelectionStart() ) {
+			if ( select( blockEditorStore ).getBlockSelectionStart() ) {
 				sidebar = SIDEBAR_BLOCK;
 			}
 		}
