@@ -200,7 +200,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds core data.
 	 */
-	private static function get_core_origin() {
+	public static function get_core_data() {
 		if ( null !== self::$core ) {
 			return self::$core;
 		}
@@ -284,7 +284,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
-	public function get_theme_data( $theme_support_data = array() ) {
+	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
 			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
@@ -356,7 +356,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds user data.
 	 */
-	private static function get_user_origin() {
+	public static function get_user_data() {
 		if ( null !== self::$user ) {
 			return self::$user;
 		}
@@ -389,57 +389,42 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * There are three sources of data for a site:
-	 * core, theme, and user.
+	 * There are three sources of data (origins) for a site:
+	 * core, theme, and user. The user's has higher priority
+	 * than the theme's, and the theme's higher than core's.
 	 *
-	 * The main function of the resolver is to
-	 * merge all this data following this algorithm:
-	 * theme overrides core, and user overrides
-	 * data coming from either theme or core.
+	 * Unlike the getters {@link get_core_data},
+	 * {@link get_theme_data}, and {@link get_user_data},
+	 * this method returns data after it has been merged
+	 * with the previous origins. This means that if the same piece of data
+	 * is declared in different origins (user, theme, and core),
+	 * the last origin overrides the previous.
 	 *
-	 * user data > theme data > core data
+	 * For example, if the user has set a background color
+	 * for the paragraph block, and the theme has done it as well,
+	 * the user preference wins.
 	 *
-	 * The main use case for the resolver is to return
-	 * the merged data up to the user level.However,
-	 * there are situations in which we need the
-	 * data merged up to a different level (theme)
-	 * or no merged at all.
-	 *
-	 * @param array   $theme_support_data Existing block editor settings.
-	 *                                    Empty array by default.
-	 * @param string  $origin The source of data the consumer wants.
-	 *                       Valid values are 'core', 'theme', 'user'.
+	 * @param array  $theme_support_data Existing block editor settings.
+	 *                                   Empty array by default.
+	 * @param string $origin To what level should we merge data.
+	 *                       Valid values are 'theme' or 'user'.
 	 *                       Default is 'user'.
-	 * @param boolean $merged Whether the data should be merged
-	 *                        with the previous origins (the default).
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public function get_origin( $theme_support_data = array(), $origin = 'user', $merged = true ) {
-		if ( ( 'user' === $origin ) && $merged ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_data( $theme_support_data ) );
-			$result->merge( self::get_user_origin() );
-			return $result;
-		}
-
-		if ( ( 'theme' === $origin ) && $merged ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_origin() );
-			$result->merge( $this->get_theme_data( $theme_support_data ) );
-			return $result;
-		}
-
-		if ( 'user' === $origin ) {
-			return self::get_user_origin();
-		}
-
+	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
 		if ( 'theme' === $origin ) {
-			return $this->get_theme_data( $theme_support_data );
+			$result = new WP_Theme_JSON();
+			$result->merge( self::get_core_data() );
+			$result->merge( self::get_theme_data( $theme_support_data ) );
+			return $result;
 		}
 
-		return self::get_core_origin();
+		$result = new WP_Theme_JSON();
+		$result->merge( self::get_core_data() );
+		$result->merge( self::get_theme_data( $theme_support_data ) );
+		$result->merge( self::get_user_data() );
+		return $result;
 	}
 
 	/**
