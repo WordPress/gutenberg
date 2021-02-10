@@ -15,7 +15,7 @@
 			margin-right: 0;
 		}
 
-		width: calc(50% - var(--gallery-block--gutter-size, #{$grid-unit-20}));
+		width: calc(50% - (var(--gallery-block--gutter-size, #{$grid-unit-20}) / 2));
 
 		&:nth-of-type(even) {
 			margin-right: 0;
