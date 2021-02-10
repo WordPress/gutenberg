@@ -13,6 +13,14 @@ export const background = css`
 	background-color: ${ ui.get( 'surfaceBackgroundColor' ) };
 `;
 
+/**
+ * @param {Object} props
+ * @param {boolean} [props.border]
+ * @param {boolean} [props.borderBottom]
+ * @param {boolean} [props.borderLeft]
+ * @param {boolean} [props.borderRight]
+ * @param {boolean} [props.borderTop]
+ */
 export function getBorders( {
 	border,
 	borderBottom,
@@ -23,13 +31,15 @@ export function getBorders( {
 	const borderStyle = `1px solid ${ ui.get( 'surfaceBorderColor' ) }`;
 
 	return css( {
-		border: border && borderStyle,
-		borderBottom: borderBottom && borderStyle,
-		borderLeft: borderLeft && borderStyle,
-		borderRight: borderRight && borderStyle,
-		borderTop: borderTop && borderStyle,
+		border: border ? borderStyle : undefined,
+		borderBottom: borderBottom ? borderStyle : undefined,
+		borderLeft: borderLeft ? borderStyle : undefined,
+		borderRight: borderRight ? borderStyle : undefined,
+		borderTop: borderTop ? borderStyle : undefined,
 	} );
 }
+
+export const primary = css``;
 
 export const secondary = css`
 	background: ${ ui.get( 'surfaceBackgroundTintColor' ) };
