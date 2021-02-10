@@ -280,15 +280,15 @@ function wrapperSelector( select ) {
 	const blockParentsClientIds = getBlockParents( clientId );
 
 	// Get Block List Settings for all ancestors of the current Block clientId
-	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
+	const parentBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
 		blockParentsClientIds
 	);
 
 	// Get the clientId of the topmost parent with the capture toolbars setting.
 	const capturingClientId = find(
 		blockParentsClientIds,
-		( ancestorClientId ) =>
-			ancestorBlockListSettings[ ancestorClientId ]
+		( parentClientId ) =>
+			parentBlockListSettings[ parentClientId ]
 				?.__experimentalCaptureToolbars
 	);
 
