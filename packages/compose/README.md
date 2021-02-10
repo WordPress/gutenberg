@@ -326,6 +326,19 @@ _Returns_
 
 -   `boolean`: Reduced motion preference value.
 
+<a name="useRefEffect" href="#useRefEffect">#</a> **useRefEffect**
+
+Effect-like ref callback.
+
+_Parameters_
+
+-   _calllback_ `Function`: Callback with ref as argument.
+-   _dependencies_ `Array`: Dependencies of the callback.
+
+_Returns_
+
+-   `Function`: Ref callback.
+
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
 Hook which allows to listen the resize event of any target element when it changes sizes.

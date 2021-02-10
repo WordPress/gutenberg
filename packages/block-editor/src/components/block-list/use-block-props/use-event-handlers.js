@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,7 +46,7 @@ export function useEventHandlers( clientId ) {
 		blockEditorStore
 	);
 
-	return useCallback(
+	return useRefEffect(
 		( node ) => {
 			if ( ! isSelected ) {
 				/**
