@@ -30,10 +30,10 @@ function SeparatorEdit( props ) {
 	const currentMaxHeight = heightConstraints[ heightUnit ].max;
 
 	useEffect( () => {
-		if ( height < currentMinHeight ) {
+		if ( height && height < currentMinHeight ) {
 			setAttributes( { height: currentMinHeight } );
 		}
-	}, [ hasDotsStyle, heightConstraints ] );
+	}, [ hasDotsStyle ] ); // Only restricting on dots style as min/max enforced on change otherwise.
 
 	const onResizeStart = () => {
 		setIsResizing( true );
@@ -88,7 +88,7 @@ function SeparatorEdit( props ) {
 			<View
 				{ ...blockProps }
 				className={ wrapperClasses }
-				style={ { height: height ? cssHeight : undefined } }
+				style={ { height: height ? cssHeight : currentMinHeight } }
 			>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
