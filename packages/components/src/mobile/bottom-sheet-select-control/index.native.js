@@ -11,6 +11,10 @@ import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
+/**
+ * Internal dependencies
+ */
+import styles from './style';
 
 const BottomSheetSelectControl = ( {
 	label,
@@ -68,7 +72,7 @@ const BottomSheetSelectControl = ( {
 					screen={ label }
 					leftButtonOnPress={ goBack }
 				/>
-				<View paddingHorizontal={ 16 }>
+				<View style={ styles.selectControl }>
 					{ items.map( ( item, index ) => (
 						<BottomSheet.Cell
 							customActionButton
