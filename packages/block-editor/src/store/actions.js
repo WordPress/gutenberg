@@ -194,7 +194,7 @@ export function updateBlock( clientId, updates ) {
  *
  * @return {Object} Action object.
  */
-export function selectBlock( clientId, initialPosition = null ) {
+export function selectBlock( clientId, initialPosition = 0 ) {
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
