@@ -188,8 +188,8 @@ If this property is added, multiple values can be selected. The value passed sho
 #### options
 
 An array of objects containing the following properties:
-- `label`: (string) The label to be shown to the user.
-- `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+- `label`: (string) The label to be shown to the user. (If the `value` property contains an array rather than a scalar, this will be the label for the option group.)
+- `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected. If this is an array rather than a scalar, an option group will be created with the options contained in the array.
 - `disabled`: (boolean) Whether or not the option should have the disabled attribute.
 - Type: `Array`
 - Required: No
