@@ -749,8 +749,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 			 * As the links for the post are "response_links" format in the data array we have to pull them out and parse them.
 			 */
 			$links = $data['_links'];
-			foreach ( $links as &$links_array ) {
-				foreach ( $links_array as &$link ) {
+			foreach ( $links as $links_array ) {
+				foreach ( $links_array as $link ) {
 					$attributes         = array_diff_key(
 						$link,
 						array(

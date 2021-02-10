@@ -73,7 +73,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 	if ( isset( $settings['fontSizes'] ) ) {
 		$font_sizes = $settings['fontSizes'];
 		// Back-compatibility for presets without units.
-		foreach ( $font_sizes as &$font_size ) {
+		foreach ( $font_sizes as $font_size ) {
 			if ( is_numeric( $font_size['size'] ) ) {
 				$font_size['size'] = $font_size['size'] . 'px';
 			}
