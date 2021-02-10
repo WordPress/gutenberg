@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Surface from '../index';
+import { Surface } from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

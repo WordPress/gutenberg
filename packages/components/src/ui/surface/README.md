@@ -15,7 +15,7 @@ import {
 function Example() {
 	return (
 		<Surface>
-			<Text>Surface</Text>
+			<Text>Lorem Ipsum</Text>
 		</Surface>
 	);
 }

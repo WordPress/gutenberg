@@ -7,8 +7,8 @@ import { ThemeProvider } from '@wp-g2/styles';
 /**
  * Internal dependencies
  */
-import Surface from '../index';
-import Text from '../../text/next/text';
+import { Surface } from '../index';
+import { Text } from '../../text';
 
 export default {
 	component: Surface,
