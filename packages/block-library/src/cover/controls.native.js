@@ -143,41 +143,6 @@ function Controls( {
 
 	return (
 		<InspectorControls>
-			<OverlayColorSettings
-				overlayColor={ attributes.overlayColor }
-				customOverlayColor={ attributes.customOverlayColor }
-				gradient={ attributes.gradient }
-				customGradient={ attributes.customGradient }
-				setAttributes={ setAttributes }
-			/>
-			{ url ? (
-				<PanelBody>
-					<RangeControl
-						label={ __( 'Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpacityChange }
-						style={ styles.rangeCellContainer }
-						separatorType={ 'topFullWidth' }
-					/>
-				</PanelBody>
-			) : null }
-			<PanelBody title={ __( 'Dimensions' ) }>
-				<UnitControl
-					label={ __( 'Minimum height' ) }
-					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
-					max={ COVER_MAX_HEIGHT }
-					unit={ minHeightUnit }
-					value={ CONTAINER_HEIGHT }
-					onChange={ onHeightChange }
-					onUnitChange={ onChangeUnit }
-					units={ CSS_UNITS }
-					style={ styles.rangeCellContainer }
-					key={ minHeightUnit }
-				/>
-			</PanelBody>
-
 			<PanelBody title={ __( 'Media' ) }>
 				{ url ? (
 					<>
@@ -283,6 +248,43 @@ function Controls( {
 						} }
 					/>
 				) }
+			</PanelBody>
+
+			<OverlayColorSettings
+				overlayColor={ attributes.overlayColor }
+				customOverlayColor={ attributes.customOverlayColor }
+				gradient={ attributes.gradient }
+				customGradient={ attributes.customGradient }
+				setAttributes={ setAttributes }
+			/>
+
+			{ url ? (
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						minimumValue={ 0 }
+						maximumValue={ 100 }
+						value={ dimRatio }
+						onChange={ onOpacityChange }
+						style={ styles.rangeCellContainer }
+						separatorType={ 'topFullWidth' }
+					/>
+				</PanelBody>
+			) : null }
+
+			<PanelBody title={ __( 'Dimensions' ) }>
+				<UnitControl
+					label={ __( 'Minimum height' ) }
+					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
+					max={ COVER_MAX_HEIGHT }
+					unit={ minHeightUnit }
+					value={ CONTAINER_HEIGHT }
+					onChange={ onHeightChange }
+					onUnitChange={ onChangeUnit }
+					units={ CSS_UNITS }
+					style={ styles.rangeCellContainer }
+					key={ minHeightUnit }
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
