@@ -137,11 +137,13 @@ export default function useSelect( _mapSelect, deps, caller ) {
 		// callbacks or potentially overwriting a
 		// changed `latestMapOutput.current`.
 		if ( latestIsAsync.current !== isAsync ) {
+			let context;
 			if ( caller === 'gallery-get-media' ) {
-				console.log( 'About to flush render queue' );
+				console.log( 'About to flush render queue in isAsync' );
+				context = caller;
 			}
 			latestIsAsync.current = isAsync;
-			renderQueue.flush( queueContext );
+			renderQueue.flush( queueContext, context );
 		}
 	} );
 
@@ -216,13 +218,15 @@ export default function useSelect( _mapSelect, deps, caller ) {
 		);
 
 		return () => {
+			let context;
 			isMountedAndNotUnsubscribing.current = false;
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			if ( caller === 'gallery-get-media' ) {
 				console.log( 'About to flush render queue on unmount' );
+				context = caller;
 			}
-			renderQueue.flush( queueContext );
+			renderQueue.flush( queueContext, context );
 		};
 	}, [ registry, trapSelect, depsChangedFlag ] );
 

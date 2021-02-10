@@ -95,19 +95,29 @@ export const createQueue = () => {
 			}
 
 			const nextElement = /** @type {any} */ ( waitingList.shift() );
+			if ( nextElement.id ) {
+				console.log( 'runWaitingList-running-for', nextElement );
+			}
 			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 				nextElement
 			) );
 			if ( nextElement.id ) {
-				console.log( 'running-callback', nextElement );
+				console.log( 'runWaitingList-run-callback', nextElement );
 			}
 			callback();
-			elementsMap.delete( nextElement );
 			if ( nextElement.id ) {
 				console.log(
-					'after-running-delete-from-elementsMap',
-					waitingList,
-					elementsMap
+					'runWaitingList-delete-from-elementsMap',
+					nextElement
+				);
+				const index = waitingList.indexOf( nextElement );
+				console.log( index );
+			}
+			if ( waitingList.indexOf( nextElement ) === -1 ) {
+				elementsMap.delete( nextElement );
+			} else if ( nextElement.id ) {
+				console.log(
+					'runWaitingList-element-back-in-waitinList-leave-in-elementsMap'
 				);
 			}
 		} while ( hasTimeRemaining() );
@@ -154,20 +164,27 @@ export const createQueue = () => {
 	 *
 	 * @type {WPPriorityQueueFlush}
 	 *
-	 * @param {WPPriorityQueueContext} element Context object.
+	 * @param {any} element Context object.
+	 * @param {any} caller Context object.
 	 *
 	 * @return {boolean} Whether flush was performed.
 	 */
-	const flush = ( element ) => {
+	const flush = ( element, caller ) => {
 		if ( ! elementsMap.has( element ) ) {
 			return false;
 		}
 
 		const index = waitingList.indexOf( element );
+		if ( caller === 'gallery-get-media' ) {
+			console.log( 'flushing from waitList', element );
+		}
 		waitingList.splice( index, 1 );
 		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 			element
 		) );
+		if ( caller === 'gallery-get-media' ) {
+			console.log( 'flushing from elementMap', element );
+		}
 		elementsMap.delete( element );
 		callback();
 
