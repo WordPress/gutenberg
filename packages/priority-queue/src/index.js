@@ -74,7 +74,7 @@ export const createQueue = () => {
 
 	let isRunning = false;
 
-	let count = 0;
+	let count = 1;
 
 	/**
 	 * Callback to process as much queue as time permits.
@@ -103,6 +103,13 @@ export const createQueue = () => {
 			}
 			callback();
 			elementsMap.delete( nextElement );
+			if ( nextElement.id ) {
+				console.log(
+					'after-running-delete-from-elementsMap',
+					waitingList,
+					elementsMap
+				);
+			}
 		} while ( hasTimeRemaining() );
 
 		requestIdleCallback( runWaitingList );
