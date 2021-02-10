@@ -14,7 +14,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
 import { STORE_NAME } from '../../store/constants';
-import SettingsHeader from './header';
+import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 
