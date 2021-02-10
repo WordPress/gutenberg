@@ -367,7 +367,7 @@ class WP_Theme_JSON {
 						unset( $styles_schema[ $prop_meta['value'][0] ][ $prop_meta['value'][1] ] );
 					}
 				}
-				self::remove_keys_not_in_schema(
+				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['styles'][ $block_selector ],
 					$styles_schema
 				);
@@ -386,7 +386,7 @@ class WP_Theme_JSON {
 				}
 
 				// Remove the properties that aren't present in the schema.
-				self::remove_keys_not_in_schema(
+				$this->theme_json['settings'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['settings'][ $block_selector ],
 					self::SCHEMA['settings']
 				);
@@ -596,19 +596,23 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $tree Input to process.
 	 * @param array $schema Schema to adhere to.
+	 *
+	 * @return array Returns the modified $tree.
 	 */
-	private static function remove_keys_not_in_schema( &$tree, $schema ) {
+	private static function remove_keys_not_in_schema( $tree, $schema ) {
 		$tree = array_intersect_key( $tree, $schema );
 
 		foreach ( $schema as $key => $data ) {
 			if ( is_array( $schema[ $key ] ) && isset( $tree[ $key ] ) ) {
-				self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
+				$tree[ $key ] = self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
 				if ( empty( $tree[ $key ] ) ) {
 					unset( $tree[ $key ] );
 				}
 			}
 		}
+
+		return $tree;
 	}
 
 	/**
