@@ -107,6 +107,9 @@ export const useI18n = () => useContext( I18nContext );
  *
  * export default withI18n( MyComponent );
  * ```
+ *
+ * @param InnerComponent React component to be wrapped and receive the i18n functions like `__`
+ * @return The wrapped component
  */
 export function withI18n< P extends I18nContextProps >(
 	InnerComponent: ComponentType< P >
