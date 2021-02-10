@@ -13,7 +13,7 @@ import { pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	createBlock,
 	rawHandler,
@@ -36,85 +36,73 @@ import { store as blockEditorStore } from '../../store';
 
 const MIN_COL_NUM = 3;
 
-export class InserterMenu extends Component {
-	constructor() {
-		super( ...arguments );
+function InserterMenu( {
+	showInsertionPoint,
+	hideInsertionPoint,
+	shouldReplaceBlock,
+	insertDefaultBlock,
+	onDismiss,
+	items,
+	canInsertBlockType,
+	destinationRootClientId,
+	getBlockType,
+	onSelect,
+} ) {
+	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
+	const [ itemWidth, setItemWidth ] = useState();
+	const [ maxWidth, setMaxWidth ] = useState();
 
-		this.onClose = this.onClose.bind( this );
-		this.onLayout = this.onLayout.bind( this );
-		this.renderItem = this.renderItem.bind( this );
-		this.state = {
-			numberOfColumns: MIN_COL_NUM,
+	useEffect( () => {
+		showInsertionPoint();
+		Dimensions.addEventListener( 'change', onLayout );
+
+		return () => {
+			hideInsertionPoint();
+			Dimensions.removeEventListener( 'change', onLayout );
 		};
+	}, [] );
 
-		Dimensions.addEventListener( 'change', this.onLayout );
-	}
-
-	componentDidMount() {
-		this.props.showInsertionPoint();
-	}
-
-	componentWillUnmount() {
-		this.props.hideInsertionPoint();
-		Dimensions.removeEventListener( 'change', this.onLayout );
-	}
-
-	calculateMinItemWidth( bottomSheetWidth ) {
-		const { paddingLeft, paddingRight } = styles.columnPadding;
-		return (
-			( bottomSheetWidth - 2 * ( paddingLeft + paddingRight ) ) /
-			MIN_COL_NUM
-		);
-	}
-
-	calculateItemWidth() {
+	function calculateItemWidth() {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
 		} = InserterButton.Styles.modalItem;
-		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
-		return itemWidth + itemPaddingLeft + itemPaddingRight;
+		const { width } = InserterButton.Styles.modalIconWrapper;
+		return width + itemPaddingLeft + itemPaddingRight;
 	}
 
-	calculateColumnsProperties() {
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft, paddingRight } = styles.columnPadding;
-		const itemTotalWidth = this.calculateItemWidth();
-		const containerTotalWidth =
-			bottomSheetWidth - ( paddingLeft + paddingRight );
-		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
-
-		if ( numofColumns < MIN_COL_NUM ) {
-			return {
-				numOfColumns: MIN_COL_NUM,
-				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
-				maxWidth: containerTotalWidth / MIN_COL_NUM,
-			};
-		}
-		return {
-			numOfColumns: numofColumns,
-			maxWidth: containerTotalWidth / numofColumns,
-		};
-	}
-
-	onClose() {
+	function onClose() {
 		// if should replace but didn't insert any block
 		// re-insert default block
-		if ( this.props.shouldReplaceBlock ) {
-			this.props.insertDefaultBlock();
+		if ( shouldReplaceBlock ) {
+			insertDefaultBlock();
 		}
-		this.props.onDismiss();
+		onDismiss();
 	}
 
-	onLayout() {
-		const {
-			numOfColumns,
-			itemWidth,
-			maxWidth,
-		} = this.calculateColumnsProperties();
-		const numberOfColumns = numOfColumns;
+	function onLayout() {
+		const sumLeftRightPadding =
+			styles.columnPadding.paddingLeft +
+			styles.columnPadding.paddingRight;
 
-		this.setState( { numberOfColumns, itemWidth, maxWidth } );
+		const bottomSheetWidth = BottomSheet.getWidth();
+		const containerTotalWidth = bottomSheetWidth - sumLeftRightPadding;
+		const itemTotalWidth = calculateItemWidth();
+
+		const columnsFitToWidth = Math.floor(
+			containerTotalWidth / itemTotalWidth
+		);
+
+		const numColumns = Math.max( MIN_COL_NUM, columnsFitToWidth );
+
+		setNumberOfColumns( numColumns );
+		setMaxWidth( containerTotalWidth / numColumns );
+
+		if ( columnsFitToWidth < MIN_COL_NUM ) {
+			const updatedItemWidth =
+				( bottomSheetWidth - 2 * sumLeftRightPadding ) / MIN_COL_NUM;
+			setItemWidth( updatedItemWidth );
+		}
 	}
 
 	/**
@@ -122,16 +110,9 @@ export class InserterMenu extends Component {
 	 * if there's any copied block in the clipboard
 	 * to add it as an extra item
 	 */
-	getItems() {
-		const {
-			items: initialItems,
-			canInsertBlockType,
-			destinationRootClientId,
-			getBlockType,
-		} = this.props;
-
+	function getItems() {
 		// Filter out reusable blocks (they will be added in another tab)
-		const items = initialItems.filter(
+		const itemsToDisplay = items.filter(
 			( { name } ) => name !== 'core/block'
 		);
 
@@ -153,69 +134,58 @@ export class InserterMenu extends Component {
 						initialAttributes: clipboardBlock.attributes,
 						innerBlocks: clipboardBlock.innerBlocks,
 					},
-					...items,
+					...itemsToDisplay,
 			  ]
-			: items;
+			: itemsToDisplay;
 	}
 
-	renderItem( { item } ) {
-		const { itemWidth, maxWidth } = this.state;
-		const { onSelect } = this.props;
-		return (
-			<InserterButton
-				item={ item }
-				itemWidth={ itemWidth }
-				maxWidth={ maxWidth }
-				onSelect={ onSelect }
-			/>
-		);
-	}
-
-	render() {
-		const { numberOfColumns } = this.state;
-		const items = this.getItems();
-
-		return (
-			<BottomSheet
-				isVisible={ true }
-				onClose={ this.onClose }
-				hideHeader
-				hasNavigation
-			>
-				<TouchableHighlight accessible={ false }>
-					<BottomSheetConsumer>
-						{ ( { listProps, safeAreaBottomInset } ) => (
-							<FlatList
-								onLayout={ this.onLayout }
-								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-								keyboardShouldPersistTaps="always"
-								numColumns={ numberOfColumns }
-								data={ items }
-								ItemSeparatorComponent={ () => (
-									<TouchableWithoutFeedback
-										accessible={ false }
-									>
-										<View style={ styles.rowSeparator } />
-									</TouchableWithoutFeedback>
-								) }
-								keyExtractor={ ( item ) => item.name }
-								renderItem={ this.renderItem }
-								{ ...listProps }
-								contentContainerStyle={ [
-									...listProps.contentContainerStyle,
-									{
-										paddingBottom:
-											safeAreaBottomInset ||
-											styles.list.paddingBottom,
-									},
-								] }
-							/>
-						) }
-					</BottomSheetConsumer>
-				</TouchableHighlight>
-			</BottomSheet>
-		);
-	}
+	return (
+		<BottomSheet
+			isVisible={ true }
+			onClose={ onClose }
+			hideHeader
+			hasNavigation
+		>
+			<TouchableHighlight accessible={ false }>
+				<BottomSheetConsumer>
+					{ ( { listProps, safeAreaBottomInset } ) => (
+						<FlatList
+							onLayout={ onLayout }
+							key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+							keyboardShouldPersistTaps="always"
+							numColumns={ numberOfColumns }
+							data={ getItems() }
+							ItemSeparatorComponent={ () => (
+								<TouchableWithoutFeedback accessible={ false }>
+									<View style={ styles.rowSeparator } />
+								</TouchableWithoutFeedback>
+							) }
+							keyExtractor={ ( item ) => item.name }
+							renderItem={ ( { item } ) => (
+								<InserterButton
+									{ ...{
+										item,
+										itemWidth,
+										maxWidth,
+										onSelect,
+									} }
+								/>
+							) }
+							{ ...listProps }
+							contentContainerStyle={ [
+								...listProps.contentContainerStyle,
+								{
+									paddingBottom:
+										safeAreaBottomInset ||
+										styles.list.paddingBottom,
+								},
+							] }
+						/>
+					) }
+				</BottomSheetConsumer>
+			</TouchableHighlight>
+		</BottomSheet>
+	);
 }
 
 export default compose(
