@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { isEmpty, omitBy } = require( 'lodash' );
+const { omitBy } = require( 'lodash' );
 const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
 
@@ -46,7 +46,7 @@ module.exports = async ( {
 					editorStyle,
 					style,
 				},
-				isEmpty
+				( value ) => ! value
 			),
 			null,
 			'\t'
