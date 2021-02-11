@@ -215,6 +215,7 @@ function gutenberg_inject_skip_link() {
 		return;
 	}
 
+	// Try to find the selector in $template_html and print the skip-link.
 	foreach ( $selectors as $selector ) {
 		if ( 0 === strpos( $selector, '#' ) ) {
 			$selector_no_hash = str_replace( '#', '', $selector );
