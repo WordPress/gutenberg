@@ -118,7 +118,7 @@ function useInsertionPoint( {
 					selectedBlock.clientId,
 					blocks,
 					null,
-					shouldFocusBlock || shouldForceFocusBlock ? 0 : undefined,
+					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
 			} else {
