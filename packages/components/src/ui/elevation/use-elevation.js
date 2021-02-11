@@ -102,5 +102,5 @@ export function useElevation( props ) {
 		value,
 	] );
 
-	return { ...otherProps, className: classes };
+	return { ...otherProps, className: classes, 'aria-hidden': true };
 }

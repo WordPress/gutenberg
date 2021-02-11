@@ -47,4 +47,5 @@ export type Props = {
 	 * ```
 	 */
 	value?: number;
+	children?: never;
 };

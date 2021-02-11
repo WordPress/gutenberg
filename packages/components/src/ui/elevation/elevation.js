@@ -1,24 +1,8 @@
 /**
- * External dependencies
- */
-import { contextConnect } from '@wp-g2/context';
-
-/**
  * Internal dependencies
  */
-import { View } from '../view';
 import { useElevation } from './use-elevation';
-
-/**
- *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
- */
-function Elevation( props, forwardedRef ) {
-	const otherProps = useElevation( props );
-
-	return <View aria-hidden { ...otherProps } ref={ forwardedRef } />;
-}
+import { createComponent } from '../utils';
 
 /**
  * `Elevation` is a core component that renders shadow, using the library's shadow system.
@@ -39,6 +23,10 @@ function Elevation( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedElevation = contextConnect( Elevation, 'Elevation' );
+const Elevation = createComponent( {
+	as: 'div',
+	useHook: useElevation,
+	name: 'Elevation',
+} );
 
-export default ConnectedElevation;
+export default Elevation;
