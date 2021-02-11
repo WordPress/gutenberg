@@ -8,9 +8,10 @@ import { cx } from '@wp-g2/styles';
  */
 import * as styles from './styles';
 
+/** @typedef {import('@wp-g2/create-styles').ViewOwnProps<{}, 'div'>} Props */
+
 /**
- *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, 'div'>} props
+ * @param {Props} props
  */
 export function useVisuallyHidden( { className, ...props } ) {
 	// circumvent the context system and write the classnames ourselves

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import VisuallyHidden from '../';
+import { VisuallyHidden } from '..';
 
 export default {
 	title: 'G2 Components (Experimental)/VisuallyHidden',
