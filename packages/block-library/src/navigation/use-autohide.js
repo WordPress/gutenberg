@@ -1,61 +1,80 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+/**
  * WordPress dependencies
  */
+import { useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
-export default function useAutohide( navElement, wrappedElementsContainer ) {
-	const [ isWrapping, setIsWrapping ] = useState( false );
+export default function useAutohide( clientId, innerBlocks, ref ) {
+	const [ state, setState ] = useState( {
+		isWrapping: false,
+		visibilityMap: [],
+	} );
+
+	const handleResize = debounce( ( nav ) => {
+		const { bottom } = nav.getBoundingClientRect();
+
+		const items = Array.from( nav.childNodes );
+		const visibilityMap = items.reduce( ( result, el ) => {
+			const isHidden = el.getBoundingClientRect().y >= bottom;
+			const [ , blockId ] = el.id.split( 'block-' );
+
+			return {
+				...result,
+				[ blockId ]: isHidden,
+			};
+		}, {} );
+		const hasWrappedElements = Object.values( visibilityMap ).some(
+			( item ) => item.isHidden
+		);
+
+		setState( {
+			isWrapping: hasWrappedElements,
+			visibilityMap,
+		} );
+	}, 100 );
 
 	useEffect( () => {
-		if ( navElement && wrappedElementsContainer ) {
-			let timeout;
+		const element = ref.current;
 
-			const { bottom } = navElement.current.getBoundingClientRect();
-
-			function handleResize() {
-				if ( timeout ) {
-					window.cancelAnimationFrame( timeout );
-				}
-
-				timeout = window.requestAnimationFrame( () => {
-					const items = Array.from( navElement.current.childNodes ); // i need to work in terms of react component
-					// Using the rendered DOM nodes does not allow me to alter props.
-					// I would also like to use react in order to move the components around.
-					// I can do this by storing arrays of elements.
-					// Moving the elements from the main container to the wrapped elements container is actually easier with react. cool.
-
-					const hasWrappedElements = items.some( ( el ) => {
-						const isBelowBottom =
-							el.getBoundingClientRect().y >= bottom;
-
-						// @todo: move this side effect elsewhere.
-						el.classList.toggle( 'wrapped', isBelowBottom );
-
-						const elementCopy = el.cloneNode( true );
-
-						if ( isBelowBottom ) {
-							wrappedElementsContainer.append( elementCopy );
-						}
-
-						return isBelowBottom;
-					} );
-
-					setIsWrapping( hasWrappedElements );
-				} );
-			}
-
-			window.addEventListener( 'resize', handleResize, false );
-
-			handleResize();
-
-			return () => {
-				// remove resize listener
-				if ( navElement ) {
-					window.removeEventListener( 'resize', handleResize );
-				}
-			};
+		if ( ! element ) {
+			return;
 		}
-	}, [ navElement, wrappedElementsContainer ] );
 
-	return [ isWrapping ];
+		const { ownerDocument } = element;
+
+		window.addEventListener(
+			'resize',
+			() => handleResize( element ),
+			false
+		);
+
+		handleResize( element );
+
+		return () => {
+			window.removeEventListener( 'resize', () =>
+				handleResize( element )
+			);
+		};
+	}, [ innerBlocks ] );
+
+	const updatedBlocks = innerBlocks.map( ( block ) => ( {
+		...block,
+		isHidden: state.visibilityMap[ block.clientId ],
+	} ) );
+
+	console.log( updatedBlocks );
+
+	useDispatch( ( dispatch ) =>
+		dispatch( 'core/block-editor' ).replaceInnerBlocks(
+			clientId,
+			updatedBlocks,
+			true
+		)
+	);
+
+	return state;
 }

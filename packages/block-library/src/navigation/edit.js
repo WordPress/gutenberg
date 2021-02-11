@@ -7,7 +7,7 @@ import mergeRefs from 'react-merge-refs';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -31,6 +31,7 @@ import {
 	justifySpaceBetween,
 } from '@wordpress/icons';
 import useAutohide from './use-autohide';
+import useMaxHeight from './use-max-height';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 
@@ -40,6 +41,7 @@ function Navigation( {
 	setAttributes,
 	clientId,
 	hasExistingNavItems,
+	innerBlocks,
 	isImmediateParentOfSelectedBlock,
 	isSelected,
 	updateInnerBlocks,
@@ -60,11 +62,16 @@ function Navigation( {
 	);
 
 	const navElement = useRef( null );
-	const wrappedElementsContainer = useRef( null );
+	const navItemsElement = useRef( null );
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const [ isWrapping ] = useAutohide( navElement, wrappedElementsContainer );
+	const containerHeight = useMaxHeight( navItemsElement );
+	const { isWrapping } = useAutohide(
+		clientId,
+		innerBlocks,
+		navItemsElement
+	);
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
@@ -72,6 +79,9 @@ function Navigation( {
 			'is-vertical': attributes.orientation === 'vertical',
 			wrapping: isWrapping,
 		} ),
+		style: {
+			height: containerHeight || 'auto',
+		},
 	} );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -114,8 +124,8 @@ function Navigation( {
 		[ blockProps.ref, navElement ]
 	);
 	const mergedInnerBlocksRefs = useCallback(
-		mergeRefs( [ innerBlocksProps.ref, wrappedElementsContainer ] ),
-		[ innerBlocksProps.ref, wrappedElementsContainer ]
+		mergeRefs( [ innerBlocksProps.ref, navItemsElement ] ),
+		[ innerBlocksProps.ref, navItemsElement ]
 	);
 
 	if ( isPlaceholderShown ) {
@@ -224,10 +234,6 @@ function Navigation( {
 					type="checkbox"
 				/>
 				<ul { ...innerBlocksProps } ref={ mergedInnerBlocksRefs } />
-				<ul
-					ref={ wrappedElementsContainer }
-					className="nav-wrapped-items"
-				/>
 				<label htmlFor="nav-toggle" className="nav-button">
 					More
 				</label>
@@ -253,6 +259,7 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 		return {
+			innerBlocks,
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
