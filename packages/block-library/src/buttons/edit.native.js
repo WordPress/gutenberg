@@ -104,18 +104,6 @@ export default function ButtonsEdit( {
 		[]
 	);
 
-	function onChangeContentJustification( updatedValue ) {
-		return () => {
-			const justification =
-				contentJustification === updatedValue
-					? undefined
-					: updatedValue;
-			setAttributes( {
-				contentJustification: justification,
-			} );
-		};
-	}
-
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
@@ -134,7 +122,9 @@ export default function ButtonsEdit( {
 					<JustifyToolbar
 						allowedControls={ [ 'left', 'center', 'right' ] }
 						value={ contentJustification }
-						onChange={ onChangeContentJustification }
+						onChange={ ( value ) =>
+							setAttributes( { contentJustification: value } )
+						}
 						popoverProps={ {
 							position: 'bottom right',
 							isAlternate: true,
