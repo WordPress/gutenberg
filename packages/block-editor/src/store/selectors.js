@@ -696,10 +696,10 @@ export function getNextBlockClientId( state, startClientId ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {?Object} Selected block.
+ * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
-	return state.initialPosition === undefined ? null : state.initialPosition;
+	return state.initialPosition;
 }
 
 /**

@@ -665,7 +665,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Selected block.
+-   `(||null)`: Initial position.
 
 <a name="getSelectionEnd" href="#getSelectionEnd">#</a> **getSelectionEnd**
 

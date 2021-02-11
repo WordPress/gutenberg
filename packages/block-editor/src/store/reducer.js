@@ -1353,39 +1353,26 @@ export function isSelectionEnabled( state = true, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {?number} Initial position: -1 or undefined.
+ * @return {number|null} Initial position: 0, -1 or null.
  */
-export function initialPosition( state, action ) {
-	const keepStateAction = [
-		'REMOVE_BLOCKS',
-		'START_TYPING',
-		'MARK_AUTOMATIC_CHANGE',
-		'MARK_AUTOMATIC_CHANGE_FINAL',
-		'SHOW_INSERTION_POINT',
-		'HIDE_INSERTION_POINT',
-		'UPDATE_BLOCK_LIST_SETTINGS',
-	];
-
+export function initialPosition( state = null, action ) {
 	if (
 		action.type === 'REPLACE_BLOCKS' &&
-		typeof action.initialPosition === 'number'
+		action.initialPosition !== undefined
 	) {
 		return action.initialPosition;
 	} else if (
-		action.type === 'SELECT_BLOCK' ||
-		action.type === 'RESET_SELECTION'
-	) {
-		return action.initialPosition;
-	} else if ( keepStateAction.includes( action.type ) ) {
-		return state;
-	} else if (
-		action.type === 'INSERT_BLOCKS' ||
-		action.type === 'REPLACE_INNER_BLOCKS'
+		[
+			'SELECT_BLOCK',
+			'RESET_SELECTION',
+			'INSERT_BLOCKS',
+			'REPLACE_INNER_BLOCKS',
+		].includes( action.type )
 	) {
 		return action.initialPosition;
 	}
 
-	// Reset the state by default (for any action not handled).
+	return state;
 }
 
 export function blocksMode( state = {}, action ) {
