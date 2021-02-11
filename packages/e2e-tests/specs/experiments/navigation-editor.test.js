@@ -93,6 +93,9 @@ async function visitNavigationEditor() {
 		page: 'gutenberg-navigation',
 	} );
 	await visitAdminPage( '/admin.php', query );
+
+	// Wait for loading to finish.
+	await page.waitForXPath( '//h2[.="Loading …"]', { hidden: true } );
 }
 
 async function getSerializedBlocks() {
