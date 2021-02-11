@@ -79,9 +79,8 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Processes a tree from i18n-theme.json into a linear array
-	 * containing the a translatable path from theme.json and an array
-	 * of properties that are translatable.
+	 * Converts a tree as in i18n-theme.json into a linear array
+	 * containing metadata to translate a theme.json file.
 	 *
 	 * For example, given this input:
 	 *
@@ -111,14 +110,14 @@ class WP_Theme_JSON_Resolver {
 	 *   ]
 	 * ]
 	 *
-	 * @param array $file_structure_partial A part of a theme.json i18n tree.
-	 * @param array $current_path           An array with a path on the theme.json i18n tree.
+	 * @param array $i18n_partial A tree that follows the format of i18n-theme.json.
+	 * @param array $current_path Keeps track of the path as we walk down the given tree.
 	 *
-	 * @return array An array of arrays each one containing a translatable path and an array of properties that are translatable.
+	 * @return array A linear array containing the paths to translate.
 	 */
-	private static function theme_json_i18_file_structure_to_preset_paths( $file_structure_partial, $current_path = array() ) {
+	private static function extract_paths_to_translate( $i18n_partial, $current_path = array() ) {
 		$result = array();
-		foreach ( $file_structure_partial as $property => $partial_child ) {
+		foreach ( $i18n_partial as $property => $partial_child ) {
 			if ( is_numeric( $property ) ) {
 				foreach ( $partial_child as $key => $context ) {
 					return array(
@@ -132,7 +131,7 @@ class WP_Theme_JSON_Resolver {
 			}
 			$result = array_merge(
 				$result,
-				self::theme_json_i18_file_structure_to_preset_paths( $partial_child, array_merge( $current_path, array( $property ) ) )
+				self::extract_paths_to_translate( $partial_child, array_merge( $current_path, array( $property ) ) )
 			);
 		}
 		return $result;
@@ -147,7 +146,7 @@ class WP_Theme_JSON_Resolver {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
-			$theme_json_i18n = self::theme_json_i18_file_structure_to_preset_paths( $file_structure );
+			$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
 		return $theme_json_i18n;
 	}
