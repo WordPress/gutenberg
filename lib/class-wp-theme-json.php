@@ -734,8 +734,6 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * Note that this modifies the $declarations in place.
-	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles       Styles to process.
 	 * @param array $supports     Supports information for this block.
