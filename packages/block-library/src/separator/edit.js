@@ -2,13 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { HorizontalRule, ResizableBox } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
 import { View } from '@wordpress/primitives';
 
@@ -16,99 +15,42 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SeparatorSettings from './separator-settings';
-import { getMarginConstraints, parseUnit } from './shared';
+import {
+	MARGIN_CONSTRAINTS,
+	calculateMargins,
+	getHeightFromStyle,
+	parseUnit,
+} from './shared';
 
 function SeparatorEdit( props ) {
-	const { attributes, setAttributes, color, setColor, isSelected } = props;
-	const { className, style } = attributes;
 	const [ isResizing, setIsResizing ] = useState( false );
+	const {
+		attributes: { style },
+		setAttributes,
+		color,
+		setColor,
+		isSelected,
+	} = props;
 
-	const { top: marginTop, bottom: marginBottom } =
-		style?.spacing?.margin || {};
-	const marginUnit = parseUnit( marginTop || marginBottom );
-	const marginTopValue = parseFloat( marginTop || 0 );
-	const marginBottomValue = parseFloat( marginBottom || 0 );
-
-	// Given different display method, dots block style has larger min height requirement.
-	const hasDotsStyle = className?.indexOf( 'is-style-dots' ) >= 0;
-	const minimumMarginScale = hasDotsStyle ? 1.5 : 1;
-	const marginConstraints = getMarginConstraints( minimumMarginScale );
-	const currentMinMargin = marginConstraints[ marginUnit ].min;
-
-	// Ensure when changing block style that any change in minimum height is
-	// enforced against existing top and bottom margins.
-	useEffect( () => {
-		if (
-			( marginTopValue || marginBottomValue ) &&
-			( marginTopValue < currentMinMargin ||
-				marginBottomValue < currentMinMargin )
-		) {
-			const topValue = Math.max( marginTopValue, currentMinMargin );
-			const bottomValue = Math.max( marginBottomValue, currentMinMargin );
-
-			setAttributes( {
-				style: {
-					...style,
-					spacing: {
-						...style?.spacing,
-						margin: {
-							top: `${ topValue }${ marginUnit }`,
-							bottom: `${ bottomValue }${ marginUnit }`,
-						},
-					},
-				},
-			} );
-		}
-	}, [ hasDotsStyle ] ); // Only restricting on dots style as min/max enforced on change otherwise.
+	const { top, bottom } = style?.spacing?.margin || {};
+	const marginUnit = parseUnit( top || bottom );
+	const { height, cssHeight } = getHeightFromStyle( style, marginUnit );
 
 	// ResizableBox callback to set height and force pixel units.
 	const onResize = ( _event, _direction, elt ) => {
-		const { min, max } = marginConstraints.px;
-		const newHeight = clamp( parseInt( elt.clientHeight, 10 ) );
-
-		// Split the resizable box's height between margins by default.
-		let top = Math.floor( newHeight / 2 );
-		let bottom = Math.ceil( newHeight / 2 );
-
-		// Handle existing ratio between top and bottom margins if available.
-		if ( marginTop && marginBottom ) {
-			const totalMargin = marginTopValue + marginBottomValue;
-			top = newHeight * ( marginTopValue / totalMargin );
-			bottom = newHeight * ( marginBottomValue / totalMargin );
-		}
-
-		// Enforce min and max margins.
-		top = clamp( Math.round( top ), min, max );
-		bottom = clamp( Math.round( bottom ), min, max );
-
+		const newHeight = parseInt( elt.clientHeight, 10 );
 		setAttributes( {
 			style: {
 				...style,
 				spacing: {
 					...style?.spacing,
-					margin: {
-						top: `${ top }px`,
-						bottom: `${ bottom }px`,
-					},
+					margin: calculateMargins( newHeight, top, bottom ),
 				},
 			},
 		} );
 	};
 
-	const onResizeStop = ( ...args ) => {
-		onResize( ...args );
-		setIsResizing( false );
-	};
-
-	const height =
-		parseFloat( marginTop || 0 ) + parseFloat( marginBottom || 0 );
-	const minCSSHeight = `${ marginConstraints.px.min * 2 }${ marginUnit }`;
-	const cssHeight = `${ height }${ marginUnit }`;
 	const blockProps = useBlockProps();
-	const wrapperClasses = blockProps.className?.replace(
-		'wp-block-separator',
-		'wp-block-separator__wrapper'
-	);
 
 	// The block's className and styles are moved to the inner <hr> to retain
 	// the different styling approaches between themes. The use of bottom
@@ -119,8 +61,15 @@ function SeparatorEdit( props ) {
 		<>
 			<View
 				{ ...blockProps }
-				className={ wrapperClasses }
-				style={ { height: height ? cssHeight : minCSSHeight } }
+				className={ blockProps.className?.replace(
+					'wp-block-separator',
+					'wp-block-separator__wrapper'
+				) }
+				style={ {
+					height: height
+						? cssHeight
+						: MARGIN_CONSTRAINTS.px.minHeight,
+				} }
 			>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
@@ -130,8 +79,9 @@ function SeparatorEdit( props ) {
 					style={ {
 						backgroundColor: color.color,
 						color: color.color,
-						marginTop: marginTop || currentMinMargin,
-						marginBottom: marginBottom || currentMinMargin,
+						marginTop: top || MARGIN_CONSTRAINTS[ marginUnit ].min,
+						marginBottom:
+							bottom || MARGIN_CONSTRAINTS[ marginUnit ].min,
 					} }
 				/>
 				<ResizableBox
@@ -155,10 +105,13 @@ function SeparatorEdit( props ) {
 						bottomLeft: false,
 						topLeft: false,
 					} }
-					minHeight={ marginConstraints.px.min * 2 } // Height will account for top and bottom margin.
+					minHeight={ MARGIN_CONSTRAINTS.px.min * 2 } // Height will account for top and bottom margin.
 					onResizeStart={ () => setIsResizing( true ) }
 					onResize={ onResize }
-					onResizeStop={ onResizeStop }
+					onResizeStop={ ( ...args ) => {
+						onResize( ...args );
+						setIsResizing( false );
+					} }
 					showHandle={ isSelected }
 					__experimentalShowTooltip={ true }
 					__experimentalTooltipProps={ {
@@ -171,7 +124,6 @@ function SeparatorEdit( props ) {
 			<SeparatorSettings
 				color={ color }
 				setColor={ setColor }
-				marginConstraints={ marginConstraints }
 				marginUnit={ marginUnit }
 				separatorStyles={ style }
 				setAttributes={ setAttributes }

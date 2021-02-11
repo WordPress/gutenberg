@@ -8,13 +8,12 @@ import { PanelBody, UnitControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { CSS_UNITS, parseUnit } from './shared';
+import { CSS_UNITS, MARGIN_CONSTRAINTS, parseUnit } from './shared';
 
 const SeparatorSettings = ( props ) => {
 	const {
 		color,
 		setColor,
-		marginConstraints,
 		marginUnit,
 		separatorStyles: style,
 		setAttributes,
@@ -46,7 +45,8 @@ const SeparatorSettings = ( props ) => {
 	};
 
 	const onUnitChange = ( unit ) => {
-		const defaultValue = marginConstraints[ unit ].default;
+		const defaultValue = MARGIN_CONSTRAINTS[ unit ].default;
+
 		// Updating the margins doesn't update the UnitControl field's input immediately :(
 		updateMargins( {
 			top: defaultValue,
@@ -59,8 +59,8 @@ const SeparatorSettings = ( props ) => {
 			<PanelBody title={ __( 'Separator settings' ) }>
 				<UnitControl
 					label={ __( 'Top margin' ) }
-					min={ marginConstraints[ topUnit ].min }
-					max={ marginConstraints[ topUnit ].max }
+					min={ MARGIN_CONSTRAINTS[ topUnit ].min }
+					max={ MARGIN_CONSTRAINTS[ topUnit ].max }
 					value={ topValue }
 					unit={ topUnit }
 					units={ CSS_UNITS }
@@ -71,8 +71,8 @@ const SeparatorSettings = ( props ) => {
 				/>
 				<UnitControl
 					label={ __( 'Bottom margin' ) }
-					min={ marginConstraints[ bottomUnit ].min }
-					max={ marginConstraints[ bottomUnit ].max }
+					min={ MARGIN_CONSTRAINTS[ bottomUnit ].min }
+					max={ MARGIN_CONSTRAINTS[ bottomUnit ].max }
 					value={ bottomValue }
 					unit={ bottomUnit }
 					units={ CSS_UNITS }

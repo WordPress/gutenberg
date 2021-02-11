@@ -11,13 +11,12 @@ import {
 /**
  * Internal dependencies
  */
-import { CSS_UNITS, parseUnit } from './shared';
+import { CSS_UNITS, MARGIN_CONSTRAINTS, parseUnit } from './shared';
 
 const SeparatorSettings = ( props ) => {
 	const {
 		color,
 		setColor,
-		marginConstraints,
 		marginUnit,
 		separatorStyles: style,
 		setAttributes,
@@ -46,7 +45,7 @@ const SeparatorSettings = ( props ) => {
 	};
 
 	const onUnitChange = ( unit ) => {
-		const defaultValue = marginConstraints[ unit ].default;
+		const defaultValue = MARGIN_CONSTRAINTS[ unit ].default;
 		updateMargins( {
 			top: defaultValue,
 			bottom: defaultValue,
@@ -58,8 +57,8 @@ const SeparatorSettings = ( props ) => {
 			<PanelBody title={ __( 'Separator settings' ) }>
 				<UnitControl
 					label={ __( 'Top margin' ) }
-					min={ marginConstraints[ topUnit ].min }
-					max={ marginConstraints[ topUnit ].max }
+					min={ MARGIN_CONSTRAINTS[ topUnit ].min }
+					max={ MARGIN_CONSTRAINTS[ topUnit ].max }
 					onChange={ createHandleMarginChange( 'top' ) }
 					value={ top }
 					unit={ marginUnit } // Needed to force unit selection to update after box resizing.
@@ -70,8 +69,8 @@ const SeparatorSettings = ( props ) => {
 				/>
 				<UnitControl
 					label={ __( 'Bottom margin' ) }
-					min={ marginConstraints[ bottomUnit ].min }
-					max={ marginConstraints[ bottomUnit ].max }
+					min={ MARGIN_CONSTRAINTS[ bottomUnit ].min }
+					max={ MARGIN_CONSTRAINTS[ bottomUnit ].max }
 					onChange={ createHandleMarginChange( 'bottom' ) }
 					value={ bottom }
 					unit={ marginUnit } // Needed to force unit selection to update after box resizing.
