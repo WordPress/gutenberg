@@ -375,6 +375,7 @@
 
 		// This border serves as a background color in Windows High Contrast mode.
 		border: 4px solid $white;
+		box-sizing: border-box;
 
 		@include break-small() {
 			transform: translate(5px, 5px);
