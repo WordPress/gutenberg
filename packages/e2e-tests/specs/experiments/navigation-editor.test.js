@@ -126,7 +126,9 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show that no menus are available.
-		await page.waitForXPath( '//h2[contains(., "No menus available")]' );
+		await page.waitForXPath( '//h2[contains(., "No menus available")]', {
+			visible: true,
+		} );
 
 		// Prepare the menu endpoint for creating a menu.
 		await setUpResponseMocking( [
@@ -166,6 +168,10 @@ describe( 'Navigation editor', () => {
 		);
 		await addAllPagesButton.click();
 
+		// When the block is created the root element changes from a div (for the placeholder)
+		// to a nav (for the navigation itself). Wait for this to happen.
+		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
+
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
@@ -177,7 +183,12 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
-		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]' );
+		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+			visible: true,
+		} );
+
+		// Wait for the block to be present.
+		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
