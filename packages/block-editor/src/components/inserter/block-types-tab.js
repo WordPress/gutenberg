@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, findIndex, flow, sortBy, groupBy, orderBy } from 'lodash';
+import { map, flow, groupBy, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,11 +43,15 @@ export function BlockTypesTab( {
 	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
-		const getCategoryIndex = ( item ) => {
-			return findIndex(
-				categories,
-				( category ) => category.slug === item.category
-			);
+		// Prioritize core blocks's display in inserter.
+		const sortCoreBlocks = ( a, b ) => {
+			const coreBlockNamePrefix = 'core/';
+			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
+			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
+			if ( firstIsCoreBlock && secondIsCoreBlock ) {
+				return 0;
+			}
+			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
 		};
 
 		return flow(
@@ -55,7 +59,7 @@ export function BlockTypesTab( {
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => sortBy( itemList, getCategoryIndex ),
+			( itemList ) => itemList.sort( sortCoreBlocks ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( items );
 	}, [ items, categories ] );
