@@ -19,7 +19,7 @@ import {
 	rawHandler,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	BottomSheet,
@@ -39,18 +39,46 @@ const MIN_COL_NUM = 3;
 function InserterMenu( {
 	showInsertionPoint,
 	hideInsertionPoint,
-	shouldReplaceBlock,
 	insertDefaultBlock,
 	onDismiss,
-	items,
-	canInsertBlockType,
-	destinationRootClientId,
-	getBlockType,
 	onSelect,
+	isAppender,
+	clientId,
+	rootClientId,
+	shouldReplaceBlock,
 } ) {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
+
+	const { items, destinationRootClientId, canInsertBlockType } = useSelect(
+		( select ) => {
+			const selectBlockEditorStore = select( blockEditorStore );
+
+			const {
+				getInserterItems,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+			} = selectBlockEditorStore;
+
+			let targetRootClientId = rootClientId;
+			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					targetRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
+			}
+
+			return {
+				items: getInserterItems( targetRootClientId ),
+				destinationRootClientId: targetRootClientId,
+				canInsertBlockType: selectBlockEditorStore.canInsertBlockType,
+			};
+		}
+	);
+
+	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
 
 	useEffect( () => {
 		showInsertionPoint();
@@ -189,42 +217,8 @@ function InserterMenu( {
 }
 
 export default compose(
-	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
-		const {
-			getInserterItems,
-			getBlockName,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSettings,
-			canInsertBlockType,
-		} = select( blockEditorStore );
-		const { getChildBlockNames, getBlockType } = select( blocksStore );
+	withSelect( () => ( {} ) ),
 
-		let destinationRootClientId = rootClientId;
-		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				destinationRootClientId =
-					getBlockRootClientId( end ) || undefined;
-			}
-		}
-		const destinationRootBlockName = getBlockName(
-			destinationRootClientId
-		);
-
-		const {
-			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-		} = getSettings();
-
-		return {
-			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
-			destinationRootClientId,
-			shouldInsertAtTheTop,
-			getBlockType,
-			canInsertBlockType,
-		};
-	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			showInsertionPoint,
