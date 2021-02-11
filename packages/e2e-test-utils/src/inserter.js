@@ -211,6 +211,12 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 		'.block-directory-downloadable-blocks-list li:first-child button'
 	);
 	await insertButton.click();
+	await page.waitForFunction(
+		() =>
+			! document.body.querySelector(
+				'.block-directory-downloadable-blocks-list li:first-child button.is-busy'
+			)
+	);
 	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
