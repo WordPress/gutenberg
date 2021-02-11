@@ -62,7 +62,7 @@ function SeparatorEdit( props ) {
 	}, [ hasDotsStyle ] ); // Only restricting on dots style as min/max enforced on change otherwise.
 
 	// ResizableBox callback to set height and force pixel units.
-	const onResizeStop = ( _event, _direction, elt ) => {
+	const onResize = ( _event, _direction, elt ) => {
 		const { min, max } = marginConstraints.px;
 		const newHeight = clamp( parseInt( elt.clientHeight, 10 ) );
 
@@ -93,6 +93,10 @@ function SeparatorEdit( props ) {
 				},
 			},
 		} );
+	};
+
+	const onResizeStop = ( ...args ) => {
+		onResize( ...args );
 		setIsResizing( false );
 	};
 
@@ -153,6 +157,7 @@ function SeparatorEdit( props ) {
 					} }
 					minHeight={ marginConstraints.px.min * 2 } // Height will account for top and bottom margin.
 					onResizeStart={ () => setIsResizing( true ) }
+					onResize={ onResize }
 					onResizeStop={ onResizeStop }
 					showHandle={ isSelected }
 					__experimentalShowTooltip={ true }
