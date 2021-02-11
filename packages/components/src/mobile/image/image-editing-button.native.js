@@ -39,7 +39,7 @@ const ImageEditingButton = ( {
 			render={ ( { open, mediaOptions } ) => (
 				<TouchableWithoutFeedback
 					accessibilityHint={ accessibilityHint }
-					accessibilityLabel="Edit image"
+					accessibilityLabel={ __( 'Edit image' ) }
 					accessibilityRole={ 'button' }
 					onPress={ open }
 				>
