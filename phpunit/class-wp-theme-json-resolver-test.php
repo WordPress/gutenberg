@@ -52,6 +52,11 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 				'key'     => 'name',
 				'context' => 'Gradient name',
 			),
+			array(
+				'path'    => array( 'customTemplates', '*' ),
+				'key'     => 'title',
+				'context' => 'Title of the custom template',
+			),
 		);
 
 		$this->assertEquals( $expected, $actual );

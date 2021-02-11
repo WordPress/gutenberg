@@ -16,6 +16,6 @@
 		}
 	},
 	"customTemplates": {
-		"*": { "title": "Title of the CPT" }
+		"*": [ { "title": "Title of the custom template" } ]
 	}
 }
