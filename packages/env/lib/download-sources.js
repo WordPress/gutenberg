@@ -111,7 +111,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 
 	const isRepo =
 		fs.existsSync( source.clonePath ) &&
-		( await git.cwd( source.clonePath ).checkIsRepo() );
+		( await git.cwd( source.clonePath ).checkIsRepo( 'root' ) );
 
 	if ( isRepo ) {
 		log( 'Repo already exists, using it.' );
@@ -124,8 +124,8 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	}
 
 	log( 'Fetching the specified ref.' );
-
 	await git.fetch( 'origin', source.ref );
+
 	log( 'Checking out the specified ref.' );
 	await git.checkout( source.ref );
 
