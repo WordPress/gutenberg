@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const getType = require( '../get-type-as-string' );
+const getType = require( '../lib/get-type-as-string' );
 
 describe( 'getType from JSDoc', () => {
 	it( 'NameExpression', () => {

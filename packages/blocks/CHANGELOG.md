@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0 (2021-02-01)
+
 ### Breaking Change
 
 -   `cloneBlock` now sanitizes the attributes to match the same logic `createBlock` has. [#28379](https://github.com/WordPress/gutenberg/pull/28379)

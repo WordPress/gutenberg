@@ -25,6 +25,12 @@
 	opacity: 1;
 }
 
+// Low specificity default to ensure background color applies to submenus.
+.wp-block-navigation__container,
+.wp-block-navigation-link {
+	background-color: inherit;
+}
+
 // Styles for submenu flyout
 .has-child {
 	// Only show the flyout when the parent menu item is selected.
