@@ -6,7 +6,7 @@ import { number } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import Truncate from '../truncate';
+import { Truncate } from '..';
 
 export default {
 	component: Truncate,
