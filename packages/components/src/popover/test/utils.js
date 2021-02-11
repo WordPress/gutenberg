@@ -5,6 +5,7 @@ import {
 	computePopoverPosition,
 	computePopoverYAxisPosition,
 	computePopoverXAxisPosition,
+	offsetIframe,
 } from '../utils';
 
 describe( 'computePopoverYAxisPosition', () => {
@@ -229,5 +230,75 @@ describe( 'computePopoverPosition', () => {
 			popoverTop: 30,
 			yAxis: 'bottom',
 		} );
+	} );
+} );
+
+describe( 'offsetIframe', () => {
+	let parent;
+
+	beforeEach( () => {
+		parent = document.createElement( 'div' );
+		document.body.appendChild( parent );
+	} );
+
+	afterEach( () => {
+		parent.remove();
+	} );
+
+	it( 'returns rect without changes if element is not an iframe', () => {
+		const rect = {
+			left: 50,
+			top: 50,
+			bottom: 100,
+			right: 100,
+			width: 50,
+			height: 50,
+		};
+		const offsettedRect = offsetIframe( rect, parent.ownerDocument );
+
+		expect( offsettedRect ).toEqual( rect );
+	} );
+
+	it( 'returns offsetted rect if element is in an iframe', () => {
+		const iframeLeft = 25;
+		const iframeTop = 50;
+		const childLeft = 10;
+		const childTop = 100;
+
+		const iframe = document.createElement( 'iframe' );
+		parent.appendChild( iframe );
+		// JSDom doesn't have a layout engine
+		// so we need to mock getBoundingClientRect and DOMRect.
+		iframe.getBoundingClientRect = jest.fn( () => ( {
+			width: 100,
+			height: 100,
+			top: iframeTop,
+			left: iframeLeft,
+		} ) );
+		iframe.contentWindow.DOMRect = jest.fn(
+			( left, top, width, height ) => ( {
+				left,
+				top,
+				right: left + width,
+				bottom: top + height,
+				width,
+				height,
+			} )
+		);
+
+		const child = document.createElement( 'div' );
+		iframe.contentWindow.document.body.appendChild( child );
+		child.getBoundingClientRect = jest.fn( () => ( {
+			width: 100,
+			height: 100,
+			top: childTop,
+			left: childLeft,
+		} ) );
+
+		const rect = child.getBoundingClientRect();
+		const offsettedRect = offsetIframe( rect, child.ownerDocument );
+
+		expect( offsettedRect.left ).toBe( iframeLeft + childLeft );
+		expect( offsettedRect.top ).toBe( iframeTop + childTop );
 	} );
 } );
