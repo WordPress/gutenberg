@@ -3423,3 +3423,67 @@ describe( '__experimentalGetParsedReusableBlock', () => {
 		);
 	} );
 } );
+
+describe( 'getInserterItems with core blocks prioritization', () => {
+	// This test is in a seperate `describe` because all other tests register
+	// some test `core` blocks and interfere with the purpose of the specific test.
+	// This tests the functionality to ensure core blocks are prioritized in the
+	// returned results, because third party blocks can be registered earlier than
+	// the core blocks (usually by using the `init` action), thus affecting the display order.
+	beforeEach( () => {
+		registerBlockType( 'plugin/block-a', {
+			save() {},
+			category: 'text',
+			title: 'Plugin Block A',
+			icon: 'test',
+		} );
+		registerBlockType( 'another-plugin/block-b', {
+			save() {},
+			category: 'text',
+			title: 'Another Plugin Block B',
+			icon: 'test',
+		} );
+		registerBlockType( 'core/block', {
+			save() {},
+			category: 'text',
+			title: 'Core Block A',
+		} );
+		registerBlockType( 'core/test-block-a', {
+			save: ( props ) => props.attributes.text,
+			category: 'design',
+			title: 'Core Block B',
+			icon: 'test',
+			keywords: [ 'testing' ],
+		} );
+	} );
+	afterEach( () => {
+		[
+			'plugin/block-a',
+			'another-plugin/block-b',
+			'core/block',
+			'core/test-block-a',
+		].forEach( unregisterBlockType );
+	} );
+	it( 'should prioritize core blocks by sorting them at the top of the returned list', () => {
+		const state = {
+			blocks: {
+				byClientId: {},
+				attributes: {},
+				order: {},
+				parents: {},
+				cache: {},
+			},
+			settings: {},
+			preferences: {},
+			blockListSettings: {},
+		};
+		const items = getInserterItems( state );
+		const expectedResult = [
+			'core/block',
+			'core/test-block-a',
+			'plugin/block-a',
+			'another-plugin/block-b',
+		];
+		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
+	} );
+} );

@@ -43,26 +43,14 @@ export function BlockTypesTab( {
 	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
-		// Prioritize core blocks's display in inserter.
-		const sortCoreBlocks = ( a, b ) => {
-			const coreBlockNamePrefix = 'core/';
-			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
-			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
-			if ( firstIsCoreBlock && secondIsCoreBlock ) {
-				return 0;
-			}
-			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
-		};
-
 		return flow(
 			( itemList ) =>
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => itemList.sort( sortCoreBlocks ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( items );
-	}, [ items, categories ] );
+	}, [ items ] );
 
 	const itemsPerCollection = useMemo( () => {
 		// Create a new Object to avoid mutating collection.
