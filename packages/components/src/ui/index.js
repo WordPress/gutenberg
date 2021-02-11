@@ -1,4 +1,5 @@
 export * from './control-label';
+export * from './elevation';
 export * from './flex';
 export * from './form-group';
 export * from './grid';

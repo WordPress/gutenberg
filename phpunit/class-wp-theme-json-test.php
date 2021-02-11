@@ -247,7 +247,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 						'misc'       => 'value',
 					),
-					'core/group' => array(
+					'core/group'     => array(
 						'custom' => array(
 							'base-font'   => 16,
 							'line-height' => array(
@@ -756,6 +756,29 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			array(
 				'page-home' => array(
 					'title' => 'Some title',
+				),
+			)
+		);
+	}
+
+	function test_get_template_parts() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'templateParts' => array(
+					'header' => array(
+						'area' => 'Some area',
+					),
+				),
+			)
+		);
+
+		$template_parts = $theme_json->get_template_parts();
+
+		$this->assertEqualSetsWithIndex(
+			$template_parts,
+			array(
+				'header' => array(
+					'area' => 'Some area',
 				),
 			)
 		);

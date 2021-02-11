@@ -173,6 +173,7 @@ const child = spawn.sync(
 		'ls',
 		'--json',
 		'--long',
+		'--all',
 		...( prod ? [ '--prod' ] : [] ),
 		...( dev ? [ '--dev' ] : [] ),
 	],
