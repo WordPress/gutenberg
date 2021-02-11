@@ -79,7 +79,13 @@ export function onBlockDrop(
 		// If the user is inserting a block
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
-			insertBlocks( blocks, targetBlockIndex, targetRootClientId, false );
+			insertBlocks(
+				blocks,
+				targetBlockIndex,
+				targetRootClientId,
+				true,
+				null
+			);
 		}
 
 		// If the user is moving a block

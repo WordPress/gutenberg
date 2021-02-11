@@ -558,6 +558,11 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Wide width' );
+
+		// Focus the block.
+		await page.keyboard.press( 'Tab' );
+
+		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.

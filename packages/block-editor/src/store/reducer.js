@@ -1189,9 +1189,8 @@ function selectionHelper( state = {}, action ) {
 			}
 
 			return { clientId: action.clientId };
-		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
+		case 'REPLACE_INNER_BLOCKS':
 		case 'INSERT_BLOCKS': {
-			// REPLACE_INNER_BLOCKS can be called with an empty array.
 			if ( ! action.updateSelection || ! action.blocks.length ) {
 				return state;
 			}
@@ -1225,11 +1224,7 @@ function selectionHelper( state = {}, action ) {
 				return state;
 			}
 
-			const newState = { clientId: blockToSelect.clientId };
-			if ( typeof action.initialPosition === 'number' ) {
-				newState.initialPosition = action.initialPosition;
-			}
-			return newState;
+			return { clientId: blockToSelect.clientId };
 		}
 	}
 
@@ -1358,23 +1353,26 @@ export function isSelectionEnabled( state = true, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {?number} Initial position: -1 or undefined.
+ * @return {number|null} Initial position: 0, -1 or null.
  */
-export function initialPosition( state, action ) {
+export function initialPosition( state = null, action ) {
 	if (
 		action.type === 'REPLACE_BLOCKS' &&
-		typeof action.initialPosition === 'number'
+		action.initialPosition !== undefined
 	) {
 		return action.initialPosition;
-	} else if ( action.type === 'SELECT_BLOCK' ) {
+	} else if (
+		[
+			'SELECT_BLOCK',
+			'RESET_SELECTION',
+			'INSERT_BLOCKS',
+			'REPLACE_INNER_BLOCKS',
+		].includes( action.type )
+	) {
 		return action.initialPosition;
-	} else if ( action.type === 'REMOVE_BLOCKS' ) {
-		return state;
-	} else if ( action.type === 'START_TYPING' ) {
-		return state;
 	}
 
-	// Reset the state by default (for any action not handled).
+	return state;
 }
 
 export function blocksMode( state = {}, action ) {
