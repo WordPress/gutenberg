@@ -192,3 +192,79 @@ function set_unique_slug_on_create_template( $post_id ) {
 	}
 }
 add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
+
+/**
+ * Inject the skip-link.
+ */
+function gutenberg_inject_skip_link() {
+	global $template_html;
+
+	// Get the selectors.
+	$selectors = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_link_selectors();
+
+	// Early exit if we don't have anything to check.
+	if ( ! $template_html ) {
+		return;
+	}
+
+	foreach ( $selectors as $selector ) {
+		if ( 0 === strpos( $selector, '#' ) ) {
+			$selector_no_hash = str_replace( '#', '', $selector );
+			if ( strpos( $template_html, 'id="' . $selector_no_hash . '"' ) || strpos( $template_html, "id='$selector_no_hash'" ) ) {
+				echo '<a class="skip-link screen-reader-text" href="' . $selector . '">' . esc_html__( 'Skip to content', 'gutenberg' ) . '</a>';
+				return;
+			}
+		}
+	}
+
+	// If we got this far, an element with the appropriate target ID was not located.
+	// Add a script to auto-generate the target and link based on the content we have.
+	add_action(
+		'wp_footer',
+		function() use ( $selectors ) {
+			?>
+			<script>
+			( function() {
+				var searchEl = [ '<?php echo implode( "','", $selectors ); ?>' ], contentEl, contentElID, parentEl, skipLink, i;
+
+				// Find the content element.
+				for ( i = 0; i < searchEl.length; i++ ) {
+					if ( ! contentEl ) {
+						contentEl = document.querySelector( searchEl[ i ] );
+					}
+				}
+
+				// Early exit if no content element was found.
+				if ( ! contentEl ) {
+					return;
+				}
+
+				// Get the ID of the content element.
+				contentElID = contentEl.id;
+				if ( ! contentElID ) {
+					contentElID = 'auto-skip-link-target';
+					contentEl.id = contentElID;
+				}
+
+				// Get the parent element. This is where we'll inject the skip-link.
+				parentEl = document.querySelector( '.wp-site-blocks' );
+				if ( ! parentEl ) {
+					parentEl = document.body;
+				}
+
+				// Create the skip link.
+				skipLink = document.createElement( 'a' );
+				skipLink.classList.add( 'skip-link' );
+				skipLink.classList.add( 'screen-reader-text' );
+				skipLink.href = '#' + contentElID;
+				skipLink.innerHTML = '<?php esc_html_e( 'Skip to content', 'gutenberg' ); ?>';
+
+				// Inject the skip link.
+				parentEl.insertAdjacentElement( 'afterbegin', skipLink );
+			}() );
+			</script>
+			<?php
+		}
+	);
+}
+add_action( 'wp_body_open', 'gutenberg_inject_skip_link' );

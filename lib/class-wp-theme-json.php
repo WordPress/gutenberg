@@ -166,6 +166,9 @@ class WP_Theme_JSON {
 			),
 			'custom'     => null,
 		),
+		'skipLink'        => array(
+			'target' => null,
+		),
 	);
 
 	/**
@@ -404,7 +407,6 @@ class WP_Theme_JSON {
 				unset( $this->theme_json[ $subtree ] );
 			}
 		}
-
 	}
 
 	/**
@@ -1066,6 +1068,35 @@ class WP_Theme_JSON {
 		} else {
 			return $this->theme_json['customTemplates'];
 		}
+	}
+
+	/**
+	 * Return the skip-link selectors of the current theme.
+	 *
+	 * @return array
+	 */
+	public function get_skip_link_selectors() {
+		if ( isset( $this->theme_json['skipLink']['auto'] ) && false === $this->theme_json['skipLink']['auto'] ) {
+			return;
+		}
+
+		$fallbacks = array(
+			'#skip-link-target',
+			'main',
+			'.wp-block-post-title',
+			'.wp-block-query-loop',
+			'.wp-block-post-content',
+			'.entry-content',
+			'h1',
+			'h2',
+		);
+
+		$selectors = array();
+		if ( isset( $this->theme_json['skipLink']['target'] ) ) {
+			$selectors = (array) $this->theme_json['skipLink']['target'];
+		}
+
+		return array_unique( array_merge( $selectors, $fallbacks ) );
 	}
 
 	/**
