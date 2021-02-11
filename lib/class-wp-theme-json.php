@@ -787,13 +787,13 @@ class WP_Theme_JSON {
 	 * Given a settings array, it extracts its presets
 	 * and adds them to the given input $stylesheet.
 	 *
-	 * Note this function modifies $stylesheet in place.
-	 *
 	 * @param string $stylesheet Input stylesheet to add the presets to.
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
+	 *
+	 * @return the modified $stylesheet.
 	 */
-	private static function compute_preset_classes( &$stylesheet, $settings, $selector ) {
+	private static function compute_preset_classes( $stylesheet, $settings, $selector ) {
 		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -816,6 +816,8 @@ class WP_Theme_JSON {
 				}
 			}
 		}
+
+		return $stylesheet;
 	}
 
 	/**
@@ -1019,7 +1021,7 @@ class WP_Theme_JSON {
 
 			// Attach the rulesets for the classes.
 			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				self::compute_preset_classes(
+				$stylesheet = self::compute_preset_classes(
 					$stylesheet,
 					$this->theme_json['settings'][ $block_selector ],
 					$selector
