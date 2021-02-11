@@ -106,11 +106,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const isHovered = useIsHovered( ref );
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
+	const mergedRefs = useMergeRefs( [ ref, useEventHandlers( clientId ) ] );
 
 	return {
 		...wrapperProps,
 		...props,
-		ref: useMergeRefs( [ ref, useEventHandlers( clientId ) ] ),
+		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		tabIndex: 0,
 		role: 'group',
