@@ -35,11 +35,45 @@ _Parameters_
 
 -   _initialData_ `[LocaleData]`: Locale data configuration.
 -   _initialDomain_ `[string]`: Domain for which configuration applies.
--   _hooks_ `[ApplyFiltersInterface]`: Hooks implementation.
+-   _hooks_ `[Hooks]`: Hooks implementation.
 
 _Returns_
 
 -   `I18n`: I18n instance
+
+<a name="defaultI18n" href="#defaultI18n">#</a> **defaultI18n**
+
+Default, singleton instance of `I18n`.
+
+<a name="getLocaleData" href="#getLocaleData">#</a> **getLocaleData**
+
+Returns locale data by domain in a Jed-formatted JSON object shape.
+
+_Related_
+
+-   <http://messageformat.github.io/Jed/>
+
+_Parameters_
+
+-   _domain_ `[string]`: Domain for which to get the data.
+
+_Returns_
+
+-   `LocaleData`: Locale data.
+
+<a name="hasTranslation" href="#hasTranslation">#</a> **hasTranslation**
+
+Check if there is a translation for a given string (in singular form).
+
+_Parameters_
+
+-   _single_ `string`: Singular form of the string to look up.
+-   _context_ `[string]`: Context information for the translators.
+-   _domain_ `[string]`: Domain to retrieve the translated text.
+
+_Returns_
+
+-   `boolean`: Whether the translation exists or not.
 
 <a name="isRTL" href="#isRTL">#</a> **isRTL**
 
@@ -85,6 +119,18 @@ _Parameters_
 _Returns_
 
 -   `string`: The formatted string.
+
+<a name="subscribe" href="#subscribe">#</a> **subscribe**
+
+Subscribes to changes of locale data
+
+_Parameters_
+
+-   _callback_ `SubscribeCallback`: Subscription callback
+
+_Returns_
+
+-   `UnsubscribeCallback`: Unsubscribe callback
 
 <a name="_n" href="#_n">#</a> **\_n**
 

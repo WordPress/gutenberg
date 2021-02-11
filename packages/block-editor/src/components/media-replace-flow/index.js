@@ -30,6 +30,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
+import { store as blockEditorStore } from '../../store';
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -45,7 +46,7 @@ const MediaReplaceFlow = ( {
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().mediaUpload;
+		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
 	const errorNoticeID = uniqueId(

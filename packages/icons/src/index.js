@@ -121,6 +121,7 @@ export { default as navigation } from './library/navigation';
 export { default as noFilter } from './library/no-filter';
 export { default as pageBreak } from './library/page-break';
 export { default as page } from './library/page';
+export { default as pages } from './library/pages';
 export { default as paragraph } from './library/paragraph';
 export { default as payment } from './library/payment';
 export { default as percent } from './library/percent';

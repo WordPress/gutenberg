@@ -15,6 +15,11 @@ import {
 	TAB,
 } from '@wordpress/keycodes';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
@@ -53,9 +58,9 @@ function isKeyDownEligibleForStartTyping( event ) {
  */
 export function useMouseMoveTypingReset( ref ) {
 	const isTyping = useSelect( ( select ) =>
-		select( 'core/block-editor' ).isTyping()
+		select( blockEditorStore ).isTyping()
 	);
-	const { stopTyping } = useDispatch( 'core/block-editor' );
+	const { stopTyping } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! isTyping ) {
@@ -111,9 +116,9 @@ export function useMouseMoveTypingReset( ref ) {
  */
 export function useTypingObserver( ref ) {
 	const isTyping = useSelect( ( select ) =>
-		select( 'core/block-editor' ).isTyping()
+		select( blockEditorStore ).isTyping()
 	);
-	const { startTyping, stopTyping } = useDispatch( 'core/block-editor' );
+	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
 	useMouseMoveTypingReset( ref );
 	useEffect( () => {

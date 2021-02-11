@@ -29,6 +29,7 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import { store as blockEditorStore } from '../../store';
 
 const emptyArray = [];
 function BlockForType( {
@@ -313,7 +314,7 @@ export default compose( [
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -380,7 +381,7 @@ export default compose( [
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 
 		return {
 			mergeBlocks( forward ) {
@@ -388,7 +389,7 @@ export default compose( [
 				const {
 					getPreviousBlockClientId,
 					getNextBlockClientId,
-				} = select( 'core/block-editor' );
+				} = select( blockEditorStore );
 
 				if ( forward ) {
 					const nextBlockClientId = getNextBlockClientId( clientId );

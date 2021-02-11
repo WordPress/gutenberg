@@ -29,6 +29,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './';
 import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 function selector( select ) {
 	const {
@@ -39,7 +40,7 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	return {
 		isNavigationMode: isNavigationMode(),
 		isMultiSelecting: isMultiSelecting(),
@@ -71,7 +72,7 @@ function BlockPopover( {
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const blockNodes = useContext( BlockNodes );
-	const { stopTyping } = useDispatch( 'core/block-editor' );
+	const { stopTyping } = useDispatch( blockEditorStore );
 
 	// Controls when the side inserter on empty lines should
 	// be shown, including writing and selection modes.
@@ -265,7 +266,7 @@ function wrapperSelector( select ) {
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
 		__experimentalGetBlockListSettingsForBlocks,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
