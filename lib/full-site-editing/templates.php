@@ -234,7 +234,7 @@ function gutenberg_inject_skip_link() {
 			?>
 			<script>
 			( function() {
-				var searchEl = [ '<?php echo esc_attr( implode( "','", $selectors ) ); ?>' ], contentEl, contentElID, parentEl, skipLink, i;
+				var searchEl = [ '<?php echo implode( "','", $selectors ); // phpcs:ignore WordPress.Security.EscapeOutput ?>' ], contentEl, contentElID, parentEl, skipLink, i;
 
 				// Find the content element.
 				for ( i = 0; i < searchEl.length; i++ ) {
