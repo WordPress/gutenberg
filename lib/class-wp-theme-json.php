@@ -860,12 +860,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * Note that this modifies the $declarations in place.
-	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
+	 *
+	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_theme_vars( &$declarations, $settings ) {
+	private static function compute_theme_vars( $declarations, $settings ) {
 		$custom_values = gutenberg_experimental_get( $settings, array( 'custom' ) );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
@@ -874,6 +874,7 @@ class WP_Theme_JSON {
 				'value' => $value,
 			);
 		}
+		return $declarations;
 	}
 
 	/**
@@ -945,7 +946,7 @@ class WP_Theme_JSON {
 			$selector = $metadata[ $block_selector ]['selector'];
 
 			$declarations = self::compute_preset_vars( array(), $settings );
-			self::compute_theme_vars( $declarations, $settings );
+			$declarations = self::compute_theme_vars( $declarations, $settings );
 
 			// Attach the ruleset for style and custom properties.
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
