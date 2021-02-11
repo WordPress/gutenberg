@@ -260,7 +260,7 @@ describe( 'useBlockSync hook', () => {
 				selection: {
 					selectionEnd: {},
 					selectionStart: {},
-					initialPosition: undefined,
+					initialPosition: null,
 				},
 			}
 		);
@@ -302,7 +302,7 @@ describe( 'useBlockSync hook', () => {
 				selection: {
 					selectionEnd: {},
 					selectionStart: {},
-					initialPosition: undefined,
+					initialPosition: null,
 				},
 			}
 		);
@@ -411,7 +411,7 @@ describe( 'useBlockSync hook', () => {
 				selection: {
 					selectionEnd: {},
 					selectionStart: {},
-					initialPosition: undefined,
+					initialPosition: null,
 				},
 			}
 		);
@@ -452,7 +452,7 @@ describe( 'useBlockSync hook', () => {
 
 		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
 			selection: {
-				initialPosition: undefined,
+				initialPosition: null,
 				selectionEnd: {},
 				selectionStart: {},
 			},
@@ -494,7 +494,7 @@ describe( 'useBlockSync hook', () => {
 				selection: {
 					selectionEnd: {},
 					selectionStart: {},
-					initialPosition: undefined,
+					initialPosition: null,
 				},
 			}
 		);
@@ -557,7 +557,7 @@ describe( 'useBlockSync hook', () => {
 				selection: {
 					selectionEnd: {},
 					selectionStart: {},
-					initialPosition: undefined,
+					initialPosition: null,
 				},
 			}
 		);
