@@ -19,8 +19,8 @@ import {
 	rawHandler,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { withDispatch, withSelect, useSelect } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { withInstanceId } from '@wordpress/compose';
 import {
 	BottomSheet,
 	BottomSheetConsumer,
@@ -33,13 +33,12 @@ import {
  */
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
+//import useInsertionPoint from './hooks/use-insertion-point';
 
 const MIN_COL_NUM = 3;
 
 function InserterMenu( {
-	showInsertionPoint,
-	hideInsertionPoint,
-	insertDefaultBlock,
+	insertionIndex,
 	onDismiss,
 	onSelect,
 	isAppender,
@@ -51,37 +50,70 @@ function InserterMenu( {
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
 
-	const { items, destinationRootClientId, canInsertBlockType } = useSelect(
-		( select ) => {
-			const selectBlockEditorStore = select( blockEditorStore );
+	const {
+		hideInsertionPoint,
+		insertDefaultBlock,
+		insertBlock,
+		clearSelectedBlock,
+		removeBlock,
+		showInsertionPoint,
+		resetBlocks,
+	} = useDispatch( blockEditorStore );
 
-			const {
-				getInserterItems,
-				getBlockRootClientId,
-				getBlockSelectionEnd,
-			} = selectBlockEditorStore;
+	const {
+		items,
+		destinationRootClientId,
+		canInsertBlockType,
+		getBlockOrder,
+		getBlockCount,
+	} = useSelect( ( select ) => {
+		const selectBlockEditorStore = select( blockEditorStore );
 
-			let targetRootClientId = rootClientId;
-			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
-				const end = getBlockSelectionEnd();
-				if ( end ) {
-					targetRootClientId =
-						getBlockRootClientId( end ) || undefined;
-				}
+		const {
+			getInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+		} = selectBlockEditorStore;
+
+		let targetRootClientId = rootClientId;
+		if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				targetRootClientId = getBlockRootClientId( end ) || undefined;
 			}
-
-			return {
-				items: getInserterItems( targetRootClientId ),
-				destinationRootClientId: targetRootClientId,
-				canInsertBlockType: selectBlockEditorStore.canInsertBlockType,
-			};
 		}
-	);
+
+		return {
+			items: getInserterItems( targetRootClientId ),
+			destinationRootClientId: targetRootClientId,
+			canInsertBlockType: selectBlockEditorStore.canInsertBlockType,
+			getBlockOrder: selectBlockEditorStore.getBlockOrder,
+			getBlockCount: selectBlockEditorStore.getBlockCount,
+		};
+	} );
 
 	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
 
 	useEffect( () => {
-		showInsertionPoint();
+		if ( shouldReplaceBlock ) {
+			const count = getBlockCount();
+			// Check if there is a rootClientId because that means it is a nested replaceable block
+			// and we don't want to clear/reset all blocks.
+			if ( count === 1 && ! rootClientId ) {
+				// Removing the last block is not possilble with `removeBlock` action.
+				// It always inserts a default block if the last of the blocks have been removed.
+				clearSelectedBlock();
+				resetBlocks( [] );
+			} else {
+				const blockToReplace = getBlockOrder( destinationRootClientId )[
+					insertionIndex
+				];
+				removeBlock( blockToReplace, false );
+			}
+		}
+
+		showInsertionPoint( destinationRootClientId, insertionIndex );
+
 		Dimensions.addEventListener( 'change', onLayout );
 
 		return () => {
@@ -103,7 +135,7 @@ function InserterMenu( {
 		// if should replace but didn't insert any block
 		// re-insert default block
 		if ( shouldReplaceBlock ) {
-			insertDefaultBlock();
+			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );
 		}
 		onDismiss();
 	}
@@ -167,6 +199,20 @@ function InserterMenu( {
 			: itemsToDisplay;
 	}
 
+	function onBlockSelect( item ) {
+		const { name, initialAttributes, innerBlocks } = item;
+
+		const insertedBlock = createBlock(
+			name,
+			initialAttributes,
+			innerBlocks
+		);
+
+		insertBlock( insertedBlock, insertionIndex, destinationRootClientId );
+
+		onSelect();
+	}
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -195,8 +241,8 @@ function InserterMenu( {
 										item,
 										itemWidth,
 										maxWidth,
-										onSelect,
 									} }
+									onSelect={ onBlockSelect }
 								/>
 							) }
 							{ ...listProps }
@@ -216,73 +262,4 @@ function InserterMenu( {
 	);
 }
 
-export default compose(
-	withSelect( () => ( {} ) ),
-
-	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const {
-			showInsertionPoint,
-			hideInsertionPoint,
-			removeBlock,
-			resetBlocks,
-			clearSelectedBlock,
-			insertBlock,
-			insertDefaultBlock,
-		} = dispatch( blockEditorStore );
-
-		return {
-			showInsertionPoint() {
-				if ( ownProps.shouldReplaceBlock ) {
-					const { getBlockOrder, getBlockCount } = select(
-						blockEditorStore
-					);
-
-					const count = getBlockCount();
-					// Check if there is a rootClientId because that means it is a nested replacable block and we don't want to clear/reset all blocks.
-					if ( count === 1 && ! ownProps.rootClientId ) {
-						// removing the last block is not possible with `removeBlock` action
-						// it always inserts a default block if the last of the blocks have been removed
-						clearSelectedBlock();
-						resetBlocks( [] );
-					} else {
-						const blockToReplace = getBlockOrder(
-							ownProps.destinationRootClientId
-						)[ ownProps.insertionIndex ];
-
-						removeBlock( blockToReplace, false );
-					}
-				}
-				showInsertionPoint(
-					ownProps.destinationRootClientId,
-					ownProps.insertionIndex
-				);
-			},
-			hideInsertionPoint,
-			onSelect( item ) {
-				const { name, initialAttributes, innerBlocks } = item;
-
-				const insertedBlock = createBlock(
-					name,
-					initialAttributes,
-					innerBlocks
-				);
-
-				insertBlock(
-					insertedBlock,
-					ownProps.insertionIndex,
-					ownProps.destinationRootClientId
-				);
-
-				ownProps.onSelect();
-			},
-			insertDefaultBlock() {
-				insertDefaultBlock(
-					{},
-					ownProps.destinationRootClientId,
-					ownProps.insertionIndex
-				);
-			},
-		};
-	} ),
-	withInstanceId
-)( InserterMenu );
+export default withInstanceId( InserterMenu );
