@@ -29,6 +29,9 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	BlockAlignmentControl,
+	__experimentalUseEditorFeature as useEditorFeature,
+	__experimentalDuotoneToolbar as DuotoneToolbar,
+	__experimentalDuotoneFilter as DuotoneFilter,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -78,6 +81,7 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
+		duotone,
 	},
 	setAttributes,
 	isSelected,
@@ -270,6 +274,10 @@ export default function Image( {
 		} );
 	}
 
+	function onDuotoneChange( newDuotone ) {
+		setAttributes( { duotone: newDuotone } );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -278,6 +286,10 @@ export default function Image( {
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
+
+	const duotonePalette = useEditorFeature( 'color.duotone' );
+
+	const colorPalette = useEditorFeature( 'color.palette' );
 
 	const controls = (
 		<>
@@ -304,6 +316,14 @@ export default function Image( {
 							onClick={ () => setIsEditingImage( true ) }
 							icon={ crop }
 							label={ __( 'Crop' ) }
+						/>
+					) }
+					{ ! isEditingImage && (
+						<DuotoneToolbar
+							value={ duotone }
+							duotonePalette={ duotonePalette }
+							colorPalette={ colorPalette }
+							onChange={ onDuotoneChange }
 						/>
 					) }
 					{ externalBlob && (
@@ -552,6 +572,13 @@ export default function Image( {
 		>
 			{ controls }
 			{ img }
+			{ duotone && (
+				<DuotoneFilter
+					selector={ `.wp-block-image.${ duotone.id } img` }
+					id={ duotone.id }
+					values={ duotone.values }
+				/>
+			) }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }
