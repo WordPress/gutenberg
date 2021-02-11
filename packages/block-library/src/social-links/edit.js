@@ -14,6 +14,7 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
+	JustifyToolbar,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
@@ -52,6 +53,7 @@ export function SocialLinksEdit( props ) {
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
+		justify,
 		openInNewTab,
 		size,
 	} = attributes;
@@ -156,6 +158,22 @@ export function SocialLinksEdit( props ) {
 						) }
 					</ToolbarItem>
 				</ToolbarGroup>
+				<JustifyToolbar
+					allowedControls={ [
+						'left',
+						'center',
+						'right',
+						'space-between',
+					] }
+					value={ justify }
+					onChange={ ( value ) =>
+						setAttributes( { justify: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
