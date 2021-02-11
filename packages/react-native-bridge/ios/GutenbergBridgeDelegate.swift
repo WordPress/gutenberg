@@ -22,6 +22,7 @@ public enum Capabilities: String {
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
+    case audioBlock
 }
 
 /// Wrapper for single block data
