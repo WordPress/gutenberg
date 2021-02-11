@@ -103,7 +103,8 @@ class WP_Theme_JSON {
 	 * }
 	 */
 	const SCHEMA = array(
-		'styles'   => array(
+		'customTemplates' => null,
+		'styles'          => array(
 			'border'     => array(
 				'radius' => null,
 				'color'  => null,
@@ -134,7 +135,7 @@ class WP_Theme_JSON {
 				'textTransform'  => null,
 			),
 		),
-		'settings' => array(
+		'settings'        => array(
 			'border'     => array(
 				'customRadius' => null,
 				'customColor'  => null,
@@ -271,15 +272,15 @@ class WP_Theme_JSON {
 			'value'   => array( 'border', 'radius' ),
 			'support' => array( '__experimentalBorder', 'radius' ),
 		),
-		'borderColor'             => array(
+		'borderColor'              => array(
 			'value'   => array( 'border', 'color' ),
 			'support' => array( '__experimentalBorder', 'color' ),
 		),
-		'borderWidth'             => array(
+		'borderWidth'              => array(
 			'value'   => array( 'border', 'width' ),
 			'support' => array( '__experimentalBorder', 'width' ),
 		),
-		'borderStyle'             => array(
+		'borderStyle'              => array(
 			'value'   => array( 'border', 'style' ),
 			'support' => array( '__experimentalBorder', 'style' ),
 		),
@@ -337,7 +338,7 @@ class WP_Theme_JSON {
 		// Remove top-level keys that aren't present in the schema.
 		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
 
-		$block_metadata = $this->get_blocks_metadata();
+		$block_metadata = self::get_blocks_metadata();
 		foreach ( array( 'settings', 'styles' ) as $subtree ) {
 			// Remove settings & styles subtrees if they aren't arrays.
 			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
@@ -366,7 +367,7 @@ class WP_Theme_JSON {
 						unset( $styles_schema[ $prop_meta['value'][0] ][ $prop_meta['value'][1] ] );
 					}
 				}
-				self::remove_keys_not_in_schema(
+				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['styles'][ $block_selector ],
 					$styles_schema
 				);
@@ -385,7 +386,7 @@ class WP_Theme_JSON {
 				}
 
 				// Remove the properties that aren't present in the schema.
-				self::remove_keys_not_in_schema(
+				$this->theme_json['settings'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['settings'][ $block_selector ],
 					self::SCHEMA['settings']
 				);
@@ -595,19 +596,23 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $tree Input to process.
 	 * @param array $schema Schema to adhere to.
+	 *
+	 * @return array Returns the modified $tree.
 	 */
-	private static function remove_keys_not_in_schema( &$tree, $schema ) {
+	private static function remove_keys_not_in_schema( $tree, $schema ) {
 		$tree = array_intersect_key( $tree, $schema );
 
 		foreach ( $schema as $key => $data ) {
 			if ( is_array( $schema[ $key ] ) && isset( $tree[ $key ] ) ) {
-				self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
+				$tree[ $key ] = self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
 				if ( empty( $tree[ $key ] ) ) {
 					unset( $tree[ $key ] );
 				}
 			}
 		}
+
+		return $tree;
 	}
 
 	/**
@@ -929,7 +934,7 @@ class WP_Theme_JSON {
 			return $stylesheet;
 		}
 
-		$metadata = $this->get_blocks_metadata();
+		$metadata = self::get_blocks_metadata();
 		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
 			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
 				continue;
@@ -989,9 +994,9 @@ class WP_Theme_JSON {
 			return $stylesheet;
 		}
 
-		$metadata = $this->get_blocks_metadata();
+		$metadata = self::get_blocks_metadata();
 		foreach ( $metadata as $block_selector => $metadata ) {
-			if ( empty( $metadata['selector'] ) || empty( $metadata['supports'] ) ) {
+			if ( empty( $metadata['selector'] ) ) {
 				continue;
 			}
 
@@ -1047,6 +1052,19 @@ class WP_Theme_JSON {
 			return array();
 		} else {
 			return $this->theme_json['settings'];
+		}
+	}
+
+	/**
+	 * Returns the page templates of the current theme.
+	 *
+	 * @return array
+	 */
+	public function get_custom_templates() {
+		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
+			return array();
+		} else {
+			return $this->theme_json['customTemplates'];
 		}
 	}
 

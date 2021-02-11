@@ -14,6 +14,7 @@ import { useCallback, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockNavigation from './';
+import { store as blockEditorStore } from '../../store';
 
 const MenuIcon = (
 	<SVG
@@ -71,7 +72,7 @@ function BlockNavigationDropdown(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
 	);
 	const isEnabled = hasBlocks && ! isDisabled;

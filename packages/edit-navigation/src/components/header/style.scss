@@ -1,43 +1,30 @@
 .edit-navigation-header {
-	padding: $grid-unit-20;
-	background: #f1f1f1; // Need to find a variable for this
-
-	.edit-navigation-header__title {
-		font-size: 23px;
-		font-weight: 400;
-		line-height: $default-line-height;
-		margin: 0 0 $grid-unit-10;
-	}
+	display: flex;
+	align-items: center;
+	padding: $grid-unit-15;
 }
 
-// Lining up all the actions in a nice row.
+.edit-navigation-header__title-subtitle {
+	flex-grow: 1;
+	padding-left: $grid-unit-10;
+}
+
+.edit-navigation-header__title {
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	margin: 0;
+}
+
+.edit-navigation-header__subtitle {
+	margin: 0;
+	font-size: 15px;
+	font-weight: normal;
+}
+
 .edit-navigation-header__actions {
 	display: flex;
-	align-items: baseline;
-	margin-top: $grid-unit-10;
-
-	.edit-navigation-header__action_header {
-		font-weight: normal;
-		font-size: inherit;
-		margin: 0;
-	}
-
-	// Spacing out the actions a little.
-	.edit-navigation-header__action_header,
-	.components-dropdown {
-		margin-right: $grid-unit-20;
-	}
-
-	.components-dropdown:last-child {
-		margin-right: 0;
-	}
 }
 
-.edit-navigation-header__create-menu-button {
-	margin-top: $grid-unit-10;
-}
-
-.edit-navigation-header__manage-locations .components-spinner {
-	display: block;
-	margin: $grid-unit-20 auto;
+.edit-navigation-header__add-menu-form {
+	min-width: 220px;
 }

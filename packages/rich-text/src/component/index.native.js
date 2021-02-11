@@ -756,12 +756,6 @@ export class RichText extends Component {
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
-			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
-			// if its internal value hasn't change. When created, default value is 0, 0
-			this.onSelectionChange(
-				this.props.selectionStart || 0,
-				this.props.selectionEnd || 0
-			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
 		}
@@ -1002,8 +996,10 @@ export default compose( [
 		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles =
-			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+		const parentBlockStyles = get( parentBlock, [
+			'attributes',
+			'childrenStyles',
+		] );
 
 		return {
 			areMentionsSupported:

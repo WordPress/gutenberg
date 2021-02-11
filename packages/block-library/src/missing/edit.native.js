@@ -16,7 +16,7 @@ import {
 	sendActionButtonPressedAction,
 	actionButtons,
 } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, Icon, TextControl } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -30,6 +30,9 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import styles from './style.scss';
+
+// Blocks that can't be edited through the Unsupported block editor identified by their name.
+const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
@@ -110,6 +113,7 @@ export class UnsupportedBlockEdit extends Component {
 			clientId,
 			isUnsupportedBlockEditorSupported,
 			canEnableUnsupportedBlockEditor,
+			isEditableInUnsupportedBlockEditor,
 		} = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
@@ -187,27 +191,30 @@ export class UnsupportedBlockEdit extends Component {
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
-					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ missingBlockDetail }
-					</Text>
+					{ isEditableInUnsupportedBlockEditor && (
+						<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
+							{ missingBlockDetail }
+						</Text>
+					) }
 				</View>
 				{ ( isUnsupportedBlockEditorSupported ||
-					canEnableUnsupportedBlockEditor ) && (
-					<>
-						<BottomSheet.Cell
-							label={ missingBlockActionButton }
-							separatorType="topFullWidth"
-							onPress={ this.requestFallback }
-							labelStyle={ actionButtonStyle }
-						/>
-						<BottomSheet.Cell
-							label={ __( 'Dismiss' ) }
-							separatorType="topFullWidth"
-							onPress={ this.toggleSheet }
-							labelStyle={ actionButtonStyle }
-						/>
-					</>
-				) }
+					canEnableUnsupportedBlockEditor ) &&
+					isEditableInUnsupportedBlockEditor && (
+						<>
+							<TextControl
+								label={ missingBlockActionButton }
+								separatorType="topFullWidth"
+								onPress={ this.requestFallback }
+								labelStyle={ actionButtonStyle }
+							/>
+							<TextControl
+								label={ __( 'Dismiss' ) }
+								separatorType="topFullWidth"
+								onPress={ this.toggleSheet }
+								labelStyle={ actionButtonStyle }
+							/>
+						</>
+					) }
 			</BottomSheet>
 		);
 	}
@@ -269,7 +276,7 @@ export class UnsupportedBlockEdit extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { attributes } ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
 			isUnsupportedBlockEditorSupported:
@@ -277,6 +284,9 @@ export default compose( [
 			canEnableUnsupportedBlockEditor:
 				getSettings( 'capabilities' )
 					.canEnableUnsupportedBlockEditor === true,
+			isEditableInUnsupportedBlockEditor: ! UBE_INCOMPATIBLE_BLOCKS.includes(
+				attributes.originalName
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

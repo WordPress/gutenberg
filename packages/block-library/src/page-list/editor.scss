@@ -1,0 +1,29 @@
+.wp-block-navigation {
+	// Block wrapper gets the classes in the editor, and there's an extra div wrapper for now, so background styles need to be inherited.
+	.wp-block-page-list > div,
+	.wp-block-page-list {
+		background-color: inherit;
+	}
+	// Make the dropdown background white if there's no background color set.
+	&:not(.has-background) {
+		.submenu-container {
+			color: $gray-900;
+			background-color: $white;
+		}
+	}
+}
+
+// Make links unclickable in the editor
+.wp-block-pages-list__item__link {
+	pointer-events: none;
+}
+
+.wp-block-page-list .components-placeholder {
+	min-height: 0;
+	padding: 0;
+	background-color: inherit;
+
+	.components-spinner {
+		margin-top: 0;
+	}
+}

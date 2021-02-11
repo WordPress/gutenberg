@@ -5,12 +5,14 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
+	InspectorControls,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
 	Dropdown,
+	PanelBody,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
@@ -78,28 +80,33 @@ export default function TemplatePartEdit( {
 		);
 	}
 
-	const inspectorAdvancedControls = (
-		<InspectorAdvancedControls>
-			<SelectControl
-				label={ __( 'HTML element' ) }
-				options={ [
-					{ label: __( 'Default (<div>)' ), value: 'div' },
-					{ label: '<header>', value: 'header' },
-					{ label: '<main>', value: 'main' },
-					{ label: '<section>', value: 'section' },
-					{ label: '<article>', value: 'article' },
-					{ label: '<aside>', value: 'aside' },
-					{ label: '<footer>', value: 'footer' },
-				] }
-				value={ TagName }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
-			/>
-		</InspectorAdvancedControls>
-	);
-
 	return (
 		<>
-			{ inspectorAdvancedControls }
+			<InspectorControls>
+				<PanelBody>
+					{ isEntityAvailable && (
+						<TemplatePartNamePanel postId={ templatePartId } />
+					) }
+				</PanelBody>
+			</InspectorControls>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
@@ -110,7 +117,6 @@ export default function TemplatePartEdit( {
 				{ isEntityAvailable && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
-							<TemplatePartNamePanel postId={ templatePartId } />
 							<Dropdown
 								className="wp-block-template-part__preview-dropdown-button"
 								contentClassName="wp-block-template-part__preview-dropdown-content"

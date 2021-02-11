@@ -84,12 +84,17 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$query_args   = array();
-		$category_ids = $request['category'];
-		$search_term  = $request['search'];
+		$query_args  = array();
+		$category_id = $request['category'];
+		$keyword_id  = $request['keyword'];
+		$search_term = $request['search'];
 
-		if ( $category_ids ) {
-			$query_args['pattern-categories'] = $category_ids;
+		if ( $category_id ) {
+			$query_args['pattern-categories'] = $category_id;
+		}
+
+		if ( $keyword_id ) {
+			$query_args['pattern-keywords'] = $keyword_id;
 		}
 
 		if ( $search_term ) {
@@ -157,7 +162,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 		$prepared_pattern = array(
 			'id'             => absint( $raw_pattern->id ),
 			'title'          => sanitize_text_field( $raw_pattern->title->rendered ),
-			'content'        => wp_kses_post( $raw_pattern->content->rendered ),
+			'content'        => wp_kses_post( $raw_pattern->pattern_content ),
 			'categories'     => array_map( 'sanitize_title', $raw_pattern->category_slugs ),
 			'keywords'       => array_map( 'sanitize_title', $raw_pattern->keyword_slugs ),
 			'description'    => sanitize_text_field( $raw_pattern->meta->wpop_description ),
@@ -271,9 +276,15 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 		$query_params['context']['default']  = 'view';
 
 		$query_params['category'] = array(
-			'description'       => __( 'Limit results to those matching a category ID.', 'gutenberg' ),
-			'type'              => 'integer',
-			'minimum'           => 1,
+			'description' => __( 'Limit results to those matching a category ID.', 'gutenberg' ),
+			'type'        => 'integer',
+			'minimum'     => 1,
+		);
+
+		$query_params['keyword'] = array(
+			'description' => __( 'Limit results to those matching a keyword ID.', 'gutenberg' ),
+			'type'        => 'integer',
+			'minimum'     => 1,
 		);
 
 		/**

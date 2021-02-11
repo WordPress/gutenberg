@@ -10,7 +10,10 @@ import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockInspector,
+	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,12 +25,14 @@ import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
 import Header from '../header';
 import Notices from '../notices';
-import Toolbar from '../toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
 
 export default function Layout( { blockEditorSettings } ) {
+	const canvasRef = useRef();
+	useBlockSelectionClearer( canvasRef );
+
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 	const savePost = () => saveNavigationPost( navigationPost );
 
@@ -37,6 +42,7 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost,
 		selectMenu,
 		deleteMenu,
+		hasLoadedMenus,
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
@@ -56,10 +62,11 @@ export default function Layout( { blockEditorSettings } ) {
 
 					<div className="edit-navigation-layout">
 						<Header
-							isPending={ ! navigationPost }
+							isPending={ ! hasLoadedMenus }
 							menus={ menus }
 							selectedMenuId={ selectedMenuId }
 							onSelectMenu={ selectMenu }
+							navigationPost={ navigationPost }
 						/>
 
 						<BlockEditorProvider
@@ -69,7 +76,6 @@ export default function Layout( { blockEditorSettings } ) {
 							settings={ {
 								...blockEditorSettings,
 								templateLock: 'all',
-								hasFixedToolbar: true,
 							} }
 							useSubRegistry={ false }
 						>
@@ -77,19 +83,22 @@ export default function Layout( { blockEditorSettings } ) {
 							<NavigationEditorShortcuts
 								saveBlocks={ savePost }
 							/>
-							<Toolbar
-								isPending={ ! navigationPost }
-								navigationPost={ navigationPost }
-							/>
-							<Editor
-								isPending={ ! navigationPost }
-								blocks={ blocks }
-							/>
+							<div
+								className="edit-navigation-layout__canvas"
+								ref={ canvasRef }
+							>
+								<Editor
+									isPending={ ! navigationPost }
+									blocks={ blocks }
+								/>
+							</div>
 							<InspectorAdditions
 								menuId={ selectedMenuId }
 								onDeleteMenu={ deleteMenu }
 							/>
 						</BlockEditorProvider>
+
+						<BlockInspector bubblesVirtually={ false } />
 					</div>
 
 					<Popover.Slot />

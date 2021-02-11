@@ -238,13 +238,13 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaSaveSync()
 
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String)
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String)
 
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String])
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]])
 
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String])
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String])
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -258,8 +258,9 @@ public extension GutenbergBridgeDelegate {
     // Media Collection
 
     func gutenbergDidRequestMediaSaveSync() {}
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) { }
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) { }
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) { }
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) { }
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesBlockReplaceSync() {}
 }

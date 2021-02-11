@@ -1,45 +1,109 @@
 .edit-navigation-editor {
-	margin: $grid-unit-20;
-
-	@include break-medium() {
-		align-items: flex-start;
-		display: flex;
-	}
-}
-
-.edit-navigation-editor__block-view {
-	@include break-medium() {
-		flex-grow: 1;
-	}
+	background: $white;
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
+	max-width: 420px;
+	margin: auto;
 
 	.components-spinner {
 		display: block;
-		margin: 10px auto;
-	}
-}
-
-.edit-navigation-editor__list-view {
-	border-top: 1px solid $gray-300;
-	margin-top: $grid-unit-20;
-	padding-top: $grid-unit-20;
-
-	@include break-medium() {
-		border-left: 1px solid $gray-300;
-		border-top: none;
-		margin-left: $grid-unit-20;
-		margin-top: 0;
-		padding-left: $grid-unit-20;
-		padding-top: 0;
-		width: 300px;
+		margin: $grid-unit-15 auto;
 	}
 
-	.edit-navigation-editor__list-view-title {
-		font-size: 1.2em;
+	// Adapt the layout of the Navigation and Link blocks
+	// to work better in the context of the Navigation Screen.
+	.wp-block-navigation {
 		margin: 0;
+		font-size: 15px;
+		padding: $grid-unit-15;
 	}
 
-	.components-spinner {
+	.wp-block-navigation-link {
 		display: block;
-		margin: 100px auto;
+
+		// Fix focus outlines
+		&.is-selected > .wp-block-navigation-link__content,
+		&.is-selected:hover > .wp-block-navigation-link__content {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+
+		&.block-editor-block-list__block:not([contenteditable]):focus::after {
+			display: none;
+		}
+	}
+
+	.wp-block-navigation-link__content {
+		padding: 0;
+		margin-bottom: 6px;
+		border-radius: $radius-block-ui;
+
+		&:hover {
+			box-shadow: 0 0 0 $border-width $gray-300;
+		}
+	}
+
+	.wp-block-navigation-link__label {
+		padding: $grid-unit-15;
+		padding-left: $grid-unit-30;
+
+		// Without this Links with submenus display a pointer.
+		cursor: text;
+	}
+
+	// Position the submenu icon so it appears to the left of
+	// the Link. All the extra specificity is help override the
+	// rotation on the SVG.
+	.wp-block-navigation .wp-block-navigation-link .wp-block-navigation-link__submenu-icon {
+		position: absolute;
+		top: 6px;
+		left: 2px;
+		padding: 6px;
+		pointer-events: none;
+
+		svg {
+			padding: 0;
+			transform: rotate(90deg);
+		}
+	}
+
+	// Submenus
+	// There's a bunch of stuff to override just to get submenus to
+	// as a normal block element.
+	.wp-block-navigation-link.has-child {
+		cursor: default;
+		border-radius: $radius-block-ui;
+	}
+
+	// Override Nav block styling for deeply nested submenus.
+	.has-child .wp-block-navigation__container .wp-block-navigation__container {
+		left: auto;
+	}
+
+	// When editing a link with children, highlight the parent
+	// and adjust the spacing and submenu icon.
+	.wp-block-navigation-link.has-child.is-editing {
+		> .wp-block-navigation__container {
+			opacity: 1;
+			visibility: visible;
+			position: relative;
+			background: transparent;
+			top: auto;
+			left: auto;
+			padding-left: $grid-unit-15;
+			min-width: auto;
+			width: 100%;
+			border: none;
+			display: block;
+
+			&::before {
+				display: none;
+			}
+		}
+	}
+
+	// Add Buttons
+	.block-editor-button-block-appender.block-list-appender__toggle {
+		margin: 0 0 0 $grid-unit-20;
+		padding: 0;
 	}
 }

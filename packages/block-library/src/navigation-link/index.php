@@ -20,7 +20,7 @@ function block_core_navigation_link_build_css_colors( $context ) {
 
 	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $context );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $context );
+	$has_custom_text_color = isset( $context['style']['color']['text'] );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -33,12 +33,12 @@ function block_core_navigation_link_build_css_colors( $context ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
 	}
 
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $context );
+	$has_custom_background_color = isset( $context['style']['color']['background'] );
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
@@ -51,7 +51,7 @@ function block_core_navigation_link_build_css_colors( $context ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
 	}
 
 	return $colors;
@@ -72,14 +72,14 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 	);
 
 	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = array_key_exists( 'customFontSize', $context );
+	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
 
 	if ( $has_named_font_size ) {
 		// Add the font size class.
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['customFontSize'] );
+		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['style']['typography']['fontSize'] );
 	}
 
 	return $font_sizes;
@@ -123,7 +123,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] );
+	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;

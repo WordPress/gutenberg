@@ -2,17 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useState,
-	useLayoutEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -23,13 +17,14 @@ import {
 	__experimentalUseFocusOutside as useFocusOutside,
 	useConstrainedTabbing,
 	useFocusReturn,
+	useMergeRefs,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { computePopoverPosition } from './utils';
+import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -41,24 +36,6 @@ import { getAnimateClassName } from '../animate';
  * @type {string}
  */
 const SLOT_NAME = 'Popover';
-
-function offsetIframe( rect, ownerDocument ) {
-	const { defaultView } = ownerDocument;
-	const { frameElement } = defaultView;
-
-	if ( ! frameElement ) {
-		return rect;
-	}
-
-	const iframeRect = frameElement.getBoundingClientRect();
-
-	return new defaultView.DOMRect(
-		rect.left + iframeRect.left,
-		rect.top + iframeRect.top,
-		rect.width,
-		rect.height
-	);
-}
 
 function computeAnchorRect(
 	anchorRefFallback,
@@ -76,7 +53,10 @@ function computeAnchorRect(
 			return;
 		}
 
-		return getAnchorRect( anchorRefFallback.current );
+		return offsetIframe(
+			getAnchorRect( anchorRefFallback.current ),
+			anchorRefFallback.current.ownerDocument
+		);
 	}
 
 	if ( anchorRef !== false ) {
@@ -492,13 +472,12 @@ const Popover = ( {
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
-	const allRefs = [
+	const mergedRefs = useMergeRefs( [
 		containerRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
-	];
-	const mergedRefs = useCallback( mergeRefs( allRefs ), allRefs );
+	] );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
