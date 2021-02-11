@@ -73,6 +73,11 @@
 		border-radius: $radius-block-ui;
 	}
 
+	// Override Nav block styling for deeply nested submenus.
+	.has-child .wp-block-navigation__container .wp-block-navigation__container {
+		left: auto;
+	}
+
 	// When editing a link with children, highlight the parent
 	// and adjust the spacing and submenu icon.
 	.wp-block-navigation-link.has-child.is-editing {
