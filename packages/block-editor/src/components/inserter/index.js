@@ -271,12 +271,7 @@ export default compose( [
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
-				insertBlock(
-					blockToInsert,
-					getInsertionIndex(),
-					rootClientId,
-					false
-				);
+				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
 
 				if ( onSelectOrClose ) {
 					onSelectOrClose();
