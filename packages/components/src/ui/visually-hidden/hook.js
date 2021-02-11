@@ -6,7 +6,7 @@ import { cx } from '@wp-g2/styles';
 /**
  * Internal dependencies
  */
-import * as styles from './visually-hidden-styles';
+import * as styles from './styles';
 
 /**
  *
