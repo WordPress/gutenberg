@@ -45,6 +45,7 @@ import {
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
+import GalleryEditV1 from './edit-v1';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -81,6 +82,11 @@ function GalleryEdit( props ) {
 		noticeUI,
 		insertBlocksAfter,
 	} = props;
+
+	if ( attributes?.ids?.length > 0 ) {
+		console.log( 'here' );
+		return <GalleryEditV1 { ...props } />;
+	}
 
 	const {
 		imageCount,
