@@ -10,7 +10,6 @@ import { defaultColumnsNumber } from './shared';
 import saveV1 from './save-v1';
 
 export default function save( { attributes } ) {
-	console.log( 'save me!', attributes );
 	if ( attributes?.ids?.length > 0 ) {
 		return saveV1( { attributes } );
 	}

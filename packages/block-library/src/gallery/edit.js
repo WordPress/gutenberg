@@ -84,7 +84,6 @@ function GalleryEdit( props ) {
 	} = props;
 
 	if ( attributes?.ids?.length > 0 ) {
-		console.log( 'here' );
 		return <GalleryEditV1 { ...props } />;
 	}
 

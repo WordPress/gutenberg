@@ -13,7 +13,6 @@ import {
 } from './constants';
 
 export default function saveV1( { attributes } ) {
-	console.log( 'did I get here?' );
 	const {
 		images,
 		columns = 3, // defaultColumnsNumber( attributes ),

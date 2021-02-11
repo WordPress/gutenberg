@@ -42,7 +42,7 @@ import { View } from '@wordpress/primitives';
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
-import Gallery from './gallery';
+import Gallery from './gallery-v1';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
