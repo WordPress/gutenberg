@@ -8,7 +8,7 @@ import { clamp } from 'lodash';
  * WordPress dependencies
  */
 import { HorizontalRule, ResizableBox } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
 import { View } from '@wordpress/primitives';
 
@@ -16,67 +16,33 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SeparatorSettings from './separator-settings';
-import { getHeightConstraints } from './shared';
+import { HEIGHT_CONSTRAINTS } from './shared';
 
 function SeparatorEdit( props ) {
 	const { attributes, setAttributes, color, setColor, isSelected } = props;
 	const { height, heightUnit } = attributes;
 	const [ isResizing, setIsResizing ] = useState( false );
 
-	const hasDotsStyle = attributes.className?.indexOf( 'is-style-dots' ) >= 0;
-	const minimumHeightScale = hasDotsStyle ? 1.5 : 1;
-	const heightConstraints = getHeightConstraints( minimumHeightScale );
-	const currentMinHeight = heightConstraints[ heightUnit ].min;
-	const currentMaxHeight = heightConstraints[ heightUnit ].max;
+	const currentMinHeight = HEIGHT_CONSTRAINTS[ heightUnit ].min;
+	const currentMaxHeight = HEIGHT_CONSTRAINTS[ heightUnit ].max;
 
-	useEffect( () => {
-		if ( height && height < currentMinHeight ) {
-			setAttributes( { height: currentMinHeight } );
-		}
-	}, [ hasDotsStyle ] ); // Only restricting on dots style as min/max enforced on change otherwise.
-
-	const onResizeStart = () => {
-		setIsResizing( true );
-	};
-
-	// Change handler for sidebar height control only.
-	const updateHeight = ( value ) => {
-		setAttributes( {
-			height: clamp(
-				parseFloat( value ), // Rounding or parsing as integer here isn't ideal for em and rem units.
-				currentMinHeight,
-				currentMaxHeight
-			),
-			heightUnit,
-		} );
-	};
-
-	const updateHeightUnit = ( value ) => {
-		setAttributes( {
-			height: heightConstraints[ value ].default,
-			heightUnit: value,
-		} );
-	};
-
-	// ResizableBox callback to set height and force pixel units.
-	const onResizeStop = ( _event, _direction, elt ) => {
+	// Resize handler for when user is drag resizing block via ResizableBlock.
+	const onResize = ( _event, _direction, elt ) => {
 		setAttributes( {
 			height: clamp(
 				parseInt( elt.clientHeight, 10 ),
-				heightConstraints.px.min,
-				heightConstraints.px.max
+				HEIGHT_CONSTRAINTS.px.min,
+				HEIGHT_CONSTRAINTS.px.max
 			),
 			heightUnit: 'px',
 		} );
-		setIsResizing( false );
 	};
 
 	const cssHeight = `${ height }${ heightUnit }`;
 	const blockProps = useBlockProps();
-	const wrapperClasses = blockProps.className?.replace(
-		'wp-block-separator',
-		'wp-block-separator__wrapper'
-	);
+	const margin = height
+		? `${ height / 2 }${ heightUnit }`
+		: `${ currentMinHeight / 2 }${ heightUnit }`;
 
 	// The block's className and styles are moved to the inner <hr> to retain
 	// the different styling approaches between themes. The use of bottom
@@ -87,7 +53,10 @@ function SeparatorEdit( props ) {
 		<>
 			<View
 				{ ...blockProps }
-				className={ wrapperClasses }
+				className={ blockProps.className?.replace(
+					'wp-block-separator',
+					'wp-block-separator__wrapper'
+				) }
 				style={ { height: height ? cssHeight : currentMinHeight } }
 			>
 				<HorizontalRule
@@ -98,6 +67,8 @@ function SeparatorEdit( props ) {
 					style={ {
 						backgroundColor: color.color,
 						color: color.color,
+						marginTop: margin,
+						marginBottom: margin,
 					} }
 				/>
 				<ResizableBox
@@ -121,9 +92,13 @@ function SeparatorEdit( props ) {
 						bottomLeft: false,
 						topLeft: false,
 					} }
-					minHeight={ heightConstraints.px.min }
-					onResizeStart={ onResizeStart }
-					onResizeStop={ onResizeStop }
+					minHeight={ HEIGHT_CONSTRAINTS.px.min }
+					onResizeStart={ () => setIsResizing( true ) }
+					onResize={ onResize }
+					onResizeStop={ ( ...args ) => {
+						onResize( ...args );
+						setIsResizing( false );
+					} }
 					showHandle={ isSelected }
 					__experimentalShowTooltip={ true }
 					__experimentalTooltipProps={ {
@@ -140,8 +115,7 @@ function SeparatorEdit( props ) {
 				maxHeight={ currentMaxHeight }
 				height={ height }
 				heightUnit={ heightUnit }
-				updateHeight={ updateHeight }
-				updateHeightUnit={ updateHeightUnit }
+				setAttributes={ setAttributes }
 			/>
 		</>
 	);

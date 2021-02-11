@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { clamp } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,19 +16,26 @@ import {
 /**
  * Internal dependencies
  */
-import { HEIGHT_CSS_UNITS } from './shared';
+import { HEIGHT_CONSTRAINTS, HEIGHT_CSS_UNITS } from './shared';
 
 const SeparatorSettings = ( props ) => {
-	const {
-		color,
-		setColor,
-		height,
-		heightUnit,
-		minHeight,
-		maxHeight,
-		updateHeight,
-		updateHeightUnit,
-	} = props;
+	const { color, setColor, height, heightUnit, setAttributes } = props;
+	const minHeight = HEIGHT_CONSTRAINTS[ heightUnit ].min;
+	const maxHeight = HEIGHT_CONSTRAINTS[ heightUnit ].max;
+
+	const updateHeight = ( value ) => {
+		setAttributes( {
+			height: clamp( parseFloat( value ), minHeight, maxHeight ),
+			heightUnit,
+		} );
+	};
+
+	const updateHeightUnit = ( value ) => {
+		setAttributes( {
+			height: HEIGHT_CONSTRAINTS[ value ].default,
+			heightUnit: value,
+		} );
+	};
 
 	return (
 		<InspectorControls>
