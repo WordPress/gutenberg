@@ -202,8 +202,8 @@ function gutenberg_inject_skip_link() {
 	// Get the selectors.
 	$selectors = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_link_selectors();
 
-	// Early exit if we don't have anything to check.
-	if ( ! $template_html ) {
+	// Sanity check.
+	if ( ! $selectors || ! $template_html ) {
 		return;
 	}
 
