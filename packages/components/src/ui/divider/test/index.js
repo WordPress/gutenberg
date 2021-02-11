@@ -7,7 +7,7 @@ import { ui } from '@wp-g2/styles';
 /**
  * Internal dependencies
  */
-import Divider from '../index';
+import { Divider } from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

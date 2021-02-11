@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import Divider from '../index';
+import { Divider } from '../index';
 
 export default {
 	component: Divider,
