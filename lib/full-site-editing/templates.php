@@ -219,7 +219,7 @@ function gutenberg_inject_skip_link() {
 		if ( 0 === strpos( $selector, '#' ) ) {
 			$selector_no_hash = str_replace( '#', '', $selector );
 			if ( strpos( $template_html, 'id="' . $selector_no_hash . '"' ) || strpos( $template_html, "id='$selector_no_hash'" ) ) {
-				echo '<a class="skip-link screen-reader-text" href="' . $selector . '">' . esc_html__( 'Skip to content', 'gutenberg' ) . '</a>';
+				echo '<a class="skip-link screen-reader-text" href="' . esc_attr( $selector ) . '">' . esc_html__( 'Skip to content', 'gutenberg' ) . '</a>';
 				return;
 			}
 		}
@@ -233,7 +233,7 @@ function gutenberg_inject_skip_link() {
 			?>
 			<script>
 			( function() {
-				var searchEl = [ '<?php echo implode( "','", $selectors ); ?>' ], contentEl, contentElID, parentEl, skipLink, i;
+				var searchEl = [ '<?php echo esc_attr( implode( "','", $selectors ) ); ?>' ], contentEl, contentElID, parentEl, skipLink, i;
 
 				// Find the content element.
 				for ( i = 0; i < searchEl.length; i++ ) {
