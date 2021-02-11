@@ -31,28 +31,28 @@ export function JustifyToolbar( {
 			icon: justifyLeft,
 			title: __( 'Justify items left' ),
 			isActive: 'left' === value,
-			onClick: onChange( 'left' ),
+			onClick: () => onChange( 'left' ),
 		},
 		{
 			name: 'center',
 			icon: justifyCenter,
 			title: __( 'Justify items center' ),
 			isActive: 'center' === value,
-			onClick: onChange( 'center' ),
+			onClick: () => onChange( 'center' ),
 		},
 		{
 			name: 'right',
 			icon: justifyRight,
 			title: __( 'Justify items right' ),
 			isActive: 'right' === value,
-			onClick: onChange( 'right' ),
+			onClick: () => onChange( 'right' ),
 		},
 		{
 			name: 'space-between',
 			icon: justifySpaceBetween,
 			title: __( 'Space between items' ),
 			isActive: 'space-between' === value,
-			onClick: onChange( 'space-between' ),
+			onClick: () => onChange( 'space-between' ),
 		},
 	];
 
