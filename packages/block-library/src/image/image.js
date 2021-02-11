@@ -96,6 +96,7 @@ export default function Image( {
 		allowResize = true,
 		linkTo: parentLinkDestination,
 		sizeSlug: parentSizeSlug,
+		isGrouped,
 	} = context;
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
@@ -361,7 +362,7 @@ export default function Image( {
 						onError={ onUploadError }
 					/>
 				) }
-				{ ! multiImageSelection && coverBlockExists && (
+				{ ! isGrouped && ! multiImageSelection && coverBlockExists && (
 					<ToolbarGroup>
 						<ToolbarButton
 							icon={ textColor }
