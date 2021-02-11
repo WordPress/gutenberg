@@ -317,6 +317,11 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void setFeaturedImage(int mediaId) {
+                mOnMediaLibraryButtonListener.onSetFeaturedImageButtonClicked(mediaId);
+            }
+
+            @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
                 mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames.toArrayList());
                 mDeferredEventEmitter.setEmitter(mRnReactNativeGutenbergBridgePackage

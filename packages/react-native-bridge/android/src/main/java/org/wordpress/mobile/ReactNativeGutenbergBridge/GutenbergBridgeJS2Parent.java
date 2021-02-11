@@ -140,6 +140,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestImageUploadCancel(int mediaId);
 
+    void setFeaturedImage(int mediaId);
+
     void editorDidEmitLog(String message, LogLevel logLevel);
 
     void editorDidAutosave();
