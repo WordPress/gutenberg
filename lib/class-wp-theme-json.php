@@ -739,10 +739,12 @@ class WP_Theme_JSON {
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles       Styles to process.
 	 * @param array $supports     Supports information for this block.
+	 *
+	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( &$declarations, $styles, $supports ) {
+	private static function compute_style_properties( $declarations, $styles, $supports ) {
 		if ( empty( $styles ) ) {
-			return;
+			return $declarations;
 		}
 
 		$properties = array();
@@ -779,6 +781,8 @@ class WP_Theme_JSON {
 				);
 			}
 		}
+
+		return $declarations;
 	}
 
 	/**
@@ -1005,7 +1009,7 @@ class WP_Theme_JSON {
 
 			$declarations = array();
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				self::compute_style_properties(
+				$declarations = self::compute_style_properties(
 					$declarations,
 					$this->theme_json['styles'][ $block_selector ],
 					$supports
@@ -1139,8 +1143,7 @@ class WP_Theme_JSON {
 
 			// Style escaping.
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = array();
-				self::compute_style_properties( $declarations, $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
+				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
 				foreach ( $declarations as $declaration ) {
 					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
 					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
