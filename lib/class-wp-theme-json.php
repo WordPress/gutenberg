@@ -847,6 +847,7 @@ class WP_Theme_JSON {
 				);
 			}
 		}
+
 		return $declarations;
 	}
 
@@ -876,6 +877,7 @@ class WP_Theme_JSON {
 				'value' => $value,
 			);
 		}
+
 		return $declarations;
 	}
 
