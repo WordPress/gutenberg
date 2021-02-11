@@ -1363,6 +1363,7 @@ export function initialPosition( state, action ) {
 		'MARK_AUTOMATIC_CHANGE_FINAL',
 		'SHOW_INSERTION_POINT',
 		'HIDE_INSERTION_POINT',
+		'UPDATE_BLOCK_LIST_SETTINGS',
 	];
 
 	if (

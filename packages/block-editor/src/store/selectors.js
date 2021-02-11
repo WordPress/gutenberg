@@ -699,7 +699,7 @@ export function getNextBlockClientId( state, startClientId ) {
  * @return {?Object} Selected block.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
-	return state.initialPosition;
+	return state.initialPosition === undefined ? null : state.initialPosition;
 }
 
 /**
