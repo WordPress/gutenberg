@@ -89,6 +89,9 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+		supports: {
+			align: true,
+		},
 		save( { attributes } ) {
 			const {
 				backgroundType,
@@ -219,6 +222,9 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+		supports: {
+			align: true,
+		},
 		save( { attributes } ) {
 			const {
 				backgroundType,
@@ -321,6 +327,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
