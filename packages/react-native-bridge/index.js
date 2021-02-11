@@ -271,8 +271,12 @@ export function requestMediaEditor( mediaUrl, callback ) {
 	);
 }
 
-export function fetchRequest( path ) {
-	return RNReactNativeGutenbergBridge.fetchRequest( path );
+export function fetchGetRequest( path ) {
+	return RNReactNativeGutenbergBridge.fetchGetRequest( path );
+}
+
+export function fetchPostRequest( path, data ) {
+	return RNReactNativeGutenbergBridge.fetchPostRequest( path, data );
 }
 
 export function logUserEvent( event, properties ) {
