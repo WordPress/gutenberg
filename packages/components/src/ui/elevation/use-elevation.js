@@ -87,8 +87,8 @@ export function useElevation( props ) {
 			styles.Elevation,
 			sx.Base,
 			sx.hover && sx.hover,
-			sx.active && sx.active,
 			sx.focus && sx.focus,
+			sx.active && sx.active,
 			className
 		);
 	}, [
