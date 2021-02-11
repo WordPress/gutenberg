@@ -199,6 +199,14 @@ add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
 function gutenberg_inject_skip_link() {
 	global $template_html;
 
+	// Add the skip-link styles if needed.
+	if ( WP_Theme_JSON_Resolver::get_theme_data()->should_add_skip_link_styles() ) {
+		echo '<style id="skip-link-styles">';
+		echo '.skip-link.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute !important;width:1px;word-wrap:normal !important;}';
+		echo '.skip-link.screen-reader-text:focus{background-color:#eee;clip:auto !important;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000;}';
+		echo '</style>';
+	}
+
 	// Get the selectors.
 	$selectors = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_link_selectors();
 

@@ -168,6 +168,8 @@ class WP_Theme_JSON {
 		),
 		'skipLink'        => array(
 			'target' => null,
+			'auto'   => null,
+			'css'    => null,
 		),
 	);
 
@@ -1098,6 +1100,16 @@ class WP_Theme_JSON {
 
 		return array_unique( array_merge( $selectors, $fallbacks ) );
 	}
+
+	/**
+	 * Whether the skip-link styles should be automatically added or not.
+	 *
+	 * @return string
+	 */
+	public function should_add_skip_link_styles() {
+		return isset( $this->theme_json['skipLink']['css'] ) && $this->theme_json['skipLink']['css'];
+	}
+
 
 	/**
 	 * Returns the stylesheet that results of processing
