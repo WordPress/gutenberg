@@ -10,6 +10,7 @@ import {
 	DropZoneProvider,
 	Popover,
 	SlotFillProvider,
+	Spinner,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import {
@@ -83,10 +84,10 @@ export default function Layout( { blockEditorSettings } ) {
 							navigationPost={ navigationPost }
 						/>
 
-						{ ! hasMenus && (
-							<EmptyState
-								isPending={ ! hasFinishedInitialLoad }
-							/>
+						{ ! hasFinishedInitialLoad && <Spinner /> }
+
+						{ hasFinishedInitialLoad && ! hasMenus && (
+							<EmptyState />
 						) }
 
 						{ isBlockEditorReady && (

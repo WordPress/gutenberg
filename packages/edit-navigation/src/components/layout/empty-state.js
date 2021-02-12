@@ -1,24 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { Card, CardBody, Spinner } from '@wordpress/components';
+import { Card, CardBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import AddMenu from '../add-menu';
 
-export default function EmptyState( { isPending } ) {
+export default function EmptyState() {
 	return (
-		<div className="edit-navigation-empty-state">
-			{ isPending && <Spinner /> }
-			{ ! isPending && (
-				<Card className="edit-navigation-empty-state__card">
-					<CardBody>
-						<AddMenu />
-					</CardBody>
-				</Card>
-			) }
-		</div>
+		<Card className="edit-navigation-empty-state">
+			<CardBody>
+				<AddMenu />
+			</CardBody>
+		</Card>
 	);
 }
