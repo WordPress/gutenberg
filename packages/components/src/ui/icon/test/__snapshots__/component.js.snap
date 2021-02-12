@@ -1,0 +1,96 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-family: var(--wp-g2-font-family);
+  font-size: 13px;
+  font-size: var(--wp-g2-font-size);
+  font-weight: normal;
+  font-weight: var(--wp-g2-font-weight);
+  margin: 0;
+  display: block;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  color: currentColor;
+  fill: currentColor;
+  height: 20px;
+  width: 20px;
+}
+
+@media (prefers-reduced-motion) {
+  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}
+
+[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 svg {
+  display: block;
+}
+
+<div
+  class="components-icon wp-components-icon emotion-0"
+  data-g2-c16t="true"
+  data-g2-component="Icon"
+>
+  <svg />
+</div>
+`;
+
+exports[`props should render fill 1`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+- Snapshot Diff:
+- - First value
+- + Second value
+-
+- @@ -7,11 +7,11 @@
+-   	\\"margin-top\\": \\"0px\\",
+-   	\\"margin-right\\": \\"0px\\",
+-   	\\"margin-bottom\\": \\"0px\\",
+-   	\\"margin-left\\": \\"0px\\",
+-   	\\"user-select\\": \\"none\\",
+- - 	\\"color\\": \\"red\\",
+- + 	\\"color\\": \\"currentColor\\",
+-   	\\"fill\\": \\"currentColor\\",
+-   	\\"height\\": \\"20px\\",
+-   	\\"width\\": \\"20px\\",
+-   	\\"visibility\\": \\"visible\\"
+-   }"
+`;
+
+exports[`props should render size 1`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+- Snapshot Diff:
+- - First value
+- + Second value
+-
+- @@ -9,9 +9,9 @@
+-   	\\"margin-bottom\\": \\"0px\\",
+-   	\\"margin-left\\": \\"0px\\",
+-   	\\"user-select\\": \\"none\\",
+-   	\\"color\\": \\"currentColor\\",
+-   	\\"fill\\": \\"currentColor\\",
+- - 	\\"height\\": \\"31px\\",
+- - 	\\"width\\": \\"31px\\",
+- + 	\\"height\\": \\"20px\\",
+- + 	\\"width\\": \\"20px\\",
+-   	\\"visibility\\": \\"visible\\"
+-   }"
+`;
