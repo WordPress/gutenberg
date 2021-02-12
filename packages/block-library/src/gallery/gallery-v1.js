@@ -15,7 +15,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
-import { defaultColumnsNumber } from './shared';
+import { defaultColumnsNumberV1 } from './deprecated';
 
 export const Gallery = ( props ) => {
 	const {
@@ -37,7 +37,7 @@ export const Gallery = ( props ) => {
 
 	const {
 		align,
-		columns = defaultColumnsNumber( attributes ),
+		columns = defaultColumnsNumberV1( attributes ),
 		caption,
 		imageCrop,
 		images,

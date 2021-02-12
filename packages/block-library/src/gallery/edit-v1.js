@@ -41,7 +41,8 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { sharedIcon } from './shared-icon';
-import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import { pickRelevantMediaFiles } from './shared';
+import { defaultColumnsNumberV1 } from './deprecated';
 import Gallery from './gallery-v1';
 import {
 	LINK_DESTINATION_ATTACHMENT,
@@ -81,7 +82,7 @@ export function GalleryEditV1( props ) {
 		onFocus,
 	} = props;
 	const {
-		columns = defaultColumnsNumber( attributes ),
+		columns = defaultColumnsNumberV1( attributes ),
 		imageCrop,
 		images,
 		linkTo,

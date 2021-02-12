@@ -6,7 +6,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { defaultColumnsNumber } from './shared';
+import { defaultColumnsNumberV1 } from './deprecated';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -15,7 +15,7 @@ import {
 export default function saveV1( { attributes } ) {
 	const {
 		images,
-		columns = 3, // defaultColumnsNumber( attributes ),
+		columns = defaultColumnsNumberV1( attributes ),
 		imageCrop,
 		caption,
 		linkTo,

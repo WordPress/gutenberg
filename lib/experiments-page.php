@@ -62,6 +62,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-widgets-in-customizer',
 		)
 	);
+	add_settings_field(
+		'gutenberg-gallery-refactor',
+		__( 'Gallery Refactor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable the refactored gallery block', 'gutenberg' ),
+			'id'    => 'gutenberg-gallery-refactor',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
