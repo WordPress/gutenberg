@@ -2,13 +2,8 @@
  * External dependencies
  */
 import { hasNamespace, useContextSystem } from '@wp-g2/context';
-import { css, cx, ui } from '@wp-g2/styles';
+import { ui } from '@wp-g2/styles';
 import { getValidChildren } from '@wp-g2/utils';
-
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,7 +19,6 @@ export function useHStack( props ) {
 	const {
 		alignment = 'edge',
 		children,
-		className,
 		direction,
 		spacing = 2,
 		...otherProps
@@ -54,17 +48,7 @@ export function useHStack( props ) {
 		}
 	);
 
-	const classes = useMemo( () => {
-		return cx(
-			css( {
-				[ ui.createToken( 'HStackSpacing' ) ]: ui.space( spacing ),
-			} ),
-			className
-		);
-	}, [ className, spacing ] );
-
 	const propsForFlex = {
-		className: classes,
 		children: clonedChildren,
 		direction,
 		justify: 'center',

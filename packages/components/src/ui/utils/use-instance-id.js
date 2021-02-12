@@ -1,4 +1,8 @@
 /**
+ * Duplicated from @wordpress/compose to enable TypeScript support for ui/* files.
+ */
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -25,10 +29,10 @@ function createId( object ) {
  *
  * @param {Object} object Object reference to create an id for.
  * @param {string} prefix Prefix for the unique id.
- * @param {string} preferredId Default ID to use.
+ * @param {string | number} [preferredId=''] Default ID to use.
  * @return {string | number} The unique instance id.
  */
-export default function useInstanceId( object, prefix, preferredId = '' ) {
+export function useInstanceId( object, prefix, preferredId = '' ) {
 	return useMemo( () => {
 		if ( preferredId ) return preferredId;
 		const id = createId( object );

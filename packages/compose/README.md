@@ -253,6 +253,11 @@ _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
 -   _prefix_ `string`: Prefix for the unique id.
+-   _preferredId_ `string`: Default ID to use.
+
+_Returns_
+
+-   `(string|number)`: The unique instance id.
 
 <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
 

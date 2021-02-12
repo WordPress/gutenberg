@@ -1,5 +1,7 @@
+export * from './control-label';
 export * from './elevation';
 export * from './flex';
+export * from './form-group';
 export * from './grid';
 export * from './h-stack';
 export * from './text';
