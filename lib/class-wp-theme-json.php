@@ -104,6 +104,7 @@ class WP_Theme_JSON {
 	 */
 	const SCHEMA = array(
 		'customTemplates' => null,
+		'templateParts'   => null,
 		'styles'          => array(
 			'border'     => array(
 				'radius' => null,
@@ -338,7 +339,7 @@ class WP_Theme_JSON {
 		// Remove top-level keys that aren't present in the schema.
 		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
 
-		$block_metadata = $this->get_blocks_metadata();
+		$block_metadata = self::get_blocks_metadata();
 		foreach ( array( 'settings', 'styles' ) as $subtree ) {
 			// Remove settings & styles subtrees if they aren't arrays.
 			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
@@ -934,7 +935,7 @@ class WP_Theme_JSON {
 			return $stylesheet;
 		}
 
-		$metadata = $this->get_blocks_metadata();
+		$metadata = self::get_blocks_metadata();
 		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
 			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
 				continue;
@@ -994,7 +995,7 @@ class WP_Theme_JSON {
 			return $stylesheet;
 		}
 
-		$metadata = $this->get_blocks_metadata();
+		$metadata = self::get_blocks_metadata();
 		foreach ( $metadata as $block_selector => $metadata ) {
 			if ( empty( $metadata['selector'] ) ) {
 				continue;
@@ -1066,6 +1067,18 @@ class WP_Theme_JSON {
 		} else {
 			return $this->theme_json['customTemplates'];
 		}
+	}
+
+	/**
+	 * Returns the template part data of current theme.
+	 *
+	 * @return array
+	 */
+	public function get_template_parts() {
+		if ( ! isset( $this->theme_json['templateParts'] ) ) {
+			return array();
+		}
+		return $this->theme_json['templateParts'];
 	}
 
 	/**

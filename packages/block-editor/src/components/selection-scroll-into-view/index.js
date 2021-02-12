@@ -16,26 +16,11 @@ import { getScrollContainer } from '@wordpress/dom';
 import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
-export function useScrollMultiSelectionIntoView( ref ) {
-	const selectionEnd = useSelect( ( select ) => {
-		const {
-			getBlockSelectionEnd,
-			hasMultiSelection,
-			isMultiSelecting,
-		} = select( blockEditorStore );
-
-		const blockSelectionEnd = getBlockSelectionEnd();
-
-		if (
-			! blockSelectionEnd ||
-			isMultiSelecting() ||
-			! hasMultiSelection()
-		) {
-			return;
-		}
-
-		return blockSelectionEnd;
-	}, [] );
+export function useScrollSelectionIntoView( ref ) {
+	const selectionEnd = useSelect(
+		( select ) => select( blockEditorStore ).getBlockSelectionEnd(),
+		[]
+	);
 
 	useEffect( () => {
 		if ( ! selectionEnd ) {
@@ -67,8 +52,8 @@ export function useScrollMultiSelectionIntoView( ref ) {
  * Scrolls the multi block selection end into view if not in view already. This
  * is important to do after selection by keyboard.
  */
-export default function MultiSelectScrollIntoView() {
+export function MultiSelectScrollIntoView() {
 	const ref = useRef();
-	useScrollMultiSelectionIntoView( ref );
+	useScrollSelectionIntoView( ref );
 	return <div ref={ ref } />;
 }

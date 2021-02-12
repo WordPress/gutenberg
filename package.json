@@ -67,6 +67,7 @@
 		"@wordpress/plugins": "file:packages/plugins",
 		"@wordpress/primitives": "file:packages/primitives",
 		"@wordpress/priority-queue": "file:packages/priority-queue",
+		"@wordpress/react-i18n": "file:packages/react-i18n",
 		"@wordpress/react-native-aztec": "file:packages/react-native-aztec",
 		"@wordpress/react-native-bridge": "file:packages/react-native-bridge",
 		"@wordpress/react-native-editor": "file:packages/react-native-editor",

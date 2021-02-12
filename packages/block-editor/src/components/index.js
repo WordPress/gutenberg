@@ -101,10 +101,7 @@ export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
 export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
-export {
-	default as MultiSelectScrollIntoView,
-	useScrollMultiSelectionIntoView as __unstableUseScrollMultiSelectionIntoView,
-} from './multi-select-scroll-into-view';
+export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
 export {
 	default as ObserveTyping,
