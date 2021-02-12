@@ -118,16 +118,19 @@ class WP_Theme_JSON_Resolver {
 	private static function extract_paths_to_translate( $i18n_partial, $current_path = array() ) {
 		$result = array();
 		foreach ( $i18n_partial as $property => $partial_child ) {
-			if ( is_numeric( $property ) ) {
-				foreach ( $partial_child as $key => $context ) {
-					return array(
-						array(
-							'path'    => $current_path,
-							'key'     => $key,
-							'context' => $context,
-						),
-					);
-				}
+			if (
+				is_array( $partial_child ) &&
+				array_key_exists( 'key', $partial_child ) &&
+				array_key_exists( 'context', $partial_child )
+			) {
+				$last_key = is_numeric( $property ) ? '*' : $property;
+				return array(
+					array(
+						'path'    => array_merge( $current_path, [ $last_key ] ),
+						'key'     => $partial_child['key'],
+						'context' => $partial_child['context'],
+					),
+				);
 			}
 			$result = array_merge(
 				$result,

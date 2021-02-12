@@ -2,20 +2,23 @@
 	"settings": {
 		"*": {
 			"typography": {
-				"fontSizes": [ { "name": "Font size name" } ],
-				"fontStyles": [ { "name": "Font style name" } ],
-				"fontWeights": [ { "name": "Font weight name" } ],
-				"fontFamilies": [ { "name": "Font family name" } ],
-				"textTransforms": [ { "name": "Text transform name" } ],
-				"textDecorations": [ { "name": "Text decoration name" } ]
+				"fontSizes": [ { "key": "name", "context": "Font size name" } ],
+				"fontStyles": [ { "key": "name", "context": "Font style name" } ],
+				"fontWeights": [ { "key": "name", "context": "Font weight name" } ],
+				"fontFamilies": [ { "key": "name", "context": "Font family name" } ],
+				"textTransforms": [ { "key": "name", "context": "Text transform name" } ],
+				"textDecorations": [ { "key": "name", "context": "Text decoration name" } ]
 			},
 			"color": {
-				"palette": [ { "name": "Color name" } ],
-				"gradients": [ { "name": "Gradient name" } ]
+				"palette": [ { "key": "name", "context": "Color name" } ],
+				"gradients": [ { "key": "name", "context": "Gradient name" } ]
 			}
 		}
 	},
 	"customTemplates": {
-		"*": [ { "title": "Title of the custom template" } ]
+		"*": {
+			"key": "title",
+			"context": "Title of the custom template"
+		}
 	}
 }
