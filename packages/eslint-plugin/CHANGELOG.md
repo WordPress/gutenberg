@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- Prepare and lint rules for TypeScript. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+- Add support and configuration for TypeScript files. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
 
 ### New Features
 
