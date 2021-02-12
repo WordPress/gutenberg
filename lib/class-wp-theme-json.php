@@ -166,8 +166,8 @@ class WP_Theme_JSON {
 			),
 			'custom'     => null,
 		),
-		'skipLink'        => array(
-			'target' => null,
+		'skipLinks'       => array(
+			'links'  => null,
 			'auto'   => null,
 			'css'    => null,
 		),
@@ -1073,16 +1073,13 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Return the skip-link selectors of the current theme.
+	 * Return an array of skip-links.
 	 *
 	 * @return array
 	 */
-	public function get_skip_link_selectors() {
-		if ( isset( $this->theme_json['skipLink']['auto'] ) && false === $this->theme_json['skipLink']['auto'] ) {
-			return;
-		}
+	public function get_skip_links() {
 
-		$fallbacks = array(
+		$fallback_elements = array(
 			'#skip-link-target',
 			'main',
 			'.wp-block-post-title',
@@ -1093,12 +1090,33 @@ class WP_Theme_JSON {
 			'h2',
 		);
 
-		$selectors = array();
-		if ( isset( $this->theme_json['skipLink']['target'] ) ) {
-			$selectors = (array) $this->theme_json['skipLink']['target'];
+		// If we don't have "skipLinks" defined return the defaults.
+		if ( ! isset( $this->theme_json['skipLinks'] ) ) {
+			return array(
+				array(
+					'target'       => $fallback_elements,
+					'label'        => __( 'Skip to content', 'gutenberg' ),
+					'useFallbacks' => false,
+				),
+			);
 		}
 
-		return array_unique( array_merge( $selectors, $fallbacks ) );
+		if ( isset( $this->theme_json['skipLinks']['auto'] ) && false === $this->theme_json['skipLinks']['auto'] ) {
+			return;
+		}
+
+		$links = array();
+		foreach ( $this->theme_json['skipLinks']['links'] as $link ) {
+			$selectors = isset( $link['target'] ) ? (array) $link['target'] : array();
+			if ( ! isset( $link['useFallbacks'] ) || $link['useFallbacks'] ) {
+				$selectors = array_unique( array_merge( $selectors, $fallback_elements ) );
+			}
+			$links[] = array(
+				'target' => array_values( $selectors ), // Use array_values to ensure there are no skipped keys in the array.
+				'label'  => isset( $link['label'] ) ? $link['label'] : __( 'Skip to content', 'gutenberg' ),
+			);
+		}
+		return $links;
 	}
 
 	/**

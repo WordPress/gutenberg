@@ -197,7 +197,9 @@ add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
  * Inject the skip-link.
  */
 function gutenberg_inject_skip_link() {
-	global $template_html;
+	global $template_html, $skip_links_via_script;
+
+	$skip_links_via_script = array();
 
 	// Add the skip-link styles if needed.
 	if ( WP_Theme_JSON_Resolver::get_theme_data()->should_add_skip_link_styles() ) {
@@ -207,28 +209,40 @@ function gutenberg_inject_skip_link() {
 		echo '</style>';
 	}
 
-	// Get the selectors.
-	$selectors = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_link_selectors();
+	// Get the array of skip-links.
+	$links = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_links();
 
 	// Sanity check.
-	if ( ! $selectors || ! $template_html ) {
+	if ( empty( $links ) || ! $template_html ) {
 		return;
 	}
 
-	// Try to find the selector in $template_html and print the skip-link.
-	foreach ( $selectors as $selector ) {
-		if ( 0 === strpos( $selector, '#' ) ) {
-			$selector_no_hash = str_replace( '#', '', $selector );
-			if ( strpos( $template_html, 'id="' . $selector_no_hash . '"' ) || strpos( $template_html, "id='$selector_no_hash'" ) ) {
-				echo '<a class="skip-link screen-reader-text" href="' . esc_attr( $selector ) . '">' . esc_html__( 'Skip to content', 'gutenberg' ) . '</a>';
-				return;
+	// Loop links.
+	foreach ( $links as $link ) {
+		$element_found = false;
+		// Try to find the selector in $template_html and print the skip-link.
+		foreach ( $link['target'] as $selector ) {
+			if ( 0 === strpos( $selector, '#' ) ) {
+				$selector_no_hash = str_replace( '#', '', $selector );
+				if ( strpos( $template_html, 'id="' . $selector_no_hash . '"' ) || strpos( $template_html, "id='$selector_no_hash'" ) ) {
+					echo '<a id="wp--skip-link--' . esc_attr( $selector_no_hash ) . '" class="skip-link screen-reader-text" href="' . esc_attr( $selector ) . '">' . esc_html( $link['label'] ) . '</a>';
+					$element_found = true;
+					break;
+				}
 			}
+		}
+
+		if ( ! $element_found ) {
+			// Add the skip-link to the $skip_links_via_script global.
+			$skip_links_via_script[] = $link;
 		}
 	}
 
-	// If we got this far, an element with the appropriate target ID was not located.
-	// Add a script to auto-generate the target and link based on the content we have.
-	add_action( 'wp_footer', 'gutenberg_the_skip_link_script' );
+	if ( ! empty( $skip_links_via_script ) ) {
+		// An element with the appropriate target ID was not located.
+		// Add a script to auto-generate the target and link based on the content we have.
+		add_action( 'wp_footer', 'gutenberg_the_skip_link_script' );
+	}
 }
 add_action( 'wp_body_open', 'gutenberg_inject_skip_link' );
 
@@ -239,52 +253,57 @@ add_action( 'wp_body_open', 'gutenberg_inject_skip_link' );
  */
 function gutenberg_the_skip_link_script() {
 
-	// Get the selectors.
-	$selectors = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_link_selectors();
+	// Get the links.
+	global $skip_links_via_script;
+
+	// Sanity check.
+	if ( empty( $skip_links_via_script ) ) {
+		return;
+	}
 	?>
 	<script>
 	( function() {
-		var searchEl = <?php echo wp_json_encode( array_values( $selectors ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>,
-			contentEl,
-			contentElID,
-			parentEl,
-			skipLink,
+		var links = <?php echo wp_json_encode( array_reverse( $skip_links_via_script ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>,
+			parentEl = document.querySelector( '.wp-site-blocks' ) || document.body,
+			generateLink = function( selectors, label, parent ) {
+				var contentEl, contentElID, skipLink, i;
+
+				// Find the content element.
+				for ( i = 0; i < selectors.length; i++ ) {
+					if ( ! contentEl ) {
+						contentEl = document.querySelector( selectors[ i ] );
+					}
+				}
+
+				// Early exit if no content element was found.
+				if ( ! contentEl ) {
+					return;
+				}
+
+				// Get the ID of the content element.
+				contentElID = contentEl.id;
+				if ( ! contentElID ) {
+					contentElID = 'auto-skip-link-target';
+					contentEl.id = contentElID;
+				}
+
+				// Create the skip link.
+				skipLink = document.createElement( 'a' );
+				skipLink.classList.add( 'skip-link' );
+				skipLink.classList.add( 'screen-reader-text' );
+				skipLink.href = '#' + contentElID;
+				skipLink.innerHTML = label;
+				skipLink.id = 'wp--skip-link--' + contentElID;
+
+				// Inject the skip link.
+				parent.insertAdjacentElement( 'afterbegin', skipLink );
+			},
 			i;
 
-		// Find the content element.
-		for ( i = 0; i < searchEl.length; i++ ) {
-			if ( ! contentEl ) {
-				contentEl = document.querySelector( searchEl[ i ] );
-			}
+		for ( i = 0; i < links.length; i++ ) {
+			generateLink( links[ i ]['target'], links[ i ]['label'], parentEl );
 		}
 
-		// Early exit if no content element was found.
-		if ( ! contentEl ) {
-			return;
-		}
-
-		// Get the ID of the content element.
-		contentElID = contentEl.id;
-		if ( ! contentElID ) {
-			contentElID = 'auto-skip-link-target';
-			contentEl.id = contentElID;
-		}
-
-		// Get the parent element. This is where we'll inject the skip-link.
-		parentEl = document.querySelector( '.wp-site-blocks' );
-		if ( ! parentEl ) {
-			parentEl = document.body;
-		}
-
-		// Create the skip link.
-		skipLink = document.createElement( 'a' );
-		skipLink.classList.add( 'skip-link' );
-		skipLink.classList.add( 'screen-reader-text' );
-		skipLink.href = '#' + contentElID;
-		skipLink.innerHTML = '<?php esc_html_e( 'Skip to content', 'gutenberg' ); ?>';
-
-		// Inject the skip link.
-		parentEl.insertAdjacentElement( 'afterbegin', skipLink );
 	}() );
 	</script>
 	<?php
