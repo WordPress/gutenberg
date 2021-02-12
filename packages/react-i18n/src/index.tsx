@@ -1,4 +1,11 @@
 /**
+ * External dependencies
+ */
+// Disable reason: Type-only import, this is fine. See https://github.com/typescript-eslint/typescript-eslint/issues/2661
+// eslint-disable-next-line no-restricted-imports
+import type { ComponentType, PropsWithChildren } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -8,9 +15,7 @@ import {
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
-import { defaultI18n } from '@wordpress/i18n';
-import type { I18n } from '@wordpress/i18n';
-import type { ComponentType, PropsWithChildren } from 'react';
+import { defaultI18n, I18n } from '@wordpress/i18n';
 import type { Subtract } from 'utility-types';
 
 interface I18nContextProps {
