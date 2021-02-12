@@ -49,7 +49,6 @@ function gutenberg_get_editor_styles() {
 		),
 	);
 
-	/* translators: Use this to specify the CSS font family for the default font. */
 	$locale_font_family = '-apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif';
 	$styles[]           = array(
 		'css' => "body { font-family: $locale_font_family }",
