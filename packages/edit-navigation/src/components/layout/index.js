@@ -60,7 +60,7 @@ export default function Layout( { blockEditorSettings } ) {
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = menus?.length;
-	const isBlockEditorReady = !! hasMenus && navigationPost;
+	const isBlockEditorReady = !! ( hasMenus && navigationPost );
 
 	return (
 		<ErrorBoundary>
