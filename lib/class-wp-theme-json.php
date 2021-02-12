@@ -415,9 +415,8 @@ class WP_Theme_JSON {
 
 	private static function translate( &$item, $key ) {
 		if ( is_string( $item ) && ( '_x(' === substr( $item, 0, 3 ) ) ) {
-			list( $name, $context ) = sscanf( $item, '_x( %s %s )' );
-			error_log( "item is $item - name is $name / context is $context" );
-			$item = translate_with_gettext_context( $name, $context, self::$domain );
+			list( $name, $context ) = explode( ',', str_replace( ')', '', str_replace( '_x(', '', $item ) ) );
+			$item = translate_with_gettext_context( trim( $name ), trim( $context ), self::$domain );
 		}
 	}
 

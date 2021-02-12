@@ -789,13 +789,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			array(
 				'customTemplates' => array(
 					'page-home' => array(
-						'title' => '_x( SomeTitle SomeContext )',
+						'title' => '_x( Some title, Some context )',
 					),
 				),
 			)
 		);
 
-		$expected = 'SomeTitle';
+		$expected = 'Some title';
 		$actual   = $theme_json->get_raw_data()['customTemplates']['page-home']['title'];
 
 		$this->assertEquals( $expected, $actual );
