@@ -44,7 +44,8 @@
 		position: relative;
 		white-space: nowrap;
 
-		&:hover {
+		&:hover,
+		&.is-hovered {
 			background: $gray-100;
 		}
 

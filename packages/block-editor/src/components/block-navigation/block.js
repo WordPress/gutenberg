@@ -133,6 +133,7 @@ export default function BlockNavigationBlock( {
 							ref={ ref }
 							tabIndex={ tabIndex }
 							onFocus={ onFocus }
+							highlightBlocksOnHover={ highlightBlocksOnHover }
 						/>
 					</div>
 				) }

@@ -103,7 +103,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index
 	);
 
-	const isHovered = useIsHovered( ref );
+	const isHovered = useIsHovered( ref, clientId );
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 

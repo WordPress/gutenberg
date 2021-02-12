@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,10 +15,11 @@ import { store as blockEditorStore } from '../../../store';
  * Returns true when the block is hovered and in navigation or outline mode, false if not.
  *
  * @param {RefObject} ref React ref with the block element.
+ * @param {string}    clientId Block client ID.
  *
  * @return {boolean} Hovered state.
  */
-export function useIsHovered( ref ) {
+export function useIsHovered( ref, clientId ) {
 	const [ isHovered, setHovered ] = useState( false );
 
 	const { isNavigationMode, isOutlineMode } = useSelect( ( select ) => {
@@ -33,6 +34,8 @@ export function useIsHovered( ref ) {
 		};
 	}, [] );
 
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+
 	function addHoverListener( eventType, value ) {
 		function listener( event ) {
 			if ( event.defaultPrevented ) {
@@ -41,6 +44,7 @@ export function useIsHovered( ref ) {
 
 			event.preventDefault();
 			setHovered( value );
+			toggleBlockHighlight( clientId, value );
 		}
 
 		ref.current.addEventListener( eventType, listener );
