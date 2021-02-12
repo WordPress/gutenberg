@@ -41,11 +41,11 @@ import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.text.ReactFontManager;
 import com.facebook.react.views.text.ReactTextUpdate;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
-import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.Constants;
 import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
@@ -677,7 +677,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
 
             if (mPreviousText.length() == 0
-                    && !TextUtils.isEmpty(newText)
+                    && !isTextEmpty(newText)
                     && !TextUtils.isEmpty(mEditText.getTagName())
                     && mEditText.getSelectedStyles().isEmpty()) {
 
@@ -689,6 +689,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                     mEditText.toggleFormatting(reactAztecTextFormat.getAztecTextFormat());
                 }
             }
+        }
+
+        // This accounts for the END_OF_BUFFER_MARKER that is added to blocks to maintain the styling, if the only char
+        // is the zero width marker then it is considered "empty"
+        private boolean isTextEmpty(String text) {
+            return text.length() == 0 || (text.length() == 1 && text.charAt(0) == Constants.INSTANCE.getEND_OF_BUFFER_MARKER());
         }
 
         @Override

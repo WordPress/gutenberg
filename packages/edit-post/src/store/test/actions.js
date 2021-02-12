@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { controls } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -95,9 +100,17 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates() ).toEqual( {
-				type: 'REQUEST_META_BOX_UPDATES',
+		it( 'should yield the REQUEST_META_BOX_UPDATES action', () => {
+			const fulfillment = requestMetaBoxUpdates();
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: {
+					type: 'REQUEST_META_BOX_UPDATES',
+				},
+			} );
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: controls.select( 'core/editor', 'getCurrentPost' ),
 			} );
 		} );
 	} );

@@ -15,21 +15,21 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockNavigationLeaf from './leaf';
-import DescenderLines from './descender-lines';
+import Indentation from './indentation';
 import Inserter from '../inserter';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockNavigationAppender( {
 	parentBlockClientId,
 	position,
 	level,
 	rowCount,
-	terminatedLevels,
 	path,
 } ) {
 	const isDragging = useSelect(
 		( select ) => {
 			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			return (
@@ -63,15 +63,10 @@ export default function BlockNavigationAppender( {
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-appender__container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
+						<Indentation level={ level } />
 						<Inserter
 							rootClientId={ parentBlockClientId }
 							__experimentalIsQuick
-							__experimentalSelectBlockOnInsert={ false }
 							aria-describedby={ descriptionId }
 							toggleProps={ { ref, tabIndex, onFocus } }
 						/>

@@ -29,7 +29,7 @@ export default function ColorPanel( {
 			return;
 		}
 
-		const colorsDetectionElement = getBlockDOMNode( clientId );
+		const colorsDetectionElement = getBlockDOMNode( clientId, document );
 		if ( ! colorsDetectionElement ) {
 			return;
 		}

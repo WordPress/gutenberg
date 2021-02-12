@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
-import './store';
 import './format';
 import './block';
+
+export { store } from './store';

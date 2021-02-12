@@ -4,13 +4,17 @@
 import { Button, Dropdown, SVG, Path } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { useCallback, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockNavigation from './';
+import { store as blockEditorStore } from '../../store';
 
 const MenuIcon = (
 	<SVG
@@ -40,7 +44,7 @@ function BlockNavigationDropdownToggle( {
 	);
 	const shortcut = useSelect(
 		( select ) =>
-			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
 				'core/edit-post/toggle-block-navigation'
 			),
 		[]
@@ -68,7 +72,7 @@ function BlockNavigationDropdown(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
 	);
 	const isEnabled = hasBlocks && ! isDisabled;

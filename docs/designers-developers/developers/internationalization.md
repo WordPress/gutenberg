@@ -24,10 +24,11 @@ function myguten_block_init() {
     wp_register_script(
         'myguten-script',
         plugins_url( 'block.js', __FILE__ ),
-        array( 'wp-blocks', 'wp-element', 'wp-i18n' )
+        array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor' )
     );
 
     register_block_type( 'myguten/simple', array(
+		'apiVersion' => 2,
         'editor_script' => 'myguten-script',
     ) );
 }
@@ -41,22 +42,28 @@ In your code, you can include the i18n functions. The most common function is **
 ```js
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'myguten/simple', {
+	apiVersion: 2,
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
 	edit: () => {
+		const blockProps = useBlockProps( { style: { color: 'red' } } );
+
 		return (
-			<p style="color:red">
+			<p {...blockProps}>
 				{ __( 'Hello World', 'myguten' ) }
 			</p>
 		);
 	},
 
 	save: () => {
+		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
+
 		return (
-			<p style="color:red">
+			<p {...blockProps}>
 				{ __( 'Hello World', 'myguten' ) }
 			</p>
 		);
@@ -68,23 +75,27 @@ registerBlockType( 'myguten/simple', {
 const { __ } = wp.i18n;
 const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
+const { useBlockProps } = wp.blockEditor;
 
 registerBlockType( 'myguten/simple', {
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
 	edit: function() {
+		const blockProps = useBlockProps( { style: { color: 'red' } } );
+		
 		return el(
 			'p',
-			{ style: { color: 'red' } },
+			blockProps,
 			__( 'Hello World', 'myguten' )
 		);
 	},
 
 	save: function() {
+		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
 		return el(
 			'p',
-			{ style: { color: 'red' } },
+			blockProps,
 			__( 'Hello World', 'myguten' )
 		);
 	},
@@ -259,3 +270,7 @@ Using `make-json` automatically names the file with the md5 hash, so it is ready
 You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
 With the language set, create a new post, add the block, and you will see the translations used.
+
+### Filtering Translations
+
+The outputs of the translation functions (`__()`, `_x()`, `_n()`, and `_nx()`) are filterable, see [i18n Filters](/docs/designers-developers/developers/filters/i18n-filters.md) for full information.

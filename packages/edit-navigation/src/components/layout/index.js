@@ -3,14 +3,17 @@
  */
 import {
 	DropZoneProvider,
-	FocusReturnProvider,
 	Popover,
 	SlotFillProvider,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockInspector,
+	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,17 +25,24 @@ import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
 import Header from '../header';
 import Notices from '../notices';
-import Toolbar from '../toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
+import { store as editNavigationStore } from '../../store';
 
 export default function Layout( { blockEditorSettings } ) {
+	const canvasRef = useRef();
+	useBlockSelectionClearer( canvasRef );
+
+	const { saveNavigationPost } = useDispatch( editNavigationStore );
+	const savePost = () => saveNavigationPost( navigationPost );
+
 	const {
 		menus,
 		selectedMenuId,
 		navigationPost,
 		selectMenu,
 		deleteMenu,
+		hasLoadedMenus,
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
@@ -45,47 +55,53 @@ export default function Layout( { blockEditorSettings } ) {
 		<ErrorBoundary>
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<FocusReturnProvider>
-						<BlockEditorKeyboardShortcuts.Register />
-						<NavigationEditorShortcuts.Register />
+					<BlockEditorKeyboardShortcuts.Register />
+					<NavigationEditorShortcuts.Register />
 
-						<Notices />
+					<Notices />
 
-						<div className="edit-navigation-layout">
-							<Header
-								isPending={ ! navigationPost }
-								menus={ menus }
-								selectedMenuId={ selectedMenuId }
-								onSelectMenu={ selectMenu }
+					<div className="edit-navigation-layout">
+						<Header
+							isPending={ ! hasLoadedMenus }
+							menus={ menus }
+							selectedMenuId={ selectedMenuId }
+							onSelectMenu={ selectMenu }
+							navigationPost={ navigationPost }
+						/>
+
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ onInput }
+							onChange={ onChange }
+							settings={ {
+								...blockEditorSettings,
+								templateLock: 'all',
+							} }
+							useSubRegistry={ false }
+						>
+							<BlockEditorKeyboardShortcuts />
+							<NavigationEditorShortcuts
+								saveBlocks={ savePost }
 							/>
-
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ onInput }
-								onChange={ onChange }
-								settings={ {
-									...blockEditorSettings,
-									templateLock: 'all',
-									hasFixedToolbar: true,
-								} }
+							<div
+								className="edit-navigation-layout__canvas"
+								ref={ canvasRef }
 							>
-								<Toolbar
-									isPending={ ! navigationPost }
-									navigationPost={ navigationPost }
-								/>
 								<Editor
 									isPending={ ! navigationPost }
 									blocks={ blocks }
 								/>
-								<InspectorAdditions
-									menuId={ selectedMenuId }
-									onDeleteMenu={ deleteMenu }
-								/>
-							</BlockEditorProvider>
-						</div>
+							</div>
+							<InspectorAdditions
+								menuId={ selectedMenuId }
+								onDeleteMenu={ deleteMenu }
+							/>
+						</BlockEditorProvider>
 
-						<Popover.Slot />
-					</FocusReturnProvider>
+						<BlockInspector bubblesVirtually={ false } />
+					</div>
+
+					<Popover.Slot />
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</ErrorBoundary>

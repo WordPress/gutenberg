@@ -26,11 +26,11 @@ export function ExternalLink(
 	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
+		/* eslint-disable react/jsx-no-target-blank */
 		<a
 			{ ...additionalProps }
 			className={ classes }
 			href={ href }
-			// eslint-disable-next-line react/jsx-no-target-blank
 			target="_blank"
 			rel={ rel }
 			ref={ ref }
@@ -47,6 +47,7 @@ export function ExternalLink(
 				className="components-external-link__icon"
 			/>
 		</a>
+		/* eslint-enable react/jsx-no-target-blank */
 	);
 }
 

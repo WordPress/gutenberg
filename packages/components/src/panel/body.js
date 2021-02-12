@@ -3,12 +3,11 @@
  */
 import classnames from 'classnames';
 import { noop } from 'lodash';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -21,6 +20,7 @@ import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
 	{
+		buttonProps = {},
 		children,
 		className,
 		icon,
@@ -76,12 +76,13 @@ export function PanelBody(
 	} );
 
 	return (
-		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
+		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				icon={ icon }
 				isOpened={ isOpened }
 				onClick={ handleOnToggle }
 				title={ title }
+				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
 				? children( { opened: isOpened } )

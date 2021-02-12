@@ -42,6 +42,7 @@ describe( 'toHTMLString', () => {
 				return;
 			}
 
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				if ( formatName ) {
 					registerFormatType( formatName, formatType );

@@ -8,6 +8,11 @@ import { reduce, forEach, debounce, mapValues } from 'lodash';
  */
 import { dispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store } from './store';
+
 const addDimensionsEventListener = ( breakpoints, operators ) => {
 	/**
 	 * Callback invoked when media query state should be updated. Is invoked a
@@ -16,7 +21,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const setIsMatching = debounce(
 		() => {
 			const values = mapValues( queries, ( query ) => query.matches );
-			dispatch( 'core/viewport' ).setIsMatching( values );
+			dispatch( store ).setIsMatching( values );
 		},
 		{ leading: true }
 	);

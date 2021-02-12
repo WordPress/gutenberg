@@ -9,7 +9,7 @@ import { isNumber, isString } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,9 +18,11 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
 import VisuallyHidden from '../visually-hidden';
+import { withNextComponent } from './next';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
+const MAX_FONT_SIZE_DISPLAY = '25px';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -45,18 +47,23 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		key: option.slug,
 		name: option.name,
 		size: option.size,
-		style: { fontSize: option.size },
+		style: {
+			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+		},
 	} ) );
 }
 
-export default function FontSizePicker( {
-	fallbackFontSize,
-	fontSizes = [],
-	disableCustomFontSizes = false,
-	onChange,
-	value,
-	withSlider = false,
-} ) {
+function FontSizePicker(
+	{
+		fallbackFontSize,
+		fontSizes = [],
+		disableCustomFontSizes = false,
+		onChange,
+		value,
+		withSlider = false,
+	},
+	ref
+) {
 	const hasUnits =
 		isString( value ) ||
 		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
@@ -87,7 +94,10 @@ export default function FontSizePicker( {
 	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 
 	return (
-		<fieldset className="components-font-size-picker">
+		<fieldset
+			className="components-font-size-picker"
+			{ ...( ref ? {} : { ref } ) }
+		>
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
@@ -118,6 +128,13 @@ export default function FontSizePicker( {
 							type="number"
 							min={ 1 }
 							onChange={ ( event ) => {
+								if (
+									! event.target.value &&
+									event.target.value !== 0
+								) {
+									onChange( undefined );
+									return;
+								}
 								if ( hasUnits ) {
 									onChange( event.target.value + 'px' );
 								} else {
@@ -159,3 +176,5 @@ export default function FontSizePicker( {
 		</fieldset>
 	);
 }
+
+export default withNextComponent( forwardRef( FontSizePicker ) );

@@ -15,7 +15,7 @@
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_social_link( $attributes, $content, $block ) {
-	$open_in_new_tab = $block->context['openInNewTab'];
+	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
 	$service    = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
 	$url        = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
@@ -35,7 +35,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$icon               = block_core_social_link_get_icon( $service );
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'wp-social-link wp-social-link-' . $service . $class_name ) );
 
-	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . '> ' . $icon . '</a></li>';
+	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . ' class="wp-block-social-link-anchor"> ' . $icon . '</a></li>';
 }
 
 /**

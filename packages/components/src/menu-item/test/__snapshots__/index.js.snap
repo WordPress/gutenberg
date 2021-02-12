@@ -7,7 +7,11 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
   onClick={[Function]}
   role="menuitemcheckbox"
 >
-  My item
+  <span
+    className="components-menu-item__item"
+  >
+    My item
+  </span>
   <Shortcut
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
@@ -34,13 +38,21 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
   role="menuitem"
 >
   <span
-    className="components-menu-item__info-wrapper"
+    className="components-menu-item__item"
   >
-    My item
     <span
-      className="components-menu-item__info"
+      className="components-menu-item__info-wrapper"
     >
-      Extended description of My Item
+      <span
+        className="components-menu-item__item"
+      >
+        My item
+      </span>
+      <span
+        className="components-menu-item__info"
+      >
+        Extended description of My Item
+      </span>
     </span>
   </span>
   <Shortcut
@@ -55,7 +67,11 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
   onClick={[Function]}
   role="menuitem"
 >
-  My item
+  <span
+    className="components-menu-item__item"
+  >
+    My item
+  </span>
   <Shortcut
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
@@ -81,7 +97,11 @@ exports[`MenuItem should match snapshot when only label provided 1`] = `
   className="components-menu-item__button"
   role="menuitem"
 >
-  My item
+  <span
+    className="components-menu-item__item"
+  >
+    My item
+  </span>
   <Shortcut
     className="components-menu-item__shortcut"
   />

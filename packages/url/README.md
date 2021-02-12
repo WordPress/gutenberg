@@ -37,6 +37,36 @@ _Returns_
 
 -   `string`: URL with arguments applied.
 
+<a name="buildQueryString" href="#buildQueryString">#</a> **buildQueryString**
+
+Generates URL-encoded query string using input query data.
+
+It is intended to behave equivalent as PHP's `http_build_query`, configured
+with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
+
+_Usage_
+
+```js
+const queryString = buildQueryString( {
+   simple: 'is ok',
+   arrays: [ 'are', 'fine', 'too' ],
+   objects: {
+      evenNested: {
+         ok: 'yes',
+      },
+   },
+} );
+// "simple=is%20ok&arrays%5B0%5D=are&arrays%5B1%5D=fine&arrays%5B2%5D=too&objects%5BevenNested%5D%5Bok%5D=yes"
+```
+
+_Parameters_
+
+-   _data_ `Record<string,*>`: Data to encode.
+
+_Returns_
+
+-   `string`: Query string.
+
 <a name="cleanForSlug" href="#cleanForSlug">#</a> **cleanForSlug**
 
 Performs some basic cleanup of a string for use as a post slug.
@@ -66,11 +96,13 @@ _Usage_
 
 ```js
 const displayUrl = filterURLForDisplay( 'https://www.wordpress.org/gutenberg/' ); // wordpress.org/gutenberg
+const imageUrl = filterURLForDisplay( 'https://www.wordpress.org/wp-content/uploads/img.png', 20 ); // …ent/uploads/img.png
 ```
 
 _Parameters_
 
 -   _url_ `string`: Original URL.
+-   _maxLength_ `(number|null)`: URL length.
 
 _Returns_
 
@@ -188,7 +220,27 @@ _Parameters_
 
 _Returns_
 
--   `(QueryArgParsed|undefined)`: Query arg value.
+-   `(QueryArgParsed|void)`: Query arg value.
+
+<a name="getQueryArgs" href="#getQueryArgs">#</a> **getQueryArgs**
+
+Returns an object of query arguments of the given URL. If the given URL is
+invalid or has no querystring, an empty object is returned.
+
+_Usage_
+
+```js
+const foo = getQueryArgs( 'https://wordpress.org?foo=bar&bar=baz' );
+// { "foo": "bar", "bar": "baz" }
+```
+
+_Parameters_
+
+-   _url_ `string`: URL.
+
+_Returns_
+
+-   `QueryArgs`: Query args object.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 

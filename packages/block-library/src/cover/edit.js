@@ -37,6 +37,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
+	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -89,6 +90,7 @@ function CoverHeightInput( {
 	value = '',
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
+
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -264,6 +266,39 @@ function CoverEdit( {
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isBlogUrl = isBlobURL( url );
 
+	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
+	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
+		minHeightUnit
+	);
+	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
+
+	const toggleMinFullHeight = () => {
+		if ( isMinFullHeight ) {
+			// If there aren't previous values, take the default ones.
+			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
+				return setAttributes( {
+					minHeight: undefined,
+					minHeightUnit: undefined,
+				} );
+			}
+
+			// Set the previous values of height.
+			return setAttributes( {
+				minHeight: prevMinHeightValue,
+				minHeightUnit: prevMinHeightUnit,
+			} );
+		}
+
+		setPrevMinHeightValue( minHeight );
+		setPrevMinHeightUnit( minHeightUnit );
+
+		// Set full height.
+		return setAttributes( {
+			minHeight: 100,
+			minHeightUnit: 'vh',
+		} );
+	};
+
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
@@ -295,26 +330,26 @@ function CoverEdit( {
 		? `${ minHeight }${ minHeightUnit }`
 		: minHeight;
 
+	const isImgElement = ! ( hasParallax || isRepeated );
+
 	const style = {
-		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
+		...( isImageBackground && ! isImgElement
+			? backgroundImageStyles( url )
+			: {
+					backgroundImage: gradientValue ? gradientValue : undefined,
+			  } ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
-	if ( gradientValue && ! url ) {
-		style.background = gradientValue;
-	}
+	const mediaStyle = {
+		objectPosition:
+			// prettier-ignore
+			focalPoint && isImgElement
+				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100) }%`
+				: undefined,
+	};
 
-	let positionValue;
-
-	if ( focalPoint ) {
-		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
-		if ( isImageBackground ) {
-			style.backgroundPosition = positionValue;
-		}
-	}
-
-	const canDim = !! url && ( overlayColor.color || gradientValue );
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
 		isVideoBackground ||
@@ -323,27 +358,29 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
-				{ hasBackground && (
-					<>
-						<BlockAlignmentMatrixToolbar
-							label={ __( 'Change content position' ) }
-							value={ contentPosition }
-							onChange={ ( nextPosition ) =>
-								setAttributes( {
-									contentPosition: nextPosition,
-								} )
-							}
-						/>
-
-						<MediaReplaceFlow
-							mediaId={ id }
-							mediaURL={ url }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*,video/*"
-							onSelect={ onSelectMedia }
-						/>
-					</>
-				) }
+				<BlockAlignmentMatrixToolbar
+					label={ __( 'Change content position' ) }
+					value={ contentPosition }
+					onChange={ ( nextPosition ) =>
+						setAttributes( {
+							contentPosition: nextPosition,
+						} )
+					}
+					isDisabled={ ! hasBackground }
+				/>
+				<FullHeightAlignment
+					isActive={ isMinFullHeight }
+					onToggle={ toggleMinFullHeight }
+					isDisabled={ ! hasBackground }
+				/>
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+				/>
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
@@ -397,53 +434,49 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				{ hasBackground && (
-					<>
-						<PanelBody title={ __( 'Dimensions' ) }>
-							<CoverHeightInput
-								value={ temporaryMinHeight || minHeight }
-								unit={ minHeightUnit }
-								onChange={ ( newMinHeight ) =>
-									setAttributes( { minHeight: newMinHeight } )
-								}
-								onUnitChange={ ( nextUnit ) => {
-									setAttributes( {
-										minHeightUnit: nextUnit,
-									} );
-								} }
-							/>
-						</PanelBody>
-						<PanelColorGradientSettings
-							title={ __( 'Overlay' ) }
-							initialOpen={ true }
-							settings={ [
-								{
-									colorValue: overlayColor.color,
-									gradientValue,
-									onColorChange: setOverlayColor,
-									onGradientChange: setGradient,
-									label: __( 'Color' ),
-								},
-							] }
-						>
-							{ canDim && (
-								<RangeControl
-									label={ __( 'Opacity' ) }
-									value={ dimRatio }
-									onChange={ ( newDimRation ) =>
-										setAttributes( {
-											dimRatio: newDimRation,
-										} )
-									}
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
-								/>
-							) }
-						</PanelColorGradientSettings>
-					</>
-				) }
+				<PanelBody title={ __( 'Dimensions' ) }>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</PanelBody>
+				<PanelColorGradientSettings
+					title={ __( 'Overlay' ) }
+					initialOpen={ true }
+					settings={ [
+						{
+							colorValue: overlayColor.color,
+							gradientValue,
+							onColorChange: setOverlayColor,
+							onGradientChange: setGradient,
+							label: __( 'Color' ),
+						},
+					] }
+				>
+					{ !! url && (
+						<RangeControl
+							label={ __( 'Opacity' ) }
+							value={ dimRatio }
+							onChange={ ( newDimRation ) =>
+								setAttributes( {
+									dimRatio: newDimRation,
+								} )
+							}
+							min={ 0 }
+							max={ 100 }
+							step={ 10 }
+							required
+						/>
+					) }
+				</PanelColorGradientSettings>
 			</InspectorControls>
 		</>
 	);
@@ -453,7 +486,10 @@ function CoverEdit( {
 		{
 			className: 'wp-block-cover__inner-container',
 		},
-		{ template: INNER_BLOCKS_TEMPLATE }
+		{
+			template: INNER_BLOCKS_TEMPLATE,
+			templateInsertUpdatesSelection: true,
+		}
 	);
 
 	if ( ! hasBackground ) {
@@ -546,18 +582,6 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ isImageBackground && (
-					// Used only to programmatically check if the image is dark or not
-					<img
-						ref={ isDarkElement }
-						aria-hidden
-						alt=""
-						style={ {
-							display: 'none',
-						} }
-						src={ url }
-					/>
-				) }
 				{ url && gradientValue && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
@@ -565,7 +589,16 @@ function CoverEdit( {
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
-						style={ { background: gradientValue } }
+						style={ { backgroundImage: gradientValue } }
+					/>
+				) }
+				{ isImageBackground && isImgElement && (
+					<img
+						ref={ isDarkElement }
+						className="wp-block-cover__image-background"
+						alt=""
+						src={ url }
+						style={ mediaStyle }
 					/>
 				) }
 				{ isVideoBackground && (
@@ -576,7 +609,7 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
-						style={ { objectPosition: positionValue } }
+						style={ mediaStyle }
 					/>
 				) }
 				{ isBlogUrl && <Spinner /> }

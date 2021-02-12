@@ -123,6 +123,13 @@ The unique identifier of the menu. The root menu can omit this, and it will defa
 
 When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
 
+### isSearchDebouncing
+
+-   Type: `boolean`
+-   Required: No
+
+Indicates whether the search is debouncing or not. In case of `true` the "No results found." text is omitted. Used to prevent showing "No results found." text between debounced searches.
+
 ### `parentMenu`
 
 -   Type: `string`
@@ -137,12 +144,19 @@ The parent menu slug; used by nested menus to indicate their parent menu.
 
 When `hasSearch` is active and `onSearch` is provided, this controls the value of the search input. Required when the `onSearch` prop is provided.
 
+### `isEmpty`
+
+-   Type: `boolean`
+-   Required: No
+
+Indicates whether the menu is empty or not. Used together with the `hideIfTargetMenuEmpty` prop of Navigation Item.
+
 ### `title`
 
 -   Type: `string`
 -   Required: No
 
-The menu title. It's also the field used by the menu search function. 
+The menu title. It's also the field used by the menu search function.
 
 ## Navigation Group Props
 
@@ -201,12 +215,27 @@ The unique identifier of the item.
 
 The child menu slug. If provided, clicking on the item will navigate to the target menu.
 
+### `hideIfTargetMenuEmpty`
+
+-   Type: `boolean`
+-   Required: No
+
+Indicates whether this item should be hidden if the menu specified in `navigateToMenu` is marked as empty in the `isEmpty` prop. Used together with the `isEmpty` prop of Navigation Menu.
+
 ### `onClick`
 
 -   Type: `function`
 -   Required: No
 
 A callback to handle clicking on a menu item.
+
+### `isText`
+
+-   Type: `boolean`
+-   Required: No
+-   Default: false
+
+If set to true then the menu item will only act as a text-only item rather than a button.
 
 ### `title`
 

@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { ENTER } from '@wordpress/keycodes';
 
 /**
@@ -147,6 +148,7 @@ function UnitControl(
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
+			aria-label={ __( 'Select unit' ) }
 			disabled={ disabled }
 			isTabbable={ isUnitSelectTabbable }
 			options={ units }

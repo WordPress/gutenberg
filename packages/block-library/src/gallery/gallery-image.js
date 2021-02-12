@@ -83,7 +83,7 @@ class GalleryImage extends Component {
 
 	onRemoveImage( event ) {
 		if (
-			this.container === document.activeElement &&
+			this.container === this.container.ownerDocument.activeElement &&
 			this.props.isSelected &&
 			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
@@ -275,6 +275,7 @@ class GalleryImage extends Component {
 				{ ! isEditing && ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"
+						aria-label={ __( 'Image caption text' ) }
 						placeholder={
 							isSelected ? __( 'Write caption…' ) : null
 						}

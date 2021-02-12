@@ -72,6 +72,7 @@ describe( 'withGlobalEvents', () => {
 	it( 'renders with original component', () => {
 		mountEnhancedComponent();
 
+		expect( console ).toHaveWarned();
 		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe(
 			'Hello'
 		);

@@ -5,10 +5,16 @@
 	"attributes": {
 		"contentJustification": {
 			"type": "string"
+		},
+		"orientation": {
+			"type": "string",
+			"default": "horizontal"
 		}
 	},
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ]
-	}
+	},
+	"editorStyle": "wp-block-buttons-editor",
+	"style": "wp-block-buttons"
 }

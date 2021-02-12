@@ -80,7 +80,7 @@ describe( 'babel-plugin', () => {
 		);
 	} );
 
-	it( 'should identify warning callee name by ', () => {
+	it( 'should identify warning callee name by', () => {
 		compare(
 			join(
 				'import warn from "@wordpress/warning";',

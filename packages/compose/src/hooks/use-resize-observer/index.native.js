@@ -39,7 +39,10 @@ const useResizeObserver = () => {
 				prevState.width !== width ||
 				prevState.height !== height
 			) {
-				return { width, height };
+				return {
+					width: Math.floor( width ),
+					height: Math.floor( height ),
+				};
 			}
 			return prevState;
 		} );

@@ -43,10 +43,9 @@ class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to read menu items if they have access to edit them.
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function permissions_check( $request ) {
+	public function permissions_check() {
 		$post_type = get_post_type_object( 'nav_menu_item' );
 		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
 			return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit posts in this post type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );

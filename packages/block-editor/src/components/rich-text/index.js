@@ -49,6 +49,7 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
+import { store as blockEditorStore } from '../../store';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -120,6 +121,7 @@ function RichTextWrapper(
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		preserveWhiteSpace,
+		__unstablePastePlainText: pastePlainText,
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
@@ -168,7 +170,7 @@ function RichTextWrapper(
 			__unstableGetBlockWithoutInnerBlocks,
 			isMultiSelecting,
 			hasMultiSelection,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
@@ -228,7 +230,7 @@ function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -343,7 +345,7 @@ function RichTextWrapper(
 
 			// If there are pasted blocks, move the caret to the end of the selected block
 			// Otherwise, retain the default value.
-			const initialPosition = hasPastedBlocks ? -1 : null;
+			const initialPosition = hasPastedBlocks ? -1 : 0;
 
 			onReplace( blocks, indexToSelect, initialPosition );
 		},
@@ -408,6 +410,11 @@ function RichTextWrapper(
 
 	const onPaste = useCallback(
 		( { value, onChange, html, plainText, files, activeFormats } ) => {
+			if ( pastePlainText ) {
+				onChange( insert( value, create( { text: plainText } ) ) );
+				return;
+			}
+
 			// Only process file if no HTML is present.
 			// Note: a pasted file may have the URL as plain text.
 			if ( files && files.length && ! html ) {
@@ -503,6 +510,7 @@ function RichTextWrapper(
 			__unstableEmbedURLOnPaste,
 			multiline,
 			preserveWhiteSpace,
+			pastePlainText,
 		]
 	);
 
@@ -632,6 +640,7 @@ function RichTextWrapper(
 						record={ value }
 						onChange={ onChange }
 						isSelected={ nestedIsSelected }
+						contentRef={ ref }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
 							<TagName
@@ -723,7 +732,7 @@ ForwardedRichTextContainer.Content.defaultProps = {
 };
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 export default ForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';

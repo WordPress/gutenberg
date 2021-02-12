@@ -57,5 +57,7 @@
 		"spacing": {
 			"padding": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-cover-editor",
+	"style": "wp-block-cover"
 }

@@ -10,7 +10,7 @@ import { isFunction } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
-import { Icon, plusCircle } from '@wordpress/icons';
+import { Icon, plus } from '@wordpress/icons';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
@@ -50,7 +50,7 @@ export const LinkControlSearchCreate = ( {
 		>
 			<Icon
 				className="block-editor-link-control__search-item-icon"
-				icon={ plusCircle }
+				icon={ plus }
 			/>
 
 			<span className="block-editor-link-control__search-item-header">

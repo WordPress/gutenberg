@@ -24,7 +24,9 @@ export default function Edit( { attributes, setAttributes } ) {
 				<Placeholder
 					icon={ blockDefault }
 					label={ __( 'Post Comment' ) }
-					instructions={ __( 'Input post comment ID' ) }
+					instructions={ __(
+						'To show a comment, input the comment ID.'
+					) }
 				>
 					<TextControl
 						value={ commentId }

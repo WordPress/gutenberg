@@ -450,7 +450,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = __experimentalGetSettings().formats.date;
 
 	return (
-		<>
+		<div>
 			{ inspectorControls }
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
@@ -510,11 +510,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.join( ' ' ) }
 							{ /* translators: excerpt truncation character, default …  */ }
 							{ __( ' … ' ) }
-							<a
-								href={ post.link }
-								target="_blank"
-								rel="noopener noreferrer"
-							>
+							<a href={ post.link } rel="noopener noreferrer">
 								{ __( 'Read more' ) }
 							</a>
 						</>
@@ -529,7 +525,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									{ addLinkToFeaturedImage ? (
 										<a
 											href={ post.link }
-											target="_blank"
 											rel="noreferrer noopener"
 										>
 											{ featuredImage }
@@ -539,11 +534,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									) }
 								</div>
 							) }
-							<a
-								href={ post.link }
-								target="_blank"
-								rel="noreferrer noopener"
-							>
+							<a href={ post.link } rel="noreferrer noopener">
 								{ titleTrimmed ? (
 									<RawHTML>{ titleTrimmed }</RawHTML>
 								) : (
@@ -585,6 +576,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 				} ) }
 			</ul>
-		</>
+		</div>
 	);
 }

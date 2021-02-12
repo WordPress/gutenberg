@@ -9,6 +9,7 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  */
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,12 +38,13 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	icon = 'menu',
+	icon = menu,
 	label,
 	popoverProps,
 	toggleProps,
 	menuProps,
 	disableOpenOnArrowDown = false,
+	text,
 	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
@@ -129,6 +131,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						text={ text }
 						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }

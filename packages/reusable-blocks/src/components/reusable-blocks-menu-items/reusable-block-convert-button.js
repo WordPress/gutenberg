@@ -8,11 +8,12 @@ import { MenuItem } from '@wordpress/components';
 import { reusableBlock } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { STORE_KEY } from '../../store/constants';
+import { store } from '../../store';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -69,10 +70,10 @@ export default function ReusableBlockConvertButton( {
 
 	const {
 		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( STORE_KEY );
+	} = useDispatch( store );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const onConvert = useCallback(
 		async function () {

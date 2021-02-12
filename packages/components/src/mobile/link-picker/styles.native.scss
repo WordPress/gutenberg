@@ -1,8 +1,6 @@
 .omniCell {
 	border-bottom-width: 1px;
 	border-bottom-color: $light-gray-400;
-	padding-left: 16px;
-	padding-right: 16px;
 }
 
 .omniCellDark {
@@ -28,4 +26,20 @@
 
 .iconDark {
 	color: $dark-tertiary;
+}
+
+.contentContainer {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	flex: 1;
+}
+
+.safeArea {
+	height: 100%;
+}
+
+.list {
+	padding-left: 0;
+	padding-right: 0;
+	padding-bottom: $grid-unit-20;
 }

@@ -20,6 +20,9 @@ const deprecated = [
 				max: 100,
 			},
 		},
+		isEligible( { width } ) {
+			return isFinite( width );
+		},
 		migrate( attributes ) {
 			return {
 				...attributes,
@@ -33,10 +36,7 @@ const deprecated = [
 				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			} );
 
-			let style;
-			if ( Number.isFinite( width ) ) {
-				style = { flexBasis: width + '%' };
-			}
+			const style = { flexBasis: width + '%' };
 
 			return (
 				<div className={ wrapperClasses } style={ style }>

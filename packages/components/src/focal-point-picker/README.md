@@ -65,7 +65,7 @@ Autoplays HTML5 video. This only applies to video sources (`url`).
 -   Type: `Object`
 -   Required: Yes
 
-An object describing the height and width of the image. Requires two paramaters: `height`, `width`.
+An object describing the height and width of the image. Requires two parameters: `height`, `width`.
 
 ### `value`
 

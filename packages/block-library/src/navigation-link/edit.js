@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, get, head, find } from 'lodash';
+import { escape, head } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -64,6 +64,8 @@ const useIsDraggingWithin = ( elementRef ) => {
 	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
 
 	useEffect( () => {
+		const { ownerDocument } = elementRef.current;
+
 		function handleDragStart( event ) {
 			// Check the first time when the dragging starts.
 			handleDragEnter( event );
@@ -84,15 +86,16 @@ const useIsDraggingWithin = ( elementRef ) => {
 		}
 
 		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
-		document.addEventListener( 'dragstart', handleDragStart );
-		document.addEventListener( 'dragend', handleDragEnd );
-		document.addEventListener( 'dragenter', handleDragEnter );
+		// Ideally, we can also use `event.relatedTarget`, but sadly that
+		// doesn't work in Safari.
+		ownerDocument.addEventListener( 'dragstart', handleDragStart );
+		ownerDocument.addEventListener( 'dragend', handleDragEnd );
+		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
 
 		return () => {
-			document.removeEventListener( 'dragstart', handleDragStart );
-			document.removeEventListener( 'dragend', handleDragEnd );
-			document.removeEventListener( 'dragenter', handleDragEnter );
+			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
+			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
+			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
 	}, [] );
 
@@ -131,8 +134,7 @@ function NavigationLinkEdit( {
 	insertLinkBlock,
 	textColor,
 	backgroundColor,
-	rgbTextColor,
-	rgbBackgroundColor,
+	inlineStyles,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
 	userCanCreatePosts = false,
@@ -167,7 +169,7 @@ function NavigationLinkEdit( {
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
-	// This can't be done in the useState call because it cconflicts
+	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
 		if ( ! url ) {
@@ -229,7 +231,7 @@ function NavigationLinkEdit( {
 
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
-			status: 'publish',
+			status: 'draft',
 		} );
 
 		return {
@@ -252,14 +254,15 @@ function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': rgbTextColor,
+			'has-text-color': !! textColor || !! inlineStyles?.color?.text,
 			[ `has-${ textColor }-color` ]: !! textColor,
-			'has-background': rgbBackgroundColor,
+			'has-background':
+				!! backgroundColor || !! inlineStyles?.color?.background,
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 		} ),
 		style: {
-			color: rgbTextColor,
-			backgroundColor: rgbBackgroundColor,
+			color: inlineStyles?.color?.text,
+			backgroundColor: inlineStyles?.color?.background,
 		},
 	} );
 
@@ -359,6 +362,7 @@ function NavigationLinkEdit( {
 								createBlock( 'core/navigation-link' )
 							)
 						}
+						aria-label={ __( 'Navigation link text' ) }
 						placeholder={ itemLabelPlaceholder }
 						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
@@ -385,12 +389,12 @@ function NavigationLinkEdit( {
 									if ( type === 'post' ) {
 										/* translators: %s: search term. */
 										format = __(
-											'Create post: <mark>%s</mark>'
+											'Create draft post: <mark>%s</mark>'
 										);
 									} else {
 										/* translators: %s: search term. */
 										format = __(
-											'Create page: <mark>%s</mark>'
+											'Create draft page: <mark>%s</mark>'
 										);
 									}
 									return createInterpolateElement(
@@ -450,27 +454,6 @@ function NavigationLinkEdit( {
 	);
 }
 
-/**
- * Returns the color object matching the slug, or undefined.
- *
- * @param {Array}  colors      The editor settings colors array.
- * @param {string} colorSlug   A string containing the color slug.
- * @param {string} customColor A string containing the custom color value.
- *
- * @return {Object} Color object included in the editor settings colors, or Undefined.
- */
-const getColorObjectByColorSlug = ( colors, colorSlug, customColor ) => {
-	if ( customColor ) {
-		return customColor;
-	}
-
-	if ( ! colors || ! colors.length ) {
-		return;
-	}
-
-	return get( find( colors, { slug: colorSlug } ), 'color' );
-};
-
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
@@ -479,18 +462,17 @@ export default compose( [
 			hasSelectedInnerBlock,
 			getBlockParentsByBlockName,
 			getSelectedBlockClientId,
-			getSettings,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootBlock = head(
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
 		);
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
-		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
 		const showSubmenuIcon =
 			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
+		const inlineStyles = navigationBlockAttributes.style;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
@@ -507,20 +489,11 @@ export default compose( [
 			hasDescendants,
 			selectedBlockHasDescendants,
 			showSubmenuIcon,
+			inlineStyles,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
 			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
 			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
-			rgbTextColor: getColorObjectByColorSlug(
-				colors,
-				navigationBlockAttributes.textColor,
-				navigationBlockAttributes.customTextColor
-			),
-			rgbBackgroundColor: getColorObjectByColorSlug(
-				colors,
-				navigationBlockAttributes.backgroundColor,
-				navigationBlockAttributes.customBackgroundColor
-			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {

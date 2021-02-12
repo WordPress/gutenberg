@@ -28,6 +28,7 @@ import LegacyWidgetEditHandler from './handler';
 import WidgetSelectControl from './widget-select-control';
 import WidgetPreview from './widget-preview';
 import LegacyWidgetInspectorCard from './inspector-card';
+import { store as editWidgetsStore } from '../../../store';
 
 function LegacyWidgetEdit( {
 	attributes,
@@ -191,12 +192,10 @@ function LegacyWidgetEdit( {
 
 export default withSelect( ( select, { clientId, attributes } ) => {
 	const { widgetClass, referenceWidgetName } = attributes;
-	let widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
-		clientId
-	);
-	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
-	const widgetArea = select( 'core/edit-widgets' ).getWidgetAreaForClientId(
-		clientId
+	let widgetId = attributes.__internalWidgetId;
+	const widget = select( editWidgetsStore ).getWidget( widgetId );
+	const widgetArea = select( editWidgetsStore ).getWidgetAreaForWidgetId(
+		widgetId
 	);
 	const editorSettings = select( 'core/block-editor' ).getSettings();
 	const { availableLegacyWidgets } = editorSettings;
@@ -214,7 +213,7 @@ export default withSelect( ( select, { clientId, attributes } ) => {
 	let isDuplicateReferenceWidget = false;
 	if ( referenceWidgetName ) {
 		const referenceWidgetBlocks = select(
-			'core/edit-widgets'
+			editWidgetsStore
 		).getReferenceWidgetBlocks( referenceWidgetName );
 		if ( clientId !== referenceWidgetBlocks[ 0 ].clientId ) {
 			isDuplicateReferenceWidget = true;

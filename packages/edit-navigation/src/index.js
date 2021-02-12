@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import { map, set, flatten, omit, partialRight } from 'lodash';
+import { map, set, flatten, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -40,14 +39,12 @@ function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
 	return {
 		...settings,
 		supports: {
-			...omit( settings.supports, [
-				'anchor',
-				'customClassName',
-				'color',
-				'fontSize',
-			] ),
 			customClassName: false,
+			html: false,
+			inserter: true,
 		},
+		// Remove any block variations.
+		variations: undefined,
 	};
 }
 
@@ -168,7 +165,7 @@ export function initialize( id, settings ) {
 	registerCoreBlocks();
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 
 	settings.__experimentalFetchLinkSuggestions = partialRight(

@@ -6,9 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { navigateRegions } from '@wordpress/components';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
+import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -24,17 +25,24 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-function InterfaceSkeleton( {
-	footer,
-	header,
-	sidebar,
-	leftSidebar,
-	content,
-	drawer,
-	actions,
-	labels,
-	className,
-} ) {
+function InterfaceSkeleton(
+	{
+		footer,
+		header,
+		sidebar,
+		secondarySidebar,
+		content,
+		drawer,
+		actions,
+		labels,
+		className,
+		shortcuts,
+	},
+	ref
+) {
+	const fallbackRef = useRef();
+	const regionsClassName = useNavigateRegions( fallbackRef, shortcuts );
+
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -44,8 +52,8 @@ function InterfaceSkeleton( {
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
-		/* translators: accessibility text for the left sidebar landmark region. */
-		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the secondary sidebar landmark region. */
+		secondarySidebar: __( 'Block Library' ),
 		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
 		/* translators: accessibility text for the publish landmark region. */
@@ -58,9 +66,12 @@ function InterfaceSkeleton( {
 
 	return (
 		<div
+			ref={ useMergeRefs( [ ref, fallbackRef ] ) }
 			className={ classnames(
 				className,
-				'interface-interface-skeleton'
+				'interface-interface-skeleton',
+				regionsClassName,
+				!! footer && 'has-footer'
 			) }
 		>
 			{ !! drawer && (
@@ -84,14 +95,14 @@ function InterfaceSkeleton( {
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
-					{ !! leftSidebar && (
+					{ !! secondarySidebar && (
 						<div
-							className="interface-interface-skeleton__left-sidebar"
+							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
-							aria-label={ mergedLabels.leftSidebar }
+							aria-label={ mergedLabels.secondarySidebar }
 							tabIndex="-1"
 						>
-							{ leftSidebar }
+							{ secondarySidebar }
 						</div>
 					) }
 					<div
@@ -138,4 +149,4 @@ function InterfaceSkeleton( {
 	);
 }
 
-export default navigateRegions( InterfaceSkeleton );
+export default forwardRef( InterfaceSkeleton );

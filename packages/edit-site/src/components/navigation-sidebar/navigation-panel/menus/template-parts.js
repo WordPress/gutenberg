@@ -9,42 +9,57 @@ import { map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
-	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
+import SearchResults from '../search-results';
 
 export default function TemplatePartsMenu() {
-	const templateParts = useSelect( ( select ) => {
-		return select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			}
-		);
-	}, [] );
+	const [ search, setSearch ] = useState( '' );
+	const onSearch = useCallback( ( value ) => {
+		setSearch( value );
+	} );
+
+	const templateParts = useSelect(
+		( select ) =>
+			select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			) || [],
+		[]
+	);
 
 	return (
 		<NavigationMenu
 			menu={ MENU_TEMPLATE_PARTS }
 			title={ __( 'Template Parts' ) }
 			parentMenu={ MENU_ROOT }
+			hasSearch={ true }
+			onSearch={ onSearch }
+			search={ search }
 		>
-			{ map( templateParts, ( templatePart ) => (
-				<TemplateNavigationItem
-					item={ templatePart }
-					key={ `wp_template_part-${ templatePart.id }` }
-				/>
-			) ) }
+			{ search && (
+				<SearchResults items={ templateParts } search={ search } />
+			) }
 
-			{ ! templateParts && <NavigationItem title={ __( 'Loading…' ) } /> }
+			{ ! search &&
+				map( templateParts, ( templatePart ) => (
+					<TemplateNavigationItem
+						item={ templatePart }
+						key={ `wp_template_part-${ templatePart.id }` }
+					/>
+				) ) }
+
+			{ ! search && templateParts === null && (
+				<NavigationItem title={ __( 'Loading…' ) } isText />
+			) }
 		</NavigationMenu>
 	);
 }

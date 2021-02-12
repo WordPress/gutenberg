@@ -7,7 +7,17 @@ export const TEMPLATES_GENERAL = [
 	'404',
 ];
 
-export const TEMPLATES_POSTS = [ 'home', 'single' ];
+export const TEMPLATES_POSTS = [ 'home', 'single', 'single-post' ];
+
+export const TEMPLATES_NEW_OPTIONS = [
+	'front-page',
+	'single-post',
+	'page',
+	'archive',
+	'search',
+	'404',
+	'index',
+];
 
 export const MENU_ROOT = 'root';
 export const MENU_CONTENT_CATEGORIES = 'content-categories';
@@ -18,3 +28,5 @@ export const MENU_TEMPLATES = 'templates';
 export const MENU_TEMPLATES_ALL = 'templates-all';
 export const MENU_TEMPLATES_PAGES = 'templates-pages';
 export const MENU_TEMPLATES_POSTS = 'templates-posts';
+
+export const SEARCH_DEBOUNCE_IN_MS = 75;

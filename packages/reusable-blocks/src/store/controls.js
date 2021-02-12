@@ -11,6 +11,11 @@ import { createRegistryControl } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { store as reusableBlocksStore } from './index.js';
+
+/**
  * Convert a reusable block to a static block effect handler
  *
  * @param {string}  clientId Block ID.
@@ -94,7 +99,7 @@ const controls = {
 					.dispatch( 'core/block-editor' )
 					.replaceBlocks( clientIds, newBlock );
 				registry
-					.dispatch( 'core/reusable-blocks' )
+					.dispatch( reusableBlocksStore )
 					.__experimentalSetEditingReusableBlock(
 						newBlock.clientId,
 						true

@@ -18,7 +18,7 @@ export const buttonOutside = (
 			height="9.5"
 			transform="rotate(-90 4.75 15.25)"
 			stroke="currentColor"
-			stroke-width="1.5"
+			strokeWidth="1.5"
 			fill="none"
 		/>
 		<Rect x="16" y="10" width="4" height="4" rx="1" fill="currentColor" />
@@ -34,7 +34,7 @@ export const buttonInside = (
 			height="14.5"
 			transform="rotate(-90 4.75 15.25)"
 			stroke="currentColor"
-			stroke-width="1.5"
+			strokeWidth="1.5"
 			fill="none"
 		/>
 		<Rect x="14" y="10" width="4" height="4" rx="1" fill="currentColor" />
@@ -51,7 +51,7 @@ export const noButton = (
 			transform="rotate(-90 4.75 15.25)"
 			stroke="currentColor"
 			fill="none"
-			stroke-width="1.5"
+			strokeWidth="1.5"
 		/>
 	</SVG>
 );
@@ -66,7 +66,7 @@ export const buttonWithIcon = (
 			rx="1.25"
 			stroke="currentColor"
 			fill="none"
-			stroke-width="1.5"
+			strokeWidth="1.5"
 		/>
 		<Rect x="8" y="11" width="8" height="2" fill="currentColor" />
 	</SVG>
@@ -82,7 +82,7 @@ export const toggleLabel = (
 			transform="rotate(-90 4.75 17.25)"
 			stroke="currentColor"
 			fill="none"
-			stroke-width="1.5"
+			strokeWidth="1.5"
 		/>
 		<Rect x="4" y="7" width="10" height="2" fill="currentColor" />
 	</SVG>

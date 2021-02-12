@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { TextControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
@@ -17,9 +18,7 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 export default function AddMenuForm( { menus, onCreate } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 
-	const { createErrorNotice, createInfoNotice } = useDispatch(
-		'core/notices'
-	);
+	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 
@@ -59,7 +58,10 @@ export default function AddMenuForm( { menus, onCreate } ) {
 	};
 
 	return (
-		<form onSubmit={ createMenu }>
+		<form
+			onSubmit={ createMenu }
+			className="edit-navigation-header__add-menu-form"
+		>
 			<TextControl
 				// Disable reason: The name field should receive focus when
 				// component mounts.

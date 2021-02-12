@@ -4,8 +4,15 @@
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
 
 /**
  * Retrieves the block types inserter state.
@@ -17,8 +24,8 @@ import { useSelect } from '@wordpress/data';
 const useBlockTypesState = ( rootClientId, onInsert ) => {
 	const { categories, collections, items } = useSelect(
 		( select ) => {
-			const { getInserterItems } = select( 'core/block-editor' );
-			const { getCategories, getCollections } = select( 'core/blocks' );
+			const { getInserterItems } = select( blockEditorStore );
+			const { getCategories, getCollections } = select( blocksStore );
 
 			return {
 				categories: getCategories(),
@@ -29,15 +36,18 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		[ rootClientId ]
 	);
 
-	const onSelectItem = ( { name, initialAttributes, innerBlocks } ) => {
-		const insertedBlock = createBlock(
-			name,
-			initialAttributes,
-			createBlocksFromInnerBlocksTemplate( innerBlocks )
-		);
+	const onSelectItem = useCallback(
+		( { name, initialAttributes, innerBlocks }, shouldFocusBlock ) => {
+			const insertedBlock = createBlock(
+				name,
+				initialAttributes,
+				createBlocksFromInnerBlocksTemplate( innerBlocks )
+			);
 
-		onInsert( insertedBlock );
-	};
+			onInsert( insertedBlock, undefined, shouldFocusBlock );
+		},
+		[ onInsert ]
+	);
 
 	return [ items, categories, collections, onSelectItem ];
 };

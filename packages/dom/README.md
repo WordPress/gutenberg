@@ -74,6 +74,18 @@ _Returns_
 Object grouping `focusable` and `tabbable` utils
 under the keys with the same name.
 
+<a name="getFilesFromDataTransfer" href="#getFilesFromDataTransfer">#</a> **getFilesFromDataTransfer**
+
+Gets all files from a DataTransfer object.
+
+_Parameters_
+
+-   _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
+
+_Returns_
+
+-   `Array<Object>`: An array containing all files.
+
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
 Returns the closest positioned element, or null under any of the conditions
@@ -157,7 +169,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Wether or not the element is empty.
+-   `boolean`: Whether or not the element is empty.
 
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 

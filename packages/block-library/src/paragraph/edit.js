@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
 	AlignmentToolbar,
@@ -29,12 +29,8 @@ function getComputedStyle( node, pseudo ) {
 const name = 'core/paragraph';
 
 function ParagraphRTLToolbar( { direction, setDirection } ) {
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
-
 	return (
-		isRTL && (
+		isRTL() && (
 			<ToolbarGroup
 				controls={ [
 					{

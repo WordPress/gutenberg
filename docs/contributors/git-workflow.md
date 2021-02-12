@@ -71,7 +71,7 @@ git push -u origin upgrade/my-branch
 
 **Step 9**: Keep up with new activity on the pull request. If any additional changes or updates are requested, then make the changes locally and push them up, following Steps 4-6.
 
-Do not make a new pull request for updates; by pushing your change to your respotiroy it will update the same PR. In this sense, the PR is a pointer on the WordPress Gutenberg repository to your copy. So when you update your copy, the PR is also updated.
+Do not make a new pull request for updates; by pushing your change to your repository it will update the same PR. In this sense, the PR is a pointer on the WordPress Gutenberg repository to your copy. So when you update your copy, the PR is also updated.
 
 That’s it! Once approved and merged, your change will be incorporated into the main repository. 🎉
 

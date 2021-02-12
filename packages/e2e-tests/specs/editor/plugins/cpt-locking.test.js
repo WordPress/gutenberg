@@ -4,6 +4,7 @@
 import {
 	activatePlugin,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
@@ -38,9 +39,9 @@ describe( 'cpt locking', () => {
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		expect(
-			await page.$x( '//button[contains(text(), "Remove block")]' )
+			await page.$x( '//button/span[contains(text(), "Remove block")]' )
 		).toHaveLength( 0 );
 	};
 
@@ -170,11 +171,8 @@ describe( 'cpt locking', () => {
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
-			await clickBlockToolbarButton( 'More options' );
-			const [ removeBlock ] = await page.$x(
-				'//button[contains(text(), "Remove block")]'
-			);
-			await removeBlock.click();
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Remove block' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
@@ -193,11 +191,9 @@ describe( 'cpt locking', () => {
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
-			await clickBlockToolbarButton( 'More options' );
-			const [ removeBlock ] = await page.$x(
-				'//button[contains(text(), "Remove block")]'
-			);
-			await removeBlock.click();
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Remove block' );
+
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 

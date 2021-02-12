@@ -235,6 +235,7 @@ function VideoEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						aria-label={ __( 'Video caption text' ) }
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						onChange={ ( value ) =>

@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import './store';
 import addDimensionsEventListener from './listener';
 
+export { store } from './store';
 export { default as ifViewportMatches } from './if-viewport-matches';
 export { default as withViewportMatch } from './with-viewport-match';
 

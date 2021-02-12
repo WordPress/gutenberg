@@ -82,7 +82,8 @@ public class WPAndroidGlueCode {
     private boolean mAppendsMultipleSelectedToSiblingBlocks = false;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
-    private OnReattachQueryListener mOnReattachQueryListener;
+    private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
+    private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -91,7 +92,7 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
-    private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
+    private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -105,7 +106,7 @@ public class WPAndroidGlueCode {
     private CountDownLatch mGetContentCountDownLatch;
     private WeakReference<View> mLastFocusedView = null;
     private RequestExecutor mRequestExecutor;
-    private AddMentionUtil mAddMentionUtil;
+    private ShowSuggestionsUtil mShowSuggestionsUtil;
     private @Nullable Bundle mEditorTheme = null;
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
@@ -134,6 +135,8 @@ public class WPAndroidGlueCode {
         void onMediaLibraryImageButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryVideoButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryMediaButtonClicked(boolean allowMultipleSelection);
+        void onMediaLibraryFileButtonClicked(boolean allowMultipleSelection);
+        void onMediaLibraryAudioButtonClicked(boolean allowMultipleSelection);
         void onUploadPhotoButtonClicked(boolean allowMultipleSelection);
         void onCapturePhotoButtonClicked();
         void onUploadVideoButtonClicked(boolean allowMultipleSelection);
@@ -143,15 +146,29 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
+        ArrayList<MediaOption> onGetOtherMediaFileOptions();
+        ArrayList<MediaOption> onGetOtherMediaAudioFileOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
+    }
+
+    public interface OnMediaFilesCollectionBasedBlockEditorListener {
+        void onRequestMediaFilesEditorLoad(ArrayList<Object> mediaFiles, String blockId);
+        void onCancelUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onRetryUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onCancelSaveForMediaCollection(ArrayList<Object> mediaFiles);
+        void onMediaFilesBlockReplaceSync(ArrayList<Object> mediaFiles, String blockId);
     }
 
     public interface OnImageFullscreenPreviewListener {
         void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
-    public interface OnReattachQueryListener {
+    public interface OnReattachMediaUploadQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    public interface OnReattachMediaSavingQueryListener {
+        void onQueryCurrentProgressForSavingMedia();
     }
 
     public interface OnEditorMountListener {
@@ -180,11 +197,6 @@ public class WPAndroidGlueCode {
 
     public interface OnGutenbergDidSendButtonPressedActionListener {
         void gutenbergDidSendButtonPressedAction(String buttonType);
-    }
-
-    public interface OnStarterPageTemplatesTooltipShownEventListener {
-        void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
-        boolean onRequestStarterPageTemplatesTooltipShown();
     }
 
     public interface OnContentInfoReceivedListener {
@@ -222,22 +234,35 @@ public class WPAndroidGlueCode {
                 mMediaPickedByUserOnBlock = true;
                 mAppendsMultipleSelectedToSiblingBlocks = !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
-                if (mediaType == MediaType.IMAGE) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.VIDEO) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.MEDIA) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
+                switch (mediaType) {
+                    case IMAGE:
+                        mOnMediaLibraryButtonListener.onMediaLibraryImageButtonClicked(allowMultipleSelection);
+                        break;
+                    case VIDEO:
+                        mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
+                        break;
+                    case MEDIA:
+                        mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
+                        break;
+                    case AUDIO:
+                        mOnMediaLibraryButtonListener.onMediaLibraryAudioButtonClicked(allowMultipleSelection);
+                        break;
+                    case ANY:
+                        mOnMediaLibraryButtonListener.onMediaLibraryFileButtonClicked(allowMultipleSelection);
+                        break;
+                    case OTHER:
+                        break;
                 }
             }
 
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
-                mAppendsMultipleSelectedToSiblingBlocks = false;
+                // image blocks do not respect the multiple selection flag, so we set the append as siblings flag instead
+                mAppendsMultipleSelectedToSiblingBlocks = mediaType == MediaType.IMAGE && !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
-                    mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(allowMultipleSelection);
+                    mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(true);
                 } else if (mediaType == MediaType.VIDEO) {
                     mOnMediaLibraryButtonListener.onUploadVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
@@ -266,7 +291,13 @@ public class WPAndroidGlueCode {
             @Override
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
                 mMediaSelectedCallback = mediaSelectedCallback;
-                mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+                mOnReattachMediaUploadQueryListener.onQueryCurrentProgressForUploadingMedia();
+            }
+
+            @Override
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
+                mMediaSelectedCallback = mediaSelectedCallback;
+                mOnReattachMediaSavingQueryListener.onQueryCurrentProgressForSavingMedia();
             }
 
             @Override
@@ -327,11 +358,21 @@ public class WPAndroidGlueCode {
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback,
                                                    MediaType mediaType) {
-                if (mediaType == MediaType.IMAGE || mediaType == MediaType.MEDIA) {
-                    ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
-                } else {
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(new ArrayList<MediaOption>());
+                switch (mediaType){
+                    case IMAGE:
+                    case MEDIA:
+                        ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
+                        break;
+                    case ANY:
+                        ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
+                        break;
+                    case AUDIO:
+                        ArrayList<MediaOption> otherMediaAudioFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaAudioFileOptions();
+                        otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaAudioFileOptions);
+                        break;
+
                 }
             }
 
@@ -384,20 +425,48 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void onAddMention(Consumer<String> onSuccess) {
-                mAddMentionUtil.getMention(onSuccess);
+            public void onShowUserSuggestions(Consumer<String> onResult) {
+                mShowSuggestionsUtil.showUserSuggestions(onResult);
+            }
+
+            @Override public void onShowXpostSuggestions(Consumer<String> onResult) {
+                mShowSuggestionsUtil.showXpostSuggestions(onResult);
             }
 
             @Override
-            public void setStarterPageTemplatesTooltipShown(boolean showTooltip) {
-                mOnStarterPageTemplatesTooltipShownListener.onSetStarterPageTemplatesTooltipShown(showTooltip);
+            public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
+                mOnMediaFilesCollectionBasedBlockEditorListener
+                        .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
             }
 
             @Override
-            public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
-                boolean tooltipShown = mOnStarterPageTemplatesTooltipShownListener.onRequestStarterPageTemplatesTooltipShown();
-                starterPageTemplatesTooltipShownCallback.onRequestStarterPageTemplatesTooltipShown(tooltipShown);
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onRetryUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
             }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelSaveForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onMediaFilesBlockReplaceSync(
+                    mediaFiles.toArrayList(), blockId
+                );
+            }
+
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -461,7 +530,8 @@ public class WPAndroidGlueCode {
 
     public void attachToContainer(ViewGroup viewGroup,
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
+                                  OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -471,14 +541,15 @@ public class WPAndroidGlueCode {
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
-                                  AddMentionUtil addMentionUtil,
-                                  OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
+                                  ShowSuggestionsUtil showSuggestionsUtil,
+                                  OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
-        mOnReattachQueryListener = onReattachQueryListener;
+        mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
+        mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
@@ -487,8 +558,8 @@ public class WPAndroidGlueCode {
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
-        mAddMentionUtil = addMentionUtil;
-        mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
+        mShowSuggestionsUtil = showSuggestionsUtil;
+        mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -856,11 +927,39 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onUploadMediaFileClear(mediaId);
     }
 
+    public void clearFileSaveStatus(final String mediaId) {
+        mDeferredEventEmitter.onSaveMediaFileClear(mediaId);
+    }
+
+    public void mediaFileSaveProgress(final String mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileSaveProgress(mediaId, progress);
+    }
+
+    public void mediaFileSaveFailed(final String mediaId) {
+        mDeferredEventEmitter.onMediaFileSaveFailed(mediaId);
+    }
+
+    public void mediaFileSaveSucceeded(final String mediaId, final String mediaUrl) {
+        mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl);
+    }
+
+    public void mediaCollectionFinalSaveResult(final String blockFirstMediaId, final boolean success) {
+        mDeferredEventEmitter.onMediaCollectionSaveResult(blockFirstMediaId, success);
+    }
+
+    public void mediaIdChanged(final String oldId, final String newId, final String oldUrl) {
+        mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
+    }
+
     public void replaceUnsupportedBlock(String content, String blockId) {
         if (mReplaceUnsupportedBlockCallback != null) {
             mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);
             mReplaceUnsupportedBlockCallback = null;
         }
+    }
+
+    public void replaceMediaFilesEditedBlock(final String mediaFiles, final String blockId) {
+        mDeferredEventEmitter.onReplaceMediaFilesEditedBlock(mediaFiles, blockId);
     }
 
     private boolean isMediaSelectedCallbackRegistered() {

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
@@ -21,7 +21,7 @@ export const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 export const MEDIA_UPLOAD_STATE_FAILED = 3;
 export const MEDIA_UPLOAD_STATE_RESET = 4;
 
-export class MediaUploadProgress extends React.Component {
+export class MediaUploadProgress extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -125,13 +125,28 @@ export class MediaUploadProgress extends React.Component {
 			'Failed to insert media.\nPlease tap for options.'
 		);
 
+		const progressBarStyle = [
+			styles.progressBar,
+			showSpinner || styles.progressBarHidden,
+			this.props.progressBarStyle,
+		];
+
 		return (
-			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
-				{ showSpinner && (
-					<View style={ styles.progressBar }>
-						<Spinner progress={ progress } />
-					</View>
-				) }
+			<View
+				style={ [
+					styles.mediaUploadProgress,
+					this.props.containerStyle,
+				] }
+				pointerEvents="box-none"
+			>
+				<View style={ progressBarStyle }>
+					{ showSpinner && (
+						<Spinner
+							progress={ progress }
+							style={ this.props.spinnerStyle }
+						/>
+					) }
+				</View>
 				{ renderContent( {
 					isUploadInProgress,
 					isUploadFailed,

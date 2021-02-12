@@ -10,10 +10,11 @@ import { blockDefault } from '@wordpress/icons';
  * Internal dependencies
  */
 import CompactList from '../../components/compact-list';
+import { store as blockDirectoryStore } from '../../store';
 
 export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect(
-		( select ) => select( 'core/block-directory' ).getNewBlockTypes(),
+		( select ) => select( blockDirectoryStore ).getNewBlockTypes(),
 		[]
 	);
 

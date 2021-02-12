@@ -1,4 +1,6 @@
 export default `
+<!-- wp:file /-->
+
 <!-- wp:heading -->
 <h2>Text Blocks</h2>
 <!-- /wp:heading -->

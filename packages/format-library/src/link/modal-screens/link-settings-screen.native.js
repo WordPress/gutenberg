@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -94,8 +92,15 @@ const LinkSettingsScreen = ( {
 			// transform selected text into link
 			newAttributes = applyFormat( value, format );
 		}
-		//move selection to end of link
-		newAttributes.start = newAttributes.end;
+		// move selection to end of link
+		const textLength = newAttributes.text.length;
+		// check for zero width spaces
+		if ( newAttributes.end > textLength ) {
+			newAttributes.start = textLength;
+			newAttributes.end = textLength;
+		} else {
+			newAttributes.start = newAttributes.end;
+		}
 		newAttributes.activeFormats = [];
 		onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		if ( ! isValidHref( url ) ) {
@@ -138,40 +143,40 @@ const LinkSettingsScreen = ( {
 	}, [ navigation, route.params?.text, text ] );
 
 	return useMemo( () => {
+		const shouldShowLinkOptions = !! inputValue;
+
 		return (
 			<>
-				<View style={ styles.container }>
-					<BottomSheet.LinkCell
-						value={ inputValue }
-						onPress={ onLinkCellPressed }
-					/>
-					<BottomSheet.Cell
-						icon={ textColor }
-						label={ __( 'Link text' ) }
-						value={ text }
-						placeholder={ __( 'Add link text' ) }
-						onChangeValue={ setText }
-						onSubmit={ submit }
-					/>
-					<BottomSheet.SwitchCell
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						value={ opensInNewWindow }
-						onValueChange={ setOpensInNewWindows }
-						separatorType={ 'fullWidth' }
-					/>
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ removeLink }
-					/>
-				</View>
-				<View
-					style={ {
-						height: listProps.safeAreaBottomInset || 1,
-					} }
+				<BottomSheet.LinkCell
+					value={ inputValue }
+					onPress={ onLinkCellPressed }
 				/>
+				<BottomSheet.Cell
+					icon={ textColor }
+					label={ __( 'Link text' ) }
+					value={ text }
+					placeholder={ __( 'Add link text' ) }
+					onChangeValue={ setText }
+					onSubmit={ submit }
+					separatorType={ shouldShowLinkOptions ? undefined : 'none' }
+				/>
+				{ shouldShowLinkOptions && (
+					<>
+						<BottomSheet.SwitchCell
+							icon={ external }
+							label={ __( 'Open in new tab' ) }
+							value={ opensInNewWindow }
+							onValueChange={ setOpensInNewWindows }
+							separatorType={ 'fullWidth' }
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Remove link' ) }
+							labelStyle={ styles.clearLinkButton }
+							separatorType={ 'none' }
+							onPress={ removeLink }
+						/>
+					</>
+				) }
 			</>
 		);
 	}, [ inputValue, text, opensInNewWindow, listProps.safeAreaBottomInset ] );
