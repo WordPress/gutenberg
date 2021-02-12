@@ -172,6 +172,10 @@ public class WPAndroidGlueCode {
         void onQueryCurrentProgressForSavingMedia();
     }
 
+    public interface OnSetFeaturedImageListener {
+        void onSetFeaturedImageButtonClicked(int mediaId);
+    }
+
     public interface OnEditorMountListener {
         void onEditorDidMount(ArrayList<Object> unsupportedBlockNames);
     }

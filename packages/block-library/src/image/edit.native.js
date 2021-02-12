@@ -14,6 +14,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	setFeaturedImage
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
@@ -246,7 +247,10 @@ export class ImageEdit extends Component {
 		} );
 	}
 
-	onSetFeatured() {}
+	onSetFeatured() {
+		const { attributes } = this.props;
+		setFeaturedImage( attributes.id );
+	}
 
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
