@@ -1,17 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Card, CardBody, Spinner } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import AddMenu from '../add-menu';
 
 export default function EmptyState( { isPending } ) {
 	return (
-		<div className="edit-navigation__empty-state">
+		<div className="edit-navigation-empty-state">
 			{ isPending && <Spinner /> }
-			{ ! isPending &&
-				__(
-					'No menus have been created. Add a new one to get started.'
-				) }
+			{ ! isPending && (
+				<Card className="edit-navigation-empty-state__card">
+					<CardBody>
+						<AddMenu />
+					</CardBody>
+				</Card>
+			) }
 		</div>
 	);
 }
