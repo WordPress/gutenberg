@@ -42,6 +42,7 @@ function FocalPointPicker( props ) {
 
 	let locationPageOffsetX = useRef().current;
 	let locationPageOffsetY = useRef().current;
+	const videoRef = useRef( null );
 
 	useEffect( () => {
 		requestFocalPointPickerTooltipShown( ( tooltipShown ) => {
@@ -190,6 +191,9 @@ function FocalPointPicker( props ) {
 		const { height, width } = event.naturalSize;
 		setVideoNaturalSize( { height, width } );
 		setDisplayPlaceholder( false );
+		// Avoid invisible, paused video on Android, presumably related to
+		// https://git.io/Jt6Dr
+		videoRef?.current.seek( 0 );
 	};
 	const onXCoordinateChange = ( x ) =>
 		onChange( { x: ( x / 100 ).toFixed( 2 ) } );
@@ -222,6 +226,7 @@ function FocalPointPicker( props ) {
 								paused
 								disableFocus
 								onLoad={ onVideoLoad }
+								ref={ videoRef }
 								resizeMode="contain"
 								source={ { uri: url } }
 								style={ videoPreviewStyles }

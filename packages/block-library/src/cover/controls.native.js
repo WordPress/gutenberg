@@ -19,7 +19,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { InspectorControls, MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -110,6 +110,7 @@ function Controls( {
 	}
 
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
+	const videoRef = useRef( null );
 
 	const mediaBackground = usePreferredColorSchemeStyle(
 		styles.mediaBackground,
@@ -204,7 +205,11 @@ function Controls( {
 											width,
 										} );
 										setDisplayPlaceholder( false );
+										// Avoid invisible, paused video on Android, presumably
+										// related to https://git.io/Jt6Dr
+										videoRef?.current.seek( 0 );
 									} }
+									ref={ videoRef }
 									resizeMode={ 'cover' }
 									source={ { uri: url } }
 									style={ videoPreviewStyles }
