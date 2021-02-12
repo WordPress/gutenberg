@@ -36,7 +36,7 @@ class Modal extends Component {
 		openModalCount++;
 
 		if ( openModalCount === 1 ) {
-			this.openFirstModal();
+			this.openFirstModal( this.props.isFullscreen );
 		}
 	}
 
@@ -48,7 +48,7 @@ class Modal extends Component {
 		openModalCount--;
 
 		if ( openModalCount === 0 ) {
-			this.closeLastModal();
+			this.closeLastModal( this.props.isFullscreen );
 		}
 
 		this.cleanDOM();
@@ -66,6 +66,7 @@ class Modal extends Component {
 	prepareDOM() {
 		if ( ! parentElement ) {
 			parentElement = document.createElement( 'div' );
+			parentElement.className = 'components-modal__portal';
 			document.body.appendChild( parentElement );
 		}
 		this.node = document.createElement( 'div' );
@@ -85,19 +86,29 @@ class Modal extends Component {
 	 * It appends an additional div to the body for the modals to be rendered in,
 	 * it hides any other elements from screen-readers and adds an additional class
 	 * to the body to prevent scrolling while the modal is open.
+	 *
+	 * @param {boolean} isFullscreen
 	 */
-	openFirstModal() {
+	openFirstModal( isFullscreen ) {
 		ariaHelper.hideApp( parentElement );
 		document.body.classList.add( this.props.bodyOpenClassName );
+		if ( isFullscreen ) {
+			document.body.classList.add( 'is-fullscreen-modal' );
+		}
 	}
 
 	/**
 	 * Cleans up the DOM after the last modal is closed and makes the app available
 	 * for screen-readers again.
+	 *
+	 * @param {boolean} isFullscreen
 	 */
-	closeLastModal() {
+	closeLastModal( isFullscreen ) {
 		document.body.classList.remove( this.props.bodyOpenClassName );
 		ariaHelper.showApp();
+		if ( isFullscreen ) {
+			document.body.classList.remove( 'is-fullscreen-modal' );
+		}
 	}
 
 	/**

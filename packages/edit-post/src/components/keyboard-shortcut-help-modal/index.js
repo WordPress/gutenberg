@@ -105,6 +105,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			title={ __( 'Keyboard shortcuts' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
+			isFullscreen
 		>
 			<ShortcutSection
 				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
