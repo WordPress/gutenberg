@@ -129,6 +129,7 @@ function FocalPointPicker( props ) {
 	);
 	const imagePreviewStyles = [
 		displayPlaceholder && styles.mediaPlaceholder,
+		styles.image,
 	];
 	const videoPreviewStyles = [
 		{
