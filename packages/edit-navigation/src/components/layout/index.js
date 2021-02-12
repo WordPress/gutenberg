@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -65,7 +70,11 @@ export default function Layout( { blockEditorSettings } ) {
 
 					<Notices />
 
-					<div className="edit-navigation-layout">
+					<div
+						className={ classnames( 'edit-navigation-layout', {
+							'has-block-inspector': isBlockEditorReady,
+						} ) }
+					>
 						<Header
 							isPending={ ! hasLoadedMenus }
 							menus={ menus }
@@ -108,10 +117,9 @@ export default function Layout( { blockEditorSettings } ) {
 									menuId={ selectedMenuId }
 									onDeleteMenu={ deleteMenu }
 								/>
+								<BlockInspector bubblesVirtually={ false } />
 							</BlockEditorProvider>
 						) }
-
-						<BlockInspector bubblesVirtually={ false } />
 					</div>
 
 					<Popover.Slot />

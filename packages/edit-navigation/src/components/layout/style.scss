@@ -22,7 +22,9 @@
 }
 
 .edit-navigation-layout {
-	margin-right: $sidebar-width;
+	&.has-block-inspector {
+		margin-right: $sidebar-width;
+	}
 
 	.edit-navigation-layout__canvas {
 		// Provide space for the floating block toolbar.
