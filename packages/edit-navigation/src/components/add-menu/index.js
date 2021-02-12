@@ -67,29 +67,27 @@ export default function AddMenu( { className, menus, onCreate } ) {
 		: __( 'A short descriptive name for your first menu.' );
 
 	return (
-		<div className={ classnames( 'edit-navigation-add-menu', className ) }>
+		<form
+			className={ classnames( 'edit-navigation-add-menu', className ) }
+			onSubmit={ createMenu }
+		>
 			<h3 className="edit-navigation-add-menu__title">{ titleText }</h3>
-			<form
-				className="edit-navigation-add-menu__form"
-				onSubmit={ createMenu }
-			>
-				<TextControl
-					label={ __( 'Menu name' ) }
-					value={ menuName }
-					onChange={ setMenuName }
-					help={ helpText }
-				/>
+			<TextControl
+				label={ __( 'Menu name' ) }
+				value={ menuName }
+				onChange={ setMenuName }
+				help={ helpText }
+			/>
 
-				<Button
-					className="edit-navigation-add-menu__create-menu-button"
-					type="submit"
-					isPrimary
-					disabled={ ! menuName.length }
-					isBusy={ isCreatingMenu }
-				>
-					{ __( 'Create menu' ) }
-				</Button>
-			</form>
-		</div>
+			<Button
+				className="edit-navigation-add-menu__create-menu-button"
+				type="submit"
+				isPrimary
+				disabled={ ! menuName.length }
+				isBusy={ isCreatingMenu }
+			>
+				{ __( 'Create menu' ) }
+			</Button>
+		</form>
 	);
 }
