@@ -74,10 +74,6 @@ export default function AddMenu( { className, menus, onCreate } ) {
 				onSubmit={ createMenu }
 			>
 				<TextControl
-					// Disable reason: The name field should receive focus when
-					// component mounts.
-					// eslint-disable-next-line jsx-a11y/no-autofocus
-					autoFocus
 					label={ __( 'Menu name' ) }
 					value={ menuName }
 					onChange={ setMenuName }
