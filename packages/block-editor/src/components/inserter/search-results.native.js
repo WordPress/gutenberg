@@ -35,7 +35,7 @@ import { store as blockEditorStore } from '../../store';
 
 const MIN_COL_NUM = 3;
 
-function InserterMenu( {
+function InserterSearchResults( {
 	insertionIndex,
 	onDismiss,
 	onSelect,
@@ -260,4 +260,4 @@ function InserterMenu( {
 	);
 }
 
-export default withInstanceId( InserterMenu );
+export default withInstanceId( InserterSearchResults );
