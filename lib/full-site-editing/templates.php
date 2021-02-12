@@ -289,8 +289,7 @@ function gutenberg_the_skip_link_script() {
 
 				// Create the skip link.
 				skipLink = document.createElement( 'a' );
-				skipLink.classList.add( 'skip-link' );
-				skipLink.classList.add( 'screen-reader-text' );
+				skipLink.classList.add( 'skip-link', 'screen-reader-text' );
 				skipLink.href = '#' + contentElID;
 				skipLink.innerHTML = label;
 				skipLink.id = 'wp--skip-link--' + contentElID;
