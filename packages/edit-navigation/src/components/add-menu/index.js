@@ -17,11 +17,8 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 
 export default function AddMenu( { className, menus, onCreate } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
-
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
-
 	const { saveMenu } = useDispatch( 'core' );
 
 	const createMenu = async ( event ) => {
@@ -51,35 +48,52 @@ export default function AddMenu( { className, menus, onCreate } ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			onCreate( menu.id );
+			if ( onCreate ) {
+				onCreate( menu.id );
+			}
 		}
 
 		setIsCreatingMenu( false );
 	};
 
-	return (
-		<form
-			className={ classnames( 'edit-navigation-add-menu', className ) }
-			onSubmit={ createMenu }
-		>
-			<TextControl
-				// Disable reason: The name field should receive focus when
-				// component mounts.
-				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus
-				label={ __( 'Menu name' ) }
-				value={ menuName }
-				onChange={ setMenuName }
-			/>
+	const hasMenus = menus?.length;
 
-			<Button
-				type="submit"
-				isPrimary
-				disabled={ ! menuName.length }
-				isBusy={ isCreatingMenu }
+	const titleText = hasMenus
+		? __( 'Create a new menu' )
+		: __( 'Create your first menu' );
+
+	const helpText = hasMenus
+		? __( 'A short descriptive name for your menu.' )
+		: __( 'A short descriptive name for your first menu.' );
+
+	return (
+		<div className={ classnames( 'edit-navigation-add-menu', className ) }>
+			<h3 className="edit-navigation-add-menu__title">{ titleText }</h3>
+			<form
+				className="edit-navigation-add-menu__form"
+				onSubmit={ createMenu }
 			>
-				{ __( 'Create menu' ) }
-			</Button>
-		</form>
+				<TextControl
+					// Disable reason: The name field should receive focus when
+					// component mounts.
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus
+					label={ __( 'Menu name' ) }
+					value={ menuName }
+					onChange={ setMenuName }
+					help={ helpText }
+				/>
+
+				<Button
+					className="edit-navigation-add-menu__create-menu-button"
+					type="submit"
+					isPrimary
+					disabled={ ! menuName.length }
+					isBusy={ isCreatingMenu }
+				>
+					{ __( 'Create menu' ) }
+				</Button>
+			</form>
+		</div>
 	);
 }
