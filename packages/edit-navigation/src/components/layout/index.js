@@ -53,6 +53,9 @@ export default function Layout( { blockEditorSettings } ) {
 
 	useMenuNotifications( selectedMenuId );
 
+	const hasMenus = menus?.length;
+	const isBlockEditorReady = !! hasMenus && navigationPost;
+
 	return (
 		<ErrorBoundary>
 			<SlotFillProvider>
@@ -71,13 +74,13 @@ export default function Layout( { blockEditorSettings } ) {
 							navigationPost={ navigationPost }
 						/>
 
-						{ ! menus?.length && (
+						{ ! hasMenus && (
 							<EmptyState
 								isPending={ ! hasFinishedInitialLoad }
 							/>
 						) }
 
-						{ ( menus?.length || navigationPost ) && (
+						{ isBlockEditorReady && (
 							<BlockEditorProvider
 								value={ blocks }
 								onInput={ onInput }
