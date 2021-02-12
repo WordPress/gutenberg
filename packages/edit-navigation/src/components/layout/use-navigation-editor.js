@@ -69,6 +69,5 @@ export default function useNavigationEditor() {
 		navigationPost,
 		selectMenu,
 		deleteMenu,
-		hasLoadedMenus,
 	};
 }
