@@ -118,6 +118,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		$xpath = $this->build_xpath_from_response( $remote_url_response );
 
+		if ( is_wp_error( $xpath ) ) {
+			return $xpath;
+		}
+
 		$data = $this->add_additional_fields_to_object(
 			array(
 				'title' => $this->get_title( $xpath ),
@@ -159,9 +163,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$errors = libxml_use_internal_errors( true );
 
 		// Ensure UTF-8 is respected by using 'mb_convert_encoding'.
-		$doc->loadHTML( mb_convert_encoding( $remote_url_response, 'HTML-ENTITIES', 'UTF-8' ) );
+		$loaded_status = $doc->loadHTML( mb_convert_encoding( $remote_url_response, 'HTML-ENTITIES', 'UTF-8' ) );
+
 		libxml_use_internal_errors( $errors );
 
+		if ( false === $loaded_status ) {
+			return new WP_Error( 'rest_invalid_content', __( 'Unable to parse HTML response from remote URL.', 'gutenberg' ) );
+		}
 		return new DOMXpath( $doc );
 	}
 

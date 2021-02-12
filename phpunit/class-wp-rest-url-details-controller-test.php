@@ -447,6 +447,45 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+	public function test_suppresses_errors_generated_by_parsing_invalid_html_response() {
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
+
+		add_filter(
+			'pre_http_request',
+			function( $response, $args ) {
+				// See https://www.php.net/manual/en/domdocument.loadhtml.php#125526.
+				$response_which_throws_errors = '<section></section><title>findme</title>';
+				return $this->mock_request_to_remote_url( 'success', $args, $response_which_throws_errors );
+			},
+			10,
+			3
+		);
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', static::$route );
+		$request->set_query_params(
+			array(
+				'url' => static::$url_placeholder,
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$data = $response->get_data();
+
+		$this->assertEquals(
+			array(
+				'title' => 'findme',
+			),
+			$data
+		);
+
+		remove_all_filters(
+			'pre_http_request'
+		);
+
+	}
 
 
 	public function test_get_item() {
@@ -538,7 +577,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		return $this->mock_request_to_remote_url( 'empty_body', $args );
 	}
 
-	private function mock_request_to_remote_url( $result_type = 'success', $args ) {
+	private function mock_request_to_remote_url( $result_type = 'success', $args, $body = null ) {
 
 		static::$request_args = $args;
 
@@ -556,6 +595,14 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// Both should return 200 for the HTTP response.
 		$should_200 = 'success' === $result_type || 'empty_body' === $result_type;
 
+		if ( $body ) {
+			$body_response = $body;
+		} elseif ( 'success' === $result_type ) {
+			$body_response = file_get_contents( __DIR__ . '/fixtures/example-website.html' );
+		} else {
+			$body_response = '';
+		}
+
 		return array(
 			'headers'     => array(),
 			'cookies'     => array(),
@@ -563,7 +610,8 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'response'    => array( 'code' => ( $should_200 ? 200 : 404 ) ),
 			'status_code' => $should_200 ? 200 : 404,
 			'success'     => $should_200 ? 1 : 0,
-			'body'        => 'success' === $result_type ? file_get_contents( __DIR__ . '/fixtures/example-website.html' ) : '',
+			'body'        => $body_response,
 		);
 	}
+
 }
