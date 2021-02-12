@@ -12,7 +12,7 @@ describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render(
 			<Portal>
-				<div>Some people are worth melting for.</div>
+				<div>Code is Poetry - WordPress.org</div>
 			</Portal>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
