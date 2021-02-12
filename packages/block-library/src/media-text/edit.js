@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -28,6 +29,7 @@ import {
 	FocalPointPicker,
 } from '@wordpress/components';
 import { pullLeft, pullRight } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -138,7 +140,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	const image = useSelect(
 		( select ) =>
-			mediaId && isSelected ? select( 'core' ).getMedia( mediaId ) : null,
+			mediaId && isSelected
+				? select( coreStore ).getMedia( mediaId )
+				: null,
 		[ isSelected, mediaId ]
 	);
 
@@ -198,7 +202,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const imageSizes = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return settings?.imageSizes;
 	} );
 	const imageSizeOptions = map(
