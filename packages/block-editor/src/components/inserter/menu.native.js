@@ -8,7 +8,6 @@ import {
 	TouchableWithoutFeedback,
 	Dimensions,
 } from 'react-native';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,7 +32,6 @@ import {
  */
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
-//import useInsertionPoint from './hooks/use-insertion-point';
 
 const MIN_COL_NUM = 3;
 
@@ -176,27 +174,27 @@ function InserterMenu( {
 			( { name } ) => name !== 'core/block'
 		);
 
-		const clipboard = getClipboard();
-		const clipboardBlock =
-			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
-		const shouldAddClipboardBlock =
-			clipboardBlock &&
-			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
+		const clipboardBlock = rawHandler( { HTML: getClipboard() } )[ 0 ];
+		const shouldAddClipboardBlock = canInsertBlockType(
+			clipboardBlock?.name,
+			destinationRootClientId
+		);
 
-		return shouldAddClipboardBlock
-			? [
-					{
-						...pick( getBlockType( clipboardBlock.name ), [
-							'name',
-							'icon',
-						] ),
-						id: 'clipboard',
-						initialAttributes: clipboardBlock.attributes,
-						innerBlocks: clipboardBlock.innerBlocks,
-					},
-					...itemsToDisplay,
-			  ]
-			: itemsToDisplay;
+		if ( shouldAddClipboardBlock ) {
+			const { name, icon } = getBlockType( clipboardBlock.name );
+			return [
+				{
+					name,
+					icon,
+					id: 'clipboard',
+					initialAttributes: clipboardBlock.attributes,
+					innerBlocks: clipboardBlock.innerBlocks,
+				},
+				...itemsToDisplay,
+			];
+		}
+
+		return itemsToDisplay;
 	}
 
 	function onBlockSelect( item ) {
