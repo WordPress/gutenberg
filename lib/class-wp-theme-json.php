@@ -1107,7 +1107,7 @@ class WP_Theme_JSON {
 	 * @return string
 	 */
 	public function should_add_skip_link_styles() {
-		return isset( $this->theme_json['skipLink']['css'] ) && $this->theme_json['skipLink']['css'];
+		return ! empty( $this->theme_json['skipLink']['css'] );
 	}
 
 
