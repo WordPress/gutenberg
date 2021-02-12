@@ -14,7 +14,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-	setFeaturedImage
+	setFeaturedImage,
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
