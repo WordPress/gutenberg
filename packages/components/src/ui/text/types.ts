@@ -1,4 +1,4 @@
-import type { Props as TruncateProps } from '../truncate/hook';
+import type { Props as TruncateProps } from '../truncate/types';
 import type { CSSProperties } from 'react';
 
 type TextAdjustLineHeightForInnerControls =
