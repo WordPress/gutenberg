@@ -23,4 +23,14 @@ module.exports = {
 	rules: {
 		'prettier/prettier': [ 'error', prettierConfig ],
 	},
+	overrides: [
+		{
+			// Unit test files and their helpers only.
+			files: [ '**/*.ts', '**/*.tsx' ],
+			rules: {
+				'jsdoc/require-param-type': 'off',
+				'jsdoc/require-returns-type': 'off',
+			},
+		},
+	],
 };
