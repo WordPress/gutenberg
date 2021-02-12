@@ -73,4 +73,14 @@ describe( 'replaceActiveStyle', () => {
 			'custom-class is-style-small'
 		);
 	} );
+
+	it( 'Should replace the previous active style with nothing if it is the default', () => {
+		const activeStyle = { name: 'large' };
+		const newStyle = { name: 'small', isDefault: true };
+		const className = 'custom-class is-style-large';
+
+		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
+			'custom-class'
+		);
+	} );
 } );
