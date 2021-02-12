@@ -21,7 +21,7 @@ import {
  */
 import SaveButton from './save-button';
 import ManageLocations from './manage-locations';
-import AddMenuForm from './add-menu-form';
+import AddMenu from '../add-menu';
 
 export default function Header( {
 	menus,
@@ -97,7 +97,8 @@ export default function Header( {
 						</Button>
 					) }
 					renderContent={ () => (
-						<AddMenuForm
+						<AddMenu
+							className="edit-navigation-header__add-menu"
 							menus={ menus }
 							onCreate={ onSelectMenu }
 						/>

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { some } from 'lodash';
-
+import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
@@ -15,7 +15,7 @@ import { store as noticesStore } from '@wordpress/notices';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function AddMenuForm( { menus, onCreate } ) {
+export default function AddMenu( { className, menus, onCreate } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
@@ -59,8 +59,8 @@ export default function AddMenuForm( { menus, onCreate } ) {
 
 	return (
 		<form
+			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
-			className="edit-navigation-header__add-menu-form"
 		>
 			<TextControl
 				// Disable reason: The name field should receive focus when
@@ -73,7 +73,6 @@ export default function AddMenuForm( { menus, onCreate } ) {
 			/>
 
 			<Button
-				className="edit-navigation-header__create-menu-button"
 				type="submit"
 				isPrimary
 				disabled={ ! menuName.length }
