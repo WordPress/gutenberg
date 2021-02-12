@@ -57,6 +57,7 @@ export default function phrasingContentReducer( node, doc ) {
 			node.removeAttribute( 'rel' );
 		}
 
+		// Handle footnote and endnote links
 		// Save anchor elements' name attribute as id
 		if ( node.name && ! node.id ) {
 			node.id = node.name;
@@ -64,7 +65,7 @@ export default function phrasingContentReducer( node, doc ) {
 		// Remove name attribute in any case: the use of the name attribute in a elements is obsolete: https://html.spec.whatwg.org/multipage/obsolete.html#obsolete-but-conforming-features
 		node.removeAttribute( 'name' );
 
-		// Search for common footnote and endnote ID structure (Word, LibreOffice). If doesn't match, remove ID parameter.
+		// Search for common footnote and endnote id structure (Word, LibreOffice). If doesn't match, remove id attribute.
 		if (
 			node.id &&
 			! /^_?(?:ftn|edn|sdfootnote|sdendnote)/i.test( node.id )
@@ -72,7 +73,7 @@ export default function phrasingContentReducer( node, doc ) {
 			node.removeAttribute( 'id' );
 		}
 
-		// Remove a tag if no link nor id
+		// Remove anchor tag if no href nor id
 		if ( ! node.id && ! node.href ) {
 			unwrap( node );
 		}

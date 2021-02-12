@@ -20,7 +20,7 @@ const textContentSchema = {
 	s: {},
 	del: {},
 	ins: {},
-	a: { attributes: [ 'href', 'target', 'rel', 'id', 'name' ] },
+	a: { attributes: [ 'href', 'target', 'rel', 'id', 'name' ] }, // id and name needed for pasting footnotes and endnotes, see /packages/blocks/src/api/raw-handling/phrasing-content-reducer.js
 	code: {},
 	abbr: { attributes: [ 'title' ] },
 	sub: {},
