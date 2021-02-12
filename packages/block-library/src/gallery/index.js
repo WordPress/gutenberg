@@ -14,7 +14,7 @@ import save from './save';
 import transforms from './transforms';
 
 const { name } = metadata;
-console.log( 'doh!' );
+
 export { metadata, name };
 
 export const settings = {
