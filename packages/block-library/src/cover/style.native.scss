@@ -162,6 +162,11 @@
 	min-width: 100%;
 }
 
+.video {
+	height: 100%;
+	max-width: 100%;
+}
+
 .focalPointHint {
 	box-shadow: 0 0 0.5px rgba(0, 0, 0, 0.5);
 	fill: $white;

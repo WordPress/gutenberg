@@ -134,9 +134,10 @@ function FocalPointPicker( props ) {
 			aspectRatio:
 				videoNaturalSize &&
 				videoNaturalSize.width / videoNaturalSize.height,
-			height: '100%',
+			// Hide Video component since it has black background while loading the source
+			opacity: displayPlaceholder ? 0 : 1,
 		},
-		! displayPlaceholder && styles.video,
+		styles.video,
 		displayPlaceholder && styles.mediaPlaceholder,
 	];
 	const focalPointGroupStyles = [
@@ -221,7 +222,7 @@ function FocalPointPicker( props ) {
 								paused
 								disableFocus
 								onLoad={ onVideoLoad }
-								resizeMode={ 'cover' }
+								resizeMode="contain"
 								source={ { uri: url } }
 								style={ videoPreviewStyles }
 							/>

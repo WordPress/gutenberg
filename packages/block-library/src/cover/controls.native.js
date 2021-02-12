@@ -123,9 +123,10 @@ function Controls( {
 			aspectRatio:
 				videoNaturalSize &&
 				videoNaturalSize.width / videoNaturalSize.height,
-			height: '100%',
+			// Hide Video component since it has black background while loading the source
+			opacity: displayPlaceholder ? 0 : 1,
 		},
-		! displayPlaceholder && styles.video,
+		styles.video,
 		displayPlaceholder && styles.imagePlaceholder,
 	];
 
@@ -190,6 +191,9 @@ function Controls( {
 									muted
 									paused
 									disableFocus
+									onLoadStart={ () => {
+										setDisplayPlaceholder( true );
+									} }
 									onLoad={ ( event ) => {
 										const {
 											height,
