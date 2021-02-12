@@ -783,4 +783,22 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 	}
+
+	function test_translation_mechanism() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'customTemplates' => array(
+					'page-home' => array(
+						'title' => '_x( SomeTitle SomeContext )',
+					),
+				),
+			)
+		);
+
+		$expected = 'SomeTitle';
+		$actual   = $theme_json->get_raw_data()['customTemplates']['page-home']['title'];
+
+		$this->assertEquals( $expected, $actual );
+	}
+
 }

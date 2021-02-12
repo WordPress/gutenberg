@@ -18,6 +18,8 @@ class WP_Theme_JSON {
 	 */
 	private $theme_json = null;
 
+	private static $domain = null;
+
 	/**
 	 * Holds block metadata extracted from block.json
 	 * to be shared among all instances so we don't
@@ -329,8 +331,9 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $theme_json A structure that follows the theme.json schema.
 	 */
-	public function __construct( $theme_json = array() ) {
+	public function __construct( $theme_json = array(), $domain = 'default' ) {
 		$this->theme_json = array();
+		self::$domain = $domain;
 
 		if ( ! is_array( $theme_json ) ) {
 			return;
@@ -406,6 +409,16 @@ class WP_Theme_JSON {
 			}
 		}
 
+		// Walk the array and translate in place
+		array_walk_recursive( $this->theme_json, [ 'WP_Theme_JSON', 'translate' ] );
+	}
+
+	private static function translate( &$item, $key ) {
+		if ( is_string( $item ) && ( '_x(' === substr( $item, 0, 3 ) ) ) {
+			list( $name, $context ) = sscanf( $item, '_x( %s %s )' );
+			error_log( "item is $item - name is $name / context is $context" );
+			$item = translate_with_gettext_context( $name, $context, self::$domain );
+		}
 	}
 
 	/**
