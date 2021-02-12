@@ -73,6 +73,10 @@ export default function AddMenu( { className, menus, onCreate } ) {
 		>
 			<h3 className="edit-navigation-add-menu__title">{ titleText }</h3>
 			<TextControl
+				// Disable reason: it should focus.
+				//
+				// eslint-disable-next-line jsx-a11y/no-autofocus
+				autoFocus
 				label={ __( 'Menu name' ) }
 				value={ menuName }
 				onChange={ setMenuName }
