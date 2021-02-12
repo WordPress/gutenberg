@@ -1,9 +1,13 @@
+$navigation-editor-width: 420px;
+$navigation-editor-top-padding: $grid-unit-40 * 3;
+
 *,
 *::before,
 *::after {
 	box-sizing: border-box;
 }
 
+@import "./components/add-menu/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/error-boundary/style.scss";
 @import "./components/header/style.scss";

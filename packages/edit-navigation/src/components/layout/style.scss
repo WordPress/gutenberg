@@ -26,7 +26,7 @@
 
 	.edit-navigation-layout__canvas {
 		// Provide space for the floating block toolbar.
-		padding-top: $grid-unit-40 * 3;
+		padding-top: $navigation-editor-top-padding;
 
 		// Ensure the entire layout is full-height, the background
 		// of the editing canvas needs to be full-height for block
@@ -35,10 +35,9 @@
 	}
 }
 
-.edit-navigation__empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 30vh;
-	font-size: 1.1rem;
+.edit-navigation-empty-state {
+	width: $navigation-editor-width;
+	padding-top: $navigation-editor-top-padding;
+	margin-left: auto;
+	margin-right: auto;
 }
