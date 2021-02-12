@@ -208,7 +208,7 @@ class WP_Theme_JSON_Resolver {
 
 		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
-		self::translate_presets( $config );
+		self::translate( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
 		$default_colors_i18n = array(
@@ -288,7 +288,7 @@ class WP_Theme_JSON_Resolver {
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
-			self::translate_presets( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme = new WP_Theme_JSON( $theme_json_data );
 		}
 
