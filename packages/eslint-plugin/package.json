@@ -53,5 +53,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"volta": {
+		"extends": "../../package.json"
 	}
 }

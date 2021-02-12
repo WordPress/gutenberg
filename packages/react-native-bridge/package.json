@@ -5,9 +5,7 @@
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"react-native"
-	],
+	"keywords": [ "react-native" ],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-bridge/README.md",
 	"repository": {
 		"type": "git",
@@ -27,5 +25,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"volta": {
+		"extends": "../../package.json"
 	}
 }
