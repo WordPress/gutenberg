@@ -1,3 +1,29 @@
+/**
+ * Converts store name to variable name.
+ * Removes dashes and uppercases the characters after dashes and appends `Store` at the end.
+ *
+ * @param {string} storeName
+ * @return {string} store name as variable name
+ */
+function storeNameToVariableNames( storeName ) {
+	return (
+		storeName
+			.split( '-' )
+			.map( ( s, index ) =>
+				index === 0
+					? s.toLowerCase()
+					: s[ 0 ].toUpperCase() + s.slice( 1 ).toLowerCase()
+			)
+			.join( '' ) + 'Store'
+	);
+}
+
+/**
+ * Returns last element of an array.
+ *
+ * @param {Array} array
+ * @return {*} last element of the array
+ */
 function arrayLast( array ) {
 	return array[ array.length - 1 ];
 }
@@ -106,61 +132,19 @@ function getFixes( fixer, context, callNode ) {
 			import: '@wordpress/core-data',
 			variable: 'coreStore',
 		},
-		'core/block-editor': {
-			import: '@wordpress/block-editor',
-			variable: 'blockEditorStore',
-		},
-		'core/block-directory': {
-			import: '@wordpress/block-directory',
-			variable: 'blockDirectoryStore',
-		},
-		'core/blocks': {
-			import: '@wordpress/blocks',
-			variable: 'blocksStore',
-		},
-		'core/editor': {
-			import: '@wordpress/editor',
-			variable: 'editorStore',
-		},
-		'core/notices': {
-			import: '@wordpress/notices',
-			variable: 'noticesStore',
-		},
-		'core/reusable-blocks': {
-			import: '@wordpress/reusable-blocks',
-			variable: 'reusableBlocksStore',
-		},
-		'core/keyboard-shortcuts': {
-			import: '@wordpress/keyboard-shortcuts',
-			variable: 'keyboardShortcutsStore',
-		},
-		'core/edit-post': {
-			import: '@wordpress/edit-post',
-			variable: 'editPostStore',
-		},
-		'core/edit-site': {
-			import: '@wordpress/edit-site',
-			variable: 'editSiteStore',
-		},
-		'core/interface': {
-			import: '@wordpress/interface',
-			variable: 'interfaceStore',
-		},
-		'core/viewport': {
-			import: '@wordpress/viewport',
-			variable: 'viewportStore',
-		},
-		'core/rich-text': {
-			import: '@wordpress/rich-text',
-			variable: 'richTextStore',
-		},
 	};
-	if ( ! storeDefinitions[ storeName ] ) {
+	let storeDefinition = storeDefinitions[ storeName ];
+	if ( ! storeDefinition && storeName.startsWith( 'core/' ) ) {
+		const storeNameWithoutCore = storeName.substring( 5 );
+		storeDefinition = {
+			import: `@wordpress/${ storeNameWithoutCore }`,
+			variable: storeNameToVariableNames( storeNameWithoutCore ),
+		};
+	}
+	if ( ! storeDefinition ) {
 		return null;
 	}
-	const { variable: variableName, import: importName } = storeDefinitions[
-		storeName
-	];
+	const { variable: variableName, import: importName } = storeDefinition;
 
 	const fixes = [
 		fixer.replaceText( callNode.arguments[ 0 ], variableName ),
@@ -172,13 +156,14 @@ function getFixes( fixer, context, callNode ) {
 	const packageImports = imports.filter(
 		( n ) => n.source.value === importName
 	);
-	const i = packageImports.length > 0 ? packageImports[ 0 ] : null;
-	if ( i ) {
-		const alreadyHasStore = i.specifiers.some(
-			( s ) => s.imported.name === 'store'
+	const packageImport =
+		packageImports.length > 0 ? packageImports[ 0 ] : null;
+	if ( packageImport ) {
+		const alreadyHasStore = packageImport.specifiers.some(
+			( specifier ) => specifier.imported.name === 'store'
 		);
 		if ( ! alreadyHasStore ) {
-			const lastSpecifier = arrayLast( i.specifiers );
+			const lastSpecifier = arrayLast( packageImport.specifiers );
 			fixes.push(
 				fixer.insertTextAfter(
 					lastSpecifier,
