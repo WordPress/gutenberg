@@ -1,14 +1,22 @@
 .titleContainer {
-	flex-direction: row;
-	align-items: center;
-	padding-bottom: 12;
+	height: $panel-header-height;
+	align-items: flex-end;
 }
 
-.title {
-	font-weight: bold;
+.buttonContainer {
+	position: absolute;
+	right: -$dashed-border-space;
+	padding: 4px;
+	padding-left: 12px;
+	padding-right: 12px;
+	border-radius: 8px;
+	border-color: $light-secondary;
+	border-width: 1px;
+}
+
+.saveButton {
 	color: $light-secondary;
-	flex-grow: 1;
-	flex-shrink: 1;
+	text-align: center;
 }
 
 .titleDark {
@@ -21,7 +29,7 @@
 	position: absolute;
 	left: -$block-selected-to-content + $block-selected-border-width;
 	right: -$block-selected-to-content + $block-selected-border-width;
-	bottom: 0;
+	bottom: 16;
 }
 
 .separatorDark {

@@ -1,26 +1,30 @@
 /**
  * External dependencies
  */
-import {
-	ActivityIndicator,
-	Platform,
-	Text,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import { BottomSheet, Icon, Disabled } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useEntityBlockEditor, useEntityProp } from '@wordpress/core-data';
+import {
+	Disabled,
+	ToolbarGroup,
+	ToolbarButton,
+	TextControl,
+	PanelBody,
+} from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	BlockControls,
+	InspectorControls,
+} from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { ungroup } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,25 +39,14 @@ export default function ReusableBlockEdit( {
 } ) {
 	const recordArgs = [ 'postType', 'wp_block', ref ];
 
-	const [ showHelp, setShowHelp ] = useState( false );
-	const infoTextStyle = usePreferredColorSchemeStyle(
-		styles.infoText,
-		styles.infoTextDark
-	);
-	const infoTitleStyle = usePreferredColorSchemeStyle(
-		styles.infoTitle,
-		styles.infoTitleDark
-	);
-	const infoSheetIconStyle = usePreferredColorSchemeStyle(
-		styles.infoSheetIcon,
-		styles.infoSheetIconDark
-	);
+	const [ isEditing, setIsEditing ] = useState( false );
+
 	const spinnerStyle = usePreferredColorSchemeStyle(
 		styles.spinner,
 		styles.spinnerDark
 	);
 
-	const { reusableBlock, hasResolved, isEditing, settings } = useSelect(
+	const { reusableBlock, hasResolved, isSaving } = useSelect(
 		( select ) => {
 			const { getSettings } = select( 'core/block-editor' );
 
@@ -68,19 +61,13 @@ export default function ReusableBlockEdit( {
 				isSaving: select( 'core' ).isSavingEntityRecord(
 					...recordArgs
 				),
-				canUserUpdate: select( 'core' ).canUser(
-					'update',
-					'blocks',
-					ref
-				),
-				isEditing: select(
-					reusableBlocksStore
-				).__experimentalIsEditingReusableBlock( clientId ),
 				settings: getSettings(),
 			};
 		},
 		[ ref, clientId ]
 	);
+
+	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -88,43 +75,23 @@ export default function ReusableBlockEdit( {
 		{ id: ref }
 	);
 
-	function openSheet() {
-		setShowHelp( true );
-	}
+	const [ title, editTitle ] = useEntityProp(
+		'postType',
+		'wp_block',
+		'title',
+		ref
+	);
 
-	function closeSheet() {
-		setShowHelp( false );
-	}
+	const setTitle = ( value ) => {
+		editTitle( value );
+		setIsEditing( true );
+	};
 
-	function renderSheet() {
-		const infoTitle =
-			Platform.OS === 'android'
-				? __(
-						"Reusable blocks aren't editable on WordPress for Android"
-				  )
-				: __( "Reusable blocks aren't editable on WordPress for iOS" );
+	const {
+		__experimentalConvertBlockToStatic: convertBlockToStatic,
+	} = useDispatch( reusableBlocksStore );
 
-		return (
-			<BottomSheet
-				isVisible={ showHelp }
-				hideHeader
-				onClose={ closeSheet }
-			>
-				<View style={ styles.infoContainer }>
-					<Icon
-						icon={ help }
-						color={ infoSheetIconStyle.color }
-						size={ styles.infoSheetIcon.size }
-					/>
-					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
-						{ infoTitle }
-					</Text>
-				</View>
-			</BottomSheet>
-		);
-	}
-
-	if ( ! hasResolved ) {
+	if ( ! hasResolved || isSaving ) {
 		return (
 			<View style={ spinnerStyle }>
 				<ActivityIndicator animating />
@@ -138,16 +105,12 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	const { title } = reusableBlock;
 	let element = (
-		<BlockEditorProvider
-			settings={ settings }
+		<InnerBlocks
 			value={ blocks }
 			onChange={ onChange }
 			onInput={ onInput }
-		>
-			<BlockList withFooter={ false } marginHorizontal={ 0 } />
-		</BlockEditorProvider>
+		/>
 	);
 
 	if ( ! isEditing ) {
@@ -155,18 +118,41 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<TouchableWithoutFeedback
-			disabled={ ! isSelected }
-			accessibilityLabel={ __( 'Help button' ) }
-			accessibilityRole={ 'button' }
-			accessibilityHint={ __( 'Tap here to show help' ) }
-			onPress={ openSheet }
-		>
+		<View>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () => convertBlockToStatic( clientId ) }
+						label={ __( 'Convert to regular blocks' ) }
+						icon={ ungroup }
+						showTooltip
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+			<InspectorControls>
+				<PanelBody>
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<View>
-				{ isSelected && <EditTitle title={ title } /> }
+				{ isSelected && (
+					<EditTitle
+						isEditing={ isEditing }
+						onClickEdit={ () => {
+							setIsEditing( true );
+						} }
+						onClickSave={ () => {
+							saveEditedEntityRecord( ...recordArgs );
+							setIsEditing( false );
+						} }
+					/>
+				) }
 				{ element }
-				{ renderSheet() }
 			</View>
-		</TouchableWithoutFeedback>
+		</View>
 	);
 }
