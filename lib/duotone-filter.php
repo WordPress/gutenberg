@@ -20,7 +20,7 @@ function gutenberg_render_duotone_filter( $selector, $id, $values ) {
 
 	<style>
 		<?php echo $selector; ?> {
-			filter: url( <?php echo '#' . $id; ?> );
+			filter: url( <?php echo esc_url( '#' . $id ); ?> );
 		}
 	</style>
 
@@ -34,7 +34,7 @@ function gutenberg_render_duotone_filter( $selector, $id, $values ) {
 		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
 	>
 		<defs>
-			<filter id="<?php echo $id; ?>">
+			<filter id="<?php echo esc_attr( $id ); ?>">
 				<feColorMatrix
 					type="matrix"
 					<?php // phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent ?>
@@ -45,9 +45,9 @@ function gutenberg_render_duotone_filter( $selector, $id, $values ) {
 					<?php // phpcs:enable Generic.WhiteSpace.DisallowSpaceIndent ?>
 				/>
 				<feComponentTransfer color-interpolation-filters="sRGB" >
-					<feFuncR type="table" tableValues="<?php echo implode( ' ', $values['r'] ); ?>" />
-					<feFuncG type="table" tableValues="<?php echo implode( ' ', $values['g'] ); ?>" />
-					<feFuncB type="table" tableValues="<?php echo implode( ' ', $values['b'] ); ?>" />
+					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $values['r'] ) ); ?>" />
+					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $values['g'] ) ); ?>" />
+					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $values['b'] ) ); ?>" />
 				</feComponentTransfer>
 			</filter>
 		</defs>
