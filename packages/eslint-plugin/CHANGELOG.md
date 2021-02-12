@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Prepare and lint rules for TypeScript. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+
 ### New Features
 
 -   Enabled `import/default` and `import/named` rules in the `recommended` ruleset. [#28513](https://github.com/WordPress/gutenberg/pull/28513)
