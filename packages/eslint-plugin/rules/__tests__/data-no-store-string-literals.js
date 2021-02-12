@@ -57,6 +57,85 @@ const invalid = [
 	`import { controls } from '@wordpress/data'; controls.dispatch( 'core' );`,
 	`import { controls } from '@wordpress/data'; controls.resolveSelect( 'core' );`,
 	`import { controls as controlsAlias } from '@wordpress/data'; controlsAlias.resolveSelect( 'core' );`,
+
+	// Direct function calls suggestions
+	{
+		// Replace core with coreStore and import coreStore
+		code: `import { select } from '@wordpress/data'; select( 'core' );`,
+		errors: [
+			{
+				suggestions: [
+					{
+						desc:
+							'Replace literal with store definition. Import store if neccessary.',
+						output: `import { select } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; select( coreStore );`,
+					},
+				],
+			},
+		],
+	},
+	{
+		// Replace core with coreStore. A @wordpress/core-data already exists, so it should append the import to that one.
+		code: `import { select } from '@wordpress/data'; import { something } from '@wordpress/core-data'; select( 'core' );`,
+		errors: [
+			{
+				suggestions: [
+					{
+						desc:
+							'Replace literal with store definition. Import store if neccessary.',
+						output: `import { select } from '@wordpress/data'; import { something,store as coreStore } from '@wordpress/core-data'; select( coreStore );`,
+					},
+				],
+			},
+		],
+	},
+	{
+		// Replace core with coreStore. A @wordpress/core-data already exists, so it should append the import to that one.
+		// This time there is a comma after the import.
+		code: `import { select } from '@wordpress/data'; import { something, } from '@wordpress/core-data'; select( 'core' );`,
+		errors: [
+			{
+				suggestions: [
+					{
+						desc:
+							'Replace literal with store definition. Import store if neccessary.',
+						output: `import { select } from '@wordpress/data'; import { something,store as coreStore, } from '@wordpress/core-data'; select( coreStore );`,
+					},
+				],
+			},
+		],
+	},
+	{
+		// Replace core with coreStore. Store import already exists. It shouldn't modify the import, just replace the literal with the store definition.
+		code: `import { select } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; select( 'core' );`,
+		errors: [
+			{
+				suggestions: [
+					{
+						desc:
+							'Replace literal with store definition. Import store if neccessary.',
+						output: `import { select } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; select( coreStore );`,
+					},
+				],
+			},
+		],
+	},
+	{
+		// Replace core with coreStore. There are internal and WordPress dependencies.
+		// It should append the import after the last WordPress dependency import.
+		code: `import { a } from './a'; import { select } from '@wordpress/data'; import { b } from './b'; select( 'core' );`,
+		errors: [
+			{
+				suggestions: [
+					{
+						desc:
+							'Replace literal with store definition. Import store if neccessary.',
+						output: `import { a } from './a'; import { select } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; import { b } from './b'; select( coreStore );`,
+					},
+				],
+			},
+		],
+	},
 ];
 const errors = [
 	{
@@ -66,5 +145,7 @@ const errors = [
 
 ruleTester.run( 'data-no-store-string-literals', rule, {
 	valid: valid.map( ( code ) => ( { code } ) ),
-	invalid: invalid.map( ( code ) => ( { code, errors } ) ),
+	invalid: invalid.map( ( code ) =>
+		typeof code === 'string' ? { code, errors } : code
+	),
 } );
