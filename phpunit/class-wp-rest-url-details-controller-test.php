@@ -454,8 +454,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		add_filter(
 			'pre_http_request',
 			function( $response, $args ) {
+				// <section> tags are one way to cause an error with DOMDocument::loadHTML.
 				// See https://www.php.net/manual/en/domdocument.loadhtml.php#125526.
-				$response_which_throws_errors = '<section></section><title>findme</title>';
+				$response_which_throws_errors = '<title>findme</title><section></section>';
 				return $this->mock_request_to_remote_url( 'success', $args, $response_which_throws_errors );
 			},
 			10,
@@ -474,6 +475,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$data = $response->get_data();
 
+		// Check that no errors are thrown by DOMDocument::loadHTML
+		// and that we still get the target value even if it's part of
+		// a document that throws errors.
 		$this->assertEquals(
 			array(
 				'title' => 'findme',

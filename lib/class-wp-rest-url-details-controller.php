@@ -170,7 +170,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		if ( false === $loaded_status ) {
 			return new WP_Error( 'rest_invalid_content', __( 'Unable to parse HTML response from remote URL.', 'gutenberg' ) );
 		}
-		return new DOMXpath( $doc );
+
+		$xpath = new DOMXpath( $doc );
+
+		return $xpath;
 	}
 
 	/**
