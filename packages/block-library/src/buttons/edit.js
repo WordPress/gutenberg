@@ -42,23 +42,15 @@ function ButtonsEdit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	function handleItemsAlignment( align ) {
-		return () => {
-			const justification =
-				contentJustification === align ? undefined : align;
-			setAttributes( {
-				contentJustification: justification,
-			} );
-		};
-	}
-
 	return (
 		<>
 			<BlockControls>
 				<JustifyToolbar
 					allowedControls={ [ 'left', 'center', 'right' ] }
 					value={ contentJustification }
-					onChange={ handleItemsAlignment }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
 					popoverProps={ {
 						position: 'bottom right',
 						isAlternate: true,
