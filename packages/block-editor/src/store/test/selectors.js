@@ -3115,18 +3115,18 @@ describe( 'selectors', () => {
 					state,
 					targetBlocksClientIds
 				)
-			).toEqual( [
-				{
+			).toEqual( {
+				'test-1-dummy-clientId': {
 					setting1: false,
 				},
-				{
+				'test-3-dummy-clientId': {
 					setting1: true,
 					setting2: false,
 				},
-			] );
+			} );
 		} );
 
-		it( 'should return empty array if settings for the blocks don’t exist', () => {
+		it( 'should return empty object if settings for the blocks don’t exist', () => {
 			// Does not include target Block clientIds
 			const state = {
 				blockListSettings: {
@@ -3150,7 +3150,7 @@ describe( 'selectors', () => {
 					state,
 					targetBlocksClientIds
 				)
-			).toEqual( [] );
+			).toEqual( {} );
 		} );
 	} );
 

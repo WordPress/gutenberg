@@ -138,6 +138,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		if ( isset( $request['wp_id'] ) ) {
 			$query['wp_id'] = $request['wp_id'];
 		}
+		if ( isset( $request['area'] ) ) {
+			$query['area'] = $request['area'];
+		}
 		$templates = array();
 		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
 			$data        = $this->prepare_item_for_response( $template, $request );
@@ -358,6 +361,16 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->post_excerpt = $template->description;
 		}
 
+		if ( 'wp_template_part' === $this->post_type ) {
+			if ( isset( $request['area'] ) ) {
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $request['area'] );
+			} elseif ( null !== $template && ! $template->is_custom && $template->area ) {
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $template->area );
+			} elseif ( ! $template->area ) {
+				$changes->tax_input['wp_template_part_area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+			}
+		}
+
 		return $changes;
 	}
 
@@ -385,6 +398,10 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			'status'      => $template->status,
 			'wp_id'       => $template->wp_id,
 		);
+
+		if ( 'wp_template_part' === $template->type ) {
+			$result['area'] = $template->area;
+		}
 
 		$result = $this->add_additional_fields_to_object( $result, $request );
 
@@ -535,6 +552,14 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 				),
 			),
 		);
+
+		if ( 'wp_template_part' === $this->post_type ) {
+			$schema['properties']['area'] = array(
+				'description' => __( 'Where the template part is intended for use (header, footer, etc.)', 'gutenberg' ),
+				'type'        => 'string',
+				'context'     => array( 'embed', 'view', 'edit' ),
+			);
+		}
 
 		$this->schema = $schema;
 

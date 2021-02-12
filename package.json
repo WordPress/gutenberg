@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.9.1",
+	"version": "10.0.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -67,6 +67,7 @@
 		"@wordpress/plugins": "file:packages/plugins",
 		"@wordpress/primitives": "file:packages/primitives",
 		"@wordpress/priority-queue": "file:packages/priority-queue",
+		"@wordpress/react-i18n": "file:packages/react-i18n",
 		"@wordpress/react-native-aztec": "file:packages/react-native-aztec",
 		"@wordpress/react-native-bridge": "file:packages/react-native-bridge",
 		"@wordpress/react-native-editor": "file:packages/react-native-editor",
@@ -197,6 +198,7 @@
 		"sass-loader": "8.0.2",
 		"semver": "7.3.2",
 		"simple-git": "1.113.0",
+		"snapshot-diff": "0.8.1",
 		"source-map-loader": "0.2.4",
 		"sprintf-js": "1.1.1",
 		"style-loader": "1.0.0",

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const getJSDocFromToken = require( '../get-jsdoc-from-token' );
+const getJSDocFromToken = require( '../lib/get-jsdoc-from-token' );
 
 describe( 'JSDoc', () => {
 	it( 'extracts description and tags', () => {

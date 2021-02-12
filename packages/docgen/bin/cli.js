@@ -3,7 +3,7 @@
 /**
  * Internal dependencies
  */
-const docgen = require( '../src' );
+const docgen = require( '../lib' );
 
 const optionator = require( 'optionator' )( {
 	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',

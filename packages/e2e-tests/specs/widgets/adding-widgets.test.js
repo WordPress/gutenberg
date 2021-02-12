@@ -6,6 +6,7 @@ import {
 	deactivatePlugin,
 	activatePlugin,
 	activateTheme,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -105,7 +106,8 @@ describe( 'Widgets screen', () => {
 		// 	firstWidgetArea
 		// );
 
-		await addParagraphBlock.click();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		const addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
@@ -125,7 +127,8 @@ describe( 'Widgets screen', () => {
 		await expectInsertionPointIndicatorToBeBelowLastBlock(
 			firstWidgetArea
 		);
-		await addParagraphBlock.click();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		await page.keyboard.type( 'Second Paragraph' );
 
@@ -311,7 +314,8 @@ describe( 'Widgets screen', () => {
 		);
 
 		const addParagraphBlock = await getParagraphBlockInGlobalInserter();
-		await addParagraphBlock.click();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		const firstParagraphBlock = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
