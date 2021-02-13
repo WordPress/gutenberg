@@ -14,9 +14,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { buttonWithIcon, toggleLabel } from './icons';
+import ButtonPositionDropdown from './button-position-dropdown.native';
 
 export default function SearchEdit( { attributes, setAttributes } ) {
 	const { label, showLabel, buttonPosition, buttonUseIcon } = attributes;
+
+	const handleBlockPositionChange = ( position ) => {
+		setAttributes( {
+			buttonPosition: position,
+		} );
+	};
 
 	const controls = (
 		<BlockControls>
@@ -30,6 +37,11 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 						} );
 					} }
 					isActive={ showLabel }
+				/>
+
+				<ButtonPositionDropdown
+					selectedOption={ buttonPosition }
+					onChange={ handleBlockPositionChange }
 				/>
 
 				{ 'no-button' !== buttonPosition && (
