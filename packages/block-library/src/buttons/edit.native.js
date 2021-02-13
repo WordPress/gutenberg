@@ -7,23 +7,22 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	InnerBlocks,
+	JustifyToolbar,
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import {
-	ToolbarGroup,
-	ToolbarItem,
-	alignmentHelpers,
-} from '@wordpress/components';
+import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
-import ContentJustificationDropdown from './content-justification-dropdown';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
@@ -105,12 +104,6 @@ export default function ButtonsEdit( {
 		[]
 	);
 
-	function onChangeContentJustification( updatedValue ) {
-		setAttributes( {
-			contentJustification: updatedValue,
-		} );
-	}
-
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
@@ -126,17 +119,17 @@ export default function ButtonsEdit( {
 		<>
 			{ isSelected && (
 				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<ContentJustificationDropdown
-									toggleProps={ toggleProps }
-									value={ contentJustification }
-									onChange={ onChangeContentJustification }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
+					<JustifyToolbar
+						allowedControls={ [ 'left', 'center', 'right' ] }
+						value={ contentJustification }
+						onChange={ ( value ) =>
+							setAttributes( { contentJustification: value } )
+						}
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
+					/>
 				</BlockControls>
 			) }
 			{ resizeObserver }

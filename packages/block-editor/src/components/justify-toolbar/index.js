@@ -24,6 +24,17 @@ export function JustifyToolbar( {
 	value,
 	popoverProps,
 } ) {
+	// If the control is already selected we want a click
+	// again on the control to deselect the item, so we
+	// call onChange( undefined )
+	const handleClick = ( next ) => {
+		if ( next === value ) {
+			onChange( undefined );
+		} else {
+			onChange( next );
+		}
+	};
+
 	const icon = value ? icons[ value ] : icons.left;
 	const allControls = [
 		{
@@ -31,28 +42,28 @@ export function JustifyToolbar( {
 			icon: justifyLeft,
 			title: __( 'Justify items left' ),
 			isActive: 'left' === value,
-			onClick: onChange( 'left' ),
+			onClick: () => handleClick( 'left' ),
 		},
 		{
 			name: 'center',
 			icon: justifyCenter,
 			title: __( 'Justify items center' ),
 			isActive: 'center' === value,
-			onClick: onChange( 'center' ),
+			onClick: () => handleClick( 'center' ),
 		},
 		{
 			name: 'right',
 			icon: justifyRight,
 			title: __( 'Justify items right' ),
 			isActive: 'right' === value,
-			onClick: onChange( 'right' ),
+			onClick: () => handleClick( 'right' ),
 		},
 		{
 			name: 'space-between',
 			icon: justifySpaceBetween,
 			title: __( 'Space between items' ),
 			isActive: 'space-between' === value,
-			onClick: onChange( 'space-between' ),
+			onClick: () => handleClick( 'space-between' ),
 		},
 	];
 

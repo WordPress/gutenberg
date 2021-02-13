@@ -22,7 +22,7 @@ export function useFlexItem( props ) {
 	const sx = {};
 
 	sx.Base = css( {
-		display: displayProp || ui.get( 'FlexItemDisplay' ),
+		display: displayProp || ui.get( 'flexItemDisplay' ),
 	} );
 
 	const classes = cx(

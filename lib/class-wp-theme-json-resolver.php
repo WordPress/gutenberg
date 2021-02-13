@@ -53,13 +53,13 @@ class WP_Theme_JSON_Resolver {
 	 * schema and returns an array with its contents,
 	 * or a void array if none found.
 	 *
-	 * @param string $file_path Path to file.
+	 * @param string $file_path Path to file. Empty if no file.
 	 *
 	 * @return array Contents that adhere to the theme.json schema.
 	 */
-	private static function get_from_file( $file_path ) {
+	private static function read_json_file( $file_path ) {
 		$config = array();
-		if ( file_exists( $file_path ) ) {
+		if ( $file_path ) {
 			$decoded_file = json_decode(
 				file_get_contents( $file_path ),
 				true
@@ -145,7 +145,7 @@ class WP_Theme_JSON_Resolver {
 	public static function get_presets_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
-			$file_structure  = self::get_from_file( __DIR__ . '/experimental-i18n-theme.json' );
+			$file_structure  = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
 			$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
 		return $theme_json_i18n;
@@ -207,7 +207,7 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
-		$config     = self::get_from_file( __DIR__ . '/experimental-default-theme.json' );
+		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
 		self::translate( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
@@ -287,7 +287,7 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
-			$theme_json_data = self::get_from_file( locate_template( 'experimental-theme.json' ) );
+			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
 			self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme = new WP_Theme_JSON( $theme_json_data );
 		}
@@ -483,10 +483,37 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = is_readable( locate_template( 'experimental-theme.json' ) );
+			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
 		}
 
 		return self::$theme_has_support;
+	}
+
+	/**
+	 * Builds the path to the given file
+	 * and checks that it is readable.
+	 *
+	 * If it isn't, returns an empty string,
+	 * otherwise returns the whole file path.
+	 *
+	 * @param string $file_name Name of the file.
+	 * @return string The whole file path or empty if the file doesn't exist.
+	 */
+	private static function get_file_path_from_theme( $file_name ) {
+		// This used to be a locate_template call.
+		// However, that method proved problematic
+		// due to its use of constants (STYLESHEETPATH)
+		// that threw errors in some scenarios.
+		//
+		// When the theme.json merge algorithm properly supports
+		// child themes, this should also fallback
+		// to the template path, as locate_template did.
+		$located   = '';
+		$candidate = get_stylesheet_directory() . '/' . $file_name;
+		if ( is_readable( $candidate ) ) {
+			$located = $candidate;
+		}
+		return $located;
 	}
 
 }
