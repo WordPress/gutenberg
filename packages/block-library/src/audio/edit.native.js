@@ -48,7 +48,7 @@ function AudioEdit( {
 	onBlur,
 	clientId,
 } ) {
-	const { id, autoplay, loop, preload, src } = attributes;
+	const { id, autoplay, muted, loop, preload, src } = attributes;
 
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 
@@ -177,6 +177,11 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Muted' ) }
+							onChange={ toggleAttribute( 'muted' ) }
+							checked={ muted }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
