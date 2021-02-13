@@ -32,8 +32,8 @@ export function getActiveStyle( styles, className ) {
 }
 
 /**
- * Replaces the active style in the block's className except
- * if it's the default style.
+ * Replaces the active style in the block's className except if it's the default
+ * style.
  *
  * @param {string}  className   Class name.
  * @param {Object?} activeStyle The replaced style.
