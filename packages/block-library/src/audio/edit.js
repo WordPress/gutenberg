@@ -40,7 +40,7 @@ function AudioEdit( {
 	noticeUI,
 	insertBlocksAfter,
 } ) {
-	const { id, autoplay, caption, loop, preload, src } = attributes;
+	const { id, autoplay, muted, caption, loop, preload, src } = attributes;
 	const blockProps = useBlockProps();
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -151,6 +151,11 @@ function AudioEdit( {
 						onChange={ toggleAttribute( 'autoplay' ) }
 						checked={ autoplay }
 						help={ getAutoplayHelp }
+					/>
+					<ToggleControl
+						label={ __( 'Muted' ) }
+						onChange={ toggleAttribute( 'muted' ) }
+						checked={ muted }
 					/>
 					<ToggleControl
 						label={ __( 'Loop' ) }
