@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -19,10 +19,10 @@ import ButtonPositionDropdown from './button-position-dropdown.native';
 export default function SearchEdit( { attributes, setAttributes } ) {
 	const { label, showLabel, buttonPosition, buttonUseIcon } = attributes;
 
-	const handleBlockPositionChange = ( position ) => {
-		setAttributes( {
-			buttonPosition: position,
-		} );
+	// Temporary. Will be removed when styling is implemented
+	// in a future PR.
+	const alert = ( message ) => {
+		Alert.alert( '', message, [ { text: 'OK' } ], { cancelable: true } );
 	};
 
 	const controls = (
@@ -41,7 +41,15 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 
 				<ButtonPositionDropdown
 					selectedOption={ buttonPosition }
-					onChange={ handleBlockPositionChange }
+					onChange={ ( position ) => {
+						setAttributes( {
+							buttonPosition: position,
+						} );
+
+						// Temporary. Will be removed when styling is implemented
+						// in a future PR.
+						alert( `Button position: ${ position }` );
+					} }
 				/>
 
 				{ 'no-button' !== buttonPosition && (
@@ -52,6 +60,10 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 							setAttributes( {
 								buttonUseIcon: ! buttonUseIcon,
 							} );
+
+							// Temporary. Will be removed when styling is implemented
+							// in a future PR.
+							alert( `Icon only button: ${ ! buttonUseIcon }` );
 						} }
 						isActive={ buttonUseIcon }
 					/>
