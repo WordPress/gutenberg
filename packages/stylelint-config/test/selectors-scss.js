@@ -2,7 +2,8 @@
  * External dependencies
  */
 const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
+	stylelint = require( 'stylelint' ),
+	{ resolve } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ describe( 'flags no warnings with valid selectors scss', () => {
 	beforeEach( () => {
 		result = stylelint.lint( {
 			code: validScss,
+			configBasedir: resolve( __dirname, '..' ),
 			config,
 		} );
 	} );
@@ -44,6 +46,7 @@ describe( 'flags warnings with invalid selectors scss', () => {
 	beforeEach( () => {
 		result = stylelint.lint( {
 			code: invalidScss,
+			configBasedir: resolve( __dirname, '..' ),
 			config,
 		} );
 	} );

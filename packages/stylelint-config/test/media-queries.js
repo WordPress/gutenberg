@@ -2,8 +2,8 @@
  * External dependencies
  */
 const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
-
+	stylelint = require( 'stylelint' ),
+	{ resolve } = require( 'path' );
 /**
  * Internal dependencies
  */
@@ -23,6 +23,7 @@ describe( 'flags no warnings with valid media queries css', () => {
 	beforeEach( () => {
 		result = stylelint.lint( {
 			code: validCss,
+			configBasedir: resolve( __dirname, '..' ),
 			config,
 		} );
 	} );
@@ -44,6 +45,7 @@ describe( 'flags warnings with invalid media queries css', () => {
 	beforeEach( () => {
 		result = stylelint.lint( {
 			code: invalidCss,
+			configBasedir: resolve( __dirname, '..' ),
 			config,
 		} );
 	} );
