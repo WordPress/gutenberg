@@ -6,11 +6,11 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { defaultColumnsNumberV1 } from './deprecated';
+import { defaultColumnsNumberV1 } from '../deprecated';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
-} from './constants';
+} from '../constants';
 
 export default function saveV1( { attributes } ) {
 	const {

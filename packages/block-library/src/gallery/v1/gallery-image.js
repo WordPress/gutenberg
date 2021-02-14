@@ -26,11 +26,11 @@ import {
 /**
  * Internal dependencies
  */
-import { pickRelevantMediaFiles } from './shared';
+import { pickRelevantMediaFiles } from '../shared';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
-} from './constants';
+} from '../constants';
 
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 

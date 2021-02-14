@@ -45,7 +45,7 @@ import {
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
-import GalleryEditV1 from './edit-v1';
+import GalleryEditV1 from './v1/edit';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [

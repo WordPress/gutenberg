@@ -15,7 +15,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
-import { defaultColumnsNumberV1 } from './deprecated';
+import { defaultColumnsNumberV1 } from '../deprecated';
 
 export const Gallery = ( props ) => {
 	const {
