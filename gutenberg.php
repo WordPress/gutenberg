@@ -9,6 +9,7 @@
  * Author: Gutenberg Team and Birgit Pauli-Haack (Gutenberg Times)
  * Text Domain: gutenberg
  * GitHub Plugin URI: bph/gutenberg
+ * Primary Branch: trunk 
  * Release Asset: true
  *
  * @package gutenberg
