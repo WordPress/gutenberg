@@ -2,7 +2,9 @@
 
 module.exports = {
 	extends: 'stylelint-config-recommended',
+	plugins: [ './plugins/ignore-mobile-files-class-selector-rule' ],
 	rules: {
+		'wordpress/ignore-mobile-files-class-selector-rule': true,
 		'at-rule-empty-line-before': [
 			'always',
 			{
