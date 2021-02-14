@@ -5,11 +5,13 @@ figure.wp-block-gallery {
 
 	display: block;
 	margin: 0;
-
-	.components-drop-zone {
-		display: none;
-		pointer-events: none;
+	&.has-nested-images {
+		.components-drop-zone {
+			display: none;
+			pointer-events: none;
+		}
 	}
+
 	> .blocks-gallery-caption {
 		flex: 0 0 100%;
 	}
@@ -65,8 +67,12 @@ figure.wp-block-gallery {
 		margin: 0 8px 0 4px;
 	}
 }
-.blocks-gallery-item {
 
+/**
+ * Deprecated css past this point. This can be removed once all galleries are migrated
+ * to V2.
+ */
+.blocks-gallery-item {
 	// Hide the focus outline that otherwise briefly appears when selecting a block.
 	figure:not(.is-selected):focus,
 	img:focus {
@@ -155,4 +161,10 @@ figure.wp-block-gallery {
 	&.is-right {
 		right: -2px;
 	}
+}
+
+.wp-block-gallery ul.blocks-gallery-grid {
+	padding: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin: 0;
 }
