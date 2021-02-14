@@ -61,9 +61,13 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 
 				// Asset files should match.
 				assetFiles.forEach( ( assetFile ) => {
+					const assetBasename = path.basename( assetFile );
+
 					expect(
 						fs.readFileSync( assetFile, 'utf-8' )
-					).toMatchSnapshot( 'Asset file should match snapshot' );
+					).toMatchSnapshot(
+						`Asset file '${ assetBasename }' should match snapshot`
+					);
 				} );
 
 				const compareByModuleIdentifier = ( m1, m2 ) => {
