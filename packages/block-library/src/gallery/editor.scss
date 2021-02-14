@@ -51,6 +51,9 @@ figure.wp-block-gallery {
 			left: 0;
 			z-index: 1;
 		}
+		figcaption {
+			z-index: 2;
+		}
 	}
 
 	figure.is-transient img {
