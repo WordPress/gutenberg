@@ -28,6 +28,8 @@ function EditInPlaceControl( {
 	switchToEditModeButtonLabel,
 	inputValidator = negate( isUndefined ),
 	editNameInputLabel = initialValue,
+	onChange = noop,
+	onKeyDown = noop,
 } ) {
 	const [ isEdit, setIsEdit ] = useState( false );
 	const [ value, setValue ] = useState( initialValue );
@@ -56,7 +58,9 @@ function EditInPlaceControl( {
 					className={ inputCssClasses }
 					value={ value }
 					onChange={ ( event ) => {
+						const _value = event.target.value;
 						setValue( event.target.value );
+						onChange( _value, event );
 					} }
 					onFocus={ () =>
 						setInputCssClasses( withTransitionCssClass )
@@ -80,6 +84,7 @@ function EditInPlaceControl( {
 							setIsEdit( false );
 							event.target.blur();
 						}
+						onKeyDown( event );
 					} }
 				/>
 			) : (
