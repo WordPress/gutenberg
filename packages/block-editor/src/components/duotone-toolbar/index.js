@@ -4,7 +4,7 @@
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { noFilter } from '@wordpress/icons';
+import { swatch } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
 /**
@@ -35,7 +35,7 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 					aria-haspopup="true"
 					aria-expanded={ isOpen }
 					onKeyDown={ openOnArrowDown }
-					label={ __( 'Change image duotone filter' ) }
+					label={ __( 'Apply duotone filter' ) }
 					icon={
 						value ? (
 							<Swatch
@@ -45,7 +45,7 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 								) }
 							/>
 						) : (
-							noFilter
+							swatch
 						)
 					}
 				/>

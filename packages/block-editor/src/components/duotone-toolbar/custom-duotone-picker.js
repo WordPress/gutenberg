@@ -4,7 +4,7 @@
 import { Button, ColorPalette, Icon } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { noFilter } from '@wordpress/icons';
+import { swatch } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,7 +19,7 @@ import {
 
 function CustomColorOption( { label, value, colors, onChange } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const icon = value ? <Swatch fill={ value } /> : <Icon icon={ noFilter } />;
+	const icon = value ? <Swatch fill={ value } /> : <Icon icon={ swatch } />;
 	return (
 		<>
 			<Button
