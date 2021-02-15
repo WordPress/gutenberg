@@ -12,3 +12,4 @@ export { default as useNavigationEditor } from './use-navigation-editor';
 export { default as useNavigationBlockEditor } from './use-navigation-block-editor';
 export { default as useMenuNotifications } from './use-menu-notifications';
 export { default as useNavigationEditorMenu } from './use-navigation-editor-menu';
+export { default as useMenuLocations } from './use-menu-locations';
