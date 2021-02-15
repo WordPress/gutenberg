@@ -7,11 +7,7 @@ import { truncate } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	getBlockType,
-	__experimentalGetBlockLabel as getBlockLabel,
-	isReusableBlock,
-} from '@wordpress/blocks';
+import { getBlockType, isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -35,7 +31,7 @@ import { store as blockEditorStore } from '../../store';
  * @return {?string} Block title.
  */
 export default function BlockTitle( { clientId } ) {
-	const { attributes, name, reusableBlockTitle } = useSelect(
+	const { name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return {};
@@ -51,7 +47,6 @@ export default function BlockTitle( { clientId } ) {
 			}
 			const isReusable = isReusableBlock( getBlockType( blockName ) );
 			return {
-				attributes: getBlockAttributes( clientId ),
 				name: blockName,
 				reusableBlockTitle:
 					isReusable &&
@@ -65,13 +60,7 @@ export default function BlockTitle( { clientId } ) {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 	if ( ! name || ! blockInformation ) return null;
-	const blockType = getBlockType( name );
-	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
-	// Label will fallback to the title if no label is defined for the current
-	// label context. If the label is defined we prioritize it over possible
-	// possible block variation title match.
-	if ( label !== blockType.title ) {
-		return truncate( label, { length: 35 } );
-	}
-	return blockInformation.title;
+
+	const label = reusableBlockTitle || blockInformation.title;
+	return truncate( label, { length: 35 } );
 }

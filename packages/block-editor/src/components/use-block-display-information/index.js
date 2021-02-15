@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -22,49 +25,67 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
- * Hook used to try to find a matching block variation and return
- * the appropriate information for display reasons. In order to
- * to try to find a match we need to things:
+ * Hook used appropriate information for display reasons.
+ * It takes variations and custom `label` function into account.
+ *
+ * In order to try to find a variation match we need to things:
  * 1. Block's client id to extract it's current attributes.
  * 2. A block variation should have set `isActive` prop to a proper function.
  *
- * If for any reason a block variaton match cannot be found,
- * the returned information come from the Block Type.
+ * Value from custom `label` function is prioritized, if that's not found
+ * then the block variation' information is returned. If both are missing
+ * then the information is returned from the Block Type.
  * If no blockType is found with the provided clientId, returns null.
  *
  * @param {string} clientId Block's client id.
  * @return {?WPBlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
  */
-
 export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
+
 			const { getBlockName, getBlockAttributes } = select(
 				blockEditorStore
 			);
 			const { getBlockType, getBlockVariations } = select( blocksStore );
+
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) return null;
+
 			const variations = getBlockVariations( blockName );
-			const blockTypeInfo = {
-				title: blockType.title,
-				icon: blockType.icon,
-				description: blockType.description,
-			};
-			if ( ! variations?.length ) return blockTypeInfo;
 			const attributes = getBlockAttributes( clientId );
-			const match = variations.find( ( variation ) =>
-				variation.isActive?.( attributes, variation.attributes )
-			);
-			if ( ! match ) return blockTypeInfo;
+
+			const dynamicTitle = getBlockLabel( blockType, attributes );
+			const variationInfo = getVariationInfo( variations, attributes );
+
+			const title =
+				dynamicTitle && dynamicTitle !== blockType.title
+					? dynamicTitle
+					: variationInfo.title || blockType.title;
+			const icon = variationInfo.icon || blockType.icon;
+			const description =
+				variationInfo.description || blockType.description;
+
 			return {
-				title: match.title || blockType.title,
-				icon: match.icon || blockType.icon,
-				description: match.description || blockType.description,
+				title,
+				icon,
+				description,
 			};
 		},
 		[ clientId ]
 	);
+}
+
+function getVariationInfo( variations, attributes ) {
+	const emptyInfo = { title: null, icon: null, description: null };
+	if ( ! variations?.length ) {
+		return emptyInfo;
+	}
+
+	const match = variations.find( ( variation ) =>
+		variation.isActive?.( attributes, variation.attributes )
+	);
+	return match || emptyInfo;
 }
