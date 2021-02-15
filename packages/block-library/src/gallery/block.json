@@ -10,6 +10,13 @@
 				"type": "object"
 			}
 		},
+		"shortCodeTransforms": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		},
 		"columns": {
 			"type": "number",
 			"minimum": 1,
