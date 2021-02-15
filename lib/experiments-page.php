@@ -110,3 +110,19 @@ function gutenberg_display_experiment_section() {
 
 	<?php
 }
+
+/**
+ * Extends default editor settings with experiments settings.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_experiments_editor_settings( $settings ) {
+	$experiments_exist    = get_option( 'gutenberg-experiments' );
+	$experiments_settings = array(
+		'__experimentalGalleryRefactor'          => $experiments_exist ? array_key_exists( 'gutenberg-gallery-refactor', get_option( 'gutenberg-experiments' ) ) : false,
+	);
+	return array_merge( $settings, $experiments_settings );
+}
+add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

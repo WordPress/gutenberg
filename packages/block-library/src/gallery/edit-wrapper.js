@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import GalleryEdit from './edit';
@@ -12,7 +18,16 @@ import GalleryEditV1 from './v1/edit';
 export default function GalleryEditWrapper( props ) {
 	const { attributes } = props;
 
-	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
+	const __experimentalGalleryRefactor = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings.__experimentalGalleryRefactor;
+	}, [] );
+
+	if (
+		! __experimentalGalleryRefactor ||
+		attributes?.ids?.length > 0 ||
+		attributes?.images?.length > 0
+	) {
 		return <GalleryEditV1 { ...props } />;
 	}
 
