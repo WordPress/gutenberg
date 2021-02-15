@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 9.9.3 =
+
+### Bug fixes
+
+- Gallery Block: Add z-index to fig caption to make sure it is still selectable ([28992](https://github.com/WordPress/gutenberg/pull/28992)
+- Inserter: Prevent focused block from stealing focus when inserting a new block ([28962](https://github.com/WordPress/gutenberg/pull/28962))
+
+
 = 9.9.2 =
 
 ### Bug fixes
@@ -7,6 +15,7 @@
 - Remove duplication of editor styles ([28837](https://github.com/WordPress/gutenberg/pull/28837))
 - Add useMergeRefs hook ([27768](https://github.com/WordPress/gutenberg/pull/27768)) (dependency of 28837)
 - Cover: add missing align attr to deprecation ([28796](https://github.com/WordPress/gutenberg/pull/28796))
+
 
 = 9.9.1 =
 
