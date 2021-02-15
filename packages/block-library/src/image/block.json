@@ -2,7 +2,13 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
-	"usesContext": [ "allowResize", "isListItem" ],
+	"usesContext": [
+		"allowResize",
+		"isListItem",
+		"linkTo",
+		"linkTarget",
+		"sizeSlug"
+	],
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -73,6 +79,14 @@
 		"isListItem": {
 			"type": "boolean",
 			"default": false
+		},
+		"inheritedAttributes": {
+			"type": "object",
+			"default": {
+				"linkTo": false,
+				"linkTarget": false,
+				"sizeSlug": false
+			}
 		}
 	},
 	"supports": {
