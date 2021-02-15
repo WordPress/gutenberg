@@ -30,6 +30,7 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	__experimentalDuotoneToolbar as DuotoneToolbar,
 	__experimentalDuotoneFilter as DuotoneFilter,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -41,6 +42,7 @@ import {
 } from '@wordpress/blocks';
 import { crop, textColor, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -93,13 +95,13 @@ export default function Image( {
 	const prevUrl = usePrevious( url );
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
-			const { getMedia } = select( 'core' );
+			const { getMedia } = select( coreStore );
 			const {
 				getMultiSelectedBlockClientIds,
 				getBlockName,
 				getSelectedBlock,
 				getSelectedBlockClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
 				block: getSelectedBlock(),
@@ -117,7 +119,7 @@ export default function Image( {
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 			return pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -126,9 +128,7 @@ export default function Image( {
 			] );
 		}
 	);
-	const { replaceBlocks, toggleSelection } = useDispatch(
-		'core/block-editor'
-	);
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);

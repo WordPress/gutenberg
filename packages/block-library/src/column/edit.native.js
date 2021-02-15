@@ -14,6 +14,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -231,7 +232,7 @@ export default compose( [
 			getBlocks,
 			getBlockOrder,
 			getBlockAttributes,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;

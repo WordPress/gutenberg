@@ -200,6 +200,7 @@ describe( 'actions', () => {
 				clientIds: [ 'chicken' ],
 				blocks: [ block ],
 				time: expect.any( Number ),
+				initialPosition: 0,
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
@@ -318,6 +319,7 @@ describe( 'actions', () => {
 				clientIds: [ 'chicken' ],
 				blocks,
 				time: expect.any( Number ),
+				initialPosition: 0,
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
@@ -406,6 +408,7 @@ describe( 'actions', () => {
 					rootClientId: 'testclientid',
 					time: expect.any( Number ),
 					updateSelection: true,
+					initialPosition: 0,
 				},
 			} );
 		} );
@@ -493,6 +496,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 				},
 			} );
 		} );
@@ -549,6 +553,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 				},
 			} );
 		} );
@@ -613,6 +618,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 				},
 			} );
 		} );
@@ -683,6 +689,7 @@ describe( 'actions', () => {
 				5,
 				'testrootid',
 				false,
+				0,
 				meta
 			);
 
@@ -725,6 +732,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 					meta: { patternName: 'core/chicken-ribs-pattern' },
 				},
 			} );
@@ -1140,6 +1148,7 @@ describe( 'actions', () => {
 				rootClientId: 'root',
 				time: expect.any( Number ),
 				updateSelection: false,
+				initialPosition: null,
 			} );
 		} );
 
@@ -1150,6 +1159,7 @@ describe( 'actions', () => {
 				rootClientId: 'root',
 				time: expect.any( Number ),
 				updateSelection: true,
+				initialPosition: 0,
 			} );
 		} );
 	} );

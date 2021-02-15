@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as styles from './flex-styles';
+import * as styles from './styles';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
@@ -43,17 +43,10 @@ export function useFlex( props ) {
 		const sx = {};
 
 		sx.Base = css( {
-			[ ui.createToken( 'FlexGap' ) ]: ui.space( gap ),
-			[ ui.createToken( 'FlexItemDisplay' ) ]: isColumn
+			[ ui.createToken( 'flexGap' ) ]: ui.space( gap ),
+			[ ui.createToken( 'flexItemDisplay' ) ]: isColumn
 				? 'block'
 				: undefined,
-			[ ui.createToken( 'FlexItemMarginBottom' ) ]: isColumn
-				? ui.get( 'FlexGap' )
-				: 0,
-			[ ui.createToken( 'FlexItemMarginRight' ) ]:
-				! isColumn && ! isReverse ? ui.get( 'FlexGap' ) : 0,
-			[ ui.createToken( 'FlexItemMarginLeft' ) ]:
-				! isColumn && isReverse ? ui.get( 'FlexGap' ) : 0,
 			alignItems: isColumn ? 'normal' : align,
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,

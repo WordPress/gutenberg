@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, get, head, find } from 'lodash';
+import { escape, head } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,6 +34,7 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -45,6 +46,7 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -134,8 +136,7 @@ function NavigationLinkEdit( {
 	insertLinkBlock,
 	textColor,
 	backgroundColor,
-	rgbTextColor,
-	rgbBackgroundColor,
+	inlineStyles,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
 	userCanCreatePosts = false,
@@ -156,7 +157,7 @@ function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { saveEntityRecord } = useDispatch( 'core' );
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -164,7 +165,7 @@ function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const isDraggingBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
+		( select ) => select( blockEditorStore ).isDraggingBlocks(),
 		[]
 	);
 
@@ -255,14 +256,15 @@ function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': rgbTextColor,
+			'has-text-color': !! textColor || !! inlineStyles?.color?.text,
 			[ `has-${ textColor }-color` ]: !! textColor,
-			'has-background': rgbBackgroundColor,
+			'has-background':
+				!! backgroundColor || !! inlineStyles?.color?.background,
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 		} ),
 		style: {
-			color: rgbTextColor,
-			backgroundColor: rgbBackgroundColor,
+			color: inlineStyles?.color?.text,
+			backgroundColor: inlineStyles?.color?.background,
 		},
 	} );
 
@@ -454,27 +456,6 @@ function NavigationLinkEdit( {
 	);
 }
 
-/**
- * Returns the color object matching the slug, or undefined.
- *
- * @param {Array}  colors      The editor settings colors array.
- * @param {string} colorSlug   A string containing the color slug.
- * @param {string} customColor A string containing the custom color value.
- *
- * @return {Object} Color object included in the editor settings colors, or Undefined.
- */
-const getColorObjectByColorSlug = ( colors, colorSlug, customColor ) => {
-	if ( customColor ) {
-		return customColor;
-	}
-
-	if ( ! colors || ! colors.length ) {
-		return;
-	}
-
-	return get( find( colors, { slug: colorSlug } ), 'color' );
-};
-
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
@@ -483,18 +464,17 @@ export default compose( [
 			hasSelectedInnerBlock,
 			getBlockParentsByBlockName,
 			getSelectedBlockClientId,
-			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { clientId } = ownProps;
 		const rootBlock = head(
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
 		);
 		const navigationBlockAttributes = getBlockAttributes( rootBlock );
-		const colors = get( getSettings(), 'colors', [] );
 		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
 			.length;
 		const showSubmenuIcon =
 			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
+		const inlineStyles = navigationBlockAttributes.style;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
@@ -511,19 +491,16 @@ export default compose( [
 			hasDescendants,
 			selectedBlockHasDescendants,
 			showSubmenuIcon,
+			inlineStyles,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
-			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
-			rgbTextColor: getColorObjectByColorSlug(
-				colors,
-				navigationBlockAttributes.textColor,
-				navigationBlockAttributes.customTextColor
+			userCanCreatePages: select( coreStore ).canUser(
+				'create',
+				'pages'
 			),
-			rgbBackgroundColor: getColorObjectByColorSlug(
-				colors,
-				navigationBlockAttributes.backgroundColor,
-				navigationBlockAttributes.customBackgroundColor
+			userCanCreatePosts: select( coreStore ).canUser(
+				'create',
+				'posts'
 			),
 		};
 	} ),
@@ -532,7 +509,7 @@ export default compose( [
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
-				const { insertBlock } = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( blockEditorStore );
 
 				const { getClientIdsOfDescendants } = registry.select(
 					'core/block-editor'

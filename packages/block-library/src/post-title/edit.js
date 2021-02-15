@@ -21,6 +21,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,14 +37,14 @@ export default function PostTitleEdit( {
 
 	const post = useSelect(
 		( select ) =>
-			select( 'core' ).getEditedEntityRecord(
+			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			),
 		[ postType, postId ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {

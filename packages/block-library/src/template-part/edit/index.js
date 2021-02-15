@@ -8,6 +8,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
@@ -19,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -40,8 +42,10 @@ export default function TemplatePartEdit( {
 	// new edits to trigger this.
 	const { isResolved, innerBlocks, isMissing } = useSelect(
 		( select ) => {
-			const { getEntityRecord, hasFinishedResolution } = select( 'core' );
-			const { getBlocks } = select( 'core/block-editor' );
+			const { getEntityRecord, hasFinishedResolution } = select(
+				coreStore
+			);
+			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',

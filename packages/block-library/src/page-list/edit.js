@@ -11,7 +11,8 @@ import { useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function PageListEdit( { context } ) {
-	const { textColor, backgroundColor, showSubmenuIcon } = context || {};
+	const { textColor, backgroundColor, showSubmenuIcon, style } =
+		context || {};
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -21,6 +22,7 @@ export default function PageListEdit( { context } ) {
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
+		style: { ...style?.color },
 	} );
 
 	return (

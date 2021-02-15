@@ -16,6 +16,7 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -105,7 +106,7 @@ export function ImageEdit( {
 
 	const ref = useRef();
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	} );
 

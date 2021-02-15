@@ -21,11 +21,13 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { useCopyOnClick } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -61,9 +63,10 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {
 			media:
-				id === undefined ? undefined : select( 'core' ).getMedia( id ),
-			mediaUpload: select( 'core/block-editor' ).getSettings()
-				.mediaUpload,
+				id === undefined
+					? undefined
+					: select( coreStore ).getMedia( id ),
+			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[ id ]
 	);

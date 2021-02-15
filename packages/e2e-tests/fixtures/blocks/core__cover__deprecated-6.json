@@ -49,7 +49,7 @@
             "isRepeated": false,
             "minHeight": 48,
             "minHeightUnit": "vw",
-            "className": "alignfull"
+            "align": "full"
         },
         "innerBlocks": [
             {
