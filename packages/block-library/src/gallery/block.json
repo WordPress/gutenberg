@@ -54,13 +54,6 @@
 			},
 			"default": []
 		},
-		"imageUploads": {
-			"type": "array",
-			"default": [],
-			"items": {
-				"type": "object"
-			}
-		},
 		"shortCodeTransforms": {
 			"type": "array",
 			"default": [],
