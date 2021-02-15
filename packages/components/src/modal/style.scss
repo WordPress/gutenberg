@@ -37,7 +37,7 @@
 			max-height: 90%;
 			transform: translate(-50%, -50%);
 			// Animate the modal frame/contents appearing on the page.
-			animation: components-modal__appear-slide-animation 0.1s ease-out;
+			animation: components-modal__appear-slide-animation 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 			animation-fill-mode: forwards;
 			@include reduce-motion("animation");
 		}
@@ -46,7 +46,7 @@
 	.components-modal__screen-overlay.is-full-screen & {
 		top: 100%;
 		transform-origin: top center;
-		animation: components-modal__appear-slide-from-bottom 0.3s forwards;
+		animation: components-modal__appear-slide-from-bottom 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 		@include reduce-motion("animation");
 	}
 }
@@ -62,7 +62,6 @@
 	background: $white;
 	align-items: center;
 	height: $header-height;
-	margin-bottom: 2 * $grid-unit-30;
 
 	border-bottom: $border-width solid $gray-300;
 	padding: 0 $grid-unit-30;
@@ -134,9 +133,38 @@
 }
 
 // Scale down the content of the page.
-body.modal-open.is-fullscreen-modal > *:not(.components-modal__portal) {
-	transition: transform 0.5s;
-	transform: scale(0.9);
+body.modal-open.is-fullscreen-modal {
+	background: $gray-900;
+
+	> *:not(.components-modal__portal) {
+		animation: components-modal__content-scale-back 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+	}
+
+	.interface-interface-skeleton__editor {
+		border-radius: $grid-unit-10;
+	}
+
+	// Increase full screen modal padding on medium+ screens
+	@include break-medium() {
+		.components-modal__header {
+			margin: 0 -#{$grid-unit-60} $grid-unit-40 * 2;
+			padding: 0 $grid-unit-60;
+			height: $grid-unit-60 * 2;
+		}
+
+		.components-modal__content {
+			padding: 0 $grid-unit-60 $grid-unit-60;
+		}
+	}
+}
+
+@keyframes components-modal__content-scale-back {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(0.93);
+	}
 }
 
 @keyframes components-modal__appear-slide-from-bottom {
@@ -144,7 +172,7 @@ body.modal-open.is-fullscreen-modal > *:not(.components-modal__portal) {
 		top: 100%;
 	}
 	to {
-		top: 100px;
+		top: 7%;
 	}
 }
 
