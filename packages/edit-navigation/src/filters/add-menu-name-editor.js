@@ -18,7 +18,7 @@ const addMenuNameEditor = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } menuName={ menuName } />
-				<NameEditor { ...props } />;
+				<NameEditor { ...props } />
 			</>
 		);
 	},
