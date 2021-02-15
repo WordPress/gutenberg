@@ -22,7 +22,6 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
