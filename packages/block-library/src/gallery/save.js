@@ -7,8 +7,12 @@ import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { defaultColumnsNumber } from './shared';
+import saveV1 from './v1/save';
 
 export default function save( { attributes } ) {
+	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
+		return saveV1( { attributes } );
+	}
 	const {
 		imageCount,
 		caption,
