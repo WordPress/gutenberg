@@ -103,6 +103,18 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 		pulls.push( ...issues );
 	}
 
+	if ( latestReleaseInSeries?.published_at ) {
+		const latestReleasePublishedAtTimestamp = new Date(
+			latestReleaseInSeries.published_at
+		);
+
+		return pulls.filter(
+			( pull ) =>
+				pull.closed_at &&
+				latestReleasePublishedAtTimestamp < new Date( pull.closed_at )
+		);
+	}
+
 	return pulls;
 }
 
