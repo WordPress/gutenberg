@@ -79,22 +79,22 @@ export default function SearchEdit( {
 		return classnames(
 			className,
 			'button-inside' === buttonPosition
-				? 'wp-block-search__button-inside'
+				? 'wp-block-search--button-inside'
 				: undefined,
 			'button-outside' === buttonPosition
-				? 'wp-block-search__button-outside'
+				? 'wp-block-search--button-outside'
 				: undefined,
 			'no-button' === buttonPosition
-				? 'wp-block-search__no-button'
+				? 'wp-block-search--no-button'
 				: undefined,
 			'button-only' === buttonPosition
-				? 'wp-block-search__button-only'
+				? 'wp-block-search--button-only'
 				: undefined,
 			! buttonUseIcon && 'no-button' !== buttonPosition
-				? 'wp-block-search__text-button'
+				? 'wp-block-search--text-button'
 				: undefined,
 			buttonUseIcon && 'no-button' !== buttonPosition
-				? 'wp-block-search__icon-button'
+				? 'wp-block-search--icon-button'
 				: undefined
 		);
 	};

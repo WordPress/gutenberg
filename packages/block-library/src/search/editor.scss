@@ -1,13 +1,13 @@
 .wp-block-search {
-	.wp-block-search__input {
+	&__input {
 		padding: $grid-unit-10;
 	}
 
-	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
+	&--button-inside &__inside-wrapper {
 		padding: $grid-unit-05;
 	}
 
-	.wp-block-search__button {
+	&__button {
 		height: auto;
 		border-radius: initial;
 

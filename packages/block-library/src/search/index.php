@@ -131,28 +131,28 @@ function classnames_for_block_core_search( $attributes ) {
 
 	if ( ! empty( $attributes['buttonPosition'] ) ) {
 		if ( 'button-inside' === $attributes['buttonPosition'] ) {
-			$classnames[] = 'wp-block-search__button-inside';
+			$classnames[] = 'wp-block-search--button-inside';
 		}
 
 		if ( 'button-outside' === $attributes['buttonPosition'] ) {
-			$classnames[] = 'wp-block-search__button-outside';
+			$classnames[] = 'wp-block-search--button-outside';
 		}
 
 		if ( 'no-button' === $attributes['buttonPosition'] ) {
-			$classnames[] = 'wp-block-search__no-button';
+			$classnames[] = 'wp-block-search--no-button';
 		}
 
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
-			$classnames[] = 'wp-block-search__button-only';
+			$classnames[] = 'wp-block-search--button-only';
 		}
 	}
 
 	if ( isset( $attributes['buttonUseIcon'] ) ) {
 		if ( ! empty( $attributes['buttonPosition'] ) && 'no-button' !== $attributes['buttonPosition'] ) {
 			if ( $attributes['buttonUseIcon'] ) {
-				$classnames[] = 'wp-block-search__icon-button';
+				$classnames[] = 'wp-block-search--icon-button';
 			} else {
-				$classnames[] = 'wp-block-search__text-button';
+				$classnames[] = 'wp-block-search--text-button';
 			}
 		}
 	}
