@@ -30,26 +30,16 @@ jest.mock( '@wordpress/blocks', () => {
 					return { title: 'Block With Long Label' };
 			}
 		},
-		__experimentalGetBlockLabel( { title } ) {
-			switch ( title ) {
-				case 'Block With Label':
-					return 'Test Label';
-
-				case 'Block With Long Label':
-					return 'This is a longer label than typical for blocks to have.';
-
-				default:
-					return title;
-			}
-		},
 	};
 } );
 
 jest.mock( '../../use-block-display-information', () => {
 	const resultsMap = {
 		'id-name-exists': { title: 'Block Title' },
-		'id-name-with-label': { title: 'Block With Label' },
-		'id-name-with-long-label': { title: 'Block With Long Label' },
+		'id-name-with-label': { title: 'Test Label' },
+		'id-name-with-long-label': {
+			title: 'This is a longer label than typical for blocks to have.',
+		},
 	};
 	return jest.fn( ( clientId ) => resultsMap[ clientId ] );
 } );
