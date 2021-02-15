@@ -49,6 +49,7 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import ImageEditor, { ImageEditingProvider } from './image-editing';
 import { isExternalImage } from './edit';
+import useParentAttributes from './use-parent-attributes';
 
 /**
  * Module constants
@@ -78,6 +79,7 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
+		inheritedAttributes,
 	},
 	setAttributes,
 	isSelected,
@@ -87,10 +89,11 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
-	allowResize,
+	context,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { allowResize = true, isListItem = false } = context;
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -104,7 +107,8 @@ export default function Image( {
 			return {
 				block: getSelectedBlock(),
 				currentId: getSelectedBlockClientId(),
-				image: id && isSelected ? getMedia( id ) : null,
+				image:
+					id && ( isSelected || isListItem ) ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -113,7 +117,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ id, isSelected, isListItem ]
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
@@ -153,6 +157,8 @@ export default function Image( {
 			setCaptionFocused( false );
 		}
 	}, [ isSelected ] );
+
+	useParentAttributes( image, context, inheritedAttributes, setAttributes );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -195,6 +201,23 @@ export default function Image( {
 	}
 
 	function onSetHref( props ) {
+		if (
+			inheritedAttributes.linkDestination ||
+			inheritedAttributes.linkTarget
+		) {
+			setAttributes( {
+				inheritedAttributes: {
+					...inheritedAttributes,
+					linkDestination: props.linkDestination
+						? false
+						: inheritedAttributes.linkDestination,
+					linkTarget:
+						props.linkTarget || props.linkTarget !== linkTarget
+							? false
+							: inheritedAttributes.linkTarget,
+				},
+			} );
+		}
 		setAttributes( props );
 	}
 
@@ -221,6 +244,14 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
+		if ( inheritedAttributes.sizeSlug ) {
+			setAttributes( {
+				inheritedAttributes: {
+					...inheritedAttributes,
+					sizeSlug: false,
+				},
+			} );
+		}
 		const newUrl = get( image, [
 			'media_details',
 			'sizes',
