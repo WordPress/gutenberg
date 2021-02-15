@@ -26,6 +26,7 @@ import {
 	RangeControl,
 } from '@wordpress/components';
 import {
+	store as blockEditorStore,
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
@@ -34,6 +35,7 @@ import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { useDispatch, withSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 
@@ -91,7 +93,7 @@ export function GalleryEditV1( props ) {
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	function setAttributes( newAttrs ) {
@@ -411,8 +413,8 @@ export function GalleryEditV1( props ) {
 
 export default compose( [
 	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const { imageSizes, mediaUpload } = getSettings();
 
 		const resizedImages = useMemo( () => {

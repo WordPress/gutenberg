@@ -8,9 +8,9 @@ import { gallery as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import deprecated from './deprecated';
-import edit from './edit';
+import edit from './edit-wrapper';
 import metadata from './block.json';
-import save from './save';
+import save from './save-wrapper';
 import transforms from './transforms';
 
 const { name } = metadata;
