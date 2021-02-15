@@ -22,7 +22,7 @@ export function NameEditor() {
 					<ToolbarItem
 						as="input"
 						value={ tmpMenuName }
-						onChange={ ( {target:{value}} ) => {
+						onChange={ ( { target: { value } } ) => {
 							setTmpMenuName( value );
 							editMenuName( value );
 						} }
