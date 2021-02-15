@@ -39,7 +39,6 @@ const PluginPrePublishPanelFill = ( {
  *                                                                      the sidebar is pinned to toolbar.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -59,7 +58,6 @@ const PluginPrePublishPanelFill = ( {
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
