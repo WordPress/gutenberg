@@ -126,7 +126,7 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show that no menus are available.
-		await page.waitForXPath( '//h2[contains(., "No menus available")]', {
+		await page.waitForXPath( '//h3[.="Create your first menu"]', {
 			visible: true,
 		} );
 
@@ -139,20 +139,11 @@ describe( 'Navigation editor', () => {
 			...getMenuItemMocks( { GET: [] } ),
 		] );
 
-		// Add a new menu.
-		const [ addNewButton ] = await page.$x(
-			'//button[contains(., "Add new")]'
-		);
-		await addNewButton.click();
-
 		await page.keyboard.type( 'Main Menu' );
 		const createMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create menu")]'
 		);
 		await createMenuButton.click();
-
-		// Close the dropdown.
-		await page.keyboard.press( 'Escape' );
 
 		// A snackbar will appear when menu creation has completed.
 		await page.waitForXPath( '//div[contains(., "Menu created")]' );
@@ -193,8 +184,7 @@ describe( 'Navigation editor', () => {
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
-	// Regressed—to be reimplemented.
-	it.skip( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
+	it( 'shows a submenu when a link is selected and hides it when clicking the editor to deselect it', async () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
 			...getMenuItemMocks( { GET: menuItemsFixture } ),
@@ -219,7 +209,7 @@ describe( 'Navigation editor', () => {
 		expect( submenuLinkVisible ).toBeDefined();
 
 		// Click the editor canvas.
-		await page.click( '.edit-navigation-editor__block-view' );
+		await page.click( '.edit-navigation-layout__canvas' );
 
 		// There should be a submenu in the DOM, but it should be hidden.
 		const submenuLinkHidden = await page.waitForXPath( submenuLinkXPath, {

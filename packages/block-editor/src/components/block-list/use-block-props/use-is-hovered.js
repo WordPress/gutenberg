@@ -33,31 +33,41 @@ export function useIsHovered( ref ) {
 		};
 	}, [] );
 
-	useEffect( () => {
-		function addListener( eventType, value ) {
-			function listener( event ) {
-				if ( event.defaultPrevented ) {
-					return;
-				}
-
-				event.preventDefault();
-				setHovered( value );
+	function addHoverListener( eventType, value ) {
+		function listener( event ) {
+			if ( event.defaultPrevented ) {
+				return;
 			}
 
-			ref.current.addEventListener( eventType, listener );
-			return () => {
-				ref.current.removeEventListener( eventType, listener );
-			};
+			event.preventDefault();
+			setHovered( value );
 		}
 
-		if ( isHovered ) {
-			return addListener( 'mouseout', false );
-		}
+		ref.current.addEventListener( eventType, listener );
+		return [ eventType, listener ];
+	}
+
+	function addHoverListeners() {
+		const hoverListeners = [];
+
+		hoverListeners.push( addHoverListener( 'mouseout', false ) );
 
 		if ( isOutlineMode || isNavigationMode ) {
-			return addListener( 'mouseover', true );
+			hoverListeners.push( addHoverListener( 'mouseover', true ) );
 		}
-	}, [ isNavigationMode, isOutlineMode, isHovered, setHovered ] );
+
+		return hoverListeners;
+	}
+
+	useEffect( () => {
+		const hoverListeners = addHoverListeners();
+
+		return () => {
+			hoverListeners.forEach( ( [ eventType, listener ] ) =>
+				ref.current.removeEventListener( eventType, listener )
+			);
+		};
+	}, [ isOutlineMode, isNavigationMode ] );
 
 	return isHovered;
 }

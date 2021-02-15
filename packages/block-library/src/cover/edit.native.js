@@ -48,6 +48,7 @@ import {
 	withColors,
 	__experimentalUseGradient,
 	__experimentalUseEditorFeature as useEditorFeature,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -621,11 +622,11 @@ const Cover = ( {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId } = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 
 		return {
 			settings: getSettings(),
@@ -634,7 +635,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),

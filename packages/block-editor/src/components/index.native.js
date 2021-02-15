@@ -13,6 +13,7 @@ export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export { default as JustifyToolbar } from './justify-toolbar';
 export { default as LineHeightControl } from './line-height-control';
 export { default as PlainText } from './plain-text';
 export {

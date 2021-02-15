@@ -13,6 +13,7 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
@@ -108,7 +109,7 @@ function MediaContainer( props ) {
 		onWidthChange,
 	} = props;
 
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	if ( mediaType && mediaUrl ) {
 		const onResizeStart = () => {

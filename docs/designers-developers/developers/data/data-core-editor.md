@@ -373,7 +373,21 @@ _Returns_
 
 -   `Array`: Block list.
 
+<a name="getEditorSelection" href="#getEditorSelection">#</a> **getEditorSelection**
+
+Returns the current selection.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection end.
+
 <a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
+
+> **Deprecated** since Gutenberg 10.0.0.
 
 Returns the current selection end.
 
@@ -386,6 +400,8 @@ _Returns_
 -   `WPBlockSelection`: The selection end.
 
 <a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+> **Deprecated** since Gutenberg 10.0.0.
 
 Returns the current selection start.
 
