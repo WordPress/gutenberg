@@ -12,7 +12,6 @@ import { createBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { pickRelevantMediaFiles } from './shared';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_NONE,
@@ -113,14 +112,13 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				const block = createBlock( 'core/gallery', {
-					imageUploads: files.map( ( file ) =>
-						pickRelevantMediaFiles( {
-							url: createBlobURL( file ),
-						} )
-					),
-				} );
-				return block;
+				const innerBlocks = files.map( ( file ) =>
+					createBlock( 'core/image', {
+						url: createBlobURL( file ),
+					} )
+				);
+
+				return createBlock( 'core/gallery', {}, innerBlocks );
 			},
 		},
 	],
