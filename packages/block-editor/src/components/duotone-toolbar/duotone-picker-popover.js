@@ -64,7 +64,9 @@ function DuotonePickerPopover( {
 										),
 										id: `duotone-filter-${ option.slug }`,
 									};
-									onChange( isSelected ? undefined : newValue );
+									onChange(
+										isSelected ? undefined : newValue
+									);
 								} }
 								aria-label={ option.name ? label : code }
 							/>

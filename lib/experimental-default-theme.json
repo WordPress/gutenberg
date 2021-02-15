@@ -138,12 +138,12 @@
 						"slug": "grayscale"
 					},
 					{
-						"name":  "Green and Yellow" ,
+						"name":  "Green and yellow" ,
 						"colors": [ "#00e400", "#f9ff00" ],
 						"slug": "green-yellow"
 					},
 					{
-						"name":  "Red and Blue" ,
+						"name":  "Red and blue" ,
 						"colors": [ "#ff0000", "#0705ff" ],
 						"slug": "red-blue"
 					},
@@ -153,17 +153,17 @@
 						"slug": "midnight"
 					},
 					{
-						"name":  "Orange and Yellow" ,
+						"name":  "Orange and yellow" ,
 						"colors": [ "#ff4b00", "#ffe400" ],
 						"slug": "orange-yellow"
 					},
 					{
-						"name":  "Magenta and Lime" ,
+						"name":  "Magenta and lime" ,
 						"colors": [ "#ff00ac", "#a8ff76" ],
 						"slug": "magenta-lime"
 					},
 					{
-						"name":  "Blue and Green" ,
+						"name":  "Blue and green" ,
 						"colors": [ "#0410ff", "#00ff00" ],
 						"slug": "blue-green"
 					}
