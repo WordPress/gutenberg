@@ -211,6 +211,10 @@ export default function NavigationLinkEdit( {
 		insertBlock( blockToInsert, insertionPoint, clientId );
 	}
 
+	if ( isSelected && ! url && ! isLinkOpen ) {
+		setIsLinkOpen( true );
+	}
+
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
 	// This can't be done in the useState call because it conflicts
@@ -308,10 +312,6 @@ export default function NavigationLinkEdit( {
 			backgroundColor: style?.color?.background,
 		},
 	} );
-
-	if ( ! url ) {
-		blockProps.onClick = () => setIsLinkOpen( true );
-	}
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
