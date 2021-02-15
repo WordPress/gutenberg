@@ -1,24 +1,14 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	filter,
-	find,
-	forEach,
-	get,
-	isEmpty,
-	map,
-	reduce,
-	some,
-	toString,
-} from 'lodash';
+import { toString, isEqual, isEmpty, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import {
+	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -31,25 +21,27 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
+import { Platform, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { useDispatch, withSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
-import { store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import { getHrefAndDestination, getImageSizeAttributes } from './utils';
+import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import useImageSizes from './use-image-sizes';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -73,146 +65,104 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 
 function GalleryEdit( props ) {
 	const {
+		setAttributes,
 		attributes,
+		clientId,
+		noticeOperations,
 		isSelected,
 		noticeUI,
-		noticeOperations,
-		mediaUpload,
-		imageSizes,
-		resizedImages,
-		onFocus,
+		insertBlocksAfter,
 	} = props;
+
 	const {
-		columns = defaultColumnsNumber( attributes ),
-		imageCrop,
-		images,
+		linkTarget,
 		linkTo,
+		columns = defaultColumnsNumber( images ),
 		sizeSlug,
+		imageUploads,
+		imageCrop,
 	} = attributes;
-	const [ selectedImage, setSelectedImage ] = useState();
-	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
+
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
 
-	function setAttributes( newAttrs ) {
-		if ( newAttrs.ids ) {
-			throw new Error(
-				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
-			);
+	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+
+	const [ images, setImages ] = useState( [] );
+	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
+	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
+
+	useEffect( () => {
+		const currentOptionsState = ! isEqual(
+			currentImageOptions,
+			imageSettings
+		);
+		if ( currentOptionsState !== dirtyImageOptions ) {
+			setDirtyImageOptions( currentOptionsState );
+		}
+	}, [ currentImageOptions, imageSettings ] );
+
+	const { getBlock, getMedia, getSettings } = useSelect( ( select ) => {
+		return {
+			getBlock: select( 'core/block-editor' ).getBlock,
+			getSettings: select( 'core/block-editor' ).getSettings,
+			getMedia: select( 'core' ).getMedia,
+		};
+	}, [] );
+
+	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
+
+	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
+		'core/block-editor'
+	);
+
+	/**
+	 * Determines the image attributes that should be applied to an image block
+	 * after the gallery updates.
+	 *
+	 * The gallery will receive the full collection of images when a new image
+	 * is added. As a result we need to reapply the image's original settings if
+	 * it already existed in the gallery. If the image is in fact new, we need
+	 * to apply the gallery's current settings to the image.
+	 *
+	 * @param  {Object} existingBlock Existing Image block that still exists after gallery update.
+	 * @param  {Object} image         Media object for the actual image.
+	 * @return {Object}               Attributes to set on the new image block.
+	 */
+	function buildImageAttributes( existingBlock, image ) {
+		if ( existingBlock ) {
+			return existingBlock.attributes;
 		}
 
-		if ( newAttrs.images ) {
-			newAttrs = {
-				...newAttrs,
-				// Unlike images[ n ].id which is a string, always ensure the
-				// ids array contains numbers as per its attribute type.
-				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
-			};
-		}
-
-		props.setAttributes( newAttrs );
-	}
-
-	function onSelectImage( index ) {
-		return () => {
-			setSelectedImage( index );
+		return {
+			...pickRelevantMediaFiles( image, sizeSlug ),
+			...getHrefAndDestination( image, linkTo ),
+			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+			sizeSlug,
 		};
-	}
-
-	function onDeselectImage() {
-		return () => {
-			setSelectedImage();
-		};
-	}
-
-	function onMove( oldIndex, newIndex ) {
-		const newImages = [ ...images ];
-		newImages.splice( newIndex, 1, images[ oldIndex ] );
-		newImages.splice( oldIndex, 1, images[ newIndex ] );
-		setSelectedImage( newIndex );
-		setAttributes( { images: newImages } );
-	}
-
-	function onMoveForward( oldIndex ) {
-		return () => {
-			if ( oldIndex === images.length - 1 ) {
-				return;
-			}
-			onMove( oldIndex, oldIndex + 1 );
-		};
-	}
-
-	function onMoveBackward( oldIndex ) {
-		return () => {
-			if ( oldIndex === 0 ) {
-				return;
-			}
-			onMove( oldIndex, oldIndex - 1 );
-		};
-	}
-
-	function onRemoveImage( index ) {
-		return () => {
-			const newImages = filter( images, ( img, i ) => index !== i );
-			setSelectedImage();
-			setAttributes( {
-				images: newImages,
-				columns: attributes.columns
-					? Math.min( newImages.length, attributes.columns )
-					: attributes.columns,
-			} );
-		};
-	}
-
-	function selectCaption( newImage ) {
-		// The image id in both the images and attachmentCaptions arrays is a
-		// string, so ensure comparison works correctly by converting the
-		// newImage.id to a string.
-		const newImageId = toString( newImage.id );
-		const currentImage = find( images, { id: newImageId } );
-		const currentImageCaption = currentImage
-			? currentImage.caption
-			: newImage.caption;
-
-		if ( ! attachmentCaptions ) {
-			return currentImageCaption;
-		}
-
-		const attachment = find( attachmentCaptions, {
-			id: newImageId,
-		} );
-
-		// if the attachment caption is updated
-		if ( attachment && attachment.caption !== newImage.caption ) {
-			return newImage.caption;
-		}
-
-		return currentImageCaption;
 	}
 
 	function onSelectImages( newImages ) {
-		setAttachmentCaptions(
+		const newBlocks = newImages.map( ( image ) => {
+			const existingBlock = find(
+				images,
+				( img ) => img.id === image.id
+			);
+
+			return createBlock( 'core/image', {
+				...buildImageAttributes( existingBlock, image ),
+				id: image.id,
+			} );
+		} );
+
+		setImages(
 			newImages.map( ( newImage ) => ( {
-				// Store the attachmentCaption id as a string for consistency
-				// with the type of the id in the images attribute.
 				id: toString( newImage.id ),
-				caption: newImage.caption,
+				url: newImage.url,
 			} ) )
 		);
-		setAttributes( {
-			images: newImages.map( ( newImage ) => ( {
-				...pickRelevantMediaFiles( newImage, sizeSlug ),
-				caption: selectCaption( newImage, images, attachmentCaptions ),
-				// The id value is stored in a data attribute, so when the
-				// block is parsed it's converted to a string. Converting
-				// to a string here ensures it's type is consistent.
-				id: toString( newImage.id ),
-			} ) ),
-			columns: attributes.columns
-				? Math.min( newImages.length, attributes.columns )
-				: attributes.columns,
-		} );
+		replaceInnerBlocks( clientId, newBlocks );
 	}
 
 	function onUploadError( message ) {
@@ -238,81 +188,62 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
-	function onFocusGalleryCaption() {
-		setSelectedImage();
+	function toggleOpenInNewTab() {
+		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
 	}
 
-	function setImageAttributes( index, newAttributes ) {
-		if ( ! images[ index ] ) {
-			return;
-		}
+	function applyImageOptions() {
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			const image = block.attributes.id
+				? find( images, { id: block.attributes.id } )
+				: null;
 
-		setAttributes( {
-			images: [
-				...images.slice( 0, index ),
-				{
-					...images[ index ],
-					...newAttributes,
-				},
-				...images.slice( index + 1 ),
-			],
+			updateBlockAttributes( block.clientId, {
+				...getHrefAndDestination( image.imageData, linkTo ),
+				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
+				...getImageSizeAttributes( image.imageData, sizeSlug ),
+			} );
 		} );
+		setDirtyImageOptions( false );
+		setImageSettings( currentImageOptions );
 	}
 
-	function getImagesSizeOptions() {
-		return map(
-			filter( imageSizes, ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
+	function cancelImageOptions() {
+		setAttributes( imageSettings );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
-		const updatedImages = map( images, ( image ) => {
-			if ( ! image.id ) {
-				return image;
-			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
-				newSizeSlug,
-			] );
-			return {
-				...image,
-				...( url && { url } ),
-			};
-		} );
-
-		setAttributes( { images: updatedImages, sizeSlug: newSizeSlug } );
+		setAttributes( { sizeSlug: newSizeSlug } );
 	}
 
 	useEffect( () => {
 		if (
 			Platform.OS === 'web' &&
-			images &&
-			images.length > 0 &&
-			every( images, ( { url } ) => isBlobURL( url ) )
+			imageUploads &&
+			imageUploads.length > 0
 		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
-			forEach( images, ( { url } ) => revokeBlobURL( url ) );
-			mediaUpload( {
-				filesList,
-				onFileChange: onSelectImages,
-				allowedTypes: [ 'image' ],
-			} );
+			onSelectImages( imageUploads );
+			setAttributes( { imageUploads: undefined } );
 		}
-	}, [] );
+	}, [ imageUploads ] );
 
 	useEffect( () => {
-		// Deselect images when deselecting the block
-		if ( ! isSelected ) {
-			setSelectedImage();
+		const newImages = getBlock( clientId ).innerBlocks.map( ( block ) => {
+			return {
+				id: block.attributes.id,
+				url: block.attributes.url,
+				attributes: block.attributes,
+				imageData: getMedia( block.attributes.id ),
+			};
+		} );
+
+		if ( ! isEqual( newImages, images ) ) {
+			setImages( newImages );
 		}
-	}, [ isSelected ] );
+	} );
 
 	useEffect( () => {
-		// linkTo attribute must be saved so blocks don't break when changing
-		// image_default_link_type in options.php
+		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
@@ -342,7 +273,6 @@ function GalleryEdit( props ) {
 			value={ images }
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
-			onFocus={ onFocus }
 		/>
 	);
 
@@ -352,8 +282,8 @@ function GalleryEdit( props ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
-	const imageSizeOptions = getImagesSizeOptions();
 	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	return (
 		<>
@@ -382,6 +312,13 @@ function GalleryEdit( props ) {
 						onChange={ setLinkTo }
 						options={ linkOptions }
 					/>
+					{ hasLinkTo && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							checked={ linkTarget === '_blank' }
+							onChange={ toggleOpenInNewTab }
+						/>
+					) }
 					{ shouldShowSizeOptions && (
 						<SelectControl
 							label={ __( 'Image size' ) }
@@ -390,80 +327,34 @@ function GalleryEdit( props ) {
 							onChange={ updateImagesSize }
 						/>
 					) }
+					{ dirtyImageOptions && (
+						<div className={ 'gallery-settings-buttons' }>
+							<Button isPrimary onClick={ applyImageOptions }>
+								{ __( 'Apply to all images' ) }
+							</Button>
+							<Button
+								className={ 'cancel-apply-to-images' }
+								isLink
+								onClick={ cancelImageOptions }
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+						</div>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
 			<Gallery
 				{ ...props }
-				selectedImage={ selectedImage }
+				images={ images }
 				mediaPlaceholder={ mediaPlaceholder }
-				onMoveBackward={ onMoveBackward }
-				onMoveForward={ onMoveForward }
-				onRemoveImage={ onRemoveImage }
-				onSelectImage={ onSelectImage }
-				onDeselectImage={ onDeselectImage }
-				onSetImageAttributes={ setImageAttributes }
-				onFocusGalleryCaption={ onFocusGalleryCaption }
 				blockProps={ blockProps }
+				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</>
 	);
 }
-
 export default compose( [
-	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( coreStore );
-		const { getSettings } = select( blockEditorStore );
-		const { imageSizes, mediaUpload } = getSettings();
-
-		const resizedImages = useMemo( () => {
-			if ( isSelected ) {
-				return reduce(
-					ids,
-					( currentResizedImages, id ) => {
-						if ( ! id ) {
-							return currentResizedImages;
-						}
-						const image = getMedia( id );
-						const sizes = reduce(
-							imageSizes,
-							( currentSizes, size ) => {
-								const defaultUrl = get( image, [
-									'sizes',
-									size.slug,
-									'url',
-								] );
-								const mediaDetailsUrl = get( image, [
-									'media_details',
-									'sizes',
-									size.slug,
-									'source_url',
-								] );
-								return {
-									...currentSizes,
-									[ size.slug ]:
-										defaultUrl || mediaDetailsUrl,
-								};
-							},
-							{}
-						);
-						return {
-							...currentResizedImages,
-							[ parseInt( id, 10 ) ]: sizes,
-						};
-					},
-					{}
-				);
-			}
-			return {};
-		}, [ isSelected, ids, imageSizes ] );
-
-		return {
-			imageSizes,
-			mediaUpload,
-			resizedImages,
-		};
-	} ),
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
 ] )( GalleryEdit );
