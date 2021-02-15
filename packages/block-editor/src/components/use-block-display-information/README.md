@@ -1,11 +1,16 @@
 # useBlockDisplayInformation
 
-A React Hook that tries to find a matching block variation and returns the appropriate information for display reasons. In order to try to find a match we need two things:
+Hook used appropriate information for display reasons.
+It takes variations and custom `label` function into account.
 
-1. Block's client id to extract its current attributes.
-2. A block variation has `isActive` prop defined with a matcher function.
+In order to try to find a variation match we need to things:
+1\. Block's client id to extract it's current attributes.
+2\. A block variation should have set `isActive` prop to a proper function.
 
-If for any reason a block variaton match cannot be found, the returned information come from the Block Type.
+Value from custom `label` function is prioritized, if that's not found
+then the block variation' information is returned. If both are missing
+then the information is returned from the Block Type.
+If no blockType is found with the provided clientId, returns null.
 
 ### Usage
 
