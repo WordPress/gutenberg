@@ -109,9 +109,10 @@ const useIsDraggingWithin = ( elementRef ) => {
  * /wp/v2/search.
  *
  * @param {string} type Link block's type attribute.
+ * @param {string} objectType Link block's object type attribute. (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type ) {
+function getSuggestionsQuery( type, objectType ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
@@ -121,6 +122,12 @@ function getSuggestionsQuery( type ) {
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
 		default:
+			if ( objectType === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( objectType === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
 			return {};
 	}
 }
@@ -152,6 +159,7 @@ function NavigationLinkEdit( {
 		description,
 		rel,
 		title,
+		objectType,
 	} = attributes;
 	const link = {
 		url,
@@ -406,7 +414,10 @@ function NavigationLinkEdit( {
 								} }
 								noDirectEntry={ !! type }
 								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery( type ) }
+								suggestionsQuery={ getSuggestionsQuery(
+									type,
+									objectType
+								) }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
