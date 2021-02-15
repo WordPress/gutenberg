@@ -96,6 +96,9 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 	 */
 	const responses = octokit.paginate.iterator( options );
 
+	/**
+	 * @type {import('@octokit/rest').IssuesListForRepoResponse}
+	 */
 	const pulls = [];
 
 	for await ( const response of responses ) {
