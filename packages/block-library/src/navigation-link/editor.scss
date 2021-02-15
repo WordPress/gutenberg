@@ -56,10 +56,16 @@
 
 // Menu item setup state, is shown when a menu item has no URL configured.
 .wp-block-navigation-link__placeholder {
-	font-family: $default-font;
-	font-size: $default-font-size;
 	position: relative;
-	padding: ($grid-unit-15 / 2) $grid-unit-10;
+
+	// Provide a little margin to show each placeholder as a separate unit.
+	margin-left: 2px;
+	margin-right: 2px;
+
+	.wp-block-navigation-link__placeholder-text {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
 
 	&::before {
 		content: "";

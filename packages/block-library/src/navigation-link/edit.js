@@ -336,6 +336,10 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
+	const classes = classnames( 'wp-block-navigation-link__content', {
+		'wp-block-navigation-link__placeholder': ! url,
+	} );
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -393,9 +397,9 @@ export default function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<div className="wp-block-navigation-link__content">
+				<div className={ classes }>
 					{ ! url ? (
-						<div className="wp-block-navigation-link__placeholder">
+						<div className="wp-block-navigation-link__placeholder-text">
 							{ __( 'Missing URL' ) }
 						</div>
 					) : (
