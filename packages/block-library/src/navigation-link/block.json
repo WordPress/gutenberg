@@ -10,6 +10,9 @@
 		"type": {
 			"type": "string"
 		},
+	  	"objectType": {
+			"type": "string"
+	  	},
 		"description": {
 			"type": "string"
 		},
