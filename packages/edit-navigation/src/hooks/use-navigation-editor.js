@@ -10,6 +10,9 @@ import { store as editNavigationStore } from '../store';
 
 export default function useNavigationEditor() {
 	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
+	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
+		false
+	);
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
 		const selectors = select( 'core' );
 		const params = { per_page: -1 };
@@ -20,6 +23,11 @@ export default function useNavigationEditor() {
 			] ),
 		};
 	}, [] );
+	useEffect( () => {
+		if ( hasLoadedMenus ) {
+			setHasFinishedInitialLoad( true );
+		}
+	}, [ hasLoadedMenus ] );
 
 	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
 
@@ -56,6 +64,7 @@ export default function useNavigationEditor() {
 		navigationPost,
 		selectMenu,
 		deleteMenu,
+		hasFinishedInitialLoad,
 		hasLoadedMenus,
 	};
 }
