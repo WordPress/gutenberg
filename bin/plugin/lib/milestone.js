@@ -114,7 +114,14 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 		return pulls.filter(
 			( pull ) =>
 				pull.closed_at &&
-				latestReleasePublishedAtTimestamp < new Date( pull.closed_at )
+				latestReleasePublishedAtTimestamp <
+					new Date(
+						// The ugly `as unknown as string` cast is required because of
+						// https://github.com/octokit/plugin-rest-endpoint-methods.js/issues/64
+						/** @type {string} */ (
+							/** @type {unknown} */ ( pull.closed_at )
+						)
+					)
 		);
 	}
 
