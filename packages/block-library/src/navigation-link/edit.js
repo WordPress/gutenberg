@@ -395,7 +395,9 @@ export default function NavigationLinkEdit( {
 			<li { ...blockProps }>
 				<div className="wp-block-navigation-link__content">
 					{ ! url ? (
-						__( 'Missing URL' )
+						<div className="wp-block-navigation-link__placeholder">
+							{ __( 'Missing URL' ) }
+						</div>
 					) : (
 						<RichText
 							ref={ ref }

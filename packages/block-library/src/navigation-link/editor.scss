@@ -53,3 +53,28 @@
 		display: none;
 	}
 }
+
+// Menu item setup state, is shown when a menu item has no URL configured.
+.wp-block-navigation-link__placeholder {
+	font-family: $default-font;
+	font-size: $default-font-size;
+	position: relative;
+	padding: ($grid-unit-15 / 2) $grid-unit-10;
+
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		background: currentColor;
+		opacity: 0.1;
+
+		.is-dark-theme & {
+			opacity: 0.2;
+		}
+	}
+}
