@@ -89,7 +89,6 @@ function GalleryEdit( props ) {
 		columns = defaultColumnsNumber( imageCount ),
 		gutterSize,
 		imageCrop,
-		imageUploads,
 		linkTarget,
 		linkTo,
 		shortCodeTransforms,
@@ -299,17 +298,6 @@ function GalleryEdit( props ) {
 	function updateImagesSize( newSizeSlug ) {
 		setAttributes( { sizeSlug: newSizeSlug } );
 	}
-
-	useEffect( () => {
-		if (
-			Platform.OS === 'web' &&
-			imageUploads &&
-			imageUploads.length > 0
-		) {
-			onSelectImages( imageUploads );
-			setAttributes( { imageUploads: undefined } );
-		}
-	}, [ imageUploads ] );
 
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
