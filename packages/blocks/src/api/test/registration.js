@@ -350,6 +350,41 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should map incompatible keys returned from the server', () => {
+			const blockName = 'core/test-block-with-incompatible-keys';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					api_version: 2,
+					provides_context: {
+						fontSize: 'fontSize',
+					},
+					uses_context: [ 'textColor' ],
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {
+					fontSize: 'fontSize',
+				},
+				usesContext: [ 'textColor' ],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,
