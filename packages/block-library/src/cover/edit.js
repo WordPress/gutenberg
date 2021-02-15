@@ -38,6 +38,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
 	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -621,7 +622,7 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,

@@ -7,6 +7,7 @@ import {
 	useBlockProps,
 	InspectorAdvancedControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
@@ -18,7 +19,7 @@ const { __Visualizer: BoxControlVisualizer } = BoxControl;
 function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const hasInnerBlocks = useSelect(
 		( select ) => {
-			const { getBlock } = select( 'core/block-editor' );
+			const { getBlock } = select( blockEditorStore );
 			const block = getBlock( clientId );
 			return !! ( block && block.innerBlocks.length );
 		},

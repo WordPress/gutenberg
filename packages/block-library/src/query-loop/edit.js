@@ -14,7 +14,9 @@ import {
 	BlockPreview,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -53,8 +55,8 @@ export default function QueryLoopEdit( {
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( 'core' );
-			const { getBlocks } = select( 'core/block-editor' );
+			const { getEntityRecords } = select( coreStore );
+			const { getBlocks } = select( blockEditorStore );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
