@@ -18,11 +18,13 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import {
+	store as blockEditorStore,
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -98,23 +100,22 @@ function GalleryEdit( props ) {
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	const { getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		const preferredStyleVariations =
 			settings.__experimentalPreferredStyleVariations;
 		return {
-			getBlock: select( 'core/block-editor' ).getBlock,
-			getSettings: select( 'core/block-editor' ).getSettings,
+			getBlock: select( blockEditorStore ).getBlock,
+			getSettings: select( blockEditorStore ).getSettings,
 			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
 		};
 	}, [] );
 
 	const innerBlockImages = useSelect(
 		( select ) => {
-			return select( 'core/block-editor' ).getBlock( clientId )
-				?.innerBlocks;
+			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
 		},
 		[ clientId ]
 	);
@@ -140,7 +141,7 @@ function GalleryEdit( props ) {
 			) {
 				return imageData;
 			}
-			const getMedia = select( 'core' ).getMedia;
+			const getMedia = select( coreStore ).getMedia;
 			const newImageData = innerBlockImages.map( ( imageBlock ) => {
 				return {
 					id: imageBlock.attributes.id,
