@@ -38,10 +38,14 @@ export default function useNavigationEditor() {
 	}, [ selectedMenuId, menus ] );
 
 	const navigationPost = useSelect(
-		( select ) =>
-			select( editNavigationStore ).getNavigationPostForMenu(
+		( select ) => {
+			if ( ! selectedMenuId ) {
+				return;
+			}
+			return select( editNavigationStore ).getNavigationPostForMenu(
 				selectedMenuId
-			),
+			);
+		},
 		[ selectedMenuId ]
 	);
 
