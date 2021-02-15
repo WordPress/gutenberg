@@ -257,7 +257,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|number)`: The unique instance id.
+-   `string | number`: The unique instance id.
 
 <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
 
