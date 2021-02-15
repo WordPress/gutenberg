@@ -27,20 +27,18 @@
 	}
 
 	.components-circular-option-picker,
-	.block-editor-duotone-toolbar__label,
 	.block-editor-duotone-toolbar__description {
-		padding: 12px;
+		padding: $grid-unit-15;
 	}
 
-	.block-editor-duotone-toolbar__label,
+	.components-menu-group__label {
+		padding: $grid-unit-15 $grid-unit-15 0 $grid-unit-15;
+	}
+
+	.components-menu-group__label,
 	.block-editor-duotone-toolbar__custom-colors,
 	.block-editor-duotone-toolbar__color-button {
 		width: 100%;
-	}
-
-	.block-editor-duotone-toolbar__label {
-		display: inline-block;
-		font-weight: bold;
 	}
 
 	.block-editor-duotone-toolbar__description {
