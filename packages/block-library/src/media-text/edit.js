@@ -9,7 +9,7 @@ import { map, filter } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -146,6 +146,13 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		[ isSelected, mediaId ]
 	);
 
+	const refMediaContainer = useRef();
+	const imperativeFocalPointPreview = ( value ) => {
+		const { style } = refMediaContainer.current.resizable;
+		const { x, y } = value;
+		style.backgroundPosition = `${ x * 100 }% ${ y * 100 }%`;
+	};
+
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
 	const onSelectMedia = attributesFromMedia( { attributes, setAttributes } );
@@ -254,6 +261,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onChange={ ( value ) =>
 						setAttributes( { focalPoint: value } )
 					}
+					onDragStart={ imperativeFocalPointPreview }
+					onDrag={ imperativeFocalPointPreview }
 				/>
 			) }
 			{ mediaType === 'image' && (
@@ -325,6 +334,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onSelectMedia={ onSelectMedia }
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
+					ref={ refMediaContainer }
 					{ ...{
 						focalPoint,
 						imageFill,
