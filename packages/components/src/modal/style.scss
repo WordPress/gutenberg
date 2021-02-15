@@ -140,10 +140,6 @@ body.modal-open.is-fullscreen-modal {
 		animation: components-modal__content-scale-back 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 	}
 
-	.interface-interface-skeleton__editor {
-		border-radius: $grid-unit-10;
-	}
-
 	// Increase full screen modal padding on medium+ screens
 	@include break-medium() {
 		.components-modal__header {
