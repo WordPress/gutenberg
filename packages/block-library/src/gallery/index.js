@@ -10,7 +10,7 @@ import { gallery as icon } from '@wordpress/icons';
 import deprecated from './deprecated';
 import edit from './edit-wrapper';
 import metadata from './block.json';
-import save from './save-wrapper';
+import save from './save';
 import transforms from './transforms';
 
 const { name } = metadata;
