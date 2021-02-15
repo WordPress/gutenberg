@@ -226,7 +226,7 @@ register_block_pattern(
 register_block_pattern(
 	'test/query-5',
 	array(
-		'title'      => __( 'Query Pattern two', 'gutenberg' ),
+		'title'      => __( 'Query Pattern five', 'gutenberg' ),
 		'categories' => array( 'core/query' ),
 		'content'    => '<!-- wp:columns -->
 		<div class="wp-block-columns"><!-- wp:column -->

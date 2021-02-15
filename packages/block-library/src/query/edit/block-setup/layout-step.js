@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { parse, store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -11,14 +10,20 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { Button, VisuallyHidden } from '@wordpress/components';
+import {
+	Button,
+	VisuallyHidden,
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+	__unstableCompositeItem as CompositeItem,
+} from '@wordpress/components';
 
 const LayoutSetupStep = ( {
 	blockType,
 	onVariationSelect,
 	onBlockPatternSelect,
 } ) => {
-	const { defaultVariation, scopeVariations, patterns } = useSelect(
+	const { defaultVariation, blockVariations, patterns } = useSelect(
 		( select ) => {
 			const { getBlockVariations, getDefaultBlockVariation } = select(
 				blocksStore
@@ -32,128 +37,146 @@ const LayoutSetupStep = ( {
 			}
 			return {
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				scopeVariations: getBlockVariations( name, 'block' ),
+				blockVariations: getBlockVariations( name, 'block' ),
 				patterns: _patterns,
 			};
 		},
 		[ blockType ]
 	);
+	const [ showBlockVariations, setShowBlockVariations ] = useState(
+		! patterns?.length
+	);
+
 	// TODO check about `useAsyncList`
+	const composite = useCompositeState();
+	// TODO check this line :)
+	if ( ! showBlockVariations && ! patterns?.length ) return null;
+	const showPatternsList = ! showBlockVariations && !! patterns.length;
 	return (
-		<div className="layout-step-container">
-			<BlockVariationPicker
-				variations={ scopeVariations }
-				onSelect={ ( nextVariation = defaultVariation ) =>
-					onVariationSelect( nextVariation )
-				}
-			/>
-			{ !! patterns.length && (
-				<PatternsPicker
-					patterns={ patterns }
-					onSelect={ onBlockPatternSelect }
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className="block-setup-block-layout-list__container"
+			aria-label={ __( 'Layout list' ) }
+		>
+			{ showBlockVariations && (
+				<>
+					{ blockVariations.map( ( variation ) => (
+						<BlockVariation
+							key={ variation.name }
+							variation={ variation }
+							onSelect={ ( nextVariation = defaultVariation ) =>
+								onVariationSelect( nextVariation )
+							}
+							composite={ composite }
+						/>
+					) ) }
+				</>
+			) }
+			{ ! showBlockVariations && !! blockVariations?.length && (
+				<BlockVariation
+					key={ defaultVariation.name }
+					title={ __( 'Start empty' ) }
+					variation={ defaultVariation }
+					onSelect={ () => {
+						setShowBlockVariations( true );
+					} }
+					composite={ composite }
 				/>
 			) }
-		</div>
+			{ showPatternsList && (
+				<>
+					{ patterns.map( ( pattern ) => (
+						<BlockPattern
+							key={ pattern.name }
+							pattern={ pattern }
+							onSelect={ onBlockPatternSelect }
+							composite={ composite }
+						/>
+					) ) }
+				</>
+			) }
+		</Composite>
 	);
 };
 
-function PatternsPicker( { patterns, onSelect } ) {
-	return (
-		<div
-			className="block-patterns-picker-container"
-			aria-label={ __( 'Block Patterns' ) }
-		>
-			<h6>{ __( 'Available block patterns' ) }</h6>
-			<div
-				className="block-patterns-picker-container__grid"
-				aria-label={ __( 'Block Patterns' ) }
-			>
-				{ patterns.map( ( pattern ) => (
-					<BlockPattern
-						key={ pattern.name }
-						pattern={ pattern }
-						onSelect={ onSelect }
-					/>
-				) ) }
-			</div>
-		</div>
-	);
-}
-
-function BlockPattern( { pattern, onSelect } ) {
+function BlockPattern( { pattern, onSelect, composite } ) {
 	const { content, viewportWidth } = pattern;
 	const blocks = useMemo( () => parse( content ), [ content ] );
-	const instanceId = useInstanceId( BlockPattern );
-	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
-
+	const descriptionId = useInstanceId(
+		BlockPattern,
+		'block-setup-block-layout-list__item-description'
+	);
 	return (
 		<div
-			className="block-patterns-list-item"
-			role="button"
-			onClick={ () => onSelect( blocks ) }
-			onKeyDown={ ( event ) => {
-				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-					onSelect( blocks );
-				}
-			} }
-			tabIndex={ 0 }
+			className="block-setup-block-layout-list__list-item"
 			aria-label={ pattern.title }
-			aria-describedby={ pattern.description ? descriptionId : undefined }
+			// aria-describedby={ variation.description ? descriptionId : undefined }
 		>
-			<BlockPreview blocks={ blocks } viewportWidth={ viewportWidth } />
-			<div className="block-editor-block-patterns-list__item-title">
-				{ pattern.title }
-			</div>
-			{ !! pattern.description && (
-				<VisuallyHidden id={ descriptionId }>
-					{ pattern.description }
-				</VisuallyHidden>
-			) }
+			<CompositeItem
+				role="option"
+				as="div"
+				{ ...composite }
+				className="block-setup-block-layout-list__item"
+				onClick={ () => onSelect( blocks ) }
+			>
+				<BlockPreview
+					blocks={ blocks }
+					viewportWidth={ viewportWidth }
+				/>
+				<div className="block-setup-block-layout-list__item-title">
+					{ pattern.title }
+				</div>
+				{ !! pattern.description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ pattern.description }
+					</VisuallyHidden>
+				) }
+			</CompositeItem>
 		</div>
 	);
 }
 
-function BlockVariationPicker( { variations, onSelect, allowSkip } ) {
+function BlockVariation( { variation, title, onSelect, composite } ) {
+	const descriptionId = useInstanceId(
+		BlockVariation,
+		'block-setup-block-layout-list__item-description'
+	);
 	return (
-		<div className="block-variations-picker-container">
-			<h6>{ __( 'Block variations' ) }</h6>
-			{ /*
-			 * Disable reason: The `list` ARIA role is redundant but
-			 * Safari+VoiceOver won't announce the list otherwise.
-			 */
-			/* eslint-disable jsx-a11y/no-redundant-roles */ }
-			<ul
-				className="block-editor-block-variation-picker__variations"
-				role="list"
-				aria-label={ __( 'Block variations' ) }
+		<div
+			className="block-setup-block-layout-list__list-item is-block-variation"
+			aria-label={ variation.title }
+			aria-describedby={
+				variation.description ? descriptionId : undefined
+			}
+		>
+			<CompositeItem
+				role="option"
+				as="div"
+				{ ...composite }
+				className="block-setup-block-layout-list__item"
+				onClick={ () => onSelect( variation ) }
+				label={ title || variation.description || variation.title }
 			>
-				{ variations.map( ( variation ) => (
-					<li key={ variation.name }>
-						<Button
-							isSecondary
-							icon={ variation.icon }
-							iconSize={ 48 }
-							onClick={ () => onSelect( variation ) }
-							className="block-editor-block-variation-picker__variation"
-							label={ variation.description || variation.title }
-						/>
-						<span
-							className="block-editor-block-variation-picker__variation-label"
-							role="presentation"
-						>
-							{ variation.title }
-						</span>
-					</li>
-				) ) }
-			</ul>
-			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-			{ allowSkip && (
-				<div className="block-editor-block-variation-picker__skip">
-					<Button isLink onClick={ () => onSelect() }>
-						{ __( 'Skip' ) }
-					</Button>
+				<div className="block-setup-block-layout-list__item-variation">
+					<Button
+						isSecondary
+						icon={ variation.icon }
+						iconSize={ 48 }
+						label={
+							title || variation.description || variation.title
+						}
+					/>
+					<div className="block-setup-block-layout-list__item-title">
+						{ title || variation.title }
+					</div>
 				</div>
-			) }
+				{ !! variation.description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ variation.description }
+					</VisuallyHidden>
+				) }
+			</CompositeItem>
 		</div>
 	);
 }

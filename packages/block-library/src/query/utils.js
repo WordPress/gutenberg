@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+
+/**
  * WordPress term object from REST API.
  * Categories ref: https://developer.wordpress.org/rest-api/reference/categories/
  * Tags ref: https://developer.wordpress.org/rest-api/reference/tags/
@@ -45,3 +51,34 @@ export const getTermsInfo = ( terms ) => ( {
 		{ mapById: {}, mapByName: {}, names: [] }
 	),
 } );
+
+// TODO jsdoc
+export const usePostTypes = () => {
+	const { postTypes } = useSelect( ( select ) => {
+		const { getPostTypes } = select( 'core' );
+		const excludedPostTypes = [ 'attachment' ];
+		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
+			( { viewable, slug } ) =>
+				viewable && ! excludedPostTypes.includes( slug )
+		);
+		return {
+			postTypes: filteredPostTypes,
+		};
+	}, [] );
+	const postTypesTaxonomiesMap = useMemo( () => {
+		if ( ! postTypes?.length ) return;
+		return postTypes.reduce( ( accumulator, type ) => {
+			accumulator[ type.slug ] = type.taxonomies;
+			return accumulator;
+		}, {} );
+	}, [ postTypes ] );
+	const postTypesSelectOptions = useMemo(
+		() =>
+			( postTypes || [] ).map( ( { labels, slug } ) => ( {
+				label: labels.singular_name,
+				value: slug,
+			} ) ),
+		[ postTypes ]
+	);
+	return { postTypesTaxonomiesMap, postTypesSelectOptions };
+};
