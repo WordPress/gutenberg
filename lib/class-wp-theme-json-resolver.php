@@ -212,7 +212,7 @@ class WP_Theme_JSON_Resolver {
 
 		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
-		self::translate( $config );
+		$config     = self::translate( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
 		$default_colors_i18n = array(
