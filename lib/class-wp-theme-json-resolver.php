@@ -293,7 +293,7 @@ class WP_Theme_JSON_Resolver {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme = new WP_Theme_JSON( $theme_json_data );
+			self::$theme     = new WP_Theme_JSON( $theme_json_data );
 		}
 
 		if ( empty( $theme_support_data ) ) {
