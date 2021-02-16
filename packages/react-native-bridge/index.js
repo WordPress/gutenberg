@@ -360,4 +360,16 @@ export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
 	);
 }
 
+export function requestFocalPointPickerTooltipShown( callback ) {
+	return RNReactNativeGutenbergBridge.requestFocalPointPickerTooltipShown(
+		callback
+	);
+}
+
+export function setFocalPointPickerTooltipShown( tooltipShown ) {
+	return RNReactNativeGutenbergBridge.setFocalPointPickerTooltipShown(
+		tooltipShown
+	);
+}
+
 export default RNReactNativeGutenbergBridge;

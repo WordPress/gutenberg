@@ -366,7 +366,6 @@ export default compose( [
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
 				getSettings,
-				getBlockHierarchyRootClientId,
 			} = select( blockEditorStore );
 
 			const isStackedHorizontally = orientation === 'horizontal';
@@ -382,10 +381,7 @@ export default compose( [
 			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
-			const rootBlockId = getBlockHierarchyRootClientId(
-				selectedBlockClientId
-			);
-			const blockCount = getBlockCount( rootBlockId );
+			const blockCount = getBlockCount();
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =

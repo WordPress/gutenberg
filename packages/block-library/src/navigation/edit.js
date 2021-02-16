@@ -14,6 +14,7 @@ import {
 	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -46,7 +47,7 @@ function Navigation( {
 		! hasExistingNavItems
 	);
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
@@ -107,23 +108,15 @@ function Navigation( {
 		);
 	}
 
-	function handleItemsAlignment( align ) {
-		return () => {
-			const itemsJustification =
-				attributes.itemsJustification === align ? undefined : align;
-			setAttributes( {
-				itemsJustification,
-			} );
-		};
-	}
-
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
-						onChange={ handleItemsAlignment }
+						onChange={ ( value ) =>
+							setAttributes( { itemsJustification: value } )
+						}
 						popoverProps={ {
 							position: 'bottom right',
 							isAlternate: true,
@@ -159,12 +152,12 @@ function Navigation( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
 			false
@@ -185,7 +178,7 @@ export default compose( [
 				if ( blocks?.length === 0 ) {
 					return false;
 				}
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+				dispatch( blockEditorStore ).replaceInnerBlocks(
 					clientId,
 					blocks,
 					true

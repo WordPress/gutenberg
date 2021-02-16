@@ -18,6 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
@@ -25,7 +26,7 @@ export default function CategoriesEdit( {
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( 'core' );
+		const { getEntityRecords } = select( coreStore );
 		const { isResolving } = select( 'core/data' );
 		const query = { per_page: -1, hide_empty: true };
 		return {

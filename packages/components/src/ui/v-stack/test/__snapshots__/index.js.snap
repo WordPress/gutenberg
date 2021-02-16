@@ -55,8 +55,6 @@ exports[`props should render alignment 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
-  --wp-g2-h-stack-spacing: calc(4px * 2);
-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
 }
 
 @media (prefers-reduced-motion) {
@@ -124,8 +122,6 @@ exports[`props should render correctly 1`] = `
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  --wp-g2-h-stack-spacing: calc(4px * 2);
-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
 }
 
 @media (prefers-reduced-motion) {
@@ -243,8 +239,6 @@ exports[`props should render spacing 1`] = `
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  --wp-g2-h-stack-spacing: calc(4px * 5);
-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 5);
 }
 
 @media (prefers-reduced-motion) {

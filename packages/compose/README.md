@@ -155,7 +155,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `(Object|Function)`: Element Ref.
+-   `Object|Function`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -164,7 +164,7 @@ Copies the text to the clipboard when the element is clicked.
 _Parameters_
 
 -   _ref_ `Object`: Reference with the element.
--   _text_ `(string|Function)`: The text to copy.
+-   _text_ `string|Function`: The text to copy.
 -   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
@@ -208,7 +208,7 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+-   _focusOnMount_ `boolean|string`: Focus on mount mode.
 
 _Returns_
 
@@ -239,7 +239,7 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `?Function`: Overrides the default return behavior.
+-   _onFocusReturn_ `Function?`: Overrides the default return behavior.
 
 _Returns_
 
@@ -253,6 +253,11 @@ _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
 -   _prefix_ `string`: Prefix for the unique id.
+-   _preferredId_ `string`: Default ID to use.
+
+_Returns_
+
+-   `string | number`: The unique instance id.
 
 <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
 
@@ -266,7 +271,7 @@ Attach a keyboard shortcut handler.
 
 _Parameters_
 
--   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
+-   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
 -   _callback_ `Function`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
@@ -294,7 +299,7 @@ with the same node.
 
 _Parameters_
 
--   _refs_ `Array<(RefObject|RefCallback)>`: The refs to be merged.
+-   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
 
 _Returns_
 
@@ -311,7 +316,7 @@ _Parameters_
 
 _Returns_
 
--   `(T|undefined)`: The value from the previous render.
+-   `T|undefined`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 

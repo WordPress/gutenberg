@@ -7,10 +7,7 @@ import {
 	useViewportMatch,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
-import {
-	__experimentalLibrary as Library,
-	__unstableUseEditorStyles as useEditorStyles,
-} from '@wordpress/block-editor';
+import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -54,7 +51,6 @@ function Interface( { blockEditorSettings } ) {
 		} ),
 		[]
 	);
-	const editorStylesRef = useEditorStyles( blockEditorSettings.styles );
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -75,7 +71,6 @@ function Interface( { blockEditorSettings } ) {
 
 	return (
 		<InterfaceSkeleton
-			ref={ editorStylesRef }
 			labels={ interfaceLabels }
 			header={ <Header /> }
 			secondarySidebar={
