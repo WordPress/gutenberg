@@ -145,7 +145,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		selectionAfterEndClientId,
 		hasBlockMovingClientId,
 		getBlockIndex,
-		getBlockCount,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
 	} = useSelect( selector, [] );
