@@ -21,6 +21,7 @@ import { BottomSheet, getClipboard } from '@wordpress/components';
 import InserterSearchResults from './search-results';
 import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
+import { searchItems } from './search-items';
 
 // This should handle showing the insertion point and the items
 // the search results component will handle picking and inserting
@@ -132,9 +133,11 @@ function InserterMenu( {
 	 */
 	function getItems() {
 		// Filter out reusable blocks (they will be added in another tab)
-		const itemsToDisplay = items.filter(
+		let itemsToDisplay = items.filter(
 			( { name } ) => name !== 'core/block'
 		);
+
+		itemsToDisplay = searchItems( itemsToDisplay, filterValue );
 
 		const clipboard = getClipboard();
 		let clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
