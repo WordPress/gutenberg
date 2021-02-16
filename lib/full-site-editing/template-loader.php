@@ -65,6 +65,17 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	global $_wp_current_template_content;
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
+	$current_legacy_template = basename( $template, '.php' );
+	$block_template_slug     = is_object( $current_template ) ? $current_template->slug : false;
+
+	foreach ( $templates as $item ) {
+		$legacy_slug = gutenberg_strip_php_suffix( $item );
+
+		if ( $block_template_slug !== $current_legacy_template && $legacy_slug === $current_legacy_template ) {
+			return $template;
+		}
+	}
+
 	if ( $current_template ) {
 		$_wp_current_template_content = empty( $current_template->content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->content;
 
