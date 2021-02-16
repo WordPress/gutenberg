@@ -137,7 +137,7 @@ export function Button( props, ref ) {
 				{ element }
 				{ describedBy && (
 					<VisuallyHidden>
-						<span id={ descriptionId }>{ describedBy }</span>
+						<span id={ describedById }>{ describedBy }</span>
 					</VisuallyHidden>
 				) }
 			</>
