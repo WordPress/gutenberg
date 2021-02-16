@@ -39,9 +39,22 @@ async function getTemplateCard() {
 	};
 }
 
+async function getBlockCard() {
+	return {
+		title: await page.$eval(
+			'.block-editor-block-card__title',
+			( element ) => element.innerText
+		),
+		description: await page.$eval(
+			'.block-editor-block-card__description',
+			( element ) => element.innerText
+		),
+	};
+}
+
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'theme-experiments/tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -94,6 +107,20 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+		} );
+
+		it( `should show template part's name in the block card if a template part block is selected`, async () => {
+			const allBlocks = await getAllBlocks();
+			const headerTemplatePart = allBlocks.find(
+				( { name, attributes } ) =>
+					name === 'core/template-part' &&
+					attributes?.slug === 'header'
+			);
+			await selectBlockByClientId( headerTemplatePart.clientId );
+
+			await toggleSidebar();
+
+			expect( ( await getBlockCard() ).title ).toEqual( 'Header' );
 		} );
 	} );
 } );
