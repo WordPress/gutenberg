@@ -7,15 +7,12 @@
 In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
 
 ```jsx
-import {
-	__experimentalSurface as Surface,
-	__experimentalText as Text,
-} from '@wp-g2/components';
+import { Surface, Text } from '@wp-g2/components/ui';
 
 function Example() {
 	return (
 		<Surface>
-			<Text>Lorem Ipsum</Text>
+			<Text>Code is Poetry</Text>
 		</Surface>
 	);
 }

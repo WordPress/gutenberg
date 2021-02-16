@@ -1,2 +1,2 @@
-export { default as Surface } from './surface';
-export * from './use-surface';
+export { default as Surface } from './component';
+export * from './hook';

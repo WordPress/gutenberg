@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createComponent } from '../utils';
-import { useSurface } from './use-surface';
+import { useSurface } from './hook';
 
 export default createComponent( {
 	as: 'div',

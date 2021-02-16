@@ -39,19 +39,18 @@ export type Props = {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Surface, Text, VStack } from `@wp-g2/components`
-	 * import { ui } from `@wp-g2/styles`
+	 * import { Surface, Text, VStack } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return (
-	 *     <VStack css={[ui.background.darkGray, ui.padding(5)]}>
-	 *       <Surface css={[ui.padding(5)]} variant="primary">
+	 *     <VStack>
+	 *       <Surface variant="primary">
 	 *         <Text>Primary Surface</Text>
 	 *       </Surface>
-	 *       <Surface css={[ui.padding(5)]} variant="secondary">
+	 *       <Surface variant="secondary">
 	 *         <Text>Secondary Surface</Text>
 	 *       </Surface>
-	 *       <Surface css={[ui.padding(5)]} variant="tertiary">
+	 *       <Surface variant="tertiary">
 	 *         <Text>Tertiary Surface</Text>
 	 *       </Surface>
 	 *     </VStack>
