@@ -72,7 +72,7 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
-	if ( ( ! isPlaceholder && isMissing ) || ! templatePartId ) {
+	if ( ( slug && ! theme ) || ( slug && isMissing ) ) {
 		return (
 			<TagName { ...blockProps }>
 				<Warning>
