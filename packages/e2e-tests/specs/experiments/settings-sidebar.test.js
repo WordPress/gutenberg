@@ -54,7 +54,7 @@ async function getBlockCard() {
 
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
-		await activateTheme( 'theme-experiments/tt1-blocks' );
+		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
