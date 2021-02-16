@@ -276,6 +276,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				onClick={ () => setNavigationMode( false ) }
 				onKeyDown={ onKeyDown }
 				describedBy={ label }
+				aria-describedby={ `${ clientId }-description` }
 			>
 				<BlockTitle clientId={ clientId } />
 			</Button>
