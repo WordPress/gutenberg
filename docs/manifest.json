@@ -606,6 +606,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Share your Block with the World",
+		"slug": "submitting-to-block-directory",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md",
+		"parent": "create-block"
+	},
+	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/readme.md",

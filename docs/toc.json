@@ -116,7 +116,8 @@
 			{ "docs/designers-developers/developers/tutorials/create-block/attributes.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/block-code.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/author-experience.md": [] },
-			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] }
+			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md": [] }
 		] },
 		{ "docs/designers-developers/developers/tutorials/block-tutorial/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },
