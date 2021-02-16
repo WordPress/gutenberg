@@ -144,7 +144,7 @@ class EditorPage {
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 200 );
+			await swipeUp( this.driver, undefined, 100, 1 );
 			return this.androidScrollAndReturnElement( accessibilityLabel );
 		}
 		return elements[ elements.length - 1 ];

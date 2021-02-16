@@ -319,7 +319,12 @@ const tapPasteAboveElement = async ( driver, element ) => {
 
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards
-const swipeUp = async ( driver, element = undefined, delay = 3000 ) => {
+const swipeUp = async (
+	driver,
+	element = undefined,
+	delay = 3000,
+	endYCoefficient = 0.5
+) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
 	if ( element !== undefined ) {
@@ -331,7 +336,7 @@ const swipeUp = async ( driver, element = undefined, delay = 3000 ) => {
 	const startX = size.width / 2;
 	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY + startY * -1 * 0.5;
+	const endY = startY + startY * -1 * endYCoefficient;
 
 	await swipeFromTo(
 		driver,
