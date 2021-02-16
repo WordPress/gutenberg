@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, concat, differenceBy, some, every } from 'lodash';
+import { isEmpty, concat, differenceBy, some, every, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,12 +25,13 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -38,7 +39,10 @@ import { createBlobURL } from '@wordpress/blob';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import { getHrefAndDestination } from './utils';
-import { getUpdatedLinkTargetSettings } from '../image/utils';
+import {
+	getUpdatedLinkTargetSettings,
+	getImageSizeAttributes,
+} from '../image/utils';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
@@ -98,9 +102,11 @@ function GalleryEdit( props ) {
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
+		updateBlockAttributes,
 	} = useDispatch( blockEditorStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const { getSettings, preferredStyle } = useSelect( ( select ) => {
+	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const preferredStyleVariations =
 			settings.__experimentalPreferredStyleVariations;
@@ -275,6 +281,29 @@ function GalleryEdit( props ) {
 
 	function setLinkTo( value ) {
 		setAttributes( { linkTo: value } );
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			const image = block.attributes.id
+				? find( imageData, { id: block.attributes.id } )
+				: null;
+			updateBlockAttributes( block.clientId, {
+				...getHrefAndDestination( image.data, value ),
+			} );
+		} );
+
+		const linkToText = [ ...linkOptions ].find(
+			( linkType ) => linkType.value === value
+		);
+
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: image size settings */
+				__( 'All gallery image links updated to: %s' ),
+				linkToText.label
+			),
+			{
+				type: 'snackbar',
+			}
+		);
 	}
 
 	function setColumnsNumber( value ) {
@@ -291,12 +320,50 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
-	function toggleOpenInNewTab() {
-		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
+	function toggleOpenInNewTab( openInNewTab ) {
+		const newLinkTarget = openInNewTab ? '_blank' : undefined;
+		setAttributes( { linkTarget: newLinkTarget } );
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			updateBlockAttributes( block.clientId, {
+				...getUpdatedLinkTargetSettings(
+					newLinkTarget,
+					block.attributes
+				),
+			} );
+		} );
+		const noticeText = openInNewTab
+			? __( 'All gallery images updated to open in new tab' )
+			: __( 'All gallery images updated to not open in new tab' );
+		createSuccessNotice( noticeText, {
+			type: 'snackbar',
+		} );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
 		setAttributes( { sizeSlug: newSizeSlug } );
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			const image = block.attributes.id
+				? find( imageData, { id: block.attributes.id } )
+				: null;
+			updateBlockAttributes( block.clientId, {
+				...getImageSizeAttributes( image.data, newSizeSlug ),
+			} );
+		} );
+
+		const imageSize = imageSizeOptions.find(
+			( size ) => size.value === newSizeSlug
+		);
+
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: image size settings */
+				__( 'All gallery image sizes updated to: %s' ),
+				imageSize.label
+			),
+			{
+				type: 'snackbar',
+			}
+		);
 	}
 
 	useEffect( () => {
