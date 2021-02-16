@@ -12,6 +12,7 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	isReusableBlock,
 } from '@wordpress/blocks';
+import { VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -73,5 +74,10 @@ export default function BlockTitle( { clientId } ) {
 	if ( label !== blockType.title ) {
 		return truncate( label, { length: 35 } );
 	}
-	return blockInformation.title;
+	return (
+		<>
+			{ blockInformation.title }
+			<VisuallyHidden>: Block.</VisuallyHidden>
+		</>
+	);
 }
