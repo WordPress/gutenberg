@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import BlockIcon from '../block-icon';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
@@ -23,6 +24,13 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 	const blocks = useMemo( () => parse( content ), [ content ] );
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
+
+	const itemIconStyle = pattern.icon
+		? {
+				backgroundColor: pattern.icon.background,
+				color: pattern.icon.foreground,
+		  }
+		: {};
 
 	return (
 		<InserterDraggableBlocks isEnabled={ isDraggable } blocks={ blocks }>
@@ -50,6 +58,17 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 						/>
 						<div className="block-editor-block-patterns-list__item-title">
 							{ pattern.title }
+							{ pattern.icon ? (
+								<span
+									className="block-editor-block-patterns-list__item-icon"
+									style={ itemIconStyle }
+								>
+									<BlockIcon
+										icon={ pattern.icon }
+										showColors
+									/>
+								</span>
+							) : null }
 						</div>
 						{ !! pattern.description && (
 							<VisuallyHidden id={ descriptionId }>

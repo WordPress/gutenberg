@@ -241,3 +241,31 @@ function register_site_icon_url( $response ) {
 add_filter( 'rest_index', 'register_site_icon_url' );
 
 add_theme_support( 'widgets-block-editor' );
+
+function register_test_block_patterns() {
+	register_block_pattern(
+		'test-block-pattern-with-icon',
+		array(
+			'title'       => 'Test Block Pattern',
+			'description' => 'A description',
+			'content'     => '<!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph -->',
+			'keywords'    =>
+				array(
+					'apples',
+					'oranges'
+				),
+			'categories'  =>
+				array(
+					'gallery',
+					'text',
+					'twentytwentyone',
+				),
+			'icon' =>
+				array(
+					'src' => 'megaphone'
+				)
+		)
+	);
+}
+
+add_action( 'init', 'register_test_block_patterns' );

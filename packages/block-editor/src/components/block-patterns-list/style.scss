@@ -30,8 +30,29 @@
 	}
 }
 
+.block-editor-block-patterns-list__item-icon {
+	padding: 0 4px;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
+	transition: all 0.05s ease-in-out;
+	@include reduce-motion("transition");
+
+	svg {
+		transition: all 0.15s ease-out;
+		@include reduce-motion("transition");
+	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
+	}
+}
+
 .block-editor-block-patterns-list__item-title {
 	padding: $grid-unit-05;
 	font-size: 12px;
-	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: auto;
 }
