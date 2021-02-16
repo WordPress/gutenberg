@@ -25,17 +25,18 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
- * Hook used appropriate information for display reasons.
+ * Hook used to return appropriate information for display reasons.
  * It takes variations and custom `label` function into account.
  *
- * In order to try to find a variation match we need to things:
- * 1. Block's client id to extract it's current attributes.
+ * In order to try to find a variation match we need two things:
+ * 1. Block's client id to extract its current attributes.
  * 2. A block variation should have set `isActive` prop to a proper function.
  *
  * Value from custom `label` function is prioritized, if that's not found
  * then the block variation' information is returned. If both are missing
  * then the information is returned from the Block Type.
- * If no blockType is found with the provided clientId, returns null.
+ *
+ * If no `blockType` is found with the provided `clientId`, returns `null`.
  *
  * @param {string} clientId Block's client id.
  * @return {?WPBlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
