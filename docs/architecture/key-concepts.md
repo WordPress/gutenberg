@@ -6,11 +6,11 @@ Blocks are an abstract unit for structuring and interacting with content. When c
 
 Blocks come in many different forms but also provide a consistent interface. They can be inserted, moved, reordered, copied, duplicated, transformed, deleted, dragged, and combined. Blocks can also be reused, allowing them to be shared across posts and post types and/or used multiple times in the same post. If it helps, you can think of blocks as a more graceful shortcode, with rich formatting tools for users to compose content.
 
-The settings and content of a block can be customized in three main places: the block canvas, the block toolbar, and the block inspector. Blocks can be limited or locked-in-place by _Templates_ and custom code.
+The settings and content of a block can be customized in three main places: the block canvas, the block toolbar, and the block inspector.
 
 ### Composability
 
-Blocks are meant to be combined in different ways. Blocks are hierarchical in that a block can be a child of or parent to another block. For example, a _Columns_ block can be the parent block to multiple child blocks in each of its columns.
+Blocks are meant to be combined in different ways. Blocks are hierarchical in that a block can be nested within another block. Nested blocks and its container are also called _children_ and _parent_ respectively. For example, a _Columns_ block can be the parent block to multiple child blocks in each of its columns. The API that governs child block usage is named `InnerBlocks`.
 
 ### Data & Attributes
 
@@ -49,4 +49,4 @@ In technical details, reusable blocks are stored as a hidden post type (`wp_bloc
 
 ## Patterns
 
-A block pattern is a group of blocks that have been combined together creating a design pattern. These design patterns provide a starting point for building more advanced pages and layouts quickly. A block pattern can be as small as a single block or as large as a full page of content. Unlike reusable blocks, once a pattern is inserted it doesn't remain in sync with the original content as it is meant to be tweaked and customized by the user. Underneath the surface, patterns are just regular blocks composed together. Themes can register patterns to offer users quick starting points with a design language familiar to that theme's aesthetics.
+A block pattern is a group of blocks that have been combined together creating a design pattern. These design patterns provide a starting point for building more advanced pages and layouts quickly. A block pattern can be as small as a single block or as large as a full page of content. Unlike reusable blocks, once a pattern is inserted it doesn't remain in sync with the original content as the blocks contained are meant to be edited and customized by the user. Underneath the surface, patterns are just regular blocks composed together. Themes can register patterns to offer users quick starting points with a design language familiar to that theme's aesthetics.
