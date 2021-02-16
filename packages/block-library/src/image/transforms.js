@@ -128,35 +128,14 @@ const transforms = {
 			},
 		},
 		{
-			type: 'files',
-			isMatch( files ) {
-				return (
-					files.length === 1 &&
-					files[ 0 ].type.indexOf( 'image/' ) === 0
-				);
-			},
-			transform( files ) {
-				const file = files[ 0 ];
-				// We don't need to upload the media directly here
-				// It's already done as part of the `componentDidMount`
-				// int the image block
-				return createBlock( 'core/image', {
-					url: createBlobURL( file ),
-				} );
-			},
-		},
-		{
-			// When drag and dropping multiple files onto a gallery this overrrides the
+			// Note: when dragging and dropping multiple files onto a gallery this overrrides the
 			// gallery transform in order to add new images to the gallery instead of
 			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
-				return (
-					files.length !== 1 &&
-					every(
-						files,
-						( file ) => file.type.indexOf( 'image/' ) === 0
-					)
+				return every(
+					files,
+					( file ) => file.type.indexOf( 'image/' ) === 0
 				);
 			},
 			transform( files ) {
