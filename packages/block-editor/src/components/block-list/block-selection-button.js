@@ -275,7 +275,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				ref={ ref }
 				onClick={ () => setNavigationMode( false ) }
 				onKeyDown={ onKeyDown }
-				label={ label }
+				describedBy={ label }
 			>
 				<BlockTitle clientId={ clientId } />
 			</Button>
