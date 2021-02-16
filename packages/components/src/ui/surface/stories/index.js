@@ -12,7 +12,7 @@ import { Text } from '../../text';
 
 export default {
 	component: Surface,
-	title: 'Components/Surface',
+	title: 'G2 Components (Experimental)/Surface',
 };
 
 const variantOptions = {
