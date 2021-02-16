@@ -12,11 +12,6 @@ import { useState, useRef, useEffect } from '@wordpress/element';
  */
 import Button from '../button';
 
-const baseInputCssClass = 'components-edit-in-place-control__input';
-const beforeTransitionInputCssClass = 'small';
-const afterTransitionInputCssClass = 'large';
-const withoutTransitionCssClass = `${ baseInputCssClass } ${ beforeTransitionInputCssClass }`;
-const withTransitionCssClass = `${ baseInputCssClass } ${ afterTransitionInputCssClass }`;
 const cancelEvent = ( event ) => (
 	event.preventDefault(), event.stopPropagation()
 );
@@ -33,9 +28,6 @@ function EditInPlaceControl( {
 } ) {
 	const [ isEdit, setIsEdit ] = useState( false );
 	const [ value, setValue ] = useState( initialValue );
-	const [ inputCssClasses, setInputCssClasses ] = useState(
-		withoutTransitionCssClass
-	);
 
 	const inputRef = useRef();
 	const buttonRef = useRef();
@@ -55,20 +47,16 @@ function EditInPlaceControl( {
 				<input
 					aria-label={ editNameInputLabel }
 					ref={ inputRef }
-					className={ inputCssClasses }
+					className={ 'components-edit-in-place-control__input' }
 					value={ value }
 					onChange={ ( event ) => {
 						const _value = event.target.value;
 						setValue( event.target.value );
 						onChange( _value, event );
 					} }
-					onFocus={ () =>
-						setInputCssClasses( withTransitionCssClass )
-					}
 					onBlur={ () => {
 						setIsEdit( false );
 						onUpdate( value );
-						setInputCssClasses( withoutTransitionCssClass );
 					} }
 					onKeyDown={ ( event ) => {
 						if ( 'Enter' === event.key ) {
