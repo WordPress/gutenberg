@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, omit } from 'lodash';
+import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,35 +32,24 @@ export default function TemplatePartsMenu() {
 		setSearch( value );
 	} );
 
-	const {
-		isLoading,
-		templateParts,
-		templatePartsByArea,
-		generalTemplateParts,
-	} = useSelect( ( select ) => {
-		const templatePartRecords = select( coreStore ).getEntityRecords(
-			'postType',
-			'wp_template_part'
-		);
+	const { isLoading, templateParts, templatePartsByArea } = useSelect(
+		( select ) => {
+			const templatePartRecords = select( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template_part'
+			);
 
-		const _templateParts = templatePartRecords || [];
-		const _templatePartsByArea = groupBy( _templateParts, 'area' );
-		const areasUsedBySubMenus = TEMPLATE_PARTS_SUB_MENUS.map(
-			( { area } ) => area
-		).filter( ( area ) => !! area );
-		const _generalTemplateParts = [].concat(
-			...Object.values(
-				omit( _templatePartsByArea, areasUsedBySubMenus )
-			)
-		);
+			const _templateParts = templatePartRecords || [];
+			const _templatePartsByArea = groupBy( _templateParts, 'area' );
 
-		return {
-			isLoading: templateParts === null,
-			templateParts: _templateParts,
-			templatePartsByArea: _templatePartsByArea,
-			generalTemplateParts: _generalTemplateParts,
-		};
-	}, [] );
+			return {
+				isLoading: templatePartRecords === null,
+				templateParts: _templateParts,
+				templatePartsByArea: _templatePartsByArea,
+			};
+		},
+		[]
+	);
 
 	return (
 		<>
@@ -96,11 +85,7 @@ export default function TemplatePartsMenu() {
 					key={ `template-parts-menu-${ menu }` }
 					menu={ menu }
 					title={ title }
-					templateParts={
-						area
-							? templatePartsByArea[ area ]
-							: generalTemplateParts
-					}
+					templateParts={ templatePartsByArea[ area ] }
 				/>
 			) ) }
 		</>

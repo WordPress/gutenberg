@@ -62,7 +62,7 @@ export const TEMPLATE_PARTS_SUB_MENUS = [
 		title: __( 'Sidebars' ),
 	},
 	{
-		area: null,
+		area: 'uncategorized',
 		menu: MENU_TEMPLATE_PARTS_GENERAL,
 		title: __( 'General' ),
 	},
