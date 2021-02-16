@@ -81,3 +81,65 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_post_editor_settings' );
+
+/**
+ * Initialize a block-based editor.
+ *
+ * @param $settings {
+ *      Elements to initialize a block-based editor.
+ *
+ *      @param array $preload_paths         paths need to be preloaded.
+ *      @param string $editor_name          editor name.
+ *      @param string $editor_script_handle editor script handle.
+ *      @param string $initializer_name     editor initialization function name.
+ *      @param array $editor_settings       editor settings.
+ * }
+ * @return void
+ */
+function gutenberg_initialize_editor( $settings ) {
+
+	$defaults = array(
+		'preload_paths'        => array(),
+		'editor_name'          => 'widgets_editor',
+		'editor_script_handle' => 'edit-widgets',
+		'initializer_name'     => 'initialize',
+		'editor_settings'      => array(),
+	);
+
+	$settings = wp_parse_args( $settings, $defaults );
+
+	$preload_paths = apply_filters( "{$settings['editor_name']}_preload_paths", $settings['preload_paths'] );
+
+	$preload_data  = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
+	wp_add_inline_script(
+		"wp-{$settings['editor_script_handle']}",
+		sprintf(
+			'wp.domReady( function() {
+				wp.%s.%s( "%s", %s );
+			} );',
+			lcfirst( str_replace( '-', '', ucwords( $settings['editor_script_handle'], '-' ) ) ),
+			$settings['initializer_name'],
+			str_replace( '_', '-', $settings['editor_name'] ),
+			wp_json_encode( $settings['editor_settings'] )
+		)
+	);
+
+	// Preload server-registered block schemas.
+	wp_add_inline_script(
+		'wp-blocks',
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
+	);
+
+}
