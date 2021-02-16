@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, toString } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,6 +19,7 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import { pickRelevantMediaFiles } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -44,19 +47,37 @@ const transforms = {
 					: undefined;
 
 				const validImages = filter( attributes, ( { url } ) => url );
-				const innerBlocks = validImages.map( ( image ) => {
-					return createBlock( 'core/image', image );
-				} );
 
-				return createBlock(
-					'core/gallery',
-					{
-						imageCount: innerBlocks.length,
-						align,
-						sizeSlug,
-					},
-					innerBlocks
-				);
+				const settings = select( blockEditorStore ).getSettings();
+				if ( settings.__experimentalGalleryRefactor ) {
+					const innerBlocks = validImages.map( ( image ) => {
+						return createBlock( 'core/image', image );
+					} );
+
+					return createBlock(
+						'core/gallery',
+						{
+							imageCount: innerBlocks.length,
+							align,
+							sizeSlug,
+						},
+						innerBlocks
+					);
+				}
+
+				return createBlock( 'core/gallery', {
+					images: validImages.map(
+						( { id, url, alt, caption } ) => ( {
+							id: toString( id ),
+							url,
+							alt,
+							caption,
+						} )
+					),
+					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
+					align,
+					sizeSlug,
+				} );
 			},
 		},
 		{
@@ -64,12 +85,41 @@ const transforms = {
 			tag: 'gallery',
 
 			attributes: {
+				images: {
+					type: 'array',
+					shortcode: ( { named: { ids } } ) => {
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( ! settings.__experimentalGalleryRefactor ) {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id: toString( id ),
+							} ) );
+						}
+					},
+				},
+				ids: {
+					type: 'array',
+					shortcode: ( { named: { ids } } ) => {
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( ! settings.__experimentalGalleryRefactor ) {
+							return parseShortcodeIds( ids );
+						}
+					},
+				},
 				shortCodeTransforms: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id: parseInt( id ),
-						} ) );
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( settings.__experimentalGalleryRefactor ) {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id: parseInt( id ),
+							} ) );
+						}
 					},
 				},
 				columns: {
@@ -112,13 +162,24 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				const innerBlocks = files.map( ( file ) =>
-					createBlock( 'core/image', {
-						url: createBlobURL( file ),
-					} )
-				);
+				const settings = select( blockEditorStore ).getSettings();
+				if ( settings.__experimentalGalleryRefactor ) {
+					const innerBlocks = files.map( ( file ) =>
+						createBlock( 'core/image', {
+							url: createBlobURL( file ),
+						} )
+					);
 
-				return createBlock( 'core/gallery', {}, innerBlocks );
+					return createBlock( 'core/gallery', {}, innerBlocks );
+				}
+				const block = createBlock( 'core/gallery', {
+					images: files.map( ( file ) =>
+						pickRelevantMediaFiles( {
+							url: createBlobURL( file ),
+						} )
+					),
+				} );
+				return block;
 			},
 		},
 	],
@@ -126,20 +187,42 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { align }, innerBlocks ) => {
-				if ( innerBlocks.length > 0 ) {
-					return innerBlocks.map(
-						( {
-							attributes: { id, url, alt, caption, sizeSlug },
-						} ) =>
-							createBlock( 'core/image', {
-								id,
-								url,
-								alt,
-								caption,
-								sizeSlug,
-								align,
-							} )
+			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
+				const settings = select( blockEditorStore ).getSettings();
+				if ( settings.__experimentalGalleryRefactor ) {
+					if ( innerBlocks.length > 0 ) {
+						return innerBlocks.map(
+							( {
+								attributes: {
+									id,
+									url,
+									alt,
+									caption,
+									imageSizeSlug,
+								},
+							} ) =>
+								createBlock( 'core/image', {
+									id,
+									url,
+									alt,
+									caption,
+									sizeSlug: imageSizeSlug,
+									align,
+								} )
+						);
+					}
+					return createBlock( 'core/image', { align } );
+				}
+				if ( images.length > 0 ) {
+					return images.map( ( { url, alt, caption }, index ) =>
+						createBlock( 'core/image', {
+							id: ids[ index ],
+							url,
+							alt,
+							caption,
+							align,
+							sizeSlug,
+						} )
 					);
 				}
 				return createBlock( 'core/image', { align } );
