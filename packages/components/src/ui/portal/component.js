@@ -7,9 +7,25 @@ import { Portal as BasePortal } from 'reakit';
 
 /* eslint-disable jsdoc/valid-types */
 /**
+ * `Portal` is a layout helper that renders components at the root `document.body` level, outside the DOM hierarchy of the parent component.
+ *
+ * @example
+ * ```jsx
+ * import { Portal, View } from `@wordpress/components/ui`;
+ *
+ * function Example() {
+ * 	return (
+ * 		<Portal>
+ * 			<View>Code Is Poetry</View>
+ * 		</Portal>
+ * 	);
+ * }
+ * ```
+ *
  * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, never>} props
  */
 /* eslint-enable jsdoc/valid-types */
+
 function Portal( { children } ) {
 	return (
 		<BasePortal>
