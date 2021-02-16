@@ -12,9 +12,15 @@
 
 .searchTextInput {
 	flex: 1;
+	flex-direction: row;
 	border: 1px solid $gray-600;
 	border-width: $border-width;
 	padding: $grid-unit-10;
+}
+
+.searchLabel {
+	flex: 1;
+	flex-direction: row;
 }
 
 $block-padding-hoz: 6px;

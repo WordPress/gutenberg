@@ -22,6 +22,7 @@ import { search } from '@wordpress/icons';
 import { buttonWithIcon, toggleLabel } from './icons';
 import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
+import richTextStyles from './rich-text.scss';
 
 const MIN_BUTTON_WIDTH = 100;
 
@@ -142,6 +143,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						style={ richTextStyles.searchButton }
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
 						identifier="text"
@@ -150,6 +152,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 							setAttributes( { buttonText: html } )
 						}
 						minWidth={ MIN_BUTTON_WIDTH }
+						textAlign="center"
 					/>
 				) }
 			</View>
@@ -163,6 +166,10 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 			{ showLabel && (
 				<RichText
 					className="wp-block-search__label"
+					style={ {
+						...styles.searchLabel,
+						...richTextStyles.searchLabel,
+					} }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
