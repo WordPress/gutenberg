@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+/**
  * Internal dependencies
  */
 import CyclePickerCell from '../bottom-sheet/cycle-picker-cell';
@@ -32,4 +36,4 @@ function CycleSelectControl( {
 	);
 }
 
-export default CycleSelectControl;
+export default memo( CycleSelectControl );

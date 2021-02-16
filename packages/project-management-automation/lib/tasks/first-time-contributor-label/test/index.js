@@ -32,6 +32,7 @@ describe( 'firstTimeContributorLabel', () => {
 			},
 			issues: {
 				addLabels: jest.fn(),
+				createComment: jest.fn(),
 			},
 		};
 
@@ -43,6 +44,7 @@ describe( 'firstTimeContributorLabel', () => {
 			author: 'ghost',
 		} );
 		expect( octokit.issues.addLabels ).not.toHaveBeenCalled();
+		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
 	} );
 
 	it( 'adds the First Time Contributor label if the user has no commits', async () => {
@@ -56,8 +58,15 @@ describe( 'firstTimeContributorLabel', () => {
 			},
 			issues: {
 				addLabels: jest.fn(),
+				createComment: jest.fn(),
 			},
 		};
+
+		const expectedComment =
+			':wave: Thanks for your first Pull Request and for helping build the future of Gutenberg and WordPress, @ghost' +
+			"! In case you missed it, we'd love to have you join us in our [Slack community](https://make.wordpress.org/chat/)," +
+			' where we hold [regularly weekly meetings](https://make.wordpress.org/core/tag/core-editor-summary/) open to anyone to coordinate with each other.\n\n' +
+			'If you want to learn more about WordPress development in general, check out the [Core Handbook](https://make.wordpress.org/core/handbook/) full of helpful information.';
 
 		await firstTimeContributorLabel( payload, octokit );
 
@@ -71,6 +80,12 @@ describe( 'firstTimeContributorLabel', () => {
 			repo: 'gutenberg',
 			issue_number: 123,
 			labels: [ 'First-time Contributor' ],
+		} );
+		expect( octokit.issues.createComment ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			issue_number: 123,
+			body: expectedComment,
 		} );
 	} );
 } );

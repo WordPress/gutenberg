@@ -35,5 +35,46 @@
         "innerContent": [
             "\n"
         ]
+    },
+    {
+        "blockName": "core/cover",
+        "attrs": {
+            "url": "https://example.com/some-background-image.png",
+            "id": 1933,
+            "dimRatio": 0,
+            "focalPoint": {
+                "x": "0.50",
+                "y": "0.40"
+            },
+            "minHeight": 48,
+            "minHeightUnit": "vw",
+            "align": "full"
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p></p>\n\t\t",
+                "innerContent": [
+                    "\n\t\t<p></p>\n\t\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+        "innerContent": [
+            "\n<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+            null,
+            "\n\t</div>\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
     }
 ]

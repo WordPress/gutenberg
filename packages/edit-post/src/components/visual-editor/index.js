@@ -12,10 +12,10 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
-	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
@@ -27,7 +27,7 @@ import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../store';
 
-export default function VisualEditor() {
+export default function VisualEditor( { styles } ) {
 	const ref = useRef();
 	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
 		const {
@@ -51,7 +51,6 @@ export default function VisualEditor() {
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 
-	useScrollMultiSelectionIntoView( ref );
 	useBlockSelectionClearer( ref );
 	useTypewriter( ref );
 	useClipboardHandler( ref );
@@ -60,6 +59,7 @@ export default function VisualEditor() {
 
 	return (
 		<div className="edit-post-visual-editor">
+			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div

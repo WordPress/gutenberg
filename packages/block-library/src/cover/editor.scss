@@ -1,6 +1,4 @@
 .wp-block-cover {
-	position: relative;
-
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.
 	&.is-placeholder {
@@ -42,12 +40,6 @@
 
 	.wp-block-cover__placeholder-background-options {
 		width: 100%;
-	}
-
-	// Fix object-fit when block is full width in the editor.
-	.wp-block-cover__image-background {
-		width: inherit;
-		height: inherit;
 	}
 }
 

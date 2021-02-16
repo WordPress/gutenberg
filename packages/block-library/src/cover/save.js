@@ -54,8 +54,10 @@ export default function save( { attributes } ) {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
+	const isImgElement = ! ( hasParallax || isRepeated );
+
 	const style = {
-		...( isImageBackground && ( hasParallax || isRepeated )
+		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: {} ),
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
@@ -65,7 +67,7 @@ export default function save( { attributes } ) {
 
 	const objectPosition =
 		// prettier-ignore
-		focalPoint && ! hasParallax
+		focalPoint && isImgElement
 			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
 			: undefined;
 
@@ -101,7 +103,7 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
-			{ isImageBackground && url && ! hasParallax && (
+			{ isImageBackground && isImgElement && url && (
 				<img
 					className={ classnames(
 						'wp-block-cover__image-background',

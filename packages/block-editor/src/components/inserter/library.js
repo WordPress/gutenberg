@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import { store as blockEditorStore } from '../../store';
 
 function InserterLibrary( {
 	rootClientId,
@@ -19,13 +20,12 @@ function InserterLibrary( {
 	isAppender,
 	showInserterHelpPanel,
 	showMostUsedBlocks = false,
-	__experimentalSelectBlockOnInsert,
 	__experimentalInsertionIndex,
 	onSelect = noop,
 } ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( 'core/block-editor' );
+			const { getBlockRootClientId } = select( blockEditorStore );
 
 			return (
 				rootClientId || getBlockRootClientId( clientId ) || undefined
@@ -42,10 +42,8 @@ function InserterLibrary( {
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
-			__experimentalSelectBlockOnInsert={
-				__experimentalSelectBlockOnInsert
-			}
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
+			shouldFocusBlock={ false }
 		/>
 	);
 }

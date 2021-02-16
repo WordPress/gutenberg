@@ -13,6 +13,12 @@
 	}
 }
 
+// Supply a min-width when inside a cover block, to prevent it from collapsing.
+.wp-block-cover .wp-block-embed {
+	min-width: 320px;
+	min-height: 240px;
+}
+
 .wp-block-embed {
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,

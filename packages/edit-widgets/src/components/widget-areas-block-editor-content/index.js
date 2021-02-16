@@ -8,6 +8,7 @@ import {
 	BlockSelectionClearer,
 	WritingFlow,
 	ObserveTyping,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 
 /**
@@ -16,9 +17,12 @@ import {
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-export default function WidgetAreasBlockEditorContent() {
+export default function WidgetAreasBlockEditorContent( {
+	blockEditorSettings,
+} ) {
 	return (
 		<div className="edit-widgets-block-editor editor-styles-wrapper">
+			<EditorStyles styles={ blockEditorSettings.styles } />
 			<KeyboardShortcuts />
 			<BlockEditorKeyboardShortcuts />
 			<Notices />

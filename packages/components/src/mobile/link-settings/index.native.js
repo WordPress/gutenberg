@@ -8,7 +8,13 @@ import { Platform, Clipboard } from 'react-native';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useEffect, useState, useRef, useContext } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useContext,
+	useCallback,
+} from '@wordpress/element';
 import { link, external } from '@wordpress/icons';
 
 /**
@@ -32,8 +38,6 @@ function LinkSettings( {
 	isVisible,
 	// Callback that is called on closing bottom sheet
 	onClose,
-	// Object of attributes to be set or updated in `LinkSettings`
-	attributes,
 	// Function called to set attributes
 	setAttributes,
 	// Callback that is called when url input field is empty
@@ -80,8 +84,12 @@ function LinkSettings( {
 	showIcon,
 	onLinkCellPressed,
 	urlValue,
+	// Attributes properties
+	url,
+	label,
+	linkTarget,
+	rel,
 } ) {
-	const { url, label, linkTarget, rel } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
@@ -100,7 +108,9 @@ function LinkSettings( {
 	const prevEditorSidebarOpened = prevEditorSidebarOpenedRef.current;
 
 	useEffect( () => {
-		setUrlInputValue( url || '' );
+		if ( url !== urlInputValue ) {
+			setUrlInputValue( url || '' );
+		}
 	}, [ url ] );
 
 	useEffect( () => {
@@ -126,57 +136,73 @@ function LinkSettings( {
 		if ( ! urlValue && onEmptyURL ) {
 			onEmptyURL();
 		}
-		setAttributes( {
-			url: prependHTTP( urlValue ),
-		} );
+
+		if ( prependHTTP( urlValue ) !== url ) {
+			setAttributes( {
+				url: prependHTTP( urlValue ),
+			} );
+		}
 	}, [ urlValue ] );
 
-	function onChangeURL( value ) {
-		if ( ! value && onEmptyURL ) {
-			onEmptyURL();
-		}
-		setUrlInputValue( value );
-	}
+	const onChangeURL = useCallback(
+		( value ) => {
+			if ( ! value && onEmptyURL ) {
+				onEmptyURL();
+			}
+			setUrlInputValue( value );
+		},
+		[ onEmptyURL ]
+	);
 
-	function onChangeLabel( value ) {
+	const onChangeLabel = useCallback( ( value ) => {
 		setLabelInputValue( value );
-	}
+	}, [] );
 
-	function onSetAttributes() {
-		setAttributes( {
-			url: prependHTTP( urlInputValue ),
-			label: labelInputValue,
-			rel: linkRelInputValue,
-		} );
-	}
+	const onSetAttributes = useCallback( () => {
+		const newURL = prependHTTP( urlInputValue );
+		if (
+			url !== newURL ||
+			labelInputValue !== label ||
+			linkRelInputValue !== rel
+		) {
+			setAttributes( {
+				url: newURL,
+				label: labelInputValue,
+				rel: linkRelInputValue,
+			} );
+		}
+	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
 
-	function onCloseSettingsSheet() {
+	const onCloseSettingsSheet = useCallback( () => {
 		onSetAttributes();
 
 		if ( onClose ) {
 			onClose();
 		}
-	}
+	}, [ onClose, onSetAttributes ] );
 
-	function onChangeOpenInNewTab( value ) {
-		const newLinkTarget = value ? '_blank' : undefined;
+	const onChangeOpenInNewTab = useCallback(
+		( value ) => {
+			const newLinkTarget = value ? '_blank' : undefined;
 
-		let updatedRel = linkRelInputValue;
-		if ( newLinkTarget && ! linkRelInputValue ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && linkRelInputValue === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
+			let updatedRel = linkRelInputValue;
+			if ( newLinkTarget && ! linkRelInputValue ) {
+				updatedRel = NEW_TAB_REL;
+			} else if ( ! newLinkTarget && linkRelInputValue === NEW_TAB_REL ) {
+				updatedRel = undefined;
+			}
 
-		setAttributes( {
-			linkTarget: newLinkTarget,
-			rel: updatedRel,
-		} );
-	}
+			setAttributes( {
+				linkTarget: newLinkTarget,
+				rel: updatedRel,
+			} );
+		},
+		[ linkRelInputValue ]
+	);
 
-	function onChangeLinkRel( value ) {
+	const onChangeLinkRel = useCallback( ( value ) => {
 		setLinkRelInputValue( value );
-	}
+	}, [] );
 
 	async function getURLFromClipboard() {
 		const clipboardText = await Clipboard.getString();

@@ -146,9 +146,11 @@ export default ( blockData, tree, type = 'all' ) => {
 		( styles, { selector }, context ) => {
 			if ( type === 'all' || type === 'cssVariables' ) {
 				const variableDeclarations = [
-					...getBlockPresetsDeclarations( tree?.[ context ] ),
+					...getBlockPresetsDeclarations(
+						tree?.settings?.[ context ]
+					),
 					...flattenTree(
-						tree?.[ context ]?.settings?.custom,
+						tree?.settings?.[ context ]?.custom,
 						'--wp--custom--',
 						'--'
 					),
@@ -165,7 +167,7 @@ export default ( blockData, tree, type = 'all' ) => {
 			if ( type === 'all' || type === 'blockStyles' ) {
 				const blockStyleDeclarations = getBlockStylesDeclarations(
 					blockData[ context ].supports,
-					tree?.[ context ]?.styles
+					tree?.styles?.[ context ]
 				);
 
 				if ( blockStyleDeclarations.length > 0 ) {
@@ -178,7 +180,7 @@ export default ( blockData, tree, type = 'all' ) => {
 
 				const presetClasses = getBlockPresetClasses(
 					selector,
-					tree?.[ context ]
+					tree?.settings?.[ context ]
 				);
 				if ( presetClasses ) {
 					styles.push( presetClasses );

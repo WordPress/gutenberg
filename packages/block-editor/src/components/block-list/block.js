@@ -45,6 +45,7 @@ import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
+import { store as blockEditorStore } from '../../store';
 
 export const BlockListBlockContext = createContext();
 
@@ -116,7 +117,7 @@ function BlockListBlock( {
 				isBlockBeingDragged,
 				isBlockHighlighted,
 				getSettings,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			return {
 				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
@@ -126,7 +127,7 @@ function BlockListBlock( {
 		},
 		[ clientId ]
 	);
-	const { removeBlock } = useDispatch( 'core/block-editor' );
+	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
@@ -286,7 +287,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
 		getMultiSelectedBlockClientIds,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
@@ -350,7 +351,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		__unstableMarkLastChangeAsPersistent,
-	} = dispatch( 'core/block-editor' );
+	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -373,14 +374,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = select( 'core/block-editor' );
+			const { getBlockIndex } = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
 			const { getPreviousBlockClientId, getNextBlockClientId } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			if ( forward ) {

@@ -1,9 +1,49 @@
 // Overriding the wp-admin background and padding
 // to give the navigation editor more room to breathe.
 .gutenberg_page_gutenberg-navigation {
-	background: $white;
-
 	#wpcontent {
 		padding-left: 0;
 	}
+
+	// Ensure the entire layout is full-height, the background
+	// of the editing canvas needs to be full-height for block
+	// deselection to work.
+	#wpwrap,
+	#wpcontent,
+	#wpbody,
+	#wpbody-content,
+	.edit-navigation,
+	.components-drop-zone__provider,
+	.edit-navigation-layout {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+}
+
+.edit-navigation-layout {
+	&.has-block-inspector {
+		margin-right: $sidebar-width;
+	}
+
+	> .components-spinner {
+		margin: $navigation-editor-spacing-top auto 0;
+	}
+
+	.edit-navigation-layout__canvas {
+		// Provide space for the floating block toolbar.
+		padding-top: $navigation-editor-spacing-top;
+
+		// Ensure the entire layout is full-height, the background
+		// of the editing canvas needs to be full-height for block
+		// deselection to work.
+		flex-grow: 1;
+	}
+}
+
+.edit-navigation-empty-state {
+	width: $navigation-editor-width;
+	margin-top: $navigation-editor-spacing-top;
+	margin-left: auto;
+	margin-right: auto;
 }

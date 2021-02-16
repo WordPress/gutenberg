@@ -15,7 +15,7 @@ When creating a new package, you need to provide at least the following:
     	"author": "The WordPress Contributors",
     	"license": "GPL-2.0-or-later",
     	"keywords": [ "wordpress" ],
-    	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
+    	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/package-name/README.md",
     	"repository": {
     		"type": "git",
     		"url": "https://github.com/WordPress/gutenberg.git"
@@ -49,7 +49,7 @@ When creating a new package, you need to provide at least the following:
 4. `CHANGELOG.md` file containing at least:
 
     ```
-    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
     ## Unreleased
 
@@ -66,7 +66,7 @@ Production dependencies are stored in the `dependencies` section of the packageâ
 
 #### Adding New Dependencies
 
-The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
+The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/HEAD/commands/add#readme) command from the root of the project.
 
 _Example:_
 
@@ -152,7 +152,7 @@ For each pull request, you should always include relevant changes in a "Unreleas
 _Example:_
 
 ```md
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 

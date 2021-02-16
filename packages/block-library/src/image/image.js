@@ -27,13 +27,19 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import { createBlock } from '@wordpress/blocks';
-import { crop, upload } from '@wordpress/icons';
+import {
+	createBlock,
+	getBlockType,
+	switchToBlockType,
+} from '@wordpress/blocks';
+import { crop, textColor, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -83,14 +89,19 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { image, multiImageSelection } = useSelect(
+	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
-			const { getMedia } = select( 'core' );
-			const { getMultiSelectedBlockClientIds, getBlockName } = select(
-				'core/block-editor'
-			);
+			const { getMedia } = select( coreStore );
+			const {
+				getMultiSelectedBlockClientIds,
+				getBlockName,
+				getSelectedBlock,
+				getSelectedBlockClientId,
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
+				block: getSelectedBlock(),
+				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
@@ -104,7 +115,7 @@ export default function Image( {
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 			return pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -113,7 +124,7 @@ export default function Image( {
 			] );
 		}
 	);
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
@@ -131,6 +142,9 @@ export default function Image( {
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
+
+	// Check if the cover block is registered.
+	const coverBlockExists = !! getBlockType( 'core/cover' );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -299,6 +313,20 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
+				) }
+				{ ! multiImageSelection && coverBlockExists && (
+					<ToolbarGroup>
+						<ToolbarButton
+							icon={ textColor }
+							label={ __( 'Add text over image' ) }
+							onClick={ () =>
+								replaceBlocks(
+									currentId,
+									switchToBlockType( block, 'core/cover' )
+								)
+							}
+						/>
+					</ToolbarGroup>
 				) }
 			</BlockControls>
 			<InspectorControls>
