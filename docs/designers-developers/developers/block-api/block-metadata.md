@@ -435,9 +435,7 @@ return array(
 
 ## Internationalization
 
-Localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when using `register_block_type_from_metadata`. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition in the `block.json` file that contains the `textdomain` field.
-
-WordPress string discovery automatically will translate these strings using the `textdomain` property specified in the `block.json` file.
+WordPress string discovery automatically will translate fields marked in the documentation as translatable using the `textdomain` property when specified in the `block.json` file. In that case, localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when executing `register_block_type_from_metadata`. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle.
 
 **Example:**
 
@@ -450,7 +448,7 @@ WordPress string discovery automatically will translate these strings using the 
 }
 ```
 
-It is transformed at runtime only when the `textdomain` field gets found in the `block.json` file loaded in the helper function [`register_block_type_from_metadata`](https://developer.wordpress.org/reference/functions/register_block_type_from_metadata/). The way it works in code is roughly equivalent to:
+The way `register_block_type_from_metadata` processes translatable values is roughly equivalent to:
 
 ```php
 <?php
