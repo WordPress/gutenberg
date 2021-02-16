@@ -64,10 +64,9 @@ export default function BlockNavigationBlock( {
 		[ clientId ]
 	);
 
-	const {
-		selectBlock: selectEditorBlock,
-		toggleBlockHighlight,
-	} = useDispatch( blockEditorStore );
+	const { selectBlock: selectEditorBlock, toggleBlockHover } = useDispatch(
+		blockEditorStore
+	);
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -88,7 +87,7 @@ export default function BlockNavigationBlock( {
 		}
 	}, [ withExperimentalFeatures, isSelected ] );
 
-	const highlightBlock = highlightBlocksOnHover ? toggleBlockHighlight : noop;
+	const highlightBlock = highlightBlocksOnHover ? toggleBlockHover : noop;
 
 	const onMouseEnter = () => {
 		setIsHovered( true );

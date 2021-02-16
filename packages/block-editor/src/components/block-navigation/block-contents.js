@@ -43,7 +43,7 @@ const BlockNavigationBlockContents = forwardRef(
 			rootClientId,
 			blockMovingClientId,
 			selectedBlockInBlockEditor,
-			isBlockHovered,
+			isBlockHoveredOrHighlighted,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -51,14 +51,16 @@ const BlockNavigationBlockContents = forwardRef(
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
 					isBlockHighlighted,
+					isBlockHovered,
 				} = select( blockEditorStore );
 				return {
 					rootClientId: getBlockRootClientId( clientId ) || '',
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
-					isBlockHovered:
+					isBlockHoveredOrHighlighted:
 						highlightBlocksOnHover &&
-						isBlockHighlighted( clientId ),
+						( isBlockHighlighted( clientId ) ||
+							isBlockHovered( clientId ) ),
 				};
 			},
 			[ clientId, highlightBlocksOnHover ]
@@ -90,7 +92,7 @@ const BlockNavigationBlockContents = forwardRef(
 				'is-dropping-before': isDroppingBefore || isBlockMoveTarget,
 				'is-dropping-after': isDroppingAfter,
 				'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
-				'is-hovered': isBlockHovered,
+				'is-hovered': isBlockHoveredOrHighlighted,
 			}
 		);
 

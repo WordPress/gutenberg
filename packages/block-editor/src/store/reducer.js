@@ -1723,6 +1723,31 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the current hovered block.
+ *
+ * @param {boolean} state  Current hovered block.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function hoveredBlock( state, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_HOVER':
+			const { clientId, isHovered } = action;
+
+			if ( isHovered ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+
+			return state;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1744,4 +1769,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	hoveredBlock,
 } );

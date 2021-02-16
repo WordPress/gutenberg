@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -20,21 +20,24 @@ import { store as blockEditorStore } from '../../../store';
  * @return {boolean} Hovered state.
  */
 export function useIsHovered( ref, clientId ) {
-	const [ isHovered, setHovered ] = useState( false );
+	const { isHovered, isNavigationMode, isOutlineMode } = useSelect(
+		( select ) => {
+			const {
+				isBlockHovered,
+				isNavigationMode: selectIsNavigationMode,
+				getSettings,
+			} = select( blockEditorStore );
 
-	const { isNavigationMode, isOutlineMode } = useSelect( ( select ) => {
-		const {
-			isNavigationMode: selectIsNavigationMode,
-			getSettings,
-		} = select( blockEditorStore );
+			return {
+				isHovered: isBlockHovered( clientId ),
+				isNavigationMode: selectIsNavigationMode(),
+				isOutlineMode: getSettings().outlineMode,
+			};
+		},
+		[]
+	);
 
-		return {
-			isNavigationMode: selectIsNavigationMode(),
-			isOutlineMode: getSettings().outlineMode,
-		};
-	}, [] );
-
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+	const { toggleBlockHover } = useDispatch( blockEditorStore );
 
 	function addHoverListener( eventType, value ) {
 		function listener( event ) {
@@ -43,8 +46,7 @@ export function useIsHovered( ref, clientId ) {
 			}
 
 			event.preventDefault();
-			setHovered( value );
-			toggleBlockHighlight( clientId, value );
+			toggleBlockHover( clientId, value );
 		}
 
 		ref.current.addEventListener( eventType, listener );

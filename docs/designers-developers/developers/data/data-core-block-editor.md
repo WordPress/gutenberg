@@ -851,6 +851,19 @@ _Returns_
 
 -   `boolean`: Whether the block is currently highlighted.
 
+<a name="isBlockHovered" href="#isBlockHovered">#</a> **isBlockHovered**
+
+Returns true if the current hovered block matches the block clientId.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block is currently hovered.
+
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 
 Whether or not the insertion point should be shown to users. This is set
@@ -1487,6 +1500,15 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _isHighlighted_ `boolean`: The highlight state.
+
+<a name="toggleBlockHover" href="#toggleBlockHover">#</a> **toggleBlockHover**
+
+Returns an action object that toggles the hovered block state.
+
+_Parameters_
+
+-   _clientId_ `string`: The block's clientId.
+-   _isHovered_ `boolean`: The hovered state.
 
 <a name="toggleBlockMode" href="#toggleBlockMode">#</a> **toggleBlockMode**
 

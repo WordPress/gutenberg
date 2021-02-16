@@ -1988,6 +1988,18 @@ export function isBlockHighlighted( state, clientId ) {
 }
 
 /**
+ * Returns true if the current hovered block matches the block clientId.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is currently hovered.
+ */
+export function isBlockHovered( state, clientId ) {
+	return state.hoveredBlock === clientId;
+}
+
+/**
  * Checks if a given block has controlled inner blocks.
  *
  * @param {Object} state Global application state.

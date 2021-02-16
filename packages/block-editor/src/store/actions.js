@@ -1371,3 +1371,17 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object that toggles the hovered block state.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} isHovered The hovered state.
+ */
+export function toggleBlockHover( clientId, isHovered ) {
+	return {
+		type: 'TOGGLE_BLOCK_HOVER',
+		clientId,
+		isHovered,
+	};
+}
