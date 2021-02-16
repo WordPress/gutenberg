@@ -28,7 +28,7 @@
 	},
 	"dependencies": {
 		"@babel/core": "^7.12.9",
-		"doctrine": "^2.1.0",
+		"comment-parser": "^1.1.1",
 		"lodash": "^4.17.19",
 		"mdast-util-inject": "1.1.0",
 		"optionator": "0.8.2",

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { some } from 'lodash';
-
+import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
@@ -15,13 +15,10 @@ import { store as noticesStore } from '@wordpress/notices';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function AddMenuForm( { menus, onCreate } ) {
+export default function AddMenu( { className, menus, onCreate } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
-
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
-
 	const { saveMenu } = useDispatch( 'core' );
 
 	const createMenu = async ( event ) => {
@@ -51,29 +48,43 @@ export default function AddMenuForm( { menus, onCreate } ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			onCreate( menu.id );
+			if ( onCreate ) {
+				onCreate( menu.id );
+			}
 		}
 
 		setIsCreatingMenu( false );
 	};
 
+	const hasMenus = menus?.length;
+
+	const titleText = hasMenus
+		? __( 'Create a new menu' )
+		: __( 'Create your first menu' );
+
+	const helpText = hasMenus
+		? __( 'A short descriptive name for your menu.' )
+		: __( 'A short descriptive name for your first menu.' );
+
 	return (
 		<form
+			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
-			className="edit-navigation-header__add-menu-form"
 		>
+			<h3 className="edit-navigation-add-menu__title">{ titleText }</h3>
 			<TextControl
-				// Disable reason: The name field should receive focus when
-				// component mounts.
+				// Disable reason: it should focus.
+				//
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus
 				label={ __( 'Menu name' ) }
 				value={ menuName }
 				onChange={ setMenuName }
+				help={ helpText }
 			/>
 
 			<Button
-				className="edit-navigation-header__create-menu-button"
+				className="edit-navigation-add-menu__create-menu-button"
 				type="submit"
 				isPrimary
 				disabled={ ! menuName.length }

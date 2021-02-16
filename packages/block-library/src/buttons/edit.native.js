@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	InnerBlocks,
 	JustifyToolbar,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
@@ -47,7 +48,7 @@ export default function ButtonsEdit( {
 				getBlockOrder: _getBlockOrder,
 				getBlockParents,
 				getSelectedBlockClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectedBlockParents = getBlockParents(
 				selectedBlockClientId,
@@ -68,7 +69,7 @@ export default function ButtonsEdit( {
 	);
 
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	useEffect( () => {

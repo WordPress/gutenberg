@@ -115,7 +115,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Block attributes.
+-   `Object?`: Block attributes.
 
 <a name="getBlockCount" href="#getBlockCount">#</a> **getBlockCount**
 
@@ -259,7 +259,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _blockName_ `(string|Array<string>)`: Block name(s) to filter.
+-   _blockName_ `string|string[]`: Block name(s) to filter.
 -   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
@@ -300,7 +300,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Object>`: Post blocks.
+-   `Object[]`: Post blocks.
 
 <a name="getBlocksByClientId" href="#getBlocksByClientId">#</a> **getBlocksByClientId**
 
@@ -310,11 +310,11 @@ objects.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `Array<string>`: Client IDs for which blocks are to be returned.
+-   _clientIds_ `string[]`: Client IDs for which blocks are to be returned.
 
 _Returns_
 
--   `Array<WPBlock>`: Block objects.
+-   `WPBlock[]`: Block objects.
 
 <a name="getBlockSelectionEnd" href="#getBlockSelectionEnd">#</a> **getBlockSelectionEnd**
 
@@ -363,7 +363,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPEditorTransformItem>`: Items that appear in inserter.
+-   `WPEditorTransformItem[]`: Items that appear in inserter.
 
 _Type Definition_
 
@@ -417,7 +417,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<string>`: Array of dragged block client ids.
+-   `string[]`: Array of dragged block client ids.
 
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
@@ -466,7 +466,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPEditorInserterItem>`: Items that appear in inserter.
+-   `WPEditorInserterItem[]`: Items that appear in inserter.
 
 _Type Definition_
 
@@ -480,7 +480,7 @@ _Properties_
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
 -   _category_ `string`: Block category that the item is associated with.
--   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
+-   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
@@ -665,7 +665,7 @@ _Parameters_
 
 _Returns_
 
--   `(||null)`: Initial position.
+-   `0|-1|null`: Initial position.
 
 <a name="getSelectionEnd" href="#getSelectionEnd">#</a> **getSelectionEnd**
 
@@ -1060,7 +1060,7 @@ Generator that triggers an action used to duplicate a list of blocks.
 
 _Parameters_
 
--   _clientIds_ `Array<string>`: 
+-   _clientIds_ `string[]`: 
 -   _updateSelection_ `boolean`: 
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
@@ -1135,11 +1135,11 @@ be inserted, optionally at a specific index respective a root block list.
 
 _Parameters_
 
--   _blocks_ `Array<Object>`: Block objects to insert.
+-   _blocks_ `Object[]`: Block objects to insert.
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
--   _initialPosition_ `(||null)`: Initial focus position. Setting it to null prevent focusing the inserted block.
+-   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
@@ -1219,7 +1219,7 @@ replacing.
 
 _Parameters_
 
--   _blocks_ `Array<Object>`: Array of block objects.
+-   _blocks_ `Object[]`: Array of block objects.
 
 _Returns_
 
@@ -1246,7 +1246,7 @@ the set of specified client IDs are to be removed.
 
 _Parameters_
 
--   _clientIds_ `(string|Array<string>)`: Client IDs of blocks to remove.
+-   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
 -   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
 
 <a name="replaceBlock" href="#replaceBlock">#</a> **replaceBlock**
@@ -1256,8 +1256,8 @@ with one or more replacement blocks.
 
 _Parameters_
 
--   _clientId_ `(string|Array<string>)`: Block client ID to replace.
--   _block_ `(Object|Array<Object>)`: Replacement block(s).
+-   _clientId_ `(string|string[])`: Block client ID to replace.
+-   _block_ `(Object|Object[])`: Replacement block(s).
 
 _Returns_
 
@@ -1270,10 +1270,10 @@ one or more replacement blocks.
 
 _Parameters_
 
--   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
--   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
+-   _clientIds_ `(string|string[])`: Block client ID(s) to replace.
+-   _blocks_ `(Object|Object[])`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
--   _initialPosition_ `(||null)`: Index of caret after in the selected block after the operation.
+-   _initialPosition_ `0|-1|null`: Index of caret after in the selected block after the operation.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
@@ -1284,9 +1284,9 @@ specified client ID should be replaced.
 _Parameters_
 
 -   _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
--   _blocks_ `Array<Object>`: Block objects to insert as new InnerBlocks
+-   _blocks_ `Object[]`: Block objects to insert as new InnerBlocks
 -   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
--   _initialPosition_ `(||null)`: Initial block position.
+-   _initialPosition_ `0|-1|null`: Initial block position.
 
 _Returns_
 
@@ -1311,7 +1311,7 @@ _Parameters_
 
 -   _selectionStart_ `WPBlockSelection`: The selection start.
 -   _selectionEnd_ `WPBlockSelection`: The selection end.
--   _initialPosition_ `(||null)`: Initial block position.
+-   _initialPosition_ `0|-1|null`: Initial block position.
 
 _Returns_
 
@@ -1327,7 +1327,7 @@ reflects a reverse selection.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `(||null)`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `0|-1|null`: Optional initial position. Pass as -1 to reflect reverse selection.
 
 _Returns_
 
@@ -1373,7 +1373,7 @@ Generator that triggers an action used to enable or disable the block moving mod
 
 _Parameters_
 
--   _hasBlockMovingClientId_ `(string|null)`: Enable/Disable block moving mode.
+-   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 
@@ -1425,7 +1425,7 @@ Returns an action object used in signalling that the user has begun to drag bloc
 
 _Parameters_
 
--   _clientIds_ `Array<string>`: An array of client ids being dragged
+-   _clientIds_ `string[]`: An array of client ids being dragged
 
 _Returns_
 
@@ -1534,7 +1534,7 @@ attributes with the specified client IDs have been updated.
 
 _Parameters_
 
--   _clientIds_ `(string|Array<string>)`: Block client IDs.
+-   _clientIds_ `string|string[]`: Block client IDs.
 -   _attributes_ `Object`: Block attributes to be merged.
 
 _Returns_

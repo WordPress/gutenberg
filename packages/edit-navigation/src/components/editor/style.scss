@@ -2,7 +2,7 @@
 	background: $white;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
-	max-width: 420px;
+	max-width: $navigation-editor-width;
 	margin: auto;
 
 	.components-spinner {

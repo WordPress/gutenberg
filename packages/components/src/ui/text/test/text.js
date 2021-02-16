@@ -7,7 +7,7 @@ import { getFontSize, ui } from '@wp-g2/styles';
 /**
  * Internal dependencies
  */
-import Text from '../text';
+import { Text } from '..';
 
 describe( 'Text', () => {
 	describe( 'snapshot tests', () => {

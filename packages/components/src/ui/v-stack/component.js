@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createComponent } from '../utils';
-import { useVStack } from './use-v-stack';
+import { useVStack } from './hook';
 
 /**
  * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.

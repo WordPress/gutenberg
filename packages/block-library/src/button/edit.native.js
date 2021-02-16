@@ -13,6 +13,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	withGradient,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -443,7 +444,7 @@ export default compose( [
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getBlockCount, getBlockRootClientId, getSettings } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 		const { maxWidth } = getSettings();
 

@@ -106,7 +106,9 @@ function block_core_navigation_link_render_submenu_icon() {
 function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Don't render the block's subtree if it is a draft.
 	if (
-		isset( $attributes['id'] ) && is_numeric( $attributes['id'] ) &&
+		isset( $attributes['id'] ) &&
+		is_numeric( $attributes['id'] ) &&
+		isset( $attributes['type'] ) &&
 		( 'post' === $attributes['type'] || 'page' === $attributes['type'] )
 	) {
 		$post = get_post( $attributes['id'] );
