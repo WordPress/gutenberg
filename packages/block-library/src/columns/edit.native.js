@@ -470,7 +470,7 @@ const ColumnsEdit = ( props ) => {
 				editorSidebarOpened: isEditorSidebarOpened(),
 			};
 		},
-		[ clientId ]
+		[ clientId, isSelected ]
 	);
 
 	const [ isVisible, setIsVisible ] = useState( false );
