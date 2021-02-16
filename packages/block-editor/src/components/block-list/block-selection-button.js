@@ -100,7 +100,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				getBlockListSettings,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
-			const total = getBlockCount();
+			const total = getBlockCount( rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
