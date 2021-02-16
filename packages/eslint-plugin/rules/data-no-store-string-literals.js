@@ -1,3 +1,33 @@
+/**
+ * Converts store name to variable name.
+ * Removes dashes and uppercases the characters after dashes and appends `Store` at the end.
+ *
+ * @param {string} storeName
+ * @return {string} store name as variable name
+ */
+function storeNameToVariableNames( storeName ) {
+	return (
+		storeName
+			.split( '-' )
+			.map( ( value, index ) =>
+				index === 0
+					? value.toLowerCase()
+					: value[ 0 ].toUpperCase() + value.slice( 1 ).toLowerCase()
+			)
+			.join( '' ) + 'Store'
+	);
+}
+
+/**
+ * Returns last element of an array.
+ *
+ * @param {Array} array
+ * @return {*} last element of the array
+ */
+function arrayLast( array ) {
+	return array[ array.length - 1 ];
+}
+
 function getReferences( context, specifiers ) {
 	const variables = specifiers.reduce(
 		( acc, specifier ) =>
@@ -85,6 +115,82 @@ function collectAllNodesFromObjectPropertyFunctionCalls( context, node ) {
 	return possibleCallExpressionNodes;
 }
 
+function getSuggest( context, callNode ) {
+	return [
+		{
+			desc:
+				'Replace literal with store definition. Import store if neccessary.',
+			fix: ( fixer ) => getFixes( fixer, context, callNode ),
+		},
+	];
+}
+
+function getFixes( fixer, context, callNode ) {
+	const storeName = callNode.arguments[ 0 ].value;
+	const storeDefinitions = {
+		core: {
+			import: '@wordpress/core-data',
+			variable: 'coreStore',
+		},
+	};
+	let storeDefinition = storeDefinitions[ storeName ];
+	if ( ! storeDefinition && storeName.startsWith( 'core/' ) ) {
+		const storeNameWithoutCore = storeName.substring( 5 );
+		storeDefinition = {
+			import: `@wordpress/${ storeNameWithoutCore }`,
+			variable: storeNameToVariableNames( storeNameWithoutCore ),
+		};
+	}
+	if ( ! storeDefinition ) {
+		return null;
+	}
+	const { variable: variableName, import: importName } = storeDefinition;
+
+	const fixes = [
+		fixer.replaceText( callNode.arguments[ 0 ], variableName ),
+	];
+
+	const imports = context
+		.getAncestors()[ 0 ]
+		.body.filter( ( node ) => node.type === 'ImportDeclaration' );
+	const packageImports = imports.filter(
+		( node ) => node.source.value === importName
+	);
+	const packageImport =
+		packageImports.length > 0 ? packageImports[ 0 ] : null;
+	if ( packageImport ) {
+		const alreadyHasStore = packageImport.specifiers.some(
+			( specifier ) => specifier.imported.name === 'store'
+		);
+		if ( ! alreadyHasStore ) {
+			const lastSpecifier = arrayLast( packageImport.specifiers );
+			fixes.push(
+				fixer.insertTextAfter(
+					lastSpecifier,
+					`,store as ${ variableName }`
+				)
+			);
+		}
+	} else {
+		const wpImports = imports.filter( ( node ) =>
+			node.source.value.startsWith( '@wordpress/' )
+		);
+		const lastImport =
+			wpImports.length > 0
+				? arrayLast( wpImports )
+				: arrayLast( imports );
+
+		fixes.push(
+			fixer.insertTextAfter(
+				lastImport,
+				`\nimport { store as ${ variableName } } from '${ importName }';`
+			)
+		);
+	}
+
+	return fixes;
+}
+
 module.exports = {
 	meta: {
 		type: 'problem',
@@ -131,6 +237,7 @@ module.exports = {
 							node: callNode.parent,
 							messageId: 'doNotUseStringLiteral',
 							data: { argument: callNode.arguments[ 0 ].value },
+							suggest: getSuggest( context, callNode ),
 						} );
 					} );
 			},
