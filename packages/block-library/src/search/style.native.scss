@@ -10,7 +10,23 @@
 	width: 100%;
 }
 
+.searchBarContainer_buttonInside {
+	flex: 1;
+	flex-direction: row;
+	justify-content: flex-start;
+	width: 100%;
+	padding: $grid-unit-05;
+	border-width: $border-width;
+	border-color: #ccc;
+	border-style: solid;
+}
+
 .searchTextInput {
+	flex: 1;
+	flex-direction: row;
+}
+
+.searchTextInput_buttonOutside {
 	flex: 1;
 	flex-direction: row;
 	border: 1px solid $gray-600;
