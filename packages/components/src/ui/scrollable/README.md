@@ -1,6 +1,6 @@
 # Scrollable
 
-`Scrollable` is a layout component that renders a stylized scrollbar.
+`Scrollable` is a layout component that content in a scrollable container.
 
 ## Usage
 

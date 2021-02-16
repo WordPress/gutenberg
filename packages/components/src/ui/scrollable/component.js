@@ -9,9 +9,18 @@ import { useScrollable } from './hook';
  *
  * @example
  * ```jsx
- * <Scrollable><View>...</View></Scrollable>
+ * import { Scrollable, View } from `@wordpress/components/ui`;
+ 
+ * function Example() {
+ * 	return (
+ * 		<Scrollable style={ { maxHeight: 200 } }>
+ * 			<View style={ { height: 500 } }>...</View>
+ * 		</Scrollable>
+ * 	);
+ * }
  * ```
  */
+
 const Scrollable = createComponent( {
 	as: 'div',
 	useHook: useScrollable,
