@@ -161,6 +161,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.
+ * @param {number} total The total number of blocks.
  *
  * @return {string} The block label.
  */
@@ -168,7 +169,8 @@ export function getAccessibleBlockLabel(
 	blockType,
 	attributes,
 	position,
-	direction = 'vertical'
+	direction = 'vertical',
+	total
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
 	const { title } = blockType;
@@ -184,36 +186,40 @@ export function getAccessibleBlockLabel(
 	if ( hasPosition && direction === 'vertical' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The block label.. */
-				__( '%1$s Block. Row %2$d. %3$s' ),
+				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The total number of blocks. 4: The block label.. */
+				__( '%1$s Block. %2$d of %3$d. %4$s' ),
 				title,
 				position,
+				total,
 				label
 			);
 		}
 
 		return sprintf(
-			/* translators: accessibility text. 1: The block title. 2: The block row number. */
-			__( '%1$s Block. Row %2$d' ),
+			/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The total number of blocks. */
+			__( '%1$s Block. %2$d of %3$d' ),
 			title,
-			position
+			position,
+			total
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The block label.. */
-				__( '%1$s Block. Column %2$d. %3$s' ),
+				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The total number of blocks. 4: The block label.. */
+				__( '%1$s Block. Column %2$d of %3$d. %4$s' ),
 				title,
 				position,
+				total,
 				label
 			);
 		}
 
 		return sprintf(
-			/* translators: accessibility text. 1: The block title. 2: The block column number. */
-			__( '%1$s Block. Column %2$d' ),
+			/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The total number of blocks. */
+			__( '%1$s Block. Column %2$d of %3$d' ),
 			title,
-			position
+			position,
+			total
 		);
 	}
 

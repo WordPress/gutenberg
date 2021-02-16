@@ -116,7 +116,14 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, total, name, attributes, blockMovingMode, orientation } = selected;
+	const {
+		index,
+		total,
+		name,
+		attributes,
+		blockMovingMode,
+		orientation,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
@@ -248,12 +255,12 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}
 
 	const blockType = getBlockType( name );
-	console.log( total );
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
 		index + 1,
-		orientation
+		orientation,
+		total
 	);
 
 	const classNames = classnames(
