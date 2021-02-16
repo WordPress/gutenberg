@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.47.0
 * [**] Make inserter long-press options "add to beginning" and "add to end" always available. [#28610]
 * [**] Add support for setting Cover block focal point. [#25810]
 * [*] Fix crash when Column block width attribute was empty. [#29015]
