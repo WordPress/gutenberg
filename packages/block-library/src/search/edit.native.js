@@ -104,10 +104,6 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 							setAttributes( {
 								buttonUseIcon: ! buttonUseIcon,
 							} );
-
-							// Temporary. Will be removed when styling is implemented
-							// in a future PR.
-							alert( `Icon only button: ${ ! buttonUseIcon }` );
 						} }
 						isActive={ buttonUseIcon }
 					/>
@@ -135,10 +131,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 	const renderButton = () => {
 		return (
-			<View
-				style={ styles.buttonContainer }
-				minWidth={ MIN_BUTTON_WIDTH }
-			>
+			<View style={ styles.buttonContainer }>
 				{ buttonUseIcon && (
 					<Button
 						className="wp-block-search__button"
