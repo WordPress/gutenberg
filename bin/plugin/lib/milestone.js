@@ -1,7 +1,6 @@
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
 /** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
-/** @typedef {import('@octokit/rest').ReposListReleasesResponse} ReposListReleasesResponse */
 
 /**
  * @typedef {"open"|"closed"|"all"} IssueState
@@ -41,53 +40,32 @@ async function getMilestoneByTitle( octokit, owner, repo, title ) {
 /**
  * Returns a promise resolving to pull requests by a given milestone ID.
  *
- * @param {GitHub}     octokit   Initialized Octokit REST client.
- * @param {string}     owner     Repository owner.
- * @param {string}     repo      Repository name.
- * @param {number}     milestone Milestone ID.
- * @param {IssueState} [state]   Optional issue state.
+ * @param {GitHub}     octokit       Initialized Octokit REST client.
+ * @param {string}     owner         Repository owner.
+ * @param {string}     repo          Repository name.
+ * @param {number}     milestone     Milestone ID.
+ * @param {IssueState} [state]       Optional issue state.
+ * @param {string}     [closedSince] Optional timestamp.
  *
  * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to pull
  *                                                    requests for the given
  *                                                    milestone.
  */
-async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
-	const milestoneResponse = await octokit.issues.getMilestone( {
-		owner,
-		repo,
-		milestone_number: milestone,
-	} );
-	const series = milestoneResponse.data.title.replace( 'Gutenberg ', '' );
-
-	const releaseOptions = await octokit.repos.listReleases.endpoint.merge( {
-		owner,
-		repo,
-	} );
-
-	let latestReleaseInSeries;
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
-	 */
-	const releases = octokit.paginate.iterator( releaseOptions );
-
-	for await ( const releasesPage of releases ) {
-		latestReleaseInSeries = releasesPage.data.find( ( release ) =>
-			release.name.startsWith( series )
-		);
-
-		if ( latestReleaseInSeries ) {
-			break;
-		}
-	}
-
+async function getIssuesByMilestone(
+	octokit,
+	owner,
+	repo,
+	milestone,
+	state,
+	closedSince
+) {
 	const options = octokit.issues.listForRepo.endpoint.merge( {
 		owner,
 		repo,
 		milestone,
 		state,
-		...( latestReleaseInSeries && {
-			since: latestReleaseInSeries.published_at,
+		...( closedSince && {
+			since: closedSince,
 		} ),
 	} );
 
@@ -106,15 +84,13 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 		pulls.push( ...issues );
 	}
 
-	if ( latestReleaseInSeries?.published_at ) {
-		const latestReleasePublishedAtTimestamp = new Date(
-			latestReleaseInSeries.published_at
-		);
+	if ( closedSince ) {
+		const closedSinceTimestamp = new Date( closedSince );
 
 		return pulls.filter(
 			( pull ) =>
 				pull.closed_at &&
-				latestReleasePublishedAtTimestamp <
+				closedSinceTimestamp <
 					new Date(
 						// The ugly `as unknown as string` cast is required because of
 						// https://github.com/octokit/plugin-rest-endpoint-methods.js/issues/64
