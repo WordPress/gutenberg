@@ -2,11 +2,16 @@
  * External dependencies
  */
 import { View, Alert, TextInput } from 'react-native';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { RichText, BlockControls } from '@wordpress/block-editor';
+import {
+	RichText,
+	BlockControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
@@ -17,9 +22,10 @@ import { search } from '@wordpress/icons';
 import { buttonWithIcon, toggleLabel } from './icons';
 import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
-import TextButton from './text-button';
 
-export default function SearchEdit( { attributes, setAttributes } ) {
+const MIN_BUTTON_WIDTH = 100;
+
+export default function SearchEdit( { attributes, setAttributes, className } ) {
 	const {
 		label,
 		showLabel,
@@ -34,6 +40,34 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 	const alert = ( message ) => {
 		Alert.alert( '', message, [ { text: 'OK' } ], { cancelable: true } );
 	};
+
+	const getBlockClassNames = () => {
+		return classnames(
+			className,
+			'button-inside' === buttonPosition
+				? 'wp-block-search__button-inside'
+				: undefined,
+			'button-outside' === buttonPosition
+				? 'wp-block-search__button-outside'
+				: undefined,
+			'no-button' === buttonPosition
+				? 'wp-block-search__no-button'
+				: undefined,
+			'button-only' === buttonPosition
+				? 'wp-block-search__button-only'
+				: undefined,
+			! buttonUseIcon && 'no-button' !== buttonPosition
+				? 'wp-block-search__text-button'
+				: undefined,
+			buttonUseIcon && 'no-button' !== buttonPosition
+				? 'wp-block-search__icon-button'
+				: undefined
+		);
+	};
+
+	const blockProps = useBlockProps( {
+		className: getBlockClassNames(),
+	} );
 
 	const controls = (
 		<BlockControls>
@@ -85,6 +119,7 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 	const renderTextField = () => {
 		return (
 			<TextInput
+				className="wp-block-search__input"
 				style={ styles.searchTextInput }
 				label={ null }
 				value={ placeholder }
@@ -100,16 +135,28 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 
 	const renderButton = () => {
 		return (
-			<View style={ styles.buttonContainer }>
-				{ buttonUseIcon && <Button icon={ search } /> }
+			<View
+				style={ styles.buttonContainer }
+				minWidth={ MIN_BUTTON_WIDTH }
+			>
+				{ buttonUseIcon && (
+					<Button
+						className="wp-block-search__button"
+						icon={ search }
+					/>
+				) }
 
 				{ ! buttonUseIcon && (
-					<TextButton
+					<RichText
+						className="wp-block-search__button"
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
+						identifier="text"
+						withoutInteractiveFormatting
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
+						minWidth={ MIN_BUTTON_WIDTH }
 					/>
 				) }
 			</View>
@@ -117,11 +164,12 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 	};
 
 	return (
-		<View>
+		<View { ...blockProps } style={ styles.searchBlockContainer }>
 			{ controls }
 
 			{ showLabel && (
 				<RichText
+					className="wp-block-search__label"
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
