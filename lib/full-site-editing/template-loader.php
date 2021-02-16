@@ -65,9 +65,9 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	global $_wp_current_template_content;
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
+	// Allow falling back to a PHP template if it has a higher priority than the block template.
 	$current_legacy_template = basename( $template, '.php' );
 	$block_template_slug     = is_object( $current_template ) ? $current_template->slug : false;
-
 	foreach ( $templates as $item ) {
 		$legacy_slug = gutenberg_strip_php_suffix( $item );
 
