@@ -93,8 +93,8 @@ export default function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
-					label={ __( 'Search' ) }
-					placeholder={ __( 'Search for blocks and patterns' ) }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
 				/>
 			) }
 
