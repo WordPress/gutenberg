@@ -51,6 +51,7 @@ function selector( select ) {
 		getNextBlockClientId,
 		hasBlockMovingClientId,
 		getBlockIndex,
+		getBlockCount,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
 		canInsertBlockType,
@@ -70,6 +71,7 @@ function selector( select ) {
 		),
 		hasBlockMovingClientId,
 		getBlockIndex,
+		getBlockCount,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
 		canInsertBlockType,
@@ -93,16 +95,19 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			const {
 				__unstableGetBlockWithoutInnerBlocks,
 				getBlockIndex,
+				getBlockCount,
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
+			const total = getBlockCount();
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
 				index,
+				total,
 				name,
 				attributes,
 				blockMovingMode,
@@ -111,7 +116,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes, blockMovingMode, orientation } = selected;
+	const { index, total, name, attributes, blockMovingMode, orientation } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
@@ -133,6 +138,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		selectionAfterEndClientId,
 		hasBlockMovingClientId,
 		getBlockIndex,
+		getBlockCount,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
 	} = useSelect( selector, [] );
@@ -242,8 +248,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}
 
 	const blockType = getBlockType( name );
-	const { getBlockCount } = useSelect( blockEditorStore );
-	console.log( getBlockCount() );
+	console.log( total );
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
