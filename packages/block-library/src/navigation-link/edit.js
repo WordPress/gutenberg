@@ -152,7 +152,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
-		isBeingDragged,
+		isDraggingBlocks,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -166,7 +166,7 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-				isDraggingBlocks,
+				isDraggingBlocks: _isDraggingBlocks,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -188,7 +188,7 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				isBeingDragged: isDraggingBlocks(),
+				isDraggingBlocks: _isDraggingBlocks(),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -292,9 +292,9 @@ export default function NavigationLinkEdit( {
 			'is-editing':
 				( isSelected || isParentOfSelectedBlock ) &&
 				// Don't show the element as editing while dragging.
-				! isBeingDragged,
+				! isDraggingBlocks,
 			// Don't select the element while dragging.
-			'is-selected': isSelected && ! isBeingDragged,
+			'is-selected': isSelected && ! isDraggingBlocks,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
@@ -315,7 +315,7 @@ export default function NavigationLinkEdit( {
 				'is-parent-of-selected-block':
 					isParentOfSelectedBlock &&
 					// Don't select as parent of selected block while dragging.
-					! isBeingDragged,
+					! isDraggingBlocks,
 			} ),
 		},
 		{
@@ -325,7 +325,7 @@ export default function NavigationLinkEdit( {
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				( isBeingDragged && hasDescendants )
+				( isDraggingBlocks && hasDescendants )
 					? InnerBlocks.DefaultAppender
 					: false,
 			__experimentalAppenderTagName: 'li',
