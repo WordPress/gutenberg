@@ -1,20 +1,25 @@
 /**
+ * External dependencies
+ */
+import { View } from 'react-native';
+/**
  * WordPress dependencies
  */
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	createBlock,
 	rawHandler,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { getClipboard } from '@wordpress/components';
+import { BottomSheet, getClipboard } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 
 import InserterSearchResults from './search-results';
+import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
 
 // This should handle showing the insertion point and the items
@@ -29,6 +34,8 @@ function InserterMenu( {
 	shouldReplaceBlock,
 	insertionIndex,
 } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+
 	const {
 		showInsertionPoint,
 		hideInsertionPoint,
@@ -156,14 +163,29 @@ function InserterMenu( {
 	}
 
 	return (
-		<InserterSearchResults
+		<BottomSheet
+			isVisible={ true }
 			onClose={ onClose }
-			items={ getItems() }
-			onSelect={ ( item ) => {
-				onInsert( item );
-				onSelect( item );
-			} }
-		/>
+			hideHeader
+			hasNavigation
+		>
+			<View>
+				<InserterSearchForm
+					onChange={ ( value ) => {
+						setFilterValue( value );
+					} }
+					value={ filterValue }
+				/>
+				<InserterSearchResults
+					onClose={ onClose }
+					items={ getItems() }
+					onSelect={ ( item ) => {
+						onInsert( item );
+						onSelect( item );
+					} }
+				/>
+			</View>
+		</BottomSheet>
 	);
 }
 
