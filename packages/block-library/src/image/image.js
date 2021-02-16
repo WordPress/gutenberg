@@ -77,7 +77,6 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
-		inheritedAttributes,
 	},
 	setAttributes,
 	isSelected,
@@ -196,24 +195,6 @@ export default function Image( {
 	}
 
 	function onSetHref( props ) {
-		if (
-			inheritedAttributes?.linkDestination ||
-			inheritedAttributes?.linkTarget
-		) {
-			setAttributes( {
-				inheritedAttributes: {
-					...inheritedAttributes,
-					linkDestination:
-						props.linkDestination || props.href
-							? false
-							: inheritedAttributes.linkDestination,
-					linkTarget:
-						props.linkTarget || props.linkTarget !== linkTarget
-							? false
-							: inheritedAttributes.linkTarget,
-				},
-			} );
-		}
 		setAttributes( props );
 	}
 
@@ -240,14 +221,6 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		if ( inheritedAttributes?.sizeSlug ) {
-			setAttributes( {
-				inheritedAttributes: {
-					...inheritedAttributes,
-					sizeSlug: false,
-				},
-			} );
-		}
 		const newUrl = get( image, [
 			'media_details',
 			'sizes',
