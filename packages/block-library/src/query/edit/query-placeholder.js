@@ -6,6 +6,7 @@ import {
 	useBlockProps,
 	__experimentalBlockVariationPicker,
 	__experimentalGetMatchingVariation as getMatchingVariation,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	createBlocksFromInnerBlocksTemplate,
@@ -35,7 +36,7 @@ const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
 		},
 		[ name ]
 	);
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 	const matchingVariation = getMatchingVariation( attributes, allVariations );
 	const icon = matchingVariation?.icon || blockType?.icon?.src;

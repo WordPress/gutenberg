@@ -165,7 +165,7 @@ _Related_
 _Parameters_
 
 -   _preview_ `Object`: options for how the preview should be shown
--   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
 -   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
@@ -316,7 +316,7 @@ _Returns_
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
-Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
+ Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
@@ -490,7 +490,7 @@ _Properties_
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
--   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
+-   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles

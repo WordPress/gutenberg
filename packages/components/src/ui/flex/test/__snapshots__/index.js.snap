@@ -31,12 +31,12 @@ exports[`props should render align 1`] = `
 - - First value
 - + Second value
 -
-- @@ -10,11 +10,11 @@
+- @@ -7,11 +7,11 @@
+-   	\\"margin-top\\": \\"0px\\",
+-   	\\"margin-right\\": \\"0px\\",
+-   	\\"margin-bottom\\": \\"0px\\",
 -   	\\"margin-left\\": \\"0px\\",
 -   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
--   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
--   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
 - - 	\\"align-items\\": \\"flex-start\\",
 - + 	\\"align-items\\": \\"center\\",
 -   	\\"flex-direction\\": \\"row\\",
@@ -64,10 +64,6 @@ exports[`props should render correctly 1`] = `
   display: flex;
   --wp-g2-flex-gap: calc(4px * 2);
   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
-  --wp-g2-flex-item-margin-bottom: 0;
-  --wp-g2-flex-item-margin-right: calc(4px * 2);
-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
-  --wp-g2-flex-item-margin-left: 0;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -195,10 +191,10 @@ exports[`props should render justify 1`] = `
 - - First value
 - + Second value
 -
-- @@ -12,9 +12,9 @@
--   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
--   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
--   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
+- @@ -9,9 +9,9 @@
+-   	\\"margin-bottom\\": \\"0px\\",
+-   	\\"margin-left\\": \\"0px\\",
+-   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
 -   	\\"align-items\\": \\"center\\",
 -   	\\"flex-direction\\": \\"row\\",
 - - 	\\"justify-content\\": \\"flex-start\\",
@@ -225,9 +221,9 @@ exports[`props should render spacing 1`] = `
 -   	\\"margin-left\\": \\"0px\\",
 - - 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
 - + 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
--   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
--   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
 -   	\\"align-items\\": \\"center\\",
--   	\\"flex-direction\\": \\"row\\","
+-   	\\"flex-direction\\": \\"row\\",
+-   	\\"justify-content\\": \\"space-between\\",
+-   	\\"width\\": \\"100%\\",
+-   	\\"visibility\\": \\"visible\\""
 `;

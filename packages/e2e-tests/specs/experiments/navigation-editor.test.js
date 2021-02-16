@@ -126,7 +126,7 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show that no menus are available.
-		await page.waitForXPath( '//h2[contains(., "No menus available")]', {
+		await page.waitForXPath( '//h3[.="Create your first menu"]', {
 			visible: true,
 		} );
 
@@ -139,20 +139,11 @@ describe( 'Navigation editor', () => {
 			...getMenuItemMocks( { GET: [] } ),
 		] );
 
-		// Add a new menu.
-		const [ addNewButton ] = await page.$x(
-			'//button[contains(., "Add new")]'
-		);
-		await addNewButton.click();
-
 		await page.keyboard.type( 'Main Menu' );
 		const createMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create menu")]'
 		);
 		await createMenuButton.click();
-
-		// Close the dropdown.
-		await page.keyboard.press( 'Escape' );
 
 		// A snackbar will appear when menu creation has completed.
 		await page.waitForXPath( '//div[contains(., "Menu created")]' );

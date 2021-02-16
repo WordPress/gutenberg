@@ -53,6 +53,12 @@ export default function useText( props ) {
 	const isCaption = size === 'caption';
 
 	if ( isHighlighter ) {
+		if ( typeof children !== 'string' ) {
+			throw new TypeError(
+				'`children` of `Text` must only be `string` types when `highlightWords` is defined'
+			);
+		}
+
 		content = createHighlighterText( {
 			autoEscape: highlightEscape,
 			// Disable reason: We need to disable this otherwise it erases the cast

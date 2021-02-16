@@ -2,10 +2,12 @@
  * Internal dependencies
  */
 import { createComponent } from '../utils';
-import useText from './use-text';
+import useText from './hook';
 
-export default createComponent( {
+const Text = createComponent( {
 	as: 'span',
 	useHook: useText,
 	name: 'Text',
 } );
+
+export default Text;

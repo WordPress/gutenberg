@@ -90,7 +90,7 @@ the user through a series of tips step by step.
 
 _Parameters_
 
--   _tipIds_ `Array<string>`: Which tips to show in the guide.
+-   _tipIds_ `string[]`: Which tips to show in the guide.
 
 _Returns_
 

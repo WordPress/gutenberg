@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createComponent } from '../utils';
-import { useHStack } from './use-h-stack';
+import { useHStack } from './hook';
 
 export default createComponent( {
 	as: 'div',

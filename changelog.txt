@@ -134,6 +134,14 @@
 - Show patterns in inserter for non-root level insert destinations. ([28459](https://github.com/WordPress/gutenberg/pull/28459))
 - Try: Cover height fix round 2. ([28455](https://github.com/WordPress/gutenberg/pull/28455))
 
+= 9.9.3 =
+
+### Bug fixes
+
+- Gallery Block: Add z-index to fig caption to make sure it is still selectable ([28992](https://github.com/WordPress/gutenberg/pull/28992)
+- Inserter: Prevent focused block from stealing focus when inserting a new block ([28962](https://github.com/WordPress/gutenberg/pull/28962))
+
+
 = 9.9.2 =
 
 ### Bug fixes
