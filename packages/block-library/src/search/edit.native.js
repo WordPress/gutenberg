@@ -15,8 +15,9 @@ import { search } from '@wordpress/icons';
  * Internal dependencies
  */
 import { buttonWithIcon, toggleLabel } from './icons';
-import ButtonPositionDropdown from './button-position-dropdown.native';
+import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
+import TextButton from './text-button';
 
 export default function SearchEdit( { attributes, setAttributes } ) {
 	const {
@@ -107,10 +108,9 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 				) }
 
 				{ ! buttonUseIcon && (
-					<RichText
+					<TextButton
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
-						withoutInteractiveFormatting
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
