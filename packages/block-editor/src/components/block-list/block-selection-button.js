@@ -242,6 +242,8 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}
 
 	const blockType = getBlockType( name );
+	const { getBlockCount } = useSelect( blockEditorStore );
+	console.log( getBlockCount );
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
