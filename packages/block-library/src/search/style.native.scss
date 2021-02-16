@@ -1,0 +1,14 @@
+.searchBarContainer {
+	flex: 1;
+	flex-direction: row;
+	justify-content: flex-start;
+	width: 100%;
+}
+
+.searchTextInput {
+	flex: 1;
+	flex-grow: 1;
+	border: 1px solid $gray-600;
+	border-width: $border-width;
+	padding: $grid-unit-10;
+}

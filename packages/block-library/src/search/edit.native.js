@@ -1,23 +1,32 @@
 /**
  * External dependencies
  */
-import { View, Alert } from 'react-native';
+import { View, Alert, TextInput } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { RichText, BlockControls } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { ToolbarGroup, ToolbarButton, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { search } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { buttonWithIcon, toggleLabel } from './icons';
 import ButtonPositionDropdown from './button-position-dropdown.native';
+import styles from './style.scss';
 
 export default function SearchEdit( { attributes, setAttributes } ) {
-	const { label, showLabel, buttonPosition, buttonUseIcon } = attributes;
+	const {
+		label,
+		showLabel,
+		buttonPosition,
+		buttonUseIcon,
+		placeholder,
+		buttonText,
+	} = attributes;
 
 	// Temporary. Will be removed when styling is implemented
 	// in a future PR.
@@ -72,6 +81,45 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 		</BlockControls>
 	);
 
+	const renderTextField = () => {
+		return (
+			<TextInput
+				style={ styles.searchTextInput }
+				label={ null }
+				value={ placeholder }
+				placeholder={
+					placeholder ? undefined : __( 'Optional placeholder…' )
+				}
+				onChangeText={ ( newVal ) =>
+					setAttributes( { placeholder: newVal } )
+				}
+			/>
+		);
+	};
+
+	const renderButton = () => {
+		return (
+			<View>
+				{ buttonUseIcon && (
+					<View>
+						<Button icon={ search } />
+					</View>
+				) }
+
+				{ ! buttonUseIcon && (
+					<RichText
+						placeholder={ __( 'Add button text' ) }
+						value={ buttonText }
+						withoutInteractiveFormatting
+						onChange={ ( html ) =>
+							setAttributes( { buttonText: html } )
+						}
+					/>
+				) }
+			</View>
+		);
+	};
+
 	return (
 		<View>
 			{ controls }
@@ -85,6 +133,17 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 					onChange={ ( html ) => setAttributes( { label: html } ) }
 				/>
 			) }
+
+			{ ( 'button-inside' === buttonPosition ||
+				'button-outside' === buttonPosition ) && (
+				<View style={ styles.searchBarContainer }>
+					{ renderTextField() }
+					{ renderButton() }
+				</View>
+			) }
+
+			{ 'button-only' === buttonPosition && renderButton() }
+			{ 'no-button' === buttonPosition && renderTextField() }
 		</View>
 	);
 }
