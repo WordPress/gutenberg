@@ -11,3 +11,19 @@
 	border-width: $border-width;
 	padding: $grid-unit-10;
 }
+
+$block-padding-hoz: 6px;
+$block-padding-vert: 10px;
+.buttonContainer {
+	background: #f7f7f7;
+	padding-left: $block-padding-hoz;
+	padding-right: $block-padding-hoz;
+	padding-top: $block-padding-vert;
+	padding-bottom: $block-padding-vert;
+	border-width: $border-width;
+	border-color: #ccc;
+	border-style: solid;
+	margin-left: 10px;
+	align-content: center;
+	align-items: center;
+}

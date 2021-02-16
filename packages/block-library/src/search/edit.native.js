@@ -100,12 +100,8 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 
 	const renderButton = () => {
 		return (
-			<View>
-				{ buttonUseIcon && (
-					<View>
-						<Button icon={ search } />
-					</View>
-				) }
+			<View style={ styles.buttonContainer }>
+				{ buttonUseIcon && <Button icon={ search } /> }
 
 				{ ! buttonUseIcon && (
 					<TextButton
