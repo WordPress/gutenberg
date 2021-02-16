@@ -1,9 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { parse } from '@wordpress/blocks';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { getPathAndQueryString } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME as editSiteStoreName } from './constants';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -74,6 +80,19 @@ export function* addTemplate( template ) {
 		'wp_template',
 		template
 	);
+
+	if ( template.content ) {
+		yield controls.dispatch(
+			'core',
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			newTemplate.id,
+			{ blocks: parse( template.content ) },
+			{ undoIgnore: true }
+		);
+	}
+
 	return {
 		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
@@ -91,8 +110,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	const page = yield controls.select( 'core/edit-site', 'getPage' );
-	yield controls.dispatch( 'core/edit-site', 'setPage', page );
+	const page = yield controls.select( editSiteStoreName, 'getPage' );
+	yield controls.dispatch( editSiteStoreName, 'setPage', page );
 }
 
 /**
@@ -182,7 +201,7 @@ export function* showHomepage() {
 	);
 
 	const { siteUrl } = yield controls.select(
-		'core/edit-site',
+		editSiteStoreName,
 		'getSettings'
 	);
 

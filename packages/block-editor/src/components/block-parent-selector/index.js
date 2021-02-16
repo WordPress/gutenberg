@@ -12,6 +12,7 @@ import { useRef } from '@wordpress/element';
  */
 import BlockIcon from '../block-icon';
 import { useShowMoversGestures } from '../block-toolbar/utils';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
@@ -21,7 +22,7 @@ import { useShowMoversGestures } from '../block-toolbar/utils';
  */
 export default function BlockParentSelector() {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 	const {
 		parentBlockType,
@@ -34,7 +35,7 @@ export default function BlockParentSelector() {
 			getBlockParents,
 			getSelectedBlockClientId,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { hasBlockSupport } = select( blocksStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const parents = getBlockParents( selectedBlockClientId );

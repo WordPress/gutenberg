@@ -5,9 +5,14 @@ import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getQueryArg, addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+
 export default function URLQueryController() {
 	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
-		'core/edit-site'
+		editSiteStore
 	);
 
 	// Set correct entity on load.
@@ -48,7 +53,7 @@ export default function URLQueryController() {
 function useCurrentPageContext() {
 	return useSelect( ( select ) => {
 		const { getEditedPostType, getEditedPostId, getPage } = select(
-			'core/edit-site'
+			editSiteStore
 		);
 
 		const page = getPage();

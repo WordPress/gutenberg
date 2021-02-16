@@ -43,6 +43,7 @@ export function InputBase(
 	ref
 ) {
 	const id = useUniqueId( idProp );
+	const hideLabel = hideLabelFromVision || ! label;
 
 	return (
 		<Root
@@ -51,6 +52,7 @@ export function InputBase(
 			isFocused={ isFocused }
 			labelPosition={ labelPosition }
 			ref={ ref }
+			__unstableVersion="next"
 		>
 			<LabelWrapper>
 				<Label
@@ -67,6 +69,7 @@ export function InputBase(
 				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
 				disabled={ disabled }
+				hideLabel={ hideLabel }
 				isFocused={ isFocused }
 				labelPosition={ labelPosition }
 			>

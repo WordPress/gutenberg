@@ -4,10 +4,11 @@
  * External dependencies
  */
 import {
-	get,
+	camelCase,
 	isFunction,
 	isNil,
 	isPlainObject,
+	mapKeys,
 	omit,
 	pick,
 	pickBy,
@@ -149,7 +150,7 @@ const LEGACY_CATEGORY_MAPPING = {
 	layout: 'design',
 };
 
-export let serverSideBlockDefinitions = {};
+export const serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -158,10 +159,12 @@ export let serverSideBlockDefinitions = {};
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	serverSideBlockDefinitions = {
-		...serverSideBlockDefinitions,
-		...definitions,
-	};
+	for ( const blockName of Object.keys( definitions ) ) {
+		serverSideBlockDefinitions[ blockName ] = mapKeys(
+			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			( value, key ) => camelCase( key )
+		);
+	}
 }
 
 /**
@@ -186,10 +189,7 @@ export function registerBlockType( name, settings ) {
 		supports: {},
 		styles: [],
 		save: () => null,
-		...pickBy(
-			get( serverSideBlockDefinitions, name, {} ),
-			( value ) => ! isNil( value )
-		),
+		...serverSideBlockDefinitions?.[ name ],
 		...settings,
 	};
 
@@ -472,6 +472,19 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  */
 export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
+}
+
+/**
+ * Determines whether or not the given block is a template part. This is a
+ * special block type that allows composing a page template out of reusable
+ * design elements.
+ *
+ * @param {Object} blockOrType Block or Block Type to test.
+ *
+ * @return {boolean} Whether the given block is a template part.
+ */
+export function isTemplatePart( blockOrType ) {
+	return blockOrType.name === 'core/template-part';
 }
 
 /**

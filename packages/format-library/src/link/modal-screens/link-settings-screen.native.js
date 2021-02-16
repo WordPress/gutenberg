@@ -92,8 +92,15 @@ const LinkSettingsScreen = ( {
 			// transform selected text into link
 			newAttributes = applyFormat( value, format );
 		}
-		//move selection to end of link
-		newAttributes.start = newAttributes.end;
+		// move selection to end of link
+		const textLength = newAttributes.text.length;
+		// check for zero width spaces
+		if ( newAttributes.end > textLength ) {
+			newAttributes.start = textLength;
+			newAttributes.end = textLength;
+		} else {
+			newAttributes.start = newAttributes.end;
+		}
 		newAttributes.activeFormats = [];
 		onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		if ( ! isValidHref( url ) ) {

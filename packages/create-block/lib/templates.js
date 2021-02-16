@@ -39,6 +39,9 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
 			npmDependencies: [
 				'@wordpress/block-editor',
 				'@wordpress/blocks',

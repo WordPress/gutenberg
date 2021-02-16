@@ -126,5 +126,4 @@ class WP_Widget_Block extends WP_Widget {
 
 		return $is_wide;
 	}
-
 }

@@ -7,6 +7,7 @@ import { useDispatch } from '@wordpress/data';
 import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { serialize } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ export default function TemplatePartPlaceholder( {
 	setAttributes,
 	innerBlocks,
 } ) {
-	const { saveEntityRecord } = useDispatch( 'core' );
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const onCreate = useCallback( async () => {
 		const title = __( 'Untitled Template Part' );
 		const templatePart = await saveEntityRecord(
