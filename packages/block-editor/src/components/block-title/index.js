@@ -76,8 +76,8 @@ export default function BlockTitle( { clientId } ) {
 	}
 	return (
 		<>
-			{ blockInformation.title }
-			<VisuallyHidden as="span">: Block.</VisuallyHidden>
+			{ `${ blockInformation.title } ` }
+			<VisuallyHidden as="span">Block.</VisuallyHidden>
 		</>
 	);
 }
