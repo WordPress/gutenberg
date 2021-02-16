@@ -60,7 +60,7 @@ export default function TemplatePartEdit( {
 				: false;
 
 			return {
-				innerBlocks: getBlocks( clientId ),
+				innerBlocks: templatePartId ? getBlocks( clientId ) : [],
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
 			};
@@ -72,7 +72,7 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
-	if ( ! isPlaceholder && isMissing ) {
+	if ( ( ! isPlaceholder && isMissing ) || ! templatePartId ) {
 		return (
 			<TagName { ...blockProps }>
 				<Warning>
