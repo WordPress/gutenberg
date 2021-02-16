@@ -17,9 +17,6 @@ export type Props = Pick<FlexProps, 'direction'> & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Button, ControlGroup, Select, TextInput } from `@wp-g2/components`
-	 * import { ui } from `@wp-g2/styles`
-	 *
 	 * function Example() {
 	 *   return (
 	 *     <ControlGroup templateColumns="auto 1fr auto">
