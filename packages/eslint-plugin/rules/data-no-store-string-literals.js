@@ -9,10 +9,10 @@ function storeNameToVariableNames( storeName ) {
 	return (
 		storeName
 			.split( '-' )
-			.map( ( s, index ) =>
+			.map( ( value, index ) =>
 				index === 0
-					? s.toLowerCase()
-					: s[ 0 ].toUpperCase() + s.slice( 1 ).toLowerCase()
+					? value.toLowerCase()
+					: value[ 0 ].toUpperCase() + value.slice( 1 ).toLowerCase()
 			)
 			.join( '' ) + 'Store'
 	);
@@ -152,9 +152,9 @@ function getFixes( fixer, context, callNode ) {
 
 	const imports = context
 		.getAncestors()[ 0 ]
-		.body.filter( ( n ) => n.type === 'ImportDeclaration' );
+		.body.filter( ( node ) => node.type === 'ImportDeclaration' );
 	const packageImports = imports.filter(
-		( n ) => n.source.value === importName
+		( node ) => node.source.value === importName
 	);
 	const packageImport =
 		packageImports.length > 0 ? packageImports[ 0 ] : null;
@@ -172,8 +172,8 @@ function getFixes( fixer, context, callNode ) {
 			);
 		}
 	} else {
-		const wpImports = imports.filter( ( n ) =>
-			n.source.value.startsWith( '@wordpress/' )
+		const wpImports = imports.filter( ( node ) =>
+			node.source.value.startsWith( '@wordpress/' )
 		);
 		const lastImport =
 			wpImports.length > 0
