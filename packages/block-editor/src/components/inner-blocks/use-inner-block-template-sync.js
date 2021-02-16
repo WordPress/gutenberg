@@ -11,6 +11,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
  * This hook makes sure that a block's inner blocks stay in sync with the given
  * block "template". The template is a block hierarchy to which inner blocks must
  * conform. If the blocks get "out of sync" with the template and the template
@@ -35,10 +40,14 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-
+	const getSelectedBlocksInitialCaretPosition = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSelectedBlocksInitialCaretPosition,
+		[]
+	);
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const innerBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
 
@@ -64,7 +73,12 @@ export default function useInnerBlockTemplateSync(
 						nextBlocks,
 						innerBlocks.length === 0 &&
 							templateInsertUpdatesSelection &&
-							nextBlocks.length !== 0
+							nextBlocks.length !== 0,
+						// This ensures the "initialPosition" doesn't change when applying the template
+						// If we're supposed to focus the block, we'll focus the first inner block
+						// otherwise, we won't apply any auto-focus.
+						// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
+						getSelectedBlocksInitialCaretPosition()
 					);
 				}
 			}

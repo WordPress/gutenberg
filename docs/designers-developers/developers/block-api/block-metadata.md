@@ -32,7 +32,7 @@ To register a new block type using metadata that can be shared between codebase 
 	},
 	"usesContext": [ "groupId" ],
 	"supports": {
-		"align": true,
+		"align": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
@@ -48,6 +48,29 @@ To register a new block type using metadata that can be shared between codebase 
 	"editorStyle": "file:./build/index.css",
 	"style": "file:./build/style.css"
 }
+```
+
+## Server-side registration
+
+There is also [`register_block_type_from_metadata`](https://developer.wordpress.org/reference/functions/register_block_type_from_metadata/) function that aims to simplify the block type registration on the server from metadata stored in the `block.json` file.
+
+This function takes two params:
+
+-   `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
+-   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
+    -   `$render_callback` (`callable`) – callback used to render blocks of this block type.
+
+It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
+
+**Example:**
+
+```php
+register_block_type_from_metadata(
+	__DIR__ . '/notice',
+	array(
+		'render_callback' => 'render_block_core_notice',
+	)
+);
 ```
 
 ## Block API
@@ -370,8 +393,6 @@ In `block.json`:
 }
 ```
 
-#### WordPress context
-
 In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file and use file paths rather than asset handles.
 
 That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
@@ -412,11 +433,9 @@ return array(
 );
 ```
 
-## Internationalization (not implemented)
+## Internationalization
 
-Localized properties will be automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition.
-
-WordPress string discovery automatically will translate these strings using the `textdomain` property specified in the `block.json` file.
+WordPress string discovery automatically will translate fields marked in the documentation as translatable using the `textdomain` property when specified in the `block.json` file. In that case, localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when executing `register_block_type_from_metadata`. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle.
 
 **Example:**
 
@@ -429,21 +448,7 @@ WordPress string discovery automatically will translate these strings using the 
 }
 ```
 
-In JavaScript, with the help of a new helper function `registerBlockTypeFromMetadata`, this becomes:
-
-```js
-const metadata = {
-	title: _x( 'My block', 'block title', 'my-plugin' ),
-	description: _x(
-		'My block is fantastic',
-		'block description',
-		'my-plugin'
-	),
-	keywords: [ _x( 'fantastic', 'block keywords', 'my-plugin' ) ],
-};
-```
-
-In PHP, it is transformed at runtime with a new helper function `register_block_from_metadata` to code roughly equivalent to:
+The way `register_block_type_from_metadata` processes translatable values is roughly equivalent to:
 
 ```php
 <?php
@@ -454,30 +459,7 @@ $metadata = array(
 );
 ```
 
-Implementation should follow the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
-
-## Server-side registration
-
-There is also a new API method proposed `register_block_type_from_metadata` that aims to simplify the block type registration on the server from metadata stored in the `block.json` file. This function is going to handle also all necessary work to make internationalization work seamlessly for metadata defined.
-
-This function takes two params:
-
--   `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
--   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
-    -   `$render_callback` (`callable`) – callback used to render blocks of this block type.
-
-It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
-
-**Example:**
-
-```php
-register_block_type_from_metadata(
-	__DIR__ . '/shortcode',
-	array(
-		'render_callback' => 'render_block_core_shortcode',
-	)
-);
-```
+Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
 
 ## Backward Compatibility
 

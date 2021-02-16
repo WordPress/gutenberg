@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "1.0.0",
+	"version": "1.0.4",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,6 +30,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.12.5",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
@@ -38,8 +39,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19",
-		"react-merge-refs": "^1.0.0"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

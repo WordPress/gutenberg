@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import registerEditSiteStore from '..';
 import {
 	toggleFeature,
 	setTemplate,
@@ -12,8 +11,6 @@ import {
 	showHomepage,
 	setHomeTemplateId,
 } from '../actions';
-
-registerEditSiteStore();
 
 describe( 'actions', () => {
 	describe( 'toggleFeature', () => {

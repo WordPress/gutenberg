@@ -10,18 +10,6 @@
 	margin: 0;
 }
 
-// Polish the Appender.
-.wp-block-navigation .block-list-appender {
-	display: inline-flex;
-	align-self: center;
-	width: $icon-size;
-	height: $icon-size;
-}
-
-.wp-block-navigation.is-vertical .block-list-appender {
-	margin: $grid-unit-10;
-}
-
 .wp-block-navigation__inserter-content {
 	padding: $grid-unit-20;
 }
@@ -35,6 +23,12 @@
 .wp-block-navigation__container.is-parent-of-selected-block {
 	visibility: visible;
 	opacity: 1;
+}
+
+// Low specificity default to ensure background color applies to submenus.
+.wp-block-navigation__container,
+.wp-block-navigation-link {
+	background-color: inherit;
 }
 
 // Styles for submenu flyout

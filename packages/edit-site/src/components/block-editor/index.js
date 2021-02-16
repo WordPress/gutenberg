@@ -15,7 +15,7 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableUseEditorStyles as useEditorStyles,
+	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { DropZoneProvider, Popover } from '@wordpress/components';
@@ -70,10 +70,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const contentRef = useRef();
 
 	useMouseMoveTypingReset( ref );
-	// This updates the host document styles.
-	// It is necessary to make sure the preset CSS Custom Properties
-	// are in scope for the sidebar UI controls that use them.
-	const editorStylesRef = useEditorStyles( settings.styles );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
@@ -106,20 +102,16 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div
-				ref={ editorStylesRef }
-				className="edit-site-visual-editor"
-				onWheel={ onWheel }
-			>
+			<div className="edit-site-visual-editor" onWheel={ onWheel }>
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
-					editorStyles={ settings.styles }
-					head={ window.__editorStyles.html }
+					headHTML={ window.__editorStyles.html }
+					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
 					contentRef={ contentRef }
 				>
-					<Canvas body={ contentRef } styles={ settings.styles } />
+					<Canvas body={ contentRef } />
 				</Iframe>
 			</div>
 		</BlockEditorProvider>

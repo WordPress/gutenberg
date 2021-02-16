@@ -223,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Object>`: Array of Block objects.
+-   `Object[]`: Array of Block objects.
 
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
@@ -248,7 +248,7 @@ falsey value for all entries.
 
 _Parameters_
 
--   _transforms_ `Array<Object>`: Transforms to search.
+-   _transforms_ `Object[]`: Transforms to search.
 -   _predicate_ `Function`: Function returning true on matching transform.
 
 _Returns_
@@ -261,7 +261,7 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _innerHTML_ `string`: Raw block content.
 -   _attributes_ `?Object`: Known block attributes (from delimiters).
 
@@ -342,7 +342,7 @@ transform object includes `blockName` as a property.
 _Parameters_
 
 -   _direction_ `string`: Transform direction ("to", "from").
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 
 _Returns_
 
@@ -379,7 +379,7 @@ _Parameters_
 
 _Returns_
 
--   `(Array<WPBlockVariation>|void)`: Block variations.
+-   `(WPBlockVariation[]|void)`: Block variations.
 
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
@@ -387,7 +387,7 @@ Returns all the block categories.
 
 _Returns_
 
--   `Array<WPBlockCategory>`: Block categories.
+-   `WPBlockCategory[]`: Block categories.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
@@ -450,7 +450,7 @@ static markup to be saved.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
@@ -465,13 +465,13 @@ enhanced element to be saved or string when raw HTML expected.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
--   `(Object|string)`: Save element or raw HTML string.
+-   `Object|string`: Save element or raw HTML string.
 
 <a name="getUnregisteredTypeHandlerName" href="#getUnregisteredTypeHandlerName">#</a> **getUnregisteredTypeHandlerName**
 
@@ -572,7 +572,7 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type.
+-   _blockTypeOrName_ `string|Object`: Block type.
 -   _attributes_ `Object`: Parsed block attributes.
 -   _originalBlockContent_ `string`: Original block content.
 
@@ -661,7 +661,7 @@ _Parameters_
 
 _Returns_
 
--   `(Array|string)`: A list of blocks or a string, depending on `handlerMode`.
+-   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
 
 <a name="rawHandler" href="#rawHandler">#</a> **rawHandler**
 
@@ -739,7 +739,7 @@ Sets the block categories.
 
 _Parameters_
 
--   _categories_ `Array<WPBlockCategory>`: Block categories.
+-   _categories_ `WPBlockCategory[]`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -791,7 +791,7 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: Blocks array or block object.
+-   _blocks_ `Array|Object`: Blocks array or block object.
 -   _name_ `string`: Block name.
 
 _Returns_

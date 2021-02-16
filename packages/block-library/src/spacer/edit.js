@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
@@ -99,7 +103,7 @@ const SpacerEdit = ( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			onResizeStart: () => toggleSelection( false ),

@@ -74,7 +74,7 @@ resolvers,
 
 _Parameters_
 
--   _paths_ (unknown type): 
+-   _paths_ ``: 
 
 _Returns_
 

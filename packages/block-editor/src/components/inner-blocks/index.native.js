@@ -21,6 +21,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from './layout';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -55,7 +56,7 @@ function UncontrolledInnerBlocks( props ) {
 	} = props;
 
 	const block = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	) || { innerBlocks: [] };
 
