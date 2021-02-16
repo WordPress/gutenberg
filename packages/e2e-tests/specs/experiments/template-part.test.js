@@ -20,7 +20,7 @@ import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activateTheme( 'theme-experiments/tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -39,7 +39,8 @@ describe( 'Template Part', () => {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Template Parts' );
+			// TODO: Change General to Headers once TT1 blocks categorise the template parts
+			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Edit it.
