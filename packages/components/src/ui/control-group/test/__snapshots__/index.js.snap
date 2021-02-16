@@ -360,7 +360,7 @@ exports[`props should render correctly 1`] = `
       data-g2-c16t="true"
       data-g2-component="ButtonContent"
     >
-      Let It
+      Lorem
     </span>
     <span
       class="components-elevation wp-components-elevation emotion-1"
@@ -383,7 +383,7 @@ exports[`props should render correctly 1`] = `
       data-g2-c16t="true"
       data-g2-component="ButtonContent"
     >
-      Go
+      Ipsum
     </span>
     <span
       class="components-elevation wp-components-elevation emotion-1"
@@ -1308,7 +1308,7 @@ exports[`props should render mixed control types 1`] = `
       data-g2-c16t="true"
       data-g2-component="ButtonContent"
     >
-      Let It
+      Lorem
     </span>
     <span
       class="components-elevation wp-components-elevation emotion-8"

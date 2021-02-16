@@ -13,8 +13,8 @@ describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render(
 			<ControlGroup>
-				<Button>Let It</Button>
-				<Button>Go</Button>
+				<Button>Lorem</Button>
+				<Button>Ipsum</Button>
 			</ControlGroup>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
@@ -26,7 +26,7 @@ describe( 'props', () => {
 			<ControlGroup>
 				<Select id="salutations" />
 				<TextInput id="fname" />
-				<Button>Let It</Button>
+				<Button>Lorem</Button>
 			</ControlGroup>
 		);
 		/* eslint-enable no-restricted-syntax */
