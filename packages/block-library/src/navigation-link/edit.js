@@ -343,19 +343,19 @@ export default function NavigationLinkEdit( {
 	let missingText = '';
 	switch ( type ) {
 		case 'post':
-			missingText = __( 'Missing Post' );
+			missingText = __( 'Select a post' );
 			break;
 		case 'page':
-			missingText = __( 'Missing Page' );
+			missingText = __( 'Select a page' );
 			break;
 		case 'category':
-			missingText = __( 'Missing Category' );
+			missingText = __( 'Select a category' );
 			break;
 		case 'tag':
-			missingText = __( 'Missing Tag' );
+			missingText = __( 'Select a tag' );
 			break;
 		default:
-			missingText = __( 'Missing URL' );
+			missingText = __( 'Add a link' );
 	}
 
 	return (
