@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createComponent } from '../utils';
-import useTruncate from './use-truncate';
+import useTruncate from './hook';
 
 /**
  * `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.

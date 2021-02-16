@@ -23,6 +23,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -119,7 +120,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 				getMenuItems,
 				isResolving,
 				hasFinishedResolution,
-			} = select( 'core' );
+			} = select( coreStore );
 			const pagesParameters = [
 				'postType',
 				'page',

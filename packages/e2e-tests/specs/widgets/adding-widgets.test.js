@@ -163,10 +163,10 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
 		}
@@ -253,7 +253,7 @@ describe( 'Widgets screen', () => {
 
 		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
-			'input[type="search"][placeholder="Search for a block"]'
+			'input[type="search"][placeholder="Search"]'
 		);
 		expect(
 			await inserterSearchBox.evaluate(
@@ -295,13 +295,13 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<h2>My Heading</h2>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
 		}
@@ -379,10 +379,10 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
 		}

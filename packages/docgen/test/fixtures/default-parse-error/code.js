@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/valid-types */
 /**
  * Function invoking callback after delay with current timestamp in milliseconds
  * since epoch.
@@ -7,3 +8,4 @@
 export default function invokeCallbackAfterDelay( callback ) {
 	setTimeout( () => callback( Date.now() ), 1000 );
 }
+/* eslint-enable jsdoc/valid-types */

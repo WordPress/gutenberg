@@ -159,14 +159,16 @@ class WP_Theme_JSON_Resolver {
 	 * @param array  $theme_json The theme.json to translate.
 	 * @param string $domain    Optional. Text domain. Unique identifier for retrieving translated strings.
 	 *                          Default 'default'.
+	 *
+	 * @return array Returns the modified $theme_json_structure.
 	 */
-	private static function translate( &$theme_json, $domain = 'default' ) {
+	private static function translate( $theme_json, $domain = 'default' ) {
 		if ( ! isset( $theme_json['settings'] ) ) {
-			return;
+			return $theme_json;
 		}
 
 		$presets = self::get_presets_to_translate();
-		foreach ( $theme_json['settings'] as &$settings ) {
+		foreach ( $theme_json['settings'] as $setting_key => $settings ) {
 			if ( empty( $settings ) ) {
 				continue;
 			}
@@ -176,24 +178,26 @@ class WP_Theme_JSON_Resolver {
 				$key     = $preset['key'];
 				$context = $preset['context'];
 
-				$array_to_translate = gutenberg_experimental_get( $settings, $path, null );
+				$array_to_translate = gutenberg_experimental_get( $theme_json['settings'][ $setting_key ], $path, null );
 				if ( null === $array_to_translate ) {
 					continue;
 				}
 
-				foreach ( $array_to_translate as &$item_to_translate ) {
+				foreach ( $array_to_translate as $item_key => $item_to_translate ) {
 					if ( empty( $item_to_translate[ $key ] ) ) {
 						continue;
 					}
 
 					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
-					$item_to_translate[ $key ] = translate_with_gettext_context( $item_to_translate[ $key ], $context, $domain );
+					$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
 					// phpcs:enable
 				}
 
-				gutenberg_experimental_set( $settings, $path, $array_to_translate );
+				gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $array_to_translate );
 			}
 		}
+
+		return $theme_json;
 	}
 
 	/**
@@ -208,7 +212,7 @@ class WP_Theme_JSON_Resolver {
 
 		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
-		self::translate( $config );
+		$config     = self::translate( $config );
 
 		// Start i18n logic to remove when JSON i18 strings are extracted.
 		$default_colors_i18n = array(
@@ -226,8 +230,8 @@ class WP_Theme_JSON_Resolver {
 			'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
 		);
 		if ( ! empty( $config['settings'][ $all_blocks ]['color']['palette'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['color']['palette'] as &$color ) {
-				$color['name'] = $default_colors_i18n[ $color['slug'] ];
+			foreach ( $config['settings'][ $all_blocks ]['color']['palette'] as $color_key => $color ) {
+				$config['settings'][ $all_blocks ]['color']['palette'][ $color_key ]['name'] = $default_colors_i18n[ $color['slug'] ];
 			}
 		}
 
@@ -246,8 +250,8 @@ class WP_Theme_JSON_Resolver {
 			'midnight'                             => __( 'Midnight', 'gutenberg' ),
 		);
 		if ( ! empty( $config['settings'][ $all_blocks ]['color']['gradients'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['color']['gradients'] as &$gradient ) {
-				$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
+			foreach ( $config['settings'][ $all_blocks ]['color']['gradients'] as $gradient_key => $gradient ) {
+				$config['settings'][ $all_blocks ]['color']['gradients'][ $gradient_key ]['name'] = $default_gradients_i18n[ $gradient['slug'] ];
 			}
 		}
 
@@ -259,8 +263,8 @@ class WP_Theme_JSON_Resolver {
 			'huge'   => __( 'Huge', 'gutenberg' ),
 		);
 		if ( ! empty( $config['settings'][ $all_blocks ]['typography']['fontSizes'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as &$font_size ) {
-				$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
+			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as $font_size_key => $font_size ) {
+				$config['settings'][ $all_blocks ]['typography']['fontSizes'][ $font_size_key ]['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 			}
 		}
 		// End i18n logic to remove when JSON i18 strings are extracted.
@@ -288,8 +292,8 @@ class WP_Theme_JSON_Resolver {
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
-			self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme = new WP_Theme_JSON( $theme_json_data );
+			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			self::$theme     = new WP_Theme_JSON( $theme_json_data );
 		}
 
 		if ( empty( $theme_support_data ) ) {

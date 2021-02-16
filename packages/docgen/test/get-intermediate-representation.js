@@ -50,37 +50,6 @@ describe( 'Intermediate Representation', () => {
 		} );
 	} );
 
-	it( 'type parse error handling', () => {
-		const token = JSON.parse(
-			fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-parse-error/exports.json'
-				),
-				'utf-8'
-			)
-		)[ 0 ];
-		const ir = getIntermediateRepresentation( null, token );
-		expect( ir ).toHaveLength( 1 );
-		expect( ir[ 0 ] ).toEqual( {
-			path: null,
-			name: 'default',
-			description:
-				'Function invoking callback after delay with current timestamp in milliseconds\nsince epoch.',
-			tags: [
-				{
-					description: 'Callback function.',
-					errors: [ 'unexpected token' ],
-					name: 'callback',
-					title: 'param',
-					type: null,
-				},
-			],
-			lineStart: 7,
-			lineEnd: 9,
-		} );
-	} );
-
 	describe( 'JSDoc in export statement', () => {
 		it( 'default export', () => {
 			const tokenClassAnonymous = fs.readFileSync(

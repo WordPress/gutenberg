@@ -146,4 +146,24 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			) !== false
 		);
 	}
+
+	function test_returns_link_for_plain_link() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-link {"label":"My Website","url":"https://example.com"} /-->'
+		);
+		$this->assertEquals( 1, count( $parsed_blocks ) );
+
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$this->assertEquals(
+			true,
+			strpos(
+				gutenberg_render_block_core_navigation_link(
+					$navigation_link_block->attributes,
+					array(),
+					$navigation_link_block
+				),
+				'My Website'
+			) !== false
+		);
+	}
 }

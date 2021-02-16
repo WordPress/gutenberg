@@ -735,15 +735,15 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * Note that this modifies the $declarations in place.
-	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles       Styles to process.
 	 * @param array $supports     Supports information for this block.
+	 *
+	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( &$declarations, $styles, $supports ) {
+	private static function compute_style_properties( $declarations, $styles, $supports ) {
 		if ( empty( $styles ) ) {
-			return;
+			return $declarations;
 		}
 
 		$properties = array();
@@ -780,19 +780,21 @@ class WP_Theme_JSON {
 				);
 			}
 		}
+
+		return $declarations;
 	}
 
 	/**
 	 * Given a settings array, it extracts its presets
 	 * and adds them to the given input $stylesheet.
 	 *
-	 * Note this function modifies $stylesheet in place.
-	 *
 	 * @param string $stylesheet Input stylesheet to add the presets to.
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
+	 *
+	 * @return the modified $stylesheet.
 	 */
-	private static function compute_preset_classes( &$stylesheet, $settings, $selector ) {
+	private static function compute_preset_classes( $stylesheet, $settings, $selector ) {
 		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -815,6 +817,8 @@ class WP_Theme_JSON {
 				}
 			}
 		}
+
+		return $stylesheet;
 	}
 
 	/**
@@ -829,12 +833,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * Note that this modifies the $declarations in place.
-	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
+	 *
+	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_preset_vars( &$declarations, $settings ) {
+	private static function compute_preset_vars( $declarations, $settings ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
@@ -844,6 +848,8 @@ class WP_Theme_JSON {
 				);
 			}
 		}
+
+		return $declarations;
 	}
 
 	/**
@@ -858,12 +864,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * Note that this modifies the $declarations in place.
-	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
+	 *
+	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_theme_vars( &$declarations, $settings ) {
+	private static function compute_theme_vars( $declarations, $settings ) {
 		$custom_values = gutenberg_experimental_get( $settings, array( 'custom' ) );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
@@ -872,6 +878,8 @@ class WP_Theme_JSON {
 				'value' => $value,
 			);
 		}
+
+		return $declarations;
 	}
 
 	/**
@@ -942,9 +950,8 @@ class WP_Theme_JSON {
 			}
 			$selector = $metadata[ $block_selector ]['selector'];
 
-			$declarations = array();
-			self::compute_preset_vars( $declarations, $settings );
-			self::compute_theme_vars( $declarations, $settings );
+			$declarations = self::compute_preset_vars( array(), $settings );
+			$declarations = self::compute_theme_vars( $declarations, $settings );
 
 			// Attach the ruleset for style and custom properties.
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
@@ -1006,7 +1013,7 @@ class WP_Theme_JSON {
 
 			$declarations = array();
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				self::compute_style_properties(
+				$declarations = self::compute_style_properties(
 					$declarations,
 					$this->theme_json['styles'][ $block_selector ],
 					$supports
@@ -1017,7 +1024,7 @@ class WP_Theme_JSON {
 
 			// Attach the rulesets for the classes.
 			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				self::compute_preset_classes(
+				$stylesheet = self::compute_preset_classes(
 					$stylesheet,
 					$this->theme_json['settings'][ $block_selector ],
 					$selector
@@ -1152,8 +1159,7 @@ class WP_Theme_JSON {
 
 			// Style escaping.
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = array();
-				self::compute_style_properties( $declarations, $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
+				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
 				foreach ( $declarations as $declaration ) {
 					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
 					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {

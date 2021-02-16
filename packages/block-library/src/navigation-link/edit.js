@@ -34,6 +34,7 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -45,6 +46,7 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -155,7 +157,7 @@ function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { saveEntityRecord } = useDispatch( 'core' );
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -163,7 +165,7 @@ function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const isDraggingBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
+		( select ) => select( blockEditorStore ).isDraggingBlocks(),
 		[]
 	);
 
@@ -462,7 +464,7 @@ export default compose( [
 			hasSelectedInnerBlock,
 			getBlockParentsByBlockName,
 			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { clientId } = ownProps;
 		const rootBlock = head(
 			getBlockParentsByBlockName( clientId, 'core/navigation' )
@@ -492,8 +494,14 @@ export default compose( [
 			inlineStyles,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
-			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
+			userCanCreatePages: select( coreStore ).canUser(
+				'create',
+				'pages'
+			),
+			userCanCreatePosts: select( coreStore ).canUser(
+				'create',
+				'posts'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
@@ -501,7 +509,7 @@ export default compose( [
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
-				const { insertBlock } = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( blockEditorStore );
 
 				const { getClientIdsOfDescendants } = registry.select(
 					'core/block-editor'

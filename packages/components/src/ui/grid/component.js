@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createComponent } from '../utils';
-import useGrid from './use-grid';
+import useGrid from './hook';
 
 /**
  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
