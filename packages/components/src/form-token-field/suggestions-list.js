@@ -130,7 +130,7 @@ class SuggestionsList extends Component {
 					  suggestion.label=decodeEntities(label);
 					return (
 						<li
-							id={ `components-form-token-suggestions78-${ this.props.instanceId }-${ index }` }
+							id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
 							role="option"
 							className={ classeName }
 							key={ this.props.displayTransform( suggestion ) }
