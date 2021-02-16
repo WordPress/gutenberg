@@ -11,14 +11,13 @@ export type ControlGroupContext = {
 	styles?: string;
 };
 
-export type Props = Pick<FlexProps, 'direction'> & {
+export type Props = Pick< FlexProps, 'direction' > & {
 	/**
 	 * Adjust the layout (width) of content using CSS grid (`grid-template-columns`).
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Button, ControlGroup, Select, TextInput } from `@wp-g2/components`
-	 * import { ui } from `@wp-g2/styles`
+	 * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return (
@@ -31,5 +30,5 @@ export type Props = Pick<FlexProps, 'direction'> & {
 	 * }
 	 * ```
 	 */
-	templateColumns?: CSSProperties['gridTemplateColumns'];
+	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
 };
