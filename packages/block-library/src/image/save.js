@@ -65,8 +65,6 @@ export default function save( { attributes } ) {
 		</>
 	);
 
-	const blockProps = useBlockProps.save( { className: classes } );
-
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
 			<div { ...useBlockProps.save() }>
@@ -75,5 +73,9 @@ export default function save( { attributes } ) {
 		);
 	}
 
-	return <figure { ...blockProps }>{ figure }</figure>;
+	return (
+		<figure { ...useBlockProps.save( { className: classes } ) }>
+			{ figure }
+		</figure>
+	);
 }
