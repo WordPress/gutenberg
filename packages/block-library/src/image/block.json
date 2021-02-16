@@ -2,13 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
-	"usesContext": [
-		"allowResize",
-		"linkTo",
-		"linkTarget",
-		"sizeSlug",
-		"isGrouped"
-	],
+	"usesContext": [ "allowResize", "isGrouped" ],
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -75,14 +69,6 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
-		},
-		"inheritedAttributes": {
-			"type": "object",
-			"default": {
-				"linkTo": false,
-				"linkTarget": false,
-				"sizeSlug": false
-			}
 		}
 	},
 	"supports": {

@@ -103,10 +103,7 @@
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
-		"isGrouped": "isGrouped",
-		"linkTo": "linkTo",
-		"linkTarget": "linkTarget",
-		"sizeSlug": "sizeSlug"
+		"isGrouped": "isGrouped"
 	},
 	"supports": {
 		"anchor": true,
