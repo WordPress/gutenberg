@@ -179,14 +179,14 @@ function AudioEdit( {
 							checked={ autoplay }
 						/>
 						<ToggleControl
-							label={ __( 'Muted' ) }
-							onChange={ toggleAttribute( 'muted' ) }
-							checked={ muted }
-						/>
-						<ToggleControl
 							label={ __( 'Loop' ) }
 							onChange={ toggleAttribute( 'loop' ) }
 							checked={ loop }
+						/>
+						<ToggleControl
+							label={ __( 'Muted' ) }
+							onChange={ toggleAttribute( 'muted' ) }
+							checked={ muted }
 						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
