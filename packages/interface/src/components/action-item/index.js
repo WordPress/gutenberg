@@ -24,11 +24,16 @@ function ActionItemSlot( {
 			fillProps={ { as: Item, ...fillProps } }
 		>
 			{ ( fills ) => {
-				//
 				const children = Children.toArray( fills );
 				if ( isEmpty( children ) ) {
 					return null;
 				}
+
+				// Special handling exists for backward compatibility.
+				// It ensures that menu items created by plugin authors aren't
+				// duplicated with automatically injected menu items coming
+				// from pinnable plugin sidebars.
+				// @see https://github.com/WordPress/gutenberg/issues/14457
 				const initializedByPlugins = [];
 				Children.forEach(
 					children,
@@ -54,6 +59,7 @@ function ActionItemSlot( {
 					}
 					return child;
 				} );
+
 				return <Container { ...props }>{ children }</Container>;
 			} }
 		</Slot>

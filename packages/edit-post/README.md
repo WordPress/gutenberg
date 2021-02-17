@@ -375,6 +375,7 @@ _Returns_
 <a name="PluginSidebar" href="#PluginSidebar">#</a> **PluginSidebar**
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
+It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`.
 If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
 
 ```js
