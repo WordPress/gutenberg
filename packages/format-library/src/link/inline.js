@@ -134,7 +134,7 @@ function InlineLinkUI( {
 			anchorRef={ anchorRef }
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			position="bottom right"
+			position="bottom center"
 			isAlternate={ true }
 		>
 			<LinkControl
