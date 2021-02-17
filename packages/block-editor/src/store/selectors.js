@@ -15,6 +15,7 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
+	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -691,10 +692,11 @@ export function getNextBlockClientId( state, startClientId ) {
 /**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
+ * If the current block is not a RichText, having initial position set to 0 means "focus block"
  *
  * @param {Object} state Global application state.
  *
- * @return {?Object} Selected block.
+ * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
 	return state.initialPosition;
@@ -1741,6 +1743,50 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+const __experimentalGetParsedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return map( patterns, ( pattern ) => ( {
+			...pattern,
+			contentBlocks: parse( pattern.content ),
+		} ) );
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
+/**
+ * Returns the list of allowed patterns for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array?} The list of allowed block types.
+ */
+export const __experimentalGetAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = __experimentalGetParsedPatterns( state );
+
+		if ( ! rootClientId ) {
+			return patterns;
+		}
+
+		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
+			return every( contentBlocks, ( { name } ) =>
+				canInsertBlockType( state, name, rootClientId )
+			);
+		} );
+
+		return patternsAllowed;
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
+	]
+);
+
 /**
  * Returns the Block List settings of a block, if any exist.
  *
@@ -1778,18 +1824,26 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
- * Returns the Block List settings for an array of blocks, if any exist.
+ * Returns the block list settings for an array of blocks, if any exist.
  *
- * @param {Object}  state    Editor state.
- * @param {Array} clientIds Block client IDs.
+ * @param {Object} state     Editor state.
+ * @param {Array}  clientIds Block client IDs.
  *
- * @return {Array} Block List Settings for each of the found blocks
+ * @return {Object} An object where the keys are client ids and the values are
+ *                  a block list setting object.
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
-	( state, clientIds ) => {
-		return filter( state.blockListSettings, ( value, key ) =>
-			clientIds.includes( key )
-		);
+	( state, clientIds = [] ) => {
+		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
+			if ( ! state.blockListSettings[ clientId ] ) {
+				return blockListSettingsForBlocks;
+			}
+
+			return {
+				...blockListSettingsForBlocks,
+				[ clientId ]: state.blockListSettings[ clientId ],
+			};
+		}, {} );
 	},
 	( state ) => [ state.blockListSettings ]
 );

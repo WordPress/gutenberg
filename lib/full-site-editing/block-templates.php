@@ -49,12 +49,17 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$file_path = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
 		if ( file_exists( $file_path ) ) {
-			return array(
+			$new_template_item = array(
 				'slug'  => $slug,
 				'path'  => $file_path,
 				'theme' => $theme_slug,
 				'type'  => $template_type,
 			);
+
+			if ( 'wp_template_part' === $template_type ) {
+				return _gutenberg_add_template_part_area_info( $new_template_item );
+			}
+			return $new_template_item;
 		}
 	}
 
@@ -93,16 +98,43 @@ function _gutenberg_get_template_files( $template_type ) {
 				// Subtract ending '.html'.
 				-5
 			);
-			$template_files[] = array(
+			$new_template_item = array(
 				'slug'  => $template_slug,
 				'path'  => $template_file,
 				'theme' => $theme_slug,
 				'type'  => $template_type,
 			);
+
+			if ( 'wp_template_part' === $template_type ) {
+				$template_files[] = _gutenberg_add_template_part_area_info( $new_template_item );
+			} else {
+				$template_files[] = $new_template_item;
+			}
 		}
 	}
 
 	return $template_files;
+}
+
+/**
+ * Attempts to add the template part's area information to the input template.
+ *
+ * @param array $template_info Template to add information to (requires 'type' and 'slug' fields).
+ *
+ * @return array Template.
+ */
+function _gutenberg_add_template_part_area_info( $template_info ) {
+	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
+		$theme_data = WP_Theme_JSON_Resolver::get_theme_data()->get_template_parts();
+	}
+
+	if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
+		$template_info['area'] = gutenberg_filter_template_part_area_type( $theme_data[ $template_info['slug'] ]['area'] );
+	} else {
+		$template_info['area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+	}
+
+	return $template_info;
 }
 
 /**
@@ -171,6 +203,10 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 		$template->title       = $default_template_types[ $template_file['slug'] ]['title'];
 	}
 
+	if ( 'wp_template_part' === $template_type && isset( $template_file['area'] ) ) {
+		$template->area = $template_file['area'];
+	}
+
 	return $template;
 }
 
@@ -206,6 +242,13 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->title       = $post->post_title;
 	$template->status      = $post->post_status;
 
+	if ( 'wp_template_part' === $post->post_type ) {
+		$type_terms = get_the_terms( $post, 'wp_template_part_area' );
+		if ( ! is_wp_error( $type_terms ) && false !== $type_terms ) {
+			$template->area = $type_terms[0]->name;
+		}
+	}
+
 	return $template;
 }
 
@@ -237,6 +280,15 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		),
 	);
 
+	if ( 'wp_template_part' === $template_type && isset( $query['area'] ) ) {
+		$wp_query_args['tax_query'][]           = array(
+			'taxonomy' => 'wp_template_part_area',
+			'field'    => 'name',
+			'terms'    => $query['area'],
+		);
+		$wp_query_args['tax_query']['relation'] = 'AND';
+	}
+
 	if ( isset( $query['slug__in'] ) ) {
 		$wp_query_args['post_name__in'] = $query['slug__in'];
 	}
@@ -261,14 +313,16 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
-			$is_custom      = array_search(
+			$is_not_custom   = false === array_search(
 				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
-			$should_include = false === $is_custom && (
-				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true )
-			);
+			$fits_slug_query =
+				! isset( $query['slug__in'] ) || in_array( $template_file['slug'], $query['slug__in'], true );
+			$fits_area_query =
+				! isset( $query['area'] ) || $template_file['area'] === $query['area'];
+			$should_include  = $is_not_custom && $fits_slug_query && $fits_area_query;
 			if ( $should_include ) {
 				$query_result[] = _gutenberg_build_template_result_from_file( $template_file, $template_type );
 			}

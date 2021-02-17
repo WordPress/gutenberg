@@ -19,6 +19,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
+import { store as blockEditorStore } from '../../store';
 
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
@@ -29,7 +30,6 @@ export default function QuickInserter( {
 	rootClientId,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -37,25 +37,24 @@ export default function QuickInserter( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert,
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
 		onInsertBlocks
 	);
 
-	const [ patterns ] = usePatternsState( onInsertBlocks );
-	const showPatterns =
-		! destinationRootClientId && patterns.length && !! filterValue;
+	const [ patterns ] = usePatternsState(
+		onInsertBlocks,
+		destinationRootClientId
+	);
+	const showPatterns = patterns.length && !! filterValue;
 	const showSearch =
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
 
 	const { setInserterIsOpened, blockIndex } = useSelect(
 		( select ) => {
-			const { getSettings, getBlockIndex } = select(
-				'core/block-editor'
-			);
+			const { getSettings, getBlockIndex } = select( blockEditorStore );
 			return {
 				setInserterIsOpened: getSettings()
 					.__experimentalSetIsInserterOpened,
@@ -71,7 +70,7 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { __unstableSetInsertionPoint } = useDispatch( 'core/block-editor' );
+	const { __unstableSetInsertionPoint } = useDispatch( blockEditorStore );
 
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
@@ -104,7 +103,6 @@ export default function QuickInserter( {
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					selectBlockOnInsert={ selectBlockOnInsert }
 					maxBlockPatterns={ showPatterns ? SHOWN_BLOCK_PATTERNS : 0 }
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }

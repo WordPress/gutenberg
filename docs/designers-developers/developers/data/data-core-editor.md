@@ -203,7 +203,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPBlock>`: Filtered set of blocks for save.
+-   `WPBlock[]`: Filtered set of blocks for save.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
@@ -331,7 +331,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Preview Link.
+-   `string?`: Preview Link.
 
 <a name="getEditedPostSlug" href="#getEditedPostSlug">#</a> **getEditedPostSlug**
 
@@ -373,7 +373,21 @@ _Returns_
 
 -   `Array`: Block list.
 
+<a name="getEditorSelection" href="#getEditorSelection">#</a> **getEditorSelection**
+
+Returns the current selection.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection end.
+
 <a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
+
+> **Deprecated** since Gutenberg 10.0.0.
 
 Returns the current selection end.
 
@@ -386,6 +400,8 @@ _Returns_
 -   `WPBlockSelection`: The selection end.
 
 <a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+> **Deprecated** since Gutenberg 10.0.0.
 
 Returns the current selection start.
 
@@ -780,7 +796,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
+-   _currentPost_ `Object?`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -1061,7 +1077,7 @@ Storage).
 
 _Parameters_
 
--   _options_ `?Object`: Extra flags to identify the autosave.
+-   _options_ `Object?`: Extra flags to identify the autosave.
 
 <a name="clearSelectedBlock" href="#clearSelectedBlock">#</a> **clearSelectedBlock**
 
@@ -1347,7 +1363,7 @@ _Parameters_
 
 -   _post_ `Object`: Post object.
 -   _edits_ `Object`: Initial edited attributes object.
--   _template_ `?Array`: Block Template.
+-   _template_ `Array?`: Block Template.
 
 <a name="setupEditorState" href="#setupEditorState">#</a> **setupEditorState**
 

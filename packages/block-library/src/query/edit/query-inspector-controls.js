@@ -28,6 +28,7 @@ import {
 	useMemo,
 	createInterpolateElement,
 } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -74,7 +75,7 @@ export default function QueryInspectorControls( {
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { authorList, categories, tags, postTypes } = useSelect(
 		( select ) => {
-			const { getEntityRecords, getPostTypes } = select( 'core' );
+			const { getEntityRecords, getPostTypes } = select( coreStore );
 			const termsQuery = { per_page: MAX_FETCHED_TERMS };
 			const _categories = getEntityRecords(
 				'taxonomy',

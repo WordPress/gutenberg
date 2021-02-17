@@ -36,6 +36,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
@@ -48,6 +49,7 @@ import {
 	replace,
 	expand,
 } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -91,6 +93,29 @@ export class ImageEdit extends Component {
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
 			this
 		);
+		this.setMappedAttributes = this.setMappedAttributes.bind( this );
+		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
+
+		this.linkSettingsOptions = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
+
+		this.sizeOptions = map( this.props.imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			name,
+		} ) );
 	}
 
 	componentDidMount() {
@@ -336,65 +361,48 @@ export class ImageEdit extends Component {
 			: width;
 	}
 
+	setMappedAttributes( { url: href, ...restAttributes } ) {
+		const { setAttributes } = this.props;
+		return href === undefined
+			? setAttributes( restAttributes )
+			: setAttributes( { ...restAttributes, href } );
+	}
+
 	getLinkSettings() {
 		const { isLinkSheetVisible } = this.state;
 		const {
 			attributes: { href: url, ...unMappedAttributes },
-			setAttributes,
 		} = this.props;
 
 		const mappedAttributes = { ...unMappedAttributes, url };
-		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
-			href === undefined
-				? setAttributes( restAttributes )
-				: setAttributes( { ...restAttributes, href } );
-
-		const options = {
-			url: {
-				label: __( 'Image Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: false,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
-			},
-		};
 
 		return (
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				attributes={ mappedAttributes }
+				url={ mappedAttributes.url }
+				rel={ mappedAttributes.rel }
+				label={ mappedAttributes.label }
+				linkTarget={ mappedAttributes.linkTarget }
 				onClose={ this.dismissSheet }
-				setAttributes={ setMappedAttributes }
+				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
-				options={ options }
+				options={ this.linkSettingsOptions }
 				showIcon={ false }
 			/>
 		);
 	}
 
+	onSizeChangeValue( newValue ) {
+		this.onSetSizeSlug( newValue );
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
-		const {
-			attributes,
-			isSelected,
-			image,
-			imageSizes,
-			clientId,
-		} = this.props;
+		const { attributes, isSelected, image, clientId } = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
-		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
-			value: slug,
-			name,
-		} ) );
-		const sizeOptionsValid = find( sizeOptions, [
+		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
 			DEFAULT_SIZE_SLUG,
 		] );
@@ -427,10 +435,8 @@ export class ImageEdit extends Component {
 							icon={ expand }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
-							onChangeValue={ ( newValue ) =>
-								this.onSetSizeSlug( newValue )
-							}
-							options={ sizeOptions }
+							onChangeValue={ this.onSizeChangeValue }
+							options={ this.sizeOptions }
 						/>
 					) }
 					<TextControl
@@ -477,8 +483,8 @@ export class ImageEdit extends Component {
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
-						{ getInspectorControls() }
-						{ getMediaOptions() }
+						{ isSelected && getInspectorControls() }
+						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress
@@ -551,8 +557,8 @@ export class ImageEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const {
 			attributes: { id, url },
 			isSelected,

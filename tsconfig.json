@@ -22,6 +22,7 @@
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue" },
 		{ "path": "packages/project-management-automation" },
+		{ "path": "packages/react-i18n" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },

@@ -1482,6 +1482,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/customize-widgets",
+		"slug": "packages-customize-widgets",
+		"markdown_source": "../packages/customize-widgets/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data-controls",
 		"slug": "packages-data-controls",
 		"markdown_source": "../packages/data-controls/README.md",
@@ -1749,6 +1755,12 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-i18n",
+		"slug": "packages-react-i18n",
+		"markdown_source": "../packages/react-i18n/README.md",
 		"parent": "packages"
 	},
 	{
