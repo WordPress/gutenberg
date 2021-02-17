@@ -11,25 +11,22 @@
 }
 
 .searchTextInput {
-	flex: 1;
-	flex-direction: row;
+	flex-grow: 1;
 	border: 1px solid $gray-600;
 	border-width: $border-width;
 	padding: $grid-unit-10;
 }
 
 .searchLabel {
-	flex: none;
+	width: 100%;
 }
 
-$block-padding-hoz: 6px;
-$block-padding-vert: 10px;
 .buttonContainer {
 	background: #f7f7f7;
-	padding-left: $block-padding-hoz;
-	padding-right: $block-padding-hoz;
-	padding-top: $block-padding-vert;
-	padding-bottom: $block-padding-vert;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	padding-top: $grid-unit-10;
+	padding-bottom: $grid-unit-10;
 	border-width: $border-width;
 	border-color: #ccc;
 	border-style: solid;
