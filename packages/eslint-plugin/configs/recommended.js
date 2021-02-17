@@ -13,6 +13,13 @@ const { config: localPrettierConfig } =
 const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 
 module.exports = {
+	settings: {
+		'import/resolver': {
+			node: {
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		}
+	},
 	parser: '@typescript-eslint/parser',
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
