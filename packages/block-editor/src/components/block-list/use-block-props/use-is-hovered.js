@@ -30,18 +30,21 @@ export function useIsHovered() {
 		return isNavigationMode() || getSettings().outlineMode;
 	}, [] );
 
-	return useRefEffect( ( node ) => {
-		if ( isEnabled ) {
-			node.addEventListener( 'mouseout', listener );
-			node.addEventListener( 'mouseover', listener );
+	return useRefEffect(
+		( node ) => {
+			if ( isEnabled ) {
+				node.addEventListener( 'mouseout', listener );
+				node.addEventListener( 'mouseover', listener );
 
-			return () => {
-				node.removeEventListener( 'mouseout', listener );
-				node.removeEventListener( 'mouseover', listener );
+				return () => {
+					node.removeEventListener( 'mouseout', listener );
+					node.removeEventListener( 'mouseover', listener );
 
-				// Remove class in case it lingers.
-				node.classList.remove( 'is-hovered' );
-			};
-		}
-	}, [ isEnabled ] );
+					// Remove class in case it lingers.
+					node.classList.remove( 'is-hovered' );
+				};
+			}
+		},
+		[ isEnabled ]
+	);
 }

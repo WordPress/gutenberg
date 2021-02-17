@@ -126,7 +126,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			blockMovingModeClassNames,
+			blockMovingModeClassNames
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};
