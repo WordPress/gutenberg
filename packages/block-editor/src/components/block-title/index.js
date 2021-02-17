@@ -7,6 +7,8 @@ import { truncate } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { createInterpolateElement } from '@wordpress/element';
 import {
 	getBlockType,
 	__experimentalGetBlockLabel as getBlockLabel,
@@ -74,10 +76,14 @@ export default function BlockTitle( { clientId } ) {
 	if ( label !== blockType.title ) {
 		return truncate( label, { length: 35 } );
 	}
-	return (
-		<>
-			{ `${ blockInformation.title } ` }
-			<VisuallyHidden as="span">Block.</VisuallyHidden>
-		</>
+	return sprintf(
+		createInterpolateElement(
+			/* translators: 1: The block title. */
+			__( '%s <VisuallyHidden>Block.</VisuallyHidden>' ),
+			{
+				VisuallyHidden: <VisuallyHidden as="span" />,
+			}
+		),
+		blockInformation.title
 	);
 }
