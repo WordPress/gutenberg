@@ -129,6 +129,7 @@ function gutenberg_examples_02_register_block() {
 		array( ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'style.css' )
 	);
+	wp_style_add_data( 'gutenberg-examples-02', 'path', dirname( __FILE__ ) . '/style.css' );
 
 	register_block_type( 'gutenberg-examples/example-02-stylesheets', array(
 		'apiVersion' => 2,
