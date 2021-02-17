@@ -13,6 +13,7 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 		isWrapping: false,
 		visibilityMap: [],
 	} );
+	const [ defaultView, setDefaultView ] = useState( null );
 
 	const getRef = () => ref;
 
@@ -40,11 +41,30 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 		} );
 	}, 100 );
 
-	useEffect( () => {
-		window.addEventListener( 'resize', handleResize );
+	const navigationElement = useMemo( () => ref.current );
 
-		return () => window.removeEvenetListener( 'resize', handleResize );
-	}, [] );
+	/*
+		Get and save reference to the window object from the ownerDocumenet of our navigation element.
+		Necessary because the resize event is only sent to the window object.
+		Reference: https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
+	*/
+	useEffect( () => {
+		if ( null !== navigationElement ) {
+			const { ownerDocument } = navigationElement;
+
+			setDefaultView( ownerDocument.defaultView );
+		}
+	}, [ navigationElement ] );
+
+	// Add resize event listener to our window object
+	useEffect( () => {
+		if ( null !== defaultView ) {
+			defaultView.addEventListener( 'resize', handleResize );
+
+			return () =>
+				defaultView.removeEventListener( 'resize', handleResize );
+		}
+	}, [ defaultView ] );
 
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
@@ -54,6 +74,11 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 	*/
 	const memoizedInnerBlocks = useMemo( () => innerBlocks, [] );
 
+	/*
+		Add an `isHidden` property to the navigation element's innerBlocks to
+		determine whether or not they're being wrapped because they don't fit
+		in the screen anymore.
+	*/
 	useMemo( () => {
 		const updatedBlocks = memoizedInnerBlocks.map( ( block ) => ( {
 			...block,
@@ -63,5 +88,9 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 		replaceInnerBlocks( clientId, updatedBlocks, true );
 	}, [ state.visibilityMap, memoizedInnerBlocks ] );
 
+	/*
+		Return the state, as it is useful for the main navigation
+		element to know if some of its elements are hidden.
+	*/
 	return state;
 }
