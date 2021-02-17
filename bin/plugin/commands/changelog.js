@@ -476,9 +476,15 @@ async function getChangelog( settings ) {
 
 	const pullRequests = await fetchAllPullRequests( octokit, settings );
 	if ( ! pullRequests.length ) {
-		throw new Error(
-			'There are no pull requests associated with the milestone.'
-		);
+		if ( settings.unreleased ) {
+			throw new Error(
+				'There are no unreleased pull requests associated with the milestone.'
+			);
+		} else {
+			throw new Error(
+				'There are no pull requests associated with the milestone.'
+			);
+		}
 	}
 
 	let changelog = '';
