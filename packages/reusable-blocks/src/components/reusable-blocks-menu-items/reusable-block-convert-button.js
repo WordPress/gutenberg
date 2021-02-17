@@ -136,7 +136,7 @@ export default function ReusableBlockConvertButton( {
 								} }
 							>
 								<TextControl
-									label={ __( 'Name your reusable block' ) }
+									label={ __( 'Name' ) }
 									value={ title }
 									onChange={ setTitle }
 								/>
