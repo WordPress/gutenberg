@@ -227,16 +227,56 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 }
 
 /**
+ * Returns a navigation link variation
+ *
+ * @param $entity WP_Taxonomy|WP_Post_Type post type or taxonomy entity.
+ * @param $kind string string of value 'taxonomy' or 'post-type'
+ * @param $name string entity name eg: post, page, post_tag, category
+ *
+ * @return array
+ */
+function build_variation_for_navigation_link( $entity, $kind ) {
+	$name = 'post_tag' === $entity->name ? 'tag' : $entity->name;
+	return array(
+		'name'        => $name,
+		/* translators: %s: Entity type, eg: Post Link, Page Link, Category Link, Tag Link, Portfolio Link etc */
+		'title'       => sprintf( __( '%s Link' ), $entity->labels->singular_name ),
+		/* translators: %s: Entity type, eg: A link to a post. A link to a page. */
+		'description' => sprintf( __( 'A link to a %s.' ), $entity->labels->singular_name ),
+		'attributes'  => array(
+			'type' => $name,
+			'kind' => $kind,
+		),
+	);
+}
+
+/**
  * Register the navigation link block.
  *
  * @uses render_block_core_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation_link() {
+
+	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
+	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
+	$variations = array();
+	if ( $post_types ) {
+		foreach ( $post_types as $post_type ) {
+			$variations[] = build_variation_for_navigation_link( $post_type, 'post-type' );
+		}
+	}
+	if ( $taxonomies ) {
+		foreach ( $taxonomies as $taxonomy ) {
+			$variations[] = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
+		}
+	}
+
 	register_block_type_from_metadata(
 		__DIR__ . '/navigation-link',
 		array(
 			'render_callback' => 'render_block_core_navigation_link',
+			'variations'      => $variations,
 		)
 	);
 }
