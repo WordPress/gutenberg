@@ -14,14 +14,12 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 		visibilityMap: [],
 	} );
 	const [ defaultView, setDefaultView ] = useState( null );
-
-	const getRef = () => ref;
+	const navigationElement = useMemo( () => ref.current );
 
 	const handleResize = debounce( () => {
-		const { current: nav } = getRef();
-		const { bottom } = nav.getBoundingClientRect();
+		const { bottom } = navigationElement.getBoundingClientRect();
 
-		const items = Array.from( nav.childNodes );
+		const items = Array.from( navigationElement.childNodes );
 		const visibilityMap = items.reduce( ( result, el ) => {
 			const isHidden = el.getBoundingClientRect().y >= bottom;
 			const [ , blockId ] = el.id.split( 'block-' );
@@ -40,8 +38,6 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 			visibilityMap,
 		} );
 	}, 100 );
-
-	const navigationElement = useMemo( () => ref.current );
 
 	/*
 		Get and save reference to the window object from the ownerDocumenet of our navigation element.
