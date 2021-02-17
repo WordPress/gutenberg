@@ -15,7 +15,12 @@ import { store as noticesStore } from '@wordpress/notices';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function AddMenu( { className, menus, onCreate } ) {
+export default function AddMenu( {
+	className,
+	menus,
+	onCreate,
+	showHeading = false,
+} ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
@@ -71,7 +76,11 @@ export default function AddMenu( { className, menus, onCreate } ) {
 			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
 		>
-			<h3 className="edit-navigation-add-menu__title">{ titleText }</h3>
+			{ showHeading && (
+				<h3 className="edit-navigation-add-menu__title">
+					{ titleText }
+				</h3>
+			) }
 			<TextControl
 				// Disable reason: it should focus.
 				//

@@ -11,10 +11,14 @@ import {
 	Button,
 	Dropdown,
 	DropdownMenu,
+	Modal,
 	MenuGroup,
+	MenuItem,
 	MenuItemsChoice,
 	Popover,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +34,11 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
+	const instanceId = useInstanceId( Header );
+	const addNewMenuHeadingId = `edit-navigation-header__add-new-menu-heading-${ instanceId }`;
+	const [ isAddNewMenuModalVisible, setIsAddNewModalVisible ] = useState(
+		false
+	);
 	const selectedMenu = find( menus, { id: selectedMenuId } );
 	const menuName = selectedMenu ? selectedMenu.name : undefined;
 	let actionHeaderText;
@@ -71,42 +80,40 @@ export default function Header( {
 							__experimentalIsFocusable: true,
 						} }
 						popoverProps={ {
+							className:
+								'edit-navigation-header__menu-selection-dropdown',
 							position: 'bottom left',
 						} }
 					>
-						{ () => (
-							<MenuGroup>
-								<MenuItemsChoice
-									value={ selectedMenuId }
-									onSelect={ onSelectMenu }
-									choices={ menus.map( ( menu ) => ( {
-										value: menu.id,
-										label: menu.name,
-									} ) ) }
-								/>
-							</MenuGroup>
+						{ ( { onClose } ) => (
+							<>
+								<MenuGroup>
+									<MenuItemsChoice
+										value={ selectedMenuId }
+										onSelect={ ( menuId ) => {
+											onSelectMenu( menuId );
+											onClose();
+										} }
+										choices={ menus.map( ( menu ) => ( {
+											value: menu.id,
+											label: menu.name,
+										} ) ) }
+									/>
+								</MenuGroup>
+								<MenuGroup>
+									<MenuItem
+										isTertiary
+										onClick={ () =>
+											setIsAddNewModalVisible( true )
+										}
+									>
+										{ __( 'Add new' ) }
+									</MenuItem>
+								</MenuGroup>
+							</>
 						) }
 					</DropdownMenu>
-
-					<Dropdown
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Add new' ) }
-							</Button>
-						) }
-						renderContent={ () => (
-							<AddMenu
-								className="edit-navigation-header__add-menu"
-								menus={ menus }
-								onCreate={ onSelectMenu }
-							/>
-						) }
-					/>
+					{ /* */ }
 
 					<Dropdown
 						contentClassName="edit-navigation-header__manage-locations"
@@ -122,6 +129,23 @@ export default function Header( {
 						) }
 						renderContent={ () => <ManageLocations /> }
 					/>
+
+					{ isAddNewMenuModalVisible && (
+						<Modal
+							title={ __( 'Create a new menu' ) }
+							onRequestClose={ () =>
+								setIsAddNewModalVisible( false )
+							}
+						>
+							<AddMenu
+								className="edit-navigation-header__add-menu"
+								menus={ menus }
+								onCreate={ onSelectMenu }
+								headingTag="h1"
+								headingId={ addNewMenuHeadingId }
+							/>
+						</Modal>
+					) }
 
 					<SaveButton navigationPost={ navigationPost } />
 

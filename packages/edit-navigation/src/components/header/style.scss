@@ -28,3 +28,8 @@
 .edit-navigation-header__add-menu {
 	min-width: 220px;
 }
+
+.edit-navigation-header__menu-selection-dropdown {
+	// Appear below the modal overlay.
+	z-index: 99998;
+}
