@@ -30,7 +30,7 @@ export const LinkControlSearchCreate = ( {
 		text = createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
-				__( '\"<mark>%s</mark>\"' ),
+				__( '"<mark>%s</mark>"' ),
 				searchTerm
 			),
 			{ mark: <mark /> }
@@ -48,8 +48,12 @@ export const LinkControlSearchCreate = ( {
 			) }
 			onClick={ onClick }
 		>
-			<span className="block-editor-link-control__search-create-label">Create draft</span>
-			<span className="block-editor-link-control__search-create-description">{ text }</span>
+			<span className="block-editor-link-control__search-create-label">
+				Create draft
+			</span>
+			<span className="block-editor-link-control__search-create-description">
+				{ text }
+			</span>
 			<Icon
 				className="block-editor-link-control__search-create-icon"
 				icon={ plus }
