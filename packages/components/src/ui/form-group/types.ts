@@ -1,3 +1,7 @@
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
 import { CSSProperties, ReactNode, ReactText } from 'react';
 
 /**

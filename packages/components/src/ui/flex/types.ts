@@ -1,4 +1,12 @@
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
 import { CSSProperties } from 'react';
+
+/**
+ * Internal dependencies
+ */
 import { ResponsiveCSSValue } from '../utils/types';
 
 export type FlexDirection = ResponsiveCSSValue<

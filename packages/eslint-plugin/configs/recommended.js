@@ -16,9 +16,9 @@ module.exports = {
 	settings: {
 		'import/resolver': {
 			node: {
-				"extensions": [".js", ".jsx", ".ts", ".tsx"]
-			}
-		}
+				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+			},
+		},
 	},
 	parser: '@typescript-eslint/parser',
 	extends: [
@@ -32,11 +32,13 @@ module.exports = {
 	},
 	overrides: [
 		{
-			// Don't require redundant JSDoc types in TypeScript files.
 			files: [ '**/*.ts', '**/*.tsx' ],
 			rules: {
+				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',
+				// handled by TS itself
+				'no-unused-vars': 'off',
 			},
 		},
 	],

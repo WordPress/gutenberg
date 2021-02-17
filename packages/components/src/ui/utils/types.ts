@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import { As } from 'reakit-utils/types';
 import { ViewOwnProps } from '@wp-g2/create-styles';
 
