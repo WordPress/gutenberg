@@ -24,8 +24,8 @@ function ActionItemSlot( {
 			fillProps={ { as: Item, ...fillProps } }
 		>
 			{ ( fills ) => {
-				const children = Children.toArray( fills );
-				if ( isEmpty( children ) ) {
+				const menuItems = Children.toArray( fills );
+				if ( isEmpty( menuItems ) ) {
 					return null;
 				}
 
@@ -36,7 +36,7 @@ function ActionItemSlot( {
 				// @see https://github.com/WordPress/gutenberg/issues/14457
 				const initializedByPlugins = [];
 				Children.forEach(
-					children,
+					menuItems,
 					( {
 						props: { __unstableInitSource, __unstableTarget },
 					} ) => {
@@ -48,7 +48,7 @@ function ActionItemSlot( {
 						}
 					}
 				);
-				Children.forEach( children, ( child ) => {
+				const children = Children.map( menuItems, ( child ) => {
 					if (
 						child.props.__unstableInitSource === 'sidebar' &&
 						initializedByPlugins.includes(

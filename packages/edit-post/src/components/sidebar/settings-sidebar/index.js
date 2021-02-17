@@ -59,7 +59,6 @@ const SettingsSidebar = () => {
 
 	return (
 		<PluginSidebarEditPost
-			isPinnable={ false }
 			identifier={ sidebarName }
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }
