@@ -15,27 +15,32 @@ import {
 } from '../index';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render(
+	let base;
+
+	beforeEach( () => {
+		base = render(
 			<Card>
 				<CardHeader title="WordPress.org" />
-				<CardBody>Code is Poetry</CardBody>
+				<CardBody>Code is Poetry.</CardBody>
 				<CardFooter>
 					<button>Agree</button>
 				</CardFooter>
 			</Card>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+	} );
+
+	test( 'should render correctly', () => {
+		expect( base.container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should render elevation', () => {
 		const { container } = render( <Card elevation /> );
-		expect( container.firstChild ).toMatchSnapshot();
-	} );
-
-	test( 'should render no elevation', () => {
-		const { container } = render( <Card elevation={ false } /> );
-		expect( container.firstChild ).toMatchSnapshot();
+		const { container: withoutElevation } = render(
+			<Card elevation={ false } />
+		);
+		expect( container.firstChild ).toMatchDiffSnapshot(
+			withoutElevation.firstChild
+		);
 	} );
 
 	test( 'should render CardInnerBody', () => {
@@ -48,6 +53,8 @@ describe( 'props', () => {
 				</CardFooter>
 			</Card>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild ).toMatchDiffSnapshot(
+			base.container.firstChild
+		);
 	} );
 } );
