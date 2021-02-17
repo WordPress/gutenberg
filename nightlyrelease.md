@@ -1,4 +1,4 @@
-Gutenberg Nightly
+![GitHub all releases](https://img.shields.io/github/downloads/bph/gutenberg/total?style=for-the-badge)
 
 - [Discussions (Q & A, testing ideas, etc)  are now open](https://github.com/bph/gutenberg/discussions)
 - Download the zip file and upload it to your test WordPress site. (Do not use this in production!) 
