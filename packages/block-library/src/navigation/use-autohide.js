@@ -5,8 +5,8 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
 
 export default function useAutohide( clientId, innerBlocks, ref ) {
 	const [ state, setState ] = useState( {
@@ -14,7 +14,10 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 		visibilityMap: [],
 	} );
 
-	const handleResize = debounce( ( nav ) => {
+	const getRef = () => ref;
+
+	const handleResize = debounce( () => {
+		const { current: nav } = getRef();
 		const { bottom } = nav.getBoundingClientRect();
 
 		const items = Array.from( nav.childNodes );
@@ -27,54 +30,38 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 				[ blockId ]: isHidden,
 			};
 		}, {} );
-		const hasWrappedElements = Object.values( visibilityMap ).some(
+		const isWrapping = Object.values( visibilityMap ).some(
 			( item ) => item.isHidden
 		);
 
 		setState( {
-			isWrapping: hasWrappedElements,
+			isWrapping,
 			visibilityMap,
 		} );
 	}, 100 );
 
 	useEffect( () => {
-		const element = ref.current;
+		window.addEventListener( 'resize', handleResize );
 
-		if ( ! element ) {
-			return;
-		}
+		return () => window.removeEvenetListener( 'resize', handleResize );
+	}, [] );
 
-		const { ownerDocument } = element;
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
-		window.addEventListener(
-			'resize',
-			() => handleResize( element ),
-			false
-		);
+	/*
+		Memoize innerBlocks value in order to avoid an infinite look of
+		replacing innerBlocks and calling replaceInnerBlocks again on the new blocks.
+	*/
+	const memoizedInnerBlocks = useMemo( () => innerBlocks, [] );
 
-		handleResize( element );
+	useMemo( () => {
+		const updatedBlocks = memoizedInnerBlocks.map( ( block ) => ( {
+			...block,
+			isHidden: state.visibilityMap[ block.clientId ],
+		} ) );
 
-		return () => {
-			window.removeEventListener( 'resize', () =>
-				handleResize( element )
-			);
-		};
-	}, [ innerBlocks ] );
-
-	const updatedBlocks = innerBlocks.map( ( block ) => ( {
-		...block,
-		isHidden: state.visibilityMap[ block.clientId ],
-	} ) );
-
-	console.log( updatedBlocks );
-
-	useDispatch( ( dispatch ) =>
-		dispatch( 'core/block-editor' ).replaceInnerBlocks(
-			clientId,
-			updatedBlocks,
-			true
-		)
-	);
+		replaceInnerBlocks( clientId, updatedBlocks, true );
+	}, [ state.visibilityMap, memoizedInnerBlocks ] );
 
 	return state;
 }

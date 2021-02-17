@@ -66,12 +66,12 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const containerHeight = useMaxHeight( navItemsElement );
-	const { isWrapping } = useAutohide(
-		clientId,
-		innerBlocks,
-		navItemsElement
+	const autohideParams = useMemo(
+		() => [ clientId, innerBlocks, navItemsElement ],
+		[ innerBlocks ]
 	);
+	const containerHeight = useMaxHeight( navItemsElement );
+	const { isWrapping } = useAutohide( ...autohideParams );
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
