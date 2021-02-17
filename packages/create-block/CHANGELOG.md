@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines.
+-   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
 
 ## 2.0.1 (2021-02-01)
 
