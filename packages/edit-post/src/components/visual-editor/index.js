@@ -19,12 +19,13 @@ import {
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
-import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../store';
 
 export default function VisualEditor( { styles } ) {
@@ -53,9 +54,10 @@ export default function VisualEditor( { styles } ) {
 
 	useBlockSelectionClearer( ref );
 	useTypewriter( ref );
-	useClipboardHandler( ref );
 	useTypingObserver( ref );
 	useCanvasClickRedirect( ref );
+
+	const mergedRefs = useMergeRefs( [ ref, useClipboardHandler() ] );
 
 	return (
 		<div className="edit-post-visual-editor">
@@ -63,7 +65,7 @@ export default function VisualEditor( { styles } ) {
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div
-				ref={ ref }
+				ref={ mergedRefs }
 				className="editor-styles-wrapper"
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
