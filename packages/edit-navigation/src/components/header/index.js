@@ -104,7 +104,7 @@ export default function Header( {
 											setIsAddNewModalVisible( true )
 										}
 									>
-										{ __( 'Add new' ) }
+										{ __( 'Create a new menu' ) }
 									</MenuItem>
 								</MenuGroup>
 							</>
