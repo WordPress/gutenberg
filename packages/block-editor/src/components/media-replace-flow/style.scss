@@ -11,6 +11,11 @@
 	padding-top: $grid-unit-20;
 }
 
+// Prevents the popover content from being scrolled out of view.
+.block-editor-media-replace-flow__options .components-popover__content {
+	overflow-y: unset;
+}
+
 .block-editor-media-replace-flow__indicator {
 	margin-left: 4px;
 }
