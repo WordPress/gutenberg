@@ -140,6 +140,9 @@ export default function Header( {
 									setIsAddNewModalVisible( false );
 									onSelectMenu( menuId );
 								} }
+								helpText={ __(
+									'A short descriptive name for your menu.'
+								) }
 							/>
 						</Modal>
 					) }

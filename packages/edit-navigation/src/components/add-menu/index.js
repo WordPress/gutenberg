@@ -19,7 +19,8 @@ export default function AddMenu( {
 	className,
 	menus,
 	onCreate,
-	showHeading = false,
+	titleText,
+	helpText,
 	focusOnMount = false,
 } ) {
 	const [ menuName, setMenuName ] = useState( '' );
@@ -62,22 +63,12 @@ export default function AddMenu( {
 		setIsCreatingMenu( false );
 	};
 
-	const hasMenus = menus?.length;
-
-	const titleText = hasMenus
-		? __( 'Create a new menu' )
-		: __( 'Create your first menu' );
-
-	const helpText = hasMenus
-		? __( 'A short descriptive name for your menu.' )
-		: __( 'A short descriptive name for your first menu.' );
-
 	return (
 		<form
 			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
 		>
-			{ showHeading && (
+			{ titleText && (
 				<h3 className="edit-navigation-add-menu__title">
 					{ titleText }
 				</h3>
