@@ -103,7 +103,7 @@ import { ViewerFill } from './viewer-slot';
 function LinkControl( {
 	searchInputPlaceholder,
 	value,
-  settings,
+	settings,
 	onChange = noop,
 	noDirectEntry = false,
 	showSuggestions = true,
@@ -245,11 +245,11 @@ function LinkControl( {
 						</Notice>
 					) }
 
-          <LinkControlSettingsDrawer
-            value={ value }
-            settings={ settings }
-            onChange={ onChange }
-          />
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
 				</>
 			) }
 
