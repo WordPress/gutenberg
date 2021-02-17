@@ -258,8 +258,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const blockInformation = useBlockDisplayInformation(
 		getBlockRootClientId( clientId )
 	);
-	// eslint-disable-next-line no-console
-	console.log( blockInformation.title );
+	if ( blockInformation !== null && orientation === 'horizontal' ) {
+		const parentTitle = blockInformation.title
+			? blockInformation.title
+			: undefined;
+		// eslint-disable-next-line no-console
+		console.log( parentTitle );
+	}
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
