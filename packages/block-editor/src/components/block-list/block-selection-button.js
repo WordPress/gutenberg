@@ -33,6 +33,7 @@ import { focus } from '@wordpress/dom';
  */
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
  * Returns true if the user is using windows.
@@ -254,6 +255,11 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}
 
 	const blockType = getBlockType( name );
+	const blockInformation = useBlockDisplayInformation(
+		getBlockRootClientId( clientId )
+	);
+	// eslint-disable-next-line no-console
+	console.log( blockInformation.title );
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
