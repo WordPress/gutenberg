@@ -192,6 +192,7 @@ export const ItemUI = styled.div`
 	height: auto;
 	min-height: 32px;
 	margin: 0;
+	padding: ${ space( 0.75 ) } ${ space( 2 ) };
 	font-weight: 400;
 	line-height: 20px;
 	width: 100%;
