@@ -108,3 +108,26 @@
 		width: 100%;
 	}
 }
+
+.display-as-grid {
+	display: grid;
+	grid-gap: 2em;
+	grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+
+	.wp-block-column {
+
+		// Between mobile and large viewports, allow 2 columns.
+		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
+			&:nth-child(even) {
+				margin-left: 0;
+			}
+		}
+
+		// At large viewports, show all columns horizontally.
+		@include break-medium() {
+			&:not(:first-child) {
+				margin-left: 0;
+			}
+		}
+	}
+}

@@ -8,7 +8,13 @@ import { dropRight, get, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+import {
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+	__experimentalUnitControl as UnitControl,
+	Notice,
+} from '@wordpress/components';
 
 import {
 	InspectorControls,
@@ -34,6 +40,7 @@ import {
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
+	CSS_UNITS,
 } from './utils';
 
 /**
@@ -49,11 +56,12 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, displayAsGrid, gridColumnMinWidth } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -66,10 +74,16 @@ function ColumnsEditContainer( {
 
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		'display-as-grid': displayAsGrid,
 	} );
 
 	const blockProps = useBlockProps( {
 		className: classes,
+		style: displayAsGrid
+			? {
+					gridTemplateColumns: `repeat(auto-fill, minmax(${ gridColumnMinWidth }, 1fr))`,
+			  }
+			: undefined,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
@@ -88,18 +102,43 @@ function ColumnsEditContainer( {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
-						label={ __( 'Columns' ) }
+						label={
+							displayAsGrid ? __( 'Areas' ) : __( 'Columns' )
+						}
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
 						min={ 1 }
-						max={ Math.max( 6, count ) }
+						max={ Math.max( displayAsGrid ? 30 : 6, count ) }
 					/>
-					{ count > 6 && (
+					{ count > 6 && ! displayAsGrid && (
 						<Notice status="warning" isDismissible={ false }>
 							{ __(
 								'This column count exceeds the recommended amount and may cause visual breakage.'
 							) }
 						</Notice>
+					) }
+					<ToggleControl
+						label={ __( 'Grid mode' ) }
+						checked={ displayAsGrid }
+						onChange={ () =>
+							setAttributes( {
+								displayAsGrid: ! displayAsGrid,
+							} )
+						}
+					/>
+					{ displayAsGrid && (
+						<UnitControl
+							label={ __( 'Minimum column width' ) }
+							labelPosition="edge"
+							__unstableInputWidth="80px"
+							value={ gridColumnMinWidth || '360px' }
+							onChange={ ( nextWidth ) => {
+								setAttributes( {
+									gridColumnMinWidth: nextWidth,
+								} );
+							} }
+							units={ CSS_UNITS }
+						/>
 					) }
 				</PanelBody>
 			</InspectorControls>

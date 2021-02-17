@@ -5,6 +5,13 @@
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
+		},
+		"displayAsGrid": {
+			"type": "boolean",
+			"default": false
+		},
+		"gridColumnMinWidth": {
+			"type": "string"
 		}
 	},
 	"supports": {

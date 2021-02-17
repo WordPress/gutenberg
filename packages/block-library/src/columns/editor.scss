@@ -28,3 +28,9 @@
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+.wp-block-columns.display-as-grid {
+	.wp-block-column {
+		margin: 0 !important;
+	}
+}
