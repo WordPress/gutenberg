@@ -97,7 +97,7 @@ export default function Header( {
 										} ) ) }
 									/>
 								</MenuGroup>
-								<MenuGroup>
+								<MenuGroup hideSeparator>
 									<MenuItem
 										isTertiary
 										onClick={ () =>
