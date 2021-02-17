@@ -46,7 +46,8 @@ export default function WidgetAreasBlockEditorProvider( {
 				'postType',
 				'wp_block'
 			),
-		} )
+		} ),
+		[]
 	);
 	const { setIsInserterOpened } = useDispatch( 'core/edit-widgets' );
 
