@@ -8,6 +8,7 @@
             "caption": "",
             "autoplay": false,
             "loop": false,
+			"muted": false,
             "align": "right"
         },
         "innerBlocks": [],
