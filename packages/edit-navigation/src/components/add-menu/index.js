@@ -24,7 +24,9 @@ export default function AddMenu( {
 	focusOnMount = false,
 } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createInfoNotice, removeNotice } = useDispatch(
+		noticesStore
+	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 	const { saveMenu } = useDispatch( 'core' );
 
@@ -34,6 +36,9 @@ export default function AddMenu( {
 		if ( ! menuName.length ) {
 			return;
 		}
+
+		// Remove any existing notices so duplicates aren't created.
+		removeNotice( 'edit-navigation-error' );
 
 		if ( some( menus, menuNameMatches( menuName ) ) ) {
 			const message = sprintf(
