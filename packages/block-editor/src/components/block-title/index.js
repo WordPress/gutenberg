@@ -76,14 +76,13 @@ export default function BlockTitle( { clientId } ) {
 	if ( label !== blockType.title ) {
 		return truncate( label, { length: 35 } );
 	}
-	return sprintf(
-		createInterpolateElement(
+	return createInterpolateElement(
+		sprintf(
 			/* translators: 1: The block title. */
 			__( '%s <VisuallyHidden>Block.</VisuallyHidden>' ),
-			{
-				VisuallyHidden: <VisuallyHidden as="span" />,
-			}
-		),
-		blockInformation.title
+		blockInformation.title ),
+	{
+		VisuallyHidden: <VisuallyHidden as="span" />,
+	}
 	);
 }
