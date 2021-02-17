@@ -34,6 +34,12 @@
 			"source": "attribute",
 			"selector": "audio",
 			"attribute": "preload"
+		},
+		"muted": {
+			"type": "boolean",
+			"source": "attribute",
+			"selector": "audio",
+			"attribute": "muted"
 		}
 	},
 	"supports": {

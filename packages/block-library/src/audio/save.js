@@ -4,7 +4,7 @@
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { autoplay, caption, loop, preload, src } = attributes;
+	const { autoplay, caption, loop, preload, src, muted } = attributes;
 
 	return (
 		src && (
@@ -15,6 +15,7 @@ export default function save( { attributes } ) {
 					autoPlay={ autoplay }
 					loop={ loop }
 					preload={ preload }
+					muted={ muted }
 				/>
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content tagName="figcaption" value={ caption } />
