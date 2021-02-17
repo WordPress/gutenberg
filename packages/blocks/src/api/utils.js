@@ -206,7 +206,7 @@ export function getAccessibleBlockLabel(
 		if ( hasLabel ) {
 			return sprintf(
 				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
-				__( 'Column %1$d of %2$d. Block child of %3$s. %4$s' ),
+				__( 'Column %1$d of %2$d. Child of %3$s block. %4$s' ),
 				position,
 				total,
 				parentTitle,
@@ -216,7 +216,7 @@ export function getAccessibleBlockLabel(
 
 		return sprintf(
 			/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. */
-			__( 'Column %1$d of %2$d. Block child of %3$s' ),
+			__( 'Column %1$d of %2$d. Child of %3$s block' ),
 			position,
 			total,
 			parentTitle
