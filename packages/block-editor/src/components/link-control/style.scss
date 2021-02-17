@@ -3,7 +3,6 @@
 	padding: ($grid-unit-15 / 2);
 }
 
-
 // ## Link Search
 // When creating or editing a URL the primary UI
 // is a search input. It pulls double duty allowing
@@ -48,12 +47,11 @@
 		// I think the submit icon is mis-aligned.
 		svg {
 			position: relative;
-			top: -2px;
-			right: 2px;
+			top: -1px;
+			right: 4px;
 		}
 	}
 }
-
 
 // ## Search Results
 .block-editor-link-control__search-results {
@@ -136,6 +134,15 @@
 	}
 }
 
+// ## Link Settings
+// Links can be set to open in a new window
+.block-editor-link-control__settings {
+	margin: 12px;
+
+	.components-base-control__field {
+		margin: 0;
+	}
+}
 
 // ## Link Preview
 // When clicking an existing link, the preview popover

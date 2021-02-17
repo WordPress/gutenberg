@@ -15,6 +15,7 @@ import { focus } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
@@ -102,6 +103,7 @@ import { ViewerFill } from './viewer-slot';
 function LinkControl( {
 	searchInputPlaceholder,
 	value,
+  settings,
 	onChange = noop,
 	noDirectEntry = false,
 	showSuggestions = true,
@@ -232,6 +234,7 @@ function LinkControl( {
 							/>
 						</LinkControlSearchInput>
 					</div>
+
 					{ errorMessage && (
 						<Notice
 							className="block-editor-link-control__search-error"
@@ -241,6 +244,12 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
+
+          <LinkControlSettingsDrawer
+            value={ value }
+            settings={ settings }
+            onChange={ onChange }
+          />
 				</>
 			) }
 
