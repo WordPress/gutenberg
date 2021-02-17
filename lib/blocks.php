@@ -209,7 +209,7 @@ function gutenberg_maybe_inline_styles() {
 	/**
 	 * The maximum size of inlined styles in bytes.
 	 *
-	 * @param int $total_inline_limit The file-size threshold, in bytes.
+	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
 	 * @return int
 	 */
 	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
