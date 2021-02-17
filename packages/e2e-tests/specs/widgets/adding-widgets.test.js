@@ -253,7 +253,7 @@ describe( 'Widgets screen', () => {
 
 		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
-			'input[type="search"][placeholder="Search for a block"]'
+			'input[type="search"][placeholder="Search"]'
 		);
 		expect(
 			await inserterSearchBox.evaluate(
