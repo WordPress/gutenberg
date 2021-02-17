@@ -80,7 +80,7 @@ export interface Props extends TruncateProps {
 	/**
 	 * Array of search words. String search terms are automatically cast to RegExps unless `highlightEscape` is true.
 	 */
-	highlightSanitize?: import( 'highlight-words-core' ).FindAllArgs[ 'sanitize' ];
+	highlightSanitize?: import('highlight-words-core').FindAllArgs[ 'sanitize' ];
 	/**
 	 * Sets `Text` to have `display: block`.
 	 */
@@ -169,24 +169,24 @@ export interface Props extends TruncateProps {
 	 * Adjusts letter-spacing of the text.
 	 */
 	letterSpacing?: CSSProperties[ 'letterSpacing' ];
-		/**
-	* Letters or words within `Text` can be highlighted using `highlightWords`.
-	*
-	* @example
-	* ```jsx
-	* import { Text } from `@wordpress/components/ui`
-	*
-	* function Example() {
-	*   return (
-	*     <Text highlightWords={["the"]}>
-	*       Where the north wind meets the sea, there's a river full of memory. Sleep,
-	*       my darling, safe and sound, for in this river all is found. In her waters,
-	*       deep and true, lay the answers and a path for you. Dive down deep into her
-	*       sound, but not too far or you'll be drowned
-	*     </Text>
-	*   )
-	* }
-	* ```
-	*/
+	/**
+	 * Letters or words within `Text` can be highlighted using `highlightWords`.
+	 *
+	 * @example
+	 * ```jsx
+	 * import { Text } from `@wordpress/components/ui`
+	 *
+	 * function Example() {
+	 *   return (
+	 *     <Text highlightWords={["the"]}>
+	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+	 *       my darling, safe and sound, for in this river all is found. In her waters,
+	 *       deep and true, lay the answers and a path for you. Dive down deep into her
+	 *       sound, but not too far or you'll be drowned
+	 *     </Text>
+	 *   )
+	 * }
+	 * ```
+	 */
 	highlightWords?: string[];
-};
+}
