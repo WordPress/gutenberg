@@ -614,29 +614,37 @@
  */
 
 .block-editor-block-list__block-selection-button {
-	display: block;
+	display: flex;
 	z-index: z-index(".block-editor-block-list__block-selection-button");
+	// Block UI appearance.
+	box-shadow: 0 0 0 $border-width $gray-900;
+	border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+	background-color: $white;
+
+	font-size: $default-font-size;
+	height: $block-toolbar-height - $border-width - $border-width;
+	padding: 0;
+
+	.components-button.has-icon.block-selection-button_drag-handle {
+		flex-grow: 1;
+		cursor: grab;
+	}
 
 	// The button here has a special style to appear as a toolbar.
 	.components-button {
-		font-size: $default-font-size;
 		height: $block-toolbar-height - $border-width - $border-width;
-		padding: $grid-unit-15 $grid-unit-20;
-
-		// Position this to align with the block toolbar.
-		position: relative;
-		top: -$border-width;
-
-		// Block UI appearance.
-		box-shadow: 0 0 0 $border-width $gray-900;
-		border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-		background-color: $white;
-
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: none;
+			border: none;
 		}
+		padding: 6px;
 	}
+
+	.components-button.block-selection-button_select-button {
+		padding-left: 0;
+	}
+
 }
 
 

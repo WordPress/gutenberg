@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { dragHandle } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -27,12 +28,14 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
+import BlockDraggable from '../block-draggable';
 
 /**
  * Returns true if the user is using windows.
@@ -256,13 +259,33 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		}
 	);
 
+	const dragHandleLabel = __( 'Drag' );
+
 	return (
 		<div className={ classNames }>
+			<BlockDraggable
+				clientIds={ [ clientId ] }
+				cloneClassname="block-editor-block-mover__drag-clone"
+			>
+				{ ( draggableProps ) => (
+					<Button
+						icon={ dragHandle }
+						className="block-selection-button_drag-handle"
+						aria-hidden="true"
+						label={ dragHandleLabel }
+						// Should not be able to tab to drag handle as this
+						// button can only be used with a pointer device.
+						tabIndex="-1"
+						{ ...draggableProps }
+					/>
+				) }
+			</BlockDraggable>
 			<Button
 				ref={ ref }
 				onClick={ () => setNavigationMode( false ) }
 				onKeyDown={ onKeyDown }
 				label={ label }
+				className="block-selection-button_select-button"
 			>
 				<BlockTitle clientId={ clientId } />
 			</Button>
