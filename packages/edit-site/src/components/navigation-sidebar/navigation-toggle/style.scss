@@ -31,7 +31,7 @@
 	z-index: 1;
 
 	// Adds a bottom border to match the header toolbar
-	border-bottom: 1px solid #e0e0e0;
+	border-bottom: 1px solid $gray-200;
 	// Prevents the bottom border from being clipped by border-bottom radius
 	border-radius: 2px 2px 0 0;
 
