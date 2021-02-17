@@ -25,7 +25,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			// Unit test files and their helpers only.
+			// Don't require redundant JSDoc types in TypeScript files.
 			files: [ '**/*.ts', '**/*.tsx' ],
 			rules: {
 				'jsdoc/require-param-type': 'off',
