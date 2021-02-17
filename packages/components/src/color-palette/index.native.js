@@ -105,7 +105,8 @@ function ColorPalette( {
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		const isWithinColors = activeColor && colors.includes( activeColor );
+		const isWithinColors =
+			activeColor && colors && colors.includes( activeColor );
 		if ( activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
