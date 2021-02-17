@@ -16,6 +16,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
     - name: Cache node modules
       uses: actions/cache@v2
       env:
@@ -28,11 +33,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
 
     - name: Npm install
       run: |
@@ -56,5 +56,5 @@ jobs:
         IFS='.' read -r -a WP_VERSION_ARRAY <<< "$WP_VERSION"
         WP_BRANCH="wp/${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
         ./bin/plugin/cli.js perf --ci $WP_BRANCH $PREVIOUS_RELEASE_BRANCH $CURRENT_RELEASE_BRANCH
-      
+
 

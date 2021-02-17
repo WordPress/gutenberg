@@ -19,6 +19,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Use Node.js ${{ matrix.node }}.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+
     - name: Cache node modules
       uses: actions/cache@v2
       env:
@@ -31,11 +36,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
-    - name: Use Node.js ${{ matrix.node }}.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node }}
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret
@@ -59,6 +59,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
     - name: Cache node modules
       uses: actions/cache@v2
       env:
@@ -71,11 +76,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
 
     - name: Npm install and build
       run: |
@@ -107,6 +107,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
     - name: Cache node modules
       uses: actions/cache@v2
       env:
@@ -119,11 +124,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret

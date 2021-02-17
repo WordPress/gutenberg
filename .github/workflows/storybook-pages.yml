@@ -14,6 +14,11 @@ jobs:
       with:
         ref: master
 
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
     - name: Cache node modules
       uses: actions/cache@v2
       env:
@@ -26,11 +31,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
-    - name: Setup Node
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14.x'
 
     - name: Install Dependencies
       run: npm ci

@@ -19,6 +19,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -31,11 +36,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.x
 
       - name: Build Gutenberg plugin ZIP file
         run: ./bin/build-plugin-zip.sh
