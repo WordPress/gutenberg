@@ -106,8 +106,12 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 		: () => {};
 	onProgress( 0 );
 
+	const progressHandler = ( { progress } ) => {
+		onProgress( progress / 100 );
+	};
+
 	log( 'Cloning or getting the repo.' );
-	const git = SimpleGit();
+	const git = SimpleGit( { progress: progressHandler } );
 
 	const isRepo =
 		fs.existsSync( source.clonePath ) &&
