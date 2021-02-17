@@ -106,6 +106,29 @@ export default function Header( {
 									>
 										{ __( 'Create a new menu' ) }
 									</MenuItem>
+									{ isAddNewMenuModalVisible && (
+										<Modal
+											title={ __( 'Create a new menu' ) }
+											onRequestClose={ () =>
+												setIsAddNewModalVisible( false )
+											}
+										>
+											<AddMenu
+												className="edit-navigation-header__add-menu"
+												menus={ menus }
+												onCreate={ ( menuId ) => {
+													setIsAddNewModalVisible(
+														false
+													);
+													onClose();
+													onSelectMenu( menuId );
+												} }
+												helpText={ __(
+													'A short descriptive name for your menu.'
+												) }
+											/>
+										</Modal>
+									) }
 								</MenuGroup>
 							</>
 						) }
@@ -125,27 +148,6 @@ export default function Header( {
 						) }
 						renderContent={ () => <ManageLocations /> }
 					/>
-
-					{ isAddNewMenuModalVisible && (
-						<Modal
-							title={ __( 'Create a new menu' ) }
-							onRequestClose={ () =>
-								setIsAddNewModalVisible( false )
-							}
-						>
-							<AddMenu
-								className="edit-navigation-header__add-menu"
-								menus={ menus }
-								onCreate={ ( menuId ) => {
-									setIsAddNewModalVisible( false );
-									onSelectMenu( menuId );
-								} }
-								helpText={ __(
-									'A short descriptive name for your menu.'
-								) }
-							/>
-						</Modal>
-					) }
 
 					<SaveButton navigationPost={ navigationPost } />
 
