@@ -17,6 +17,7 @@ import { store as viewportStore } from '@wordpress/viewport';
  * Internal dependencies
  */
 import ComplementaryAreaHeader from '../complementary-area-header';
+import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
@@ -90,11 +91,13 @@ function ComplementaryArea( {
 	isPinnable = true,
 	panelClassName,
 	scope,
+	name,
 	smallScreenTitle,
 	title,
 	toggleShortcut,
 	isActiveByDefault,
 	showIconLabels = false,
+	__unstableInitSource,
 } ) {
 	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
@@ -149,6 +152,16 @@ function ComplementaryArea( {
 						isTertiary={ showIconLabels }
 					/>
 				</PinnedItems>
+			) }
+			{ isPinnable && (
+				<ComplementaryAreaMoreMenuItem
+					__unstableInitSource={ __unstableInitSource }
+					target={ name }
+					scope={ scope }
+					icon={ icon }
+				>
+					{ title }
+				</ComplementaryAreaMoreMenuItem>
 			) }
 			{ isActive && (
 				<ComplementaryAreaFill

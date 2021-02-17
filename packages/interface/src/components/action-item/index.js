@@ -7,6 +7,7 @@ import { isEmpty, noop } from 'lodash';
  * WordPress dependencies
  */
 import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
+import { Children } from '@wordpress/element';
 
 function ActionItemSlot( {
 	name,
@@ -22,16 +23,44 @@ function ActionItemSlot( {
 			bubblesVirtually={ bubblesVirtually }
 			fillProps={ { as: Item, ...fillProps } }
 		>
-			{ ( fills ) =>
-				! isEmpty( fills ) && (
-					<Container { ...props }>{ fills }</Container>
-				)
-			}
+			{ ( fills ) => {
+				//
+				const children = Children.toArray( fills );
+				if ( isEmpty( children ) ) {
+					return null;
+				}
+				const initializedByPlugins = [];
+				Children.forEach(
+					children,
+					( {
+						props: { __unstableInitSource, __unstableTarget },
+					} ) => {
+						if (
+							__unstableTarget &&
+							__unstableInitSource === 'plugin'
+						) {
+							initializedByPlugins.push( __unstableTarget );
+						}
+					}
+				);
+				Children.forEach( children, ( child ) => {
+					if (
+						child.props.__unstableInitSource === 'sidebar' &&
+						initializedByPlugins.includes(
+							child.props.__unstableTarget
+						)
+					) {
+						return null;
+					}
+					return child;
+				} );
+				return <Container { ...props }>{ children }</Container>;
+			} }
 		</Slot>
 	);
 }
 
-function ActionItem( { name, as, onClick, ...props } ) {
+function ActionItem( { name, as, __unstableTarget, onClick, ...props } ) {
 	return (
 		<Fill name={ name }>
 			{ ( fillProps ) => {
@@ -39,6 +68,7 @@ function ActionItem( { name, as, onClick, ...props } ) {
 				const Item = as || fpAs || Button;
 				return (
 					<Item
+						__unstableTarget={ __unstableTarget }
 						onClick={
 							onClick || fpOnClick
 								? ( ...args ) => {

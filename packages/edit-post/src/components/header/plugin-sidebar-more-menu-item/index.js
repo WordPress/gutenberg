@@ -53,6 +53,10 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
 
 export default function PluginSidebarMoreMenuItem( props ) {
 	return (
-		<ComplementaryAreaMoreMenuItem scope="core/edit-post" { ...props } />
+		<ComplementaryAreaMoreMenuItem
+			__unstableInitSource="plugin"
+			scope="core/edit-post"
+			{ ...props }
+		/>
 	);
 }
