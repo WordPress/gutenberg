@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean } from '@storybook/addon-knobs';
+import { boolean, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,7 @@ const continents = [
 const FormTokenFieldExample = () => {
 	const showHowTo = boolean( 'Show how to instructions', true );
 	const expandOnFocus = boolean( 'Expand on focus', false );
+	const placeholder = text( 'Placeholder', '' );
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 
 	return (
@@ -40,6 +41,7 @@ const FormTokenFieldExample = () => {
 			label="Type a continent"
 			expandOnFocus={ expandOnFocus }
 			showHowTo={ showHowTo }
+			placeholder={ placeholder }
 		/>
 	);
 };
@@ -51,6 +53,7 @@ export const _default = () => {
 const FormTokenFieldAsyncExample = () => {
 	const showHowTo = boolean( 'Show how to instructions', true );
 	const expandOnFocus = boolean( 'Expand on focus', false );
+	const placeholder = text( 'Placeholder', '' );
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 	const [ availableContinents, setAvailableContinents ] = useState( [] );
 	const searchContinents = ( input ) => {
@@ -73,6 +76,7 @@ const FormTokenFieldAsyncExample = () => {
 			label="Type a continent"
 			expandOnFocus={ expandOnFocus }
 			showHowTo={ showHowTo }
+			placeholder={ placeholder }
 		/>
 	);
 };

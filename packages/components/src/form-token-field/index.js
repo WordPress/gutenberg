@@ -574,6 +574,7 @@ class FormTokenField extends Component {
 			autoCapitalize,
 			autoComplete,
 			maxLength,
+			placeholder,
 			value,
 			instanceId,
 		} = this.props;
@@ -582,6 +583,7 @@ class FormTokenField extends Component {
 			instanceId,
 			autoCapitalize,
 			autoComplete,
+			placeholder: value.length === 0 ? placeholder : '',
 			ref: this.bindInput,
 			key: 'input',
 			disabled: this.props.disabled,
