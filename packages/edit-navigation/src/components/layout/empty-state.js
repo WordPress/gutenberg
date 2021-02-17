@@ -12,7 +12,7 @@ export default function EmptyState() {
 	return (
 		<Card className="edit-navigation-empty-state">
 			<CardBody>
-				<AddMenu showHeading />
+				<AddMenu showHeading focusOnMount />
 			</CardBody>
 		</Card>
 	);

@@ -20,6 +20,7 @@ export default function AddMenu( {
 	menus,
 	onCreate,
 	showHeading = false,
+	focusOnMount = false,
 } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
@@ -85,7 +86,7 @@ export default function AddMenu( {
 				// Disable reason: it should focus.
 				//
 				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus
+				autoFocus={ focusOnMount }
 				label={ __( 'Menu name' ) }
 				value={ menuName }
 				onChange={ setMenuName }
