@@ -17,7 +17,6 @@ import {
 	MenuItemsChoice,
 	Popover,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 
 /**
@@ -34,8 +33,6 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
-	const instanceId = useInstanceId( Header );
-	const addNewMenuHeadingId = `edit-navigation-header__add-new-menu-heading-${ instanceId }`;
 	const [ isAddNewMenuModalVisible, setIsAddNewModalVisible ] = useState(
 		false
 	);
@@ -113,7 +110,6 @@ export default function Header( {
 							</>
 						) }
 					</DropdownMenu>
-					{ /* */ }
 
 					<Dropdown
 						contentClassName="edit-navigation-header__manage-locations"
@@ -140,9 +136,10 @@ export default function Header( {
 							<AddMenu
 								className="edit-navigation-header__add-menu"
 								menus={ menus }
-								onCreate={ onSelectMenu }
-								headingTag="h1"
-								headingId={ addNewMenuHeadingId }
+								onCreate={ ( menuId ) => {
+									setIsAddNewModalVisible( false );
+									onSelectMenu( menuId );
+								} }
 							/>
 						</Modal>
 					) }
