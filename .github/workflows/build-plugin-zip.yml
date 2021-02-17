@@ -91,12 +91,3 @@ jobs:
           asset_path: ./gutenberg.zip
           asset_name: gutenberg.zip
           asset_content_type: application/zip
-
-      - name: Publish Release
-        run: |
-          curl \
-            --request PATCH \
-            --url https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
-            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
-            --header "Accept: application/vnd.github.v3+json" \
-            --data-raw '{"draft":false}'
