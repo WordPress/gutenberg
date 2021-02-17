@@ -402,7 +402,11 @@ class FormTokenField extends Component {
 	}
 
 	addNewToken( token ) {
-		const { expandOnFocus } = this.props;
+		const { expandOnFocus, validateInput } = this.props;
+		if ( ! validateInput( token ) ) {
+			this.props.speak( this.props.messages.invalid, 'assertive' );
+			return;
+		}
 		this.addNewTokens( [ token ] );
 		this.props.speak( this.props.messages.added, 'assertive' );
 
@@ -702,7 +706,9 @@ FormTokenField.defaultProps = {
 		added: __( 'Item added.' ),
 		removed: __( 'Item removed.' ),
 		remove: __( 'Remove item' ),
+		invalid: __( 'Invalid item' ),
 	},
+	validateInput: () => true,
 	showHowTo: true,
 };
 
