@@ -99,7 +99,7 @@ export default function Header( {
 								</MenuGroup>
 								<MenuGroup hideSeparator>
 									<MenuItem
-										isTertiary
+										isPrimary
 										onClick={ () =>
 											setIsAddNewModalVisible( true )
 										}
