@@ -19,9 +19,20 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 	const handleResize = debounce( () => {
 		const { bottom } = navigationElement.getBoundingClientRect();
 
+		// Create an array of the Navigation DOM Element's children.
 		const items = Array.from( navigationElement.childNodes );
+		/*
+			Create a map with each innerBlock's visibility by block id
+		*/
 		const visibilityMap = items.reduce( ( result, el ) => {
+			/*
+				Determine whether an element is hidden based on its position
+				relative to the bottom of the navigation element; if an element
+				is below the bottom, it means that the browser has determined that
+				the element doesn't fit in the screen horizontally.
+			*/
 			const isHidden = el.getBoundingClientRect().y >= bottom;
+			// Get the clientId for each block from their DOM Element's `id` attribute
 			const [ , blockId ] = el.id.split( 'block-' );
 
 			return {
@@ -29,6 +40,10 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 				[ blockId ]: isHidden,
 			};
 		}, {} );
+		/*
+			Determine whether or not the Navigation Element has any
+			wrapped (hidden) elements.
+		*/
 		const isWrapping = Object.values( visibilityMap ).some(
 			( item ) => item.isHidden
 		);
