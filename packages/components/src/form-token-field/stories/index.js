@@ -29,6 +29,7 @@ const continents = [
 
 const FormTokenFieldExample = () => {
 	const showHowTo = boolean( 'Show how to instructions', true );
+	const expandOnFocus = boolean( 'Expand on focus', false );
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 
 	return (
@@ -37,6 +38,7 @@ const FormTokenFieldExample = () => {
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			label="Type a continent"
+			expandOnFocus={ expandOnFocus }
 			showHowTo={ showHowTo }
 		/>
 	);
@@ -48,6 +50,7 @@ export const _default = () => {
 
 const FormTokenFieldAsyncExample = () => {
 	const showHowTo = boolean( 'Show how to instructions', true );
+	const expandOnFocus = boolean( 'Expand on focus', false );
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 	const [ availableContinents, setAvailableContinents ] = useState( [] );
 	const searchContinents = ( input ) => {
@@ -68,6 +71,7 @@ const FormTokenFieldAsyncExample = () => {
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			onInputChange={ searchContinents }
 			label="Type a continent"
+			expandOnFocus={ expandOnFocus }
 			showHowTo={ showHowTo }
 		/>
 	);

@@ -108,9 +108,14 @@ class FormTokenField extends Component {
 	}
 
 	onFocus( event ) {
+		const { expandOnFocus } = this.props;
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
-			this.setState( { isActive: true } );
+			const newState = { isActive: true };
+			if ( expandOnFocus ) {
+				newState.isExpanded = true;
+			}
+			this.setState( newState );
 		} else {
 			/*
 			 * Otherwise, focus is on one of the token "remove" buttons and we
@@ -397,6 +402,7 @@ class FormTokenField extends Component {
 	}
 
 	addNewToken( token ) {
+		const { expandOnFocus } = this.props;
 		this.addNewTokens( [ token ] );
 		this.props.speak( this.props.messages.added, 'assertive' );
 
@@ -404,7 +410,7 @@ class FormTokenField extends Component {
 			incompleteTokenValue: '',
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
-			isExpanded: false,
+			isExpanded: ! expandOnFocus,
 		} );
 
 		if ( this.state.isActive ) {
@@ -491,6 +497,7 @@ class FormTokenField extends Component {
 	}
 
 	updateSuggestions( resetSelectedSuggestion = true ) {
+		const { expandOnFocus } = this.props;
 		const { incompleteTokenValue } = this.state;
 
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
@@ -500,7 +507,9 @@ class FormTokenField extends Component {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
 		const newState = {
-			isExpanded: inputHasMinimumChars && hasMatchingSuggestions,
+			isExpanded:
+				expandOnFocus ||
+				( inputHasMinimumChars && hasMatchingSuggestions ),
 		};
 		if ( resetSelectedSuggestion ) {
 			newState.selectedSuggestionIndex = -1;
