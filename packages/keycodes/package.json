@@ -23,7 +23,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
+		"@babel/runtime": "^7.12.5",
 		"@wordpress/i18n": "file:../i18n",
 		"lodash": "^4.17.19"
 	},

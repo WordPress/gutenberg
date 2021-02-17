@@ -30,7 +30,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
+		"@babel/runtime": "^7.12.5",
 		"jest-matcher-utils": "^25.3.0",
 		"lodash": "^4.17.19"
 	},
