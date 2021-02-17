@@ -162,6 +162,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.
  * @param {number} total The total number of blocks.
+ * @param {string} parentTitle In the event of a child block, this param gets the title of the parent block.
  *
  * @return {string} The block label.
  */
@@ -170,7 +171,8 @@ export function getAccessibleBlockLabel(
 	attributes,
 	position,
 	direction = 'vertical',
-	total
+	total,
+	parentTitle
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
 	const { title } = blockType;
@@ -203,19 +205,21 @@ export function getAccessibleBlockLabel(
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block label.. */
-				__( 'Column %1$d of %2$d. %3$s' ),
+				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
+				__( 'Column %1$d of %2$d. Block child of %3$s. %4$s' ),
 				position,
 				total,
+				parentTitle,
 				label
 			);
 		}
 
 		return sprintf(
-			/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. */
-			__( 'Column %1$d of %2$d' ),
+			/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. */
+			__( 'Column %1$d of %2$d. Block child of %3$s' ),
 			position,
-			total
+			total,
+			parentTitle
 		);
 	}
 

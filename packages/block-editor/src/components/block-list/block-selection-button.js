@@ -255,22 +255,22 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}
 
 	const blockType = getBlockType( name );
+	let parentTitle;
 	const blockInformation = useBlockDisplayInformation(
 		getBlockRootClientId( clientId )
 	);
-	if ( blockInformation !== null && orientation === 'horizontal' ) {
-		const parentTitle = blockInformation.title
+	if ( blockInformation !== null ) {
+		parentTitle = blockInformation.title
 			? blockInformation.title
 			: undefined;
-		// eslint-disable-next-line no-console
-		console.log( parentTitle );
 	}
 	const label = getAccessibleBlockLabel(
 		blockType,
 		attributes,
 		index + 1,
 		orientation,
-		total
+		total,
+		parentTitle
 	);
 
 	const classNames = classnames(
