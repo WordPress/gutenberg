@@ -146,7 +146,8 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await siteEditor.visit();
-		await clickTemplateItem( 'Template Parts', 'header' );
+		// TODO: Change General to Headers once TT1 blocks categorise the template parts
+		await clickTemplateItem( [ 'Template Parts', 'General' ], 'header' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'
