@@ -50,6 +50,8 @@ To register a new block type using metadata that can be shared between codebase 
 }
 ```
 
+The same file is also used when [submitting block to Block Directory](/docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md).
+
 ## Server-side registration
 
 There is also [`register_block_type_from_metadata`](https://developer.wordpress.org/reference/functions/register_block_type_from_metadata/) function that aims to simplify the block type registration on the server from metadata stored in the `block.json` file.
