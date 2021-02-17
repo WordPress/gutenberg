@@ -103,16 +103,22 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		</BlockControls>
 	);
 
+	const mergeWithBorderStyle = ( style ) => {
+		return { ...style, ...styles.border };
+	};
+
 	const renderTextField = () => {
 		const inputStyle =
-			buttonPosition !== 'button-inside'
-				? styles.searchTextInput_buttonOutside
-				: styles.searchTextInput;
+			buttonPosition === 'button-inside'
+				? styles.searchTextInput
+				: mergeWithBorderStyle( styles.searchTextInput );
 
 		return (
 			<TextInput
 				className="wp-block-search__input"
 				style={ inputStyle }
+				numberOfLines={ 1 }
+				ellipsizeMode="tail" // currently only works on ios
 				label={ null }
 				value={ placeholder }
 				placeholder={
@@ -156,7 +162,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 	const searchBarStyle =
 		buttonPosition === 'button-inside'
-			? styles.searchBarContainer_buttonInside
+			? mergeWithBorderStyle( styles.searchBarContainer )
 			: styles.searchBarContainer;
 
 	return (

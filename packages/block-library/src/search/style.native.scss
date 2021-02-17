@@ -10,27 +10,16 @@
 	width: 100%;
 }
 
-.searchBarContainer_buttonInside {
-	flex: 1;
-	flex-direction: row;
-	justify-content: flex-start;
-	width: 100%;
-	padding: $grid-unit-05;
+.border {
+	border: 1px solid $gray-600;
 	border-width: $border-width;
-	border-color: #ccc;
-	border-style: solid;
+	padding: $grid-unit-05;
 }
 
 .searchTextInput {
 	flex-grow: 1;
-}
-
-.searchTextInput_buttonOutside {
-	flex: 1;
-	flex-direction: row;
-	border: 1px solid $gray-600;
-	border-width: $border-width;
-	padding: $grid-unit-10;
+	flex-shrink: 1;
+	padding: $grid-unit-05;
 }
 
 .searchLabel {
@@ -38,6 +27,7 @@
 }
 
 .buttonContainer {
+	flex-shrink: 1;
 	background: #f7f7f7;
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-10;
