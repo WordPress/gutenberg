@@ -61,6 +61,8 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 		if ( null !== defaultView ) {
 			defaultView.addEventListener( 'resize', handleResize );
 
+			handleResize();
+
 			return () =>
 				defaultView.removeEventListener( 'resize', handleResize );
 		}
