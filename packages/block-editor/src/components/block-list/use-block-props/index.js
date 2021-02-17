@@ -103,10 +103,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index
 	);
 
-	const isHovered = useIsHovered( ref );
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
-	const mergedRefs = useMergeRefs( [ ref, useEventHandlers( clientId ) ] );
+	const mergedRefs = useMergeRefs( [
+		ref,
+		useEventHandlers( clientId ),
+		useIsHovered(),
+	] );
 
 	return {
 		...wrapperProps,
@@ -124,7 +127,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			props.className,
 			wrapperProps.className,
 			blockMovingModeClassNames,
-			{ 'is-hovered': isHovered }
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};
