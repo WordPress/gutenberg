@@ -178,6 +178,8 @@ export function getAccessibleBlockLabel(
 	const { title } = blockType;
 	const label = getBlockLabel( blockType, attributes, 'accessibility' );
 	const hasPosition = position !== undefined;
+	const parentTitleOutput =
+		parentTitle !== undefined ? ` Child of ${ parentTitle } block.` : '';
 
 	// getBlockLabel returns the block title as a fallback when there's no label,
 	// if it did return the title, this function needs to avoid adding the
@@ -188,38 +190,40 @@ export function getAccessibleBlockLabel(
 	if ( hasPosition && direction === 'vertical' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The block label.. */
-				__( '%1$d of %2$d. %3$s' ),
+				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. 4: The block label.. */
+				__( '%1$d of %2$d.%3$s %4$s' ),
 				position,
 				total,
+				parentTitleOutput,
 				label
 			);
 		}
 
 		return sprintf(
-			/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. */
-			__( '%1$d of %2$d' ),
+			/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. */
+			__( '%1$d of %2$d.%3$s' ),
 			position,
-			total
+			total,
+			parentTitleOutput
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
 			return sprintf(
 				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
-				__( 'Column %1$d of %2$d. Child of %3$s block. %4$s' ),
+				__( 'Column %1$d of %2$d.%3$s %4$s' ),
 				position,
 				total,
-				parentTitle,
+				parentTitleOutput,
 				label
 			);
 		}
 
 		return sprintf(
 			/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. */
-			__( 'Column %1$d of %2$d. Child of %3$s block' ),
+			__( 'Column %1$d of %2$d.%3$s' ),
 			position,
 			total,
-			parentTitle
+			parentTitleOutput
 		);
 	}
 
