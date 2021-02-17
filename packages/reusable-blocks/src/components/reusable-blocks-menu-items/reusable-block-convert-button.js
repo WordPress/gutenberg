@@ -130,6 +130,8 @@ export default function ReusableBlockConvertButton( {
 								onSubmit={ ( event ) => {
 									event.preventDefault();
 									onConvert( title );
+									setIsModalOpen( false );
+									setTitle( '' );
 									onClose();
 								} }
 							>
