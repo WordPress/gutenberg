@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, find, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -58,20 +58,18 @@ function getTemplateLocation( template ) {
 
 function getUnusedTemplates( templates, showOnFront ) {
 	const unusedTemplates = [];
-	const templateSlugs = templates.map( ( { slug } ) => slug );
 
 	// `home` template is unused if it is superseded by `front-page`
 	// or show on front is set to show a page rather than blog posts.
-	const homeTemplateExists = templateSlugs.includes( 'home' );
+	const homeTemplateExists = some( templates, { slug: 'home' } );
 	if ( homeTemplateExists && showOnFront !== 'posts' ) {
-		unusedTemplates.push(
-			templates.find( ( { slug } ) => slug === 'home' )
-		);
+		unusedTemplates.push( find( templates, { slug: 'home' } ) );
 	}
 
-	const usedTemplateSlugs = templateSlugs.filter(
-		( slug ) => ! unusedTemplates.find( ( template ) => slug === template )
+	const usedTemplates = templates.filter(
+		( template ) => ! unusedTemplates.includes( template )
 	);
+	const usedTemplateSlugs = map( usedTemplates, 'slug' );
 	const supersededTemplates = templates.filter( ( { slug } ) =>
 		isTemplateSuperseded( slug, usedTemplateSlugs )
 	);
@@ -79,7 +77,7 @@ function getUnusedTemplates( templates, showOnFront ) {
 	return [ ...supersededTemplates, ...unusedTemplates ];
 }
 
-function getTemplatesLocation( templates ) {
+function getTemplatesLocationMap( templates ) {
 	return templates.reduce( ( obj, template ) => {
 		obj[ template.slug ] = getTemplateLocation( template );
 		return obj;
@@ -94,37 +92,37 @@ export default function TemplatesMenu() {
 
 	const { templates, showOnFront } = useSelect( ( select ) => {
 		const { getEntityRecords, getEditedEntityRecord } = select( coreStore );
-		const _templates = getEntityRecords( 'postType', 'wp_template', {
-			per_page: -1,
-		} );
-		const _showOnFront = getEditedEntityRecord( 'root', 'site' )
-			.show_on_front;
-		return { templates: _templates, showOnFront: _showOnFront };
+		return {
+			templates: getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+			} ),
+			showOnFront: getEditedEntityRecord( 'root', 'site' ).show_on_front,
+		};
 	}, [] );
+
 	const templatesWithLocation = useMemo( () => {
 		if ( ! templates ) {
 			return null;
 		}
 
 		const unusedTemplates = getUnusedTemplates( templates, showOnFront );
-		const templateLocations = getTemplatesLocation( templates );
+		const templateLocations = getTemplatesLocationMap( templates );
 
-		return templates.map( ( template ) => {
-			return {
-				template,
-				location: unusedTemplates.some(
-					( t ) => t.slug === template.slug
-				)
-					? MENU_TEMPLATES_UNUSED
-					: templateLocations[ template.slug ],
-			};
-		} );
+		return templates.map( ( template ) => ( {
+			template,
+			location: find( unusedTemplates, { slug: template.slug } )
+				? MENU_TEMPLATES_UNUSED
+				: templateLocations[ template.slug ],
+		} ) );
 	}, [ templates ] );
 
-	const topLevelTemplates =
-		templatesWithLocation
-			?.filter( ( { location } ) => location === MENU_TEMPLATES )
-			?.map( ( { template } ) => template ) ?? [];
+	const topLevelTemplates = useMemo(
+		() =>
+			templatesWithLocation
+				?.filter( ( { location } ) => location === MENU_TEMPLATES )
+				?.map( ( { template } ) => template ) ?? [],
+		[ templatesWithLocation ]
+	);
 
 	return (
 		<NavigationMenu
