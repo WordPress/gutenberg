@@ -74,7 +74,7 @@ export default function Header( {
 						icon={ null }
 						toggleProps={ {
 							showTooltip: false,
-							children: __( 'Select menu' ),
+							children: __( 'Switch menu' ),
 							isTertiary: true,
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
