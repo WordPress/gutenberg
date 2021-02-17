@@ -49,6 +49,7 @@ function EditInPlaceControl( {
 					ref={ inputRef }
 					className={ 'components-edit-in-place-control__input' }
 					value={ value }
+					size={ String( value ).length }
 					onChange={ ( event ) => {
 						const _value = event.target.value;
 						setValue( event.target.value );
