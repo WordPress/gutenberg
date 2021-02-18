@@ -137,20 +137,22 @@ function ComplementaryArea( {
 
 	return (
 		<>
-			{ isPinned && isPinnable && (
+			{ isPinnable && (
 				<PinnedItems scope={ scope }>
-					<ComplementaryAreaToggle
-						scope={ scope }
-						identifier={ identifier }
-						isPressed={
-							isActive && ( ! showIconLabels || isLarge )
-						}
-						aria-expanded={ isActive }
-						label={ title }
-						icon={ showIconLabels ? check : icon }
-						showTooltip={ ! showIconLabels }
-						isTertiary={ showIconLabels }
-					/>
+					{ isPinned && (
+						<ComplementaryAreaToggle
+							scope={ scope }
+							identifier={ identifier }
+							isPressed={
+								isActive && ( ! showIconLabels || isLarge )
+							}
+							aria-expanded={ isActive }
+							label={ title }
+							icon={ showIconLabels ? check : icon }
+							showTooltip={ ! showIconLabels }
+							isTertiary={ showIconLabels }
+						/>
+					) }
 				</PinnedItems>
 			) }
 			{ __unstableInitSource !== 'core' && isPinnable && (
