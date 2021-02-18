@@ -35,6 +35,11 @@ add_filter(
 	10,
 	2
 );
+add_filter( 'github_updater_set_options',
+	function () {
+		return array( 'current_branch_gutenberg' => 'gutenberg-nightly' );
+	}
+);
 add_filter( 'github_updater_no_release_asset_branches', '__return_true' );
 // End GitHub Updater filters.
 
