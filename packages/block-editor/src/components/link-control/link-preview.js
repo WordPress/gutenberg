@@ -28,9 +28,14 @@ export default function LinkPreview( { value, onEditClick } ) {
 				'is-current': true,
 			} ) }
 		>
-			<span className="block-editor-link-control__link-current-url">
-				{ displayURL }
-			</span>
+			<Button
+				target="_blank"
+				label={ __( 'Visit URL in new tab' ) }
+				className="block-editor-link-control__link-current-url"
+				href={ value.url }
+			>
+				<span>{ displayURL }</span>
+			</Button>
 
 			<Button
 				isPrimary
@@ -39,17 +44,6 @@ export default function LinkPreview( { value, onEditClick } ) {
 				className="block-editor-link-control__link-edit"
 			>
 				{ __( 'Edit' ) }
-			</Button>
-
-			<Button
-				isTertiary
-				target="_blank"
-				label={ __( 'Visit URL' ) }
-				showToolTip={ true }
-				className="block-editor-link-control__link-visit"
-				href={ value.url }
-			>
-				{ __( 'Visit' ) }
 			</Button>
 
 			<ViewerSlot fillProps={ value } />

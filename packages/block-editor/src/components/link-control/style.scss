@@ -194,26 +194,21 @@
 
 // ## Link Preview
 // When clicking an existing link, the preview popover
-// shows the current link with actions to edit and visit.
+// shows the current link and a button to edit.
 .block-editor-link-control__link {
 	display: flex;
 	align-items: center;
 }
 
 .block-editor-link-control__link-current-url {
-	margin: 0 $grid-unit-20 0 $grid-unit-15;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	display: inline-block;
-	max-width: 280px;
-	cursor: default;
-}
+	margin-right: $grid-unit-10;
 
-.block-editor-link-control__link-edit {
-	margin-right: $grid-unit-05;
-}
-
-.block-editor-link-control__link-visit.components-button.is-tertiary {
-	padding: ($grid-unit-15 / 2) $grid-unit-15;
+	// An extra span is required as buttons normally display
+	// with inline-flex, but this doesn't support the truncation.
+	span {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 280px;
+	}
 }
