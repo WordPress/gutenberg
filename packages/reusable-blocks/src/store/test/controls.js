@@ -30,7 +30,7 @@ describe( 'reusable blocks effects', () => {
 		} );
 
 		registerBlockType( 'core/block', {
-			title: 'Reusable Block',
+			title: 'Reusable block',
 			category: 'text',
 			save: () => null,
 			attributes: {
@@ -74,7 +74,7 @@ describe( 'reusable blocks effects', () => {
 				expect.objectContaining( {
 					content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 					status: 'publish',
-					title: 'Untitled Reusable Block',
+					title: 'Untitled Reusable block',
 				} )
 			);
 			expect( replaceBlocks ).toHaveBeenCalledWith(

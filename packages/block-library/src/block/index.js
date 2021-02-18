@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Reusable Block', 'block title' ),
+	title: _x( 'Reusable block', 'block title' ),
 	description: __(
 		'Create and save content to reuse across your site. Update the block, and the changes apply everywhere it’s used.'
 	),
