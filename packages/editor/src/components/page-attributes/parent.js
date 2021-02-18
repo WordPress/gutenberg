@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -25,7 +26,7 @@ import { buildTermsTree } from '../../utils/terms';
 
 function getTitle( post ) {
 	return post?.title?.rendered
-		? post.title.rendered
+		? decodeEntities( post.title.rendered )
 		: `#${ post.id } (${ __( 'no title' ) })`;
 }
 
