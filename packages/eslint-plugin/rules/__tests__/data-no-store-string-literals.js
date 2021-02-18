@@ -37,6 +37,21 @@ const valid = [
 	`import { controls as controlsAlias } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; controlsAlias.resolveSelect( store );`,
 ];
 
+const createSuggestionTestCase = ( code, output ) => ( {
+	code,
+	errors: [
+		{
+			suggestions: [
+				{
+					desc:
+						'Replace literal with store definition. Import store if neccessary.',
+					output,
+				},
+			],
+		},
+	],
+} );
+
 const invalid = [
 	// Callback functions
 	`import { createRegistrySelector } from '@wordpress/data'; createRegistrySelector(( select ) => { select( 'core' ); });`,
@@ -57,6 +72,50 @@ const invalid = [
 	`import { controls } from '@wordpress/data'; controls.dispatch( 'core' );`,
 	`import { controls } from '@wordpress/data'; controls.resolveSelect( 'core' );`,
 	`import { controls as controlsAlias } from '@wordpress/data'; controlsAlias.resolveSelect( 'core' );`,
+
+	// Direct function calls suggestions
+	// Replace core with coreStore and import coreStore
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; select( 'core' );`,
+		`import { select } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; select( coreStore );`
+	),
+	// Replace core with coreStore. A @wordpress/core-data already exists, so it should append the import to that one.
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; import { something } from '@wordpress/core-data'; select( 'core' );`,
+		`import { select } from '@wordpress/data'; import { something,store as coreStore } from '@wordpress/core-data'; select( coreStore );`
+	),
+	// Replace core with coreStore. A @wordpress/core-data already exists, so it should append the import to that one.
+	// This time there is a comma after the import.
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; import { something, } from '@wordpress/core-data'; select( 'core' );`,
+		`import { select } from '@wordpress/data'; import { something,store as coreStore, } from '@wordpress/core-data'; select( coreStore );`
+	),
+	// Replace core with coreStore. Store import already exists. It shouldn't modify the import, just replace the literal with the store definition.
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; select( 'core' );`,
+		`import { select } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; select( coreStore );`
+	),
+	// Replace core with coreStore. There are internal and WordPress dependencies.
+	// It should append the import after the last WordPress dependency import.
+	createSuggestionTestCase(
+		`import { a } from './a'; import { select } from '@wordpress/data'; import { b } from './b'; select( 'core' );`,
+		`import { a } from './a'; import { select } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; import { b } from './b'; select( coreStore );`
+	),
+	// Replace block-editor with blockEditorStore
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; select( 'core/block-editor' );`,
+		`import { select } from '@wordpress/data';\nimport { store as blockEditorStore } from '@wordpress/block-editor'; select( blockEditorStore );`
+	),
+	// Replace notices with noticesStore
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; select( 'core/notices' );`,
+		`import { select } from '@wordpress/data';\nimport { store as noticesStore } from '@wordpress/notices'; select( noticesStore );`
+	),
+	// Replace edit-post with editPostStore
+	createSuggestionTestCase(
+		`import { select } from '@wordpress/data'; select( 'core/edit-post' );`,
+		`import { select } from '@wordpress/data';\nimport { store as editPostStore } from '@wordpress/edit-post'; select( editPostStore );`
+	),
 ];
 const errors = [
 	{
@@ -66,5 +125,7 @@ const errors = [
 
 ruleTester.run( 'data-no-store-string-literals', rule, {
 	valid: valid.map( ( code ) => ( { code } ) ),
-	invalid: invalid.map( ( code ) => ( { code, errors } ) ),
+	invalid: invalid.map( ( code ) =>
+		typeof code === 'string' ? { code, errors } : code
+	),
 } );

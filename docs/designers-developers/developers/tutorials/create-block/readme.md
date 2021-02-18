@@ -34,3 +34,4 @@ The create a block tutorials breaks down to the following sections.
 4. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
 5. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
 6. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)
+7. [Share your Block with the World](/docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md)
