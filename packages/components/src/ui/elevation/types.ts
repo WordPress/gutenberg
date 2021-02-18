@@ -28,23 +28,6 @@ export type Props = {
 	/**
 	 * Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
 	 * In the example below, `isInteractive` is activated to give a better sense of depth.
-	 *
-	 * @example
-	 * ```jsx
-	 * import { Elevation, Surface, Text, View } from `@wp-g2/components`
-	 * import { ui } from `@wp-g2/styles`
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <View css={[ui.padding(5)]}>
-	 *       <Surface css={[ui.padding(5)]}>
-	 *         <Text>Into The Unknown</Text>
-	 *         <Elevation value={8} isInteractive />
-	 *       </Surface>
-	 *     </View>
-	 *   )
-	 * }
-	 * ```
 	 */
 	value?: number;
 	children?: never;

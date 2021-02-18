@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { useElevation } from './use-elevation';
+import { useElevation } from './hook';
 import { createComponent } from '../utils';
 
 /**
@@ -11,15 +11,15 @@ import { createComponent } from '../utils';
  *
  * @example
  * ```jsx
+ * import { Elevation, Surface, Text, View } from `@wordpress/components/ui`;
+ *
  * function Example() {
- *   return (
- *     <View css={ [ ui.padding( 5 ) ] }>
- *       <Surface css={ [ ui.padding( 5 ) ] }>
- *         <Text>Into The Unknown</Text>
- *         <Elevation value={ 5 } />
- *       </Surface>
- *     </View>
- *   );
+ * 	return (
+ * 		<Surface>
+ * 			<Text>Code is Poetry</Text>
+ * 			<Elevation value={ 5 } />
+ * 		</Surface>
+ * 	);
  * }
  * ```
  */

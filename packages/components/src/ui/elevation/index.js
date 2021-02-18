@@ -1,2 +1,2 @@
-export { default as Elevation } from './elevation';
-export * from './use-elevation';
+export { default as Elevation } from './component';
+export * from './hook';

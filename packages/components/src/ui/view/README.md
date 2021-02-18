@@ -1,6 +1,6 @@
 # View (Experimental)
 
-`View` is a core component that renders everything in the library. It is the principle component in the entire library. Note that `View` is not exported from components, it's fully internal.
+`View` is a core component that renders everything in the library. It is the principle component in the entire library.
 
 **Everything** is a `View`, and a `View` is **everything**.
 
@@ -12,7 +12,7 @@ import { Text, View } from '@wordpress/components/ui';
 function Example() {
 	return (
 		<View>
-			<Text>Into The Unknown</Text>
+			<Text>Code is Poetry</Text>
 		</View>
 	);
 }

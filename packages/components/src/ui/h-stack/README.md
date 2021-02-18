@@ -6,18 +6,18 @@
 
 `HStack` can render anything inside.
 
-```jsx 
+```jsx
 function Example() {
 	return (
 		<HStack>
-			<View css={ [ ui.background.blue ] }>
-				<Text>Ana</Text>
+			<View>
+				<Text>Code</Text>
 			</View>
-			<View css={ [ ui.background.blue ] }>
-				<Text>Elsa</Text>
+			<View>
+				<Text>is</Text>
 			</View>
-			<View css={ [ ui.background.blue ] }>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</HStack>
 	);
@@ -80,21 +80,21 @@ Determines if children should wrap.
 
 When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to take up the remaining space.
 
-```jsx live
-import { HStack, Spacer, Text, View } from '@wp-g2/components';
+```jsx
+import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {
 	return (
 		<HStack>
-			<View css={[ui.background.blue]}>
-				<Text>Ana</Text>
+			<View>
+				<Text>Code</Text>
 			</View>
-			<Spacer css={[ui.background.blue]}>
-				<Text>Elsa</Text>
+			<Spacer>
+				<Text>is</Text>
 			</Spacer>
-			<View css={[ui.background.blue]}>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</HStack>
 	);
@@ -103,25 +103,24 @@ function Example() {
 
 `Spacer` also be used in-between items to push them apart.
 
-```jsx live
-import { HStack, Spacer, Text, View } from '@wp-g2/components';
+```jsx
+import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
 import { ui } from '@wp-g2/styles';
 
 function Example() {
 	return (
 		<HStack>
-			<View css={[ui.background.blue]}>
-				<Text>Ana</Text>
+			<View>
+				<Text>Code</Text>
 			</View>
 			<Spacer />
-			<View css={[ui.background.blue]}>
-				<Text>Elsa</Text>
+			<View>
+				<Text>is</Text>
 			</View>
-			<View css={[ui.background.blue]}>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</HStack>
 	);
 }
 ```
-
