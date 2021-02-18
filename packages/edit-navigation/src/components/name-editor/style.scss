@@ -3,3 +3,9 @@
 	font-style: normal;
 	color: $gray-700;
 }
+
+.components-name-editor__text-control {
+	.components-base-control {
+		border: none;
+	}
+}

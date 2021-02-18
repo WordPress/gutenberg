@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { BaseControl } from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import {
 	IsMenuEditorFocused,
 	useMenuEntity,
@@ -31,27 +31,36 @@ export function NameEditor() {
 	}, [ isMenuNameEditFocused ] );
 	return (
 		<>
-			<BaseControl label={ __( 'Name' ) } id={ id }>
-				<div>
-					<input
-						ref={ inputRef }
-						id={ id }
-						onBlur={ () => setIsMenuNameEditFocused( false ) }
-						className="components-text-control__input"
-						value={ tmpMenuName }
-						onChange={ ( { target: { value } } ) => {
-							setTmpMenuName( value );
-							editMenuName( value );
-						} }
-						aria-label={ __( 'Edit menu name' ) }
-					/>
-				</div>
-			</BaseControl>
-			<div className="edit-navigation-name-editor__edit-name-description">
-				{ __(
+			<TextControl
+				ref={ inputRef }
+				help={ __(
 					'A short, descriptive name used to refer to this menu elsewhere.'
 				) }
-			</div>
+				label={ __( 'Name' ) }
+				id={ id }
+				onBlur={ () => setIsMenuNameEditFocused( false ) }
+				className="components-name-editor__text-control"
+				value={ tmpMenuName }
+				onChange={ ( value ) => {
+					setTmpMenuName( value );
+					editMenuName( value );
+				} }
+				aria-label={ __( 'Edit menu name' ) }
+			/>
+			{ /*<div>*/ }
+			{ /*	<input*/ }
+			{ /*		ref={ inputRef }*/ }
+			{ /*		id={ id }*/ }
+			{ /*		onBlur={ () => setIsMenuNameEditFocused( false ) }*/ }
+			{ /*		className="components-text-control__input"*/ }
+			{ /*		value={ tmpMenuName }*/ }
+			{ /*		onChange={ ( { target: { value } } ) => {*/ }
+			{ /*			setTmpMenuName( value );*/ }
+			{ /*			editMenuName( value );*/ }
+			{ /*		} }*/ }
+			{ /*		aria-label={ __( 'Edit menu name' ) }*/ }
+			{ /*	/>*/ }
+			{ /*</div>*/ }
 		</>
 	);
 }
