@@ -224,6 +224,10 @@
 		}
 	}
 
+	&.is-outline-mode.is-selected.is-hovered {
+		cursor: unset;
+	}
+
 	// Spotlight mode.
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
