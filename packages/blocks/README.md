@@ -183,8 +183,8 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 <a name="cloneBlock" href="#cloneBlock">#</a> **cloneBlock**
 
-Given a block object, returns a copy of the block object, optionally merging
-new attributes and/or replacing its inner blocks.
+Given a block object, returns a copy of the block object while sanitizing its attributes,
+optionally merging new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
@@ -237,6 +237,21 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the list of blocks matches a templates
+
+<a name="duplicateBlock" href="#duplicateBlock">#</a> **duplicateBlock**
+
+Given a block object, returns a copy of the block object without sanitizing its attributes,
+optionally merging new attributes and/or replacing its inner blocks.
+
+_Parameters_
+
+-   _block_ `Object`: Block instance.
+-   _mergeAttributes_ `Object`: Block attributes.
+-   _newInnerBlocks_ `?Array`: Nested blocks.
+
+_Returns_
+
+-   `Object`: A cloned block.
 
 <a name="findTransform" href="#findTransform">#</a> **findTransform**
 

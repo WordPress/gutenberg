@@ -88,8 +88,38 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
- * Given a block object, returns a copy of the block object, optionally merging
- * new attributes and/or replacing its inner blocks.
+ * Given a block object, returns a copy of the block object without sanitizing its attributes,
+ * optionally merging new attributes and/or replacing its inner blocks.
+ *
+ * @param {Object} block              Block instance.
+ * @param {Object} mergeAttributes    Block attributes.
+ * @param {?Array} newInnerBlocks     Nested blocks.
+ *
+ * @return {Object} A cloned block.
+ */
+export function duplicateBlock( block, mergeAttributes = {}, newInnerBlocks ) {
+	const clientId = uuid();
+
+	const attributes = {
+		...block.attributes,
+		...mergeAttributes,
+	};
+
+	return {
+		...block,
+		clientId,
+		attributes,
+		innerBlocks:
+			newInnerBlocks ||
+			block.innerBlocks.map( ( innerBlock ) =>
+				duplicateBlock( innerBlock )
+			),
+	};
+}
+
+/**
+ * Given a block object, returns a copy of the block object while sanitizing its attributes,
+ * optionally merging new attributes and/or replacing its inner blocks.
  *
  * @param {Object} block              Block instance.
  * @param {Object} mergeAttributes    Block attributes.
