@@ -473,24 +473,10 @@ export function placeCaretAtVerticalEdge(
  */
 export function isTextField( element ) {
 	const { nodeName, contentEditable } = element;
-	const nonTextInputs = [
-		'button',
-		'checkbox',
-		'hidden',
-		'file',
-		'radio',
-		'image',
-		'range',
-		'reset',
-		'submit',
-		'number',
-		'email',
-	];
-	return (
-		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
-		nodeName === 'TEXTAREA' ||
-		contentEditable === 'true'
-	);
+	const textInputTypes = [ 'text', 'password', 'search', 'url' ];
+	const isTextInput =
+		nodeName === 'INPUT' && textInputTypes.includes( element.type );
+	return isTextInput || nodeName === 'TEXTAREA' || contentEditable === 'true';
 }
 
 /**
