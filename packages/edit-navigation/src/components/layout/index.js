@@ -19,13 +19,14 @@ import {
 	BlockInspector,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import EmptyState from './empty-state';
 import {
+	IsMenuEditorFocused,
 	MenuIdContext,
 	useNavigationEditor,
 	useNavigationBlockEditor,
@@ -42,7 +43,9 @@ import { store as editNavigationStore } from '../../store';
 export default function Layout( { blockEditorSettings } ) {
 	const canvasRef = useRef();
 	useBlockSelectionClearer( canvasRef );
-
+	const [ isMenuNameEditFocused, setIsMenuNameEditFocused ] = useState(
+		false
+	);
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 	const savePost = () => saveNavigationPost( navigationPost );
 
@@ -80,53 +83,60 @@ export default function Layout( { blockEditorSettings } ) {
 						} ) }
 					>
 						<MenuIdContext.Provider value={ selectedMenuId }>
-							<Header
-								isPending={ ! hasLoadedMenus }
-								menus={ menus }
-								selectedMenuId={ selectedMenuId }
-								onSelectMenu={ selectMenu }
-								navigationPost={ navigationPost }
-							/>
+							<IsMenuEditorFocused.Provider
+								value={ [
+									isMenuNameEditFocused,
+									setIsMenuNameEditFocused,
+								] }
+							>
+								<Header
+									isPending={ ! hasLoadedMenus }
+									menus={ menus }
+									selectedMenuId={ selectedMenuId }
+									onSelectMenu={ selectMenu }
+									navigationPost={ navigationPost }
+								/>
 
-							{ ! hasFinishedInitialLoad && <Spinner /> }
+								{ ! hasFinishedInitialLoad && <Spinner /> }
 
-							{ hasFinishedInitialLoad && ! hasMenus && (
-								<EmptyState />
-							) }
+								{ hasFinishedInitialLoad && ! hasMenus && (
+									<EmptyState />
+								) }
 
-							{ isBlockEditorReady && (
-								<BlockEditorProvider
-									value={ blocks }
-									onInput={ onInput }
-									onChange={ onChange }
-									settings={ {
-										...blockEditorSettings,
-										templateLock: 'all',
-									} }
-									useSubRegistry={ false }
-								>
-									<BlockEditorKeyboardShortcuts />
-									<NavigationEditorShortcuts
-										saveBlocks={ savePost }
-									/>
-									<div
-										className="edit-navigation-layout__canvas"
-										ref={ canvasRef }
+								{ isBlockEditorReady && (
+									<BlockEditorProvider
+										value={ blocks }
+										onInput={ onInput }
+										onChange={ onChange }
+										settings={ {
+											...blockEditorSettings,
+											templateLock: 'all',
+										} }
+										useSubRegistry={ false }
 									>
-										<Editor
-											isPending={ ! hasLoadedMenus }
-											blocks={ blocks }
+										<BlockEditorKeyboardShortcuts />
+										<NavigationEditorShortcuts
+											saveBlocks={ savePost }
 										/>
-									</div>
-									<InspectorAdditions
-										menuId={ selectedMenuId }
-										onDeleteMenu={ deleteMenu }
-									/>
-									<BlockInspector
-										bubblesVirtually={ false }
-									/>
-								</BlockEditorProvider>
-							) }
+										<div
+											className="edit-navigation-layout__canvas"
+											ref={ canvasRef }
+										>
+											<Editor
+												isPending={ ! hasLoadedMenus }
+												blocks={ blocks }
+											/>
+										</div>
+										<InspectorAdditions
+											menuId={ selectedMenuId }
+											onDeleteMenu={ deleteMenu }
+										/>
+										<BlockInspector
+											bubblesVirtually={ false }
+										/>
+									</BlockEditorProvider>
+								) }
+							</IsMenuEditorFocused.Provider>
 						</MenuIdContext.Provider>
 					</div>
 

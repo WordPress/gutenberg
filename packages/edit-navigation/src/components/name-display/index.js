@@ -6,10 +6,12 @@ import { BlockControls } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { useNavigationEditorMenu } from '../../hooks';
+import { useNavigationEditorMenu, IsMenuEditorFocused } from '../../hooks';
+import { useContext } from '@wordpress/element';
 
-export default function NameDisplay( { setIsMenuNameEditFocused } ) {
+export default function NameDisplay() {
 	const { menuName } = useNavigationEditorMenu();
+	const [ , setIsMenuNameEditFocused ] = useContext( IsMenuEditorFocused );
 	return (
 		<BlockControls>
 			<ToolbarGroup>
