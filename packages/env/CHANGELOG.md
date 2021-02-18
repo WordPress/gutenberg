@@ -1,5 +1,9 @@
 ## Master
 
+### Breaking Change
+
+-   Migrate from `nodegit` to `simple-git`. This change now requires you to have a `git` binary installed locally to utilize the git sources feature of wp-env.json.
+
 ### New Feature
 
 -   URLs for ZIP files are now supported as core, plugin, and theme sources.
