@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Migrate from `nodegit` to `simple-git`. This change now requires you to have a `git` binary installed locally to utilize the git sources feature of wp-env.json.
+
 ### New Features
 
 -   Add a `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the database container ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
