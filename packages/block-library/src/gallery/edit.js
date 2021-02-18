@@ -259,11 +259,6 @@ function GalleryEdit( props ) {
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
 				...buildImageAttributes( false, image ),
-				inheritedAttributes: {
-					linkDestination: true,
-					linkTarget: true,
-					sizeSlug: true,
-				},
 				id: image.id,
 			} );
 		} );
