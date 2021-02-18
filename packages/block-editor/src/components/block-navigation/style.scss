@@ -28,6 +28,11 @@
 		color: $white;
 	}
 
+	// TODO: Replicate highlighted state from mocks (this is a temporary placeholder)
+	&.is-highlighted {
+		border: 1px solid var(--wp-admin-theme-color);
+	}
+
 	&.is-dragging {
 		display: none;
 	}
