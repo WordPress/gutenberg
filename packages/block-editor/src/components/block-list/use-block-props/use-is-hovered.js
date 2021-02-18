@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -33,6 +33,8 @@ export function useIsHovered( ref ) {
 		};
 	}, [] );
 
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+
 	function addHoverListener( eventType, value ) {
 		function listener( event ) {
 			if ( event.defaultPrevented ) {
@@ -40,6 +42,7 @@ export function useIsHovered( ref ) {
 			}
 
 			event.preventDefault();
+			toggleBlockHighlight( ref.current.dataset.block, true );
 			setHovered( value );
 		}
 
