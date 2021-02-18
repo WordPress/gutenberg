@@ -3,7 +3,7 @@ import { CSSProperties, ReactNode, ReactText } from 'react';
 /**
  * Internal dependencies
  */
-import { Props as ControlLabelProps } from '../control-label/types'; 
+import { Props as ControlLabelProps } from '../control-label/types';
 import { Props as GridProps } from '../grid/types';
 
 export type FormGroupLabelProps = ControlLabelProps & {
@@ -24,6 +24,6 @@ type Horizontal = GridProps & {
 	horizontal: true;
 };
 
-type Vertical = { horizontal: false; };
+type Vertical = { horizontal: false };
 
-export type FormGroupProps = FormGroupContentProps & (Horizontal | Vertical);
+export type FormGroupProps = FormGroupContentProps & ( Horizontal | Vertical );

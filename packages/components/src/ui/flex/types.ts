@@ -1,7 +1,9 @@
 import { CSSProperties } from 'react';
 import { ResponsiveCSSValue } from '../utils/types';
 
-export type FlexDirection = ResponsiveCSSValue< CSSProperties[ 'flexDirection' ] >;
+export type FlexDirection = ResponsiveCSSValue<
+	CSSProperties[ 'flexDirection' ]
+>;
 
 export type FlexProps = {
 	/**

@@ -1,3 +1,4 @@
+export * from './control-group';
 export * from './control-label';
 export * from './elevation';
 export * from './flex';

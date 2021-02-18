@@ -19,7 +19,7 @@ export type AlignmentProps = {
 	align?: CSSProperties[ 'alignItems' ];
 };
 
-export type Alignments = Record<HStackAlignment, AlignmentProps>;
+export type Alignments = Record< HStackAlignment, AlignmentProps >;
 
 export type Props = Omit< FlexProps, 'align' | 'gap' > & {
 	/**
