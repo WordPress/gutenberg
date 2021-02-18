@@ -2301,22 +2301,6 @@ describe( 'state', () => {
 			expect( state.selectionEnd ).toEqual( expected );
 		} );
 
-		it( 'should not select inserted block if updateSelection flag is false', () => {
-			const original = deepFreeze( {
-				selectionStart: { clientId: 'a' },
-				selectionEnd: { clientId: 'a' },
-			} );
-			const action = {
-				type: 'INSERT_BLOCKS',
-				blocks: [ { clientId: 'ribs' } ],
-				updateSelection: false,
-			};
-			const state = selection( original, action );
-
-			expect( state.selectionStart ).toBe( original.selectionStart );
-			expect( state.selectionEnd ).toBe( original.selectionEnd );
-		} );
-
 		it( 'should not update the state if the block moved is already selected', () => {
 			const original = deepFreeze( {
 				selectionStart: { clientId: 'ribs' },
@@ -2475,23 +2459,6 @@ describe( 'state', () => {
 			expect( state.selectionEnd ).toEqual( expected.selectionEnd );
 		} );
 
-		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
-			const original = deepFreeze( {
-				selectionStart: { clientId: 'chicken' },
-				selectionEnd: { clientId: 'chicken' },
-			} );
-			const action = {
-				type: 'REPLACE_INNER_BLOCKS',
-				blocks: [ { clientId: 'another-block' } ],
-				rootClientId: 'parent',
-				updateSelection: false,
-			};
-			const state = selection( original, action );
-
-			expect( state.selectionStart ).toEqual( original.selectionStart );
-			expect( state.selectionEnd ).toEqual( original.selectionEnd );
-		} );
-
 		it( 'should keep the same selection on RESET_BLOCKS if the selected blocks continue to exist', () => {
 			const original = deepFreeze( {
 				selectionStart: { clientId: 'chicken' },
@@ -2620,6 +2587,80 @@ describe( 'state', () => {
 						insert: { name: 'core/block', ref: 123 },
 					},
 				},
+			} );
+		} );
+		describe( 'block variations handling', () => {
+			const blockWithVariations = 'core/test-block-with-variations';
+			beforeAll( () => {
+				const variations = [
+					{
+						name: 'apple',
+						attributes: { fruit: 'apple' },
+					},
+					{ name: 'orange', attributes: { fruit: 'orange' } },
+				].map( ( variation ) => ( {
+					...variation,
+					isActive: ( blockAttributes, variationAttributes ) =>
+						blockAttributes?.fruit === variationAttributes.fruit,
+				} ) );
+				registerBlockType( blockWithVariations, {
+					save: noop,
+					edit: noop,
+					title: 'Fruit with variations',
+					variations,
+				} );
+			} );
+			afterAll( () => {
+				unregisterBlockType( blockWithVariations );
+			} );
+			it( 'should return proper results with both found or not found block variation matches', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						{
+							clientId: 'no match',
+							name: blockWithVariations,
+						},
+						{
+							clientId: 'not a variation match',
+							name: blockWithVariations,
+							attributes: { fruit: 'not in a variation' },
+						},
+						{
+							clientId: 'orange',
+							name: blockWithVariations,
+							attributes: { fruit: 'orange' },
+						},
+						{
+							clientId: 'apple',
+							name: blockWithVariations,
+							attributes: { fruit: 'apple' },
+						},
+					],
+					time: 123456,
+				} );
+
+				const orangeVariationName = `${ blockWithVariations }/orange`;
+				const appleVariationName = `${ blockWithVariations }/apple`;
+				expect( state ).toEqual( {
+					insertUsage: expect.objectContaining( {
+						[ orangeVariationName ]: {
+							time: 123456,
+							count: 1,
+							insert: { name: orangeVariationName },
+						},
+						[ appleVariationName ]: {
+							time: 123456,
+							count: 1,
+							insert: { name: appleVariationName },
+						},
+						[ blockWithVariations ]: {
+							time: 123456,
+							count: 2,
+							insert: { name: blockWithVariations },
+						},
+					} ),
+				} );
 			} );
 		} );
 	} );

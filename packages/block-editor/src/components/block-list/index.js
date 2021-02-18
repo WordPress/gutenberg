@@ -17,6 +17,8 @@ import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
+import { store as blockEditorStore } from '../../store';
+import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -31,6 +33,7 @@ export default function BlockList( { className } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
+	useScrollSelectionIntoView( ref );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
@@ -69,7 +72,7 @@ function Items( {
 			getGlobalBlockCount,
 			isTyping,
 			__experimentalGetActiveBlockIdByBlockNames,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		// Determine if there is an active entity area to spotlight.
 		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(

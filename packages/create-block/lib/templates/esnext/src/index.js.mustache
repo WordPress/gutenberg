@@ -6,13 +6,6 @@
 import { registerBlockType } from '@wordpress/blocks';
 
 /**
- * Retrieves the translation of text.
- *
- * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
  * All files containing `style` keyword are bundled together. The code used
  * gets applied both to the front of your site and to the editor.
@@ -37,48 +30,6 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	 * @see https://make.wordpress.org/core/2020/11/18/block-api-version-2/
 	 */
 	apiVersion: {{apiVersion}},
-
-	/**
-	 * This is the display title for your block, which can be translated with `i18n` functions.
-	 * The block inserter will show this name.
-	 */
-	title: __(
-		'{{title}}',
-		'{{textdomain}}'
-	),
-
-	{{#description}}
-	/**
-	 * This is a short description for your block, can be translated with `i18n` functions.
-	 * It will be shown in the Block Tab in the Settings Sidebar.
-	 */
-	description: __(
-		'{{description}}',
-		'{{textdomain}}'
-	),
-
-	{{/description}}
-	/**
-	 * Blocks are grouped into categories to help users browse and discover them.
-	 * The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
-	 */
-	category: '{{category}}',
-
-	{{#dashicon}}
-	/**
-	 * An icon property should be specified to make it easier to identify a block.
-	 * These can be any of WordPress’ Dashicons, or a custom svg element.
-	 */
-	icon: '{{dashicon}}',
-
-	{{/dashicon}}
-	/**
-	 * Optional block extended support features.
-	 */
-	supports: {
-		// Removes support for an HTML mode.
-		html: false,
-	},
 
 	/**
 	 * @see ./edit.js

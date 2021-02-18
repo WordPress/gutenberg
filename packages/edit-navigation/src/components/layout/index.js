@@ -1,20 +1,30 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
 	DropZoneProvider,
 	Popover,
 	SlotFillProvider,
+	Spinner,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockInspector,
+	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import EmptyState from './empty-state';
 import useNavigationEditor from './use-navigation-editor';
 import useNavigationBlockEditor from './use-navigation-block-editor';
 import useMenuNotifications from './use-menu-notifications';
@@ -22,17 +32,21 @@ import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
 import Header from '../header';
 import Notices from '../notices';
-import Toolbar from '../toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
 
 export default function Layout( { blockEditorSettings } ) {
+	const canvasRef = useRef();
+	useBlockSelectionClearer( canvasRef );
+
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 	const savePost = () => saveNavigationPost( navigationPost );
 
 	const {
 		menus,
+		hasLoadedMenus,
+		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
 		selectMenu,
@@ -45,6 +59,9 @@ export default function Layout( { blockEditorSettings } ) {
 
 	useMenuNotifications( selectedMenuId );
 
+	const hasMenus = !! menus?.length;
+	const isBlockEditorReady = !! ( hasMenus && navigationPost );
+
 	return (
 		<ErrorBoundary>
 			<SlotFillProvider>
@@ -54,42 +71,56 @@ export default function Layout( { blockEditorSettings } ) {
 
 					<Notices />
 
-					<div className="edit-navigation-layout">
+					<div
+						className={ classnames( 'edit-navigation-layout', {
+							'has-block-inspector': isBlockEditorReady,
+						} ) }
+					>
 						<Header
-							isPending={ ! navigationPost }
+							isPending={ ! hasLoadedMenus }
 							menus={ menus }
 							selectedMenuId={ selectedMenuId }
 							onSelectMenu={ selectMenu }
+							navigationPost={ navigationPost }
 						/>
 
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ onInput }
-							onChange={ onChange }
-							settings={ {
-								...blockEditorSettings,
-								templateLock: 'all',
-								hasFixedToolbar: true,
-							} }
-							useSubRegistry={ false }
-						>
-							<BlockEditorKeyboardShortcuts />
-							<NavigationEditorShortcuts
-								saveBlocks={ savePost }
-							/>
-							<Toolbar
-								isPending={ ! navigationPost }
-								navigationPost={ navigationPost }
-							/>
-							<Editor
-								isPending={ ! navigationPost }
-								blocks={ blocks }
-							/>
-							<InspectorAdditions
-								menuId={ selectedMenuId }
-								onDeleteMenu={ deleteMenu }
-							/>
-						</BlockEditorProvider>
+						{ ! hasFinishedInitialLoad && <Spinner /> }
+
+						{ hasFinishedInitialLoad && ! hasMenus && (
+							<EmptyState />
+						) }
+
+						{ isBlockEditorReady && (
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ onInput }
+								onChange={ onChange }
+								settings={ {
+									...blockEditorSettings,
+									templateLock: 'all',
+								} }
+								useSubRegistry={ false }
+							>
+								<BlockEditorKeyboardShortcuts />
+								<NavigationEditorShortcuts
+									saveBlocks={ savePost }
+								/>
+								<div
+									className="edit-navigation-layout__canvas"
+									ref={ canvasRef }
+								>
+									<Editor
+										isPending={ ! hasLoadedMenus }
+										blocks={ blocks }
+									/>
+								</div>
+								<InspectorAdditions
+									menuId={ selectedMenuId }
+									onDeleteMenu={ deleteMenu }
+								/>
+								<BlockInspector bubblesVirtually={ false } />
+							</BlockEditorProvider>
+						) }
 					</div>
 
 					<Popover.Slot />

@@ -270,3 +270,7 @@ Using `make-json` automatically names the file with the md5 hash, so it is ready
 You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
 With the language set, create a new post, add the block, and you will see the translations used.
+
+### Filtering Translations
+
+The outputs of the translation functions (`__()`, `_x()`, `_n()`, and `_nx()`) are filterable, see [i18n Filters](/docs/designers-developers/developers/filters/i18n-filters.md) for full information.

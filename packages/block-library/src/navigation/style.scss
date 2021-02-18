@@ -1,15 +1,25 @@
 // Default background and font color
 .wp-block-navigation:not(.has-background) .wp-block-navigation__container {
 	.wp-block-navigation__container {
-		color: $gray-900;
+		// Set a background color for submenus so that they're not transparent.
+		// NOTE TO DEVS - if refactoring this code, please double-check that
+		// submenus have a default background color, this feature has regressed
+		// several times, so care needs to be taken.
 		background-color: $white;
+		color: $gray-900;
+	}
+}
+
+.wp-block-navigation .wp-block-navigation__container {
+	.wp-block-navigation__container {
+		align-items: normal;
 		min-width: 200px;
 	}
 }
 
-// Justification.
-.items-justified-left > ul {
-	justify-content: flex-start;
+.wp-block-navigation__container {
+	// Vertically align child blocks, like Social Links or Search.
+	align-items: center;
 }
 
 .items-justified-center > ul {

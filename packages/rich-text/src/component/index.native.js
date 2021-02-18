@@ -1002,8 +1002,10 @@ export default compose( [
 		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles =
-			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+		const parentBlockStyles = get( parentBlock, [
+			'attributes',
+			'childrenStyles',
+		] );
 
 		return {
 			areMentionsSupported:

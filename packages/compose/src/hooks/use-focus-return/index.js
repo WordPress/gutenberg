@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import useCallbackRef from '../use-callback-ref';
+import { useRef, useEffect, useCallback } from '@wordpress/element';
 
 /**
  * When opening modals/sidebars/dialogs, the focus
@@ -40,7 +35,7 @@ function useFocusReturn( onFocusReturn ) {
 		onFocusReturnRef.current = onFocusReturn;
 	}, [ onFocusReturn ] );
 
-	return useCallbackRef( ( node ) => {
+	return useCallback( ( node ) => {
 		if ( node ) {
 			// Set ref to be used when unmounting.
 			ref.current = node;
@@ -52,6 +47,14 @@ function useFocusReturn( onFocusReturn ) {
 
 			focusedBeforeMount.current = node.ownerDocument.activeElement;
 		} else if ( focusedBeforeMount.current ) {
+			const isFocused = ref.current.contains(
+				ref.current.ownerDocument.activeElement
+			);
+
+			if ( ref.current.isConnected && ! isFocused ) {
+				return;
+			}
+
 			// Defer to the component's own explicit focus return behavior, if
 			// specified. This allows for support that the `onFocusReturn`
 			// decides to allow the default behavior to occur under some

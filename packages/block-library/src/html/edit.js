@@ -8,6 +8,7 @@ import {
 	PlainText,
 	transformStyles,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -35,7 +36,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		return [
 			defaultStyles,
 			...transformStyles(
-				select( 'core/block-editor' ).getSettings().styles
+				select( blockEditorStore ).getSettings().styles
 			),
 		];
 	}, [] );

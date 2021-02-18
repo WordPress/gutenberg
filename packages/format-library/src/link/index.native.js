@@ -73,7 +73,7 @@ export const link = {
 			}
 
 			stopAddingLink() {
-				this.setState( { addingLink: false } );
+				this.setState( { addingLink: false, clipboardURL: undefined } );
 			}
 
 			getLinkSelection() {

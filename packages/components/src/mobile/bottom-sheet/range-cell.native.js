@@ -125,7 +125,7 @@ class BottomSheetRangeCell extends Component {
 				] }
 				cellRowContainerStyle={ containerStyle }
 				accessibilityRole={ 'none' }
-				value={ '' }
+				leftAlign
 				editable={ false }
 				activeOpacity={ 1 }
 				accessible={ accessible }

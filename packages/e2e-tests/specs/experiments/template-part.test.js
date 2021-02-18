@@ -5,7 +5,6 @@ import {
 	createNewPost,
 	insertBlock,
 	disablePrePublishChecks,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
 	getAllBlocks,
@@ -13,12 +12,11 @@ import {
 	clickBlockToolbarButton,
 	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
@@ -34,20 +32,15 @@ describe( 'Template Part', () => {
 
 	describe( 'Template part block', () => {
 		beforeEach( async () => {
-			await visitAdminPage(
-				'admin.php',
-				addQueryArgs( '', {
-					page: 'gutenberg-edit-site',
-				} ).slice( 1 )
-			);
-			await page.waitForSelector( '.edit-site-visual-editor iframe' );
+			await siteEditor.visit();
 		} );
 
 		async function updateHeader( content ) {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Template Parts' );
+			// TODO: Change General to Headers once TT1 blocks categorise the template parts
+			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Edit it.
@@ -61,11 +54,11 @@ describe( 'Template Part', () => {
 				'.edit-site-save-button__button:not(.is-busy)'
 			);
 
-			// Switch back to the front page template.
+			// Switch back to the Index template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 		}
 
@@ -120,11 +113,6 @@ describe( 'Template Part', () => {
 			// Detach blocks from template part using ellipsis menu.
 			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
 
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
-
 			// Verify there is one less template part on the page.
 			const finalTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
@@ -157,11 +145,6 @@ describe( 'Template Part', () => {
 
 			// Verify new template part is created with expected content.
 			await assertParagraphInTemplatePart( 'Some block...' );
-
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await canvas().$$(
@@ -201,11 +184,6 @@ describe( 'Template Part', () => {
 			// Verify new template part is created with expected content.
 			await assertParagraphInTemplatePart( 'Some block #1' );
 			await assertParagraphInTemplatePart( 'Some block #2' );
-
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await canvas().$$(
@@ -255,11 +233,6 @@ describe( 'Template Part', () => {
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
 
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
-
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
@@ -276,11 +249,6 @@ describe( 'Template Part', () => {
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();
-
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 		} );
 	} );
 } );

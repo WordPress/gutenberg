@@ -58,11 +58,12 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_schema_validation_subtree_is_removed_if_not_array() {
+		$root_name  = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => 'invalid/not/array',
 				'styles'   => array(
-					'global'         => 'invalid/not/array',
+					$root_name       => 'invalid/not/array',
 					'core/paragraph' => array(
 						'invalid/not/array' => false,
 					),
@@ -99,6 +100,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_schema_validation_subtree_is_removed_if_empty() {
+		$root_name  = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
@@ -107,12 +109,12 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							'custom' => false,
 						),
 					),
-					'global'      => array(
+					$root_name    => array(
 						'invalid/key' => false,
 					),
 				),
 				'styles'   => array(
-					'global' => array(
+					$root_name => array(
 						'color'      => array(
 							'link' => 'blue',
 						),
@@ -132,7 +134,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			'styles' => array(
-				'global' => array(
+				$root_name => array(
 					'color' => array(
 						'link' => 'blue',
 					),
@@ -144,10 +146,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_schema_validation_subtree_is_removed_if_style_not_supported_by_block() {
+		$root_name  = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'styles' => array(
-					'global' => array(
+					$root_name => array(
 						'color'   => array(
 							'text' => 'var:preset|color|dark-gray',
 						),
@@ -167,7 +170,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$actual   = $theme_json->get_raw_data();
 		$expected = array(
 			'styles' => array(
-				'global' => array(
+				$root_name => array(
 					'color' => array(
 						'text' => 'var:preset|color|dark-gray',
 					),
@@ -178,11 +181,12 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_settings() {
+		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		// See schema at WP_Theme_JSON::SCHEMA.
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					'global' => array(
+					$root_name => array(
 						'color'       => array(
 							'custom' => false,
 						),
@@ -190,7 +194,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					),
 				),
 				'styles'   => array(
-					'global' => array(
+					$root_name => array(
 						'color' => array(
 							'link' => 'blue',
 						),
@@ -202,7 +206,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$result = $theme_json->get_settings();
 
 		$expected = array(
-			'global' => array(
+			$root_name => array(
 				'color' => array(
 					'custom' => false,
 				),
@@ -213,11 +217,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet() {
-		// See schema at WP_Theme_JSON::SCHEMA.
+		$root_name       = WP_Theme_JSON::ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON::ALL_BLOCKS_NAME;
+
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					'global'     => array(
+					$all_blocks_name => array(
 						'color'      => array(
 							'text'    => 'value',
 							'palette' => array(
@@ -241,7 +247,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 						'misc'       => 'value',
 					),
-					'core/group' => array(
+					'core/group'     => array(
 						'custom' => array(
 							'base-font'   => 16,
 							'line-height' => array(
@@ -253,7 +259,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					),
 				),
 				'styles'   => array(
-					'global'     => array(
+					$root_name   => array(
 						'color' => array(
 							'link' => '#111',
 							'text' => 'var:preset|color|grey',
@@ -288,9 +294,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	public function test_merge_incoming_data() {
-		$initial = array(
+		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
+		$initial   = array(
 			'settings' => array(
-				'global'         => array(
+				$root_name       => array(
 					'color' => array(
 						'custom'  => false,
 						'palette' => array(
@@ -312,7 +319,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			),
 			'styles'   => array(
-				'global' => array(
+				$root_name => array(
 					'typography' => array(
 						'fontSize' => '12',
 					),
@@ -342,7 +349,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$add_key_in_settings = array(
 			'settings' => array(
-				'global' => array(
+				$root_name => array(
 					'color' => array(
 						'customGradient' => true,
 					),
@@ -352,7 +359,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$update_key_in_settings = array(
 			'settings' => array(
-				'global' => array(
+				$root_name => array(
 					'color' => array(
 						'custom' => true,
 					),
@@ -396,7 +403,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$update_presets = array(
 			'settings' => array(
-				'global' => array(
+				$root_name => array(
 					'color'      => array(
 						'palette'   => array(
 							array(
@@ -431,7 +438,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			'settings' => array(
-				'global'         => array(
+				$root_name       => array(
 					'color'      => array(
 						'custom'         => true,
 						'customGradient' => true,
@@ -475,7 +482,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			),
 			'styles'   => array(
-				'global'     => array(
+				$root_name   => array(
 					'typography' => array(
 						'fontSize' => '12',
 					),
@@ -580,10 +587,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_non_preset_settings() {
+		$root_name  = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					'global' => array(
+					$root_name => array(
 						'color'   => array(
 							'custom'  => true,
 							'palette' => array(
@@ -616,7 +624,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$result   = $theme_json->get_raw_data();
 		$expected = array(
 			'settings' => array(
-				'global' => array(
+				$root_name => array(
 					'color' => array(
 						'palette' => array(
 							array(
@@ -643,10 +651,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_preset_settings() {
+		$root_name  = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					'global' => array(
+					$root_name => array(
 						'color'      => array(
 							'palette' => array(
 								array(
@@ -704,7 +713,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$result   = $theme_json->get_raw_data();
 		$expected = array(
 			'settings' => array(
-				'global' => array(
+				$root_name => array(
 					'color'      => array(
 						'palette' => array(
 							array(
@@ -727,5 +736,51 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			),
 		);
 		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
+	function test_get_custom_templates() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'customTemplates' => array(
+					'page-home' => array(
+						'title' => 'Some title',
+					),
+				),
+			)
+		);
+
+		$page_templates = $theme_json->get_custom_templates();
+
+		$this->assertEqualSetsWithIndex(
+			$page_templates,
+			array(
+				'page-home' => array(
+					'title' => 'Some title',
+				),
+			)
+		);
+	}
+
+	function test_get_template_parts() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'templateParts' => array(
+					'header' => array(
+						'area' => 'Some area',
+					),
+				),
+			)
+		);
+
+		$template_parts = $theme_json->get_template_parts();
+
+		$this->assertEqualSetsWithIndex(
+			$template_parts,
+			array(
+				'header' => array(
+					'area' => 'Some area',
+				),
+			)
+		);
 	}
 }

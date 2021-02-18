@@ -24,13 +24,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	GLOBAL_CONTEXT_NAME,
-	GLOBAL_CONTEXT_SELECTOR,
-	GLOBAL_CONTEXT_SUPPORTS,
+	ALL_BLOCKS_NAME,
+	ALL_BLOCKS_SELECTOR,
+	ROOT_BLOCK_NAME,
+	ROOT_BLOCK_SELECTOR,
+	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
 } from './utils';
 import getGlobalStyles from './global-styles-renderer';
+import { store as editSiteStore } from '../../store';
 
 const EMPTY_CONTENT = { isGlobalStylesUserThemeJSON: true };
 const EMPTY_CONTENT_STRING = JSON.stringify( EMPTY_CONTENT );
@@ -81,9 +84,13 @@ const extractSupportKeys = ( supports ) => {
 
 const getContexts = ( blockTypes ) => {
 	const result = {
-		[ GLOBAL_CONTEXT_NAME ]: {
-			selector: GLOBAL_CONTEXT_SELECTOR,
-			supports: GLOBAL_CONTEXT_SUPPORTS,
+		[ ROOT_BLOCK_NAME ]: {
+			selector: ROOT_BLOCK_SELECTOR,
+			supports: ROOT_BLOCK_SUPPORTS,
+		},
+		[ ALL_BLOCKS_NAME ]: {
+			selector: ALL_BLOCKS_SELECTOR,
+			supports: [], // by being an empty array, the styles subtree will be ignored
 		},
 	};
 
@@ -128,10 +135,10 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const { blockTypes, settings } = useSelect( ( select ) => {
 		return {
 			blockTypes: select( blocksStore ).getBlockTypes(),
-			settings: select( 'core/edit-site' ).getSettings(),
+			settings: select( editSiteStore ).getSettings(),
 		};
 	} );
-	const { updateSettings } = useDispatch( 'core/edit-site' );
+	const { updateSettings } = useDispatch( editSiteStore );
 
 	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 

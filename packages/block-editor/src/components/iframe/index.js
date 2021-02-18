@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import mergeRefs from 'react-merge-refs';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -13,6 +8,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -136,7 +132,7 @@ function setHead( doc, head ) {
 		'<style>body{margin:0}</style>' + head;
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
+function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
 	const setRef = useCallback( ( node ) => {
@@ -146,19 +142,24 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 
 		function setDocumentIfReady() {
 			const { contentDocument } = node;
-			const { readyState } = contentDocument;
+			const { readyState, body } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
-			contentRef.current = contentDocument.body;
-			setIframeDocument( contentDocument );
-			setHead( contentDocument, head );
+			if ( typeof contentRef === 'function' ) {
+				contentRef( body );
+			} else if ( contentRef ) {
+				contentRef.current = body;
+			}
+
+			setHead( contentDocument, headHTML );
 			setBodyClassName( contentDocument );
 			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
+			setIframeDocument( contentDocument );
 
 			return true;
 		}
@@ -176,12 +177,13 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	return (
 		<iframe
 			{ ...props }
-			ref={ useCallback( mergeRefs( [ ref, setRef ] ), [] ) }
+			ref={ useMergeRefs( [ ref, setRef ] ) }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"
 		>
 			{ iframeDocument && createPortal( children, iframeDocument.body ) }
+			{ iframeDocument && createPortal( head, iframeDocument.head ) }
 		</iframe>
 	);
 }

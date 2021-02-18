@@ -17,6 +17,7 @@ import { useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { getMoversSetup } from './mover-description';
+import { store as blockEditorStore } from '../../store';
 
 export const BLOCK_MOVER_DIRECTION_TOP = 'blockPageMoverOptions-moveToTop';
 export const BLOCK_MOVER_DIRECTION_BOTTOM =
@@ -132,7 +133,7 @@ export default compose(
 			getTemplateLock,
 			getBlockRootClientId,
 			getBlockOrder,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
@@ -154,7 +155,7 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
 		const { moveBlocksDown, moveBlocksUp, moveBlocksToPosition } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
