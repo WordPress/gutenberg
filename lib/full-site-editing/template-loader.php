@@ -154,15 +154,14 @@ function gutenberg_render_title_tag() {
 }
 
 /**
- * Renders the markup for the current template.
+ * Returns the markup for the current template.
  */
-function gutenberg_render_the_template() {
+function gutenberg_get_the_template_html() {
 	global $_wp_current_template_content;
 	global $wp_embed;
 
 	if ( ! $_wp_current_template_content ) {
-		echo '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
-		return;
+		return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
 	}
 
 	$content = $wp_embed->run_shortcode( $_wp_current_template_content );
@@ -178,9 +177,14 @@ function gutenberg_render_the_template() {
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
 	// (e.g. `.wp-site-blocks > *`).
-	echo '<div class="wp-site-blocks">';
-	echo $content; // phpcs:ignore WordPress.Security.EscapeOutput
-	echo '</div>';
+	return '<div class="wp-site-blocks">' . $content . '</div>';
+}
+
+/**
+ * Renders the markup for the current template.
+ */
+function gutenberg_render_the_template() {
+	echo gutenberg_get_the_template_html(); // phpcs:ignore WordPress.Security.EscapeOutput
 }
 
 /**

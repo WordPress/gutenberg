@@ -13,6 +13,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { storeConfig } from '../../store';
+import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) => {
@@ -28,7 +29,7 @@ const withRegistryProvider = createHigherOrderComponent(
 				useEffect( () => {
 					const newRegistry = createRegistry( {}, registry );
 					newRegistry.registerStore(
-						'core/block-editor',
+						blockEditorStoreName,
 						storeConfig
 					);
 					setSubRegistry( newRegistry );

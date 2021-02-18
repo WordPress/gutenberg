@@ -71,6 +71,7 @@ const {
 	getLowestCommonAncestorWithSelectedBlock,
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetParsedReusableBlock,
+	__experimentalGetAllowedPatterns,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3114,18 +3115,18 @@ describe( 'selectors', () => {
 					state,
 					targetBlocksClientIds
 				)
-			).toEqual( [
-				{
+			).toEqual( {
+				'test-1-dummy-clientId': {
 					setting1: false,
 				},
-				{
+				'test-3-dummy-clientId': {
 					setting1: true,
 					setting2: false,
 				},
-			] );
+			} );
 		} );
 
-		it( 'should return empty array if settings for the blocks don’t exist', () => {
+		it( 'should return empty object if settings for the blocks don’t exist', () => {
 			// Does not include target Block clientIds
 			const state = {
 				blockListSettings: {
@@ -3149,7 +3150,7 @@ describe( 'selectors', () => {
 					state,
 					targetBlocksClientIds
 				)
-			).toEqual( [] );
+			).toEqual( {} );
 		} );
 	} );
 
@@ -3349,6 +3350,58 @@ describe( 'selectors', () => {
 			).toEqual( 'client-id-03' );
 		} );
 	} );
+
+	describe( '__experimentalGetAllowedPatterns', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+					block2: { name: 'core/test-block-b' },
+				},
+				attributes: {
+					block1: {},
+					block2: {},
+				},
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+				block2: {
+					allowedBlocks: [],
+				},
+			},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						title: 'pattern with a',
+						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
+					},
+					{
+						title: 'pattern with b',
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+				],
+			},
+		};
+
+		it( 'should return all patterns for root level', () => {
+			expect(
+				__experimentalGetAllowedPatterns( state, null )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'should return patterns that consists of blocks allowed for the specified client ID', () => {
+			expect(
+				__experimentalGetAllowedPatterns( state, 'block1' )
+			).toHaveLength( 1 );
+
+			expect(
+				__experimentalGetAllowedPatterns( state, 'block2' )
+			).toHaveLength( 0 );
+		} );
+	} );
 } );
 
 describe( '__experimentalGetParsedReusableBlock', () => {
@@ -3368,5 +3421,69 @@ describe( '__experimentalGetParsedReusableBlock', () => {
 		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
 			[]
 		);
+	} );
+} );
+
+describe( 'getInserterItems with core blocks prioritization', () => {
+	// This test is in a seperate `describe` because all other tests register
+	// some test `core` blocks and interfere with the purpose of the specific test.
+	// This tests the functionality to ensure core blocks are prioritized in the
+	// returned results, because third party blocks can be registered earlier than
+	// the core blocks (usually by using the `init` action), thus affecting the display order.
+	beforeEach( () => {
+		registerBlockType( 'plugin/block-a', {
+			save() {},
+			category: 'text',
+			title: 'Plugin Block A',
+			icon: 'test',
+		} );
+		registerBlockType( 'another-plugin/block-b', {
+			save() {},
+			category: 'text',
+			title: 'Another Plugin Block B',
+			icon: 'test',
+		} );
+		registerBlockType( 'core/block', {
+			save() {},
+			category: 'text',
+			title: 'Core Block A',
+		} );
+		registerBlockType( 'core/test-block-a', {
+			save: ( props ) => props.attributes.text,
+			category: 'design',
+			title: 'Core Block B',
+			icon: 'test',
+			keywords: [ 'testing' ],
+		} );
+	} );
+	afterEach( () => {
+		[
+			'plugin/block-a',
+			'another-plugin/block-b',
+			'core/block',
+			'core/test-block-a',
+		].forEach( unregisterBlockType );
+	} );
+	it( 'should prioritize core blocks by sorting them at the top of the returned list', () => {
+		const state = {
+			blocks: {
+				byClientId: {},
+				attributes: {},
+				order: {},
+				parents: {},
+				cache: {},
+			},
+			settings: {},
+			preferences: {},
+			blockListSettings: {},
+		};
+		const items = getInserterItems( state );
+		const expectedResult = [
+			'core/block',
+			'core/test-block-a',
+			'plugin/block-a',
+			'another-plugin/block-b',
+		];
+		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
 	} );
 } );

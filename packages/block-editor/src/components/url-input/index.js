@@ -22,6 +22,11 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -538,7 +543,7 @@ class URLInput extends Component {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md
  */
 export default compose(
 	withSafeTimeout,
@@ -550,7 +555,7 @@ export default compose(
 		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
 			return;
 		}
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			__experimentalFetchLinkSuggestions: getSettings()
 				.__experimentalFetchLinkSuggestions,

@@ -33,7 +33,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// switch to html and verify html
 		const html = await editorPage.getHtmlContent();
-		expect( testData.listHtml.toLowerCase() ).toBe( html.toLowerCase() );
+		expect( html.toLowerCase() ).toBe( testData.listHtml.toLowerCase() );
 	} );
 
 	// This test depends on being run immediately after 'should be able to add a new List block'
@@ -50,8 +50,8 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// switch to html and verify html
 		const html = await editorPage.getHtmlContent();
-		expect( testData.listHtmlOrdered.toLowerCase() ).toBe(
-			html.toLowerCase()
+		expect( html.toLowerCase() ).toBe(
+			testData.listHtmlOrdered.toLowerCase()
 		);
 		// Remove list block to return editor to empty state
 		listBlockElement = await editorPage.getBlockAtPosition(

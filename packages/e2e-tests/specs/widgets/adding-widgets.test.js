@@ -6,6 +6,7 @@ import {
 	deactivatePlugin,
 	activatePlugin,
 	activateTheme,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -52,6 +53,11 @@ describe( 'Widgets screen', () => {
 		const blockLibrary = await page.waitForSelector(
 			'[aria-label="Block Library"][role="region"]'
 		);
+
+		// Check that there are categorizations in the inserter (#26329).
+		const categoryHeader = await blockLibrary.$$( 'h2' );
+		expect( categoryHeader.length > 0 ).toBe( true );
+
 		const [ addParagraphBlock ] = await blockLibrary.$x(
 			'//*[@role="option"][*[text()="Paragraph"]]'
 		);
@@ -77,6 +83,15 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
+	async function getInlineInserterButton() {
+		return await page.waitForSelector(
+			'button[aria-label="Add block"][aria-haspopup="true"]',
+			{
+				visible: true,
+			}
+		);
+	}
+
 	it( 'Should insert content using the global inserter', async () => {
 		const widgetAreas = await page.$$(
 			'[aria-label="Block: Widget Area"][role="group"]'
@@ -91,7 +106,8 @@ describe( 'Widgets screen', () => {
 		// 	firstWidgetArea
 		// );
 
-		await addParagraphBlock.click();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		const addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
@@ -111,7 +127,8 @@ describe( 'Widgets screen', () => {
 		await expectInsertionPointIndicatorToBeBelowLastBlock(
 			firstWidgetArea
 		);
-		await addParagraphBlock.click();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		await page.keyboard.type( 'Second Paragraph' );
 
@@ -146,10 +163,10 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
 		}
@@ -176,10 +193,7 @@ describe( 'Widgets screen', () => {
 				10
 		);
 
-		// Aria selectors cannot select buttons with the aria-haspopup property, fallback to CSS selector.
-		const inlineInserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]'
-		);
+		let inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
 
 		const inlineQuickInserter = await page.waitForSelector(
@@ -191,8 +205,13 @@ describe( 'Widgets screen', () => {
 		);
 		await paragraphBlock.click();
 
-		const firstParagraphBlock = await firstWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		const firstParagraphBlock = await page.waitForFunction(
+			( widgetArea ) =>
+				widgetArea.querySelector(
+					'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+				),
+			{},
+			firstWidgetArea
 		);
 
 		expect(
@@ -229,14 +248,12 @@ describe( 'Widgets screen', () => {
 			secondParagraphBlockBoundingBox.y - 10
 		);
 
-		const inserterButton = await page.waitForSelector(
-			'button[aria-label="Add block"][aria-haspopup="true"]'
-		);
-		await inserterButton.click();
+		inlineInserterButton = await getInlineInserterButton();
+		await inlineInserterButton.click();
 
 		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
-			'input[type="search"][placeholder="Search for a block"]'
+			'input[type="search"][placeholder="Search"]'
 		);
 		expect(
 			await inserterSearchBox.evaluate(
@@ -278,14 +295,95 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<h2>My Heading</h2>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
+		</div></div>",
+		}
+	` );
+	} );
+
+	it( 'Should duplicate the widgets', async () => {
+		const firstWidgetArea = await page.$(
+			'[aria-label="Block: Widget Area"][role="group"]'
+		);
+
+		const addParagraphBlock = await getParagraphBlockInGlobalInserter();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
+
+		const firstParagraphBlock = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await page.keyboard.type( 'First Paragraph' );
+
+		// Trigger the toolbar to appear.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.up( 'Shift' );
+
+		const blockToolbar = await page.waitForSelector(
+			'[role="toolbar"][aria-label="Block tools"]'
+		);
+		const moreOptionsButton = await blockToolbar.$(
+			'button[aria-label="Options"]'
+		);
+		await moreOptionsButton.click();
+
+		const optionsMenu = await page.waitForSelector(
+			'[role="menu"][aria-label="Options"]'
+		);
+		const [ duplicateButton ] = await optionsMenu.$x(
+			'//*[@role="menuitem"][*[text()="Duplicate"]]'
+		);
+		await duplicateButton.click();
+
+		await page.waitForFunction(
+			( paragraph ) =>
+				paragraph.nextSibling &&
+				paragraph.nextSibling.matches( '[data-block]' ),
+			{},
+			firstParagraphBlock
+		);
+		const duplicatedParagraphBlock = await firstParagraphBlock.evaluateHandle(
+			( paragraph ) => paragraph.nextSibling
+		);
+
+		const firstParagraphBlockClientId = await firstParagraphBlock.evaluate(
+			( node ) => node.dataset.block
+		);
+		const duplicatedParagraphBlockClientId = await duplicatedParagraphBlock.evaluate(
+			( node ) => node.dataset.block
+		);
+
+		expect( firstParagraphBlockClientId ).not.toBe(
+			duplicatedParagraphBlockClientId
+		);
+		expect(
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node.textContent
+			)
+		).toBe( 'First Paragraph' );
+		expect(
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node === document.activeElement
+			)
+		).toBe( true );
+
+		await saveWidgets();
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
 		</div></div>",
 		}
 	` );
@@ -300,6 +398,7 @@ async function saveWidgets() {
 
 	// FIXME: The snackbar above is enough for the widget areas to get saved,
 	// but not enough for the widgets to get saved.
+	// eslint-disable-next-line no-restricted-syntax
 	await page.waitForTimeout( 500 );
 }
 
@@ -328,21 +427,16 @@ async function getSerializedWidgetAreas() {
 async function cleanupWidgets() {
 	await visitAdminPage( 'widgets.php' );
 
-	await page.evaluate( () => {
-		const deleteButtons = document.querySelectorAll(
-			'#widgets-right .widget button.widget-control-remove'
-		);
+	let widget = await page.$( '.widgets-sortables .widget' );
 
-		deleteButtons.forEach( ( deleteButton ) => deleteButton.click() );
-	} );
+	// We have to do this one-by-one since there might be race condition when deleting multiple widgets at once.
+	while ( widget ) {
+		const deleteButton = await widget.$( 'button.widget-control-remove' );
+		const id = await widget.evaluate( ( node ) => node.id );
+		await deleteButton.evaluate( ( node ) => node.click() );
+		// Wait for the widget to be removed from DOM.
+		await page.waitForSelector( `#${ id }`, { hidden: true } );
 
-	await page.click( '#inactive-widgets-control-remove' );
-
-	await page.waitForFunction(
-		() =>
-			document.querySelectorAll( '.widgets-sortables .widget' ).length ===
-			0
-	);
-	// No idea why we need this, but just asserting the widgets are gone seems to be not enough.
-	await page.waitForTimeout( 500 );
+		widget = await page.$( '.widgets-sortables .widget' );
+	}
 }

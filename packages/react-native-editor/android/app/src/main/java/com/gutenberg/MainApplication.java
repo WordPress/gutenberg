@@ -87,7 +87,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
                     case AUDIO:
-                        rnMediaList.add(new Media(4, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        rnMediaList.add(new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
                         break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
@@ -155,6 +155,15 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
+            }
+
+            @Override
+            public void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback) {
+                focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(false);
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
@@ -197,7 +206,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
@@ -217,6 +225,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
                 Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void mediaFilesBlockReplaceSync(
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show();
             }
 
             @Override

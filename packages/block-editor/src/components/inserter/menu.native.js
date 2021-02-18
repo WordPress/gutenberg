@@ -32,6 +32,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 const MIN_COL_NUM = 3;
 
@@ -123,11 +124,16 @@ export class InserterMenu extends Component {
 	 */
 	getItems() {
 		const {
-			items,
+			items: initialItems,
 			canInsertBlockType,
 			destinationRootClientId,
 			getBlockType,
 		} = this.props;
+
+		// Filter out reusable blocks (they will be added in another tab)
+		const items = initialItems.filter(
+			( { name } ) => name !== 'core/block'
+		);
 
 		const clipboard = getClipboard();
 		const clipboardBlock =
@@ -221,7 +227,7 @@ export default compose(
 			getBlockSelectionEnd,
 			getSettings,
 			canInsertBlockType,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { getChildBlockNames, getBlockType } = select( blocksStore );
 
 		let destinationRootClientId = rootClientId;
@@ -258,13 +264,13 @@ export default compose(
 			clearSelectedBlock,
 			insertBlock,
 			insertDefaultBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 
 		return {
 			showInsertionPoint() {
 				if ( ownProps.shouldReplaceBlock ) {
 					const { getBlockOrder, getBlockCount } = select(
-						'core/block-editor'
+						blockEditorStore
 					);
 
 					const count = getBlockCount();

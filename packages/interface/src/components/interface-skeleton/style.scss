@@ -64,8 +64,10 @@ html.interface-interface-skeleton__html-container {
 	overscroll-behavior-y: none;
 
 	// Footer overlap prevention
-	@include break-medium() {
-		padding-bottom: $button-size-small + $border-width;
+	.has-footer & {
+		@include break-medium() {
+			padding-bottom: $button-size-small + $border-width;
+		}
 	}
 }
 

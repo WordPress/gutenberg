@@ -8,6 +8,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -30,7 +31,7 @@ export function QueryContent( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const { postsPerPage } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			postsPerPage:
 				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
@@ -89,7 +90,7 @@ const QueryEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
-			!! select( 'core/block-editor' ).getBlocks( clientId ).length,
+			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;

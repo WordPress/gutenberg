@@ -15,7 +15,7 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableUseEditorStyles as useEditorStyles,
+	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { DropZoneProvider, Popover } from '@wordpress/components';
@@ -26,11 +26,11 @@ import { DropZoneProvider, Popover } from '@wordpress/components';
 import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
+import { store as editSiteStore } from '../../store';
 
-function Canvas( { body, styles } ) {
+function Canvas( { body } ) {
 	useBlockSelectionClearer( body );
 	useTypingObserver( body );
-	useEditorStyles( body, styles );
 
 	return (
 		<DropZoneProvider>
@@ -49,7 +49,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getEditedPostType,
 				getPage,
 				__experimentalGetPreviewDeviceType,
-			} = select( 'core/edit-site' );
+			} = select( editSiteStore );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -63,7 +63,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage } = useDispatch( editSiteStore );
 
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useRef();
@@ -106,11 +106,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
-					head={ window.__editorStyles.html }
+					headHTML={ window.__editorStyles.html }
+					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
 					contentRef={ contentRef }
 				>
-					<Canvas body={ contentRef } styles={ settings.styles } />
+					<Canvas body={ contentRef } />
 				</Iframe>
 			</div>
 		</BlockEditorProvider>

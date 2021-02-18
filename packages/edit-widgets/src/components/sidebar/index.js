@@ -39,7 +39,7 @@ function ComplementaryAreaTab( { identifier, label, isActive } ) {
 	return (
 		<Button
 			onClick={ () =>
-				enableComplementaryArea( editWidgetsStore, identifier )
+				enableComplementaryArea( editWidgetsStore.name, identifier )
 			}
 			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
 				'is-active': isActive,
@@ -74,7 +74,7 @@ export default function Sidebar() {
 
 		const selectedBlock = getSelectedBlock();
 
-		let activeArea = getActiveComplementaryArea( editWidgetsStore );
+		let activeArea = getActiveComplementaryArea( editWidgetsStore.name );
 		if ( ! activeArea ) {
 			if ( selectedBlock ) {
 				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
