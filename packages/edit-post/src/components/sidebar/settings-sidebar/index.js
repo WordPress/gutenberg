@@ -59,6 +59,7 @@ const SettingsSidebar = () => {
 
 	return (
 		<PluginSidebarEditPost
+			__unstableInitSource="core"
 			identifier={ sidebarName }
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }

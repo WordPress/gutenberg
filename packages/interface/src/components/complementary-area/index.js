@@ -153,7 +153,7 @@ function ComplementaryArea( {
 					/>
 				</PinnedItems>
 			) }
-			{ isPinnable && (
+			{ __unstableInitSource !== 'core' && isPinnable && (
 				<ComplementaryAreaMoreMenuItem
 					__unstableInitSource={ __unstableInitSource }
 					target={ name }
