@@ -53,13 +53,13 @@ export default function VisualEditor( { styles } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 
 	useBlockSelectionClearer( ref );
-	useTypewriter( ref );
 	useTypingObserver( ref );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
+		useTypewriter(),
 	] );
 
 	return (
