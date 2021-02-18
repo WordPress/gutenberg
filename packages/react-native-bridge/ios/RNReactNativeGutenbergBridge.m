@@ -29,6 +29,6 @@ RCT_EXTERN_METHOD(requestMediaFilesSaveCancelDialog:(NSArray<NSString *> *)media
 RCT_EXTERN_METHOD(onCancelUploadForMediaCollection:(NSArray<NSString *> *)mediaFiles)
 RCT_EXTERN_METHOD(actionButtonPressed:(NSString *)buttonType)
 RCT_EXTERN_METHOD(mediaSaveSync)
-RCT_EXTERN_METHOD(mediaFilesBlockReplaceSync)
+RCT_EXTERN_METHOD(mediaFilesBlockReplaceSync:(NSArray<NSDictionary *> *)mediaFiles clientId:(NSString *)clientId)
 
 @end

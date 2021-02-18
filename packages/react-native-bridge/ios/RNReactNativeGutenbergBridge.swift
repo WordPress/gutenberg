@@ -328,10 +328,10 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func mediaFilesBlockReplaceSync() {
+    func mediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
         DispatchQueue.main.async {
             if self.hasObservers {
-                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync()
+                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync(mediaFiles, clientId: clientId)
             }
         }
     }
