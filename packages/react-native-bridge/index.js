@@ -354,10 +354,14 @@ export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
  * @param {string} blockClientId the clientId of the block.
  */
 export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
-	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
-		mediaFiles,
-		blockClientId
-	);
+	// This bridge function is only working on Android so for now it can only be called from that platform.
+	// NOTE: 1.47.0 version includes changes in the native side that will allow this function to be called on iOS too.
+	if ( isAndroid ) {
+		RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
+			mediaFiles,
+			blockClientId
+		);
+	}
 }
 
 export default RNReactNativeGutenbergBridge;
