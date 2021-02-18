@@ -61,6 +61,22 @@ describe( 'Gallery', () => {
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
+	it( 'gallery caption can be edited', async () => {
+		const galleryCaption = 'Tested gallery caption';
+
+		await insertBlock( 'Gallery' );
+		const filename = await upload( '.wp-block-gallery input[type="file"]' );
+
+		await getUploadedFileFigure( filename );
+
+		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
+		await page.keyboard.type( galleryCaption );
+
+		expect( await getEditedPostContent() ).toMatch(
+			new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
+		);
+	} );
+
 	it( "uploaded images' captions can be edited", async () => {
 		await insertBlock( 'Gallery' );
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
