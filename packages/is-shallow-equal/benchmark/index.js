@@ -43,7 +43,7 @@ Promise.all( [
 				require( '..' ).isShallowEqualObjects,
 				require( '..' ).isShallowEqualArrays,
 			],
-			[ '@wordpress/is-shallow-equal', require( '..' ) ],
+			[ '@wordpress/is-shallow-equal', require( '..' ).default ],
 			[ 'shallowequal', shallowequal ],
 			[
 				'shallow-equal (type specific)',

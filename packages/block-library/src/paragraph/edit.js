@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
 	AlignmentToolbar,
@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -29,12 +30,8 @@ function getComputedStyle( node, pseudo ) {
 const name = 'core/paragraph';
 
 function ParagraphRTLToolbar( { direction, setDirection } ) {
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
-
 	return (
-		isRTL && (
+		isRTL() && (
 			<ToolbarGroup
 				controls={ [
 					{
@@ -91,7 +88,7 @@ function ParagraphBlock( {
 	const inlineFontSize = style?.fontSize;
 	const size = useSelect(
 		( select ) => {
-			const { fontSizes } = select( 'core/block-editor' ).getSettings();
+			const { fontSizes } = select( blockEditorStore ).getSettings();
 			return getFontSize( fontSizes, fontSize, inlineFontSize ).size;
 		},
 		[ fontSize, inlineFontSize ]

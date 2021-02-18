@@ -41,6 +41,29 @@ const gutenbergPackages = Object.keys( dependencies )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
+const stylesTransform = ( content ) => {
+	if ( mode === 'production' ) {
+		return postcss( [
+			require( 'cssnano' )( {
+				preset: [
+					'default',
+					{
+						discardComments: {
+							removeAll: true,
+						},
+					},
+				],
+			} ),
+		] )
+			.process( content, {
+				from: 'src/app.css',
+				to: 'dest/app.css',
+			} )
+			.then( ( result ) => result.css );
+	}
+	return content;
+};
+
 module.exports = {
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -57,6 +80,9 @@ module.exports = {
 					},
 					compress: {
 						passes: 2,
+					},
+					mangle: {
+						reserved: [ '__', '_n', '_nx', '_x' ],
 					},
 				},
 				extractComments: false,
@@ -96,6 +122,13 @@ module.exports = {
 					process.env.npm_package_config_GUTENBERG_PHASE,
 					10
 				) || 1
+			),
+			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
+			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
+				parseInt(
+					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
+					10
+				) || 0
 			),
 			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
 				process.env.FORCE_REDUCED_MOTION
@@ -140,30 +173,43 @@ module.exports = {
 				from: `./packages/${ packageName }/build-style/*.css`,
 				to: `./build/${ packageName }/`,
 				flatten: true,
-				transform: ( content ) => {
-					if ( mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [
-									'default',
-									{
-										discardComments: {
-											removeAll: true,
-										},
-									},
-								],
-							} ),
-						] )
-							.process( content, {
-								from: 'src/app.css',
-								to: 'dest/app.css',
-							} )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
+				transform: stylesTransform,
 			} ) )
 		),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/build-style/*/style.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }style\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/style.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/style-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }style-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/style-rtl.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/editor.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }editor\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/editor.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/editor-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }editor-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/editor-rtl.css',
+				transform: stylesTransform,
+			},
+		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
 				'./packages/block-library/src/': 'build/block-library/blocks/',

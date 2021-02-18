@@ -1,13 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { parse } from '@wordpress/blocks';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { getPathAndQueryString } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { findTemplate } from './controls';
+import { STORE_NAME as editSiteStoreName } from './constants';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -41,13 +43,25 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
  * Returns an action object used to set a template.
  *
  * @param {number} templateId The template ID.
- *
+ * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
-export function setTemplate( templateId ) {
+export function* setTemplate( templateId, templateSlug ) {
+	const pageContext = { templateSlug };
+	if ( ! templateSlug ) {
+		const template = yield controls.resolveSelect(
+			'core',
+			'getEntityRecord',
+			'postType',
+			'wp_template',
+			templateId
+		);
+		pageContext.templateSlug = template?.slug;
+	}
 	return {
 		type: 'SET_TEMPLATE',
 		templateId,
+		page: { context: pageContext },
 	};
 }
 
@@ -66,9 +80,23 @@ export function* addTemplate( template ) {
 		'wp_template',
 		template
 	);
+
+	if ( template.content ) {
+		yield controls.dispatch(
+			'core',
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			newTemplate.id,
+			{ blocks: parse( template.content ) },
+			{ undoIgnore: true }
+		);
+	}
+
 	return {
 		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
+		page: { context: { templateSlug: newTemplate.slug } },
 	};
 }
 
@@ -82,8 +110,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	const page = yield controls.select( 'core/edit-site', 'getPage' );
-	yield controls.dispatch( 'core/edit-site', 'setPage', page );
+	const page = yield controls.select( editSiteStoreName, 'getPage' );
+	yield controls.dispatch( editSiteStoreName, 'setPage', page );
 }
 
 /**
@@ -114,7 +142,8 @@ export function setHomeTemplateId( homeTemplateId ) {
 }
 
 /**
- * Resolves the template for a page and displays both.
+ * Resolves the template for a page and displays both. If no path is given, attempts
+ * to use the postId to generate a path like `?p=${ postId }`.
  *
  * @param {Object}  page         The page object.
  * @param {string}  page.type    The page type.
@@ -125,10 +154,33 @@ export function setHomeTemplateId( homeTemplateId ) {
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
-	const templateId = yield findTemplate( page.path );
+	if ( ! page.path && page.context?.postId ) {
+		const entity = yield controls.resolveSelect(
+			'core',
+			'getEntityRecord',
+			'postType',
+			page.context.postType || 'post',
+			page.context.postId
+		);
+
+		page.path = getPathAndQueryString( entity.link );
+	}
+	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
+		'core',
+		'__experimentalGetTemplateForLink',
+		page.path
+	);
 	yield {
 		type: 'SET_PAGE',
-		page,
+		page: ! templateSlug
+			? page
+			: {
+					...page,
+					context: {
+						...page.context,
+						templateSlug,
+					},
+			  },
 		templateId,
 	};
 	return templateId;
@@ -148,8 +200,13 @@ export function* showHomepage() {
 		'site'
 	);
 
+	const { siteUrl } = yield controls.select(
+		editSiteStoreName,
+		'getSettings'
+	);
+
 	const page = {
-		path: '/',
+		path: siteUrl,
 		context:
 			showOnFront === 'page'
 				? {

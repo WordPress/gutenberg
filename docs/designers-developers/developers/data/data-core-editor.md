@@ -203,7 +203,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPBlock>`: Filtered set of blocks for save.
+-   `WPBlock[]`: Filtered set of blocks for save.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
@@ -331,7 +331,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Preview Link.
+-   `string?`: Preview Link.
 
 <a name="getEditedPostSlug" href="#getEditedPostSlug">#</a> **getEditedPostSlug**
 
@@ -373,7 +373,21 @@ _Returns_
 
 -   `Array`: Block list.
 
+<a name="getEditorSelection" href="#getEditorSelection">#</a> **getEditorSelection**
+
+Returns the current selection.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection end.
+
 <a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
+
+> **Deprecated** since Gutenberg 10.0.0.
 
 Returns the current selection end.
 
@@ -386,6 +400,8 @@ _Returns_
 -   `WPBlockSelection`: The selection end.
 
 <a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+> **Deprecated** since Gutenberg 10.0.0.
 
 Returns the current selection start.
 
@@ -568,17 +584,10 @@ _Related_
 
 <a name="getStateBeforeOptimisticTransaction" href="#getStateBeforeOptimisticTransaction">#</a> **getStateBeforeOptimisticTransaction**
 
+> **Deprecated** since Gutenberg 9.7.0.
+
 Returns state object prior to a specified optimist transaction ID, or `null`
 if the transaction corresponding to the given ID cannot be found.
-
-_Parameters_
-
--   _state_ `Object`: Current global application state.
--   _transactionId_ `Object`: Optimist transaction ID.
-
-_Returns_
-
--   `Object`: Global application state prior to transaction.
 
 <a name="getSuggestedPostFormat" href="#getSuggestedPostFormat">#</a> **getSuggestedPostFormat**
 
@@ -696,17 +705,10 @@ _Related_
 
 <a name="inSomeHistory" href="#inSomeHistory">#</a> **inSomeHistory**
 
+> **Deprecated** since Gutenberg 9.7.0.
+
 Returns true if an optimistic transaction is pending commit, for which the
 before state satisfies the given predicate function.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _predicate_ `Function`: Function given state, returning true if match.
-
-_Returns_
-
--   `boolean`: Whether predicate matches for some history.
 
 <a name="isAncestorMultiSelected" href="#isAncestorMultiSelected">#</a> **isAncestorMultiSelected**
 
@@ -794,7 +796,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
+-   _currentPost_ `Object?`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -1075,7 +1077,7 @@ Storage).
 
 _Parameters_
 
--   _options_ `?Object`: Extra flags to identify the autosave.
+-   _options_ `Object?`: Extra flags to identify the autosave.
 
 <a name="clearSelectedBlock" href="#clearSelectedBlock">#</a> **clearSelectedBlock**
 
@@ -1361,7 +1363,7 @@ _Parameters_
 
 -   _post_ `Object`: Post object.
 -   _edits_ `Object`: Initial edited attributes object.
--   _template_ `?Array`: Block Template.
+-   _template_ `Array?`: Block Template.
 
 <a name="setupEditorState" href="#setupEditorState">#</a> **setupEditorState**
 
@@ -1490,12 +1492,10 @@ Undocumented declaration.
 
 <a name="updatePost" href="#updatePost">#</a> **updatePost**
 
+> **Deprecated** since Gutenberg 9.7.0.
+
 Returns an action object used in signalling that a patch of updates for the
 latest version of the post have been received.
-
-_Parameters_
-
--   _edits_ `Object`: Updated post fields.
 
 _Returns_
 

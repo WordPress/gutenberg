@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/notices';
 import '@wordpress/block-editor';
-import '@wordpress/reusable-blocks';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -44,6 +42,7 @@ import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
+import * as pageList from './page-list';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
@@ -59,7 +58,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-import * as classic from './classic';
+import * as classic from './freeform';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
 
@@ -71,6 +70,10 @@ import * as templatePart from './template-part';
 import * as query from './query';
 import * as queryLoop from './query-loop';
 import * as queryPagination from './query-pagination';
+import * as queryPaginationNext from './query-pagination-next';
+import * as queryPaginationNumbers from './query-pagination-numbers';
+import * as queryPaginationPrevious from './query-pagination-previous';
+import * as postNavigationLink from './post-navigation-link';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
@@ -147,6 +150,7 @@ export const __experimentalGetCoreBlocks = () => [
 	missing,
 	more,
 	nextpage,
+	pageList,
 	preformatted,
 	pullquote,
 	rss,
@@ -217,6 +221,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								query,
 								queryLoop,
 								queryPagination,
+								queryPaginationNext,
+								queryPaginationNumbers,
+								queryPaginationPrevious,
 								postTitle,
 								postContent,
 								postAuthor,
@@ -232,6 +239,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postFeaturedImage,
 								postHierarchicalTerms,
 								postTags,
+								postNavigationLink,
 						  ]
 						: [] ),
 				].forEach( registerBlock );

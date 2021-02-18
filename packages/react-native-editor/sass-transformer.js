@@ -48,9 +48,9 @@ const autoImportIncludePaths = [
 	path.join( path.dirname( __filename ), '../base-styles' ),
 ];
 const autoImportAssets = [
+	'_variables.scss',
 	'_colors.scss',
 	'_breakpoints.scss',
-	'_variables.scss',
 	'_native.scss',
 	'_mixins.scss',
 	'_animations.scss',

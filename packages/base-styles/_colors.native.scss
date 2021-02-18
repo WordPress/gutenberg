@@ -24,7 +24,9 @@ $light-opacity-light-700: rgba($white, 0.4);
 $alert-yellow: #f0b849;
 $alert-red: #d94f4f;
 $alert-green: #4ab866;
+$red-30: #f86368;
 $red-40: #e65054;
+$red-50: #d63638;
 
 // Primary Accent (Blues)
 $blue-wordpress: #0087be;
@@ -40,6 +42,7 @@ $gray: #87a6bc;
 $gray-light: lighten($gray, 33%); //#f3f6f8
 $gray-dark: darken($gray, 38%); //#2e4453
 $gray-900: #1a1a1a;
+$gray-700: #757575;
 
 // $gray-text: ideal for standard, non placeholder text
 // $gray-text-min: minimum contrast needed for WCAG 2.0 AA on white background

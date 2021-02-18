@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType } from '@wordpress/blocks';
+
+/**
  * External dependencies
  */
 import { create, act } from 'react-test-renderer';
@@ -9,6 +14,7 @@ import { create, act } from 'react-test-renderer';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
+import { store as blockEditorStore } from '../../../store';
 
 const TestWrapper = withRegistryProvider( ( props ) => {
 	if ( props.setRegistry ) {
@@ -19,6 +25,15 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 } );
 
 describe( 'useBlockSync hook', () => {
+	beforeAll( () => {
+		registerBlockType( 'test/test-block', {
+			title: 'Test block',
+			attributes: {
+				foo: { type: 'number' },
+			},
+		} );
+	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -101,7 +116,12 @@ describe( 'useBlockSync hook', () => {
 		);
 
 		const testBlocks = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		await act( async () => {
 			root.update(
@@ -118,7 +138,8 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( resetBlocks ).not.toHaveBeenCalled();
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', testBlocks );
+		// We can't check the args because the blocks are cloned.
+		expect( replaceInnerBlocks ).toHaveBeenCalled();
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
@@ -130,7 +151,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 		let root;
 		let registry;
@@ -150,11 +176,11 @@ describe( 'useBlockSync hook', () => {
 		} );
 
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		const newBlockValue = registry
-			.select( 'core/block-editor' )
+			.select( blockEditorStore )
 			.getBlocks( 'test' );
 		replaceInnerBlocks.mockClear();
 
@@ -200,7 +226,6 @@ describe( 'useBlockSync hook', () => {
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
-
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
@@ -223,15 +248,21 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a non-persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.__unstableMarkNextChangeAsNotPersistent();
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( onInput ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
@@ -262,12 +293,18 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( onChange ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -282,7 +319,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		await act( async () => {
@@ -325,7 +367,12 @@ describe( 'useBlockSync hook', () => {
 		const onInput = jest.fn();
 
 		const value1 = [
-			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
 		];
 
 		let registry;
@@ -347,13 +394,26 @@ describe( 'useBlockSync hook', () => {
 		replaceInnerBlocks.mockClear();
 
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( onChange ).toHaveBeenCalledWith(
-			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			[
+				{
+					name: 'test/test-block',
+					clientId: 'a',
+					innerBlocks: [],
+					attributes: { foo: 2 },
+				},
+			],
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -383,7 +443,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		const updatedBlocks1 = [
@@ -391,8 +451,11 @@ describe( 'useBlockSync hook', () => {
 		];
 
 		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
-			selectionEnd: {},
-			selectionStart: {},
+			selection: {
+				initialPosition: null,
+				selectionEnd: {},
+				selectionStart: {},
+			},
 		} );
 
 		const newBlocks = [
@@ -418,7 +481,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
 		// The first callback should not have been called.
@@ -427,7 +490,13 @@ describe( 'useBlockSync hook', () => {
 		// The second callback should be called with the new change.
 		expect( onChange2 ).toHaveBeenCalledWith(
 			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 	} );
 
@@ -475,7 +544,7 @@ describe( 'useBlockSync hook', () => {
 
 		// Create a persistent change.
 		registry
-			.dispatch( 'core/block-editor' )
+			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'b', { foo: 3 } );
 
 		// The first callback should never be called in this scenario.
@@ -484,7 +553,13 @@ describe( 'useBlockSync hook', () => {
 		// Only the new callback should be called.
 		expect( onChange2 ).toHaveBeenCalledWith(
 			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 	} );
 } );

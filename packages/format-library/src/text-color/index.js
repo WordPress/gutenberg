@@ -21,7 +21,7 @@ import { removeFormat } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColor } from './inline';
 
 const name = 'core/text-color';
-const title = __( 'Text Color' );
+const title = __( 'Text color' );
 
 const EMPTY_ARRAY = [];
 
@@ -87,7 +87,10 @@ function TextColorEdit( {
 					onClose={ disableIsAddingColor }
 					activeAttributes={ activeAttributes }
 					value={ value }
-					onChange={ onChange }
+					onChange={ ( ...args ) => {
+						onChange( ...args );
+						disableIsAddingColor();
+					} }
 					contentRef={ contentRef }
 				/>
 			) }

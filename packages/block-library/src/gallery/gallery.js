@@ -96,6 +96,7 @@ export const Gallery = ( props ) => {
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
 				className="blocks-gallery-caption"
+				aria-label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
 				unstableOnFocus={ onFocusGalleryCaption }

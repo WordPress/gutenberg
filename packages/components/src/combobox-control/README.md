@@ -1,6 +1,6 @@
 # ComboboxControl
 
-`ComboboxControl` is an enhanced version of a [`SelectControl`](/packages/components/src/select-control/readme.md), with the addition of being able to search for options using a search input.
+`ComboboxControl` is an enhanced version of a [`SelectControl`](/packages/components/src/select-control/README.md), with the addition of being able to search for options using a search input.
 
 ## Table of contents
 
@@ -10,7 +10,7 @@
 
 ## Design guidelines
 
-These are the same as [the ones for `SelectControl`s](/packages/components/src/select-control/readme.md#design-guidelines), but this component is better suited for when there are too many items to scroll through or load at once so you need to filter them based on user input.
+These are the same as [the ones for `SelectControl`s](/packages/components/src/select-control/README.md#design-guidelines), but this component is better suited for when there are too many items to scroll through or load at once so you need to filter them based on user input.
 
 ## Development guidelines
 
@@ -91,7 +91,7 @@ The options that can be chosen from.
 - Type: `Array<{ value: String, label: String }>`
 - Required: Yes
 
-#### onInputChange
+#### onFilterValueChange
 
 Function called with the control's search input value changes. The argument contains the next input value.
 

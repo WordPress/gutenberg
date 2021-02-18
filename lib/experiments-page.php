@@ -51,6 +51,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-navigation',
 		)
 	);
+	add_settings_field(
+		'gutenberg-widgets-in-customizer',
+		__( 'Widgets', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Widgets screen in Customizer', 'gutenberg' ),
+			'id'    => 'gutenberg-widgets-in-customizer',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -88,23 +99,3 @@ function gutenberg_display_experiment_section() {
 
 	<?php
 }
-
-/**
- * Extends default editor settings with experiments settings.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments_settings = array(
-		'__unstableEnableFullSiteEditingBlocks' => gutenberg_is_fse_theme(),
-	);
-	$gradient_presets     = current( (array) get_theme_support( 'editor-gradient-presets' ) );
-	if ( false !== $gradient_presets ) {
-		$experiments_settings['gradients'] = $gradient_presets;
-	}
-
-	return array_merge( $settings, $experiments_settings );
-}
-add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

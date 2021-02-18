@@ -3,7 +3,7 @@ InnerBlocks
 
 InnerBlocks exports a pair of components which can be used in block implementations to enable nested block content.
 
-Refer to the [implementation of the Columns block](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src/columns) as an example resource.
+Refer to the [implementation of the Columns block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/columns) as an example resource.
 
 ## Usage
 
@@ -11,22 +11,26 @@ In a block's `edit` implementation, render `InnerBlocks`. Then, in the `save` im
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...
 
-	edit( { className } ) {
+	edit() {
+		const blockProps = useBlockProps();
+
 		return (
-			<div className={ className }>
+			<div { ...blockProps }>
 				<InnerBlocks />
 			</div>
 		);
 	},
 
 	save() {
+		const blockProps = useBlockProps.save();
+
 		return (
-			<div>
+			<div { ...blockProps }>
 				<InnerBlocks.Content />
 			</div>
 		);

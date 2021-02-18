@@ -16,11 +16,14 @@ import Tiles from './tiles';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockCaption } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
-import { WIDE_ALIGNMENTS } from '@wordpress/components';
+import { alignmentHelpers } from '@wordpress/components';
 
 const TILE_SPACING = 15;
 
@@ -28,12 +31,14 @@ const TILE_SPACING = 15;
 const MAX_DISPLAYED_COLUMNS = 4;
 const MAX_DISPLAYED_COLUMNS_NARROW = 2;
 
+const { isFullWidth } = alignmentHelpers;
+
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	useEffect( mediaUploadSync, [] );
 
 	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
+		return !! select( blockEditorStore ).getSettings().isRTL;
 	}, [] );
 
 	const {
@@ -84,8 +89,6 @@ export const Gallery = ( props ) => {
 		onFocusGalleryCaption();
 	};
 
-	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-
 	return (
 		<View style={ { flex: 1 } }>
 			<Tiles
@@ -131,7 +134,7 @@ export const Gallery = ( props ) => {
 					);
 				} ) }
 			</Tiles>
-			<View style={ [ isFullWidth && styles.fullWidth ] }>
+			<View style={ isFullWidth( align ) && styles.fullWidth }>
 				{ mediaPlaceholder }
 			</View>
 			<BlockCaption

@@ -49,9 +49,10 @@ describe( 'PostPublishButton', () => {
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).toBeNull();
 
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/edit-post' ).requestMetaBoxUpdates()
-		);
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
+			return true;
+		} );
 		expect(
 			await page.$( '.editor-post-publish-button[aria-disabled="true"]' )
 		).not.toBeNull();

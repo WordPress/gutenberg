@@ -18,6 +18,11 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+/**
  * Module Constants
  */
 const PANEL_NAME = 'page-attributes';
@@ -55,7 +60,7 @@ export function PageAttributes( {
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
 	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-		'core/edit-post'
+		editPostStore
 	);
 	const { getPostType } = select( 'core' );
 	return {
@@ -66,7 +71,7 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
+	const { toggleEditorPanelOpened } = dispatch( editPostStore );
 
 	return {
 		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),

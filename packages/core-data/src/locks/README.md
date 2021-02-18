@@ -1,10 +1,10 @@
 # Store locks
 
-Operations mutating the store (resolvers, saveEntityRecord) interfere with each other by changing the state used by other "concurrent" operations. My solution is to enable these operations to lock parts of the state tree that are expected to remain constant for the duration of the operation. For example `saveEntityRecord("postType", "book", 3)` would acquire a lock on a book with id=3 and nothing else.
+Operations mutating the store (resolvers, saveEntityRecord) interfere with each other by changing the state used by other "concurrent" operations. The solution is to enable these operations to lock parts of the state tree that are expected to remain constant for the duration of the operation. For example `saveEntityRecord("postType", "book", 3)` would acquire a lock on a book with id=3 and nothing else.
 
 More generally, interfering store operations should run sequentially. Each operation acquires a lock scoped to its state dependencies. If a lock cannot be acquired, the operation is delayed until a lock can be acquired. Locks are either exclusive or shared. If all operations request a shared lock, everything is executed concurrently. If any operation requests an exclusive lock, is it run only after all other locks (shared or exclusive) acting on the same scope are released.
 
-The most complex part of this PR is the concept of lock scope. Locks are stored in a tree. Each node in the tree looks like this:
+The most complex part of this API is the concept of lock scope. Locks are stored in a tree. Each node in the tree looks like this:
 
 ```jsx
 {
@@ -105,4 +105,4 @@ Since there are two shared locks on `book`, the operation is delayed until both 
 
 If any fetch operation is triggered now, it will attempt to acquire a shared lock on `book`. Since one of `book` descendants holds an exclusive lock, fetch must wait until that lock is released.
 
-This structure makes it quite easy to control concurrent reads/writes with, as I believe, any granularity. For example, if we wanted to make sure two fetch operations may run only if their `query` is different, each could acquire two locks: a shared lock on `book` to prevent clashing with writes, and an exclusive lock on an unrelated branch such as `fetchByQuery > [query]`.
+This structure makes it quite easy to control concurrent reads/writes with any granularity. For example, if we wanted to make sure two fetch operations may run only if their `query` is different, each could acquire two locks: a shared lock on `book` to prevent clashing with writes, and an exclusive lock on an unrelated branch such as `fetchByQuery > [query]`.

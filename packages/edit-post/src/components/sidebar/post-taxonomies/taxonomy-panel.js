@@ -10,6 +10,11 @@ import { compose } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
 function TaxonomyPanel( {
 	isEnabled,
 	taxonomy,
@@ -44,16 +49,16 @@ export default compose(
 		return {
 			panelName,
 			isEnabled: slug
-				? select( 'core/edit-post' ).isEditorPanelEnabled( panelName )
+				? select( editPostStore ).isEditorPanelEnabled( panelName )
 				: false,
 			isOpened: slug
-				? select( 'core/edit-post' ).isEditorPanelOpened( panelName )
+				? select( editPostStore ).isEditorPanelOpened( panelName )
 				: false,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onTogglePanel: () => {
-			dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+			dispatch( editPostStore ).toggleEditorPanelOpened(
 				ownProps.panelName
 			);
 		},

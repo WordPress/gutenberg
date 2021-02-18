@@ -8,7 +8,7 @@ const variations = [
 		name: 'category',
 		title: __( 'Post Categories' ),
 		icon: 'category',
-		is_default: true,
+		isDefault: true,
 		attributes: { term: 'category' },
 	},
 ];

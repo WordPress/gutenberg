@@ -197,7 +197,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		global $wp_registered_widgets;
 
 		$widgets = array();
-		foreach ( $wp_registered_widgets as $slug => $widget ) {
+		foreach ( $wp_registered_widgets as $widget ) {
 			$widget_callback = $widget['callback'];
 			unset( $widget['callback'] );
 

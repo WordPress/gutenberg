@@ -33,5 +33,7 @@
 			"link": true
 		},
 		"lineHeight": true
-	}
+	},
+	"editorStyle": "wp-block-post-author-editor",
+	"style": "wp-block-post-author"
 }

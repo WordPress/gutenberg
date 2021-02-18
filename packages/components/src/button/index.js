@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray } from 'lodash';
+import { isArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
+import VisuallyHidden from '../visually-hidden';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
@@ -34,6 +35,7 @@ export function Button( props, ref ) {
 		className,
 		disabled,
 		icon,
+		iconPosition = 'left',
 		iconSize,
 		showTooltip,
 		tooltipPosition,
@@ -42,6 +44,7 @@ export function Button( props, ref ) {
 		children,
 		text,
 		__experimentalIsFocusable: isFocusable,
+		describedBy,
 		...additionalProps
 	} = props;
 
@@ -103,32 +106,59 @@ export function Button( props, ref ) {
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
+	const descriptionId = describedBy ? uniqueId() : null;
+
+	const describedById =
+		additionalProps[ 'aria-describedby' ] || descriptionId;
+
 	const element = (
 		<Tag
 			{ ...tagProps }
 			{ ...additionalProps }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
+			aria-describedby={ describedById }
 			ref={ ref }
 		>
-			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+			{ icon && iconPosition === 'left' && (
+				<Icon icon={ icon } size={ iconSize } />
+			) }
 			{ text && <>{ text }</> }
+			{ icon && iconPosition === 'right' && (
+				<Icon icon={ icon } size={ iconSize } />
+			) }
 			{ children }
 		</Tag>
 	);
 
 	if ( ! shouldShowTooltip ) {
-		return element;
+		return (
+			<>
+				{ element }
+				{ describedBy && (
+					<VisuallyHidden>
+						<span id={ descriptionId }>{ describedBy }</span>
+					</VisuallyHidden>
+				) }
+			</>
+		);
 	}
 
 	return (
-		<Tooltip
-			text={ label }
-			shortcut={ shortcut }
-			position={ tooltipPosition }
-		>
-			{ element }
-		</Tooltip>
+		<>
+			<Tooltip
+				text={ describedBy ? describedBy : label }
+				shortcut={ shortcut }
+				position={ tooltipPosition }
+			>
+				{ element }
+			</Tooltip>
+			{ describedBy && (
+				<VisuallyHidden>
+					<span id={ descriptionId }>{ describedBy }</span>
+				</VisuallyHidden>
+			) }
+		</>
 	);
 }
 

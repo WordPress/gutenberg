@@ -252,6 +252,20 @@ function isInserterOpened( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking whether the inserter is open.
+ *
+ * @param {boolean} state
+ * @param {Object}  action
+ */
+function isEditingTemplate( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_EDITING_TEMPLATE':
+			return action.value;
+	}
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
@@ -265,4 +279,5 @@ export default combineReducers( {
 	removedPanels,
 	deviceType,
 	isInserterOpened,
+	isEditingTemplate,
 } );

@@ -18,6 +18,7 @@ import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -45,9 +46,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select(
-			'core/keyboard-shortcuts'
-		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
 			duplicate: getShortcutRepresentation(
 				'core/block-editor/duplicate'
@@ -96,7 +95,7 @@ export function BlockSettingsDropdown( {
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
-					label={ __( 'More options' ) }
+					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons
@@ -142,7 +141,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert Before' ) }
+											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ flow(
@@ -151,7 +150,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert After' ) }
+											{ __( 'Insert after' ) }
 										</MenuItem>
 									</>
 								) }
@@ -159,7 +158,7 @@ export function BlockSettingsDropdown( {
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
-										{ __( 'Move To' ) }
+										{ __( 'Move to' ) }
 									</MenuItem>
 								) }
 								{ count === 1 && (

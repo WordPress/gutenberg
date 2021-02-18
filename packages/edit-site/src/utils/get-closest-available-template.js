@@ -4,20 +4,28 @@
 import { find } from 'lodash';
 
 export default function getClosestAvailableTemplate( slug, templates ) {
-	if ( 'front-page' === slug ) {
-		const homeTemplate = find( templates, { slug: 'home' } );
-		if ( homeTemplate ) {
-			return homeTemplate;
-		}
+	const template = find( templates, { slug } );
+	if ( template ) {
+		return template;
 	}
 
-	if ( 'single' === slug || 'page' === slug ) {
-		const singularTemplate = find( templates, { slug: 'singular' } );
-		if ( singularTemplate ) {
-			return singularTemplate;
-		}
+	switch ( slug ) {
+		case 'single':
+		case 'page':
+			return getClosestAvailableTemplate( 'singular', templates );
+		case 'author':
+		case 'category':
+		case 'taxonomy':
+		case 'date':
+		case 'tag':
+			return getClosestAvailableTemplate( 'archive', templates );
+		case 'front-page':
+			return getClosestAvailableTemplate( 'home', templates );
+		case 'attachment':
+			return getClosestAvailableTemplate( 'single', templates );
+		case 'privacy-policy':
+			return getClosestAvailableTemplate( 'page', templates );
 	}
 
-	const indexTemplate = find( templates, { slug: 'index' } );
-	return indexTemplate;
+	return find( templates, { slug: 'index' } );
 }

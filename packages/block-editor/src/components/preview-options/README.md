@@ -2,7 +2,7 @@
 
 The `PreviewOptions` component displays the list of different preview options available in the editor.
 
-It returns a [`DropdownMenu`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/dropdown-menu) component with these different options. The options currently available in the editor are Desktop, Mobile, Tablet and "Preview in new tab".
+It returns a [`DropdownMenu`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/dropdown-menu) component with these different options. The options currently available in the editor are Desktop, Mobile, Tablet and "Preview in new tab".
 
 ![Preview options dropdown menu](https://make.wordpress.org/core/files/2020/09/preview-options-dropdown-menu.png)
 
@@ -83,4 +83,4 @@ Used to set the device type that will be used to display the preview inside the 
 
 ## Related components
 
-Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.

@@ -33,5 +33,7 @@
 			"gradients": true
 		},
 		"__unstablePasteTextInline": true
-	}
+	},
+	"editorStyle": "wp-block-list-editor",
+	"style": "wp-block-list"
 }

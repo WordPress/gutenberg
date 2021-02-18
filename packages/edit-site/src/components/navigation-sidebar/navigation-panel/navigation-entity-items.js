@@ -5,6 +5,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __experimentalNavigationItem as NavigationItem } from '@wordpress/components';
 import { getPathAndQueryString } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../../store';
+
 const getEntityTitle = ( kind, entity ) =>
 	'taxonomy' === kind ? entity.name : entity?.title?.rendered;
 
@@ -14,7 +19,7 @@ export default function NavigationEntityItems( { kind, name, query = {} } ) {
 		[ kind, name, query ]
 	);
 
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage } = useDispatch( editSiteStore );
 
 	if ( ! entities ) {
 		return null;

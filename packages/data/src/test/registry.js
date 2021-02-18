@@ -8,6 +8,7 @@ import { castArray, mapValues } from 'lodash';
  */
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
+import createReduxStore from '../redux-store';
 
 jest.useFakeTimers();
 
@@ -502,6 +503,44 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK
 			jest.runAllTimers();
 			await promise;
+		} );
+	} );
+
+	describe( 'register', () => {
+		it( 'should work with the store definition as param for select', () => {
+			const store = createReduxStore( 'demo', {
+				reducer: ( state = 'OK' ) => state,
+				selectors: {
+					getValue: ( state ) => state,
+				},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+		} );
+
+		it( 'should work with the store definition as param for dispatch', async () => {
+			const store = createReduxStore( 'demo', {
+				reducer( state = 'OK', action ) {
+					if ( action.type === 'UPDATE' ) {
+						return 'UPDATED';
+					}
+					return state;
+				},
+				actions: {
+					update() {
+						return { type: 'UPDATE' };
+					},
+				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+			await registry.dispatch( store ).update();
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
 		} );
 	} );
 

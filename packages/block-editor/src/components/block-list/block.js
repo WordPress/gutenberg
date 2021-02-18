@@ -44,7 +44,8 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { useBlockProps } from './block-wrapper';
+import { useBlockProps } from './use-block-props';
+import { store as blockEditorStore } from '../../store';
 
 export const BlockListBlockContext = createContext();
 
@@ -84,7 +85,6 @@ function BlockListBlock( {
 	mode,
 	isLocked,
 	clientId,
-	rootClientId,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -111,22 +111,23 @@ function BlockListBlock( {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted, isFocusMode } = useSelect(
+	const { isDragging, isHighlighted, isFocusMode, isOutlineMode } = useSelect(
 		( select ) => {
 			const {
 				isBlockBeingDragged,
 				isBlockHighlighted,
 				getSettings,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			return {
 				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
 				isFocusMode: getSettings().focusMode,
+				isOutlineMode: getSettings().outlineMode,
 			};
 		},
 		[ clientId ]
 	);
-	const { removeBlock } = useDispatch( 'core/block-editor' );
+	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
@@ -175,6 +176,7 @@ function BlockListBlock( {
 				isLargeViewport &&
 				( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode && isLargeViewport,
+			'is-outline-mode': isOutlineMode,
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 			'is-active-entity': activeEntityBlockId === clientId,
 		},
@@ -216,7 +218,6 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		rootClientId,
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
@@ -286,7 +287,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
 		getMultiSelectedBlockClientIds,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
@@ -350,7 +351,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		__unstableMarkLastChangeAsPersistent,
-	} = dispatch( 'core/block-editor' );
+	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -373,14 +374,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = select( 'core/block-editor' );
+			const { getBlockIndex } = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
 			const { getPreviousBlockClientId, getNextBlockClientId } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			if ( forward ) {

@@ -30,5 +30,6 @@
 			"link": true
 		},
 		"lineHeight": true
-	}
+	},
+	"editorStyle": "wp-block-post-excerpt-editor"
 }

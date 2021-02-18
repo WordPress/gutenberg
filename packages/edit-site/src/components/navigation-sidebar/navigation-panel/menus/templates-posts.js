@@ -23,18 +23,20 @@ import {
 } from '../constants';
 
 export default function TemplatesPostsMenu( { templates } ) {
-	const generalTemplates = templates?.filter( ( { slug } ) =>
-		TEMPLATES_POSTS.includes( slug )
-	);
-	const specificTemplates = templates?.filter( ( { slug } ) =>
-		slug.startsWith( 'post-' )
-	);
+	const generalTemplates =
+		templates?.filter( ( { slug } ) => TEMPLATES_POSTS.includes( slug ) ) ??
+		[];
+	const specificTemplates =
+		templates?.filter( ( { slug } ) => slug.startsWith( 'post-' ) ) ?? [];
 
 	return (
 		<NavigationMenu
 			menu={ MENU_TEMPLATES_POSTS }
 			title={ __( 'Posts' ) }
 			parentMenu={ MENU_TEMPLATES }
+			isEmpty={
+				generalTemplates.length === 0 && specificTemplates.length === 0
+			}
 		>
 			<NavigationGroup title={ _x( 'Specific', 'specific templates' ) }>
 				{ map( specificTemplates, ( template ) => (

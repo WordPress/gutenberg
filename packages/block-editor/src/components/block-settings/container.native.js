@@ -2,17 +2,25 @@
  * WordPress dependencies
  */
 import { InspectorControls } from '@wordpress/block-editor';
-import { BottomSheet, ColorSettings } from '@wordpress/components';
+import {
+	BottomSheet,
+	ColorSettings,
+	FocalPointSettings,
+	LinkPickerScreen,
+} from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
+import { store as blockEditorStore } from '../../store';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
 	color: 'Color',
+	focalPoint: 'FocalPoint',
+	linkPicker: 'linkPicker',
 };
 
 function BottomSheetSettings( {
@@ -41,6 +49,21 @@ function BottomSheetSettings( {
 				>
 					<ColorSettings defaultSettings={ settings } />
 				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.focalPoint }
+					fullScreen
+				>
+					<FocalPointSettings />
+				</BottomSheet.NavigationScreen>
+				<BottomSheet.NavigationScreen
+					name={ blockSettingsScreens.linkPicker }
+					fullScreen
+					isScrollable
+				>
+					<LinkPickerScreen
+						returnScreenName={ blockSettingsScreens.settings }
+					/>
+				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
@@ -49,7 +72,7 @@ function BottomSheetSettings( {
 export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),

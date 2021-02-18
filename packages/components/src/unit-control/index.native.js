@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { Text, View, TouchableWithoutFeedback, Platform } from 'react-native';
+import {
+	Text,
+	View,
+	TouchableWithoutFeedback,
+	Platform,
+	findNodeHandle,
+} from 'react-native';
 
 /**
  * Internal dependencies
@@ -10,11 +16,12 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS } from './utils';
+import { CSS_UNITS, hasUnits } from './utils';
+
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useCallback, useMemo, memo } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -35,12 +42,13 @@ function UnitControl( {
 	...props
 } ) {
 	const pickerRef = useRef();
+	const anchorNodeRef = useRef();
 
-	function onPickerPresent() {
+	const onPickerPresent = useCallback( () => {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
 		}
-	}
+	}, [ pickerRef?.current ] );
 
 	const currentInputValue = currentInput === null ? value : currentInput;
 	const initialControlValue = isFinite( currentInputValue )
@@ -52,45 +60,68 @@ function UnitControl( {
 		styles.unitButtonTextDark
 	);
 
-	const renderUnitButton = () => {
-		const accessibilityHint =
-			Platform.OS === 'ios'
-				? __( 'Double tap to open Action Sheet with available options' )
-				: __(
-						'Double tap to open Bottom Sheet with available options'
-				  );
+	/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
+	const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
 
-		/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
-		const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
+	const accessibilityHint =
+		Platform.OS === 'ios'
+			? __( 'Double tap to open Action Sheet with available options' )
+			: __( 'Double tap to open Bottom Sheet with available options' );
 
-		return (
-			<TouchableWithoutFeedback
-				onPress={ onPickerPresent }
-				accessibilityLabel={ accessibilityLabel }
-				accessibilityRole="button"
-				accessibilityHint={ accessibilityHint }
-			>
-				<View style={ styles.unitButton }>
-					<Text style={ unitButtonTextStyle }>{ unit }</Text>
-				</View>
-			</TouchableWithoutFeedback>
-		);
-	};
-
-	const renderUnitPicker = () => {
-		return (
-			<View style={ styles.unitMenu }>
-				{ renderUnitButton() }
-				<Picker
-					ref={ pickerRef }
-					options={ units }
-					onChange={ onUnitChange }
-					hideCancelButton
-					leftAlign
-				/>
+	const renderUnitButton = useMemo( () => {
+		const unitButton = (
+			<View style={ styles.unitButton }>
+				<Text style={ unitButtonTextStyle }>{ unit }</Text>
 			</View>
 		);
-	};
+
+		if ( hasUnits( units ) ) {
+			return (
+				<TouchableWithoutFeedback
+					onPress={ onPickerPresent }
+					accessibilityLabel={ accessibilityLabel }
+					accessibilityRole="button"
+					accessibilityHint={ accessibilityHint }
+				>
+					{ unitButton }
+				</TouchableWithoutFeedback>
+			);
+		}
+
+		return unitButton;
+	}, [
+		onPickerPresent,
+		accessibilityLabel,
+		accessibilityHint,
+		unitButtonTextStyle,
+		unit,
+	] );
+
+	const getAnchor = useCallback(
+		() =>
+			anchorNodeRef?.current
+				? findNodeHandle( anchorNodeRef?.current )
+				: undefined,
+		[ anchorNodeRef?.current ]
+	);
+
+	const renderUnitPicker = useCallback( () => {
+		return (
+			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
+				{ renderUnitButton }
+				{ hasUnits( units ) ? (
+					<Picker
+						ref={ pickerRef }
+						options={ units }
+						onChange={ onUnitChange }
+						hideCancelButton
+						leftAlign
+						getAnchor={ getAnchor }
+					/>
+				) : null }
+			</View>
+		);
+	}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
 	return (
 		<>
@@ -128,4 +159,4 @@ function UnitControl( {
 	);
 }
 
-export default withPreferredColorScheme( UnitControl );
+export default memo( withPreferredColorScheme( UnitControl ) );

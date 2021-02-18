@@ -73,7 +73,26 @@ export function dispatch( ...args ) {
 	return dataControls.dispatch( ...args );
 }
 
-export const awaitPromise = function ( promise ) {
+/**
+ * Dispatches a control action for awaiting on a promise to be resolved.
+ *
+ * @param {Object} promise Promise to wait for.
+ *
+ * @example
+ * ```js
+ * import { __unstableAwaitPromise } from '@wordpress/data-controls';
+ *
+ * // Action generator using apiFetch
+ * export function* myAction() {
+ * 	const promise = getItemsAsync();
+ * 	const items = yield __unstableAwaitPromise( promise );
+ * 	// do something with the items.
+ * }
+ * ```
+ *
+ * @return {Object} The control descriptor.
+ */
+export const __unstableAwaitPromise = function ( promise ) {
 	return {
 		type: 'AWAIT_PROMISE',
 		promise,

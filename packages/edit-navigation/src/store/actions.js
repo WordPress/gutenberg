@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -96,7 +97,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			throw new Error();
 		}
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Navigation saved.' ),
 			{
@@ -105,7 +106,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 		);
 	} catch ( e ) {
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			__( 'There was an error.' ),
 			{

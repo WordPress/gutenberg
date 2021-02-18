@@ -5,25 +5,38 @@ import {
 	Button,
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '../index';
-import { getTemplateInfo } from '../../../utils';
+import { store as editSiteStore } from '../../../store';
 
 export default function TemplateNavigationItem( { item } ) {
-	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
+	const { title, description } = useSelect(
+		( select ) =>
+			'wp_template' === item.type
+				? select( 'core/editor' ).__experimentalGetTemplateInfo( item )
+				: {
+						title: item?.title?.rendered || item?.slug,
+						description: '',
+				  },
+		[]
+	);
+	const { setTemplate, setTemplatePart } = useDispatch( editSiteStore );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
-	const { title, description } = getTemplateInfo( item );
+	if ( ! item ) {
+		return null;
+	}
 
 	const onActivateItem = () =>
 		'wp_template' === item.type
-			? setTemplate( item.id )
+			? setTemplate( item.id, item.slug )
 			: setTemplatePart( item.id );
 
 	return (
@@ -37,7 +50,10 @@ export default function TemplateNavigationItem( { item } ) {
 				onMouseEnter={ () => setIsPreviewVisible( true ) }
 				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				{ title }
+				<div className="edit-site-navigation-panel__template-item-title">
+					{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
+					{ title }
+				</div>
 				{ description && (
 					<div className="edit-site-navigation-panel__template-item-description">
 						{ description }

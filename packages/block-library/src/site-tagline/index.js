@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Site Tagline' ),
+	title: _x( 'Site Tagline', 'block title' ),
 	description: __( 'In a few words, what this site is about.' ),
 	keywords: [ __( 'description' ) ],
 	icon,

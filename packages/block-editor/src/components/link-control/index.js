@@ -120,6 +120,7 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const [ internalInputValue, setInternalInputValue ] = useState(
 		( value && value.url ) || ''
@@ -142,19 +143,20 @@ function LinkControl( {
 	}, [ forceIsEditingLink ] );
 
 	useEffect( () => {
-		// When `isEditingLink` is set to `false`, a focus loss could occur
+		if ( isMounting.current ) {
+			isMounting.current = false;
+			return;
+		}
+		// When `isEditingLink` changes, a focus loss could occur
 		// since the link input may be removed from the DOM. To avoid this,
 		// reinstate focus to a suitable target if focus has in-fact been lost.
 		// Note that the check is necessary because while typically unsetting
 		// edit mode would render the read-only mode's link element, it isn't
 		// guaranteed. The link input may continue to be shown if the next value
 		// is still unassigned after calling `onChange`.
-		const hadFocusLoss =
-			isEndingEditWithFocus.current &&
-			wrapperNode.current &&
-			! wrapperNode.current.contains(
-				wrapperNode.current.ownerDocument.activeElement
-			);
+		const hadFocusLoss = ! wrapperNode.current.contains(
+			wrapperNode.current.ownerDocument.activeElement
+		);
 
 		if ( hadFocusLoss ) {
 			// Prefer to focus a natural focusable descendent of the wrapper,

@@ -148,6 +148,9 @@ describe( 'Multi-block selection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '2' );
 
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
@@ -563,7 +566,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
-		await clickBlockToolbarButton( 'Change text alignment' );
+		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Align text center' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

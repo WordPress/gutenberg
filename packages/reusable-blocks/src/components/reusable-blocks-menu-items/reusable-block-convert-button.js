@@ -3,16 +3,24 @@
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-import { useCallback } from '@wordpress/element';
-import { MenuItem } from '@wordpress/components';
+import { useCallback, useState } from '@wordpress/element';
+import {
+	MenuItem,
+	Modal,
+	Button,
+	TextControl,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
 import { reusableBlock } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { STORE_KEY } from '../../store/constants';
+import { store } from '../../store';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -26,6 +34,8 @@ export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
 } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( 'core' );
@@ -69,16 +79,16 @@ export default function ReusableBlockConvertButton( {
 
 	const {
 		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( STORE_KEY );
+	} = useDispatch( store );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		'core/notices'
+		noticesStore
 	);
 	const onConvert = useCallback(
-		async function () {
+		async function ( reusableBlockTitle ) {
 			try {
-				await convertBlocksToReusable( clientIds );
-				createSuccessNotice( __( 'Block created.' ), {
+				await convertBlocksToReusable( clientIds, reusableBlockTitle );
+				createSuccessNotice( __( 'Reusable block created.' ), {
 					type: 'snackbar',
 				} );
 			} catch ( error ) {
@@ -97,15 +107,61 @@ export default function ReusableBlockConvertButton( {
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
-				<MenuItem
-					icon={ reusableBlock }
-					onClick={ () => {
-						onConvert();
-						onClose();
-					} }
-				>
-					{ __( 'Add to Reusable blocks' ) }
-				</MenuItem>
+				<>
+					<MenuItem
+						icon={ reusableBlock }
+						onClick={ () => {
+							setIsModalOpen( true );
+						} }
+					>
+						{ __( 'Add to Reusable blocks' ) }
+					</MenuItem>
+					{ isModalOpen && (
+						<Modal
+							title={ __( 'Create Reusable block' ) }
+							closeLabel={ __( 'Close' ) }
+							onRequestClose={ () => {
+								setIsModalOpen( false );
+								setTitle( '' );
+							} }
+							overlayClassName="reusable-blocks-menu-items__convert-modal"
+						>
+							<form
+								onSubmit={ ( event ) => {
+									event.preventDefault();
+									onConvert( title );
+									setIsModalOpen( false );
+									setTitle( '' );
+									onClose();
+								} }
+							>
+								<TextControl
+									label={ __( 'Name' ) }
+									value={ title }
+									onChange={ setTitle }
+								/>
+								<Flex justify="flex-end">
+									<FlexItem>
+										<Button
+											isSecondary
+											onClick={ () => {
+												setIsModalOpen( false );
+												setTitle( '' );
+											} }
+										>
+											{ __( 'Cancel' ) }
+										</Button>
+									</FlexItem>
+									<FlexItem>
+										<Button isPrimary type="submit">
+											{ __( 'Save' ) }
+										</Button>
+									</FlexItem>
+								</Flex>
+							</form>
+						</Modal>
+					) }
+				</>
 			) }
 		</BlockSettingsMenuControls>
 	);

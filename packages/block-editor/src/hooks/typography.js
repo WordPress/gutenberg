@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { hasBlockSupport } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+/**
+ * External dependencies
+ */
+import {
+	PanelBody,
+	__unstableComponentSystemProvider as ComponentSystemProvider,
+} from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -18,7 +24,8 @@ import {
 	useIsLineHeightDisabled,
 } from './line-height';
 import {
-	FONT_APPEARANCE_SUPPORT_KEY,
+	FONT_STYLE_SUPPORT_KEY,
+	FONT_WEIGHT_SUPPORT_KEY,
 	FontAppearanceEdit,
 	useIsFontAppearanceDisabled,
 } from './font-appearance';
@@ -43,8 +50,9 @@ import {
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_APPEARANCE_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	FONT_STYLE_SUPPORT_KEY,
+	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
@@ -59,11 +67,15 @@ export function TypographyPanel( props ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
-				<FontFamilyEdit { ...props } />
-				<FontSizeEdit { ...props } />
-				<FontAppearanceEdit { ...props } />
-				<LineHeightEdit { ...props } />
-				<TextDecorationAndTransformEdit { ...props } />
+				<ComponentSystemProvider
+					__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
+				>
+					<FontFamilyEdit { ...props } />
+					<FontSizeEdit { ...props } />
+					<FontAppearanceEdit { ...props } />
+					<LineHeightEdit { ...props } />
+					<TextDecorationAndTransformEdit { ...props } />
+				</ComponentSystemProvider>
 			</PanelBody>
 		</InspectorControls>
 	);

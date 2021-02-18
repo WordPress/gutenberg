@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+/**
  * Internal dependencies
  */
 import Cell from '../mobile/bottom-sheet/cell';
@@ -32,4 +36,4 @@ function TextControl( {
 	);
 }
 
-export default TextControl;
+export default memo( TextControl );

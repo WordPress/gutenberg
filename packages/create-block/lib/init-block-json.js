@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { isEmpty, omitBy } = require( 'lodash' );
+const { omitBy } = require( 'lodash' );
 const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
 
@@ -11,11 +11,14 @@ const { writeFile } = require( 'fs' ).promises;
 const { info } = require( './log' );
 
 module.exports = async ( {
+	apiVersion,
 	slug,
 	namespace,
 	title,
 	description,
 	category,
+	attributes,
+	supports,
 	dashicon,
 	textdomain,
 	editorScript,
@@ -23,7 +26,6 @@ module.exports = async ( {
 	style,
 } ) => {
 	const outputFile = join( process.cwd(), slug, 'block.json' );
-
 	info( '' );
 	info( 'Creating a "block.json" file.' );
 	await writeFile(
@@ -31,20 +33,20 @@ module.exports = async ( {
 		JSON.stringify(
 			omitBy(
 				{
+					apiVersion,
 					name: namespace + '/' + slug,
 					title,
 					category,
 					icon: dashicon,
 					description,
+					attributes,
+					supports,
 					textdomain,
-					supports: {
-						html: false,
-					},
 					editorScript,
 					editorStyle,
 					style,
 				},
-				isEmpty
+				( value ) => ! value
 			),
 			null,
 			'\t'

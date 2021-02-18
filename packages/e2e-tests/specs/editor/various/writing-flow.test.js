@@ -397,6 +397,18 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should navigate contenteditable with normal line height', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => {
+			document.activeElement.style.lineHeight = 'normal';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should not prematurely multi-select', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
@@ -523,46 +535,16 @@ describe( 'Writing Flow', () => {
 
 		await page.mouse.move( x, y );
 		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 
 		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
 		await page.mouse.click( x, lowerInserterY );
-		await page.keyboard.type( '3' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should not have a dead zone between blocks (upper)', async () => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
-
-		// Find a point outside the paragraph between the blocks where it's
-		// expected that the sibling inserter would be placed.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const paragraphRect = await paragraph.boundingBox();
-		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
-		const y = paragraphRect.y + paragraphRect.height + 1;
-
-		await page.mouse.move( x, y );
-		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point-inserter'
-		);
-
-		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point-inserter'
-		);
-		const inserterRect = await inserter.boundingBox();
-		const upperInserterY = inserterRect.y + inserterRect.height / 3;
-
-		await page.mouse.click( x, upperInserterY );
 		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -574,8 +556,13 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'Change alignment' );
+		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Wide width' );
+
+		// Focus the block.
+		await page.keyboard.press( 'Tab' );
+
+		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
@@ -590,11 +577,11 @@ describe( 'Writing Flow', () => {
 
 		await page.mouse.move( x, y );
 		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 
 		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;

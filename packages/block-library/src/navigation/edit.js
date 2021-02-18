@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { upperFirst } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -12,8 +11,10 @@ import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
+	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -24,8 +25,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import * as navIcons from './icons';
+
 import NavigationPlaceholder from './placeholder';
+import PlaceholderPreview from './placeholder-preview';
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -38,16 +40,22 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
+	hasItemJustificationControls = attributes.orientation === 'horizontal',
 	hasListViewModal = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			'is-vertical': attributes.orientation === 'vertical',
+		} ),
+	} );
+
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
@@ -61,6 +69,7 @@ function Navigation( {
 				'core/navigation-link',
 				'core/search',
 				'core/social-links',
+				'core/page-list',
 			],
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
@@ -75,6 +84,11 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
+			__experimentalLayout: {
+				type: 'default',
+				alignments: [],
+			},
+			placeholder: <PlaceholderPreview />,
 		}
 	);
 
@@ -94,60 +108,19 @@ function Navigation( {
 		);
 	}
 
-	function handleItemsAlignment( align ) {
-		return () => {
-			const itemsJustification =
-				attributes.itemsJustification === align ? undefined : align;
-			setAttributes( {
-				itemsJustification,
-			} );
-		};
-	}
-
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
-
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
-					<ToolbarGroup
-						icon={
-							attributes.itemsJustification
-								? navIcons[
-										`justify${ upperFirst(
-											attributes.itemsJustification
-										) }Icon`
-								  ]
-								: navIcons.justifyLeftIcon
+					<JustifyToolbar
+						value={ attributes.itemsJustification }
+						onChange={ ( value ) =>
+							setAttributes( { itemsJustification: value } )
 						}
-						label={ __( 'Change items justification' ) }
-						isCollapsed
-						controls={ [
-							{
-								icon: navIcons.justifyLeftIcon,
-								title: __( 'Justify items left' ),
-								isActive:
-									'left' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'left' ),
-							},
-							{
-								icon: navIcons.justifyCenterIcon,
-								title: __( 'Justify items center' ),
-								isActive:
-									'center' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'center' ),
-							},
-							{
-								icon: navIcons.justifyRightIcon,
-								title: __( 'Justify items right' ),
-								isActive:
-									'right' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'right' ),
-							},
-						] }
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
 					/>
 				) }
 				{ hasListViewModal && (
@@ -170,13 +143,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav
-				{ ...blockProps }
-				className={ classnames(
-					blockProps.className,
-					blockClassNames
-				) }
-			>
+			<nav { ...blockProps }>
 				<ul { ...innerBlocksProps } />
 			</nav>
 		</>
@@ -185,12 +152,12 @@ function Navigation( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
 			false
@@ -211,7 +178,7 @@ export default compose( [
 				if ( blocks?.length === 0 ) {
 					return false;
 				}
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+				dispatch( blockEditorStore ).replaceInnerBlocks(
 					clientId,
 					blocks,
 					true

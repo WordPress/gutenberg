@@ -21,15 +21,24 @@
 	// Token input
 	input[type="text"].components-form-token-field__input {
 		display: inline-block;
+		flex: 1;
+		font-size: 16px;
 		width: 100%;
 		max-width: 100%;
 		margin-left: 4px;
 		padding: 0;
 		min-height: 24px;
+		min-width: 50px;
 		background: inherit;
 		border: 0;
 		color: $gray-900;
 		box-shadow: none;
+
+		// Resolves Zooming on iOS devices
+		// https://github.com/WordPress/gutenberg/issues/27405
+		@include break-small() {
+			font-size: 13px;
+		}
 
 		&:focus,
 		.components-form-token-field.is-active & {

@@ -200,7 +200,7 @@ function gutenberg_get_legacy_widget_settings() {
 
 	$settings['availableLegacyWidgets'] = $available_legacy_widgets;
 
-	return gutenberg_experiments_editor_settings( $settings );
+	return $settings;
 }
 
 /**

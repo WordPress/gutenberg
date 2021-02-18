@@ -10,7 +10,14 @@ import { useSelect } from '@wordpress/data';
 import {
 	getBlockType,
 	__experimentalGetBlockLabel as getBlockLabel,
+	isReusableBlock,
 } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import useBlockDisplayInformation from '../use-block-display-information';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -28,38 +35,43 @@ import {
  * @return {?string} Block title.
  */
 export default function BlockTitle( { clientId } ) {
-	const { attributes, name } = useSelect(
+	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return {};
 			}
-			const { getBlockName, getBlockAttributes } = select(
-				'core/block-editor'
-			);
+			const {
+				getBlockName,
+				getBlockAttributes,
+				__experimentalGetReusableBlockTitle,
+			} = select( blockEditorStore );
+			const blockName = getBlockName( clientId );
+			if ( ! blockName ) {
+				return {};
+			}
+			const isReusable = isReusableBlock( getBlockType( blockName ) );
 			return {
 				attributes: getBlockAttributes( clientId ),
-				name: getBlockName( clientId ),
+				name: blockName,
+				reusableBlockTitle:
+					isReusable &&
+					__experimentalGetReusableBlockTitle(
+						getBlockAttributes( clientId ).ref
+					),
 			};
 		},
 		[ clientId ]
 	);
 
-	if ( ! name ) {
-		return null;
-	}
-
+	const blockInformation = useBlockDisplayInformation( clientId );
+	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
-	if ( ! blockType ) {
-		return null;
+	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
+	// Label will fallback to the title if no label is defined for the current
+	// label context. If the label is defined we prioritize it over possible
+	// possible block variation title match.
+	if ( label !== blockType.title ) {
+		return truncate( label, { length: 35 } );
 	}
-
-	const { title } = blockType;
-	const label = getBlockLabel( blockType, attributes );
-
-	// Label will often fall back to the title if no label is defined for the
-	// current label context. We do not want "Paragraph: Paragraph".
-	if ( label !== title ) {
-		return `${ title }: ${ truncate( label, { length: 15 } ) }`;
-	}
-	return title;
+	return blockInformation.title;
 }

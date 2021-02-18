@@ -79,6 +79,19 @@ export function MoreExamplesStory() {
 						</a>
 					</NavigationItem>
 				</NavigationGroup>
+				<NavigationGroup title="Text only items">
+					<NavigationItem
+						item="item-text-only"
+						title="This is just text, doesn't have any functionality"
+						isText
+					/>
+					<NavigationItem
+						item="item-text-only-with-badge"
+						title="Text with badge"
+						badge="2"
+						isText
+					/>
+				</NavigationGroup>
 			</NavigationMenu>
 
 			<NavigationMenu

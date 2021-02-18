@@ -4,6 +4,7 @@ $color-palette-circle-spacing: 12px;
 .components-circular-option-picker {
 	display: inline-block;
 	width: 100%;
+	min-width: 188px;
 
 	.components-circular-option-picker__custom-clear-wrapper {
 		display: flex;

@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
 import { isEqual } from 'lodash';
+
 /**
  * WordPress dependencies
  */
+import { memo } from '@wordpress/element';
 
-const List = React.memo( FlatList, isEqual );
+const List = memo( FlatList, isEqual );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,

@@ -57,10 +57,13 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		filemtime( "$dir/$style_css" )
 	);
 
-	register_block_type( '{{namespace}}/{{slug}}', array(
-		'editor_script' => '{{namespace}}-{{slug}}-block-editor',
-		'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
-		'style'         => '{{namespace}}-{{slug}}-block',
-	) );
+	register_block_type(
+		'{{namespace}}/{{slug}}',
+		array(
+			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
+			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
+			'style'         => '{{namespace}}-{{slug}}-block',
+		)
+	);
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

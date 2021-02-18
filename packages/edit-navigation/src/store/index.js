@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,20 +11,16 @@ import * as resolvers from './resolvers';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-
-/**
- * Module Constants
- */
-const MODULE_KEY = 'core/edit-navigation';
+import { STORE_NAME } from './constants';
 
 /**
  * Block editor data store configuration.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
  *
  * @type {Object}
  */
-export const storeConfig = {
+const storeConfig = {
 	reducer,
 	controls,
 	selectors,
@@ -32,6 +28,13 @@ export const storeConfig = {
 	actions,
 };
 
-const store = registerStore( MODULE_KEY, storeConfig );
+/**
+ * Store definition for the edit navigation namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
-export default store;
+register( store );

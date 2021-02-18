@@ -305,7 +305,7 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         }
     }
 
-    def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules"] as String[]
+    def nodeModulesFolders = ["$mobileGutenbergRootDir/node_modules", "$mobileGutenbergRootDir/gutenberg/node_modules", "$mobileGutenbergRootDir/jetpack/node_modules"] as String[]
     task cleanupNodeModulesFolders(type: Delete) {
         doFirst {
             println "Deleting node_modules folders"

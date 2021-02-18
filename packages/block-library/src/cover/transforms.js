@@ -14,26 +14,42 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/image' ],
 			transform: ( { caption, url, align, id, anchor } ) =>
-				createBlock( 'core/cover', {
-					title: caption,
-					url,
-					align,
-					id,
-					anchor,
-				} ),
+				createBlock(
+					'core/cover',
+					{
+						url,
+						align,
+						id,
+						anchor,
+					},
+					[
+						createBlock( 'core/paragraph', {
+							content: caption,
+							fontSize: 'large',
+						} ),
+					]
+				),
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
 			transform: ( { caption, src, align, id, anchor } ) =>
-				createBlock( 'core/cover', {
-					title: caption,
-					url: src,
-					align,
-					id,
-					backgroundType: VIDEO_BACKGROUND_TYPE,
-					anchor,
-				} ),
+				createBlock(
+					'core/cover',
+					{
+						url: src,
+						align,
+						id,
+						backgroundType: VIDEO_BACKGROUND_TYPE,
+						anchor,
+					},
+					[
+						createBlock( 'core/paragraph', {
+							content: caption,
+							fontSize: 'large',
+						} ),
+					]
+				),
 		},
 	],
 	to: [

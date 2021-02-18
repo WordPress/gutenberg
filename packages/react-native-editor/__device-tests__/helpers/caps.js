@@ -13,7 +13,6 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	platformVersion: '14.0',
 	deviceName: 'iPhone 11',
 };
 

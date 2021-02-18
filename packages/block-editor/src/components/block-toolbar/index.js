@@ -22,12 +22,9 @@ import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import { useShowMoversGestures } from './utils';
-import ExpandedBlockControlsContainer from './expanded-block-controls-container';
+import { store as blockEditorStore } from '../../store';
 
-export default function BlockToolbar( {
-	hideDragHandle,
-	__experimentalExpandedControl = false,
-} ) {
+export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
 		blockClientId,
@@ -44,7 +41,7 @@ export default function BlockToolbar( {
 			isBlockValid,
 			getBlockRootClientId,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
@@ -68,9 +65,10 @@ export default function BlockToolbar( {
 		};
 	}, [] );
 
-	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
+	// Handles highlighting the current block outline on hover or focus of the
+	// block type toolbar area.
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const nodeRef = useRef();
-
 	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
 		{
 			ref: nodeRef,
@@ -83,6 +81,8 @@ export default function BlockToolbar( {
 		}
 	);
 
+	// Account for the cases where the block toolbar is rendered within the
+	// header area and not contextually to the block.
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
@@ -106,18 +106,12 @@ export default function BlockToolbar( {
 		shouldShowMovers && 'is-showing-movers'
 	);
 
-	const Wrapper = __experimentalExpandedControl
-		? ExpandedBlockControlsContainer
-		: 'div';
-
 	return (
-		<Wrapper className={ classes }>
+		<div className={ classes }>
+			{ ! isMultiToolbar && ! displayHeaderToolbar && (
+				<BlockParentSelector clientIds={ blockClientIds } />
+			) }
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
-						<BlockParentSelector clientIds={ blockClientIds } />
-					</div>
-				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 						<BlockSwitcher clientIds={ blockClientIds } />
@@ -141,6 +135,6 @@ export default function BlockToolbar( {
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
-		</Wrapper>
+		</div>
 	);
 }

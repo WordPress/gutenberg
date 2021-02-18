@@ -6,18 +6,13 @@ import { defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	DropZoneProvider,
-	SlotFillProvider,
-	FocusReturnProvider,
-} from '@wordpress/components';
+import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
@@ -28,6 +23,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
+import { store as editWidgetsStore } from '../../store';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
@@ -40,8 +36,8 @@ export default function WidgetAreasBlockEditorProvider( {
 				select( 'core' ).canUser( 'create', 'media' ),
 				true
 			),
-			widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
-			widgets: select( 'core/edit-widgets' ).getWidgets(),
+			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
+			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: select( 'core' ).getEntityRecords(
 				'postType',
 				'wp_block'
@@ -49,7 +45,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		} ),
 		[]
 	);
-	const { setIsInserterOpened } = useDispatch( 'core/edit-widgets' );
+	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -86,26 +82,23 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<FocusReturnProvider>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ onInput }
-							onChange={ onChange }
-							settings={ settings }
-							useSubRegistry={ false }
-							{ ...props }
-						>
-							{ children }
-							<ReusableBlocksMenuItems
-								rootClientId={ widgetAreaId }
-							/>
-						</BlockEditorProvider>
-					</FocusReturnProvider>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ onInput }
+						onChange={ onChange }
+						settings={ settings }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						{ children }
+						<ReusableBlocksMenuItems
+							rootClientId={ widgetAreaId }
+						/>
+					</BlockEditorProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>

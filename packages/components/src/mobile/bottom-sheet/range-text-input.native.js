@@ -39,8 +39,11 @@ class RangeTextInput extends Component {
 		this.onSubmitEditing = this.onSubmitEditing.bind( this );
 		this.onChangeText = this.onChangeText.bind( this );
 
-		const { value, defaultValue, min } = props;
-		const initialValue = value || defaultValue || min;
+		const { value, defaultValue, min, decimalNum } = props;
+		const initialValue = toFixed(
+			value || defaultValue || min,
+			decimalNum
+		);
 
 		const fontScale = this.getFontScale();
 
@@ -128,13 +131,6 @@ class RangeTextInput extends Component {
 		onChange( validValue );
 	}
 
-	onChangeValue( initialValue ) {
-		const { decimalNum } = this.props;
-		initialValue = toFixed( initialValue, decimalNum );
-		this.setState( { inputValue: initialValue } );
-		this.updateValue( initialValue );
-	}
-
 	onChangeText( textValue ) {
 		const { decimalNum } = this.props;
 		const inputValue = removeNonDigit( textValue, decimalNum );
@@ -194,7 +190,7 @@ class RangeTextInput extends Component {
 		const valueFinalStyle = [
 			! isIOS ? inputBorderStyles : verticalBorderStyle,
 			{
-				width: 40 * fontScale,
+				width: 50 * fontScale,
 			},
 		];
 

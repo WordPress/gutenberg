@@ -4,6 +4,7 @@
 import {
 	LineHeightControl,
 	__experimentalFontFamilyControl as FontFamilyControl,
+	__experimentalFontAppearanceControl as FontAppearanceControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -14,9 +15,10 @@ import { __ } from '@wordpress/i18n';
 import { useEditorFeature } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
+	const hasLineHeight = useHasLineHeightControl( { supports, name } );
+	const hasFontAppearence = useHasAppearenceControl( { supports, name } );
 	return (
-		useHasLineHeightControl( { supports, name } ) ||
-		supports.includes( 'fontSize' )
+		hasLineHeight || hasFontAppearence || supports.includes( 'fontSize' )
 	);
 }
 
@@ -27,10 +29,20 @@ function useHasLineHeightControl( { supports, name } ) {
 	);
 }
 
+function useHasAppearenceControl( { supports, name } ) {
+	const hasFontStyles =
+		useEditorFeature( 'typography.customFontStyle', name ) &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useEditorFeature( 'typography.customFontWeight', name ) &&
+		supports.includes( 'fontWeight' );
+	return hasFontStyles || hasFontWeights;
+}
+
 export default function TypographyPanel( {
 	context: { supports, name },
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 } ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useEditorFeature(
@@ -38,24 +50,31 @@ export default function TypographyPanel( {
 		name
 	);
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const hasFontStyles =
+		useEditorFeature( 'typography.customFontStyle', name ) &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useEditorFeature( 'typography.customFontWeight', name ) &&
+		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
+	const hasAppearenceControl = useHasAppearenceControl( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
-					value={ getStyleProperty( name, 'fontFamily' ) }
+					value={ getStyle( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'fontFamily', value )
+						setStyle( name, 'fontFamily', value )
 					}
 				/>
 			) }
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ getStyleProperty( name, 'fontSize' ) }
+					value={ getStyle( name, 'fontSize' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'fontSize', value )
+						setStyle( name, 'fontSize', value )
 					}
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
@@ -63,10 +82,24 @@ export default function TypographyPanel( {
 			) }
 			{ hasLineHeightEnabled && (
 				<LineHeightControl
-					value={ getStyleProperty( name, 'lineHeight' ) }
+					value={ getStyle( name, 'lineHeight' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'lineHeight', value )
+						setStyle( name, 'lineHeight', value )
 					}
+				/>
+			) }
+			{ hasAppearenceControl && (
+				<FontAppearanceControl
+					value={ {
+						fontStyle: getStyle( name, 'fontStyle' ),
+						fontWeight: getStyle( name, 'fontWeight' ),
+					} }
+					onChange={ ( { fontStyle, fontWeight } ) => {
+						setStyle( name, 'fontStyle', fontStyle );
+						setStyle( name, 'fontWeight', fontWeight );
+					} }
+					hasFontStyles={ hasFontStyles }
+					hasFontWeights={ hasFontWeights }
 				/>
 			) }
 		</PanelBody>

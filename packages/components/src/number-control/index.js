@@ -7,6 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,7 +17,6 @@ import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
-import { useRTL } from '../utils/style-mixins';
 import { add, subtract, roundClamp } from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
@@ -40,7 +40,6 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const isRtl = useRTL();
 	const baseValue = roundClamp( 0, min, max, step );
 
 	const jumpStep = useJumpStep( {
@@ -120,7 +119,7 @@ export function NumberControl(
 
 				case 'e':
 					directionBaseValue = x;
-					directionModifier = isRtl ? -1 : 1;
+					directionModifier = isRTL() ? -1 : 1;
 					break;
 
 				case 's':
@@ -130,7 +129,7 @@ export function NumberControl(
 
 				case 'w':
 					directionBaseValue = x;
-					directionModifier = isRtl ? 1 : -1;
+					directionModifier = isRTL() ? 1 : -1;
 					break;
 			}
 
