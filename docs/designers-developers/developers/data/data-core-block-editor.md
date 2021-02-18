@@ -1535,7 +1535,7 @@ attributes with the specified client IDs have been updated.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged.
+-   _attributes_ `Object`: Block attributes to be merged. Can be keyed by clientIds if different attribute changes required for each block in clientIds.
 
 _Returns_
 

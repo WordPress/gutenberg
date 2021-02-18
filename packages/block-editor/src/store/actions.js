@@ -154,7 +154,8 @@ export function receiveBlocks( blocks ) {
  * attributes with the specified client IDs have been updated.
  *
  * @param {string|string[]} clientIds  Block client IDs.
- * @param {Object}          attributes Block attributes to be merged.
+ * @param {Object}          attributes Block attributes to be merged. Can be keyed by clientIds if
+ * different attribute changes required for each block in clientIds.
  *
  * @return {Object} Action object.
  */
