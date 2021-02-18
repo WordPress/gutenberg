@@ -34,7 +34,7 @@ Returns all registered plugins.
 
 _Returns_
 
--   `Array<WPPlugin>`: Plugin settings.
+-   `WPPlugin[]`: Plugin settings.
 
 <a name="PluginArea" href="#PluginArea">#</a> **PluginArea**
 

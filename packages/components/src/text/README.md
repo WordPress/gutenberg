@@ -5,7 +5,7 @@ A component for rendering text.
 ## Usage
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 const HeroPanel = () => (
 	<>

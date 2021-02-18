@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 export default function useHierarchicalTermLinks( { postId, postType, term } ) {
@@ -21,7 +21,7 @@ export default function useHierarchicalTermLinks( { postId, postType, term } ) {
 
 	const { hierarchicalTermLinks, isLoadingHierarchicalTermLinks } = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( 'core' );
+			const { getEntityRecord } = select( coreStore );
 
 			let loaded = true;
 

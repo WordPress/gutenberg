@@ -13,6 +13,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -38,7 +39,7 @@ function ColumnEdit( {
 	const { hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			return {
@@ -49,7 +50,7 @@ function ColumnEdit( {
 		[ clientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const updateAlignment = ( value ) => {
 		// Update own alignment.

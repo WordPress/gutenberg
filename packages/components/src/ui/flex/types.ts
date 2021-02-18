@@ -1,7 +1,9 @@
 import { CSSProperties } from 'react';
 import { ResponsiveCSSValue } from '../utils/types';
 
-export type FlexDirection = ResponsiveCSSValue< CSSProperties[ 'flexDirection' ] >;
+export type FlexDirection = ResponsiveCSSValue<
+	CSSProperties[ 'flexDirection' ]
+>;
 
 export type FlexProps = {
 	/**
@@ -109,7 +111,7 @@ export type FlexProps = {
 	 * }
 	 * ```
 	 */
-	gap?: number;
+	gap?: import('react').ReactText;
 	/**
 	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
 	 * In the example below, `flex-start` will align the children content to the left.
