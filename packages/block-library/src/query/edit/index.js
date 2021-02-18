@@ -9,7 +9,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
