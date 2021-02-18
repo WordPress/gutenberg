@@ -37,6 +37,15 @@ async function upload( selector ) {
 	return filename;
 }
 
+async function getUploadedFileFigure( filename ) {
+	const image = await page.waitForSelector(
+		`.wp-block-gallery img[src$="${ filename }.png"]`
+	);
+
+	const figureElement = await image.getProperty( 'parentElement' );
+	return await figureElement.asElement();
+}
+
 describe( 'Gallery', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -50,6 +59,34 @@ describe( 'Gallery', () => {
 			`<!-- wp:gallery {"ids":\\[\\d+\\],"linkTo":"none"} -->\\s*<figure class="wp-block-gallery columns-1 is-cropped"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img src="[^"]+\\/${ filename }\\.png" alt="" data-id="\\d+" data-link=".+" class="wp-image-\\d+"\\/><\\/figure><\\/li><\\/ul><\\/figure>\\s*<!-- \\/wp:gallery -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
+	} );
+
+	it( "uploaded images' captions can be edited", async () => {
+		await insertBlock( 'Gallery' );
+		const filename = await upload( '.wp-block-gallery input[type="file"]' );
+
+		const figureElement = await getUploadedFileFigure( filename );
+
+		await figureElement.click();
+
+		expect(
+			await figureElement.evaluate( ( element ) =>
+				element.classList.contains( 'is-selected' )
+			)
+		).toBeTruthy();
+
+		const captionElement = await figureElement.$(
+			'.block-editor-rich-text__editable'
+		);
+
+		const caption = 'Tested caption';
+
+		await captionElement.click();
+		await page.keyboard.type( caption );
+
+		expect( await getEditedPostContent() ).toMatch(
+			new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
+		);
 	} );
 
 	// Disable reason:
