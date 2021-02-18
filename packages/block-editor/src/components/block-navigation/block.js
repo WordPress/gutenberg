@@ -46,10 +46,11 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
-	const { isDragging, blockParents } = useSelect(
+	const { isDragging, isHighlighted, blockParents } = useSelect(
 		( select ) => {
 			const {
 				isBlockBeingDragged,
+				isBlockHighlighted,
 				isAncestorBeingDragged,
 				getBlockParents,
 			} = select( blockEditorStore );
@@ -59,6 +60,7 @@ export default function BlockNavigationBlock( {
 					isBlockBeingDragged( clientId ) ||
 					isAncestorBeingDragged( clientId ),
 				blockParents: getBlockParents( clientId ),
+				isHighlighted: isBlockHighlighted( clientId ),
 			};
 		},
 		[ clientId ]
@@ -104,6 +106,7 @@ export default function BlockNavigationBlock( {
 			className={ classnames( {
 				'is-selected': isSelected,
 				'is-dragging': isDragging,
+				'is-highlighted': isHighlighted,
 			} ) }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
