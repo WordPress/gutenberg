@@ -88,7 +88,7 @@ export default function ReusableBlockConvertButton( {
 		async function ( reusableBlockTitle ) {
 			try {
 				await convertBlocksToReusable( clientIds, reusableBlockTitle );
-				createSuccessNotice( __( 'Block created.' ), {
+				createSuccessNotice( __( 'Reusable block created.' ), {
 					type: 'snackbar',
 				} );
 			} catch ( error ) {
@@ -118,7 +118,7 @@ export default function ReusableBlockConvertButton( {
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
-							title={ __( 'Create reusable block' ) }
+							title={ __( 'Create Reusable block' ) }
 							closeLabel={ __( 'Close' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );

@@ -60,7 +60,7 @@ const createReusableBlock = async ( content, title ) => {
 
 	// Wait for creation to finish
 	await page.waitForXPath(
-		'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
 	);
 
 	// Check that we have a reusable block on the page
@@ -182,7 +182,7 @@ describe( 'Reusable blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block created."]'
 		);
 
 		await clearAllBlocks();
@@ -235,7 +235,7 @@ describe( 'Reusable blocks', () => {
 		// Save the reusable block
 		await page.click( publishButtonSelector );
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable Block updated."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable block updated."]'
 		);
 
 		await createNewPost();

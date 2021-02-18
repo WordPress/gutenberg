@@ -81,7 +81,7 @@ const controls = {
 		( registry ) =>
 			async function ( { clientIds, title } ) {
 				const reusableBlock = {
-					title: title || __( 'Untitled Reusable Block' ),
+					title: title || __( 'Untitled Reusable block' ),
 					content: serialize(
 						registry
 							.select( 'core/block-editor' )
