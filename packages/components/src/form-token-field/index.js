@@ -708,6 +708,7 @@ FormTokenField.defaultProps = {
 		remove: __( 'Remove item' ),
 		invalid: __( 'Invalid item' ),
 	},
+	expandOnFocus: false,
 	validateInput: () => true,
 	showHowTo: true,
 };
