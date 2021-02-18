@@ -257,8 +257,8 @@ class ButtonEdit extends Component {
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: Math.min(
-					parentWidth,
+				maxWidth: Math.max(
+					parentWidth - spacing,
 					this.props.maxWidth - 2 * spacing
 				),
 			} );
@@ -376,7 +376,21 @@ class ButtonEdit extends Component {
 				? MIN_WIDTH
 				: placeholderTextWidth;
 		if ( width ) {
-			minWidth = Math.floor( maxWidth * ( width / 100 ) );
+			const minWidthSpace = Math.floor( maxWidth * ( width / 100 ) );
+			switch ( width ) {
+				case 100:
+					minWidth = minWidthSpace - 10;
+					break;
+				case 75:
+					minWidth = minWidthSpace - 16;
+					break;
+				case 50:
+					minWidth = minWidthSpace - 26;
+					break;
+				case 25:
+					minWidth = minWidthSpace - 35;
+					break;
+			}
 		}
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,

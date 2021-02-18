@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { debounce } from 'lodash';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -73,15 +73,10 @@ export default function ButtonsEdit( {
 	);
 
 	useEffect( () => {
-		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
-		const { isFullWidth } = alignmentHelpers;
 
 		if ( width ) {
-			const base = width - margins;
-			const isFullWidthBlock = isFullWidth( align );
-
-			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
+			setMaxWidth( width );
 		}
 	}, [ sizes, align ] );
 
@@ -121,6 +116,10 @@ export default function ButtonsEdit( {
 
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
+
+	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+	const { isFullWidth } = alignmentHelpers;
+
 	return (
 		<>
 			{ isSelected && (
@@ -149,7 +148,7 @@ export default function ButtonsEdit( {
 				horizontalAlignment={ contentJustification }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ maxWidth }
+				parentWidth={ isFullWidth( align ) ? screenWidth : maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }
