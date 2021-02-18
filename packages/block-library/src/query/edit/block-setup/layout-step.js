@@ -36,14 +36,14 @@ const LayoutSetupStep = ( {
 			const { getBlockVariations, getDefaultBlockVariation } = select(
 				blocksStore
 			);
-			const { getSettings } = select( blockEditorStore );
-			const { __experimentalBlockPatterns: allPatterns } = getSettings();
-			const { name, isMatchingBlockPattern } = blockType;
-			let _patterns;
-			// TODO create selector
-			if ( isMatchingBlockPattern ) {
-				_patterns = allPatterns?.filter( isMatchingBlockPattern );
-			}
+			const { __experimentalGetScopedBlockPatterns } = select(
+				blockEditorStore
+			);
+			const { name } = blockType;
+			const _patterns = __experimentalGetScopedBlockPatterns(
+				name,
+				'block'
+			);
 			const _blockVariations = getBlockVariations( name, 'block' );
 			return {
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),

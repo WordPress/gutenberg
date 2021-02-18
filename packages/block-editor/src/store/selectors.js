@@ -1801,6 +1801,18 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	]
 );
 
+// TODO jsdoc + tests
+export const __experimentalGetScopedBlockPatterns = createSelector(
+	( state, blockName, scope ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		if ( ! blockName && ! scope ) return EMPTY_ARRAY;
+		return patterns.filter( ( pattern ) =>
+			pattern.scope?.[ blockName ]?.includes?.( scope )
+		);
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
 /**
  * Returns the Block List settings of a block, if any exist.
  *
