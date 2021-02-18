@@ -37,19 +37,16 @@ function ActionItemSlot( {
 				Children.forEach(
 					fills,
 					( {
-						props: { __unstableInitSource, __unstableTarget },
+						props: { __unstableExplicitMenuItem, __unstableTarget },
 					} ) => {
-						if (
-							__unstableTarget &&
-							__unstableInitSource === 'plugin'
-						) {
+						if ( __unstableTarget && __unstableExplicitMenuItem ) {
 							initializedByPlugins.push( __unstableTarget );
 						}
 					}
 				);
 				const children = Children.map( fills, ( child ) => {
 					if (
-						child.props.__unstableInitSource === 'sidebar' &&
+						! child.props.__unstableExplicitMenuItem &&
 						initializedByPlugins.includes(
 							child.props.__unstableTarget
 						)

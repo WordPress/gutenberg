@@ -11,7 +11,7 @@ import ActionItem from '../action-item';
 export default function ComplementaryAreaMoreMenuItem( {
 	scope,
 	target,
-	__unstableInitSource,
+	__unstableExplicitMenuItem,
 	...props
 } ) {
 	return (
@@ -19,7 +19,9 @@ export default function ComplementaryAreaMoreMenuItem( {
 			as={ ( toggleProps ) => {
 				return (
 					<ActionItem
-						__unstableInitSource={ __unstableInitSource }
+						__unstableExplicitMenuItem={
+							__unstableExplicitMenuItem
+						}
 						__unstableTarget={ `${ scope }/${ target }` }
 						name={ `${ scope }/plugin-more-menu` }
 						{ ...toggleProps }

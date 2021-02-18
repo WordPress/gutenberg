@@ -97,7 +97,6 @@ function ComplementaryArea( {
 	toggleShortcut,
 	isActiveByDefault,
 	showIconLabels = false,
-	__unstableInitSource,
 } ) {
 	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
@@ -155,9 +154,8 @@ function ComplementaryArea( {
 					) }
 				</PinnedItems>
 			) }
-			{ __unstableInitSource !== 'core' && isPinnable && (
+			{ name && isPinnable && (
 				<ComplementaryAreaMoreMenuItem
-					__unstableInitSource={ __unstableInitSource }
 					target={ name }
 					scope={ scope }
 					icon={ icon }

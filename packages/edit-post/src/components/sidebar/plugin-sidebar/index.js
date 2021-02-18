@@ -92,7 +92,6 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 	} );
 	return (
 		<ComplementaryArea
-			__unstableInitSource="sidebar"
 			panelClassName={ className }
 			className="edit-post-sidebar"
 			smallScreenTitle={ postTitle || __( '(no title)' ) }
