@@ -4,7 +4,6 @@
 import {
 	FlatList,
 	View,
-	TouchableHighlight,
 	TouchableWithoutFeedback,
 	Dimensions,
 } from 'react-native';
@@ -73,9 +72,9 @@ function InserterSearchResults( { items, onSelect } ) {
 	}
 
 	return (
-		<TouchableHighlight accessible={ false }>
-			<BottomSheetConsumer>
-				{ ( { listProps, safeAreaBottomInset } ) => (
+		<BottomSheetConsumer>
+			{ ( { listProps, safeAreaBottomInset } ) => {
+				return (
 					<FlatList
 						onLayout={ onLayout }
 						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
@@ -108,9 +107,9 @@ function InserterSearchResults( { items, onSelect } ) {
 							},
 						] }
 					/>
-				) }
-			</BottomSheetConsumer>
-		</TouchableHighlight>
+				);
+			} }
+		</BottomSheetConsumer>
 	);
 }
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, TouchableHighlight } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -172,22 +172,26 @@ function InserterMenu( {
 			hideHeader
 			hasNavigation
 		>
-			<View>
-				<InserterSearchForm
-					onChange={ ( value ) => {
-						setFilterValue( value );
-					} }
-					value={ filterValue }
-				/>
-				<InserterSearchResults
-					onClose={ onClose }
-					items={ getItems() }
-					onSelect={ ( item ) => {
-						onInsert( item );
-						onSelect( item );
-					} }
-				/>
-			</View>
+			<TouchableHighlight accessible={ false }>
+				<View>
+					<View>
+						<InserterSearchForm
+							onChange={ ( value ) => {
+								setFilterValue( value );
+							} }
+							value={ filterValue }
+						/>
+					</View>
+					<InserterSearchResults
+						onClose={ onClose }
+						items={ getItems() }
+						onSelect={ ( item ) => {
+							onInsert( item );
+							onSelect( item );
+						} }
+					/>
+				</View>
+			</TouchableHighlight>
 		</BottomSheet>
 	);
 }

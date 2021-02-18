@@ -20,16 +20,54 @@
 	padding-bottom: 20;
 }
 
+$search-button-size: $button-size + 10;
+
+.searchButton {
+	height: $search-button-size;
+	margin: $grid-unit-20 $grid-unit-30;
+	border-radius: 8px 8px 8px 8px;
+	flex-direction: row;
+	padding-left: 10px;
+	align-items: center;
+}
+.searchButtonDark {
+	background-color: rgba($white, 0.07);
+}
+
+.searchButtonContent {
+	padding-right: 10;
+}
+.searchButtonContentDark {
+	color: $white;
+}
+.searchButtonIcon {
+	fill: $white;
+	height: $search-button-size - 10;
+}
+.searchButtonIconDark {
+	fill: $white;
+}
+
 .searchForm {
+	height: $search-button-size;
+	border-radius: 8px;
 	color: $gray-dark;
-	margin: $grid-unit-20;
-	background-color: rgba($white, 1);
+	margin: $grid-unit-30;
+	padding-left: $grid-unit-20;
+	background-color: $white;
+	flex-direction: row;
+	justify-content: space-between;
 }
 
 .searchFormDark {
-	color: $white;
-	padding: $grid-unit-20;
 	background-color: rgba($white, 0.07);
+}
+
+.searchFormInput {
+	color: $gray-dark;
+}
+.searchFormInputDark {
+	color: $white;
 }
 
 .searchFormPlaceholder {
