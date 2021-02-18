@@ -88,6 +88,7 @@ class ButtonEdit extends Component {
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
+		this.onPlaceholderTextWidth = this.onPlaceholderTextWidth.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.onRemove = this.onRemove.bind( this );
 		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
@@ -144,7 +145,7 @@ class ButtonEdit extends Component {
 		}
 
 		if ( prevProps.parentWidth !== parentWidth ) {
-			this.onSetMaxWidth();
+			this.onSetMaxWidth( null, true );
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
@@ -247,20 +248,19 @@ class ButtonEdit extends Component {
 		this.onSetMaxWidth( width );
 	}
 
-	onSetMaxWidth( width ) {
+	onSetMaxWidth( width, isParentWidthDidChange = false ) {
 		const { maxWidth } = this.state;
 		const { parentWidth } = this.props;
 		const { marginRight: spacing } = styles.defaultButton;
 
-		const isParentWidthChanged = maxWidth !== parentWidth;
+		const isParentWidthChanged = isParentWidthDidChange
+			? isParentWidthDidChange
+			: maxWidth !== parentWidth;
 		const isWidthChanged = maxWidth !== width;
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: Math.max(
-					parentWidth - spacing,
-					this.props.maxWidth - 2 * spacing
-				),
+				maxWidth: parentWidth - spacing,
 			} );
 		} else if ( ! parentWidth && width && isWidthChanged ) {
 			this.setState( { maxWidth: width - spacing } );
@@ -313,26 +313,26 @@ class ButtonEdit extends Component {
 	// Render `Text` with `placeholderText` styled as a placeholder
 	// to calculate its width which then is set as a `minWidth`
 	getPlaceholderWidth( placeholderText ) {
-		const { maxWidth, placeholderTextWidth } = this.state;
 		return (
 			<Text
 				style={ styles.placeholder }
-				onTextLayout={ ( { nativeEvent } ) => {
-					const textWidth =
-						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
-					if ( textWidth && textWidth !== placeholderTextWidth ) {
-						this.setState( {
-							placeholderTextWidth: Math.min(
-								textWidth,
-								maxWidth
-							),
-						} );
-					}
-				} }
+				onTextLayout={ this.onPlaceholderTextWidth }
 			>
 				{ placeholderText }
 			</Text>
 		);
+	}
+
+	onPlaceholderTextWidth( { nativeEvent } ) {
+		const { maxWidth, placeholderTextWidth } = this.state;
+		const textWidth =
+			nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
+
+		if ( textWidth && textWidth !== placeholderTextWidth ) {
+			this.setState( {
+				placeholderTextWidth: Math.min( textWidth, maxWidth ),
+			} );
+		}
 	}
 
 	render() {
@@ -376,21 +376,16 @@ class ButtonEdit extends Component {
 				? MIN_WIDTH
 				: placeholderTextWidth;
 		if ( width ) {
-			const minWidthSpace = Math.floor( maxWidth * ( width / 100 ) );
-			switch ( width ) {
-				case 100:
-					minWidth = minWidthSpace - 10;
-					break;
-				case 75:
-					minWidth = minWidthSpace - 16;
-					break;
-				case 50:
-					minWidth = minWidthSpace - 26;
-					break;
-				case 25:
-					minWidth = minWidthSpace - 35;
-					break;
-			}
+			const minWidthSubtractionMap = {
+				100: 0,
+				75: 11,
+				50: 22,
+				25: 33,
+			};
+
+			minWidth =
+				Math.floor( maxWidth * ( width / 100 ) ) -
+				minWidthSubtractionMap[ width ];
 		}
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
@@ -502,18 +497,15 @@ export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getBlockCount, getBlockRootClientId, getSettings } = select(
+		const { getBlockCount, getBlockRootClientId } = select(
 			blockEditorStore
 		);
-		const { maxWidth } = getSettings();
-
 		const parentId = getBlockRootClientId( clientId );
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
 			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			numOfButtons,
-			maxWidth,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

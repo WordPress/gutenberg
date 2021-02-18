@@ -74,10 +74,10 @@ export default function ButtonsEdit( {
 
 	useEffect( () => {
 		const { width } = sizes || {};
-
-		if ( width ) {
-			setMaxWidth( width );
-		}
+		const { isFullWidth } = alignmentHelpers;
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const isFullWidthBlock = isFullWidth( align );
+		setMaxWidth( isFullWidthBlock ? screenWidth : width );
 	}, [ sizes, align ] );
 
 	const onAddNextButton = useCallback(
@@ -116,10 +116,6 @@ export default function ButtonsEdit( {
 
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
-
-	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-	const { isFullWidth } = alignmentHelpers;
-
 	return (
 		<>
 			{ isSelected && (
@@ -148,7 +144,7 @@ export default function ButtonsEdit( {
 				horizontalAlignment={ contentJustification }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ isFullWidth( align ) ? screenWidth : maxWidth }
+				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }
