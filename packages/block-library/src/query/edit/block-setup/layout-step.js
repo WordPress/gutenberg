@@ -9,21 +9,29 @@ import {
 	BlockPreview,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	Button,
+	Icon,
 	VisuallyHidden,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 const LayoutSetupStep = ( {
 	blockType,
 	onVariationSelect,
 	onBlockPatternSelect,
 } ) => {
-	const { defaultVariation, blockVariations, patterns } = useSelect(
+	const [ showBack, setShowBack ] = useState( false );
+	const {
+		defaultVariation,
+		blockVariations,
+		patterns,
+		hasBlockVariations,
+	} = useSelect(
 		( select ) => {
 			const { getBlockVariations, getDefaultBlockVariation } = select(
 				blocksStore
@@ -32,71 +40,89 @@ const LayoutSetupStep = ( {
 			const { __experimentalBlockPatterns: allPatterns } = getSettings();
 			const { name, isMatchingBlockPattern } = blockType;
 			let _patterns;
+			// TODO create selector
 			if ( isMatchingBlockPattern ) {
 				_patterns = allPatterns?.filter( isMatchingBlockPattern );
 			}
+			const _blockVariations = getBlockVariations( name, 'block' );
 			return {
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				blockVariations: getBlockVariations( name, 'block' ),
+				blockVariations: _blockVariations,
 				patterns: _patterns,
+				hasBlockVariations: !! _blockVariations?.length,
 			};
 		},
 		[ blockType ]
 	);
 	const [ showBlockVariations, setShowBlockVariations ] = useState(
-		! patterns?.length
+		! patterns?.length && hasBlockVariations
 	);
-
-	// TODO check about `useAsyncList`
 	const composite = useCompositeState();
-	// TODO check this line :)
-	if ( ! showBlockVariations && ! patterns?.length ) return null;
+	// Show nothing if block variations and block pattterns do not exist.
+	if ( ! hasBlockVariations && ! patterns?.length ) return null;
+
 	const showPatternsList = ! showBlockVariations && !! patterns.length;
 	return (
-		<Composite
-			{ ...composite }
-			role="listbox"
-			className="block-setup-block-layout-list__container"
-			aria-label={ __( 'Layout list' ) }
-		>
-			{ showBlockVariations && (
-				<>
-					{ blockVariations.map( ( variation ) => (
-						<BlockVariation
-							key={ variation.name }
-							variation={ variation }
-							onSelect={ ( nextVariation = defaultVariation ) =>
-								onVariationSelect( nextVariation )
-							}
-							composite={ composite }
-						/>
-					) ) }
-				</>
-			) }
-			{ ! showBlockVariations && !! blockVariations?.length && (
-				<BlockVariation
-					key={ defaultVariation.name }
-					title={ __( 'Start empty' ) }
-					variation={ defaultVariation }
-					onSelect={ () => {
-						setShowBlockVariations( true );
+		<>
+			{ showBack && (
+				<Button
+					className="block-setup-block-layout-back-button"
+					icon={ isRTL() ? chevronRight : chevronLeft }
+					isTertiary
+					onClick={ () => {
+						setShowBack( false );
+						setShowBlockVariations( false );
 					} }
-					composite={ composite }
-				/>
+				>
+					{ __( 'Back' ) }
+				</Button>
 			) }
-			{ showPatternsList && (
-				<>
-					{ patterns.map( ( pattern ) => (
-						<BlockPattern
-							key={ pattern.name }
-							pattern={ pattern }
-							onSelect={ onBlockPatternSelect }
-							composite={ composite }
-						/>
-					) ) }
-				</>
-			) }
-		</Composite>
+			<Composite
+				{ ...composite }
+				role="listbox"
+				className="block-setup-block-layout-list__container"
+				aria-label={ __( 'Layout list' ) }
+			>
+				{ showBlockVariations && (
+					<>
+						{ blockVariations.map( ( variation ) => (
+							<BlockVariation
+								key={ variation.name }
+								variation={ variation }
+								onSelect={ (
+									nextVariation = defaultVariation
+								) => onVariationSelect( nextVariation ) }
+								composite={ composite }
+							/>
+						) ) }
+					</>
+				) }
+				{ ! showBlockVariations && hasBlockVariations && (
+					<BlockVariation
+						key={ defaultVariation.name }
+						title={ __( 'Start empty' ) }
+						variation={ defaultVariation }
+						onSelect={ () => {
+							setShowBack( true );
+							setShowBlockVariations( true );
+						} }
+						composite={ composite }
+					/>
+				) }
+				{ showPatternsList && (
+					<>
+						{ patterns.map( ( pattern ) => (
+							<BlockPattern
+								key={ pattern.name }
+								pattern={ pattern }
+								onSelect={ onBlockPatternSelect }
+								composite={ composite }
+							/>
+						) ) }
+					</>
+				) }
+			</Composite>
+		</>
 	);
 };
 
@@ -158,18 +184,11 @@ function BlockVariation( { variation, title, onSelect, composite } ) {
 				onClick={ () => onSelect( variation ) }
 				label={ title || variation.description || variation.title }
 			>
-				<div className="block-setup-block-layout-list__item-variation">
-					<Button
-						isSecondary
-						icon={ variation.icon }
-						iconSize={ 48 }
-						label={
-							title || variation.description || variation.title
-						}
-					/>
-					<div className="block-setup-block-layout-list__item-title">
-						{ title || variation.title }
-					</div>
+				<div className="block-setup-block-layout-list__item-variation-icon">
+					<Icon icon={ variation.icon } size={ 48 } />
+				</div>
+				<div className="block-setup-block-layout-list__item-title">
+					{ title || variation.title }
 				</div>
 				{ !! variation.description && (
 					<VisuallyHidden id={ descriptionId }>

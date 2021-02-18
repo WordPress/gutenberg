@@ -1,69 +1,49 @@
 /**
  * WordPress dependencies
  */
-// import { useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
-// import { store as blocksStore } from '@wordpress/blocks';
-// import { useState } from '@wordpress/element';
-// import { __ } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 
-const BlockSetup = ( { icon, label, children } ) => {
-	// const [ activeStep, setActiveStep ] = useState( 0 );
-	const blockProps = useBlockProps();
-	// const handleNext = () =>
-	// 	setActiveStep( ( previousActiveStep ) => previousActiveStep + 1 );
-	// const handlePrevious = () =>
-	// 	setActiveStep( ( previousActiveStep ) => previousActiveStep - 1 );
+/**
+ * Internal dependencies
+ */
+import LayoutSetupStep from './layout-step';
 
-	// const { activeStepContent, instructions } = useMemo( () => {
-	// 	return {
-	// 		instructions: setUpSteps[ activeStep ]?.instructions,
-	// 		activeStepContent: setUpSteps[ activeStep ]?.content,
-	// 	};
-	// }, [ activeStep, setUpSteps ] );
-	// const stepInfoText = `Step ${ activeStep + 1 } of ${ steps.length }:`;
+const BlockSetup = ( {
+	blockName,
+	useLayoutSetup,
+	onVariationSelect = () => {},
+	onBlockPatternSelect = () => {},
+	children,
+} ) => {
+	const { blockType } = useSelect(
+		( select ) => {
+			const { getBlockType } = select( blocksStore );
+			return { blockType: getBlockType( blockName ) };
+		},
+		[ blockName ]
+	);
+	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
 			<Placeholder
-				icon={ icon }
-				label={ label }
-				// instructions={ `${ stepInfoText } ${ instructions }` }
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
 				isColumnLayout
 			>
+				{ useLayoutSetup && (
+					<LayoutSetupStep
+						blockType={ blockType }
+						onVariationSelect={ onVariationSelect }
+						onBlockPatternSelect={ onBlockPatternSelect }
+					/>
+				) }
 				{ children }
-				{ /* <section className="current-step-container">
-					{ activeStepContent }
-				</section> */ }
-				{ /* <BlockSetupNavigation
-					totalSteps={ steps.length }
-					currentStep={ activeStep }
-					handleNext={ handleNext }
-					handlePrevious={ handlePrevious }
-				/> */ }
 			</Placeholder>
 		</div>
 	);
 };
-
-// const BlockSetupNavigation = ( {
-// 	handleNext,
-// 	handlePrevious,
-// 	totalSteps,
-// 	currentStep,
-// } ) => {
-// 	const showPrevious = currentStep !== 0;
-// 	const showNext = currentStep < totalSteps - 1;
-// 	return (
-// 		<div className="block-setup-navigation">
-// 			{ showPrevious && (
-// 				<Button onClick={ handlePrevious }>{ __( 'Previous' ) }</Button>
-// 			) }
-// 			{ showNext && (
-// 				<Button onClick={ handleNext }>{ __( 'Next' ) }</Button>
-// 			) }
-// 		</div>
-// 	);
-// };
 
 export default BlockSetup;
