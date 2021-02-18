@@ -71,6 +71,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	* End: Include for phase 2
 	*/
 
+	if ( ! class_exists( 'WP_REST_URL_Details_Controller' ) ) {
+		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
+	}
+
 	require __DIR__ . '/rest-api.php';
 }
 
@@ -87,6 +91,12 @@ require __DIR__ . '/editor-settings.php';
 if ( ! class_exists( 'WP_Block_Template ' ) ) {
 	require __DIR__ . '/full-site-editing/class-wp-block-template.php';
 }
+
+// These are used by some FSE features
+// as well as global styles.
+require __DIR__ . '/class-wp-theme-json.php';
+require __DIR__ . '/class-wp-theme-json-resolver.php';
+
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';
 require __DIR__ . '/full-site-editing/default-template-types.php';
@@ -102,11 +112,10 @@ require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
+require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
-require __DIR__ . '/class-wp-theme-json.php';
-require __DIR__ . '/class-wp-theme-json-resolver.php';
 require __DIR__ . '/global-styles.php';
 require __DIR__ . '/query-utils.php';
 

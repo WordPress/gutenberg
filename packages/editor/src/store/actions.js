@@ -593,12 +593,8 @@ export function unlockPostAutosaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const {
-		__unstableShouldCreateUndoLevel,
-		selectionStart,
-		selectionEnd,
-	} = options;
-	const edits = { blocks, selectionStart, selectionEnd };
+	const { __unstableShouldCreateUndoLevel, selection } = options;
+	const edits = { blocks, selection };
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield controls.select(

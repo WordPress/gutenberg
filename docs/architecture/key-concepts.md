@@ -2,11 +2,19 @@
 
 ## Blocks
 
-Blocks are an abstract unit for organizing and composing content, strung together to create content for a webpage.
+Blocks are an abstract unit for structuring and interacting with content. When composed together they create the content for a webpage. Everything from a paragraph, to a video, to the site title is represented as a block.
 
-Blocks are hierarchical in that a block can be a child of or parent to another block. For example, a two-column Columns block can be the parent block to multiple child blocks in each of its columns.
+Blocks come in many different forms but also provide a consistent interface. They can be inserted, moved, reordered, copied, duplicated, transformed, deleted, dragged, and combined. Blocks can also be reused, allowing them to be shared across posts and post types and/or used multiple times in the same post. If it helps, you can think of blocks as a more graceful shortcode, with rich formatting tools for users to compose content.
 
-If it helps, you can think of blocks as a more graceful shortcode, with rich formatting tools for users to compose content. To this point, there is a new Block Grammar. Distilled, the block grammar is an HTML comment, either a self-closing tag or with a beginning tag and ending tag. In the main tag, depending on the block type and user customizations, there can be a JSON object. This raw form of the block is referred to as serialized.
+The settings and content of a block can be customized in three main places: the block canvas, the block toolbar, and the block inspector.
+
+### Composability
+
+Blocks are meant to be combined in different ways. Blocks are hierarchical in that a block can be nested within another block. Nested blocks and its container are also called _children_ and _parent_ respectively. For example, a _Columns_ block can be the parent block to multiple child blocks in each of its columns. The API that governs child block usage is named `InnerBlocks`.
+
+### Data & Attributes
+
+Blocks understand content as attributes and are serializable to HTML. To this point, there is a new Block Grammar. Distilled, the block grammar is an HTML comment, either a self-closing tag or with a beginning tag and ending tag. In the main tag, depending on the block type and user customizations, there can be a JSON object. This raw form of the block is referred to as serialized.
 
 ```html
 <!-- wp:paragraph {"key": "value"} -->
@@ -18,45 +26,37 @@ Blocks can be static or dynamic. Static blocks contain rendered content and an o
 
 Each block contains Attributes or configuration settings, which can be sourced from raw HTML in the content via meta or other customizable origins.
 
-The Paragraph is the default block. Instead of a new line upon typing `return` on a keyboard, try to think of it as an empty Paragraph block (type "/" to trigger an autocompleting Slash Inserter -- "/image" will pull up Images as well as Instagram embeds).
+### Transformations
 
-Users insert new blocks by clicking the plus button for the Block Inserter, typing "/" for the Slash Inserter, or typing `return` for a blank Paragraph block.
+Blocks have the ability to be transformed into other block types. This allows basic operations like converting a paragraph into a heading, but also more intricate ones like multiple images becoming a gallery. Transformations work for single blocks and for multi-block selections. Internal block variations are also possible transformation targets.
 
-Blocks can be duplicated within content using the menu from the block's toolbar or via keyboard shortcut.
+### Variations
 
-Blocks can also be made repeatable, allowing them to be shared across posts and post types and/or used multiple times in the same post. If a reusable block is edited in one place, those changes are reflected everywhere that that block is used.
+Given a block type, a block variation is a predefined set of its initial attributes. This API allows creating a single block from which multiple configurations are possible. Variations provide different possible interfaces, including showing up as entirely new blocks in the library, or as presets when inserting a new block. Read [the API documentation](/docs/designers-developers/developers/block-api/block-registration.md#variations-optional) for more details.
 
-Blocks can be limited or locked-in-place by Templates and custom code.
+**More on Blocks**
 
-#### More on Blocks
+- **[Block API](/docs/designers-developers/developers/block-api/README.md)**
+- **[Tutorial: Building A Custom Block](/docs/designers-developers/developers/tutorials/create-block/readme.md)**
 
-- **Block API**
-- **Block Styles**
-- **Tutorial: Building A Custom Block**
+## Reusable Blocks
 
-## Block Categories
-
-In the Block Inserter (the accordion-sorted, popup modal that shows a site's available blocks to users) each accordion title is a Block Category, which are either the defaults or customized by developers through Plugins or code.
-
-## Reusable blocks
-
-Reusable blocks is a block (or multiple blocks) that you can insert, modify, repeatable piece of content.
-
-The content and style of a reusable block is intended to be consistent wherever it is used. 
-
-Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page (widgets are planned to be available, but not yet possible, in Gutenberg). 
+A reusable blocks is a block (or multiple blocks) that can be inserted and edited globally at once. If a reusable block is edited in one place, those changes are reflected across all posts and pages that that block is used. Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page. 
 
 Any edits to a reusable block will appear on every other use of that block, saving time from having to make the same edit on different posts. 
 
-Reusable blocks are stored as a hidden post type (wp_block) and are dynamic blocks that "ref" or reference the post_id and return the post_content for that block. 
+In technical details, reusable blocks are stored as a hidden post type (`wp_block`) and are dynamic blocks that "ref" or reference the `post_id` and return the `post_content` for that block.
 
-The same reusable block can be used across different post types (e.g. post and page). 
+## Patterns
 
-If you need to create a structure (a block consisting of heading, paragraph, and list) that is very similar across multiple posts but the content is slightly different across those pages or posts, you can do the following to minimize the amount of duplicate work to do:
+A [block pattern](/docs/designers-developers/developers/block-api/block-patterns.md) is a group of blocks that have been combined together creating a design pattern. These design patterns provide a starting point for building more advanced pages and layouts quickly. A block pattern can be as small as a single block or as large as a full page of content. Unlike reusable blocks, once a pattern is inserted it doesn't remain in sync with the original content as the blocks contained are meant to be edited and customized by the user. Underneath the surface, patterns are just regular blocks composed together. Themes can register patterns to offer users quick starting points with a design language familiar to that theme's aesthetics.
 
-1. create a 'skeleton' that will have shared characteristics (e.g. the same color background, font size)
-1. save this as a reusable block.
-1. Then, on other pages/posts:
-1. Within the block editor: insert the reusable block 
-1. Open the block's properties (three dots)
-and "convert to regular block"; the block is no longer 'reusable' and all edits to this block will only appear on this page/post.
+## Templates (in progress)
+
+While the post editor concentrates on the content of a post, the [template](/docs/designers-developers/developers/block-api/block-templates.md) editor allows declaring and editing an entire site using blocks, from header to footer. To support these efforts there's a collection of blocks that interact with different parts of a site (like the site title, description, logo, navigation, etc) as well as semantic areas like header, sidebar, and footer. Templates are broken down between templates (that describe a full page) and template parts (that describe reusable areas within a template). These templates and template parts can be composed together and registered by a theme. They are also entirely editable by users using the block editor. Customized templates are saved in a `wp_template` post type. Block templates include both static pages and dynamic ones, like archives, singular, home, 404, etc.
+
+Note: custom post types can also be initialized with a starting `post_content` template that should not be confused with the theme template system described above.
+
+## Global Styles (in progress)
+
+Describes a set of configuration and default properties of blocks and their visual aspects. Global Styles is both an interface (which users access through the site editor) and a configuration system done through [a `theme.json` file](/docs/designers-developers/developers/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what attributes are supported, what specific tools a theme offers (like a custom color palette), the available design tools present both globally and on each block, and an infrastructure that allows to enqueue only the relevant CSS based on what blocks are used on a page.

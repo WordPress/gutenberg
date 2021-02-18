@@ -14,6 +14,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../../utils/dom';
+import { store as blockEditorStore } from '../../../store';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -33,7 +34,7 @@ function useInitialPosition( clientId ) {
 				isMultiSelecting,
 				isNavigationMode,
 				isBlockSelected,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			if ( ! isBlockSelected( clientId ) ) {
 				return;
@@ -44,7 +45,7 @@ function useInitialPosition( clientId ) {
 			}
 
 			// If there's no initial position, return 0 to focus the start.
-			return getSelectedBlocksInitialCaretPosition() || 0;
+			return getSelectedBlocksInitialCaretPosition();
 		},
 		[ clientId ]
 	);
@@ -52,7 +53,7 @@ function useInitialPosition( clientId ) {
 
 /**
  * Transitions focus to the block or inner tabbable when the block becomes
- * selected.
+ * selected and an initial position is set.
  *
  * @param {RefObject} ref      React ref with the block element.
  * @param {string}    clientId Block client ID.
@@ -61,7 +62,7 @@ export function useFocusFirstElement( ref, clientId ) {
 	const initialPosition = useInitialPosition( clientId );
 
 	useEffect( () => {
-		if ( initialPosition === undefined ) {
+		if ( initialPosition === undefined || initialPosition === null ) {
 			return;
 		}
 

@@ -16,7 +16,7 @@ import LinkSettings from './';
 const LinkSettingsScreen = ( props ) => {
 	const navigation = useNavigation();
 	const route = useRoute();
-	const { url = '' } = props.attributes || {};
+	const { url = '' } = props;
 	const { inputValue = url } = route.params || {};
 
 	const onLinkCellPressed = () => {

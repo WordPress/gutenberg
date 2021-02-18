@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { button as icon } from '@wordpress/icons';
+import { buttons as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

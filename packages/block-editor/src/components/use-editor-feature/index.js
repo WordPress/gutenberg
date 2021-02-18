@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) =>
@@ -77,7 +78,7 @@ export default function useEditorFeature( featurePath ) {
 	const setting = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const settings = getSettings();
 			const blockType = select( blocksStore ).getBlockType( blockName );

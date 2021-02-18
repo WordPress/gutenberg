@@ -10,6 +10,7 @@ import { omit } from 'lodash';
 import { useRef, useEffect, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -92,7 +93,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
 	useFocusFirstElement( ref, clientId );
-	useEventHandlers( ref, clientId );
 
 	// Block Reordering animation
 	useMovingAnimation(
@@ -103,14 +103,18 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index
 	);
 
-	const isHovered = useIsHovered( ref );
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
+	const mergedRefs = useMergeRefs( [
+		ref,
+		useEventHandlers( clientId ),
+		useIsHovered(),
+	] );
 
 	return {
 		...wrapperProps,
 		...props,
-		ref,
+		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		tabIndex: 0,
 		role: 'group',
@@ -122,8 +126,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			blockMovingModeClassNames,
-			{ 'is-hovered': isHovered }
+			blockMovingModeClassNames
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

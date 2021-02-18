@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Enabled `import/default` and `import/named` rules in the `recommended` ruleset. [#28513](https://github.com/WordPress/gutenberg/pull/28513)
+-   Add new rule `@wordpress/data-no-store-string-literals` to discourage passing string literals to reference data stores ([#28726](https://github.com/WordPress/gutenberg/pull/28726)).
+
 ## 8.0.1 (2021-01-28)
 
 ### Bug Fix

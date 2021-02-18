@@ -14,6 +14,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -138,41 +139,56 @@ function ColumnEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						min={ 1 }
-						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
-						onChange={ onChange }
-						onComplete={ onChangeWidth }
-						onUnitChange={ onChangeUnit }
-						decimalNum={ 1 }
-						value={ getWidths( columns )[ selectedColumnIndex ] }
-						unit={ widthUnit }
-						units={ CSS_UNITS }
-						preview={
-							<ColumnsPreview
-								columnWidths={ getWidths( columns, false ) }
-								selectedColumnIndex={ selectedColumnIndex }
+			{ isSelected && (
+				<>
+					<BlockControls>
+						<BlockVerticalAlignmentToolbar
+							onChange={ updateAlignment }
+							value={ verticalAlignment }
+						/>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Column settings' ) }>
+							<UnitControl
+								label={ __( 'Width' ) }
+								min={ 1 }
+								max={
+									isPercentageUnit( widthUnit )
+										? 100
+										: undefined
+								}
+								onChange={ onChange }
+								onComplete={ onChangeWidth }
+								onUnitChange={ onChangeUnit }
+								decimalNum={ 1 }
+								value={
+									getWidths( columns )[ selectedColumnIndex ]
+								}
+								unit={ widthUnit }
+								units={ CSS_UNITS }
+								preview={
+									<ColumnsPreview
+										columnWidths={ getWidths(
+											columns,
+											false
+										) }
+										selectedColumnIndex={
+											selectedColumnIndex
+										}
+									/>
+								}
 							/>
-						}
-					/>
-				</PanelBody>
-				<PanelBody>
-					<FooterMessageControl
-						label={ __(
-							'Note: Column layout may vary between themes and screen sizes'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
+						</PanelBody>
+						<PanelBody>
+							<FooterMessageControl
+								label={ __(
+									'Note: Column layout may vary between themes and screen sizes'
+								) }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</>
+			) }
 			<View
 				style={ [
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
@@ -216,7 +232,7 @@ export default compose( [
 			getBlocks,
 			getBlockOrder,
 			getBlockAttributes,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;

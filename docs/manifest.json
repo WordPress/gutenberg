@@ -144,6 +144,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Type Metadata",
+		"slug": "block-metadata",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-metadata.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Block Patterns",
 		"slug": "block-patterns",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
@@ -600,6 +606,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Share your Block with the World",
+		"slug": "submitting-to-block-directory",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md",
+		"parent": "create-block"
+	},
+	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
@@ -966,12 +978,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Grid",
-		"slug": "grid",
-		"markdown_source": "../packages/components/src/grid/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
@@ -1071,12 +1077,6 @@
 		"title": "MenuItemsChoice",
 		"slug": "menu-items-choice",
 		"markdown_source": "../packages/components/src/menu-items-choice/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "BottomSheetNavigation",
-		"slug": "bottom-sheet-navigation",
-		"markdown_source": "../packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/README.md",
 		"parent": "components"
 	},
 	{
@@ -1224,12 +1224,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Next",
-		"slug": "next",
-		"markdown_source": "../packages/components/src/text/next/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Text",
 		"slug": "text",
 		"markdown_source": "../packages/components/src/text/README.md",
@@ -1290,21 +1284,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Truncate",
-		"slug": "truncate",
-		"markdown_source": "../packages/components/src/truncate/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "UnitControl",
 		"slug": "unit-control",
 		"markdown_source": "../packages/components/src/unit-control/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "View",
-		"slug": "view",
-		"markdown_source": "../packages/components/src/view/README.md",
 		"parent": "components"
 	},
 	{
@@ -1509,6 +1491,12 @@
 		"title": "@wordpress/custom-templated-path-webpack-plugin",
 		"slug": "packages-custom-templated-path-webpack-plugin",
 		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/customize-widgets",
+		"slug": "packages-customize-widgets",
+		"markdown_source": "../packages/customize-widgets/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1779,6 +1767,12 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-i18n",
+		"slug": "packages-react-i18n",
+		"markdown_source": "../packages/react-i18n/README.md",
 		"parent": "packages"
 	},
 	{

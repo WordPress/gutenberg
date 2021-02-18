@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   "mappings" sources are now downloaded if they contain non-local sources.
+
 ## 3.0.0 (2020-12-17)
 
 ### Breaking Changes

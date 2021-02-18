@@ -217,12 +217,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet() {
-		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
-		// See schema at WP_Theme_JSON::SCHEMA.
+		$root_name       = WP_Theme_JSON::ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON::ALL_BLOCKS_NAME;
+
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					$root_name   => array(
+					$all_blocks_name => array(
 						'color'      => array(
 							'text'    => 'value',
 							'palette' => array(
@@ -246,7 +247,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 						'misc'       => 'value',
 					),
-					'core/group' => array(
+					'core/group'     => array(
 						'custom' => array(
 							'base-font'   => 16,
 							'line-height' => array(
@@ -735,5 +736,51 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			),
 		);
 		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
+	function test_get_custom_templates() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'customTemplates' => array(
+					'page-home' => array(
+						'title' => 'Some title',
+					),
+				),
+			)
+		);
+
+		$page_templates = $theme_json->get_custom_templates();
+
+		$this->assertEqualSetsWithIndex(
+			$page_templates,
+			array(
+				'page-home' => array(
+					'title' => 'Some title',
+				),
+			)
+		);
+	}
+
+	function test_get_template_parts() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'templateParts' => array(
+					'header' => array(
+						'area' => 'Some area',
+					),
+				),
+			)
+		);
+
+		$template_parts = $theme_json->get_template_parts();
+
+		$this->assertEqualSetsWithIndex(
+			$template_parts,
+			array(
+				'header' => array(
+					'area' => 'Some area',
+				),
+			)
+		);
 	}
 }

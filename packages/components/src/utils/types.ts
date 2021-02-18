@@ -1,15 +1,3 @@
-import { As } from 'reakit-utils/types';
-import { ViewOwnProps } from '@wp-g2/create-styles';
-
-export type Options<T extends As, P extends ViewOwnProps<{}, T>> = {
-	as: T;
-	name: string;
-	useHook: (props: P) => any;
-	memo?: boolean;
-};
-
-export type ResponsiveCSSValue<T> = Array<T | undefined> | T;
-
 export type SizeRangeDefault =
 	| 'xLarge'
 	| 'large'
@@ -19,7 +7,7 @@ export type SizeRangeDefault =
 
 export type SizeRangeReduced = 'large' | 'medium' | 'small';
 
-export type FormElementProps<V> = {
+export type FormElementProps< V > = {
 	/**
 	 * The default (initial) state to use if `value` is undefined.
 	 */

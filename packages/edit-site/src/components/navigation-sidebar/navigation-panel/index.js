@@ -15,11 +15,12 @@ import ContentNavigation from './content-navigation';
 import TemplatesNavigation from './templates-navigation';
 import { useSelect } from '@wordpress/data';
 import { MENU_ROOT } from './constants';
+import { store as editSiteStore } from '../../../store';
 
 const NavigationPanel = ( { isOpen } ) => {
 	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
 	const { templatesActiveMenu, siteTitle } = useSelect( ( select ) => {
-		const { getNavigationPanelActiveMenu } = select( 'core/edit-site' );
+		const { getNavigationPanelActiveMenu } = select( editSiteStore );
 		const { getEntityRecord } = select( 'core' );
 
 		const siteData =
