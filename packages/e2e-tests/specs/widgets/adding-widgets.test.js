@@ -309,7 +309,7 @@ describe( 'Widgets screen', () => {
 	} );
 
 	it( 'Should duplicate the widgets', async () => {
-		const firstWidgetArea = await page.$(
+		let firstWidgetArea = await page.$(
 			'[aria-label="Block: Widget Area"][role="group"]'
 		);
 
@@ -317,15 +317,44 @@ describe( 'Widgets screen', () => {
 		await addParagraphBlock.focus();
 		await pressKeyWithModifier( 'primary', 'Enter' );
 
-		const firstParagraphBlock = await firstWidgetArea.$(
+		let firstParagraphBlock = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
 		);
 		await page.keyboard.type( 'First Paragraph' );
 
+		await saveWidgets();
+		await page.reload();
+		// Wait for the widget areas to load.
+		firstWidgetArea = await page.waitForSelector(
+			'[aria-label="Block: Widget Area"][role="group"]'
+		);
+
+		const initialSerializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( initialSerializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>",
+		}
+	` );
+		const initialWidgets = await getWidgetAreaWidgets();
+		expect( initialWidgets ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": Array [
+		    "block-2",
+		  ],
+		  "sidebar-2": Array [],
+		  "wp_inactive_widgets": Array [],
+		}
+	` );
+
+		firstParagraphBlock = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"]'
+		);
+		await firstParagraphBlock.focus();
+
 		// Trigger the toolbar to appear.
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 
 		const blockToolbar = await page.waitForSelector(
 			'[role="toolbar"][aria-label="Block tools"]'
@@ -376,8 +405,8 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 
 		await saveWidgets();
-		const serializedWidgetAreas = await getSerializedWidgetAreas();
-		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		const editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
 		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
@@ -385,6 +414,17 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
+		}
+	` );
+		const editedWidgets = await getWidgetAreaWidgets();
+		expect( editedWidgets ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": Array [
+		    "block-2",
+		    "block-3",
+		  ],
+		  "sidebar-2": Array [],
+		  "wp_inactive_widgets": Array [],
 		}
 	` );
 	} );
@@ -417,6 +457,23 @@ async function getSerializedWidgetAreas() {
 	);
 
 	return serializedWidgetAreas;
+}
+
+async function getWidgetAreaWidgets() {
+	const widgets = await page.evaluate( () => {
+		const widgetAreas = wp.data
+			.select( 'core/edit-widgets' )
+			.getWidgetAreas();
+		const sidebars = {};
+
+		for ( const widgetArea of widgetAreas ) {
+			sidebars[ widgetArea.id ] = widgetArea.widgets;
+		}
+
+		return sidebars;
+	} );
+
+	return widgets;
 }
 
 /**
