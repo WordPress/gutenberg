@@ -80,9 +80,10 @@ export default function BlockTitle( { clientId } ) {
 		sprintf(
 			/* translators: 1: The block title. */
 			__( '%s <VisuallyHidden>Block.</VisuallyHidden>' ),
-		blockInformation.title ),
-	{
-		VisuallyHidden: <VisuallyHidden as="span" />,
-	}
+			blockInformation.title
+		),
+		{
+			VisuallyHidden: <VisuallyHidden as="span" />,
+		}
 	);
 }
