@@ -184,14 +184,10 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template_content       = file_get_contents( $template_file['path'] );
 	$theme                  = wp_get_theme()->get_stylesheet();
 
-	if ( 'wp_template' === $template_type ) {
-		$template_content = _inject_theme_attribute_in_content( $template_content );
-	}
-
 	$template            = new WP_Block_Template();
 	$template->id        = $theme . '//' . $template_file['slug'];
 	$template->theme     = $theme;
-	$template->content   = $template_content;
+	$template->content   = _inject_theme_attribute_in_content( $template_content );
 	$template->slug      = $template_file['slug'];
 	$template->is_custom = false;
 	$template->type      = $template_type;

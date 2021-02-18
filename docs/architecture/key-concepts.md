@@ -32,12 +32,12 @@ Blocks have the ability to be transformed into other block types. This allows ba
 
 ### Variations
 
-Given a block type, a block variation is a predefined set of its initial attributes. This API allows creating a single block from which multiple configurations are possible. Variations provide different possible interfaces, including showing up as entirely new blocks in the library, or as presets when inserting a new block. Read [the API documentation](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#variations-optional) for more details.
+Given a block type, a block variation is a predefined set of its initial attributes. This API allows creating a single block from which multiple configurations are possible. Variations provide different possible interfaces, including showing up as entirely new blocks in the library, or as presets when inserting a new block. Read [the API documentation](/docs/designers-developers/developers/block-api/block-registration.md#variations-optional) for more details.
 
-### More on Blocks
+**More on Blocks**
 
-- **[Block API](https://developer.wordpress.org/block-editor/developers/block-api/)**
-- **[Tutorial: Building A Custom Block](https://developer.wordpress.org/block-editor/tutorials/create-block/)**
+- **[Block API](/docs/designers-developers/developers/block-api/README.md)**
+- **[Tutorial: Building A Custom Block](/docs/designers-developers/developers/tutorials/create-block/readme.md)**
 
 ## Reusable Blocks
 
@@ -49,4 +49,14 @@ In technical details, reusable blocks are stored as a hidden post type (`wp_bloc
 
 ## Patterns
 
-A block pattern is a group of blocks that have been combined together creating a design pattern. These design patterns provide a starting point for building more advanced pages and layouts quickly. A block pattern can be as small as a single block or as large as a full page of content. Unlike reusable blocks, once a pattern is inserted it doesn't remain in sync with the original content as the blocks contained are meant to be edited and customized by the user. Underneath the surface, patterns are just regular blocks composed together. Themes can register patterns to offer users quick starting points with a design language familiar to that theme's aesthetics.
+A [block pattern](/docs/designers-developers/developers/block-api/block-patterns.md) is a group of blocks that have been combined together creating a design pattern. These design patterns provide a starting point for building more advanced pages and layouts quickly. A block pattern can be as small as a single block or as large as a full page of content. Unlike reusable blocks, once a pattern is inserted it doesn't remain in sync with the original content as the blocks contained are meant to be edited and customized by the user. Underneath the surface, patterns are just regular blocks composed together. Themes can register patterns to offer users quick starting points with a design language familiar to that theme's aesthetics.
+
+## Templates (in progress)
+
+While the post editor concentrates on the content of a post, the [template](/docs/designers-developers/developers/block-api/block-templates.md) editor allows declaring and editing an entire site using blocks, from header to footer. To support these efforts there's a collection of blocks that interact with different parts of a site (like the site title, description, logo, navigation, etc) as well as semantic areas like header, sidebar, and footer. Templates are broken down between templates (that describe a full page) and template parts (that describe reusable areas within a template). These templates and template parts can be composed together and registered by a theme. They are also entirely editable by users using the block editor. Customized templates are saved in a `wp_template` post type. Block templates include both static pages and dynamic ones, like archives, singular, home, 404, etc.
+
+Note: custom post types can also be initialized with a starting `post_content` template that should not be confused with the theme template system described above.
+
+## Global Styles (in progress)
+
+Describes a set of configuration and default properties of blocks and their visual aspects. Global Styles is both an interface (which users access through the site editor) and a configuration system done through [a `theme.json` file](/docs/designers-developers/developers/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what attributes are supported, what specific tools a theme offers (like a custom color palette), the available design tools present both globally and on each block, and an infrastructure that allows to enqueue only the relevant CSS based on what blocks are used on a page.
