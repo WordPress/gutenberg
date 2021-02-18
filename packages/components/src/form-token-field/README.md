@@ -52,7 +52,7 @@ The `value` property is handled in a manner similar to controlled form component
 - `placeholder` - If passed, the `TokenField` input will show a placeholder string if no value tokens are present.
 - `expandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
 - `showHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
-- `validateInput` - If passed, all introduced values will be validated before the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+- `validateInput` - If passed, all introduced values will be validated before being added as tokens.
 
 ## Usage
 
