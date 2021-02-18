@@ -99,9 +99,11 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				getBlockCount,
 				hasBlockMovingClientId,
 				getBlockListSettings,
+				getBlockRootClientId,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			const total = getBlockCount( rootClientId );
+			const passedRootClientId = getBlockRootClientId( clientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
@@ -113,6 +115,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				attributes,
 				blockMovingMode,
 				orientation: getBlockListSettings( rootClientId )?.orientation,
+				passedRootClientId,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -124,6 +127,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		attributes,
 		blockMovingMode,
 		orientation,
+		passedRootClientId,
 	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
@@ -256,9 +260,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 	const blockType = getBlockType( name );
 	let parentTitle;
-	const blockInformation = useBlockDisplayInformation(
-		getBlockRootClientId( clientId )
-	);
+	const blockInformation = useBlockDisplayInformation( passedRootClientId );
 	if ( blockInformation !== null ) {
 		parentTitle = blockInformation.title
 			? blockInformation.title
