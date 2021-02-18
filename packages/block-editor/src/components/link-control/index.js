@@ -7,7 +7,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Button, Spinner, Notice } from '@wordpress/components';
-import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -227,11 +226,13 @@ function LinkControl( {
 							}
 						>
 							<Button
+								isPrimary
 								type="submit"
-								label={ __( 'Submit' ) }
-								icon={ keyboardReturn }
+								label={ __( 'Done' ) }
 								className="block-editor-link-control__search-submit"
-							/>
+							>
+								{ __( 'Done' ) }
+							</Button>
 						</LinkControlSearchInput>
 					</div>
 

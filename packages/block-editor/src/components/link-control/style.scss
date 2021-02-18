@@ -18,8 +18,8 @@
 			// know something is happening.
 			.components-spinner {
 				position: absolute;
-				top: 12px;
-				right: 42px;
+				top: 9px;
+				right: 66px;
 				z-index: 1;
 			}
 		}
@@ -28,7 +28,7 @@
 			border-radius: $radius-block-ui;
 			background: $gray-100;
 			max-width: 50vw;
-			padding: ($grid-unit-15/2) 42px ($grid-unit-15/2) $grid-unit-15;
+			padding: ($grid-unit-15/2) 60px ($grid-unit-15/2) $grid-unit-15;
 			font-size: 13px;
 			line-height: 24px;
 
@@ -41,15 +41,9 @@
 
 	.block-editor-link-control__search-submit {
 		position: absolute;
-		top: 1px;
-		right: 1px;
-
-		// I think the submit icon is mis-aligned.
-		svg {
-			position: relative;
-			top: -1px;
-			right: 4px;
-		}
+		top: 3px;
+		right: 3px;
+		height: 32px;
 	}
 }
 
@@ -81,6 +75,7 @@
 	mark {
 		background: none;
 		font-weight: 600;
+		color: inherit;
 	}
 }
 
@@ -99,6 +94,16 @@
 
 	&.is-selected {
 		background: $gray-100;
+	}
+
+	&:hover {
+		.block-editor-link-control__search-item-title {
+			color: var(--wp-admin-theme-color);
+		}
+
+		.block-editor-link-control__search-item-info {
+			color: $gray-900;
+		}
 	}
 }
 
