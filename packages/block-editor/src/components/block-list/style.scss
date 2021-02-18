@@ -211,10 +211,6 @@
 		}
 	}
 
-	&.is-outline-mode.is-selected.rich-text {
-		cursor: unset;
-	}
-
 	&.is-outline-mode.is-hovered:not(.is-typing) {
 		cursor: default;
 
