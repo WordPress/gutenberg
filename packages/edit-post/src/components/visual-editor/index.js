@@ -55,9 +55,12 @@ export default function VisualEditor( { styles } ) {
 	useBlockSelectionClearer( ref );
 	useTypewriter( ref );
 	useTypingObserver( ref );
-	useCanvasClickRedirect( ref );
 
-	const mergedRefs = useMergeRefs( [ ref, useClipboardHandler() ] );
+	const mergedRefs = useMergeRefs( [
+		ref,
+		useClipboardHandler(),
+		useCanvasClickRedirect(),
+	] );
 
 	return (
 		<div className="edit-post-visual-editor">
