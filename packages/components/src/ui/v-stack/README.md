@@ -85,8 +85,8 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
 ```jsx
 function Example() {
 	return (
-		<VStack css={ [ ui.frame.height( 200 ) ] }>
-			<View css={ [ ui.background.blue ] }>
+		<VStack>
+			<View>
 				<Text>Ana</Text>
 			</View>
 			<Spacer css={ [ ui.background.blue ] }>
