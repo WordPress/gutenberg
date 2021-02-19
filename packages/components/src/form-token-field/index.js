@@ -111,11 +111,11 @@ class FormTokenField extends Component {
 		const { __experimentalExpandOnFocus } = this.props;
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
-			const newState = { isActive: true };
-			if ( __experimentalExpandOnFocus ) {
-				newState.isExpanded = true;
-			}
-			this.setState( newState );
+			this.setState( {
+				isActive: true,
+				isExpanded:
+					!! __experimentalExpandOnFocus || this.state.isExpanded,
+			} );
 		} else {
 			/*
 			 * Otherwise, focus is on one of the token "remove" buttons and we
