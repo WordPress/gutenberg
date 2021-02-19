@@ -89,7 +89,6 @@ function BlockListBlock( {
 	isMultiSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
-	isLastMultiSelected,
 	isTypingWithinBlock,
 	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
@@ -220,7 +219,6 @@ function BlockListBlock( {
 		clientId,
 		isSelected,
 		isFirstMultiSelected,
-		isLastMultiSelected,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -279,7 +277,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		isAncestorMultiSelected,
 		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
-		getLastMultiSelectedBlockClientId,
 		isTyping,
 		getBlockMode,
 		isSelectionEnabled,
@@ -314,7 +311,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 			isBlockMultiSelected( clientId ) ||
 			isAncestorMultiSelected( clientId ),
 		isFirstMultiSelected,
-		isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
 		multiSelectedClientIds: isFirstMultiSelected
 			? getMultiSelectedBlockClientIds()
 			: undefined,

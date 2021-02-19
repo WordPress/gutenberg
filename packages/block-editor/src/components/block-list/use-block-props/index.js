@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useContext } from '@wordpress/element';
+import { useRef, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
@@ -16,12 +15,12 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { SetBlockNodes } from '../';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
+import { useBlockNodes } from './use-block-nodes';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -42,12 +41,10 @@ import { useEventHandlers } from './use-event-handlers';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
-	const setBlockNodes = useContext( SetBlockNodes );
 	const {
 		clientId,
 		isSelected,
 		isFirstMultiSelected,
-		isLastMultiSelected,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -57,37 +54,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockTitle,
 		wrapperProps = {},
 	} = useContext( BlockListBlockContext );
-
-	// Provide the selected node, or the first and last nodes of a multi-
-	// selection, so it can be used to position the contextual block toolbar.
-	// We only provide what is necessary, and remove the nodes again when they
-	// are no longer selected.
-	useEffect( () => {
-		if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
-			const node = ref.current;
-			setBlockNodes( ( nodes ) => ( {
-				...nodes,
-				[ clientId ]: node,
-			} ) );
-			return () => {
-				setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
-			};
-		}
-	}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
-
-	// Set new block node if it changes.
-	// This effect should happen on every render, so no dependencies should be
-	// added.
-	useEffect( () => {
-		const node = ref.current;
-		setBlockNodes( ( nodes ) => {
-			if ( ! nodes[ clientId ] || nodes[ clientId ] === node ) {
-				return nodes;
-			}
-
-			return { ...nodes, [ clientId ]: node };
-		} );
-	} );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -109,6 +75,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref,
 		useEventHandlers( clientId ),
 		useIsHovered(),
+		useBlockNodes( clientId ),
 	] );
 
 	return {
