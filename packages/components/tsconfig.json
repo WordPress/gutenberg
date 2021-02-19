@@ -1,6 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"importsNotUsedAsValues": "error",
 		"rootDir": "src",
 		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ]

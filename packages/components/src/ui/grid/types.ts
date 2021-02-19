@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
 type ResponsiveCSSValue< T > = Array< T | undefined > | T;
 
