@@ -327,7 +327,9 @@ export function ColorEdit( props ) {
 				...( hasTextColorSupport( blockName )
 					? [
 							{
-								label: colorLabels?.textColorLabel || __( 'Text Color' ),
+								label:
+									colorLabels?.textColorLabel ||
+									__( 'Text Color' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									colors,
@@ -340,7 +342,9 @@ export function ColorEdit( props ) {
 				...( hasBackground || hasGradient
 					? [
 							{
-								label: colorLabels?.backgroundColorLabel || __( 'Background Color' ),
+								label:
+									colorLabels?.backgroundColorLabel ||
+									__( 'Background Color' ),
 								onColorChange: hasBackground
 									? onChangeColor( 'background' )
 									: undefined,
@@ -359,7 +363,9 @@ export function ColorEdit( props ) {
 				...( isLinkColorEnabled && hasLinkColorSupport( blockName )
 					? [
 							{
-								label: colorLabels?.linkColorLabel || __( 'Link Color' ),
+								label:
+									colorLabels?.linkColorLabel ||
+									__( 'Link Color' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									colors,

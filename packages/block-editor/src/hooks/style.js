@@ -8,6 +8,7 @@ import { capitalize, has, get, startsWith } from 'lodash';
  */
 import { addFilter } from '@wordpress/hooks';
 import {
+	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
@@ -159,11 +160,14 @@ export const withBlockControls = createHigherOrderComponent(
 			SPACING_SUPPORT_KEY
 		);
 
+		const colorSupport = getBlockSupport( blockName, COLOR_SUPPORT_KEY );
 		const colorLabels = {
-			backgroundColorLabel: 'Background Label',
-			linkColorLabel: 'Link Label',
-			textColorLabel: 'Text Label',
-		}
+			backgroundColorLabel:
+				colorSupport?.__experimentalBackgroundColorLabel,
+			linkColorLabel: colorSupport?.__experimentalLinkColorLabel,
+			textColorLabel: colorSupport?.__experimentalTextColorLabel,
+		};
+
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<BorderPanel key="border" { ...props } />,
