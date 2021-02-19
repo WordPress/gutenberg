@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import View from '../view';
+import { View } from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
