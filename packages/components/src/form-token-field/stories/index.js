@@ -31,6 +31,10 @@ const FormTokenFieldExample = () => {
 	const showHowTo = boolean( 'Show how to instructions', true );
 	const expandOnFocus = boolean( 'Expand on focus', false );
 	const placeholder = text( 'Placeholder', '' );
+	const enableValidation = boolean(
+		'Validate that value is in suggestions',
+		false
+	);
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 
 	return (
@@ -42,6 +46,11 @@ const FormTokenFieldExample = () => {
 			placeholder={ placeholder }
 			__experimentalExpandOnFocus={ expandOnFocus }
 			__experimentalShowHowTo={ showHowTo }
+			__experimentalValidateInput={
+				enableValidation
+					? ( newValue ) => continents.includes( newValue )
+					: () => true
+			}
 		/>
 	);
 };
@@ -54,6 +63,10 @@ const FormTokenFieldAsyncExample = () => {
 	const showHowTo = boolean( 'Show how to instructions', true );
 	const expandOnFocus = boolean( 'Expand on focus', false );
 	const placeholder = text( 'Placeholder', '' );
+	const enableValidation = boolean(
+		'Validate that value is in suggestions',
+		false
+	);
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 	const [ availableContinents, setAvailableContinents ] = useState( [] );
 	const searchContinents = ( input ) => {
@@ -77,6 +90,11 @@ const FormTokenFieldAsyncExample = () => {
 			placeholder={ placeholder }
 			__experimentalExpandOnFocus={ expandOnFocus }
 			__experimentalShowHowTo={ showHowTo }
+			__experimentalValidateInput={
+				enableValidation
+					? ( newValue ) => continents.includes( newValue )
+					: () => true
+			}
 		/>
 	);
 };
