@@ -55,7 +55,6 @@ class WP_Widget_Block extends WP_Widget {
 	public function widget( $args, $instance ) {
 		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance ) );
 		$content = do_blocks( $instance['content'] );
-		echo $content;
 
 		// Handle embeds for block widgets.
 		//
