@@ -227,7 +227,6 @@ function BlockListBlock( {
 		className: wrapperClassName,
 		isLocked,
 		name,
-		mode,
 		blockTitle: blockType.title,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
