@@ -159,10 +159,15 @@ export const withBlockControls = createHigherOrderComponent(
 			SPACING_SUPPORT_KEY
 		);
 
+		const colorLabels = {
+			backgroundColorLabel: 'Background Label',
+			linkColorLabel: 'Link Label',
+			textColorLabel: 'Text Label',
+		}
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<BorderPanel key="border" { ...props } />,
-			<ColorEdit key="colors" { ...props } />,
+			<ColorEdit key="colors" { ...{ ...props, colorLabels } } />,
 			<BlockEdit key="edit" { ...props } />,
 			hasSpacingSupport && (
 				<SpacingPanelControl key="spacing">

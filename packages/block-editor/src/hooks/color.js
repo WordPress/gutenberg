@@ -213,7 +213,7 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  * @return {WPElement} Color edit element.
  */
 export function ColorEdit( props ) {
-	const { name: blockName, attributes } = props;
+	const { name: blockName, attributes, colorLabels } = props;
 	const isLinkColorEnabled = useEditorFeature( 'color.link' );
 	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
@@ -327,7 +327,7 @@ export function ColorEdit( props ) {
 				...( hasTextColorSupport( blockName )
 					? [
 							{
-								label: __( 'Text Color' ),
+								label: colorLabels?.textColorLabel || __( 'Text Color' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									colors,
@@ -340,7 +340,7 @@ export function ColorEdit( props ) {
 				...( hasBackground || hasGradient
 					? [
 							{
-								label: __( 'Background Color' ),
+								label: colorLabels?.backgroundColorLabel || __( 'Background Color' ),
 								onColorChange: hasBackground
 									? onChangeColor( 'background' )
 									: undefined,
@@ -359,7 +359,7 @@ export function ColorEdit( props ) {
 				...( isLinkColorEnabled && hasLinkColorSupport( blockName )
 					? [
 							{
-								label: __( 'Link Color' ),
+								label: colorLabels?.linkColorLabel || __( 'Link Color' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									colors,
