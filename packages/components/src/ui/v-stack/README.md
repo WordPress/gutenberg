@@ -89,7 +89,7 @@ function Example() {
 			<View>
 				<Text>Code</Text>
 			</View>
-			<Spacer css={ [ ui.background.blue ] }>
+			<Spacer>
 				<Text>is</Text>
 			</Spacer>
 			<View>
@@ -105,16 +105,16 @@ function Example() {
 ```jsx
 function Example() {
 	return (
-		<VStack css={ [ ui.frame.height( 200 ) ] }>
-			<View css={ [ ui.background.blue ] }>
-				<Text>Ana</Text>
+		<VStack>
+			<View>
+				<Text>Code</Text>
 			</View>
 			<Spacer />
-			<View css={ [ ui.background.blue ] }>
-				<Text>Elsa</Text>
+			<View>
+				<Text>is</Text>
 			</View>
-			<View css={ [ ui.background.blue ] }>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</VStack>
 	);
