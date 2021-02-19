@@ -164,7 +164,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should show suggestions when when input is empty if expandOnFocus is set to true', () => {
-			setUp( { expandOnFocus: true } );
+			setUp( { __experimentalExpandOnFocus: true } );
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -358,7 +358,7 @@ describe( 'FormTokenField', () => {
 
 		it( "should not add values that don't pass the validation", () => {
 			setUp( {
-				validateInput: ( newValue ) => newValue !== 'baz',
+				__experimentalValidateInput: ( newValue ) => newValue !== 'baz',
 			} );
 			setText( 'baz' );
 			sendKeyDown( keyCodes.enter );

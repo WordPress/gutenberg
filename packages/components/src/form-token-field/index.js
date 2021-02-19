@@ -108,11 +108,11 @@ class FormTokenField extends Component {
 	}
 
 	onFocus( event ) {
-		const { expandOnFocus } = this.props;
+		const { __experimentalExpandOnFocus } = this.props;
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
 			const newState = { isActive: true };
-			if ( expandOnFocus ) {
+			if ( __experimentalExpandOnFocus ) {
 				newState.isExpanded = true;
 			}
 			this.setState( newState );
@@ -402,9 +402,15 @@ class FormTokenField extends Component {
 	}
 
 	addNewToken( token ) {
-		const { expandOnFocus, validateInput } = this.props;
-		if ( ! validateInput( token ) ) {
-			this.props.speak( this.props.messages.invalid, 'assertive' );
+		const {
+			__experimentalExpandOnFocus,
+			__experimentalValidateInput,
+		} = this.props;
+		if ( ! __experimentalValidateInput( token ) ) {
+			this.props.speak(
+				this.props.messages.__experimentalInvalid,
+				'assertive'
+			);
 			return;
 		}
 		this.addNewTokens( [ token ] );
@@ -414,7 +420,7 @@ class FormTokenField extends Component {
 			incompleteTokenValue: '',
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
-			isExpanded: ! expandOnFocus,
+			isExpanded: ! __experimentalExpandOnFocus,
 		} );
 
 		if ( this.state.isActive ) {
@@ -501,7 +507,7 @@ class FormTokenField extends Component {
 	}
 
 	updateSuggestions( resetSelectedSuggestion = true ) {
-		const { expandOnFocus } = this.props;
+		const { __experimentalExpandOnFocus } = this.props;
 		const { incompleteTokenValue } = this.state;
 
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
@@ -512,7 +518,7 @@ class FormTokenField extends Component {
 
 		const newState = {
 			isExpanded:
-				expandOnFocus ||
+				__experimentalExpandOnFocus ||
 				( inputHasMinimumChars && hasMatchingSuggestions ),
 		};
 		if ( resetSelectedSuggestion ) {
@@ -610,7 +616,7 @@ class FormTokenField extends Component {
 			label = __( 'Add item' ),
 			instanceId,
 			className,
-			showHowTo,
+			__experimentalShowHowTo,
 		} = this.props;
 		const { isExpanded } = this.state;
 		const classes = classnames(
@@ -673,7 +679,7 @@ class FormTokenField extends Component {
 						/>
 					) }
 				</div>
-				{ showHowTo && (
+				{ __experimentalShowHowTo && (
 					<p
 						id={ `components-form-token-suggestions-howto-${ instanceId }` }
 						className="components-form-token-field__help"
@@ -706,11 +712,11 @@ FormTokenField.defaultProps = {
 		added: __( 'Item added.' ),
 		removed: __( 'Item removed.' ),
 		remove: __( 'Remove item' ),
-		invalid: __( 'Invalid item' ),
+		__experimentalInvalid: __( 'Invalid item' ),
 	},
-	expandOnFocus: false,
-	validateInput: () => true,
-	showHowTo: true,
+	__experimentalExpandOnFocus: false,
+	__experimentalValidateInput: () => true,
+	__experimentalShowHowTo: true,
 };
 
 export default withSpokenMessages( withInstanceId( FormTokenField ) );

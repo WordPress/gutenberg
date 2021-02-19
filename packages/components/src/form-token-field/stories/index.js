@@ -39,9 +39,9 @@ const FormTokenFieldExample = () => {
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			label="Type a continent"
-			expandOnFocus={ expandOnFocus }
-			showHowTo={ showHowTo }
 			placeholder={ placeholder }
+			__experimentalExpandOnFocus={ expandOnFocus }
+			__experimentalShowHowTo={ showHowTo }
 		/>
 	);
 };
@@ -74,9 +74,9 @@ const FormTokenFieldAsyncExample = () => {
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			onInputChange={ searchContinents }
 			label="Type a continent"
-			expandOnFocus={ expandOnFocus }
-			showHowTo={ showHowTo }
 			placeholder={ placeholder }
+			__experimentalExpandOnFocus={ expandOnFocus }
+			__experimentalShowHowTo={ showHowTo }
 		/>
 	);
 };
