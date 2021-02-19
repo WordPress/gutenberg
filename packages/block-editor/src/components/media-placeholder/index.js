@@ -63,8 +63,8 @@ export function MediaPlaceholder( {
 	isAppender,
 	accept,
 	addToGallery,
-	isGallery = false,
 	multiple = false,
+	handleUpload = true,
 	dropZoneUIOnly,
 	disableDropZone,
 	disableMediaButtons,
@@ -118,26 +118,13 @@ export function MediaPlaceholder( {
 		}
 	};
 
-	const onMediaLibrarySelection = ( files ) => {
-		if ( isGallery ) {
-			onSelect( files, true );
-			return;
-		}
-		onSelect( files );
-	};
-
 	const onFilesUpload = ( files ) => {
-		if ( isGallery ) {
-			// Because the refactored Gallery hands the files over to Image component InnerBlocks just
-			// hand the handling of the files over to the Gallery
-			onSelect( files );
-			return;
+		if ( ! handleUpload ) {
+			return onSelect( files );
 		}
 		onFilesPreUpload( files );
 		let setMedia;
 		if ( multiple ) {
-			// This is still needed to handle v1 versions of the Gallery block. It can be removed
-			// once all Gallery instances are forced to migrate.
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
 				// and is passed newMedia containing every item in its group each time, we must
@@ -323,7 +310,7 @@ export function MediaPlaceholder( {
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
-				onSelect={ onMediaLibrarySelection }
+				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
 				value={
 					Array.isArray( value )
