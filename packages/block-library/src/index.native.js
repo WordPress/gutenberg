@@ -226,6 +226,7 @@ export const registerCoreBlocks = () => {
 		file,
 		audio,
 		devOnly( reusableBlock ),
+		devOnly( search ),
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

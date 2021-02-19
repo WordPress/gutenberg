@@ -320,7 +320,13 @@ Blocks are able to provide base structural CSS styles, and themes can add styles
 
 Other features, like the new _wide_ and _full-wide_ alignment options, are simply CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-This is currently a work in progress and we recommend reviewing the [block based theme documentation](https://developer.wordpress.org/block-editor/tutorials/block-based-themes/) to learn more. 
+This is currently a work in progress and we recommend reviewing the [block based theme documentation](https://developer.wordpress.org/block-editor/tutorials/block-based-themes/) to learn more.
+
+## What are block variations? Are they the same as block styles?
+
+No, block variations are different versions of a single base block, sharing a similar functionality, but with slight differences in their implementation, or settings (attributes, InnerBlocks,etc). Block variations are transparent for users, and once there is a registered block variation, it will appear as a new block. For example, the `embed` block registers different block variations to embed content from specific providers.
+
+Meanwhile, [block styles](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) allow you to provide alternative styles to existing blocks, and they work by adding a className to the block’s wrapper. Once a block has registered block styles, block style selector will appear in its sidebar so that users can chose among the different registered styles.
 
 ## How do editor styles work?
 
