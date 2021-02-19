@@ -338,15 +338,7 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 		const initialWidgets = await getWidgetAreaWidgets();
-		expect( initialWidgets ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": Array [
-		    "block-2",
-		  ],
-		  "sidebar-2": Array [],
-		  "wp_inactive_widgets": Array [],
-		}
-	` );
+		expect( initialWidgets[ 'sidebar-1' ].length ).toBe( 1 );
 
 		firstParagraphBlock = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"]'
@@ -417,16 +409,10 @@ describe( 'Widgets screen', () => {
 		}
 	` );
 		const editedWidgets = await getWidgetAreaWidgets();
-		expect( editedWidgets ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": Array [
-		    "block-2",
-		    "block-3",
-		  ],
-		  "sidebar-2": Array [],
-		  "wp_inactive_widgets": Array [],
-		}
-	` );
+		expect( editedWidgets[ 'sidebar-1' ].length ).toBe( 2 );
+		expect( editedWidgets[ 'sidebar-1' ][ 0 ] ).toBe(
+			initialWidgets[ 'sidebar-1' ][ 0 ]
+		);
 	} );
 
 	it( 'Should display legacy widgets', async () => {
