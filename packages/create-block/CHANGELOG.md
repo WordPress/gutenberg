@@ -10,6 +10,10 @@
 
 -   Block scaffolded with `esnext` template is now registered from `block.json` with the `register_block_type_from_metadata` helper ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
 
+### Bug Fixes
+
+-   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+
 ## 2.0.1 (2021-02-01)
 
 ### Bug Fix

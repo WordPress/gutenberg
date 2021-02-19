@@ -44,6 +44,12 @@ const hasColorSupport = ( blockType ) => {
 	);
 };
 
+const shouldSkipSerialization = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport?.__experimentalSkipSerialization;
+};
+
 const hasLinkColorSupport = ( blockType ) => {
 	if ( Platform.OS !== 'web' ) {
 		return false;
@@ -124,7 +130,10 @@ function addAttributes( settings ) {
  * @return {Object}            Filtered props applied to save element
  */
 export function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasColorSupport( blockType ) ) {
+	if (
+		! hasColorSupport( blockType ) ||
+		shouldSkipSerialization( blockType )
+	) {
 		return props;
 	}
 
@@ -169,7 +178,10 @@ export function addSaveProps( props, blockType, attributes ) {
  * @return {Object}          Filtered block settings
  */
 export function addEditProps( settings ) {
-	if ( ! hasColorSupport( settings ) ) {
+	if (
+		! hasColorSupport( settings ) ||
+		shouldSkipSerialization( settings )
+	) {
 		return settings;
 	}
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
@@ -375,7 +387,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
 		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-		if ( ! hasColorSupport( name ) ) {
+		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
 

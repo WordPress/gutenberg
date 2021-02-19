@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as styles from './elevation-styles';
+import * as styles from './styles';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props

@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.47.0
 * [**] Add support for setting Cover block focal point. [#25810]
 
 ## 1.46.1
