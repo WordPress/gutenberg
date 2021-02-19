@@ -144,7 +144,7 @@ export default function ButtonsEdit( {
 				horizontalAlignment={ contentJustification }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ maxWidth }
+				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }

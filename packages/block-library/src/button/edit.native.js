@@ -376,13 +376,14 @@ class ButtonEdit extends Component {
 				? MIN_WIDTH
 				: placeholderTextWidth;
 		if ( width ) {
+			// Map of the percentage width to pixel subtraction that make the buttons fit nicely into columns.
 			const minWidthSubtractionMap = {
 				100: 0,
 				75: 11,
 				50: 22,
 				25: 33,
 			};
-
+			// Set the width of the button.
 			minWidth =
 				Math.floor( maxWidth * ( width / 100 ) ) -
 				minWidthSubtractionMap[ width ];
@@ -433,8 +434,8 @@ class ButtonEdit extends Component {
 						}
 						identifier="text"
 						tagName="p"
-						minWidth={ minWidth }
-						maxWidth={ maxWidth }
+						minWidth={ minWidth } // The minimum Button size.
+						maxWidth={ maxWidth } // The width of the screen.
 						id={ clientId }
 						isSelected={ isButtonFocused }
 						withoutInteractiveFormatting
