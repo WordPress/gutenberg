@@ -72,7 +72,12 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
-	if ( ! isPlaceholder && isMissing ) {
+	// We don't want to render a missing state if we have any inner blocks.
+	// A new template part is automatically created if we have any inner blocks but no entity.
+	if (
+		innerBlocks.length === 0 &&
+		( ( slug && ! theme ) || ( slug && isMissing ) )
+	) {
 		return (
 			<TagName { ...blockProps }>
 				<Warning>
