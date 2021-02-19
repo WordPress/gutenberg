@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { TextControl } from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function TemplatePartNamePanel( { postId } ) {
@@ -14,13 +14,15 @@ export default function TemplatePartNamePanel( { postId } ) {
 	);
 
 	return (
-		<TextControl
-			label={ __( 'Template title' ) }
-			value={ title }
-			onChange={ ( value ) => {
-				setTitle( value );
-			} }
-			onFocus={ ( event ) => event.target.select() }
-		/>
+		<PanelBody>
+			<TextControl
+				label={ __( 'Template title' ) }
+				value={ title }
+				onChange={ ( value ) => {
+					setTitle( value );
+				} }
+				onFocus={ ( event ) => event.target.select() }
+			/>
+		</PanelBody>
 	);
 }

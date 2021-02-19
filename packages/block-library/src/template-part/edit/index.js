@@ -13,7 +13,6 @@ import {
 import {
 	SelectControl,
 	Dropdown,
-	PanelBody,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
@@ -29,6 +28,7 @@ import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
+import TemplatePartCategoryPanel from './category-panel';
 
 export default function TemplatePartEdit( {
 	attributes: { slug, theme, tagName: TagName = 'div' },
@@ -92,11 +92,12 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody>
-					{ isEntityAvailable && (
+				{ isEntityAvailable && (
+					<>
 						<TemplatePartNamePanel postId={ templatePartId } />
-					) }
-				</PanelBody>
+						<TemplatePartCategoryPanel postId={ templatePartId } />
+					</>
+				) }
 			</InspectorControls>
 			<InspectorAdvancedControls>
 				<SelectControl
