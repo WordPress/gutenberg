@@ -11,6 +11,7 @@ import { useRef, useEffect, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
+import { store as blockEditorStore } from '../../../store';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -53,10 +55,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index,
 		className,
 		name,
-		mode,
 		blockTitle,
 		wrapperProps = {},
 	} = useContext( BlockListBlockContext );
+	const mode = useSelect( ( select ) => {
+		return select( blockEditorStore ).getBlockMode( clientId );
+	} );
 
 	// Provide the selected node, or the first and last nodes of a multi-
 	// selection, so it can be used to position the contextual block toolbar.
