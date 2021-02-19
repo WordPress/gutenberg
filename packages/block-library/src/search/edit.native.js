@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import { View, Alert } from 'react-native';
 
 /**
