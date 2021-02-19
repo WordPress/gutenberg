@@ -49,7 +49,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		clientId,
 		isSelected,
 		isFirstMultiSelected,
-		isLastMultiSelected,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -66,8 +65,21 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	// selection, so it can be used to position the contextual block toolbar.
 	// We only provide what is necessary, and remove the nodes again when they
 	// are no longer selected.
-	const isNodeNeeded =
-		isSelected || isFirstMultiSelected || isLastMultiSelected;
+	const isNodeNeeded = useSelect(
+		( select ) => {
+			const {
+				isBlockSelected,
+				isFirstMultiSelectedBlock,
+				getLastMultiSelectedBlockClientId,
+			} = select( blockEditorStore );
+			return (
+				isBlockSelected( clientId ) ||
+				isFirstMultiSelectedBlock( clientId ) ||
+				getLastMultiSelectedBlockClientId() === clientId
+			);
+		},
+		[ clientId ]
+	);
 	const nodesRef = useRefEffect(
 		( node ) => {
 			if ( ! isNodeNeeded ) {
