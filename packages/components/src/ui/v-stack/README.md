@@ -7,7 +7,7 @@
 `VStack` can render anything inside.
 
 ```jsx
-import { VStack, Text, View } from '@wp-g2/components/ui';
+import { VStack, Text, View } from '@wordpress/components/ui';
 
 function Example() {
 	return (
