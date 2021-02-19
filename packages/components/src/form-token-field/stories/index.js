@@ -27,14 +27,15 @@ const continents = [
 	'Oceania',
 ];
 
+const getKnobs = () => ( {
+	showHowTo: boolean( 'Show how to instructions', true ),
+	expandOnFocus: boolean( 'Expand on focus', false ),
+	placeholder: text( 'Placeholder', '' ),
+	enableValidation: boolean( 'Validate that value is in suggestions', false ),
+} );
+
 const FormTokenFieldExample = () => {
-	const showHowTo = boolean( 'Show how to instructions', true );
-	const expandOnFocus = boolean( 'Expand on focus', false );
-	const placeholder = text( 'Placeholder', '' );
-	const enableValidation = boolean(
-		'Validate that value is in suggestions',
-		false
-	);
+	const knobs = getKnobs();
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 
 	return (
@@ -43,11 +44,11 @@ const FormTokenFieldExample = () => {
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			label="Type a continent"
-			placeholder={ placeholder }
-			__experimentalExpandOnFocus={ expandOnFocus }
-			__experimentalShowHowTo={ showHowTo }
+			placeholder={ knobs.placeholder }
+			__experimentalExpandOnFocus={ knobs.expandOnFocus }
+			__experimentalShowHowTo={ knobs.showHowTo }
 			__experimentalValidateInput={
-				enableValidation
+				knobs.enableValidation
 					? ( newValue ) => continents.includes( newValue )
 					: () => true
 			}
@@ -60,13 +61,7 @@ export const _default = () => {
 };
 
 const FormTokenFieldAsyncExample = () => {
-	const showHowTo = boolean( 'Show how to instructions', true );
-	const expandOnFocus = boolean( 'Expand on focus', false );
-	const placeholder = text( 'Placeholder', '' );
-	const enableValidation = boolean(
-		'Validate that value is in suggestions',
-		false
-	);
+	const knobs = getKnobs();
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 	const [ availableContinents, setAvailableContinents ] = useState( [] );
 	const searchContinents = ( input ) => {
@@ -87,11 +82,11 @@ const FormTokenFieldAsyncExample = () => {
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			onInputChange={ searchContinents }
 			label="Type a continent"
-			placeholder={ placeholder }
-			__experimentalExpandOnFocus={ expandOnFocus }
-			__experimentalShowHowTo={ showHowTo }
+			placeholder={ knobs.placeholder }
+			__experimentalExpandOnFocus={ knobs.expandOnFocus }
+			__experimentalShowHowTo={ knobs.showHowTo }
 			__experimentalValidateInput={
-				enableValidation
+				knobs.enableValidation
 					? ( newValue ) => continents.includes( newValue )
 					: () => true
 			}
