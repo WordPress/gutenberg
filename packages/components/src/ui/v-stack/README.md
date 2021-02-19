@@ -93,7 +93,7 @@ function Example() {
 				<Text>Elsa</Text>
 			</Spacer>
 			<View css={ [ ui.background.blue ] }>
-				<Text>Olaf</Text>
+				<Text>Poetry</Text>
 			</View>
 		</VStack>
 	);
