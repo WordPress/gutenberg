@@ -155,7 +155,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `(Object|Function)`: Element Ref.
+-   `Object|Function`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -164,7 +164,7 @@ Copies the text to the clipboard when the element is clicked.
 _Parameters_
 
 -   _ref_ `Object`: Reference with the element.
--   _text_ `(string|Function)`: The text to copy.
+-   _text_ `string|Function`: The text to copy.
 -   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
@@ -208,7 +208,7 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `(boolean|string)`: Focus on mount mode.
+-   _focusOnMount_ `boolean|string`: Focus on mount mode.
 
 _Returns_
 
@@ -239,7 +239,7 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `?Function`: Overrides the default return behavior.
+-   _onFocusReturn_ `Function?`: Overrides the default return behavior.
 
 _Returns_
 
@@ -253,6 +253,11 @@ _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
 -   _prefix_ `string`: Prefix for the unique id.
+-   _preferredId_ `string`: Default ID to use.
+
+_Returns_
+
+-   `string | number`: The unique instance id.
 
 <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
 
@@ -266,7 +271,7 @@ Attach a keyboard shortcut handler.
 
 _Parameters_
 
--   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
+-   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
 -   _callback_ `Function`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
@@ -294,7 +299,7 @@ with the same node.
 
 _Parameters_
 
--   _refs_ `Array<(RefObject|RefCallback)>`: The refs to be merged.
+-   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
 
 _Returns_
 
@@ -311,7 +316,7 @@ _Parameters_
 
 _Returns_
 
--   `(T|undefined)`: The value from the previous render.
+-   `T|undefined`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
@@ -320,6 +325,30 @@ Hook returning whether the user has a preference for reduced motion.
 _Returns_
 
 -   `boolean`: Reduced motion preference value.
+
+<a name="useRefEffect" href="#useRefEffect">#</a> **useRefEffect**
+
+Effect-like ref callback. Just like with `useEffect`, this allows you to
+return a cleanup function to be run if the ref changes or one of the
+dependencies changes. The ref is provided as an argument to the callback
+functions. The main difference between this and `useEffect` is that
+the `useEffect` callback is not called when the ref changes, but this is.
+Pass the returned ref callback as the component's ref and merge multiple refs
+with `useMergeRefs`.
+
+It's worth noting that if the dependencies array is empty, there's not
+strictly a need to clean up event handlers for example, because the node is
+to be removed. It _is_ necessary if you add dependencies because the ref
+callback will be called multiple times for the same node.
+
+_Parameters_
+
+-   _calllback_ `Function`: Callback with ref as argument.
+-   _dependencies_ `Array`: Dependencies of the callback.
+
+_Returns_
+
+-   `Function`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 

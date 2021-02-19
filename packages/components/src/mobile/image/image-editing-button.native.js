@@ -18,8 +18,12 @@ import styles from './style.scss';
 
 const accessibilityHint =
 	Platform.OS === 'ios'
-		? __( 'Double tap to open Action Sheet to edit or replace the image' )
-		: __( 'Double tap to open Bottom Sheet to edit or replace the image' );
+		? __(
+				'Double tap to open Action Sheet to edit, replace, or clear the image'
+		  )
+		: __(
+				'Double tap to open Bottom Sheet to edit, replace, or clear the image'
+		  );
 
 const ImageEditingButton = ( {
 	onSelectMediaUploadOption,
@@ -34,10 +38,10 @@ const ImageEditingButton = ( {
 			openReplaceMediaOptions={ openMediaOptions }
 			render={ ( { open, mediaOptions } ) => (
 				<TouchableWithoutFeedback
-					onPress={ open }
-					accessibilityRole={ 'button' }
-					accessibilityLabell={ __( 'Edit the cover image' ) }
 					accessibilityHint={ accessibilityHint }
+					accessibilityLabel={ __( 'Edit image' ) }
+					accessibilityRole={ 'button' }
+					onPress={ open }
 				>
 					<View style={ styles.editContainer }>
 						<View style={ styles.edit }>

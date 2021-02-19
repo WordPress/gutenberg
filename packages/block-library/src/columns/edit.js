@@ -17,6 +17,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -57,7 +58,7 @@ function ColumnsEditContainer( {
 	const { count } = useSelect(
 		( select ) => {
 			return {
-				count: select( 'core/block-editor' ).getBlockCount( clientId ),
+				count: select( blockEditorStore ).getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
@@ -118,8 +119,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateAlignment( verticalAlignment ) {
 			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-			const { getBlockOrder } = registry.select( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
+			const { getBlockOrder } = registry.select( blockEditorStore );
 
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
@@ -142,8 +143,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-			const { getBlocks } = registry.select( 'core/block-editor' );
+			const { replaceInnerBlocks } = dispatch( blockEditorStore );
+			const { getBlocks } = registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
 			const hasExplicitWidths = hasExplicitPercentColumnWidths(
@@ -220,7 +221,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 		},
 		[ name ]
 	);
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 
 	return (
@@ -253,7 +254,7 @@ const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
-			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+			select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks

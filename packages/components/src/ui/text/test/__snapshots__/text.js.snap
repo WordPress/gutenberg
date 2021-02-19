@@ -50,7 +50,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
     class=""
     data-g2-component="Text"
   >
-    Some people are worth melting for.
+    Lorem ipsum.
   </span>
 </span>
 `;
@@ -94,6 +94,6 @@ exports[`Text snapshot tests should render correctly 1`] = `
   data-g2-c16t="true"
   data-g2-component="Text"
 >
-  Some people are worth melting for.
+  Lorem ipsum.
 </span>
 `;

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace deprecated `doctrine` parser with simpler `comment-parser` to support a wider variety of types. This also de-normalizes types such that types will be transcribed exactly as they are declared in the doc comments.
+
 ## 1.7.0 (2020-02-04)
 
 ### Bug Fixes
