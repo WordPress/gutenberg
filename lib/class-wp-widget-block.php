@@ -54,8 +54,6 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function widget( $args, $instance ) {
 		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance ) );
-		echo do_blocks( $instance['content'] );
-
 		// Handle embeds for block widgets.
 		//
 		// When this feature is added to core it may need to be implemented
@@ -63,7 +61,10 @@ class WP_Widget_Block extends WP_Widget {
 		// filter for its content, which WP_Embed uses in its constructor.
 		// See https://core.trac.wordpress.org/ticket/51566.
 		global $wp_embed;
-		echo $wp_embed->autoembed( $content );
+		$content = $wp_embed->run_shortcode( $instance['content'] );
+		$content = $wp_embed->autoembed( $content );
+
+		echo do_blocks( $content );
 
 		echo $args['after_widget'];
 	}
