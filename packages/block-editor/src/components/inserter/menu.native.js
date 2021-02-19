@@ -174,14 +174,19 @@ function InserterMenu( {
 		>
 			<TouchableHighlight accessible={ false }>
 				<View>
-					<View>
-						<InserterSearchForm
-							onChange={ ( value ) => {
-								setFilterValue( value );
-							} }
-							value={ filterValue }
-						/>
-					</View>
+					{
+						// eslint-disable-next-line no-undef
+						__DEV__ && (
+							<View>
+								<InserterSearchForm
+									onChange={ ( value ) => {
+										setFilterValue( value );
+									} }
+									value={ filterValue }
+								/>
+							</View>
+						)
+					}
 					<InserterSearchResults
 						onClose={ onClose }
 						items={ getItems() }
