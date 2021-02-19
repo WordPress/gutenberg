@@ -90,7 +90,7 @@ function Example() {
 				<Text>Ana</Text>
 			</View>
 			<Spacer css={ [ ui.background.blue ] }>
-				<Text>Elsa</Text>
+				<Text>is</Text>
 			</Spacer>
 			<View>
 				<Text>Poetry</Text>
