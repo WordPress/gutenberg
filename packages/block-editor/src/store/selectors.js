@@ -1807,7 +1807,7 @@ export const __experimentalGetScopedBlockPatterns = createSelector(
 		const patterns = state.settings.__experimentalBlockPatterns;
 		if ( ! blockName && ! scope ) return EMPTY_ARRAY;
 		return patterns.filter( ( pattern ) =>
-			pattern.scope?.[ blockName ]?.includes?.( scope )
+			pattern.scope?.[ scope ]?.includes?.( blockName )
 		);
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]

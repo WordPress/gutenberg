@@ -140,7 +140,10 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Query Pattern one', 'gutenberg' ),
 		'categories' => array( 'core/query' ),
-		'scope'      => array( 'core/query' => array( 'block' ) ),
+		'scope'      => array(
+			'inserter' => false,
+			'block'    => array( 'core/query' ),
+		),
 		'content'    => '<!-- wp:post-featured-image /-->
 		<!-- wp:columns -->
 		<div class="wp-block-columns"><!-- wp:column -->
@@ -161,7 +164,10 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Query Pattern two', 'gutenberg' ),
 		'categories' => array( 'core/query' ),
-		'scope'      => array( 'core/query' => array( 'block' ) ),
+		'scope'      => array(
+			'inserter' => false,
+			'block'    => array( 'core/query' ),
+		),
 		'content'    => '<!-- wp:columns -->
 		<div class="wp-block-columns"><!-- wp:column -->
 		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /-->
@@ -184,7 +190,10 @@ register_block_pattern(
 	'test/query-3',
 	array(
 		'title'   => __( 'Query Pattern three', 'gutenberg' ),
-		'scope'   => array( 'core/query' => array( 'block' ) ),
+		'scope'   => array(
+			'inserter' => false,
+			'block'    => array( 'core/query' ),
+		),
 		'content' => '<!-- wp:post-title {"isLink":true} /-->
 		<!-- wp:separator {"align":"center","className":"is-style-twentytwentyone-separator-thick"} -->
 		<hr class="wp-block-separator aligncenter is-style-twentytwentyone-separator-thick"/>
@@ -207,7 +216,10 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Query Pattern four', 'gutenberg' ),
 		'categories' => array( 'core/query' ),
-		'scope'      => array( 'core/query' => array( 'block' ) ),
+		'scope'      => array(
+			'inserter' => false,
+			'block'    => array( 'core/query' ),
+		),
 		'content'    => '<!-- wp:columns -->
 		<div class="wp-block-columns"><!-- wp:column -->
 		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /-->
@@ -231,7 +243,10 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Query Pattern five', 'gutenberg' ),
 		'categories' => array( 'core/query' ),
-		'scope'      => array( 'core/query' => array( 'block' ) ),
+		'scope'      => array(
+			'inserter' => false,
+			'block'    => array( 'core/query' ),
+		),
 		'content'    => '<!-- wp:columns -->
 		<div class="wp-block-columns"><!-- wp:column -->
 		<div class="wp-block-column"><!-- wp:post-title {"isLink":true} /-->
