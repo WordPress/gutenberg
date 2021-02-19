@@ -62,4 +62,18 @@ function Spinner( props, forwardedRef ) {
 	);
 }
 
+/**
+ * `Spinner` is a component that notify users that their action is being processed.
+ *
+ * @example
+ * ```jsx
+ * import { Spinner } from `@wp-g2/components/ui`;
+ *
+ * function Example() {
+ * 	return (
+ * 		<Spinner />
+ * 	);
+ * }
+ * ```
+ */
 export default contextConnect( Spinner, 'Spinner' );
