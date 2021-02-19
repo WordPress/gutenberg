@@ -168,7 +168,7 @@ function GalleryEdit( props ) {
 		if ( ! shortCodeTransforms || ! shortCodeImages ) {
 			return;
 		}
-		onSelectImages( shortCodeImages );
+		updateImages( shortCodeImages );
 		setAttributes( { shortCodeTransforms: undefined } );
 	}, [ shortCodeTransforms, shortCodeImages ] );
 
@@ -217,22 +217,8 @@ function GalleryEdit( props ) {
 		};
 	}
 
-	function onSelectImages( selectedImages, replace = false ) {
-		const imageArray =
-			Object.prototype.toString.call( selectedImages ) ===
-			'[object FileList]'
-				? Array.from( selectedImages ).map( ( file ) => {
-						if ( ! file.url ) {
-							return pickRelevantMediaFiles( {
-								url: createBlobURL( file ),
-							} );
-						}
-
-						return file;
-				  } )
-				: selectedImages;
-
-		const processedImages = imageArray
+	function updateImages( selectedImages ) {
+		const processedImages = selectedImages
 			.filter(
 				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
 			)
@@ -246,13 +232,9 @@ function GalleryEdit( props ) {
 				return file;
 			} );
 
-		const existingImageBlocks = replace
-			? innerBlockImages.filter( ( block ) =>
-					processedImages.find(
-						( img ) => img.url === block.attributes.url
-					)
-			  )
-			: innerBlockImages;
+		const existingImageBlocks = innerBlockImages.filter( ( block ) =>
+			processedImages.find( ( img ) => img.url === block.attributes.url )
+		);
 
 		const newImages = differenceBy( processedImages, images, 'url' );
 
@@ -378,7 +360,7 @@ function GalleryEdit( props ) {
 	const mediaPlaceholder = (
 		<MediaPlaceholder
 			addToGallery={ hasImages }
-			isGallery={ true }
+			hanldeUpload={ false }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
@@ -386,7 +368,7 @@ function GalleryEdit( props ) {
 				title: ! hasImages && __( 'Gallery' ),
 				instructions: ! hasImages && PLACEHOLDER_TEXT,
 			} }
-			onSelect={ onSelectImages }
+			onSelect={ updateImages }
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
