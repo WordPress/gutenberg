@@ -104,7 +104,6 @@ function Example() {
 
 ```jsx
 import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
-import { ui } from '@wp-g2/styles';
 
 function Example() {
 	return (
