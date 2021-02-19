@@ -360,7 +360,7 @@ function GalleryEdit( props ) {
 	const mediaPlaceholder = (
 		<MediaPlaceholder
 			addToGallery={ hasImages }
-			hanldeUpload={ false }
+			handleUpload={ false }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
