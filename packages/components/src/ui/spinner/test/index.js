@@ -9,7 +9,12 @@ import { render } from '@testing-library/react';
 import { Spinner } from '..';
 
 describe( 'props', () => {
-	const base = render( <Spinner /> );
+	let base;
+
+	beforeEach( () => {
+		base = render( <Spinner /> );
+	} );
+
 	test( 'should render correctly', () => {
 		expect( base.container.firstChild ).toMatchSnapshot();
 	} );

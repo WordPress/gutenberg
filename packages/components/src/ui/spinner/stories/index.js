@@ -9,5 +9,11 @@ export default {
 };
 
 export const _default = () => {
-	return <Spinner />;
+	return (
+		<>
+			<Spinner />
+			<Spinner size={ 30 } />
+			<Spinner color="blue" size="50" />
+		</>
+	);
 };

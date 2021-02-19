@@ -2,7 +2,21 @@
 
 exports[`props should render color 1`] = `
 "Snapshot Diff:
-  Comparing two different types of values. Expected [32mobject[39m but received [31mnull[39m."
+- First value
++ Second value
+
+@@ -10,11 +10,10 @@
+      class=\\"css-16xh7r5\\"
+      style=\\"transform: scale(0.4444444444444444);\\"
+    >
+      <div
+        class=\\"css-1frx7qu\\"
+-       style=\\"color: blue;\\"
+      >
+        <div
+          class=\\"InnerBar1\\"
+        />
+        <div"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -277,5 +291,26 @@ exports[`props should render correctly 1`] = `
 
 exports[`props should render size 1`] = `
 "Snapshot Diff:
-  Comparing two different types of values. Expected [32mobject[39m but received [31mnull[39m."
+- First value
++ Second value
+
+@@ -1,16 +1,16 @@
+  <div
+    aria-busy=\\"true\\"
+    class=\\"components-spinner wp-components-spinner css-10r9amq\\"
+    data-g2-c16t=\\"true\\"
+    data-g2-component=\\"Spinner\\"
+-   style=\\"height: 31px; width: 31px;\\"
++   style=\\"height: 16px; width: 16px;\\"
+  >
+    <div
+      aria-hidden=\\"true\\"
+      class=\\"css-16xh7r5\\"
+-     style=\\"transform: scale(0.8611111111111112);\\"
++     style=\\"transform: scale(0.4444444444444444);\\"
+    >
+      <div
+        class=\\"css-1frx7qu\\"
+      >
+        <div"
 `;
