@@ -11,10 +11,12 @@ describe( 'Inserter', () => {
 		await createNewPost();
 		await openGlobalBlockInserter();
 		await page.focus( '.editor-block-list-item-paragraph' );
-		await page.waitForSelector( '.block-editor-inserter__preview', {
-			visible: true,
-		} );
-		const preview = await page.$( '.block-editor-inserter__preview' );
+		const preview = await page.waitForSelector(
+			'.block-editor-inserter__preview',
+			{
+				visible: true,
+			}
+		);
 		const isPreviewVisible = await preview.isIntersectingViewport();
 		expect( isPreviewVisible ).toBe( true );
 	} );
