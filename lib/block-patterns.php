@@ -9,7 +9,7 @@
 register_block_pattern(
 	'query/large-posts',
 	array(
-		'title'   => __( 'Large Posts', 'gutenberg' ),
+		'title'   => __( 'Large', 'gutenberg' ),
 		'scope'   => array(
 			'inserter' => false,
 			'block'    => array( 'core/query' ),
@@ -27,7 +27,7 @@ register_block_pattern(
 register_block_pattern(
 	'query/medium-posts',
 	array(
-		'title'   => __( 'Medium Posts', 'gutenberg' ),
+		'title'   => __( 'Medium', 'gutenberg' ),
 		'scope'   => array(
 			'inserter' => false,
 			'block'    => array( 'core/query' ),
@@ -47,7 +47,7 @@ register_block_pattern(
 register_block_pattern(
 	'query/small-posts',
 	array(
-		'title'   => __( 'Small Posts', 'gutenberg' ),
+		'title'   => __( 'Small', 'gutenberg' ),
 		'scope'   => array(
 			'inserter' => false,
 			'block'    => array( 'core/query' ),
