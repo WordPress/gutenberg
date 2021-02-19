@@ -21,6 +21,9 @@ import { View } from '@wordpress/primitives';
 const MIN_SPACER_HEIGHT = 1;
 const MAX_SPACER_HEIGHT = 500;
 
+const MIN_SPACER_WIDTH = 1;
+const MAX_SPACER_WIDTH = 500;
+
 const SpacerEdit = ( {
 	attributes,
 	isSelected,
@@ -29,10 +32,15 @@ const SpacerEdit = ( {
 	onResizeStop,
 } ) => {
 	const [ isResizing, setIsResizing ] = useState( false );
-	const { height } = attributes;
+	const { height, width } = attributes;
 	const updateHeight = ( value ) => {
 		setAttributes( {
 			height: value,
+		} );
+	};
+	const updateWidth = ( value ) => {
+		setAttributes( {
+			width: value,
 		} );
 	};
 
@@ -47,7 +55,12 @@ const SpacerEdit = ( {
 			parseInt( height + delta.height, 10 ),
 			MAX_SPACER_HEIGHT
 		);
+		const spacerWidth = Math.min(
+			parseInt( width + delta.width, 10 ),
+			MAX_SPACER_WIDTH
+		);
 		updateHeight( spacerHeight );
+		updateWidth( spacerWidth );
 		setIsResizing( false );
 	};
 
@@ -63,11 +76,13 @@ const SpacerEdit = ( {
 					) }
 					size={ {
 						height,
+						width,
 					} }
 					minHeight={ MIN_SPACER_HEIGHT }
+					minWidth={ MIN_SPACER_WIDTH }
 					enable={ {
 						top: false,
-						right: false,
+						right: true,
 						bottom: true,
 						left: false,
 						topRight: false,
@@ -94,6 +109,13 @@ const SpacerEdit = ( {
 						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
 						value={ height }
 						onChange={ updateHeight }
+					/>
+					<RangeControl
+						label={ __( 'Width in pixels' ) }
+						min={ MIN_SPACER_WIDTH }
+						max={ Math.max( MAX_SPACER_WIDTH, width ) }
+						value={ width }
+						onChange={ updateWidth }
 					/>
 				</PanelBody>
 			</InspectorControls>
