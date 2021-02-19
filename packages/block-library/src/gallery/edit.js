@@ -218,7 +218,21 @@ function GalleryEdit( props ) {
 	}
 
 	function updateImages( selectedImages ) {
-		const processedImages = selectedImages
+		const imageArray =
+			Object.prototype.toString.call( selectedImages ) ===
+			'[object FileList]'
+				? Array.from( selectedImages ).map( ( file ) => {
+						if ( ! file.url ) {
+							return pickRelevantMediaFiles( {
+								url: createBlobURL( file ),
+							} );
+						}
+
+						return file;
+				  } )
+				: selectedImages;
+
+		const processedImages = imageArray
 			.filter(
 				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
 			)
