@@ -67,6 +67,8 @@ To override the default behavior, you can pass one or both of the following opti
     -   Example: `npm run changelog -- --milestone="Gutenberg 8.1"`
 -   `--token <token>`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
     -   Example: `npm run changelog -- --token="..."`
+-   `--unreleased`: Only list PRs that have been closed after the latest release in the milestone's series has been published. In other words, only list PRs that haven't been part of a release yet.
+    -   Example: `npm run changelog -- --milestone="Gutenberg 9.8" --unreleased`. If the latest version in the 9.8 series is 9.8.3, only show PRs for the in the 9.8 series that were closed (merged) after 9.8.3 was published.
 
 The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
 

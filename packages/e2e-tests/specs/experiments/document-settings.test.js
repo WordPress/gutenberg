@@ -75,7 +75,8 @@ describe( 'Document Settings', () => {
 			// Navigate to a template part
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Template Parts' );
+			// TODO: Change General to Headers once TT1 blocks categorise the template parts
+			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Evaluate the document settings title

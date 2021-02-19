@@ -175,20 +175,8 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
-		echo do_blocks( $instance['content'] );
-		$textarea_id = $this->get_field_id( 'content' );
 		?>
-		<br/>
-		<textarea id="<?php echo $textarea_id; ?>" name="<?php echo $this->get_field_name( 'content' ); ?>"
-				class="content sync-input" hidden><?php echo esc_textarea( $instance['content'] ); ?></textarea>
-		<script>
-			(function() {
-				var link = "<?php echo esc_js( admin_url( 'themes.php?page=gutenberg-widgets' ) ); ?>";
-				var container = jQuery('#<?php echo $textarea_id; ?>').closest(".form").find('.widget-control-actions .alignleft');
-				container.prepend(jQuery('<span> |</span>'));
-				container.prepend(jQuery('<a href="'+link+'" class="button-link">Edit</a>'));
-			})();
-		</script>
+		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>" rows="6" cols="50" class="widefat text wp-block-widget-textarea"><?php echo esc_textarea( $instance['content'] ); ?></textarea>
 		<?php
 	}
 
