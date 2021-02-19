@@ -229,9 +229,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 /**
  * Returns a navigation link variation
  *
- * @param $entity WP_Taxonomy|WP_Post_Type post type or taxonomy entity.
- * @param $kind string string of value 'taxonomy' or 'post-type'
- * @param $name string entity name eg: post, page, post_tag, category
+ * @param WP_Taxonomy|WP_Post_Type $entity post type or taxonomy entity.
+ * @param string                   $kind string of value 'taxonomy' or 'post-type'.
  *
  * @return array
  */
