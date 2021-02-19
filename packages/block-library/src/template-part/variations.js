@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { footer, header, sidebar } from '@wordpress/icons';
+import { footer, header } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -26,13 +26,6 @@ const variations = [
 		title: __( 'Header' ),
 		icon: header,
 		isActive: createIsActiveBasedOnArea( 'header' ),
-		scope: [],
-	},
-	{
-		name: 'sidebar',
-		title: __( 'Sidebar' ),
-		icon: sidebar,
-		isActive: createIsActiveBasedOnArea( 'sidebar' ),
 		scope: [],
 	},
 	{
