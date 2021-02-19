@@ -63,7 +63,7 @@ class WP_Widget_Block extends WP_Widget {
 		global $wp_embed;
 		$content = $wp_embed->run_shortcode( $instance['content'] );
 		$content = $wp_embed->autoembed( $content );
-		
+
 		echo do_blocks( $content );
 
 		echo $args['after_widget'];
