@@ -6,13 +6,13 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import View from '../view';
+import { View } from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render(
 			<View>
-				<span>Some people are worth melting for.</span>
+				<span />
 			</View>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
@@ -21,7 +21,7 @@ describe( 'props', () => {
 	test( 'should render as another element', () => {
 		const { container } = render(
 			<View as="p">
-				<span>Some people are worth melting for.</span>
+				<span />
 			</View>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
@@ -35,7 +35,7 @@ describe( 'props', () => {
 					background: pink;
 				` }
 			>
-				<span>Some people are worth melting for.</span>
+				<span />
 			</View>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
@@ -49,7 +49,7 @@ describe( 'props', () => {
 					background: 'pink',
 				} }
 			>
-				<span>Some people are worth melting for.</span>
+				<span />
 			</View>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
@@ -66,7 +66,7 @@ describe( 'props', () => {
 					`font-weight: bold;`,
 				] }
 			>
-				<span>Some people are worth melting for.</span>
+				<span />
 			</View>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
