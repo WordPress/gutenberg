@@ -259,7 +259,7 @@ export function getAccessibleBlockLabel(
 	}
 
 	if ( hasLabel ) {
-		return sprintf( '%1$s', label );
+		return label;
 	}
 }
 
