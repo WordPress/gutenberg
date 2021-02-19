@@ -87,7 +87,7 @@ function Example() {
 	return (
 		<VStack>
 			<View>
-				<Text>Ana</Text>
+				<Text>Code</Text>
 			</View>
 			<Spacer css={ [ ui.background.blue ] }>
 				<Text>is</Text>
