@@ -6,7 +6,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-const createIsActive = ( area ) => ( { theme, slug } ) => {
+const createIsActiveBasedOnArea = ( area ) => ( { theme, slug } ) => {
 	if ( ! slug ) {
 		return false;
 	}
@@ -25,21 +25,21 @@ const variations = [
 		name: 'header',
 		title: __( 'Header' ),
 		icon: header,
-		isActive: createIsActive( 'header' ),
+		isActive: createIsActiveBasedOnArea( 'header' ),
 		scope: [],
 	},
 	{
 		name: 'sidebar',
 		title: __( 'Sidebar' ),
 		icon: sidebar,
-		isActive: createIsActive( 'sidebar' ),
+		isActive: createIsActiveBasedOnArea( 'sidebar' ),
 		scope: [],
 	},
 	{
 		name: 'footer',
 		title: __( 'Footer' ),
 		icon: footer,
-		isActive: createIsActive( 'footer' ),
+		isActive: createIsActiveBasedOnArea( 'footer' ),
 		scope: [],
 	},
 ];
