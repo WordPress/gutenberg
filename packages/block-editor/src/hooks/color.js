@@ -47,7 +47,7 @@ const hasColorSupport = ( blockType ) => {
 const shouldSkipSerialization = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return colorSupport?.skipSerialization;
+	return colorSupport?.__experimentalSkipSerialization;
 };
 
 const hasLinkColorSupport = ( blockType ) => {

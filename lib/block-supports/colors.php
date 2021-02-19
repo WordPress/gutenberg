@@ -61,7 +61,7 @@ function gutenberg_register_colors_support( $block_type ) {
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
 
-	if ( array_key_exists( 'skipSerialization', $color_support ) && $color_support['skipSerialization'] ) {
+	if ( array_key_exists( '__experimentalSkipSerialization', $color_support ) && $color_support['__experimentalSkipSerialization'] ) {
 		return array();
 	}
 
