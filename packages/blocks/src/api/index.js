@@ -7,8 +7,8 @@
 export {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
-	duplicateBlock,
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,

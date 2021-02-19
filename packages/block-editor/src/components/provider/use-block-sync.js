@@ -8,7 +8,7 @@ import { last, noop } from 'lodash';
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { duplicateBlock } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -100,7 +100,7 @@ export default function useBlockSync( {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
 			const storeBlocks = controlledBlocks.map( ( block ) =>
-				duplicateBlock( block )
+				cloneBlock( block )
 			);
 			if ( subscribed.current ) {
 				pendingChanges.current.incoming = storeBlocks;
