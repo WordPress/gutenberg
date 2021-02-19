@@ -5,9 +5,11 @@ import {
 	get,
 	unescape as unescapeString,
 	debounce,
-	flatMap,
+	map,
 	repeat,
 	find,
+	flatten,
+	deburr,
 } from 'lodash';
 
 /**
@@ -29,10 +31,23 @@ function getTitle( post ) {
 		: `#${ post.id } (${ __( 'no title' ) })`;
 }
 
+export const getItemPriority = ( name, searchValue ) => {
+	const normalizedName = deburr( name ).toLowerCase();
+	const normalizedSearch = deburr( searchValue ).toLowerCase();
+	if ( normalizedName === normalizedSearch ) {
+		return 0;
+	}
+
+	if ( normalizedName.indexOf( normalizedSearch ) === 0 ) {
+		return normalizedName.length;
+	}
+
+	return Infinity;
+};
+
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const isSearching = fieldValue;
 	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
 			const { getPostType, getEntityRecords, getEntityRecord } = select(
@@ -56,7 +71,7 @@ export function PageAttributesParent() {
 			};
 
 			// Perform a search when the field is changed.
-			if ( isSearching ) {
+			if ( !! fieldValue ) {
 				query.search = fieldValue;
 			}
 
@@ -77,17 +92,28 @@ export function PageAttributesParent() {
 	const isHierarchical = get( postType, [ 'hierarchical' ], false );
 	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
 	const pageItems = items || [];
-	const getOptionsFromTree = ( tree, level = 0 ) => {
-		return flatMap( tree, ( treeNode ) => [
-			{
-				value: treeNode.id,
-				label: repeat( '— ', level ) + unescapeString( treeNode.name ),
-			},
-			...getOptionsFromTree( treeNode.children || [], level + 1 ),
-		] );
-	};
 
 	const parentOptions = useMemo( () => {
+		const getOptionsFromTree = ( tree, level = 0 ) => {
+			const mappedNodes = map( tree, ( treeNode ) => [
+				{
+					value: treeNode.id,
+					label:
+						repeat( '— ', level ) + unescapeString( treeNode.name ),
+					rawName: treeNode.name,
+				},
+				...getOptionsFromTree( treeNode.children || [], level + 1 ),
+			] );
+
+			const sortedNodes = mappedNodes.sort( ( [ a ], [ b ] ) => {
+				const priorityA = getItemPriority( a.rawName, fieldValue );
+				const priorityB = getItemPriority( b.rawName, fieldValue );
+				return priorityA >= priorityB ? 1 : -1;
+			} );
+
+			return flatten( sortedNodes );
+		};
+
 		let tree = pageItems.map( ( item ) => ( {
 			id: item.id,
 			parent: item.parent,
@@ -95,7 +121,7 @@ export function PageAttributesParent() {
 		} ) );
 
 		// Only build a hierarchical tree when not searching.
-		if ( ! isSearching ) {
+		if ( ! fieldValue ) {
 			tree = buildTermsTree( tree );
 		}
 
@@ -113,7 +139,7 @@ export function PageAttributesParent() {
 			} );
 		}
 		return opts;
-	}, [ pageItems ] );
+	}, [ pageItems, fieldValue ] );
 
 	if ( ! isHierarchical || ! parentPageLabel ) {
 		return null;
