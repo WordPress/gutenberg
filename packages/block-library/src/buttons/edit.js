@@ -46,7 +46,6 @@ function ButtonsEdit( {
 		<>
 			<BlockControls>
 				<JustifyToolbar
-					allowedControls={ [ 'left', 'center', 'right' ] }
 					value={ contentJustification }
 					onChange={ ( value ) =>
 						setAttributes( { contentJustification: value } )
