@@ -62,10 +62,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
 
 	if ( array_key_exists( 'skipSerialization', $color_support ) && $color_support['skipSerialization'] ) {
-		return array(
-			'class'  => '',
-			'styles' => '',
-		);
+		return array();
 	}
 
 	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
