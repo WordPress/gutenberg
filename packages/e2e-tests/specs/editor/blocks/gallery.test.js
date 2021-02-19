@@ -37,15 +37,6 @@ async function upload( selector ) {
 	return filename;
 }
 
-async function getUploadedFileFigure( filename ) {
-	const image = await page.waitForSelector(
-		`.wp-block-gallery img[src$="${ filename }.png"]`
-	);
-
-	const figureElement = await image.getProperty( 'parentElement' );
-	return await figureElement.asElement();
-}
-
 describe( 'Gallery', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -65,9 +56,7 @@ describe( 'Gallery', () => {
 		const galleryCaption = 'Tested gallery caption';
 
 		await insertBlock( 'Gallery' );
-		const filename = await upload( '.wp-block-gallery input[type="file"]' );
-
-		await getUploadedFileFigure( filename );
+		await upload( '.wp-block-gallery input[type="file"]' );
 
 		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
 		await page.keyboard.type( galleryCaption );
@@ -79,17 +68,13 @@ describe( 'Gallery', () => {
 
 	it( "uploaded images' captions can be edited", async () => {
 		await insertBlock( 'Gallery' );
-		const filename = await upload( '.wp-block-gallery input[type="file"]' );
+		await upload( '.wp-block-gallery input[type="file"]' );
 
-		const figureElement = await getUploadedFileFigure( filename );
+		const figureElement = await page.waitForSelector(
+			'.blocks-gallery-item figure'
+		);
 
 		await figureElement.click();
-
-		expect(
-			await figureElement.evaluate( ( element ) =>
-				element.classList.contains( 'is-selected' )
-			)
-		).toBeTruthy();
 
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
