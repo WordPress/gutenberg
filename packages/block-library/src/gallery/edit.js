@@ -218,19 +218,21 @@ function GalleryEdit( props ) {
 	}
 
 	function updateImages( selectedImages ) {
-		const imageArray =
+		const newFileUploads =
 			Object.prototype.toString.call( selectedImages ) ===
-			'[object FileList]'
-				? Array.from( selectedImages ).map( ( file ) => {
-						if ( ! file.url ) {
-							return pickRelevantMediaFiles( {
-								url: createBlobURL( file ),
-							} );
-						}
+			'[object FileList]';
 
-						return file;
-				  } )
-				: selectedImages;
+		const imageArray = newFileUploads
+			? Array.from( selectedImages ).map( ( file ) => {
+					if ( ! file.url ) {
+						return pickRelevantMediaFiles( {
+							url: createBlobURL( file ),
+						} );
+					}
+
+					return file;
+			  } )
+			: selectedImages;
 
 		const processedImages = imageArray
 			.filter(
@@ -246,9 +248,13 @@ function GalleryEdit( props ) {
 				return file;
 			} );
 
-		const existingImageBlocks = innerBlockImages.filter( ( block ) =>
-			processedImages.find( ( img ) => img.url === block.attributes.url )
-		);
+		const existingImageBlocks = ! newFileUploads
+			? innerBlockImages.filter( ( block ) =>
+					processedImages.find(
+						( img ) => img.url === block.attributes.url
+					)
+			  )
+			: innerBlockImages;
 
 		const newImages = differenceBy( processedImages, images, 'url' );
 
