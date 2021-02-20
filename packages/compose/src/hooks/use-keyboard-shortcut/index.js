@@ -15,16 +15,16 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
- * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
- * @property {Object}  [target]      React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean}                                   [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}                                    [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean}                                   [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {import('react').MutableRefObject<Element>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
 /**
  * Return true if platform is MacOS.
  *
- * @param {Object} _window   window object by default; used for DI testing.
+ * @param {Window} _window   window object by default; used for DI testing.
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
@@ -63,7 +63,11 @@ function useKeyboardShortcut(
 		if ( isDisabled ) {
 			return;
 		}
-		const mousetrap = new Mousetrap( target ? target.current : document );
+		const mousetrap = new Mousetrap(
+			target
+				? target.current
+				: /** @type {Element} */ (/** @type {unknown} */ ( document ))
+		);
 		castArray( shortcuts ).forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
 			// Determines whether a key is a modifier by the length of the string.
@@ -86,12 +90,20 @@ function useKeyboardShortcut(
 				);
 			}
 
-			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
-			mousetrap[ bindFn ](
-				shortcut,
-				( ...args ) => currentCallback.current( ...args ),
-				eventName
-			);
+			if ( bindGlobal ) {
+				Mousetrap.bindGlobal(
+					shortcut,
+					( ...args ) => currentCallback.current( ...args ),
+					eventName
+				);
+			}
+			{
+				mousetrap.bind(
+					shortcut,
+					( ...args ) => currentCallback.current( ...args ),
+					eventName
+				);
+			}
 		} );
 
 		return () => {
