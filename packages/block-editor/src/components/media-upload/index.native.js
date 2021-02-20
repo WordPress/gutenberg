@@ -155,7 +155,12 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerSelect( value ) {
-		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+		const {
+			allowedTypes = [],
+			onSelect,
+			onSelectURL,
+			multiple = false,
+		} = this.props;
 
 		if ( value === 'URL' ) {
 			prompt(
@@ -168,7 +173,7 @@ export class MediaUpload extends Component {
 					},
 					{
 						text: __( 'Apply' ),
-						onPress: ( url ) => onSelect( { url } ),
+						onPress: ( url ) => onSelectURL( url ),
 					},
 				], // buttons
 				'plain-text', // type
