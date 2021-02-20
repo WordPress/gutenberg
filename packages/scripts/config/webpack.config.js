@@ -35,6 +35,9 @@ const cssLoaders = [
 		loader: require.resolve( 'css-loader' ),
 		options: {
 			sourceMap: ! isProduction,
+			modules: {
+				auto: true,
+			},
 		},
 	},
 	{
@@ -101,7 +104,7 @@ const config = {
 		splitChunks: {
 			cacheGroups: {
 				style: {
-					test: /[\\/]style\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					automaticNameDelimiter: '-',
