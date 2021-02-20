@@ -57,12 +57,15 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockTitle,
 		wrapperProps = {},
 	} = useContext( BlockListBlockContext );
-	const mode = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlockMode( clientId );
-	} );
-	const { isPartOfSelection, adjustScrolling, enableAnimation } = useSelect(
+	const {
+		mode,
+		isPartOfSelection,
+		adjustScrolling,
+		enableAnimation,
+	} = useSelect(
 		( select ) => {
 			const {
+				getBlockMode,
 				isTyping,
 				getGlobalBlockCount,
 				isBlockSelected,
@@ -75,6 +78,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			return {
+				mode: getBlockMode( clientId ),
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
