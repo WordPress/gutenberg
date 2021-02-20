@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,19 +9,19 @@ import { omit } from 'lodash';
 import { useRef, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { SetBlockNodes } from '../';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
+import { useBlockNodes } from './use-block-nodes';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -44,12 +43,10 @@ import { store as blockEditorStore } from '../../../store';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
-	const setBlockNodes = useContext( SetBlockNodes );
 	const {
 		clientId,
 		isSelected,
 		isFirstMultiSelected,
-		isLastMultiSelected,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -61,30 +58,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mode = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlockMode( clientId );
 	} );
-
-	// Provide the selected node, or the first and last nodes of a multi-
-	// selection, so it can be used to position the contextual block toolbar.
-	// We only provide what is necessary, and remove the nodes again when they
-	// are no longer selected.
-	const isNodeNeeded =
-		isSelected || isFirstMultiSelected || isLastMultiSelected;
-	const nodesRef = useRefEffect(
-		( node ) => {
-			if ( ! isNodeNeeded ) {
-				return;
-			}
-
-			setBlockNodes( ( nodes ) => ( {
-				...nodes,
-				[ clientId ]: node,
-			} ) );
-
-			return () => {
-				setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
-			};
-		},
-		[ isNodeNeeded, clientId, setBlockNodes ]
-	);
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -104,7 +77,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		ref,
-		nodesRef,
+		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
 		useIsHovered(),
 	] );
