@@ -25,6 +25,12 @@ import { useBlockNodes } from './use-block-nodes';
 import { store as blockEditorStore } from '../../../store';
 
 /**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
+
+/**
  * This hook is used to lightly mark an element as a block element. The element
  * should be the outermost element of a block. Call this hook and pass the
  * returned props to the element to mark as a block. If you define a ref for the
@@ -45,10 +51,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const ref = props.ref || fallbackRef;
 	const {
 		clientId,
-		isSelected,
-		isFirstMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
 		index,
 		className,
 		name,
@@ -58,20 +60,36 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mode = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlockMode( clientId );
 	} );
+	const { isPartOfSelection, adjustScrolling, enableAnimation } = useSelect(
+		( select ) => {
+			const {
+				isTyping,
+				getGlobalBlockCount,
+				isBlockSelected,
+				isBlockMultiSelected,
+				isAncestorMultiSelected,
+				isFirstMultiSelectedBlock,
+			} = select( blockEditorStore );
+			const isSelected = isBlockSelected( clientId );
+			const isPartOfMultiSelection =
+				isBlockMultiSelected( clientId ) ||
+				isAncestorMultiSelected( clientId );
+			return {
+				isPartOfSelection: isSelected || isPartOfMultiSelection,
+				adjustScrolling:
+					isSelected || isFirstMultiSelectedBlock( clientId ),
+				enableAnimation:
+					! isTyping() &&
+					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			};
+		},
+		[ clientId ]
+	);
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
 	useFocusFirstElement( ref, clientId );
-
-	// Block Reordering animation
-	useMovingAnimation(
-		ref,
-		isSelected || isPartOfMultiSelection,
-		isSelected || isFirstMultiSelected,
-		enableAnimation,
-		index
-	);
 
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -80,6 +98,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
 		useIsHovered(),
+		useMovingAnimation( {
+			isSelected: isPartOfSelection,
+			adjustScrolling,
+			enableAnimation,
+			triggerAnimationOnChange: index,
+		} ),
 	] );
 
 	return {

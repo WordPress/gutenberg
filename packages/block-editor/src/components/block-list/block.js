@@ -87,9 +87,6 @@ function BlockListBlock( {
 	clientId,
 	isSelected,
 	isMultiSelected,
-	isPartOfMultiSelection,
-	isFirstMultiSelected,
-	isLastMultiSelected,
 	isTypingWithinBlock,
 	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
@@ -104,7 +101,6 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 	index,
-	enableAnimation,
 	activeEntityBlockId,
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -219,10 +215,6 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		isSelected,
-		isFirstMultiSelected,
-		isLastMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
 		index,
 		className: wrapperClassName,
 		isLocked,
@@ -275,10 +267,8 @@ function BlockListBlock( {
 const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		isBlockSelected,
-		isAncestorMultiSelected,
 		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
-		getLastMultiSelectedBlockClientId,
 		isTyping,
 		getBlockMode,
 		isSelectionEnabled,
@@ -309,11 +299,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		isMultiSelected: isBlockMultiSelected( clientId ),
-		isPartOfMultiSelection:
-			isBlockMultiSelected( clientId ) ||
-			isAncestorMultiSelected( clientId ),
 		isFirstMultiSelected,
-		isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
 		multiSelectedClientIds: isFirstMultiSelected
 			? getMultiSelectedBlockClientIds()
 			: undefined,
