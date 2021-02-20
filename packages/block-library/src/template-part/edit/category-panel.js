@@ -27,6 +27,8 @@ export default function TemplatePartCategoryPanel( { postId } ) {
 					},
 				] }
 				value={ area }
+				direction="column"
+				justify="flex-start"
 				onChange={ ( value ) => setArea( value ) }
 			/>
 		</PanelBody>
