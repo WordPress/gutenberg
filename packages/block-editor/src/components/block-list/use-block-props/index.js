@@ -77,8 +77,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isFirstMultiSelectedBlock( clientId ) ||
 				getLastMultiSelectedBlockClientId() === clientId
 			);
-		},
-		[ clientId ]
+		}
+		// To do: figure out why tests are failing when dependencies are added.
+		// This data was originally retrieved with `withSelect` in `block.js`.
+		// For some reason, adding `clientId` as a dependency results in
+		// `toolbar-roving-tabindex.test.js` e2e test failures.
 	);
 	const nodesRef = useRefEffect(
 		( node ) => {
