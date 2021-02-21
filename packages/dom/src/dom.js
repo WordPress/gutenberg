@@ -8,8 +8,12 @@ import { includes, noop } from 'lodash';
  */
 import { isPhrasingContent } from './phrasing-content';
 
+/**
+ * @param {Element} node
+ * @return {CSSStyleDeclaration | undefined} Computed style for node
+ */
 function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
+	return node.ownerDocument.defaultView?.getComputedStyle( node );
 }
 
 /**
@@ -17,6 +21,7 @@ function getComputedStyle( node ) {
  * some browsers ignore when creating a union.
  *
  * @param {Range} range The range to check.
+ * @return {number | undefined } Range height
  */
 function getRangeHeight( range ) {
 	const rects = Array.from( range.getClientRects() );
@@ -44,6 +49,10 @@ function getRangeHeight( range ) {
 function isSelectionForward( selection ) {
 	const { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
 
+	if ( ! anchorNode || ! focusNode ) {
+		return false;
+	}
+
 	const position = anchorNode.compareDocumentPosition( focusNode );
 
 	// Disable reason: `Node#compareDocumentPosition` returns a bitmask value,
@@ -70,19 +79,29 @@ function isSelectionForward( selection ) {
 	return true;
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {Element} element Element to test
+ * @return {element is HTMLTextAreaElement | HTMLInputElement} True if element it Input or TextArea
+ */
+function isInputOrTextAreaElement( element ) {
+	return 'INPUT' === element.tagName || 'TEXTAREA' === element.tagName;
+}
+/* eslint-enable jsdoc/valid-types */
+
 /**
  * Check whether the selection is at the edge of the container. Checks for
  * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container    Focusable element.
- * @param {boolean} isReverse    Set to true to check left, false to check right.
- * @param {boolean} onlyVertical Set to true to check only vertical position.
+ * @param {HTMLElement} container      Focusable element.
+ * @param {boolean}     isReverse      Set to true to check left, false to check right.
+ * @param {boolean}     [onlyVertical] Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
 function isEdge( container, isReverse, onlyVertical ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+	if ( isInputOrTextAreaElement( container ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
@@ -101,9 +120,9 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 
-	const selection = defaultView.getSelection();
+	const selection = defaultView?.getSelection();
 
-	if ( ! selection.rangeCount ) {
+	if ( ! selection?.rangeCount ) {
 		return false;
 	}
 
@@ -129,14 +148,15 @@ function isEdge( container, isReverse, onlyVertical ) {
 	// collapsed  selection.
 	if (
 		! isCollapsed &&
-		getRangeHeight( range ) > collapsedRangeRect.height &&
+		/** @type {number} */ ( getRangeHeight( range ) ) >
+			collapsedRangeRect.height &&
 		isForward === isReverse
 	) {
 		return false;
 	}
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const { direction } = getComputedStyle( container );
+	const direction = getComputedStyle( container )?.direction;
 	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 	const containerRect = container.getBoundingClientRect();
@@ -188,7 +208,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 /**
  * Check whether the selection is horizontally at the edge of the container.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse Set to true to check left, false for right.
  *
  * @return {boolean} True if at the horizontal edge, false if not.
@@ -200,7 +220,7 @@ export function isHorizontalEdge( container, isReverse ) {
 /**
  * Check whether the selection is vertically at the edge of the container.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse Set to true to check top, false for bottom.
  *
  * @return {boolean} True if at the vertical edge, false if not.
