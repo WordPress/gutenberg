@@ -726,14 +726,18 @@ export function getScrollContainer( node ) {
 export function getOffsetParent( node ) {
 	// Cannot retrieve computed style or offset parent only anything other than
 	// an element node, so find the closest element node.
+
+	/* eslint-disable jsdoc/no-undefined-types */
+	/** @type {(Node & ParentNode) | null} */
 	let closestElement;
+	/* eslint-enable jsdoc/no-undefined-types */
 	while ( ( closestElement = node.parentNode ) ) {
 		if ( isElement( closestElement ) ) {
 			break;
 		}
 	}
 
-	if ( ! closestElement ) {
+	if ( ! isElement( closestElement ) ) {
 		return null;
 	}
 
@@ -765,7 +769,7 @@ export function replace( processedNode, newNode ) {
  * @return {void}
  */
 export function remove( node ) {
-	node.parentNode.removeChild( node );
+	node.parentNode?.removeChild( node );
 }
 
 /**
