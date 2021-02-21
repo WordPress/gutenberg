@@ -22,6 +22,7 @@ import useMovingAnimation from '../../use-moving-animation';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
+import { useBlockClassNames } from './use-block-class-names';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
 import { useBlockNodes } from './use-block-nodes';
@@ -99,7 +100,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	useFocusFirstElement( ref, clientId );
 
-	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		ref,
@@ -129,7 +129,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			blockMovingModeClassNames
+			useBlockClassNames( clientId ),
+			useBlockMovingModeClassNames( clientId )
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

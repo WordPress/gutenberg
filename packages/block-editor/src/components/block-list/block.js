@@ -16,25 +16,14 @@ import {
 import {
 	getBlockType,
 	getSaveElement,
-	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
 	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import {
-	withDispatch,
-	withSelect,
-	useSelect,
-	useDispatch,
-} from '@wordpress/data';
-import {
-	compose,
-	pure,
-	ifCondition,
-	useViewportMatch,
-} from '@wordpress/compose';
+import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
+import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -86,9 +75,6 @@ function BlockListBlock( {
 	isLocked,
 	clientId,
 	isSelected,
-	isMultiSelected,
-	isTypingWithinBlock,
-	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
 	className,
 	name,
@@ -101,28 +87,7 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 	index,
-	activeEntityBlockId,
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	// In addition to withSelect, we should favor using useSelect in this
-	// component going forward to avoid leaking new props to the public API
-	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted, isFocusMode, isOutlineMode } = useSelect(
-		( select ) => {
-			const {
-				isBlockBeingDragged,
-				isBlockHighlighted,
-				getSettings,
-			} = select( blockEditorStore );
-			return {
-				isDragging: isBlockBeingDragged( clientId ),
-				isHighlighted: isBlockHighlighted( clientId ),
-				isFocusMode: getSettings().focusMode,
-				isOutlineMode: getSettings().outlineMode,
-			};
-		},
-		[ clientId ]
-	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
@@ -157,24 +122,9 @@ function BlockListBlock( {
 	const wrapperClassName = classnames(
 		generatedClassName,
 		customClassName,
-		'block-editor-block-list__block',
 		{
 			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': isSelected && ! isDragging,
-			'is-highlighted': isHighlighted,
-			'is-multi-selected': isMultiSelected,
-			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging': isDragging,
-			'is-typing': isTypingWithinBlock,
-			'is-focused':
-				isFocusMode &&
-				isLargeViewport &&
-				( isSelected || isAncestorOfSelectedBlock ),
-			'is-focus-mode': isFocusMode && isLargeViewport,
-			'is-outline-mode': isOutlineMode,
-			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
-			'is-active-entity': activeEntityBlockId === clientId,
 		},
 		className
 	);
@@ -264,12 +214,9 @@ function BlockListBlock( {
 const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		isBlockSelected,
-		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
-		isTyping,
 		getBlockMode,
 		isSelectionEnabled,
-		hasSelectedInnerBlock,
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
 		getMultiSelectedBlockClientIds,
@@ -277,14 +224,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
-	const checkDeep = true;
-
-	// "ancestor" is the more appropriate label due to "deep" check
-	const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
-		clientId,
-		checkDeep
-	);
-
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
@@ -295,33 +234,22 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		isMultiSelected: isBlockMultiSelected( clientId ),
 		isFirstMultiSelected,
 		multiSelectedClientIds: isFirstMultiSelected
 			? getMultiSelectedBlockClientIds()
 			: undefined,
-
-		// We only care about this prop when the block is selected
-		// Thus to avoid unnecessary rerenders we avoid updating the prop if
-		// the block is not selected.
-		isTypingWithinBlock:
-			( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
-
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		isLocked: !! templateLock,
-
 		// Users of the editor.BlockListBlock filter used to be able to
 		// access the block prop.
 		// Ideally these blocks would rely on the clientId prop only.
 		// This is kept for backward compatibility reasons.
 		block,
-
 		name,
 		attributes,
 		isValid,
 		isSelected,
-		isAncestorOfSelectedBlock,
 	};
 } );
 
