@@ -299,15 +299,17 @@ export function computeCaretRect( win ) {
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse True for end, false for start.
+ *
+ * @return {void}
  */
 export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	if ( ! container ) {
 		return;
 	}
 
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+	if ( isInputOrTextAreaElement( container ) ) {
 		container.focus();
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;
@@ -613,7 +615,8 @@ function inputFieldHasUncollapsedSelection( element ) {
 export function documentHasUncollapsedSelection( doc ) {
 	return (
 		documentHasTextSelection( doc ) ||
-		inputFieldHasUncollapsedSelection( doc.activeElement )
+		( !! doc.activeElement &&
+			inputFieldHasUncollapsedSelection( doc.activeElement ) )
 	);
 }
 
@@ -626,6 +629,10 @@ export function documentHasUncollapsedSelection( doc ) {
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasSelection( doc ) {
+	if ( ! doc.activeElement ) {
+		return false;
+	}
+
 	return (
 		isTextField( doc.activeElement ) ||
 		isNumberInput( doc.activeElement ) ||
@@ -642,14 +649,14 @@ export function documentHasSelection( doc ) {
  * @return {boolean} True if entirely selected, false if not.
  */
 export function isEntirelySelected( element ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
+	if ( isInputOrTextAreaElement( element ) ) {
 		return (
 			element.selectionStart === 0 &&
 			element.value.length === element.selectionEnd
 		);
 	}
 
-	if ( ! element.isContentEditable ) {
+	if ( ! (/** @type {HTMLElement} */ ( element ).isContentEditable) ) {
 		return true;
 	}
 
