@@ -6,7 +6,7 @@
  * @return {Object[]} An array containing all files.
  */
 export function getFilesFromDataTransfer( dataTransfer ) {
-	const files = [ ...dataTransfer.files ];
+	const files = Array.from( dataTransfer.files );
 
 	Array.from( dataTransfer.items ).forEach( ( item ) => {
 		const file = item.getAsFile();
