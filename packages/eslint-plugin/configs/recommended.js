@@ -19,8 +19,11 @@ module.exports = {
 				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
 			},
 		},
+		'import/parser': {
+			'@typescript-eslint/parser': [ '.ts', '.tsx' ],
+		},
+		'import/core-modules': [ 'react' ],
 	},
-	parser: '@typescript-eslint/parser',
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',

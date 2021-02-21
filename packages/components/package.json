@@ -69,7 +69,6 @@
 	},
 	"peerDependencies": {
 		"@wp-g2/create-styles": "^0.0.154",
-		"react": "^16.13.1",
 		"reakit-utils": "^0.15.1"
 	},
 	"publishConfig": {
