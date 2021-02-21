@@ -502,7 +502,7 @@ function isElement( node ) {
  *
  * @param {Element} element The HTML element.
  *
- * @return {HTMLElement is HTMLInputElement | HTMLTextAreaElement | ElementContentEditable} True if the element is an text field, false if not.
+ * @return {HTMLElement is HTMLElement} True if the element is a text input, textarea, or contenteditable.
  */
 export function isTextField( element ) {
 	/* eslint-enable jsdoc/valid-types */
@@ -587,7 +587,10 @@ function inputFieldHasUncollapsedSelection( element ) {
 		return false;
 	}
 	try {
-		const { selectionStart, selectionEnd } = element;
+		const {
+			selectionStart,
+			selectionEnd,
+		} = /** @type {HTMLInputElement} */ ( element );
 
 		return selectionStart !== null && selectionStart !== selectionEnd;
 	} catch ( error ) {
@@ -749,11 +752,13 @@ export function getOffsetParent( node ) {
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+	const computedPosition = getComputedStyle( closestElement )?.position;
+	if ( computedPosition && computedPosition !== 'static' ) {
 		return closestElement;
 	}
 
-	return closestElement.offsetParent;
+	// Ensure we return null and not a potential `undefined` property of the closestElement object.
+	return /** @type {HTMLElement} */ ( closestElement ).offsetParent || null;
 }
 
 /**
@@ -775,7 +780,7 @@ export function replace( processedNode, newNode ) {
  * @return {void}
  */
 export function remove( node ) {
-	node.parentNode?.removeChild( node );
+	node.parentNode.removeChild( node );
 }
 
 /**
