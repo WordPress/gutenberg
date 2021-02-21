@@ -416,7 +416,7 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 /**
  * Places the caret at the top or bottom of a given element.
  *
- * @param {Element} container           Focusable element.
+ * @param {HTMLElement} container           Focusable element.
  * @param {boolean} isReverse           True for bottom, false for top.
  * @param {DOMRect} [rect]              The rectangle to position the caret with.
  * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
@@ -506,7 +506,10 @@ export function isTextField( element ) {
 		'number',
 	];
 	return (
-		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
+		( nodeName === 'INPUT' &&
+			! nonTextInputs.includes(
+				/** @type {HTMLInputElement} */ ( element ).type
+			) ) ||
 		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);
@@ -521,9 +524,13 @@ export function isTextField( element ) {
  * @return {boolean} True if the element is input and holds a number.
  */
 export function isNumberInput( element ) {
-	const { nodeName, type, valueAsNumber } = element;
+	const { nodeName } = element;
 
-	return nodeName === 'INPUT' && type === 'number' && !! valueAsNumber;
+	return (
+		nodeName === 'INPUT' &&
+		/** @type {HTMLInputElement} */ ( element ).type === 'number' &&
+		!! (/** @type {HTMLInputElement} */ ( element ).valueAsNumber)
+	);
 }
 
 /**
@@ -976,7 +983,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
  * Recursively checks if an element is empty. An element is not empty if it
  * contains text or contains elements with attributes such as images.
  *
- * @param {Element} element The element to check.
+ * @param {Node} element The element to check.
  *
  * @return {boolean} Whether or not the element is empty.
  */
@@ -987,13 +994,13 @@ export function isEmpty( element ) {
 
 	return Array.from( element.childNodes ).every( ( node ) => {
 		if ( node.nodeType === node.TEXT_NODE ) {
-			return ! node.nodeValue.trim();
+			return ! (/** @type {Text} */ ( node ).nodeValue?.trim());
 		}
 
 		if ( node.nodeType === node.ELEMENT_NODE ) {
 			if ( node.nodeName === 'BR' ) {
 				return true;
-			} else if ( node.hasAttributes() ) {
+			} else if ( /** @type {Element} */ ( node ).hasAttributes() ) {
 				return false;
 			}
 
