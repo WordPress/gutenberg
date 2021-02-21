@@ -695,7 +695,7 @@ export function isEntirelySelected( element ) {
  * @return {Element | undefined} Scrollable container node, if found.
  */
 export function getScrollContainer( node ) {
-	if ( ! node ) {
+	if ( ! isElement( node ) ) {
 		return;
 	}
 
@@ -761,7 +761,7 @@ export function replace( processedNode, newNode ) {
 /**
  * Given a DOM node, removes it from the DOM.
  *
- * @param {Element} node Node to be removed.
+ * @param {Node} node Node to be removed.
  * @return {void}
  */
 export function remove( node ) {
@@ -772,8 +772,8 @@ export function remove( node ) {
  * Given two DOM nodes, inserts the former in the DOM as the next sibling of
  * the latter.
  *
- * @param {Element} newNode       Node to be inserted.
- * @param {Element} referenceNode Node after which to perform the insertion.
+ * @param {Node} newNode       Node to be inserted.
+ * @param {Node} referenceNode Node after which to perform the insertion.
  * @return {void}
  */
 export function insertAfter( newNode, referenceNode ) {
@@ -800,7 +800,7 @@ export function unwrap( node ) {
 /**
  * Replaces the given node with a new node with the given tag name.
  *
- * @param {Element}  node    The node to replace
+ * @param {Node}  node    The node to replace
  * @param {string}   tagName The new tag name.
  *
  * @return {Element} The new node.
@@ -820,8 +820,8 @@ export function replaceTag( node, tagName ) {
 /**
  * Wraps the given node with a new node with the given tag name.
  *
- * @param {Element} newNode       The node to insert.
- * @param {Element} referenceNode The node to wrap.
+ * @param {Node} newNode       The node to insert.
+ * @param {Node} referenceNode The node to wrap.
  */
 export function wrap( newNode, referenceNode ) {
 	referenceNode.parentNode.insertBefore( newNode, referenceNode );
