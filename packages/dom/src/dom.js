@@ -661,9 +661,8 @@ export function isEntirelySelected( element ) {
 	}
 
 	const { ownerDocument } = element;
-	const { defaultView } = ownerDocument;
-	const selection = defaultView.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const selection = ownerDocument.defaultView?.getSelection();
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
 		return true;
@@ -682,9 +681,9 @@ export function isEntirelySelected( element ) {
 
 	const lastChild = element.lastChild;
 	const lastChildContentLength =
-		lastChild.nodeType === lastChild.TEXT_NODE
-			? lastChild.data.length
-			: lastChild.childNodes.length;
+		lastChild && lastChild.nodeType === lastChild.TEXT_NODE
+			? /** @type {Text} */ ( lastChild ).data.length
+			: /** @type {Element} */ ( lastChild ).childNodes.length;
 
 	return (
 		startContainer === element.firstChild &&
