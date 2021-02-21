@@ -3,7 +3,7 @@
  */
 // Disable reason: Type-only import, this is fine. See https://github.com/typescript-eslint/typescript-eslint/issues/2661
 // eslint-disable-next-line no-restricted-imports
-import type { ComponentType, PropsWithChildren } from 'react';
+import type { ComponentType, FunctionComponent, PropsWithChildren } from 'react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,8 @@ import {
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
-import { defaultI18n, I18n } from '@wordpress/i18n';
+import { defaultI18n } from '@wordpress/i18n';
+import type { I18n } from '@wordpress/i18n';
 import type { Subtract } from 'utility-types';
 
 interface I18nContextProps {
@@ -103,6 +104,8 @@ export function I18nProvider( props: I18nProviderProps ): JSX.Element {
  */
 export const useI18n = () => useContext( I18nContext );
 
+type PropsAndI18n<P> = Pick<P, Exclude<keyof P, "__" | "_x" | "_n" | "_nx" | "isRTL" | "hasTranslation">>; 
+
 /**
  * React higher-order component that passes the i18n translate functions (the same set
  * as exposed by the `useI18n` hook) to the wrapped component as props.
@@ -123,7 +126,7 @@ export const useI18n = () => useContext( I18nContext );
  */
 export function withI18n< P extends I18nContextProps >(
 	InnerComponent: ComponentType< P >
-) {
+): FunctionComponent< PropsAndI18n< P > > {
 	const EnhancedComponent: ComponentType<
 		Subtract< P, I18nContextProps >
 	> = ( props ) => {
