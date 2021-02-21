@@ -393,7 +393,7 @@ function caretRangeFromPoint( doc, x, y ) {
  * @param {Document} doc       The document of the range.
  * @param {number}    x         Horizontal position within the current viewport.
  * @param {number}    y         Vertical position within the current viewport.
- * @param {Element}  container Container in which the range is expected to be found.
+ * @param {HTMLElement}  container Container in which the range is expected to be found.
  *
  * @return {?Range} The best range for the given point.
  */
