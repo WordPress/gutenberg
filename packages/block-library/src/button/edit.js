@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -44,34 +44,17 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 
 const EMPTY_ARRAY = [];
 
-let computedBorderRadius;
-document.addEventListener( 'readystatechange', () => {
-	// returns early until styles are loaded
-	if ( document.readyState !== 'complete' ) return;
-	const sample = document.createElement( 'a' );
-	sample.className = 'wp-block-button__link';
-	const wrapper = document.createElement( 'div' );
-	wrapper.className = 'editor-styles-wrapper';
-	wrapper.hidden = true;
-	wrapper.appendChild( sample );
-	document.body.appendChild( wrapper );
-	computedBorderRadius = parseFloat(
-		window.getComputedStyle( sample ).getPropertyValue( 'border-radius' )
-	);
-	document.body.removeChild( wrapper );
-} );
-
-function BorderPanel( { borderRadius = '', setAttributes } ) {
+function BorderPanel( { radius = '', revertRadius, setAttributes } ) {
 	const setBorderRadius = ( value ) =>
 		setAttributes( { borderRadius: value } );
 	return (
 		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
-				value={ borderRadius }
+				value={ radius }
 				label={ __( 'Border radius' ) }
 				min={ MIN_BORDER_RADIUS_VALUE }
 				max={ MAX_BORDER_RADIUS_VALUE }
-				initialPosition={ computedBorderRadius }
+				initialPosition={ revertRadius }
 				allowReset
 				onChange={ setBorderRadius }
 			/>
@@ -240,6 +223,36 @@ function ButtonEdit( props ) {
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const blockProps = useBlockProps();
 
+	const [ computedBorderRadius, setComputedBorderRadius ] = useState();
+	const refBorderSettings = useRef( {
+		element: null,
+		variant: null,
+	} );
+	// Updates computedBorderRadius if the style variant has changed
+	useEffect( () => {
+		const variant = /\bis-style-[^\s]+/.exec( blockProps.className )?.[ 0 ];
+		const { current } = refBorderSettings;
+		if ( variant !== current.variant || ! computedBorderRadius ) {
+			const hasOwnValue = current.element.style.borderRadius !== '';
+			let ownValue;
+			if ( hasOwnValue ) {
+				ownValue = current.element.style.borderRadius;
+				current.element.style.borderRadius = '';
+			}
+			setComputedBorderRadius(
+				parseFloat(
+					current.element.ownerDocument.defaultView
+						.getComputedStyle( current.element )
+						.getPropertyValue( 'border-radius' )
+				)
+			);
+			if ( hasOwnValue ) {
+				current.element.style.borderRadius = ownValue;
+			}
+			current.variant = variant;
+		}
+	}, [ blockProps.className ] );
+
 	return (
 		<>
 			<ColorEdit { ...props } />
@@ -278,6 +291,9 @@ function ButtonEdit( props ) {
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
+					ref={ ( ref ) =>
+						( refBorderSettings.current.element = ref )
+					}
 				/>
 			</div>
 			<URLPicker
@@ -290,7 +306,8 @@ function ButtonEdit( props ) {
 			/>
 			<InspectorControls>
 				<BorderPanel
-					borderRadius={ borderRadius }
+					radius={ borderRadius }
+					revertRadius={ computedBorderRadius }
 					setAttributes={ setAttributes }
 				/>
 				<WidthPanel
