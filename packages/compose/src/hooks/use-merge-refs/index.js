@@ -52,7 +52,7 @@ export default function useMergeRefs( refs ) {
 
 	// There should be no dependencies so that `callback` is only called when
 	// the node changes.
-	return useCallback( ( value ) => {
+	const rootCallback = useCallback( ( value ) => {
 		// Update the element so it can be used when calling ref callbacks on a
 		// dependency change.
 		element.current = value;
@@ -60,7 +60,14 @@ export default function useMergeRefs( refs ) {
 
 		// When an element changes, the current ref callback should be called
 		// with the new element and the previous one with `null`.
-		const refsToUpdate = value ? currentRefs.current : previousRefs.current;
+		let refsToUpdate;
+		if ( value ) {
+			refsToUpdate = currentRefs.current;
+			// Makes this callback mimic a ref
+			rootCallback.current = value;
+		} else {
+			refsToUpdate = previousRefs.current;
+		}
 
 		// Update the latest refs.
 		refsToUpdate.forEach( ( ref ) => {
@@ -71,4 +78,5 @@ export default function useMergeRefs( refs ) {
 			}
 		} );
 	}, [] );
+	return rootCallback;
 }
