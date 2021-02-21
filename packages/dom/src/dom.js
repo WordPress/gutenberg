@@ -481,18 +481,33 @@ export function placeCaretAtVerticalEdge(
 	selection.addRange( range );
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {Node | null | undefined} node
+ * @return {node is Element} True if node is an Element node
+ */
+function isElement( node ) {
+	/* eslint-enable jsdoc/valid-types */
+	return !! node && node.nodeType === node.ELEMENT_NODE;
+}
+
+/* eslint-disable jsdoc/valid-types */
 /**
  * Check whether the given element is a text field, where text field is defined
  * by the ability to select within the input, or that it is contenteditable.
  *
  * See: https://html.spec.whatwg.org/#textFieldSelection
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
- * @return {boolean} True if the element is an text field, false if not.
+ * @return {HTMLElement is HTMLInputElement | HTMLTextAreaElement | ElementContentEditable} True if the element is an text field, false if not.
  */
 export function isTextField( element ) {
-	const { nodeName, contentEditable } = element;
+	/* eslint-enable jsdoc/valid-types */
+	const {
+		nodeName,
+		contentEditable,
+	} = /** @type { HTMLElement } */ ( element );
 	const nonTextInputs = [
 		'button',
 		'checkbox',
@@ -515,15 +530,17 @@ export function isTextField( element ) {
 	);
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Check whether the given element is an input field of type number
  * and has a valueAsNumber
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
- * @return {boolean} True if the element is input and holds a number.
+ * @return {element is HTMLInputElement} True if the element is input and holds a number.
  */
 export function isNumberInput( element ) {
+	/* eslint-enable jsdoc/valid-types */
 	const { nodeName } = element;
 
 	return (
@@ -559,7 +576,7 @@ export function documentHasTextSelection( doc ) {
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
  * @return {boolean} Whether the input/textareaa element has some "selection".
  */
@@ -673,9 +690,9 @@ export function isEntirelySelected( element ) {
 /**
  * Given a DOM node, finds the closest scrollable container node.
  *
- * @param {Element} node Node from which to start.
+ * @param {Node | null} node Node from which to start.
  *
- * @return {?Element} Scrollable container node, if found.
+ * @return {Element | undefined} Scrollable container node, if found.
  */
 export function getScrollContainer( node ) {
 	if ( ! node ) {
@@ -685,8 +702,8 @@ export function getScrollContainer( node ) {
 	// Scrollable if scrollable height exceeds displayed...
 	if ( node.scrollHeight > node.clientHeight ) {
 		// ...except when overflow is defined to be hidden or visible
-		const { overflowY } = getComputedStyle( node );
-		if ( /(auto|scroll)/.test( overflowY ) ) {
+		const overflowY = getComputedStyle( node )?.overflowY;
+		if ( overflowY && /(auto|scroll)/.test( overflowY ) ) {
 			return node;
 		}
 	}
@@ -711,7 +728,7 @@ export function getOffsetParent( node ) {
 	// an element node, so find the closest element node.
 	let closestElement;
 	while ( ( closestElement = node.parentNode ) ) {
-		if ( closestElement.nodeType === closestElement.ELEMENT_NODE ) {
+		if ( isElement( closestElement ) ) {
 			break;
 		}
 	}
@@ -845,7 +862,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			schema.hasOwnProperty( tag ) &&
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
-			if ( node.nodeType === node.ELEMENT_NODE ) {
+			if ( isElement( node ) ) {
 				const {
 					attributes = [],
 					classes = [],
@@ -997,10 +1014,10 @@ export function isEmpty( element ) {
 			return ! (/** @type {Text} */ ( node ).nodeValue?.trim());
 		}
 
-		if ( node.nodeType === node.ELEMENT_NODE ) {
+		if ( isElement( node ) ) {
 			if ( node.nodeName === 'BR' ) {
 				return true;
-			} else if ( /** @type {Element} */ ( node ).hasAttributes() ) {
+			} else if ( node.hasAttributes() ) {
 				return false;
 			}
 
