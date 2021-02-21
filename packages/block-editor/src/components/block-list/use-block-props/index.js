@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { useRef, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+import {
+	__unstableGetBlockProps as getBlockProps,
+	getBlockType,
+} from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -49,16 +52,13 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
-	const {
-		clientId,
-		index,
-		className,
-		name,
-		blockTitle,
-		wrapperProps = {},
-	} = useContext( BlockListBlockContext );
+	const { clientId, index, className, wrapperProps = {} } = useContext(
+		BlockListBlockContext
+	);
 	const {
 		mode,
+		name,
+		blockTitle,
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
@@ -66,6 +66,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		( select ) => {
 			const {
 				getBlockMode,
+				getBlockName,
 				isTyping,
 				getGlobalBlockCount,
 				isBlockSelected,
@@ -77,8 +78,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
+			const blockName = getBlockName( clientId );
 			return {
 				mode: getBlockMode( clientId ),
+				name: blockName,
+				blockTitle: getBlockType( blockName ).title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),

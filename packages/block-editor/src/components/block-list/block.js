@@ -217,9 +217,6 @@ function BlockListBlock( {
 		isSelected,
 		index,
 		className: wrapperClassName,
-		isLocked,
-		name,
-		blockTitle: blockType.title,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
