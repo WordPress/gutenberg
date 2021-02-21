@@ -502,7 +502,7 @@ function isElement( node ) {
  *
  * @param {Element} element The HTML element.
  *
- * @return {HTMLElement is HTMLInputElement | HTMLTextAreaElement | ElementContentEditable} True if the element is an text field, false if not.
+ * @return {HTMLElement is HTMLElement} True if the element is a text input, textarea, or contenteditable.
  */
 export function isTextField( element ) {
 	/* eslint-enable jsdoc/valid-types */
@@ -587,7 +587,10 @@ function inputFieldHasUncollapsedSelection( element ) {
 		return false;
 	}
 	try {
-		const { selectionStart, selectionEnd } = element;
+		const {
+			selectionStart,
+			selectionEnd,
+		} = /** @type {HTMLInputElement} */ ( element );
 
 		return selectionStart !== null && selectionStart !== selectionEnd;
 	} catch ( error ) {
@@ -661,9 +664,8 @@ export function isEntirelySelected( element ) {
 	}
 
 	const { ownerDocument } = element;
-	const { defaultView } = ownerDocument;
-	const selection = defaultView.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const selection = ownerDocument.defaultView?.getSelection();
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
 		return true;
@@ -682,9 +684,9 @@ export function isEntirelySelected( element ) {
 
 	const lastChild = element.lastChild;
 	const lastChildContentLength =
-		lastChild.nodeType === lastChild.TEXT_NODE
-			? lastChild.data.length
-			: lastChild.childNodes.length;
+		lastChild && lastChild.nodeType === lastChild.TEXT_NODE
+			? /** @type {Text} */ ( lastChild ).data.length
+			: /** @type {Element} */ ( lastChild ).childNodes.length;
 
 	return (
 		startContainer === element.firstChild &&
@@ -750,11 +752,13 @@ export function getOffsetParent( node ) {
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+	const computedPosition = getComputedStyle( closestElement )?.position;
+	if ( computedPosition && computedPosition !== 'static' ) {
 		return closestElement;
 	}
 
-	return closestElement.offsetParent;
+	// Ensure we return null and not a potential `undefined` property of the closestElement object.
+	return /** @type {HTMLElement} */ ( closestElement ).offsetParent || null;
 }
 
 /**
@@ -776,7 +780,7 @@ export function replace( processedNode, newNode ) {
  * @return {void}
  */
 export function remove( node ) {
-	node.parentNode?.removeChild( node );
+	node.parentNode.removeChild( node );
 }
 
 /**
