@@ -23,6 +23,8 @@ import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockClassNames } from './use-block-class-names';
+import { useBlockDefaultClassName } from './use-block-default-class-name';
+import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
 import { useBlockNodes } from './use-block-nodes';
@@ -130,6 +132,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			props.className,
 			wrapperProps.className,
 			useBlockClassNames( clientId ),
+			useBlockDefaultClassName( clientId ),
+			useBlockCustomClassName( clientId ),
 			useBlockMovingModeClassNames( clientId )
 		),
 		style: { ...wrapperProps.style, ...props.style },

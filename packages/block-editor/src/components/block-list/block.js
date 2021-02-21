@@ -17,9 +17,7 @@ import {
 	getBlockType,
 	getSaveElement,
 	isUnmodifiedDefaultBlock,
-	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
-	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
@@ -99,7 +97,6 @@ function BlockListBlock( {
 	const lightBlockWrapper =
 		blockType.apiVersion > 1 ||
 		hasBlockSupport( blockType, 'lightBlockWrapper', false );
-	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
@@ -108,26 +105,12 @@ function BlockListBlock( {
 			blockType.getEditWrapperProps( attributes )
 		);
 	}
-
-	const generatedClassName =
-		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
-			? getBlockDefaultClassName( name )
-			: null;
-	const customClassName = lightBlockWrapper ? attributes.className : null;
 	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 
 	// The wp-block className is important for editor styles.
-	// Generate the wrapper class names handling the different states of the
-	// block.
-	const wrapperClassName = classnames(
-		generatedClassName,
-		customClassName,
-		{
-			'wp-block': ! isAligned,
-			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-		},
-		className
-	);
+	const wrapperClassName = classnames( className, {
+		'wp-block': ! isAligned,
+	} );
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -175,7 +158,7 @@ function BlockListBlock( {
 
 	if ( ! isValid ) {
 		block = (
-			<Block>
+			<Block className="has-warning">
 				<BlockInvalidWarning clientId={ clientId } />
 				<div>{ getSaveElement( blockType, attributes ) }</div>
 			</Block>
@@ -203,7 +186,7 @@ function BlockListBlock( {
 				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block>
+				<Block className="has-warning">
 					<BlockCrashWarning />
 				</Block>
 			) }
