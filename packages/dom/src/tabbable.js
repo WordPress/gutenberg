@@ -18,7 +18,7 @@ import { find as findFocusable } from './focusable';
  *
  * @param {Element} element Element from which to retrieve.
  *
- * @return {?number} Tab index of element (default 0).
+ * @return {number} Tab index of element (default 0).
  */
 function getTabIndex( element ) {
 	const tabIndex = element.getAttribute( 'tabindex' );
@@ -37,18 +37,32 @@ export function isTabbableIndex( element ) {
 }
 
 /**
+ * @callback StatefulRadioGroupReducer
+ *
+ * @param {Element[]} result
+ * @param {Element} element
+ * @return {Element[]}
+ */
+
+/**
  * Returns a stateful reducer function which constructs a filtered array of
  * tabbable elements, where at most one radio input is selected for a given
  * name, giving priority to checked input, falling back to the first
  * encountered.
  *
- * @return {Function} Radio group collapse reducer.
+ * @return {StatefulRadioGroupReducer} Radio group collapse reducer.
  */
 function createStatefulCollapseRadioGroup() {
+	/** @type {Record<string, Element>} */
 	const CHOSEN_RADIO_BY_NAME = {};
 
 	return function collapseRadioGroup( result, element ) {
-		const { nodeName, type, checked, name } = element;
+		const {
+			nodeName,
+			type,
+			checked,
+			name,
+		} = /** @type {HTMLInputElement} */ ( element );
 
 		// For all non-radio tabbables, construct to array by concatenating.
 		if ( nodeName !== 'INPUT' || type !== 'radio' || ! name ) {
@@ -78,6 +92,12 @@ function createStatefulCollapseRadioGroup() {
 }
 
 /**
+ * @typedef IndexedElement
+ * @property {Element} element Element
+ * @property {number}  index   Index
+ */
+
+/**
  * An array map callback, returning an object with the element value and its
  * array index location as properties. This is used to emulate a proper stable
  * sort where equal tabIndex should be left in order of their occurrence in the
@@ -86,7 +106,7 @@ function createStatefulCollapseRadioGroup() {
  * @param {Element} element Element.
  * @param {number}  index   Array index of element.
  *
- * @return {Object} Mapped object with element, index.
+ * @return {IndexedElement} Mapped object with element, index.
  */
 function mapElementToObjectTabbable( element, index ) {
 	return { element, index };
@@ -96,7 +116,7 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param {Object} object Mapped object with index.
+ * @param {IndexedElement} object Mapped object with index.
  *
  * @return {Element} Mapped object element.
  */
@@ -109,8 +129,8 @@ function mapObjectTabbableToElement( object ) {
  *
  * @see mapElementToObjectTabbable
  *
- * @param {Object} a First object to compare.
- * @param {Object} b Second object to compare.
+ * @param {IndexedElement} a First object to compare.
+ * @param {IndexedElement} b Second object to compare.
  *
  * @return {number} Comparator result.
  */
@@ -128,9 +148,9 @@ function compareObjectTabbables( a, b ) {
 /**
  * Givin focusable elements, filters out tabbable element.
  *
- * @param {Array} focusables Focusable elements to filter.
+ * @param {Element[]} focusables Focusable elements to filter.
  *
- * @return {Array} Tabbable elements.
+ * @return {Element[]} Tabbable elements.
  */
 function filterTabbable( focusables ) {
 	return focusables
@@ -141,6 +161,11 @@ function filterTabbable( focusables ) {
 		.reduce( createStatefulCollapseRadioGroup(), [] );
 }
 
+/**
+ * @param {Element} context Context
+ *
+ * @return {Element[]} Tabbable elements
+ */
 export function find( context ) {
 	return filterTabbable( findFocusable( context ) );
 }
