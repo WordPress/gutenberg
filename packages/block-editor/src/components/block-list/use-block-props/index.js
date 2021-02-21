@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { useRef, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+import {
+	__unstableGetBlockProps as getBlockProps,
+	getBlockType,
+} from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -23,6 +26,12 @@ import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-name
 import { useEventHandlers } from './use-event-handlers';
 import { useBlockNodes } from './use-block-nodes';
 import { store as blockEditorStore } from '../../../store';
+
+/**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -43,35 +52,52 @@ import { store as blockEditorStore } from '../../../store';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
+	const { clientId, index, className, wrapperProps = {} } = useContext(
+		BlockListBlockContext
+	);
 	const {
-		clientId,
-		isSelected,
-		isFirstMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
-		index,
-		className,
+		mode,
 		name,
 		blockTitle,
-		wrapperProps = {},
-	} = useContext( BlockListBlockContext );
-	const mode = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlockMode( clientId );
-	} );
+		isPartOfSelection,
+		adjustScrolling,
+		enableAnimation,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockMode,
+				getBlockName,
+				isTyping,
+				getGlobalBlockCount,
+				isBlockSelected,
+				isBlockMultiSelected,
+				isAncestorMultiSelected,
+				isFirstMultiSelectedBlock,
+			} = select( blockEditorStore );
+			const isSelected = isBlockSelected( clientId );
+			const isPartOfMultiSelection =
+				isBlockMultiSelected( clientId ) ||
+				isAncestorMultiSelected( clientId );
+			const blockName = getBlockName( clientId );
+			return {
+				mode: getBlockMode( clientId ),
+				name: blockName,
+				blockTitle: getBlockType( blockName ).title,
+				isPartOfSelection: isSelected || isPartOfMultiSelection,
+				adjustScrolling:
+					isSelected || isFirstMultiSelectedBlock( clientId ),
+				enableAnimation:
+					! isTyping() &&
+					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			};
+		},
+		[ clientId ]
+	);
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
 	useFocusFirstElement( ref, clientId );
-
-	// Block Reordering animation
-	useMovingAnimation(
-		ref,
-		isSelected || isPartOfMultiSelection,
-		isSelected || isFirstMultiSelected,
-		enableAnimation,
-		index
-	);
 
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -80,6 +106,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
 		useIsHovered(),
+		useMovingAnimation( {
+			isSelected: isPartOfSelection,
+			adjustScrolling,
+			enableAnimation,
+			triggerAnimationOnChange: index,
+		} ),
 	] );
 
 	return {
