@@ -112,8 +112,7 @@ const LayoutSetupStep = ( {
 				{ ! showBlockVariations && hasBlockVariations && (
 					<BlockVariation
 						key={ defaultVariation.name }
-						title={ __( 'Start empty' ) }
-						variation={ defaultVariation }
+						variation={ { title: __( 'Start empty' ) } }
 						onSelect={ () => {
 							setShowBack( true );
 							setShowBlockVariations( true );
@@ -137,7 +136,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 		<div
 			className="block-setup-block-layout-list__list-item"
 			aria-label={ pattern.title }
-			// aria-describedby={ variation.description ? descriptionId : undefined }
+			aria-describedby={ pattern.description ? descriptionId : undefined }
 		>
 			<CompositeItem
 				role="option"
@@ -163,7 +162,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 	);
 }
 
-function BlockVariation( { variation, title, onSelect, composite } ) {
+function BlockVariation( { variation, onSelect, composite } ) {
 	const descriptionId = useInstanceId(
 		BlockVariation,
 		'block-setup-block-layout-list__item-description'
@@ -182,14 +181,16 @@ function BlockVariation( { variation, title, onSelect, composite } ) {
 				{ ...composite }
 				className="block-setup-block-layout-list__item"
 				onClick={ () => onSelect( variation ) }
-				label={ title || variation.description || variation.title }
+				label={ variation.description || variation.title }
 			>
-				<div className="block-setup-block-layout-list__item-variation-icon">
-					<Icon icon={ variation.icon } size={ 48 } />
-				</div>
+				{ variation.icon && (
+					<div className="block-setup-block-layout-list__item-variation-icon">
+						<Icon icon={ variation.icon } size={ 48 } />
+					</div>
+				) }
 			</CompositeItem>
 			<div className="block-setup-block-layout-list__item-title">
-				{ title || variation.title }
+				{ variation.title }
 			</div>
 			{ !! variation.description && (
 				<VisuallyHidden id={ descriptionId }>
