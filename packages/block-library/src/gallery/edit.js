@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, concat, differenceBy, some, every, find } from 'lodash';
+import { isEmpty, concat, differenceBy, find, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { Platform, useEffect, useMemo } from '@wordpress/element';
+import { Platform, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -124,40 +124,51 @@ function GalleryEdit( props ) {
 		[ clientId ]
 	);
 
-	const images = useMemo(
-		() =>
-			innerBlockImages?.map( ( block ) => ( {
-				id: block.attributes.id,
-				url: block.attributes.url,
-				attributes: block.attributes,
-			} ) ),
-		[ innerBlockImages ]
-	);
-
-	const imageData = useSelect(
+	const images = useSelect(
 		( select ) => {
-			if (
-				! innerBlockImages?.length ||
-				some(
-					innerBlockImages,
-					( imageBlock ) => ! imageBlock.attributes.id
-				)
-			) {
-				return imageData;
+			if ( ! innerBlockImages?.length ) {
+				return images;
 			}
+
+			// Avoid running the getMedia calls for images we already
+			// have the data for.
+			const existingImages =
+				images?.length > 0
+					? images.filter( ( image ) =>
+							innerBlockImages.find(
+								( imageBlock ) =>
+									image.id === imageBlock.attributes.id
+							)
+					  )
+					: [];
+
 			const getMedia = select( coreStore ).getMedia;
-			const newImageData = innerBlockImages.map( ( imageBlock ) => {
-				return {
-					id: imageBlock.attributes.id,
-					data: getMedia( imageBlock.attributes.id ),
-				};
-			} );
 
-			if ( every( newImageData, ( img ) => img.data ) ) {
-				return newImageData;
+			// Only populate the newImages array with images
+			// that have an id and return data from getMedia call.
+			const newImages = innerBlockImages
+				.filter(
+					( imageBlock ) =>
+						imageBlock.attributes.id &&
+						! images?.find(
+							( img ) => img.id === imageBlock.attributes.id
+						)
+				)
+				.map( ( imageBlock ) => {
+					return {
+						blockId: imageBlock.clientId,
+						id: imageBlock.attributes.id,
+						url: imageBlock.attributes.url,
+						attributes: imageBlock.attributes,
+						data: getMedia( imageBlock.attributes.id ),
+					};
+				} )
+				.filter( ( img ) => img.data );
+
+			if ( newImages.length > 0 ) {
+				return [ ...existingImages, ...newImages ];
 			}
-
-			return imageData;
+			return isEqual( images, existingImages ) ? images : existingImages;
 		},
 		[ innerBlockImages ]
 	);
@@ -173,21 +184,17 @@ function GalleryEdit( props ) {
 	}, [ shortCodeTransforms, shortCodeImages ] );
 
 	useEffect( () => {
-		if ( ! images ) {
+		if ( ! innerBlockImages?.length ) {
 			setAttributes( { imageCount: undefined } );
 			return;
 		}
 
 		if ( images.length !== imageCount ) {
-			setAttributes( { imageCount: images.length } );
+			setAttributes( { imageCount: innerBlockImages.length } );
 		}
 	}, [ images ] );
 
-	const imageSizeOptions = useImageSizes(
-		imageData,
-		isSelected,
-		getSettings
-	);
+	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
 
 	/**
 	 * Determines the image attributes that should be applied to an image block
@@ -261,6 +268,7 @@ function GalleryEdit( props ) {
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
 				...buildImageAttributes( false, image ),
+				url: image.url,
 				id: image.id,
 			} );
 		} );
@@ -280,7 +288,7 @@ function GalleryEdit( props ) {
 		setAttributes( { linkTo: value } );
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? find( images, { id: block.attributes.id } )
 				: null;
 			updateBlockAttributes( block.clientId, {
 				...getHrefAndDestination( image.data, value ),
@@ -340,7 +348,7 @@ function GalleryEdit( props ) {
 		setAttributes( { sizeSlug: newSizeSlug } );
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? find( images, { id: block.attributes.id } )
 				: null;
 			updateBlockAttributes( block.clientId, {
 				...getImageSizeAttributes( image.data, newSizeSlug ),
@@ -375,7 +383,7 @@ function GalleryEdit( props ) {
 		}
 	}, [ linkTo ] );
 
-	const hasImages = !! images?.length;
+	const hasImages = !! innerBlockImages?.length;
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
