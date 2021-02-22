@@ -16,15 +16,16 @@ import { isFunction } from 'lodash';
  *
  * @typedef {Object} WPPlugin
  *
- * @property {string}                    name   A string identifying the plugin. Must be
- *                                              unique across all registered plugins.
- * @property {string|WPElement|Function} icon   An icon to be shown in the UI. It can
- *                                              be a slug of the Dashicon, or an element
- *                                              (or function returning an element) if you
- *                                              choose to render your own SVG.
- * @property {Function}                  render A component containing the UI elements
- *                                              to be rendered.
- * @property {string}                    area   The pluginArea name to be rendered inside of.
+ * @property {string}                    name    A string identifying the plugin. Must be
+ *                                               unique across all registered plugins.
+ * @property {string|WPElement|Function} [icon]  An icon to be shown in the UI. It can
+ *                                               be a slug of the Dashicon, or an element
+ *                                               (or function returning an element) if you
+ *                                               choose to render your own SVG.
+ * @property {Function}                  render  A component containing the UI elements
+ *                                               to be rendered.
+ * @property {string}                    [scope] The scope to be used when rendering inside
+ * 												 a plugin area.
  */
 
 /**
@@ -75,7 +76,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: moreIcon,
  * 	render: Component,
- * 	area: "my-app-area",
+ * 	scope: 'my-page',
  * } );
  * ```
  *
@@ -105,7 +106,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: more,
  * 	render: Component,
- * 	area: "my-app-area",
+ * 	scope: 'my-page',
  * } );
  * ```
  *

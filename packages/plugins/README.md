@@ -50,7 +50,7 @@ var PluginArea = wp.plugins.PluginArea;
 function Layout() {
 	return el(
 		'div',
-		{ area: 'my-app-area' },
+		{ scope: 'my-page' },
 		'Content of the page',
 		PluginArea
 	);
@@ -64,7 +64,7 @@ import { PluginArea } from '@wordpress/plugins';
 const Layout = () => (
 	<div>
 		Content of the page
-		<PluginArea area="my-app-area" />
+		<PluginArea scope="my-page" />
 	</div>
 );
 ```
@@ -112,7 +112,7 @@ function Component() {
 registerPlugin( 'plugin-name', {
 	icon: moreIcon,
 	render: Component,
-	area: "my-app-area",
+	scope: 'my-page',
 } );
 ```
 
@@ -141,7 +141,7 @@ const Component = () => (
 registerPlugin( 'plugin-name', {
 	icon: more,
 	render: Component,
-	area: "my-app-area",
+	scope: 'my-page',
 } );
 ```
 
