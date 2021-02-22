@@ -29,6 +29,7 @@ export default function useMenuEntity( menuId ) {
 		editEntityRecord( ...menuEntityData, { name } );
 
 	return {
+		editedMenuName,
 		saveMenuName,
 		editMenuName,
 	};

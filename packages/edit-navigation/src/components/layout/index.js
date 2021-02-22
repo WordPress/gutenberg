@@ -19,14 +19,14 @@ import {
 	BlockInspector,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
-import { useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import EmptyState from './empty-state';
 import {
-	IsMenuEditorFocused,
+	IsMenuNameControlFocusedContext,
 	MenuIdContext,
 	useNavigationEditor,
 	useNavigationBlockEditor,
@@ -43,7 +43,7 @@ import { store as editNavigationStore } from '../../store';
 export default function Layout( { blockEditorSettings } ) {
 	const canvasRef = useRef();
 	useBlockSelectionClearer( canvasRef );
-	const [ isMenuNameEditFocused, setIsMenuNameEditFocused ] = useState(
+	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
@@ -83,11 +83,14 @@ export default function Layout( { blockEditorSettings } ) {
 						} ) }
 					>
 						<MenuIdContext.Provider value={ selectedMenuId }>
-							<IsMenuEditorFocused.Provider
-								value={ [
-									isMenuNameEditFocused,
-									setIsMenuNameEditFocused,
-								] }
+							<IsMenuNameControlFocusedContext.Provider
+								value={ useMemo(
+									() => [
+										isMenuNameControlFocused,
+										setIsMenuNameControlFocused,
+									],
+									[ isMenuNameControlFocused ]
+								) }
 							>
 								<Header
 									isPending={ ! hasLoadedMenus }
@@ -136,7 +139,7 @@ export default function Layout( { blockEditorSettings } ) {
 										/>
 									</BlockEditorProvider>
 								) }
-							</IsMenuEditorFocused.Provider>
+							</IsMenuNameControlFocusedContext.Provider>
 						</MenuIdContext.Provider>
 					</div>
 
