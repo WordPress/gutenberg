@@ -104,8 +104,7 @@ export default function Image( {
 			return {
 				block: getSelectedBlock(),
 				currentId: getSelectedBlockClientId(),
-				image:
-					id && ( isSelected || isGrouped ) ? getMedia( id ) : null,
+				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -114,7 +113,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected, isGrouped ]
+		[ id, isSelected ]
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
