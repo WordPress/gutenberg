@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.0.1 =
+
+### Bug Fixes
+
+ - CSS-in-JS: Fix inline comment for select-dropdown (external module)
+
+
 = 10.0.0 =
 
 ### Features
