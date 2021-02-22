@@ -118,7 +118,7 @@ function Button( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Button } from `@wordpress/components/ui`
+ * import { Button } from `@wordpress/components/ui`;
  *
  * function Example() {
  *   return <Button variant="secondary">Code is Poetry</Button>;
