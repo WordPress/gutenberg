@@ -80,7 +80,9 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"fbjs": "3.0.0",
+		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#e5d52756f7c4287bd6e40127a0554ab009dffd93"
 	},
 	"devDependencies": {
 		"@actions/core": "1.2.6",
