@@ -24,8 +24,8 @@ import { isFunction } from 'lodash';
  *                                               choose to render your own SVG.
  * @property {Function}                  render  A component containing the UI elements
  *                                               to be rendered.
- * @property {string}                    [scope] The scope to be used when rendering inside
- * 												 a plugin area.
+ * @property {string}                    [scope] The optional scope to be used when rendering inside
+ *                                               a plugin area. No scope by default.
  */
 
 /**
@@ -216,12 +216,12 @@ export function getPlugin( name ) {
 }
 
 /**
- * Returns all registered plugins.
+ * Returns all registered plugins without a scope or for a given scope.
  *
  * @param {string} [scope] The scope to be used when rendering inside
- * 						   a plugin area.
+ *                         a plugin area. No scope by default.
  *
- * @return {WPPlugin[]} The list of all plugins or for a give scope.
+ * @return {WPPlugin[]} The list of plugins without a scope or for a given scope.
  */
 export function getPlugins( scope ) {
 	return Object.values( plugins ).filter(

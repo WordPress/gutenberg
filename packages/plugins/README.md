@@ -30,15 +30,15 @@ _Returns_
 
 <a name="getPlugins" href="#getPlugins">#</a> **getPlugins**
 
-Returns all registered plugins.
+Returns all registered plugins without a scope or for a given scope.
 
 _Parameters_
 
--   _scope_ `[string]`: The scope to be used when rendering inside a plugin area.
+-   _scope_ `[string]`: The scope to be used when rendering inside a plugin area. No scope by default.
 
 _Returns_
 
--   `WPPlugin[]`: The list of all plugins or for a give scope.
+-   `WPPlugin[]`: The list of plugins without a scope or for a given scope.
 
 <a name="PluginArea" href="#PluginArea">#</a> **PluginArea**
 
