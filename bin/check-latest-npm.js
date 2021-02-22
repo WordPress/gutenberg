@@ -12,7 +12,9 @@ const semver = require( 'semver' );
  * Internal dependencies
  */
 const {
-	engines: { npm: npmSemver },
+	engines: { npm: npmRange },
+	// Ignore reason: `package.json` exists outside `bin` `rootDir`.
+	// @ts-ignore
 } = require( '../package.json' );
 
 /**
@@ -60,7 +62,7 @@ async function getLatestNPMVersion() {
 
 				const versions = Object.values( data[ 'dist-tags' ] );
 
-				resolve( semver.maxSatisfying( versions, npmSemver ) );
+				resolve( semver.maxSatisfying( versions, npmRange ) );
 			}
 		).on( 'error', ( error ) => {
 			if (
