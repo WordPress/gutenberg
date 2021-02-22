@@ -59,8 +59,7 @@
 	position: relative;
 
 	// Provide a little margin to show each placeholder as a separate unit.
-	margin-left: 2px;
-	margin-right: 2px;
+	margin: 2px;
 
 	.wp-block-navigation-link__placeholder-text {
 		font-family: $default-font;
@@ -93,7 +92,7 @@
 .wp-block-navigation
 .wp-block-navigation-link:not(.is-editing)
 .wp-block-navigation-link__content.wp-block-navigation-link__placeholder {
-	border: $border-width solid $gray-700;
+	box-shadow: inset 0 0 0 $border-width $gray-700;
 	border-radius: $radius-block-ui;
 	color: var(--wp-admin-theme-color);
 }
