@@ -3,6 +3,8 @@
  */
 const IS_ROOT_TAG = /^(body|html|:root).*$/;
 
+const IS_BUTTON_TAG = /^(button).*$/;
+
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
 	const updateSelector = ( selector ) => {
 		if ( ignore.includes( selector.trim() ) ) {
@@ -12,6 +14,10 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 		// Anything other than a root tag is always prefixed.
 		{
 			if ( ! selector.match( IS_ROOT_TAG ) ) {
+				if ( selector.match( IS_BUTTON_TAG ) ) {
+					return namespace + ' ' + selector.replace( /^(button)/, 'button:not(.components-button)' );
+				}
+
 				return namespace + ' ' + selector;
 			}
 		}
