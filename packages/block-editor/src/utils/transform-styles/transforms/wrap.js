@@ -8,18 +8,19 @@ const IS_BUTTON_TAG = /^(button).*$/;
 const IS_INPUT_TAG = /^(input).*$/;
 
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
-
 	const updateSelector = ( selector ) => {
 		if ( selector.match( IS_BUTTON_TAG ) ) {
 			return selector.replace(
-					IS_BUTTON_TAG,
-					'button:not(.components-button)' );
+				IS_BUTTON_TAG,
+				'button:not(.components-button)'
+			);
 		}
 
 		if ( selector.match( IS_INPUT_TAG ) ) {
 			return selector.replace(
-					IS_INPUT_TAG,
-					'input:not(.components-text-control__input):not(.components-placeholder__input):not(.components-form-token-field__input)' );
+				IS_INPUT_TAG,
+				'input:not(.components-text-control__input):not(.components-placeholder__input):not(.components-form-token-field__input)'
+			);
 		}
 
 		return selector;
