@@ -97,18 +97,6 @@ const LayoutSetupStep = ( {
 						) ) }
 					</>
 				) }
-				{ ! showBlockVariations && hasBlockVariations && (
-					<BlockVariation
-						key={ defaultVariation.name }
-						title={ __( 'Start empty' ) }
-						variation={ defaultVariation }
-						onSelect={ () => {
-							setShowBack( true );
-							setShowBlockVariations( true );
-						} }
-						composite={ composite }
-					/>
-				) }
 				{ showPatternsList && (
 					<>
 						{ patterns.map( ( pattern ) => (
@@ -120,6 +108,18 @@ const LayoutSetupStep = ( {
 							/>
 						) ) }
 					</>
+				) }
+				{ ! showBlockVariations && hasBlockVariations && (
+					<BlockVariation
+						key={ defaultVariation.name }
+						title={ __( 'Start empty' ) }
+						variation={ defaultVariation }
+						onSelect={ () => {
+							setShowBack( true );
+							setShowBlockVariations( true );
+						} }
+						composite={ composite }
+					/>
 				) }
 			</Composite>
 		</>
