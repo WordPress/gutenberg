@@ -6,6 +6,7 @@ import {
 	deactivatePlugin,
 	activatePlugin,
 	activateTheme,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
