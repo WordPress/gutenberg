@@ -21,7 +21,7 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 						namespace +
 						' ' +
 						selector.replace(
-							/^(button)/,
+							IS_BUTTON_TAG,
 							'button:not(.components-button)'
 						)
 					);
@@ -32,7 +32,7 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 						namespace +
 						' ' +
 						selector.replace(
-							/^(input)/,
+							IS_INPUT_TAG,
 							'input:not(.components-text-control__input):not(.components-placeholder__input):not(.components-form-token-field__input)'
 						)
 					);
