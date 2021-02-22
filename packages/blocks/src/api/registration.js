@@ -160,7 +160,8 @@ export const serverSideBlockDefinitions = {};
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 	for ( const blockName of Object.keys( definitions ) ) {
-		// don't overwrite with block.json if we've already initialized from server
+		// Don't overwrite if already set. It covers the case when metadata
+		// was initialized from the server.
 		if ( serverSideBlockDefinitions[ blockName ] ) {
 			continue;
 		}
