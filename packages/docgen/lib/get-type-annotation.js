@@ -418,7 +418,7 @@ module.exports =
 				return getReturnTypeAnnotation( tag, token );
 			}
 			default: {
-				return tag.type;
+				return '';
 			}
 		}
 	};

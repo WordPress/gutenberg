@@ -14,4 +14,12 @@ describe( 'Type annotations', () => {
 		expect( result ).toBe( 'number' );
 	} );
 
+	it( "returns empty if no JSDoc type and TS data can't be inferred either", () => {
+		const tag = {
+			tag: 'unknown',
+		};
+		const node = {};
+		const result = getTypeAnnotation( tag, node );
+		expect( result ).toBe( '' );
+	} );
 } );
