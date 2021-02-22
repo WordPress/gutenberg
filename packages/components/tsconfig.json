@@ -17,6 +17,7 @@
 		"src/dashicon/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/spinner/**/*",
 		"src/tip/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",
