@@ -313,6 +313,18 @@ export default function Image( {
 							label={ __( 'Upload external image' ) }
 						/>
 					) }
+					{ ! multiImageSelection && coverBlockExists && (
+						<ToolbarButton
+							icon={ textColor }
+							label={ __( 'Add text over image' ) }
+							onClick={ () =>
+								replaceBlocks(
+									currentId,
+									switchToBlockType( block, 'core/cover' )
+								)
+							}
+						/>
+					) }
 				</ToolbarGroup>
 				{ ! multiImageSelection && ! isEditingImage && (
 					<MediaReplaceFlow
@@ -324,20 +336,6 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-				{ ! multiImageSelection && coverBlockExists && (
-					<ToolbarGroup>
-						<ToolbarButton
-							icon={ textColor }
-							label={ __( 'Add text over image' ) }
-							onClick={ () =>
-								replaceBlocks(
-									currentId,
-									switchToBlockType( block, 'core/cover' )
-								)
-							}
-						/>
-					</ToolbarGroup>
 				) }
 			</BlockControls>
 			<InspectorControls>
