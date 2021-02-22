@@ -38,11 +38,8 @@ function InserterTabs( {
 		if ( showReusableBlocks ) {
 			tempTabs.push( reusableBlocksTab );
 		}
-		if ( hasFilter( 'editor.BlockInserterTabs.order' ) ) {
-			tempTabs = applyFilters(
-				'editor.BlockInserterTabs.order',
-				tempTabs
-			);
+		if ( hasFilter( 'editor.BlockInserterTabs' ) ) {
+			tempTabs = applyFilters( 'editor.BlockInserterTabs', tempTabs );
 		}
 		return tempTabs;
 	}, [
