@@ -7,7 +7,10 @@ import { kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import {
+	BlockSettingsMenuControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	MenuItem,
 	TextControl,
@@ -25,7 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
-	const { replaceBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -87,7 +90,10 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 									value={ title }
 									onChange={ setTitle }
 								/>
-								<Flex justify="flex-end">
+								<Flex
+									className="edit-site-template-part-converter__convert-modal-actions"
+									justify="flex-end"
+								>
 									<FlexItem>
 										<Button
 											isSecondary
