@@ -88,8 +88,8 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
- * Given a block object, returns a copy of the block object, optionally merging
- * new attributes and/or replacing its inner blocks.
+ * Given a block object, returns a copy of the block object while sanitizing its attributes,
+ * optionally merging new attributes and/or replacing its inner blocks.
  *
  * @param {Object} block              Block instance.
  * @param {Object} mergeAttributes    Block attributes.
@@ -97,7 +97,11 @@ export function createBlocksFromInnerBlocksTemplate(
  *
  * @return {Object} A cloned block.
  */
-export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
+export function __experimentalCloneSanitizedBlock(
+	block,
+	mergeAttributes = {},
+	newInnerBlocks
+) {
 	const clientId = uuid();
 
 	const sanitizedAttributes = sanitizeBlockAttributes( block.name, {
@@ -109,6 +113,34 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 		...block,
 		clientId,
 		attributes: sanitizedAttributes,
+		innerBlocks:
+			newInnerBlocks ||
+			block.innerBlocks.map( ( innerBlock ) =>
+				__experimentalCloneSanitizedBlock( innerBlock )
+			),
+	};
+}
+
+/**
+ * Given a block object, returns a copy of the block object,
+ * optionally merging new attributes and/or replacing its inner blocks.
+ *
+ * @param {Object} block              Block instance.
+ * @param {Object} mergeAttributes    Block attributes.
+ * @param {?Array} newInnerBlocks     Nested blocks.
+ *
+ * @return {Object} A cloned block.
+ */
+export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
+	const clientId = uuid();
+
+	return {
+		...block,
+		clientId,
+		attributes: {
+			...block.attributes,
+			...mergeAttributes,
+		},
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
