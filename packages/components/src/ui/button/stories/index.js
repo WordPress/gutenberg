@@ -1,7 +1,10 @@
 /**
+ * External dependencies
+ */
+import { boolean, number, select } from '@storybook/addon-knobs';
+/**
  * Internal dependencies
  */
-import { Flex, Text } from '../..';
 import { Button } from '..';
 
 export default {
@@ -9,56 +12,54 @@ export default {
 	title: 'G2 Components (Experimental)/Button',
 };
 
-const Buttons = ( props ) => {
-	return (
-		<Flex direction="row" justify="left" spacing={ 4 }>
-			<Text size={ 12 } variant="muted">
-				Large
-			</Text>
-			<Button size="large" { ...props }>
-				Button
-			</Button>
-			<Text size={ 12 } variant="muted">
-				Medium
-			</Text>
-			<Button size="medium" { ...props }>
-				Button
-			</Button>
-			<Text size={ 12 } variant="muted">
-				Small
-			</Text>
-			<Button size="small" { ...props }>
-				Button
-			</Button>
-		</Flex>
-	);
-};
+const createSelectProps = ( collection ) =>
+	collection.reduce( ( data, item ) => ( { ...data, [ item ]: item } ), {} );
 
 export const _default = () => {
-	return (
-		<>
-			<Buttons variant="primary" />
-			<Buttons variant="secondary" />
-			<Buttons variant="tertiary" />
-			<Buttons isDestructive variant="primary" />
-			<Buttons isDestructive variant="secondary" />
-			<Buttons isDestructive variant="tertiary" />
-			<Buttons isSubtle variant="secondary" />
-			<Buttons isControl />
-			<Buttons isControl isSubtle />
-			<Buttons
-				elevation={ 2 }
-				prefix={ <Text>Prefix</Text> }
-				suffix={ <Text>Suffix</Text> }
-				variant="secondary"
-			/>
-			<Buttons
-				elevation={ 2 }
-				isLoading
-				prefix={ <Text>Prefix</Text> }
-				suffix={ <Text>Suffix</Text> }
-				variant="secondary"
-			/>
-		</>
+	const disabled = boolean( 'disabled', false );
+	const elevation = number( 'elevation', 0 );
+	const hasCaret = boolean( 'hasCaret', false );
+	const isActive = boolean( 'isActive', false );
+	const isBlock = boolean( 'isBlock', false );
+	const isControl = boolean( 'isControl', false );
+	const isDestructive = boolean( 'isDestructive', false );
+	const isLoading = boolean( 'isLoading', false );
+	const isRounded = boolean( 'isRounded', false );
+	const isSplit = boolean( 'isSplit', false );
+	const isSubtle = boolean( 'isSubtle', false );
+	const size = select(
+		'size',
+		createSelectProps( [ 'large', 'medium', 'small', 'xSmall' ] ),
+		'medium'
 	);
+
+	const variant = select(
+		'variant',
+		createSelectProps( [
+			'primary',
+			'secondary',
+			'tertiary',
+			'plain',
+			'link',
+		] ),
+		'secondary'
+	);
+
+	const props = {
+		disabled,
+		elevation,
+		hasCaret,
+		isActive,
+		isBlock,
+		isControl,
+		isDestructive,
+		isLoading,
+		isRounded,
+		isSplit,
+		isSubtle,
+		size,
+		variant,
+	};
+
+	return <Button { ...props }>Button</Button>;
 };
