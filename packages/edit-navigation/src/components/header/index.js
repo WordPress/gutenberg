@@ -70,8 +70,11 @@ export default function Header( {
 					<DropdownMenu
 						icon={ null }
 						toggleProps={ {
-							showTooltip: false,
 							children: __( 'Switch menu' ),
+							'aria-label': __(
+								'Switch menu, or create a new menu'
+							),
+							showTooltip: false,
 							isTertiary: true,
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
@@ -94,6 +97,11 @@ export default function Header( {
 										choices={ menus.map( ( menu ) => ( {
 											value: menu.id,
 											label: menu.name,
+											'aria-label': sprintf(
+												/* translators: %s: The name of a menu. */
+												__( "Switch to '%s'" ),
+												menu.name
+											),
 										} ) ) }
 									/>
 								</MenuGroup>
