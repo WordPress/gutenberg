@@ -47,7 +47,7 @@ describe( 'Buttons', () => {
 		// Make sure that the dialog is still opened, and that focus is retained
 		// within (focusing on the link preview).
 		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
+			':focus.block-editor-link-control__link'
 		);
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
