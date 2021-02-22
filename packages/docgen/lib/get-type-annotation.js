@@ -350,11 +350,6 @@ function getParamTypeAnnotation( tag, token ) {
 	// search for the param token corresponding to the tag
 	// use the tag's `name` property
 
-	// if the file is using JSDoc type annotations, just use the JSDoc
-	if ( tag.type ) {
-		return tag.type;
-	}
-
 	if ( babelTypes.isExportNamedDeclaration( token ) ) {
 		token = token.declaration;
 	}
@@ -391,11 +386,6 @@ function getParamTypeAnnotation( tag, token ) {
  * @return {null | string} The function's return type annoation.
  */
 function getReturnTypeAnnotation( tag, token ) {
-	// if the file is using JSDoc type annotations, just use the JSDoc
-	if ( tag.type ) {
-		return tag.type;
-	}
-
 	if ( babelTypes.isExportNamedDeclaration( token ) ) {
 		token = token.declaration;
 	}
@@ -415,6 +405,11 @@ module.exports =
 	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
 	 */
 	function ( tag, token ) {
+		// If the file is using JSDoc type annotations, use the JSDoc.
+		if ( tag.type ) {
+			return tag.type;
+		}
+
 		switch ( tag.tag ) {
 			case 'param': {
 				return getParamTypeAnnotation( tag, token );
