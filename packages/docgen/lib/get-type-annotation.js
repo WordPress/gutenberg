@@ -381,11 +381,10 @@ function getParamTypeAnnotation( tag, token ) {
 }
 
 /**
- * @param {CommentTag} tag A return comment tag.
  * @param {ASTNode} token A function token.
  * @return {null | string} The function's return type annoation.
  */
-function getReturnTypeAnnotation( tag, token ) {
+function getReturnTypeAnnotation( token ) {
 	if ( babelTypes.isExportNamedDeclaration( token ) ) {
 		token = token.declaration;
 	}
@@ -415,7 +414,7 @@ module.exports =
 				return getParamTypeAnnotation( tag, token );
 			}
 			case 'return': {
-				return getReturnTypeAnnotation( tag, token );
+				return getReturnTypeAnnotation( token );
 			}
 			default: {
 				return '';
