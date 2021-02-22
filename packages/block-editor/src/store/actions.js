@@ -8,6 +8,7 @@ import { castArray, findKey, first, last, some } from 'lodash';
  */
 import {
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -1223,7 +1224,9 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 		last( castArray( clientIds ) ),
 		rootClientId
 	);
-	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+	const clonedBlocks = blocks.map( ( block ) =>
+		__experimentalCloneSanitizedBlock( block )
+	);
 	yield insertBlocks(
 		clonedBlocks,
 		lastSelectedIndex + 1,
