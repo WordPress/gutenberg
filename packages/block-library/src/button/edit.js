@@ -239,13 +239,13 @@ function ButtonEdit( props ) {
 				ownValue = current.element.style.borderRadius;
 				current.element.style.borderRadius = '';
 			}
-			setComputedBorderRadius(
-				parseFloat(
-					current.element.ownerDocument.defaultView
-						.getComputedStyle( current.element )
-						.getPropertyValue( 'border-radius' )
-				)
-			);
+			let value = current.element.ownerDocument.defaultView
+				.getComputedStyle( current.element )
+				.getPropertyValue( 'border-radius' );
+			// if it's a compound value (has a space) it's not suitable for the
+			// single input of the UI so an empty string is preferable
+			value = value.indexOf( ' ' ) !== -1 ? '' : parseFloat( value );
+			setComputedBorderRadius( value );
 			if ( hasOwnValue ) {
 				current.element.style.borderRadius = ownValue;
 			}
