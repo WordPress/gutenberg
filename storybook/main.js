@@ -25,9 +25,9 @@ module.exports = {
 	// https://github.com/storybookjs/storybook/issues/12270
 	webpackFinal: async ( config ) => {
 		// Find the DefinePlugin
-		const plugin = config.plugins.find(
-			( p ) => p.definitions?.[ 'process.env' ]
-		);
+		const plugin = config.plugins.find( ( p ) => {
+			return p.definitions && p.definitions[ 'process.env' ];
+		} );
 		// Add custom env variables
 		Object.keys( customEnvVariables ).forEach( ( key ) => {
 			plugin.definitions[ 'process.env' ][ key ] = JSON.stringify(
