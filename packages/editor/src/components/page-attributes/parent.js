@@ -5,7 +5,6 @@ import {
 	get,
 	unescape as unescapeString,
 	debounce,
-	map,
 	repeat,
 	find,
 	flatten,
@@ -38,7 +37,7 @@ export const getItemPriority = ( name, searchValue ) => {
 		return 0;
 	}
 
-	if ( normalizedName.indexOf( normalizedSearch ) === 0 ) {
+	if ( normalizedName.startsWith( normalizedSearch ) ) {
 		return normalizedName.length;
 	}
 
@@ -95,7 +94,7 @@ export function PageAttributesParent() {
 
 	const parentOptions = useMemo( () => {
 		const getOptionsFromTree = ( tree, level = 0 ) => {
-			const mappedNodes = map( tree, ( treeNode ) => [
+			const mappedNodes = tree.map( ( treeNode ) => [
 				{
 					value: treeNode.id,
 					label:
