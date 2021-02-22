@@ -104,7 +104,7 @@ function ButtonGroup( props, forwardedRef ) {
 }
 
 /**
- * `ButtonGroup` is a form component contains and coordinates the checked state of multiple `Button` components.
+ * `ButtonGroup` is a form component that groups related buttons together. It can also coordinate the checked state of multiple `Button` components.
  *
  * @example
  * ```jsx
@@ -112,10 +112,10 @@ function ButtonGroup( props, forwardedRef ) {
  *
  * function Example() {
  *  return (
- *    <ButtonGroup value="code">
- *      <Button value="code">Code</Button>
- *      <Button value="is">is</Button>
- *      <Button value="Poetry">Poetry</Button>
+ *    <ButtonGroup>
+ *      <Button>Code</Button>
+ *      <Button>is</Button>
+ *      <Button>Poetry</Button>
  *    </ButtonGroup>
  *  );
  * }
