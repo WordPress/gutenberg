@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { TextControl, Button } from '@wordpress/components';
+import { useFocusOnMount } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -21,7 +22,7 @@ export default function AddMenu( {
 	onCreate,
 	titleText,
 	helpText,
-	focusOnMount = false,
+	focusInputOnMount = false,
 } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const { createErrorNotice, createInfoNotice, removeNotice } = useDispatch(
@@ -29,6 +30,8 @@ export default function AddMenu( {
 	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 	const { saveMenu } = useDispatch( 'core' );
+
+	const inputRef = useFocusOnMount( focusInputOnMount );
 
 	const createMenu = async ( event ) => {
 		event.preventDefault();
@@ -79,10 +82,7 @@ export default function AddMenu( {
 				</h3>
 			) }
 			<TextControl
-				// Disable reason: it should focus.
-				//
-				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus={ focusOnMount }
+				ref={ inputRef }
 				label={ __( 'Menu name' ) }
 				value={ menuName }
 				onChange={ setMenuName }

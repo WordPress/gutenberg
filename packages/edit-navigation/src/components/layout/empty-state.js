@@ -16,7 +16,7 @@ export default function EmptyState() {
 				<AddMenu
 					titleText={ __( 'Create your first menu' ) }
 					helpText={ __( 'A short descriptive name for your menu.' ) }
-					focusOnMount
+					focusInputOnMount
 				/>
 			</CardBody>
 		</Card>
