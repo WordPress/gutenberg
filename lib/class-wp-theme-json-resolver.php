@@ -256,14 +256,14 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$default_duotone_i18n = array(
-			'dark-grayscale' => __( 'Dark grayscale', 'gutenberg' ),
-			'grayscale'      => __( 'Grayscale', 'gutenberg' ),
-			'green-yellow'   => __( 'Green and yellow', 'gutenberg' ),
-			'red-blue'       => __( 'Red and blue', 'gutenberg' ),
-			'midnight'       => __( 'Midnight', 'gutenberg' ),
-			'orange-yellow'  => __( 'Orange and yellow', 'gutenberg' ),
-			'magenta-lime'   => __( 'Magenta and lime', 'gutenberg' ),
-			'blue-green'     => __( 'Blue and green', 'gutenberg' ),
+			'dark-grayscale'     => __( 'Dark grayscale', 'gutenberg' ),
+			'grayscale'          => __( 'Grayscale', 'gutenberg' ),
+			'purple-yellow'      => __( 'Purple and yellow', 'gutenberg' ),
+			'dark-blue-salmon'      => __( 'Dark blue and salmon', 'gutenberg' ),
+			'midnight'           => __( 'Midnight', 'gutenberg' ),
+			'magenta-yellow'     => __( 'Dark magenta and yellow', 'gutenberg' ),
+			'purple-light-green' => __( 'Purple and light green', 'gutenberg' ),
+			'brown-yellow'       => __( 'Brown and yellow', 'gutenberg' ),
 		);
 		if ( ! empty( $config['global']['settings']['color']['duotone'] ) ) {
 			foreach ( $config['global']['settings']['color']['duotone'] as &$gradient ) {
