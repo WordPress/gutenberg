@@ -11,7 +11,7 @@ $blocks-block__margin: 0.5em;
 	cursor: pointer;
 	display: inline-block;
 	font-size: 1.125em;
-	padding: 0.667em 1.333em;
+	padding: calc(0.667em + 2px) calc(1.333em + 2px); // The extra 2px are added to size solids the same as the outline versions.
 	text-align: center;
 	text-decoration: none;
 	overflow-wrap: break-word;
@@ -76,6 +76,7 @@ $blocks-block__margin: 0.5em;
 .is-style-outline > .wp-block-button__link,
 .wp-block-button__link.is-style-outline {
 	border: 2px solid currentColor;
+	padding: 0.667em 1.333em;
 }
 
 .is-style-outline > .wp-block-button__link:not(.has-text-color),
