@@ -1801,11 +1801,25 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	]
 );
 
-// TODO jsdoc + tests
+/**
+ * Returns the list of patterns based on specific `scope` and
+ * a block's name.
+ * `inserter` scope should be handled differently, probably in
+ * combination with `__experimentalGetAllowedPatterns`.
+ * For now `__experimentalGetScopedBlockPatterns` handles properly
+ * all other scopes.
+ * Since both APIs are experimental we should revisit this.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} scope Block pattern scope.
+ * @param {string} blockName Block's name.
+ *
+ * @return {Array} The list of matched block patterns based on provided scope and block name.
+ */
 export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, blockName, scope ) => {
+	( state, scope, blockName ) => {
+		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
 		const patterns = state.settings.__experimentalBlockPatterns;
-		if ( ! blockName && ! scope ) return EMPTY_ARRAY;
 		return patterns.filter( ( pattern ) =>
 			pattern.scope?.[ scope ]?.includes?.( blockName )
 		);

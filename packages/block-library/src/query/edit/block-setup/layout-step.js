@@ -41,8 +41,8 @@ const LayoutSetupStep = ( {
 			);
 			const { name } = blockType;
 			const _patterns = __experimentalGetScopedBlockPatterns(
-				name,
-				'block'
+				'block',
+				name
 			);
 			const _blockVariations = getBlockVariations( name, 'block' );
 			return {
