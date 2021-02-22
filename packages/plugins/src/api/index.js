@@ -118,12 +118,12 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 	if ( typeof name !== 'string' ) {
-		console.error( 'Plugin names must be strings.' );
+		console.error( 'Plugin name must be string.' );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
-			'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
+			'Plugin name must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 		);
 		return null;
 	}
@@ -133,11 +133,27 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
-	if ( ! isFunction( settings.render ) ) {
+	const { render, scope } = settings;
+
+	if ( ! isFunction( render ) ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);
 		return null;
+	}
+
+	if ( scope ) {
+		if ( typeof scope !== 'string' ) {
+			console.error( 'Plugin scope must be string.' );
+			return null;
+		}
+
+		if ( ! /^[a-z][a-z0-9-]*$/.test( scope ) ) {
+			console.error(
+				'Plugin scope must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-page".'
+			);
+			return null;
+		}
 	}
 
 	plugins[ name ] = {
@@ -202,8 +218,13 @@ export function getPlugin( name ) {
 /**
  * Returns all registered plugins.
  *
- * @return {WPPlugin[]} Plugin settings.
+ * @param {string} [scope] The scope to be used when rendering inside
+ * 						   a plugin area.
+ *
+ * @return {WPPlugin[]} The list of all plugins or for a give scope.
  */
-export function getPlugins() {
-	return Object.values( plugins );
+export function getPlugins( scope ) {
+	return Object.values( plugins ).filter(
+		( plugin ) => plugin.scope === scope
+	);
 }

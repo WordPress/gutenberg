@@ -32,9 +32,13 @@ _Returns_
 
 Returns all registered plugins.
 
+_Parameters_
+
+-   _scope_ `[string]`: The scope to be used when rendering inside a plugin area.
+
 _Returns_
 
--   `WPPlugin[]`: Plugin settings.
+-   `WPPlugin[]`: The list of all plugins or for a give scope.
 
 <a name="PluginArea" href="#PluginArea">#</a> **PluginArea**
 

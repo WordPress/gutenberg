@@ -59,8 +59,9 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map( getPlugins(), ( { icon, name, render, scope } ) => {
-				if ( this.props.scope === scope ) {
+			plugins: map(
+				getPlugins( this.props.scope ),
+				( { icon, name, render } ) => {
 					return {
 						Plugin: render,
 						context: {
@@ -69,7 +70,7 @@ class PluginArea extends Component {
 						},
 					};
 				}
-			} ).filter( Boolean ),
+			),
 		};
 	}
 
