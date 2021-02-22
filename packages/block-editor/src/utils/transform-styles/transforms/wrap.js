@@ -5,6 +5,8 @@ const IS_ROOT_TAG = /^(body|html|:root).*$/;
 
 const IS_BUTTON_TAG = /^(button).*$/;
 
+const IS_INPUT_TAG = /^(input).*$/;
+
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
 	const updateSelector = ( selector ) => {
 		if ( ignore.includes( selector.trim() ) ) {
@@ -15,7 +17,25 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 		{
 			if ( ! selector.match( IS_ROOT_TAG ) ) {
 				if ( selector.match( IS_BUTTON_TAG ) ) {
-					return namespace + ' ' + selector.replace( /^(button)/, 'button:not(.components-button)' );
+					return (
+						namespace +
+						' ' +
+						selector.replace(
+							/^(button)/,
+							'button:not(.components-button)'
+						)
+					);
+				}
+
+				if ( selector.match( IS_INPUT_TAG ) ) {
+					return (
+						namespace +
+						' ' +
+						selector.replace(
+							/^(input)/,
+							'input:not(.components-text-control__input):not(.components-placeholder__input):not(.components-form-token-field__input)'
+						)
+					);
 				}
 
 				return namespace + ' ' + selector;
