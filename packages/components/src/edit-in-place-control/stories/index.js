@@ -10,59 +10,74 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import EditInPlaceControl from '../';
-import { isUndefined, negate } from 'lodash';
+import { useInlineEdit } from '../use-inline-edit';
 
 export default {
 	title: 'Components/EditInPlaceControl',
-	component: EditInPlaceControl,
+	component: MyCustomEditInPlaceControl,
 };
 
+function MyCustomEditInPlaceControl( props = {} ) {
+	const { isEdit, amendInputProps, amendToggleProps, value } = useInlineEdit(
+		props
+	);
+
+	const buttonProps = {
+		onClick: ( _value ) =>
+			// eslint-disable-next-line no-console
+			console.log( 'custom handle on click', _value ),
+	};
+	const inputProps = { value };
+
+	return (
+		<>
+			{ isEdit ? (
+				<input { ...amendInputProps( ...inputProps ) } />
+			) : (
+				<button { ...amendToggleProps( ...buttonProps ) }>
+					{ value }
+				</button>
+			) }
+		</>
+	);
+}
+
 export const _default = () => {
+	const validate = ( _value ) => _value.length > 0;
+	const initialValue = text( 'Initial value', 'Input initial value' );
 	const [ onClickCallbacks, setOnClickCallbacks ] = useState( 0 );
-	const [ onUpdateCallbacks, setOnUpdateCallbacks ] = useState( 0 );
 	const [ onChangeCallbacks, setOnChangeCallbacks ] = useState( 0 );
-	const [ onKeydownCallbacks, setOnKeydownCallbacks ] = useState( 0 );
+	const [ value, setValue ] = useState( initialValue );
+	const [ isInputValid, setIsInputValid ] = useState( true );
 
 	const incrementOnClickCallbacks = () =>
 		setOnClickCallbacks( 1 + onClickCallbacks );
-	const incrementOnUpdateCallbacks = () =>
-		setOnUpdateCallbacks( 1 + onUpdateCallbacks );
+
 	const incrementOnChangeCallbacks = () =>
 		setOnChangeCallbacks( 1 + onChangeCallbacks );
-	const incrementOnKeydownCallbacks = () =>
-		setOnKeydownCallbacks( 1 + onKeydownCallbacks );
-
-	const initialValue = text( 'Initial value', 'Input initial value' );
-	const switchToEditModeButtonLabel = text(
-		'Aria label informing user, the button will switch to edit mode on click',
-		'Edit mode'
-	);
-	const inputLabel = text(
-		'Aria label attached to input (when on edit mdoe)',
-		'Input text'
-	);
 
 	const props = {
-		initialValue,
+		value,
+		validate,
 		onClick: incrementOnClickCallbacks,
-		onUpdate: incrementOnUpdateCallbacks,
-		switchToEditModeButtonLabel,
-		inputValidator: negate( isUndefined ),
-		inputLabel,
-		onChange: incrementOnChangeCallbacks,
-		onKeyDown: incrementOnKeydownCallbacks,
+		inputValidator: validate,
+		onChange: ( _value ) => (
+			setValue( _value ),
+			incrementOnChangeCallbacks( _value ),
+			setIsInputValid( true )
+		),
+		onWrongInput: () => setIsInputValid( false ),
 	};
 
 	return (
 		<>
-			<EditInPlaceControl { ...props } />
+			<MyCustomEditInPlaceControl { ...props } />
 			<ul>
 				<li> onClick callbacks: { onClickCallbacks } </li>
-				<li> onUpdate callbacks: { onUpdateCallbacks } </li>
 				<li> onChange callback: { onChangeCallbacks } </li>
-				<li> onKeyDown callback: { onKeydownCallbacks } </li>
+				<li> value: { onChangeCallbacks } </li>
 				<li> inputValidator: is defined </li>
+				<li> is input valid: { isInputValid + '' } </li>
 			</ul>
 		</>
 	);
