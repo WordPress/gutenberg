@@ -133,7 +133,7 @@ export type Props = {
 	/**
 	 * Renders prefix content within `Button`.
 	 */
-	prefix?: ReactElement;
+	pre?: ReactElement;
 	/**
 	 * Determines the size of `Button`.
 	 *

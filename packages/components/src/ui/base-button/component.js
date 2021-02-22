@@ -44,7 +44,7 @@ function BaseButton( props, forwardedRef ) {
 		isFocused = false,
 		isLoading = false,
 		noWrap = true,
-		prefix,
+		pre,
 		suffix,
 		...otherProps
 	} = useBaseButton( props );
@@ -70,7 +70,7 @@ function BaseButton( props, forwardedRef ) {
 			ref={ forwardedRef }
 		>
 			<LoadingOverlay isLoading={ isLoading } />
-			{ prefix && (
+			{ pre && (
 				<FlexItem
 					as="span"
 					className={ cx(
@@ -79,7 +79,7 @@ function BaseButton( props, forwardedRef ) {
 					) }
 					{ ...ui.$( 'ButtonPrefix' ) }
 				>
-					{ prefix }
+					{ pre }
 				</FlexItem>
 			) }
 			{ icon && (

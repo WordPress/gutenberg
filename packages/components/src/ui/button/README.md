@@ -128,7 +128,7 @@ Determines how inner content is aligned.
 
 Determines if inner content should be wrapped.
 
-##### prefix
+##### pre
 
 **Type**: `React.ReactElement`
 
