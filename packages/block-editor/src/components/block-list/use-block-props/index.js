@@ -2,28 +2,36 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useRef, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	__unstableGetBlockProps as getBlockProps,
+	getBlockType,
+} from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { SetBlockNodes } from '../';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
+import { useBlockNodes } from './use-block-nodes';
 import { store as blockEditorStore } from '../../../store';
+
+/**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -44,46 +52,46 @@ import { store as blockEditorStore } from '../../../store';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
-	const setBlockNodes = useContext( SetBlockNodes );
+	const { clientId, index, className, wrapperProps = {} } = useContext(
+		BlockListBlockContext
+	);
 	const {
-		clientId,
-		isSelected,
-		isFirstMultiSelected,
-		isLastMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
-		index,
-		className,
+		mode,
 		name,
 		blockTitle,
-		wrapperProps = {},
-	} = useContext( BlockListBlockContext );
-	const mode = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlockMode( clientId );
-	} );
-
-	// Provide the selected node, or the first and last nodes of a multi-
-	// selection, so it can be used to position the contextual block toolbar.
-	// We only provide what is necessary, and remove the nodes again when they
-	// are no longer selected.
-	const isNodeNeeded =
-		isSelected || isFirstMultiSelected || isLastMultiSelected;
-	const nodesRef = useRefEffect(
-		( node ) => {
-			if ( ! isNodeNeeded ) {
-				return;
-			}
-
-			setBlockNodes( ( nodes ) => ( {
-				...nodes,
-				[ clientId ]: node,
-			} ) );
-
-			return () => {
-				setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
+		isPartOfSelection,
+		adjustScrolling,
+		enableAnimation,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockMode,
+				getBlockName,
+				isTyping,
+				getGlobalBlockCount,
+				isBlockSelected,
+				isBlockMultiSelected,
+				isAncestorMultiSelected,
+				isFirstMultiSelectedBlock,
+			} = select( blockEditorStore );
+			const isSelected = isBlockSelected( clientId );
+			const isPartOfMultiSelection =
+				isBlockMultiSelected( clientId ) ||
+				isAncestorMultiSelected( clientId );
+			const blockName = getBlockName( clientId );
+			return {
+				mode: getBlockMode( clientId ),
+				name: blockName,
+				blockTitle: getBlockType( blockName ).title,
+				isPartOfSelection: isSelected || isPartOfMultiSelection,
+				adjustScrolling:
+					isSelected || isFirstMultiSelectedBlock( clientId ),
+				enableAnimation:
+					! isTyping() &&
+					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			};
 		},
-		[ isNodeNeeded, clientId, setBlockNodes ]
+		[ clientId ]
 	);
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -91,22 +99,19 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	useFocusFirstElement( ref, clientId );
 
-	// Block Reordering animation
-	useMovingAnimation(
-		ref,
-		isSelected || isPartOfMultiSelection,
-		isSelected || isFirstMultiSelected,
-		enableAnimation,
-		index
-	);
-
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		ref,
-		nodesRef,
+		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
 		useIsHovered(),
+		useMovingAnimation( {
+			isSelected: isPartOfSelection,
+			adjustScrolling,
+			enableAnimation,
+			triggerAnimationOnChange: index,
+		} ),
 	] );
 
 	return {

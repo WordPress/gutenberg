@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
+import { Placeholder, Dropdown, Button } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -35,21 +35,6 @@ export default function TemplatePartPlaceholder( {
 			theme: templatePart.theme,
 		} );
 	}, [ setAttributes ] );
-
-	// If there are inner blocks present, the content for creation is clear.
-	// Therefore immediately create the template part with the given inner blocks as its content.
-	useEffect( () => {
-		if ( innerBlocks.length ) {
-			onCreate();
-		}
-	}, [] );
-	if ( innerBlocks.length ) {
-		return (
-			<Placeholder>
-				<Spinner />
-			</Placeholder>
-		);
-	}
 
 	return (
 		<Placeholder
