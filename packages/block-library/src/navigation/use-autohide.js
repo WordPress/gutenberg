@@ -45,7 +45,7 @@ export default function useAutohide( clientId, innerBlocks, ref ) {
 			wrapped (hidden) elements.
 		*/
 		const isWrapping = Object.values( visibilityMap ).some(
-			( item ) => item.isHidden
+			( isHidden ) => isHidden
 		);
 
 		setState( {
