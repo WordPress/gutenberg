@@ -6,7 +6,9 @@ const { types: babelTypes } = require( '@babel/core' );
 /* eslint-disable jsdoc/valid-types */
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
-/** @typedef {babelTypes.TSType} TypeAnnotation  */
+/** @typedef {babelTypes.TSType} TypeAnnotation */
+/** @typedef {import('@babel/core').Node} ASTNode */
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType} typeAnnotation
@@ -340,7 +342,7 @@ function getTypeAnnotation( typeAnnotation ) {
 
 /**
  * @param {CommentTag} tag The documented parameter.
- * @param {import('@babel/core').Node} token The function the parameter is documented on.
+ * @param {ASTNode} token The function the parameter is documented on.
  * @return {null | string} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, token ) {
@@ -384,7 +386,7 @@ function getParamTypeAnnotation( tag, token ) {
 
 /**
  * @param {CommentTag} tag A return comment tag.
- * @param {import('@babel/core').Node} token A function token.
+ * @param {ASTNode} token A function token.
  * @return {null | string} The function's return type annoation.
  */
 function getReturnTypeAnnotation( tag, token ) {
@@ -407,8 +409,8 @@ function getReturnTypeAnnotation( tag, token ) {
 
 module.exports =
 	/**
-	 * @param {CommentBlock['tags'][0]} tag A comment tag.
-	 * @param {import('@babel/core').Node} token A function token.
+	 * @param {CommentTag} tag A comment tag.
+	 * @param {ASTNode} token A function token.
 	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
 	 */
 	function ( tag, token ) {
@@ -424,4 +426,3 @@ module.exports =
 			}
 		}
 	};
-/* eslint-enable jsdoc/valid-types */
