@@ -9,7 +9,6 @@ const ios = {
 	processArguments: {
 		args: [ 'uitesting' ],
 	},
-	showXcodeLog: true,
 };
 
 exports.iosLocal = {
