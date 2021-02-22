@@ -29,6 +29,8 @@ interface I18nContextProps {
 
 /**
  * Utility to make a new context value
+ *
+ * @param i18n
  */
 function makeContextValue( i18n: I18n ): I18nContextProps {
 	return {
@@ -64,8 +66,11 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
  *
  * You can also instantiate the provider without the `i18n` prop. In that case it will use the
  * default `I18n` instance exported from `@wordpress/i18n`.
+ *
+ * @param props i18n provider props.
+ * @return Children wrapped in the I18nProvider.
  */
-export function I18nProvider( props: I18nProviderProps ) {
+export function I18nProvider( props: I18nProviderProps ): JSX.Element {
 	const { children, i18n = defaultI18n } = props;
 	const [ update, forceUpdate ] = useReducer( () => [], [] );
 
