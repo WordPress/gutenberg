@@ -18,6 +18,7 @@ export default function save( { attributes } ) {
 		imageCount,
 		caption,
 		columns = defaultColumnsNumber( imageCount ),
+		gutterSize,
 		imageCrop,
 	} = attributes;
 
@@ -25,8 +26,13 @@ export default function save( { attributes } ) {
 		imageCrop ? 'is-cropped' : ''
 	}`;
 
+	const style = {
+		'--gallery-block--gutter-size':
+			gutterSize !== undefined ? `${ gutterSize }px` : undefined,
+	};
+
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
+		<figure { ...useBlockProps.save( { className, style } ) }>
 			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
