@@ -313,6 +313,10 @@ export default function NavigationLinkEdit( {
 		},
 	} );
 
+	if ( ! url ) {
+		blockProps.onClick = () => setIsLinkOpen( true );
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation__container', {
@@ -418,6 +422,11 @@ export default function NavigationLinkEdit( {
 				<div className={ classes }>
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
+							<KeyboardShortcuts
+								shortcuts={ {
+									enter: () => isSelected && setIsLinkOpen( true ),
+								} }
+							/>
 							{ missingText }
 						</div>
 					) : (
@@ -459,6 +468,12 @@ export default function NavigationLinkEdit( {
 							onClose={ () => setIsLinkOpen( false ) }
 							isAlternate
 						>
+							<KeyboardShortcuts
+								bindGlobal
+								shortcuts={ {
+									escape: () => setIsLinkOpen( false ),
+								} }
+							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
