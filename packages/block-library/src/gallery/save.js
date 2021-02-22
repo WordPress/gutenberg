@@ -13,11 +13,11 @@ export default function save( { attributes } ) {
 	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
 		return saveV1( { attributes } );
 	}
+
 	const {
 		imageCount,
 		caption,
 		columns = defaultColumnsNumber( imageCount ),
-		gutterSize,
 		imageCrop,
 	} = attributes;
 
@@ -25,13 +25,8 @@ export default function save( { attributes } ) {
 		imageCrop ? 'is-cropped' : ''
 	}`;
 
-	const style = {
-		'--gallery-block--gutter-size':
-			gutterSize !== undefined ? `${ gutterSize }px` : undefined,
-	};
-
 	return (
-		<figure { ...useBlockProps.save( { className, style } ) }>
+		<figure { ...useBlockProps.save( { className } ) }>
 			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
