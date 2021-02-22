@@ -36,6 +36,8 @@
 		margin: 0 $grid-unit-15 $grid-unit-15 0;
 		width: 200px;
 		text-align: center;
+		display: flex;
+		flex-direction: column;
 
 		&.is-block-variation {
 			width: 90px;
@@ -45,6 +47,12 @@
 				margin-right: 0;
 				height: auto;
 			}
+		}
+
+		.block-setup-block-layout-list__item-title {
+			margin-top: auto;
+			padding: $grid-unit-05;
+			font-size: $helptext-font-size;
 		}
 
 		.block-setup-block-layout-list__item {
@@ -65,13 +73,6 @@
 				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 2px solid transparent;
-			}
-
-			.block-setup-block-layout-list__item-title {
-				margin-top: auto;
-				padding: $grid-unit-05;
-				font-size: $helptext-font-size;
-				text-align: center;
 			}
 
 			.block-editor-block-preview__container {

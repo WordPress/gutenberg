@@ -150,15 +150,15 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 				/>
-				<div className="block-setup-block-layout-list__item-title">
-					{ pattern.title }
-				</div>
-				{ !! pattern.description && (
-					<VisuallyHidden id={ descriptionId }>
-						{ pattern.description }
-					</VisuallyHidden>
-				) }
 			</CompositeItem>
+			<div className="block-setup-block-layout-list__item-title">
+				{ pattern.title }
+			</div>
+			{ !! pattern.description && (
+				<VisuallyHidden id={ descriptionId }>
+					{ pattern.description }
+				</VisuallyHidden>
+			) }
 		</div>
 	);
 }
@@ -187,15 +187,15 @@ function BlockVariation( { variation, title, onSelect, composite } ) {
 				<div className="block-setup-block-layout-list__item-variation-icon">
 					<Icon icon={ variation.icon } size={ 48 } />
 				</div>
-				<div className="block-setup-block-layout-list__item-title">
-					{ title || variation.title }
-				</div>
-				{ !! variation.description && (
-					<VisuallyHidden id={ descriptionId }>
-						{ variation.description }
-					</VisuallyHidden>
-				) }
 			</CompositeItem>
+			<div className="block-setup-block-layout-list__item-title">
+				{ title || variation.title }
+			</div>
+			{ !! variation.description && (
+				<VisuallyHidden id={ descriptionId }>
+					{ variation.description }
+				</VisuallyHidden>
+			) }
 		</div>
 	);
 }
