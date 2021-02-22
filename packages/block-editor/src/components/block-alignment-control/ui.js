@@ -49,12 +49,13 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockAlignmentUI( {
+function BlockAlignmentUI( {
 	value,
 	onChange,
 	controls = DEFAULT_CONTROLS,
 	isToolbar,
 	isCollapsed = true,
+	isToolbarButton = true,
 } ) {
 	const { wideControlsEnabled = false } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -90,7 +91,7 @@ export function BlockAlignmentUI( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : {};
+	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
 
 	return (
 		<UIComponent
