@@ -2,15 +2,28 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { category, page, postTitle, tag } from '@wordpress/icons';
-
-const ICON_MAP = {
+import {
 	category,
 	page,
-	post: postTitle,
+	postTitle,
 	tag,
-	//TODO: add a generic CPT icon, remember to ask folks for a new icon
-};
+	customPostType,
+} from '@wordpress/icons';
+
+function getIcon( variationName ) {
+	switch ( variationName ) {
+		case 'post':
+			return postTitle;
+		case 'page':
+			return page;
+		case 'tag':
+			return tag;
+		case 'category':
+			return category;
+		default:
+			return customPostType;
+	}
+}
 
 function enhanceNavigationLinkVariations( settings, name ) {
 	if ( name !== 'core/navigation-link' ) {
@@ -21,10 +34,9 @@ function enhanceNavigationLinkVariations( settings, name ) {
 		const variations = settings.variations.map( ( variation ) => {
 			return {
 				...variation,
-				...( ! variation.icon &&
-					ICON_MAP[ variation.name ] && {
-						icon: ICON_MAP[ variation.name ],
-					} ),
+				...( ! variation.icon && {
+					icon: getIcon( variation.name ),
+				} ),
 				...( ! variation.isActive && {
 					isActive: ( blockAttributes, variationAttributes ) => {
 						return (
