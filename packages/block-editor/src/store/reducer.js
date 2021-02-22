@@ -822,7 +822,7 @@ export const blocks = flow(
 					( accumulator, id ) => ( {
 						...accumulator,
 						[ id ]: reduce(
-							action.attributes[ id ]
+							action.uniqueByBlock
 								? action.attributes[ id ]
 								: action.attributes,
 							( result, value, key ) => {
@@ -1652,7 +1652,7 @@ export function lastBlockAttributesChange( state, action ) {
 			return action.clientIds.reduce(
 				( accumulator, id ) => ( {
 					...accumulator,
-					[ id ]: action.attributes[ id ]
+					[ id ]: action.uniqueByBlock
 						? action.attributes[ id ]
 						: action.attributes,
 				} ),
