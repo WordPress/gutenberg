@@ -6,11 +6,12 @@ import { text } from '@storybook/addon-knobs';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { pick } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { useInlineEdit } from '../use-inline-edit';
+import useInlineEdit from '../hook';
 
 export default {
 	title: 'Components/EditInPlaceControl',
@@ -21,20 +22,12 @@ function MyCustomEditInPlaceControl( props = {} ) {
 	const { isEdit, amendInputProps, amendToggleProps, value } = useInlineEdit(
 		props
 	);
-
-	const buttonProps = {
-		onClick: ( _value ) =>
-			// eslint-disable-next-line no-console
-			console.log( 'custom handle on click', _value ),
-	};
-	const inputProps = { value };
-
 	return (
 		<>
 			{ isEdit ? (
-				<input { ...amendInputProps( ...inputProps ) } />
+				<input { ...amendInputProps( { value } ) } />
 			) : (
-				<button { ...amendToggleProps( ...buttonProps ) }>
+				<button { ...amendToggleProps( pick( props, 'onClick' ) ) }>
 					{ value }
 				</button>
 			) }
@@ -43,27 +36,27 @@ function MyCustomEditInPlaceControl( props = {} ) {
 }
 
 export const _default = () => {
-	const validate = ( _value ) => _value.length > 0;
+	const validate = ( _value = '' ) => _value.length > 0;
 	const initialValue = text( 'Initial value', 'Input initial value' );
 	const [ onClickCallbacks, setOnClickCallbacks ] = useState( 0 );
-	const [ onChangeCallbacks, setOnChangeCallbacks ] = useState( 0 );
+	const [ ocCommitCallbacks, setOnCommitCallbacks ] = useState( 0 );
 	const [ value, setValue ] = useState( initialValue );
 	const [ isInputValid, setIsInputValid ] = useState( true );
 
 	const incrementOnClickCallbacks = () =>
 		setOnClickCallbacks( 1 + onClickCallbacks );
 
-	const incrementOnChangeCallbacks = () =>
-		setOnChangeCallbacks( 1 + onChangeCallbacks );
+	const incrementOnCommitCallbacks = () =>
+		setOnCommitCallbacks( 1 + ocCommitCallbacks );
 
 	const props = {
 		value,
 		validate,
 		onClick: incrementOnClickCallbacks,
 		inputValidator: validate,
-		onChange: ( _value ) => (
+		onCommit: ( _value ) => (
 			setValue( _value ),
-			incrementOnChangeCallbacks( _value ),
+			incrementOnCommitCallbacks(),
 			setIsInputValid( true )
 		),
 		onWrongInput: () => setIsInputValid( false ),
@@ -74,10 +67,9 @@ export const _default = () => {
 			<MyCustomEditInPlaceControl { ...props } />
 			<ul>
 				<li> onClick callbacks: { onClickCallbacks } </li>
-				<li> onChange callback: { onChangeCallbacks } </li>
-				<li> value: { onChangeCallbacks } </li>
+				<li> onCommit callback: { ocCommitCallbacks } </li>
 				<li> inputValidator: is defined </li>
-				<li> is input valid: { isInputValid + '' } </li>
+				<li> is commited input valid: { isInputValid + '' } </li>
 			</ul>
 		</>
 	);

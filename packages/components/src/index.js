@@ -77,7 +77,6 @@ export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as __experimentalInputControl } from './input-control';
-export { default as __experimentalEditInPlaceControl } from './edit-in-place-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -165,3 +164,5 @@ export {
 	__unstableWithNext,
 	__unstableComponentSystemProvider,
 } from './__next/context';
+
+export { useInlineEdit } from './inline-edit';

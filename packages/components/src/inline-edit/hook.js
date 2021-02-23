@@ -1,33 +1,37 @@
 /**
  * External dependencies
  */
-import { isUndefined, negate, noop } from 'lodash';
+import { isUndefined, negate, noop, flow } from 'lodash';
 /**
  * WordPress dependencies
  */
 import { useEffect, useState, useRef } from '@wordpress/element';
 
 const cancelEvent = ( event ) => (
-	event.preventDefault(), event.stopPropagation()
+	event.preventDefault(), event.stopPropagation(), event
 );
 
+const getEventValue = ( { target: { value } } ) => value;
 const mergeEvent = ( ...handlers ) => ( event ) =>
 	handlers.forEach( ( handler = noop ) => handler( event ) );
 
-export function useInlineEdit( {
+export default function useInlineEdit({
 	validate = negate( isUndefined ),
 	onWrongInput = noop,
-	onChange: onInputChange = noop,
+	onCommit = noop,
 	value: propValue,
 } ) {
 	const [ isInEditMode, setIsInEditMode ] = useState( false );
 	const [ editingValue, setEditingValue ] = useState( propValue );
 	const inputRef = useRef();
 	const toggleRef = useRef();
+	const isInvalid = negate( validate );
+	const changeToEditMode = () => setIsInEditMode( true );
+	const changeToToggleMode = () => setIsInEditMode( false );
 
 	useEffect( () => {
 		setEditingValue( propValue );
-		if ( ! validate( value ) ) onWrongInput( value );
+		if ( isInvalid( value ) ) onWrongInput( value );
 	}, [ propValue ] );
 
 	useEffect( () => {
@@ -40,32 +44,30 @@ export function useInlineEdit( {
 		}
 	}, [ isInEditMode ] );
 
-	const handleOnCommit = ( event ) => {
+	const commit = ( event ) => {
 		const { value } = event.target;
 		cancelEvent( event );
 		if ( validate( value ) ) {
-			setIsInEditMode( false );
-			onInputChange( value );
+			changeToToggleMode();
+			onCommit( value );
 		} else {
 			onWrongInput( value );
 		}
 	};
 
-	const handleOnChange = ( event ) => {
-		setEditingValue( event.target.value );
-	};
-
-	const handleOnKeyDown = ( event ) => {
+	const handleInputActions = ( event ) => {
 		if ( 'Enter' === event.key ) {
-			handleOnCommit( event );
+			commit( event );
 		}
 		if ( 'Escape' === event.key ) {
 			cancelEvent( event );
 			event.target.blur();
+			changeToToggleMode();
+		} else {
+			const { value } = event.target;
+			setEditingValue( value );
 		}
 	};
-
-	const handleOnClick = () => setIsInEditMode( true );
 
 	const amendInputProps = ( {
 		onChange,
@@ -74,19 +76,22 @@ export function useInlineEdit( {
 		...inputProps
 	} = {} ) => ( {
 		ref: inputRef,
-		onChange: mergeEvent( handleOnChange, onChange ),
-		onKeyDown: mergeEvent( handleOnKeyDown, onKeyDown ),
-		onBlur: mergeEvent( handleOnCommit, onBlur ),
+		onChange: mergeEvent(
+			flow( [ getEventValue, setEditingValue ] ),
+			onChange
+		),
+		onKeyDown: mergeEvent( handleInputActions, onKeyDown ),
+		onBlur: mergeEvent( commit, onBlur ),
 		...inputProps,
 	} );
 
 	const amendToggleProps = ( { onClick, ...toggleProps } = {} ) => ( {
 		ref: toggleRef,
-		onClick: mergeEvent( handleOnClick, onClick ),
+		onClick: mergeEvent( changeToEditMode, onClick ),
 		...toggleProps,
 	} );
 
-	const value = isInEditMode ? editingValue : value;
+	const value = isInEditMode ? editingValue : propValue;
 
 	return {
 		isEdit: isInEditMode,
