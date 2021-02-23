@@ -1,39 +1,62 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PostSchedule as PostScheduleForm,
-	PostScheduleLabel,
 	PostScheduleCheck,
+	PostScheduleLabel,
 } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
-export function PostSchedule() {
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+const PANEL_NAME = 'schedule';
+
+export default function PostSchedule() {
+	const { isOpened, isRemoved } = useSelect( ( select ) => {
+		// We use isEditorPanelRemoved to hide the panel if it was
+		// programatically removed. We don't use isEditorPanelEnabled since
+		// this panel should not be disabled through the UI.
+		const { isEditorPanelRemoved, isEditorPanelOpened } = select(
+			editPostStore
+		);
+
+		return {
+			isOpened: isEditorPanelOpened( PANEL_NAME ),
+			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
+		};
+	}, [] );
+
+	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+
+	if ( isRemoved ) {
+		return null;
+	}
+
 	return (
 		<PostScheduleCheck>
-			<PanelRow className="edit-post-post-schedule">
-				<span>{ __( 'Publish' ) }</span>
-				<Dropdown
-					position="bottom left"
-					contentClassName="edit-post-post-schedule__dialog"
-					renderToggle={ ( { onToggle, isOpen } ) => (
-						<>
-							<Button
-								className="edit-post-post-schedule__toggle"
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								isTertiary
-							>
-								<PostScheduleLabel />
-							</Button>
-						</>
-					) }
-					renderContent={ () => <PostScheduleForm /> }
-				/>
-			</PanelRow>
+			<PanelBody
+				initialOpen={ false }
+				opened={ isOpened }
+				onToggle={ () => {
+					toggleEditorPanelOpened( PANEL_NAME );
+				} }
+				title={
+					<>
+						{ __( 'Publish date:' ) }
+						<span className="editor-post-publish-panel__link">
+							<PostScheduleLabel />
+						</span>
+					</>
+				}
+			>
+				<PostScheduleForm />
+			</PanelBody>
 		</PostScheduleCheck>
 	);
 }
-
-export default PostSchedule;

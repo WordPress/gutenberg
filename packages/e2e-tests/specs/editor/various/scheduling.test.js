@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, changeSiteTimezone } from '@wordpress/e2e-test-utils';
+import {
+	changeSiteTimezone,
+	createNewPost,
+	openSidebarPanel,
+} from '@wordpress/e2e-test-utils';
 
 async function getPublishButtonText() {
 	return page.$eval(
@@ -55,8 +59,7 @@ describe( 'Scheduling', () => {
 
 	it( 'Should keep date time UI focused when the previous and next month buttons are clicked', async () => {
 		await createNewPost();
-
-		await page.click( '.edit-post-post-schedule__toggle' );
+		await openSidebarPanel( 'Publish date:' );
 		await page.click(
 			'div[aria-label="Move backward to switch to the previous month."]'
 		);

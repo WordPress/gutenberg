@@ -480,6 +480,14 @@ _Returns_
 
 Opens the publish panel.
 
+<a name="openSidebarPanel" href="#openSidebarPanel">#</a> **openSidebarPanel**
+
+Opens a sidebar panel with the provided title.
+
+_Parameters_
+
+-   _panelTitle_ `string`: The name of sidebar panel.
+
 <a name="pressKeyTimes" href="#pressKeyTimes">#</a> **pressKeyTimes**
 
 Presses the given keyboard key a number of times in sequence.

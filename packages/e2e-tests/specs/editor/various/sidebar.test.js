@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import {
+	activatePlugin,
 	clearLocalStorage,
 	createNewPost,
+	deactivatePlugin,
 	findSidebarPanelWithTitle,
 	enableFocusLossObservation,
 	disableFocusLossObservation,
@@ -120,10 +122,22 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
+		await activatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+
 		await createNewPost();
 		await enableFocusLossObservation();
 		await openDocumentSettingsSidebar();
 
+		expect( await findSidebarPanelWithTitle( 'Status' ) ).toBeDefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Visibility:' )
+		).toBeDefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Publish date:' )
+		).toBeDefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Post Format' )
+		).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeDefined();
 		expect(
@@ -131,25 +145,37 @@ describe( 'Sidebar', () => {
 		).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
-		expect(
-			await findSidebarPanelWithTitle( 'Status & visibility' )
-		).toBeDefined();
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 
+			removeEditorPanel( 'post-status' );
+			removeEditorPanel( 'visibility' );
+			removeEditorPanel( 'schedule' );
+			removeEditorPanel( 'post-format' );
 			removeEditorPanel( 'taxonomy-panel-category' );
 			removeEditorPanel( 'taxonomy-panel-post_tag' );
 			removeEditorPanel( 'featured-image' );
 			removeEditorPanel( 'post-excerpt' );
 			removeEditorPanel( 'discussion-panel' );
-			removeEditorPanel( 'post-status' );
 		} );
 
 		const getPanelToggleSelector = ( panelTitle ) => {
 			return `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"${ panelTitle }")]`;
 		};
 
+		expect( await page.$x( getPanelToggleSelector( 'Status' ) ) ).toEqual(
+			[]
+		);
+		expect(
+			await page.$x( getPanelToggleSelector( 'Visibility:' ) )
+		).toEqual( [] );
+		expect(
+			await page.$x( getPanelToggleSelector( 'Publish date:' ) )
+		).toEqual( [] );
+		expect(
+			await page.$x( getPanelToggleSelector( 'Post Format' ) )
+		).toEqual( [] );
 		expect(
 			await page.$x( getPanelToggleSelector( 'Categories' ) )
 		).toEqual( [] );
@@ -165,8 +191,7 @@ describe( 'Sidebar', () => {
 		expect(
 			await page.$x( getPanelToggleSelector( 'Discussion' ) )
 		).toEqual( [] );
-		expect(
-			await page.$x( getPanelToggleSelector( 'Status & visibility' ) )
-		).toEqual( [] );
+
+		await deactivatePlugin( 'gutenberg-test-plugin-post-formats-support' );
 	} );
 } );

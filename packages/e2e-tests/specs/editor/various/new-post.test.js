@@ -5,6 +5,7 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
+	openSidebarPanel,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'new editor state', () => {
@@ -34,6 +35,8 @@ describe( 'new editor state', () => {
 		);
 		expect( postPreviewButton ).not.toBeNull();
 		// Should display the Post Formats UI.
+		await openSidebarPanel( 'Post Format' );
+		await page.waitForSelector( '.editor-post-format' );
 		const postFormatsUi = await page.$( '.editor-post-format' );
 		expect( postFormatsUi ).not.toBeNull();
 	} );
