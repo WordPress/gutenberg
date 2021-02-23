@@ -288,21 +288,6 @@ export function ImageEdit( {
 		className: classes,
 	} );
 
-	const image = url && (
-		<Image
-			attributes={ attributes }
-			setAttributes={ setAttributes }
-			isSelected={ isSelected }
-			insertBlocksAfter={ insertBlocksAfter }
-			onReplace={ onReplace }
-			onSelectImage={ onSelectImage }
-			onSelectURL={ onSelectURL }
-			onUploadError={ onUploadError }
-			containerRef={ ref }
-			context={ context }
-		/>
-	);
-
 	return (
 		<figure { ...blockProps }>
 			{ url && (
@@ -316,6 +301,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					context={ context }
 				/>
 			) }
 			{ ! url && (
