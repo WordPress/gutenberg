@@ -18,10 +18,10 @@ const EMPTY_OBJECT = {};
 const ExportedServerSideRender = withSelect( ( select ) => {
 	const coreEditorSelect = select( 'core/editor' );
 	if ( coreEditorSelect ) {
-		const currentPostId = coreEditorSelect.getCurrentPostId();
-		if ( currentPostId ) {
+		const currentPost = coreEditorSelect.getCurrentPost();
+		if ( currentPost ) {
 			return {
-				currentPostId,
+				currentPostId: currentPost.wp_id || currentPost.id,
 			};
 		}
 	}
