@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 10.0.2 =
+
+### Bug Fixes
+
+- Fix white screen on RTL languages. ([29256](https://github.com/WordPress/gutenberg/pull/29256))
+- Fix Button block borders for the solid style variation.
+
+
 = 10.0.1 =
 
 ### Bug Fixes
