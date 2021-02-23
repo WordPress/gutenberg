@@ -17,12 +17,8 @@ import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
-
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
+import { store as blockEditorStore } from '../../store';
+import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
@@ -31,6 +27,7 @@ export default function BlockList( { className } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
+	useScrollSelectionIntoView( ref );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
@@ -66,10 +63,8 @@ function Items( {
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			getGlobalBlockCount,
-			isTyping,
 			__experimentalGetActiveBlockIdByBlockNames,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		// Determine if there is an active entity area to spotlight.
 		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
@@ -82,9 +77,6 @@ function Items( {
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation:
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			activeEntityBlockId,
 		};
 	}
@@ -95,7 +87,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		orientation,
 		hasMultiSelection,
-		enableAnimation,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
@@ -127,7 +118,6 @@ function Items( {
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
-							enableAnimation={ enableAnimation }
 							className={ classnames( {
 								'is-drop-target': isDropTarget,
 								'is-dropping-horizontally':

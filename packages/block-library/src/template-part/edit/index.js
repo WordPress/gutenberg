@@ -5,18 +5,22 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
+	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
 	Dropdown,
+	PanelBody,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -38,8 +42,10 @@ export default function TemplatePartEdit( {
 	// new edits to trigger this.
 	const { isResolved, innerBlocks, isMissing } = useSelect(
 		( select ) => {
-			const { getEntityRecord, hasFinishedResolution } = select( 'core' );
-			const { getBlocks } = select( 'core/block-editor' );
+			const { getEntityRecord, hasFinishedResolution } = select(
+				coreStore
+			);
+			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -66,7 +72,12 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
-	if ( ! isPlaceholder && isMissing ) {
+	// We don't want to render a missing state if we have any inner blocks.
+	// A new template part is automatically created if we have any inner blocks but no entity.
+	if (
+		innerBlocks.length === 0 &&
+		( ( slug && ! theme ) || ( slug && isMissing ) )
+	) {
 		return (
 			<TagName { ...blockProps }>
 				<Warning>
@@ -80,6 +91,13 @@ export default function TemplatePartEdit( {
 
 	return (
 		<>
+			<InspectorControls>
+				<PanelBody>
+					{ isEntityAvailable && (
+						<TemplatePartNamePanel postId={ templatePartId } />
+					) }
+				</PanelBody>
+			</InspectorControls>
 			<InspectorAdvancedControls>
 				<SelectControl
 					label={ __( 'HTML element' ) }
@@ -108,7 +126,6 @@ export default function TemplatePartEdit( {
 				{ isEntityAvailable && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
-							<TemplatePartNamePanel postId={ templatePartId } />
 							<Dropdown
 								className="wp-block-template-part__preview-dropdown-button"
 								contentClassName="wp-block-template-part__preview-dropdown-content"

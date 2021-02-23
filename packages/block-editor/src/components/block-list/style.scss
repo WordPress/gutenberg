@@ -224,6 +224,10 @@
 		}
 	}
 
+	&.is-outline-mode.is-selected.is-hovered {
+		cursor: unset;
+	}
+
 	// Spotlight mode.
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
@@ -578,6 +582,11 @@
 		min-width: $block-toolbar-height/2;
 		width: $block-toolbar-height/2;
 	}
+}
+
+// Position mover arrows for both toolbars.
+.block-editor-block-contextual-toolbar,
+.edit-post-header-toolbar__block-toolbar {
 
 	.block-editor-block-mover:not(.is-horizontal) {
 		// Position SVGs.

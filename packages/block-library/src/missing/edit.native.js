@@ -16,7 +16,7 @@ import {
 	sendActionButtonPressedAction,
 	actionButtons,
 } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, Icon, TextControl } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -25,6 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -201,13 +202,13 @@ export class UnsupportedBlockEdit extends Component {
 					canEnableUnsupportedBlockEditor ) &&
 					isEditableInUnsupportedBlockEditor && (
 						<>
-							<BottomSheet.Cell
+							<TextControl
 								label={ missingBlockActionButton }
 								separatorType="topFullWidth"
 								onPress={ this.requestFallback }
 								labelStyle={ actionButtonStyle }
 							/>
-							<BottomSheet.Cell
+							<TextControl
 								label={ __( 'Dismiss' ) }
 								separatorType="topFullWidth"
 								onPress={ this.toggleSheet }
@@ -277,7 +278,7 @@ export class UnsupportedBlockEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, { attributes } ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
@@ -290,7 +291,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { selectBlock } = dispatch( blockEditorStore );
 		return {
 			selectBlock() {
 				selectBlock( ownProps.clientId );

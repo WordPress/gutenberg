@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 
-type ResponsiveCSSValue<T> = Array<T | undefined> | T;
+type ResponsiveCSSValue< T > = Array< T | undefined > | T;
 
 type GridAlignment =
 	| 'bottom'

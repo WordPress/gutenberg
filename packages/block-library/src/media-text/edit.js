@@ -9,7 +9,7 @@ import { map, filter } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -28,6 +29,7 @@ import {
 	FocalPointPicker,
 } from '@wordpress/components';
 import { pullLeft, pullRight } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -138,9 +140,18 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	const image = useSelect(
 		( select ) =>
-			mediaId && isSelected ? select( 'core' ).getMedia( mediaId ) : null,
+			mediaId && isSelected
+				? select( coreStore ).getMedia( mediaId )
+				: null,
 		[ isSelected, mediaId ]
 	);
+
+	const refMediaContainer = useRef();
+	const imperativeFocalPointPreview = ( value ) => {
+		const { style } = refMediaContainer.current.resizable;
+		const { x, y } = value;
+		style.backgroundPosition = `${ x * 100 }% ${ y * 100 }%`;
+	};
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
@@ -198,7 +209,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const imageSizes = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return settings?.imageSizes;
 	} );
 	const imageSizeOptions = map(
@@ -250,6 +261,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onChange={ ( value ) =>
 						setAttributes( { focalPoint: value } )
 					}
+					onDragStart={ imperativeFocalPointPreview }
+					onDrag={ imperativeFocalPointPreview }
 				/>
 			) }
 			{ mediaType === 'image' && (
@@ -321,6 +334,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onSelectMedia={ onSelectMedia }
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
+					ref={ refMediaContainer }
 					{ ...{
 						focalPoint,
 						imageFill,

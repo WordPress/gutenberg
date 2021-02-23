@@ -1,23 +1,85 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalNavigationMenu as NavigationMenu } from '@wordpress/components';
+import {
+	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationItem as NavigationItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import NavigationEntityItems from '../navigation-entity-items';
 import { MENU_CONTENT_PAGES, MENU_ROOT } from '../constants';
+import ContentNavigationItem from '../content-navigation-item';
+import SearchResults from '../search-results';
+import useDebouncedSearch from '../use-debounced-search';
 
 export default function ContentPagesMenu() {
+	const {
+		search,
+		searchQuery,
+		onSearch,
+		isDebouncing,
+	} = useDebouncedSearch();
+
+	const { pages, isResolved } = useSelect(
+		( select ) => {
+			const { getEntityRecords, hasFinishedResolution } = select(
+				'core'
+			);
+			const getEntityRecordsArgs = [
+				'postType',
+				'page',
+				{
+					search: searchQuery,
+				},
+			];
+			const hasResolvedPosts = hasFinishedResolution(
+				'getEntityRecords',
+				getEntityRecordsArgs
+			);
+			return {
+				pages: getEntityRecords( ...getEntityRecordsArgs ),
+				isResolved: hasResolvedPosts,
+			};
+		},
+		[ searchQuery ]
+	);
+
+	const shouldShowLoadingForDebouncing = search && isDebouncing;
+	const showLoading = ! isResolved || shouldShowLoadingForDebouncing;
+
 	return (
 		<NavigationMenu
 			menu={ MENU_CONTENT_PAGES }
 			title={ __( 'Pages' ) }
 			parentMenu={ MENU_ROOT }
+			hasSearch={ true }
+			onSearch={ onSearch }
+			search={ search }
+			isSearchDebouncing={ isDebouncing || ! isResolved }
 		>
-			<NavigationEntityItems kind="postType" name="page" />
+			{ search && ! isDebouncing && (
+				<SearchResults
+					items={ pages }
+					search={ search }
+					disableFilter
+				/>
+			) }
+
+			{ ! search &&
+				pages?.map( ( page ) => (
+					<ContentNavigationItem
+						item={ page }
+						key={ `${ page.type }-${ page.id }` }
+					/>
+				) ) }
+
+			{ showLoading && (
+				<NavigationItem title={ __( 'Loading…' ) } isText />
+			) }
 		</NavigationMenu>
 	);
 }

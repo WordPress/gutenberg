@@ -45,6 +45,7 @@ export class MediaUpload extends Component {
 				( option ) => {
 					return {
 						...option,
+						requiresModal: true,
 						types: allowedTypes,
 						id: option.value,
 					};
@@ -60,6 +61,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.deviceCamera, // ID is the value sent to native
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 			label: __( 'Take a Photo' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE ],
 			icon: capturePhoto,
 		};
@@ -68,6 +70,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.deviceCamera,
 			value: mediaSources.deviceCamera,
 			label: __( 'Take a Video' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_VIDEO ],
 			icon: captureVideo,
 		};
@@ -76,6 +79,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.deviceLibrary,
 			value: mediaSources.deviceLibrary,
 			label: __( 'Choose from device' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: image,
 		};
@@ -84,6 +88,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
+			requiresModal: true,
 			types: [
 				MEDIA_TYPE_IMAGE,
 				MEDIA_TYPE_VIDEO,

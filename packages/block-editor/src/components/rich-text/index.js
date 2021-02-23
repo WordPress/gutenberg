@@ -49,6 +49,7 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
+import { store as blockEditorStore } from '../../store';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -169,7 +170,7 @@ function RichTextWrapper(
 			__unstableGetBlockWithoutInnerBlocks,
 			isMultiSelecting,
 			hasMultiSelection,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
@@ -229,7 +230,7 @@ function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -296,6 +297,10 @@ function RichTextWrapper(
 			const hasPastedBlocks = pastedBlocks.length > 0;
 			let lastPastedBlockIndex = -1;
 
+			// Consider the after value to be the original it is not empty and
+			// the before value *is* empty.
+			const isAfterOriginal = isEmpty( before ) && ! isEmpty( after );
+
 			// Create a block with the content before the caret if there's no pasted
 			// blocks, or if there are pasted blocks and the value is not empty.
 			// We do not want a leading empty block on paste, but we do if split
@@ -306,7 +311,8 @@ function RichTextWrapper(
 						toHTMLString( {
 							value: before,
 							multilineTag,
-						} )
+						} ),
+						! isAfterOriginal
 					)
 				);
 				lastPastedBlockIndex += 1;
@@ -333,7 +339,8 @@ function RichTextWrapper(
 						toHTMLString( {
 							value: after,
 							multilineTag,
-						} )
+						} ),
+						isAfterOriginal
 					)
 				);
 			}
@@ -344,7 +351,7 @@ function RichTextWrapper(
 
 			// If there are pasted blocks, move the caret to the end of the selected block
 			// Otherwise, retain the default value.
-			const initialPosition = hasPastedBlocks ? -1 : null;
+			const initialPosition = hasPastedBlocks ? -1 : 0;
 
 			onReplace( blocks, indexToSelect, initialPosition );
 		},

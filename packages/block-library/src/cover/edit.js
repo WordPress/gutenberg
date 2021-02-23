@@ -38,6 +38,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
 	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -235,15 +236,19 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	return isDark;
 }
 
+function mediaPosition( { x, y } ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
+
 function CoverEdit( {
 	attributes,
-	setAttributes,
 	isSelected,
 	noticeUI,
+	noticeOperations,
 	overlayColor,
+	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	noticeOperations,
 } ) {
 	const {
 		contentPosition,
@@ -344,9 +349,8 @@ function CoverEdit( {
 
 	const mediaStyle = {
 		objectPosition:
-			// prettier-ignore
 			focalPoint && isImgElement
-				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100) }%`
+				? mediaPosition( focalPoint )
 				: undefined,
 	};
 
@@ -354,6 +358,13 @@ function CoverEdit( {
 	const showFocalPointPicker =
 		isVideoBackground ||
 		( isImageBackground && ( ! hasParallax || isRepeated ) );
+
+	const imperativeFocalPointPreview = ( value ) => {
+		const [ styleOfRef, property ] = isDarkElement.current
+			? [ isDarkElement.current.style, 'objectPosition' ]
+			: [ blockProps.ref.current.style, 'backgroundPosition' ];
+		styleOfRef[ property ] = mediaPosition( value );
+	};
 
 	const controls = (
 		<>
@@ -405,6 +416,8 @@ function CoverEdit( {
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
 								onChange={ ( newFocalPoint ) =>
 									setAttributes( {
 										focalPoint: newFocalPoint,
@@ -621,7 +634,7 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,

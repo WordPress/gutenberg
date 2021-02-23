@@ -25,6 +25,7 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item.native';
+import { store as blockEditorStore } from '../../store';
 
 const BlockListContext = createContext();
 
@@ -365,8 +366,7 @@ export default compose( [
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
 				getSettings,
-				getBlockHierarchyRootClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			const isStackedHorizontally = orientation === 'horizontal';
 
@@ -381,16 +381,11 @@ export default compose( [
 			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
-			const blockCount = getBlockCount( rootBlockId );
-
-			const rootBlockId = getBlockHierarchyRootClientId(
-				selectedBlockClientId
-			);
+			const blockCount = getBlockCount();
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
-
 			return {
 				blockClientIds,
 				blockCount,
@@ -406,7 +401,7 @@ export default compose( [
 	),
 	withDispatch( ( dispatch ) => {
 		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		return {
@@ -457,7 +452,7 @@ const EmptyListComponentCompose = compose( [
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );

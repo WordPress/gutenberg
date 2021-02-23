@@ -11,6 +11,11 @@ import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
  * A function to call when the block value has been updated in the block-editor
  * store.
  *
@@ -50,10 +55,7 @@ import { cloneBlock } from '@wordpress/blocks';
  *                                is used to initalize the block-editor store
  *                                and for resetting the blocks to incoming
  *                                changes like undo.
- * @param {Object} props.selectionStart The selection start vlaue from the
- *                                controlling component.
- * @param {Object} props.selectionEnd The selection end vlaue from the
- *                                controlling component.
+ * @param {Object} props.selection The selection state responsible to restore the selection on undo/redo.
  * @param {onBlockUpdate} props.onChange Function to call when a persistent
  *                                change has been made in the block-editor blocks
  *                                for the given clientId. For example, after
@@ -67,8 +69,7 @@ import { cloneBlock } from '@wordpress/blocks';
 export default function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
-	selectionStart: controlledSelectionStart,
-	selectionEnd: controlledSelectionEnd,
+	selection: controlledSelection,
 	onChange = noop,
 	onInput = noop,
 } ) {
@@ -80,8 +81,8 @@ export default function useBlockSync( {
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-	} = registry.dispatch( 'core/block-editor' );
-	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
+	} = registry.dispatch( blockEditorStore );
+	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -146,10 +147,11 @@ export default function useBlockSync( {
 			pendingChanges.current.outgoing = [];
 			setControlledBlocks();
 
-			if ( controlledSelectionStart && controlledSelectionEnd ) {
+			if ( controlledSelection ) {
 				resetSelection(
-					controlledSelectionStart,
-					controlledSelectionEnd
+					controlledSelection.selectionStart,
+					controlledSelection.selectionEnd,
+					controlledSelection.initialPosition
 				);
 			}
 		}
@@ -159,9 +161,10 @@ export default function useBlockSync( {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
+			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
-		} = registry.select( 'core/block-editor' );
+		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
 		let isPersistent = isLastBlockChangePersistent();
@@ -218,8 +221,11 @@ export default function useBlockSync( {
 					? onChangeRef.current
 					: onInputRef.current;
 				updateParent( blocks, {
-					selectionStart: getSelectionStart(),
-					selectionEnd: getSelectionEnd(),
+					selection: {
+						selectionStart: getSelectionStart(),
+						selectionEnd: getSelectionEnd(),
+						initialPosition: getSelectedBlocksInitialCaretPosition(),
+					},
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
