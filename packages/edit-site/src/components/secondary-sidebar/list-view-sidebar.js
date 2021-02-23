@@ -6,17 +6,37 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useFocusOnMount } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+
+function useFocusSelectedOnMount() {
+	return useCallback( ( node ) => {
+		if ( ! node || node.contains( node.ownerDocument.activeElement ) ) {
+			return;
+		}
+
+		const foundNode = node.querySelector(
+			'.block-editor-block-navigation-leaf.is-selected'
+		);
+
+		const target = foundNode
+			? focus.tabbable.find( foundNode )[ 0 ]
+			: focus.tabbable.find( node )[ 0 ];
+
+		if ( target ) {
+			target.focus();
+		}
+	}, [] );
+}
 
 export default function ListViewSidebar() {
 	const { isListViewOpen, rootBlocks, selectedBlockClientId } = useSelect(
@@ -34,7 +54,7 @@ export default function ListViewSidebar() {
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusSelectedOnMountRef = useFocusSelectedOnMount();
 
 	useShortcut(
 		'core/edit-site/toggle-list-view',
@@ -64,7 +84,7 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
-				ref={ focusOnMountRef }
+				ref={ focusSelectedOnMountRef }
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
