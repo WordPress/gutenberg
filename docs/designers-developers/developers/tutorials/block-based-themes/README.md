@@ -172,7 +172,8 @@ Inside the block-templates folder, create an `index.html` file.
 
 In `index.html`, include the template parts by adding two HTML comments.
 
-The HTML comments starts with `wp:template-part` which is the name of the template-part block type. Inside the curly brackets there is key and its values: The "slug" is the key and the slug of the template part e.g. "header", or "footer" is its value.
+The HTML comments starts with `wp:template-part` which is the name of the template-part block type. The curly braces `{}` have key value pairs.
+In the below example, the "slug" is the key and "header", or "footer" is the value of the slug.
 
 ```
 <!-- wp:template-part {"slug":"header"} /-->
