@@ -93,9 +93,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.6.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check() {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
@@ -132,9 +133,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.6.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_item_permissions_check() {
+	public function get_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
@@ -162,9 +164,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.6.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function create_item_permissions_check() {
+	public function create_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
@@ -203,9 +206,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.6.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function update_item_permissions_check() {
+	public function update_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
@@ -252,9 +256,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.6.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function delete_item_permissions_check() {
+	public function delete_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
