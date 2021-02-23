@@ -4,6 +4,7 @@
 import {
 	FlatList,
 	View,
+	TouchableHighlight,
 	TouchableWithoutFeedback,
 	Dimensions,
 } from 'react-native';
@@ -12,11 +13,7 @@ import {
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	InserterButton,
-} from '@wordpress/components';
+import { BottomSheet, InserterButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -25,7 +22,12 @@ import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
 
-function InserterSearchResults( { items, onSelect } ) {
+function InserterSearchResults( {
+	items,
+	onSelect,
+	listProps,
+	safeAreaBottomInset,
+} ) {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
@@ -72,44 +74,40 @@ function InserterSearchResults( { items, onSelect } ) {
 	}
 
 	return (
-		<BottomSheetConsumer>
-			{ ( { listProps, safeAreaBottomInset } ) => {
-				return (
-					<FlatList
-						onLayout={ onLayout }
-						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-						keyboardShouldPersistTaps="always"
-						numColumns={ numberOfColumns }
-						data={ items }
-						ItemSeparatorComponent={ () => (
-							<TouchableWithoutFeedback accessible={ false }>
-								<View style={ styles.rowSeparator } />
-							</TouchableWithoutFeedback>
-						) }
-						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) => (
-							<InserterButton
-								{ ...{
-									item,
-									itemWidth,
-									maxWidth,
-									onSelect,
-								} }
-							/>
-						) }
-						{ ...listProps }
-						contentContainerStyle={ [
-							...listProps.contentContainerStyle,
-							{
-								paddingBottom:
-									safeAreaBottomInset ||
-									styles.list.paddingBottom,
-							},
-						] }
+		<TouchableHighlight accessible={ false }>
+			<FlatList
+				onLayout={ onLayout }
+				key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+				keyboardShouldPersistTaps="always"
+				numColumns={ numberOfColumns }
+				data={ items }
+				initialNumToRender={ 3 }
+				ItemSeparatorComponent={ () => (
+					<TouchableWithoutFeedback accessible={ false }>
+						<View style={ styles.rowSeparator } />
+					</TouchableWithoutFeedback>
+				) }
+				keyExtractor={ ( item ) => item.name }
+				renderItem={ ( { item } ) => (
+					<InserterButton
+						{ ...{
+							item,
+							itemWidth,
+							maxWidth,
+							onSelect,
+						} }
 					/>
-				);
-			} }
-		</BottomSheetConsumer>
+				) }
+				{ ...listProps }
+				contentContainerStyle={ [
+					...listProps.contentContainerStyle,
+					{
+						paddingBottom:
+							safeAreaBottomInset || styles.list.paddingBottom,
+					},
+				] }
+			/>
+		</TouchableHighlight>
 	);
 }
 

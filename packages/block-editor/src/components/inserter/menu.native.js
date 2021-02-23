@@ -12,7 +12,11 @@ import {
 	rawHandler,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { BottomSheet, getClipboard } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	getClipboard,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -80,7 +84,8 @@ function InserterMenu( {
 
 	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
 
-	// Show/Hide insertion point on Mount/Dismount
+	useEffect( () => {
+		// Show/Hide insertion point on Mount/Dismount
 	useEffect( () => {
 		if ( shouldReplaceBlock ) {
 			const count = getBlockCount();
@@ -172,10 +177,11 @@ function InserterMenu( {
 			hideHeader
 			hasNavigation
 		>
-			<TouchableHighlight accessible={ false }>
-				<View>
-					{
-						// eslint-disable-next-line no-undef
+			<BottomSheetConsumer>
+				{ ( { listProps, safeAreaBottomInset } ) => (
+					<View>
+						{
+							// eslint-disable-next-line no-undef
 						__DEV__ && (
 							<View>
 								<InserterSearchForm
@@ -187,16 +193,21 @@ function InserterMenu( {
 							</View>
 						)
 					}
-					<InserterSearchResults
+						<InserterSearchResults
 						onClose={ onClose }
-						items={ getItems() }
-						onSelect={ ( item ) => {
-							onInsert( item );
-							onSelect( item );
-						} }
-					/>
-				</View>
-			</TouchableHighlight>
+							items={ getItems() }
+							onSelect={ ( item ) => {
+								onInsert( item );
+								onSelect( item );
+							} }
+							{ ...{
+								listProps,
+								safeAreaBottomInset,
+							} }
+						/>
+					</View>
+				) }
+			</BottomSheetConsumer>
 		</BottomSheet>
 	);
 }
