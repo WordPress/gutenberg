@@ -18,10 +18,16 @@ const { types: babelTypes } = require( '@babel/core' );
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 	const params = typeAnnotation.parameters
 		.map(
-			( p ) => `${ p.name }: ${ getTypeAnnotation( p.typeAnnotation ) }`
+			( p ) =>
+				`${ p.name }: ${ getTypeAnnotation(
+					p.typeAnnotation.typeAnnotation
+				) }`
 		)
 		.join( ', ' );
-	const returnType = getTypeAnnotation( typeAnnotation.returnType );
+	const returnType = getTypeAnnotation(
+		typeAnnotation.returnType ||
+			typeAnnotation.typeAnnotation.typeAnnotation
+	);
 	return `( ${ params } )${ returnIndicator }${ returnType }`;
 }
 
@@ -38,7 +44,7 @@ function getTypeLiteralCallSignatureDeclarationTypeAnnotations(
 		} );
 
 	if ( callProperties.length ) {
-		return `${ callProperties.join( '; ' ) } `;
+		return `${ callProperties.join( '; ' ) }; `;
 	}
 	return '';
 }
@@ -48,16 +54,18 @@ function getTypeLiteralCallSignatureDeclarationTypeAnnotations(
  */
 function getTypeLiteralIndexSignatureTypeAnnotations( typeAnnotation ) {
 	const indexers = typeAnnotation.members
-		.map( ( m ) => babelTypes.isTSIndexSignature( m ) )
+		.filter( ( m ) => babelTypes.isTSIndexSignature( m ) )
 		.map( ( indexer ) => {
 			const parameter = indexer.parameters[ 0 ];
 			return `[ ${ parameter.name }: ${ getTypeAnnotation(
-				parameter.typeAnnotation
-			) } ]: ${ getTypeAnnotation( indexer.typeAnnotation ) }`;
+				parameter.typeAnnotation.typeAnnotation
+			) } ]: ${ getTypeAnnotation(
+				indexer.typeAnnotation.typeAnnotation
+			) }`;
 		} );
 
 	if ( indexers.length ) {
-		return `${ indexers.join( '; ' ) } `;
+		return `${ indexers.join( '; ' ) }; `;
 	}
 	return '';
 }
@@ -69,13 +77,13 @@ function getTypeLiteralPropertyTypeAnnotations( typeAnnotation ) {
 	const properties = typeAnnotation.members
 		.filter( ( m ) => babelTypes.isTSPropertySignature( m ) )
 		.map( ( prop ) => {
-			return `${ prop.key.name }: ${ getTypeAnnotation(
-				prop.typeAnnotation
-			) }`;
+			return `${ prop.key.name }${
+				prop.optional ? '?' : ''
+			}: ${ getTypeAnnotation( prop.typeAnnotation.typeAnnotation ) }`;
 		} );
 
 	if ( properties.length ) {
-		return `${ properties.join( '; ' ) } `;
+		return `${ properties.join( '; ' ) }; `;
 	}
 	return '';
 }
@@ -92,7 +100,7 @@ function getTypeLiteralTypeAnnotation( typeAnnotation ) {
 	);
 	const properties = getTypeLiteralPropertyTypeAnnotations( typeAnnotation );
 
-	return `{ ${ callProperties }${ indexers }${ properties }}`;
+	return `{ ${ callProperties }${ properties }${ indexers }}`;
 }
 
 /**
@@ -114,7 +122,7 @@ function getIntersectionTypeAnnotation( typeAnnotation ) {
  * @return {string} The type annotation
  */
 function getArrayTypeAnnotation( typeAnnotation ) {
-	return `${ getTypeAnnotation( typeAnnotation ) }[]`;
+	return `${ getTypeAnnotation( typeAnnotation.elementType ) }[]`;
 }
 
 /**
@@ -188,7 +196,7 @@ function getLiteralTypeAnnotation( typeAnnotation ) {
 		}
 		case 'NumericLiteral':
 		case 'BooleanLiteral': {
-			return typeAnnotation.literal.value;
+			return typeAnnotation.literal.value.toString();
 		}
 		case 'StringLiteral': {
 			return `'${ typeAnnotation.literal.value }'`;
@@ -411,10 +419,22 @@ module.exports =
 
 		switch ( tag.tag ) {
 			case 'param': {
-				return getParamTypeAnnotation( tag, token );
+				try {
+					return getParamTypeAnnotation( tag, token );
+				} catch ( e ) {
+					throw new Error(
+						`Could not find param type for "${ tag.description }"`
+					);
+				}
 			}
 			case 'return': {
-				return getReturnTypeAnnotation( token );
+				try {
+					return getReturnTypeAnnotation( token );
+				} catch ( e ) {
+					throw new Error(
+						`Could not find return type for "${ tag.name } ${ tag.description }"`
+					);
+				}
 			}
 			default: {
 				return '';
