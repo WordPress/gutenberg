@@ -3,8 +3,13 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 const AREA_OPTIONS = [
 	{ label: __( 'Header' ), value: 'header' },
@@ -16,7 +21,7 @@ const AREA_OPTIONS = [
 ];
 
 export function TemplatePartAdvancedControls( {
-	TagName,
+	tagName,
 	setAttributes,
 	isEntityAvailable,
 	templatePartId,
@@ -60,7 +65,14 @@ export function TemplatePartAdvancedControls( {
 			<SelectControl
 				label={ __( 'HTML element' ) }
 				options={ [
-					{ label: __( 'Default (<div>)' ), value: 'div' },
+					{
+						label: sprintf(
+							/* translators: %s: HTML tag based on area. */
+							__( 'Default based on area (%s)' ),
+							`<${ getTagBasedOnArea( area ) }>`
+						),
+						value: '',
+					},
 					{ label: '<header>', value: 'header' },
 					{ label: '<main>', value: 'main' },
 					{ label: '<section>', value: 'section' },
@@ -68,7 +80,7 @@ export function TemplatePartAdvancedControls( {
 					{ label: '<aside>', value: 'aside' },
 					{ label: '<footer>', value: 'footer' },
 				] }
-				value={ TagName }
+				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
 		</InspectorAdvancedControls>
