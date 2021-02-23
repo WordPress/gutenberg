@@ -198,6 +198,7 @@
 .block-editor-link-control__link {
 	display: flex;
 	align-items: center;
+	flex-direction: row-reverse;
 }
 
 .block-editor-link-control__link-current-url {

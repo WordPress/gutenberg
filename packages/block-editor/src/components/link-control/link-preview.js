@@ -29,21 +29,21 @@ export default function LinkPreview( { value, onEditClick } ) {
 			} ) }
 		>
 			<Button
-				target="_blank"
-				label={ __( 'Visit URL in new tab' ) }
-				className="block-editor-link-control__link-current-url"
-				href={ value.url }
-			>
-				<span>{ displayURL }</span>
-			</Button>
-
-			<Button
 				isPrimary
 				label={ __( 'Edit link URL' ) }
 				onClick={ () => onEditClick() }
 				className="block-editor-link-control__link-edit"
 			>
 				{ __( 'Edit' ) }
+			</Button>
+
+			<Button
+				target="_blank"
+				label={ __( 'Visit URL in new tab' ) }
+				className="block-editor-link-control__link-current-url"
+				href={ value.url }
+			>
+				<span>{ displayURL }</span>
 			</Button>
 
 			<ViewerSlot fillProps={ value } />
