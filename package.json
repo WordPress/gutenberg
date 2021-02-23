@@ -79,7 +79,8 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"create-emotion": "11.0.0"
 	},
 	"devDependencies": {
 		"@actions/core": "1.2.6",
