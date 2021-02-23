@@ -30,8 +30,17 @@ import { buttonWithIcon, toggleLabel } from './icons';
 import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
 import richTextStyles from './rich-text.scss';
-import { isPercentageUnit, CSS_UNITS } from './utils.js';
+import {
+	isPercentageUnit,
+	CSS_UNITS,
+	MIN_WIDTH,
+	PC_WIDTH_DEFAULT,
+	PX_WIDTH_DEFAULT,
+} from './utils.js';
 
+/**
+ * Constants
+ */
 const MIN_BUTTON_WIDTH = 100;
 
 export default function SearchEdit( { attributes, setAttributes, className } ) {
@@ -62,6 +71,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 	const onChangeUnit = ( nextUnit ) => {
 		setAttributes( {
+			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
 			widthUnit: nextUnit,
 		} );
 	};
@@ -136,7 +146,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 				<PanelBody title={ __( 'Search Settings' ) }>
 					<UnitControl
 						label={ __( 'Width' ) }
-						min={ 1 }
+						min={ widthUnit === '%' ? 1 : MIN_WIDTH }
 						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
 						decimalNum={ 1 }
 						units={ CSS_UNITS }
