@@ -40,6 +40,10 @@ function getTemplateLocation( template ) {
 		return MENU_TEMPLATES;
 	}
 
+	if ( slug === 'page-home' ) {
+		return MENU_TEMPLATES_GENERAL;
+	}
+
 	if (
 		slug.startsWith( 'post-' ) ||
 		slug.startsWith( 'author-' ) ||
