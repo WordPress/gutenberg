@@ -33,18 +33,18 @@ describe( 'omitNonSerializableKeys', () => {
 	it( 'should return the same style if no keys are skipped from serialization', () => {
 		const style = {
 			color: { text: 'red' },
-			lineHeigh: 2,
+			lineHeight: 2,
 		};
 		expect( omitNonSerializableKeys( style, {} ) ).toEqual( {
 			color: { text: 'red' },
-			lineHeigh: 2,
+			lineHeight: 2,
 		} );
 	} );
 
 	it( 'should omit the color key if it is skipped for serialization', () => {
 		const style = {
 			color: { text: 'red' },
-			lineHeigh: 2,
+			lineHeight: 2,
 		};
 		const blockSupports = {
 			color: {
@@ -52,7 +52,7 @@ describe( 'omitNonSerializableKeys', () => {
 			},
 		};
 		expect( omitNonSerializableKeys( style, blockSupports ) ).toEqual( {
-			lineHeigh: 2,
+			lineHeight: 2,
 		} );
 	} );
 } );
