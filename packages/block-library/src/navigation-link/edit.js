@@ -424,7 +424,8 @@ export default function NavigationLinkEdit( {
 						<div className="wp-block-navigation-link__placeholder-text">
 							<KeyboardShortcuts
 								shortcuts={ {
-									enter: () => isSelected && setIsLinkOpen( true ),
+									enter: () =>
+										isSelected && setIsLinkOpen( true ),
 								} }
 							/>
 							{ missingText }
