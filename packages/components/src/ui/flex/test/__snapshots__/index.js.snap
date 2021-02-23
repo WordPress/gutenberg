@@ -1,29 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render + wrap non Flex children 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -7,14 +7,10 @@
-      class=\\"components-flex-item wp-components-flex-item css-uyw6h0\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"FlexItem\\"
+      class="components-flex-item wp-components-flex-item css-uyw6h0"
+      data-g2-c16t="true"
+      data-g2-component="FlexItem"
     />
     <div
--     class=\\"css-1nqjm19\\"
+-     class="css-1nqjm19"
 -   />
 -   <div />
 -   <div
-      class=\\"components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block css-2e3tg1\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"FlexBlock\\"
+      class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block css-2e3tg1"
+      data-g2-c16t="true"
+      data-g2-component="FlexBlock"
     />
-  </div>"
+  </div>
 `;
 
 exports[`props should render align 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
@@ -32,18 +32,18 @@ exports[`props should render align 1`] = `
 - + Second value
 -
 - @@ -7,11 +7,11 @@
--   	\\"margin-top\\": \\"0px\\",
--   	\\"margin-right\\": \\"0px\\",
--   	\\"margin-bottom\\": \\"0px\\",
--   	\\"margin-left\\": \\"0px\\",
--   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
-- - 	\\"align-items\\": \\"flex-start\\",
-- + 	\\"align-items\\": \\"center\\",
--   	\\"flex-direction\\": \\"row\\",
--   	\\"justify-content\\": \\"space-between\\",
--   	\\"width\\": \\"100%\\",
--   	\\"visibility\\": \\"visible\\"
--   }"
+-   	"margin-top": "0px",
+-   	"margin-right": "0px",
+-   	"margin-bottom": "0px",
+-   	"margin-left": "0px",
+-   	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+- - 	"align-items": "flex-start",
+- + 	"align-items": "center",
+-   	"flex-direction": "row",
+-   	"justify-content": "space-between",
+-   	"width": "100%",
+-   	"visibility": "visible"
+-   }
 `;
 
 exports[`props should render correctly 1`] = `
@@ -183,7 +183,7 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render justify 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
@@ -192,20 +192,20 @@ exports[`props should render justify 1`] = `
 - + Second value
 -
 - @@ -9,9 +9,9 @@
--   	\\"margin-bottom\\": \\"0px\\",
--   	\\"margin-left\\": \\"0px\\",
--   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--   	\\"align-items\\": \\"center\\",
--   	\\"flex-direction\\": \\"row\\",
-- - 	\\"justify-content\\": \\"flex-start\\",
-- + 	\\"justify-content\\": \\"space-between\\",
--   	\\"width\\": \\"100%\\",
--   	\\"visibility\\": \\"visible\\"
--   }"
+-   	"margin-bottom": "0px",
+-   	"margin-left": "0px",
+-   	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+-   	"align-items": "center",
+-   	"flex-direction": "row",
+- - 	"justify-content": "flex-start",
+- + 	"justify-content": "space-between",
+-   	"width": "100%",
+-   	"visibility": "visible"
+-   }
 `;
 
 exports[`props should render spacing 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
@@ -214,16 +214,16 @@ exports[`props should render spacing 1`] = `
 - + Second value
 -
 - @@ -6,11 +6,11 @@
--   	\\"margin\\": \\"0px\\",
--   	\\"margin-top\\": \\"0px\\",
--   	\\"margin-right\\": \\"0px\\",
--   	\\"margin-bottom\\": \\"0px\\",
--   	\\"margin-left\\": \\"0px\\",
-- - 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
-- + 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--   	\\"align-items\\": \\"center\\",
--   	\\"flex-direction\\": \\"row\\",
--   	\\"justify-content\\": \\"space-between\\",
--   	\\"width\\": \\"100%\\",
--   	\\"visibility\\": \\"visible\\""
+-   	"margin": "0px",
+-   	"margin-top": "0px",
+-   	"margin-right": "0px",
+-   	"margin-bottom": "0px",
+-   	"margin-left": "0px",
+- - 	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 5)",
+- + 	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+-   	"align-items": "center",
+-   	"flex-direction": "row",
+-   	"justify-content": "space-between",
+-   	"width": "100%",
+-   	"visibility": "visible"
 `;
