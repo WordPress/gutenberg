@@ -11,6 +11,7 @@ import {
 	__experimentalToolbarContext as ToolbarContext,
 	createSlotFill,
 	ToolbarGroup,
+	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
 
 /**
@@ -18,17 +19,61 @@ import {
  */
 import useDisplayBlockControls from '../use-display-block-controls';
 
-const { Fill, Slot } = createSlotFill( 'BlockControls' );
+const BlockControlsDefault = createSlotFill( 'BlockControls' );
+const BlockControlsBlock = createSlotFill( 'BlockFormatControlsBlock' );
+const BlockControlsInline = createSlotFill( 'BlockFormatControls' );
+const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
 
-function BlockControlsSlot( props ) {
+const segments = {
+	default: BlockControlsDefault,
+	block: BlockControlsBlock,
+	inline: BlockControlsInline,
+	other: BlockControlsOther,
+};
+
+const slotNames = {
+	default: 'BlockControls',
+	block: 'BlockFormatControlsBlock',
+	inline: 'BlockFormatControls',
+	other: 'BlockControlsOther',
+};
+
+function BlockControlsSlot( { segment = 'default', ...props } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	return <Slot { ...props } fillProps={ accessibleToolbarState } />;
+	const Slot = segments[ segment ].Slot;
+	const slot = useSlot( slotNames[ segment ] );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return null;
+	}
+
+	if ( segment === 'default' ) {
+		return (
+			<Slot
+				{ ...props }
+				bubblesVirtually
+				fillProps={ accessibleToolbarState }
+			/>
+		);
+	}
+
+	return (
+		<ToolbarGroup>
+			<Slot
+				{ ...props }
+				bubblesVirtually
+				fillProps={ accessibleToolbarState }
+			/>
+		</ToolbarGroup>
+	);
 }
 
-function BlockControlsFill( { controls, children } ) {
+function BlockControlsFill( { segment = 'default', controls, children } ) {
 	if ( ! useDisplayBlockControls() ) {
 		return null;
 	}
+	const Fill = segments[ segment ].Fill;
 
 	return (
 		<Fill>
@@ -39,7 +84,9 @@ function BlockControlsFill( { controls, children } ) {
 				const value = ! isEmpty( fillProps ) ? fillProps : null;
 				return (
 					<ToolbarContext.Provider value={ value }>
-						<ToolbarGroup controls={ controls } />
+						{ segment === 'default' && (
+							<ToolbarGroup controls={ controls } />
+						) }
 						{ children }
 					</ToolbarContext.Provider>
 				);
@@ -51,5 +98,13 @@ function BlockControlsFill( { controls, children } ) {
 const BlockControls = BlockControlsFill;
 
 BlockControls.Slot = BlockControlsSlot;
+
+// This is just here for backward compatibility
+export const BlockFormatControls = ( props ) => {
+	return <BlockControlsFill segment="inline" { ...props } />;
+};
+BlockFormatControls.Slot = ( props ) => {
+	return <BlockControlsSlot segment="inline" { ...props } />;
+};
 
 export default BlockControls;

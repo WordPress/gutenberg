@@ -3,7 +3,7 @@ export { BlockAlignmentToolbar } from './block-alignment-control';
 export { BlockContextProvider } from './block-context';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
-export { default as BlockFormatControls } from './block-format-controls';
+export { default as BlockFormatControls } from './block-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export * from './colors';

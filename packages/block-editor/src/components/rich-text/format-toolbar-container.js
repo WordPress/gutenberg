@@ -6,7 +6,7 @@ import { Popover } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlockFormatControls from '../block-format-controls';
+import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 
 const FormatToolbarContainer = ( { inline, anchorRef } ) => {
@@ -27,9 +27,9 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 	}
 	// Render regular toolbar
 	return (
-		<BlockFormatControls>
+		<BlockControls segment="inline">
 			<FormatToolbar />
-		</BlockFormatControls>
+		</BlockControls>
 	);
 };
 
