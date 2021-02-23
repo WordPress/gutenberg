@@ -17,9 +17,6 @@ import { getClipboard } from '@wordpress/components';
 import InserterSearchResults from './search-results';
 import { store as blockEditorStore } from '../../store';
 
-// This should handle showing the insertion point and the items
-// the search results component will handle picking and inserting
-
 function InserterMenu( {
 	onSelect,
 	onDismiss,
@@ -72,7 +69,6 @@ function InserterMenu( {
 
 	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
 
-	// Show/Hide insertion point on Mount/Dismount
 	useEffect( () => {
 		if ( shouldReplaceBlock ) {
 			const count = getBlockCount();
@@ -90,13 +86,14 @@ function InserterMenu( {
 				removeBlock( blockToReplace, false );
 			}
 		}
+	  // Show/Hide insertion point on Mount/Dismount
 		showInsertionPoint( destinationRootClientId, insertionIndex );
 		return hideInsertionPoint;
 	}, [] );
 
 	const onClose = useCallback( () => {
-		// if should replace but didn't insert any block
-		// re-insert default block
+		// If should replace but didn't insert any block
+		// re-insert default block.
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );
 		}
