@@ -10,7 +10,7 @@ import {
 	RichText,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden, withFilters } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { useRef, useEffect } from '@wordpress/element';
@@ -92,4 +92,4 @@ function RichTextVisibilityHelper( { isHidden, ...richTextProps } ) {
 	);
 }
 
-export default Gallery;
+export default withFilters( 'editor.Gallery' )( Gallery );
