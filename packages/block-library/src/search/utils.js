@@ -28,3 +28,14 @@ export const CSS_UNITS = [
 		default: PX_WIDTH_DEFAULT,
 	},
 ];
+
+/**
+ * Returns a boolean whether passed unit is percentage
+ *
+ * @param {string} unit Column width unit.
+ *
+ * @return {boolean} 	Whether unit is '%'.
+ */
+export function isPercentageUnit( unit ) {
+	return unit === '%';
+}
