@@ -11,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { sanitizeBlockAttributes } from '@wordpress/blocks';
+import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
@@ -62,7 +62,8 @@ export class ServerSideRender extends Component {
 		} = props;
 
 		const sanitizedAttributes =
-			attributes && sanitizeBlockAttributes( block, attributes );
+			attributes &&
+			__experimentalSanitizeBlockAttributes( block, attributes );
 
 		// If httpMethod is 'POST', send the attributes in the request body instead of the URL.
 		// This allows sending a larger attributes object than in a GET request, where the attributes are in the URL.

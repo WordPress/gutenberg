@@ -720,20 +720,6 @@ _Parameters_
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
 -   _variation_ `WPBlockVariation`: Object describing a block variation.
 
-<a name="sanitizeBlockAttributes" href="#sanitizeBlockAttributes">#</a> **sanitizeBlockAttributes**
-
-Ensure attributes contains only values defined by block type, and merge
-default values for missing attributes.
-
-_Parameters_
-
--   _name_ `string`: The block's name.
--   _attributes_ `Object`: The block's attributes.
-
-_Returns_
-
--   `Object`: The sanitized attributes.
-
 <a name="serialize" href="#serialize">#</a> **serialize**
 
 Takes a block or set of blocks and returns the serialized post content.
