@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	InnerBlocks,
 	JustifyToolbar,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
@@ -30,7 +31,7 @@ const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 const layoutProp = { type: 'default', alignments: [] };
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align },
+	attributes: { contentJustification, align, orientation },
 	clientId,
 	isSelected,
 	setAttributes,
@@ -47,7 +48,7 @@ export default function ButtonsEdit( {
 				getBlockOrder: _getBlockOrder,
 				getBlockParents,
 				getSelectedBlockClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectedBlockParents = getBlockParents(
 				selectedBlockClientId,
@@ -68,7 +69,7 @@ export default function ButtonsEdit( {
 	);
 
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	useEffect( () => {
@@ -113,6 +114,11 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	return (
@@ -120,7 +126,7 @@ export default function ButtonsEdit( {
 			{ isSelected && (
 				<BlockControls>
 					<JustifyToolbar
-						allowedControls={ [ 'left', 'center', 'right' ] }
+						allowedControls={ justifyControls }
 						value={ contentJustification }
 						onChange={ ( value ) =>
 							setAttributes( { contentJustification: value } )

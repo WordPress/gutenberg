@@ -9,7 +9,7 @@
  */
 function getSymbolTagsByName( symbol, ...names ) {
 	return symbol.tags.filter( ( tag ) => {
-		return names.some( ( name ) => name === tag.title );
+		return names.some( ( name ) => name === tag.tag );
 	} );
 }
 

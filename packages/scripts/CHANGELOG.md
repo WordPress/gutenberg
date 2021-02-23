@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+### New Features
+
+-   Default `check-engines` command to the `engines` config in `package.json` file of the current project ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+
 ### Enhancements
 
 -   Make `check-licenses` command compatible with npm v7 ([#28909](https://github.com/WordPress/gutenberg/pull/28909)).
 -   Add `Python 2.0` to non-GPL compatible OSS licenses allowed for development in `check-licenses` command ([#29968](https://github.com/WordPress/gutenberg/pull/28968)).
+-   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines with `check-engines` command ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
 
 ## 13.0.0 (2021-01-21)
 

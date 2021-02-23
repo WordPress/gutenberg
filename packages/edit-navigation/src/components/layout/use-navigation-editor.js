@@ -10,6 +10,9 @@ import { useState, useEffect } from '@wordpress/element';
 import { store as editNavigationStore } from '../../store';
 
 export default function useNavigationEditor() {
+	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
+		false
+	);
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
 		const selectors = select( 'core' );
 		const params = { per_page: -1 };
@@ -21,6 +24,12 @@ export default function useNavigationEditor() {
 		};
 	}, [] );
 
+	useEffect( () => {
+		if ( hasLoadedMenus ) {
+			setHasFinishedInitialLoad( true );
+		}
+	}, [ hasLoadedMenus ] );
+
 	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
 
 	useEffect( () => {
@@ -30,10 +39,14 @@ export default function useNavigationEditor() {
 	}, [ selectedMenuId, menus ] );
 
 	const navigationPost = useSelect(
-		( select ) =>
-			select( editNavigationStore ).getNavigationPostForMenu(
+		( select ) => {
+			if ( ! selectedMenuId ) {
+				return;
+			}
+			return select( editNavigationStore ).getNavigationPostForMenu(
 				selectedMenuId
-			),
+			);
+		},
 		[ selectedMenuId ]
 	);
 
@@ -54,10 +67,11 @@ export default function useNavigationEditor() {
 
 	return {
 		menus,
+		hasLoadedMenus,
+		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
 		selectMenu,
 		deleteMenu,
-		hasLoadedMenus,
 	};
 }

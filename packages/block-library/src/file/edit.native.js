@@ -44,6 +44,7 @@ import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { getProtocol } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -588,7 +589,9 @@ export default compose( [
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
-			media: isNotFileHref ? select( 'core' ).getMedia( id ) : undefined,
+			media: isNotFileHref
+				? select( coreStore ).getMedia( id )
+				: undefined,
 			isSidebarOpened: isSelected && isEditorSidebarOpened(),
 		};
 	} ),

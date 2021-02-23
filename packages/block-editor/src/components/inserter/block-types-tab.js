@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, findIndex, flow, sortBy, groupBy, orderBy } from 'lodash';
+import { map, flow, groupBy, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,22 +43,14 @@ export function BlockTypesTab( {
 	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
-		const getCategoryIndex = ( item ) => {
-			return findIndex(
-				categories,
-				( category ) => category.slug === item.category
-			);
-		};
-
 		return flow(
 			( itemList ) =>
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( items );
-	}, [ items, categories ] );
+	}, [ items ] );
 
 	const itemsPerCollection = useMemo( () => {
 		// Create a new Object to avoid mutating collection.

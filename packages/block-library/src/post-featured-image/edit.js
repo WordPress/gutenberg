@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
 	Icon,
@@ -43,7 +43,7 @@ function PostFeaturedImageDisplay( {
 	);
 	const media = useSelect(
 		( select ) =>
-			featuredImage && select( 'core' ).getMedia( featuredImage ),
+			featuredImage && select( coreStore ).getMedia( featuredImage ),
 		[ featuredImage ]
 	);
 	const onSelectImage = ( value ) => {

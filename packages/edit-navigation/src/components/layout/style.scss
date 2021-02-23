@@ -22,15 +22,28 @@
 }
 
 .edit-navigation-layout {
-	margin-right: $sidebar-width;
+	&.has-block-inspector {
+		margin-right: $sidebar-width;
+	}
+
+	> .components-spinner {
+		margin: $navigation-editor-spacing-top auto 0;
+	}
 
 	.edit-navigation-layout__canvas {
 		// Provide space for the floating block toolbar.
-		padding-top: $grid-unit-40 * 3;
+		padding-top: $navigation-editor-spacing-top;
 
 		// Ensure the entire layout is full-height, the background
 		// of the editing canvas needs to be full-height for block
 		// deselection to work.
 		flex-grow: 1;
 	}
+}
+
+.edit-navigation-empty-state {
+	width: $navigation-editor-width;
+	margin-top: $navigation-editor-spacing-top;
+	margin-left: auto;
+	margin-right: auto;
 }

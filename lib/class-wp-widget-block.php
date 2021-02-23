@@ -29,7 +29,7 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function __construct() {
 		$widget_ops  = array(
-			'classname'                   => 'widget_block',
+			'classname'                   => '%s', // Set dynamically in widget().
 			'description'                 => __( 'Gutenberg block.', 'gutenberg' ),
 			'customize_selective_refresh' => true,
 		);
@@ -53,9 +53,7 @@ class WP_Widget_Block extends WP_Widget {
 	 * @global WP_Post $post Global post object.
 	 */
 	public function widget( $args, $instance ) {
-		echo $args['before_widget'];
-		$content = do_blocks( $instance['content'] );
-
+		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance ) );
 		// Handle embeds for block widgets.
 		//
 		// When this feature is added to core it may need to be implemented
@@ -63,9 +61,93 @@ class WP_Widget_Block extends WP_Widget {
 		// filter for its content, which WP_Embed uses in its constructor.
 		// See https://core.trac.wordpress.org/ticket/51566.
 		global $wp_embed;
-		echo $wp_embed->autoembed( $content );
+		$content = $wp_embed->run_shortcode( $instance['content'] );
+		$content = $wp_embed->autoembed( $content );
+
+		echo do_blocks( $content );
 
 		echo $args['after_widget'];
+	}
+
+	/**
+	 * Calculates the classname to use in the block widget's container HTML.
+	 *
+	 * Usually this is set to $this->widget_options['classname'] by
+	 * dynamic_sidebar(). In this case, however, we want to set the classname
+	 * dynamically depending on the block contained by this block widget.
+	 *
+	 * If a block widget contains a block that has an equivalent legacy widget,
+	 * we display that legacy widget's class name. This helps with theme
+	 * backwards compatibility.
+	 *
+	 * @since 9.3.0
+	 *
+	 * @param array $instance Settings for the current block widget instance.
+	 *
+	 * @return string The classname to use in the block widget's container HTML.
+	 */
+	private function get_dynamic_classname( $instance ) {
+		$blocks = parse_blocks( $instance['content'] );
+
+		$block_name = isset( $blocks[0] ) ? $blocks[0]['blockName'] : null;
+
+		switch ( $block_name ) {
+			case 'core/paragraph':
+				$classname = 'widget_block widget_text';
+				break;
+			case 'core/calendar':
+				$classname = 'widget_block widget_calendar';
+				break;
+			case 'core/search':
+				$classname = 'widget_block widget_search';
+				break;
+			case 'core/html':
+				$classname = 'widget_block widget_custom_html';
+				break;
+			case 'core/archives':
+				$classname = 'widget_block widget_archive';
+				break;
+			case 'core/latest-posts':
+				$classname = 'widget_block widget_recent_entries';
+				break;
+			case 'core/latest-comments':
+				$classname = 'widget_block widget_recent_comments';
+				break;
+			case 'core/tag-cloud':
+				$classname = 'widget_block widget_tag_cloud';
+				break;
+			case 'core/categories':
+				$classname = 'widget_block widget_categories';
+				break;
+			case 'core/audio':
+				$classname = 'widget_block widget_media_audio';
+				break;
+			case 'core/video':
+				$classname = 'widget_block widget_media_video';
+				break;
+			case 'core/image':
+				$classname = 'widget_block widget_media_image';
+				break;
+			case 'core/gallery':
+				$classname = 'widget_block widget_media_gallery';
+				break;
+			case 'core/rss':
+				$classname = 'widget_block widget_rss';
+				break;
+			default:
+				$classname = 'widget_block';
+		}
+
+		/**
+		 * The classname used in the block widget's container HTML.
+		 *
+		 * This can be set according to the name of the block contained by the
+		 * block widget.
+		 *
+		 * @param string $classname The classname to be used in the block widget's container HTML, e.g. 'widget_block widget_text'.
+		 * @param string $block_name The name of the block contained by the block widget, e.g. 'core/paragraph'.
+		 */
+		return apply_filters( 'widget_block_dynamic_classname', $classname, $block_name );
 	}
 
 	/**
@@ -94,20 +176,8 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
-		echo do_blocks( $instance['content'] );
-		$textarea_id = $this->get_field_id( 'content' );
 		?>
-		<br/>
-		<textarea id="<?php echo $textarea_id; ?>" name="<?php echo $this->get_field_name( 'content' ); ?>"
-				class="content sync-input" hidden><?php echo esc_textarea( $instance['content'] ); ?></textarea>
-		<script>
-			(function() {
-				var link = "<?php echo esc_js( admin_url( 'themes.php?page=gutenberg-widgets' ) ); ?>";
-				var container = jQuery('#<?php echo $textarea_id; ?>').closest(".form").find('.widget-control-actions .alignleft');
-				container.prepend(jQuery('<span> |</span>'));
-				container.prepend(jQuery('<a href="'+link+'" class="button-link">Edit</a>'));
-			})();
-		</script>
+		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>" rows="6" cols="50" class="widefat text wp-block-widget-textarea"><?php echo esc_textarea( $instance['content'] ); ?></textarea>
 		<?php
 	}
 

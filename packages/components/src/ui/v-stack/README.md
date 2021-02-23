@@ -6,21 +6,20 @@
 
 `VStack` can render anything inside.
 
-```jsx live
-import { VStack, Text, View } from '@wp-g2/components';
-import { ui } from '@wp-g2/styles';
+```jsx
+import { VStack, Text, View } from '@wordpress/components/ui';
 
 function Example() {
 	return (
-		<VStack css={[ui.frame.height(200)]}>
-			<View css={[ui.background.blue]}>
-				<Text>Ana</Text>
+		<VStack>
+			<View>
+				<Text>Code</Text>
 			</View>
-			<View css={[ui.background.blue]}>
-				<Text>Elsa</Text>
+			<View>
+				<Text>is</Text>
 			</View>
-			<View css={[ui.background.blue]}>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</VStack>
 	);
@@ -86,15 +85,15 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
 ```jsx
 function Example() {
 	return (
-		<VStack css={[ui.frame.height(200)]}>
-			<View css={[ui.background.blue]}>
-				<Text>Ana</Text>
+		<VStack>
+			<View>
+				<Text>Code</Text>
 			</View>
-			<Spacer css={[ui.background.blue]}>
-				<Text>Elsa</Text>
+			<Spacer>
+				<Text>is</Text>
 			</Spacer>
-			<View css={[ui.background.blue]}>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</VStack>
 	);
@@ -103,19 +102,19 @@ function Example() {
 
 `Spacer` can also be used in-between items to push them apart.
 
-```jsx live
+```jsx
 function Example() {
 	return (
-		<VStack css={[ui.frame.height(200)]}>
-			<View css={[ui.background.blue]}>
-				<Text>Ana</Text>
+		<VStack>
+			<View>
+				<Text>Code</Text>
 			</View>
 			<Spacer />
-			<View css={[ui.background.blue]}>
-				<Text>Elsa</Text>
+			<View>
+				<Text>is</Text>
 			</View>
-			<View css={[ui.background.blue]}>
-				<Text>Olaf</Text>
+			<View>
+				<Text>Poetry</Text>
 			</View>
 		</VStack>
 	);
