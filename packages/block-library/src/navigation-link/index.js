@@ -15,9 +15,7 @@ import './hooks';
 
 const { name } = metadata;
 
-// If we export metadata, this calls unstable__bootstrapServerSideBlockDefinitions a second time, and overwrites
-// what was injected on the page
-export { name };
+export { name, metadata };
 
 export const settings = {
 	title: _x( 'Link', 'block title' ),
