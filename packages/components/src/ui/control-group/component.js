@@ -57,7 +57,7 @@ function ControlGroup( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`
+ * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`;
  *
  * function Example() {
  *   return (

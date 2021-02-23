@@ -9,7 +9,7 @@ import { cx } from '@wp-g2/styles';
  */
 import { useFormGroupContextId } from '../form-group';
 import { useText } from '../text';
-import * as styles from './control-label-styles';
+import * as styles from './styles';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'label'>} props

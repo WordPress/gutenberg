@@ -75,3 +75,9 @@ jobs:
       with:
         name: ios-screen-recordings
         path: packages/react-native-editor/ios-screen-recordings
+
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: appium-logs
+        path: packages/react-native-editor/appium-out.log
