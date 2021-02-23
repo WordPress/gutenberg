@@ -25,6 +25,7 @@
 			{ "docs/designers-developers/developers/block-api/block-supports.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-transforms.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-metadata.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] },
 			{ "docs/designers-developers/developers/block-api/versions.md": [] }
@@ -115,7 +116,8 @@
 			{ "docs/designers-developers/developers/tutorials/create-block/attributes.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/block-code.md": [] },
 			{ "docs/designers-developers/developers/tutorials/create-block/author-experience.md": [] },
-			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] }
+			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md": [] }
 		] },
 		{ "docs/designers-developers/developers/tutorials/block-tutorial/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },

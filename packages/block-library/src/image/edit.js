@@ -16,6 +16,7 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -104,7 +105,7 @@ export function ImageEdit( {
 
 	const ref = useRef();
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	} );
 
@@ -263,14 +264,6 @@ export function ImageEdit( {
 	}, [ isTemp ] );
 
 	const isExternal = isExternalImage( id, url );
-	const controls = (
-		<BlockControls>
-			<BlockAlignmentToolbar
-				value={ align }
-				onChange={ updateAlignment }
-			/>
-		</BlockControls>
-	);
 	const src = isExternal ? url : undefined;
 	const mediaPreview = !! url && (
 		<img
@@ -278,21 +271,6 @@ export function ImageEdit( {
 			title={ __( 'Edit image' ) }
 			className={ 'edit-image-preview' }
 			src={ url }
-		/>
-	);
-
-	const mediaPlaceholder = (
-		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			onSelect={ onSelectImage }
-			onSelectURL={ onSelectURL }
-			notices={ noticeUI }
-			onError={ onUploadError }
-			accept="image/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			value={ { id, src } }
-			mediaPreview={ mediaPreview }
-			disableMediaButtons={ url }
 		/>
 	);
 
@@ -309,25 +287,41 @@ export function ImageEdit( {
 	} );
 
 	return (
-		<>
-			{ controls }
-			<figure { ...blockProps }>
-				{ url && (
-					<Image
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						isSelected={ isSelected }
-						insertBlocksAfter={ insertBlocksAfter }
-						onReplace={ onReplace }
-						onSelectImage={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onUploadError={ onUploadError }
-						containerRef={ ref }
+		<figure { ...blockProps }>
+			{ url && (
+				<Image
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					containerRef={ ref }
+				/>
+			) }
+			{ ! url && (
+				<BlockControls>
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
 					/>
-				) }
-				{ mediaPlaceholder }
-			</figure>
-		</>
+				</BlockControls>
+			) }
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				onSelect={ onSelectImage }
+				onSelectURL={ onSelectURL }
+				notices={ noticeUI }
+				onError={ onUploadError }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				disableMediaButtons={ url }
+			/>
+		</figure>
 	);
 }
 

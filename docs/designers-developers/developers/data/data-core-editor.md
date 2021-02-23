@@ -203,7 +203,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPBlock>`: Filtered set of blocks for save.
+-   `WPBlock[]`: Filtered set of blocks for save.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
@@ -331,7 +331,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Preview Link.
+-   `string?`: Preview Link.
 
 <a name="getEditedPostSlug" href="#getEditedPostSlug">#</a> **getEditedPostSlug**
 
@@ -796,7 +796,7 @@ Return true if the current post has already been published.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
+-   _currentPost_ `Object?`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -1077,7 +1077,7 @@ Storage).
 
 _Parameters_
 
--   _options_ `?Object`: Extra flags to identify the autosave.
+-   _options_ `Object?`: Extra flags to identify the autosave.
 
 <a name="clearSelectedBlock" href="#clearSelectedBlock">#</a> **clearSelectedBlock**
 
@@ -1363,7 +1363,7 @@ _Parameters_
 
 -   _post_ `Object`: Post object.
 -   _edits_ `Object`: Initial edited attributes object.
--   _template_ `?Array`: Block Template.
+-   _template_ `Array?`: Block Template.
 
 <a name="setupEditorState" href="#setupEditorState">#</a> **setupEditorState**
 

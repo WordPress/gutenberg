@@ -24,11 +24,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func provideToNative_Html(_ html: String, title: String, changed: Bool, contentInfo: [String:Int]) {
         DispatchQueue.main.async {
-            let info = ContentInfo.decode(from: contentInfo)            
+            let info = ContentInfo.decode(from: contentInfo)
             self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed, contentInfo: info)
         }
     }
-    
+
     @objc
     func requestMediaPickFrom(_ source: String, filter: [String]?, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
         let mediaSource = getMediaSource(withId: source)
@@ -93,7 +93,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                 guard let mediaInfo = mediaInfo else {
                     callback(nil)
                     return
-                }                
+                }
                 callback([mediaInfo.id as Any, mediaInfo.url as Any])
             })
         }
@@ -259,7 +259,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             sendEvent(withName: event.rawValue, body: body)
         }
     }
-    
+
     @objc
     func logUserEvent(_ event: String, properties: [AnyHashable: Any]?) {
         guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
@@ -275,7 +275,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             case .failure(let error):
                 rejecter(error.domain, "\(error.code)", error)
             }
-        })        
+        })
     }
 
 	@objc
@@ -325,13 +325,23 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                 self.delegate?.gutenbergDidRequestMediaSaveSync()
             }
         }
+	}
+
+    @objc
+    func requestFocalPointPickerTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {
+        callback([self.delegate?.gutenbergDidRequestFocalPointPickerTooltipShown() ?? false])
     }
 
     @objc
-    func mediaFilesBlockReplaceSync() {
+    func setFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
+        self.delegate?.gutenbergDidRequestSetFocalPointPickerTooltipShown(tooltipShown)
+    }
+
+    @objc
+    func mediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
         DispatchQueue.main.async {
             if self.hasObservers {
-                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync()
+                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync(mediaFiles, clientId: clientId)
             }
         }
     }

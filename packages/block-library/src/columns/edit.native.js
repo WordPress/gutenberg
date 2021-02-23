@@ -22,6 +22,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import {
@@ -301,8 +302,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateAlignment( verticalAlignment ) {
 			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-			const { getBlockOrder } = registry.select( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
+			const { getBlockOrder } = registry.select( blockEditorStore );
 
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
@@ -316,7 +317,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			} );
 		},
 		updateInnerColumnWidth( value, columnId ) {
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
 
 			updateBlockAttributes( columnId, {
 				width: value,
@@ -324,7 +325,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 		updateBlockSettings( settings ) {
 			const { clientId } = ownProps;
-			const { updateBlockListSettings } = dispatch( 'core/block-editor' );
+			const { updateBlockListSettings } = dispatch( blockEditorStore );
 			updateBlockListSettings( clientId, settings );
 		},
 		/**
@@ -336,9 +337,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { replaceInnerBlocks } = dispatch( blockEditorStore );
 			const { getBlocks, getBlockAttributes } = registry.select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			let innerBlocks = getBlocks( clientId );
@@ -405,10 +406,10 @@ const ColumnsEditContainerWrapper = withDispatch(
 		onAddNextColumn: () => {
 			const { clientId } = ownProps;
 			const { replaceInnerBlocks, selectBlock } = dispatch(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const { getBlocks, getBlockAttributes } = registry.select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			// Get verticalAlignment from Columns block to set the same to new Column
@@ -429,7 +430,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 		onDeleteBlock: () => {
 			const { clientId } = ownProps;
-			const { removeBlock } = dispatch( 'core/block-editor' );
+			const { removeBlock } = dispatch( blockEditorStore );
 			removeBlock( clientId );
 		},
 	} )
@@ -451,7 +452,7 @@ const ColumnsEdit = ( props ) => {
 				getBlocks,
 				getBlockParents,
 				getBlockAttributes,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const { isEditorSidebarOpened } = select( 'core/edit-post' );
 			const innerBlocks = getBlocks( clientId );
 
@@ -475,7 +476,7 @@ const ColumnsEdit = ( props ) => {
 				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
 		},
-		[ clientId ]
+		[ clientId, isSelected ]
 	);
 
 	const memoizedInnerWidths = useMemo( () => {
