@@ -4,13 +4,11 @@
 import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
-	InspectorAdvancedControls,
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	SelectControl,
 	Dropdown,
 	ToolbarGroup,
 	ToolbarButton,
@@ -23,11 +21,10 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
-import TemplatePartCategoryPanel from './category-panel';
+import { TemplatePartAdvancedControls } from './advanced-controls';
 
 export default function TemplatePartEdit( {
 	attributes: { slug, theme, tagName: TagName = 'div' },
@@ -90,30 +87,12 @@ export default function TemplatePartEdit( {
 
 	return (
 		<>
-			<InspectorAdvancedControls>
-				{ isEntityAvailable && (
-					<TemplatePartNamePanel postId={ templatePartId } />
-				) }
-				{ isEntityAvailable && (
-					<TemplatePartCategoryPanel postId={ templatePartId } />
-				) }
-				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
-						{ label: '<header>', value: 'header' },
-						{ label: '<main>', value: 'main' },
-						{ label: '<section>', value: 'section' },
-						{ label: '<article>', value: 'article' },
-						{ label: '<aside>', value: 'aside' },
-						{ label: '<footer>', value: 'footer' },
-					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-				/>
-			</InspectorAdvancedControls>
+			<TemplatePartAdvancedControls
+				TagName={ TagName }
+				setAttributes={ setAttributes }
+				isEntityAvailable={ isEntityAvailable }
+				templatePartId={ templatePartId }
+			/>
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
