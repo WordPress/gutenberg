@@ -73,6 +73,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
+<<<<<<< HEAD
 @@ -7,10 +7,9 @@
   	"margin-top": "0px",
   	"margin-right": "0px",
@@ -84,4 +85,46 @@ Snapshot Diff:
   	"overflow-y": "auto",
   	"visibility": "visible"
   }
+=======
+- Snapshot Diff:
+- - First value
+- + Second value
+-
+-   Array [
+-     Object {
+-       \\"-moz-osx-font-smoothing\\": \\"grayscale\\",
+- -     \\"-moz-scroll-behavior\\": \\"smooth\\",
+- -     \\"-ms-scroll-behavior\\": \\"smooth\\",
+-       \\"-webkit-font-smoothing\\": \\"antialiased\\",
+- -     \\"-webkit-scroll-behavior\\": \\"smooth\\",
+-       \\"0\\": \\"box-sizing\\",
+-       \\"1\\": \\"-moz-osx-font-smoothing\\",
+- -     \\"10\\": \\"-ms-scroll-behavior\\",
+- -     \\"11\\": \\"scroll-behavior\\",
+- -     \\"12\\": \\"overflow-x\\",
+- -     \\"13\\": \\"overflow-y\\",
+-       \\"2\\": \\"-webkit-font-smoothing\\",
+-       \\"3\\": \\"font-family\\",
+-       \\"4\\": \\"font-size\\",
+-       \\"5\\": \\"font-weight\\",
+-       \\"6\\": \\"margin\\",
+-       \\"7\\": \\"height\\",
+- -     \\"8\\": \\"-webkit-scroll-behavior\\",
+- -     \\"9\\": \\"-moz-scroll-behavior\\",
+- +     \\"8\\": \\"overflow-x\\",
+- +     \\"9\\": \\"overflow-y\\",
+-       \\"box-sizing\\": \\"border-box\\",
+-       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
+-       \\"font-size\\": \\"var(--wp-g2-font-size)\\",
+-       \\"font-weight\\": \\"var(--wp-g2-font-weight)\\",
+-       \\"height\\": \\"100%\\",
+- -     \\"length\\": 14,
+- +     \\"length\\": 10,
+-       \\"margin\\": \\"0\\",
+-       \\"overflow-x\\": \\"hidden\\",
+-       \\"overflow-y\\": \\"auto\\",
+- -     \\"scroll-behavior\\": \\"smooth\\",
+-     },
+-   ]"
+>>>>>>> Make style diff snapshots work with CSS variables
 `;

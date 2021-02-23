@@ -23,6 +23,7 @@ Snapshot Diff:
 `;
 
 exports[`props should render align 1`] = `
+<<<<<<< HEAD
 Snapshot Diff:
 - Received styles
 + Base styles
@@ -40,6 +41,47 @@ Snapshot Diff:
   	"width": "100%",
   	"visibility": "visible"
   }
+=======
+"Snapshot Diff:
+- First value
++ Second value
+
+- Snapshot Diff:
+- - First value
+- + Second value
+-
+- @@ -1,14 +1,14 @@
+-   Array [
+-     Object {
+-       \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+-       \\"-moz-osx-font-smoothing\\": \\"grayscale\\",
+- -     \\"-ms-flex-align\\": \\"flex-start\\",
+- +     \\"-ms-flex-align\\": \\"center\\",
+-       \\"-ms-flex-direction\\": \\"row\\",
+-       \\"-ms-flex-pack\\": \\"justify\\",
+- -     \\"-webkit-align-items\\": \\"flex-start\\",
+- -     \\"-webkit-box-align\\": \\"flex-start\\",
+- +     \\"-webkit-align-items\\": \\"center\\",
+- +     \\"-webkit-box-align\\": \\"center\\",
+-       \\"-webkit-box-pack\\": \\"justify\\",
+-       \\"-webkit-flex-direction\\": \\"row\\",
+-       \\"-webkit-font-smoothing\\": \\"antialiased\\",
+-       \\"-webkit-justify-content\\": \\"space-between\\",
+-       \\"0\\": \\"box-sizing\\",
+- @@ -30,11 +30,11 @@
+-       \\"5\\": \\"font-weight\\",
+-       \\"6\\": \\"margin\\",
+-       \\"7\\": \\"display\\",
+-       \\"8\\": \\"--wp-g2-flex-gap\\",
+-       \\"9\\": \\"-webkit-align-items\\",
+- -     \\"align-items\\": \\"flex-start\\",
+- +     \\"align-items\\": \\"center\\",
+-       \\"box-sizing\\": \\"border-box\\",
+-       \\"display\\": \\"flex\\",
+-       \\"flex-direction\\": \\"row\\",
+-       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
+-       \\"font-size\\": \\"var(--wp-g2-font-size)\\","
+>>>>>>> Make style diff snapshots work with CSS variables
 `;
 
 exports[`props should render correctly 1`] = `
@@ -179,6 +221,7 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render justify 1`] = `
+<<<<<<< HEAD
 Snapshot Diff:
 - Received styles
 + Base styles
@@ -214,4 +257,69 @@ Snapshot Diff:
   	"justify-content": "space-between",
   	"width": "100%",
   	"visibility": "visible"
+=======
+"Snapshot Diff:
+- First value
++ Second value
+
+- Snapshot Diff:
+- - First value
+- + Second value
+-
+- @@ -2,17 +2,17 @@
+-     Object {
+-       \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+-       \\"-moz-osx-font-smoothing\\": \\"grayscale\\",
+-       \\"-ms-flex-align\\": \\"center\\",
+-       \\"-ms-flex-direction\\": \\"row\\",
+- -     \\"-ms-flex-pack\\": \\"start\\",
+- +     \\"-ms-flex-pack\\": \\"justify\\",
+-       \\"-webkit-align-items\\": \\"center\\",
+-       \\"-webkit-box-align\\": \\"center\\",
+- -     \\"-webkit-box-pack\\": \\"start\\",
+- +     \\"-webkit-box-pack\\": \\"justify\\",
+-       \\"-webkit-flex-direction\\": \\"row\\",
+-       \\"-webkit-font-smoothing\\": \\"antialiased\\",
+- -     \\"-webkit-justify-content\\": \\"flex-start\\",
+- +     \\"-webkit-justify-content\\": \\"space-between\\",
+-       \\"0\\": \\"box-sizing\\",
+-       \\"1\\": \\"-moz-osx-font-smoothing\\",
+-       \\"10\\": \\"-webkit-box-align\\",
+-       \\"11\\": \\"-ms-flex-align\\",
+-       \\"12\\": \\"align-items\\",
+- @@ -37,11 +37,11 @@
+-       \\"display\\": \\"flex\\",
+-       \\"flex-direction\\": \\"row\\",
+-       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
+-       \\"font-size\\": \\"var(--wp-g2-font-size)\\",
+-       \\"font-weight\\": \\"var(--wp-g2-font-weight)\\",
+- -     \\"justify-content\\": \\"flex-start\\",
+- +     \\"justify-content\\": \\"space-between\\",
+-       \\"length\\": 21,
+-       \\"margin\\": \\"0\\",
+-       \\"width\\": \\"100%\\",
+-     },
+-   ]"
+`;
+
+exports[`props should render spacing 1`] = `
+"Snapshot Diff:
+- First value
++ Second value
+
+- Snapshot Diff:
+- - First value
+- + Second value
+-
+- @@ -1,8 +1,8 @@
+-   Array [
+-     Object {
+- -     \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
+- +     \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+-       \\"-moz-osx-font-smoothing\\": \\"grayscale\\",
+-       \\"-ms-flex-align\\": \\"center\\",
+-       \\"-ms-flex-direction\\": \\"row\\",
+-       \\"-ms-flex-pack\\": \\"justify\\",
+-       \\"-webkit-align-items\\": \\"center\\","
+>>>>>>> Make style diff snapshots work with CSS variables
 `;

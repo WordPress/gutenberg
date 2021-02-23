@@ -3,7 +3,39 @@
  */
 const snapshotDiff = require( 'snapshot-diff' );
 
-const serialize = ( obj ) => JSON.stringify( obj, undefined, '\t' );
+const getStyleSheets = () =>
+	Array.from( document.getElementsByTagName( 'style' ) );
+
+/**
+ *
+ * @param {Element} element
+ * @param {HTMLStyleElement[]} styleSheets
+ */
+const getStyleRulesForElement = ( element, styleSheets ) => {
+	return styleSheets.reduce( ( matchingRules, styleSheet ) => {
+		const found = [];
+		Array.from( styleSheet.sheet.cssRules ).forEach( ( rule ) => {
+			try {
+				if ( element.matches( rule.selectorText ) ) {
+					found.push( rule.style );
+				}
+			} catch ( e ) {
+				/* Ignore these???????????????? */
+			}
+		} );
+		return [ ...matchingRules, ...found ];
+	}, [] );
+};
+
+/* eslint-disable no-unused-vars */
+const cleanStyleRule = ( {
+	parentRule,
+	__starts,
+	__ends,
+	_importants,
+	...cleanedRule
+} ) => cleanedRule;
+/* eslint-enable no-unused-vars */
 
 /**
  * @param {Element} received
@@ -11,13 +43,14 @@ const serialize = ( obj ) => JSON.stringify( obj, undefined, '\t' );
  * @param {string} testName
  */
 function toMatchStyleDiffSnapshot( received, expected, testName ) {
-	const receivedStyles = serialize(
-		window.getComputedStyle( received )._values
+	const styleSheets = getStyleSheets();
+	const receivedStyles = getStyleRulesForElement( received, styleSheets ).map(
+		cleanStyleRule
 	);
-	const expectedStyles = serialize(
-		window.getComputedStyle( expected )._values
+	const expectedStyles = getStyleRulesForElement( expected, styleSheets ).map(
+		cleanStyleRule
 	);
-	const ret = snapshotDiff.toMatchDiffSnapshot.call(
+	return snapshotDiff.toMatchDiffSnapshot.call(
 		this,
 		receivedStyles,
 		expectedStyles,
@@ -27,7 +60,6 @@ function toMatchStyleDiffSnapshot( received, expected, testName ) {
 		},
 		testName || ''
 	);
-	return ret;
 }
 
 expect.extend( { toMatchStyleDiffSnapshot } );
