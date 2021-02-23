@@ -44,7 +44,7 @@ function getTemplateLocation( template ) {
 		slug.startsWith( 'post-' ) ||
 		slug.startsWith( 'author-' ) ||
 		slug.startsWith( 'single-post-' ) ||
-		slug.startsWith( 'tag' )
+		slug.startsWith( 'tag-' )
 	) {
 		return MENU_TEMPLATES_POSTS;
 	}
