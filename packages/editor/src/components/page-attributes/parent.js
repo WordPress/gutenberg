@@ -18,6 +18,7 @@ import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -26,7 +27,9 @@ import { buildTermsTree } from '../../utils/terms';
 
 function getTitle( post ) {
 	return post?.title?.rendered
-		? post.title.rendered
+		? 'publish' === post.status
+			? post.title.rendered
+			: `${ post.title.rendered } (${ post.status })`
 		: `#${ post.id } (${ __( 'no title' ) })`;
 }
 
@@ -52,7 +55,7 @@ export function PageAttributesParent() {
 			const { getPostType, getEntityRecords, getEntityRecord } = select(
 				'core'
 			);
-			const { getCurrentPostId, getEditedPostAttribute } = select(
+			const { getCurrentPost, getCurrentPostId, getEditedPostAttribute } = select(
 				'core/editor'
 			);
 			const postTypeSlug = getEditedPostAttribute( 'type' );
@@ -60,14 +63,18 @@ export function PageAttributesParent() {
 			const pType = getPostType( postTypeSlug );
 			const postId = getCurrentPostId();
 			const isHierarchical = get( pType, [ 'hierarchical' ], false );
-			const query = {
-				per_page: 100,
-				exclude: postId,
-				parent_exclude: postId,
-				orderby: 'menu_order',
-				order: 'asc',
-				_fields: 'id,title,parent',
-			};
+			const query = applyFilters(
+				'editor.PageAttributesParent.queryArgs',
+				{
+					per_page: 100,
+					exclude: postId,
+					parent_exclude: postId,
+					orderby: 'menu_order',
+					order: 'asc',
+					_fields: 'id,title,parent,status',
+				},
+				getCurrentPost()
+			);
 
 			// Perform a search when the field is changed.
 			if ( !! fieldValue ) {

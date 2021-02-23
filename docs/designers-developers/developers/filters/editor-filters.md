@@ -30,6 +30,24 @@ var customPreviewMessage = function() {
 wp.hooks.addFilter( 'editor.PostPreview.interstitialMarkup', 'my-plugin/custom-preview-message', customPreviewMessage );
 ```
 
+### `editor.PageAttributesParent.queryArgs`
+
+Filters the query arguments used to populate the page attributes parent page dropdown. For instance, this can be used to add draft posts to the dropdown list. Please note that the equivalent PHP filter hook `quick_edit_dropdown_pages_args` must be used to alter the quick edit parent page dropdown.
+
+_Example:_
+
+```js
+var pageAttributesParentQuery = function( args, post ) {
+	if ( post.type === 'page' ) {
+		args.status = 'publish,draft';
+	}
+
+	return args;
+};
+
+wp.hooks.addFilter( 'editor.PageAttributesParent.queryArgs', 'my-plugin/page-attributes-parent-query', pageAttributesParentQuery );
+```
+
 ## Editor settings
 
 ### `block_editor_settings`
