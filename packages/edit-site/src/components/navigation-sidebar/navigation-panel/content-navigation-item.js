@@ -67,7 +67,10 @@ export default function ContentNavigationItem( { item } ) {
 				<NavigationPanelPreviewFill>
 					<TemplatePreview
 						rawContent={ previewContent }
-						provideEntity={ item }
+						blockContext={ {
+							postType: item.type,
+							postId: item.id,
+						} }
 					/>
 				</NavigationPanelPreviewFill>
 			) }
