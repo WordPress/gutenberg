@@ -8,14 +8,8 @@ import {
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	Dropdown,
-	ToolbarGroup,
-	ToolbarButton,
-	Spinner,
-} from '@wordpress/components';
+import { Button, Dropdown, ToolbarGroup, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { chevronUp, chevronDown } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -114,17 +108,15 @@ export default function TemplatePartEdit( {
 								contentClassName="wp-block-template-part__preview-dropdown-content"
 								position="bottom right left"
 								renderToggle={ ( { isOpen, onToggle } ) => (
-									<ToolbarButton
+									<Button
 										aria-expanded={ isOpen }
-										icon={
-											isOpen ? chevronUp : chevronDown
-										}
-										label={ __( 'Choose another' ) }
 										onClick={ onToggle }
 										// Disable when open to prevent odd FireFox bug causing reopening.
 										// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
 										disabled={ isOpen }
-									/>
+									>
+										{ __( 'Replace' ) }
+									</Button>
 								) }
 								renderContent={ ( { onClose } ) => (
 									<TemplatePartSelection
