@@ -86,7 +86,7 @@ function InserterMenu( {
 				removeBlock( blockToReplace, false );
 			}
 		}
-	  // Show/Hide insertion point on Mount/Dismount
+		// Show/Hide insertion point on Mount/Dismount
 		showInsertionPoint( destinationRootClientId, insertionIndex );
 		return hideInsertionPoint;
 	}, [] );
