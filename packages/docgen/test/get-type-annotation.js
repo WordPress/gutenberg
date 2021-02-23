@@ -1837,13 +1837,21 @@ describe( 'Type annotations', () => {
 
 		it( 'should throw an error if there is no return type', () => {
 			expect( () => getTypeAnnotation( returnTag, node ) ).toThrow(
-				'Could not find return type for "My favorite return"'
+				"Could not find return type for function 'fn'."
 			);
 		} );
 
 		it( 'should throw an error if there is no param type', () => {
 			expect( () => getTypeAnnotation( paramTag, node ) ).toThrow(
-				'Could not find param type for "A foo parameter"'
+				"Could not find type for parameter 'foo' in function 'fn'."
+			);
+		} );
+
+		it( 'should throw an error if it cannot find the param by name', () => {
+			expect( () =>
+				getTypeAnnotation( { ...paramTag, name: 'notFoo' }, node )
+			).toThrow(
+				"Could not find corresponding parameter token for documented parameter 'notFoo' in function 'fn'."
 			);
 		} );
 	} );

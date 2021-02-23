@@ -350,26 +350,47 @@ function getTypeAnnotation( typeAnnotation ) {
 }
 
 /**
+ * @param {ASTNode} token
+ * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration} The function token.
+ */
+function getFunctionToken( token ) {
+	let resolvedToken = token;
+	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
+	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
+		// ignore multiple variable declarations
+		resolvedToken = resolvedToken.declarations[ 0 ].init;
+	}
+
+	return resolvedToken;
+}
+
+function getFunctionNameForError( declarationToken ) {
+	let namedFunctionToken = declarationToken;
+	if ( babelTypes.isExportNamedDeclaration( declarationToken ) ) {
+		namedFunctionToken = declarationToken;
+	}
+
+	if ( babelTypes.isVariableDeclaration( namedFunctionToken ) ) {
+		namedFunctionToken = namedFunctionToken.declarations[ 0 ];
+	}
+
+	return namedFunctionToken.id.name;
+}
+
+/**
  * @param {CommentTag} tag The documented parameter.
- * @param {ASTNode} token The function the parameter is documented on.
+ * @param {ASTNode} declarationToken The function the parameter is documented on.
  * @return {null | string} The parameter's type annotation.
  */
-function getParamTypeAnnotation( tag, token ) {
-	// search for the param token corresponding to the tag
-	// use the tag's `name` property
-
-	if ( babelTypes.isExportNamedDeclaration( token ) ) {
-		token = token.declaration;
-	}
-
-	if ( babelTypes.isVariableDeclaration( token ) ) {
-		// ignore multiple variable declarations
-		token = token.declarations[ 0 ].init;
-	}
+function getParamTypeAnnotation( tag, declarationToken ) {
+	const functionToken = getFunctionToken( declarationToken );
 
 	// otherwise find the corresponding parameter token for the documented parameter
 	/** @type {babelTypes.Identifier} */
-	const paramToken = token.params.reduce( ( found, pToken ) => {
+	const paramToken = functionToken.params.reduce( ( found, pToken ) => {
 		if ( found ) return found;
 		return pToken.name === tag.name ? pToken : found;
 	}, null );
@@ -378,31 +399,41 @@ function getParamTypeAnnotation( tag, token ) {
 	// we'll give a descriptive error so that it's easy to diagnose the issue.
 	if ( ! paramToken ) {
 		throw new Error(
-			`Cound not find corresponding parameter token for documented parameter ${ tag.name } in function ${ token.id.name }.`
+			`Could not find corresponding parameter token for documented parameter '${
+				tag.name
+			}' in function '${ getFunctionNameForError( declarationToken ) }'.`
 		);
 	}
 
-	/** @type {babelTypes.TSTypeAnnotation} */
-	const typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-
-	return getTypeAnnotation( typeAnnotation );
+	try {
+		/** @type {babelTypes.TSTypeAnnotation} */
+		const typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+		return getTypeAnnotation( typeAnnotation );
+	} catch ( e ) {
+		throw new Error(
+			`Could not find type for parameter '${
+				tag.name
+			}' in function '${ getFunctionNameForError( declarationToken ) }'.`
+		);
+	}
 }
 
 /**
- * @param {ASTNode} token A function token.
+ * @param {ASTNode} declarationToken A function token.
  * @return {null | string} The function's return type annoation.
  */
-function getReturnTypeAnnotation( token ) {
-	if ( babelTypes.isExportNamedDeclaration( token ) ) {
-		token = token.declaration;
-	}
+function getReturnTypeAnnotation( declarationToken ) {
+	const functionToken = getFunctionToken( declarationToken );
 
-	if ( babelTypes.isVariableDeclaration( token ) ) {
-		// ignore multiple variable declarations
-		token = token.declarations[ 0 ].init;
+	try {
+		return getTypeAnnotation( functionToken.returnType.typeAnnotation );
+	} catch ( e ) {
+		throw new Error(
+			`Could not find return type for function '${ getFunctionNameForError(
+				declarationToken
+			) }'.`
+		);
 	}
-
-	return getTypeAnnotation( token.returnType.typeAnnotation );
 }
 
 module.exports =
@@ -419,22 +450,10 @@ module.exports =
 
 		switch ( tag.tag ) {
 			case 'param': {
-				try {
-					return getParamTypeAnnotation( tag, token );
-				} catch ( e ) {
-					throw new Error(
-						`Could not find param type for "${ tag.description }"`
-					);
-				}
+				return getParamTypeAnnotation( tag, token );
 			}
 			case 'return': {
-				try {
-					return getReturnTypeAnnotation( token );
-				} catch ( e ) {
-					throw new Error(
-						`Could not find return type for "${ tag.name } ${ tag.description }"`
-					);
-				}
+				return getReturnTypeAnnotation( token );
 			}
 			default: {
 				return '';
