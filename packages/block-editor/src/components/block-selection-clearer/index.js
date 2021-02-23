@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useBlockSelectionClearer( ref ) {
+export function useBlockSelectionClearer() {
 	const hasSelection = useSelect( ( select ) => {
 		const { hasSelectedBlock, hasMultiSelection } = select(
 			blockEditorStore
@@ -19,30 +19,31 @@ export function useBlockSelectionClearer( ref ) {
 	} );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	useEffect( () => {
-		if ( ! hasSelection ) {
-			return;
-		}
-
-		function onMouseDown( event ) {
-			// Only handle clicks on the canvas, not the content.
-			if ( event.target.closest( '.wp-block' ) ) {
+	return useRefEffect(
+		( node ) => {
+			if ( ! hasSelection ) {
 				return;
 			}
 
-			clearSelectedBlock();
-		}
+			function onMouseDown( event ) {
+				// Only handle clicks on the canvas, not the content.
+				if ( event.target.closest( '.wp-block' ) ) {
+					return;
+				}
 
-		ref.current.addEventListener( 'mousedown', onMouseDown );
+				clearSelectedBlock();
+			}
 
-		return () => {
-			ref.current.removeEventListener( 'mousedown', onMouseDown );
-		};
-	}, [ hasSelection, clearSelectedBlock ] );
+			node.addEventListener( 'mousedown', onMouseDown );
+
+			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
+			};
+		},
+		[ hasSelection, clearSelectedBlock ]
+	);
 }
 
 export default function BlockSelectionClearer( props ) {
-	const ref = useRef();
-	useBlockSelectionClearer( ref );
-	return <div ref={ ref } { ...props } />;
+	return <div ref={ useBlockSelectionClearer() } { ...props } />;
 }

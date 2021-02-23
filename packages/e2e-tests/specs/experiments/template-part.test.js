@@ -18,6 +18,9 @@ import {
  */
 import { navigationPanel, siteEditor } from '../../experimental-features';
 
+const templatePartNameInput =
+	'.edit-site-template-part-converter__modal .components-text-control__input';
+
 describe( 'Template Part', () => {
 	beforeAll( async () => {
 		await activateTheme( 'tt1-blocks' );
@@ -142,6 +145,17 @@ describe( 'Template Part', () => {
 
 			// Convert block to a template part.
 			await triggerEllipsisMenuItem( 'Make template part' );
+			const nameInput = await page.waitForSelector(
+				templatePartNameInput
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'My template part' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
+			);
 
 			// Verify new template part is created with expected content.
 			await assertParagraphInTemplatePart( 'Some block...' );
@@ -180,6 +194,17 @@ describe( 'Template Part', () => {
 
 			// Convert block to a template part.
 			await triggerEllipsisMenuItem( 'Make template part' );
+			const nameInput = await page.waitForSelector(
+				templatePartNameInput
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'My multi  template part' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
+			);
 
 			// Verify new template part is created with expected content.
 			await assertParagraphInTemplatePart( 'Some block #1' );

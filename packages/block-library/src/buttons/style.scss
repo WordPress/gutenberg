@@ -92,4 +92,8 @@ $blocks-block__margin: 0.5em;
 			margin-left: 0;
 		}
 	}
+
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
 }

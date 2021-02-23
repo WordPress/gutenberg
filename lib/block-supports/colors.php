@@ -60,6 +60,15 @@ function gutenberg_register_colors_support( $block_type ) {
  */
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
+
+	if (
+		is_array( $color_support ) &&
+		array_key_exists( '__experimentalSkipSerialization', $color_support ) &&
+		$color_support['__experimentalSkipSerialization']
+	) {
+		return array();
+	}
+
 	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
 	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
 	$has_link_colors_support       = gutenberg_experimental_get( $color_support, array( 'link' ), false );
