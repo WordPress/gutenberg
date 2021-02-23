@@ -79,6 +79,7 @@ export function TemplatePartAdvancedControls( {
 					{ label: '<article>', value: 'article' },
 					{ label: '<aside>', value: 'aside' },
 					{ label: '<footer>', value: 'footer' },
+					{ label: '<div>', value: 'div' },
 				] }
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
