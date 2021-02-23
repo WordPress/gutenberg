@@ -268,15 +268,19 @@ function GalleryEdit( props ) {
 
 	function setLinkTo( value ) {
 		setAttributes( { linkTo: value } );
+		const changedAttributes = {};
+		const blocks = [];
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			blocks.push( block.clientId );
 			const image = block.attributes.id
 				? find( imageData, { id: block.attributes.id } )
 				: null;
-			updateBlockAttributes( block.clientId, {
-				...getHrefAndDestination( image, value ),
-			} );
+			changedAttributes[ block.clientId ] = getHrefAndDestination(
+				image,
+				value
+			);
 		} );
-
+		updateBlockAttributes( blocks, changedAttributes, true );
 		const linkToText = [ ...linkOptions ].find(
 			( linkType ) => linkType.value === value
 		);
@@ -310,14 +314,16 @@ function GalleryEdit( props ) {
 	function toggleOpenInNewTab( openInNewTab ) {
 		const newLinkTarget = openInNewTab ? '_blank' : undefined;
 		setAttributes( { linkTarget: newLinkTarget } );
+		const changedAttributes = {};
+		const blocks = [];
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			updateBlockAttributes( block.clientId, {
-				...getUpdatedLinkTargetSettings(
-					newLinkTarget,
-					block.attributes
-				),
-			} );
+			blocks.push( block.clientId );
+			changedAttributes[ block.clientId ] = getUpdatedLinkTargetSettings(
+				newLinkTarget,
+				block.attributes
+			);
 		} );
+		updateBlockAttributes( blocks, changedAttributes, true );
 		const noticeText = openInNewTab
 			? __( 'All gallery images updated to open in new tab' )
 			: __( 'All gallery images updated to not open in new tab' );
@@ -328,15 +334,19 @@ function GalleryEdit( props ) {
 
 	function updateImagesSize( newSizeSlug ) {
 		setAttributes( { sizeSlug: newSizeSlug } );
+		const changedAttributes = {};
+		const blocks = [];
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			blocks.push( block.clientId );
 			const image = block.attributes.id
 				? find( imageData, { id: block.attributes.id } )
 				: null;
-			updateBlockAttributes( block.clientId, {
-				...getImageSizeAttributes( image, newSizeSlug ),
-			} );
+			changedAttributes[ block.clientId ] = getImageSizeAttributes(
+				image,
+				newSizeSlug
+			);
 		} );
-
+		updateBlockAttributes( blocks, changedAttributes, true );
 		const imageSize = imageSizeOptions.find(
 			( size ) => size.value === newSizeSlug
 		);
