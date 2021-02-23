@@ -50,7 +50,7 @@ Snapshot Diff:
 - - First value
 - + Second value
 -
-- @@ -1,14 +1,14 @@
+- @@ -1,19 +1,19 @@
 -   Array [
 -     Object {
 -       \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
@@ -67,13 +67,6 @@ Snapshot Diff:
 -       \\"-webkit-flex-direction\\": \\"row\\",
 -       \\"-webkit-font-smoothing\\": \\"antialiased\\",
 -       \\"-webkit-justify-content\\": \\"space-between\\",
--       \\"0\\": \\"box-sizing\\",
-- @@ -30,11 +30,11 @@
--       \\"5\\": \\"font-weight\\",
--       \\"6\\": \\"margin\\",
--       \\"7\\": \\"display\\",
--       \\"8\\": \\"--wp-g2-flex-gap\\",
--       \\"9\\": \\"-webkit-align-items\\",
 - -     \\"align-items\\": \\"flex-start\\",
 - +     \\"align-items\\": \\"center\\",
 -       \\"box-sizing\\": \\"border-box\\",
@@ -266,7 +259,7 @@ Snapshot Diff:
 - - First value
 - + Second value
 -
-- @@ -2,17 +2,17 @@
+- @@ -2,24 +2,24 @@
 -     Object {
 -       \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
 -       \\"-moz-osx-font-smoothing\\": \\"grayscale\\",
@@ -282,12 +275,8 @@ Snapshot Diff:
 -       \\"-webkit-font-smoothing\\": \\"antialiased\\",
 - -     \\"-webkit-justify-content\\": \\"flex-start\\",
 - +     \\"-webkit-justify-content\\": \\"space-between\\",
--       \\"0\\": \\"box-sizing\\",
--       \\"1\\": \\"-moz-osx-font-smoothing\\",
--       \\"10\\": \\"-webkit-box-align\\",
--       \\"11\\": \\"-ms-flex-align\\",
--       \\"12\\": \\"align-items\\",
-- @@ -37,11 +37,11 @@
+-       \\"align-items\\": \\"center\\",
+-       \\"box-sizing\\": \\"border-box\\",
 -       \\"display\\": \\"flex\\",
 -       \\"flex-direction\\": \\"row\\",
 -       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
@@ -295,7 +284,6 @@ Snapshot Diff:
 -       \\"font-weight\\": \\"var(--wp-g2-font-weight)\\",
 - -     \\"justify-content\\": \\"flex-start\\",
 - +     \\"justify-content\\": \\"space-between\\",
--       \\"length\\": 21,
 -       \\"margin\\": \\"0\\",
 -       \\"width\\": \\"100%\\",
 -     },
