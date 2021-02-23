@@ -31,7 +31,7 @@ import { buttonWithIcon, toggleLabel } from './icons';
 import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
 import richTextStyles from './rich-text.scss';
-import { isPercentageUnit, CSS_UNITS } from './utils.js';
+import { isPercentageUnit, getWidthWithUnit, CSS_UNITS } from './utils.js';
 
 const MIN_BUTTON_WIDTH = 100;
 
@@ -49,6 +49,27 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+
+	const onChange = ( nextWidth ) => {
+		console.log( `onChange > nextWidth = ${ nextWidth }` );
+		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
+			return;
+		}
+		onChangeWidth( nextWidth );
+	};
+
+	const onChangeWidth = ( nextWidth ) => {
+		console.log( `onChangeWidth > nextWidth = ${ nextWidth }` );
+		const widthWithUnit = getWidthWithUnit( nextWidth, widthUnit );
+
+		setAttributes( {
+			width: widthWithUnit,
+		} );
+	};
+
+	const onChangeUnit = ( nextUnit ) => {
+		console.log( `onChangeUnit > nextUnit = ${ nextUnit }` );
+	};
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -124,7 +145,11 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
 						decimalNum={ 1 }
 						units={ CSS_UNITS }
-						unit={ widthUnit }
+						unit={ widthUnit || '%' }
+						onChange={ onChange }
+						onComplete={ onChangeWidth }
+						onUnitChange={ onChangeUnit }
+						value={ width || parseFloat( 100 ) }
 					/>
 				</PanelBody>
 			</InspectorControls>
