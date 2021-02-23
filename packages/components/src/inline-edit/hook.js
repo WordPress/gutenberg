@@ -15,7 +15,7 @@ const getEventValue = ( { target: { value } } ) => value;
 const mergeEvent = ( ...handlers ) => ( event ) =>
 	handlers.forEach( ( handler = noop ) => handler( event ) );
 
-export default function useInlineEdit({
+export default function useInlineEdit( {
 	validate = negate( isUndefined ),
 	onWrongInput = noop,
 	onCommit = noop,
