@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { PanelBody, SelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const CATEGORY_OPTIONS = [
@@ -23,16 +23,12 @@ export default function TemplatePartCategoryPanel( { postId } ) {
 	);
 
 	return (
-		<PanelBody title={ __( 'Category' ) }>
-			<SelectControl
-				label={ __( 'Select template part category' ) }
-				labelPosition="top"
-				options={ CATEGORY_OPTIONS }
-				value={ area }
-				direction="column"
-				justify="flex-start"
-				onChange={ setArea }
-			/>
-		</PanelBody>
+		<SelectControl
+			label={ __( 'Area' ) }
+			labelPosition="top"
+			options={ CATEGORY_OPTIONS }
+			value={ area }
+			onChange={ setArea }
+		/>
 	);
 }

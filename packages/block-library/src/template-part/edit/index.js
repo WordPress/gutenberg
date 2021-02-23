@@ -5,7 +5,6 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
-	InspectorControls,
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
@@ -91,15 +90,13 @@ export default function TemplatePartEdit( {
 
 	return (
 		<>
-			<InspectorControls>
-				{ isEntityAvailable && (
-					<>
-						<TemplatePartNamePanel postId={ templatePartId } />
-						<TemplatePartCategoryPanel postId={ templatePartId } />
-					</>
-				) }
-			</InspectorControls>
 			<InspectorAdvancedControls>
+				{ isEntityAvailable && (
+					<TemplatePartNamePanel postId={ templatePartId } />
+				) }
+				{ isEntityAvailable && (
+					<TemplatePartCategoryPanel postId={ templatePartId } />
+				) }
 				<SelectControl
 					label={ __( 'HTML element' ) }
 					options={ [
