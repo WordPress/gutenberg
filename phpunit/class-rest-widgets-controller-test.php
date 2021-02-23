@@ -923,7 +923,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
@@ -939,7 +939,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
