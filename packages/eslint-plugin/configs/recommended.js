@@ -21,7 +21,6 @@ module.exports = {
 		},
 		'import/core-modules': [ 'react' ],
 	},
-	parser: '@typescript-eslint/parser',
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',
@@ -34,6 +33,7 @@ module.exports = {
 	overrides: [
 		{
 			files: [ '**/*.ts', '**/*.tsx' ],
+			parser: '@typescript-eslint/parser',
 			rules: {
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
