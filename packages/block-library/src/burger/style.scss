@@ -1,0 +1,25 @@
+// To do: remove horizontal margin override by the editor.
+
+.wp-block-burger {
+	.wp-block-burger__inner-container {
+		display: none;
+	}
+	> input[type="checkbox"] {
+		display: none;
+	}
+}
+
+.wp-block-burger__toggle-status:checked ~ .wp-block-burger__inner-container {
+	display: block;
+}
+
+@include break-medium() {
+	.wp-block-burger {
+		.wp-block-burger__inner-container {
+			display: block;
+		}
+	}
+	.wp-block-burger .wp-block-burger__toggle-button {
+		display: none;
+	}
+}

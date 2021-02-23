@@ -24,6 +24,7 @@ import * as archives from './archives';
 import * as audio from './audio';
 import * as buttons from './buttons';
 import * as button from './button';
+import * as burger from './burger';
 import * as calendar from './calendar';
 import * as categories from './categories';
 import * as code from './code';
@@ -132,6 +133,7 @@ export const __experimentalGetCoreBlocks = () => [
 	shortcode,
 	archives,
 	audio,
+	burger,
 	button,
 	buttons,
 	calendar,
