@@ -76,10 +76,10 @@ const getJsonpFunctionIdentifier = () => {
 	);
 };
 
-const getLiveReloadPort = ( inputPort, defaultPort = 35729 ) => {
+const getLiveReloadPort = ( inputPort ) => {
 	const parsedPort = parseInt( inputPort, 10 );
 
-	return Number.isInteger( parsedPort ) ? parsedPort : defaultPort;
+	return Number.isInteger( parsedPort ) ? parsedPort : 35729;
 };
 
 const config = {
