@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, concat, differenceBy, some, every, find } from 'lodash';
+import { isEmpty, concat, differenceBy, some, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -140,19 +140,14 @@ function GalleryEdit( props ) {
 			) {
 				return imageData;
 			}
-			const getMedia = select( coreStore ).getMedia;
-			const newImageData = innerBlockImages.map( ( imageBlock ) => {
-				return {
-					id: imageBlock.attributes.id,
-					data: getMedia( imageBlock.attributes.id ),
-				};
-			} );
 
-			if ( every( newImageData, ( img ) => img.data ) ) {
-				return newImageData;
-			}
+			const imageIds = innerBlockImages.map(
+				( imageBlock ) => imageBlock.attributes.id
+			);
 
-			return imageData;
+			const getMediaItems = select( coreStore ).getMediaItems;
+
+			return getMediaItems( { include: imageIds } );
 		},
 		[ innerBlockImages ]
 	);
@@ -278,7 +273,7 @@ function GalleryEdit( props ) {
 				? find( imageData, { id: block.attributes.id } )
 				: null;
 			updateBlockAttributes( block.clientId, {
-				...getHrefAndDestination( image.data, value ),
+				...getHrefAndDestination( image, value ),
 			} );
 		} );
 
@@ -338,7 +333,7 @@ function GalleryEdit( props ) {
 				? find( imageData, { id: block.attributes.id } )
 				: null;
 			updateBlockAttributes( block.clientId, {
-				...getImageSizeAttributes( image.data, newSizeSlug ),
+				...getImageSizeAttributes( image, newSizeSlug ),
 			} );
 		} );
 
