@@ -290,7 +290,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			$sidebar['before_title']  = isset( $registered_sidebar['before_title'] ) ? $registered_sidebar['before_title'] : '';
 			$sidebar['after_title']   = isset( $registered_sidebar['after_title'] ) ? $registered_sidebar['after_title'] : '';
 		} else {
-			$sidebar['status'] = 'inactive';
+			$sidebar['status']      = 'inactive';
+			$sidebar['name']        = $raw_sidebar['name'];
+			$sidebar['description'] = '';
+			$sidebar['class']       = '';
 		}
 
 		$fields = $this->get_fields_for_response( $request );
