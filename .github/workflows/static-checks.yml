@@ -32,6 +32,9 @@ jobs:
       with:
         node-version: 14.x
 
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
+
     - name: Npm install and build
       # A "full" install is executed, since `npm ci` does not always exit
       # with an error status code if the lock file is inaccurate.

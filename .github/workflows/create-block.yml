@@ -43,6 +43,9 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
 
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
+
     - name: npm install, build, format and lint
       run: |
         npm ci

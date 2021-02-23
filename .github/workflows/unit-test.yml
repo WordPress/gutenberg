@@ -37,6 +37,9 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
 
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
+
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret
       # source files with `babel-jest`. Some packages have their own custom
@@ -76,6 +79,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
 
     - name: Npm install and build
       run: |
@@ -124,6 +130,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+
+    - name: Install latest NPM version
+      run: npm install -g npm@latest
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret
