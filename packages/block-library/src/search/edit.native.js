@@ -47,7 +47,6 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 	} = attributes;
 
 	const onChange = ( nextWidth ) => {
-		console.log( `onChange > nextWidth = ${ nextWidth }` );
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
 			return;
 		}
@@ -55,8 +54,6 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 	};
 
 	const onChangeWidth = ( nextWidth ) => {
-		console.log( `onChangeWidth > nextWidth = ${ nextWidth }` );
-
 		setAttributes( {
 			width: nextWidth,
 			widthUnit,
@@ -64,7 +61,9 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 	};
 
 	const onChangeUnit = ( nextUnit ) => {
-		console.log( `onChangeUnit > nextUnit = ${ nextUnit }` );
+		setAttributes( {
+			widthUnit: nextUnit,
+		} );
 	};
 
 	const getBlockClassNames = () => {
