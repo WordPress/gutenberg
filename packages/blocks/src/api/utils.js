@@ -225,7 +225,7 @@ export function getAccessibleBlockLabel(
 		if ( hasLabel ) {
 			return sprintf(
 				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block label.. */
-				__( 'Column %1$d of %2$d. %4$s' ),
+				__( 'Column %1$d of %2$d. %3$s' ),
 				position,
 				total,
 				label
