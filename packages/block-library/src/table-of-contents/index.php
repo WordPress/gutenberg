@@ -309,7 +309,7 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 	}
 
 	return sprintf(
-		'<nav class="%1$s">%2$s</nav>',
+		'<nav %1$s>%2$s</nav>',
 		get_block_wrapper_attributes(),
 		block_core_table_of_contents_render_list(
 			block_core_table_of_contents_linear_to_nested_heading_list( $headings )
