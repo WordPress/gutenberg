@@ -7,12 +7,13 @@ import { camelCase, upperFirst } from 'lodash';
  * Given a function mapping a component to an enhanced component and modifier
  * name, returns the enhanced component augmented with a generated displayName.
  *
- * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ * @template {{}} T
+ * @param {(OriginalComponent: import('react').ComponentType<T>) => import('react').ComponentType<T>} mapComponentToEnhancedComponent Function mapping component
  *                                                   to enhanced component.
  * @param {string}   modifierName                    Seed name from which to
  *                                                   generated display name.
  *
- * @return {WPComponent} Component class with generated display name assigned.
+ * @return {(OriginalComponent: import('react').ComponentType<T>) => import('react').ComponentType<T>} Component class with generated display name assigned.
  */
 function createHigherOrderComponent(
 	mapComponentToEnhancedComponent,

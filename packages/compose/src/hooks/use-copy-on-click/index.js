@@ -11,8 +11,9 @@ import { useRef, useEffect, useState } from '@wordpress/element';
 /**
  * Copies the text to the clipboard when the element is clicked.
  *
- * @param {Object}          ref     Reference with the element.
- * @param {string|Function} text    The text to copy.
+ * @template {HTMLElement} TElement
+ * @param {import('react').RefObject<TElement>}          ref     Reference with the element.
+ * @param {string| ( () => string )} text    The text to copy.
  * @param {number}          timeout Optional timeout to reset the returned
  *                                  state. 4 seconds by default.
  *
@@ -20,10 +21,16 @@ import { useRef, useEffect, useState } from '@wordpress/element';
  *                   timeout.
  */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
 	const clipboard = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
+		if ( ! ref.current ) {
+			return;
+		}
+
+		/** @type {number} */
 		let timeoutId;
 
 		// Clipboard listens to click events.
@@ -39,7 +46,7 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 
 			// Handle ClipboardJS focus bug, see https://github.com/zenorocha/clipboard.js/issues/680
 			if ( trigger ) {
-				trigger.focus();
+				/** @type {HTMLElement} */ ( trigger ).focus();
 			}
 
 			if ( timeout ) {
@@ -50,7 +57,9 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		} );
 
 		return () => {
-			clipboard.current.destroy();
+			if ( clipboard.current ) {
+				clipboard.current.destroy();
+			}
 			clearTimeout( timeoutId );
 		};
 	}, [ text, timeout, setHasCopied ] );

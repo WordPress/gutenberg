@@ -7,9 +7,10 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  * Higher-order component creator, creating a new component which renders if
  * the given condition is satisfied or with the given optional prop name.
  *
- * @param {Function} predicate Function to test condition.
+ * @template {{}} T
+ * @param {(props: T) => boolean} predicate Function to test condition.
  *
- * @return {Function} Higher-order component.
+ * @return {(Component: import('react').ComponentType<T>) => import('react').ComponentType<T>} Higher-order component.
  */
 const ifCondition = ( predicate ) =>
 	createHigherOrderComponent(

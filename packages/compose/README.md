@@ -85,12 +85,12 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ `(OriginalComponent: import('react').ComponentType<T>) => import('react').ComponentType<T>`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `WPComponent`: Component class with generated display name assigned.
+-   `(OriginalComponent: import('react').ComponentType<T>) => import('react').ComponentType<T>`: Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
@@ -99,11 +99,11 @@ the given condition is satisfied or with the given optional prop name.
 
 _Parameters_
 
--   _predicate_ `Function`: Function to test condition.
+-   _predicate_ `(props: T) => boolean`: Function to test condition.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `(Component: import('react').ComponentType<T>) => import('react').ComponentType<T>`: Higher-order component.
 
 <a name="pure" href="#pure">#</a> **pure**
 
@@ -126,11 +126,11 @@ This behavior is useful if we want to render a list of items asynchronously for 
 
 _Parameters_
 
--   _list_ `Array`: Source array.
+-   _list_ `T[]`: Source array.
 
 _Returns_
 
--   `Array`: Async array.
+-   `T[]`: Async array.
 
 <a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
 
@@ -163,8 +163,8 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
--   _text_ `string|Function`: The text to copy.
+-   _ref_ `import('react').RefObject<TElement>`: Reference with the element.
+-   _text_ `string| ( () => string )`: The text to copy.
 -   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
