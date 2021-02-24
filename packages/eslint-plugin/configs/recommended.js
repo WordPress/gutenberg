@@ -27,6 +27,7 @@ module.exports = {
 		'prettier/react',
 		'plugin:@typescript-eslint/eslint-recommended',
 	],
+	ignorePatterns: [ '**/*.d.ts' ],
 	rules: {
 		'prettier/prettier': [ 'error', prettierConfig ],
 	},
