@@ -183,21 +183,16 @@ function InputField(
 		}
 	);
 
-	const { onMouseDown, ...dragProps } = isDragEnabled
-		? dragGestureProps()
-		: {};
+	const dragProps = isDragEnabled ? dragGestureProps() : {};
 	/*
 	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
 	 * type=number when their spinner arrows are pressed.
 	 */
-	let handleOnMouseDown = onMouseDown;
+	let handleOnMouseDown;
 	if ( type === 'number' ) {
 		handleOnMouseDown = ( event ) => {
 			if ( event.target !== event.target.ownerDocument.activeElement ) {
 				event.target.focus();
-			}
-			if ( isDragEnabled ) {
-				onMouseDown( event );
 			}
 		};
 	}
