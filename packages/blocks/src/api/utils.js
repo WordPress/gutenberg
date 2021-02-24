@@ -188,20 +188,21 @@ export function getAccessibleBlockLabel(
 
 	if ( hasPosition && direction === 'vertical' ) {
 		if ( hasLabel ) {
+			if ( hasParentTitle ) {
+				return sprintf(
+					/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. 4: The block label.. */
+					__( '%1$d of %2$d. Child of %3$s block. %4$s' ),
+					position,
+					total,
+					parentTitle,
+					label
+				);
+			}
 			return sprintf(
 				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The block label.. */
 				__( '%1$d of %2$d. %3$s' ),
 				position,
 				total,
-				label
-			);
-		} else if ( hasLabel && hasParentTitle ) {
-			return sprintf(
-				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. 4: The block label.. */
-				__( '%1$d of %2$d. Child of %3$s block. %4$s' ),
-				position,
-				total,
-				parentTitle,
 				label
 			);
 		}
@@ -223,20 +224,21 @@ export function getAccessibleBlockLabel(
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
+			if ( hasParentTitle ) {
+				return sprintf(
+					/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
+					__( 'Column %1$d of %2$d. Child of %3$s block. %4$s' ),
+					position,
+					total,
+					parentTitle,
+					label
+				);
+			}
 			return sprintf(
 				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block label.. */
 				__( 'Column %1$d of %2$d. %3$s' ),
 				position,
 				total,
-				label
-			);
-		} else if ( hasLabel && hasParentTitle ) {
-			return sprintf(
-				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
-				__( 'Column %1$d of %2$d. Child of %3$s block. %4$s' ),
-				position,
-				total,
-				parentTitle,
 				label
 			);
 		}
