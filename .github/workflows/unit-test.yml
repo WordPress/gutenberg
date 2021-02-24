@@ -5,7 +5,9 @@ name: Unit Tests
 on:
   pull_request:
   push:
-    branches: [master, wp-trunk]
+    branches:
+      - master
+      - 'wp/**'
 
 jobs:
   unit-js:
