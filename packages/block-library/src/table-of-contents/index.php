@@ -23,7 +23,7 @@ function block_core_table_of_contents_get_headings_from_content(
 	$current_page = 1
 ) {
 	/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
-	// Disabled because of PHP DOMDoument and DOMXPath APIs using camelCase.
+	// Disabled because of PHP DOMDocument and DOMXPath APIs using camelCase.
 
 	// Create a document to load the post content into.
 	$doc = new DOMDocument();
@@ -190,7 +190,7 @@ function block_core_table_of_contents_linear_to_nested_heading_list(
 		if ( $heading['level'] === $heading_list[0]['level'] ) {
 			// Check that the next iteration will return a value.
 			// If it does and the next level is greater than the current level,
-			// the next iteration becomes a child of the current interation.
+			// the next iteration becomes a child of the current iteration.
 			if (
 				isset( $heading_list[ $key + 1 ] ) &&
 				$heading_list[ $key + 1 ]['level'] > $heading['level']
