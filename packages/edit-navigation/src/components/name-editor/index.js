@@ -38,7 +38,6 @@ export function NameEditor() {
 				onChange={ ( value ) => {
 					editMenuName( value );
 				} }
-				aria-label={ __( 'Edit menu name' ) }
 			/>
 		</>
 	);

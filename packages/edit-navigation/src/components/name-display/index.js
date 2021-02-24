@@ -20,7 +20,10 @@ export default function NameDisplay() {
 	return (
 		<BlockControls>
 			<ToolbarGroup>
-				<ToolbarButton onClick={ setIsMenuNameEditFocused }>
+				<ToolbarButton
+					aria-label={ `Edit menu name: ${ menuName }` }
+					onClick={ setIsMenuNameEditFocused }
+				>
 					{ menuName }
 				</ToolbarButton>
 			</ToolbarGroup>
