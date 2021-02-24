@@ -25,7 +25,7 @@
 	border-radius: 8px;
 	color: $gray-dark;
 	margin: $grid-unit-30;
-	background-color: $white;
+	background-color: $gray-light;
 	flex-direction: row;
 	justify-content: space-between;
 }
@@ -35,7 +35,7 @@
 }
 
 .searchFormInput {
-	color: $gray;
+	color: $gray-dark;
 	flex: 2;
 }
 
