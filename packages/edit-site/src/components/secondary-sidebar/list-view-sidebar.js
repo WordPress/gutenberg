@@ -18,18 +18,26 @@ import { focus } from '@wordpress/dom';
  */
 import { store as editSiteStore } from '../../store';
 
+/**
+ * Hook used to focus on mount the selected block's corresponding list item,
+ * or the first list item if no block is selected.
+ *
+ * @see packages/compose/src/hooks/use-focus-on-mount/index.js
+ *
+ * @return {Function} Ref callback.
+ */
 function useFocusSelectedOnMount() {
 	return useCallback( ( node ) => {
 		if ( ! node || node.contains( node.ownerDocument.activeElement ) ) {
 			return;
 		}
 
-		const foundNode = node.querySelector(
+		const selectedItem = node.querySelector(
 			'.block-editor-block-navigation-leaf.is-selected'
 		);
 
-		const target = foundNode
-			? focus.tabbable.find( foundNode )[ 0 ]
+		const target = selectedItem
+			? focus.tabbable.find( selectedItem )[ 0 ]
 			: focus.tabbable.find( node )[ 0 ];
 
 		if ( target ) {
