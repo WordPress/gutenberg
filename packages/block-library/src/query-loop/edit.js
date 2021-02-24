@@ -48,11 +48,6 @@ export default function QueryLoopEdit( {
 		} = {},
 		queryContext = [ {} ],
 		templateSlug,
-		// `layout` and `align` context come from `Query` block
-		// and is a UI choice to make the handling of the block more
-		// user friendly. The plan is to find a way to make these two
-		// attributes of `QueryLoop`, but keep them in `Query` toolbar
-		// and later absorb the `QueryLoop` toolbar from its parent.
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
