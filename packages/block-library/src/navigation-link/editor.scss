@@ -57,6 +57,7 @@
 // Menu item setup state, is shown when a menu item has no URL configured.
 .wp-block-navigation-link__placeholder {
 	position: relative;
+	cursor: pointer;
 
 	// Provide a little margin to show each placeholder as a separate unit.
 	margin: 2px;
