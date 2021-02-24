@@ -7,12 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	createContext,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
+import { createContext, useMemo, useCallback } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveElement,
@@ -89,29 +84,6 @@ function BlockListBlock( {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
-	// Handling the error state
-	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( true );
-
-	const blockType = getBlockType( name );
-	const lightBlockWrapper =
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
-
-	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = mergeWrapperProps(
-			wrapperProps,
-			blockType.getEditWrapperProps( attributes )
-		);
-	}
-	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
-
-	// The wp-block className is important for editor styles.
-	const wrapperClassName = classnames( className, {
-		'wp-block': ! isAligned,
-	} );
-
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
@@ -132,27 +104,33 @@ function BlockListBlock( {
 		/>
 	);
 
+	const blockType = getBlockType( name );
+	const lightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
+
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType.getEditWrapperProps ) {
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
+	}
+
+	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
+
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
 	if ( isAligned ) {
-		const alignmentWrapperProps = {
-			'data-align': wrapperProps[ 'data-align' ],
-		};
 		blockEdit = (
-			<div className="wp-block" { ...alignmentWrapperProps }>
+			<div
+				className="wp-block"
+				data-align={ wrapperProps[ 'data-align' ] }
+			>
 				{ blockEdit }
 			</div>
 		);
 	}
-
-	const value = {
-		clientId,
-		isSelected,
-		index,
-		className: wrapperClassName,
-		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
-	};
-	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
 	let block;
 
@@ -180,16 +158,27 @@ function BlockListBlock( {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
+	const value = {
+		clientId,
+		isSelected,
+		index,
+		// The wp-block className is important for editor styles.
+		className: classnames( className, { 'wp-block': ! isAligned } ),
+		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
+	};
+	const memoizedValue = useMemo( () => value, Object.values( value ) );
+
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
-			<BlockCrashBoundary onError={ onBlockError }>
+			<BlockCrashBoundary
+				fallback={
+					<Block className="has-warning">
+						<BlockCrashWarning />
+					</Block>
+				}
+			>
 				{ block }
 			</BlockCrashBoundary>
-			{ !! hasError && (
-				<Block className="has-warning">
-					<BlockCrashWarning />
-				</Block>
-			) }
 		</BlockListBlockContext.Provider>
 	);
 }
