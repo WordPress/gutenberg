@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { swatch } from '@wordpress/icons';
@@ -28,28 +28,26 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 	};
 	return (
 		<>
-			<ToolbarGroup>
-				<ToolbarButton
-					showTooltip
-					onClick={ onToggle }
-					aria-haspopup="true"
-					aria-expanded={ isOpen }
-					onKeyDown={ openOnArrowDown }
-					label={ __( 'Apply duotone filter' ) }
-					icon={
-						value ? (
-							<Swatch
-								fill={ getGradientFromValues(
-									value.values,
-									'135deg'
-								) }
-							/>
-						) : (
-							swatch
-						)
-					}
-				/>
-			</ToolbarGroup>
+			<ToolbarButton
+				showTooltip
+				onClick={ onToggle }
+				aria-haspopup="true"
+				aria-expanded={ isOpen }
+				onKeyDown={ openOnArrowDown }
+				label={ __( 'Apply duotone filter' ) }
+				icon={
+					value ? (
+						<Swatch
+							fill={ getGradientFromValues(
+								value.values,
+								'135deg'
+							) }
+						/>
+					) : (
+						swatch
+					)
+				}
+			/>
 			{ isOpen && (
 				<DuotonePickerPopover
 					value={ value }

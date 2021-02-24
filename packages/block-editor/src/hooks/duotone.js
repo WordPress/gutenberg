@@ -11,6 +11,7 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { ToolbarGroup } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
@@ -102,14 +103,16 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 		return (
 			<>
 				<BlockControls>
-					<DuotoneToolbar
-						value={ duotone }
-						duotonePalette={ duotonePalette }
-						colorPalette={ colorPalette }
-						onChange={ ( newDuotone ) => {
-							setAttributes( { duotone: newDuotone } );
-						} }
-					/>
+					<ToolbarGroup>
+						<DuotoneToolbar
+							value={ duotone }
+							duotonePalette={ duotonePalette }
+							colorPalette={ colorPalette }
+							onChange={ ( newDuotone ) => {
+								setAttributes( { duotone: newDuotone } );
+							} }
+						/>
+					</ToolbarGroup>
 				</BlockControls>
 				<div className={ duotone?.id }>
 					<BlockEdit { ...props } />
