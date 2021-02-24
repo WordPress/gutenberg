@@ -37,7 +37,7 @@ module.exports = {
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
 		'jest-emotion',
-		require.resolve( 'snapshot-diff/serializer' ),
+		'snapshot-diff/serializer',
 	],
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
