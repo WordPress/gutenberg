@@ -482,10 +482,7 @@ async function releaseRC() {
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new RC version of the Plugin.\n',
 		'It goes through different steps: creating the release branch, bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
-		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, and attach it to a release draft.\n',
-		"To perform a release you'll have to be a member of the " +
-			config.team +
-			' Team.\n'
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, and attach it to a release draft.\n'
 	);
 
 	const version = await releasePlugin( true );
