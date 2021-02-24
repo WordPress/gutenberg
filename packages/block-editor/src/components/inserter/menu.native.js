@@ -40,6 +40,7 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
 
 	const {
 		showInsertionPoint,
@@ -181,18 +182,21 @@ function InserterMenu( {
 				{ ( { listProps, safeAreaBottomInset } ) => (
 					<View>
 						{
-							// eslint-disable-next-line no-undef
+						// eslint-disable-next-line no-undef
 						__DEV__ && (
 							<View>
-								<InserterSearchForm
-									onChange={ ( value ) => {
-										setFilterValue( value );
-									} }
-									value={ filterValue }
-								/>
-							</View>
-						)
-					}
+							<InserterSearchForm
+								onChange={ ( value ) => {
+									setFilterValue( value );
+								} }
+								value={ filterValue }
+								onLayout={ ( event ) => {
+									const { height } = event.nativeEvent.layout;
+									setSearchFormHeight( height );
+								} }
+							/>
+						) }
+
 						<InserterSearchResults
 						onClose={ onClose }
 							items={ getItems() }
@@ -203,6 +207,7 @@ function InserterMenu( {
 							{ ...{
 								listProps,
 								safeAreaBottomInset,
+								searchFormHeight,
 							} }
 						/>
 					</View>

@@ -22,7 +22,7 @@ import {
  */
 import styles from './style.scss';
 
-function InserterSearchForm( { value, onChange } ) {
+function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	const [ isActive, setIsActive ] = useState( false );
 
 	const inputRef = useRef();
@@ -43,7 +43,7 @@ function InserterSearchForm( { value, onChange } ) {
 	);
 
 	return (
-		<TouchableHighlight accessible={ false }>
+		<TouchableHighlight accessible={ false } onLayout={ onLayout }>
 			<View style={ searchFormStyle }>
 				{ isActive ? (
 					<ToolbarButton
