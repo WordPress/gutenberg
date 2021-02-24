@@ -96,4 +96,13 @@ $blocks-block__margin: 0.5em;
 			margin-left: 0;
 		}
 	}
+
+	// Back compat: Inner button blocks previously had their own alignment
+	// options. Forcing them to 100% width in the flex container replicates
+	// that these were block level elements that took up the full width.
+	.wp-block-button.aligncenter {
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
+	}
 }
