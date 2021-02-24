@@ -4,7 +4,7 @@
 import {
 	createNewPost,
 	openGlobalBlockInserter,
-	getAllBlocks,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Inserter', () => {
@@ -26,25 +26,19 @@ describe( 'Inserter', () => {
 	} );
 
 	it( 'last-inserted block should be given and keep the focus', async () => {
-		await page.focus( '.block-editor-default-block-appender__content' );
-		await page.keyboard.type( 'Testing inserted block focus' );
+		await page.type(
+			'.block-editor-default-block-appender__content',
+			'Testing inserted block focus'
+		);
 
-		await openGlobalBlockInserter();
-
-		await page.keyboard.down( 'Control' );
-		await page.click( '.editor-block-list-item-image' );
-		await page.keyboard.up( 'Control' );
+		await insertBlock( 'Image' );
 
 		await page.waitForSelector( 'figure[data-type="core/image"]' );
-
-		const imageBlock = ( await getAllBlocks() ).find(
-			( block ) => block.name === 'core/image'
-		);
 
 		const selectedBlock = await page.evaluate( () => {
 			return wp.data.select( 'core/block-editor' ).getSelectedBlock();
 		} );
 
-		expect( selectedBlock.clientId ).toBe( imageBlock.clientId );
+		expect( selectedBlock.name ).toBe( 'core/image' );
 	} );
 } );
