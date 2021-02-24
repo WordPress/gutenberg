@@ -144,6 +144,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Type Metadata",
+		"slug": "block-metadata",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-metadata.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Block Patterns",
 		"slug": "block-patterns",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
@@ -597,6 +603,12 @@
 		"title": "Finishing Touches",
 		"slug": "finishing",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/finishing.md",
+		"parent": "create-block"
+	},
+	{
+		"title": "Share your Block with the World",
+		"slug": "submitting-to-block-directory",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
 	},
 	{

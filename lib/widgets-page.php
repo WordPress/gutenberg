@@ -33,7 +33,7 @@ function gutenberg_widgets_init( $hook ) {
 		wp_enqueue_style( 'wp-block-library-theme' );
 		wp_add_inline_style(
 			'wp-block-library-theme',
-			'.block-widget-form .widget-control-save { display: none; }'
+			'.wp-block-widget-textarea { width: 100%; min-height: 5em; margin: 8px 0 16px 0; }'
 		);
 		return;
 	}

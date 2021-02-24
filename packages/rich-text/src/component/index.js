@@ -20,6 +20,7 @@ import {
 } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -162,8 +163,9 @@ function RichText(
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
-	ref
+	forwardedRef
 ) {
+	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
 		formatTypes,
@@ -1073,7 +1075,7 @@ function RichText(
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref,
+		ref: useMergeRefs( [ forwardedRef, ref ] ),
 		style: defaultStyle,
 		className: 'rich-text',
 		onPaste: handlePaste,

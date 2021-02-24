@@ -2,16 +2,24 @@
 /**
  * REST API: WP_REST_Widgets_Controller class
  *
- * @package Gutenberg
+ * @package WordPress
+ * @subpackage REST_API
+ * @since 5.6.0
  */
 
 /**
- * Core class representing a controller for widgets.
+ * Core class to access widgets via the REST API.
+ *
+ * @since 5.6.0
+ *
+ * @see WP_REST_Controller
  */
 class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 	/**
 	 * Widgets controller constructor.
+	 *
+	 * @since 5.6.0
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
@@ -20,6 +28,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 	/**
 	 * Registers the widget routes for the controller.
+	 *
+	 * @since 5.6.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -225,13 +235,11 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			}
 		}
 
-		$backup_post = $_POST;
-
 		if ( isset( $request['settings'] ) ) {
+			$backup_post = $_POST;
 			$this->save_widget( $request );
+			$_POST = $backup_post;
 		}
-
-		$_POST = $backup_post;
 
 		if ( isset( $request['sidebar'] ) && $request['sidebar'] !== $sidebar_id ) {
 			$sidebar_id = $request['sidebar'];
@@ -275,7 +283,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 		if ( $request['force'] ) {
 			$prepared = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
-			$this->assign_to_sidebar( $widget_id, null );
+			$this->assign_to_sidebar( $widget_id, '' );
 			$prepared->set_data(
 				array(
 					'deleted'  => true,
@@ -299,8 +307,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Assigns a widget to the given sidebar.
 	 *
+	 * @since 5.6.0
+	 *
 	 * @param string $widget_id  The widget id to assign.
-	 * @param string $sidebar_id The sidebar id to assign to.
+	 * @param string $sidebar_id The sidebar id to assign to. If empty, the widget won't be added to any sidebar.
 	 */
 	protected function assign_to_sidebar( $widget_id, $sidebar_id ) {
 		$sidebars = wp_get_sidebars_widgets();
@@ -325,6 +335,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Performs a permissions check for managing widgets.
 	 *
+	 * @since 5.6.0
+	 *
 	 * @return true|WP_Error
 	 */
 	protected function permissions_check() {
@@ -344,6 +356,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Finds the sidebar a widget belongs to.
 	 *
+	 * @since 5.6.0
+	 *
 	 * @param string $widget_id The widget id to search for.
 	 * @return string|WP_Error The found sidebar id, or a WP_Error instance if it does not exist.
 	 */
@@ -362,9 +376,11 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Saves the widget in the request object.
 	 *
+	 * @since 5.6.0
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
-	 * @return string
+	 * @return string The saved widget ID.
 	 */
 	protected function save_widget( $request ) {
 		global $wp_registered_widget_updates, $wp_registered_widgets;
@@ -434,6 +450,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the last number used by the given widget.
 	 *
+	 * @since 5.6.0
+	 *
+	 * @global array $wp_registered_widget_updates List of widget update callbacks.
+	 *
 	 * @param string $id_base The widget id base.
 	 * @return int The last number, or zero if the widget has not been used.
 	 */
@@ -462,6 +482,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * Prepares the widget for the REST response.
 	 *
 	 * @since 5.6.0
+	 *
+	 * @global array $wp_registered_sidebars        The registered sidebars.
+	 * @global array $wp_registered_widgets         The registered widgets.
+	 * @global array $wp_registered_widget_controls The registered widget controls.
 	 *
 	 * @param array           $item    An array containing a widget_id and sidebar_id.
 	 * @param WP_REST_Request $request Request object.
@@ -573,30 +597,34 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$response->add_links( $this->prepare_links( $prepared ) );
 
 		/**
-		 * Filter widget REST API response.
+		 * Filters the REST API response for a widget.
+		 *
+		 * @since 5.6.0
 		 *
 		 * @param WP_REST_Response $response The response object.
-		 * @param array            $prepared Widget data.
+		 * @param array            $widget   The registered widget data.
 		 * @param WP_REST_Request  $request  Request used to generate the response.
 		 */
-		return apply_filters( 'rest_prepare_widget', $response, $prepared, $request );
+		return apply_filters( 'rest_prepare_widget', $response, $widget, $request );
 	}
 
 	/**
-	 * Prepares links for the request.
+	 * Prepares links for the widget.
+	 *
+	 * @since 5.6.0
 	 *
 	 * @param array $prepared Widget.
 	 * @return array Links for the given widget.
 	 */
 	protected function prepare_links( $prepared ) {
-		$id_base = ( ! empty( $prepared['id_base'] ) ) ? $prepared['id_base'] : $prepared['id'];
+		$id_base = ! empty( $prepared['id_base'] ) ? $prepared['id_base'] : $prepared['id'];
 
 		return array(
-			'collection'                => array(
-				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
-			),
 			'self'                      => array(
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $prepared['id'] ) ),
+			),
+			'collection'                => array(
+				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 			),
 			'about'                     => array(
 				'href'       => rest_url( sprintf( 'wp/v2/widget-types/%s', $id_base ) ),
@@ -611,9 +639,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a widget instance.
 	 *
-	 * @param array  $sidebar sidebar data available at $wp_registered_sidebars.
-	 * @param string $id      Identifier of the widget instance.
+	 * @since 5.6.0
 	 *
+	 * @param array  $sidebar The sidebar data registered with {@see register_sidebar()}.
+	 * @param string $id      Identifier of the widget instance.
 	 * @return array Array containing the widget instance.
 	 */
 	protected function get_sidebar_widget_instance( $sidebar, $id ) {
@@ -646,10 +675,13 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Given a widget id returns an array containing information about the widget.
+	 * Returns an array containing information about the requested widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @global array $wp_registered_widgets The list of reigstered widgets.
 	 *
 	 * @param string $widget_id Identifier of the widget.
-	 *
 	 * @return array Array containing the the widget object, the number, and the name.
 	 */
 	protected function get_widget_info( $widget_id ) {

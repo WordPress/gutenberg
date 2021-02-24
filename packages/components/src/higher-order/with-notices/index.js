@@ -22,15 +22,6 @@ import NoticeList from '../../notice/list';
  * @return {WPComponent} Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
-	let isForwardRef;
-	const { render } = OriginalComponent;
-	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
-	if ( typeof render === 'function' ) {
-		isForwardRef = true;
-		return forwardRef( Component );
-	}
-	return Component;
-
 	function Component( props, ref ) {
 		const [ noticeList, setNoticeList ] = useState( [] );
 
@@ -97,4 +88,13 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 			<OriginalComponent { ...propsOut } />
 		);
 	}
+
+	let isForwardRef;
+	const { render } = OriginalComponent;
+	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
+	if ( typeof render === 'function' ) {
+		isForwardRef = true;
+		return forwardRef( Component );
+	}
+	return Component;
 } );
