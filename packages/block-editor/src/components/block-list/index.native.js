@@ -167,25 +167,26 @@ export class BlockList extends Component {
 
 	render() {
 		const { isRootList } = this.props;
-
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
+		const blockList = isRootList ? (
+			<BlockListContext.Provider value={ this.scrollViewRef }>
+				{ this.renderList() }
+			</BlockListContext.Provider>
+		) : (
+			<BlockListContext.Consumer>
+				{ ( ref ) =>
+					this.renderList( {
+						parentScrollRef: ref,
+					} )
+				}
+			</BlockListContext.Consumer>
+		);
+
 		return (
 			<OnCaretVerticalPositionChange.Provider
 				value={ this.onCaretVerticalPositionChange }
 			>
-				{ isRootList ? (
-					<BlockListContext.Provider value={ this.scrollViewRef }>
-						{ this.renderList() }
-					</BlockListContext.Provider>
-				) : (
-					<BlockListContext.Consumer>
-						{ ( ref ) =>
-							this.renderList( {
-								parentScrollRef: ref,
-							} )
-						}
-					</BlockListContext.Consumer>
-				) }
+				{ blockList }
 			</OnCaretVerticalPositionChange.Provider>
 		);
 	}
