@@ -1729,6 +1729,577 @@ describe( 'Type annotations', () => {
 		} );
 	} );
 
+	describe( 'imports, parameterized types, rest types, operator types, type predicates, index accessed types', () => {
+		const node = {
+			type: 'FunctionDeclaration',
+			start: 0,
+			end: 145,
+			loc: {
+				start: {
+					line: 1,
+					column: 0,
+				},
+				end: {
+					line: 4,
+					column: 19,
+				},
+			},
+			id: {
+				type: 'Identifier',
+				start: 9,
+				end: 11,
+				loc: {
+					start: {
+						line: 1,
+						column: 9,
+					},
+					end: {
+						line: 1,
+						column: 11,
+					},
+					identifierName: 'fn',
+				},
+				name: 'fn',
+			},
+			generator: false,
+			async: false,
+			params: [
+				{
+					type: 'Identifier',
+					start: 14,
+					end: 77,
+					loc: {
+						start: {
+							line: 2,
+							column: 1,
+						},
+						end: {
+							line: 2,
+							column: 64,
+						},
+						identifierName: 'foo',
+					},
+					name: 'foo',
+					typeAnnotation: {
+						type: 'TSTypeAnnotation',
+						start: 17,
+						end: 77,
+						loc: {
+							start: {
+								line: 2,
+								column: 4,
+							},
+							end: {
+								line: 2,
+								column: 64,
+							},
+						},
+						typeAnnotation: {
+							type: 'TSIndexedAccessType',
+							start: 19,
+							end: 77,
+							loc: {
+								start: {
+									line: 2,
+									column: 6,
+								},
+								end: {
+									line: 2,
+									column: 64,
+								},
+							},
+							objectType: {
+								type: 'TSImportType',
+								start: 19,
+								end: 62,
+								loc: {
+									start: {
+										line: 2,
+										column: 6,
+									},
+									end: {
+										line: 2,
+										column: 49,
+									},
+								},
+								argument: {
+									type: 'StringLiteral',
+									start: 26,
+									end: 33,
+									loc: {
+										start: {
+											line: 2,
+											column: 13,
+										},
+										end: {
+											line: 2,
+											column: 20,
+										},
+									},
+									extra: {
+										rawValue: 'react',
+										raw: "'react'",
+									},
+									value: 'react',
+								},
+								qualifier: {
+									type: 'TSQualifiedName',
+									start: 35,
+									end: 62,
+									loc: {
+										start: {
+											line: 2,
+											column: 22,
+										},
+										end: {
+											line: 2,
+											column: 49,
+										},
+									},
+									left: {
+										type: 'TSQualifiedName',
+										start: 35,
+										end: 48,
+										loc: {
+											start: {
+												line: 2,
+												column: 22,
+											},
+											end: {
+												line: 2,
+												column: 35,
+											},
+										},
+										left: {
+											type: 'TSQualifiedName',
+											start: 35,
+											end: 42,
+											loc: {
+												start: {
+													line: 2,
+													column: 22,
+												},
+												end: {
+													line: 2,
+													column: 29,
+												},
+											},
+											left: {
+												type: 'Identifier',
+												start: 35,
+												end: 38,
+												loc: {
+													start: {
+														line: 2,
+														column: 22,
+													},
+													end: {
+														line: 2,
+														column: 25,
+													},
+													identifierName: 'bar',
+												},
+												name: 'bar',
+											},
+											right: {
+												type: 'Identifier',
+												start: 39,
+												end: 42,
+												loc: {
+													start: {
+														line: 2,
+														column: 26,
+													},
+													end: {
+														line: 2,
+														column: 29,
+													},
+													identifierName: 'baz',
+												},
+												name: 'baz',
+											},
+										},
+										right: {
+											type: 'Identifier',
+											start: 43,
+											end: 48,
+											loc: {
+												start: {
+													line: 2,
+													column: 30,
+												},
+												end: {
+													line: 2,
+													column: 35,
+												},
+												identifierName: 'types',
+											},
+											name: 'types',
+										},
+									},
+									right: {
+										type: 'Identifier',
+										start: 49,
+										end: 62,
+										loc: {
+											start: {
+												line: 2,
+												column: 36,
+											},
+											end: {
+												line: 2,
+												column: 49,
+											},
+											identifierName: 'ComponentType',
+										},
+										name: 'ComponentType',
+									},
+								},
+							},
+							indexType: {
+								type: 'TSLiteralType',
+								start: 63,
+								end: 76,
+								loc: {
+									start: {
+										line: 2,
+										column: 50,
+									},
+									end: {
+										line: 2,
+										column: 63,
+									},
+								},
+								literal: {
+									type: 'StringLiteral',
+									start: 63,
+									end: 76,
+									loc: {
+										start: {
+											line: 2,
+											column: 50,
+										},
+										end: {
+											line: 2,
+											column: 63,
+										},
+									},
+									extra: {
+										rawValue: 'displayName',
+										raw: "'displayName'",
+									},
+									value: 'displayName',
+								},
+							},
+						},
+					},
+				},
+				{
+					type: 'RestElement',
+					start: 80,
+					end: 125,
+					loc: {
+						start: {
+							line: 3,
+							column: 1,
+						},
+						end: {
+							line: 3,
+							column: 46,
+						},
+					},
+					argument: {
+						type: 'Identifier',
+						start: 83,
+						end: 87,
+						loc: {
+							start: {
+								line: 3,
+								column: 4,
+							},
+							end: {
+								line: 3,
+								column: 8,
+							},
+							identifierName: 'rest',
+						},
+						name: 'rest',
+					},
+					typeAnnotation: {
+						type: 'TSTypeAnnotation',
+						start: 87,
+						end: 125,
+						loc: {
+							start: {
+								line: 3,
+								column: 8,
+							},
+							end: {
+								line: 3,
+								column: 46,
+							},
+						},
+						typeAnnotation: {
+							type: 'TSTupleType',
+							start: 89,
+							end: 125,
+							loc: {
+								start: {
+									line: 3,
+									column: 10,
+								},
+								end: {
+									line: 3,
+									column: 46,
+								},
+							},
+							elementTypes: [
+								{
+									type: 'TSParenthesizedType',
+									start: 90,
+									end: 105,
+									loc: {
+										start: {
+											line: 3,
+											column: 11,
+										},
+										end: {
+											line: 3,
+											column: 26,
+										},
+									},
+									typeAnnotation: {
+										type: 'TSUnionType',
+										start: 91,
+										end: 104,
+										loc: {
+											start: {
+												line: 3,
+												column: 12,
+											},
+											end: {
+												line: 3,
+												column: 25,
+											},
+										},
+										types: [
+											{
+												type: 'TSStringKeyword',
+												start: 91,
+												end: 97,
+												loc: {
+													start: {
+														line: 3,
+														column: 12,
+													},
+													end: {
+														line: 3,
+														column: 18,
+													},
+												},
+											},
+											{
+												type: 'TSNumberKeyword',
+												start: 98,
+												end: 104,
+												loc: {
+													start: {
+														line: 3,
+														column: 19,
+													},
+													end: {
+														line: 3,
+														column: 25,
+													},
+												},
+											},
+										],
+									},
+								},
+								{
+									type: 'TSRestType',
+									start: 107,
+									end: 124,
+									loc: {
+										start: {
+											line: 3,
+											column: 28,
+										},
+										end: {
+											line: 3,
+											column: 45,
+										},
+									},
+									typeAnnotation: {
+										type: 'TSTypeOperator',
+										start: 110,
+										end: 124,
+										loc: {
+											start: {
+												line: 3,
+												column: 31,
+											},
+											end: {
+												line: 3,
+												column: 45,
+											},
+										},
+										operator: 'keyof',
+										typeAnnotation: {
+											type: 'TSTypeReference',
+											start: 116,
+											end: 124,
+											loc: {
+												start: {
+													line: 3,
+													column: 37,
+												},
+												end: {
+													line: 3,
+													column: 45,
+												},
+											},
+											typeName: {
+												type: 'Identifier',
+												start: 116,
+												end: 124,
+												loc: {
+													start: {
+														line: 3,
+														column: 37,
+													},
+													end: {
+														line: 3,
+														column: 45,
+													},
+													identifierName: 'constant',
+												},
+												name: 'constant',
+											},
+										},
+									},
+								},
+							],
+						},
+					},
+				},
+			],
+			returnType: {
+				type: 'TSTypeAnnotation',
+				start: 127,
+				end: 142,
+				loc: {
+					start: {
+						line: 4,
+						column: 1,
+					},
+					end: {
+						line: 4,
+						column: 16,
+					},
+				},
+				typeAnnotation: {
+					type: 'TSTypePredicate',
+					start: 127,
+					end: 142,
+					loc: {
+						start: {
+							line: 4,
+							column: 1,
+						},
+						end: {
+							line: 4,
+							column: 16,
+						},
+					},
+					parameterName: {
+						type: 'Identifier',
+						start: 129,
+						end: 132,
+						loc: {
+							start: {
+								line: 4,
+								column: 3,
+							},
+							end: {
+								line: 4,
+								column: 6,
+							},
+							identifierName: 'foo',
+						},
+						name: 'foo',
+					},
+					typeAnnotation: {
+						type: 'TSTypeAnnotation',
+						start: 136,
+						end: 142,
+						loc: {
+							start: {
+								line: 4,
+								column: 10,
+							},
+							end: {
+								line: 4,
+								column: 16,
+							},
+						},
+						typeAnnotation: {
+							type: 'TSStringKeyword',
+							start: 136,
+							end: 142,
+							loc: {
+								start: {
+									line: 4,
+									column: 10,
+								},
+								end: {
+									line: 4,
+									column: 16,
+								},
+							},
+						},
+					},
+					asserts: false,
+				},
+			},
+			body: {
+				type: 'BlockStatement',
+				start: 143,
+				end: 145,
+				loc: {
+					start: {
+						line: 4,
+						column: 17,
+					},
+					end: {
+						line: 4,
+						column: 19,
+					},
+				},
+				body: [],
+				directives: [],
+			},
+		};
+
+		it( 'should get the index accessed import type', () => {
+			expect( getTypeAnnotation( paramTag, node ) ).toBe(
+				"import( 'react' ).bar.baz.types.ComponentType[ 'displayName' ]"
+			);
+		} );
+
+		it( 'should get the parameterized tuple rest type', () => {
+			expect(
+				getTypeAnnotation( { ...paramTag, name: 'rest' }, node )
+			).toBe( '[ ( string | number ), ...keyof constant ]' );
+		} );
+
+		it( 'should get the type predicate return type', () => {
+			expect( getTypeAnnotation( returnTag, node ) ).toBe(
+				'foo is string'
+			);
+		} );
+	} );
+
 	describe( 'missing types', () => {
 		const node = {
 			type: 'VariableDeclaration',

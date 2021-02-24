@@ -133,7 +133,7 @@ function getTupleTypeAnnotation( typeAnnotation ) {
 		.map( getTypeAnnotation )
 		.join( ', ' );
 	if ( types.length ) {
-		return `[ ${ types.join( ', ' ) } ]`;
+		return `[ ${ types } ]`;
 	}
 	return '[]';
 }
@@ -158,9 +158,9 @@ function unifyQualifiedName( qualifiedName ) {
  */
 function getImportTypeAnnotation( typeAnnotation ) {
 	// Should this just return the unqualified name (i.e., typeAnnotation.name || typeAnnotation.right.name)?
-	return `import('${ typeAnnotation.argument.value }').${ unifyQualifiedName(
-		typeAnnotation.qualifier
-	) }`;
+	return `import( '${
+		typeAnnotation.argument.value
+	}' ).${ unifyQualifiedName( typeAnnotation.qualifier ) }`;
 }
 
 /**
@@ -169,7 +169,7 @@ function getImportTypeAnnotation( typeAnnotation ) {
  */
 function getIndexedAccessTypeAnnotationObjectName( objectType ) {
 	if ( babelTypes.isTSImportType( objectType ) ) {
-		return objectType.qualifier.name;
+		return getImportTypeAnnotation( objectType );
 	}
 	return objectType.typeName.name;
 }
@@ -293,8 +293,9 @@ function getTypeAnnotation( typeAnnotation ) {
 			return `${ getTypeAnnotation( typeAnnotation.typeAnnotation ) }?`;
 		}
 		case 'TSParenthesizedType': {
-			// string parens
-			return getTypeAnnotation( typeAnnotation.typeAnnotation );
+			return `( ${ getTypeAnnotation(
+				typeAnnotation.typeAnnotation
+			) } )`;
 		}
 		case 'TSRestType': {
 			return `...${ getTypeAnnotation( typeAnnotation.typeAnnotation ) }`;
@@ -322,7 +323,9 @@ function getTypeAnnotation( typeAnnotation ) {
 		case 'TSTypePredicate': {
 			return `${
 				typeAnnotation.parameterName.name
-			} is ${ getTypeAnnotation( typeAnnotation.typeAnnotation ) }`;
+			} is ${ getTypeAnnotation(
+				typeAnnotation.typeAnnotation.typeAnnotation
+			) }`;
 		}
 		case 'TSTypeQuery': {
 			// unsure what this is
@@ -392,7 +395,10 @@ function getParamTypeAnnotation( tag, declarationToken ) {
 	/** @type {babelTypes.Identifier} */
 	const paramToken = functionToken.params.reduce( ( found, pToken ) => {
 		if ( found ) return found;
-		return pToken.name === tag.name ? pToken : found;
+		const tokenName = babelTypes.isRestElement( pToken )
+			? pToken.argument.name
+			: pToken.name;
+		return tokenName === tag.name ? pToken : found;
 	}, null );
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
