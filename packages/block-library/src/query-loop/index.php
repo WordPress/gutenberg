@@ -36,18 +36,17 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$posts      = get_posts( $query );
 	$classnames = '';
-	// `layout` and `align` context come from `Query` block
-	// and is a UI choice to make the handling of the block more
-	// user friendly. The plan is to find a way to make these two
-	// attributes of `QueryLoop`, but keep them in `Query` toolbar
-	// and later absorb the `QueryLoop` toolbar from its parent.
 	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
 		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
 			$classnames = "is-flex-container columns-{$block->context['layout']['columns']}";
 		}
 	}
-	if ( isset( $block->context['align'] ) ) {
-		$classnames .= " align{$block->context['align']}";
+
+	// We haven't used the `supports.align` here because first we
+	// need to find a way to absorb toolbars for nested block
+	// wrappers (https://github.com/WordPress/gutenberg/issues/7694).
+	if ( isset( $attributes['align'] ) ) {
+		$classnames .= " align{$attributes['align']}";
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );

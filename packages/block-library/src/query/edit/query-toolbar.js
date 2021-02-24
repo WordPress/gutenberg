@@ -8,11 +8,17 @@ import {
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
+import {
+	BlockAlignmentToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
 
 export default function QueryToolbar( {
+	clientId,
 	attributes: { query, layout },
 	setQuery,
 	setLayout,
@@ -21,6 +27,21 @@ export default function QueryToolbar( {
 		QueryToolbar,
 		'blocks-query-pagination-max-page-input'
 	);
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { queryLoops } = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const blocks = getBlocks( clientId );
+			const _queryLoops = blocks?.filter(
+				( { name } ) => name === 'core/query-loop'
+			);
+			return {
+				queryLoops: _queryLoops,
+			};
+		},
+		[ clientId ]
+	);
+
 	const layoutControls = [
 		{
 			icon: list,
@@ -36,6 +57,14 @@ export default function QueryToolbar( {
 			isActive: layout?.type === 'flex',
 		},
 	];
+	// Updates the `align` property in `QueryLoop` InnerBlocks all at once.
+	// This is usually just one instance though, as it doesn't make sense to
+	// have more than one `QueryLoop` in each `Query` block.
+	const updateAlignment = ( newValue ) => {
+		queryLoops.forEach( ( queryLoop ) => {
+			updateBlockAttributes( queryLoop.clientId, { align: newValue } );
+		} );
+	};
 	return (
 		<>
 			{ ! query.inherit && (
@@ -107,6 +136,13 @@ export default function QueryToolbar( {
 						) }
 					/>
 				</ToolbarGroup>
+			) }
+			{ !! queryLoops?.length && (
+				<BlockAlignmentToolbar
+					value={ queryLoops[ 0 ].attributes.align }
+					onChange={ updateAlignment }
+					controls={ [ 'wide', 'full' ] }
+				/>
 			) }
 			<ToolbarGroup controls={ layoutControls } />
 		</>

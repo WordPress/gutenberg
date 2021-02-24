@@ -25,6 +25,7 @@ export function QueryContent( {
 	attributes,
 	context: { postId },
 	setAttributes,
+	clientId,
 } ) {
 	const { queryId, query, layout } = attributes;
 	const instanceId = useInstanceId( QueryContent );
@@ -72,6 +73,7 @@ export function QueryContent( {
 			/>
 			<BlockControls>
 				<QueryToolbar
+					clientId={ clientId }
 					attributes={ attributes }
 					setQuery={ updateQuery }
 					setLayout={ updateLayout }

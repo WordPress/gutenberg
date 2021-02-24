@@ -30,6 +30,7 @@ const TEMPLATE = [
 ];
 export default function QueryLoopEdit( {
 	clientId,
+	attributes: { align },
 	context: {
 		query: {
 			perPage,
@@ -53,7 +54,6 @@ export default function QueryLoopEdit( {
 		// attributes of `QueryLoop`, but keep them in `Query` toolbar
 		// and later absorb the `QueryLoop` toolbar from its parent.
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
-		align,
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext;
@@ -135,6 +135,9 @@ export default function QueryLoopEdit( {
 			[ `columns-${ columns }` ]: hasLayoutFlex,
 		} ),
 	};
+	// We haven't used the `supports.align` here because first we
+	// need to find a way to absorb toolbars for nested block
+	// wrappers (https://github.com/WordPress/gutenberg/issues/7694).
 	if ( align ) extraBlockProps[ 'data-align' ] = align;
 	const blockProps = useBlockProps( extraBlockProps );
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
