@@ -2,7 +2,7 @@
 
 ESNext is JavaScript written using syntax and features only available in a version newer than browser support—the support browser versions is referred to as ECMAScript 5 (ES5). [JSX](https://reactjs.org/docs/introducing-jsx.html) is a custom syntax extension to JavaScript, created by React project, that allows you to write JavaScript using a familiar HTML tag-like syntax.
 
-See the [ESNext syntax documentation](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
+See the [ESNext syntax documentation](/docs/howto-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
 
 Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
 
@@ -34,7 +34,7 @@ First, you need to set up Node.js for your development environment. The steps re
 -   macOS: `brew install node`
 -   Windows: `choco install node`
 
-If you are not using a package manager, see the [developer environment setup documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
+If you are not using a package manager, see the [developer environment setup documentation](/docs/getting-started/tutorials/devenv/readme.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
 
 **Note:** The build tools and process occur on the command-line, so basic familiarity using a terminal application is required. Some text editors have a terminal built-in that is fine to use; Visual Studio Code and PhpStorm are two popular options.
 
@@ -125,7 +125,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md), and the block will load in the editor.
+After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/howto-guides/javascript/loading-javascript.md), and the block will load in the editor.
 
 ## Development Mode
 

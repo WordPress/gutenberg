@@ -49,7 +49,7 @@ Let's confirm the plugin is loaded and working.
 
 -or-
 
-(3B) If you are using `wp-env`, see [Development Environment setup](/docs/designers-developers/developers/tutorials/devenv/readme.md), then you should now run from inside the `gutenpride` directory:
+(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/tutorials/devenv/readme.md), then you should now run from inside the `gutenpride` directory:
 
 ```sh
 wp-env start
@@ -112,7 +112,7 @@ For the `editorScript` provided in the block metadata, the build process creates
 
 The `wp_register_script` function used internally registers a name, called the handle, and relates that name to the script file. The dependencies are used to specify if the script requires including other libraries. The version is specified so the browser will reload if the file changed.
 
-The `wp_set_script_translations` function tells WordPress to load translations for this script, if they exist. See more about [translations & internationalization.](/docs/designers-developers/developers/internationalization.md)
+The `wp_set_script_translations` function tells WordPress to load translations for this script, if they exist. See more about [translations & internationalization.](/docs/howto-guides/internationalization.md)
 
 With the above in place, create a new post to load the editor and check your plugin is in the inserter. You can use `/` to search, or click the box with the [+] and search for "Gutenpride" to find the block.
 
@@ -124,10 +124,10 @@ To open the developer tools in Firefox, use the menu selecting Web Developer : T
 
 Try running `npm run start` that will start the watch process for automatic rebuilds. If you then make an update to `src/index.js` file, you will see the build run, and if you reload the WordPress editor you'll see the change.
 
-For more info, see the build section of the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) in the Block Editor Handbook.
+For more info, see the build section of the [Getting Started with JavaScript tutorial](/docs/howto-guides/javascript/js-build-setup.md) in the Block Editor Handbook.
 
 ## Summary
 
 Hopefully, at this point, you have your plugin created and activated. We have the package.json with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
 
-Next Section: [Anatomy of a Block](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
+Next Section: [Anatomy of a Block](/docs/getting-started/tutorials/create-block/block-anatomy.md)

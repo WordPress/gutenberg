@@ -6,7 +6,7 @@ The tutorial includes setting up your development environment, tools, and gettin
 
 ## Prerequisites
 
-The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/getting-started/tutorials/devenv/readme.md).
 
 ## Quick Start
 
@@ -28,10 +28,10 @@ After activated, go to the block editor and use the inserter to search and add y
 
 The create a block tutorials breaks down to the following sections.
 
-1. [WordPress Plugin](/docs/designers-developers/developers/tutorials/create-block/wp-plugin.md)
-2. [Anatomy of a Gutenberg Block ](/docs/designers-developers/developers/tutorials/create-block/block-anatomy.md)
-3. [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/attributes.md)
-4. [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
-5. [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
-6. [Finishing Touches](/docs/designers-developers/developers/tutorials/create-block/finishing.md)
-7. [Share your Block with the World](/docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md)
+1. [WordPress Plugin](/docs/getting-started/tutorials/create-block/wp-plugin.md)
+2. [Anatomy of a Gutenberg Block ](/docs/getting-started/tutorials/create-block/block-anatomy.md)
+3. [Block Attributes](/docs/getting-started/tutorials/create-block/attributes.md)
+4. [Code Implementation](/docs/getting-started/tutorials/create-block/block-code.md)
+5. [Authoring Experience](/docs/getting-started/tutorials/create-block/author-experience.md)
+6. [Finishing Touches](/docs/getting-started/tutorials/create-block/finishing.md)
+7. [Share your Block with the World](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md)

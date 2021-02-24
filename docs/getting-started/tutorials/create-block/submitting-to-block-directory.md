@@ -48,7 +48,7 @@ Examples for an Image Slider block:
 -   carousel
 -   gallery
 
-[Read more about keywords.](/docs/designers-developers/developers/block-api/block-metadata.md#keywords)
+[Read more about keywords.](/docs/reference-guides/block-api/block-metadata.md#keywords)
 
 ### Choose the right category
 
@@ -62,13 +62,13 @@ The Block Editor allows you to indicate the category your block belongs in, maki
 -   widgets
 -   embed
 
-[Read more about categories.](/docs/designers-developers/developers/block-api/block-metadata.md#category)
+[Read more about categories.](/docs/reference-guides/block-api/block-metadata.md#category)
 
 Wondering where to input all this information? Read the next section :)
 
 ## Step 2: Analyze your plugin
 
-Each block in your plugin should have a corresponding `block.json` file with the [block metadata](/docs/designers-developers/developers/block-api/block-metadata.md). This file provides the Block Directory important information about your block. Along with being the place to store contextual information about your block like the: `name`, `description`, `keywords` and `category`, the `block.json` file stores the location of your block’s files.
+Each block in your plugin should have a corresponding `block.json` file with the [block metadata](/docs/reference-guides/block-api/block-metadata.md). This file provides the Block Directory important information about your block. Along with being the place to store contextual information about your block like the: `name`, `description`, `keywords` and `category`, the `block.json` file stores the location of your block’s files.
 
 Block plugins submitted to the Block Directory can contain mutliple blocks only if they are children of a single parent/ancestor. There should only be one main block. For example, a list block can contain list-item blocks. Children blocks must set the `parent` property in their `block.json` file.
 
@@ -94,7 +94,7 @@ Here is an example of a basic block.json file.
 }
 ```
 
-The `block.json` file also contains other important properties. Take a look at an [example block.json](/docs/designers-developers/developers/block-api/block-metadata.md) for additional properties to be included in the block.json file.
+The `block.json` file also contains other important properties. Take a look at an [example block.json](/docs/reference-guides/block-api/block-metadata.md) for additional properties to be included in the block.json file.
 
 ## Step 3: Zip & Submit
 

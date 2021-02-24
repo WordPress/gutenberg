@@ -57,7 +57,7 @@ attributes: {
 - Type: `boolean`
 - Default value: `true`
 
-This property allows to enable [wide alignment](/docs/designers-developers/developers/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+This property allows to enable [wide alignment](/docs/howto-guides/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 supports: {
@@ -271,7 +271,7 @@ supports: {
 - Type: `boolean`
 - Default value: `false`
 
-This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/designers-developers/developers/themes/theme-support.md#supporting-custom-line-heights).
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/howto-guides/themes/theme-support.md#supporting-custom-line-heights).
 
 ```js
 supports: {
@@ -330,7 +330,7 @@ supports: {
 - Subproperties:
   - `padding`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/designers-developers/developers/themes/theme-support.md##cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/howto-guides/themes/theme-support.md##cover-block-padding).
 
 ```js
 supports: {

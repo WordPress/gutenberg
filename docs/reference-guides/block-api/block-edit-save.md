@@ -92,7 +92,7 @@ var blockSettings = {
 
 The `edit` function also receives a number of properties through an object argument. You can use these properties to adapt the behavior of your block.
 
-The `attributes` property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for how to specify attribute sources.
+The `attributes` property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for how to specify attribute sources.
 
 In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
@@ -285,10 +285,10 @@ _Note:_ The save function should be a pure function that depends only on the att
 It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
 This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
- - Use [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
+ - Use [dynamic blocks](/docs/howto-guides/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
  - Store the external value as an attribute which is dynamically updated in the block's `edit` function as changes occur.
 
-For [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
+For [dynamic blocks](/docs/howto-guides/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
 
 If left unspecified, the default implementation will save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
 
@@ -324,11 +324,11 @@ save: function( props ) {
 {% end %}
 
 
-When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
+When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
 
 ## Examples
 
-Here are a couple examples of using attributes, edit, and save all together.  For a full working example, see the [Introducing Attributes and Editable Fields](/docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+Here are a couple examples of using attributes, edit, and save all together.  For a full working example, see the [Introducing Attributes and Editable Fields](/docs/howto-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
 
 ### Saving Attributes to Child Elements
 
@@ -504,10 +504,10 @@ The two most common sources of block invalidations are:
 
 Before starting to debug, be sure to familiarize yourself with the validation step described above documenting the process for detecting whether a block is invalid. A block is invalid if its regenerated markup does not match what is saved in post content, so often this can be caused by the attributes of a block being parsed incorrectly from the saved content.
 
-If you're using [attribute sources](/docs/designers-developers/developers/block-api/block-attributes.md), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
+If you're using [attribute sources](/docs/reference-guides/block-api/block-attributes.md), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
 
 When a block is detected as invalid, a warning will be logged into your browser's developer tools console. The warning will include specific details about the exact point at which a difference in markup occurred. Be sure to look closely at any differences in the expected and actual markups to see where problems are occurring.
 
 **I've changed my block's `save` behavior and old content now includes invalid blocks. How can I fix this?**
 
-Refer to the guide on [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) to learn more about how to accommodate legacy content in intentional markup changes.
+Refer to the guide on [Deprecated Blocks](/docs/reference-guides/block-api/block-deprecation.md) to learn more about how to accommodate legacy content in intentional markup changes.

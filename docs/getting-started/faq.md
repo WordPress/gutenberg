@@ -326,7 +326,7 @@ This is currently a work in progress and we recommend reviewing the [block based
 
 No, block variations are different versions of a single base block, sharing a similar functionality, but with slight differences in their implementation, or settings (attributes, InnerBlocks,etc). Block variations are transparent for users, and once there is a registered block variation, it will appear as a new block. For example, the `embed` block registers different block variations to embed content from specific providers.
 
-Meanwhile, [block styles](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) allow you to provide alternative styles to existing blocks, and they work by adding a className to the block’s wrapper. Once a block has registered block styles, a block style selector will appear in its sidebar so that users can choose among the different registered styles.
+Meanwhile, [block styles](/docs/reference-guides/filters/block-filters.md#block-style-variations) allow you to provide alternative styles to existing blocks, and they work by adding a className to the block’s wrapper. Once a block has registered block styles, a block style selector will appear in its sidebar so that users can choose among the different registered styles.
 
 ## How do editor styles work?
 
@@ -339,7 +339,7 @@ function gutenbergtheme_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
 
-*See:* [Editor Styles](/docs/designers-developers/developers/themes/theme-support.md#editor-styles)
+*See:* [Editor Styles](/docs/howto-guides/themes/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 
@@ -390,7 +390,7 @@ Our approach—as outlined in [the technical overview introduction](https://make
 
 This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issues/1516) to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
-We suggest you look at the [Gutenberg key concepts](/docs/designers-developers/key-concepts.md) to learn more about how this aspect of the project works.
+We suggest you look at the [Gutenberg key concepts](/docs/getting-started/architecture/key-concepts.md) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
 In JS:

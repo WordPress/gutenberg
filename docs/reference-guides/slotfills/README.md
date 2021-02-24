@@ -97,12 +97,12 @@ const PostStatus = ( { isOpened, onTogglePanel } ) => (
 
 The following SlotFills are available in the `edit-post` package. Please refer to the individual items below for usage and example details:
 
-* [MainDashboardButton](/docs/designers-developers/developers/slotfills/main-dashboard-button.md)
-* [PluginBlockSettingsMenuItem](/docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md)
-* [PluginDocumentSettingPanel](/docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md)
-* [PluginMoreMenuItem](/docs/designers-developers/developers/slotfills/plugin-more-menu-item.md)
-* [PluginPostPublishPanel](/docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md)
-* [PluginPostStatusInfo](/docs/designers-developers/developers/slotfills/plugin-post-status-info.md)
-* [PluginPrePublishPanel](/docs/designers-developers/developers/slotfills/plugin-pre-publish-panel.md)
-* [PluginSidebar](/docs/designers-developers/developers/slotfills/plugin-sidebar.md)
-* [PluginSidebarMoreMenuItem](/docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md)
+* [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md)
+* [PluginBlockSettingsMenuItem](/docs/reference-guides/slotfills/plugin-block-settings-menu-item.md)
+* [PluginDocumentSettingPanel](/docs/reference-guides/slotfills/plugin-document-setting-panel.md)
+* [PluginMoreMenuItem](/docs/reference-guides/slotfills/plugin-more-menu-item.md)
+* [PluginPostPublishPanel](/docs/reference-guides/slotfills/plugin-post-publish-panel.md)
+* [PluginPostStatusInfo](/docs/reference-guides/slotfills/plugin-post-status-info.md)
+* [PluginPrePublishPanel](/docs/reference-guides/slotfills/plugin-pre-publish-panel.md)
+* [PluginSidebar](/docs/reference-guides/slotfills/plugin-sidebar.md)
+* [PluginSidebarMoreMenuItem](/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md)

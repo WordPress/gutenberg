@@ -67,7 +67,7 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
+Plugins and Themes can also register [custom block categories](/docs/reference-guides/filters/block-filters.md#managing-block-categories).
 
 #### icon (optional)
 
@@ -138,7 +138,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-style-variations) for existing blocks.
 
 #### attributes (optional)
 
@@ -166,7 +166,7 @@ attributes: {
 },
 ```
 
--   **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
+-   **See: [Attributes](/docs/reference-guides/block-api/block-attributes.md).**
 
 #### example (optional)
 
@@ -292,13 +292,13 @@ variations: [
 
 -   **_Type:_** `Object`
 
-Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/designers-developers/developers/block-api/block-supports.md) for more details.
+Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
 #### transforms (optional)
 
 -   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/designers-developers/developers/block-api/block-transforms.md) for more info about each available transformation.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/reference-guides/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 

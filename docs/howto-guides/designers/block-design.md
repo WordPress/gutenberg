@@ -76,7 +76,7 @@ Avoid long, multi-line block names.
 
 Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
 
-You can add a description by using the description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration.md). 
+You can add a description by using the description attribute in the [registerBlockType function](/docs/reference-guides/block-api/block-registration.md). 
 
 Stick to a single imperative sentence with an action + subject format. Examples:
 
@@ -132,7 +132,7 @@ Check how your block looks, feels, and works on as many devices and screen sizes
 
 ### Support Gutenberg's dark background editor scheme
 
-Check how your block looks with [dark backgrounds](/docs/designers-developers/developers/themes/theme-support.md#dark-backgrounds) in the editor.
+Check how your block looks with [dark backgrounds](/docs/howto-guides/themes/theme-support.md#dark-backgrounds) in the editor.
 
 ## Examples
 

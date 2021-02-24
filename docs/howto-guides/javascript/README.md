@@ -10,11 +10,11 @@ The block editor introduced in WordPress 5.0 is written in JavaScript, with the 
 
 ### Table of Contents
 
-1. [Plugins Background](/docs/designers-developers/developers/tutorials/javascript/plugins-background.md)
-2. [Loading JavaScript](/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md)
-3. [Extending the Block Editor](/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md)
-4. [Troubleshooting](/docs/designers-developers/developers/tutorials/javascript/troubleshooting.md)
-5. [JavaScript Versions and Building](/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md)
-6. [Scope your code](/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md)
-7. [JavaScript Build Step](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md)
-8. [ESNext Syntax](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md)
+1. [Plugins Background](/docs/howto-guides/javascript/plugins-background.md)
+2. [Loading JavaScript](/docs/howto-guides/javascript/loading-javascript.md)
+3. [Extending the Block Editor](/docs/howto-guides/javascript/extending-the-block-editor.md)
+4. [Troubleshooting](/docs/howto-guides/javascript/troubleshooting.md)
+5. [JavaScript Versions and Building](/docs/howto-guides/javascript/versions-and-building.md)
+6. [Scope your code](/docs/howto-guides/javascript/scope-your-code.md)
+7. [JavaScript Build Step](/docs/howto-guides/javascript/js-build-setup.md)
+8. [ESNext Syntax](/docs/howto-guides/javascript/esnext-js.md)

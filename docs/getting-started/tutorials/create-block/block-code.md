@@ -65,4 +65,4 @@ Update **gutenpride.php** to enqueue from generated file location:
 $editor_css = "build/index.css";
 ```
 
-Next Section: [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
+Next Section: [Authoring Experience](/docs/getting-started/tutorials/create-block/author-experience.md)

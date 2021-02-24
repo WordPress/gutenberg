@@ -4,7 +4,7 @@ To modify the behavior of existing blocks, WordPress exposes several APIs:
 
 ### Block Style Variations
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/) for a full example.
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/howto-guides/javascript/) for a full example.
 
 _Example:_
 
@@ -178,7 +178,7 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_  A [block validation](/docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The editor verifies that the content stored in the post matches the content output by the `save()` function.
+_Note:_  A [block validation](/docs/reference-guides/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The editor verifies that the content stored in the post matches the content output by the `save()` function.
 
 To avoid this validation error, use `render_block` server-side to modify existing post content instead of this filter. See [render_block documentation](https://developer.wordpress.org/reference/hooks/render_block/).
 
