@@ -40,6 +40,13 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const MIN_WIDTH = 40;
+// Map of the percentage width to pixel subtraction that make the buttons fit nicely into columns.
+const MIN_WIDTH_MARGINS = {
+	100: 0,
+	75: styles.button75.marginLeft,
+	50: styles.button50.marginLeft,
+	25: styles.button25.marginLeft,
+};
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
@@ -376,17 +383,10 @@ class ButtonEdit extends Component {
 				? MIN_WIDTH
 				: placeholderTextWidth;
 		if ( width ) {
-			// Map of the percentage width to pixel subtraction that make the buttons fit nicely into columns.
-			const minWidthSubtractionMap = {
-				100: 0,
-				75: 11,
-				50: 22,
-				25: 33,
-			};
 			// Set the width of the button.
-			minWidth =
-				Math.floor( maxWidth * ( width / 100 ) ) -
-				minWidthSubtractionMap[ width ];
+			minWidth = Math.floor(
+				maxWidth * ( width / 100 ) - MIN_WIDTH_MARGINS[ width ]
+			);
 		}
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,

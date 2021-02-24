@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { debounce } from 'lodash';
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -75,9 +75,11 @@ export default function ButtonsEdit( {
 	useEffect( () => {
 		const { width } = sizes || {};
 		const { isFullWidth } = alignmentHelpers;
-		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-		const isFullWidthBlock = isFullWidth( align );
-		setMaxWidth( isFullWidthBlock ? screenWidth : width );
+
+		if ( width ) {
+			const isFullWidthBlock = isFullWidth( align );
+			setMaxWidth( isFullWidthBlock ? blockWidth : width );
+		}
 	}, [ sizes, align ] );
 
 	const onAddNextButton = useCallback(
