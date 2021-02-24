@@ -66,6 +66,10 @@ $blocks-block__margin: 0.5em;
 		}
 	}
 
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
+
 	// Kept for backward compatibiity.
 	&.aligncenter {
 		text-align: center;
@@ -91,9 +95,5 @@ $blocks-block__margin: 0.5em;
 			/*rtl:ignore*/
 			margin-left: 0;
 		}
-	}
-
-	&.is-content-justification-space-between {
-		justify-content: space-between;
 	}
 }
