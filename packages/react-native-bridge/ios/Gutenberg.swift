@@ -141,8 +141,33 @@ public class Gutenberg: NSObject {
     private func sendEvent(_ event: RNReactNativeGutenbergBridge.EventName, body: [String: Any]? = nil) {
         bridgeModule.sendEvent(withName: event.rawValue, body: body)
     }
-    
+
     public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?) {
+        mediaUpdate(event: .mediaUpload, id: id, state: state, progress: progress, url: url, serverID: serverID)
+    }
+
+    public func updateMediaSaveStatus(id: Int32, state: MediaSaveState, progress: Float, url: URL?, serverID: Int32?) {
+        mediaUpdate(event: .mediaSave, id: id, state: state, progress: progress, url: url, serverID: serverID)
+    }
+
+    public func onMediaCollectionSaveResult(firstMediaIdInCollection: String, success: Bool) {
+        sendEvent(.mediaSave, body: [
+            "state": MediaSaveEvent.result.rawValue,
+            "firstMediaIdInCollection": firstMediaIdInCollection,
+            "success": success,
+        ])
+    }
+
+    public func onMediaIdChanged(oldId: String, newId: String, oldUrl: URL) {
+        sendEvent(.mediaSave, body: [
+            "state": MediaSaveEvent.idChange.rawValue,
+            "oldId": oldId,
+            "newId": newId,
+            "oldUrl": oldUrl,
+        ])
+    }
+
+    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State, progress: Float, url: URL?, serverID: Int32?)  {
         var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress];
         if let url = url {
             data["mediaUrl"] = url.absoluteString
@@ -150,7 +175,7 @@ public class Gutenberg: NSObject {
         if let serverID = serverID {
             data["mediaServerId"] = serverID
         }
-        sendEvent(.mediaUpload, body: data)
+        sendEvent(event, body: data)
     }
 
     public func appendMedia(id: Int32, url: URL, type: MediaType) {
@@ -204,14 +229,27 @@ extension Gutenberg: RCTBridgeDelegate {
     }
 }
 
+protocol MediaState: RawRepresentable {}
+
 extension Gutenberg {
-    public enum MediaUploadState: Int {
+    public enum MediaUploadState: Int, MediaState {
         case uploading = 1
         case succeeded = 2
         case failed = 3
         case reset = 4
     }
-    
+
+    public enum MediaSaveState: Int, MediaState {
+        case saving = 5
+        case succeeded = 6
+        case failed = 7
+        case reset = 8
+    }
+
+    enum MediaSaveEvent: Int {
+        case result = 9
+        case idChange = 10
+    }
 }
 
 extension Gutenberg {
@@ -220,6 +258,7 @@ extension Gutenberg {
         case video
         case audio
         case other
+        case any
     }
 }
 

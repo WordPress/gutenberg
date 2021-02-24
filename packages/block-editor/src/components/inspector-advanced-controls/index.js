@@ -19,4 +19,7 @@ function InspectorAdvancedControls( { children } ) {
 InspectorAdvancedControls.slotName = name;
 InspectorAdvancedControls.Slot = Slot;
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md
+ */
 export default InspectorAdvancedControls;

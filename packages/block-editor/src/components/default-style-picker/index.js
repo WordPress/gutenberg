@@ -1,10 +1,16 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 export default function DefaultStylePicker( { blockName } ) {
 	const {
@@ -13,14 +19,14 @@ export default function DefaultStylePicker( { blockName } ) {
 		styles,
 	} = useSelect(
 		( select ) => {
-			const settings = select( 'core/block-editor' ).getSettings();
+			const settings = select( blockEditorStore ).getSettings();
 			const preferredStyleVariations =
 				settings.__experimentalPreferredStyleVariations;
 			return {
 				preferredStyle: preferredStyleVariations?.value?.[ blockName ],
 				onUpdatePreferredStyleVariations:
 					preferredStyleVariations?.onChange ?? null,
-				styles: select( 'core/blocks' ).getBlockStyles( blockName ),
+				styles: select( blocksStore ).getBlockStyles( blockName ),
 			};
 		},
 		[ blockName ]

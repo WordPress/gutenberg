@@ -34,16 +34,20 @@ const ImageComponent = ( {
 	editButton = true,
 	focalPoint,
 	height: imageHeight,
+	highlightSelected = true,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
+	onImageDataLoad,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	resizeMode,
 	retryMessage,
+	retryIcon,
 	url,
 	shapeStyle,
+	style,
 	width: imageWidth,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
@@ -52,11 +56,15 @@ const ImageComponent = ( {
 	useEffect( () => {
 		if ( url ) {
 			Image.getSize( url, ( imgWidth, imgHeight ) => {
-				setImageData( {
+				const metaData = {
 					aspectRatio: imgWidth / imgHeight,
 					width: imgWidth,
 					height: imgHeight,
-				} );
+				};
+				setImageData( metaData );
+				if ( onImageDataLoad ) {
+					onImageDataLoad( metaData );
+				}
 			} );
 		}
 	}, [ url ] );
@@ -78,7 +86,12 @@ const ImageComponent = ( {
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+				return (
+					<Icon
+						icon={ retryIcon || SvgIconRetry }
+						{ ...styles.iconRetry }
+					/>
+				);
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = iconPlaceholderStyles;
 				break;
@@ -160,6 +173,7 @@ const ImageComponent = ( {
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
 				imageData && align && { alignItems: align },
+				style,
 			] }
 			onLayout={ onContainerLayout }
 		>
@@ -172,14 +186,16 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
-					<View
-						style={ [
-							styles.imageBorder,
-							{ height: containerSize?.height },
-						] }
-					/>
-				) }
+				{ isSelected &&
+					highlightSelected &&
+					! ( isUploadInProgress || isUploadFailed ) && (
+						<View
+							style={ [
+								styles.imageBorder,
+								{ height: containerSize?.height },
+							] }
+						/>
+					) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -210,7 +226,12 @@ const ImageComponent = ( {
 							styles.retryContainer,
 						] }
 					>
-						<View style={ styles.modalIcon }>
+						<View
+							style={ [
+								styles.retryIcon,
+								retryIcon && styles.customRetryIcon,
+							] }
+						>
 							{ getIcon( ICON_TYPE.RETRY ) }
 						</View>
 						<Text style={ styles.uploadFailedText }>
@@ -218,21 +239,16 @@ const ImageComponent = ( {
 						</Text>
 					</View>
 				) }
-
-				{ editButton &&
-					isSelected &&
-					! isUploadInProgress &&
-					! isUploadFailed && (
-						<ImageEditingButton
-							onSelectMediaUploadOption={
-								onSelectMediaUploadOption
-							}
-							openMediaOptions={ openMediaOptions }
-							url={ imageData && url }
-							pickerOptions={ mediaPickerOptions }
-						/>
-					) }
 			</View>
+
+			{ editButton && isSelected && ! isUploadInProgress && (
+				<ImageEditingButton
+					onSelectMediaUploadOption={ onSelectMediaUploadOption }
+					openMediaOptions={ openMediaOptions }
+					url={ ! isUploadFailed && imageData && url }
+					pickerOptions={ mediaPickerOptions }
+				/>
+			) }
 		</View>
 	);
 };

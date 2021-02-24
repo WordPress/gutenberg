@@ -4,34 +4,35 @@
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, Dropdown, Button } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
+import { serialize } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import TemplatePartSelection from '../selection';
 
-export default function TemplatePartPlaceholder( { setAttributes } ) {
-	const { saveEntityRecord } = useDispatch( 'core' );
+export default function TemplatePartPlaceholder( {
+	setAttributes,
+	innerBlocks,
+} ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const onCreate = useCallback( async () => {
-		const title = 'Untitled Template Part';
-		const slug = cleanForSlug( title );
+		const title = __( 'Untitled Template Part' );
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
 			{
 				title,
-				status: 'publish',
-				slug,
-				meta: { theme: 'custom' },
+				slug: 'template-part',
+				content: serialize( innerBlocks ),
 			}
 		);
 		setAttributes( {
-			postId: templatePart.id,
 			slug: templatePart.slug,
-			theme: templatePart.meta.theme,
+			theme: templatePart.theme,
 		} );
 	}, [ setAttributes ] );
 

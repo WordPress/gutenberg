@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockNavigationDropdown,
@@ -9,10 +10,7 @@ import {
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 import { _x } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
@@ -21,59 +19,57 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
-import PageSwitcher from '../page-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
-import NavigationToggle from './navigation-toggle';
+import TemplateDetails from '../template-details';
+import { store as editSiteStore } from '../../store';
 
-export default function Header( {
-	openEntitiesSavedStates,
-	isInserterOpen,
-	onToggleInserter,
-	isNavigationOpen,
-	onToggleNavigation,
-} ) {
+export default function Header( { openEntitiesSavedStates } ) {
+	const inserterButton = useRef();
 	const {
 		deviceType,
+		entityTitle,
 		hasFixedToolbar,
 		template,
-		page,
-		showOnFront,
+		templateType,
+		isInserterOpen,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
 			isFeatureActive,
-			getTemplateId,
-			getTemplatePartId,
-			getTemplateType,
-			getPage,
-		} = select( 'core/edit-site' );
-
-		const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-		const { show_on_front: _showOnFront } = getEditedEntityRecord(
-			'root',
-			'site'
+			getEditedPostType,
+			getEditedPostId,
+			isInserterOpened,
+		} = select( editSiteStore );
+		const { getEntityRecord } = select( 'core' );
+		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
+			'core/editor'
 		);
 
-		const _templateId = getTemplateId();
+		const postType = getEditedPostType();
+		const postId = getEditedPostId();
+		const record = getEntityRecord( 'postType', postType, postId );
+		const _entityTitle =
+			'wp_template' === postType
+				? getTemplateInfo( record ).title
+				: record?.slug;
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
+			entityTitle: _entityTitle,
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			templateId: _templateId,
-			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
-			templatePartId: getTemplatePartId(),
-			templateType: getTemplateType(),
-			page: getPage(),
-			showOnFront: _showOnFront,
+			template: record,
+			templateType: postType,
+			isInserterOpen: isInserterOpened(),
 		};
 	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setPage,
-	} = useDispatch( 'core/edit-site' );
+		setIsInserterOpened,
+	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
@@ -82,45 +78,65 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<MainDashboardButton.Slot>
-					<NavigationToggle
-						isOpen={ isNavigationOpen }
-						onClick={ onToggleNavigation }
-					/>
-				</MainDashboardButton.Slot>
 				<div className="edit-site-header__toolbar">
 					<Button
+						ref={ inserterButton }
 						isPrimary
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
-						onClick={ onToggleInserter }
+						onMouseDown={ ( event ) => {
+							event.preventDefault();
+						} }
+						onClick={ () => {
+							if ( isInserterOpen ) {
+								// Focusing the inserter button closes the inserter popover
+								inserterButton.current.focus();
+							} else {
+								setIsInserterOpened( true );
+							}
+						} }
 						icon={ plus }
 						label={ _x(
 							'Add block',
 							'Generic label for block inserter button'
 						) }
 					/>
-					<ToolSelector />
-					<UndoButton />
-					<RedoButton />
-					<BlockNavigationDropdown />
+					{ isLargeViewport && (
+						<>
+							<ToolSelector />
+							<UndoButton />
+							<RedoButton />
+							<BlockNavigationDropdown />
+						</>
+					) }
 					{ displayBlockToolbar && (
 						<div className="edit-site-header-toolbar__block-toolbar">
 							<BlockToolbar hideDragHandle />
 						</div>
 					) }
-					<div className="edit-site-header__toolbar-switchers">
-						<PageSwitcher
-							showOnFront={ showOnFront }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					</div>
 				</div>
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions documentTitle={ template?.slug } />
+				{ 'wp_template' === templateType && (
+					<DocumentActions
+						entityTitle={ entityTitle }
+						entityLabel="template"
+					>
+						{ ( { onClose } ) => (
+							<TemplateDetails
+								template={ template }
+								onClose={ onClose }
+							/>
+						) }
+					</DocumentActions>
+				) }
+				{ 'wp_template_part' === templateType && (
+					<DocumentActions
+						entityTitle={ entityTitle }
+						entityLabel="template part"
+					/>
+				) }
 			</div>
 
 			<div className="edit-site-header_end">

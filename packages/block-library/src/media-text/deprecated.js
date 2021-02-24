@@ -62,7 +62,7 @@ const baseAttributes = {
 	},
 	isStackedOnMobile: {
 		type: 'boolean',
-		default: false,
+		default: true,
 	},
 };
 

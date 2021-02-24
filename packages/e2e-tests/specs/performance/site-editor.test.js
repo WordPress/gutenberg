@@ -5,31 +5,32 @@ import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
 
 /**
- * Internal dependencies
- */
-import { useExperimentalFeatures } from '../../experimental-features';
-
-/**
  * WordPress dependencies
  */
-import { trashAllPosts, visitAdminPage } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
+import {
+	trashAllPosts,
+	activateTheme,
+	canvas,
+} from '@wordpress/e2e-test-utils';
+
+/**
+ * Internal dependencies
+ */
+import { siteEditor } from '../../experimental-features';
 
 jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
-
 	beforeAll( async () => {
+		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template', 'auto-draft' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'Loading', async () => {
@@ -37,14 +38,11 @@ describe( 'Site Editor Performance', () => {
 			load: [],
 			type: [],
 			focus: [],
+			inserterOpen: [],
+			inserterHover: [],
 		};
 
-		await visitAdminPage(
-			'admin.php',
-			addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 )
-		);
+		await siteEditor.visit();
 
 		let i = 3;
 
@@ -52,7 +50,11 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.wp-block' );
+			await page.waitForSelector( '.edit-site-visual-editor', {
+				timeout: 120000,
+			} );
+			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+
 			results.load.push( new Date() - startTime );
 		}
 

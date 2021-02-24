@@ -1,3 +1,15 @@
+/**
+ * WordPress dependencies
+ */
+import { useBlockProps } from '@wordpress/block-editor';
+
 export default function save( { attributes } ) {
-	return <div style={ { height: attributes.height } } aria-hidden />;
+	return (
+		<div
+			{ ...useBlockProps.save( {
+				style: { height: attributes.height },
+				'aria-hidden': true,
+			} ) }
+		/>
+	);
 }

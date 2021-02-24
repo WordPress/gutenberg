@@ -52,7 +52,10 @@ function onInstall() {
 	console.log( 'Installing…' );
 }
 
-lazyImport( 'is-equal-shallow@^0.1.3', { onInstall } ).then( /* ... */ );
+lazyImport( 'fbjs@^1.0.0', {
+	localPath: './lib/shallowEqual',
+	onInstall,
+} ).then(/* ... */);
 ```
 
 Note that `lazyImport` can throw an error when offline and unable to install the dependency using NPM. You may want to anticipate this and provide remediation steps for a failed install, such as logging a warning messsage:
@@ -69,10 +72,17 @@ try {
 
 ### Options
 
+#### `localPath`
+
+-   Type: `string`
+-   Required: No
+
+Local path pointing to a file or directory that can be used when other script that `main` needs to be imported.
+
 #### `onInstall`
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 Function to call if and when the module is being installed. Since installation can cause a delay in script execution, this can be useful to output logging information or display a spinner.
 

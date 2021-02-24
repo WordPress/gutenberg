@@ -1,5 +1,6 @@
 .components-autocomplete__popover .components-popover__content > div {
 	padding: $grid-unit-20;
+	min-width: 220px;
 }
 
 .components-autocomplete__result.components-button {

@@ -6,17 +6,13 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { Flex, FlexItem } from '../../flex';
+import { Flex } from '../../flex';
 import { color } from '../../utils/style-mixins';
 
 const CIRCLE_SIZE = 30;
 
 export const Root = styled( Flex )`
 	max-width: 200px;
-`;
-
-export const NumberControlWrapper = styled( FlexItem )`
-	width: 80px;
 `;
 
 export const CircleRoot = styled.div`

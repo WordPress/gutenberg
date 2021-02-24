@@ -7,12 +7,17 @@ import { castArray, first, last, every } from 'lodash';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	switchToBlockType,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { useNotifyCopy } from '../copy-handler';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockActions( {
 	clientIds,
@@ -24,9 +29,9 @@ export default function BlockActions( {
 		getBlockRootClientId,
 		getBlocksByClientId,
 		getTemplateLock,
-	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
+	} = useSelect( ( select ) => select( blockEditorStore ), [] );
 	const { getDefaultBlockName, getGroupingBlockName } = useSelect(
-		( select ) => select( 'core/blocks' ),
+		( select ) => select( blocksStore ),
 		[]
 	);
 
@@ -55,7 +60,7 @@ export default function BlockActions( {
 		setBlockMovingClientId,
 		setNavigationMode,
 		selectBlock,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	const notifyCopy = useNotifyCopy();
 

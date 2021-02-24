@@ -4,8 +4,8 @@
         "name": "core/social-links",
         "isValid": true,
         "attributes": {
-			"openInNewTab": false
-		},
+            "openInNewTab": false
+        },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",

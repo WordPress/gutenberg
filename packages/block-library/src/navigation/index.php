@@ -125,28 +125,32 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors          = block_core_navigation_build_css_colors( $attributes );
-	$font_sizes      = block_core_navigation_build_css_font_sizes( $attributes );
-	$classes         = array_merge(
+	$colors     = block_core_navigation_build_css_colors( $attributes );
+	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
+	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array()
 	);
-	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
-		: '';
 
 	$inner_blocks_html = '';
 	foreach ( $block->inner_blocks as $inner_block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
 
+	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
+
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => implode( ' ', $classes ),
+			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+		)
+	);
+
 	return sprintf(
-		'<nav %1$s %2$s><ul class="wp-block-navigation__container">%3$s</ul></nav>',
-		$class_attribute,
-		$style_attribute,
+		'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
+		$wrapper_attributes,
 		$inner_blocks_html
 	);
 }
@@ -167,3 +171,34 @@ function register_block_core_navigation() {
 }
 
 add_action( 'init', 'register_block_core_navigation' );
+
+/**
+ * Filter that changes the parsed attribute values of navigation blocks contain typographic presets to contain the values directly.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block being rendered without typographic presets.
+ */
+function block_core_navigation_typographic_presets_backcompatibility( $parsed_block ) {
+	if ( 'core/navigation' === $parsed_block['blockName'] ) {
+		$attribute_to_prefix_map = array(
+			'fontStyle'      => 'var:preset|font-style|',
+			'fontWeight'     => 'var:preset|font-weight|',
+			'textDecoration' => 'var:preset|text-decoration|',
+			'textTransform'  => 'var:preset|text-transform|',
+		);
+		foreach ( $attribute_to_prefix_map as $style_attribute => $prefix ) {
+			if ( ! empty( $parsed_block['attrs']['style']['typography'][ $style_attribute ] ) ) {
+				$prefix_len      = strlen( $prefix );
+				$attribute_value = &$parsed_block['attrs']['style']['typography'][ $style_attribute ];
+				if ( 0 === strncmp( $attribute_value, $prefix, $prefix_len ) ) {
+					$attribute_value = substr( $attribute_value, $prefix_len );
+				}
+				if ( 'textDecoration' === $style_attribute && 'strikethrough' === $attribute_value ) {
+					$attribute_value = 'line-through';
+				}
+			}
+		}
+	}
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );

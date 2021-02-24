@@ -46,10 +46,12 @@ export default function VerseEdit( {
 						content: nextContent,
 					} );
 				} }
-				placeholder={ __( 'Write…' ) }
+				aria-label={ __( 'Verse text' ) }
+				placeholder={ __( 'Write verse…' ) }
 				onMerge={ mergeBlocks }
 				textAlign={ textAlign }
 				{ ...blockProps }
+				__unstablePastePlainText
 			/>
 		</>
 	);

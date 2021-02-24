@@ -13,13 +13,14 @@ import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
 function BlockMover( {
 	isFirst,
@@ -40,6 +41,8 @@ function BlockMover( {
 		return null;
 	}
 
+	const dragHandleLabel = __( 'Drag' );
+
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the buttons while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
@@ -56,22 +59,16 @@ function BlockMover( {
 					clientIds={ clientIds }
 					cloneClassname="block-editor-block-mover__drag-clone"
 				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
 							aria-hidden="true"
-							label={ _n(
-								'Drag block',
-								'Drag blocks',
-								clientIds.length
-							) }
+							label={ dragHandleLabel }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable={ isDraggable }
+							{ ...draggableProps }
 						/>
 					) }
 				</BlockDraggable>
@@ -106,7 +103,7 @@ export default withSelect( ( select, { clientIds } ) => {
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const normalizedClientIds = castArray( clientIds );
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );

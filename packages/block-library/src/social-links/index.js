@@ -16,7 +16,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social Icons' ),
+	title: _x( 'Social Icons', 'block title' ),
 	description: __(
 		'Display icons linking to your social media profiles or websites.'
 	),

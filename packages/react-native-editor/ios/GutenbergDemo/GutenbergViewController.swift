@@ -1,9 +1,11 @@
-
 import UIKit
 import Gutenberg
 import Aztec
 
 class GutenbergViewController: UIViewController {
+    private lazy var filesAppMediaPicker: DocumentsMediaSource = {
+        return DocumentsMediaSource(gutenberg: gutenberg, coordinator: mediaUploadCoordinator)
+    }()
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self, extraModules: [CustomImageLoader()])
     fileprivate var htmlMode = false
@@ -38,19 +40,18 @@ class GutenbergViewController: UIViewController {
     @objc func saveButtonPressed(sender: UIBarButtonItem) {
         gutenberg.requestHTML()
     }
-    
+
     func registerLongPressGestureRecognizer() {
         longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         view.addGestureRecognizer(longPressGesture)
     }
-    
+
     @objc func handleLongPress() {
         NotificationCenter.default.post(Notification(name: MediaUploadCoordinator.failUpload ))
     }
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-
     func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
@@ -99,8 +100,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                 } else {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
                 }
-            default:
-                break
+            case .other, .any:
+                 callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
+            case .audio:
+                callback([MediaInfo(id: 5, url: "https://cldup.com/59IrU0WJtq.mp3", type: "audio", caption: "Summer presto")])
             }
         case .deviceLibrary:
             print("Gutenberg did request a device media picker, opening the device picker")
@@ -108,6 +111,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
+
+        case .filesApp, .otherApps:
+            pickAndUploadFromFilesApp(filter: currentFilter, callback: callback)
         default: break
         }
     }
@@ -127,6 +133,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             self.mediaPickCoordinator = nil
         } )
         mediaPickCoordinator?.pick(from: source)
+    }
+
+    private func pickAndUploadFromFilesApp(filter: Gutenberg.MediaType, callback: @escaping MediaPickerDidPickMediaCallback) {
+        filesAppMediaPicker.presentPicker(origin: self, filters: [filter], multipleSelection: false, callback: callback)
     }
 
     func gutenbergDidRequestMediaUploadSync() {
@@ -199,7 +209,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
         callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
-    
+
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
         print("Gutenberg loged user event")
     }
@@ -215,11 +225,39 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
+    }
+
+    func gutenbergDidRequestMediaSaveSync() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+        print(#function)
+	}
+
+    func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool {
         return false;
     }
 
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
+    func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
     }
 }
@@ -252,15 +290,15 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
-    
+
     func gutenbergTranslations() -> [String : [String]]? {
         return nil
     }
-    
+
     func gutenbergInitialContent() -> String? {
         return nil
     }
-    
+
     func gutenbergInitialTitle() -> String? {
         return nil
     }
@@ -268,8 +306,11 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
+            .xposts: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
+            .mediaFilesCollectionBlock: true,
+            .audioBlock: true
         ]
     }
 
@@ -280,6 +321,15 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergEditorTheme() -> GutenbergEditorTheme? {
         return nil
     }
+
+    func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
+        return [.filesApp, .otherApps]
+    }
+}
+
+extension Gutenberg.MediaSource {
+    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Choose from device", types: [.any])
+    static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
 }
 
 //MARK: - Navigation bar
@@ -323,7 +373,7 @@ extension GutenbergViewController {
 
         present(alert, animated: true)
     }
-    
+
     var toggleHTMLModeAction: UIAlertAction {
         return UIAlertAction(
             title: htmlMode ? "Switch To Visual" : "Switch to HTML",
@@ -332,7 +382,7 @@ extension GutenbergViewController {
                 self.toggleHTMLMode(action)
         })
     }
-    
+
     var updateHtmlAction: UIAlertAction {
         return UIAlertAction(
             title: "Update HTML",
@@ -361,7 +411,7 @@ extension GutenbergViewController {
                 self.gutenberg.updateCapabilities()
         })
     }
-    
+
     func alertWithTextInput(using handler: ((String?) -> Void)?) -> UIAlertController {
         let alert = UIAlertController(title: "Enter HTML", message: nil, preferredStyle: .alert)
         alert.addTextField()
@@ -372,7 +422,7 @@ extension GutenbergViewController {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         return alert
     }
-    
+
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()

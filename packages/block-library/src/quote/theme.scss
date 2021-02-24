@@ -1,12 +1,12 @@
 .wp-block-quote {
-	border-left: 0.25em solid $black;
+	border-left: 0.25em solid currentColor;
 	margin: 0 0 1.75em 0;
 	padding-left: 1em;
 
 	cite,
 	footer,
 	&__citation {
-		color: #555;
+		color: currentColor;
 		font-size: 0.8125em;
 		margin-top: 1em;
 		position: relative;
@@ -15,7 +15,7 @@
 
 	&.has-text-align-right {
 		border-left: none;
-		border-right: 0.25em solid $black;
+		border-right: 0.25em solid currentColor;
 		padding-left: 0;
 		padding-right: 1em;
 	}

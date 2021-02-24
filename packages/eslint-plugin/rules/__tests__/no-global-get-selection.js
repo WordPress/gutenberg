@@ -23,7 +23,12 @@ ruleTester.run( 'no-global-get-selection', rule, {
 	invalid: [
 		{
 			code: 'window.getSelection();',
-			errors: [ { message: 'Avoid global selection getting' } ],
+			errors: [
+				{
+					message:
+						'Avoid accessing the selection with a global. Use the ownerDocument.defaultView property on a node ref instead.',
+				},
+			],
 		},
 	],
 } );

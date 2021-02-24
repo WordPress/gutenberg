@@ -259,14 +259,14 @@ export default {
 	component: ComboboxControl,
 };
 
-function ComboboxControlWithState() {
-	const mapCountryOption = ( country ) => ( {
-		value: country.code,
-		label: country.name,
-	} );
-	const [ filteredOptions, setFilteredOptions ] = useState(
-		countries.map( mapCountryOption )
-	);
+const mapCountryOption = ( country ) => ( {
+	value: country.code,
+	label: country.name,
+} );
+
+const countryOptions = countries.map( mapCountryOption );
+
+function CountryCodeComboboxControl() {
 	const [ value, setValue ] = useState( null );
 
 	return (
@@ -275,22 +275,10 @@ function ComboboxControlWithState() {
 				value={ value }
 				onChange={ setValue }
 				label="Select a country"
-				options={ filteredOptions }
-				onFilterValueChange={ ( filter ) =>
-					setFilteredOptions(
-						countries
-							.filter( ( country ) =>
-								country.name
-									.toLowerCase()
-									.startsWith( filter.toLowerCase() )
-							)
-							.slice( 0, 20 )
-							.map( mapCountryOption )
-					)
-				}
+				options={ countryOptions }
 			/>
 			<p>Value: { value }</p>
 		</>
 	);
 }
-export const _default = () => <ComboboxControlWithState />;
+export const _default = () => <CountryCodeComboboxControl />;

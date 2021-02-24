@@ -25,6 +25,8 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -74,7 +76,7 @@ const EmbedEdit = ( props ) => {
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
 				getThemeSupports,
-			} = select( 'core' );
+			} = select( coreStore );
 			if ( ! attributesUrl ) {
 				return { fetching: false, cannotEmbed: false };
 			}
@@ -173,8 +175,14 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ preview, isEditingURL ] );
 
+	const blockProps = useBlockProps();
+
 	if ( fetching ) {
-		return <EmbedLoading />;
+		return (
+			<div { ...blockProps }>
+				<EmbedLoading />
+			</div>
+		);
 	}
 
 	// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
@@ -184,25 +192,29 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<EmbedPlaceholder
-				icon={ icon }
-				label={ label }
-				onSubmit={ ( event ) => {
-					if ( event ) {
-						event.preventDefault();
-					}
+			<div { ...blockProps }>
+				<EmbedPlaceholder
+					icon={ icon }
+					label={ label }
+					onSubmit={ ( event ) => {
+						if ( event ) {
+							event.preventDefault();
+						}
 
-					setIsEditingURL( false );
-					setAttributes( { url } );
-				} }
-				value={ url }
-				cannotEmbed={ cannotEmbed }
-				onChange={ ( event ) => setURL( event.target.value ) }
-				fallback={ () => fallback( url, onReplace ) }
-				tryAgain={ () => {
-					invalidateResolution( 'core', 'getEmbedPreview', [ url ] );
-				} }
-			/>
+						setIsEditingURL( false );
+						setAttributes( { url } );
+					} }
+					value={ url }
+					cannotEmbed={ cannotEmbed }
+					onChange={ ( event ) => setURL( event.target.value ) }
+					fallback={ () => fallback( url, onReplace ) }
+					tryAgain={ () => {
+						invalidateResolution( 'core', 'getEmbedPreview', [
+							url,
+						] );
+					} }
+				/>
+			</div>
 		);
 	}
 
@@ -232,21 +244,23 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<EmbedPreview
-				preview={ preview }
-				previewable={ previewable }
-				className={ className }
-				url={ url }
-				type={ type }
-				caption={ caption }
-				onCaptionChange={ ( value ) =>
-					setAttributes( { caption: value } )
-				}
-				isSelected={ isSelected }
-				icon={ icon }
-				label={ label }
-				insertBlocksAfter={ insertBlocksAfter }
-			/>
+			<div { ...blockProps }>
+				<EmbedPreview
+					preview={ preview }
+					previewable={ previewable }
+					className={ className }
+					url={ url }
+					type={ type }
+					caption={ caption }
+					onCaptionChange={ ( value ) =>
+						setAttributes( { caption: value } )
+					}
+					isSelected={ isSelected }
+					icon={ icon }
+					label={ label }
+					insertBlocksAfter={ insertBlocksAfter }
+				/>
+			</div>
 		</>
 	);
 };

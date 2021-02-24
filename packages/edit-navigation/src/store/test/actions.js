@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ import {
 import { menuItemsQuery, computeCustomizedAttribute } from '../utils';
 
 jest.mock( '../utils', () => {
-	const utils = require.requireActual( '../utils' );
+	const utils = jest.requireActual( '../utils' );
 	// Mock serializeProcessing to always return the callback for easier testing and less boilerplate.
 	utils.serializeProcessing = ( callback ) => callback;
 	return utils;
@@ -346,7 +347,7 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: true } ).value ).toEqual(
 			dispatch(
-				'core/notices',
+				noticesStore,
 				'createSuccessNotice',
 				__( 'Navigation saved.' ),
 				{
@@ -476,7 +477,7 @@ describe( 'saveNavigationPost', () => {
 
 		expect( action.next( { success: false } ).value ).toEqual(
 			dispatch(
-				'core/notices',
+				noticesStore,
 				'createErrorNotice',
 				__( 'There was an error.' ),
 				{

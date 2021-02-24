@@ -34,7 +34,7 @@ if ( ! function_exists( 'wp_head' ) ) {
 		<?php
 		$registry = WP_Block_Type_Registry::get_instance();
 		$block    = $registry->get_registered( 'core/legacy-widget' );
-		echo $block->render( $_GET['widgetPreview'] );
+		echo $block->render( $_GET['widget-preview'] );
 		?>
 	</div><!-- #content -->
 </div><!-- #page -->

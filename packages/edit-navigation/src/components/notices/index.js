@@ -8,11 +8,12 @@ import { filter } from 'lodash';
  */
 import { NoticeList, SnackbarList } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 export default function EditNavigationNotices() {
-	const { removeNotice } = useDispatch( 'core/notices' );
+	const { removeNotice } = useDispatch( noticesStore );
 	const notices = useSelect(
-		( select ) => select( 'core/notices' ).getNotices(),
+		( select ) => select( noticesStore ).getNotices(),
 		[]
 	);
 	const dismissibleNotices = filter( notices, {

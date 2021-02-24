@@ -22,8 +22,11 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 		'site',
 		'description'
 	);
-	const blockProps = useBlockProps();
-
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	return (
 		<>
 			<BlockControls>
@@ -37,11 +40,9 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 
 			<RichText
 				allowedFormats={ [] }
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
 				onChange={ setSiteTagline }
-				placeholder={ __( 'Site Tagline' ) }
+				aria-label={ __( 'Site tagline text' ) }
+				placeholder={ __( 'Write site tagline…' ) }
 				tagName="p"
 				value={ siteTagline }
 				{ ...blockProps }

@@ -7,9 +7,9 @@ import {
 	Platform,
 	PanResponder,
 	Dimensions,
-	ScrollView,
 	Keyboard,
 	StatusBar,
+	ScrollView,
 	TouchableHighlight,
 } from 'react-native';
 import Modal from 'react-native-modal';
@@ -48,6 +48,7 @@ class BottomSheet extends Component {
 		this.onScroll = this.onScroll.bind( this );
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
+		this.onDismiss = this.onDismiss.bind( this );
 		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
 			this
 		);
@@ -211,6 +212,16 @@ class BottomSheet extends Component {
 		}
 	}
 
+	onDismiss() {
+		const { onDismiss } = this.props;
+
+		if ( onDismiss ) {
+			onDismiss();
+		}
+
+		this.onCloseBottomSheet();
+	}
+
 	onShouldEnableScroll( value ) {
 		this.setState( { scrollEnabled: value } );
 	}
@@ -236,6 +247,7 @@ class BottomSheet extends Component {
 		const { handleClosingBottomSheet } = this.state;
 		if ( handleClosingBottomSheet ) {
 			handleClosingBottomSheet();
+			this.onHandleClosingBottomSheet( null );
 		}
 		if ( onClose ) {
 			onClose();
@@ -283,10 +295,9 @@ class BottomSheet extends Component {
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
-			onDismiss,
-			isChildrenScrollable,
 			children,
 			withHeaderSeparator = false,
+			hasNavigation,
 			...rest
 		} = this.props;
 		const {
@@ -343,8 +354,6 @@ class BottomSheet extends Component {
 				styles.content,
 				hideHeader && styles.emptyHeader,
 				contentStyle,
-				isChildrenScrollable && this.getContentStyle(),
-				contentStyle,
 				isFullScreen && { flexGrow: 1 },
 			],
 			style: listStyle,
@@ -353,7 +362,7 @@ class BottomSheet extends Component {
 			automaticallyAdjustContentInsets: false,
 		};
 
-		const WrapperView = isChildrenScrollable ? View : ScrollView;
+		const WrapperView = hasNavigation ? View : ScrollView;
 
 		const getHeader = () => (
 			<>
@@ -383,9 +392,9 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.onCloseBottomSheet }
 				onBackButtonPress={ this.onHardwareButtonPress }
 				onSwipe={ this.onCloseBottomSheet }
-				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
+				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
 				onModalHide={
-					Platform.OS === 'android' ? onDismiss : undefined
+					Platform.OS === 'android' ? this.onDismiss : undefined
 				}
 				swipeDirection="down"
 				onMoveShouldSetResponder={
@@ -421,7 +430,7 @@ class BottomSheet extends Component {
 					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
-						{ ...( isChildrenScrollable
+						{ ...( hasNavigation
 							? { style: listProps.style }
 							: listProps ) }
 					>
@@ -438,14 +447,25 @@ class BottomSheet extends Component {
 									.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
+								safeAreaBottomInset,
 							} }
 						>
-							<TouchableHighlight accessible={ false }>
+							{ hasNavigation ? (
 								<>{ children }</>
-							</TouchableHighlight>
+							) : (
+								<TouchableHighlight accessible={ false }>
+									<>{ children }</>
+								</TouchableHighlight>
+							) }
 						</BottomSheetProvider>
-						{ ! isChildrenScrollable && (
-							<View style={ { height: safeAreaBottomInset } } />
+						{ ! hasNavigation && (
+							<View
+								style={ {
+									height:
+										safeAreaBottomInset ||
+										styles.scrollableContent.paddingBottom,
+								} }
+							/>
 						) }
 					</WrapperView>
 				</KeyboardAvoidingView>

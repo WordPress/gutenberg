@@ -41,7 +41,20 @@ export const buildWidgetAreasPostId = () => `widget-areas`;
  * @return {Object} Query.
  */
 export function buildWidgetAreasQuery() {
-	return {};
+	return {
+		per_page: -1,
+	};
+}
+
+/**
+ * Builds a query to resolve widgets.
+ *
+ * @return {Object} Query.
+ */
+export function buildWidgetsQuery() {
+	return {
+		per_page: -1,
+	};
 }
 
 /**

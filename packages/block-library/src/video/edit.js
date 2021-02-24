@@ -19,6 +19,7 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -32,6 +33,8 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
+import TracksEditor from './tracks-editor';
+import Tracks from './tracks';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -48,9 +51,9 @@ function VideoEdit( {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
-	const { id, caption, controls, poster, src } = attributes;
+	const { id, caption, controls, poster, src, tracks } = attributes;
 	const mediaUpload = useSelect(
-		( select ) => select( 'core/block-editor' ).getSettings().mediaUpload
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload
 	);
 
 	useEffect( () => {
@@ -145,6 +148,12 @@ function VideoEdit( {
 	return (
 		<>
 			<BlockControls>
+				<TracksEditor
+					tracks={ tracks }
+					onChange={ ( newTracks ) => {
+						setAttributes( { tracks: newTracks } );
+					} }
+				/>
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }
@@ -220,11 +229,14 @@ function VideoEdit( {
 						poster={ poster }
 						src={ src }
 						ref={ videoPlayer }
-					/>
+					>
+						<Tracks tracks={ tracks } />
+					</video>
 				</Disabled>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						aria-label={ __( 'Video caption text' ) }
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						onChange={ ( value ) =>

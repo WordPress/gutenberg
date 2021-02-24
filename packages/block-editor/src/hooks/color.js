@@ -34,9 +34,6 @@ export const COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
 
 const hasColorSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 	return (
 		colorSupport &&
@@ -45,6 +42,12 @@ const hasColorSupport = ( blockType ) => {
 			colorSupport.background !== false ||
 			colorSupport.text !== false )
 	);
+};
+
+const shouldSkipSerialization = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport?.__experimentalSkipSerialization;
 };
 
 const hasLinkColorSupport = ( blockType ) => {
@@ -68,20 +71,12 @@ const hasGradientSupport = ( blockType ) => {
 };
 
 const hasBackgroundColorSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return colorSupport && colorSupport.background !== false;
 };
 
 const hasTextColorSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return colorSupport && colorSupport.text !== false;
@@ -135,7 +130,10 @@ function addAttributes( settings ) {
  * @return {Object}            Filtered props applied to save element
  */
 export function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasColorSupport( blockType ) ) {
+	if (
+		! hasColorSupport( blockType ) ||
+		shouldSkipSerialization( blockType )
+	) {
 		return props;
 	}
 
@@ -180,7 +178,10 @@ export function addSaveProps( props, blockType, attributes ) {
  * @return {Object}          Filtered block settings
  */
 export function addEditProps( settings ) {
-	if ( ! hasColorSupport( settings ) ) {
+	if (
+		! hasColorSupport( settings ) ||
+		shouldSkipSerialization( settings )
+	) {
 		return settings;
 	}
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
@@ -226,7 +227,7 @@ export function ColorEdit( props ) {
 		localAttributes.current = attributes;
 	}, [ attributes ] );
 
-	if ( ! hasColorSupport( blockName ) ) {
+	if ( ! hasColorSupport( blockName ) || Platform.OS !== 'web' ) {
 		return null;
 	}
 
@@ -386,7 +387,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
 		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-		if ( ! hasColorSupport( name ) ) {
+		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
 

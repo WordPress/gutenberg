@@ -94,7 +94,7 @@ describe( 'getQueriedItems', () => {
 				2: true,
 			},
 			queries: {
-				'': [ 1, 2 ],
+				'_fields=content': [ 1, 2 ],
 			},
 		};
 
@@ -133,7 +133,7 @@ describe( 'getQueriedItems', () => {
 				2: true,
 			},
 			queries: {
-				'': [ 1, 2 ],
+				'_fields=content%2Cmeta.template': [ 1, 2 ],
 			},
 		};
 

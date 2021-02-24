@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { BlockControls, InspectorControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	Disabled,
@@ -50,26 +54,30 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		}
 	}
 
+	const blockProps = useBlockProps();
+
 	if ( isEditing ) {
 		return (
-			<Placeholder icon={ rss } label="RSS">
-				<form
-					onSubmit={ onSubmitURL }
-					className="wp-block-rss__placeholder-form"
-				>
-					<TextControl
-						placeholder={ __( 'Enter URL here…' ) }
-						value={ feedURL }
-						onChange={ ( value ) =>
-							setAttributes( { feedURL: value } )
-						}
-						className="wp-block-rss__placeholder-input"
-					/>
-					<Button isPrimary type="submit">
-						{ __( 'Use URL' ) }
-					</Button>
-				</form>
-			</Placeholder>
+			<div { ...blockProps }>
+				<Placeholder icon={ rss } label="RSS">
+					<form
+						onSubmit={ onSubmitURL }
+						className="wp-block-rss__placeholder-form"
+					>
+						<TextControl
+							placeholder={ __( 'Enter URL here…' ) }
+							value={ feedURL }
+							onChange={ ( value ) =>
+								setAttributes( { feedURL: value } )
+							}
+							className="wp-block-rss__placeholder-input"
+						/>
+						<Button isPrimary type="submit">
+							{ __( 'Use URL' ) }
+						</Button>
+					</form>
+				</Placeholder>
+			</div>
 		);
 	}
 
@@ -151,9 +159,14 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<Disabled>
-				<ServerSideRender block="core/rss" attributes={ attributes } />
-			</Disabled>
+			<div { ...blockProps }>
+				<Disabled>
+					<ServerSideRender
+						block="core/rss"
+						attributes={ attributes }
+					/>
+				</Disabled>
+			</div>
 		</>
 	);
 }

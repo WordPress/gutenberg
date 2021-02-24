@@ -52,6 +52,82 @@ function gutenberg_test_cpt_locking() {
 			'template_lock' => false,
 		)
 	);
+	register_post_type(
+		'l-post-ul-group',
+		array(
+			'public'        => true,
+			'label'         => 'Locked Post Unlocked group',
+			'show_in_rest'  => true,
+			'template'      => array(
+				array(
+					'core/group',
+					array(
+						'templateLock' => false,
+					),
+					array(
+						array( 'core/quote' ),
+						array(
+							'core/paragraph',
+							array(
+								'placeholder' => 'Add a description',
+							),
+						),
+					),
+				),
+			),
+			'template_lock' => 'all',
+		)
+	);
+	register_post_type(
+		'l-post-l-group',
+		array(
+			'public'        => true,
+			'label'         => 'Locked Post Locked group',
+			'show_in_rest'  => true,
+			'template'      => array(
+				array(
+					'core/group',
+					array(
+						'templateLock' => 'all',
+					),
+					array(
+						array( 'core/quote' ),
+						array(
+							'core/paragraph',
+							array(
+								'placeholder' => 'Add a description',
+							),
+						),
+					),
+				),
+			),
+			'template_lock' => 'all',
+		)
+	);
+	register_post_type(
+		'l-post-i-group',
+		array(
+			'public'        => true,
+			'label'         => 'Locked Post Inherited group',
+			'show_in_rest'  => true,
+			'template'      => array(
+				array(
+					'core/group',
+					array(),
+					array(
+						array( 'core/quote' ),
+						array(
+							'core/paragraph',
+							array(
+								'placeholder' => 'Add a description',
+							),
+						),
+					),
+				),
+			),
+			'template_lock' => 'all',
+		)
+	);
 }
 
 add_action( 'init', 'gutenberg_test_cpt_locking' );

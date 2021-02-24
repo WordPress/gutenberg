@@ -32,6 +32,7 @@
 				el( InnerBlocks, {
 					template: [ [ 'gutenberg/test-context-consumer', {} ] ],
 					templateLock: 'all',
+					templateInsertUpdatesSelection: true,
 				} )
 			);
 		},

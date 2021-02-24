@@ -115,7 +115,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Block attributes.
+-   `Object?`: Block attributes.
 
 <a name="getBlockCount" href="#getBlockCount">#</a> **getBlockCount**
 
@@ -160,16 +160,22 @@ _Returns_
 
 <a name="getBlockInsertionPoint" href="#getBlockInsertionPoint">#</a> **getBlockInsertionPoint**
 
-Returns the insertion point, the index at which the new inserted block would
-be placed. Defaults to the last index.
+Returns the insertion point. This will be:
+
+1) The insertion point manually set using setInsertionPoint() or
+   showInsertionPoint(); or
+2) The point after the current block selection, if there is a selection; or
+3) The point at the end of the block list.
+
+Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
--   `Object`: Insertion point object with `rootClientId`, `index`.
+-   `Object`: Insertion point object with `rootClientId` and `index`.
 
 <a name="getBlockListSettings" href="#getBlockListSettings">#</a> **getBlockListSettings**
 
@@ -243,15 +249,17 @@ _Returns_
 
 <a name="getBlockParentsByBlockName" href="#getBlockParentsByBlockName">#</a> **getBlockParentsByBlockName**
 
-Given a block client ID and a block name,
-returns the list of all its parents from top to bottom,
-filtered by the given name.
+Given a block client ID and a block name, returns the list of all its parents
+from top to bottom, filtered by the given name(s). For example, if passed
+'core/group' as the blockName, it will only return parents which are group
+blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will
+return parents which are group blocks and parents which are cover blocks.
 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _blockName_ `string`: Block name to filter.
+-   _blockName_ `string|string[]`: Block name(s) to filter.
 -   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
@@ -292,7 +300,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Object>`: Post blocks.
+-   `Object[]`: Post blocks.
 
 <a name="getBlocksByClientId" href="#getBlocksByClientId">#</a> **getBlocksByClientId**
 
@@ -302,11 +310,11 @@ objects.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `Array<string>`: Client IDs for which blocks are to be returned.
+-   _clientIds_ `string[]`: Client IDs for which blocks are to be returned.
 
 _Returns_
 
--   `Array<WPBlock>`: Block objects.
+-   `WPBlock[]`: Block objects.
 
 <a name="getBlockSelectionEnd" href="#getBlockSelectionEnd">#</a> **getBlockSelectionEnd**
 
@@ -335,6 +343,40 @@ _Parameters_
 _Returns_
 
 -   `?string`: Client ID of block selection start.
+
+<a name="getBlockTransformItems" href="#getBlockTransformItems">#</a> **getBlockTransformItems**
+
+Determines the items that appear in the available block transforms list.
+
+Each item object contains what's necessary to display a menu item in the
+transform list and handle its selection.
+
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>)
+that combines block usage frequenty and recency.
+
+Items are returned ordered descendingly by their 'frecency'.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `WPEditorTransformItem[]`: Items that appear in inserter.
+
+_Type Definition_
+
+-   _WPEditorTransformItem_ `Object`
+
+_Properties_
+
+-   _id_ `string`: Unique identifier for the item.
+-   _name_ `string`: The type of block to create.
+-   _title_ `string`: Title of the item, as it appears in the inserter.
+-   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+-   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
+-   _frecency_ `number`: Heuristic that combines frequency and recency.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
@@ -375,7 +417,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<string>`: Array of dragged block client ids.
+-   `string[]`: Array of dragged block client ids.
 
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
@@ -424,7 +466,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPEditorInserterItem>`: Items that appear in inserter.
+-   `WPEditorInserterItem[]`: Items that appear in inserter.
 
 _Type Definition_
 
@@ -438,7 +480,7 @@ _Properties_
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
 -   _category_ `string`: Block category that the item is associated with.
--   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
+-   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
@@ -615,6 +657,7 @@ _Returns_
 
 Returns the initial caret position for the selected block.
 This position is to used to position the caret properly when the selected block changes.
+If the current block is not a RichText, having initial position set to 0 means "focus block"
 
 _Parameters_
 
@@ -622,7 +665,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Selected block.
+-   `0|-1|null`: Initial position.
 
 <a name="getSelectionEnd" href="#getSelectionEnd">#</a> **getSelectionEnd**
 
@@ -810,7 +853,8 @@ _Returns_
 
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 
-Returns true if we should show the block insertion point.
+Whether or not the insertion point should be shown to users. This is set
+using showInsertionPoint() or hideInsertionPoint().
 
 _Parameters_
 
@@ -818,7 +862,7 @@ _Parameters_
 
 _Returns_
 
--   `?boolean`: Whether the insertion point is visible or not.
+-   `?boolean`: Whether the insertion point should be shown.
 
 <a name="isBlockMultiSelected" href="#isBlockMultiSelected">#</a> **isBlockMultiSelected**
 
@@ -1016,7 +1060,7 @@ Generator that triggers an action used to duplicate a list of blocks.
 
 _Parameters_
 
--   _clientIds_ `Array<string>`: 
+-   _clientIds_ `string[]`: 
 -   _updateSelection_ `boolean`: 
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
@@ -1046,7 +1090,7 @@ _Parameters_
 
 <a name="hideInsertionPoint" href="#hideInsertionPoint">#</a> **hideInsertionPoint**
 
-Returns an action object hiding the insertion point.
+Hides the insertion point for users.
 
 _Returns_
 
@@ -1091,10 +1135,11 @@ be inserted, optionally at a specific index respective a root block list.
 
 _Parameters_
 
--   _blocks_ `Array<Object>`: Block objects to insert.
+-   _blocks_ `Object[]`: Block objects to insert.
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+-   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
@@ -1124,10 +1169,6 @@ _Parameters_
 
 -   _firstBlockClientId_ `string`: Client ID of the first block to merge.
 -   _secondBlockClientId_ `string`: Client ID of the second block to merge.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="moveBlocksDown" href="#moveBlocksDown">#</a> **moveBlocksDown**
 
@@ -1170,10 +1211,6 @@ _Parameters_
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="receiveBlocks" href="#receiveBlocks">#</a> **receiveBlocks**
 
 Returns an action object used in signalling that blocks have been received.
@@ -1182,7 +1219,7 @@ replacing.
 
 _Parameters_
 
--   _blocks_ `Array<Object>`: Array of block objects.
+-   _blocks_ `Object[]`: Array of block objects.
 
 _Returns_
 
@@ -1209,7 +1246,7 @@ the set of specified client IDs are to be removed.
 
 _Parameters_
 
--   _clientIds_ `(string|Array<string>)`: Client IDs of blocks to remove.
+-   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
 -   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
 
 <a name="replaceBlock" href="#replaceBlock">#</a> **replaceBlock**
@@ -1219,8 +1256,8 @@ with one or more replacement blocks.
 
 _Parameters_
 
--   _clientId_ `(string|Array<string>)`: Block client ID to replace.
--   _block_ `(Object|Array<Object>)`: Replacement block(s).
+-   _clientId_ `(string|string[])`: Block client ID to replace.
+-   _block_ `(Object|Object[])`: Replacement block(s).
 
 _Returns_
 
@@ -1233,10 +1270,10 @@ one or more replacement blocks.
 
 _Parameters_
 
--   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
--   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
+-   _clientIds_ `(string|string[])`: Block client ID(s) to replace.
+-   _blocks_ `(Object|Object[])`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
--   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
+-   _initialPosition_ `0|-1|null`: Index of caret after in the selected block after the operation.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
@@ -1247,8 +1284,9 @@ specified client ID should be replaced.
 _Parameters_
 
 -   _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
--   _blocks_ `Array<Object>`: Block objects to insert as new InnerBlocks
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _blocks_ `Object[]`: Block objects to insert as new InnerBlocks
+-   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
+-   _initialPosition_ `0|-1|null`: Initial block position.
 
 _Returns_
 
@@ -1264,10 +1302,6 @@ _Parameters_
 
 -   _blocks_ `Array`: Array of blocks.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="resetSelection" href="#resetSelection">#</a> **resetSelection**
 
 Returns an action object used in signalling that selection state should be
@@ -1277,6 +1311,7 @@ _Parameters_
 
 -   _selectionStart_ `WPBlockSelection`: The selection start.
 -   _selectionEnd_ `WPBlockSelection`: The selection end.
+-   _initialPosition_ `0|-1|null`: Initial block position.
 
 _Returns_
 
@@ -1292,7 +1327,7 @@ reflects a reverse selection.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `?number`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `0|-1|null`: Optional initial position. Pass as -1 to reflect reverse selection.
 
 _Returns_
 
@@ -1338,7 +1373,7 @@ Generator that triggers an action used to enable or disable the block moving mod
 
 _Parameters_
 
--   _hasBlockMovingClientId_ `(string|null)`: Enable/Disable block moving mode.
+-   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 
@@ -1371,13 +1406,14 @@ _Returns_
 
 <a name="showInsertionPoint" href="#showInsertionPoint">#</a> **showInsertionPoint**
 
-Returns an action object used in signalling that the insertion point should
-be shown.
+Sets the insertion point and shows it to users.
+
+Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _index_ `?number`: Index at which block should be inserted.
+-   _rootClientId_ `?string`: Root client ID of block list in which to insert. Use `undefined` for the root block list.
+-   _index_ `number`: Index at which block should be inserted.
 
 _Returns_
 
@@ -1389,7 +1425,7 @@ Returns an action object used in signalling that the user has begun to drag bloc
 
 _Parameters_
 
--   _clientIds_ `Array<string>`: An array of client ids being dragged
+-   _clientIds_ `string[]`: An array of client ids being dragged
 
 _Returns_
 
@@ -1498,8 +1534,9 @@ attributes with the specified client IDs have been updated.
 
 _Parameters_
 
--   _clientIds_ `(string|Array<string>)`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged.
+-   _clientIds_ `string|string[]`: Block client IDs.
+-   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if uniqueByBlock is true.
+-   _uniqueByBlock_ `boolean`: true if each block in clientIds array has a unique set of attributes
 
 _Returns_
 
@@ -1529,6 +1566,17 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object
+
+<a name="validateBlocksToTemplate" href="#validateBlocksToTemplate">#</a> **validateBlocksToTemplate**
+
+Block validity is a function of blocks state (at the point of a
+reset) and the template setting. As a compromise to its placement
+across distinct parts of state, it is implemented here as a side-
+effect of the block reset action.
+
+_Parameters_
+
+-   _blocks_ `Array`: Array of blocks.
 
 
 <!-- END TOKEN(Autogenerated actions|../../../../packages/block-editor/src/store/actions.js) -->

@@ -1,0 +1,33 @@
+{
+	"name": "@wordpress/customize-widgets",
+	"private": true,
+	"version": "1.0.0-prerelease",
+	"description": "Widgets blocks in Customizer Module for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [ "wordpress" ],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/customize-widgets/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/customize-widgets"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.11.2",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/element": "file:../element",
+		"lodash": "^4.17.19"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

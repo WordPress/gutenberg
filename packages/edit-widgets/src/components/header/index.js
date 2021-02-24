@@ -20,24 +20,27 @@ import { useRef } from '@wordpress/element';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import useLastSelectedRootId from '../../hooks/use-last-selected-root-id';
+import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
+import { store as editWidgetsStore } from '../../store';
 
 function Header() {
 	const inserterButton = useRef();
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
 		( select ) =>
-			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( rootClientId ),
-		[ rootClientId ]
+			select( editWidgetsStore ).getIsWidgetAreaOpen(
+				widgetAreaClientId
+			),
+		[ widgetAreaClientId ]
 	);
 	const isInserterOpened = useSelect( ( select ) =>
-		select( 'core/edit-widgets' ).isInserterOpened()
+		select( editWidgetsStore ).isInserterOpened()
 	);
 	const { setIsWidgetAreaOpen, setIsInserterOpened } = useDispatch(
-		'core/edit-widgets'
+		editWidgetsStore
 	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const rootClientId = useLastSelectedRootId();
 	const handleClick = () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button closes the inserter popover
@@ -45,9 +48,9 @@ function Header() {
 		} else {
 			if ( ! isLastSelectedWidgetAreaOpen ) {
 				// Select the last selected block if hasn't already.
-				selectBlock( rootClientId );
+				selectBlock( widgetAreaClientId );
 				// Open the last selected widget area when opening the inserter.
-				setIsWidgetAreaOpen( rootClientId, true );
+				setIsWidgetAreaOpen( widgetAreaClientId, true );
 			}
 			// The DOM updates resulting from selectBlock() and setIsInserterOpened() calls are applied the
 			// same tick and pretty much in a random order. The inserter is closed if any other part of the

@@ -3,12 +3,11 @@
  */
 import classnames from 'classnames';
 import { noop } from 'lodash';
-import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -20,7 +19,17 @@ import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
-	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
+	{
+		buttonProps = {},
+		children,
+		className,
+		icon,
+		initialOpen,
+		onToggle = noop,
+		opened,
+		title,
+		scrollAfterOpen = true,
+	},
 	ref
 ) {
 	const [ isOpened, setIsOpened ] = useControlledState( opened, {
@@ -39,21 +48,26 @@ export function PanelBody(
 		onToggle( next );
 	};
 
+	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value
+	const scrollAfterOpenRef = useRef();
+	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render
 	useUpdateEffect( () => {
-		if ( isOpened ) {
+		if (
+			isOpened &&
+			scrollAfterOpenRef.current &&
+			nodeRef.current?.scrollIntoView
+		) {
 			/*
 			 * Scrolls the content into view when visible.
 			 * This improves the UX when there are multiple stacking <PanelBody />
 			 * components in a scrollable container.
 			 */
-			if ( nodeRef.current.scrollIntoView ) {
-				nodeRef.current.scrollIntoView( {
-					inline: 'nearest',
-					block: 'nearest',
-					behavior: scrollBehavior,
-				} );
-			}
+			nodeRef.current.scrollIntoView( {
+				inline: 'nearest',
+				block: 'nearest',
+				behavior: scrollBehavior,
+			} );
 		}
 	}, [ isOpened, scrollBehavior ] );
 
@@ -62,12 +76,13 @@ export function PanelBody(
 	} );
 
 	return (
-		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
+		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				icon={ icon }
 				isOpened={ isOpened }
 				onClick={ handleOnToggle }
 				title={ title }
+				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
 				? children( { opened: isOpened } )

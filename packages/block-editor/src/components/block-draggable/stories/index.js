@@ -1,15 +1,16 @@
 /**
- * WordPress dependencies
- */
-import { wordpress } from '@wordpress/icons';
-
-/**
  * Internal dependencies
  */
-import { BlockDraggableChip } from '../draggable-chip';
+import BlockDraggableChip from '../draggable-chip';
 
 export default { title: 'BlockEditor/BlockDraggable' };
 
 export const _default = () => {
-	return <BlockDraggableChip icon={ wordpress } label="WordPress" />;
+	// create a wrapper box for the absolutely-positioned child component
+	const wrapperStyle = { margin: '24px 0', position: 'relative' };
+	return (
+		<div style={ wrapperStyle }>
+			<BlockDraggableChip clientIds={ [ 1, 2 ] } />
+		</div>
+	);
 };

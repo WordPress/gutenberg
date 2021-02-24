@@ -9,7 +9,7 @@ import {
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
-describe( 'adding blocks', () => {
+describe( 'adding patterns', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );

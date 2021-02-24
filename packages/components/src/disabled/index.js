@@ -15,6 +15,11 @@ import {
 } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import { StyledWrapper } from './styles/disabled-styles';
+
 const { Consumer, Provider } = createContext( false );
 
 /**
@@ -36,7 +41,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
 	'TEXTAREA',
 ];
 
-function Disabled( { className, children, ...props } ) {
+function Disabled( { className, children, isDisabled = true, ...props } ) {
 	const node = useRef();
 
 	const disable = () => {
@@ -70,6 +75,10 @@ function Disabled( { className, children, ...props } ) {
 	);
 
 	useLayoutEffect( () => {
+		if ( ! isDisabled ) {
+			return;
+		}
+
 		disable();
 
 		const observer = new window.MutationObserver( debouncedDisable );
@@ -85,15 +94,19 @@ function Disabled( { className, children, ...props } ) {
 		};
 	}, [] );
 
+	if ( ! isDisabled ) {
+		return <Provider value={ false }>{ children }</Provider>;
+	}
+
 	return (
 		<Provider value={ true }>
-			<div
+			<StyledWrapper
 				ref={ node }
 				className={ classnames( className, 'components-disabled' ) }
 				{ ...props }
 			>
 				{ children }
-			</div>
+			</StyledWrapper>
 		</Provider>
 	);
 }

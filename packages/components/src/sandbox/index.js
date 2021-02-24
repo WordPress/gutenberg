@@ -1,101 +1,127 @@
 /**
  * WordPress dependencies
  */
-import { Component, renderToString, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
+import {
+	renderToString,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import FocusableIframe from '../focusable-iframe';
 
-class Sandbox extends Component {
-	constructor() {
-		super( ...arguments );
+const observeAndResizeJS = `
+	( function() {
+		var observer;
 
-		this.trySandbox = this.trySandbox.bind( this );
-		this.checkMessageForResize = this.checkMessageForResize.bind( this );
+		if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
+			return;
+		}
 
-		this.iframe = createRef();
+		function sendResize() {
+			var clientBoundingRect = document.body.getBoundingClientRect();
 
-		this.state = {
-			width: 0,
-			height: 0,
-		};
+			window.parent.postMessage( {
+				action: 'resize',
+				width: clientBoundingRect.width,
+				height: clientBoundingRect.height,
+			}, '*' );
+		}
+
+		observer = new MutationObserver( sendResize );
+		observer.observe( document.body, {
+			attributes: true,
+			attributeOldValue: false,
+			characterData: true,
+			characterDataOldValue: false,
+			childList: true,
+			subtree: true
+		} );
+
+		window.addEventListener( 'load', sendResize, true );
+
+		// Hack: Remove viewport unit styles, as these are relative
+		// the iframe root and interfere with our mechanism for
+		// determining the unconstrained page bounds.
+		function removeViewportStyles( ruleOrNode ) {
+			if( ruleOrNode.style ) {
+				[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
+					if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+						ruleOrNode.style[ style ] = '';
+					}
+				} );
+			}
+		}
+
+		Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
+		Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
+			Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
+		} );
+
+		document.body.style.position = 'absolute';
+		document.body.style.width = '100%';
+		document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+
+		sendResize();
+
+		// Resize events can change the width of elements with 100% width, but we don't
+		// get an DOM mutations for that, so do the resize when the window is resized, too.
+		window.addEventListener( 'resize', sendResize, true );
+} )();`;
+
+const style = `
+	body {
+		margin: 0;
 	}
-
-	componentDidMount() {
-		this.trySandbox();
-		this.trySandboxWithoutRerender = () => {
-			this.trySandbox( false );
-		};
-		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
-		// after reordering the containing block. See these two issues for more details:
-		// https://github.com/WordPress/gutenberg/issues/6146
-		// https://github.com/facebook/react/issues/18752
-		this.iframe.current.addEventListener(
-			'load',
-			this.trySandboxWithoutRerender,
-			false
-		);
+	html,
+	body,
+	body > div,
+	body > div iframe {
+		width: 100%;
 	}
-
-	componentDidUpdate( prevProps ) {
-		const forceRerender = prevProps.html !== this.props.html;
-
-		this.trySandbox( forceRerender );
+	html.wp-has-aspect-ratio,
+	body.wp-has-aspect-ratio,
+	body.wp-has-aspect-ratio > div,
+	body.wp-has-aspect-ratio > div iframe {
+		height: 100%;
+		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
-
-	componentWillUnmount() {
-		this.iframe.current.removeEventListener(
-			'load',
-			this.trySandboxWithoutRerender
-		);
+	body > div > * {
+		margin-top: 0 !important; /* Has to have !important to override inline styles. */
+		margin-bottom: 0 !important;
 	}
+`;
 
-	isFrameAccessible() {
+export default function Sandbox( {
+	html = '',
+	title = '',
+	type,
+	styles = [],
+	scripts = [],
+	onFocus,
+} ) {
+	const ref = useRef();
+	const [ width, setWidth ] = useState( 0 );
+	const [ height, setHeight ] = useState( 0 );
+
+	function isFrameAccessible() {
 		try {
-			return !! this.iframe.current.contentDocument.body;
+			return !! ref.current.contentDocument.body;
 		} catch ( e ) {
 			return false;
 		}
 	}
 
-	checkMessageForResize( event ) {
-		const iframe = this.iframe.current;
-
-		// Attempt to parse the message data as JSON if passed as string
-		let data = event.data || {};
-		if ( 'string' === typeof data ) {
-			try {
-				data = JSON.parse( data );
-			} catch ( e ) {}
-		}
-
-		// Verify that the mounted element is the source of the message
-		if ( ! iframe || iframe.contentWindow !== event.source ) {
+	function trySandbox( forceRerender = false ) {
+		if ( ! isFrameAccessible() ) {
 			return;
 		}
 
-		// Update the state only if the message is formatted as we expect, i.e.
-		// as an object with a 'resize' action, width, and height
-		const { action, width, height } = data;
-		const { width: oldWidth, height: oldHeight } = this.state;
-
-		if (
-			'resize' === action &&
-			( oldWidth !== width || oldHeight !== height )
-		) {
-			this.setState( { width, height } );
-		}
-	}
-
-	trySandbox( forceRerender = false ) {
-		if ( ! this.isFrameAccessible() ) {
-			return;
-		}
-
-		const body = this.iframe.current.contentDocument.body;
+		const { contentDocument, ownerDocument } = ref.current;
+		const { body } = contentDocument;
 
 		if (
 			! forceRerender &&
@@ -104,125 +130,39 @@ class Sandbox extends Component {
 			return;
 		}
 
-		const observeAndResizeJS = `
-			( function() {
-				var observer;
-
-				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
-					return;
-				}
-
-				function sendResize() {
-					var clientBoundingRect = document.body.getBoundingClientRect();
-
-					window.parent.postMessage( {
-						action: 'resize',
-						width: clientBoundingRect.width,
-						height: clientBoundingRect.height,
-					}, '*' );
-				}
-
-				observer = new MutationObserver( sendResize );
-				observer.observe( document.body, {
-					attributes: true,
-					attributeOldValue: false,
-					characterData: true,
-					characterDataOldValue: false,
-					childList: true,
-					subtree: true
-				} );
-
-				window.addEventListener( 'load', sendResize, true );
-
-				// Hack: Remove viewport unit styles, as these are relative
-				// the iframe root and interfere with our mechanism for
-				// determining the unconstrained page bounds.
-				function removeViewportStyles( ruleOrNode ) {
-					if( ruleOrNode.style ) {
-						[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-							if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-								ruleOrNode.style[ style ] = '';
-							}
-						} );
-					}
-				}
-
-				Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
-				Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
-					Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
-				} );
-
-				document.body.style.position = 'absolute';
-				document.body.style.width = '100%';
-				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
-
-				sendResize();
-
-				// Resize events can change the width of elements with 100% width, but we don't
-				// get an DOM mutations for that, so do the resize when the window is resized, too.
-				window.addEventListener( 'resize', sendResize, true );
-		} )();`;
-
-		const style = `
-			body {
-				margin: 0;
-			}
-			html,
-			body,
-			body > div,
-			body > div > iframe {
-				width: 100%;
-			}
-			html.wp-has-aspect-ratio,
-			body.wp-has-aspect-ratio,
-			body.wp-has-aspect-ratio > div,
-			body.wp-has-aspect-ratio > div > iframe {
-				height: 100%;
-				overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
-			}
-			body > div > * {
-				margin-top: 0 !important; /* Has to have !important to override inline styles. */
-				margin-bottom: 0 !important;
-			}
-		`;
-
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
 		const htmlDoc = (
 			<html
-				lang={ document.documentElement.lang }
-				className={ this.props.type }
+				lang={ ownerDocument.documentElement.lang }
+				className={ type }
 			>
 				<head>
-					<title>{ this.props.title }</title>
+					<title>{ title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
-					{ this.props.styles &&
-						this.props.styles.map( ( rules, i ) => (
-							<style
-								key={ i }
-								dangerouslySetInnerHTML={ { __html: rules } }
-							/>
-						) ) }
+					{ styles.map( ( rules, i ) => (
+						<style
+							key={ i }
+							dangerouslySetInnerHTML={ { __html: rules } }
+						/>
+					) ) }
 				</head>
 				<body
 					data-resizable-iframe-connected="data-resizable-iframe-connected"
-					className={ this.props.type }
+					className={ type }
 				>
-					<div
-						dangerouslySetInnerHTML={ { __html: this.props.html } }
-					/>
+					<div dangerouslySetInnerHTML={ { __html: html } } />
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
 							__html: observeAndResizeJS,
 						} }
 					/>
-					{ this.props.scripts &&
-						this.props.scripts.map( ( src ) => (
-							<script key={ src } src={ src } />
-						) ) }
+					{ scripts.map( ( src ) => (
+						<script key={ src } src={ src } />
+					) ) }
 				</body>
 			</html>
 		);
@@ -230,38 +170,78 @@ class Sandbox extends Component {
 		// writing the document like this makes it act in the same way as if it was
 		// loaded over the network, so DOM creation and mutation, script execution, etc.
 		// all work as expected
-		const iframeDocument = this.iframe.current.contentWindow.document;
-		iframeDocument.open();
-		iframeDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
-		iframeDocument.close();
+		contentDocument.open();
+		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		contentDocument.close();
 	}
 
-	static get defaultProps() {
-		return {
-			html: '',
-			title: '',
+	useEffect( () => {
+		trySandbox();
+
+		function tryNoForceSandbox() {
+			trySandbox( false );
+		}
+
+		function checkMessageForResize( event ) {
+			const iframe = ref.current;
+
+			// Verify that the mounted element is the source of the message
+			if ( ! iframe || iframe.contentWindow !== event.source ) {
+				return;
+			}
+
+			// Attempt to parse the message data as JSON if passed as string
+			let data = event.data || {};
+
+			if ( 'string' === typeof data ) {
+				try {
+					data = JSON.parse( data );
+				} catch ( e ) {}
+			}
+
+			// Update the state only if the message is formatted as we expect,
+			// i.e. as an object with a 'resize' action.
+			if ( 'resize' !== data.action ) {
+				return;
+			}
+
+			setWidth( data.width );
+			setHeight( data.height );
+		}
+
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+
+		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
+		// after reordering the containing block. See these two issues for more details:
+		// https://github.com/WordPress/gutenberg/issues/6146
+		// https://github.com/facebook/react/issues/18752
+		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
+		defaultView.addEventListener( 'message', checkMessageForResize );
+
+		return () => {
+			ref.current.removeEventListener( 'load', tryNoForceSandbox, false );
+			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
-	}
+	}, [] );
 
-	render() {
-		const { title, onFocus } = this.props;
+	useEffect( () => {
+		trySandbox();
+	}, [ title, type, styles, scripts ] );
 
-		return (
-			<FocusableIframe
-				iframeRef={ this.iframe }
-				title={ title }
-				className="components-sandbox"
-				sandbox="allow-scripts allow-same-origin allow-presentation"
-				onFocus={ onFocus }
-				width={ Math.ceil( this.state.width ) }
-				height={ Math.ceil( this.state.height ) }
-			/>
-		);
-	}
+	useEffect( () => {
+		trySandbox( true );
+	}, [ html ] );
+
+	return (
+		<FocusableIframe
+			iframeRef={ ref }
+			title={ title }
+			className="components-sandbox"
+			sandbox="allow-scripts allow-same-origin allow-presentation"
+			onFocus={ onFocus }
+			width={ Math.ceil( width ) }
+			height={ Math.ceil( height ) }
+		/>
+	);
 }
-
-Sandbox = withGlobalEvents( {
-	message: 'checkMessageForResize',
-} )( Sandbox );
-
-export default Sandbox;

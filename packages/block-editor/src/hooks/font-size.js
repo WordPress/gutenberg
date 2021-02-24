@@ -105,15 +105,6 @@ export function FontSizeEdit( props ) {
 	const isDisabled = useIsFontSizeDisabled( props );
 	const fontSizes = useEditorFeature( 'typography.fontSizes' );
 
-	if ( isDisabled ) {
-		return null;
-	}
-
-	const fontSizeObject = getFontSize(
-		fontSizes,
-		fontSize,
-		style?.typography?.fontSize
-	);
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
 
@@ -129,9 +120,20 @@ export function FontSizeEdit( props ) {
 		} );
 	};
 
-	return (
-		<FontSizePicker value={ fontSizeObject.size } onChange={ onChange } />
+	if ( isDisabled ) {
+		return null;
+	}
+
+	const fontSizeObject = getFontSize(
+		fontSizes,
+		fontSize,
+		style?.typography?.fontSize
 	);
+
+	const fontSizeValue =
+		fontSizeObject?.size || style?.typography?.fontSize || fontSize;
+
+	return <FontSizePicker onChange={ onChange } value={ fontSizeValue } />;
 }
 
 /**
@@ -142,7 +144,7 @@ export function FontSizeEdit( props ) {
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes' );
-	const hasFontSizes = fontSizes.length;
+	const hasFontSizes = !! fontSizes?.length;
 
 	return (
 		! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) || ! hasFontSizes

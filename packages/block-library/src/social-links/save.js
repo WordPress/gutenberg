@@ -1,11 +1,36 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function save() {
+export default function save( props ) {
+	const {
+		attributes: {
+			iconBackgroundColorValue,
+			iconColorValue,
+			itemsJustification,
+			size,
+		},
+	} = props;
+
+	const className = classNames( size, {
+		'has-icon-color': iconColorValue,
+		'has-icon-background-color': iconBackgroundColorValue,
+		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
+	} );
+
+	const style = {
+		'--wp--social-links--icon-color': iconColorValue,
+		'--wp--social-links--icon-background-color': iconBackgroundColorValue,
+	};
+
 	return (
-		<ul { ...useBlockProps.save() }>
+		<ul { ...useBlockProps.save( { className, style } ) }>
 			<InnerBlocks.Content />
 		</ul>
 	);

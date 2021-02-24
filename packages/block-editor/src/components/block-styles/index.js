@@ -15,6 +15,7 @@ import {
 	getBlockType,
 	cloneBlock,
 	getBlockFromExample,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
@@ -22,6 +23,7 @@ import {
  */
 import { getActiveStyle, replaceActiveStyle } from './utils';
 import BlockPreview from '../block-preview';
+import { store as blockEditorStore } from '../../store';
 
 const useGenericPreviewBlock = ( block, type ) =>
 	useMemo(
@@ -42,8 +44,8 @@ function BlockStyles( {
 	itemRole,
 } ) {
 	const selector = ( select ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
+		const { getBlock } = select( blockEditorStore );
+		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
 		const blockType = getBlockType( block.name );
 		return {
@@ -58,7 +60,7 @@ function BlockStyles( {
 		clientId,
 	] );
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const genericPreviewBlock = useGenericPreviewBlock( block, type );
 
 	if ( ! styles || styles.length === 0 ) {

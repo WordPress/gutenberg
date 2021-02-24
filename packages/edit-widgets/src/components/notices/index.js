@@ -8,17 +8,18 @@ import { filter } from 'lodash';
  */
 import { SnackbarList } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 function Notices() {
 	const { notices } = useSelect( ( select ) => {
 		return {
-			notices: select( 'core/notices' ).getNotices(),
+			notices: select( noticesStore ).getNotices(),
 		};
 	}, [] );
 	const snackbarNotices = filter( notices, {
 		type: 'snackbar',
 	} );
-	const { removeNotice } = useDispatch( 'core/notices' );
+	const { removeNotice } = useDispatch( noticesStore );
 
 	return (
 		<SnackbarList

@@ -13,6 +13,12 @@
 	}
 }
 
+// Supply a min-width when inside a cover block, to prevent it from collapsing.
+.wp-block-cover .wp-block-embed {
+	min-width: 320px;
+	min-height: 240px;
+}
+
 .wp-block-embed {
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
@@ -74,8 +80,8 @@
 		padding-top: 100%; // 1 / 1 * 100
 	}
 
-	.wp-embed-aspect-9-6 .wp-block-embed__wrapper::before {
-		padding-top: 66.66%; // 6 / 9 * 100
+	.wp-embed-aspect-9-16 .wp-block-embed__wrapper::before {
+		padding-top: 177.77%; // 16 / 9 * 100
 	}
 
 	.wp-embed-aspect-1-2 .wp-block-embed__wrapper::before {

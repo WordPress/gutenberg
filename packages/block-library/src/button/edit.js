@@ -7,8 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useState, useRef } from '@wordpress/element';
 import {
+	Button,
+	ButtonGroup,
 	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
@@ -70,12 +72,42 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
+
+		// Update attributes
+		setAttributes( { width } );
+	}
+
+	return (
+		<PanelBody title={ __( 'Width settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button width' ) }>
+				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+					return (
+						<Button
+							key={ widthValue }
+							isSmall
+							isPrimary={ widthValue === selectedWidth }
+							onClick={ () => handleChange( widthValue ) }
+						>
+							{ widthValue }%
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
+		</PanelBody>
+	);
+}
+
 function URLPicker( {
 	isSelected,
 	url,
 	setAttributes,
 	opensInNewTab,
 	onToggleOpenInNewTab,
+	anchorRef,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
@@ -96,6 +128,7 @@ function URLPicker( {
 		<Popover
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
+			anchorRef={ anchorRef?.current }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -168,6 +201,7 @@ function ButtonEdit( props ) {
 		rel,
 		text,
 		url,
+		width,
 	} = attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
@@ -197,13 +231,20 @@ function ButtonEdit( props ) {
 	);
 
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
-	const blockProps = useBlockProps();
+	const ref = useRef();
+	const blockProps = useBlockProps( { ref } );
 
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<div { ...blockProps }>
+			<div
+				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+				} ) }
+			>
 				<RichText
+					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
@@ -239,10 +280,15 @@ function ButtonEdit( props ) {
 				isSelected={ isSelected }
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+				anchorRef={ ref }
 			/>
 			<InspectorControls>
 				<BorderPanel
 					borderRadius={ borderRadius }
+					setAttributes={ setAttributes }
+				/>
+				<WidthPanel
+					selectedWidth={ width }
 					setAttributes={ setAttributes }
 				/>
 				<PanelBody title={ __( 'Link settings' ) }>

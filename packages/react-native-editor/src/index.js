@@ -18,6 +18,7 @@ import {
 	validateThemeColors,
 	validateThemeGradients,
 } from '@wordpress/block-editor';
+import { dispatch } from '@wordpress/data';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -99,6 +100,21 @@ const setupInitHooks = () => {
 			};
 		}
 	);
+
+	wpHooks.addAction(
+		'native.render',
+		'core/react-native-editor',
+		( props ) => {
+			const isAudioBlockEnabled =
+				props.capabilities && props.capabilities.audioBlock;
+
+			if ( isAudioBlockEnabled === true ) {
+				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/audio' ] );
+			} else {
+				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/audio' ] );
+			}
+		}
+	);
 };
 
 let blocksRegistered = false;
@@ -136,5 +152,8 @@ const setupLocale = ( locale, extraTranslations ) => {
 	blocksRegistered = true;
 };
 
-reactNativeSetup();
-gutenbergSetup();
+export { initialHtml as initialHtmlGutenberg };
+export function doGutenbergNativeSetup() {
+	reactNativeSetup();
+	gutenbergSetup();
+}

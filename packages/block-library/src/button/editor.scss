@@ -67,6 +67,16 @@
 	}
 }
 
+.wp-button-label__width {
+	.components-button-group {
+		display: block;
+	}
+
+	.components-base-control__field {
+		margin-bottom: 12px;
+	}
+}
+
 // Display "table" is used because the button container should only wrap the content and not takes the full width.
 div[data-type="core/button"] {
 	display: table;

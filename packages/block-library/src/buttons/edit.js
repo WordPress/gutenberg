@@ -1,37 +1,69 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
+	BlockControls,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	JustifyToolbar,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
+import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-// Inside buttons block alignment options are not supported.
-const alignmentHooksSetting = {
-	isEmbedButton: true,
-};
+function ButtonsEdit( {
+	attributes: { contentJustification, orientation },
+	setAttributes,
+} ) {
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+			'is-vertical': orientation === 'vertical',
+		} ),
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		template: BUTTONS_TEMPLATE,
+		orientation,
+		__experimentalLayout: {
+			type: 'default',
+			alignments: [],
+		},
+		templateInsertUpdatesSelection: true,
+	} );
 
-function ButtonsEdit() {
-	const blockProps = useBlockProps();
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
-		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				__experimentalPassedProps={ blockProps }
-				__experimentalTagName="div"
-				template={ BUTTONS_TEMPLATE }
-				orientation="horizontal"
-			/>
-		</AlignmentHookSettingsProvider>
+		<>
+			<BlockControls>
+				<JustifyToolbar
+					allowedControls={ justifyControls }
+					value={ contentJustification }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
+			</BlockControls>
+			<div { ...innerBlocksProps } />
+		</>
 	);
 }
 

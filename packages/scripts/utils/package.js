@@ -15,9 +15,12 @@ const { pkg, path: pkgPath } = readPkgUp( {
 
 const getPackagePath = () => pkgPath;
 
+const getPackageProp = ( prop ) => pkg && pkg[ prop ];
+
 const hasPackageProp = ( prop ) => pkg && pkg.hasOwnProperty( prop );
 
 module.exports = {
 	getPackagePath,
+	getPackageProp,
 	hasPackageProp,
 };

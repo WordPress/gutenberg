@@ -168,7 +168,7 @@ describe( 'adding blocks from block directory', () => {
 
 		const selectorContent = await page.evaluate(
 			() =>
-				document.querySelector( '.block-editor-inserter__block-list' )
+				document.querySelector( '.block-editor-inserter__main-area' )
 					.innerHTML
 		);
 		expect( selectorContent ).toContain( 'has-no-results' );

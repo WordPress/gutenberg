@@ -12,5 +12,7 @@
 	},
 	"supports": {
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-site-logo-editor",
+	"style": "wp-block-site-logo"
 }

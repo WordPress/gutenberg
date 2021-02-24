@@ -59,11 +59,16 @@ class MenuItem extends Component {
 
 		return (
 			<TouchableHighlight
-				style={ styles.touchableArea }
+				style={ [
+					styles.touchableArea,
+					item.isDisabled ? styles.disabled : null,
+				] }
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
-				accessibilityLabel={ blockTitle }
+				accessibilityRole="button"
+				accessibilityLabel={ `${ item.title } block` }
 				onPress={ this.onPress }
+				disabled={ item.isDisabled }
 			>
 				<View style={ [ styles.modalItem, { width: maxWidth } ] }>
 					<View

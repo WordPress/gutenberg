@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { pressKeyWithModifier } from './press-key-with-modifier';
+import { canvas } from './canvas';
 
 // This selector is written to support the current and old inserter markup
 // because the performance tests need to be able to run across versions.
@@ -44,21 +45,41 @@ async function isGlobalInserterOpen() {
 		);
 	} );
 }
-
-async function toggleGlobalBlockInserter() {
+/**
+ * Toggles the global inserter.
+ */
+export async function toggleGlobalBlockInserter() {
 	await page.click(
 		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"]'
 	);
 }
 
 /**
+ * Moves focus to the selected block.
+ */
+async function focusSelectedBlock() {
+	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
+	await page.evaluate( () => {
+		wp.data
+			.dispatch( 'core/block-editor' )
+			.selectBlock(
+				wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId(),
+				0
+			);
+	} );
+}
+
+/**
  * Retrieves the document container by css class and checks to make sure the document's active element is within it
  */
 async function waitForInserterCloseAndContentFocus() {
-	await page.waitForFunction( () =>
-		document.body
-			.querySelector( '.block-editor-block-list__layout' )
-			.contains( document.activeElement )
+	await canvas().waitForFunction(
+		() =>
+			document.activeElement.closest(
+				'.block-editor-block-list__layout'
+			) !== null
 	);
 }
 
@@ -127,10 +148,11 @@ export async function searchForReusableBlock( searchTerm ) {
  */
 export async function insertBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
-	const insertButton = (
-		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//button//span[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
@@ -143,12 +165,11 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await searchForPattern( searchTerm );
-	const insertButton = (
-		await page.$x(
-			`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
-		)
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//div[@role = 'option']//div[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
@@ -162,12 +183,17 @@ export async function insertPattern( searchTerm ) {
  */
 export async function insertReusableBlock( searchTerm ) {
 	await searchForReusableBlock( searchTerm );
-	const insertButton = (
-		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//button//span[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
+	// We should wait until the block is loaded
+	await page.waitForXPath(
+		'//*[@class="block-library-block__reusable-block-container"]'
+	);
 }
 
 /**
@@ -185,6 +211,13 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 		'.block-directory-downloadable-blocks-list li:first-child button'
 	);
 	await insertButton.click();
+	await page.waitForFunction(
+		() =>
+			! document.body.querySelector(
+				'.block-directory-downloadable-blocks-list li:first-child button.is-busy'
+			)
+	);
+	await focusSelectedBlock();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }

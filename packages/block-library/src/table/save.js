@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, getColorClassName } from '@wordpress/block-editor';
+import {
+	RichText,
+	getColorClassName,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -77,7 +81,7 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<figure>
+		<figure { ...useBlockProps.save() }>
 			<table className={ classes === '' ? undefined : classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />

@@ -40,3 +40,13 @@
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 }
+
+.wp-block-legacy-widget-inspector-card {
+	// Padding left = an icon, some margin and some padding
+	padding: 0 $grid-unit-20 $grid-unit-20 ( $icon-size + $grid-unit-40 + $grid-unit-05 );
+}
+
+.interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
+	margin: 0 0 5px;
+	font-weight: 500;
+}

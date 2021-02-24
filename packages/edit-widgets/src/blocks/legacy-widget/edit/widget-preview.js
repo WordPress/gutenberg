@@ -15,10 +15,11 @@ function WidgetPreview( { widgetAreaId, attributes, hidden, ...props } ) {
 	const HEIGHT_MARGIN = 20;
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
 	const iframeRef = useRef();
-	const currentUrl = document.location.href;
-	const siteUrl = currentUrl.substr( 0, currentUrl.indexOf( 'wp-admin/' ) );
-	const iframeUrl = addQueryArgs( siteUrl, {
-		widgetPreview: {
+	const widgetScreenUrl = addQueryArgs( 'themes.php', {
+		page: 'gutenberg-widgets',
+	} );
+	const iframeUrl = addQueryArgs( widgetScreenUrl, {
+		'widget-preview': {
 			...attributes,
 			sidebarId: widgetAreaId,
 		},

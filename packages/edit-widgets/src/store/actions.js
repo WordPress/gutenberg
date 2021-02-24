@@ -1,37 +1,23 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { dispatch, select, getWidgetToClientIdMapping } from './controls';
+import { dispatch, select } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
-	buildWidgetAreasPostId,
 	buildWidgetAreasQuery,
 	createStubPost,
 	KIND,
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
-
-/**
- * Initializes the stub post before rendering the widgets editor.
- * Required in order to ensure the data layer won't try to resolve the stub post.
- *
- * @access private
- */
-export function* initializeState() {
-	yield persistStubPost( buildWidgetAreasPostId(), [] );
-}
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 /**
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
@@ -43,9 +29,6 @@ export function* initializeState() {
  */
 export const persistStubPost = function* ( id, blocks ) {
 	const stubPost = createStubPost( id, blocks );
-	const args = [ KIND, POST_TYPE, id ];
-	// This is the magic that prevents core-data from trying to resolve the entity
-	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
 	yield dispatch(
 		'core',
 		'receiveEntityRecords',
@@ -55,13 +38,12 @@ export const persistStubPost = function* ( id, blocks ) {
 		{ id: stubPost.id },
 		false
 	);
-	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 	return stubPost;
 };
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
-		'core/edit-widgets',
+		editWidgetsStoreName,
 		'getEditedWidgetAreas'
 	);
 	if ( ! editedWidgetAreas?.length ) {
@@ -70,7 +52,7 @@ export function* saveEditedWidgetAreas() {
 	try {
 		yield* saveWidgetAreas( editedWidgetAreas );
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Widgets saved.' ),
 			{
@@ -79,9 +61,10 @@ export function* saveEditedWidgetAreas() {
 		);
 	} catch ( e ) {
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
-			__( 'There was an error.' ),
+			/* translators: %s: The error message. */
+			sprintf( __( 'There was an error. %s' ), e.message ),
 			{
 				type: 'snackbar',
 			}
@@ -91,45 +74,8 @@ export function* saveEditedWidgetAreas() {
 
 export function* saveWidgetAreas( widgetAreas ) {
 	try {
-		const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
-		const widgetIdToClientId = yield getWidgetToClientIdMapping();
-		const clientIdToWidgetId = invert( widgetIdToClientId );
-
-		// @TODO: Batch save / concurrency
 		for ( const widgetArea of widgetAreas ) {
-			const post = yield select(
-				'core',
-				'getEditedEntityRecord',
-				KIND,
-				POST_TYPE,
-				buildWidgetAreaPostId( widgetArea.id )
-			);
-			const widgetsBlocks = post.blocks;
-			const newWidgets = widgetsBlocks.map( ( block ) => {
-				const widgetId = clientIdToWidgetId[ block.clientId ];
-				const oldWidget = widgets[ widgetId ];
-				return transformBlockToWidget( block, oldWidget );
-			} );
-
-			yield dispatch(
-				'core',
-				'editEntityRecord',
-				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				widgetArea.id,
-				{ widgets: newWidgets }
-			);
-
-			yield* trySaveWidgetArea( widgetArea.id );
-
-			yield dispatch(
-				'core',
-				'receiveEntityRecords',
-				KIND,
-				POST_TYPE,
-				post,
-				undefined
-			);
+			yield* saveWidgetArea( widgetArea.id );
 		}
 	} finally {
 		// saveEditedEntityRecord resets the resolution status, let's fix it manually
@@ -142,6 +88,144 @@ export function* saveWidgetAreas( widgetAreas ) {
 			buildWidgetAreasQuery()
 		);
 	}
+}
+
+export function* saveWidgetArea( widgetAreaId ) {
+	const widgets = yield select( editWidgetsStoreName, 'getWidgets' );
+
+	const post = yield select(
+		'core',
+		'getEditedEntityRecord',
+		KIND,
+		POST_TYPE,
+		buildWidgetAreaPostId( widgetAreaId )
+	);
+
+	// Remove all duplicate reference widget instances
+	const usedReferenceWidgets = [];
+	const widgetsBlocks = post.blocks.filter(
+		( { attributes: { referenceWidgetName } } ) => {
+			if ( referenceWidgetName ) {
+				if ( usedReferenceWidgets.includes( referenceWidgetName ) ) {
+					return false;
+				}
+				usedReferenceWidgets.push( referenceWidgetName );
+			}
+			return true;
+		}
+	);
+
+	const batchMeta = [];
+	const batchTasks = [];
+	const sidebarWidgetsIds = [];
+	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
+		const block = widgetsBlocks[ i ];
+		const widgetId = block.attributes.__internalWidgetId;
+		const oldWidget = widgets[ widgetId ];
+		const widget = transformBlockToWidget( block, oldWidget );
+		// We'll replace the null widgetId after save, but we track it here
+		// since order is important.
+		sidebarWidgetsIds.push( widgetId );
+
+		if ( widgetId ) {
+			yield dispatch(
+				'core',
+				'editEntityRecord',
+				'root',
+				'widget',
+				widgetId,
+				{
+					...widget,
+					sidebar: widgetAreaId,
+				}
+			);
+
+			const hasEdits = yield select(
+				'core',
+				'hasEditsForEntityRecord',
+				'root',
+				'widget',
+				widgetId
+			);
+
+			if ( ! hasEdits ) {
+				continue;
+			}
+
+			batchTasks.push( ( { saveEditedEntityRecord } ) =>
+				saveEditedEntityRecord( 'root', 'widget', widgetId )
+			);
+		} else {
+			batchTasks.push( ( { saveEntityRecord } ) =>
+				saveEntityRecord( 'root', 'widget', {
+					...widget,
+					sidebar: widgetAreaId,
+				} )
+			);
+		}
+
+		batchMeta.push( {
+			block,
+			position: i,
+			clientId: block.clientId,
+		} );
+	}
+
+	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
+
+	const failedWidgetNames = [];
+
+	for ( let i = 0; i < records.length; i++ ) {
+		const widget = records[ i ];
+		const { block, position } = batchMeta[ i ];
+
+		const error = yield select(
+			'core',
+			'getLastEntitySaveError',
+			'root',
+			'widget',
+			widget.id
+		);
+		if ( error ) {
+			failedWidgetNames.push( block.attributes?.name || block?.name );
+		}
+
+		if ( ! sidebarWidgetsIds[ position ] ) {
+			sidebarWidgetsIds[ position ] = widget.id;
+		}
+	}
+
+	if ( failedWidgetNames.length ) {
+		throw new Error(
+			sprintf(
+				/* translators: %s: List of widget names */
+				__( 'Could not save the following widgets: %s.' ),
+				failedWidgetNames.join( ', ' )
+			)
+		);
+	}
+
+	yield dispatch(
+		'core',
+		'editEntityRecord',
+		KIND,
+		WIDGET_AREA_ENTITY_TYPE,
+		widgetAreaId,
+		{
+			widgets: sidebarWidgetsIds,
+		}
+	);
+
+	yield* trySaveWidgetArea( widgetAreaId );
+
+	yield dispatch(
+		'core',
+		'receiveEntityRecords',
+		KIND,
+		POST_TYPE,
+		post,
+		undefined
+	);
 }
 
 function* trySaveWidgetArea( widgetAreaId ) {
@@ -234,8 +318,8 @@ export function setIsInserterOpened( value ) {
  */
 export function* closeGeneralSidebar() {
 	yield dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'disableComplementaryArea',
-		'core/edit-widgets'
+		editWidgetsStoreName
 	);
 }

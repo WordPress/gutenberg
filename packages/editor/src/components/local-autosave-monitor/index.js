@@ -11,6 +11,7 @@ import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -62,7 +63,7 @@ function useAutosaveNotice() {
 		[]
 	);
 
-	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
@@ -169,9 +170,9 @@ function useAutosavePurge() {
 }
 
 function LocalAutosaveMonitor() {
-	const { __experimentalLocalAutosave } = useDispatch( 'core/editor' );
-	const autosave = useCallback( () => {
-		requestIdleCallback( __experimentalLocalAutosave );
+	const { autosave } = useDispatch( 'core/editor' );
+	const deferedAutosave = useCallback( () => {
+		requestIdleCallback( () => autosave( { local: true } ) );
 	}, [] );
 	useAutosaveNotice();
 	useAutosavePurge();
@@ -187,7 +188,7 @@ function LocalAutosaveMonitor() {
 	return (
 		<AutosaveMonitor
 			interval={ localAutosaveInterval }
-			autosave={ autosave }
+			autosave={ deferedAutosave }
 		/>
 	);
 }

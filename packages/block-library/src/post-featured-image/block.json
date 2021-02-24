@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "core/post-featured-image",
 	"category": "design",
 	"attributes": {
@@ -12,6 +13,9 @@
 		"postType"
 	],
 	"supports": {
+		"align": [ "left", "right", "center", "wide", "full" ],
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-post-featured-image-editor",
+	"style": "wp-block-post-featured-image"
 }

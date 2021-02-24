@@ -92,6 +92,26 @@ else:
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
+<h4>File</h4>
+<!-- /wp:heading -->
+
+<!-- wp:file /-->
+
+<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<!-- /wp:file -->
+
+<!-- wp:heading {"level":4} -->
+<h4>Audio</h4>
+<!-- /wp:heading -->
+
+<!-- wp:audio /-->
+
+<!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
+<!-- /wp:audio -->
+
+<!-- wp:heading {"level":4} -->
 <h4>Gallery</h4>
 <!-- /wp:heading -->
 
@@ -218,24 +238,6 @@ else:
 <!-- wp:shortcode -->
 [youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]
 <!-- /wp:shortcode -->
-
-<!-- wp:heading -->
-<h2>Jetpack</h2>
-<!-- /wp:heading -->
-
-<!-- wp:jetpack/contact-info -->
-<div class="wp-block-jetpack-contact-info"><!-- wp:jetpack/email {"email":"me@wordpress.org"} -->
-<div class="wp-block-jetpack-email"><a href="mailto:me@wordpress.org">me@wordpress.org</a></div>
-<!-- /wp:jetpack/email -->
-
-<!-- wp:jetpack/phone {"phone":"+1"} -->
-<div class="wp-block-jetpack-phone"><a href="tel:+1">+1</a></div>
-<!-- /wp:jetpack/phone -->
-
-<!-- wp:jetpack/address {"address":"Random Street"} -->
-<div class="wp-block-jetpack-address"><div class="jetpack-address__address jetpack-address__address1">Random Street</div></div>
-<!-- /wp:jetpack/address --></div>
-<!-- /wp:jetpack/contact-info -->
 
 <!-- wp:heading -->
 <h2>Unsupported</h2>

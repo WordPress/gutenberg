@@ -37,6 +37,5 @@
 	width: 100%;
 	@include break-medium() {
 		width: fit-content;
-		width: -moz-fit-content;
 	}
 }

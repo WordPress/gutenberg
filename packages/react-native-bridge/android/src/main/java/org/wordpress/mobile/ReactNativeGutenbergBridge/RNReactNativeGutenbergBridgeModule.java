@@ -21,7 +21,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.StarterPageTemplatesTooltipShownCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
@@ -46,14 +46,19 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
     private static final String EVENT_NAME_UPDATE_THEME = "updateTheme";
+    private static final String EVENT_NAME_SHOW_NOTICE = "showNotice";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID = "newId";
+    private static final String MAP_KEY_SHOW_NOTICE_MESSAGE = "message";
+
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
+    public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
 
@@ -110,6 +115,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void setFocusOnTitleInJS() {
         WritableMap writableMap = new WritableNativeMap();
         emitToJS(EVENT_NAME_FOCUS_TITLE, writableMap);
+    }
+
+    public void showNoticeInJS(String message) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_SHOW_NOTICE_MESSAGE, message);
+        emitToJS(EVENT_NAME_SHOW_NOTICE, writableMap);
     }
 
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
@@ -196,6 +207,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void mediaSaveSync() {
+        mGutenbergBridgeJS2Parent.mediaSaveSync(getNewMediaSelectedCallback(true,null));
+    }
+
+    @ReactMethod
     public void requestImageFailedRetryDialog(final int mediaId) {
         mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
     }
@@ -218,6 +234,31 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
         mGutenbergBridgeJS2Parent.requestMediaEditor(getNewMediaSelectedCallback(false, onUploadMediaSelected), mediaUrl);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad(mediaFiles, blockId);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesFailedRetryDialog(mediaFiles);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesUploadCancelDialog(mediaFiles);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesSaveCancelDialog(mediaFiles);
+    }
+
+    @ReactMethod
+    public void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId) {
+        mGutenbergBridgeJS2Parent.mediaFilesBlockReplaceSync(mediaFiles, blockId);
     }
 
     @ReactMethod
@@ -276,36 +317,39 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
-        return new OtherMediaOptionsReceivedCallback() {
-            @Override public void onOtherMediaOptionsReceived(ArrayList<MediaOption> mediaOptions) {
-                WritableArray writableArray = new WritableNativeArray();
-                for (MediaOption mediaOption : mediaOptions) {
-                    writableArray.pushMap(mediaOption.toMap());
-                }
-                jsCallback.invoke(writableArray);
+        return mediaOptions -> {
+            WritableArray writableArray = new WritableNativeArray();
+            for (MediaOption mediaOption : mediaOptions) {
+                writableArray.pushMap(mediaOption.toMap());
             }
+            jsCallback.invoke(writableArray);
         };
     }
 
     @ReactMethod
-    public void addMention(Promise promise) {
-        mGutenbergBridgeJS2Parent.onAddMention(promise::resolve);
+    public void showUserSuggestions(Promise promise) {
+        mGutenbergBridgeJS2Parent.onShowUserSuggestions(promise::resolve);
     }
 
     @ReactMethod
-    public void setStarterPageTemplatesTooltipShown(boolean tooltipShown) {
-        mGutenbergBridgeJS2Parent.setStarterPageTemplatesTooltipShown(tooltipShown);
+    public void showXpostSuggestions(Promise promise) {
+        mGutenbergBridgeJS2Parent.onShowXpostSuggestions(promise::resolve);
     }
 
     @ReactMethod
-    public void requestStarterPageTemplatesTooltipShown(final Callback jsCallback) {
-        StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback = requestStarterPageTemplatesTooltipShownCallback(jsCallback);
-        mGutenbergBridgeJS2Parent.requestStarterPageTemplatesTooltipShown(starterPageTemplatesTooltipShownCallback);
+    public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
+        mGutenbergBridgeJS2Parent.setFocalPointPickerTooltipShown(tooltipShown);
     }
 
-    private StarterPageTemplatesTooltipShownCallback requestStarterPageTemplatesTooltipShownCallback(final Callback jsCallback) {
-        return new StarterPageTemplatesTooltipShownCallback() {
-            @Override public void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown) {
+    @ReactMethod
+    public void requestFocalPointPickerTooltipShown(final Callback jsCallback) {
+        FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback = requestFocalPointPickerTooltipShownCallback(jsCallback);
+        mGutenbergBridgeJS2Parent.requestFocalPointPickerTooltipShown(focalPointPickerTooltipShownCallback);
+    }
+
+    private FocalPointPickerTooltipShownCallback requestFocalPointPickerTooltipShownCallback(final Callback jsCallback) {
+        return new FocalPointPickerTooltipShownCallback() {
+            @Override public void onRequestFocalPointPickerTooltipShown(boolean tooltipShown) {
                 jsCallback.invoke(tooltipShown);
             }
         };

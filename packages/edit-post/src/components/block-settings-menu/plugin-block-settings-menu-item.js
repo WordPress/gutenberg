@@ -9,7 +9,6 @@ import { difference } from 'lodash';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { plugins } from '@wordpress/icons';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	difference( selected, allowed ).length === 0;
@@ -41,7 +40,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {string}                [props.role]          The ARIA role for the menu item.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -65,7 +63,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
@@ -102,7 +99,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
-					icon={ icon || plugins }
+					icon={ icon }
 					label={ small ? label : undefined }
 					role={ role }
 				>

@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -38,11 +36,16 @@ const LinkSettingsScreen = ( {
 	value,
 	isActive,
 	activeAttributes,
+	isVisible,
 } ) => {
 	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
 		activeAttributes.target === '_blank'
 	);
+	const [ linkValues, setLinkValues ] = useState( {
+		isActiveLink: isActive,
+		isRemovingLink: false,
+	} );
 
 	const {
 		shouldEnableBottomSheetMaxHeight,
@@ -63,7 +66,26 @@ const LinkSettingsScreen = ( {
 		} );
 	}, [ inputValue, opensInNewWindow, text ] );
 
-	const submitLink = () => {
+	useEffect( () => {
+		const { isActiveLink, isRemovingLink } = linkValues;
+		if ( !! inputValue && ! isActiveLink && isVisible ) {
+			submitLink( false );
+		} else if ( ( inputValue === '' && isActiveLink ) || isRemovingLink ) {
+			removeLink( false );
+		}
+	}, [
+		inputValue,
+		isVisible,
+		linkValues.isActiveLink,
+		linkValues.isRemovingLink,
+	] );
+
+	const clearFormat = () => {
+		onChange( { ...value, activeFormats: [] } );
+		setLinkValues( { isActiveLink: false, isRemovingLink: true } );
+	};
+
+	const submitLink = ( shouldCloseBottomSheet = true ) => {
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -94,10 +116,19 @@ const LinkSettingsScreen = ( {
 			// transform selected text into link
 			newAttributes = applyFormat( value, format );
 		}
-		//move selection to end of link
-		newAttributes.start = newAttributes.end;
+		// move selection to end of link
+		const textLength = newAttributes.text.length;
+		// check for zero width spaces
+		if ( newAttributes.end > textLength ) {
+			newAttributes.start = textLength;
+			newAttributes.end = textLength;
+		} else {
+			newAttributes.start = newAttributes.end;
+		}
 		newAttributes.activeFormats = [];
 		onChange( { ...newAttributes, needsSelectionUpdate: true } );
+		setLinkValues( { isActiveLink: true, isRemovingLink: false } );
+
 		if ( ! isValidHref( url ) ) {
 			speak(
 				__(
@@ -111,12 +142,17 @@ const LinkSettingsScreen = ( {
 			speak( __( 'Link inserted' ), 'assertive' );
 		}
 
-		onClose();
+		if ( shouldCloseBottomSheet ) {
+			onClose();
+		}
 	};
 
-	const removeLink = () => {
+	const removeLink = ( shouldCloseBottomSheet = true ) => {
+		clearFormat();
 		onRemove();
-		onClose();
+		if ( shouldCloseBottomSheet ) {
+			onClose();
+		}
 	};
 
 	const submit = ( submitValue ) => {
@@ -138,40 +174,40 @@ const LinkSettingsScreen = ( {
 	}, [ navigation, route.params?.text, text ] );
 
 	return useMemo( () => {
+		const shouldShowLinkOptions = !! inputValue;
+
 		return (
 			<>
-				<View style={ styles.container }>
-					<BottomSheet.LinkCell
-						value={ inputValue }
-						onPress={ onLinkCellPressed }
-					/>
-					<BottomSheet.Cell
-						icon={ textColor }
-						label={ __( 'Link text' ) }
-						value={ text }
-						placeholder={ __( 'Add link text' ) }
-						onChangeValue={ setText }
-						onSubmit={ submit }
-					/>
-					<BottomSheet.SwitchCell
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						value={ opensInNewWindow }
-						onValueChange={ setOpensInNewWindows }
-						separatorType={ 'fullWidth' }
-					/>
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ removeLink }
-					/>
-				</View>
-				<View
-					style={ {
-						height: listProps.safeAreaBottomInset || 1,
-					} }
+				<BottomSheet.LinkCell
+					value={ inputValue }
+					onPress={ onLinkCellPressed }
 				/>
+				<BottomSheet.Cell
+					icon={ textColor }
+					label={ __( 'Link text' ) }
+					value={ text }
+					placeholder={ __( 'Add link text' ) }
+					onChangeValue={ setText }
+					onSubmit={ submit }
+					separatorType={ shouldShowLinkOptions ? undefined : 'none' }
+				/>
+				{ shouldShowLinkOptions && (
+					<>
+						<BottomSheet.SwitchCell
+							icon={ external }
+							label={ __( 'Open in new tab' ) }
+							value={ opensInNewWindow }
+							onValueChange={ setOpensInNewWindows }
+							separatorType={ 'fullWidth' }
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Remove link' ) }
+							labelStyle={ styles.clearLinkButton }
+							separatorType={ 'none' }
+							onPress={ removeLink }
+						/>
+					</>
+				) }
 			</>
 		);
 	}, [ inputValue, text, opensInNewWindow, listProps.safeAreaBottomInset ] );

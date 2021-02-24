@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
@@ -43,6 +42,7 @@ import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
+import * as pageList from './page-list';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
@@ -58,7 +58,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-import * as classic from './classic';
+import * as classic from './freeform';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
 
@@ -70,6 +70,10 @@ import * as templatePart from './template-part';
 import * as query from './query';
 import * as queryLoop from './query-loop';
 import * as queryPagination from './query-pagination';
+import * as queryPaginationNext from './query-pagination-next';
+import * as queryPaginationNumbers from './query-pagination-numbers';
+import * as queryPaginationPrevious from './query-pagination-previous';
+import * as postNavigationLink from './post-navigation-link';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
@@ -104,7 +108,70 @@ const registerBlock = ( block ) => {
 };
 
 /**
+ * Function to get all the core blocks in an array.
+ *
+ * @example
+ * ```js
+ * import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
+ *
+ * const coreBlocks = __experimentalGetCoreBlocks();
+ * ```
+ */
+export const __experimentalGetCoreBlocks = () => [
+	// Common blocks are grouped at the top to prioritize their display
+	// in various contexts — like the inserter and auto-complete components.
+	paragraph,
+	image,
+	heading,
+	gallery,
+	list,
+	quote,
+
+	// Register all remaining core blocks.
+	shortcode,
+	archives,
+	audio,
+	button,
+	buttons,
+	calendar,
+	categories,
+	code,
+	columns,
+	column,
+	cover,
+	embed,
+	file,
+	group,
+	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+	html,
+	mediaText,
+	latestComments,
+	latestPosts,
+	missing,
+	more,
+	nextpage,
+	pageList,
+	preformatted,
+	pullquote,
+	rss,
+	search,
+	separator,
+	reusableBlock,
+	socialLinks,
+	socialLink,
+	spacer,
+	subhead,
+	table,
+	tagCloud,
+	textColumns,
+	verse,
+	video,
+];
+
+/**
  * Function to register core blocks provided by the block editor.
+ *
+ * @param {Array} blocks An optional array of the core blocks being registered.
  *
  * @example
  * ```js
@@ -113,56 +180,10 @@ const registerBlock = ( block ) => {
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = () => {
-	[
-		// Common blocks are grouped at the top to prioritize their display
-		// in various contexts — like the inserter and auto-complete components.
-		paragraph,
-		image,
-		heading,
-		gallery,
-		list,
-		quote,
-
-		// Register all remaining core blocks.
-		shortcode,
-		archives,
-		audio,
-		button,
-		buttons,
-		calendar,
-		categories,
-		code,
-		columns,
-		column,
-		cover,
-		embed,
-		file,
-		group,
-		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
-		html,
-		mediaText,
-		latestComments,
-		latestPosts,
-		missing,
-		more,
-		nextpage,
-		preformatted,
-		pullquote,
-		rss,
-		search,
-		separator,
-		reusableBlock,
-		socialLinks,
-		socialLink,
-		spacer,
-		subhead,
-		table,
-		tagCloud,
-		textColumns,
-		verse,
-		video,
-	].forEach( registerBlock );
+export const registerCoreBlocks = (
+	blocks = __experimentalGetCoreBlocks()
+) => {
+	blocks.forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
@@ -175,8 +196,7 @@ export const registerCoreBlocks = () => {
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings Editor settings.
- *
+ * @param {boolean} enableFSEBlocks Whether to enable the full site editing blocks.
  * @example
  * ```js
  * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
@@ -186,15 +206,13 @@ export const registerCoreBlocks = () => {
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( settings ) => {
-				const { __experimentalEnableFullSiteEditing } = settings;
-
+		? ( enableFSEBlocks ) => {
 				[
 					navigation,
 					navigationLink,
 
 					// Register Full Site Editing Blocks.
-					...( __experimentalEnableFullSiteEditing
+					...( enableFSEBlocks
 						? [
 								siteLogo,
 								siteTagline,
@@ -203,6 +221,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								query,
 								queryLoop,
 								queryPagination,
+								queryPaginationNext,
+								queryPaginationNumbers,
+								queryPaginationPrevious,
 								postTitle,
 								postContent,
 								postAuthor,
@@ -218,6 +239,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postFeaturedImage,
 								postHierarchicalTerms,
 								postTags,
+								postNavigationLink,
 						  ]
 						: [] ),
 				].forEach( registerBlock );
