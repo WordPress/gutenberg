@@ -100,9 +100,19 @@ $blocks-block__margin: 0.5em;
 	// Back compat: Inner button blocks previously had their own alignment
 	// options. Forcing them to 100% width in the flex container replicates
 	// that these were block level elements that took up the full width.
-	.wp-block-button.aligncenter {
-		margin-left: 0;
-		margin-right: 0;
+	//
+	// Disable the stylelint rule, otherwise this selector is ugly!
+	/* stylelint-disable indentation */
+	&:not(
+		.is-content-justification-space-between,
+		.is-content-justification-right,
+		.is-content-justification-left,
+		.is-content-justification-center
+	) .wp-block-button.aligncenter {
+	/* stylelint-enable indentation */
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: $blocks-block__margin;
 		width: 100%;
 	}
 }
