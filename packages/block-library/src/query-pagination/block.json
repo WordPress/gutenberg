@@ -9,7 +9,8 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false
+		"html": false,
+		"align": [ "wide", "full" ]
 	},
 	"editorStyle": "wp-block-query-pagination-editor",
 	"style": "wp-block-query-pagination"

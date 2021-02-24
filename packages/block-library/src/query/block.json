@@ -34,13 +34,15 @@
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query",
-		"layout": "layout"
+		"layout": "layout",
+		"align": "align"
 	},
 	"usesContext": [
 		"postId"
 	],
 	"supports": {
-		"html": false
+		"html": false,
+		"align": [ "wide", "full" ]
 	},
 	"editorStyle": "wp-block-query-editor"
 }

@@ -47,7 +47,13 @@ export default function QueryLoopEdit( {
 		} = {},
 		queryContext = [ {} ],
 		templateSlug,
+		// `layout` and `align` context come from `Query` block
+		// and is a UI choice to make the handling of the block more
+		// user friendly. The plan is to find a way to make these two
+		// attributes of `QueryLoop`, but keep them in `Query` toolbar
+		// and later absorb the `QueryLoop` toolbar from its parent.
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
+		align,
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext;
@@ -123,12 +129,14 @@ export default function QueryLoopEdit( {
 		[ posts ]
 	);
 	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
-	const blockProps = useBlockProps( {
+	const extraBlockProps = {
 		className: classnames( {
 			'is-flex-container': hasLayoutFlex,
 			[ `columns-${ columns }` ]: hasLayoutFlex,
 		} ),
-	} );
+	};
+	if ( align ) extraBlockProps[ 'data-align' ] = align;
+	const blockProps = useBlockProps( extraBlockProps );
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
