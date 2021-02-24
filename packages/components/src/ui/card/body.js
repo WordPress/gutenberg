@@ -12,7 +12,6 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { usePopoverContext } from '../popover';
 import { Scrollable } from '../scrollable';
 import { View } from '../view';
 import * as styles from './styles';
@@ -27,17 +26,9 @@ function CardBody( props, forwardedRef ) {
 		'CardBody'
 	);
 
-	const { popover } = usePopoverContext();
-
 	const classes = useMemo(
-		() =>
-			cx(
-				styles.Body,
-				styles.borderRadius,
-				popover && styles.popoverBody,
-				className
-			),
-		[ className, popover ]
+		() => cx( styles.Body, styles.borderRadius, className ),
+		[ className ]
 	);
 
 	if ( scrollable ) {

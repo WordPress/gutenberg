@@ -22,3 +22,9 @@ export const PopoverContent = css`
 		display: none;
 	}
 `;
+
+export const cardStyle = css`
+	${ ui.$( 'CardBody' ).getSelector() } {
+		max-height: 80vh;
+	}
+`;

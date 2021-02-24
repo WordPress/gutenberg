@@ -56,10 +56,6 @@ export const rounded = css`
 	border-radius: ${ ui.get( 'cardBorderRadius' ) };
 `;
 
-export const popoverBody = css`
-	max-height: 80vh;
-`;
-
 export const small = css`
 	min-height: 30px;
 `;
