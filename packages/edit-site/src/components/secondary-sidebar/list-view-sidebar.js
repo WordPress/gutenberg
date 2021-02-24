@@ -6,45 +6,17 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
+import { useFocusOnMount } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-
-/**
- * Hook used to focus on mount the selected block's corresponding list item,
- * or the first list item if no block is selected.
- *
- * @see packages/compose/src/hooks/use-focus-on-mount/index.js
- *
- * @return {Function} Ref callback.
- */
-function useFocusSelectedOnMount() {
-	return useCallback( ( node ) => {
-		if ( ! node || node.contains( node.ownerDocument.activeElement ) ) {
-			return;
-		}
-
-		const selectedItem = node.querySelector(
-			'.block-editor-block-navigation-leaf.is-selected'
-		);
-
-		const target = selectedItem
-			? focus.tabbable.find( selectedItem )[ 0 ]
-			: focus.tabbable.find( node )[ 0 ];
-
-		if ( target ) {
-			target.focus();
-		}
-	}, [] );
-}
 
 export default function ListViewSidebar() {
 	const { isListViewOpen, rootBlocks, selectedBlockClientId } = useSelect(
@@ -62,7 +34,7 @@ export default function ListViewSidebar() {
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const focusSelectedOnMountRef = useFocusSelectedOnMount();
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	useShortcut(
 		'core/edit-site/toggle-list-view',
@@ -92,14 +64,14 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
-				ref={ focusSelectedOnMountRef }
+				ref={ focusOnMountRef }
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
-					highlightBlocksOnHover
 					selectBlock={ selectBlock }
 					selectedBlockClientId={ selectedBlockClientId }
 					showNestedBlocks
+					__experimentalPersistentListViewFeatures
 				/>
 			</div>
 		</div>

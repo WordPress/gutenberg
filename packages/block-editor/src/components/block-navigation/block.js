@@ -40,7 +40,6 @@ export default function BlockNavigationBlock( {
 	siblingBlockCount,
 	showBlockMovers,
 	path,
-	highlightBlocksOnHover,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -76,18 +75,27 @@ export default function BlockNavigationBlock( {
 	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
+		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': isHovered }
 	);
 	useEffect( () => {
-		if ( withExperimentalFeatures && isSelected ) {
+		if (
+			( withExperimentalFeatures ||
+				withExperimentalPersistentListViewFeatures ) &&
+			isSelected
+		) {
 			cellRef.current.focus();
 		}
-	}, [ withExperimentalFeatures, isSelected ] );
+	}, [
+		withExperimentalFeatures,
+		withExperimentalPersistentListViewFeatures,
+		isSelected,
+	] );
 
-	const highlightBlock = highlightBlocksOnHover
+	const highlightBlock = withExperimentalPersistentListViewFeatures
 		? toggleBlockHighlight
 		: () => {};
 
