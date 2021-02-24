@@ -15,10 +15,6 @@
  * @return array (Maybe) modified page templates array.
  */
 function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_type ) {
-	if ( ! gutenberg_is_fse_theme() ) {
-		return $templates;
-	}
-
 	$data             = WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates();
 	$custom_templates = array();
 	if ( isset( $data ) ) {

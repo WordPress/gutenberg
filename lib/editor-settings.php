@@ -39,7 +39,7 @@ function gutenberg_get_common_block_editor_settings() {
 	};
 
 	$settings = array(
-		'__unstableEnableFullSiteEditingBlocks' => gutenberg_is_fse_theme(),
+		'__unstableEnableFullSiteEditingBlocks' => true,
 		'disableCustomColors'                   => get_theme_support( 'disable-custom-colors' ),
 		'disableCustomFontSizes'                => get_theme_support( 'disable-custom-font-sizes' ),
 		'disableCustomGradients'                => get_theme_support( 'disable-custom-gradients' ),
@@ -77,7 +77,7 @@ function gutenberg_get_common_block_editor_settings() {
  * @return array Filtered settings.
  */
 function gutenberg_extend_post_editor_settings( $settings ) {
-	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_is_fse_theme();
+	$settings['__unstableEnableFullSiteEditingBlocks'] = true;
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_post_editor_settings' );

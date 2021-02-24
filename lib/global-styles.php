@@ -201,10 +201,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['gradients'] );
 
 	$origin = 'theme';
-	if (
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_theme()
-	) {
+	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
@@ -228,8 +225,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		! empty( $screen ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_theme()
+		WP_Theme_JSON_Resolver::theme_has_support()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
 		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
