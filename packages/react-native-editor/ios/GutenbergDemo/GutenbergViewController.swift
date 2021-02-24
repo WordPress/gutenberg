@@ -233,7 +233,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesBlockReplaceSync() {
+    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
         print(#function)
     }
 
@@ -310,6 +310,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
+            .audioBlock: true
         ]
     }
 

@@ -51,6 +51,7 @@ export { default as crop } from './library/crop';
 export { default as currencyDollar } from './library/currency-dollar';
 export { default as currencyEuro } from './library/currency-euro';
 export { default as currencyPound } from './library/currency-pound';
+export { default as customPostType } from './library/custom-post-type';
 export { default as desktop } from './library/desktop';
 export { default as dragHandle } from './library/drag-handle';
 export { default as download } from './library/download';

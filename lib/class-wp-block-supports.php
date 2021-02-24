@@ -49,7 +49,7 @@ class WP_Block_Supports {
 	}
 
 	/**
-	 * Initializes the block supports. It registes the block supports block attributes.
+	 * Initializes the block supports. It registers the block supports block attributes.
 	 */
 	public static function init() {
 		$instance = self::get_instance();

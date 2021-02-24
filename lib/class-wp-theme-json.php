@@ -711,7 +711,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Whether the medatata contains a key named properties.
+	 * Whether the metadata contains a key named properties.
 	 *
 	 * @param array $metadata Description of the style property.
 	 *
@@ -1239,7 +1239,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Retuns the raw data.
+	 * Returns the raw data.
 	 *
 	 * @return array Raw data.
 	 */

@@ -273,7 +273,7 @@ function LinkSettings( {
 								onSubmit={ onCloseSettingsSheet }
 								autoCapitalize="none"
 								autoCorrect={ false }
-								keyboardType="url"
+								keyboardType="default"
 							/>
 						) }
 					</>
