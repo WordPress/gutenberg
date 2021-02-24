@@ -1,56 +1,52 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render (Flex) gap 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -1,8 +1,8 @@
--   Array [
--     Object {
-- -     \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 1)\\",
-- +     \\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
--       \\"-moz-appearance\\": \\"none\\",
--       \\"-moz-osx-font-smoothing\\": \\"grayscale\\",
--       \\"-moz-user-select\\": \\"none\\",
--       \\"-ms-flex-align\\": \\"center\\",
--       \\"-ms-flex-direction\\": \\"row\\","
+@@ -1,8 +1,8 @@
+  Array [
+    Object {
+-     "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 1)",
++     "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+      "-moz-appearance": "none",
+      "-moz-osx-font-smoothing": "grayscale",
+      "-moz-user-select": "none",
+      "-ms-flex-align": "center",
+      "-ms-flex-direction": "row",
 `;
 
 exports[`props should render as link (href) 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -1,15 +1,14 @@
 - <a
 + <button
-    aria-busy=\\"false\\"
-    class=\\"components-flex wp-components-flex components-base-button wp-components-base-button components-button wp-components-button css-pr721c\\"
-    data-active=\\"false\\"
-    data-destructive=\\"false\\"
-    data-focused=\\"false\\"
-    data-g2-c16t=\\"true\\"
-    data-g2-component=\\"Button\\"
-    data-icon=\\"false\\"
--   href=\\"#\\"
+    aria-busy="false"
+    class="components-flex wp-components-flex components-base-button wp-components-base-button components-button wp-components-button css-pr721c"
+    data-active="false"
+    data-destructive="false"
+    data-focused="false"
+    data-g2-c16t="true"
+    data-g2-component="Button"
+    data-icon="false"
+-   href="#"
   >
     <span
-      class=\\"components-flex-item wp-components-flex-item css-1493c17\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonContent\\"
+      class="components-flex-item wp-components-flex-item css-1493c17"
+      data-g2-c16t="true"
+      data-g2-component="ButtonContent"
 @@ -20,6 +19,6 @@
-      aria-hidden=\\"true\\"
-      class=\\"components-elevation wp-components-elevation css-8abvx7\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonElevation\\"
+      aria-hidden="true"
+      class="components-elevation wp-components-elevation css-8abvx7"
+      data-g2-c16t="true"
+      data-g2-component="ButtonElevation"
     />
 - </a>
-+ </button>"
++ </button>
 `;
 
 exports[`props should render correctly 1`] = `
@@ -362,340 +358,304 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render disabled 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -5,11 +5,10 @@
-    data-destructive=\\"false\\"
-    data-focused=\\"false\\"
-    data-g2-c16t=\\"true\\"
-    data-g2-component=\\"Button\\"
-    data-icon=\\"false\\"
--   disabled=\\"\\"
+    data-destructive="false"
+    data-focused="false"
+    data-g2-c16t="true"
+    data-g2-component="Button"
+    data-icon="false"
+-   disabled=""
   >
     <span
-      class=\\"components-flex-item wp-components-flex-item css-1493c17\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonContent\\""
+      class="components-flex-item wp-components-flex-item css-1493c17"
+      data-g2-c16t="true"
+      data-g2-component="ButtonContent"
 `;
 
 exports[`props should render elevation 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
-
-- Snapshot Diff:
-- Compared values have no visual difference."
+Snapshot Diff:
+Compared values have no visual difference.
 `;
 
 exports[`props should render hasCaret 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -14,29 +14,10 @@
-      data-g2-component=\\"ButtonContent\\"
+      data-g2-component="ButtonContent"
     >
       Lorem
     </span>
     <span
--     class=\\"components-flex-item wp-components-flex-item css-1wwr4qj\\"
--     data-g2-c16t=\\"true\\"
--     data-g2-component=\\"ButtonCaret\\"
+-     class="components-flex-item wp-components-flex-item css-1wwr4qj"
+-     data-g2-c16t="true"
+-     data-g2-component="ButtonCaret"
 -   >
 -     <svg
--       aria-hidden=\\"true\\"
--       focusable=\\"false\\"
--       height=\\"16\\"
--       role=\\"img\\"
--       viewBox=\\"0 0 24 24\\"
--       width=\\"16\\"
--       xmlns=\\"http://www.w3.org/2000/svg\\"
+-       aria-hidden="true"
+-       focusable="false"
+-       height="16"
+-       role="img"
+-       viewBox="0 0 24 24"
+-       width="16"
+-       xmlns="http://www.w3.org/2000/svg"
 -     >
 -       <path
--         d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"
+-         d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
 -       />
 -     </svg>
 -   </span>
 -   <span
-      aria-hidden=\\"true\\"
-      class=\\"components-elevation wp-components-elevation css-8abvx7\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonElevation\\"
-    />"
+      aria-hidden="true"
+      class="components-elevation wp-components-elevation css-8abvx7"
+      data-g2-c16t="true"
+      data-g2-component="ButtonElevation"
+    />
 `;
 
 exports[`props should render icon 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -4,19 +4,12 @@
-    data-active=\\"false\\"
-    data-destructive=\\"false\\"
-    data-focused=\\"false\\"
-    data-g2-c16t=\\"true\\"
-    data-g2-component=\\"Button\\"
--   data-icon=\\"true\\"
+    data-active="false"
+    data-destructive="false"
+    data-focused="false"
+    data-g2-c16t="true"
+    data-g2-component="Button"
+-   data-icon="true"
 - >
 -   <span
--     class=\\"components-flex-item wp-components-flex-item css-1dor7w6\\"
--     data-g2-c16t=\\"true\\"
--     data-g2-component=\\"ButtonIcon\\"
-+   data-icon=\\"false\\"
+-     class="components-flex-item wp-components-flex-item css-1dor7w6"
+-     data-g2-c16t="true"
+-     data-g2-component="ButtonIcon"
++   data-icon="false"
   >
 -     <svg />
 -   </span>
     <span
-      class=\\"components-flex-item wp-components-flex-item css-1493c17\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonContent\\"
-    >"
+      class="components-flex-item wp-components-flex-item css-1493c17"
+      data-g2-c16t="true"
+      data-g2-component="ButtonContent"
+    >
 `;
 
 exports[`props should render isControl 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -17,19 +17,18 @@
--       \\"-webkit-justify-content\\": \\"center\\",
--       \\"-webkit-text-decoration\\": \\"none\\",
--       \\"-webkit-user-select\\": \\"none\\",
--       \\"align-items\\": \\"center\\",
--       \\"appearance\\": \\"none\\",
-- -     \\"background-color\\": \\"var(--wp-g2-control-background-color)\\",
-- -     \\"border\\": \\"1px solid\\",
-- -     \\"border-color\\": \\"var(--wp-g2-control-border-color)\\",
-- +     \\"background-color\\": \\"var(--wp-g2-button-secondary-color)\\",
-- +     \\"border-color\\": \\"var(--wp-g2-button-secondary-border-color)\\",
--       \\"border-radius\\": \\"var(--wp-g2-control-border-radius)\\",
--       \\"border-style\\": \\"solid\\",
--       \\"border-width\\": \\"1px\\",
--       \\"box-shadow\\": \\"0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent\\",
--       \\"box-sizing\\": \\"border-box\\",
-- -     \\"color\\": \\"var(--wp-g2-color-text)\\",
-- +     \\"color\\": \\"var(--wp-g2-button-secondary-text-color)\\",
--       \\"cursor\\": \\"pointer\\",
--       \\"display\\": \\"inline-flex\\",
--       \\"flex-direction\\": \\"row\\",
--       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
--       \\"font-size\\": \\"var(--wp-g2-font-size)\\","
+@@ -17,19 +17,18 @@
+      "-webkit-justify-content": "center",
+      "-webkit-text-decoration": "none",
+      "-webkit-user-select": "none",
+      "align-items": "center",
+      "appearance": "none",
+-     "background-color": "var(--wp-g2-control-background-color)",
+-     "border": "1px solid",
+-     "border-color": "var(--wp-g2-control-border-color)",
++     "background-color": "var(--wp-g2-button-secondary-color)",
++     "border-color": "var(--wp-g2-button-secondary-border-color)",
+      "border-radius": "var(--wp-g2-control-border-radius)",
+      "border-style": "solid",
+      "border-width": "1px",
+      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
+      "box-sizing": "border-box",
+-     "color": "var(--wp-g2-color-text)",
++     "color": "var(--wp-g2-button-secondary-text-color)",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flex-direction": "row",
+      "font-family": "var(--wp-g2-font-family)",
+      "font-size": "var(--wp-g2-font-size)",
 `;
 
 exports[`props should render isDestructive 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -48,10 +48,6 @@
--       \\"text-decoration\\": \\"none\\",
--       \\"touch-action\\": \\"manipulation\\",
--       \\"user-select\\": \\"none\\",
--       \\"width\\": \\"auto\\",
--     },
-- -   Object {
-- -     \\"border-color\\": \\"var(--wp-g2-color-destructive)\\",
-- -     \\"color\\": \\"var(--wp-g2-color-destructive)\\",
-- -   },
--   ]"
+@@ -48,10 +48,6 @@
+      "text-decoration": "none",
+      "touch-action": "manipulation",
+      "user-select": "none",
+      "width": "auto",
+    },
+-   Object {
+-     "border-color": "var(--wp-g2-color-destructive)",
+-     "color": "var(--wp-g2-color-destructive)",
+-   },
+  ]
 `;
 
 exports[`props should render isLoading 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
-
-- Snapshot Diff:
-- Compared values have no visual difference."
+Snapshot Diff:
+Compared values have no visual difference.
 `;
 
 exports[`props should render isNarrow 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
-
-- Snapshot Diff:
-- Compared values have no visual difference."
+Snapshot Diff:
+Compared values have no visual difference.
 `;
 
 exports[`props should render isRounded 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -19,11 +19,11 @@
--       \\"-webkit-user-select\\": \\"none\\",
--       \\"align-items\\": \\"center\\",
--       \\"appearance\\": \\"none\\",
--       \\"background-color\\": \\"var(--wp-g2-button-secondary-color)\\",
--       \\"border-color\\": \\"var(--wp-g2-button-secondary-border-color)\\",
-- -     \\"border-radius\\": \\"99999px\\",
-- +     \\"border-radius\\": \\"var(--wp-g2-control-border-radius)\\",
--       \\"border-style\\": \\"solid\\",
--       \\"border-width\\": \\"1px\\",
--       \\"box-shadow\\": \\"0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent\\",
--       \\"box-sizing\\": \\"border-box\\",
--       \\"color\\": \\"var(--wp-g2-button-secondary-text-color)\\","
+@@ -19,11 +19,11 @@
+      "-webkit-user-select": "none",
+      "align-items": "center",
+      "appearance": "none",
+      "background-color": "var(--wp-g2-button-secondary-color)",
+      "border-color": "var(--wp-g2-button-secondary-border-color)",
+-     "border-radius": "99999px",
++     "border-radius": "var(--wp-g2-control-border-radius)",
+      "border-style": "solid",
+      "border-width": "1px",
+      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
+      "box-sizing": "border-box",
+      "color": "var(--wp-g2-button-secondary-text-color)",
 `;
 
 exports[`props should render isSubtle 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -18,17 +18,17 @@
--       \\"-webkit-text-decoration\\": \\"none\\",
--       \\"-webkit-user-select\\": \\"none\\",
--       \\"align-items\\": \\"center\\",
--       \\"appearance\\": \\"none\\",
--       \\"background-color\\": \\"var(--wp-g2-button-secondary-color)\\",
-- -     \\"border-color\\": \\"var(--wp-g2-control-border-color-subtle)\\",
-- +     \\"border-color\\": \\"var(--wp-g2-button-secondary-border-color)\\",
--       \\"border-radius\\": \\"var(--wp-g2-control-border-radius)\\",
--       \\"border-style\\": \\"solid\\",
--       \\"border-width\\": \\"1px\\",
--       \\"box-shadow\\": \\"0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent\\",
--       \\"box-sizing\\": \\"border-box\\",
-- -     \\"color\\": \\"var(--wp-g2-color-text)\\",
-- +     \\"color\\": \\"var(--wp-g2-button-secondary-text-color)\\",
--       \\"cursor\\": \\"pointer\\",
--       \\"display\\": \\"inline-flex\\",
--       \\"flex-direction\\": \\"row\\",
--       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
--       \\"font-size\\": \\"var(--wp-g2-font-size)\\","
+@@ -18,17 +18,17 @@
+      "-webkit-text-decoration": "none",
+      "-webkit-user-select": "none",
+      "align-items": "center",
+      "appearance": "none",
+      "background-color": "var(--wp-g2-button-secondary-color)",
+-     "border-color": "var(--wp-g2-control-border-color-subtle)",
++     "border-color": "var(--wp-g2-button-secondary-border-color)",
+      "border-radius": "var(--wp-g2-control-border-radius)",
+      "border-style": "solid",
+      "border-width": "1px",
+      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
+      "box-sizing": "border-box",
+-     "color": "var(--wp-g2-color-text)",
++     "color": "var(--wp-g2-button-secondary-text-color)",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flex-direction": "row",
+      "font-family": "var(--wp-g2-font-family)",
+      "font-size": "var(--wp-g2-font-size)",
 `;
 
 exports[`props should render prefix 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -7,19 +7,10 @@
-    data-g2-c16t=\\"true\\"
-    data-g2-component=\\"Button\\"
-    data-icon=\\"false\\"
+    data-g2-c16t="true"
+    data-g2-component="Button"
+    data-icon="false"
   >
     <span
--     class=\\"components-flex-item wp-components-flex-item css-1dor7w6\\"
--     data-g2-c16t=\\"true\\"
--     data-g2-component=\\"ButtonPrefix\\"
+-     class="components-flex-item wp-components-flex-item css-1dor7w6"
+-     data-g2-c16t="true"
+-     data-g2-component="ButtonPrefix"
 -   >
 -     <span>
 -       Prefix
 -     </span>
 -   </span>
 -   <span
-      class=\\"components-flex-item wp-components-flex-item css-1493c17\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonContent\\"
+      class="components-flex-item wp-components-flex-item css-1493c17"
+      data-g2-c16t="true"
+      data-g2-component="ButtonContent"
     >
-      Lorem"
+      Lorem
 `;
 
 exports[`props should render size 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -35,15 +35,15 @@
--       \\"font-weight\\": \\"600\\",
--       \\"height\\": \\"auto\\",
--       \\"justify-content\\": \\"center\\",
--       \\"line-height\\": \\"1\\",
--       \\"margin\\": \\"0\\",
-- -     \\"min-height\\": \\"var(--wp-g2-control-height-small)\\",
-- +     \\"min-height\\": \\"var(--wp-g2-control-height)\\",
--       \\"outline\\": \\"none\\",
--       \\"padding-bottom\\": \\"calc(var(--wp-g2-grid-base) * 1)\\",
-- -     \\"padding-left\\": \\"var(--wp-g2-control-padding-x)\\",
-- -     \\"padding-right\\": \\"var(--wp-g2-control-padding-x)\\",
-- +     \\"padding-left\\": \\"var(--wp-g2-button-padding-x)\\",
-- +     \\"padding-right\\": \\"var(--wp-g2-button-padding-x)\\",
--       \\"padding-top\\": \\"calc(var(--wp-g2-grid-base) * 1)\\",
--       \\"position\\": \\"relative\\",
--       \\"text-align\\": \\"center\\",
--       \\"text-decoration\\": \\"none\\",
--       \\"touch-action\\": \\"manipulation\\","
+@@ -35,15 +35,15 @@
+      "font-weight": "600",
+      "height": "auto",
+      "justify-content": "center",
+      "line-height": "1",
+      "margin": "0",
+-     "min-height": "var(--wp-g2-control-height-small)",
++     "min-height": "var(--wp-g2-control-height)",
+      "outline": "none",
+      "padding-bottom": "calc(var(--wp-g2-grid-base) * 1)",
+-     "padding-left": "var(--wp-g2-control-padding-x)",
+-     "padding-right": "var(--wp-g2-control-padding-x)",
++     "padding-left": "var(--wp-g2-button-padding-x)",
++     "padding-right": "var(--wp-g2-button-padding-x)",
+      "padding-top": "calc(var(--wp-g2-grid-base) * 1)",
+      "position": "relative",
+      "text-align": "center",
+      "text-decoration": "none",
+      "touch-action": "manipulation",
 `;
 
 exports[`props should render suffix 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -14,19 +14,10 @@
-      data-g2-component=\\"ButtonContent\\"
+      data-g2-component="ButtonContent"
     >
       Lorem
     </span>
     <span
--     class=\\"components-flex-item wp-components-flex-item css-1dor7w6\\"
--     data-g2-c16t=\\"true\\"
--     data-g2-component=\\"ButtonSuffix\\"
+-     class="components-flex-item wp-components-flex-item css-1dor7w6"
+-     data-g2-c16t="true"
+-     data-g2-component="ButtonSuffix"
 -   >
 -     <span>
 -       Suffix
 -     </span>
 -   </span>
 -   <span
-      aria-hidden=\\"true\\"
-      class=\\"components-elevation wp-components-elevation css-8abvx7\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"ButtonElevation\\"
-    />"
+      aria-hidden="true"
+      class="components-elevation wp-components-elevation css-8abvx7"
+      data-g2-c16t="true"
+      data-g2-component="ButtonElevation"
+    />
 `;
 
 exports[`props should render variant 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -17,18 +17,18 @@
--       \\"-webkit-justify-content\\": \\"center\\",
--       \\"-webkit-text-decoration\\": \\"none\\",
--       \\"-webkit-user-select\\": \\"none\\",
--       \\"align-items\\": \\"center\\",
--       \\"appearance\\": \\"none\\",
-- -     \\"background-color\\": \\"var(--wp-g2-button-primary-color)\\",
-- -     \\"border-color\\": \\"var(--wp-g2-button-primary-border-color)\\",
-- +     \\"background-color\\": \\"var(--wp-g2-button-secondary-color)\\",
-- +     \\"border-color\\": \\"var(--wp-g2-button-secondary-border-color)\\",
--       \\"border-radius\\": \\"var(--wp-g2-control-border-radius)\\",
--       \\"border-style\\": \\"solid\\",
--       \\"border-width\\": \\"1px\\",
--       \\"box-shadow\\": \\"0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent\\",
--       \\"box-sizing\\": \\"border-box\\",
-- -     \\"color\\": \\"var(--wp-g2-button-primary-text-color)\\",
-- +     \\"color\\": \\"var(--wp-g2-button-secondary-text-color)\\",
--       \\"cursor\\": \\"pointer\\",
--       \\"display\\": \\"inline-flex\\",
--       \\"flex-direction\\": \\"row\\",
--       \\"font-family\\": \\"var(--wp-g2-font-family)\\",
--       \\"font-size\\": \\"var(--wp-g2-font-size)\\","
+@@ -17,18 +17,18 @@
+      "-webkit-justify-content": "center",
+      "-webkit-text-decoration": "none",
+      "-webkit-user-select": "none",
+      "align-items": "center",
+      "appearance": "none",
+-     "background-color": "var(--wp-g2-button-primary-color)",
+-     "border-color": "var(--wp-g2-button-primary-border-color)",
++     "background-color": "var(--wp-g2-button-secondary-color)",
++     "border-color": "var(--wp-g2-button-secondary-border-color)",
+      "border-radius": "var(--wp-g2-control-border-radius)",
+      "border-style": "solid",
+      "border-width": "1px",
+      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
+      "box-sizing": "border-box",
+-     "color": "var(--wp-g2-button-primary-text-color)",
++     "color": "var(--wp-g2-button-secondary-text-color)",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flex-direction": "row",
+      "font-family": "var(--wp-g2-font-family)",
+      "font-size": "var(--wp-g2-font-size)",
 `;
