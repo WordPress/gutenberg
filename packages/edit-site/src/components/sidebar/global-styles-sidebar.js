@@ -107,7 +107,7 @@ function getPanelTitle( context ) {
 	}
 
 	let panelTitle = blockType.title;
-	if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
+	if ( context?.title ) {
 		panelTitle += ` (${ context.title })`;
 	}
 	return panelTitle;

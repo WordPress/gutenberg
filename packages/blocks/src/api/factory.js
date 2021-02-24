@@ -30,7 +30,10 @@ import {
 	getBlockTypes,
 	getGroupingBlockName,
 } from './registration';
-import { normalizeBlockType, sanitizeBlockAttributes } from './utils';
+import {
+	normalizeBlockType,
+	__experimentalSanitizeBlockAttributes,
+} from './utils';
 
 /**
  * Returns a block object given its type and attributes.
@@ -42,7 +45,10 @@ import { normalizeBlockType, sanitizeBlockAttributes } from './utils';
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
-	const sanitizedAttributes = sanitizeBlockAttributes( name, attributes );
+	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
+		name,
+		attributes
+	);
 
 	const clientId = uuid();
 
@@ -104,10 +110,13 @@ export function __experimentalCloneSanitizedBlock(
 ) {
 	const clientId = uuid();
 
-	const sanitizedAttributes = sanitizeBlockAttributes( block.name, {
-		...block.attributes,
-		...mergeAttributes,
-	} );
+	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
+		block.name,
+		{
+			...block.attributes,
+			...mergeAttributes,
+		}
+	);
 
 	return {
 		...block,
