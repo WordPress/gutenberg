@@ -49,6 +49,7 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
+import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
 
 const wrapperClasses = 'block-editor-rich-text';
@@ -154,11 +155,8 @@ function RichTextWrapper(
 	identifier = identifier || instanceId;
 
 	const fallbackRef = useRef();
-	const {
-		clientId,
-		onCaretVerticalPositionChange,
-		isSelected: blockIsSelected,
-	} = useBlockEditContext();
+	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
+	const nativeProps = useNativeProps();
 	const selector = ( select ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -595,7 +593,7 @@ function RichTextWrapper(
 			}
 			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
-			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
+			{ ...nativeProps }
 			blockIsSelected={
 				originalIsSelected !== undefined
 					? originalIsSelected
