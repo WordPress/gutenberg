@@ -28,6 +28,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
+	BlockAlignmentControl,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -259,6 +260,16 @@ export default function Image( {
 		} );
 	}
 
+	function updateAlignment( nextAlign ) {
+		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -271,8 +282,12 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls>
-				{ ! multiImageSelection && ! isEditingImage && (
-					<ToolbarGroup>
+				<ToolbarGroup>
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+					{ ! multiImageSelection && ! isEditingImage && (
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
@@ -283,39 +298,22 @@ export default function Image( {
 							linkClass={ linkClass }
 							rel={ rel }
 						/>
-					</ToolbarGroup>
-				) }
-				{ allowCrop && (
-					<ToolbarGroup>
+					) }
+					{ allowCrop && (
 						<ToolbarButton
 							onClick={ () => setIsEditingImage( true ) }
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>
-					</ToolbarGroup>
-				) }
-				{ externalBlob && (
-					<ToolbarGroup>
+					) }
+					{ externalBlob && (
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
 							label={ __( 'Upload external image' ) }
 						/>
-					</ToolbarGroup>
-				) }
-				{ ! multiImageSelection && ! isEditingImage && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						onSelect={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onError={ onUploadError }
-					/>
-				) }
-				{ ! multiImageSelection && coverBlockExists && (
-					<ToolbarGroup>
+					) }
+					{ ! multiImageSelection && coverBlockExists && (
 						<ToolbarButton
 							icon={ textColor }
 							label={ __( 'Add text over image' ) }
@@ -326,7 +324,18 @@ export default function Image( {
 								)
 							}
 						/>
-					</ToolbarGroup>
+					) }
+				</ToolbarGroup>
+				{ ! multiImageSelection && ! isEditingImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
 				) }
 			</BlockControls>
 			<InspectorControls>

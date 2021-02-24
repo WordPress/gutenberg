@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { BlockAlignmentToolbar } from '../';
+import BlockAlignmentUI from '../ui';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -20,12 +20,12 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 } );
 useSelect.mockImplementation( () => ( { wideControlsEnabled: false } ) );
 
-describe( 'BlockAlignmentToolbar', () => {
+describe( 'BlockAlignmentUI', () => {
 	const alignment = 'left';
 	const onChange = jest.fn();
 
 	const wrapper = shallow(
-		<BlockAlignmentToolbar value={ alignment } onChange={ onChange } />
+		<BlockAlignmentUI value={ alignment } onChange={ onChange } isToolbar />
 	);
 
 	const controls = wrapper.props().controls;
