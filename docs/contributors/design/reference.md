@@ -1,9 +1,9 @@
 # Reference
 
--   [Glossary](/docs/designers-developers/glossary.md)
+-   [Glossary](/docs/getting-started/glossary.md)
 -   [Coding Guidelines](/docs/contributors/coding-guidelines.md)
 -   [Testing Overview](/docs/contributors/testing-overview.md)
--   [Frequently Asked Questions](/docs/designers-developers/faq.md)
+-   [Frequently Asked Questions](/docs/getting-started/faq.md)
 
 ## Logo
 
@@ -15,4 +15,4 @@ Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cris
 
 ## Mockups
 
-Mockup Sketch files are available in [the Design section](/docs/designers-developers/designers/design-resources.md).
+Mockup Sketch files are available in [the Design section](/docs/howto-guides/designers/design-resources.md).

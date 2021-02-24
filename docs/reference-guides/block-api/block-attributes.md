@@ -20,7 +20,7 @@ See [WordPress's REST API documentation](https://developer.wordpress.org/rest-ap
 
 Attribute sources are used to define how the block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
-If no attribute source is specified, the attribute will be saved to (and read from) the block's [comment delimiter](/docs/designers-developers/key-concepts.md#delimiters-and-parsing-expression-grammar).
+If no attribute source is specified, the attribute will be saved to (and read from) the block's [comment delimiter](/docs/getting-started/architecture/key-concepts.md#delimiters-and-parsing-expression-grammar).
 
 The keys specified in the attributes source object are named as you see fit. The result of the attribute source definition is assigned as a value to each key.
 

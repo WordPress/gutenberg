@@ -36,7 +36,7 @@ function gutenberg_examples_01_register_block() {
 add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
 
-Note the above example, shows using the [wp-scripts build step](/docs/designers-developers/developers/tutorials/javascript/js-build-setup/) that automatically sets dependencies and versions the file. 
+Note the above example, shows using the [wp-scripts build step](/docs/howto-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file. 
 
 If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
 
@@ -123,7 +123,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 
 _By now you should be able to see `Hello World, step 1 (from the editor).` in the admin side and `Hello World, step 1 (from the frontend).` on the frontend side._
 
-Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/designers-developers/developers/block-api/block-registration.md#icon-optional).
+Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/reference-guides/block-api/block-registration.md#icon-optional).
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
 

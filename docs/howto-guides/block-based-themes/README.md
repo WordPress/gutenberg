@@ -12,11 +12,11 @@ This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
 
- 1. [What is needed to create a block-based theme?](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
- 2. [Creating the theme](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-theme)
- 3. [Creating the templates and template parts](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-templates-and-template-parts)
- 4. [Experimental-theme.json - Global styles](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#experimental-theme-json-global-styles)
- 5. [Adding blocks](/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md)
+ 1. [What is needed to create a block-based theme?](/docs/howto-guides/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
+ 2. [Creating the theme](/docs/howto-guides/block-based-themes/README.md#creating-the-theme)
+ 3. [Creating the templates and template parts](/docs/howto-guides/block-based-themes/README.md#creating-the-templates-and-template-parts)
+ 4. [Experimental-theme.json - Global styles](/docs/howto-guides/block-based-themes/README.md#experimental-theme-json-global-styles)
+ 5. [Adding blocks](/docs/howto-guides/block-based-themes/block-based-themes-2-adding-blocks.md)
 
 ## What is needed to create a block-based theme?
 
@@ -32,7 +32,7 @@ Each template or template part contains the [block grammar](https://developer.wo
 
 A block based theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
 
-The theme may optionally include an [experimental-theme.json file](/docs/designers-developers/developers/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
+The theme may optionally include an [experimental-theme.json file](/docs/howto-guides/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
 
 Templates are placed inside the `block-templates` folder, and template parts are placed inside the `block-template-parts` folder:
 
@@ -377,4 +377,4 @@ Below are the presets and styles combined:
 }
 ```
 
-## [Adding blocks](/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md)
+## [Adding blocks](/docs/howto-guides/block-based-themes/block-based-themes-2-adding-blocks.md)

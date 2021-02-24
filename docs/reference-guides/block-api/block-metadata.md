@@ -50,7 +50,7 @@ To register a new block type using metadata that can be shared between codebase 
 }
 ```
 
-The same file is also used when [submitting block to Block Directory](/docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md).
+The same file is also used when [submitting block to Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md).
 
 ## Server-side registration
 
@@ -130,7 +130,7 @@ The core provided categories are:
 -   widgets
 -   embed
 
-Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
+Plugins and Themes can also register [custom block categories](/docs/reference-guides/filters/block-filters.md#managing-block-categories).
 
 An implementation should expect and tolerate unknown categories, providing some reasonable fallback behavior (e.g. a "text" category).
 
@@ -232,7 +232,7 @@ The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/b
 
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
-See the [the attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
+See the [the attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
 
 ### Provides Context
 
@@ -244,7 +244,7 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 
 Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
 
-See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+See [the block context documentation](/docs/reference-guides/block-api/block-context.md) for more details.
 
 ```json
 {
@@ -264,7 +264,7 @@ See [the block context documentation](/docs/designers-developers/developers/bloc
 
 Array of the names of context values to inherit from an ancestor provider.
 
-See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+See [the block context documentation](/docs/reference-guides/block-api/block-context.md) for more details.
 
 ```json
 {
@@ -280,7 +280,7 @@ See [the block context documentation](/docs/designers-developers/developers/bloc
 -   Property: `supports`
 -   Default: `{}`
 
-It contains as set of options to control features used in the editor. See the [the supports documentation](/docs/designers-developers/developers/block-api/block-supports.md) for more details.
+It contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
 ### Style Variations
 
@@ -301,7 +301,7 @@ It contains as set of options to control features used in the editor. See the [t
 
 Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the style variation if it is selected.
 
-Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-style-variations) for existing blocks.
 
 ### Example
 
@@ -322,7 +322,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 
 It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
 
-See the [the example documentation](/docs/designers-developers/developers/block-api/block-registration.md#example-optional) for more details.
+See the [the example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 
 ### Editor Script
 
@@ -471,10 +471,10 @@ Once all details are ready, Core Blocks will be migrated iteratively and third-p
 
 The following properties are going to be supported for backward compatibility reasons on the client-side only. Some of them might be replaced with alternative APIs in the future:
 
--   `edit` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
--   `save` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
--   `transforms` - see the [Transforms](/docs/designers-developers/developers/block-api/block-registration.md#transforms-optional) documentation for more details.
--   `deprecated` - see the [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) documentation for more details.
+-   `edit` - see the [Edit and Save](/docs/reference-guides/block-api/block-edit-save.md) documentation for more details.
+-   `save` - see the [Edit and Save](/docs/reference-guides/block-api/block-edit-save.md) documentation for more details.
+-   `transforms` - see the [Transforms](/docs/reference-guides/block-api/block-registration.md#transforms-optional) documentation for more details.
+-   `deprecated` - see the [Deprecated Blocks](/docs/reference-guides/block-api/block-deprecation.md) documentation for more details.
 -   `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
 -   `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
 
@@ -494,4 +494,4 @@ wp.blocks.registerBlockType( 'my-block/name', {
 } );
 ```
 
-In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) and `register_block_type_from_metadata` functions on the server.
+In the case of [dynamic blocks](/docs/howto-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) and `register_block_type_from_metadata` functions on the server.

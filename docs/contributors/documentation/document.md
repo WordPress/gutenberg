@@ -39,7 +39,7 @@ To update an existing page:
 
 ### Create a New Document
 
-To add a new documentation page requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md):
+To add a new documentation page requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/howto-guides/javascript/js-build-setup.md):
 
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and .md extension.
 2. Add content, all documents require one and only H1 tag, using markdown notation.
@@ -73,7 +73,7 @@ An example, the link to this page is: `/docs/contributors/document.md`
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
 
-A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `ESNext` and `ES5` code samples. For example, [on this block tutorial page](/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md).
+A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `ESNext` and `ES5` code samples. For example, [on this block tutorial page](/docs/howto-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
 
 Here is an example `codetabs` section:
 

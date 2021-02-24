@@ -100,4 +100,4 @@ Structured this way, these packages can be used in a variety of combinations out
 
 ## Going further
 
- - [Package Reference](/docs/designers-developers/developers/packages.md)
+ - [Package Reference](/docs/reference-guides/packages.md)

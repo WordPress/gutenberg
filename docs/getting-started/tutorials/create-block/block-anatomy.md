@@ -2,7 +2,7 @@
 
 At its simplest, a block in the WordPress block editor is a JavaScript object with a specific set of properties.
 
-**Note:** Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, I recommend reviewing the [ESNext syntax documentation](/docs/designers-developers/developers/tutorials/javascript/esnext-js.md) to familiarize yourself with the newer syntax used in modern JavaScript development.
+**Note:** Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, I recommend reviewing the [ESNext syntax documentation](/docs/howto-guides/javascript/esnext-js.md) to familiarize yourself with the newer syntax used in modern JavaScript development.
 
 Here is the complete code for registering a block:
 
@@ -35,13 +35,13 @@ registerBlockType( 'create-block/gutenpride', {
 
 The first parameter in the **registerBlockType** function is the block name, this should match exactly to the name registered in the PHP file.
 
-The second parameter to the function is the block object. See the [block registration documentation](/docs/designers-developers/developers/block-api/block-registration.md) for full details.
+The second parameter to the function is the block object. See the [block registration documentation](/docs/reference-guides/block-api/block-registration.md) for full details.
 
 The **title** is the title of the block shown in the Inserter.
 
 The **icon** is the icon shown in the Inserter. The icon property expects any Dashicon name as a string, see [list of available icons](https://developer.wordpress.org/resource/dashicons/). You can also provide an SVG object, but for now it's easiest to just pick a Dashicon name.
 
-The **category** specified is a string and must be one of: "common, formatting, layout, widgets, or embed". You can create your own custom category name, [see documentation for details](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories). For this tutorial, I specified "widgets" as the category.
+The **category** specified is a string and must be one of: "common, formatting, layout, widgets, or embed". You can create your own custom category name, [see documentation for details](/docs/reference-guides/filters/block-filters.md#managing-block-categories). For this tutorial, I specified "widgets" as the category.
 
 The last two block object properties are **edit** and **save**, these are the key parts of a block. Both properties should be defined as functions.
 
@@ -61,4 +61,4 @@ __( 'Gutenpride', 'gutenpride' );
 
 This is an internationalization wrapper that allows for the string "Gutenpride" to be translated. The second parameter, "gutenpride" is called the text domain and gives context for where the string is from. The JavaScript internationalization, often abbreviated i18n, matches the core WordPress internationalization process. See the [Internationalization in Plugin Developer Handbook](https://developer.wordpress.org/plugins/internationalization/) for more details.
 
-Next Section: [Block Attributes](/docs/designers-developers/developers/tutorials/create-block/attributes.md)
+Next Section: [Block Attributes](/docs/getting-started/tutorials/create-block/attributes.md)

@@ -18,11 +18,11 @@ Add this to the `index.js` file within the `registerBlockType` function. The `at
 
 When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an `attributes.message` variable.
 
-Note: The text portion is equivalent to `innerText` attribute of a DOM element. For more details and other examples see the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md).
+Note: The text portion is equivalent to `innerText` attribute of a DOM element. For more details and other examples see the [Block Attributes documentation](/docs/reference-guides/block-api/block-attributes.md).
 
 ## Edit and Save
 
-The **attributes** are passed to the `edit` and `save` functions, along with a **setAttributes** function to set the values. Additional parameters are also passed in to this functions, see [the edit/save documentation](/docs/designers-developers/developers/block-api/block-edit-save.md) for more details.
+The **attributes** are passed to the `edit` and `save` functions, along with a **setAttributes** function to set the values. Additional parameters are also passed in to this functions, see [the edit/save documentation](/docs/reference-guides/block-api/block-edit-save.md) for more details.
 
 The `attributes` is a JavaScript object containing the values of each attribute, or default values if defined. The `setAttributes` is a function to update an attribute.
 
@@ -71,4 +71,4 @@ export default function Save( { attributes, className } ) {
 
 Rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
-Next Section: [Code Implementation](/docs/designers-developers/developers/tutorials/create-block/block-code.md)
+Next Section: [Code Implementation](/docs/getting-started/tutorials/create-block/block-code.md)

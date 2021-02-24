@@ -2,7 +2,7 @@
 
 > This is the documentation for the current implementation of the block-based templates and template parts themes. This is part of the Full Site Editing project. These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors, and theme authors.
 
-This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend. For an introduction about block-based themes and Full site editing templates, refer to the [block-based themes documentation](/docs/designers-developers/developers/themes/block-based-themes.md).
+This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend. For an introduction about block-based themes and Full site editing templates, refer to the [block-based themes documentation](/docs/howto-guides/themes/block-based-themes.md).
 
 ## Storage
 

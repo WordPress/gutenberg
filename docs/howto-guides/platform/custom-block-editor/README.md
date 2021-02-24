@@ -1,6 +1,6 @@
 # Building a custom block editor
 
-The purpose of [this tutorial](/docs/designers-developers/developers/platform/custom-block-editor/tutorial.md) is to step through the fundamentals of creating a custom instance of a "block editor".
+The purpose of [this tutorial](/docs/reference-guides/platform/custom-block-editor/tutorial.md) is to step through the fundamentals of creating a custom instance of a "block editor".
 
 ![alt text](https://wordpress.org/gutenberg/files/2020/03/editor.png "The Standalone Editor instance populated with example Blocks within a custom WP Admin page.")
 
@@ -15,4 +15,4 @@ Code snippets are provided in "ESNext". ESNext refers to the next versions of th
 
 Note that it is not required to use ESNext to create blocks or extend the editor, you can use classic JavaScript. However, once familiar with ESNext, developers find it is easier to read and write, thus most code examples you'll find use the ESNext syntax.
 
-* [Start custom block editor tutorial](/docs/designers-developers/developers/platform/custom-block-editor/tutorial.md)
+* [Start custom block editor tutorial](/docs/reference-guides/platform/custom-block-editor/tutorial.md)

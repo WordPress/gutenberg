@@ -273,4 +273,4 @@ With the language set, create a new post, add the block, and you will see the tr
 
 ### Filtering Translations
 
-The outputs of the translation functions (`__()`, `_x()`, `_n()`, and `_nx()`) are filterable, see [i18n Filters](/docs/designers-developers/developers/filters/i18n-filters.md) for full information.
+The outputs of the translation functions (`__()`, `_x()`, `_n()`, and `_nx()`) are filterable, see [i18n Filters](/docs/reference-guides/filters/i18n-filters.md) for full information.
