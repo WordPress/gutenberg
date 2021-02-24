@@ -36,6 +36,20 @@ According to the [WebAIM: Screen Reader User Survey #8 Results](https://webaim.o
 
 When testing with screen readers, try to use some of the combinations at the top of this list. For example, when testing with VoiceOver, it's preferrable to use Safari.
 
+### NVDA with Firefox
+
+[NVDA](https://www.nvaccess.org/about-nvda/) is a free screen reader for Windows and [the most popular one](https://webaim.org/projects/screenreadersurvey8/#primary).
+
+After installing it, you can activate NVDA by opening the app as you would do with other programs. An icon will appear on the System Tray where you have access more options. It's recommended to enable the "Speech viewer" dialog so it's easier to demonstrate what's being announced by NVDA when you take screenshots.
+
+![NVDA options with Speech viewer enabled](https://user-images.githubusercontent.com/3068563/108868727-428db880-75d5-11eb-84a9-2c0b749a22ad.png)
+
+While in the Gutenberg editor, with NVDA activated, you can press <kbd>Insert+F7</kbd> to open the Elements List where you can find elements grouped by their types, such as links, headings, form fields, buttons and landmarks.
+
+![NVDA Elements List dialog](https://user-images.githubusercontent.com/3068563/109054067-33356a80-76bc-11eb-83d4-e0c536c30d22.png)
+
+Make sure the elements have proper labels and prefer to navigate through landmarks and then use <kbd>Tab</kbd> and arrow keys to move through the elements within the landmarks.
+
 ### VoiceOver with Safari
 
 [VoiceOver](https://support.apple.com/guide/voiceover-guide/welcome/web) is the native screen reader on macOS. You can enable it on System Preferences > Accessibility > VoiceOver > Enable VoiceOver or by quickly pressing Touch ID three times while holding the Command key.
