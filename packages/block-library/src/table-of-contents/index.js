@@ -20,6 +20,6 @@ export const settings = {
 		'Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.'
 	),
 	icon,
-	keywords: [ __( 'outline' ), __( 'summary' ) ],
+	keywords: [ __( 'document outline' ), __( 'summary' ) ],
 	edit,
 };
