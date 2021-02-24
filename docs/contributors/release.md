@@ -38,6 +38,10 @@ During the release process, you'll be asked to provide:
 -   A [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line): have one ready beforehand by visiting [this page](https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages), if you haven't got one yet.
 -   User and password for your GitHub account: if 2FA is enabled for your account (it should), you need to provide a personal access token instead of password (you can use the one necessary for the release).
 
+The release script will create a `git` tag for the release and push it to GitHub. This triggers a GitHub workflow that builds the plugin, creates a release draft (based on the Changelog), and attaches the plugin zip. This will take a couple of minutes. You will then find the release draft at https://github.com/WordPress/gutenberg/releases. You can edit it further (but note that the changes won't be propagated to `changelog.txt`). Once you're happy with it, press the 'Publish' button.
+
+If you're releasing a stable version (rather than an RC), this will trigger a GitHub action that will upload the plugin to the WordPress.org plugin repository (SVN). This action needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
+
 ### Manual Release Process
 
 #### Creating the first Release Candidate
