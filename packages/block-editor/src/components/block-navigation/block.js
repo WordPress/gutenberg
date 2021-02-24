@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,7 +87,9 @@ export default function BlockNavigationBlock( {
 		}
 	}, [ withExperimentalFeatures, isSelected ] );
 
-	const highlightBlock = highlightBlocksOnHover ? toggleBlockHighlight : noop;
+	const highlightBlock = highlightBlocksOnHover
+		? toggleBlockHighlight
+		: () => {};
 
 	const onMouseEnter = () => {
 		setIsHovered( true );
