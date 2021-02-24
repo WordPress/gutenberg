@@ -12,19 +12,12 @@ import { BlockEditContextProvider, useBlockEditContext } from './context';
 export { useBlockEditContext };
 
 export default function BlockEdit( props ) {
-	const {
-		name,
-		isSelected,
-		clientId,
-		onFocus,
-		onCaretVerticalPositionChange,
-	} = props;
+	const { name, isSelected, clientId, onFocus } = props;
 	const context = {
 		name,
 		isSelected,
 		clientId,
 		onFocus,
-		onCaretVerticalPositionChange,
 	};
 	return (
 		<BlockEditContextProvider

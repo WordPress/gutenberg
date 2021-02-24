@@ -29,6 +29,8 @@ import { store as blockEditorStore } from '../../store';
 
 const BlockListContext = createContext();
 
+export const OnCaretVerticalPositionChange = createContext();
+
 const stylesMemo = {};
 const getStyles = (
 	isRootList,
@@ -165,19 +167,26 @@ export class BlockList extends Component {
 
 	render() {
 		const { isRootList } = this.props;
+
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
-		return isRootList ? (
-			<BlockListContext.Provider value={ this.scrollViewRef }>
-				{ this.renderList() }
-			</BlockListContext.Provider>
-		) : (
-			<BlockListContext.Consumer>
-				{ ( ref ) =>
-					this.renderList( {
-						parentScrollRef: ref,
-					} )
-				}
-			</BlockListContext.Consumer>
+		return (
+			<OnCaretVerticalPositionChange.Provider
+				value={ this.onCaretVerticalPositionChange }
+			>
+				{ isRootList ? (
+					<BlockListContext.Provider value={ this.scrollViewRef }>
+						{ this.renderList() }
+					</BlockListContext.Provider>
+				) : (
+					<BlockListContext.Consumer>
+						{ ( ref ) =>
+							this.renderList( {
+								parentScrollRef: ref,
+							} )
+						}
+					</BlockListContext.Consumer>
+				) }
+			</OnCaretVerticalPositionChange.Provider>
 		);
 	}
 
@@ -319,9 +328,6 @@ export class BlockList extends Component {
 				onDeleteBlock={ onDeleteBlock }
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
-				}
-				onCaretVerticalPositionChange={
-					this.onCaretVerticalPositionChange
 				}
 				blockWidth={ blockWidth }
 			/>
