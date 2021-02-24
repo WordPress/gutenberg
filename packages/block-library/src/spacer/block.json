@@ -9,9 +9,12 @@
 		},
 		"width": {
 			"type": "number",
-			"default": 100
+			"default": 72
 		}
 	},
+	"usesContext": [
+		"orientation"
+	],
 	"supports": {
 		"anchor": true
 	},
