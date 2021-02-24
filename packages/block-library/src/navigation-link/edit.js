@@ -211,10 +211,6 @@ export default function NavigationLinkEdit( {
 		insertBlock( blockToInsert, insertionPoint, clientId );
 	}
 
-	if ( isSelected && ! url && ! isLinkOpen ) {
-		setIsLinkOpen( true );
-	}
-
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
 	// This can't be done in the useState call because it conflicts
