@@ -155,7 +155,15 @@ exports[`Slot should render in expected order 1`] = `
   <div>
     first
     second
+    third
+    fourth
   </div>
+  <button
+    type="button"
+  />
+  <button
+    type="button"
+  />
   <button
     type="button"
   />

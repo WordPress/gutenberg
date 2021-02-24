@@ -192,6 +192,7 @@ describe( 'Slot', () => {
 					<Slot name="egg" />
 				</div>
 				<Filler name="egg" key="second" text="second" />
+				<Filler name="egg" key="third" text="third" />
 			</Provider>
 		);
 
@@ -202,6 +203,8 @@ describe( 'Slot', () => {
 				</div>
 				<Filler name="egg" key="first" text="first" />
 				<Filler name="egg" key="second" text="second" />
+				<Filler name="egg" key="third" text="third" />
+				<Filler name="egg" key="fourth" text="fourth" />
 			</Provider>
 		);
 
