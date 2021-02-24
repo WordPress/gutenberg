@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableHighlight } from 'react-native';
+import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -27,8 +27,7 @@ import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
 import { searchItems } from './search-items';
 
-// This should handle showing the insertion point and the items
-// the search results component will handle picking and inserting
+const MIN_ITEMS_FOR_SEARCH = 2;
 
 function InserterMenu( {
 	onSelect,
@@ -41,6 +40,8 @@ function InserterMenu( {
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
+	// eslint-disable-next-line no-undef
+	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 
 	const {
 		showInsertionPoint,
@@ -87,7 +88,6 @@ function InserterMenu( {
 
 	useEffect( () => {
 		// Show/Hide insertion point on Mount/Dismount
-	useEffect( () => {
 		if ( shouldReplaceBlock ) {
 			const count = getBlockCount();
 			// Check if there is a rootClientId because that means it is a nested replaceable block
@@ -105,6 +105,12 @@ function InserterMenu( {
 			}
 		}
 		showInsertionPoint( destinationRootClientId, insertionIndex );
+
+		// Show search form if there are enough items to filter.
+		if ( getItems()?.length < MIN_ITEMS_FOR_SEARCH ) {
+			setShowSearchForm( false );
+		}
+
 		return hideInsertionPoint;
 	}, [] );
 
@@ -177,14 +183,12 @@ function InserterMenu( {
 			onClose={ onClose }
 			hideHeader
 			hasNavigation
+			setMinHeightToMaxHeight={ showSearchForm }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps, safeAreaBottomInset } ) => (
 					<View>
-						{
-						// eslint-disable-next-line no-undef
-						__DEV__ && (
-							<View>
+						{ showSearchForm && (
 							<InserterSearchForm
 								onChange={ ( value ) => {
 									setFilterValue( value );
@@ -198,7 +202,6 @@ function InserterMenu( {
 						) }
 
 						<InserterSearchResults
-						onClose={ onClose }
 							items={ getItems() }
 							onSelect={ ( item ) => {
 								onInsert( item );
