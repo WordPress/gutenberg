@@ -15,7 +15,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editPostStore } from '../../../store';
 
 function PostTemplate() {
-	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
+	const { template, isEditing } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPostType,
@@ -26,26 +26,20 @@ function PostTemplate() {
 		);
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
-		const isFSEEnabled = select( editorStore ).getEditorSettings()
-			.isFSETheme;
 		const isViewable =
 			getPostType( getCurrentPostType() )?.viewable ?? false;
 		return {
 			template:
-				isFSEEnabled &&
-				isViewable &&
-				link &&
-				getCurrentPost().status !== 'auto-draft'
+				isViewable && link && getCurrentPost().status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( link )
 					: null,
 			isEditing: isEditingTemplate(),
-			isFSETheme: isFSEEnabled,
 		};
 	}, [] );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	if ( ! isFSETheme || ! template ) {
+	if ( ! template ) {
 		return null;
 	}
 
