@@ -101,6 +101,9 @@ $blocks-block__margin: 0.5em;
 	// options. Forcing them to 100% width in the flex container replicates
 	// that these were block level elements that took up the full width.
 	//
+	// This back compat rule is ignored if the user decides to use the
+	// newer justification options on the button block, hence the :not.
+	//
 	// Disable the stylelint rule, otherwise this selector is ugly!
 	/* stylelint-disable indentation */
 	&:not(
