@@ -8,10 +8,8 @@ import {
 import { Button } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -19,38 +17,18 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { store as editSiteStore } from '../../store';
 
 export default function ListViewSidebar() {
-	const { isListViewOpen, rootBlocks, selectedBlockClientId } = useSelect(
-		( select ) => {
-			const { getSelectedBlockClientId, __unstableGetBlockTree } = select(
-				blockEditorStore
-			);
-			const { isListViewOpened } = select( editSiteStore );
-			return {
-				isListViewOpen: isListViewOpened(),
-				rootBlocks: __unstableGetBlockTree(),
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
-		}
-	);
+	const { rootBlocks, selectedBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, __unstableGetBlockTree } = select(
+			blockEditorStore
+		);
+		return {
+			rootBlocks: __unstableGetBlockTree(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	} );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-
-	useShortcut(
-		'core/edit-site/toggle-list-view',
-		useCallback( () => {
-			if ( isListViewOpen ) {
-				setIsListViewOpened( false );
-			} else {
-				setIsListViewOpened( true );
-			}
-		}, [ isListViewOpen, isListViewOpen ] ),
-		{ bindGlobal: true }
-	);
-
-	if ( ! isListViewOpen ) {
-		return null;
-	}
 
 	return (
 		<div className="edit-site-editor__list-view-panel">

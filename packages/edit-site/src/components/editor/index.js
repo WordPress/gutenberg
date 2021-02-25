@@ -45,6 +45,7 @@ function Editor( { initialSettings } ) {
 	const {
 		isFullscreenActive,
 		isInserterOpen,
+		isListViewOpen,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -56,6 +57,7 @@ function Editor( { initialSettings } ) {
 		const {
 			isFeatureActive,
 			isInserterOpened,
+			isListViewOpened,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
@@ -72,6 +74,7 @@ function Editor( { initialSettings } ) {
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
+			isListViewOpen: isListViewOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			sidebarIsOpened: !! select(
 				interfaceStore
@@ -153,6 +156,16 @@ function Editor( { initialSettings } ) {
 		return null;
 	}
 
+	const secondarySidebar = () => {
+		if ( isInserterOpen ) {
+			return <InserterSidebar />;
+		}
+		if ( isListViewOpen ) {
+			return <ListViewSidebar />;
+		}
+		return null;
+	};
+
 	return (
 		<>
 			<URLQueryController />
@@ -184,14 +197,7 @@ function Editor( { initialSettings } ) {
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
-											secondarySidebar={
-												<>
-													{ isInserterOpen && (
-														<InserterSidebar />
-													) }
-													<ListViewSidebar />
-												</>
-											}
+											secondarySidebar={ secondarySidebar() }
 											sidebar={
 												sidebarIsOpened && (
 													<ComplementaryArea.Slot scope="core/edit-site" />
