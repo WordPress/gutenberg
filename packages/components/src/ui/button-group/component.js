@@ -14,7 +14,7 @@ import { RadioGroup, useRadioState } from 'reakit';
 /**
  * WordPress dependencies
  */
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -29,8 +29,6 @@ import * as styles from './styles';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function ButtonGroup( props, forwardedRef ) {
-	const { __ } = useI18n();
-
 	const {
 		baseId,
 		className,
