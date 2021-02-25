@@ -34,11 +34,16 @@ export default function useGetMedia( innerBlockImages ) {
 			if ( imageIds.length === 0 ) {
 				return currentImageMedia;
 			}
-			const getMediaItems = select( coreStore ).getMediaItems;
-			return getMediaItems( {
-				include: imageIds,
-				per_page: imageIds.length,
+
+			const getMedia = select( coreStore ).getMedia;
+			const newImageMedia = imageIds.map( ( img ) => {
+				return getMedia( img );
 			} );
+
+			if ( newImageMedia.some( ( img ) => ! img ) ) {
+				return currentImageMedia;
+			}
+			return newImageMedia;
 		},
 		[ innerBlockImages ]
 	);
@@ -55,5 +60,6 @@ export default function useGetMedia( innerBlockImages ) {
 		setCurrentImageMedia( newCurrentMedia );
 		return newCurrentMedia;
 	}
+
 	return currentImageMedia;
 }
