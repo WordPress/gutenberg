@@ -7,7 +7,6 @@ import {
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
-	useConstrainedTabbing,
 	useFocusOnMount,
 	useFocusReturn,
 	useInstanceId,
@@ -36,7 +35,6 @@ export default function ListViewSidebar() {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
-	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const focusReturnRef = useFocusReturn();
 	function closeOnEscape( event ) {
@@ -66,11 +64,7 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
-				ref={ useMergeRefs( [
-					constrainedTabbingRef,
-					focusReturnRef,
-					focusOnMountRef,
-				] ) }
+				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
