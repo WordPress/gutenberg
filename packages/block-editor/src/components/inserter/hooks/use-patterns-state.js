@@ -31,8 +31,13 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } = select(
 				blockEditorStore
 			);
+			const inserterPatterns = __experimentalGetAllowedPatterns(
+				rootClientId
+			).filter(
+				( pattern ) => ! pattern.scope || pattern.scope.inserter
+			);
 			return {
-				patterns: __experimentalGetAllowedPatterns( rootClientId ),
+				patterns: inserterPatterns,
 				patternCategories: getSettings()
 					.__experimentalBlockPatternCategories,
 			};
