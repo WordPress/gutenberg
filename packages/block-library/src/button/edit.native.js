@@ -43,9 +43,9 @@ const MIN_WIDTH = 40;
 // Map of the percentage width to pixel subtraction that make the buttons fit nicely into columns.
 const MIN_WIDTH_MARGINS = {
 	100: 0,
-	75: styles.button75.marginLeft,
-	50: styles.button50.marginLeft,
-	25: styles.button25.marginLeft,
+	75: styles.button75?.marginLeft,
+	50: styles.button50?.marginLeft,
+	25: styles.button25?.marginLeft,
 };
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
