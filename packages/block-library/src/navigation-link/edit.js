@@ -463,7 +463,6 @@ export default function NavigationLinkEdit( {
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
-							isAlternate
 						>
 							<KeyboardShortcuts
 								bindGlobal
