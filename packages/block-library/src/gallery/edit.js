@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, concat, some, find } from 'lodash';
+import { isEmpty, concat, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,6 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -52,6 +51,7 @@ import {
 import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
+import useGetMedia from './use-get-media';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -132,31 +132,7 @@ function GalleryEdit( props ) {
 		[ innerBlockImages ]
 	);
 
-	const imageData = useSelect(
-		( select ) => {
-			if (
-				! innerBlockImages?.length ||
-				some(
-					innerBlockImages,
-					( imageBlock ) => ! imageBlock.attributes.id
-				)
-			) {
-				return imageData;
-			}
-
-			const imageIds = innerBlockImages.map(
-				( imageBlock ) => imageBlock.attributes.id
-			);
-
-			const getMediaItems = select( coreStore ).getMediaItems;
-
-			return getMediaItems( {
-				include: imageIds,
-				per_page: imageIds.length,
-			} );
-		},
-		[ innerBlockImages ]
-	);
+	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
 

@@ -23,7 +23,7 @@ export default function useGetNewImages( images, imageData ) {
 		}
 
 		// Now lets see if we have any images hydrated from saved content and if so
-		// add then to currentImages state.
+		// add them to currentImages state.
 		images.forEach( ( image ) => {
 			if (
 				image.fromSavedContent &&
@@ -36,7 +36,7 @@ export default function useGetNewImages( images, imageData ) {
 			}
 		} );
 
-		// Now check for any new images that have been added InnerBlocks and for which
+		// Now check for any new images that have been added to InnerBlocks and for which
 		// we have the imageData we need for setting default block attributes.
 		const newImages = images.filter(
 			( image ) =>
