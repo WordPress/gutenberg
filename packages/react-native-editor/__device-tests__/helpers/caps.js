@@ -20,6 +20,7 @@ exports.iosServer = {
 	...ios,
 	platformVersion: '13.4', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
 	deviceName: 'iPhone 11 Simulator',
+	showXcodeLog: true,
 };
 
 exports.android = {
