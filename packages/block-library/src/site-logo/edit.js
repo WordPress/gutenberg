@@ -350,12 +350,9 @@ export default function LogoEdit( {
 		'is-focused': isSelected,
 	} );
 
-	const key = !! logoUrl;
-
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
-		key,
 	} );
 
 	return (
