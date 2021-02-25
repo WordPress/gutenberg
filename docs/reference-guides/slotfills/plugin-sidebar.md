@@ -23,7 +23,7 @@ registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 
 ### Closed State
 
-![Closed State](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/plugin-sidebar-closed-state.png?raw=true)
+![Closed State](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-closed-state.png?raw=true)
 
 ### Open State
 
