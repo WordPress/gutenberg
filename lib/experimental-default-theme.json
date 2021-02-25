@@ -139,33 +139,33 @@
 					},
 					{
 						"name":  "Purple and yellow" ,
-						"colors": [ "#710094", "#fcff41" ],
+						"colors": [ "#8c00b7", "#fcff41" ],
 						"slug": "purple-yellow"
 					},
 					{
-						"name":  "Dark blue and salmon" ,
-						"colors": [ "#00008a", "#ff7070" ],
-						"slug": "dark-blue-salmon"
+						"name":  "Blue and red" ,
+						"colors": [ "#000097", "#ff4747" ],
+						"slug": "blue-red"
 					},
 					{
 						"name":  "Midnight" ,
-						"colors": [ "#02004b", "#55b5ff" ],
+						"colors": [ "#000000", "#00a5ff" ],
 						"slug": "midnight"
 					},
 					{
-						"name":  "Dark magenta and yellow" ,
-						"colors": [ "#b80052", "#fff278" ],
+						"name":  "Magenta and yellow" ,
+						"colors": [ "#c7005a", "#fff278" ],
 						"slug": "magenta-yellow"
 					},
 					{
-						"name":  "Purple and light green" ,
-						"colors": [ "#820059", "#acff7c" ],
-						"slug": "purple-light-green"
+						"name":  "Purple and green" ,
+						"colors": [ "#a60072", "#67ff66" ],
+						"slug": "purple-green"
 					},
 					{
-						"name":  "Brown and yellow" ,
-						"colors": [ "#711b26", "#ffde4c" ],
-						"slug": "brown-yellow"
+						"name":  "Blue and orange" ,
+						"colors": [ "#1900d8", "#ffa96b" ],
+						"slug": "blue-orange"
 					}
 				],
 				"custom": true,

@@ -50,7 +50,7 @@ function CustomColorPicker( { colors, palette, onChange } ) {
 	return (
 		<div className="block-editor-duotone-toolbar__custom-colors">
 			<CustomColorOption
-				label={ __( 'Dark color' ) }
+				label={ __( 'Shadows' ) }
 				value={ colors[ 0 ] }
 				colors={ palette }
 				onChange={ ( newColor ) => {
@@ -66,7 +66,7 @@ function CustomColorPicker( { colors, palette, onChange } ) {
 				} }
 			/>
 			<CustomColorOption
-				label={ __( 'Light color' ) }
+				label={ __( 'Highlights' ) }
 				value={ colors[ 1 ] }
 				colors={ palette }
 				onChange={ ( newColor ) => {
