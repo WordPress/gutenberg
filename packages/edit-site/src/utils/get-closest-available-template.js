@@ -4,7 +4,6 @@
 import { find } from 'lodash';
 
 export default function getClosestAvailableTemplate( slug, templates ) {
-
 	// Fallback in case there are no templates.
 	if ( ! templates.length ) {
 		return {
