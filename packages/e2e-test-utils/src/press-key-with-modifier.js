@@ -121,6 +121,7 @@ async function emulateClipboard( type ) {
 
 			window._clipboardData.setData( 'text/plain', plainText );
 			window._clipboardData.setData( 'text/html', html );
+			window._clipboardData.setData( 'wp-e2e-test', 'true' );
 		}
 
 		document.activeElement.dispatchEvent(
