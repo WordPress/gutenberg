@@ -1,4 +1,4 @@
-# Explanation
+# Explanations
 
 ## [Architecture](/docs/explanations/architecture/README.md)
 

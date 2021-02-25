@@ -420,7 +420,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "ReferenceGuides",
+		"title": "Reference Guides",
 		"slug": "reference-guides",
 		"markdown_source": "../docs/reference-guides/README.md",
 		"parent": null
