@@ -191,6 +191,7 @@ function InputField(
 	let handleOnMouseDown;
 	if ( type === 'number' ) {
 		handleOnMouseDown = ( event ) => {
+			props.onMouseDown?.( event );
 			if ( event.target !== event.target.ownerDocument.activeElement ) {
 				event.target.focus();
 			}
