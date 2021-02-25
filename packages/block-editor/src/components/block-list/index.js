@@ -59,25 +59,16 @@ function Items( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( blockEditorStore );
-
-		// Determine if there is an active entity area to spotlight.
-		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
-			getSettings().__experimentalSpotlightEntityBlocks
-		);
-
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
-			activeEntityBlockId,
 		};
 	}
 
@@ -87,7 +78,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		orientation,
 		hasMultiSelection,
-		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const dropTargetIndex = useBlockDropZone( {
@@ -123,9 +113,7 @@ function Items( {
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
-								'has-active-entity': activeEntityBlockId,
 							} ) }
-							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);
