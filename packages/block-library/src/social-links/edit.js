@@ -88,13 +88,7 @@ export function SocialLinksEdit( props ) {
 			iconBackgroundColor.color || iconBackgroundColorValue,
 	} );
 
-	const style = {
-		'--wp--social-links--icon-color': iconColor.color || iconColorValue,
-		'--wp--social-links--icon-background-color':
-			iconBackgroundColor.color || iconBackgroundColorValue,
-	};
-
-	const blockProps = useBlockProps( { className, style } );
+	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
@@ -176,7 +170,6 @@ export function SocialLinksEdit( props ) {
 							value: iconColor.color || iconColorValue,
 							onChange: ( colorValue ) => {
 								setIconColor( colorValue );
-								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( { iconColorValue: colorValue } );
 							},
 							label: __( 'Icon color' ),
@@ -189,7 +182,6 @@ export function SocialLinksEdit( props ) {
 								iconBackgroundColorValue,
 							onChange: ( colorValue ) => {
 								setIconBackgroundColor( colorValue );
-								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( {
 									iconBackgroundColorValue: colorValue,
 								} );
