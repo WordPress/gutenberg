@@ -6,14 +6,83 @@
  */
 
 /**
+ * Returns whether the FSE is enabled or not.
+ *
+ * @return boolean Whether FSE is enabled or not.
+ */
+function gutenberg_is_fse_enabled() {
+	return gutenberg_is_fse_theme() || get_option( 'gutenberg_enable_fse' );
+}
+
+/**
+ * Returns whether the current theme is an FSE theme or not.
+ *
+ * @return boolean Whether the current theme is an FSE theme or not.
+ */
+function gutenberg_is_fse_theme() {
+	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
+}
+
+/**
+ * Show a notice when a Full Site Editing theme is used.
+ */
+function gutenberg_full_site_editing_notice() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+	?>
+	<div class="notice notice-warning">
+		<p><?php _e( 'You\'re using an experimental Full Site Editing theme. Full Site Editing is an experimental feature and potential API changes are to be expected!', 'gutenberg' ); ?></p>
+	</div>
+	<?php
+}
+add_action( 'admin_notices', 'gutenberg_full_site_editing_notice' );
+
+/**
+ * Removes legacy pages from FSE themes.
+ */
+function gutenberg_remove_legacy_pages() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	global $submenu;
+	if ( isset( $submenu['themes.php'] ) ) {
+		$indexes_to_remove = array();
+		foreach ( $submenu['themes.php'] as $index => $menu_item ) {
+			if (
+				false !== strpos( $menu_item[2], 'customize.php' ) ||
+				false !== strpos( $menu_item[2], 'gutenberg-widgets' )
+			) {
+				$indexes_to_remove[] = $index;
+			}
+		}
+
+		foreach ( $indexes_to_remove as $index ) {
+			unset( $submenu['themes.php'][ $index ] );
+		}
+	}
+}
+
+add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
+
+/**
  * Removes legacy adminbar items from FSE themes.
  *
  * @param WP_Admin_Bar $wp_admin_bar The admin-bar instance.
  */
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
+	// Remove items if an FSE theme.
+	if ( ! gutenberg_is_fse_theme() ) {
+		$wp_admin_bar->remove_node( 'customize' );
+		$wp_admin_bar->remove_node( 'customize-background' );
+		$wp_admin_bar->remove_node( 'customize-header' );
+		$wp_admin_bar->remove_node( 'widgets' );
+	}
+
 	// Add site-editor link.
-	if ( ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
+	if ( gutenberg_is_fse_enabled() && ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
 		$wp_admin_bar->add_node(
 			array(
 				'id'    => 'site-editor',
@@ -38,6 +107,10 @@ add_filter( 'menu_order', 'gutenberg_menu_order' );
  * @param array $menu_order Menu Order.
  */
 function gutenberg_menu_order( $menu_order ) {
+	if ( ! gutenberg_is_fse_enabled() ) {
+		return $menu_order;
+	}
+
 	$new_positions = array(
 		// Position the site editor before the appearance menu.
 		'gutenberg-edit-site' => array_search( 'themes.php', $menu_order, true ),
@@ -54,3 +127,40 @@ function gutenberg_menu_order( $menu_order ) {
 	}
 	return $menu_order;
 }
+
+/**
+ * Add option under "General" settings to enable FSE.
+ *
+ * @return void
+ */
+function gutenberg_add_fse_general_setting() {
+
+	// Register the setting.
+	register_setting(
+		'general',
+		'gutenberg_enable_fse',
+		array(
+			'type'              => 'boolean',
+			'default'           => false,
+			'sanitize_callback' => function( $val ) {
+				return (bool) $val;
+			},
+		)
+	);
+
+	// Add the field.
+	add_settings_field(
+		'gutenberg_enable_fse',
+		esc_html__( 'Allow creating templates using the block editor', 'gutenberg' ),
+		function() {
+			?>
+			<input name="gutenberg_enable_fse" type="checkbox" id="gutenberg_enable_fse" value="1" <?php checked( '1', get_option( 'gutenberg_enable_fse' ) ); ?> />
+			<?php
+		},
+		'general',
+        'default',
+        array( 'label_for' => 'gutenberg_enable_fse' )
+    );
+}
+add_action('admin_init', 'gutenberg_add_fse_general_setting');
+

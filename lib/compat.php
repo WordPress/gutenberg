@@ -85,7 +85,7 @@ add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
  * @return bool
  */
 function gutenberg_should_load_separate_block_styles() {
-	$load_separate_styles = true;
+	$load_separate_styles = gutenberg_is_fse_enabled();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
