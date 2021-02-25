@@ -4,6 +4,22 @@
 import { find } from 'lodash';
 
 export default function getClosestAvailableTemplate( slug, templates ) {
+
+	// Fallback in case there are no templates.
+	if ( ! templates.length ) {
+		return {
+			id: 'index',
+			content: {
+				raw: '',
+			},
+			slug: 'index',
+			is_custom: false,
+			type: 'wp_template',
+			status: 'publish',
+			wp_id: null,
+		};
+	}
+
 	const template = find( templates, { slug } );
 	if ( template ) {
 		return template;
