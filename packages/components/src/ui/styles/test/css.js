@@ -59,11 +59,20 @@ describe( 'basic', () => {
 } );
 
 describe( 'plugins', () => {
-	test( 'should render reliably in an environment with existing styles', () => {
+	let existingStyles;
+	beforeEach( () => {
 		// Simulate an environment with existing styles
-		const existingStyles = document.createElement( 'style' );
-		existingStyles.innerHTML = `div.box { background: green; }`;
+		existingStyles = document.createElement( 'style' );
 		document.querySelector( 'head' ).appendChild( existingStyles );
+	} );
+
+	afterEach( () => {
+		document.querySelector( 'head' ).removeChild( existingStyles );
+		document.documentElement.removeAttribute( 'dir' );
+	} );
+
+	test( 'should render reliably in an environment with existing styles', () => {
+		existingStyles.innerHTML = `div.box { background: green; }`;
 
 		const style = css`
 			background: blue;
@@ -72,9 +81,6 @@ describe( 'plugins', () => {
 		const { container } = render( <div className={ `box ${ style }` } /> );
 
 		expect( container.firstChild ).toHaveStyle( `background: blue;` );
-
-		// Clean up
-		document.querySelector( 'head' ).removeChild( existingStyles );
 	} );
 
 	test( 'should automatically render rtl styles', () => {
@@ -105,7 +111,5 @@ describe( 'plugins', () => {
 		expect( container.firstChild ).not.toHaveStyle(
 			`transform: translateX( 55% );`
 		);
-		// Reset an rtl environment
-		document.documentElement.removeAttribute( 'dir' );
 	} );
 } );
