@@ -1,6 +1,6 @@
 # Reference Guides
 
-## Block API Reference
+## [Block API Reference](/docs/reference-guides/block-api/README.md)
 
 -   [Block registration](/docs/reference-guides/block-api/block-registration.md)
 -   [Edit and Save](/docs/reference-guides/block-api/block-edit-save.md)
@@ -15,14 +15,14 @@
 -   [Annotations](/docs/reference-guides/block-api/block-annotations.md)
 -   [Versions](/docs/reference-guides/block-api/versions.md)
 
-## Filter Reference
+## [Filter Reference](/docs/reference-guides/filters/README.md)
 
 -   [Block Filters](/docs/reference-guides/filters/block-filters.md)
 -   [Editor Filters (Experimental)](/docs/reference-guides/filters/editor-filters.md)
 -   [Parser Filters](/docs/reference-guides/filters/parser-filters.md)
 -   [Autocomplete](/docs/reference-guides/filters/autocomplete-filters.md)
 
-## SlotFills Reference
+## [SlotFills Reference](/docs/reference-guides/slotfills/README.md)
 
 -   [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md)
 -   [PluginBlockSettingsMenuItem](/docs/reference-guides/slotfills/plugin-block-settings-menu-item.md)
@@ -34,13 +34,13 @@
 -   [PluginSidebar](/docs/reference-guides/slotfills/plugin-sidebar.md)
 -   [PluginSidebarMoreMenuItem](/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md)
 
-## RichText Reference
+## [RichText Reference](/docs/reference-guides/richtext.md)
 
-## Component Reference
+## [Component Reference](/packages/components/README.md)
 
-## Package Reference
+## [Package Reference](/docs/reference-guides/packages.md)
 
-## Data Module Reference
+## [Data Module Reference](/docs/reference-guides/data/README.md)
 
 -   [**core**: WordPress Core Data](/docs/reference-guides/data/data-core.md)
     -   [**core/annotations**: Annotations](/docs/reference-guides/data/data-core-annotations.md)
