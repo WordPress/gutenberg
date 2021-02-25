@@ -21,6 +21,38 @@ describe( 'RTL', () => {
 		} );
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/29250.
+	it( 'loads editor without errors when RTL is set at the WP admin level', async () => {
+		await page.evaluate( () => {
+			window._loadedWithoutErrors = true;
+
+			window.addEventListener( 'error', function ( event ) {
+				window._loadedWithoutErrors = false;
+				event.preventDefault();
+			} );
+
+			const scripts = Array.from( document.querySelectorAll( 'script' ) );
+			const snippetScriptEl = document.createElement( 'script' );
+			const newComponentsScriptEl = document.createElement( 'script' );
+			const head = document.head;
+
+			const componentsScriptSrc = scripts.find( ( s ) =>
+				s.src.match( 'components/index.js' )
+			).src;
+
+			snippetScriptEl.text = 'document.dir = "rtl";';
+			newComponentsScriptEl.src = componentsScriptSrc;
+
+			//scripts.forEach( ( script ) => script.remove() );
+			head.appendChild( snippetScriptEl );
+			head.appendChild( newComponentsScriptEl );
+		} );
+
+		expect(
+			await page.evaluate( () => window._loadedWithoutErrors )
+		).toBeTruthy();
+	} );
+
 	it( 'should arrow navigate', async () => {
 		await page.keyboard.press( 'Enter' );
 
