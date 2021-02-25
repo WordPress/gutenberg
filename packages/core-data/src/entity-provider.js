@@ -6,10 +6,11 @@ import {
 	useContext,
 	useCallback,
 	useEffect,
-	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+
+const EMPTY_ARRAY = [];
 
 /**
  * Internal dependencies
@@ -129,66 +130,75 @@ export function useEntityProp( kind, type, prop, _id ) {
  * @param {string} kind                            The entity kind.
  * @param {string} type                            The entity type.
  * @param {Object} options
- * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
- * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
- * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
  * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor(
-	kind,
-	type,
-	{
-		initialEdits,
-		blocksProp = 'blocks',
-		contentProp = 'content',
-		id: _id,
-	} = {}
-) {
+export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, type );
 	const id = _id ?? providerId;
-
-	const [ content, setContent ] = useEntityProp(
-		kind,
-		type,
-		contentProp,
-		id
+	const { content, blocks } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( 'core' );
+			const editedEntity = getEditedEntityRecord( kind, type, id );
+			return {
+				blocks: editedEntity.blocks,
+				content: editedEntity.content,
+			};
+		},
+		[ kind, type, id ]
+	);
+	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
+		'core'
 	);
 
-	const { editEntityRecord } = useDispatch( 'core' );
 	useEffect( () => {
-		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, {
-				undoIgnore: true,
-			} );
-		}
-	}, [ id ] );
-	const initialBlocks = useMemo( () => {
+		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
-		// set content to a function already.
-		if ( content && typeof content !== 'function' ) {
+		// set content to a function already or the blocks are already in state.
+		if ( content && typeof content !== 'function' && ! blocks ) {
 			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : [];
+			editEntityRecord(
+				kind,
+				type,
+				id,
+				{
+					blocks: parsedContent,
+				},
+				{ undoIgnore: true }
+			);
 		}
-		return [];
 	}, [ content ] );
-	const [ blocks = initialBlocks, onInput ] = useEntityProp(
-		kind,
-		type,
-		blocksProp,
-		id
-	);
 
 	const onChange = useCallback(
-		( nextBlocks ) => {
-			onInput( nextBlocks );
-			// Use a function edit to avoid serializing often.
-			setContent( ( { blocks: blocksToSerialize } ) =>
-				serialize( blocksToSerialize )
-			);
+		( newBlocks, options ) => {
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
+
+			const noChange = blocks === edits.blocks;
+			if ( noChange ) {
+				return __unstableCreateUndoLevel( kind, type, id );
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				__unstableSerializeAndClean( blocksForSerialization );
+
+			editEntityRecord( kind, type, id, edits );
 		},
-		[ onInput, setContent ]
+		[ kind, type, id, blocks ]
 	);
-	return [ blocks, onInput, onChange ];
+
+	const onInput = useCallback(
+		( newBlocks, options ) => {
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
+			editEntityRecord( kind, type, id, edits );
+		},
+		[ kind, type, id ]
+	);
+
+	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
 }

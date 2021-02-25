@@ -24,15 +24,35 @@ function useUniqueId( idProp ) {
 	return idProp || id;
 }
 
+// Adapter to map props for the new ui/flex compopnent.
+function getUIFlexProps( { labelPosition } ) {
+	const props = {};
+	switch ( labelPosition ) {
+		case 'top':
+			props.direction = 'column';
+			props.gap = 0;
+			break;
+		case 'bottom':
+			props.direction = 'column-reverse';
+			props.gap = 0;
+			break;
+		case 'edge':
+			props.justify = 'space-between';
+			break;
+	}
+
+	return props;
+}
+
 export function InputBase(
 	{
+		__unstableInputWidth,
 		children,
 		className,
 		disabled = false,
 		hideLabelFromVision = false,
+		labelPosition,
 		id: idProp,
-		isFloatingLabel = false,
-		isFilled = false,
 		isFocused = false,
 		label,
 		prefix,
@@ -43,36 +63,36 @@ export function InputBase(
 	ref
 ) {
 	const id = useUniqueId( idProp );
-
-	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
-	const isFloatingLabelSet =
-		! hideLabelFromVision && isFloatingLabel && label;
+	const hideLabel = hideLabelFromVision || ! label;
 
 	return (
 		<Root
 			{ ...props }
+			{ ...getUIFlexProps( { labelPosition } ) }
 			className={ className }
-			isFloatingLabel={ isFloatingLabelSet }
 			isFocused={ isFocused }
+			labelPosition={ labelPosition }
 			ref={ ref }
+			__unstableVersion="next"
 		>
 			<LabelWrapper>
 				<Label
 					className="components-input-control__label"
 					hideLabelFromVision={ hideLabelFromVision }
+					labelPosition={ labelPosition }
 					htmlFor={ id }
-					isFilled={ isFilled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabel }
 					size={ size }
 				>
 					{ label }
 				</Label>
 			</LabelWrapper>
 			<Container
+				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
 				disabled={ disabled }
+				hideLabel={ hideLabel }
 				isFocused={ isFocused }
+				labelPosition={ labelPosition }
 			>
 				{ prefix && (
 					<Prefix className="components-input-control__prefix">
@@ -88,8 +108,6 @@ export function InputBase(
 				<Backdrop
 					aria-hidden="true"
 					disabled={ disabled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
 					label={ label }
 					size={ size }

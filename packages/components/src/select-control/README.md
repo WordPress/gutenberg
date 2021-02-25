@@ -131,6 +131,12 @@ If this property is added, a label will be generated using label property as the
 - Type: `String`
 - Required: No
 
+#### labelPosition
+
+The position of the label (`top`, `side`, or `bottom`).
+- Type: `String`
+- Required: No
+
 #### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.

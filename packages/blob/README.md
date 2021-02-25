@@ -38,7 +38,21 @@ _Parameters_
 
 _Returns_
 
--   `(File|undefined)`: The file for the blob URL.
+-   `File|undefined`: The file for the blob URL.
+
+<a name="getBlobTypeByURL" href="#getBlobTypeByURL">#</a> **getBlobTypeByURL**
+
+Retrieve a blob type based on URL. The file must have been created by
+`createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
+`undefined`.
+
+_Parameters_
+
+-   _url_ `string`: The blob URL.
+
+_Returns_
+
+-   `string|undefined`: The blob type.
 
 <a name="isBlobURL" href="#isBlobURL">#</a> **isBlobURL**
 

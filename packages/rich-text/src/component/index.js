@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-import { find, isNil, pickBy, startsWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -25,6 +19,8 @@ import {
 	ESCAPE,
 } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,10 +38,12 @@ import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
-import withFormatTypes from './with-format-types';
+import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
+import { slice } from '../slice';
+import { getTextContent } from '../get-text-content';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -95,19 +93,12 @@ const defaultStyle = { whiteSpace };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
-function createPrepareEditableTree( props, prefix ) {
-	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
-		if ( key.startsWith( prefix ) ) {
-			accumulator.push( props[ key ] );
-		}
-
-		return accumulator;
-	}, [] );
-
+function createPrepareEditableTree( fns ) {
 	return ( value ) =>
-		fns.reduce( ( accumulator, fn ) => {
-			return fn( accumulator, value.text );
-		}, value.formats );
+		fns.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
 }
 
 /**
@@ -137,46 +128,59 @@ function fixPlaceholderSelection( defaultView ) {
 	selection.collapseToStart();
 }
 
-function RichText( {
-	tagName: TagName = 'div',
-	value = '',
-	selectionStart,
-	selectionEnd,
-	children,
-	allowedFormats,
-	withoutInteractiveFormatting,
-	formatTypes,
-	style,
-	className,
-	placeholder,
-	disabled,
-	preserveWhiteSpace,
-	onPaste,
-	format = 'string',
-	onDelete,
-	onEnter,
-	onSelectionChange,
-	onChange,
-	unstableOnFocus: onFocus,
-	setFocusedElement,
-	instanceId,
-	__unstableMultilineTag: multilineTag,
-	__unstableMultilineRootTag: multilineRootTag,
-	__unstableDisableFormats: disableFormats,
-	__unstableDidAutomaticChange: didAutomaticChange,
-	__unstableInputRule: inputRule,
-	__unstableMarkAutomaticChange: markAutomaticChange,
-	__unstableAllowPrefixTransformations: allowPrefixTransformations,
-	__unstableUndo: undo,
-	__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
-	__unstableOnEnterFormattedText: onEnterFormattedText,
-	__unstableOnExitFormattedText: onExitFormattedText,
-	__unstableOnCreateUndoLevel: onCreateUndoLevel,
-	__unstableIsSelected: isSelected,
-	forwardedRef: ref,
-	...remainingProps
-} ) {
+function RichText(
+	{
+		tagName: TagName = 'div',
+		value = '',
+		selectionStart,
+		selectionEnd,
+		children,
+		allowedFormats,
+		withoutInteractiveFormatting,
+		placeholder,
+		disabled,
+		preserveWhiteSpace,
+		onPaste,
+		format = 'string',
+		onDelete,
+		onEnter,
+		onSelectionChange,
+		onChange,
+		unstableOnFocus: onFocus,
+		setFocusedElement,
+		instanceId,
+		clientId,
+		identifier,
+		__unstableMultilineTag: multilineTag,
+		__unstableMultilineRootTag: multilineRootTag,
+		__unstableDisableFormats: disableFormats,
+		__unstableDidAutomaticChange: didAutomaticChange,
+		__unstableInputRule: inputRule,
+		__unstableMarkAutomaticChange: markAutomaticChange,
+		__unstableAllowPrefixTransformations: allowPrefixTransformations,
+		__unstableUndo: undo,
+		__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
+		__unstableOnEnterFormattedText: onEnterFormattedText,
+		__unstableOnExitFormattedText: onExitFormattedText,
+		__unstableOnCreateUndoLevel: onCreateUndoLevel,
+		__unstableIsSelected: isSelected,
+	},
+	forwardedRef
+) {
+	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
+	const {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
+	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
 	// tagName can now be a component for light blocks.
@@ -212,10 +216,7 @@ function RichText( {
 			return string;
 		}
 
-		const prepare = createPrepareEditableTree(
-			remainingProps,
-			'format_value_functions'
-		);
+		const prepare = createPrepareEditableTree( valueHandlers );
 
 		const result = create( {
 			html: string,
@@ -306,13 +307,28 @@ function RichText( {
 			multilineTag,
 			multilineWrapperTags:
 				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			prepareEditableTree: createPrepareEditableTree(
-				remainingProps,
-				'format_prepare_functions'
-			),
+			prepareEditableTree: createPrepareEditableTree( prepareHandlers ),
 			__unstableDomOnly: domOnly,
 			placeholder,
 		} );
+	}
+
+	function handleCopy( event ) {
+		if ( isCollapsed( record.current ) ) {
+			return;
+		}
+
+		const selectedRecord = slice( record.current );
+		const plainText = getTextContent( selectedRecord );
+		const html = toHTMLString( {
+			value: selectedRecord,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+		event.clipboardData.setData( 'text/plain', plainText );
+		event.clipboardData.setData( 'text/html', html );
+		event.clipboardData.setData( 'rich-text', 'true' );
+		event.preventDefault();
 	}
 
 	/**
@@ -328,13 +344,7 @@ function RichText( {
 			return;
 		}
 
-		const clipboardData = event.clipboardData;
-		let { items, files } = clipboardData;
-
-		// In Edge these properties can be null instead of undefined, so a more
-		// rigorous test is required over using default values.
-		items = isNil( items ) ? [] : items;
-		files = isNil( files ) ? [] : files;
+		const { clipboardData } = event;
 
 		let plainText = '';
 		let html = '';
@@ -388,32 +398,16 @@ function RichText( {
 		}
 
 		if ( onPaste ) {
-			files = Array.from( files );
-
-			Array.from( items ).forEach( ( item ) => {
-				if ( ! item.getAsFile ) {
-					return;
-				}
-
-				const file = item.getAsFile();
-
-				if ( ! file ) {
-					return;
-				}
-
-				const { name, type, size } = file;
-
-				if ( ! find( files, { name, type, size } ) ) {
-					files.push( file );
-				}
-			} );
+			const files = getFilesFromDataTransfer( clipboardData );
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
-				files,
+				isInternal,
+				files: [ ...files ],
 				activeFormats,
 			} );
 		}
@@ -826,7 +820,7 @@ function RichText( {
 			return;
 		}
 
-		if ( document.activeElement !== ref.current ) {
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
 			return;
 		}
 
@@ -913,9 +907,6 @@ function RichText( {
 		applyRecord( newRecord );
 
 		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
-		const changeHandlers = pickBy( remainingProps, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
-		);
 
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 			changeHandler( newRecord.formats, newRecord.text );
@@ -1075,15 +1066,11 @@ function RichText( {
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
-	const prefix = 'format_prepare_props_';
-	const predicate = ( v, key ) => key.startsWith( prefix );
-	const prepareProps = pickBy( remainingProps, predicate );
-
 	useEffect( () => {
 		if ( didMount.current ) {
 			applyFromProps();
 		}
-	}, Object.values( prepareProps ) );
+	}, dependencies );
 
 	useLayoutEffect( () => {
 		applyRecord( record.current, { domOnly: true } );
@@ -1105,19 +1092,15 @@ function RichText( {
 		applyRecord( record.current );
 	}
 
-	const ariaProps = pickBy( remainingProps, ( v, key ) =>
-		startsWith( key, 'aria-' )
-	);
-
 	const editableProps = {
 		// Overridable props.
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		...ariaProps,
-		ref,
-		style: style ? { ...style, whiteSpace } : defaultStyle,
-		className: classnames( 'rich-text', className ),
+		ref: useMergeRefs( [ forwardedRef, ref ] ),
+		style: defaultStyle,
+		className: 'rich-text',
+		onCopy: handleCopy,
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
@@ -1146,14 +1129,11 @@ function RichText( {
 		<>
 			{ isSelected && (
 				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
 					value={ record.current }
 					onChange={ handleChange }
 					onFocus={ focus }
 					formatTypes={ formatTypes }
+					forwardedRef={ ref }
 				/>
 			) }
 			{ children &&
@@ -1170,12 +1150,8 @@ function RichText( {
 	);
 }
 
-const RichTextWrapper = withFormatTypes( RichText );
-
 /**
  * Renders a rich content input, providing users with the option to format the
  * content.
  */
-export default forwardRef( ( props, ref ) => {
-	return <RichTextWrapper { ...props } forwardedRef={ ref } />;
-} );
+export default forwardRef( RichText );

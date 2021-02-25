@@ -1,9 +1,17 @@
+/**
+ * External dependencies
+ */
+const path = require( 'path' );
+
 module.exports = function ( api ) {
 	api.cache( true );
 	return {
 		presets: [ 'module:metro-react-native-babel-preset' ],
 		plugins: [
-			'@babel/plugin-proposal-async-generator-functions',
+			path.resolve(
+				__dirname,
+				'../../node_modules/@babel/plugin-proposal-async-generator-functions'
+			),
 			'@babel/plugin-transform-runtime',
 			[
 				'react-native-platform-specific-extensions',
@@ -45,6 +53,9 @@ module.exports = function ( api ) {
 		env: {
 			development: {
 				plugins: [ '@babel/transform-react-jsx-source' ],
+			},
+			production: {
+				plugins: [ 'transform-remove-console' ],
 			},
 		},
 	};

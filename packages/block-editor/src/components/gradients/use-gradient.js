@@ -13,6 +13,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
+import useEditorFeature from '../use-editor-feature';
+import { store as blockEditorStore } from '../../store';
+
+const EMPTY_ARRAY = [];
 
 export function __experimentalGetGradientClass( gradientSlug ) {
 	if ( ! gradientSlug ) {
@@ -63,22 +67,20 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const { gradients, gradient, customGradient } = useSelect(
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const { gradient, customGradient } = useSelect(
 		( select ) => {
-			const { getBlockAttributes, getSettings } = select(
-				'core/block-editor'
-			);
-			const attributes = getBlockAttributes( clientId );
+			const { getBlockAttributes } = select( blockEditorStore );
+			const attributes = getBlockAttributes( clientId ) || {};
 			return {
-				gradient: attributes[ gradientAttribute ],
 				customGradient: attributes[ customGradientAttribute ],
-				gradients: getSettings().gradients,
+				gradient: attributes[ gradientAttribute ],
 			};
 		},
 		[ clientId, gradientAttribute, customGradientAttribute ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setGradient = useCallback(
 		( newGradientValue ) => {
 			const slug = getGradientSlugByValue( gradients, newGradientValue );

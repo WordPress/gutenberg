@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { render } from 'enzyme';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,12 +11,12 @@ import {
 /**
  * Internal dependencies
  */
-import EmbedEdit from '../edit';
 import {
 	findMoreSuitableBlock,
 	getClassNames,
 	createUpgradedEmbedBlock,
 	getEmbedInfoByProvider,
+	removeAspectRatioClasses,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
@@ -31,12 +26,6 @@ const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
 
-describe( 'core/embed', () => {
-	test( 'block edit matches snapshot', () => {
-		const wrapper = render( <EmbedEdit attributes={ {} } /> );
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
 describe( 'utils', () => {
 	beforeAll( () => {
 		registerBlockType( DEFAULT_EMBED_BLOCK, {
@@ -89,6 +78,33 @@ describe( 'utils', () => {
 					false
 				)
 			).toEqual( expected );
+		} );
+		it( 'should preserve existing classes and replace aspect ratio related classes with the current embed preview', () => {
+			const html = '<iframe height="3" width="4"></iframe>';
+			const expected =
+				'wp-block-embed wp-embed-aspect-4-3 wp-has-aspect-ratio';
+			expect(
+				getClassNames(
+					html,
+					'wp-block-embed wp-embed-aspect-16-9 wp-has-aspect-ratio',
+					true
+				)
+			).toEqual( expected );
+		} );
+	} );
+	describe( 'removeAspectRatioClasses', () => {
+		it( 'should preserve existing classes, if no aspect ratio classes exist', () => {
+			const existingClassNames = 'wp-block-embed is-type-video';
+			expect( removeAspectRatioClasses( existingClassNames ) ).toEqual(
+				existingClassNames
+			);
+		} );
+		it( 'should remove the aspect ratio classes', () => {
+			const existingClassNames =
+				'wp-block-embed is-type-video wp-embed-aspect-16-9 wp-has-aspect-ratio';
+			expect( removeAspectRatioClasses( existingClassNames ) ).toEqual(
+				'wp-block-embed is-type-video'
+			);
 		} );
 	} );
 	describe( 'createUpgradedEmbedBlock', () => {

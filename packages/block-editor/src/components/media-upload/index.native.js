@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import React from 'react';
-
-/**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
@@ -13,16 +9,24 @@ import {
 	requestMediaPicker,
 	mediaSources,
 } from '@wordpress/react-native-bridge';
-import { capturePhoto, captureVideo, image, wordpress } from '@wordpress/icons';
+import {
+	capturePhoto,
+	captureVideo,
+	image,
+	wordpress,
+	mobile,
+} from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_TYPE_AUDIO = 'audio';
+export const MEDIA_TYPE_ANY = 'any';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
-export class MediaUpload extends React.Component {
+export class MediaUpload extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
@@ -41,6 +45,7 @@ export class MediaUpload extends React.Component {
 				( option ) => {
 					return {
 						...option,
+						requiresModal: true,
 						types: allowedTypes,
 						id: option.value,
 					};
@@ -56,6 +61,7 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.deviceCamera, // ID is the value sent to native
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 			label: __( 'Take a Photo' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE ],
 			icon: capturePhoto,
 		};
@@ -64,6 +70,7 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.deviceCamera,
 			value: mediaSources.deviceCamera,
 			label: __( 'Take a Video' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_VIDEO ],
 			icon: captureVideo,
 		};
@@ -72,6 +79,7 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.deviceLibrary,
 			value: mediaSources.deviceLibrary,
 			label: __( 'Choose from device' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: image,
 		};
@@ -80,7 +88,13 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+			requiresModal: true,
+			types: [
+				MEDIA_TYPE_IMAGE,
+				MEDIA_TYPE_VIDEO,
+				MEDIA_TYPE_AUDIO,
+				MEDIA_TYPE_ANY,
+			],
 			icon: wordpress,
 			mediaLibrary: true,
 		};
@@ -118,17 +132,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getChooseFromDeviceIcon() {
-		const { allowedTypes = [] } = this.props;
-
-		const isOneType = allowedTypes.length === 1;
-		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
-		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
-
-		if ( isImage || ! isOneType ) {
-			return 'format-image';
-		} else if ( isVideo ) {
-			return 'format-video';
-		}
+		return mobile;
 	}
 
 	onPickerPresent() {
@@ -154,10 +158,13 @@ export class MediaUpload extends React.Component {
 	}
 
 	render() {
-		const { allowedTypes = [], isReplacingMedia } = this.props;
+		const { allowedTypes = [], isReplacingMedia, multiple } = this.props;
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAudio = isOneType && allowedTypes.includes( MEDIA_TYPE_AUDIO );
+		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
+
 		const isImageOrVideo =
 			allowedTypes.length === 2 &&
 			allowedTypes.includes( MEDIA_TYPE_IMAGE ) &&
@@ -168,7 +175,9 @@ export class MediaUpload extends React.Component {
 			if ( isReplacingMedia ) {
 				pickerTitle = __( 'Replace image' );
 			} else {
-				pickerTitle = __( 'Choose image' );
+				pickerTitle = multiple
+					? __( 'Choose images' )
+					: __( 'Choose image' );
 			}
 		} else if ( isVideo ) {
 			if ( isReplacingMedia ) {
@@ -181,6 +190,19 @@ export class MediaUpload extends React.Component {
 				pickerTitle = __( 'Replace image or video' );
 			} else {
 				pickerTitle = __( 'Choose image or video' );
+			}
+		} else if ( isAudio ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace audio' );
+			} else {
+				pickerTitle = __( 'Choose audio' );
+			}
+		} else if ( isAnyType ) {
+			pickerTitle = __( 'Choose file' );
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace file' );
+			} else {
+				pickerTitle = __( 'Choose file' );
 			}
 		}
 

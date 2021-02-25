@@ -3,8 +3,10 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.text.LineBreaker;
 import android.os.Build;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.util.Consumer;
 
@@ -39,11 +41,11 @@ import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.text.ReactFontManager;
 import com.facebook.react.views.text.ReactTextUpdate;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
-import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.Constants;
 import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
@@ -106,7 +108,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
         aztecText.setFocusableInTouchMode(false);
-        aztecText.setFocusable(false);
+        aztecText.setEnabled(true);
         aztecText.setCalypsoMode(false);
         aztecText.setPadding(0, 0, 0, 0);
         // This is a temporary hack that sets the correct GB link color and underline
@@ -369,13 +371,26 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.TEXT_ALIGN)
     public void setTextAlign(ReactAztecText view, @Nullable String textAlign) {
         if ("justify".equals(textAlign)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+            /*
+                JUSTIFICATION_MODE_XYZ constants were moved from Layout to LineBreaker in
+                SDK 29. The values of the constants haven't changed, but Lint is complaining that we
+                 can't use constants which were introduced in SDK 29 on older version. Separating
+                  the calls into two methods per SDK version annotated with RequiresApi was the
+                  only way how to make lint happy.
+             */
+            // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+            if (Build.VERSION.SDK_INT >= 29) {
+                setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setJustificationModeSDK26(view, Layout.JUSTIFICATION_MODE_INTER_WORD);
             }
             view.setGravity(Gravity.START);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(Layout.JUSTIFICATION_MODE_NONE);
+            // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+            if (Build.VERSION.SDK_INT >= 29) {
+                setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_NONE);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setJustificationModeSDK26(view, Layout.JUSTIFICATION_MODE_NONE);
             }
 
             if (textAlign == null || "auto".equals(textAlign)) {
@@ -390,6 +405,17 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 throw new JSApplicationIllegalArgumentException("Invalid textAlign: " + textAlign);
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setJustificationModeSDK26(ReactAztecText view, int justificationModeInterWord) {
+        view.setJustificationMode(justificationModeInterWord);
+    }
+
+    // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+    @RequiresApi(api = 29)
+    private void setJustificationModeSdk29(ReactAztecText view, int justificationModeInterWord) {
+        view.setJustificationMode(justificationModeInterWord);
     }
 
     private void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
@@ -651,7 +677,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
 
             if (mPreviousText.length() == 0
-                    && !TextUtils.isEmpty(newText)
+                    && !isTextEmpty(newText)
                     && !TextUtils.isEmpty(mEditText.getTagName())
                     && mEditText.getSelectedStyles().isEmpty()) {
 
@@ -663,6 +689,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                     mEditText.toggleFormatting(reactAztecTextFormat.getAztecTextFormat());
                 }
             }
+        }
+
+        // This accounts for the END_OF_BUFFER_MARKER that is added to blocks to maintain the styling, if the only char
+        // is the zero width marker then it is considered "empty"
+        private boolean isTextEmpty(String text) {
+            return text.length() == 0 || (text.length() == 1 && text.charAt(0) == Constants.INSTANCE.getEND_OF_BUFFER_MARKER());
         }
 
         @Override

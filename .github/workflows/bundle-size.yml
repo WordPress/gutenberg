@@ -12,7 +12,7 @@ jobs:
       with:
         fetch-depth: 1
 
-    - uses: preactjs/compressed-size-action@v1
+    - uses: preactjs/compressed-size-action@v2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         pattern: "{build/**/*.js,build/**/*.css}"

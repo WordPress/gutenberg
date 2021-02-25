@@ -9,6 +9,7 @@ import { select } from '@wordpress/data';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { getFormatType } from '../get-format-type';
+import { store as richTextStore } from '../store';
 
 describe( 'registerFormatType', () => {
 	beforeAll( () => {
@@ -17,7 +18,7 @@ describe( 'registerFormatType', () => {
 	} );
 
 	afterEach( () => {
-		select( 'core/rich-text' )
+		select( richTextStore )
 			.getFormatTypes()
 			.forEach( ( { name } ) => {
 				unregisterFormatType( name );

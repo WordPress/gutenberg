@@ -1,13 +1,14 @@
 /** @typedef {import('estree').Comment} Comment */
 /** @typedef {import('estree').Node} Node */
 
-module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
+/** @type {import('eslint').Rule.RuleModule} */
+module.exports = {
 	meta: {
 		type: 'layout',
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
 			url:
-				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
+				'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
 		schema: [],
 		fixable: 'code',
@@ -254,4 +255,4 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			},
 		};
 	},
-} );
+};

@@ -6,16 +6,17 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
+import { store as blockDirectoryStore } from '../../store';
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
-	const { installBlockType } = useDispatch( 'core/block-directory' );
-	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
+	const { installBlockType } = useDispatch( blockDirectoryStore );
 
 	if ( ! items.length ) {
 		return null;
@@ -33,12 +34,18 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 					<DownloadableBlockListItem
 						key={ item.id }
 						onClick={ () => {
-							installBlockType( item ).then( ( success ) => {
-								if ( success ) {
-									onSelect( item );
-									setIsInserterOpened( false );
-								}
-							} );
+							// Check if the block is registered (`getBlockType`
+							// will return an object). If so, insert the block.
+							// This prevents installing existing plugins.
+							if ( getBlockType( item.name ) ) {
+								onSelect( item );
+							} else {
+								installBlockType( item ).then( ( success ) => {
+									if ( success ) {
+										onSelect( item );
+									}
+								} );
+							}
 							onHover( null );
 						} }
 						item={ item }

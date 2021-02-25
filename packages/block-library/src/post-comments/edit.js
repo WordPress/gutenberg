@@ -11,15 +11,16 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 function PostCommentsDisplay( { postId } ) {
 	return useSelect(
 		( select ) => {
-			const comments = select( 'core' ).getEntityRecords(
+			const comments = select( coreStore ).getEntityRecords(
 				'root',
 				'comment',
 				{
@@ -49,10 +50,19 @@ export default function PostCommentsEdit( {
 } ) {
 	const { postType, postId } = context;
 	const { textAlign } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	if ( ! postType || ! postId ) {
 		return (
-			<Warning>{ __( 'Post comments block: no post found.' ) }</Warning>
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Post comments block: no post found.' ) }
+				</Warning>
+			</div>
 		);
 	}
 
@@ -67,13 +77,9 @@ export default function PostCommentsEdit( {
 				/>
 			</BlockControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockProps }>
 				<PostCommentsDisplay postId={ postId } />
-			</Block.div>
+			</div>
 		</>
 	);
 }

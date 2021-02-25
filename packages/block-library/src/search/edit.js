@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalBlock as Block,
+	useBlockProps,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -90,10 +90,10 @@ export default function SearchEdit( {
 			'button-only' === buttonPosition
 				? 'wp-block-search__button-only'
 				: undefined,
-			buttonUseIcon && 'no-button' !== buttonPosition
+			! buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__text-button'
 				: undefined,
-			! buttonUseIcon && 'no-button' !== buttonPosition
+			buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__icon-button'
 				: undefined
 		);
@@ -221,17 +221,6 @@ export default function SearchEdit( {
 								>
 									{ __( 'Button Inside' ) }
 								</MenuItem>
-								<MenuItem
-									icon={ buttonOnly }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-only',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Only' ) }
-								</MenuItem>
 							</MenuGroup>
 						) }
 					</DropdownMenu>
@@ -319,8 +308,12 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const blockProps = useBlockProps( {
+		className: getBlockClassNames(),
+	} );
+
 	return (
-		<Block.div className={ getBlockClassNames() }>
+		<div { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (
@@ -339,7 +332,6 @@ export default function SearchEdit( {
 					width: `${ width }${ widthUnit }`,
 				} }
 				className="wp-block-search__inside-wrapper"
-				isResetValueOnUnitChange
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
 				onResizeStart={ ( event, direction, elt ) => {
@@ -368,6 +360,6 @@ export default function SearchEdit( {
 				{ 'button-only' === buttonPosition && renderButton() }
 				{ 'no-button' === buttonPosition && renderTextField() }
 			</ResizableBox>
-		</Block.div>
+		</div>
 	);
 }

@@ -10,12 +10,18 @@ import {
 	preferences,
 	settings,
 	homeTemplateId,
-	templateId,
-	templatePartId,
-	templateType,
-	page,
+	editedPost,
+	navigationPanel,
+	blockInserterPanel,
 } from '../reducer';
 import { PREFERENCES_DEFAULTS } from '../defaults';
+
+import {
+	setNavigationPanelActiveMenu,
+	openNavigationPanelToMenu,
+	setIsNavigationPanelOpened,
+	setIsInserterOpened,
+} from '../actions';
 
 describe( 'state', () => {
 	describe( 'preferences()', () => {
@@ -78,108 +84,174 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'templateId()', () => {
+	describe( 'editedPost()', () => {
 		it( 'should apply default state', () => {
-			expect( templateId( undefined, {} ) ).toEqual( undefined );
+			expect( editedPost( undefined, {} ) ).toEqual( {} );
 		} );
 
 		it( 'should default to returning the same state', () => {
 			const state = {};
-			expect( templateId( state, {} ) ).toBe( state );
+			expect( editedPost( state, {} ) ).toBe( state );
 		} );
 
 		it( 'should update when a template is set', () => {
 			expect(
-				templateId( 1, {
-					type: 'SET_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
+				editedPost(
+					{ id: 1, type: 'wp_template' },
+					{
+						type: 'SET_TEMPLATE',
+						templateId: 2,
+					}
+				)
+			).toEqual( { id: 2, type: 'wp_template' } );
 		} );
 
 		it( 'should update when a page is set', () => {
 			expect(
-				templateId( 1, {
-					type: 'SET_PAGE',
-					templateId: 2,
-				} )
-			).toEqual( 2 );
-		} );
-	} );
-
-	describe( 'templatePartId()', () => {
-		it( 'should apply default state', () => {
-			expect( templatePartId( undefined, {} ) ).toEqual( undefined );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templatePartId( state, {} ) ).toBe( state );
+				editedPost(
+					{ id: 1, type: 'wp_template' },
+					{
+						type: 'SET_PAGE',
+						templateId: 2,
+						page: {},
+					}
+				)
+			).toEqual( { id: 2, type: 'wp_template', page: {} } );
 		} );
 
 		it( 'should update when a template part is set', () => {
 			expect(
-				templatePartId( 1, {
-					type: 'SET_TEMPLATE_PART',
-					templatePartId: 2,
-				} )
-			).toEqual( 2 );
+				editedPost(
+					{ id: 1, type: 'wp_template' },
+					{
+						type: 'SET_TEMPLATE_PART',
+						templatePartId: 2,
+					}
+				)
+			).toEqual( { id: 2, type: 'wp_template_part' } );
 		} );
 	} );
 
-	describe( 'templateType()', () => {
+	describe( 'navigationPanel()', () => {
 		it( 'should apply default state', () => {
-			expect( templateType( undefined, {} ) ).toEqual( 'wp_template' );
+			expect( navigationPanel( undefined, {} ) ).toEqual( {
+				menu: 'root',
+				isOpen: false,
+			} );
 		} );
 
 		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templateType( state, {} ) ).toBe( state );
+			const state = { test: 1 };
+			expect( navigationPanel( state, {} ) ).toBe( state );
 		} );
 
-		it( 'should update when a template is set', () => {
+		it( 'should set the active navigation panel', () => {
 			expect(
-				templateType( undefined, {
-					type: 'SET_TEMPLATE',
-				} )
-			).toEqual( 'wp_template' );
+				navigationPanel(
+					undefined,
+					setNavigationPanelActiveMenu( 'test-menu' )
+				)
+			).toEqual( {
+				isOpen: false,
+				menu: 'test-menu',
+			} );
 		} );
 
-		it( 'should update when a page is set', () => {
+		it( 'should be able to open the navigation panel to a menu', () => {
 			expect(
-				templateType( undefined, {
-					type: 'SET_PAGE',
-				} )
-			).toEqual( 'wp_template' );
+				navigationPanel(
+					undefined,
+					openNavigationPanelToMenu( 'test-menu' )
+				)
+			).toEqual( {
+				isOpen: true,
+				menu: 'test-menu',
+			} );
 		} );
 
-		it( 'should update when a template part is set', () => {
+		it( 'should be able to open the navigation panel', () => {
 			expect(
-				templateType( undefined, {
-					type: 'SET_TEMPLATE_PART',
-				} )
-			).toEqual( 'wp_template_part' );
+				navigationPanel( undefined, setIsNavigationPanelOpened( true ) )
+			).toEqual( {
+				isOpen: true,
+				menu: 'root',
+			} );
+		} );
+
+		it( 'should change the menu to root when closing the panel', () => {
+			const state = navigationPanel(
+				undefined,
+				openNavigationPanelToMenu( 'test-menu' )
+			);
+
+			expect( state.menu ).toEqual( 'test-menu' );
+			expect(
+				navigationPanel( state, setIsNavigationPanelOpened( false ) )
+			).toEqual( {
+				isOpen: false,
+				menu: 'root',
+			} );
+		} );
+
+		it( 'should close the navigation panel when opening the inserter and change the menu to root', () => {
+			const state = navigationPanel(
+				undefined,
+				openNavigationPanelToMenu( 'test-menu' )
+			);
+
+			expect( state.menu ).toEqual( 'test-menu' );
+			expect(
+				navigationPanel( state, setIsInserterOpened( true ) )
+			).toEqual( {
+				isOpen: false,
+				menu: 'root',
+			} );
+		} );
+
+		it( 'should not change the state when closing the inserter', () => {
+			const state = navigationPanel(
+				undefined,
+				openNavigationPanelToMenu( 'test-menu' )
+			);
+
+			expect( state.menu ).toEqual( 'test-menu' );
+			expect(
+				navigationPanel( state, setIsInserterOpened( false ) )
+			).toEqual( state );
 		} );
 	} );
 
-	describe( 'page()', () => {
+	describe( 'blockInserterPanel()', () => {
 		it( 'should apply default state', () => {
-			expect( page( undefined, {} ) ).toEqual( undefined );
+			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
 		} );
 
 		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( page( state, {} ) ).toBe( state );
+			expect( blockInserterPanel( true, {} ) ).toBe( true );
 		} );
 
-		it( 'should set the page', () => {
-			const newPage = {};
+		it( 'should set the open state of the inserter panel', () => {
 			expect(
-				page( undefined, {
-					type: 'SET_PAGE',
-					page: newPage,
-				} )
-			).toBe( newPage );
+				blockInserterPanel( false, setIsInserterOpened( true ) )
+			).toBe( true );
+			expect(
+				blockInserterPanel( true, setIsInserterOpened( false ) )
+			).toBe( false );
+		} );
+
+		it( 'should close the inserter when opening the nav panel', () => {
+			expect(
+				blockInserterPanel( true, openNavigationPanelToMenu( 'noop' ) )
+			).toBe( false );
+			expect(
+				blockInserterPanel( true, setIsNavigationPanelOpened( true ) )
+			).toBe( false );
+		} );
+
+		it( 'should not change the state when closing the nav panel', () => {
+			expect(
+				blockInserterPanel( true, setIsNavigationPanelOpened( false ) )
+			).toBe( true );
 		} );
 	} );
 } );

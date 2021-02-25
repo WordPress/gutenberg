@@ -92,6 +92,6 @@ add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 
 Reload the editor and open the sidebar:
 
-![Sidebar with style and controls](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/sidebar-style-and-controls.png)
+![Sidebar with style and controls](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/sidebar-style-and-controls.png)
 
 With the input control and the styling the sidebar looks nicer. This code doesn't let users to store or retrieve data just yet, so the next steps will focus on how to connect it to the meta block field.

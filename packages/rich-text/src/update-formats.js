@@ -4,17 +4,19 @@
 
 import { isFormatEqual } from './is-format-equal';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Efficiently updates all the formats from `start` (including) until `end`
  * (excluding) with the active formats. Mutates `value`.
  *
- * @param  {Object} $1         Named paramentes.
- * @param  {Object} $1.value   Value te update.
- * @param  {number} $1.start   Index to update from.
- * @param  {number} $1.end     Index to update until.
- * @param  {Array}  $1.formats Replacement formats.
+ * @param  {Object}        $1         Named paramentes.
+ * @param  {RichTextValue} $1.value   Value te update.
+ * @param  {number}        $1.start   Index to update from.
+ * @param  {number}        $1.end     Index to update until.
+ * @param  {Array}         $1.formats Replacement formats.
  *
- * @return {Object} Mutated value.
+ * @return {RichTextValue} Mutated value.
  */
 export function updateFormats( { value, start, end, formats } ) {
 	const formatsBefore = value.formats[ start - 1 ] || [];

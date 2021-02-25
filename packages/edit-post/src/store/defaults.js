@@ -10,6 +10,8 @@ export const PREFERENCES_DEFAULTS = {
 		welcomeGuide: true,
 		fullscreenMode: true,
 		showIconLabels: false,
+		themeStyles: true,
+		showBlockBreadcrumbs: true,
 	},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},

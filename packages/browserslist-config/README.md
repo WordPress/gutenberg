@@ -10,6 +10,8 @@ Install the module
 $ npm install browserslist @wordpress/browserslist-config --save-dev
 ```
 
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+
 ## Usage
 
 Add this to your `package.json` file:

@@ -1,33 +1,63 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, isObject } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
 
 const deprecatedFlags = {
+	'color.palette': ( settings ) =>
+		settings.colors === undefined ? undefined : settings.colors,
+	'color.gradients': ( settings ) =>
+		settings.gradients === undefined ? undefined : settings.gradients,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
 			: ! settings.disableCustomColors,
-	'gradient.custom': ( settings ) =>
+	'color.customGradient': ( settings ) =>
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
-	'fontSize.custom': ( settings ) =>
+	'typography.fontSizes': ( settings ) =>
+		settings.fontSizes === undefined ? undefined : settings.fontSizes,
+	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'lineHeight.custom': ( settings ) => settings.enableCustomLineHeight,
+	'typography.customLineHeight': ( settings ) =>
+		settings.enableCustomLineHeight,
+	'spacing.units': ( settings ) => {
+		if ( settings.enableCustomUnits === undefined ) {
+			return;
+		}
+
+		if ( settings.enableCustomUnits === true ) {
+			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+		}
+
+		return settings.enableCustomUnits;
+	},
+	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
+
+function blockAttributesMatch( blockAttributes, attributes ) {
+	for ( const attribute in attributes ) {
+		if ( attributes[ attribute ] !== blockAttributes[ attribute ] ) {
+			return false;
+		}
+	}
+	return true;
+}
 
 /**
  * Hook that retrieves the setting for the given editor feature.
@@ -43,12 +73,43 @@ const deprecatedFlags = {
  * ```
  */
 export default function useEditorFeature( featurePath ) {
-	const { name: blockName } = useBlockEditContext();
+	const { name: blockName, clientId } = useBlockEditContext();
 
 	const setting = useSelect(
 		( select ) => {
-			// 1 - Use deprecated settings, if available.
-			const settings = select( 'core/block-editor' ).getSettings();
+			const { getBlockAttributes, getSettings } = select(
+				blockEditorStore
+			);
+			const settings = getSettings();
+			const blockType = select( blocksStore ).getBlockType( blockName );
+
+			let context = blockName;
+			const selectors = get( blockType, [
+				'supports',
+				'__experimentalSelector',
+			] );
+			if ( isObject( selectors ) ) {
+				const blockAttributes = getBlockAttributes( clientId ) || {};
+				for ( const contextSelector in selectors ) {
+					const { attributes } = selectors[ contextSelector ];
+					if ( blockAttributesMatch( blockAttributes, attributes ) ) {
+						context = contextSelector;
+						break;
+					}
+				}
+			}
+
+			// 1 - Use __experimental features, if available.
+			// We cascade to the all value if the block one is not available.
+			const defaultsPath = `__experimentalFeatures.defaults.${ featurePath }`;
+			const blockPath = `__experimentalFeatures.${ context }.${ featurePath }`;
+			const experimentalFeaturesResult =
+				get( settings, blockPath ) ?? get( settings, defaultsPath );
+			if ( experimentalFeaturesResult !== undefined ) {
+				return experimentalFeaturesResult;
+			}
+
+			// 2 - Use deprecated settings, otherwise.
 			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
 				? deprecatedFlags[ featurePath ]( settings )
 				: undefined;
@@ -56,16 +117,13 @@ export default function useEditorFeature( featurePath ) {
 				return deprecatedSettingsValue;
 			}
 
-			// 2 - Use __experimental features otherwise.
-			// We cascade to the global value if the block one is not available.
-			//
-			// TODO: make it work for blocks that define multiple selectors
-			// such as core/heading or core/post-title.
-			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
-			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
-			return get( settings, blockPath ) ?? get( settings, globalPath );
+			// 3 - Fall back for typography.dropCap:
+			// This is only necessary to support typography.dropCap.
+			// when __experimentalFeatures are not present (core without plugin).
+			// To remove when __experimentalFeatures are ported to core.
+			return featurePath === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, featurePath ]
+		[ blockName, clientId, featurePath ]
 	);
 
 	return setting;

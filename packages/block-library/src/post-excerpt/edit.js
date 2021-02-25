@@ -14,7 +14,7 @@ import {
 	InspectorControls,
 	RichText,
 	Warning,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -57,6 +57,11 @@ function PostExcerptEditor( {
 		postId,
 		postType
 	);
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -92,32 +97,26 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockProps }>
 				<RichText
 					className={
 						! showMoreOnNewLine &&
 						'wp-block-post-excerpt__excerpt is-inline'
 					}
-					placeholder={ postContentExcerpt }
+					aria-label={ __( 'Post excerpt text' ) }
 					value={
 						excerpt ||
-						( isSelected
-							? ''
-							: postContentExcerpt ||
-							  __( 'No post excerpt found' ) )
+						postContentExcerpt ||
+						( isSelected ? '' : __( 'No post excerpt found' ) )
 					}
 					onChange={ setExcerpt }
-					keepPlaceholderOnFocus
 				/>
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
 						<RichText
 							tagName="a"
+							aria-label={ __( 'Read more link text' ) }
 							placeholder={ __( 'Read more…' ) }
 							value={ moreText }
 							onChange={ ( newMoreText ) =>
@@ -128,6 +127,7 @@ function PostExcerptEditor( {
 				) : (
 					<RichText
 						tagName="a"
+						aria-label={ __( 'Read more link text' ) }
 						placeholder={ __( 'Read more…' ) }
 						value={ moreText }
 						onChange={ ( newMoreText ) =>
@@ -135,7 +135,7 @@ function PostExcerptEditor( {
 						}
 					/>
 				) }
-			</Block.div>
+			</div>
 		</>
 	);
 }

@@ -1,13 +1,47 @@
 {
+	"apiVersion": 2,
 	"name": "core/social-links",
 	"category": "widgets",
+	"attributes": {
+		"iconColor": {
+			"type": "string"
+		},
+		"customIconColor": {
+			"type": "string"
+		},
+		"iconColorValue": {
+			"type": "string"
+		},
+		"iconBackgroundColor": {
+			"type": "string"
+		},
+		"customIconBackgroundColor": {
+			"type": "string"
+		},
+		"iconBackgroundColorValue": {
+			"type": "string"
+		},
+		"openInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"size": {
+			"type": "string"
+		}
+	},
+	"providesContext": {
+		"openInNewTab": "openInNewTab",
+		"iconColorValue": "iconColorValue",
+		"iconBackgroundColorValue": "iconBackgroundColorValue"
+	},
 	"supports": {
 		"align": [
 			"left",
 			"center",
 			"right"
 		],
-		"lightBlockWrapper": true,
 		"anchor": true
-	}
+	},
+	"editorStyle": "wp-block-social-links-editor",
+	"style": "wp-block-social-links"
 }

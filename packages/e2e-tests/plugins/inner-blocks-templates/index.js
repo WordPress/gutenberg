@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var createBlock = wp.blocks.createBlock;
 	var el = wp.element.createElement;
@@ -24,7 +24,24 @@
 		],
 	];
 
-	var save = function() {
+	var TEMPLATE_TWO_PARAGRAPHS = [
+		[
+			'core/paragraph',
+			{
+				fontSize: 'large',
+				content: 'One',
+			},
+		],
+		[
+			'core/paragraph',
+			{
+				fontSize: 'large',
+				content: 'Two',
+			},
+		],
+	];
+
+	var save = function () {
 		return el( InnerBlocks.Content );
 	};
 
@@ -33,7 +50,7 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			return el( InnerBlocks, {
 				template: TEMPLATE,
 			} );
@@ -47,7 +64,7 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			return el( InnerBlocks, {
 				template: TEMPLATE,
 				templateLock: 'all',
@@ -57,14 +74,50 @@
 		save,
 	} );
 
+	registerBlockType( 'test/test-inner-blocks-update-locked-template', {
+		title: 'Test Inner Blocks update locked template',
+		icon: 'cart',
+		category: 'text',
+
+		attributes: {
+			hasUpdatedTemplate: {
+				type: 'boolean',
+				default: false,
+			},
+		},
+
+		edit: function ( props ) {
+			const hasUpdatedTemplated = props.attributes.hasUpdatedTemplate;
+			return el(
+				'div',
+				null,
+				[
+					el( 'button', {
+						onClick: function () {
+							props.setAttributes( { hasUpdatedTemplate: true } )
+						},
+					}, 'Update template' ),
+					el( InnerBlocks, {
+						template: hasUpdatedTemplated ? TEMPLATE_TWO_PARAGRAPHS : TEMPLATE,
+						templateLock: 'all',
+					} ),
+				]
+			);
+		},
+
+		save,
+	} );
+
+
 	registerBlockType( 'test/test-inner-blocks-paragraph-placeholder', {
 		title: 'Test Inner Blocks Paragraph Placeholder',
 		icon: 'cart',
 		category: 'text',
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			return el( InnerBlocks, {
 				template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
+				templateInsertUpdatesSelection: true,
 			} );
 		},
 
@@ -86,7 +139,7 @@
 						'test/test-inner-blocks-locking-all',
 						'test/test-inner-blocks-paragraph-placeholder',
 					],
-					transform: function( attributes, innerBlocks ) {
+					transform: function ( attributes, innerBlocks ) {
 						return createBlock(
 							'test/test-inner-blocks-transformer-target',
 							attributes,
@@ -99,7 +152,7 @@
 				{
 					type: 'block',
 					blocks: [ 'test/i-dont-exist' ],
-					transform: function( attributes, innerBlocks ) {
+					transform: function ( attributes, innerBlocks ) {
 						return createBlock(
 							'test/test-inner-blocks-transformer-target',
 							attributes,
@@ -110,7 +163,7 @@
 			],
 		},
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			return el( InnerBlocks, {
 				template: TEMPLATE,
 			} );

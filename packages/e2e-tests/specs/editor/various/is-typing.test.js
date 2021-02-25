@@ -25,8 +25,7 @@ describe( 'isTyping', () => {
 		expect( blockToolbar ).toBe( null );
 
 		// Moving the mouse shows the toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 
 		// Toolbar is visible
 		blockToolbar = await page.$( blockToolbarSelector );

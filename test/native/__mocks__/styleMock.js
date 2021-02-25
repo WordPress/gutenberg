@@ -93,4 +93,17 @@ module.exports = {
 	defaultBlock: {
 		marginTop: 16,
 	},
+	scrollableContent: {
+		paddingBottom: 20,
+	},
+	buttonText: {
+		color: 'white',
+	},
+	placeholderTextColor: {
+		color: 'white',
+	},
+	defaultButton: {
+		paddingLeft: 10,
+		paddingRight: 10,
+	},
 };

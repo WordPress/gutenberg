@@ -14,7 +14,8 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/options';
+import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
+import { store as editPostStore } from '../../../store';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
@@ -61,7 +62,6 @@ const PluginDocumentSettingFill = ( {
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var el = wp.element.createElement;
@@ -86,7 +86,6 @@ const PluginDocumentSettingFill = ( {
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { registerPlugin } from '@wordpress/plugins';
@@ -115,15 +114,15 @@ const PluginDocumentSettingPanel = compose(
 	} ),
 	withSelect( ( select, { panelName } ) => {
 		return {
-			opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
-			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+			opened: select( editPostStore ).isEditorPanelOpened( panelName ),
+			isEnabled: select( editPostStore ).isEditorPanelEnabled(
 				panelName
 			),
 		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onToggle() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+			return dispatch( editPostStore ).toggleEditorPanelOpened(
 				panelName
 			);
 		},

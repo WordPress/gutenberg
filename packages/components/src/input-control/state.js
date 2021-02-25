@@ -131,10 +131,8 @@ function inputControlStateReducer( composedStateReducers ) {
 				break;
 
 			case actionTypes.UPDATE:
-				if ( payload.value !== state.value ) {
-					nextState.value = payload.value;
-					nextState.isDirty = false;
-				}
+				nextState.value = payload.value;
+				nextState.isDirty = false;
 				break;
 
 			/**
@@ -218,7 +216,7 @@ export function useInputControlStateReducer(
 	 * Actions for the reducer
 	 */
 	const change = createChangeEvent( actionTypes.CHANGE );
-	const inValidate = createChangeEvent( actionTypes.INVALIDATE );
+	const invalidate = createChangeEvent( actionTypes.INVALIDATE );
 	const reset = createChangeEvent( actionTypes.RESET );
 	const commit = createChangeEvent( actionTypes.COMMIT );
 	const update = createChangeEvent( actionTypes.UPDATE );
@@ -238,7 +236,7 @@ export function useInputControlStateReducer(
 		drag,
 		dragEnd,
 		dragStart,
-		inValidate,
+		invalidate,
 		pressDown,
 		pressEnter,
 		pressUp,

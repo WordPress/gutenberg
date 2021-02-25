@@ -11,12 +11,14 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalBlock as Block,
+	useBlockProps,
 	__experimentalBlockVariationPicker as BlockVariationPicker,
 } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -39,7 +41,7 @@ export default function PostHierarchicalTermsEdit( {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),
@@ -53,7 +55,7 @@ export default function PostHierarchicalTermsEdit( {
 	const selectedTerm = useSelect(
 		( select ) => {
 			if ( ! term ) return {};
-			const taxonomies = select( 'core' ).getTaxonomies( {
+			const taxonomies = select( coreStore ).getTaxonomies( {
 				per_page: -1,
 			} );
 			return (
@@ -81,20 +83,25 @@ export default function PostHierarchicalTermsEdit( {
 	const hasPost = postId && postType;
 	const hasHierarchicalTermLinks =
 		hierarchicalTermLinks && hierarchicalTermLinks.length > 0;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	if ( ! hasPost ) {
 		return (
-			<Block.div>
+			<div { ...blockProps }>
 				<Warning>
 					{ __( 'Post Hierarchical Terms block: post not found.' ) }
 				</Warning>
-			</Block.div>
+			</div>
 		);
 	}
 
 	if ( ! term ) {
 		return (
-			<Block.div>
+			<div { ...blockProps }>
 				<BlockVariationPicker
 					icon={ blockType?.icon?.src }
 					label={ blockType?.title }
@@ -103,7 +110,7 @@ export default function PostHierarchicalTermsEdit( {
 					} }
 					variations={ variations }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
@@ -117,11 +124,7 @@ export default function PostHierarchicalTermsEdit( {
 					} }
 				/>
 			</BlockControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockProps }>
 				{ isLoadingHierarchicalTermLinks && <Spinner /> }
 
 				{ hasHierarchicalTermLinks &&
@@ -137,7 +140,7 @@ export default function PostHierarchicalTermsEdit( {
 					// eslint-disable-next-line camelcase
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-			</Block.div>
+			</div>
 		</>
 	);
 }

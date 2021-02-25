@@ -29,16 +29,16 @@ export default function BoxUnitControl( {
 	} );
 
 	return (
-		<UnitControlWrapper aria-label={ label } { ...bindHoverGesture() }>
+		<UnitControlWrapper { ...bindHoverGesture() }>
 			<Tooltip text={ label }>
 				<UnitControl
+					aria-label={ label }
 					className="component-box-control__unit-control"
 					hideHTMLArrows
 					isFirst={ isFirst }
 					isLast={ isLast }
 					isOnly={ isOnly }
 					isPressEnterToChange
-					isFloatingLabel
 					isResetValueOnUnitChange={ false }
 					value={ value }
 					{ ...props }

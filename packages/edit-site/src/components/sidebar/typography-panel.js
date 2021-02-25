@@ -2,60 +2,106 @@
  * WordPress dependencies
  */
 import {
-	FontSizePicker,
-	__experimentalLineHeightControl as LineHeightControl,
+	LineHeightControl,
+	__experimentalFontFamilyControl as FontFamilyControl,
+	__experimentalFontAppearanceControl as FontAppearanceControl,
 } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { FONT_SIZE, LINE_HEIGHT, fromPx, toPx } from '../editor/utils';
+import { useEditorFeature } from '../editor/utils';
 
-export default ( {
+export function useHasTypographyPanel( { supports, name } ) {
+	const hasLineHeight = useHasLineHeightControl( { supports, name } );
+	const hasFontAppearence = useHasAppearenceControl( { supports, name } );
+	return (
+		hasLineHeight || hasFontAppearence || supports.includes( 'fontSize' )
+	);
+}
+
+function useHasLineHeightControl( { supports, name } ) {
+	return (
+		useEditorFeature( 'typography.customLineHeight', name ) &&
+		supports.includes( 'lineHeight' )
+	);
+}
+
+function useHasAppearenceControl( { supports, name } ) {
+	const hasFontStyles =
+		useEditorFeature( 'typography.customFontStyle', name ) &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useEditorFeature( 'typography.customFontWeight', name ) &&
+		supports.includes( 'fontWeight' );
+	return hasFontStyles || hasFontWeights;
+}
+
+export default function TypographyPanel( {
 	context: { supports, name },
-	getProperty,
-	setProperty,
-} ) => {
-	if (
-		! supports.includes( FONT_SIZE ) &&
-		! supports.includes( LINE_HEIGHT )
-	) {
-		return null;
-	}
+	getStyle,
+	setStyle,
+} ) {
+	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
+	const disableCustomFontSizes = ! useEditorFeature(
+		'typography.customFontSize',
+		name
+	);
+	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const hasFontStyles =
+		useEditorFeature( 'typography.customFontStyle', name ) &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useEditorFeature( 'typography.customFontWeight', name ) &&
+		supports.includes( 'fontWeight' );
+	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
+	const hasAppearenceControl = useHasAppearenceControl( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
-			{ supports.includes( FONT_SIZE ) && (
-				<FontSizePicker
-					value={ fromPx(
-						getProperty( name, [ 'typography', 'fontSize' ] )
-					) }
+			{ supports.includes( 'fontFamily' ) && (
+				<FontFamilyControl
+					fontFamilies={ fontFamilies }
+					value={ getStyle( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
-						setProperty(
-							name,
-							[ 'typography', 'fontSize' ],
-							toPx( value )
-						)
+						setStyle( name, 'fontFamily', value )
 					}
 				/>
 			) }
-			{ supports.includes( LINE_HEIGHT ) && (
-				<LineHeightControl
-					value={ getProperty( name, [
-						'typography',
-						'lineHeight',
-					] ) }
+			{ supports.includes( 'fontSize' ) && (
+				<FontSizePicker
+					value={ getStyle( name, 'fontSize' ) }
 					onChange={ ( value ) =>
-						setProperty(
-							name,
-							[ 'typography', 'lineHeight' ],
-							value
-						)
+						setStyle( name, 'fontSize', value )
 					}
+					fontSizes={ fontSizes }
+					disableCustomFontSizes={ disableCustomFontSizes }
+				/>
+			) }
+			{ hasLineHeightEnabled && (
+				<LineHeightControl
+					value={ getStyle( name, 'lineHeight' ) }
+					onChange={ ( value ) =>
+						setStyle( name, 'lineHeight', value )
+					}
+				/>
+			) }
+			{ hasAppearenceControl && (
+				<FontAppearanceControl
+					value={ {
+						fontStyle: getStyle( name, 'fontStyle' ),
+						fontWeight: getStyle( name, 'fontWeight' ),
+					} }
+					onChange={ ( { fontStyle, fontWeight } ) => {
+						setStyle( name, 'fontStyle', fontStyle );
+						setStyle( name, 'fontWeight', fontWeight );
+					} }
+					hasFontStyles={ hasFontStyles }
+					hasFontWeights={ hasFontWeights }
 				/>
 			) }
 		</PanelBody>
 	);
-};
+}

@@ -9,8 +9,9 @@ import { map, filter } from 'lodash';
 import { PanelBody, ToggleControl, SelectControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { store as coreStore } from '@wordpress/core-data';
 
 function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 	const { taxonomy, showTagCounts } = attributes;
@@ -59,17 +60,19 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 	return (
 		<>
 			{ inspectorControls }
-			<ServerSideRender
-				key="tag-cloud"
-				block="core/tag-cloud"
-				attributes={ attributes }
-			/>
+			<div { ...useBlockProps() }>
+				<ServerSideRender
+					key="tag-cloud"
+					block="core/tag-cloud"
+					attributes={ attributes }
+				/>
+			</div>
 		</>
 	);
 }
 
 export default withSelect( ( select ) => {
 	return {
-		taxonomies: select( 'core' ).getTaxonomies(),
+		taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
 	};
 } )( TagCloudEdit );

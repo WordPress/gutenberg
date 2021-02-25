@@ -11,14 +11,8 @@ const { sprintf } = require( 'sprintf-js' );
  * Internal dependencies
  */
 const { log, formats } = require( '../lib/logger' );
-const {
-	askForConfirmation,
-	runStep,
-	readJSONFile,
-	runShellScript,
-} = require( '../lib/utils' );
+const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const git = require( '../lib/git' );
-const svn = require( '../lib/svn' );
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
 	getIssuesByMilestone,
@@ -31,59 +25,22 @@ const {
 	findReleaseBranchName,
 } = require( './common' );
 
-const STABLE_TAG_REGEX = /Stable tag: [0-9]+\.[0-9]+\.[0-9]+\s*\n/;
-const STABLE_TAG_PLACEHOLDER = 'Stable tag: V.V.V\n';
-
-/**
- * Fetching the SVN repository to the working directory.
- *
- * @param {string} abortMessage Abort message.
- *
- * @return {Promise<string>} Repository local path.
- */
-async function runSvnRepositoryCheckoutStep( abortMessage ) {
-	// Cloning the repository
-	let svnWorkingDirectoryPath;
-	await runStep( 'Fetching the SVN repository', abortMessage, async () => {
-		log( '>> Fetching the SVN repository' );
-		svnWorkingDirectoryPath = svn.checkout( config.svnRepositoryURL );
-		log(
-			'>> The SVN repository has been successfully fetched in the following temporary folder: ' +
-				formats.success( svnWorkingDirectoryPath )
-		);
-	} );
-
-	return svnWorkingDirectoryPath;
-}
-
 /**
  * Creates a new release branch based on the last package.json version
- * and chooses the next RC version number.
+ * and chooses the next version number.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage            Abort Message.
- *
- * @return {Promise<Object>} chosen version and versionLabels.
+ * @param {string} version the new version.
+ * @param {string} releaseBranch The release branch to push to.
  */
 async function runReleaseBranchCreationStep(
 	gitWorkingDirectoryPath,
-	abortMessage
+	abortMessage,
+	version,
+	releaseBranch
 ) {
-	let version, releaseBranch, versionLabel;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
-		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-		const packageJson = readJSONFile( packageJsonPath );
-		const nextMajor = getNextMajorVersion( packageJson.version );
-		const parsedMajorVersion = semver.parse( nextMajor );
-
-		version = nextMajor + '-rc.1';
-		releaseBranch =
-			'release/' +
-			parsedMajorVersion.major +
-			'.' +
-			parsedMajorVersion.minor;
-		versionLabel = nextMajor + ' RC1';
-
 		await askForConfirmation(
 			'The Plugin version to be used is ' +
 				formats.success( version ) +
@@ -92,74 +49,45 @@ async function runReleaseBranchCreationStep(
 			abortMessage
 		);
 
-		// Creating the release branch
+		// Creates the release branch
 		await git.createLocalBranch( gitWorkingDirectoryPath, releaseBranch );
+
 		log(
 			'>> The local release branch ' +
 				formats.success( releaseBranch ) +
 				' has been successfully created.'
 		);
 	} );
-
-	return {
-		version,
-		versionLabel,
-		releaseBranch,
-	};
 }
 
 /**
- * Checkouts out the release branch and chooses a stable version number.
+ * Checkouts out the release branch.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage Abort Message.
- *
- * @return {Promise<Object>} chosen version and versionLabels.
+ * @param {string} version The new version.
+ * @param {string} releaseBranch The release branch to checkout.
  */
 async function runReleaseBranchCheckoutStep(
 	gitWorkingDirectoryPath,
-	abortMessage
+	abortMessage,
+	version,
+	releaseBranch
 ) {
-	let releaseBranch, version;
 	await runStep(
 		'Getting into the release branch',
 		abortMessage,
 		async () => {
-			const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-			releaseBranch = findReleaseBranchName( packageJsonPath );
 			await git.checkoutRemoteBranch(
 				gitWorkingDirectoryPath,
 				releaseBranch
 			);
+
 			log(
 				'>> The local release branch ' +
 					formats.success( releaseBranch ) +
 					' has been successfully checked out.'
 			);
-
-			const releaseBranchPackageJson = readJSONFile( packageJsonPath );
-			const releaseBranchParsedVersion = semver.parse(
-				releaseBranchPackageJson.version
-			);
-
-			if (
-				releaseBranchParsedVersion.prerelease &&
-				releaseBranchParsedVersion.prerelease.length
-			) {
-				version =
-					releaseBranchParsedVersion.major +
-					'.' +
-					releaseBranchParsedVersion.minor +
-					'.' +
-					releaseBranchParsedVersion.patch;
-			} else {
-				version =
-					releaseBranchParsedVersion.major +
-					'.' +
-					releaseBranchParsedVersion.minor +
-					'.' +
-					( releaseBranchParsedVersion.patch + 1 );
-			}
 
 			await askForConfirmation(
 				'The Version to release is ' +
@@ -170,12 +98,6 @@ async function runReleaseBranchCheckoutStep(
 			);
 		}
 	);
-
-	return {
-		version,
-		versionLabel: version,
-		releaseBranch,
-	};
 }
 
 /**
@@ -237,7 +159,7 @@ async function runBumpPluginVersionUpdateChangelogAndCommitStep(
 				readmeFileContent.indexOf( '== Changelog ==' )
 			) +
 			'== Changelog ==\n\n' +
-			`To read the changelog for ${ config.name } ${ version }, please navigate to the <a href="${ config.wpRepositoryReleasesURL }v${ version }">release page</a>.` +
+			`To read the changelog for ${ config.name } ${ version }, please navigate to the <a href="${ config.wpRepositoryReleasesURL }tag/v${ version }">release page</a>.` +
 			'\n';
 		fs.writeFileSync( readmePath, newReadmeContent );
 
@@ -293,35 +215,6 @@ async function runBumpPluginVersionUpdateChangelogAndCommitStep(
 }
 
 /**
- * Run the Plugin ZIP Creation step.
- *
- * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
- * @param {string} abortMessage            Abort message.
- *
- * @return {Promise<string>} Plugin ZIP Path
- */
-async function runPluginZIPCreationStep(
-	gitWorkingDirectoryPath,
-	abortMessage
-) {
-	const zipPath = gitWorkingDirectoryPath + '/' + config.slug + '.zip';
-	await runStep( 'Plugin ZIP creation', abortMessage, async () => {
-		await askForConfirmation(
-			'Proceed and build the plugin ZIP? (It takes a few minutes)',
-			true,
-			abortMessage
-		);
-		runShellScript( config.buildZipCommand, gitWorkingDirectoryPath );
-		log(
-			'>> The plugin ZIP has been built successfully. Path: ' +
-				formats.success( zipPath )
-		);
-	} );
-
-	return zipPath;
-}
-
-/**
  * Create a local Git Tag.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
@@ -371,10 +264,12 @@ async function runPushGitChangesStep(
 				true,
 				abortMessage
 			);
+
 			await git.pushBranchToOrigin(
 				gitWorkingDirectoryPath,
 				releaseBranch
 			);
+
 			await git.pushTagsToOrigin( gitWorkingDirectoryPath );
 		}
 	);
@@ -412,220 +307,6 @@ async function runCherrypickBumpCommitIntoMasterStep(
 				'master'
 			);
 			await git.pushBranchToOrigin( gitWorkingDirectoryPath, 'master' );
-		}
-	);
-}
-
-/**
- * Creates the github release and uploads the ZIP file into it.
- *
- * @param {string}  zipPath       Plugin zip path.
- * @param {string}  version       Released version.
- * @param {string}  versionLabel  Label of the released Version.
- * @param {string}  changelog     Release changelog.
- * @param {boolean} isPrerelease  is a pre-release.
- * @param {string}  abortMessage  Abort message.
- *
- * @return {Promise<Object>} Github release object.
- */
-async function runGithubReleaseStep(
-	zipPath,
-	version,
-	versionLabel,
-	changelog,
-	isPrerelease,
-	abortMessage
-) {
-	let octokit;
-	let release;
-	await runStep( 'Creating the GitHub release', abortMessage, async () => {
-		await askForConfirmation(
-			'Proceed with the creation of the GitHub release?',
-			true,
-			abortMessage
-		);
-
-		const { token } = await inquirer.prompt( [
-			{
-				type: 'input',
-				name: 'token',
-				message:
-					'Please enter a GitHub personal authentication token.\n' +
-					'You can create one by navigating to ' +
-					formats.success(
-						'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages'
-					) +
-					'.\nToken:',
-			},
-		] );
-
-		octokit = new Octokit( {
-			auth: token,
-		} );
-
-		const releaseData = await octokit.repos.createRelease( {
-			owner: config.githubRepositoryOwner,
-			repo: config.githubRepositoryName,
-			tag_name: 'v' + version,
-			name: versionLabel,
-			body: changelog,
-			prerelease: isPrerelease,
-		} );
-		release = releaseData.data;
-
-		log( '>> The GitHub release has been created.' );
-	} );
-	abortMessage =
-		abortMessage + ' Make sure to remove the the GitHub release as well.';
-
-	// Uploading the Zip to the Github release
-	await runStep( 'Uploading the plugin ZIP', abortMessage, async () => {
-		const filestats = fs.statSync( zipPath );
-		await octokit.repos.uploadReleaseAsset( {
-			url: release.upload_url,
-			headers: {
-				'content-length': filestats.size,
-				'content-type': 'application/zip',
-			},
-			name: config.slug + '.zip',
-			file: fs.createReadStream( zipPath ),
-		} );
-		log( '>> The plugin ZIP has been successfully uploaded.' );
-	} );
-
-	log(
-		'>> The GitHub release is available here: ' +
-			formats.success( release.html_url )
-	);
-
-	return release;
-}
-
-/**
- * Updates and commits the content of the SVN repo using the new plugin ZIP.
- *
- * @param {string} svnWorkingDirectoryPath SVN Working Directory Path.
- * @param {string} zipPath                 Plugin zip path.
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
- */
-async function runUpdateTrunkContentStep(
-	svnWorkingDirectoryPath,
-	zipPath,
-	version,
-	abortMessage
-) {
-	// Updating the content of the svn
-	await runStep( 'Updating trunk content', abortMessage, async () => {
-		log( '>> Replacing trunk content using the new plugin ZIP' );
-
-		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
-
-		const previousReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-		const stableTag = previousReadmeFileContent.match(
-			STABLE_TAG_REGEX
-		)[ 0 ];
-
-		// Delete everything
-		runShellScript(
-			'find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +',
-			svnWorkingDirectoryPath
-		);
-
-		// Update the content using the plugin ZIP
-		runShellScript( 'unzip ' + zipPath + ' -d ' + svnWorkingDirectoryPath );
-
-		// Replace the stable tag placeholder with the existing stable tag on the SVN repository.
-		const newReadmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-		fs.writeFileSync(
-			readmePath,
-			newReadmeFileContent.replace( STABLE_TAG_PLACEHOLDER, stableTag )
-		);
-
-		// Commit the content changes
-		runShellScript(
-			"svn st | grep '^?' | awk '{print $2}' | xargs svn add",
-			svnWorkingDirectoryPath
-		);
-		runShellScript(
-			"svn st | grep '^!' | awk '{print $2}' | xargs svn rm",
-			svnWorkingDirectoryPath
-		);
-		await askForConfirmation(
-			'Trunk content has been updated, please check the SVN diff. Commit the changes?',
-			true,
-			abortMessage
-		);
-
-		svn.commit( svnWorkingDirectoryPath, 'Committing version ' + version );
-		log( '>> Trunk has been successfully updated' );
-	} );
-}
-
-/**
- * Creates a new SVN Tag
- *
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
- */
-async function runSvnTagStep( version, abortMessage ) {
-	await runStep( 'Creating the SVN Tag', abortMessage, async () => {
-		await askForConfirmation(
-			'Proceed with the creation of the SVN Tag?',
-			true,
-			abortMessage
-		);
-		svn.tagTrunk(
-			config.svnRepositoryURL,
-			version,
-			'Tagging version ' + version
-		);
-		log(
-			'>> The SVN ' +
-				formats.success( version ) +
-				' tag has been successfully created'
-		);
-	} );
-}
-
-/**
- * Updates the stable version of the plugin in the SVN repository.
- *
- * @param {string} svnWorkingDirectoryPath SVN working directory.
- * @param {string} version                 Version.
- * @param {string} abortMessage            Abort Message.
- */
-async function updateThePluginStableVersion(
-	svnWorkingDirectoryPath,
-	version,
-	abortMessage
-) {
-	// Updating the content of the svn
-	await runStep(
-		"Updating the plugin's stable version",
-		abortMessage,
-		async () => {
-			const readmePath = svnWorkingDirectoryPath + '/readme.txt';
-			const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
-			const newReadmeContent = readmeFileContent.replace(
-				STABLE_TAG_REGEX,
-				'Stable tag: ' + version + '\n'
-			);
-			fs.writeFileSync( readmePath, newReadmeContent );
-
-			// Commit the content changes
-			await askForConfirmation(
-				'The stable version is updated in the readme.txt file. Commit the changes?',
-				true,
-				abortMessage
-			);
-
-			svn.commit(
-				svnWorkingDirectoryPath,
-				'Releasing version ' + version
-			);
-
-			log( '>> Stable version updated successfully' );
 		}
 	);
 }
@@ -679,11 +360,13 @@ async function isMilestoneClear( version ) {
  *
  * @param {boolean} isRC Whether it's an RC release or not.
  *
- * @return {Promise<Object>} Github release object.
+ * @return {string} The new version.
  */
 async function releasePlugin( isRC = true ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
+	let version, releaseBranch;
+
 	const temporaryFolders = [];
 
 	await askForConfirmation( 'Ready to go? ' );
@@ -700,16 +383,55 @@ async function releasePlugin( isRC = true ) {
 	const gitWorkingDirectory = await runGitRepositoryCloneStep( abortMessage );
 	temporaryFolders.push( gitWorkingDirectory );
 
-	// Creating the release branch
-	const { version, versionLabel, releaseBranch } = isRC
-		? await runReleaseBranchCreationStep(
+	const packageJsonPath = gitWorkingDirectory + '/package.json';
+	const packageJson = readJSONFile( packageJsonPath );
+	const packageVersion = packageJson.version;
+	const parsedPackagedVersion = semver.parse( packageJson.version );
+	const isPackageVersionRC = parsedPackagedVersion.prerelease.length > 0;
+
+	// Are we going to release an RC?
+	if ( isRC ) {
+		// We are releasing an RC.
+		// If packageVersion is stable, then generate new branch and RC1.
+		// If packageVersion is RC, then checkout branch and inc RC.
+		if ( ! isPackageVersionRC ) {
+			version = getNextMajorVersion( packageVersion ) + '-rc.1';
+			const parsedVersion = semver.parse( version );
+
+			releaseBranch =
+				'release/' + parsedVersion.major + '.' + parsedVersion.minor;
+
+			await runReleaseBranchCreationStep(
 				gitWorkingDirectory,
-				abortMessage
-		  )
-		: await runReleaseBranchCheckoutStep(
+				abortMessage,
+				version,
+				releaseBranch
+			);
+		} else {
+			version = semver.inc( packageVersion, 'prerelease', 'rc' );
+			releaseBranch = findReleaseBranchName( packageJsonPath );
+
+			await runReleaseBranchCheckoutStep(
 				gitWorkingDirectory,
-				abortMessage
-		  );
+				abortMessage,
+				version,
+				releaseBranch
+			);
+		}
+	} else {
+		// We are releasing a stable version.
+		// If packageVersion is stable, then checkout the branch and inc patch.
+		// If packageVersion is RC, then checkout the branch and inc patch, effectively removing the RC.
+		version = semver.inc( packageVersion, 'patch' );
+		releaseBranch = findReleaseBranchName( packageJsonPath );
+
+		await runReleaseBranchCheckoutStep(
+			gitWorkingDirectory,
+			abortMessage,
+			version,
+			findReleaseBranchName( packageJsonPath )
+		);
+	}
 
 	if ( ! ( await isMilestoneClear( version ) ) ) {
 		await askForConfirmation(
@@ -727,12 +449,6 @@ async function releasePlugin( isRC = true ) {
 		abortMessage
 	);
 
-	// Plugin ZIP creation
-	const zipPath = await runPluginZIPCreationStep(
-		gitWorkingDirectory,
-		abortMessage
-	);
-
 	// Creating the git tag
 	await runCreateGitTagStep( gitWorkingDirectory, version, abortMessage );
 
@@ -744,28 +460,9 @@ async function releasePlugin( isRC = true ) {
 	);
 
 	abortMessage =
-		'Aborting! Make sure to ' +
-		( isRC ? 'remove' : 'reset' ) +
-		' the remote release branch and remove the git tag.';
-
-	// Creating the GitHub Release
-	const release = await runGithubReleaseStep(
-		zipPath,
-		version,
-		versionLabel,
-		changelog,
-		isRC,
-		abortMessage
-	);
-
-	abortMessage =
 		'Aborting! Make sure to manually cherry-pick the ' +
 		formats.success( commitHash ) +
 		' commit to the master branch.';
-	if ( ! isRC ) {
-		abortMessage +=
-			' Make sure to perform the SVN release manually as well.';
-	}
 
 	// Cherry-picking the bump commit into master
 	await runCherrypickBumpCommitIntoMasterStep(
@@ -774,70 +471,32 @@ async function releasePlugin( isRC = true ) {
 		abortMessage
 	);
 
-	if ( ! isRC ) {
-		abortMessage =
-			'Aborting! The GitHub release is done. Make sure to perform the SVN release manually.';
-
-		await askForConfirmation(
-			'The GitHub release is complete. Proceed with the SVN release? ',
-			true,
-			abortMessage
-		);
-
-		// Fetching the SVN repository
-		const svnWorkingDirectory = await runSvnRepositoryCheckoutStep(
-			abortMessage
-		);
-		temporaryFolders.push( svnWorkingDirectory );
-
-		// Updating the SVN trunk content
-		await runUpdateTrunkContentStep(
-			svnWorkingDirectory,
-			zipPath,
-			version,
-			abortMessage
-		);
-
-		abortMessage =
-			'Aborting! The GitHub release is done, SVN trunk updated. Make sure to create the SVN tag and update the stable version manually.';
-		await runSvnTagStep( version, abortMessage );
-
-		abortMessage =
-			'Aborting! The GitHub release is done, SVN tagged. Make sure to update the stable version manually.';
-		await updateThePluginStableVersion(
-			svnWorkingDirectory,
-			version,
-			abortMessage
-		);
-	}
-
 	abortMessage = 'Aborting! The release is finished though.';
 	await runCleanLocalFoldersStep( temporaryFolders, abortMessage );
 
-	return release;
+	return version;
 }
 
 async function releaseRC() {
 	log(
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new RC version of the Plugin.\n',
-		'It goes through different steps: creating the release branch, bumping the plugin version, tagging and creating the GitHub release, building the ZIP...\n',
-		"To perform a release you'll have to be a member of the " +
-			config.team +
-			' Team.\n'
+		'It goes through different steps: creating the release branch, bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, and attach it to a release draft.\n'
 	);
 
-	const release = await releasePlugin( true );
+	const version = await releasePlugin( true );
 
 	log(
 		'\n>> 🎉 The ' +
 			config.name +
 			' version ' +
-			formats.success( release.name ) +
-			' has been successfully released.\n',
-		'You can access the GitHub release here: ' +
-			formats.success( release.html_url ) +
+			formats.success( version ) +
+			' has been successfully tagged.\n',
+		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+			formats.success( config.wpRepositoryReleasesURL ) +
 			'\n',
+		"Don't forget to publish the release once the draft is available!\n",
 		'Thanks for performing the release!\n'
 	);
 }
@@ -846,24 +505,33 @@ async function releaseStable() {
 	log(
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new stable version of the Plugin.\n',
-		'It goes through different steps: bumping the plugin version, tagging and creating the GitHub release, building the ZIP, pushing the release to the SVN repository...\n',
-		"To perform a release you'll have to be a member of the " +
+		'It goes through different steps: bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, and attach it to a release draft.\n',
+		'To have the release uploaded to the WP.org plugin repository SVN, you need approval from a member of the ' +
 			config.team +
 			' Team.\n'
 	);
 
-	const release = await releasePlugin( false );
+	const version = await releasePlugin( false );
 
 	log(
 		'\n>> 🎉 ' +
 			config.name +
 			' ' +
-			formats.success( release.name ) +
-			' has been successfully released.\n',
-		'You can access the GitHub release here: ' +
-			formats.success( release.html_url ) +
+			formats.success( version ) +
+			' has been successfully tagged.\n',
+		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+			formats.success( config.wpRepositoryReleasesURL ) +
 			'\n',
-		"In a few minutes, you'll be able to update the plugin from the WordPress repository.\n",
+		"Don't forget to publish the release once the draft is available!\n",
+		'Once published, the upload to the WP.org plugin repository needs approval from a member of the ' +
+			config.team +
+			' Team at ' +
+			formats.success(
+				config.githubRepositoryURL +
+					'actions/workflows/upload-release-to-plugin-repo.yml '
+			) +
+			'.\n',
 		"Thanks for performing the release! and don't forget to publish the release post.\n"
 	);
 }

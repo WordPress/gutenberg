@@ -155,8 +155,8 @@ export function computeCustomizedAttribute(
 				original_title: '',
 				url: block.attributes.url,
 				description: block.attributes.description,
-				xfn: block.attributes.rel.split( ' ' ),
-				classes: block.attributes.className.split( ' ' ),
+				xfn: block.attributes.rel?.split( ' ' ),
+				classes: block.attributes.className?.split( ' ' ),
 				attr_title: block.attributes.title,
 			};
 		} else {

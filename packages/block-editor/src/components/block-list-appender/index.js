@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { createContext } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -15,6 +16,10 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+import { store as blockEditorStore } from '../../store';
+
+// A Context to store the map of the appender map.
+export const AppenderNodesContext = createContext();
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -38,9 +43,7 @@ function BlockListAppender( {
 	if ( CustomAppender ) {
 		// Prefer custom render prop if provided.
 		appender = <CustomAppender />;
-	} else if ( canInsertDefaultBlock ) {
-		// Render the default block appender when renderAppender has not been
-		// provided and the context supports use of the default appender.
+	} else {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;
 		const isAnotherDefaultAppenderAlreadyDisplayed =
@@ -50,26 +53,31 @@ function BlockListAppender( {
 		if (
 			! isDocumentAppender &&
 			! isParentSelected &&
-			isAnotherDefaultAppenderAlreadyDisplayed
+			( ! selectedBlockClientId ||
+				isAnotherDefaultAppenderAlreadyDisplayed )
 		) {
 			return null;
 		}
 
-		appender = (
-			<DefaultBlockAppender
-				rootClientId={ rootClientId }
-				lastBlockClientId={ last( blockClientIds ) }
-			/>
-		);
-	} else {
-		// Fallback in the case no renderAppender has been provided and the
-		// default block can't be inserted.
-		appender = (
-			<ButtonBlockAppender
-				rootClientId={ rootClientId }
-				className="block-list-appender__toggle"
-			/>
-		);
+		if ( canInsertDefaultBlock ) {
+			// Render the default block appender when renderAppender has not been
+			// provided and the context supports use of the default appender.
+			appender = (
+				<DefaultBlockAppender
+					rootClientId={ rootClientId }
+					lastBlockClientId={ last( blockClientIds ) }
+				/>
+			);
+		} else {
+			// Fallback in the case no renderAppender has been provided and the
+			// default block can't be inserted.
+			appender = (
+				<ButtonBlockAppender
+					rootClientId={ rootClientId }
+					className="block-list-appender__toggle"
+				/>
+			);
+		}
 	}
 
 	return (
@@ -86,7 +94,11 @@ function BlockListAppender( {
 			// Prevent the block from being selected when the appender is
 			// clicked.
 			onFocus={ stopPropagation }
-			className={ classnames( 'block-list-appender', className ) }
+			className={ classnames(
+				'block-list-appender',
+				'wp-block',
+				className
+			) }
 		>
 			{ appender }
 		</TagName>
@@ -99,7 +111,7 @@ export default withSelect( ( select, { rootClientId } ) => {
 		canInsertBlockType,
 		getTemplateLock,
 		getSelectedBlockClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),

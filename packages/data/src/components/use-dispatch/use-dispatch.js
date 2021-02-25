@@ -3,16 +3,19 @@
  */
 import useRegistry from '../registry-provider/use-registry';
 
+/** @typedef {import('./types').WPDataStore} WPDataStore */
+
 /**
  * A custom react hook returning the current registry dispatch actions creators.
  *
  * Note: The component using this hook must be within the context of a
  * RegistryProvider.
  *
- * @param {string} [storeName]  Optionally provide the name of the store from
- *                             which to retrieve action creators. If not
- *                             provided, the registry.dispatch function is
- *                             returned instead.
+ * @param {string|WPDataStore} [storeNameOrDefinition] Optionally provide the name of the
+ *                                                     store or its definition from which to
+ *                                                     retrieve action creators. If not
+ *                                                     provided, the registry.dispatch
+ *                                                     function is returned instead.
  *
  * @example
  * This illustrates a pattern where you may need to retrieve dynamic data from
@@ -20,8 +23,8 @@ import useRegistry from '../registry-provider/use-registry';
  * action.
  *
  * ```jsx
- * const { useDispatch, useSelect } = wp.data;
- * const { useCallback } = wp.element;
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { useCallback } from '@wordpress/element';
  *
  * function Button( { onClick, children } ) {
  *   return <button type="button" onClick={ onClick }>{ children }</button>
@@ -46,9 +49,11 @@ import useRegistry from '../registry-provider/use-registry';
  * ```
  * @return {Function}  A custom react hook.
  */
-const useDispatch = ( storeName ) => {
+const useDispatch = ( storeNameOrDefinition ) => {
 	const { dispatch } = useRegistry();
-	return storeName === void 0 ? dispatch : dispatch( storeName );
+	return storeNameOrDefinition === void 0
+		? dispatch
+		: dispatch( storeNameOrDefinition );
 };
 
 export default useDispatch;

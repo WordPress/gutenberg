@@ -16,7 +16,7 @@ attributes: {
 
 Add this to the `index.js` file within the `registerBlockType` function. The `attributes` are at the same level as the title and description fields.
 
-When the block loads it will: look at the saved content for the block, look for the div tag, take the text portion, and store the content in an `attributes.message` variable.
+When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an `attributes.message` variable.
 
 Note: The text portion is equivalent to `innerText` attribute of a DOM element. For more details and other examples see the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md).
 

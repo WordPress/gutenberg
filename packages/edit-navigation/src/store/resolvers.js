@@ -25,6 +25,10 @@ import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
  * @return {void}
  */
 export function* getNavigationPostForMenu( menuId ) {
+	if ( ! menuId ) {
+		return;
+	}
+
 	const stubPost = createStubPost( menuId );
 	// Persist an empty post to warm up the state
 	yield persistPost( stubPost );
@@ -51,14 +55,14 @@ export function* getNavigationPostForMenu( menuId ) {
 	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 }
 
-const createStubPost = ( menuId, navigationBlock ) => {
+const createStubPost = ( menuId, navigationBlock = null ) => {
 	const id = buildNavigationPostId( menuId );
 	return {
 		id,
 		slug: id,
 		status: 'draft',
 		type: 'page',
-		blocks: [ navigationBlock ],
+		blocks: navigationBlock ? [ navigationBlock ] : [],
 		meta: {
 			menuId,
 		},
@@ -108,7 +112,13 @@ function createNavigationBlock( menuItems ) {
 
 	// menuItemsToTreeOfBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
 	const innerBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
-	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
+	const navigationBlock = createBlock(
+		'core/navigation',
+		{
+			orientation: 'vertical',
+		},
+		innerBlocks
+	);
 	return [ navigationBlock, menuItemIdToClientId ];
 }
 

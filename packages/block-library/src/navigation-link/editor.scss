@@ -25,16 +25,18 @@
 	}
 
 	.block-list-appender {
-		margin: $grid-unit-10 * 2;
-		margin-left: $grid-unit-10 * 1.25;
-		margin-top: $grid-unit-10 * 1.25;
+		margin-top: $grid-unit-20;
+		// The right margin should be set to auto, so as to not shift layout in flex containers.
+		margin-right: auto;
+		margin-bottom: $grid-unit-20;
+		margin-left: $grid-unit-20;
 	}
 }
 
 // Separator
 .wp-block-navigation-link__separator {
 	margin: $grid-unit-10 0 $grid-unit-10;
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 }
 
 // Popover styles

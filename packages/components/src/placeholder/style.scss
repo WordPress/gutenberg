@@ -1,4 +1,5 @@
 .components-placeholder.components-placeholder { // This needs specificity to override individual block styles.
+	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
 	min-height: 200px;

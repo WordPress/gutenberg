@@ -6,11 +6,12 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { resolveWidgetAreas, select, dispatch } from './controls';
+import { resolveWidgets, resolveWidgetAreas, select } from './controls';
+import { persistStubPost, setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
-	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
+	buildWidgetsQuery,
 	buildWidgetAreasQuery,
 	buildWidgetAreaPostId,
 	buildWidgetAreasPostId,
@@ -29,7 +30,6 @@ export function* getWidgetAreas() {
 	);
 
 	const widgetAreaBlocks = [];
-	const widgetIdToClientId = {};
 	const sortedWidgetAreas = widgetAreas.sort( ( a, b ) => {
 		if ( a.id === 'wp_inactive_widgets' ) {
 			return 1;
@@ -40,59 +40,57 @@ export function* getWidgetAreas() {
 		return 0;
 	} );
 	for ( const widgetArea of sortedWidgetAreas ) {
-		const widgetBlocks = [];
-		for ( const widget of widgetArea.widgets ) {
-			const block = transformWidgetToBlock( widget );
-			widgetIdToClientId[ widget.id ] = block.clientId;
-			widgetBlocks.push( block );
-		}
-
-		// Persist the actual post containing the navigation block
-		yield persistStubPost(
-			buildWidgetAreaPostId( widgetArea.id ),
-			widgetBlocks
-		);
-
 		widgetAreaBlocks.push(
 			createBlock( 'core/widget-area', {
 				id: widgetArea.id,
 				name: widgetArea.name,
 			} )
 		);
+
+		if ( ! widgetArea.widgets.length ) {
+			// If this widget area has no widgets, it won't get a post setup by
+			// the getWidgets resolver.
+			yield persistStubPost( buildWidgetAreaPostId( widgetArea.id ), [] );
+		}
 	}
 
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
+	const widgetAreasOpenState = {};
+	widgetAreaBlocks.forEach( ( widgetAreaBlock, index ) => {
+		// Defaults to open the first widget area.
+		widgetAreasOpenState[ widgetAreaBlock.clientId ] = index === 0;
+	} );
+	yield setWidgetAreasOpenState( widgetAreasOpenState );
 
-	yield {
-		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
-		mapping: widgetIdToClientId,
-	};
+	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 }
 
-const persistStubPost = function* ( id, blocks ) {
-	const stubPost = createStubPost( id, blocks );
-	const args = [ KIND, POST_TYPE, id ];
-	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
-	yield dispatch(
+export function* getWidgets() {
+	const query = buildWidgetsQuery();
+	yield resolveWidgets( query );
+	const widgets = yield select(
 		'core',
-		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
-		stubPost,
-		{ id: stubPost.id },
-		false
+		'getEntityRecords',
+		'root',
+		'widget',
+		query
 	);
-	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
-	return stubPost;
-};
 
-const createStubPost = ( id, blocks ) => ( {
-	id,
-	slug: id,
-	status: 'draft',
-	type: 'page',
-	blocks,
-	meta: {
-		widgetAreaId: id,
-	},
-} );
+	const groupedBySidebar = {};
+
+	for ( const widget of widgets ) {
+		const block = transformWidgetToBlock( widget );
+		groupedBySidebar[ widget.sidebar ] =
+			groupedBySidebar[ widget.sidebar ] || [];
+		groupedBySidebar[ widget.sidebar ].push( block );
+	}
+
+	for ( const sidebarId in groupedBySidebar ) {
+		if ( groupedBySidebar.hasOwnProperty( sidebarId ) ) {
+			// Persist the actual post containing the widget block
+			yield persistStubPost(
+				buildWidgetAreaPostId( sidebarId ),
+				groupedBySidebar[ sidebarId ]
+			);
+		}
+	}
+}

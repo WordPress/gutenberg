@@ -16,6 +16,7 @@ import { useBlockNavigationContext } from './context';
 import BlockNavigationBlockSlot from './block-slot';
 import BlockNavigationBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
+import { store as blockEditorStore } from '../../store';
 
 const BlockNavigationBlockContents = forwardRef(
 	(
@@ -37,13 +38,28 @@ const BlockNavigationBlockContents = forwardRef(
 
 		const { clientId } = block;
 
-		const rootClientId = useSelect(
-			( select ) =>
-				select( 'core/block-editor' ).getBlockRootClientId(
-					clientId
-				) || '',
+		const {
+			rootClientId,
+			blockMovingClientId,
+			selectedBlockInBlockEditor,
+		} = useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					hasBlockMovingClientId,
+					getSelectedBlockClientId,
+				} = select( blockEditorStore );
+				return {
+					rootClientId: getBlockRootClientId( clientId ) || '',
+					blockMovingClientId: hasBlockMovingClientId(),
+					selectedBlockInBlockEditor: getSelectedBlockClientId(),
+				};
+			},
 			[ clientId ]
 		);
+
+		const isBlockMoveTarget =
+			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
 		const {
 			rootClientId: dropTargetRootClientId,
@@ -65,7 +81,7 @@ const BlockNavigationBlockContents = forwardRef(
 		const className = classnames(
 			'block-editor-block-navigation-block-contents',
 			{
-				'is-dropping-before': isDroppingBefore,
+				'is-dropping-before': isDroppingBefore || isBlockMoveTarget,
 				'is-dropping-after': isDroppingAfter,
 				'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
 			}
@@ -76,7 +92,7 @@ const BlockNavigationBlockContents = forwardRef(
 				clientIds={ [ block.clientId ] }
 				elementId={ `block-navigation-block-${ block.clientId }` }
 			>
-				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) =>
+				{ ( { draggable, onDragStart, onDragEnd } ) =>
 					__experimentalFeatures ? (
 						<BlockNavigationBlockSlot
 							ref={ ref }
@@ -87,9 +103,9 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
+							draggable={ draggable && __experimentalFeatures }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
 							{ ...props }
 						/>
 					) : (
@@ -102,9 +118,9 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
+							draggable={ draggable && __experimentalFeatures }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
 							{ ...props }
 						/>
 					)

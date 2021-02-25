@@ -21,16 +21,3 @@ export const cleanEmptyObject = ( object ) => {
 		? undefined
 		: cleanedNestedObjects;
 };
-
-export const STYLE_MAPPINGS = {
-	lineHeight: [ 'typography', 'lineHeight' ],
-	fontSize: [ 'typography', 'fontSize' ],
-	background: [ 'color', 'gradient' ],
-	backgroundColor: [ 'color', 'background' ],
-	color: [ 'color', 'text' ],
-	'--wp--style--color--link': [ 'color', 'link' ],
-	paddingTop: [ 'spacing', 'padding', 'top' ],
-	paddingRight: [ 'spacing', 'padding', 'right' ],
-	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
-	paddingLeft: [ 'spacing', 'padding', 'left' ],
-};

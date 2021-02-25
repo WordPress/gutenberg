@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	RichTextToolbarButton,
@@ -22,24 +21,19 @@ import { removeFormat } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColor } from './inline';
 
 const name = 'core/text-color';
-const title = __( 'Text Color' );
+const title = __( 'Text color' );
 
 const EMPTY_ARRAY = [];
 
-function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
+function TextColorEdit( {
+	value,
+	onChange,
+	isActive,
+	activeAttributes,
+	contentRef,
+} ) {
 	const allowCustomControl = useEditorFeature( 'color.custom' );
-	const { colors } = useSelect( ( select ) => {
-		const blockEditorSelect = select( 'core/block-editor' );
-		let settings;
-		if ( blockEditorSelect && blockEditorSelect.getSettings ) {
-			settings = blockEditorSelect.getSettings();
-		} else {
-			settings = {};
-		}
-		return {
-			colors: get( settings, [ 'colors' ], EMPTY_ARRAY ),
-		};
-	} );
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,
@@ -90,11 +84,14 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					addingColor={ isAddingColor }
 					onClose={ disableIsAddingColor }
 					activeAttributes={ activeAttributes }
 					value={ value }
-					onChange={ onChange }
+					onChange={ ( ...args ) => {
+						onChange( ...args );
+						disableIsAddingColor();
+					} }
+					contentRef={ contentRef }
 				/>
 			) }
 		</>

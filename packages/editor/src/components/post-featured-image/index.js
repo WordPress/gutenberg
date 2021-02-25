@@ -6,7 +6,7 @@ import { has, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
@@ -95,6 +95,28 @@ function PostFeaturedImage( {
 		<PostFeaturedImageCheck>
 			{ noticeUI }
 			<div className="editor-post-featured-image">
+				{ media && (
+					<div
+						id={ `editor-post-featured-image-${ featuredImageId }-describedby` }
+						className="hidden"
+					>
+						{ media.alt_text &&
+							sprintf(
+								// Translators: %s: The selected image alt text.
+								__( 'Current image: %s' ),
+								media.alt_text
+							) }
+						{ ! media.alt_text &&
+							sprintf(
+								// Translators: %s: The selected image filename.
+								__(
+									'The current image has no alternative text. The file name is: %s'
+								),
+								media.media_details.sizes?.full?.file ||
+									media.slug
+							) }
+					</div>
+				) }
 				<MediaUploadCheck fallback={ instructions }>
 					<MediaUpload
 						title={
@@ -104,11 +126,7 @@ function PostFeaturedImage( {
 						onSelect={ onUpdateImage }
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						modalClass={
-							! featuredImageId
-								? 'editor-post-featured-image__media-modal'
-								: 'editor-post-featured-image__media-modal'
-						}
+						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
@@ -122,6 +140,11 @@ function PostFeaturedImage( {
 										! featuredImageId
 											? null
 											: __( 'Edit or update the image' )
+									}
+									aria-describedby={
+										! featuredImageId
+											? null
+											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
 								>
 									{ !! featuredImageId && media && (

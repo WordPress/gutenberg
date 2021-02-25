@@ -4,10 +4,10 @@
         "name": "core/search",
         "isValid": true,
         "attributes": {
-            "buttonPosition": "button-outside",
-            "buttonUseIcon": false,
+            "showLabel": true,
             "placeholder": "",
-            "showLabel": true
+            "buttonPosition": "button-outside",
+            "buttonUseIcon": false
         },
         "innerBlocks": [],
         "originalContent": ""

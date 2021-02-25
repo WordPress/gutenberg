@@ -6,7 +6,13 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildWidgetAreasQuery, KIND, WIDGET_AREA_ENTITY_TYPE } from './utils';
+import {
+	buildWidgetAreasQuery,
+	buildWidgetsQuery,
+	KIND,
+	WIDGET_AREA_ENTITY_TYPE,
+} from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 /**
  * Trigger an API Fetch request.
@@ -49,17 +55,6 @@ export function isProcessingPost( postId ) {
 }
 
 /**
- * Selects widgetId -> clientId mapping (necessary for saving widgets).
- *
- * @return {Object} Action.
- */
-export function getWidgetToClientIdMapping() {
-	return {
-		type: 'GET_WIDGET_TO_CLIENT_ID_MAPPING',
-	};
-}
-
-/**
  * Resolves navigation post for given menuId.
  *
  * @see selectors.js
@@ -76,7 +71,7 @@ export function getNavigationPostForMenu( menuId ) {
 }
 
 /**
- * Resolves menu items for given menu id.
+ * Resolves widget areas.
  *
  * @param {Object} query Query.
  * @return {Object} Action.
@@ -84,6 +79,19 @@ export function getNavigationPostForMenu( menuId ) {
 export function resolveWidgetAreas( query = buildWidgetAreasQuery() ) {
 	return {
 		type: 'RESOLVE_WIDGET_AREAS',
+		query,
+	};
+}
+
+/**
+ * Resolves widgets.
+ *
+ * @param {Object} query Query.
+ * @return {Object} Action.
+ */
+export function resolveWidgets( query = buildWidgetsQuery() ) {
+	return {
+		type: 'RESOLVE_WIDGETS',
 		query,
 	};
 }
@@ -123,6 +131,8 @@ export function dispatch( registryName, actionName, ...args ) {
 }
 
 const controls = {
+	AWAIT_PROMISE: ( { promise } ) => promise,
+
 	SELECT: createRegistryControl(
 		( registry ) => ( { registryName, selectorName, args } ) => {
 			return registry.select( registryName )[ selectorName ]( ...args );
@@ -144,12 +154,6 @@ const controls = {
 		}
 	),
 
-	GET_WIDGET_TO_CLIENT_ID_MAPPING: createRegistryControl(
-		( registry ) => () => {
-			return getState( registry ).mapping || {};
-		}
-	),
-
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { registryName, actionName, args } ) => {
 			return registry.dispatch( registryName )[ actionName ]( ...args );
@@ -159,13 +163,19 @@ const controls = {
 	RESOLVE_WIDGET_AREAS: createRegistryControl(
 		( registry ) => ( { query } ) => {
 			return registry
-				.__experimentalResolveSelect( 'core' )
+				.resolveSelect( 'core' )
 				.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 		}
 	),
+
+	RESOLVE_WIDGETS: createRegistryControl( ( registry ) => ( { query } ) => {
+		return registry
+			.resolveSelect( 'core' )
+			.getEntityRecords( 'root', 'widget', query );
+	} ),
 };
 
 const getState = ( registry ) =>
-	registry.stores[ 'core/edit-widgets' ].store.getState();
+	registry.stores[ editWidgetsStoreName ].store.getState();
 
 export default controls;

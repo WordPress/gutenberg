@@ -6,11 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockControls,
 	Warning,
-	__experimentalBlock as Block,
+	useBlockProps,
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -27,7 +27,7 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 	);
 	const tagLinks = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( 'core' );
+			const { getEntityRecord } = select( coreStore );
 			let loaded = true;
 
 			const links = tags?.map( ( tagId ) => {
@@ -77,6 +77,12 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 		);
 	}
 
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
 	return (
 		<>
 			<BlockControls>
@@ -87,13 +93,7 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 					} }
 				/>
 			</BlockControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
-				{ display }
-			</Block.div>
+			<div { ...blockProps }>{ display }</div>
 		</>
 	);
 }

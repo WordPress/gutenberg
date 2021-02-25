@@ -1,26 +1,24 @@
 /**
+ * Internal dependencies
+ */
+import {
+	FocalPointWrapper,
+	PointerIconPathFill,
+	PointerIconPathOutline,
+	PointerIconSVG,
+} from './styles/focal-point-style';
+
+/**
  * External dependencies
  */
 import classnames from 'classnames';
 
-/**
- * Internal dependencies
- */
-import {
-	PointerIconSVG,
-	PointerIconPathFill,
-	PointerIconPathOutline,
-	FocalPointWrapper,
-} from './styles/focal-point-style';
-
 export default function FocalPoint( {
 	coordinates = { left: '50%', top: '50%' },
-	isDragging = false,
 	...props
 } ) {
 	const classes = classnames(
-		'components-focal-point-picker__icon_container',
-		isDragging && 'is-dragging'
+		'components-focal-point-picker__icon_container'
 	);
 
 	const style = {

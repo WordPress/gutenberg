@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty, pick } from 'lodash';
+import { every, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,6 @@ import {
 	__experimentalGradientPicker as GradientPicker,
 } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -89,6 +88,7 @@ function ColorGradientControlInner( {
 	onGradientChange,
 	colorValue,
 	gradientValue,
+	clearable,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -152,6 +152,7 @@ function ColorGradientControlInner( {
 								: onColorChange
 						}
 						{ ...{ colors, disableCustomColors } }
+						clearable={ clearable }
 					/>
 				) }
 				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
@@ -166,6 +167,7 @@ function ColorGradientControlInner( {
 								: onGradientChange
 						}
 						{ ...{ gradients, disableCustomGradients } }
+						clearable={ clearable }
 					/>
 				) }
 			</fieldset>
@@ -174,15 +176,14 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const colorGradientSettings = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		return pick( settings, colorsAndGradientKeys );
-	} );
+	const colorGradientSettings = {};
+	colorGradientSettings.colors = useEditorFeature( 'color.palette' );
+	colorGradientSettings.gradients = useEditorFeature( 'color.gradients' );
 	colorGradientSettings.disableCustomColors = ! useEditorFeature(
 		'color.custom'
 	);
 	colorGradientSettings.disableCustomGradients = ! useEditorFeature(
-		'gradient.custom'
+		'color.customGradient'
 	);
 
 	return (

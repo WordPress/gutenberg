@@ -25,9 +25,12 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeAndroidModalClosed: jest.fn(),
 		subscribeUpdateTheme: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
+		subscribeUpdateCapabilities: jest.fn(),
+		subscribeShowNotice: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
+		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
@@ -104,7 +107,7 @@ jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 } );
 
 // Overwrite some native module mocks from `react-native` jest preset:
-// https://github.com/facebook/react-native/blob/master/jest/setup.js
+// https://github.com/facebook/react-native/blob/HEAD/jest/setup.js
 // to fix issue "TypeError: Cannot read property 'Commands' of undefined"
 // raised when calling focus or blur on a native component
 const mockNativeModules = {

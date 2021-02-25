@@ -7,7 +7,7 @@ import { KIND, POST_TYPE, buildNavigationPostId } from '../utils';
 
 // Mock createBlock to avoid creating block in test environment
 jest.mock( '@wordpress/blocks', () => {
-	const blocks = require.requireActual( '@wordpress/blocks' );
+	const blocks = jest.requireActual( '@wordpress/blocks' );
 	let id = 0;
 
 	return {
@@ -24,6 +24,12 @@ jest.mock( '@wordpress/blocks', () => {
 } );
 
 describe( 'getNavigationPostForMenu', () => {
+	it( 'returns early when a menuId is not provided', () => {
+		const generator = getNavigationPostForMenu( null );
+		expect( generator.next().value ).toBeUndefined();
+		expect( generator.next().done ).toBe( true );
+	} );
+
 	it( 'gets navigation post for menu id', () => {
 		const menuId = 123;
 
@@ -35,7 +41,7 @@ describe( 'getNavigationPostForMenu', () => {
 			slug: id,
 			status: 'draft',
 			type: 'page',
-			blocks: [ undefined ],
+			blocks: [],
 			meta: {
 				menuId,
 			},
@@ -114,7 +120,9 @@ describe( 'getNavigationPostForMenu', () => {
 			type: 'page',
 			blocks: [
 				{
-					attributes: {},
+					attributes: {
+						orientation: 'vertical',
+					},
 					clientId: expect.stringMatching( /client-id-\d+/ ),
 					innerBlocks: [
 						{

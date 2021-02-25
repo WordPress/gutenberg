@@ -16,7 +16,8 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -41,9 +42,9 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-
+	const blockProps = useBlockProps();
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
 
@@ -116,7 +117,7 @@ function AudioEdit( {
 	}
 	if ( ! src ) {
 		return (
-			<Block.div>
+			<div { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectAudio }
@@ -127,7 +128,7 @@ function AudioEdit( {
 					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
@@ -175,7 +176,7 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.figure>
+			<figure { ...blockProps }>
 				{ /*
 					Disable the audio tag so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
@@ -186,6 +187,7 @@ function AudioEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						aria-label={ __( 'Audio caption text' ) }
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						onChange={ ( value ) =>
@@ -197,7 +199,7 @@ function AudioEdit( {
 						}
 					/>
 				) }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }

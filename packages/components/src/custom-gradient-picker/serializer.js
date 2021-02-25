@@ -13,7 +13,11 @@ export function serializeGradientColor( { type, value } ) {
 	return `${ type }(${ value.join( ',' ) })`;
 }
 
-export function serializeGradientPosition( { type, value } ) {
+export function serializeGradientPosition( position ) {
+	if ( ! position ) {
+		return '';
+	}
+	const { value, type } = position;
 	return `${ value }${ type }`;
 }
 

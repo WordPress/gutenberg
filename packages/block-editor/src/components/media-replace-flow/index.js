@@ -19,9 +19,10 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { DOWN } from '@wordpress/keycodes';
+import { DOWN, TAB, ESCAPE } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ import { upload, media as mediaIcon } from '@wordpress/icons';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
+import { store as blockEditorStore } from '../../store';
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -44,7 +46,7 @@ const MediaReplaceFlow = ( {
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().mediaUpload;
+		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
 	const errorNoticeID = uniqueId(
@@ -121,6 +123,7 @@ const MediaReplaceFlow = ( {
 					<ToolbarButton
 						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
+						aria-haspopup="true"
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 					>
@@ -167,10 +170,18 @@ const MediaReplaceFlow = ( {
 						<form
 							className="block-editor-media-flow__url-input"
 							onKeyDown={ ( event ) => {
-								event.stopPropagation();
+								if (
+									! [ TAB, ESCAPE ].includes( event.keyCode )
+								) {
+									event.stopPropagation();
+								}
 							} }
 							onKeyPress={ ( event ) => {
-								event.stopPropagation();
+								if (
+									! [ TAB, ESCAPE ].includes( event.keyCode )
+								) {
+									event.stopPropagation();
+								}
 							} }
 						>
 							<span className="block-editor-media-replace-flow__image-url-label">
@@ -196,7 +207,7 @@ const MediaReplaceFlow = ( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { createNotice, removeNotice } = dispatch( 'core/notices' );
+		const { createNotice, removeNotice } = dispatch( noticesStore );
 		return {
 			createNotice,
 			removeNotice,

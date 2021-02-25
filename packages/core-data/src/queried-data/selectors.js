@@ -3,6 +3,7 @@
  */
 import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
+import { get, set } from 'lodash';
 
 /**
  * Internal dependencies
@@ -30,7 +31,6 @@ function getQueriedItemsUncached( state, query ) {
 	const { stableKey, page, perPage, include, fields } = getQueryParts(
 		query
 	);
-
 	let itemIds;
 	if ( Array.isArray( include ) && ! stableKey ) {
 		// If the parsed query yields a set of IDs, but otherwise no filtering,
@@ -72,16 +72,9 @@ function getQueriedItemsUncached( state, query ) {
 			filteredItem = {};
 
 			for ( let f = 0; f < fields.length; f++ ) {
-				// Abort the entire request if a field is missing from the item.
-				// This accounts for the fact that queried items are stored by
-				// stable key without an associated fields query. Other requests
-				// may have included fewer fields properties.
-				const field = fields[ f ];
-				if ( ! item.hasOwnProperty( field ) ) {
-					return null;
-				}
-
-				filteredItem[ field ] = item[ field ];
+				const field = fields[ f ].split( '.' );
+				const value = get( item, field );
+				set( filteredItem, field, value );
 			}
 		} else {
 			// If expecting a complete item, validate that completeness, or

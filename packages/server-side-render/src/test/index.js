@@ -13,7 +13,7 @@ describe( 'rendererPath', () => {
 		);
 	} );
 
-	test( 'should format basic url params ', () => {
+	test( 'should format basic url params', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				stringArg: 'test',
@@ -26,7 +26,7 @@ describe( 'rendererPath', () => {
 		);
 	} );
 
-	test( 'should format object params ', () => {
+	test( 'should format object params', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				objectArg: {

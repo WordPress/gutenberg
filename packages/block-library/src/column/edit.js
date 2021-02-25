@@ -11,14 +11,24 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
-	__experimentalBlock as Block,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { CSS_UNITS } from '../columns/utils';
+
 function ColumnEdit( {
-	attributes: { verticalAlignment, width },
+	attributes: { verticalAlignment, width, templateLock = false },
 	setAttributes,
 	clientId,
 } ) {
@@ -29,7 +39,7 @@ function ColumnEdit( {
 	const { hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			return {
@@ -40,7 +50,7 @@ function ColumnEdit( {
 		[ clientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const updateAlignment = ( value ) => {
 		// Update own alignment.
@@ -51,7 +61,17 @@ function ColumnEdit( {
 		} );
 	};
 
-	const hasWidth = Number.isFinite( width );
+	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
+	const blockProps = useBlockProps( {
+		className: classes,
+		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock,
+		renderAppender: hasChildBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
 
 	return (
 		<>
@@ -63,36 +83,21 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<RangeControl
-						label={ __( 'Percentage width' ) }
+					<UnitControl
+						label={ __( 'Width' ) }
+						labelPosition="edge"
+						__unstableInputWidth="80px"
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
+							nextWidth =
+								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
-						min={ 0 }
-						max={ 100 }
-						step={ 0.1 }
-						required
-						allowReset
-						placeholder={
-							width === undefined ? __( 'Auto' ) : undefined
-						}
+						units={ CSS_UNITS }
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InnerBlocks
-				templateLock={ false }
-				renderAppender={
-					hasChildBlocks
-						? undefined
-						: () => <InnerBlocks.ButtonBlockAppender />
-				}
-				__experimentalTagName={ Block.div }
-				__experimentalPassedProps={ {
-					className: classes,
-					style: hasWidth ? { flexBasis: width + '%' } : undefined,
-				} }
-			/>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }

@@ -23,7 +23,7 @@ This component was named after a [complementatry landmark](https://www.w3.org/TR
 
 It is possible to control which complementary is enabled by using the store:
 
-Bellow are some examples of how to control the active complementary area using the store:
+Below are some examples of how to control the active complementary area using the store:
 ```js
 wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
 // -> "edit-post/document"

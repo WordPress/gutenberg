@@ -4,5 +4,8 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/**/*" ]
+	"references": [
+		{ "path": "../hooks" },
+	],
+  	"include": [ "src/**/*" ],
 }

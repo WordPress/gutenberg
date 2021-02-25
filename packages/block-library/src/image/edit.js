@@ -15,11 +15,14 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+
+/* global wp */
 
 /**
  * Internal dependencies
@@ -30,8 +33,10 @@ import Image from './image';
  * Module constants
  */
 import {
-	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_SIZE_SLUG,
 } from './constants';
@@ -83,7 +88,6 @@ export function ImageEdit( {
 		caption,
 		align,
 		id,
-		linkDestination,
 		width,
 		height,
 		sizeSlug,
@@ -101,7 +105,7 @@ export function ImageEdit( {
 
 	const ref = useRef();
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	} );
 
@@ -152,21 +156,49 @@ export function ImageEdit( {
 			additionalAttributes = { url };
 		}
 
-		// Check if the image is linked to it's media.
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			mediaAttributes.href = media.url;
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+		if ( ! linkDestination ) {
+			// Use the WordPress option to determine the proper default.
+			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
+			switch (
+				wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
+				case 'file':
+				case LINK_DESTINATION_MEDIA:
+					linkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case 'post':
+				case LINK_DESTINATION_ATTACHMENT:
+					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case LINK_DESTINATION_CUSTOM:
+					linkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+				case LINK_DESTINATION_NONE:
+					linkDestination = LINK_DESTINATION_NONE;
+					break;
+			}
 		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			mediaAttributes.href = media.link;
+		// Check if the image is linked to it's media.
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
 		}
+		mediaAttributes.href = href;
 
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
@@ -232,14 +264,6 @@ export function ImageEdit( {
 	}, [ isTemp ] );
 
 	const isExternal = isExternalImage( id, url );
-	const controls = (
-		<BlockControls>
-			<BlockAlignmentToolbar
-				value={ align }
-				onChange={ updateAlignment }
-			/>
-		</BlockControls>
-	);
 	const src = isExternal ? url : undefined;
 	const mediaPreview = !! url && (
 		<img
@@ -250,21 +274,6 @@ export function ImageEdit( {
 		/>
 	);
 
-	const mediaPlaceholder = (
-		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			onSelect={ onSelectImage }
-			onSelectURL={ onSelectURL }
-			notices={ noticeUI }
-			onError={ onUploadError }
-			accept="image/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			value={ { id, src } }
-			mediaPreview={ mediaPreview }
-			disableMediaButtons={ url }
-		/>
-	);
-
 	const classes = classnames( className, {
 		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
@@ -272,30 +281,47 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
+	const blockProps = useBlockProps( {
+		ref,
+		className: classes,
+	} );
 
 	return (
-		<>
-			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
-				{ url && (
-					<Image
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						isSelected={ isSelected }
-						insertBlocksAfter={ insertBlocksAfter }
-						onReplace={ onReplace }
-						onSelectImage={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onUploadError={ onUploadError }
-						containerRef={ ref }
+		<figure { ...blockProps }>
+			{ url && (
+				<Image
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					containerRef={ ref }
+				/>
+			) }
+			{ ! url && (
+				<BlockControls>
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
 					/>
-				) }
-				{ mediaPlaceholder }
-			</Block.figure>
-		</>
+				</BlockControls>
+			) }
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				onSelect={ onSelectImage }
+				onSelectURL={ onSelectURL }
+				notices={ noticeUI }
+				onError={ onUploadError }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				disableMediaButtons={ url }
+			/>
+		</figure>
 	);
 }
 
