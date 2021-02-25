@@ -25,10 +25,11 @@
 	}
 
 	.block-list-appender {
-		margin: $grid-unit-10 * 2;
-		margin-left: $grid-unit-10 * 1.25;
-		margin-top: $grid-unit-10 * 1.25;
+		margin-top: $grid-unit-20;
+		// The right margin should be set to auto, so as to not shift layout in flex containers.
 		margin-right: auto;
+		margin-bottom: $grid-unit-20;
+		margin-left: $grid-unit-20;
 	}
 }
 
