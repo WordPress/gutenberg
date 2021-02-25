@@ -14,7 +14,7 @@ import { BottomSheet } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import styles from './style';
+import styles from './style.scss';
 
 const BottomSheetSelectControl = ( {
 	label,
