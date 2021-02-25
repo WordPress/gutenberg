@@ -100,9 +100,7 @@ class URLInput extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.suggestionsRequest?.cancel ) {
-			this.suggestionsRequest.cancel();
-		}
+		this.suggestionsRequest?.cancel?.();
 		delete this.suggestionsRequest;
 	}
 
