@@ -47,7 +47,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
-		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
+		if ( ! current_user_can( 'edit_posts' ) ) {
 			$error = __( 'Sorry, you are not allowed to read the block editor settings.', 'gutenberg' );
 			return new WP_Error( 'rest_cannot_read_settings', $error, array( 'status' => rest_authorization_required_code() ) );
 		}
