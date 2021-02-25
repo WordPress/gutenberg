@@ -314,11 +314,7 @@ function RichText(
 	}
 
 	function handleCopy( event ) {
-		// Something other than the browser already set data.
-		if (
-			event.clipboardData.getData( 'text/plain' ) &&
-			event.clipboardData.getData( 'wp-e2e-test' ) !== 'true'
-		) {
+		if ( isCollapsed( record.current ) ) {
 			return;
 		}
 
