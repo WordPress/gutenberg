@@ -104,7 +104,8 @@ function InserterSearchResults( {
 					...listProps.contentContainerStyle,
 					{
 						paddingBottom:
-							(safeAreaBottomInset || styles.list.paddingBottom) + searchFormHeight,
+							( safeAreaBottomInset ||
+								styles.list.paddingBottom ) + searchFormHeight,
 					},
 				] }
 			/>
