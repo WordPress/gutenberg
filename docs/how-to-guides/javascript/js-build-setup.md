@@ -2,7 +2,7 @@
 
 ESNext is JavaScript written using syntax and features only available in a version newer than browser support—the support browser versions is referred to as ECMAScript 5 (ES5). [JSX](https://reactjs.org/docs/introducing-jsx.html) is a custom syntax extension to JavaScript, created by React project, that allows you to write JavaScript using a familiar HTML tag-like syntax.
 
-See the [ESNext syntax documentation](/docs/howto-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
+See the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
 
 Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/code/getting-started.md) documentation.
 
@@ -125,7 +125,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/howto-guides/javascript/loading-javascript.md), and the block will load in the editor.
+After the build finishes, you will see the built file created at `build/index.js`. Enqueue this file in the admin screen as you would any JavaScript in WordPress, see [loading JavaScript step in this tutorial](/docs/how-to-guides/javascript/loading-javascript.md), and the block will load in the editor.
 
 ## Development Mode
 

@@ -285,10 +285,10 @@ _Note:_ The save function should be a pure function that depends only on the att
 It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
 This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
- - Use [dynamic blocks](/docs/howto-guides/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
+ - Use [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
  - Store the external value as an attribute which is dynamically updated in the block's `edit` function as changes occur.
 
-For [dynamic blocks](/docs/howto-guides/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
+For [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
 
 If left unspecified, the default implementation will save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
 
@@ -328,7 +328,7 @@ When saving your block, you want to save the attributes in the same format speci
 
 ## Examples
 
-Here are a couple examples of using attributes, edit, and save all together.  For a full working example, see the [Introducing Attributes and Editable Fields](/docs/howto-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+Here are a couple examples of using attributes, edit, and save all together.  For a full working example, see the [Introducing Attributes and Editable Fields](/docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
 
 ### Saving Attributes to Child Elements
 

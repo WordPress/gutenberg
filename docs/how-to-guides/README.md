@@ -4,7 +4,7 @@ The new editor is highly flexible, like most of WordPress. You can build custom 
 
 ## Creating Blocks
 
-The editor is about blocks, and the main extensibility API is the Block API. It allows you to create your own static blocks, [Dynamic Blocks](/docs/howto-guides/block-tutorial/creating-dynamic-blocks.md) ( rendered on the server ) and also blocks capable of saving data to Post Meta for more structured content.
+The editor is about blocks, and the main extensibility API is the Block API. It allows you to create your own static blocks, [Dynamic Blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) ( rendered on the server ) and also blocks capable of saving data to Post Meta for more structured content.
 
 If you want to learn more about block creation, see the [Create a Block tutorial](/docs/getting-started/tutorials/create-block/readme.md) for the best place to start.
 
@@ -24,7 +24,7 @@ You can also filter certain aspects of the editor; this is documented on the [Ed
 
 ## Meta Boxes
 
-Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged, learn how through these [meta data tutorials](/docs/howto-guides/metabox/readme.md).
+Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged, learn how through these [meta data tutorials](/docs/how-to-guides/metabox/readme.md).
 
 See how the new editor [supports existing Meta Boxes](/docs/reference-guides/backward-compatibility/meta-box.md).
 
@@ -32,7 +32,7 @@ See how the new editor [supports existing Meta Boxes](/docs/reference-guides/bac
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
 
-There are some advanced block features which require opt-in support in the theme. See [theme support](/docs/howto-guides/themes/theme-support.md).
+There are some advanced block features which require opt-in support in the theme. See [theme support](/docs/how-to-guides/themes/theme-support.md).
 
 ## Autocomplete
 

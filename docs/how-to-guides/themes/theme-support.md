@@ -360,7 +360,7 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
-Further reading: [Applying Styles with Stylesheets](/docs/howto-guides/block-tutorial/applying-styles-with-stylesheets.md).
+Further reading: [Applying Styles with Stylesheets](/docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md).
 
 ## Responsive embedded content
 

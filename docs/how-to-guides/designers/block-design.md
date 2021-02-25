@@ -132,7 +132,7 @@ Check how your block looks, feels, and works on as many devices and screen sizes
 
 ### Support Gutenberg's dark background editor scheme
 
-Check how your block looks with [dark backgrounds](/docs/howto-guides/themes/theme-support.md#dark-backgrounds) in the editor.
+Check how your block looks with [dark backgrounds](/docs/how-to-guides/themes/theme-support.md#dark-backgrounds) in the editor.
 
 ## Examples
 
