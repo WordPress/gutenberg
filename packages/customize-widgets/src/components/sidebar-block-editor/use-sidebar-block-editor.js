@@ -27,10 +27,16 @@ function blockToWidget( block, existingWidget = null ) {
 			};
 		}
 	} else {
+		const instance = {
+			content: serialize( block ),
+		};
 		widget = {
 			idBase: 'block',
 			widgetClass: 'WP_Widget_Block',
-			instance: { content: serialize( block ) },
+			instance: {
+				...instance,
+				__unstable_instance: instance,
+			},
 		};
 	}
 
@@ -40,12 +46,14 @@ function blockToWidget( block, existingWidget = null ) {
 	};
 }
 
-function widgetToBlock( widget, existingBlock = null ) {
+function widgetToBlock( widget ) {
 	let block;
 
 	// FIXME: We'll never get it here with blocks, we need to update this.
-	if ( widget.widgetClass === 'WP_Widget_Block' ) {
-		const parsedBlocks = parse( widget.instance.content );
+	if ( widget.idBase === 'block' ) {
+		const parsedBlocks = parse(
+			widget.instance.__unstable_instance.content
+		);
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
 			: createBlock( 'core/paragraph', {} );
@@ -68,10 +76,7 @@ function widgetToBlock( widget, existingBlock = null ) {
 		block = createBlock( 'core/legacy-widget', attributes, [] );
 	}
 
-	return {
-		...block,
-		clientId: existingBlock?.clientId ?? block.clientId,
-	};
+	return block;
 }
 
 function initState( sidebar ) {
