@@ -6,10 +6,17 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import {
+	useConstrainedTabbing,
+	useFocusOnMount,
+	useFocusReturn,
+	useInstanceId,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -28,14 +35,29 @@ export default function ListViewSidebar() {
 	} );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const [ listViewDialogRef, listViewDialogProps ] = useDialog( {
-		onClose: () => setIsListViewOpened( false ),
-	} );
+
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const focusReturnRef = useFocusReturn();
+	function closeOnEscape( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			event.stopPropagation();
+			setIsListViewOpened( false );
+		}
+	}
+
+	const instanceId = useInstanceId( ListViewSidebar );
+	const labelId = `edit-site-editor__list-view-panel-label-${ instanceId }`;
 
 	return (
-		<div className="edit-site-editor__list-view-panel">
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			aria-labelledby={ labelId }
+			className="edit-site-editor__list-view-panel"
+			onKeyDown={ closeOnEscape }
+		>
 			<div className="edit-site-editor__list-view-panel-header">
-				<strong>{ __( 'List view' ) }</strong>
+				<strong id={ labelId }>{ __( 'List view' ) }</strong>
 				<Button
 					icon={ closeSmall }
 					label={ __( 'Close list view sidebar' ) }
@@ -44,8 +66,11 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
-				ref={ listViewDialogRef }
-				{ ...listViewDialogProps }
+				ref={ useMergeRefs( [
+					constrainedTabbingRef,
+					focusReturnRef,
+					focusOnMountRef,
+				] ) }
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
