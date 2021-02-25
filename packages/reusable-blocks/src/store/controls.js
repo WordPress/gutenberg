@@ -77,7 +77,7 @@ const controls = {
 
 			const newBlocks = parse(
 				isFunction( reusableBlock.content )
-					? reusableBlock.content( reusableBlock.blocks )
+					? reusableBlock.content( reusableBlock )
 					: reusableBlock.content
 			);
 			registry
