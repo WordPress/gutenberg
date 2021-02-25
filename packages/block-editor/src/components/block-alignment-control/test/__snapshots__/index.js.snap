@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BlockAlignmentToolbar should match snapshot 1`] = `
+exports[`BlockAlignmentUI should match snapshot 1`] = `
 <ToolbarGroup
   controls={
     Array [

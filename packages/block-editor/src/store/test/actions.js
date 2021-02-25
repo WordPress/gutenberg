@@ -90,6 +90,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 
@@ -101,6 +102,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 	} );

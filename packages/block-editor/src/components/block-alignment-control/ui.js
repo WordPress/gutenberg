@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToolbarGroup } from '@wordpress/components';
+import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	positionCenter,
@@ -49,11 +49,13 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockAlignmentToolbar( {
+function BlockAlignmentUI( {
 	value,
 	onChange,
 	controls = DEFAULT_CONTROLS,
+	isToolbar,
 	isCollapsed = true,
+	isToolbarButton = true,
 } ) {
 	const { wideControlsEnabled = false } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -61,7 +63,7 @@ export function BlockAlignmentToolbar( {
 		return {
 			wideControlsEnabled: settings.alignWide,
 		};
-	} );
+	}, [] );
 	const layout = useLayout();
 	const supportsAlignments = layout.type === 'default';
 
@@ -88,10 +90,12 @@ export function BlockAlignmentToolbar( {
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
+	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+
 	return (
-		<ToolbarGroup
+		<UIComponent
 			popoverProps={ POPOVER_PROPS }
-			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignmentControl
 					? activeAlignmentControl.icon
@@ -107,8 +111,9 @@ export function BlockAlignmentToolbar( {
 					onClick: applyOrUnset( control ),
 				};
 			} ) }
+			{ ...extraProps }
 		/>
 	);
 }
 
-export default BlockAlignmentToolbar;
+export default BlockAlignmentUI;
