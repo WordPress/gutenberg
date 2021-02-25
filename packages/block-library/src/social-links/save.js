@@ -18,13 +18,8 @@ export default function save( props ) {
 		'has-icon-background-color': iconBackgroundColorValue,
 	} );
 
-	const style = {
-		'--wp--social-links--icon-color': iconColorValue,
-		'--wp--social-links--icon-background-color': iconBackgroundColorValue,
-	};
-
 	return (
-		<ul { ...useBlockProps.save( { className, style } ) }>
+		<ul { ...useBlockProps.save( { className } ) }>
 			<InnerBlocks.Content />
 		</ul>
 	);
