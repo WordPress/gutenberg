@@ -1,4 +1,5 @@
-.edit-site-editor__inserter-panel {
+.edit-site-editor__inserter-panel,
+.edit-site-editor__list-view-panel {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -15,19 +16,17 @@
 	}
 }
 
-.edit-site-editor__inserter-panel-content {
+.edit-site-editor__inserter-panel-content,
+.edit-site-editor__list-view-panel-content {
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+}
 
+
+.edit-site-editor__inserter-panel-content {
 	@include break-medium() {
 		height: 100%;
 	}
-}
-
-.edit-site-editor__list-view-panel {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
 }
 
 .edit-site-editor__list-view-panel-header {
@@ -43,7 +42,4 @@
 .edit-site-editor__list-view-panel-content {
 	overflow-y: auto;
 	padding: $grid-unit-10;
-
-	// Leave space for the close button
-	height: calc(100% - #{$button-size} - #{$grid-unit-10});
 }
