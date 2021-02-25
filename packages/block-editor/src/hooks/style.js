@@ -105,7 +105,7 @@ function addAttribute( settings ) {
  * @param {Object} blockSupports Info about block supports.
  * @return {Object} Filtered style.
  */
-export function omitNonSerializableKeys( style, blockSupports ) {
+export function omitKeysNotToSerialize( style, blockSupports ) {
 	return omitBy(
 		style,
 		( value, key ) =>
@@ -127,7 +127,7 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
-	const filteredStyle = omitNonSerializableKeys( style, {
+	const filteredStyle = omitKeysNotToSerialize( style, {
 		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
 	} );
 	props.style = {

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getInlineStyles, omitNonSerializableKeys } from '../style';
+import { getInlineStyles, omitKeysNotToSerialize } from '../style';
 
 describe( 'getInlineStyles', () => {
 	it( 'should return an empty object when called with undefined', () => {
@@ -29,13 +29,13 @@ describe( 'getInlineStyles', () => {
 	} );
 } );
 
-describe( 'omitNonSerializableKeys', () => {
+describe( 'omitKeysNotToSerialize', () => {
 	it( 'should return the same style if no keys are skipped from serialization', () => {
 		const style = {
 			color: { text: 'red' },
 			lineHeight: 2,
 		};
-		expect( omitNonSerializableKeys( style, {} ) ).toEqual( {
+		expect( omitKeysNotToSerialize( style, {} ) ).toEqual( {
 			color: { text: 'red' },
 			lineHeight: 2,
 		} );
@@ -51,7 +51,7 @@ describe( 'omitNonSerializableKeys', () => {
 				__experimentalSkipSerialization: true,
 			},
 		};
-		expect( omitNonSerializableKeys( style, blockSupports ) ).toEqual( {
+		expect( omitKeysNotToSerialize( style, blockSupports ) ).toEqual( {
 			lineHeight: 2,
 		} );
 	} );
