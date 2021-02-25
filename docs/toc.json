@@ -13,13 +13,6 @@
 				{ "docs/getting-started/tutorials/create-block/finishing.md": [] }
 			] }
 		] },
-		{ "docs/getting-started/architecture/README.md": [
-			{ "docs/getting-started/architecture/key-concepts.md": [] },
-			{ "docs/getting-started/architecture/data-flow.md": [] },
-			{ "docs/getting-started/architecture/modularity.md": [] },
-			{ "docs/getting-started/architecture/performance.md": [] },
-			{ "docs/getting-started/architecture/automated-testing.md": [] }
-		] },
 		{ "docs/getting-started/glossary.md": [] },
 		{ "docs/getting-started/faq.md": [] },
 		{ "docs/getting-started/history.md": [] },
@@ -141,7 +134,15 @@
 		] }
 	] },
 	{ "docs/explanations/README.md": [
-		{ "docs/explanations/full-site-editing-templates.md": [] }
+
+		{ "docs/explanations/architecture/README.md": [
+			{ "docs/explanations/architecture/key-concepts.md": [] },
+			{ "docs/explanations/architecture/data-flow.md": [] },
+			{ "docs/explanations/architecture/modularity.md": [] },
+			{ "docs/explanations/architecture/performance.md": [] },
+			{ "docs/explanations/architecture/automated-testing.md": [] },
+			{ "docs/explanations/architecture/full-site-editing-templates.md": [] }
+		] }
 	] },
 	{ "docs/contributors/README.md": [
 		{ "docs/contributors/code/develop.md": [

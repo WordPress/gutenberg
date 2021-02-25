@@ -66,42 +66,6 @@
 		"parent": "create-block"
 	},
 	{
-		"title": "Architecture",
-		"slug": "architecture",
-		"markdown_source": "../docs/getting-started/architecture/README.md",
-		"parent": "getting-started"
-	},
-	{
-		"title": "Key Concepts",
-		"slug": "key-concepts",
-		"markdown_source": "../docs/getting-started/architecture/key-concepts.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Data Flow and Data Format",
-		"slug": "data-flow",
-		"markdown_source": "../docs/getting-started/architecture/data-flow.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Modularity",
-		"slug": "modularity",
-		"markdown_source": "../docs/getting-started/architecture/modularity.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Performance",
-		"slug": "performance",
-		"markdown_source": "../docs/getting-started/architecture/performance.md",
-		"parent": "architecture"
-	},
-	{
-		"title": "Automated Testing",
-		"slug": "automated-testing",
-		"markdown_source": "../docs/getting-started/architecture/automated-testing.md",
-		"parent": "architecture"
-	},
-	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
@@ -1728,10 +1692,46 @@
 		"parent": null
 	},
 	{
+		"title": "Architecture",
+		"slug": "architecture",
+		"markdown_source": "../docs/explanations/architecture/README.md",
+		"parent": "explanations"
+	},
+	{
+		"title": "Key Concepts",
+		"slug": "key-concepts",
+		"markdown_source": "../docs/explanations/architecture/key-concepts.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Data Flow and Data Format",
+		"slug": "data-flow",
+		"markdown_source": "../docs/explanations/architecture/data-flow.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Modularity",
+		"slug": "modularity",
+		"markdown_source": "../docs/explanations/architecture/modularity.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Performance",
+		"slug": "performance",
+		"markdown_source": "../docs/explanations/architecture/performance.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Automated Testing",
+		"slug": "automated-testing",
+		"markdown_source": "../docs/explanations/architecture/automated-testing.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "FullSiteEditingTemplates",
 		"slug": "full-site-editing-templates",
-		"markdown_source": "../docs/explanations/full-site-editing-templates.md",
-		"parent": "explanations"
+		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
+		"parent": "architecture"
 	},
 	{
 		"title": "Contributor Guide",
