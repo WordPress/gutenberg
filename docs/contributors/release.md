@@ -275,7 +275,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
 
-Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the main branch of Gutenberg.
+Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Minor WordPress Releases
 

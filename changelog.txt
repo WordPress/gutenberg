@@ -7659,7 +7659,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 * Fix keyboard interaction (up/down arrow keys) causing focus to transfer out of the default block’s insertion menu.
 * Fix regression causing dynamic blocks not rendering in the frontend.
 * Fix vertical alignment issue on Media & Text block.
-* Fix some linter errors in main branch.
+* Fix some linter errors in trunk branch.
 * Fix dash line in More/Next-Page blocks.
 * Fix missing Categories block label.
 * Fix embedding and demo tests.
