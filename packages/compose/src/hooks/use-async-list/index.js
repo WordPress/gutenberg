@@ -89,7 +89,7 @@ function useAsyncList( list ) {
 	}, [ list ] );
 
 	/* eslint-disable jsdoc/valid-types */
-	return /** @type T[] */ ( current );
+	return /** @type {T[]} */ ( current );
 	/* eslint-enable jsdoc/valid-types */
 }
 
