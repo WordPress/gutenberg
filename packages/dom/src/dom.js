@@ -82,7 +82,7 @@ function isSelectionForward( selection ) {
 /* eslint-disable jsdoc/valid-types */
 /**
  * @param {Element} element Element to test
- * @return {element is HTMLTextAreaElement | HTMLInputElement} True if element it Input or TextArea
+ * @return {element is HTMLTextAreaElement | HTMLInputElement} True if element is Input or TextArea
  */
 function isInputOrTextAreaElement( element ) {
 	return 'INPUT' === element.tagName || 'TEXTAREA' === element.tagName;
