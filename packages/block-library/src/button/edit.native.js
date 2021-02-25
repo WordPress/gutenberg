@@ -435,7 +435,7 @@ class ButtonEdit extends Component {
 						identifier="text"
 						tagName="p"
 						minWidth={ minWidth } // The minimum Button size.
-						maxWidth={ maxWidth } // The width of the screen.
+						maxWidth={ width ? minWidth : maxWidth } // The width of the screen.
 						id={ clientId }
 						isSelected={ isButtonFocused }
 						withoutInteractiveFormatting
