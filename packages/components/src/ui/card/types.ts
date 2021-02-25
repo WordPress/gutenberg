@@ -16,11 +16,11 @@ export type CardProps = SurfaceProps & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Card, CardBody, Text } from `@wp-g2/components`
+	 * import { Card, CardBody, Text } from `@wordpress/components/ui`
 	 *
 	 * function Example() {
 	 *   return (
-	 *     <Card elevation={8}>
+	 *     <Card elevation={ 8 }>
 	 *       <CardBody>
 	 *         <Text>Card Content</Text>
 	 *       </CardBody>

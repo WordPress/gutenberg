@@ -47,6 +47,8 @@ function CardHeader( props, forwardedRef ) {
  *
  * @example
  * ```jsx
+ * import { Card, CardBody, CardHeader } from '@wordpress/components/ui';
+ *
  * <Card>
  * 	<CardHeader>...</CardHeader>
  * 	<CardBody>...</CardBody>

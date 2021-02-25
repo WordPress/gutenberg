@@ -66,13 +66,13 @@ function Card( props, forwardedRef ) {
  *   CardBody,
  *   CardFooter,
  *   Text,
- * } from `@wp-g2/components`
+ * } from `@wordpress/components/ui`
  *
  * function Example() {
  *   return (
  *     <Card>
  *       <CardHeader>
- *         <Heading size={4}>Card Title</Heading>
+ *         <Heading size={ 4 }>Card Title</Heading>
  *       </CardHeader>
  *       <CardBody>
  *         <Text>Card Content</Text>
