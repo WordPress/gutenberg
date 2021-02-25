@@ -251,8 +251,8 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 
 	return array(
 		'name'        => $name,
-		'title'       => $title ? $title : $fallback_title,
-		'description' => $description ? $description : $fallback_description,
+		'title'       => isset( $title ) ? $title : $fallback_title,
+		'description' => isset( $description ) ? $description : $fallback_description,
 		'attributes'  => array(
 			'type' => $name,
 			'kind' => $kind,
