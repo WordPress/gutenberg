@@ -165,6 +165,7 @@
 		] },
 		{ "docs/contributors/triage.md": [] },
 		{ "docs/contributors/localizing.md": [] },
+		{ "docs/contributors/accessibility-testing.md": [] },
 		{ "docs/contributors/repository-management.md": [] },
 		{ "docs/contributors/folder-structure.md": [] },
 		{ "docs/contributors/versions-in-wordpress.md": [] },

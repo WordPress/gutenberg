@@ -220,7 +220,7 @@ It is preferred to implement all components as [function components](https://rea
 
 ## JavaScript Documentation using JSDoc
 
-Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
+Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/code/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/code/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
 
 For additional guidance, consult the following resources:
 
@@ -266,7 +266,7 @@ Note the use of quotes when defining a set of string literals. As in the [JavaSc
 
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#import-types) to import type declarations from other files or third-party dependencies.
 
-Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/coding-guidelines.md#imports).
+Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/code/coding-guidelines.md#imports).
 
 ```js
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
@@ -472,6 +472,6 @@ For class components, there is no recommendation for documenting the props of th
 We use
 [`phpcs` (PHP_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
 
-The easiest way to use PHPCS is [local environment](/docs/contributors/getting-started.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint-php`.
+The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint-php`.
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
