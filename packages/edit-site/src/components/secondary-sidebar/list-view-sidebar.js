@@ -6,7 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useFocusOnMount } from '@wordpress/compose';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -28,7 +28,9 @@ export default function ListViewSidebar() {
 	} );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const [ listViewDialogRef, listViewDialogProps ] = useDialog( {
+		onClose: () => setIsListViewOpened( false ),
+	} );
 
 	return (
 		<div className="edit-site-editor__list-view-panel">
@@ -42,7 +44,8 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
-				ref={ focusOnMountRef }
+				ref={ listViewDialogRef }
+				{ ...listViewDialogProps }
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
