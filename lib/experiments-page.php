@@ -62,17 +62,19 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-widgets-in-customizer',
 		)
 	);
-	add_settings_field(
-		'gutenberg-fse',
-		__( 'Full Site Editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Allow creating templates using the block editor', 'gutenberg' ),
-			'id'    => 'gutenberg-fse',
-		)
-	);
+	if ( ! gutenberg_is_fse_theme() ) {
+		add_settings_field(
+			'gutenberg-fse',
+			__( 'Full Site Editing', 'gutenberg' ),
+			'gutenberg_display_experiment_field',
+			'gutenberg-experiments',
+			'gutenberg_experiments_section',
+			array(
+				'label' => __( 'Allow creating templates using the block editor', 'gutenberg' ),
+				'id'    => 'gutenberg-fse',
+			)
+		);
+	}
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
