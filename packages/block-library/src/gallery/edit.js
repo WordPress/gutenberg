@@ -24,7 +24,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { Platform, useEffect, useMemo, useState } from '@wordpress/element';
+import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -51,6 +51,7 @@ import {
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
+import useGetNewImages from './use-get-new-images';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -93,8 +94,6 @@ function GalleryEdit( props ) {
 		shortCodeTransforms,
 		sizeSlug,
 	} = attributes;
-
-	const [ currentImages, setCurrentImages ] = useState( [] );
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -151,63 +150,24 @@ function GalleryEdit( props ) {
 
 			const getMediaItems = select( coreStore ).getMediaItems;
 
-			return getMediaItems( { include: imageIds } );
+			return getMediaItems( {
+				include: imageIds,
+				per_page: imageIds.length,
+			} );
 		},
 		[ innerBlockImages ]
 	);
 
+	const newImages = useGetNewImages( images, imageData );
+
 	useEffect( () => {
-		let imagesUpdated = false;
-
-		// First lets check if any images have been deleted.
-		const newCurrentImages = currentImages.filter( ( currentImg ) =>
-			images.find( ( img ) => {
-				return currentImg.clientId === img.clientId;
-			} )
-		);
-
-		if ( newCurrentImages.length < currentImages.length ) {
-			imagesUpdated = true;
-		}
-
-		// Now lets see if we have any images hydrated from saved content and if so
-		// add then to currentImages state.
-		images.forEach( ( image ) => {
-			if (
-				image.fromSavedContent &&
-				! newCurrentImages.find(
-					( currentImage ) => currentImage.id === image.id
-				)
-			) {
-				imagesUpdated = true;
-				newCurrentImages.push( image );
-			}
-		} );
-
-		// Now check for any new images that have been added InnerBlocks and for which
-		// we have the imageData we need for setting default block attributes.
-		const incomingImages = images.filter(
-			( image ) =>
-				! newCurrentImages.find(
-					( currentImage ) => image.id && currentImage.id === image.id
-				) &&
-				imageData?.find( ( img ) => img.id === image.id ) &&
-				! image.fromSavedConent
-		);
-
-		incomingImages.forEach( ( newImage ) => {
-			imagesUpdated = true;
+		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
 				...buildImageAttributes( false, newImage ),
 				id: newImage.id,
 			} );
-			newCurrentImages.push( newImage );
 		} );
-
-		if ( imagesUpdated ) {
-			setCurrentImages( newCurrentImages );
-		}
-	}, [ images, imageData, currentImages ] );
+	}, [ newImages ] );
 
 	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
 
@@ -303,14 +263,14 @@ function GalleryEdit( props ) {
 			  )
 			: innerBlockImages;
 
-		const newImages = processedImages.filter(
+		const newImageList = processedImages.filter(
 			( img ) =>
 				! existingImageBlocks.find(
 					( existingImg ) => img.id === existingImg.attributes.id
 				)
 		);
 
-		const newBlocks = newImages.map( ( image ) => {
+		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: image.id,
 				url: image.url,
