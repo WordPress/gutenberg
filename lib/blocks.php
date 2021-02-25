@@ -42,6 +42,7 @@ function gutenberg_reregister_core_block_types() {
 				'spacer',
 				'subhead',
 				'table',
+				'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
@@ -89,6 +90,7 @@ function gutenberg_reregister_core_block_types() {
 					'site-logo.php'                 => 'core/site-logo',
 					'site-tagline.php'              => 'core/site-tagline',
 					'site-title.php'                => 'core/site-title',
+					'table-of-contents.php'         => 'core/table-of-contents',
 					'template-part.php'             => 'core/template-part',
 				)
 			),

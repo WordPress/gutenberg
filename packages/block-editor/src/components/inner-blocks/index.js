@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
@@ -159,7 +159,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		[ clientId, isSmallScreen ]
 	);
 
-	const ref = props.ref || fallbackRef;
+	const ref = useMergeRefs( [ props.ref, fallbackRef ] );
 	const InnerBlocks =
 		options.value && options.onChange
 			? ControlledInnerBlocks
@@ -179,7 +179,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			<InnerBlocks
 				{ ...options }
 				clientId={ clientId }
-				wrapperRef={ ref }
+				wrapperRef={ fallbackRef }
 			/>
 		),
 	};
