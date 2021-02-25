@@ -769,15 +769,15 @@
 	},
 	{
 		"title": "Creating a block-based theme",
-		"slug": "block-based-themes",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-themes/README.md",
+		"slug": "block-based-theme",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-theme/README.md",
 		"parent": "tutorials"
 	},
 	{
 		"title": "Adding blocks to your theme",
 		"slug": "block-based-themes-2-adding-blocks",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md",
-		"parent": "block-based-themes"
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-theme/block-based-themes-2-adding-blocks.md",
+		"parent": "block-based-theme"
 	},
 	{
 		"title": "Component Reference",
