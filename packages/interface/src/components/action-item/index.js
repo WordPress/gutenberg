@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
+import { isArray, isEmpty, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { Children } from '@wordpress/element';
 
 function ActionItemSlot( {
@@ -16,6 +17,16 @@ function ActionItemSlot( {
 	bubblesVirtually,
 	...props
 } ) {
+	if ( isArray( Component ) ) {
+		deprecated(
+			'Passing a tuple of components with `as` prop to `ActionItem.Slot` component',
+			{
+				alternative: 'a component with `as` prop',
+				version: '10.3',
+			}
+		);
+		Component = Component[ 0 ];
+	}
 	return (
 		<Slot
 			name={ name }
