@@ -1,26 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render CardInnerBody 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -12,13 +12,13 @@
-        data-g2-c16t=\\"true\\"
-        data-g2-component=\\"CardHeader\\"
-        title=\\"WordPress.org\\"
+        data-g2-c16t="true"
+        data-g2-component="CardHeader"
+        title="WordPress.org"
       />
       <div
--       class=\\"components-card-inner-body wp-components-card-inner-body css-1n7epz\\"
-+       class=\\"components-scrollable wp-components-scrollable components-card-body wp-components-card-body css-1hp1ar\\"
-        data-g2-c16t=\\"true\\"
--       data-g2-component=\\"CardInnerBody\\"
-+       data-g2-component=\\"CardBody\\"
+-       class="components-card-inner-body wp-components-card-inner-body css-1n7epz"
++       class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body css-1hp1ar"
+        data-g2-c16t="true"
+-       data-g2-component="CardInnerBody"
++       data-g2-component="CardBody"
       >
         Code is Poetry.
       </div>
       <div
-        class=\\"components-flex wp-components-flex components-card-footer wp-components-card-footer css-1qwgs3h\\""
+        class="components-flex wp-components-flex components-card-footer wp-components-card-footer css-1qwgs3h"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -458,27 +458,27 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render elevation 1`] = `
-"Snapshot Diff:
+Snapshot Diff:
 - First value
 + Second value
 
 @@ -7,16 +7,16 @@
-      class=\\"css-1kk7lqu\\"
-      data-g2-component=\\"CardContent\\"
+      class="css-1kk7lqu"
+      data-g2-component="CardContent"
     />
     <div
-      aria-hidden=\\"true\\"
--     class=\\"components-elevation wp-components-elevation css-1vg495v\\"
-+     class=\\"components-elevation wp-components-elevation css-1wkolpp\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"CardElevation\\"
+      aria-hidden="true"
+-     class="components-elevation wp-components-elevation css-1vg495v"
++     class="components-elevation wp-components-elevation css-1wkolpp"
+      data-g2-c16t="true"
+      data-g2-component="CardElevation"
     />
     <div
-      aria-hidden=\\"true\\"
--     class=\\"components-elevation wp-components-elevation css-dgxm8l\\"
-+     class=\\"components-elevation wp-components-elevation css-1zwi7l\\"
-      data-g2-c16t=\\"true\\"
-      data-g2-component=\\"CardElevation\\"
+      aria-hidden="true"
+-     class="components-elevation wp-components-elevation css-dgxm8l"
++     class="components-elevation wp-components-elevation css-1zwi7l"
+      data-g2-c16t="true"
+      data-g2-component="CardElevation"
     />
-  </div>"
+  </div>
 `;
