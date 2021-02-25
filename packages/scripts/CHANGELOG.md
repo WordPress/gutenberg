@@ -5,6 +5,9 @@
 ### New Features
 
 -   Default `check-engines` command to the `engines` config in `package.json` file of the current project ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+### Breaking Changes
+
+- Lint TypeScript files as part of `lint-js`. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
 
 ### Enhancements
 

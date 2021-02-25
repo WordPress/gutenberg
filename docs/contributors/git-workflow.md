@@ -60,7 +60,7 @@ git commit -m "Your Good Commit Message" path/to/FILE
 **Step 6**: Push your change up to GitHub. The change will be pushed to your fork of the repository on the GitHub
 
 ```bash
-git push -u origin upgrade/my-branch
+git push -u origin update/my-branch
 ```
 
 **Step 7**: Go to your forked repository on GitHub -- it will automatically detect the change and give you a link to create a pull request.

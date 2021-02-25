@@ -219,15 +219,9 @@ function Editor( { initialSettings } ) {
 														<div className="edit-site-editor__inserter-panel-content">
 															<Library
 																showInserterHelpPanel
-																onSelect={ () => {
-																	if (
-																		isMobile
-																	) {
-																		setIsInserterOpened(
-																			false
-																		);
-																	}
-																} }
+																shouldFocusBlock={
+																	isMobile
+																}
 															/>
 														</div>
 													</div>

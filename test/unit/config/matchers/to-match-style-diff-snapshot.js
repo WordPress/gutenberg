@@ -17,12 +17,17 @@ function toMatchStyleDiffSnapshot( received, expected, testName ) {
 	const expectedStyles = serialize(
 		window.getComputedStyle( expected )._values
 	);
-	const difference = snapshotDiff( receivedStyles, expectedStyles );
-	return snapshotDiff.toMatchDiffSnapshot.call(
+	const ret = snapshotDiff.toMatchDiffSnapshot.call(
 		this,
-		difference,
+		receivedStyles,
+		expectedStyles,
+		{
+			aAnnotation: 'Received styles',
+			bAnnotation: 'Base styles',
+		},
 		testName || ''
 	);
+	return ret;
 }
 
 expect.extend( { toMatchStyleDiffSnapshot } );

@@ -2,7 +2,9 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release Gutenberg, you need commit access to the [WordPress.org plugin repository][plugin repository] as well as being part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
+To release a stable version of the Gutenberg plugin, you need approval from a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core) for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release.
+
+To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
 ## Plugin Releases
 
@@ -12,7 +14,7 @@ We release a new major version approximately every two weeks. The current and ne
 
 -   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
--   **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
+-   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
@@ -37,6 +39,10 @@ During the release process, you'll be asked to provide:
 -   A changelog: prepare one beforehand by following the instructions below.
 -   A [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line): have one ready beforehand by visiting [this page](https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages), if you haven't got one yet.
 -   User and password for your GitHub account: if 2FA is enabled for your account (it should), you need to provide a personal access token instead of password (you can use the one necessary for the release).
+
+The release script will create a `git` tag for the release and push it to GitHub. This triggers a GitHub workflow that builds the plugin, creates a release draft (based on the Changelog), and attaches the plugin zip. This will take a couple of minutes. You will then find the release draft at https://github.com/WordPress/gutenberg/releases. You can edit it further (but note that the changes won't be propagated to `changelog.txt`). Once you're happy with it, press the 'Publish' button.
+
+If you're releasing a stable version (rather than an RC), this will trigger a GitHub action that will upload the plugin to the WordPress.org plugin repository (SVN). This action needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 ### Manual Release Process
 

@@ -5,7 +5,13 @@ export const WIDE_ALIGNMENTS = {
 	},
 	// `innerContainers`: Group of blocks based on `InnerBlocks` component,
 	// used to nest other blocks inside
-	innerContainers: [ 'core/group', 'core/columns', 'core/column' ],
+	innerContainers: [
+		'core/group',
+		'core/columns',
+		'core/column',
+		'core/buttons',
+		'core/button',
+	],
 	excludeBlocks: [ 'core/heading' ],
 };
 
