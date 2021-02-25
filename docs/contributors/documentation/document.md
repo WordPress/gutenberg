@@ -25,7 +25,7 @@ The Block Editor Handbook is a mix of markdown files in the `/docs/` directory o
 
 An automated job publishes the docs every 15 minutes to the [Block Editor Handbook site](https://developer.wordpress.org/block-editor/).
 
-See [the Git Workflow](/docs/contributors/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
 
 ### Update a Document
 
@@ -96,7 +96,7 @@ The preferred format for code examples is ESNext, this should be the default vie
 
 ### Editor Config
 
-You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/develop/getting-started.md) for complete details.
+You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started.md) for complete details.
 
 An example config for using Visual Studio Code and the Prettier extensions:
 

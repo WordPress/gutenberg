@@ -4,7 +4,7 @@ Performance is a key feature for editor applications and the Block editor is not
 
 ## Metrics
 
-To ensure the block editor stays performant across releases and development, we monitor some key metrics using [performance testing](/docs/contributors/testing-overview.md#performance-testing). 
+To ensure the block editor stays performant across releases and development, we monitor some key metrics using [performance testing](/docs/contributors/code/testing-overview.md#performance-testing). 
 
 **Loading Time:** The time it takes to load an editor page.
 **Typing Time:** The time it takes for the browser to respond while typing on the editor.

@@ -1848,6 +1848,12 @@
 		"parent": "contributors"
 	},
 	{
+		"title": "Accessibility Testing",
+		"slug": "accessibility-testing",
+		"markdown_source": "../docs/contributors/accessibility-testing.md",
+		"parent": "contributors"
+	},
+	{
 		"title": "Repository Management",
 		"slug": "repository-management",
 		"markdown_source": "../docs/contributors/repository-management.md",

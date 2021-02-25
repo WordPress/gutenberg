@@ -49,7 +49,7 @@ This will create a directory called `gutenberg` with all the files for the proje
 git switch -c update/my-branch
 ```
 
-**Step 4**: Make the code changes. Build, confirm, and test your change thoroughly. See [coding guidelines](/docs/contributors/coding-guidelines.md) and [testing overview](/docs/contributors/testing-overview.md) for guidance.
+**Step 4**: Make the code changes. Build, confirm, and test your change thoroughly. See [coding guidelines](/docs/contributors/code/coding-guidelines.md) and [testing overview](/docs/contributors/code/testing-overview.md) for guidance.
 
 **Step 5**: Commit your change with a [good commit message](https://make.wordpress.org/core/handbook/best-practices/commit-messages/). This will commit your change to your local copy of the repository.
 
