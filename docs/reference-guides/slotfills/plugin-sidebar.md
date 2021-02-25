@@ -27,4 +27,4 @@ registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 
 ### Open State
 
-![Open State](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers//assets/plugin-sidebar-open-state.png?raw=true)
+![Open State](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-open-state.png?raw=true)
