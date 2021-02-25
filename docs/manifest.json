@@ -1,9 +1,15 @@
 [
 	{
+		"title": "Getting started",
+		"slug": "handbook",
+		"markdown_source": "../docs/readme.md",
+		"parent": null
+	},
+	{
 		"title": "Getting Started",
 		"slug": "getting-started",
 		"markdown_source": "../docs/getting-started/README.md",
-		"parent": null
+		"parent": "handbook"
 	},
 	{
 		"title": "Tutorials",
