@@ -70,11 +70,12 @@ function BlockAlignmentUI( {
 	if ( ! supportsAlignments ) {
 		return null;
 	}
-
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
 	const enabledControls = controls.filter(
 		( control ) =>
-			( wideControlsEnabled || ! WIDE_CONTROLS.includes( control ) ) &&
+			( layout.alignments || // Ignore the global wideAlignment check if the layout explicitely defines alignments.
+				wideControlsEnabled ||
+				! WIDE_CONTROLS.includes( control ) ) &&
 			availableAlignments.includes( control )
 	);
 

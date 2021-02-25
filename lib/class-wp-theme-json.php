@@ -166,6 +166,7 @@ class WP_Theme_JSON {
 				'customTextTransforms'  => null,
 			),
 			'custom'     => null,
+			'layout'     => null,
 		),
 	);
 

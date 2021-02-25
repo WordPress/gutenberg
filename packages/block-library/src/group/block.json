@@ -9,6 +9,9 @@
 		},
 		"templateLock": {
 			"type": "string"
+		},
+		"layout": {
+			"type": "object"
 		}
 	},
 	"supports": {
