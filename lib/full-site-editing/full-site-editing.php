@@ -11,7 +11,7 @@
  * @return boolean Whether FSE is enabled or not.
  */
 function gutenberg_is_fse_enabled() {
-	return gutenberg_is_fse_theme() || get_option( 'gutenberg_enable_fse' );
+	return gutenberg_is_fse_theme() || gutenberg_is_experiment_enabled( 'gutenberg-fse' );
 }
 
 /**
@@ -127,40 +127,3 @@ function gutenberg_menu_order( $menu_order ) {
 	}
 	return $menu_order;
 }
-
-/**
- * Add option under "General" settings to enable FSE.
- *
- * @return void
- */
-function gutenberg_add_fse_general_setting() {
-
-	// Register the setting.
-	register_setting(
-		'general',
-		'gutenberg_enable_fse',
-		array(
-			'type'              => 'boolean',
-			'default'           => false,
-			'sanitize_callback' => function( $val ) {
-				return (bool) $val;
-			},
-		)
-	);
-
-	// Add the field.
-	add_settings_field(
-		'gutenberg_enable_fse',
-		esc_html__( 'Allow creating templates using the block editor', 'gutenberg' ),
-		function() {
-			?>
-			<input name="gutenberg_enable_fse" type="checkbox" id="gutenberg_enable_fse" value="1" <?php checked( '1', get_option( 'gutenberg_enable_fse' ) ); ?> />
-			<?php
-		},
-		'general',
-        'default',
-        array( 'label_for' => 'gutenberg_enable_fse' )
-    );
-}
-add_action('admin_init', 'gutenberg_add_fse_general_setting');
-
