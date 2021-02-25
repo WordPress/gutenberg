@@ -43,7 +43,6 @@ describe( 'RTL', () => {
 			snippetScriptEl.text = 'document.dir = "rtl";';
 			newComponentsScriptEl.src = componentsScriptSrc;
 
-			//scripts.forEach( ( script ) => script.remove() );
 			head.appendChild( snippetScriptEl );
 			head.appendChild( newComponentsScriptEl );
 		} );
