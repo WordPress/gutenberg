@@ -7,7 +7,7 @@ export type SizeRangeDefault =
 
 export type SizeRangeReduced = 'large' | 'medium' | 'small';
 
-export type FormElementProps<V> = {
+export type FormElementProps< V > = {
 	/**
 	 * The default (initial) state to use if `value` is undefined.
 	 */

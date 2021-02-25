@@ -7,7 +7,10 @@ export * from './gradients';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
-export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export {
+	BlockAlignmentControl,
+	BlockAlignmentToolbar,
+} from './block-alignment-control';
 export { default as __experimentalBlockFullHeightAligmentToolbar } from './block-full-height-alignment-toolbar';
 export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
@@ -96,15 +99,12 @@ export {
 	useClipboardHandler as __unstableUseClipboardHandler,
 } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
-export { default as __unstableUseEditorStyles } from './editor-styles';
+export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
 export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
-export {
-	default as MultiSelectScrollIntoView,
-	useScrollMultiSelectionIntoView as __unstableUseScrollMultiSelectionIntoView,
-} from './multi-select-scroll-into-view';
+export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
 export {
 	default as ObserveTyping,

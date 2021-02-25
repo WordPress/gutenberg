@@ -247,7 +247,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 						'misc'       => 'value',
 					),
-					'core/group' => array(
+					'core/group'     => array(
 						'custom' => array(
 							'base-font'   => 16,
 							'line-height' => array(
@@ -738,10 +738,10 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	function test_get_page_templates() {
+	function test_get_custom_templates() {
 		$theme_json = new WP_Theme_JSON(
 			array(
-				'pageTemplates' => array(
+				'customTemplates' => array(
 					'page-home' => array(
 						'title' => 'Some title',
 					),
@@ -749,13 +749,36 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$page_templates = $theme_json->get_page_templates();
+		$page_templates = $theme_json->get_custom_templates();
 
 		$this->assertEqualSetsWithIndex(
 			$page_templates,
 			array(
 				'page-home' => array(
 					'title' => 'Some title',
+				),
+			)
+		);
+	}
+
+	function test_get_template_parts() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'templateParts' => array(
+					'header' => array(
+						'area' => 'Some area',
+					),
+				),
+			)
+		);
+
+		$template_parts = $theme_json->get_template_parts();
+
+		$this->assertEqualSetsWithIndex(
+			$template_parts,
+			array(
+				'header' => array(
+					'area' => 'Some area',
 				),
 			)
 		);

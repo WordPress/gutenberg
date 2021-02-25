@@ -1,6 +1,6 @@
 # Getting Started for the React Native based Mobile Gutenberg
 
-Welcome! This is the Getting Started guide for the native mobile port of the block editor, targeting Android and iOS devices. Overall, it's a React Native library to be used in parent greenfield or brownfield apps. Continue reading for information on how to build and it!
+Welcome! This is the Getting Started guide for the native mobile port of the block editor, targeting Android and iOS devices. Overall, it's a React Native library to be used in parent greenfield or brownfield apps. Continue reading for information on how to build, test, and run it.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ git clone https://github.com/WordPress/gutenberg.git
 
 ## Set up
 
-Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
+Note that the commands described here should be run in the top-level directory of the cloned project. Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
 
 ```
 nvm install --latest-npm

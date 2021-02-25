@@ -2,7 +2,8 @@
 	background: $white;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
-	margin-top: $grid-unit-50 * 2;
+	max-width: $navigation-editor-width;
+	margin: auto;
 
 	.components-spinner {
 		display: block;
@@ -71,6 +72,11 @@
 	.wp-block-navigation-link.has-child {
 		cursor: default;
 		border-radius: $radius-block-ui;
+	}
+
+	// Override Nav block styling for deeply nested submenus.
+	.has-child .wp-block-navigation__container .wp-block-navigation__container {
+		left: auto;
 	}
 
 	// When editing a link with children, highlight the parent

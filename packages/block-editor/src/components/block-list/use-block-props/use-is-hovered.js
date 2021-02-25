@@ -1,63 +1,50 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
 
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
+function listener( event ) {
+	if ( event.defaultPrevented ) {
+		return;
+	}
+
+	const action = event.type === 'mouseover' ? 'add' : 'remove';
+
+	event.preventDefault();
+	event.currentTarget.classList[ action ]( 'is-hovered' );
+}
 
 /**
- * Returns true when the block is hovered and in navigation or outline mode, false if not.
- *
- * @param {RefObject} ref React ref with the block element.
- *
- * @return {boolean} Hovered state.
+ * Adds `is-hovered` class when the block is hovered and in navigation or
+ * outline mode.
  */
-export function useIsHovered( ref ) {
-	const [ isHovered, setHovered ] = useState( false );
-
-	const { isNavigationMode, isOutlineMode } = useSelect( ( select ) => {
-		const {
-			isNavigationMode: selectIsNavigationMode,
-			getSettings,
-		} = select( blockEditorStore );
-
-		return {
-			isNavigationMode: selectIsNavigationMode(),
-			isOutlineMode: getSettings().outlineMode,
-		};
+export function useIsHovered() {
+	const isEnabled = useSelect( ( select ) => {
+		const { isNavigationMode, getSettings } = select( blockEditorStore );
+		return isNavigationMode() || getSettings().outlineMode;
 	}, [] );
 
-	useEffect( () => {
-		function addListener( eventType, value ) {
-			function listener( event ) {
-				if ( event.defaultPrevented ) {
-					return;
-				}
+	return useRefEffect(
+		( node ) => {
+			if ( isEnabled ) {
+				node.addEventListener( 'mouseout', listener );
+				node.addEventListener( 'mouseover', listener );
 
-				event.preventDefault();
-				setHovered( value );
+				return () => {
+					node.removeEventListener( 'mouseout', listener );
+					node.removeEventListener( 'mouseover', listener );
+
+					// Remove class in case it lingers.
+					node.classList.remove( 'is-hovered' );
+				};
 			}
-
-			ref.current.addEventListener( eventType, listener );
-			return () => {
-				ref.current.removeEventListener( eventType, listener );
-			};
-		}
-
-		if ( isHovered ) {
-			return addListener( 'mouseout', false );
-		}
-
-		if ( isOutlineMode || isNavigationMode ) {
-			return addListener( 'mouseover', true );
-		}
-	}, [ isNavigationMode, isOutlineMode, isHovered, setHovered ] );
-
-	return isHovered;
+		},
+		[ isEnabled ]
+	);
 }

@@ -11,6 +11,7 @@ import { Disabled } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useBlockProps } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 const getYearMonth = memoize( ( date ) => {
 	if ( ! date ) {
@@ -25,7 +26,7 @@ const getYearMonth = memoize( ( date ) => {
 
 export default function CalendarEdit( { attributes } ) {
 	const date = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getEditedPostAttribute } = select( editorStore );
 
 		const postType = getEditedPostAttribute( 'type' );
 		// Dates are used to overwrite year and month used on the calendar.

@@ -7,7 +7,9 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
@@ -20,9 +22,10 @@ function ParagraphBlock( {
 	mergedStyle,
 	style,
 	isSelected,
+	clientId,
 } ) {
 	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
+		return !! select( blockEditorStore ).getSettings().isRTL;
 	}, [] );
 
 	const { align, content, placeholder } = attributes;
@@ -32,6 +35,9 @@ function ParagraphBlock( {
 		...style,
 	};
 
+	const onAlignmentChange = useCallback( ( nextAlign ) => {
+		setAttributes( { align: nextAlign } );
+	}, [] );
 	return (
 		<>
 			{ isSelected && (
@@ -39,9 +45,7 @@ function ParagraphBlock( {
 					<AlignmentToolbar
 						value={ align }
 						isRTL={ isRTL }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
+						onChange={ onAlignmentChange }
 					/>
 				</BlockControls>
 			) }
@@ -56,15 +60,23 @@ function ParagraphBlock( {
 						content: nextContent,
 					} );
 				} }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( name );
+				onSplit={ ( value, isOriginal ) => {
+					let newAttributes;
+
+					if ( isOriginal || value ) {
+						newAttributes = {
+							...attributes,
+							content: value,
+						};
 					}
 
-					return createBlock( name, {
-						...attributes,
-						content: value,
-					} );
+					const block = createBlock( name, newAttributes );
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

@@ -39,7 +39,8 @@
 		"customBackgroundColor": "customBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
-		"showSubmenuIcon": "showSubmenuIcon"
+		"showSubmenuIcon": "showSubmenuIcon",
+		"style": "style"
 	},
 	"supports": {
 		"align": [

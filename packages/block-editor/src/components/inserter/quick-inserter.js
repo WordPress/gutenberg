@@ -30,7 +30,6 @@ export default function QuickInserter( {
 	rootClientId,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -38,16 +37,17 @@ export default function QuickInserter( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert,
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
 		onInsertBlocks
 	);
 
-	const [ patterns ] = usePatternsState( onInsertBlocks );
-	const showPatterns =
-		! destinationRootClientId && patterns.length && !! filterValue;
+	const [ patterns ] = usePatternsState(
+		onInsertBlocks,
+		destinationRootClientId
+	);
+	const showPatterns = patterns.length && !! filterValue;
 	const showSearch =
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
@@ -92,7 +92,8 @@ export default function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
-					placeholder={ __( 'Search for a block' ) }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
 				/>
 			) }
 
@@ -103,7 +104,6 @@ export default function QuickInserter( {
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					selectBlockOnInsert={ selectBlockOnInsert }
 					maxBlockPatterns={ showPatterns ? SHOWN_BLOCK_PATTERNS : 0 }
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }

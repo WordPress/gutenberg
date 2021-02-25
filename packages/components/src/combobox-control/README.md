@@ -91,7 +91,7 @@ The options that can be chosen from.
 - Type: `Array<{ value: String, label: String }>`
 - Required: Yes
 
-#### onInputChange
+#### onFilterValueChange
 
 Function called with the control's search input value changes. The argument contains the next input value.
 

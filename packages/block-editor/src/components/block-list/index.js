@@ -18,12 +18,7 @@ import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
-
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
+import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
@@ -32,6 +27,7 @@ export default function BlockList( { className } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
+	useScrollSelectionIntoView( ref );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
@@ -63,30 +59,16 @@ function Items( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			getGlobalBlockCount,
-			isTyping,
-			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( blockEditorStore );
-
-		// Determine if there is an active entity area to spotlight.
-		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
-			getSettings().__experimentalSpotlightEntityBlocks
-		);
-
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation:
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			activeEntityBlockId,
 		};
 	}
 
@@ -96,8 +78,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		orientation,
 		hasMultiSelection,
-		enableAnimation,
-		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const dropTargetIndex = useBlockDropZone( {
@@ -128,15 +108,12 @@ function Items( {
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
-							enableAnimation={ enableAnimation }
 							className={ classnames( {
 								'is-drop-target': isDropTarget,
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
-								'has-active-entity': activeEntityBlockId,
 							} ) }
-							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);
