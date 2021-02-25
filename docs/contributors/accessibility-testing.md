@@ -40,7 +40,7 @@ When testing with screen readers, try to use some of the combinations at the top
 
 [NVDA](https://www.nvaccess.org/about-nvda/) is a free screen reader for Windows and [the most popular one](https://webaim.org/projects/screenreadersurvey8/#primary).
 
-After installing it, you can activate NVDA by opening the app as you would do with other programs. An icon will appear on the System Tray where you have access more options. It's recommended to enable the "Speech viewer" dialog so it's easier to demonstrate what's being announced by NVDA when you take screenshots.
+After installing it, you can activate NVDA by opening the app as you would do with other programs. An icon will appear on the System Tray where you have access to more options. It's recommended to enable the "Speech viewer" dialog so it's easier to demonstrate what's being announced by NVDA when you take screenshots.
 
 <img src="https://user-images.githubusercontent.com/3068563/108868727-428db880-75d5-11eb-84a9-2c0b749a22ad.png" alt="NVDA options with Speech viewer enabled" width="640">
 
