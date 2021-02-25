@@ -55,7 +55,7 @@ If you are not seeing your changes, and no errors, check that your JavaScript fi
 
 If you do not see the file being loaded, double check the enqueue function is correct. You can also check your server logs to see if there is an error messages.
 
-Add a test message to confirm your JavaScript is loading, add a `console.log("Here");` at the top of your code, and confirm the message is shown. If not, it is likely the file is not loading properly, [review the loading JavaScript page](/docs/howto-guides/javascript/loading-javascript.md) for details on enqueuing JavaScript properly.
+Add a test message to confirm your JavaScript is loading, add a `console.log("Here");` at the top of your code, and confirm the message is shown. If not, it is likely the file is not loading properly, [review the loading JavaScript page](/docs/how-to-guides/javascript/loading-javascript.md) for details on enqueuing JavaScript properly.
 
 ## Confirm all dependencies are loading
 
@@ -73,4 +73,4 @@ wp_enqueue_script(
 );
 ```
 
-For automated dependency management, it is recommended to [use wp-scripts to build step your JavaScript](/docs/howto-guides/javascript/js-build-setup.md#dependency-management).
+For automated dependency management, it is recommended to [use wp-scripts to build step your JavaScript](/docs/how-to-guides/javascript/js-build-setup.md#dependency-management).

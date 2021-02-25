@@ -10,6 +10,6 @@ Additionally, the ESNext code examples in the handbook include [JSX syntax](http
 
 For simplicity, the JavaScript tutorial uses the ES5 definition, without JSX. This code can run straight in your browser and does not require an additional build step. In many cases, it is perfectly fine to follow the same approach for simple plugins or experimenting. As your codebase grows in complexity it might be a good idea to switch to ESNext. You will find the majority of code and documentation across the block editor uses ESNext.
 
-See the [JavaScript Build Setup documentation](/docs/howto-guides/javascript/js-build-setup.md) for setting up a development environment using ESNext syntax.
+See the [JavaScript Build Setup documentation](/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment using ESNext syntax.
 
-See the [ESNext syntax documentation](/docs/howto-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
+See the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.

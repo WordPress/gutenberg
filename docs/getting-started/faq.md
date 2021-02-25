@@ -339,7 +339,7 @@ function gutenbergtheme_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
 
-*See:* [Editor Styles](/docs/howto-guides/themes/theme-support.md#editor-styles)
+*See:* [Editor Styles](/docs/how-to-guides/themes/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 

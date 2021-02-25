@@ -36,7 +36,7 @@ function gutenberg_examples_01_register_block() {
 add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
 
-Note the above example, shows using the [wp-scripts build step](/docs/howto-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file. 
+Note the above example, shows using the [wp-scripts build step](/docs/how-to-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file. 
 
 If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
 

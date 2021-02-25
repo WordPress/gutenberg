@@ -10,11 +10,11 @@ The block editor introduced in WordPress 5.0 is written in JavaScript, with the 
 
 ### Table of Contents
 
-1. [Plugins Background](/docs/howto-guides/javascript/plugins-background.md)
-2. [Loading JavaScript](/docs/howto-guides/javascript/loading-javascript.md)
-3. [Extending the Block Editor](/docs/howto-guides/javascript/extending-the-block-editor.md)
-4. [Troubleshooting](/docs/howto-guides/javascript/troubleshooting.md)
-5. [JavaScript Versions and Building](/docs/howto-guides/javascript/versions-and-building.md)
-6. [Scope your code](/docs/howto-guides/javascript/scope-your-code.md)
-7. [JavaScript Build Step](/docs/howto-guides/javascript/js-build-setup.md)
-8. [ESNext Syntax](/docs/howto-guides/javascript/esnext-js.md)
+1. [Plugins Background](/docs/how-to-guides/javascript/plugins-background.md)
+2. [Loading JavaScript](/docs/how-to-guides/javascript/loading-javascript.md)
+3. [Extending the Block Editor](/docs/how-to-guides/javascript/extending-the-block-editor.md)
+4. [Troubleshooting](/docs/how-to-guides/javascript/troubleshooting.md)
+5. [JavaScript Versions and Building](/docs/how-to-guides/javascript/versions-and-building.md)
+6. [Scope your code](/docs/how-to-guides/javascript/scope-your-code.md)
+7. [JavaScript Build Step](/docs/how-to-guides/javascript/js-build-setup.md)
+8. [ESNext Syntax](/docs/how-to-guides/javascript/esnext-js.md)

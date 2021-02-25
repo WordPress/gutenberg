@@ -6,12 +6,12 @@ In this short tutorial you will create one of these blocks, which will prompt a 
 
 For background around the thinking of blocks as the interface, please see the [key concepts section](/docs/architecture/key-concepts.md) of the handbook.
 
-Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps of [the JavaScript tutorial](/docs/howto-guides/javascript/readme.md) for information setting up a plugin.
+Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps of [the JavaScript tutorial](/docs/how-to-guides/javascript/readme.md) for information setting up a plugin.
 
 ## Table of Contents
 
-1. [Register Meta Field](/docs/howto-guides/metabox/meta-block-2-register-meta.md)
-2. [Add Meta Block](/docs/howto-guides/metabox/meta-block-3-add.md)
-3. [Use Post Meta Data](/docs/howto-guides/metabox/meta-block-4-use-data.md)
-4. [Finishing Touches](/docs/howto-guides/metabox/meta-block-5-finishing.md)
+1. [Register Meta Field](/docs/how-to-guides/metabox/meta-block-2-register-meta.md)
+2. [Add Meta Block](/docs/how-to-guides/metabox/meta-block-3-add.md)
+3. [Use Post Meta Data](/docs/how-to-guides/metabox/meta-block-4-use-data.md)
+4. [Finishing Touches](/docs/how-to-guides/metabox/meta-block-5-finishing.md)
 
