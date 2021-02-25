@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import {
+import type {
 	RadioStateReturn,
 	RadioGroupProps as ReakitRadioGroupProps,
 } from 'reakit';
