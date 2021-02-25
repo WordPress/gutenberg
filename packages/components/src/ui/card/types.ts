@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { CSSProperties } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
-import { Props as SurfaceProps } from '../surface/types';
+import type { Props as SurfaceProps } from '../surface/types';
 
 export type CardProps = SurfaceProps & {
 	/**
