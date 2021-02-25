@@ -12,11 +12,11 @@ This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
 
- 1. [What is needed to create a block-based theme?](/docs/how-to-guides/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
- 2. [Creating the theme](/docs/how-to-guides/block-based-themes/README.md#creating-the-theme)
- 3. [Creating the templates and template parts](/docs/how-to-guides/block-based-themes/README.md#creating-the-templates-and-template-parts)
- 4. [Experimental-theme.json - Global styles](/docs/how-to-guides/block-based-themes/README.md#experimental-theme-json-global-styles)
- 5. [Adding blocks](/docs/how-to-guides/block-based-themes/block-based-themes-2-adding-blocks.md)
+ 1. [What is needed to create a block-based theme?](/docs/how-to-guides/block-based-theme/README.md#what-is-needed-to-create-a-block-based-theme)
+ 2. [Creating the theme](/docs/how-to-guides/block-based-theme/README.md#creating-the-theme)
+ 3. [Creating the templates and template parts](/docs/how-to-guides/block-based-theme/README.md#creating-the-templates-and-template-parts)
+ 4. [Experimental-theme.json - Global styles](/docs/how-to-guides/block-based-theme/README.md#experimental-theme-json-global-styles)
+ 5. [Adding blocks](/docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md)
 
 ## What is needed to create a block-based theme?
 
@@ -377,4 +377,4 @@ Below are the presets and styles combined:
 }
 ```
 
-## [Adding blocks](/docs/how-to-guides/block-based-themes/block-based-themes-2-adding-blocks.md)
+## [Adding blocks](/docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md)
