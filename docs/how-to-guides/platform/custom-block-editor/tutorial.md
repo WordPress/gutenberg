@@ -279,7 +279,7 @@ Here we are scaffolding the core of the editor's layout alongside a few speciali
 Let's examine these in more detail:
 
 * `<SlotFillProvider>` - enables the use of the ["Slot/Fill"
-  pattern](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/docs/designers-developers/developers/slotfills/README.md) through our component tree.
+  pattern](/docs/reference-guides/slotfills/README.md) through our component tree.
 * `<DropZoneProvider>` - enables the use of [dropzones for drag and drop functionality](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/drop-zone).
 * `<Notices>` - custom component. Provides a "snack bar" Notice that will be rendered if any messages are dispatched to `core/notices` store.
 * `<Header>` - renders the static title "Standalone Block Editor" at the top of the
