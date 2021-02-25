@@ -11,17 +11,16 @@ import { Children } from '@wordpress/element';
 
 function ActionItemSlot( {
 	name,
-	as = [ ButtonGroup, Button ],
+	as: Component = ButtonGroup,
 	fillProps = {},
 	bubblesVirtually,
 	...props
 } ) {
-	const [ Container, Item ] = as;
 	return (
 		<Slot
 			name={ name }
 			bubblesVirtually={ bubblesVirtually }
-			fillProps={ { as: Item, ...fillProps } }
+			fillProps={ fillProps }
 		>
 			{ ( fills ) => {
 				if ( isEmpty( Children.toArray( fills ) ) ) {
@@ -56,20 +55,18 @@ function ActionItemSlot( {
 					return child;
 				} );
 
-				return <Container { ...props }>{ children }</Container>;
+				return <Component { ...props }>{ children }</Component>;
 			} }
 		</Slot>
 	);
 }
 
-function ActionItem( { name, as, onClick, ...props } ) {
+function ActionItem( { name, as: Component = Button, onClick, ...props } ) {
 	return (
 		<Fill name={ name }>
-			{ ( fillProps ) => {
-				const { onClick: fpOnClick, as: fpAs } = fillProps;
-				const Item = as || fpAs || Button;
+			{ ( { onClick: fpOnClick } ) => {
 				return (
-					<Item
+					<Component
 						onClick={
 							onClick || fpOnClick
 								? ( ...args ) => {
