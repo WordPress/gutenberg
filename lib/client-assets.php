@@ -698,7 +698,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_wit
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	$settings['isFSETheme'] = gutenberg_is_fse_enabled();
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );

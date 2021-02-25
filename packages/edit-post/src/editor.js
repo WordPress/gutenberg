@@ -63,7 +63,7 @@ function Editor( {
 			getPostType,
 			getEntityRecords,
 		} = select( 'core' );
-		const { getCurrentPost } = select( 'core/editor' );
+		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -79,6 +79,7 @@ function Editor( {
 		} else {
 			postObject = getEntityRecord( 'postType', postType, postId );
 		}
+		const isFSETheme = getEditorSettings().isFSETheme;
 		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
@@ -103,6 +104,7 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
+				isFSETheme &&
 				isViewable &&
 				postObject &&
 				getCurrentPost().status !== 'auto-draft'
