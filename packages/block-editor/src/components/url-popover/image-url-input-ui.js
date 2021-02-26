@@ -142,7 +142,17 @@ const ImageURLInputUI = ( {
 	const onSubmitLinkChange = useCallback( () => {
 		return ( event ) => {
 			if ( urlInput ) {
-				onChangeUrl( { href: urlInput } );
+				// It is possible the entered URL actually matches a named link destination.
+				// This check will ensure our link destination is correct.
+				const selectedDestination =
+					getLinkDestinations().find(
+						( destination ) => destination.url === urlInput
+					)?.linkDestination || LINK_DESTINATION_CUSTOM;
+
+				onChangeUrl( {
+					href: urlInput,
+					linkDestination: selectedDestination,
+				} );
 			}
 			stopEditLink();
 			setUrlInput( null );

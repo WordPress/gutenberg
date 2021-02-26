@@ -5,17 +5,15 @@ import {
 	createNewPost,
 	insertBlock,
 	publishPost,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
 	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -114,10 +112,6 @@ describe( 'Multi-entity save flow', () => {
 
 			// Should trigger multi-entity save button once template part edited.
 			await assertMultiSaveEnabled();
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Should only have save panel a11y button active after child entities edited.
 			await assertExistance( publishA11ySelector, false );
@@ -186,16 +180,13 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			const query = addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 );
-			await visitAdminPage( 'admin.php', query );
+			await siteEditor.visit();
 
-			// Ensure we are on 'front-page' demo template.
+			// Ensure we are on 'index' template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.

@@ -45,6 +45,7 @@ import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
+import { store as blockEditorStore } from '../../store';
 
 export const BlockListBlockContext = createContext();
 
@@ -86,9 +87,6 @@ function BlockListBlock( {
 	clientId,
 	isSelected,
 	isMultiSelected,
-	isPartOfMultiSelection,
-	isFirstMultiSelected,
-	isLastMultiSelected,
 	isTypingWithinBlock,
 	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
@@ -103,7 +101,6 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 	index,
-	enableAnimation,
 	activeEntityBlockId,
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -116,7 +113,7 @@ function BlockListBlock( {
 				isBlockBeingDragged,
 				isBlockHighlighted,
 				getSettings,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			return {
 				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
@@ -126,7 +123,7 @@ function BlockListBlock( {
 		},
 		[ clientId ]
 	);
-	const { removeBlock } = useDispatch( 'core/block-editor' );
+	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
@@ -218,16 +215,8 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		isSelected,
-		isFirstMultiSelected,
-		isLastMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
 		index,
 		className: wrapperClassName,
-		isLocked,
-		name,
-		mode,
-		blockTitle: blockType.title,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
@@ -275,10 +264,8 @@ function BlockListBlock( {
 const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		isBlockSelected,
-		isAncestorMultiSelected,
 		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
-		getLastMultiSelectedBlockClientId,
 		isTyping,
 		getBlockMode,
 		isSelectionEnabled,
@@ -286,7 +273,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
 		getMultiSelectedBlockClientIds,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
@@ -309,11 +296,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		isMultiSelected: isBlockMultiSelected( clientId ),
-		isPartOfMultiSelection:
-			isBlockMultiSelected( clientId ) ||
-			isAncestorMultiSelected( clientId ),
 		isFirstMultiSelected,
-		isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
 		multiSelectedClientIds: isFirstMultiSelected
 			? getMultiSelectedBlockClientIds()
 			: undefined,
@@ -350,7 +333,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		__unstableMarkLastChangeAsPersistent,
-	} = dispatch( 'core/block-editor' );
+	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -373,14 +356,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = select( 'core/block-editor' );
+			const { getBlockIndex } = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
 			const { getPreviousBlockClientId, getNextBlockClientId } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			if ( forward ) {

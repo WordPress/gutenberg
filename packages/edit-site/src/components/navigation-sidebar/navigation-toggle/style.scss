@@ -14,6 +14,11 @@
 
 	body.is-navigation-sidebar-open & {
 		display: flex;
+
+		.edit-site-navigation-toggle__button {
+			border-bottom: 1px solid transparent;
+			border-radius: 0;
+		}
 	}
 }
 
@@ -24,6 +29,11 @@
 	height: $header-height + $border-width; // Cover header border
 	width: $header-height;
 	z-index: 1;
+
+	// Adds a bottom border to match the header toolbar
+	border-bottom: 1px solid $gray-200;
+	// Prevents the bottom border from being clipped by border-bottom radius
+	border-radius: 2px 2px 0 0;
 
 	&.has-icon {
 		min-width: $header-height;

@@ -11,6 +11,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
@@ -159,6 +160,23 @@ describe( 'block factory', () => {
 				content: 'test',
 			} );
 		} );
+
+		it( 'should sanitize attributes not defined in the block type', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			expect( block.attributes ).toEqual( {} );
+		} );
 	} );
 
 	describe( 'createBlocksFromInnerBlocksTemplate', () => {
@@ -274,6 +292,31 @@ describe( 'block factory', () => {
 						type: 'boolean',
 						default: false,
 					},
+					includesDefault: {
+						type: 'boolean',
+						default: true,
+					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
+					content: {
+						type: 'array',
+						source: 'children',
+					},
+					defaultContent: {
+						type: 'array',
+						source: 'children',
+						default: 'test',
+					},
+					unknownDefaultContent: {
+						type: 'array',
+						source: 'children',
+						default: 1,
+					},
+					htmlContent: {
+						source: 'html',
+					},
 				},
 				save: noop,
 				category: 'text',
@@ -287,12 +330,19 @@ describe( 'block factory', () => {
 
 			const clonedBlock = cloneBlock( block, {
 				isDifferent: true,
+				htmlContent: 'test',
 			} );
 
 			expect( clonedBlock.name ).toEqual( block.name );
 			expect( clonedBlock.attributes ).toEqual( {
+				includesDefault: true,
+				includesFalseyDefault: 0,
 				align: 'left',
 				isDifferent: true,
+				content: [],
+				defaultContent: [ 'test' ],
+				unknownDefaultContent: [],
+				htmlContent: 'test',
 			} );
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
 			expect( typeof clonedBlock.clientId ).toBe( 'string' );
@@ -374,6 +424,29 @@ describe( 'block factory', () => {
 			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual(
 				block.innerBlocks[ 1 ].attributes
 			);
+		} );
+	} );
+
+	describe( '__experimentalCloneSanitizedBlock', () => {
+		it( 'should sanitize attributes not defined in the block type', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					align: {
+						type: 'string',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
 		} );
 	} );
 

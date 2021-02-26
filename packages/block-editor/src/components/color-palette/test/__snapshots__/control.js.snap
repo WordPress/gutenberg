@@ -51,6 +51,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             className="components-circular-option-picker__option-wrapper"
           >
             <button
+              aria-describedby={null}
               aria-label="Color: red"
               aria-pressed={true}
               className="components-button components-circular-option-picker__option is-pressed"
@@ -91,6 +92,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             className="components-dropdown components-circular-option-picker__dropdown-link-action"
           >
             <button
+              aria-describedby={null}
               aria-expanded={false}
               aria-haspopup="true"
               aria-label="Custom color picker"
@@ -102,6 +104,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             </button>
           </div>
           <button
+            aria-describedby={null}
             className="components-button components-circular-option-picker__clear is-secondary is-small"
             onClick={[Function]}
             type="button"

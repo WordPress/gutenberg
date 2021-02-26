@@ -48,9 +48,9 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 ## Updating to New Release
 
-To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
+To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -230,7 +230,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
 ### `lint-md-js`
 
@@ -254,7 +254,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
+It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
 
 ### `lint-style`
 
@@ -335,7 +335,7 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-e2e`
 
-Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md):
+Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/HEAD/docs/api.md):
 
 > [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
 
@@ -608,6 +608,6 @@ module.exports = {
 };
 ```
 
-If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

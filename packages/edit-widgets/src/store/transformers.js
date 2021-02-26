@@ -3,13 +3,26 @@
  */
 import { createBlock, parse, serialize } from '@wordpress/blocks';
 
+function __experimentalAddWidgetIdToBlock( block, widgetId ) {
+	return {
+		...block,
+		attributes: {
+			...( block.attributes || {} ),
+			__internalWidgetId: widgetId,
+		},
+	};
+}
+
 export function transformWidgetToBlock( widget ) {
 	if ( widget.widget_class === 'WP_Widget_Block' ) {
 		const parsedBlocks = parse( widget.settings.content );
 		if ( ! parsedBlocks.length ) {
-			return createBlock( 'core/paragraph', {}, [] );
+			return __experimentalAddWidgetIdToBlock(
+				createBlock( 'core/paragraph', {}, [] ),
+				widget.id
+			);
 		}
-		return parsedBlocks[ 0 ];
+		return __experimentalAddWidgetIdToBlock( parsedBlocks[ 0 ], widget.id );
 	}
 
 	const attributes = {
@@ -27,7 +40,10 @@ export function transformWidgetToBlock( widget ) {
 		attributes.widgetClass = widget.widget_class;
 	}
 
-	return createBlock( 'core/legacy-widget', attributes, [] );
+	return __experimentalAddWidgetIdToBlock(
+		createBlock( 'core/legacy-widget', attributes, [] ),
+		widget.id
+	);
 }
 
 export function transformBlockToWidget( block, relatedWidget = {} ) {

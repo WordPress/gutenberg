@@ -22,7 +22,7 @@ import {
 	findTransform,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__experimentalRichText as RichText,
 	__unstableCreateElement,
@@ -49,6 +49,7 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
+import { store as blockEditorStore } from '../../store';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -153,7 +154,6 @@ function RichTextWrapper(
 	identifier = identifier || instanceId;
 
 	const fallbackRef = useRef();
-	const ref = forwardedRef || fallbackRef;
 	const {
 		clientId,
 		onCaretVerticalPositionChange,
@@ -169,7 +169,7 @@ function RichTextWrapper(
 			__unstableGetBlockWithoutInnerBlocks,
 			isMultiSelecting,
 			hasMultiSelection,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
@@ -229,7 +229,7 @@ function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -296,6 +296,10 @@ function RichTextWrapper(
 			const hasPastedBlocks = pastedBlocks.length > 0;
 			let lastPastedBlockIndex = -1;
 
+			// Consider the after value to be the original it is not empty and
+			// the before value *is* empty.
+			const isAfterOriginal = isEmpty( before ) && ! isEmpty( after );
+
 			// Create a block with the content before the caret if there's no pasted
 			// blocks, or if there are pasted blocks and the value is not empty.
 			// We do not want a leading empty block on paste, but we do if split
@@ -306,7 +310,8 @@ function RichTextWrapper(
 						toHTMLString( {
 							value: before,
 							multilineTag,
-						} )
+						} ),
+						! isAfterOriginal
 					)
 				);
 				lastPastedBlockIndex += 1;
@@ -333,7 +338,8 @@ function RichTextWrapper(
 						toHTMLString( {
 							value: after,
 							multilineTag,
-						} )
+						} ),
+						isAfterOriginal
 					)
 				);
 			}
@@ -344,7 +350,7 @@ function RichTextWrapper(
 
 			// If there are pasted blocks, move the caret to the end of the selected block
 			// Otherwise, retain the default value.
-			const initialPosition = hasPastedBlocks ? -1 : null;
+			const initialPosition = hasPastedBlocks ? -1 : 0;
 
 			onReplace( blocks, indexToSelect, initialPosition );
 		},
@@ -551,11 +557,13 @@ function RichTextWrapper(
 		[ onReplace, __unstableMarkAutomaticChange ]
 	);
 
+	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
+
 	const content = (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
-			ref={ ref }
+			ref={ mergedRef }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			selectionStart={ selectionStart }
@@ -629,7 +637,7 @@ function RichTextWrapper(
 					{ nestedIsSelected && hasFormats && (
 						<FormatToolbarContainer
 							inline={ inlineToolbar }
-							anchorRef={ ref.current }
+							anchorRef={ fallbackRef.current }
 						/>
 					) }
 					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
@@ -639,7 +647,7 @@ function RichTextWrapper(
 						record={ value }
 						onChange={ onChange }
 						isSelected={ nestedIsSelected }
-						contentRef={ ref }
+						contentRef={ fallbackRef }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
 							<TagName
@@ -731,7 +739,7 @@ ForwardedRichTextContainer.Content.defaultProps = {
 };
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 export default ForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';

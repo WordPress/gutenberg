@@ -47,8 +47,8 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		if ( ! isAndroid() ) {
 			const html = await editorPage.getHtmlContent();
 
-			expect( testData.imageShorteHtml.toLowerCase() ).toBe(
-				html.toLowerCase()
+			expect( html.toLowerCase() ).toBe(
+				testData.imageShorteHtml.toLowerCase()
 			);
 		}
 		/* eslint-enable jest/no-conditional-expect */

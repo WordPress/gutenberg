@@ -5,7 +5,11 @@ import { __ } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { cloneBlock, getBlockFromExample } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	getBlockFromExample,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,7 +23,7 @@ export default function BlockStylesMenu( {
 } ) {
 	const [ hoveredClassName, setHoveredClassName ] = useState();
 	const blockType = useSelect(
-		( select ) => select( 'core/blocks' ).getBlockType( name ),
+		( select ) => select( blocksStore ).getBlockType( name ),
 		[ name ]
 	);
 

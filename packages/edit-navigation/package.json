@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.8.1",
+	"version": "1.8.6",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -11,7 +11,7 @@
 		"editor",
 		"navigation"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-navigation/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-navigation/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

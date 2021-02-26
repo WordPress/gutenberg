@@ -84,7 +84,11 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/autocomplete/README.md>
+
+<a name="BlockAlignmentControl" href="#BlockAlignmentControl">#</a> **BlockAlignmentControl**
+
+Undocumented declaration.
 
 <a name="BlockAlignmentToolbar" href="#BlockAlignmentToolbar">#</a> **BlockAlignmentToolbar**
 
@@ -108,7 +112,7 @@ Component which merges passed value with current consumed block context.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-context/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-context/README.md>
 
 _Parameters_
 
@@ -160,12 +164,12 @@ BlockPreview renders a preview of a block or array of blocks.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-preview/README.md>
 
 _Parameters_
 
 -   _preview_ `Object`: options for how the preview should be shown
--   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
 -   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
@@ -184,7 +188,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md>
 
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
@@ -214,13 +218,13 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
 
 <a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
@@ -316,7 +320,7 @@ _Returns_
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
-Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
+ Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
@@ -384,7 +388,7 @@ _Returns_
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
 
 <a name="Inserter" href="#Inserter">#</a> **Inserter**
 
@@ -394,13 +398,17 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls-advanced/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+<a name="JustifyToolbar" href="#JustifyToolbar">#</a> **JustifyToolbar**
+
+Undocumented declaration.
 
 <a name="LineHeightControl" href="#LineHeightControl">#</a> **LineHeightControl**
 
@@ -410,7 +418,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md>
 
 <a name="MediaReplaceFlow" href="#MediaReplaceFlow">#</a> **MediaReplaceFlow**
 
@@ -420,13 +428,13 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MediaUploadCheck" href="#MediaUploadCheck">#</a> **MediaUploadCheck**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
@@ -441,7 +449,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
 
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
@@ -451,7 +459,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
@@ -461,7 +469,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md>
 
 <a name="RichTextShortcut" href="#RichTextShortcut">#</a> **RichTextShortcut**
 
@@ -486,7 +494,7 @@ _Properties_
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
--   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
+-   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
@@ -509,7 +517,7 @@ Store definition for the block editor namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 _Type_
 
@@ -521,7 +529,7 @@ Block editor data store configuration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
 _Type_
 
@@ -554,19 +562,19 @@ can vary. It is the last clicked or scrolled to position.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLInputButton" href="#URLInputButton">#</a> **URLInputButton**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLPopover" href="#URLPopover">#</a> **URLPopover**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
 <a name="useBlockDisplayInformation" href="#useBlockDisplayInformation">#</a> **useBlockDisplayInformation**
 
@@ -640,7 +648,7 @@ _Returns_
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/warning/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md>
 
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 

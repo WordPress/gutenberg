@@ -5,17 +5,22 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
+	InspectorControls,
 	useBlockProps,
+	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	SelectControl,
 	Dropdown,
+	PanelBody,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -30,26 +35,34 @@ export default function TemplatePartEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const templatePartId = theme + '//' + slug;
+	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks } = useSelect(
+	const { isResolved, innerBlocks, isMissing } = useSelect(
 		( select ) => {
-			const { getBlocks } = select( 'core/block-editor' );
-			const entityRecord =
-				theme && slug
-					? select( 'core' ).getEntityRecord(
-							'postType',
-							'wp_template_part',
-							theme + '//' + slug
-					  )
-					: null;
+			const { getEntityRecord, hasFinishedResolution } = select(
+				coreStore
+			);
+			const { getBlocks } = select( blockEditorStore );
+
+			const getEntityArgs = [
+				'postType',
+				'wp_template_part',
+				templatePartId,
+			];
+			const entityRecord = templatePartId
+				? getEntityRecord( ...getEntityArgs )
+				: null;
+			const hasResolvedEntity = templatePartId
+				? hasFinishedResolution( 'getEntityRecord', getEntityArgs )
+				: false;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
-				isResolved: !! entityRecord,
+				isResolved: hasResolvedEntity,
+				isMissing: hasResolvedEntity && ! entityRecord,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -57,29 +70,52 @@ export default function TemplatePartEdit( {
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
+	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 
-	const inspectorAdvancedControls = (
-		<InspectorAdvancedControls>
-			<SelectControl
-				label={ __( 'HTML element' ) }
-				options={ [
-					{ label: __( 'Default (<div>)' ), value: 'div' },
-					{ label: '<header>', value: 'header' },
-					{ label: '<main>', value: 'main' },
-					{ label: '<section>', value: 'section' },
-					{ label: '<article>', value: 'article' },
-					{ label: '<aside>', value: 'aside' },
-					{ label: '<footer>', value: 'footer' },
-				] }
-				value={ TagName }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
-			/>
-		</InspectorAdvancedControls>
-	);
+	// We don't want to render a missing state if we have any inner blocks.
+	// A new template part is automatically created if we have any inner blocks but no entity.
+	if (
+		innerBlocks.length === 0 &&
+		( ( slug && ! theme ) || ( slug && isMissing ) )
+	) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ __(
+						'Template part has been deleted or is unavailable.'
+					) }
+				</Warning>
+			</TagName>
+		);
+	}
 
 	return (
 		<>
-			{ inspectorAdvancedControls }
+			<InspectorControls>
+				<PanelBody>
+					{ isEntityAvailable && (
+						<TemplatePartNamePanel postId={ templatePartId } />
+					) }
+				</PanelBody>
+			</InspectorControls>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
@@ -87,10 +123,9 @@ export default function TemplatePartEdit( {
 						innerBlocks={ innerBlocks }
 					/>
 				) }
-				{ ! isPlaceholder && isResolved && (
+				{ isEntityAvailable && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
-							<TemplatePartNamePanel postId={ templatePartId } />
 							<Dropdown
 								className="wp-block-template-part__preview-dropdown-button"
 								contentClassName="wp-block-template-part__preview-dropdown-content"
@@ -118,7 +153,7 @@ export default function TemplatePartEdit( {
 						</ToolbarGroup>
 					</BlockControls>
 				) }
-				{ ! isPlaceholder && isResolved && (
+				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }

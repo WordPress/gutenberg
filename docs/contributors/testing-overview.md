@@ -380,7 +380,7 @@ To locally run the tests in debug mode, follow these steps:
 
 ### Native mobile end-to-end tests
 
-Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continious integration](docs/contributors/native-mobile.md#native-mobile-e2e-tests-in-continuous-integration). More information on running these tests locally can be found in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/__device-tests__).
+Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continious integration](docs/contributors/native-mobile.md#native-mobile-e2e-tests-in-continuous-integration). More information on running these tests locally can be found in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/__device-tests__).
 
 ## End-to-end Testing
 
@@ -450,7 +450,7 @@ Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-e
 
 ### Core Block Testing
 
-Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/master/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
 
 ## PHP Testing
 

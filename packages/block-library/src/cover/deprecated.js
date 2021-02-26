@@ -13,6 +13,7 @@ import {
 	getColorClassName,
 	InnerBlocks,
 	__experimentalGetGradientClass,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -71,8 +72,15 @@ const deprecated = [
 				type: 'string',
 				default: 'center',
 			},
+			isRepeated: {
+				type: 'boolean',
+				default: false,
+			},
 			minHeight: {
 				type: 'number',
+			},
+			minHeightUnit: {
+				type: 'string',
 			},
 			gradient: {
 				type: 'string',
@@ -80,6 +88,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
@@ -91,6 +102,7 @@ const deprecated = [
 				dimRatio,
 				focalPoint,
 				hasParallax,
+				isRepeated,
 				overlayColor,
 				url,
 				minHeight: minHeightProp,
@@ -142,6 +154,7 @@ const deprecated = [
 				{
 					'has-background-dim': dimRatio !== 0,
 					'has-parallax': hasParallax,
+					'is-repeated': isRepeated,
 					'has-background-gradient': gradient || customGradient,
 					[ gradientClass ]: ! url && gradientClass,
 					'has-custom-content-position': ! isContentPositionCenter(
@@ -152,7 +165,7 @@ const deprecated = [
 			);
 
 			return (
-				<div className={ classes } style={ style }>
+				<div { ...useBlockProps.save( { className: classes, style } ) }>
 					{ url &&
 						( gradient || customGradient ) &&
 						dimRatio !== 0 && (
@@ -208,6 +221,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
@@ -311,6 +327,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {

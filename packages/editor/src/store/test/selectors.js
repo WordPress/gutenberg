@@ -16,6 +16,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { layout, footer, header } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -2894,12 +2895,13 @@ describe( 'selectors', () => {
 			).toEqual( 'test description' );
 		} );
 
-		it( 'should return both a title and a description', () => {
+		it( 'should return a title, description, and icon', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, { slug: 'index' } )
 			).toEqual( {
 				title: 'Default (Index)',
 				description: 'Main template',
+				icon: layout,
 			} );
 
 			expect(
@@ -2910,6 +2912,7 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'test title',
 				description: 'Main template',
+				icon: layout,
 			} );
 
 			expect(
@@ -2920,6 +2923,7 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'Default (Index)',
 				description: 'test description',
+				icon: layout,
 			} );
 
 			expect(
@@ -2931,6 +2935,49 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'test title',
 				description: 'test description',
+				icon: layout,
+			} );
+		} );
+
+		it( 'should return correct icon based on area', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = uncategorized',
+					area: 'uncategorized',
+				} )
+			).toEqual( {
+				title: 'template part, area = uncategorized',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = invalid',
+					area: 'invalid',
+				} )
+			).toEqual( {
+				title: 'template part, area = invalid',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = header',
+					area: 'header',
+				} )
+			).toEqual( {
+				title: 'template part, area = header',
+				icon: header,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = footer',
+					area: 'footer',
+				} )
+			).toEqual( {
+				title: 'template part, area = footer',
+				icon: footer,
 			} );
 		} );
 	} );

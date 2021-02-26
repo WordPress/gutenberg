@@ -67,6 +67,8 @@ To override the default behavior, you can pass one or both of the following opti
     -   Example: `npm run changelog -- --milestone="Gutenberg 8.1"`
 -   `--token <token>`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
     -   Example: `npm run changelog -- --token="..."`
+-   `--unreleased`: Only list PRs that have been closed after the latest release in the milestone's series has been published. In other words, only list PRs that haven't been part of a release yet.
+    -   Example: `npm run changelog -- --milestone="Gutenberg 9.8" --unreleased`. If the latest version in the 9.8 series is 9.8.3, only show PRs for the in the 9.8 series that were closed (merged) after 9.8.3 was published.
 
 The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
 
@@ -265,7 +267,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
 10. Run the script `npm run publish:prod`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/master/commands/publish#bump-from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
 
 Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the main branch of Gutenberg.
 
@@ -335,11 +337,11 @@ Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https
     > lerna success found 3 packages ready to publish
     > ```
 
-Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/master/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
+Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/HEAD/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
 
 Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
 
-Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#maintaining-changelogs) documentation and commit the changes:
+Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
 
 1. `git checkout wp/trunk`
 2. Update each of the `CHANGELOG.md` files
@@ -430,4 +432,4 @@ Time to announce the published changes in the #core-js and #core-editor Slack ch
 Ta-da! 🎉
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
-[package release process]: https://github.com/WordPress/gutenberg/blob/master/packages/README.md#releasing-packages
+[package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages

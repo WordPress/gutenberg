@@ -172,8 +172,8 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
-			const { selectionStart, selectionEnd } = options;
-			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
 
 			const noChange = blocks === edits.blocks;
 			if ( noChange ) {
@@ -193,8 +193,8 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
-			const { selectionStart, selectionEnd } = options;
-			const edits = { blocks: newBlocks, selectionStart, selectionEnd };
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
 			editEntityRecord( kind, type, id, edits );
 		},
 		[ kind, type, id ]

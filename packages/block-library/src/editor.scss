@@ -27,6 +27,7 @@
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
+@import "./page-list/editor.scss";
 @import "./paragraph/editor.scss";
 @import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
@@ -50,6 +51,8 @@
 @import "./video/editor.scss";
 @import "./query-loop/editor.scss";
 @import "./query/editor.scss";
+@import "./query-pagination/editor.scss";
+@import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
 
 :root .editor-styles-wrapper {

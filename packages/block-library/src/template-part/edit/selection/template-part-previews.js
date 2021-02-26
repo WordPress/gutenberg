@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 function PreviewPlaceholder() {
 	return (
@@ -36,7 +37,11 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const { slug, theme, title } = templatePart;
+	const {
+		slug,
+		theme,
+		title: { rendered: title },
+	} = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -49,7 +54,7 @@ function TemplatePartItem( {
 			sprintf(
 				/* translators: %s: template part title. */
 				__( 'Template Part "%s" inserted.' ),
-				title
+				title || slug
 			),
 			{
 				type: 'snackbar',
@@ -70,12 +75,12 @@ function TemplatePartItem( {
 				}
 			} }
 			tabIndex={ 0 }
-			aria-label={ templatePart.slug }
+			aria-label={ title || slug }
 			{ ...composite }
 		>
 			<BlockPreview blocks={ blocks } />
 			<div className="wp-block-template-part__selection-preview-item-title">
-				{ templatePart.slug }
+				{ title || slug }
 			</div>
 		</CompositeItem>
 	);
@@ -202,7 +207,7 @@ export default function TemplatePartPreviews( {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
 		return (
-			select( 'core' ).getEntityRecords(
+			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part'
 			) || []

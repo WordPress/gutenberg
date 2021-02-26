@@ -2,6 +2,8 @@
  * External dependencies
  */
 const { escapeRegExp } = require( 'lodash' );
+const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -27,6 +29,11 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.js',
 	'**/@(storybook|stories)/**/*.js',
 ];
+
+// All files from packages that have types provided with TypeScript.
+const typedFiles = glob( 'packages/*/package.json' )
+	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
 module.exports = {
 	root: true,
@@ -54,6 +61,9 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'@wordpress/data-no-store-string-literals': 'warn',
+		'import/default': 'error',
+		'import/named': 'error',
 		'no-restricted-imports': [
 			'error',
 			{
@@ -62,6 +72,11 @@ module.exports = {
 						name: 'lodash',
 						importNames: [ 'memoize' ],
 						message: 'Please use `memize` instead.',
+					},
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
 					},
 					{
 						name: 'reakit',
@@ -105,6 +120,12 @@ module.exports = {
 			{
 				selector:
 					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message:
+					'This method is deprecated. You should use the more explicit API methods available.',
+			},
+			{
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
@@ -141,6 +162,7 @@ module.exports = {
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
+				'import/named': 'off',
 			},
 		},
 		{
@@ -186,6 +208,13 @@ module.exports = {
 			files: [ 'bin/**/*.js' ],
 			rules: {
 				'no-console': 'off',
+			},
+		},
+		{
+			files: typedFiles,
+			rules: {
+				'jsdoc/no-undefined-types': 'off',
+				'jsdoc/valid-types': 'off',
 			},
 		},
 	],

@@ -88,11 +88,11 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 * `WP_Dependencies::set_translations` will fall over on itself if setting
 	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
 	 * as a dependency of itself, exhausting memory. The same applies for the
-	 * polyfill script, which is a dependency _of_ `wp-i18n`.
+	 * polyfill and hooks scripts, which are dependencies _of_ `wp-i18n`.
 	 *
 	 * See: https://core.trac.wordpress.org/ticket/46089
 	 */
-	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
+	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
 	if ( 'wp-i18n' === $handle ) {
@@ -316,7 +316,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
+		array( 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
@@ -325,7 +325,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -357,6 +357,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		filemtime( gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' )
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library', 'path', gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' );
 
 	gutenberg_override_style(
 		$styles,
@@ -375,6 +376,7 @@ function gutenberg_register_packages_styles( $styles ) {
 			'wp-components',
 			'wp-editor',
 			'wp-block-library',
+			'wp-reusable-blocks',
 			// Always include visual styles so the editor never appears broken.
 			'wp-block-library-theme',
 		),
@@ -431,7 +433,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks', 'wp-reusable-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -444,6 +446,24 @@ function gutenberg_register_packages_styles( $styles ) {
 		filemtime( gutenberg_dir_path() . 'build/block-directory/style.css' )
 	);
 	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-customize-widgets',
+		gutenberg_url( 'build/customize-widgets/style.css' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		filemtime( gutenberg_dir_path() . 'build/customize-widgets/style.css' )
+	);
+	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-reusable-blocks',
+		gutenberg_url( 'build/reusable-blocks/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/reusable-blocks/style.css' )
+	);
+	$styles->add_data( 'wp-reusable-block', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 
@@ -695,7 +715,7 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
 			$handles[] = $block_type->style;
 		}
