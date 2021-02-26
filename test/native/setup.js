@@ -105,15 +105,6 @@ jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
 } );
 
-// Overwrite some native module mocks from `react-native` jest preset:
-// https://github.com/facebook/react-native/blob/HEAD/jest/setup.js
-// to fix issue "TypeError: Cannot read property 'Commands' of undefined"
-// raised when calling focus or blur on a native component
-const UIManager = jest.requireMock(
-	'react-native/Libraries/ReactNative/UIManager'
-);
-UIManager.getViewManagerConfig.mockReturnValue( { Commands: {} } );
-
 jest.mock( 'react-native-reanimated', () => {
 	const Reanimated = require( 'react-native-reanimated/mock' );
 
@@ -126,3 +117,10 @@ jest.mock( 'react-native-reanimated', () => {
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
 jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
+
+// We currently reference TextStateInput (a private module) within
+// react-native-aztec/src/AztecView. Doing so requires that we mock it via its
+// internal path to avoid "TypeError: Cannot read property 'Commands' of
+// undefined." The private module referenced could possibly be replaced with
+// a React ref instead. We could then remove this internal mock.
+jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
