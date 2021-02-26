@@ -36,15 +36,29 @@ According to the [WebAIM: Screen Reader User Survey #8 Results](https://webaim.o
 
 When testing with screen readers, try to use some of the combinations at the top of this list. For example, when testing with VoiceOver, it's preferrable to use Safari.
 
+### NVDA with Firefox
+
+[NVDA](https://www.nvaccess.org/about-nvda/) is a free screen reader for Windows and [the most popular one](https://webaim.org/projects/screenreadersurvey8/#primary).
+
+After installing it, you can activate NVDA by opening the app as you would do with other programs. An icon will appear on the System Tray where you have access to more options. It's recommended to enable the "Speech viewer" dialog so it's easier to demonstrate what's being announced by NVDA when you take screenshots.
+
+<img src="https://user-images.githubusercontent.com/3068563/108868727-428db880-75d5-11eb-84a9-2c0b749a22ad.png" alt="NVDA options with Speech viewer enabled" width="640">
+
+While in the Gutenberg editor, with NVDA activated, you can press <kbd>Insert+F7</kbd> to open the Elements List where you can find elements grouped by their types, such as links, headings, form fields, buttons and landmarks.
+
+<img src="https://user-images.githubusercontent.com/3068563/109054067-33356a80-76bc-11eb-83d4-e0c536c30d22.png" alt="NVDA Elements List dialog" width="640">
+
+Make sure the elements have proper labels and prefer to navigate through landmarks and then use <kbd>Tab</kbd> and arrow keys to move through the elements within the landmarks.
+
 ### VoiceOver with Safari
 
 [VoiceOver](https://support.apple.com/guide/voiceover-guide/welcome/web) is the native screen reader on macOS. You can enable it on System Preferences > Accessibility > VoiceOver > Enable VoiceOver or by quickly pressing Touch ID three times while holding the Command key.
 
-![macOS accessibility preferences panel](https://user-images.githubusercontent.com/3068563/107645175-2560fd80-6c57-11eb-9e07-365c798869d8.png)
+<img src="https://user-images.githubusercontent.com/3068563/107645175-2560fd80-6c57-11eb-9e07-365c798869d8.png" alt="macOS accessibility preferences panel" width="720">
 
 While in the Gutenberg editor, with VoiceOver activated, you can press <kbd>Control+Option+U</kbd> to open the Rotor and find more easily the different regions and elements on the page. This is also a good way to make sure elements are labelled correctly. If a name on this list doesn't make sense, it should be improved.
 
-![Navigating through form controls and landmarks using the VoiceOver Rotor](https://user-images.githubusercontent.com/3068563/107646280-8e954080-6c58-11eb-8481-72e051d73973.gif)
+<img src="https://user-images.githubusercontent.com/3068563/107646280-8e954080-6c58-11eb-8481-72e051d73973.gif" alt="Navigating through form controls and landmarks using the VoiceOver Rotor" width="640">
 
 Prefer to select a region or another larger area to begin with instead of individual elements on the Rotor so you can better test the navigation within that region.
 
