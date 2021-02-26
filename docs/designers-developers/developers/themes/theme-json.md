@@ -466,6 +466,7 @@ These are the current typography properties supported by blocks:
 | Post Tags | - | Yes | - | - | Yes | - | - |
 | Post Title | Yes | Yes | - | - | Yes | - | - |
 | Preformatted | - | Yes | - | - | - | - | - |
+| Pullquote | - | Yes | - | - | Yes | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
 | Site Title | Yes | Yes | - | - | Yes | - | - |
 | Verse | Yes | Yes | - | - | - | - | - |
