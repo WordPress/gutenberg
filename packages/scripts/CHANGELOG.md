@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 13.1.0-next.0 (2021-02-26)
-
 ### New Features
 
 -   Default `check-engines` command to the `engines` config in `package.json` file of the current project ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).

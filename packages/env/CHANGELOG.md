@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 4.0.0-next.0 (2021-02-26)
-
 ### Breaking Change
 
 -   Migrate from `nodegit` to `simple-git`. This change now requires you to have a `git` binary installed locally to utilize the git sources feature of wp-env.json.
