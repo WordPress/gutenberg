@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { NativeModules } from 'react-native';
 import 'react-native-gesture-handler/jestSetup';
 
 jest.mock( '@wordpress/element', () => {
@@ -110,22 +109,10 @@ jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 // https://github.com/facebook/react-native/blob/HEAD/jest/setup.js
 // to fix issue "TypeError: Cannot read property 'Commands' of undefined"
 // raised when calling focus or blur on a native component
-const mockNativeModules = {
-	UIManager: {
-		...NativeModules.UIManager,
-		getViewManagerConfig: jest.fn( () => ( { Commands: {} } ) ),
-	},
-};
-
-Object.keys( mockNativeModules ).forEach( ( module ) => {
-	try {
-		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
-	} catch ( error ) {
-		jest.doMock( module, () => mockNativeModules[ module ], {
-			virtual: true,
-		} );
-	}
-} );
+const UIManager = jest.requireMock(
+	'react-native/Libraries/ReactNative/UIManager'
+);
+UIManager.getViewManagerConfig.mockReturnValue( { Commands: {} } );
 
 jest.mock( 'react-native-reanimated', () => {
 	const Reanimated = require( 'react-native-reanimated/mock' );
