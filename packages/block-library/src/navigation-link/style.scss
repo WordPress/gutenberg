@@ -9,23 +9,6 @@
 	}
 }
 
-.wp-block-navigation__container {
-	// Reset the default list styles
-	list-style: none;
-	margin: 0;
-	padding-left: 0;
-
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-
-	// Vertical layout
-
-	.is-vertical & {
-		display: block;
-	}
-}
-
 // Styles for submenu flyout
 .has-child {
 	> .wp-block-navigation-link__content {
@@ -102,6 +85,19 @@
 		}
 	}
 }
+
+// Default background and font color
+.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
+	.wp-block-navigation-link__container {
+		// Set a background color for submenus so that they're not transparent.
+		// NOTE TO DEVS - if refactoring this code, please double-check that
+		// submenus have a default background color, this feature has regressed
+		// several times, so care needs to be taken.
+		background-color: $white;
+		color: $gray-900;
+	}
+}
+
 
 // Force links to inherit text decoration applied to navigation block.
 .wp-block-navigation[style*="text-decoration"] {
