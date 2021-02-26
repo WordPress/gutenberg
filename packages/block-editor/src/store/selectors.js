@@ -960,6 +960,8 @@ export function getBlockIndex( state, clientId, rootClientId ) {
 export function isBlockSelected( state, clientId ) {
 	const { selectionStart, selectionEnd } = state.selection;
 
+	if ( clientId === undefined ) return false;
+
 	if ( selectionStart.clientId !== selectionEnd.clientId ) {
 		return false;
 	}
