@@ -10,6 +10,11 @@ import {
 	customPostType,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import fallbackVariations from './fallback-variations';
+
 function getIcon( variationName ) {
 	switch ( variationName ) {
 		case 'post':
@@ -30,7 +35,17 @@ function enhanceNavigationLinkVariations( settings, name ) {
 		return settings;
 	}
 
-	if ( settings?.variations ) {
+	// Fallback handling may be deleted after supported WP ranges understand the `variations`
+	// property when passed to register_block_type_from_metadata in index.php
+	if ( ! settings.variations ) {
+		return {
+			...settings,
+			variations: [ ...fallbackVariations ],
+		};
+	}
+
+	// Otherwise decorate server passed variations with an icon and isActive function
+	if ( settings.variations ) {
 		const variations = settings.variations.map( ( variation ) => {
 			return {
 				...variation,
