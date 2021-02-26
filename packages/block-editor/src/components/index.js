@@ -15,10 +15,12 @@ export { default as __experimentalBlockFullHeightAligmentControl } from './block
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
-export { default as BlockControls } from './block-controls';
+export {
+	default as BlockControls,
+	BlockFormatControls,
+} from './block-controls';
 export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
-export { default as BlockFormatControls } from './block-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-slot';
