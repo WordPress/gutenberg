@@ -8,8 +8,7 @@
 			"default": 100
 		},
 		"width": {
-			"type": "number",
-			"default": 72
+			"type": "number"
 		}
 	},
 	"usesContext": [

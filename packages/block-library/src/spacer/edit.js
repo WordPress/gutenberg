@@ -15,7 +15,7 @@ import {
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
 
 const MIN_SPACER_HEIGHT = 1;
@@ -51,17 +51,22 @@ const SpacerEdit = ( {
 		setIsResizing( true );
 	};
 
-	const handleOnResizeStop = ( event, direction, elt, delta ) => {
+	const handleOnVerticalResizeStop = ( event, direction, elt, delta ) => {
 		onResizeStop();
 		const spacerHeight = Math.min(
 			parseInt( height + delta.height, 10 ),
 			MAX_SPACER_HEIGHT
 		);
+		updateHeight( spacerHeight );
+		setIsResizing( false );
+	};
+
+	const handleOnHorizontalResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
 		const spacerWidth = Math.min(
 			parseInt( width + delta.width, 10 ),
 			MAX_SPACER_WIDTH
 		);
-		updateHeight( spacerHeight );
 		updateWidth( spacerWidth );
 		setIsResizing( false );
 	};
@@ -93,7 +98,7 @@ const SpacerEdit = ( {
 						topLeft: false,
 					} }
 					onResizeStart={ handleOnResizeStart }
-					onResizeStop={ handleOnResizeStop }
+					onResizeStop={ handleOnHorizontalResizeStop }
 					showHandle={ isSelected }
 					__experimentalShowTooltip={ true }
 					__experimentalTooltipProps={ {
@@ -128,7 +133,7 @@ const SpacerEdit = ( {
 					topLeft: false,
 				} }
 				onResizeStart={ handleOnResizeStart }
-				onResizeStop={ handleOnResizeStop }
+				onResizeStop={ handleOnVerticalResizeStop }
 				showHandle={ isSelected }
 				__experimentalShowTooltip={ true }
 				__experimentalTooltipProps={ {
@@ -139,6 +144,13 @@ const SpacerEdit = ( {
 			/>
 		);
 	};
+
+	useEffect( () => {
+		if ( orientation === 'horizontal' && ! width ) {
+			updateWidth( 72 );
+			updateHeight( null );
+		}
+	}, [] );
 
 	return (
 		<>
