@@ -1,13 +1,23 @@
 /**
  * External dependencies
  */
-import { invert, omit, keyBy, isEqual } from 'lodash';
+import { omit, keyBy, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+
+function __experimentalAddWidgetIdToBlock( block, widgetId ) {
+	return {
+		...block,
+		attributes: {
+			...( block.attributes || {} ),
+			__internalWidgetId: widgetId,
+		},
+	};
+}
 
 function blockToWidget( block, existingWidget = null ) {
 	let widget;
@@ -49,7 +59,6 @@ function blockToWidget( block, existingWidget = null ) {
 function widgetToBlock( widget ) {
 	let block;
 
-	// FIXME: We'll never get it here with blocks, we need to update this.
 	if ( widget.idBase === 'block' ) {
 		const parsedBlocks = parse(
 			widget.instance.__unstable_instance.content
@@ -76,17 +85,16 @@ function widgetToBlock( widget ) {
 		block = createBlock( 'core/legacy-widget', attributes, [] );
 	}
 
-	return block;
+	return __experimentalAddWidgetIdToBlock( block, widget.id );
 }
 
 function initState( sidebar ) {
-	const state = { blocks: [], widgetIds: {} };
+	const state = { blocks: [] };
 
 	for ( const widgetId of sidebar.getWidgetIds() ) {
 		const widget = sidebar.getWidget( widgetId );
 		const block = widgetToBlock( widget );
 		state.blocks.push( block );
-		state.widgetIds[ block.clientId ] = widgetId;
 	}
 
 	return state;
@@ -114,44 +122,34 @@ export default function useSidebarBlockEditor( sidebar ) {
 					);
 					setState( ( lastState ) => ( {
 						blocks: [ ...lastState.blocks, block ],
-						widgetIds: {
-							...lastState.widgetIds,
-							[ block.clientId ]: widgetId,
-						},
 					} ) );
 					break;
 				}
 
 				case 'widgetRemoved': {
 					const { widgetId } = event;
-					const blockClientId = invert( state.widgetIds )[ widgetId ];
 					setState( ( lastState ) => ( {
 						blocks: lastState.blocks.filter(
-							( { clientId } ) => clientId !== blockClientId
+							( { attributes: { __internalWidgetId } } ) =>
+								__internalWidgetId !== widgetId
 						),
-						widgetIds: omit( lastState.widgetIds, blockClientId ),
 					} ) );
 					break;
 				}
 
 				case 'widgetChanged': {
 					const { widgetId } = event;
-					const blockClientIdToUpdate = invert( state.widgetIds )[
-						widgetId
-					];
 					const blockToUpdate = state.blocks.find(
-						( { clientId } ) => clientId === blockClientIdToUpdate
+						( { attributes: { __internalWidgetId } } ) =>
+							__internalWidgetId === widgetId
 					);
 					const updatedBlock = widgetToBlock(
 						sidebar.getWidget( widgetId ),
 						blockToUpdate
 					);
 					setState( ( lastState ) => ( {
-						...lastState,
 						blocks: lastState.blocks.map( ( block ) =>
-							block.clientId === blockClientIdToUpdate
-								? updatedBlock
-								: block
+							block === blockToUpdate ? updatedBlock : block
 						),
 					} ) );
 					break;
@@ -159,15 +157,20 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 				case 'widgetsReordered':
 					const { widgetIds } = event;
-					const blockClientIds = invert( state.widgetIds );
-					const blocksByClientId = keyBy( state.blocks, 'clientId' );
-					setState( ( lastState ) => ( {
-						...lastState,
-						blocks: widgetIds.map(
-							( widgetId ) =>
-								blocksByClientId[ blockClientIds[ widgetId ] ]
-						),
-					} ) );
+
+					setState( ( lastState ) => {
+						const blocksByWidgetId = keyBy(
+							lastState.blocks,
+							'attributes.__internalWidgetId'
+						);
+
+						return {
+							...lastState,
+							blocks: widgetIds.map(
+								( widgetId ) => blocksByWidgetId[ widgetId ]
+							),
+						};
+					} );
 					break;
 			}
 		};
@@ -180,17 +183,23 @@ export default function useSidebarBlockEditor( sidebar ) {
 		( nextBlocks ) => {
 			ignoreIncoming.current = true;
 
-			let nextWidgetIds = state.widgetIds;
+			const blocksByWidgetId = keyBy(
+				state.blocks,
+				( block ) => block.attributes.__internalWidgetId
+			);
 
-			const blocksByClientId = keyBy( state.blocks, 'clientId' );
-
-			const seen = {};
-
-			for ( const nextBlock of nextBlocks ) {
-				if ( nextBlock.clientId in blocksByClientId ) {
-					const block = blocksByClientId[ nextBlock.clientId ];
+			nextBlocks.forEach( ( nextBlock, index ) => {
+				if (
+					nextBlock.attributes.__internalWidgetId &&
+					nextBlock.attributes.__internalWidgetId in blocksByWidgetId
+				) {
+					const block =
+						blocksByWidgetId[
+							nextBlock.attributes.__internalWidgetId
+						];
 					if ( ! isEqual( block, nextBlock ) ) {
-						const widgetId = state.widgetIds[ nextBlock.clientId ];
+						const widgetId =
+							nextBlock.attributes.__internalWidgetId;
 						const widgetToUpdate = sidebar.getWidget( widgetId );
 						const widget = blockToWidget(
 							nextBlock,
@@ -200,19 +209,17 @@ export default function useSidebarBlockEditor( sidebar ) {
 					}
 				} else {
 					const widget = blockToWidget( nextBlock );
-					const widgetId = sidebar.addWidget( widget );
-					if ( nextWidgetIds === state.widgetIds ) {
-						nextWidgetIds = { ...state.widgetIds };
-					}
-					nextWidgetIds[ nextBlock.clientId ] = widgetId;
+					sidebar.addWidget( widget, index );
 				}
+			} );
 
-				seen[ nextBlock.clientId ] = true;
-			}
+			const seen = nextBlocks.map(
+				( block ) => block.attributes.__internalWidgetId
+			);
 
 			for ( const block of state.blocks ) {
-				if ( ! seen[ block.clientId ] ) {
-					const widgetId = state.widgetIds[ block.clientId ];
+				const widgetId = block.attributes.__internalWidgetId;
+				if ( ! seen.includes( widgetId ) ) {
 					sidebar.removeWidget( widgetId );
 				}
 			}
@@ -220,12 +227,19 @@ export default function useSidebarBlockEditor( sidebar ) {
 			if (
 				nextBlocks.length === state.blocks.length &&
 				! isEqual(
-					nextBlocks.map( ( { clientId } ) => clientId ),
-					state.blocks.map( ( { clientId } ) => clientId )
+					nextBlocks.map(
+						( { attributes: { __internalWidgetId } } ) =>
+							__internalWidgetId
+					),
+					state.blocks.map(
+						( { attributes: { __internalWidgetId } } ) =>
+							__internalWidgetId
+					)
 				)
 			) {
 				const order = nextBlocks.map(
-					( { clientId } ) => state.widgetIds[ clientId ]
+					( { attributes: { __internalWidgetId } } ) =>
+						__internalWidgetId
 				);
 				sidebar.setWidgetIds( order );
 			}
@@ -233,7 +247,6 @@ export default function useSidebarBlockEditor( sidebar ) {
 			setState( ( lastState ) => ( {
 				...lastState,
 				blocks: nextBlocks,
-				widgetIds: nextWidgetIds,
 			} ) );
 
 			ignoreIncoming.current = false;
