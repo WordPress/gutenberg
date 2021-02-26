@@ -1622,6 +1622,17 @@ describe( 'selectors', () => {
 
 			expect( isBlockSelected( state, 23 ) ).toBe( false );
 		} );
+
+		it( 'should return false if the block is undefined', () => {
+			const state = {
+				selection: {
+					selectionStart: {},
+					selectionEnd: {},
+				},
+			};
+
+			expect( isBlockSelected( state, undefined ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'hasSelectedInnerBlock', () => {
