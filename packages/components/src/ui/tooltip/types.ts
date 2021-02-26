@@ -10,9 +10,11 @@ import type { ReactElement } from 'react';
  * Internal dependencies
  */
 import type { PopperProps } from '../utils/types';
+import type { ShortcutProps } from '../shortcut';
 
 export type Props = TooltipInitialState &
-	PopperProps & {
+	PopperProps &
+	Pick< ShortcutProps, 'shortcut' > & {
 		/**
 		 * Determines if `Tooltip` has animations.
 		 */

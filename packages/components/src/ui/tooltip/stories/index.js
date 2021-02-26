@@ -11,7 +11,15 @@ export default {
 
 export const _default = () => {
 	return (
-		<Tooltip content="Tooltip" visible gutter={ 10 }>
+		<Tooltip
+			content="Tooltip"
+			visible
+			gutter={ 10 }
+			shortcut={ {
+				display: 'meta + 1',
+				ariaLabel: 'shortcut-aria-label',
+			} }
+		>
 			<Text>Hello</Text>
 		</Tooltip>
 	);

@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { css, styled, ui } from '@wp-g2/styles';
+/**
+ * Internal dependencies
+ */
+import { Shortcut } from '../shortcut';
 
 export const TooltipContent = css`
 	${ ui.zIndex( 'Tooltip', 1000002 ) };
@@ -26,4 +30,9 @@ export const TooltipPopoverView = styled.div`
 
 export const noOutline = css`
 	outline: none;
+`;
+
+export const TooltipShortcut = styled( Shortcut )`
+	display: inline-block;
+	margin-left: ${ ui.space( 1 ) };
 `;

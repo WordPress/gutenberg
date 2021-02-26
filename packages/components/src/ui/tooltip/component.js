@@ -16,6 +16,7 @@ import { useMemo, cloneElement } from '@wordpress/element';
  */
 import { TooltipContext } from './context';
 import TooltipContent from './content';
+import { TooltipShortcut } from './styles';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
@@ -34,6 +35,7 @@ function Tooltip( props, forwardedRef ) {
 		modal = true,
 		placement,
 		visible = false,
+		shortcut,
 		...otherProps
 	} = useContextSystem( props, 'Tooltip' );
 
@@ -65,6 +67,7 @@ function Tooltip( props, forwardedRef ) {
 			{ content && (
 				<TooltipContent unstable_portal={ modal }>
 					{ content }
+					{ shortcut && <TooltipShortcut shortcut={ shortcut } /> }
 				</TooltipContent>
 			) }
 			{ children && (
