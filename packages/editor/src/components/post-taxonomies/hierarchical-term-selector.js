@@ -3,11 +3,13 @@
  */
 import {
 	get,
+	escape as escapeString,
 	unescape as unescapeString,
 	without,
 	find,
 	some,
 	invoke,
+	throttle,
 } from 'lodash';
 
 /**
@@ -36,19 +38,18 @@ import { buildTermsTree } from '../../utils/terms';
  * Module Constants
  */
 const DEFAULT_QUERY = {
-	per_page: -1,
+	per_page: 20,
 	orderby: 'name',
 	order: 'asc',
 	_fields: 'id,name,parent',
 };
-
-const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.findTerm = this.findTerm.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
 		this.onChangeFormName = this.onChangeFormName.bind( this );
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
 		this.onAddTerm = this.onAddTerm.bind( this );
@@ -219,18 +220,21 @@ class HierarchicalTermSelector extends Component {
 		}
 	}
 
-	fetchTerms() {
+	searchTerms( search = '', callback ) {
+		invoke( this.searchRequest, [ 'abort' ] );
+		this.searchRequest = this.fetchTerms( { search } ).then( callback );
+	}
+
+	fetchTerms( params = {} ) {
 		const { taxonomy } = this.props;
 		if ( ! taxonomy ) {
 			return;
 		}
+		const query = { ...DEFAULT_QUERY, ...params };
 		this.fetchRequest = apiFetch( {
-			path: addQueryArgs(
-				`/wp/v2/${ taxonomy.rest_base }`,
-				DEFAULT_QUERY
-			),
+			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
 		} );
-		this.fetchRequest.then(
+		return this.fetchRequest.then(
 			( terms ) => {
 				// resolve
 				const availableTermsTree = this.sortBySelected(
@@ -298,33 +302,37 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	setFilterValue( event ) {
-		const { availableTermsTree } = this.state;
 		const filterValue = event.target.value;
-		const filteredTermsTree = availableTermsTree
-			.map( this.getFilterMatcher( filterValue ) )
-			.filter( ( term ) => term );
-		const getResultCount = ( terms ) => {
-			let count = 0;
-			for ( let i = 0; i < terms.length; i++ ) {
-				count++;
-				if ( undefined !== terms[ i ].children ) {
-					count += getResultCount( terms[ i ].children );
-				}
-			}
-			return count;
-		};
 		this.setState( {
 			filterValue,
-			filteredTermsTree,
 		} );
+		this.searchTerms( escapeString( event.target.value ), () => {
+			const { availableTermsTree } = this.state;
+			const filteredTermsTree = availableTermsTree
+				.map( this.getFilterMatcher( filterValue ) )
+				.filter( ( term ) => term );
+			const getResultCount = ( terms ) => {
+				let count = 0;
+				for ( let i = 0; i < terms.length; i++ ) {
+					count++;
+					if ( undefined !== terms[ i ].children ) {
+						count += getResultCount( terms[ i ].children );
+					}
+				}
+				return count;
+			};
+			this.setState( {
+				filteredTermsTree,
+			} );
 
-		const resultCount = getResultCount( filteredTermsTree );
-		const resultsFoundMessage = sprintf(
-			/* translators: %d: number of results */
-			_n( '%d result found.', '%d results found.', resultCount ),
-			resultCount
-		);
-		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
+			const resultCount = getResultCount( filteredTermsTree );
+			const resultsFoundMessage = sprintf(
+				/* translators: %d: number of results */
+				_n( '%d result found.', '%d results found.', resultCount ),
+				resultCount
+			);
+			this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
+		} );
 	}
 
 	getFilterMatcher( filterValue ) {
@@ -452,24 +460,19 @@ class HierarchicalTermSelector extends Component {
 			[ 'name' ],
 			__( 'Terms' )
 		);
-		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 		return [
-			showFilter && (
-				<label key="filter-label" htmlFor={ filterInputId }>
-					{ filterLabel }
-				</label>
-			),
-			showFilter && (
-				<input
-					type="search"
-					id={ filterInputId }
-					value={ filterValue }
-					onChange={ this.setFilterValue }
-					className="editor-post-taxonomies__hierarchical-terms-filter"
-					key="term-filter-input"
-				/>
-			),
+			<label key="filter-label" htmlFor={ filterInputId }>
+				{ filterLabel }
+			</label>,
+			<input
+				type="search"
+				id={ filterInputId }
+				value={ filterValue }
+				onChange={ this.setFilterValue }
+				className="editor-post-taxonomies__hierarchical-terms-filter"
+				key="term-filter-input"
+			/>,
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"
 				key="term-list"
