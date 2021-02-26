@@ -4,7 +4,15 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 
 ## 10.3.0
 
--   Passing a tuple of components with `as` prop to `ActionItem.Slot` component is no longer supported. Please pass a component with `as` prop instead.
+-   Passing a tuple of components with `as` prop to `ActionItem.Slot` component is no longer supported. Please pass a component with `as` prop instead. Example:
+    ```diff
+		<ActionItem.Slot
+ 						name="core/edit-post/plugin-more-menu"
+ 						label={ __( 'Plugins' ) }
+ 		- 				as={ [ MenuGroup, MenuItem ] }
+ 		+ 				as={ MenuGroup }
+		/>
+    ```
 
 ## 9.7.0
 
