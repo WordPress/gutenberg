@@ -7,28 +7,49 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { HorizontalRule } from '@wordpress/components';
+import { View } from '@wordpress/primitives';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
+
 /**
  * Internal dependencies
  */
 import SeparatorSettings from './separator-settings';
+import { MARGIN_CONSTRAINTS, parseUnit } from './shared';
 
-function SeparatorEdit( { color, setColor, className } ) {
+function SeparatorEdit( props ) {
+	const {
+		color,
+		attributes: { style },
+	} = props;
+
+	const { top, bottom } = style?.spacing?.margin || {};
+	const marginUnit = parseUnit( top || bottom );
+	const blockProps = useBlockProps();
+
 	return (
 		<>
-			<HorizontalRule
-				{ ...useBlockProps( {
-					className: classnames( className, {
+			<View
+				{ ...blockProps }
+				className={ blockProps.className?.replace(
+					'wp-block-separator',
+					'wp-block-separator-wrapper'
+				) }
+			>
+				<HorizontalRule
+					className={ classnames( blockProps.className, {
 						'has-background': color.color,
 						[ color.class ]: color.class,
-					} ),
-					style: {
+					} ) }
+					style={ {
 						backgroundColor: color.color,
 						color: color.color,
-					},
-				} ) }
-			/>
-			<SeparatorSettings color={ color } setColor={ setColor } />
+						marginTop: top || MARGIN_CONSTRAINTS[ marginUnit ].min,
+						marginBottom:
+							bottom || MARGIN_CONSTRAINTS[ marginUnit ].min,
+					} }
+				/>
+			</View>
+			<SeparatorSettings { ...props } />
 		</>
 	);
 }
