@@ -6,21 +6,19 @@
  */
 
 /**
- * Extracts heading content, anchor, and level from the given post content.
+ * Extracts heading content, id, page, and level from the given post content.
  *
  * @access private
  *
  * @param string $content       The post content to extract headings from.
  * @param int    $headings_page The page of the post where the headings are
  *                              located.
- * @param int    $current_page  The page of the post currently being rendered.
  *
  * @return array The list of headings.
  */
 function block_core_table_of_contents_get_headings_from_content(
 	$content,
-	$headings_page = 1,
-	$current_page = 1
+	$headings_page = 1
 ) {
 	/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 	// Disabled because of PHP DOMDocument and DOMXPath APIs using camelCase.
@@ -83,23 +81,14 @@ function block_core_table_of_contents_get_headings_from_content(
 	);
 
 	return array_map(
-		function ( $heading ) use ( $headings_page, $current_page ) {
-			$anchor = '';
+		function ( $heading ) use ( $headings_page ) {
+			$id = null;
 
 			if ( isset( $heading->attributes ) ) {
 				$id_attribute = $heading->attributes->getNamedItem( 'id' );
 
-				if ( null !== $id_attribute ) {
+				if ( null !== $id_attribute && '' !== $id_attribute->nodeValue ) {
 					$id = $id_attribute->nodeValue;
-					if ( $headings_page === $current_page ) {
-						$anchor = '#' . $id;
-					} elseif ( 1 !== $headings_page && 1 === $current_page ) {
-						$anchor = './' . $headings_page . '/#' . $id;
-					} elseif ( 1 === $headings_page && 1 !== $current_page ) {
-						$anchor = '../#' . $id;
-					} else {
-						$anchor = '../' . $headings_page . '/#' . $id;
-					}
 				}
 			}
 
@@ -108,7 +97,8 @@ function block_core_table_of_contents_get_headings_from_content(
 				// be an h1-h6, we can just grab the 2nd character of the tag name
 				// and convert it to an integer. Should be faster than conditionals.
 				'level'   => (int) $heading->nodeName[1],
-				'anchor'  => $anchor,
+				'id'      => $id,
+				'page'    => $headings_page,
 				'content' => $heading->textContent,
 			);
 		},
@@ -141,11 +131,10 @@ function block_core_table_of_contents_get_headings(
 	if ( $multipage ) {
 		// Creates a list of heading lists, one list per page.
 		$pages_of_headings = array_map(
-			function( $page_content, $page_index ) use ( $page ) {
+			function( $page_content, $page_index ) {
 				return block_core_table_of_contents_get_headings_from_content(
 					$page_content,
-					$page_index + 1,
-					$page
+					$page_index + 1
 				);
 			},
 			$pages,
@@ -241,23 +230,33 @@ function block_core_table_of_contents_linear_to_nested_heading_list(
  *
  * @access private
  *
- * @param array $nested_heading_list Nested list of heading data.
+ * @param array  $nested_heading_list Nested list of heading data.
+ * @param string $page_url            URL of the page the block belongs to.
  *
  * @return string The heading list rendered as HTML.
  */
-function block_core_table_of_contents_render_list( $nested_heading_list ) {
+function block_core_table_of_contents_render_list(
+	$nested_heading_list,
+	$page_url
+) {
 	$entry_class = 'wp-block-table-of-contents__entry';
 
 	$child_nodes = array_map(
-		function ( $child_node ) use ( $entry_class ) {
-			$anchor  = $child_node['heading']['anchor'];
+		function ( $child_node ) use ( $entry_class, $page_url ) {
+			$id      = $child_node['heading']['id'];
 			$content = $child_node['heading']['content'];
 
-			if ( isset( $anchor ) && '' !== $anchor ) {
+			if ( isset( $id ) ) {
+				$href = add_query_arg(
+					'page',
+					(string) $child_node['heading']['page'],
+					remove_query_arg( 'page', $page_url )
+				) . '#' . $id;
+
 				$entry = sprintf(
 					'<a class="%1$s" href="%2$s">%3$s</a>',
 					$entry_class,
-					esc_attr( $anchor ),
+					esc_url( $href ),
 					esc_html( $content )
 				);
 			} else {
@@ -272,7 +271,10 @@ function block_core_table_of_contents_render_list( $nested_heading_list ) {
 				'<li>%1$s%2$s</li>',
 				$entry,
 				$child_node['children']
-					? block_core_table_of_contents_render_list( $child_node['children'] )
+					? block_core_table_of_contents_render_list(
+						$child_node['children'],
+						$page_url
+					)
 					: null
 			);
 		},
@@ -312,7 +314,8 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 		'<nav %1$s>%2$s</nav>',
 		get_block_wrapper_attributes(),
 		block_core_table_of_contents_render_list(
-			block_core_table_of_contents_linear_to_nested_heading_list( $headings )
+			block_core_table_of_contents_linear_to_nested_heading_list( $headings ),
+			get_permalink( $block->context['postId'] )
 		)
 	);
 }
