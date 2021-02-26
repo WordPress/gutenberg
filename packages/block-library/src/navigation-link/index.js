@@ -15,7 +15,7 @@ import './hooks';
 
 const { name } = metadata;
 
-export { name, metadata };
+export { metadata, name };
 
 export const settings = {
 	title: _x( 'Link', 'block title' ),
