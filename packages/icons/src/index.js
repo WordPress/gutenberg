@@ -119,6 +119,7 @@ export { default as moreHorizontal } from './library/more-horizontal';
 export { default as moreHorizontalMobile } from './library/more-horizontal-mobile';
 export { default as moreVertical } from './library/more-vertical';
 export { default as navigation } from './library/navigation';
+export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
 export { default as page } from './library/page';
 export { default as pages } from './library/pages';

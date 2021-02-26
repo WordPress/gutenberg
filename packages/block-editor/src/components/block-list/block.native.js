@@ -42,7 +42,6 @@ function BlockForType( {
 	mergeBlocks,
 	name,
 	onBlockFocus,
-	onCaretVerticalPositionChange,
 	onChange,
 	onDeleteBlock,
 	onReplace,
@@ -81,7 +80,6 @@ function BlockForType( {
 				onReplace={ onReplace }
 				insertBlocksAfter={ insertBlocksAfter }
 				mergeBlocks={ mergeBlocks }
-				onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
 				// Block level styles
 				wrapperProps={ wrapperProps }
 				// inherited styles merged with block level styles
