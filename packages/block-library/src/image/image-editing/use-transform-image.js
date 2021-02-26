@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ editedUrl, setEditedUrl ] = useState();
@@ -90,6 +91,15 @@ function useTransformState( { url, naturalWidth, naturalHeight } ) {
 		const el = new window.Image();
 		el.src = url;
 		el.onload = editImage;
+
+		const imgCrossOrigin = applyFilters(
+			'media.crossOrigin',
+			undefined,
+			url
+		);
+		if ( typeof imgCrossOrigin === 'string' ) {
+			el.crossOrigin = imgCrossOrigin;
+		}
 	}, [
 		rotation,
 		naturalWidth,

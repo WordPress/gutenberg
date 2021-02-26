@@ -19,6 +19,7 @@ import {
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_TYPE_AUDIO = 'audio';
 export const MEDIA_TYPE_ANY = 'any';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
@@ -44,6 +45,7 @@ export class MediaUpload extends Component {
 				( option ) => {
 					return {
 						...option,
+						requiresModal: true,
 						types: allowedTypes,
 						id: option.value,
 					};
@@ -59,6 +61,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.deviceCamera, // ID is the value sent to native
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 			label: __( 'Take a Photo' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE ],
 			icon: capturePhoto,
 		};
@@ -67,6 +70,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.deviceCamera,
 			value: mediaSources.deviceCamera,
 			label: __( 'Take a Video' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_VIDEO ],
 			icon: captureVideo,
 		};
@@ -75,6 +79,7 @@ export class MediaUpload extends Component {
 			id: mediaSources.deviceLibrary,
 			value: mediaSources.deviceLibrary,
 			label: __( 'Choose from device' ),
+			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: image,
 		};
@@ -83,7 +88,13 @@ export class MediaUpload extends Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_ANY ],
+			requiresModal: true,
+			types: [
+				MEDIA_TYPE_IMAGE,
+				MEDIA_TYPE_VIDEO,
+				MEDIA_TYPE_AUDIO,
+				MEDIA_TYPE_ANY,
+			],
 			icon: wordpress,
 			mediaLibrary: true,
 		};
@@ -151,6 +162,7 @@ export class MediaUpload extends Component {
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAudio = isOneType && allowedTypes.includes( MEDIA_TYPE_AUDIO );
 		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
 
 		const isImageOrVideo =
@@ -179,8 +191,19 @@ export class MediaUpload extends Component {
 			} else {
 				pickerTitle = __( 'Choose image or video' );
 			}
+		} else if ( isAudio ) {
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace audio' );
+			} else {
+				pickerTitle = __( 'Choose audio' );
+			}
 		} else if ( isAnyType ) {
 			pickerTitle = __( 'Choose file' );
+			if ( isReplacingMedia ) {
+				pickerTitle = __( 'Replace file' );
+			} else {
+				pickerTitle = __( 'Choose file' );
+			}
 		}
 
 		const getMediaOptions = () => (

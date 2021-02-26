@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockNavigationDropdown,
@@ -23,8 +24,10 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
+import { store as editSiteStore } from '../../store';
 
 export default function Header( { openEntitiesSavedStates } ) {
+	const inserterButton = useRef();
 	const {
 		deviceType,
 		entityTitle,
@@ -39,7 +42,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
-		} = select( 'core/edit-site' );
+		} = select( editSiteStore );
 		const { getEntityRecord } = select( 'core' );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
 			'core/editor'
@@ -66,7 +69,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
-	} = useDispatch( 'core/edit-site' );
+	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
@@ -77,12 +80,21 @@ export default function Header( { openEntitiesSavedStates } ) {
 			<div className="edit-site-header_start">
 				<div className="edit-site-header__toolbar">
 					<Button
+						ref={ inserterButton }
 						isPrimary
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
-						onClick={ () =>
-							setIsInserterOpened( ! isInserterOpen )
-						}
+						onMouseDown={ ( event ) => {
+							event.preventDefault();
+						} }
+						onClick={ () => {
+							if ( isInserterOpen ) {
+								// Focusing the inserter button closes the inserter popover
+								inserterButton.current.focus();
+							} else {
+								setIsInserterOpened( true );
+							}
+						} }
 						icon={ plus }
 						label={ _x(
 							'Add block',

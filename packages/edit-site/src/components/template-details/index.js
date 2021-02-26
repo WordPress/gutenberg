@@ -9,6 +9,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
+import { store as editSiteStore } from '../../store';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -16,7 +17,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const { openNavigationPanelToMenu } = useDispatch( 'core/edit-site' );
+	const { openNavigationPanelToMenu } = useDispatch( editSiteStore );
 
 	if ( ! template ) {
 		return null;

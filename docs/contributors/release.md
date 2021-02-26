@@ -2,7 +2,9 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release Gutenberg, you need commit access to the [WordPress.org plugin repository][plugin repository] as well as being part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
+To release a stable version of the Gutenberg plugin, you need approval from a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core) for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release.
+
+To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
 ## Plugin Releases
 
@@ -12,7 +14,7 @@ We release a new major version approximately every two weeks. The current and ne
 
 -   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
--   **Two days after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
+-   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
@@ -37,6 +39,10 @@ During the release process, you'll be asked to provide:
 -   A changelog: prepare one beforehand by following the instructions below.
 -   A [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line): have one ready beforehand by visiting [this page](https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages), if you haven't got one yet.
 -   User and password for your GitHub account: if 2FA is enabled for your account (it should), you need to provide a personal access token instead of password (you can use the one necessary for the release).
+
+The release script will create a `git` tag for the release and push it to GitHub. This triggers a GitHub workflow that builds the plugin, creates a release draft (based on the Changelog), and attaches the plugin zip. This will take a couple of minutes. You will then find the release draft at https://github.com/WordPress/gutenberg/releases. You can edit it further (but note that the changes won't be propagated to `changelog.txt`). Once you're happy with it, press the 'Publish' button.
+
+If you're releasing a stable version (rather than an RC), this will trigger a GitHub action that will upload the plugin to the WordPress.org plugin repository (SVN). This action needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 ### Manual Release Process
 
@@ -67,6 +73,8 @@ To override the default behavior, you can pass one or both of the following opti
     -   Example: `npm run changelog -- --milestone="Gutenberg 8.1"`
 -   `--token <token>`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
     -   Example: `npm run changelog -- --token="..."`
+-   `--unreleased`: Only list PRs that have been closed after the latest release in the milestone's series has been published. In other words, only list PRs that haven't been part of a release yet.
+    -   Example: `npm run changelog -- --milestone="Gutenberg 9.8" --unreleased`. If the latest version in the 9.8 series is 9.8.3, only show PRs for the in the 9.8 series that were closed (merged) after 9.8.3 was published.
 
 The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
 
@@ -265,7 +273,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
 10. Run the script `npm run publish:prod`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/master/commands/publish#bump-from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
 
 Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the main branch of Gutenberg.
 
@@ -335,7 +343,7 @@ Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https
     > lerna success found 3 packages ready to publish
     > ```
 
-Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/master/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
+Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/HEAD/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
 
 Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
 

@@ -1,6 +1,14 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+### Breaking Change
+
+-   Migrate from `nodegit` to `simple-git`. This change now requires you to have a `git` binary installed locally to utilize the git sources feature of wp-env.json.
+
+### Bug Fixes
+
+-   "mappings" sources are now downloaded if they contain non-local sources.
 
 ## 3.0.0 (2020-12-17)
 

@@ -45,8 +45,7 @@ const postTypeEntities = [
 	...postTypeEntity,
 	transientEdits: {
 		blocks: true,
-		selectionStart: true,
-		selectionEnd: true,
+		selection: true,
 	},
 	mergedEdits: {
 		meta: true,

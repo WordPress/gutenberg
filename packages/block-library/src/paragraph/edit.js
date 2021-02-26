@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -72,6 +73,7 @@ function ParagraphBlock( {
 	onReplace,
 	onRemove,
 	setAttributes,
+	clientId,
 } ) {
 	const {
 		align,
@@ -87,7 +89,7 @@ function ParagraphBlock( {
 	const inlineFontSize = style?.fontSize;
 	const size = useSelect(
 		( select ) => {
-			const { fontSizes } = select( 'core/block-editor' ).getSettings();
+			const { fontSizes } = select( blockEditorStore ).getSettings();
 			return getFontSize( fontSizes, fontSize, inlineFontSize ).size;
 		},
 		[ fontSize, inlineFontSize ]
@@ -147,15 +149,23 @@ function ParagraphBlock( {
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
 				}
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( name );
+				onSplit={ ( value, isOriginal ) => {
+					let newAttributes;
+
+					if ( isOriginal || value ) {
+						newAttributes = {
+							...attributes,
+							content: value,
+						};
 					}
 
-					return createBlock( name, {
-						...attributes,
-						content: value,
-					} );
+					const block = createBlock( name, newAttributes );
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

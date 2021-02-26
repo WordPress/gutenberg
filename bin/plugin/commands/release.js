@@ -159,7 +159,7 @@ async function runBumpPluginVersionUpdateChangelogAndCommitStep(
 				readmeFileContent.indexOf( '== Changelog ==' )
 			) +
 			'== Changelog ==\n\n' +
-			`To read the changelog for ${ config.name } ${ version }, please navigate to the <a href="${ config.wpRepositoryReleasesURL }v${ version }">release page</a>.` +
+			`To read the changelog for ${ config.name } ${ version }, please navigate to the <a href="${ config.wpRepositoryReleasesURL }tag/v${ version }">release page</a>.` +
 			'\n';
 		fs.writeFileSync( readmePath, newReadmeContent );
 
@@ -482,10 +482,7 @@ async function releaseRC() {
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new RC version of the Plugin.\n',
 		'It goes through different steps: creating the release branch, bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
-		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, attach it to a release, and publish it.\n',
-		"To perform a release you'll have to be a member of the " +
-			config.team +
-			' Team.\n'
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, and attach it to a release draft.\n'
 	);
 
 	const version = await releasePlugin( true );
@@ -496,11 +493,10 @@ async function releaseRC() {
 			' version ' +
 			formats.success( version ) +
 			' has been successfully tagged.\n',
-		"In a few minutes, you'll be able to find the GitHub release here: " +
-			formats.success(
-				`${ config.wpRepositoryReleasesURL }v${ version }`
-			) +
+		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+			formats.success( config.wpRepositoryReleasesURL ) +
 			'\n',
+		"Don't forget to publish the release once the draft is available!\n",
 		'Thanks for performing the release!\n'
 	);
 }
@@ -510,8 +506,8 @@ async function releaseStable() {
 		formats.title( '\n💃 Time to release ' + config.name + ' 🕺\n\n' ),
 		'Welcome! This tool is going to help you release a new stable version of the Plugin.\n',
 		'It goes through different steps: bumping the plugin version, tagging the release, and pushing the tag to GitHub.\n',
-		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, attach it to a release, publish it, and push the release to the SVN repository.\n',
-		"To perform a release you'll have to be a member of the " +
+		'Once the tag is pushed to GitHub, GitHub will build the plugin ZIP, and attach it to a release draft.\n',
+		'To have the release uploaded to the WP.org plugin repository SVN, you need approval from a member of the ' +
 			config.team +
 			' Team.\n'
 	);
@@ -524,12 +520,18 @@ async function releaseStable() {
 			' ' +
 			formats.success( version ) +
 			' has been successfully tagged.\n',
-		"In a few minutes, you'll be able to find the GitHub release here: " +
-			formats.success(
-				`${ config.wpRepositoryReleasesURL }v${ version }`
-			) +
+		"In a few minutes, you'll be able to find the GitHub release draft here: " +
+			formats.success( config.wpRepositoryReleasesURL ) +
 			'\n',
-		"Once published, it'll be automatically uploaded to the WordPress plugin repository.\n",
+		"Don't forget to publish the release once the draft is available!\n",
+		'Once published, the upload to the WP.org plugin repository needs approval from a member of the ' +
+			config.team +
+			' Team at ' +
+			formats.success(
+				config.githubRepositoryURL +
+					'actions/workflows/upload-release-to-plugin-repo.yml '
+			) +
+			'.\n',
 		"Thanks for performing the release! and don't forget to publish the release post.\n"
 	);
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "2.19.0",
+	"version": "2.19.1",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"element",
 		"react"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/element/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/element/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

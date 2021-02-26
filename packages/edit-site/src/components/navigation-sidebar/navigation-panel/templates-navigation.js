@@ -17,6 +17,7 @@ import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
 import MainDashboardButton from '../../main-dashboard-button';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
+import { store as editSiteStore } from '../../../store';
 
 export default function TemplatesNavigation() {
 	const { postId, postType, activeMenu } = useSelect( ( select ) => {
@@ -24,7 +25,7 @@ export default function TemplatesNavigation() {
 			getEditedPostType,
 			getEditedPostId,
 			getNavigationPanelActiveMenu,
-		} = select( 'core/edit-site' );
+		} = select( editSiteStore );
 
 		return {
 			postId: getEditedPostId(),
@@ -33,7 +34,7 @@ export default function TemplatesNavigation() {
 		};
 	}, [] );
 
-	const { setNavigationPanelActiveMenu } = useDispatch( 'core/edit-site' );
+	const { setNavigationPanelActiveMenu } = useDispatch( editSiteStore );
 
 	return (
 		<Navigation

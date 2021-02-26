@@ -50,3 +50,9 @@ jobs:
       with:
         name: android-screen-recordings
         path: packages/react-native-editor/android-screen-recordings
+
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: appium-logs
+        path: packages/react-native-editor/appium-out.log

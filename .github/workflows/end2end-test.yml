@@ -5,7 +5,9 @@ on:
     paths-ignore:
     - '**.md'
   push:
-    branches: [master]
+    branches:
+      - master
+      - 'wp/**'
     paths-ignore:
     - '**.md'
 

@@ -14,6 +14,7 @@ import {
 	receiveUserPermission,
 	receiveAutosaves,
 	receiveCurrentUser,
+	__experimentalBatch,
 } from '../actions';
 
 jest.mock( '../locks/actions', () => ( {
@@ -28,6 +29,15 @@ jest.mock( '../locks/actions', () => ( {
 		},
 	] ),
 } ) );
+
+jest.mock( '../batch', () => {
+	const { createBatch } = jest.requireActual( '../batch' );
+	return {
+		createBatch() {
+			return createBatch( ( inputs ) => Promise.resolve( inputs ) );
+		},
+	};
+} );
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', () => {
@@ -290,5 +300,79 @@ describe( 'receiveCurrentUser', () => {
 			type: 'RECEIVE_CURRENT_USER',
 			currentUser,
 		} );
+	} );
+} );
+
+describe( '__experimentalBatch', () => {
+	it( 'batches multiple actions together', async () => {
+		const generator = __experimentalBatch(
+			[
+				( { saveEntityRecord: _saveEntityRecord } ) =>
+					_saveEntityRecord( 'root', 'widget', {} ),
+				( { saveEditedEntityRecord: _saveEditedEntityRecord } ) =>
+					_saveEditedEntityRecord( 'root', 'widget', 123 ),
+				( { deleteEntityRecord: _deleteEntityRecord } ) =>
+					_deleteEntityRecord( 'root', 'widget', 123, {} ),
+			],
+			{ __unstableProcessor: ( inputs ) => Promise.resolve( inputs ) }
+		);
+		// Run generator up to `yield getDispatch()`.
+		const { value: getDispatchControl } = generator.next();
+		expect( getDispatchControl ).toEqual( { type: 'GET_DISPATCH' } );
+		const actions = {
+			saveEntityRecord: jest.fn(
+				( kind, name, record, { __unstableFetch } ) => {
+					__unstableFetch( {} );
+					return { id: 123, created: true };
+				}
+			),
+			saveEditedEntityRecord: jest.fn(
+				( kind, name, recordId, { __unstableFetch } ) => {
+					__unstableFetch( {} );
+					return { id: 123, updated: true };
+				}
+			),
+			deleteEntityRecord: jest.fn(
+				( kind, name, recordId, query, { __unstableFetch } ) => {
+					__unstableFetch( {} );
+					return { id: 123, deleted: true };
+				}
+			),
+		};
+		const dispatch = () => actions;
+		// Run generator up to `yield __unstableAwaitPromise( ... )`.
+		const { value: awaitPromiseControl } = generator.next( dispatch );
+		expect( actions.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'widget',
+			{},
+			{ __unstableFetch: expect.any( Function ) }
+		);
+		expect( actions.saveEditedEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'widget',
+			123,
+			{ __unstableFetch: expect.any( Function ) }
+		);
+		expect( actions.deleteEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'widget',
+			123,
+			{},
+			{ __unstableFetch: expect.any( Function ) }
+		);
+		expect( awaitPromiseControl ).toEqual( {
+			type: 'AWAIT_PROMISE',
+			promise: expect.any( Promise ),
+		} );
+		// Run generator to the end.
+		const { value: results } = generator.next(
+			await awaitPromiseControl.promise
+		);
+		expect( results ).toEqual( [
+			{ id: 123, created: true },
+			{ id: 123, updated: true },
+			{ id: 123, deleted: true },
+		] );
 	} );
 } );

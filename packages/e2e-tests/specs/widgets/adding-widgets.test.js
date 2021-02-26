@@ -6,6 +6,7 @@ import {
 	deactivatePlugin,
 	activatePlugin,
 	activateTheme,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -64,7 +65,6 @@ describe( 'Widgets screen', () => {
 		return addParagraphBlock;
 	}
 
-	/*
 	async function expectInsertionPointIndicatorToBeBelowLastBlock(
 		widgetArea
 	) {
@@ -82,7 +82,6 @@ describe( 'Widgets screen', () => {
 			insertionPointIndicatorBoundingBox.y > lastBlockBoundingBox.y
 		).toBe( true );
 	}
-	*/
 
 	async function getInlineInserterButton() {
 		return await page.waitForSelector(
@@ -107,7 +106,8 @@ describe( 'Widgets screen', () => {
 		// 	firstWidgetArea
 		// );
 
-		await addParagraphBlock.click();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		const addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
 			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
@@ -124,10 +124,11 @@ describe( 'Widgets screen', () => {
 		addParagraphBlock = await getParagraphBlockInGlobalInserter();
 		await addParagraphBlock.hover();
 
-		/*await expectInsertionPointIndicatorToBeBelowLastBlock(
+		await expectInsertionPointIndicatorToBeBelowLastBlock(
 			firstWidgetArea
-		);*/
-		await addParagraphBlock.click();
+		);
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
 
 		await page.keyboard.type( 'Second Paragraph' );
 
@@ -162,10 +163,10 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
 		}
@@ -252,7 +253,7 @@ describe( 'Widgets screen', () => {
 
 		// TODO: The query should be rewritten with role and label.
 		const inserterSearchBox = await page.waitForSelector(
-			'input[type="search"][placeholder="Search for a block"]'
+			'input[type="search"][placeholder="Search"]'
 		);
 		expect(
 			await inserterSearchBox.evaluate(
@@ -294,14 +295,218 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
 		<h2>My Heading</h2>
 		</div></div>
-		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
+		</div></div>",
+		}
+	` );
+	} );
+
+	it( 'Should duplicate the widgets', async () => {
+		let firstWidgetArea = await page.$(
+			'[aria-label="Block: Widget Area"][role="group"]'
+		);
+
+		const addParagraphBlock = await getParagraphBlockInGlobalInserter();
+		await addParagraphBlock.focus();
+		await pressKeyWithModifier( 'primary', 'Enter' );
+
+		let firstParagraphBlock = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await page.keyboard.type( 'First Paragraph' );
+
+		await saveWidgets();
+		await page.reload();
+		// Wait for the widget areas to load.
+		firstWidgetArea = await page.waitForSelector(
+			'[aria-label="Block: Widget Area"][role="group"]'
+		);
+
+		const initialSerializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( initialSerializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>",
+		}
+	` );
+		const initialWidgets = await getWidgetAreaWidgets();
+		expect( initialWidgets[ 'sidebar-1' ].length ).toBe( 1 );
+
+		firstParagraphBlock = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"]'
+		);
+		await firstParagraphBlock.focus();
+
+		// Trigger the toolbar to appear.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		const blockToolbar = await page.waitForSelector(
+			'[role="toolbar"][aria-label="Block tools"]'
+		);
+		const moreOptionsButton = await blockToolbar.$(
+			'button[aria-label="Options"]'
+		);
+		await moreOptionsButton.click();
+
+		const optionsMenu = await page.waitForSelector(
+			'[role="menu"][aria-label="Options"]'
+		);
+		const [ duplicateButton ] = await optionsMenu.$x(
+			'//*[@role="menuitem"][*[text()="Duplicate"]]'
+		);
+		await duplicateButton.click();
+
+		await page.waitForFunction(
+			( paragraph ) =>
+				paragraph.nextSibling &&
+				paragraph.nextSibling.matches( '[data-block]' ),
+			{},
+			firstParagraphBlock
+		);
+		const duplicatedParagraphBlock = await firstParagraphBlock.evaluateHandle(
+			( paragraph ) => paragraph.nextSibling
+		);
+
+		const firstParagraphBlockClientId = await firstParagraphBlock.evaluate(
+			( node ) => node.dataset.block
+		);
+		const duplicatedParagraphBlockClientId = await duplicatedParagraphBlock.evaluate(
+			( node ) => node.dataset.block
+		);
+
+		expect( firstParagraphBlockClientId ).not.toBe(
+			duplicatedParagraphBlockClientId
+		);
+		expect(
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node.textContent
+			)
+		).toBe( 'First Paragraph' );
+		expect(
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node === document.activeElement
+			)
+		).toBe( true );
+
+		await saveWidgets();
+		const editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>",
+		}
+	` );
+		const editedWidgets = await getWidgetAreaWidgets();
+		expect( editedWidgets[ 'sidebar-1' ].length ).toBe( 2 );
+		expect( editedWidgets[ 'sidebar-1' ][ 0 ] ).toBe(
+			initialWidgets[ 'sidebar-1' ][ 0 ]
+		);
+	} );
+
+	it( 'Should display legacy widgets', async () => {
+		await visitAdminPage( 'widgets.php' );
+
+		const [ searchWidget ] = await page.$x(
+			'//*[@id="widget-list"]//h3[text()="Search"]'
+		);
+		await searchWidget.click();
+
+		const [ addWidgetButton ] = await page.$x(
+			'//button[text()="Add Widget"]'
+		);
+		await addWidgetButton.click();
+
+		// Wait for the changes to be saved.
+		// TODO: Might have better ways to do this.
+		await page.waitForFunction( () => {
+			const addedSearchWidget = document.querySelector(
+				'#widgets-right .widget'
+			);
+			const spinner = addedSearchWidget.querySelector( '.spinner' );
+
+			return (
+				addedSearchWidget.classList.contains( 'open' ) &&
+				! spinner.classList.contains( 'is-active' )
+			);
+		} );
+		// FIXME: For some reasons, waiting for the spinner to disappear is not enough.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 500 );
+
+		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+		// Wait for the widget areas to load.
+		await page.waitForSelector(
+			'[aria-label="Block: Widget Area"][role="group"]'
+		);
+
+		const legacyWidget = await page.waitForSelector(
+			'[data-block][data-type="core/legacy-widget"]'
+		);
+
+		const legacyWidgetName = await legacyWidget.$( 'h3' );
+		expect(
+			await legacyWidgetName.evaluate( ( node ) => node.textContent )
+		).toBe( 'Search' );
+
+		await legacyWidget.focus();
+
+		// Trigger the toolbar to appear.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		let [ previewButton ] = await page.$x(
+			'//button[*[contains(text(), "Preview")]]'
+		);
+		await previewButton.click();
+
+		const iframe = await legacyWidget.$( 'iframe' );
+		const frame = await iframe.contentFrame();
+
+		// Expect to have search input.
+		await frame.waitForSelector( 'input[type="search"]' );
+
+		const [ editButton ] = await page.$x(
+			'//button[*[contains(text(), "Edit")]]'
+		);
+		await editButton.click();
+
+		// TODO: Should query this with role and label.
+		const titleInput = await legacyWidget.$( 'input' );
+		await titleInput.type( 'Search Title' );
+
+		// Trigger the toolbar to appear.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		[ previewButton ] = await page.$x(
+			'//button[*[contains(text(), "Preview")]]'
+		);
+		await previewButton.click();
+
+		// Expect to have search title.
+		await frame.waitForXPath( '//h2[text()="Search Title"]' );
+
+		await saveWidgets();
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_search\\"><div class=\\"widget-content\\"><h2 class=\\"widget-title subheading heading-size-3\\">Search Title</h2><form role=\\"search\\"  method=\\"get\\" class=\\"search-form\\" action=\\"http://localhost:8889/\\">
+			<label for=\\"search-form-1\\">
+				<span class=\\"screen-reader-text\\">Search for:</span>
+				<input type=\\"search\\" id=\\"search-form-1\\" class=\\"search-field\\" placeholder=\\"Search &hellip;\\" value=\\"\\" name=\\"s\\" />
+			</label>
+			<input type=\\"submit\\" class=\\"search-submit\\" value=\\"Search\\" />
+		</form>
 		</div></div>",
 		}
 	` );
@@ -335,6 +540,23 @@ async function getSerializedWidgetAreas() {
 	);
 
 	return serializedWidgetAreas;
+}
+
+async function getWidgetAreaWidgets() {
+	const widgets = await page.evaluate( () => {
+		const widgetAreas = wp.data
+			.select( 'core/edit-widgets' )
+			.getWidgetAreas();
+		const sidebars = {};
+
+		for ( const widgetArea of widgetAreas ) {
+			sidebars[ widgetArea.id ] = widgetArea.widgets;
+		}
+
+		return sidebars;
+	} );
+
+	return widgets;
 }
 
 /**

@@ -7,6 +7,7 @@ import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
@@ -16,7 +17,7 @@ import {
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
-import QueryPlaceholder from './query-placeholder';
+import QueryBlockSetup from './query-block-setup';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
@@ -30,7 +31,7 @@ export function QueryContent( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const { postsPerPage } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			postsPerPage:
 				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
@@ -89,11 +90,10 @@ const QueryEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
-			!! select( 'core/block-editor' ).getBlocks( clientId ).length,
+			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
-
+	const Component = hasInnerBlocks ? QueryContent : QueryBlockSetup;
 	return <Component { ...props } />;
 };
 

@@ -16,7 +16,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
  */
 import BlockTitle from '../block-title';
 import SubdirectorSVG from './subdirectory-icon';
-
+import { store as blockEditorStore } from '../../store';
 import styles from './block-selection-button.scss';
 
 const BlockSelectionButton = ( {
@@ -78,7 +78,7 @@ const BlockSelectionButton = ( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockRootClientId, getBlockName, getSettings } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		const blockName = getBlockName( clientId );

@@ -27,6 +27,8 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
+	store as blockEditorStore,
+	BlockAlignmentControl,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -36,8 +38,9 @@ import {
 	getBlockType,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { crop, textColor, upload } from '@wordpress/icons';
+import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -89,13 +92,13 @@ export default function Image( {
 	const prevUrl = usePrevious( url );
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
-			const { getMedia } = select( 'core' );
+			const { getMedia } = select( coreStore );
 			const {
 				getMultiSelectedBlockClientIds,
 				getBlockName,
 				getSelectedBlock,
 				getSelectedBlockClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
 				block: getSelectedBlock(),
@@ -113,7 +116,7 @@ export default function Image( {
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 			return pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -122,9 +125,7 @@ export default function Image( {
 			] );
 		}
 	);
-	const { replaceBlocks, toggleSelection } = useDispatch(
-		'core/block-editor'
-	);
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
@@ -259,6 +260,16 @@ export default function Image( {
 		} );
 	}
 
+	function updateAlignment( nextAlign ) {
+		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -271,8 +282,12 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls>
-				{ ! multiImageSelection && ! isEditingImage && (
-					<ToolbarGroup>
+				<ToolbarGroup>
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+					{ ! multiImageSelection && ! isEditingImage && (
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
@@ -283,26 +298,34 @@ export default function Image( {
 							linkClass={ linkClass }
 							rel={ rel }
 						/>
-					</ToolbarGroup>
-				) }
-				{ allowCrop && (
-					<ToolbarGroup>
+					) }
+					{ allowCrop && (
 						<ToolbarButton
 							onClick={ () => setIsEditingImage( true ) }
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>
-					</ToolbarGroup>
-				) }
-				{ externalBlob && (
-					<ToolbarGroup>
+					) }
+					{ externalBlob && (
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
 							label={ __( 'Upload external image' ) }
 						/>
-					</ToolbarGroup>
-				) }
+					) }
+					{ ! multiImageSelection && coverBlockExists && (
+						<ToolbarButton
+							icon={ overlayText }
+							label={ __( 'Add text over image' ) }
+							onClick={ () =>
+								replaceBlocks(
+									currentId,
+									switchToBlockType( block, 'core/cover' )
+								)
+							}
+						/>
+					) }
+				</ToolbarGroup>
 				{ ! multiImageSelection && ! isEditingImage && (
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -313,20 +336,6 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-				{ ! multiImageSelection && coverBlockExists && (
-					<ToolbarGroup>
-						<ToolbarButton
-							icon={ textColor }
-							label={ __( 'Add text over image' ) }
-							onClick={ () =>
-								replaceBlocks(
-									currentId,
-									switchToBlockType( block, 'core/cover' )
-								)
-							}
-						/>
-					</ToolbarGroup>
 				) }
 			</BlockControls>
 			<InspectorControls>

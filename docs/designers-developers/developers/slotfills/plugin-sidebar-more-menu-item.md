@@ -29,4 +29,4 @@ registerPlugin( 'plugin-sidebar-expanded-test', {
 
 ## Location
 
-![Interaction](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-sidebar-more-menu-item.gif?raw=true)
+![Interaction](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/assets/plugin-sidebar-more-menu-item.gif?raw=true)

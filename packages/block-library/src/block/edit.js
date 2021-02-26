@@ -18,6 +18,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -25,11 +26,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-
-/**
- * Internal dependencies
- */
-import useNoRecursiveRenders from './use-no-recursive-renders';
+import { ungroup } from '@wordpress/icons';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -124,9 +121,10 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => convertBlockToStatic( clientId ) }
-						>
-							{ __( 'Convert to regular blocks' ) }
-						</ToolbarButton>
+							label={ __( 'Convert to regular blocks' ) }
+							icon={ ungroup }
+							showTooltip
+						/>
 					</ToolbarGroup>
 				</BlockControls>
 				<InspectorControls>
