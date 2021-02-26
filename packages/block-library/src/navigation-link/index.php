@@ -104,13 +104,12 @@ function block_core_navigation_link_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
+	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
+	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
+	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
+
 	// Don't render the block's subtree if it is a draft.
-	if (
-		isset( $attributes['id'] ) &&
-		is_numeric( $attributes['id'] ) &&
-		isset( $attributes['type'] ) &&
-		( 'post' === $attributes['type'] || 'page' === $attributes['type'] )
-	) {
+	if ( $is_post_type && $navigation_link_has_id ) {
 		$post = get_post( $attributes['id'] );
 		if ( 'publish' !== $post->post_status ) {
 			return '';
