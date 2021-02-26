@@ -311,7 +311,7 @@ export default function NavigationLinkEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation__container', {
+			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block':
 					isParentOfSelectedBlock &&
 					// Don't select as parent of selected block while dragging.
