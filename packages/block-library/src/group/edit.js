@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { v4 as uuid } from 'uuid';
 import classnames from 'classnames';
 
 /**
@@ -25,6 +24,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 const isWeb = Platform.OS === 'web';
@@ -58,6 +58,7 @@ export const CSS_UNITS = [
 ];
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
+	const id = useInstanceId( GroupEdit );
 	const { defaultLayout, hasInnerBlocks } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -70,29 +71,36 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const blockProps = useBlockProps();
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const { contentSize, wideSize } = layout;
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: classnames( 'wp-block-group__inner-container', {
-				[ `wp-container-${ layout.id }` ]: !! layout.id,
-			} ),
-		},
-		{
-			templateLock,
-			renderAppender: hasInnerBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: {
-				type: 'default',
-				alignments:
-					contentSize || wideSize
-						? [ 'wide', 'full' ]
-						: [ 'left', 'center', 'right' ],
-			},
-		}
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `wp-container-${ id }` ]: contentSize || wideSize,
+		} ),
+	} );
+	/* TODO: find a way to render this extra div as a child of the inner block wrapper 
+	const extraChildren = (
+		<BoxControlVisualizer
+			values={ attributes.style?.spacing?.padding }
+			showValues={ attributes.style?.visualizers?.padding }
+		/>
 	);
+	*/
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock,
+		renderAppender: hasInnerBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+		__experimentalLayout: {
+			type: 'default',
+			// TODO: only pass this if the theme supports the new alignments.
+			// otherwise make all alignments avaiable.
+			alignments:
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ],
+		},
+	} );
 
 	return (
 		<>
@@ -105,7 +113,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 								setAttributes( {
 									layout: {
 										...defaultLayout,
-										id: layout.id ?? uuid(),
 									},
 								} );
 							} }
@@ -125,7 +132,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 								layout: {
 									...layout,
 									contentSize: nextWidth,
-									id: layout.id ?? uuid(),
 								},
 							} );
 						} }
@@ -143,7 +149,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 								layout: {
 									...layout,
 									wideSize: nextWidth,
-									id: layout.id ?? uuid(),
 								},
 							} );
 						} }
@@ -169,32 +174,26 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					}
 				/>
 			</InspectorAdvancedControls>
-			<TagName { ...blockProps }>
-				{ ( wideSize || contentSize ) && (
-					<style>
-						{ `
-							.wp-container-${ layout.id } > * {
+			{ ( wideSize || contentSize ) && (
+				<style>
+					{ `
+							.wp-container-${ id } > * {
 								max-width: ${ contentSize ?? wideSize };
 								margin-left: auto;
 								margin-right: auto;
 							}
 						
-							.wp-container-${ layout.id } > [data-align="wide"] {
+							.wp-container-${ id } > [data-align="wide"] {
 								max-width: ${ wideSize ?? contentSize };
 							}
 						
-							.wp-container-${ layout.id } > [data-align="full"] {
+							.wp-container-${ id } > [data-align="full"] {
 								max-width: none;
 							}
 						` }
-					</style>
-				) }
-				<BoxControlVisualizer
-					values={ attributes.style?.spacing?.padding }
-					showValues={ attributes.style?.visualizers?.padding }
-				/>
-				<div { ...innerBlocksProps } />
-			</TagName>
+				</style>
+			) }
+			<TagName { ...innerBlocksProps } />
 		</>
 	);
 }

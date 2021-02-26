@@ -7,7 +7,11 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	getColorClassName,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 const migrateAttributes = ( attributes ) => {
 	if ( ! attributes.tagName ) {
@@ -34,6 +38,46 @@ const migrateAttributes = ( attributes ) => {
 };
 
 const deprecated = [
+	// Version of the block with the double dif
+	{
+		attributes: {
+			tagName: {
+				type: 'string',
+				default: 'div',
+			},
+			templateLock: {
+				type: 'string',
+			},
+			layout: {
+				type: 'object',
+			},
+		},
+		supports: {
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			color: {
+				gradients: true,
+				link: true,
+			},
+			spacing: {
+				padding: true,
+			},
+			__experimentalBorder: {
+				radius: true,
+			},
+		},
+		save( { attributes } ) {
+			const { tagName: Tag } = attributes;
+
+			return (
+				<Tag { ...useBlockProps.save() }>
+					<div className="wp-block-group__inner-container">
+						<InnerBlocks.Content />
+					</div>
+				</Tag>
+			);
+		},
+	},
 	// Version of the block without global styles support
 	{
 		attributes: {

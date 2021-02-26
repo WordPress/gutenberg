@@ -61,8 +61,7 @@
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^3.0.0",
-		"tinycolor2": "^1.4.2",
-		"uuid": "^8.3.0"
+		"tinycolor2": "^1.4.2"
 	},
 	"publishConfig": {
 		"access": "public"
