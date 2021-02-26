@@ -243,6 +243,10 @@ $color-control-label-height: 20px;
 	.is-selected & {
 		opacity: 0.2;
 	}
+
+	.is-dark-theme .is-selected & {
+		opacity: 0.4;
+	}
 }
 
 // Selected state.
