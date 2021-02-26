@@ -72,7 +72,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
 
 		// Don't override the template if we find a template matching the slug we look for
-		// and which does not match a block template slug
+		// and which does not match a block template slug.
 		if ( $current_template_slug !== $current_block_template_slug && $current_template_slug === $template_item_slug ) {
 			return $template;
 		}
