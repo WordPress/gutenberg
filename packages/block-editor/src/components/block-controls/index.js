@@ -24,7 +24,7 @@ const BlockControlsBlock = createSlotFill( 'BlockControlsBlock' );
 const BlockControlsInline = createSlotFill( 'BlockFormatControls' );
 const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
 
-const segments = {
+const groups = {
 	default: BlockControlsDefault,
 	block: BlockControlsBlock,
 	inline: BlockControlsInline,
@@ -38,17 +38,17 @@ const slotNames = {
 	other: 'BlockControlsOther',
 };
 
-function BlockControlsSlot( { segment = 'default', ...props } ) {
+function BlockControlsSlot( { group = 'default', ...props } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	const Slot = segments[ segment ].Slot;
-	const slot = useSlot( slotNames[ segment ] );
+	const Slot = groups[ group ].Slot;
+	const slot = useSlot( slotNames[ group ] );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
 		return null;
 	}
 
-	if ( segment === 'default' ) {
+	if ( group === 'default' ) {
 		return (
 			<Slot
 				{ ...props }
@@ -69,11 +69,11 @@ function BlockControlsSlot( { segment = 'default', ...props } ) {
 	);
 }
 
-function BlockControlsFill( { segment = 'default', controls, children } ) {
+function BlockControlsFill( { group = 'default', controls, children } ) {
 	if ( ! useDisplayBlockControls() ) {
 		return null;
 	}
-	const Fill = segments[ segment ].Fill;
+	const Fill = groups[ group ].Fill;
 
 	return (
 		<Fill>
@@ -84,7 +84,7 @@ function BlockControlsFill( { segment = 'default', controls, children } ) {
 				const value = ! isEmpty( fillProps ) ? fillProps : null;
 				return (
 					<ToolbarContext.Provider value={ value }>
-						{ segment === 'default' && (
+						{ group === 'default' && (
 							<ToolbarGroup controls={ controls } />
 						) }
 						{ children }
@@ -101,10 +101,10 @@ BlockControls.Slot = BlockControlsSlot;
 
 // This is just here for backward compatibility
 export const BlockFormatControls = ( props ) => {
-	return <BlockControlsFill segment="inline" { ...props } />;
+	return <BlockControlsFill group="inline" { ...props } />;
 };
 BlockFormatControls.Slot = ( props ) => {
-	return <BlockControlsSlot segment="inline" { ...props } />;
+	return <BlockControlsSlot group="inline" { ...props } />;
 };
 
 export default BlockControls;

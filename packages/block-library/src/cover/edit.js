@@ -399,7 +399,7 @@ function CoverEdit( {
 
 	const controls = (
 		<>
-			<BlockControls segment="block">
+			<BlockControls group="block">
 				<BlockAlignmentMatrixControl
 					label={ __( 'Change content position' ) }
 					value={ contentPosition }
@@ -416,7 +416,7 @@ function CoverEdit( {
 					isDisabled={ ! hasBackground }
 				/>
 			</BlockControls>
-			<BlockControls segment="other">
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }

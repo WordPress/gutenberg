@@ -138,7 +138,7 @@ export const withToolbarControls = createHigherOrderComponent(
 
 		return [
 			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls" segment="block">
+				<BlockControls key="align-controls" group="block">
 					<BlockAlignmentControl
 						value={ props.attributes.align }
 						onChange={ updateAlignment }

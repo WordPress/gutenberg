@@ -7,7 +7,7 @@ import FormatToolbar from './format-toolbar';
 const FormatToolbarContainer = () => {
 	// Render regular toolbar
 	return (
-		<BlockControls segment="inline">
+		<BlockControls group="inline">
 			<FormatToolbar />
 		</BlockControls>
 	);

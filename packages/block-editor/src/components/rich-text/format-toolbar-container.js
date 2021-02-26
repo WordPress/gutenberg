@@ -27,7 +27,7 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 	}
 	// Render regular toolbar
 	return (
-		<BlockControls segment="inline">
+		<BlockControls group="inline">
 			<FormatToolbar />
 		</BlockControls>
 	);

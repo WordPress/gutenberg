@@ -41,10 +41,10 @@ export default function BlockToolbar() {
 			{ mode === 'visual' && isValid && (
 				<>
 					<UngroupButton />
-					<BlockControls.Slot segment="block" />
+					<BlockControls.Slot group="block" />
 					<BlockControls.Slot />
-					<BlockControls.Slot segment="inline" />
-					<BlockControls.Slot segment="other" />
+					<BlockControls.Slot group="inline" />
+					<BlockControls.Slot group="other" />
 				</>
 			) }
 		</>
