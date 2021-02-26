@@ -123,7 +123,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			</div>
 			{ shouldShowVisualToolbar && (
 				<>
-					{ ' ' }
 					<BlockControls.Slot
 						segment="block"
 						className="block-editor-block-toolbar__slot"

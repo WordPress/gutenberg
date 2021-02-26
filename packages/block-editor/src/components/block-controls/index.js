@@ -20,7 +20,7 @@ import {
 import useDisplayBlockControls from '../use-display-block-controls';
 
 const BlockControlsDefault = createSlotFill( 'BlockControls' );
-const BlockControlsBlock = createSlotFill( 'BlockFormatControlsBlock' );
+const BlockControlsBlock = createSlotFill( 'BlockControlsBlock' );
 const BlockControlsInline = createSlotFill( 'BlockFormatControls' );
 const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
 
@@ -33,7 +33,7 @@ const segments = {
 
 const slotNames = {
 	default: 'BlockControls',
-	block: 'BlockFormatControlsBlock',
+	block: 'BlockControlsBlock',
 	inline: 'BlockFormatControls',
 	other: 'BlockControlsOther',
 };
