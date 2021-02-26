@@ -74,7 +74,7 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
 	// Remove items if an FSE theme.
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( gutenberg_is_fse_theme() ) {
 		$wp_admin_bar->remove_node( 'customize' );
 		$wp_admin_bar->remove_node( 'customize-background' );
 		$wp_admin_bar->remove_node( 'customize-header' );
