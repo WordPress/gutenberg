@@ -66,12 +66,14 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	// Allow falling back to a PHP template if it has a higher priority than the block template.
-	$current_legacy_template = basename( $template, '.php' );
-	$block_template_slug     = is_object( $current_template ) ? $current_template->slug : false;
-	foreach ( $templates as $item ) {
-		$legacy_slug = gutenberg_strip_php_suffix( $item );
+	$current_template_slug       = basename( $template, '.php' );
+	$current_block_template_slug = is_object( $current_template ) ? $current_template->slug : false;
+	foreach ( $templates as $template_item) {
+		$template_item_slug = gutenberg_strip_php_suffix( $template_item);
 
-		if ( $block_template_slug !== $current_legacy_template && $legacy_slug === $current_legacy_template ) {
+		// Don't override the template if we find a template matching the slug we look for
+		// and which does not match a block template slug
+		if ( $current_template_slug !== $current_block_template_slug && $current_template_slug === $template_item_slug) {
 			return $template;
 		}
 	}
