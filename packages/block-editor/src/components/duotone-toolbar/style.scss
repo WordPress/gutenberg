@@ -26,8 +26,7 @@
 		min-width: 214px;
 	}
 
-	.components-circular-option-picker,
-	.block-editor-duotone-toolbar__description {
+	.components-circular-option-picker {
 		padding: $grid-unit-15;
 	}
 
@@ -39,11 +38,6 @@
 	.block-editor-duotone-toolbar__custom-colors,
 	.block-editor-duotone-toolbar__color-button {
 		width: 100%;
-	}
-
-	.block-editor-duotone-toolbar__description {
-		border-top: $border-width solid $gray-900;
-		color: $gray-700;
 	}
 }
 

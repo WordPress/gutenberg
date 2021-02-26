@@ -88,11 +88,6 @@ function DuotonePickerPopover( {
 					/>
 				</CircularOptionPicker>
 			</MenuGroup>
-			<div className="block-editor-duotone-toolbar__description">
-				{ __(
-					'The duotone filter creates a two-color version of your image, where you choose the colors.'
-				) }
-			</div>
 		</Popover>
 	);
 }
