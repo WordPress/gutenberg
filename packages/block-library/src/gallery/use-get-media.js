@@ -25,16 +25,13 @@ export default function useGetMedia( innerBlockImages ) {
 				return currentImageMedia;
 			}
 
-			const imageIds = innerBlockImages
-				.map( ( imageBlock ) => imageBlock.attributes.id )
-				.filter(
-					( id ) =>
-						! currentImageMedia.find( ( img ) => id === img.id )
-				);
+			const imageIds = innerBlockImages.map(
+				( imageBlock ) => imageBlock.attributes.id
+			);
+
 			if ( imageIds.length === 0 ) {
 				return currentImageMedia;
 			}
-
 			const getMedia = select( coreStore ).getMedia;
 			const newImageMedia = imageIds.map( ( img ) => {
 				return getMedia( img );
@@ -43,22 +40,15 @@ export default function useGetMedia( innerBlockImages ) {
 			if ( newImageMedia.some( ( img ) => ! img ) ) {
 				return currentImageMedia;
 			}
+
 			return newImageMedia;
 		},
 		[ innerBlockImages ]
 	);
 
-	const newData = imageMedia?.filter(
-		( img ) =>
-			! currentImageMedia.find(
-				( currentImg ) => currentImg.id === img.id
-			)
-	);
-
-	if ( newData?.length > 0 ) {
-		const newCurrentMedia = [ ...currentImageMedia, ...newData ];
-		setCurrentImageMedia( newCurrentMedia );
-		return newCurrentMedia;
+	if ( imageMedia?.length !== currentImageMedia.length ) {
+		setCurrentImageMedia( imageMedia );
+		return imageMedia;
 	}
 
 	return currentImageMedia;
