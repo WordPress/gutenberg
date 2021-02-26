@@ -148,7 +148,7 @@ const SpacerEdit = ( {
 	useEffect( () => {
 		if ( orientation === 'horizontal' && ! width ) {
 			updateWidth( 72 );
-			updateHeight( null );
+			updateHeight( 0 );
 		}
 	}, [] );
 
