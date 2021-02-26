@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	Spinner,
@@ -20,6 +20,47 @@ import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { store as blockDirectoryStore } from '../../store';
+
+// Return the appropriate block item label, given the block data and status.
+function getDownloadableBlockLabel(
+	{ title, rating, ratingCount },
+	{ hasNotice, isInstalled, isInstalling }
+) {
+	const stars = Math.round( rating / 0.5 ) * 0.5;
+
+	if ( ! isInstalled && hasNotice ) {
+		/* translators: %1$s: block title */
+		return sprintf( 'Retry installing %s.', decodeEntities( title ) );
+	}
+
+	if ( isInstalled ) {
+		/* translators: %1$s: block title */
+		return sprintf( 'Add %s.', decodeEntities( title ) );
+	}
+
+	if ( isInstalling ) {
+		/* translators: %1$s: block title */
+		return sprintf( 'Installing %s.', decodeEntities( title ) );
+	}
+
+	// No ratings yet, just use the title.
+	if ( ratingCount < 1 ) {
+		/* translators: %1$s: block title */
+		return sprintf( 'Install %s.', decodeEntities( title ) );
+	}
+
+	return sprintf(
+		/* translators: %1$s: block title, %2$s: average rating, %3$s: total ratings count. */
+		_n(
+			'Install %1$s. %2$s stars with %3$s review.',
+			'Install %1$s. %2$s stars with %3$s reviews.',
+			ratingCount
+		),
+		decodeEntities( title ),
+		stars,
+		ratingCount
+	);
+}
 
 function DownloadableBlockListItem( { composite, item, onClick } ) {
 	const { author, description, icon, rating, title } = item;
@@ -62,6 +103,13 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 			} }
 			isBusy={ isInstalling }
 			disabled={ isInstalling || ! isInstallable }
+			label={ getDownloadableBlockLabel( item, {
+				hasNotice,
+				isInstalled,
+				isInstalling,
+			} ) }
+			showTooltip={ true }
+			tooltipPosition="top center"
 		>
 			<div className="block-directory-downloadable-block-list-item__icon">
 				<DownloadableBlockIcon icon={ icon } title={ title } />
