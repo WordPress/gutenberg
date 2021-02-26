@@ -73,15 +73,12 @@ export default function ButtonsEdit( {
 	);
 
 	useEffect( () => {
-		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
 		const { isFullWidth } = alignmentHelpers;
 
 		if ( width ) {
-			const base = width - margins;
 			const isFullWidthBlock = isFullWidth( align );
-
-			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
+			setMaxWidth( isFullWidthBlock ? blockWidth : width );
 		}
 	}, [ sizes, align ] );
 
@@ -149,7 +146,7 @@ export default function ButtonsEdit( {
 				horizontalAlignment={ contentJustification }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ maxWidth }
+				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }

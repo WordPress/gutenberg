@@ -67,6 +67,10 @@
 		"tinycolor2": "^1.4.2",
 		"uuid": "^8.3.0"
 	},
+	"peerDependencies": {
+		"@wp-g2/create-styles": "^0.0.154",
+		"reakit-utils": "^0.15.1"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
