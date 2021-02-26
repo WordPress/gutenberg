@@ -122,3 +122,19 @@ If the HTML tags from text formatting such as `<strong>` or `<em>` are being esc
 Before moving forward, consider if using the RichText component makes sense at all. Would it be better to use a basic `input` or `textarea` element? If you don't think any formatting should be possible, these HTML tags may make more sense.
 
 If you'd still like to use RichText, you can eliminate all of the formatting options by specifying the `withoutInteractiveFormatting` property.
+
+### Disable Specific Format Types
+
+The RichText component uses formats to display inline elements, for example images within the paragraph block. There are two methods to limit formats:
+
+1. You can set a specific set of allowed formats. For example, only allowing bold and links, use:
+
+```
+wp.richText.allowedFormats( ['core/bold', 'core/link' ] );
+```
+
+2. If you just want to disable a single format use the `unregisterFormatType` function.  For example to disable inline images, use:
+
+```
+wp.richText.unregisterFormatType( 'core/image' );
+```
