@@ -5,6 +5,12 @@
 	flex-direction: column;
 }
 
+.edit-site-editor__list-view-panel {
+	// Same width as the Inserter.
+	// @see packages/block-editor/src/components/inserter/style.scss
+	width: 350px;
+}
+
 .edit-site-editor__inserter-panel-header {
 	padding-top: $grid-unit-10;
 	padding-right: $grid-unit-10;
