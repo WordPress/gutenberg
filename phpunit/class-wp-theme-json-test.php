@@ -298,15 +298,15 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			array(
 				'settings' => array(
 					'core/group' => array(
-						'color'      => array(
+						'color' => array(
 							'palette' => array(
 								array(
 									'slug'  => 'grey',
 									'color' => 'grey',
 								),
 							),
-						)
-					)
+						),
+					),
 				),
 				'styles'   => array(
 					'core/group' => array(
@@ -314,7 +314,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							'text' => 'red',
 						),
 					),
-				)
+				),
 			)
 		);
 
