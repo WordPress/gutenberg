@@ -65,7 +65,7 @@
 			"__experimentalSkipSerialization": true
 		},
 		"reusable": false,
-		"__experimentalSelector": ".wp-block-button > a"
+		"__experimentalSelector": ".wp-block-button__link"
 	},
 	"editorStyle": "wp-block-button-editor",
 	"style": "wp-block-button"
