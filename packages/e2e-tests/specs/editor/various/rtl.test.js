@@ -37,7 +37,7 @@ describe( 'RTL', () => {
 			const head = document.head;
 
 			const componentsScriptSrc = scripts.find( ( s ) =>
-				s.src.match( 'components/index.js' )
+				s.src.match( /components\/index\.js/ )
 			).src;
 
 			snippetScriptEl.text = 'document.dir = "rtl";';
