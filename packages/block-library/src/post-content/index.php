@@ -18,7 +18,9 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
+	$post_classes = implode( ' ', get_post_class() );
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content ' . $post_classes ) );
 
 	return (
 		'<div ' . $wrapper_attributes . '>' .
