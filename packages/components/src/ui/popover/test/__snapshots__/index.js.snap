@@ -231,12 +231,12 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface wp-components-surface components-card wp-components-card emotion-4"
+  class="components-surface wp-components-surface components-card wp-components-card ic-1vr61kr ic-15506ld ic-192yz5d emotion-4"
   data-g2-c16t="true"
   data-g2-component="Card"
 >
   <div
-    class="emotion-1"
+    class="ic-192yz5d emotion-1"
     data-g2-component="CardContent"
   >
     <iframe
@@ -247,7 +247,7 @@ exports[`props should render correctly 1`] = `
       tabindex="-1"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body emotion-0"
+      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-1reds0m ic-y3p1xi ic-192yz5d emotion-0"
       data-g2-c16t="true"
       data-g2-component="CardBody"
     >
@@ -256,13 +256,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation wp-components-elevation emotion-2"
+    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-2"
     data-g2-c16t="true"
     data-g2-component="CardElevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation wp-components-elevation emotion-3"
+    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-3"
     data-g2-c16t="true"
     data-g2-component="CardElevation"
   />
@@ -278,7 +278,7 @@ Snapshot Diff:
   <div
 -   aria-label="show"
 +   aria-label="popover-base-popover"
-    class="components-popover-content wp-components-popover-content components-popover wp-components-popover css-5x8ae3"
+    class="components-popover-content wp-components-popover-content components-popover wp-components-popover ic-fzg5i9 ic-1o22l1x ic-192yz5d css-5x8ae3"
     data-dialog="true"
     data-g2-c16t="true"
     data-g2-component="Popover"
@@ -288,7 +288,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface wp-components-surface components-card wp-components-card css-1262q7e"
+      class="components-surface wp-components-surface components-card wp-components-card ic-1vr61kr ic-15506ld ic-192yz5d css-1262q7e"
 `;
 
 exports[`props should render without content 1`] = `
@@ -300,7 +300,7 @@ Snapshot Diff:
   <div
 -   aria-label="popover-contentless-popover"
 +   aria-label="popover-base-popover"
-    class="components-popover-content wp-components-popover-content components-popover wp-components-popover css-5x8ae3"
+    class="components-popover-content wp-components-popover-content components-popover wp-components-popover ic-fzg5i9 ic-1o22l1x ic-192yz5d css-5x8ae3"
     data-dialog="true"
     data-g2-c16t="true"
     data-g2-component="Popover"
@@ -310,7 +310,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface wp-components-surface components-card wp-components-card css-1262q7e"
+      class="components-surface wp-components-surface components-card wp-components-card ic-1vr61kr ic-15506ld ic-192yz5d css-1262q7e"
 @@ -22,10 +22,17 @@
           frameborder="0"
           src="about:blank"
@@ -318,7 +318,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body css-1hp1ar"
++         class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-1reds0m ic-y3p1xi ic-192yz5d css-1hp1ar"
 +         data-g2-c16t="true"
 +         data-g2-component="CardBody"
 +       >
@@ -327,6 +327,6 @@ Snapshot Diff:
       </div>
       <div
         aria-hidden="true"
-        class="components-elevation wp-components-elevation css-1vg495v"
+        class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1vg495v"
         data-g2-c16t="true"
 `;
