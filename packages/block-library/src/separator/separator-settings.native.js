@@ -61,25 +61,29 @@ const SeparatorSettings = ( props ) => {
 					label={ __( 'Top margin' ) }
 					min={ MARGIN_CONSTRAINTS[ topUnit ].min }
 					max={ MARGIN_CONSTRAINTS[ topUnit ].max }
-					value={ topValue }
+					value={ topValue || MARGIN_CONSTRAINTS[ topUnit ].min }
 					unit={ topUnit }
 					units={ CSS_UNITS }
 					onChange={ createHandleMarginChange( 'top' ) }
 					onUnitChange={ onUnitChange }
 					decimalNum={ 1 }
-					key={ 'separator-top-margin' }
+					key={ `separator-top-margin-${ topUnit }` }
+					step={ topUnit === 'px' ? 1 : 0.1 }
 				/>
 				<UnitControl
 					label={ __( 'Bottom margin' ) }
 					min={ MARGIN_CONSTRAINTS[ bottomUnit ].min }
 					max={ MARGIN_CONSTRAINTS[ bottomUnit ].max }
-					value={ bottomValue }
+					value={
+						bottomValue || MARGIN_CONSTRAINTS[ bottomUnit ].min
+					}
 					unit={ bottomUnit }
 					units={ CSS_UNITS }
 					onChange={ createHandleMarginChange( 'bottom' ) }
 					onUnitChange={ onUnitChange }
 					decimalNum={ 1 }
-					key={ 'separator-bottom-margin' }
+					key={ `separator-bottom-margin-${ bottomUnit }` }
+					step={ bottomUnit === 'px' ? 1 : 0.1 }
 				/>
 			</PanelBody>
 			<PanelColorSettings
