@@ -236,10 +236,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 function build_variation_for_navigation_link( $entity, $kind ) {
 	$name = 'post_tag' === $entity->name ? 'tag' : $entity->name;
 
-	/* translators: %s: Entity type, eg: Post Link, Page Link, Category Link, Tag Link, Portfolio Link etc */
-	$fallback_title = sprintf( __( '%s Link' ), $entity->labels->singular_name );
-	/* translators: %s: Entity type, eg: A link to a post. A link to a page. */
-	$fallback_description = sprintf( __( 'A link to a %s.' ), $entity->labels->singular_name );
+	$title       = '';
+	$description = '';
 
 	if ( property_exists( $entity->labels, 'item_link' ) ) {
 		$title = $entity->labels->item_link;
@@ -250,8 +248,8 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 
 	return array(
 		'name'        => $name,
-		'title'       => isset( $title ) ? $title : $fallback_title,
-		'description' => isset( $description ) ? $description : $fallback_description,
+		'title'       => $title,
+		'description' => $description,
 		'attributes'  => array(
 			'type' => $name,
 			'kind' => $kind,
