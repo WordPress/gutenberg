@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -17,8 +12,7 @@ export default function useGetMedia( innerBlockImages ) {
 		( select ) => {
 			if (
 				! innerBlockImages?.length ||
-				some(
-					innerBlockImages,
+				innerBlockImages.some(
 					( imageBlock ) => ! imageBlock.attributes.id
 				)
 			) {
@@ -48,8 +42,7 @@ export default function useGetMedia( innerBlockImages ) {
 
 	if (
 		imageMedia?.length !== currentImageMedia.length ||
-		some(
-			imageMedia,
+		imageMedia.some(
 			( newImage ) =>
 				! currentImageMedia.find(
 					( currentImage ) => currentImage.id === newImage.id
@@ -59,6 +52,5 @@ export default function useGetMedia( innerBlockImages ) {
 		setCurrentImageMedia( imageMedia );
 		return imageMedia;
 	}
-
 	return currentImageMedia;
 }
