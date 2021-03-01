@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, concat, differenceBy, some, find } from 'lodash';
+import { isEmpty, concat, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,6 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -51,6 +50,8 @@ import {
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
+import useGetNewImages from './use-get-new-images';
+import useGetMedia from './use-get-media';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -122,35 +123,27 @@ function GalleryEdit( props ) {
 	const images = useMemo(
 		() =>
 			innerBlockImages?.map( ( block ) => ( {
+				clientId: block.clientId,
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
+				fromSavedContent: Boolean( block.originalContent ),
 			} ) ),
 		[ innerBlockImages ]
 	);
 
-	const imageData = useSelect(
-		( select ) => {
-			if (
-				! innerBlockImages?.length ||
-				some(
-					innerBlockImages,
-					( imageBlock ) => ! imageBlock.attributes.id
-				)
-			) {
-				return imageData;
-			}
+	const imageData = useGetMedia( innerBlockImages );
 
-			const imageIds = innerBlockImages.map(
-				( imageBlock ) => imageBlock.attributes.id
-			);
+	const newImages = useGetNewImages( images, imageData );
 
-			const getMediaItems = select( coreStore ).getMediaItems;
-
-			return getMediaItems( { include: imageIds } );
-		},
-		[ innerBlockImages ]
-	);
+	useEffect( () => {
+		newImages?.forEach( ( newImage ) => {
+			updateBlockAttributes( newImage.clientId, {
+				...buildImageAttributes( false, newImage ),
+				id: newImage.id,
+			} );
+		} );
+	}, [ newImages ] );
 
 	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
 
@@ -241,17 +234,22 @@ function GalleryEdit( props ) {
 		const existingImageBlocks = ! newFileUploads
 			? innerBlockImages.filter( ( block ) =>
 					processedImages.find(
-						( img ) => img.url === block.attributes.url
+						( img ) => img.id === block.attributes.id
 					)
 			  )
 			: innerBlockImages;
 
-		const newImages = differenceBy( processedImages, images, 'url' );
+		const newImageList = processedImages.filter(
+			( img ) =>
+				! existingImageBlocks.find(
+					( existingImg ) => img.id === existingImg.attributes.id
+				)
+		);
 
-		const newBlocks = newImages.map( ( image ) => {
+		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
-				...buildImageAttributes( false, image ),
 				id: image.id,
+				url: image.url,
 			} );
 		} );
 
