@@ -1,7 +1,7 @@
 // The button element easily inherits styles that are meant for the editor style.
 // These rules enhance the specificity to reduce that inheritance.
 // This is duplicated in visual-editor.
-.edit-site-block-editor__editor-styles-wrapper  .components-button {
+.edit-site-block-editor__editor-styles-wrapper .components-button {
 	font-family: $default-font;
 	font-size: $default-font-size;
 	padding: 6px 12px;
@@ -9,5 +9,36 @@
 	&.is-tertiary,
 	&.has-icon {
 		padding: 6px;
+	}
+}
+
+/**
+ * Remove the site editor outer margins to better match front-end view
+ */
+
+// Undo the "Editor Normalization Styles" padding
+// !important used to override inline style
+.editor-styles-wrapper {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+// Remove the top margin for the header template part
+.edit-site-block-editor__block-list .wp-block-template-part.site-header {
+	margin-top: 0;
+
+	// And the top margin of the first block in the template part
+	.wp-block:first-of-type .block-editor-block-list__block {
+		margin-top: 0;
+	}
+}
+
+// Remove the bottom margin for the fotter
+.edit-site-block-editor__block-list .wp-block-template-part.site-footer {
+	margin-bottom: 0;
+
+	// And the bottom margin of the last block in the template part
+	.wp-block:last-of-type .block-editor-block-list__block {
+		margin-bottom: 0;
 	}
 }
