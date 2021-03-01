@@ -37,6 +37,7 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
+import { store as blocksStore } from '../../store';
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {
@@ -349,6 +350,41 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should map incompatible keys returned from the server', () => {
+			const blockName = 'core/test-block-with-incompatible-keys';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					api_version: 2,
+					provides_context: {
+						fontSize: 'fontSize',
+					},
+					uses_context: [ 'textColor' ],
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {
+					fontSize: 'fontSize',
+				},
+				usesContext: [ 'textColor' ],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,
@@ -645,6 +681,7 @@ describe( 'blocks', () => {
 						// Verify that for deprecations, the filter is called with a merge of pre-filter
 						// settings with deprecation keys omitted and the deprecation entry.
 						if ( i > 0 ) {
+							// eslint-disable-next-line jest/no-conditional-expect
 							expect( settings ).toEqual( {
 								...omit(
 									{
@@ -732,7 +769,7 @@ describe( 'blocks', () => {
 		it( 'creates a new block collection', () => {
 			registerBlockCollection( 'core', { title: 'Core' } );
 
-			expect( select( 'core/blocks' ).getCollections() ).toEqual( {
+			expect( select( blocksStore ).getCollections() ).toEqual( {
 				core: { title: 'Core', icon: undefined },
 			} );
 		} );
@@ -744,7 +781,7 @@ describe( 'blocks', () => {
 			registerBlockCollection( 'core2', { title: 'Core2' } );
 			unregisterBlockCollection( 'core' );
 
-			expect( select( 'core/blocks' ).getCollections() ).toEqual( {
+			expect( select( blocksStore ).getCollections() ).toEqual( {
 				core2: { title: 'Core2', icon: undefined },
 			} );
 		} );

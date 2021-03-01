@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { useNavigationTreeNodes } from './use-navigation-tree-nodes';
@@ -18,6 +23,50 @@ export const useCreateNavigationTree = () => {
 		removeNode: removeMenu,
 	} = useNavigationTreeNodes();
 
+	/**
+	 * Stores direct nested menus of menus
+	 * This makes it easy to traverse menu tree
+	 *
+	 * Key is the menu prop of the menu
+	 * Value is an array of menu keys
+	 */
+	const [ childMenu, setChildMenu ] = useState( {} );
+	const getChildMenu = ( menu ) => childMenu[ menu ] || [];
+
+	const traverseMenu = ( startMenu, callback ) => {
+		const visited = [];
+		let queue = [ startMenu ];
+		let current;
+
+		while ( queue.length > 0 ) {
+			current = getMenu( queue.shift() );
+
+			if ( ! current || visited.includes( current.menu ) ) {
+				continue;
+			}
+
+			visited.push( current.menu );
+			queue = [ ...queue, ...getChildMenu( current.menu ) ];
+
+			if ( callback( current ) === false ) {
+				break;
+			}
+		}
+	};
+
+	const isMenuEmpty = ( menuToCheck ) => {
+		let isEmpty = true;
+
+		traverseMenu( menuToCheck, ( current ) => {
+			if ( ! current.isEmpty ) {
+				isEmpty = false;
+				return false;
+			}
+		} );
+
+		return isEmpty;
+	};
+
 	return {
 		items,
 		getItem,
@@ -26,7 +75,24 @@ export const useCreateNavigationTree = () => {
 
 		menus,
 		getMenu,
-		addMenu,
+		addMenu: ( key, value ) => {
+			setChildMenu( ( state ) => {
+				const newState = { ...state };
+
+				if ( ! newState[ value.parentMenu ] ) {
+					newState[ value.parentMenu ] = [];
+				}
+
+				newState[ value.parentMenu ].push( key );
+
+				return newState;
+			} );
+
+			addMenu( key, value );
+		},
 		removeMenu,
+		childMenu,
+		traverseMenu,
+		isMenuEmpty,
 	};
 };

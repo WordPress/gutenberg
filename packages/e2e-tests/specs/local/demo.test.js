@@ -29,7 +29,11 @@ describe( 'new editor state', () => {
 				onRequestMatch: createJSONResponse( MOCK_VIMEO_RESPONSE ),
 			},
 		] );
-		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );
+
+		await Promise.all( [
+			visitAdminPage( 'post-new.php', 'gutenberg-demo' ),
+			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+		] );
 	} );
 
 	it( 'content should load, making the post dirty', async () => {

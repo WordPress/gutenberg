@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { awaitPromise } from '@wordpress/data-controls';
+import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import { controls } from '@wordpress/data';
 
 export function* __unstableAcquireStoreLock( store, path, { exclusive } ) {
@@ -9,7 +9,7 @@ export function* __unstableAcquireStoreLock( store, path, { exclusive } ) {
 		exclusive,
 	} );
 	yield* __unstableProcessPendingLockRequests();
-	return yield awaitPromise( promise );
+	return yield __unstableAwaitPromise( promise );
 }
 
 export function* __unstableEnqueueLockRequest( store, path, { exclusive } ) {

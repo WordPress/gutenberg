@@ -8,11 +8,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BaseOption from './base';
+import { store as editPostStore } from '../../../store';
 
 export default compose(
 	withSelect( ( select, { panelName } ) => {
 		const { isEditorPanelEnabled, isEditorPanelRemoved } = select(
-			'core/edit-post'
+			editPostStore
 		);
 		return {
 			isRemoved: isEditorPanelRemoved( panelName ),
@@ -22,6 +23,6 @@ export default compose(
 	ifCondition( ( { isRemoved } ) => ! isRemoved ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onChange: () =>
-			dispatch( 'core/edit-post' ).toggleEditorPanelEnabled( panelName ),
+			dispatch( editPostStore ).toggleEditorPanelEnabled( panelName ),
 	} ) )
 )( BaseOption );

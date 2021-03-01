@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
@@ -22,6 +22,7 @@ const editOption = {
 	id: MEDIA_EDITOR,
 	value: MEDIA_EDITOR,
 	label: __( 'Edit' ),
+	requiresModal: true,
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 
@@ -32,7 +33,7 @@ const replaceOption = {
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 
-export class MediaEdit extends React.Component {
+export class MediaEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );

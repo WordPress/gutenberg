@@ -9,11 +9,12 @@ import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { REDUCER_KEY } from './name';
+import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable } from './utils';
@@ -41,7 +42,7 @@ const EMPTY_ARRAY = [];
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
 		return select( 'core/data' ).isResolving(
-			REDUCER_KEY,
+			STORE_NAME,
 			'getEmbedPreview',
 			[ url ]
 		);
@@ -51,15 +52,29 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
+ * @param {Object}           state Data state.
+ * @param {Object|undefined} query Optional object of query parameters to
+ *                                 include with request.
+ * @return {Array} Authors list.
+ */
+export function getAuthors( state, query ) {
+	const path = addQueryArgs(
+		'/wp/v2/users/?who=authors&per_page=100',
+		query
+	);
+	return getUserQueryResults( state, path );
+}
+
+/**
+ * Returns all available authors.
+ *
  * @param {Object} state Data state.
+ * @param {number} id The author id.
  *
  * @return {Array} Authors list.
  */
-export function getAuthors( state ) {
-	deprecated( "select( 'core' ).getAuthors()", {
-		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
-	} );
-	return getUserQueryResults( state, 'authors' );
+export function __unstableGetAuthor( state, id ) {
+	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
@@ -692,7 +707,7 @@ export function getAutosave( state, postType, postId, authorId ) {
  */
 export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
-		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 			postType,
 			postId,
 		] );
@@ -725,3 +740,19 @@ export const getReferenceByDistinctEdits = createSelector(
 		state.undo.flattenedUndo,
 	]
 );
+
+/**
+ * Retrieve the frontend template used for a given link.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} link  Link.
+ *
+ * @return {Object?} The template record.
+ */
+export function __experimentalGetTemplateForLink( state, link ) {
+	const records = getEntityRecords( state, 'postType', 'wp_template', {
+		'find-template': link,
+	} );
+
+	return records?.length ? records[ 0 ] : null;
+}

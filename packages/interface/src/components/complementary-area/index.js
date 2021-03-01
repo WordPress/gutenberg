@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import ComplementaryAreaHeader from '../complementary-area-header';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
+import { store as interfaceStore } from '../../store';
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
@@ -42,7 +44,7 @@ function useAdjustComplementaryListener(
 	const previousIsSmall = useRef( false );
 	const shouldOpenWhenNotSmall = useRef( false );
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
+		interfaceStore
 	);
 	useEffect( () => {
 		// If the complementary area is active and the editor is switching from a big to a small window size.
@@ -97,17 +99,15 @@ function ComplementaryArea( {
 	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
-				'core/interface'
+				interfaceStore
 			);
 			const _activeArea = getActiveComplementaryArea( scope );
 			return {
 				isActive: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
 				activeArea: _activeArea,
-				isSmall: select( 'core/viewport' ).isViewportMatch(
-					'< medium'
-				),
-				isLarge: select( 'core/viewport' ).isViewportMatch( 'large' ),
+				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
 			};
 		},
 		[ identifier, scope ]
@@ -124,7 +124,7 @@ function ComplementaryArea( {
 		disableComplementaryArea,
 		pinItem,
 		unpinItem,
-	} = useDispatch( 'core/interface' );
+	} = useDispatch( interfaceStore );
 
 	useEffect( () => {
 		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {

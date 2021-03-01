@@ -432,7 +432,7 @@
 }
 .CalendarMonthGrid__horizontal {
 	position: absolute;
-	left: 9px;
+	left: 0;
 }
 .CalendarMonthGrid__vertical {
 	margin: 0 auto;
@@ -573,7 +573,7 @@
 	position: relative;
 }
 .DayPicker_weekHeaders__horizontal {
-	margin-left: 9px;
+	margin-left: 13px;
 }
 .DayPicker_weekHeader {
 	color: #757575;
@@ -581,6 +581,7 @@
 	top: 62px;
 	z-index: 2;
 	text-align: left;
+	padding: 0 !important;
 }
 .DayPicker_weekHeader__vertical {
 	left: 50%;
@@ -605,6 +606,7 @@
 .DayPicker_weekHeader_li {
 	display: inline-block;
 	text-align: center;
+	margin: 0 1px;
 }
 .DayPicker_transitionContainer {
 	position: relative;

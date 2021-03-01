@@ -22,6 +22,10 @@ figure.wp-block-image:not(.wp-block) {
 		margin-top: -9px;
 		margin-left: -9px;
 	}
+
+	&:not(.is-style-rounded) > div {
+		border-radius: inherit;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
@@ -106,6 +110,7 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image__zoom {
 	.components-popover__content {
 		overflow: visible;
+		min-width: 260px;
 	}
 
 	.components-range-control {
@@ -115,6 +120,8 @@ figure.wp-block-image:not(.wp-block) {
 	.components-base-control__field {
 		display: flex;
 		margin-bottom: 0;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 

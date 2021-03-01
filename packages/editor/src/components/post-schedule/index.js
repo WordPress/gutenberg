@@ -9,7 +9,6 @@ import { useRef } from '@wordpress/element';
 
 export function PostSchedule( { date, onUpdateDate } ) {
 	const ref = useRef();
-
 	const settings = __experimentalGetSettings();
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
 	// We also make sure this a is not escaped by a "/"

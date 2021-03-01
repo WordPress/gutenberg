@@ -21,14 +21,23 @@
 			0 0 0 3px var(--wp-admin-theme-color);
 	}
 
+	&.components-snackbar-explicit-dismiss {
+		cursor: default;
+	}
+
 	.components-snackbar__content-with-icon {
-		margin-left: 32px;
+		margin-left: 24px;
 	}
 
 	.components-snackbar__icon {
 		position: absolute;
 		top: 24px;
-		left: 26px;
+		left: 28px;
+	}
+
+	.components-snackbar__dismiss-button {
+		margin-left: 32px;
+		cursor: pointer;
 	}
 }
 

@@ -20,6 +20,7 @@ import {
 } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -162,8 +163,9 @@ function RichText(
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
-	ref
+	forwardedRef
 ) {
+	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
 		formatTypes,
@@ -174,6 +176,8 @@ function RichText(
 	} = useFormatTypes( {
 		clientId,
 		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
@@ -374,7 +378,7 @@ function RichText(
 		}
 
 		if ( onPaste ) {
-			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
+			const files = getFilesFromDataTransfer( clipboardData );
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
@@ -1071,7 +1075,7 @@ function RichText(
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref,
+		ref: useMergeRefs( [ forwardedRef, ref ] ),
 		style: defaultStyle,
 		className: 'rich-text',
 		onPaste: handlePaste,
@@ -1102,10 +1106,6 @@ function RichText(
 		<>
 			{ isSelected && (
 				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
 					value={ record.current }
 					onChange={ handleChange }
 					onFocus={ focus }

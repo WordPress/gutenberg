@@ -6,10 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { navigateRegions } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
+import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -25,19 +25,24 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-function InterfaceSkeleton( {
-	footer,
-	header,
-	sidebar,
-	secondarySidebar,
-	content,
-	drawer,
-	actions,
-	labels,
-	className,
-	// Deprecated props.
-	leftSidebar,
-} ) {
+function InterfaceSkeleton(
+	{
+		footer,
+		header,
+		sidebar,
+		secondarySidebar,
+		content,
+		drawer,
+		actions,
+		labels,
+		className,
+		shortcuts,
+	},
+	ref
+) {
+	const fallbackRef = useRef();
+	const regionsClassName = useNavigateRegions( fallbackRef, shortcuts );
+
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -59,20 +64,14 @@ function InterfaceSkeleton( {
 
 	const mergedLabels = { ...defaultLabels, ...labels };
 
-	if ( leftSidebar ) {
-		deprecated( 'leftSidebar prop in InterfaceSkeleton component', {
-			alternative: 'secondarySidebar prop',
-			version: '9.7.0',
-			plugin: 'Gutenberg',
-		} );
-		secondarySidebar = leftSidebar;
-	}
-
 	return (
 		<div
+			ref={ useMergeRefs( [ ref, fallbackRef ] ) }
 			className={ classnames(
 				className,
-				'interface-interface-skeleton'
+				'interface-interface-skeleton',
+				regionsClassName,
+				!! footer && 'has-footer'
 			) }
 		>
 			{ !! drawer && (
@@ -150,4 +149,4 @@ function InterfaceSkeleton( {
 	);
 }
 
-export default navigateRegions( InterfaceSkeleton );
+export default forwardRef( InterfaceSkeleton );

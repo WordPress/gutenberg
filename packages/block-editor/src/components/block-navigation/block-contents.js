@@ -16,6 +16,7 @@ import { useBlockNavigationContext } from './context';
 import BlockNavigationBlockSlot from './block-slot';
 import BlockNavigationBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
+import { store as blockEditorStore } from '../../store';
 
 const BlockNavigationBlockContents = forwardRef(
 	(
@@ -47,7 +48,7 @@ const BlockNavigationBlockContents = forwardRef(
 					getBlockRootClientId,
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
-				} = select( 'core/block-editor' );
+				} = select( blockEditorStore );
 				return {
 					rootClientId: getBlockRootClientId( clientId ) || '',
 					blockMovingClientId: hasBlockMovingClientId(),
@@ -91,7 +92,7 @@ const BlockNavigationBlockContents = forwardRef(
 				clientIds={ [ block.clientId ] }
 				elementId={ `block-navigation-block-${ block.clientId }` }
 			>
-				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) =>
+				{ ( { draggable, onDragStart, onDragEnd } ) =>
 					__experimentalFeatures ? (
 						<BlockNavigationBlockSlot
 							ref={ ref }
@@ -102,9 +103,9 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
+							draggable={ draggable && __experimentalFeatures }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
 							{ ...props }
 						/>
 					) : (
@@ -117,9 +118,9 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ isDraggable && __experimentalFeatures }
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
+							draggable={ draggable && __experimentalFeatures }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
 							{ ...props }
 						/>
 					)

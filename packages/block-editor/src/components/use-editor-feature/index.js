@@ -6,12 +6,14 @@ import { get, isObject } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) =>
@@ -45,6 +47,7 @@ const deprecatedFlags = {
 
 		return settings.enableCustomUnits;
 	},
+	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
 function blockAttributesMatch( blockAttributes, attributes ) {
@@ -75,10 +78,10 @@ export default function useEditorFeature( featurePath ) {
 	const setting = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const settings = getSettings();
-			const blockType = select( 'core/blocks' ).getBlockType( blockName );
+			const blockType = select( blocksStore ).getBlockType( blockName );
 
 			let context = blockName;
 			const selectors = get( blockType, [
@@ -86,7 +89,7 @@ export default function useEditorFeature( featurePath ) {
 				'__experimentalSelector',
 			] );
 			if ( isObject( selectors ) ) {
-				const blockAttributes = getBlockAttributes( clientId );
+				const blockAttributes = getBlockAttributes( clientId ) || {};
 				for ( const contextSelector in selectors ) {
 					const { attributes } = selectors[ contextSelector ];
 					if ( blockAttributesMatch( blockAttributes, attributes ) ) {
@@ -97,14 +100,11 @@ export default function useEditorFeature( featurePath ) {
 			}
 
 			// 1 - Use __experimental features, if available.
-			// We cascade to the global value if the block one is not available.
-			//
-			// TODO: make it work for blocks that define multiple selectors
-			// such as core/heading or core/post-title.
-			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
+			// We cascade to the all value if the block one is not available.
+			const defaultsPath = `__experimentalFeatures.defaults.${ featurePath }`;
 			const blockPath = `__experimentalFeatures.${ context }.${ featurePath }`;
 			const experimentalFeaturesResult =
-				get( settings, blockPath ) ?? get( settings, globalPath );
+				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
 				return experimentalFeaturesResult;
 			}

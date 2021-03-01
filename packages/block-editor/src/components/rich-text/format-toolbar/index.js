@@ -41,9 +41,8 @@ const FormatToolbar = () => {
 								{ ( toggleProps ) => (
 									<DropdownMenu
 										icon={ chevronDown }
-										label={ __(
-											'More rich text controls'
-										) }
+										/* translators: button label text should, if possible, be under 16 characters. */
+										label={ __( 'More' ) }
 										toggleProps={ toggleProps }
 										controls={ orderBy(
 											fills.map(

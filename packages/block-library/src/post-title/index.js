@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { postTitle as icon } from '@wordpress/icons';
 
 /**
@@ -14,8 +14,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Title' ),
-	description: __( 'Add the title of your post.' ),
+	title: _x( 'Post Title', 'block title' ),
+	description: __(
+		'Displays the title of a post, page, or any other content-type.'
+	),
 	icon,
 	edit,
 };

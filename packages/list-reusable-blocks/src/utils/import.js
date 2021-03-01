@@ -34,7 +34,7 @@ async function importReusableBlock( file ) {
 		! isString( parsedContent.title ) ||
 		! isString( parsedContent.content )
 	) {
-		throw new Error( 'Invalid Reusable Block JSON file' );
+		throw new Error( 'Invalid Reusable block JSON file' );
 	}
 	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
 	const reusableBlock = await apiFetch( {

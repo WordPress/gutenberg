@@ -271,4 +271,28 @@ describe( 'TimePicker', () => {
 
 		expect( monthInputIndex > dayInputIndex ).toBe( true );
 	} );
+
+	it( 'Should set a time when passed a null currentTime', () => {
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime={ null }
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
+
+		const monthInput = screen.getByLabelText( 'Month' ).value;
+		const dayInput = screen.getByLabelText( 'Day' ).value;
+		const yearInput = screen.getByLabelText( 'Year' ).value;
+		const hoursInput = screen.getByLabelText( 'Hours' ).value;
+		const minutesInput = screen.getByLabelText( 'Minutes' ).value;
+
+		expect( Number.isNaN( parseInt( monthInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( dayInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( yearInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( hoursInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( minutesInput, 10 ) ) ).toBe( false );
+	} );
 } );

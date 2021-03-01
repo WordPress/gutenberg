@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
@@ -35,22 +30,6 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 } ) {
-	/**
-	 * A unique key is generated when switching between editing and not editing
-	 * a link, based on:
-	 *
-	 * - This component may be rendered _either_ when a link is active _or_
-	 *   when adding or editing a link.
-	 * - It's only desirable to shift focus into the Popover when explicitly
-	 *   adding or editing a link, not when in the inline boundary of a link.
-	 * - Focus behavior can only be controlled on a Popover at the time it
-	 *   mounts, so a new instance of the component must be mounted to
-	 *   programmatically enact the focusOnMount behavior.
-	 *
-	 * @type {string}
-	 */
-	const mountingKey = useMemo( uniqueId, [ addingLink ] );
-
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
 	 * link, toggle values cannot be applied immediately, because there is not
@@ -146,11 +125,14 @@ function InlineLinkUI( {
 
 	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 
+	// The focusOnMount prop shouldn't evolve during render of a Popover
+	// otherwise it causes a render of the content.
+	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
+
 	return (
 		<Popover
-			key={ mountingKey }
 			anchorRef={ anchorRef }
-			focusOnMount={ addingLink ? 'firstElement' : false }
+			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			position="bottom center"
 		>

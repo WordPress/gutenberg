@@ -3,6 +3,11 @@
  */
 import { dispatch, select } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blocksStore } from '../store';
+
 /** @typedef {import('../store/reducer').WPBlockCategory} WPBlockCategory */
 
 /**
@@ -11,7 +16,7 @@ import { dispatch, select } from '@wordpress/data';
  * @return {WPBlockCategory[]} Block categories.
  */
 export function getCategories() {
-	return select( 'core/blocks' ).getCategories();
+	return select( blocksStore ).getCategories();
 }
 
 /**
@@ -20,7 +25,7 @@ export function getCategories() {
  * @param {WPBlockCategory[]} categories Block categories.
  */
 export function setCategories( categories ) {
-	dispatch( 'core/blocks' ).setCategories( categories );
+	dispatch( blocksStore ).setCategories( categories );
 }
 
 /**
@@ -31,5 +36,5 @@ export function setCategories( categories ) {
  *                                   that should be updated.
  */
 export function updateCategory( slug, category ) {
-	dispatch( 'core/blocks' ).updateCategory( slug, category );
+	dispatch( blocksStore ).updateCategory( slug, category );
 }

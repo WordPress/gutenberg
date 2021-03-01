@@ -11,6 +11,11 @@ import { createRegistryControl } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { store as reusableBlocksStore } from './index.js';
+
+/**
  * Convert a reusable block to a static block effect handler
  *
  * @param {string}  clientId Block ID.
@@ -26,13 +31,15 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Convert a static block to a reusable block effect handler
  *
- * @param {Array}  clientIds Block IDs.
+ * @param {Array} clientIds Block IDs.
+ * @param {string} title    Reusable block title.
  * @return {Object} control descriptor.
  */
-export function convertBlocksToReusable( clientIds ) {
+export function convertBlocksToReusable( clientIds, title ) {
 	return {
 		type: 'CONVERT_BLOCKS_TO_REUSABLE',
 		clientIds,
+		title,
 	};
 }
 
@@ -72,9 +79,9 @@ const controls = {
 
 	CONVERT_BLOCKS_TO_REUSABLE: createRegistryControl(
 		( registry ) =>
-			async function ( { clientIds } ) {
+			async function ( { clientIds, title } ) {
 				const reusableBlock = {
-					title: __( 'Untitled Reusable Block' ),
+					title: title || __( 'Untitled Reusable block' ),
 					content: serialize(
 						registry
 							.select( 'core/block-editor' )
@@ -94,7 +101,7 @@ const controls = {
 					.dispatch( 'core/block-editor' )
 					.replaceBlocks( clientIds, newBlock );
 				registry
-					.dispatch( 'core/reusable-blocks' )
+					.dispatch( reusableBlocksStore )
 					.__experimentalSetEditingReusableBlock(
 						newBlock.clientId,
 						true

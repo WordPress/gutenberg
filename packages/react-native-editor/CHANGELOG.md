@@ -1,4 +1,4 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 <!--
 For each user feature we should also add a importance categorization label  to indicate the relevance of the change for end users of GB Mobile. The format is the following:
@@ -11,13 +11,46 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
-* [***] Adding support for selecting different unit of value in Cover and Columns blocks
-* [**] Button block - Add link picker to the block settings
+## 1.47.0
+* [**] Add support for setting Cover block focal point. [#25810]
+
+## 1.46.1
+* [**] Make inserter long-press options "add to beginning" and "add to end" always available. [#28610]
+* [*] Fix crash when Column block width attribute was empty. [#29015]
+
+## 1.46.0
+* [***] New Block: Audio [#27401, #27467, #28594]
+* [**] Add support for setting heading anchors [#27935]
+* [**] Disable Unsupported Block Editor for Reusable blocks [#28552]
+* [**] Add proper handling for single use blocks such as the more block [#28339]
+
+## 1.45.0
+* [*] Use react-native-url-polyfill in globals - [https://github.com/WordPress/gutenberg/pull/27867]
+* [*] Remove Old Layout Picker - [https://github.com/WordPress/gutenberg/pull/27640]
+
+## 1.44.1
+* [**] Fix crash in mobile paragraph blocks with custom font size [#28121]
+* [**] Add move to top bottom when long pressing block movers  [#27554]
+
+## 1.44.0
+
+* [***] Add support for cross-posting between sites
+* [***] Full-width and wide alignment support for Columns
+
+## 1.43.0
+* [***] New Block: File [#27228]
+* [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
+
+## 1.42.0
+* [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
+* [**] Button block - Add link picker to the block settings [#26206]
+* [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
+* [*] Fix theme colors syncing with the editor [#26821]
+* [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 
 ## 1.41.0
 
 * [***] Faster editor start and overall operation on Android [#26732]
-
 * [*] [Android] Enable multiple upload support for Image block
 
 ## 1.40.0

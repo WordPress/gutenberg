@@ -19,6 +19,7 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -52,7 +53,7 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, caption, controls, poster, src, tracks } = attributes;
 	const mediaUpload = useSelect(
-		( select ) => select( 'core/block-editor' ).getSettings().mediaUpload
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload
 	);
 
 	useEffect( () => {
@@ -235,6 +236,7 @@ function VideoEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						aria-label={ __( 'Video caption text' ) }
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						onChange={ ( value ) =>

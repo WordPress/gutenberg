@@ -1,15 +1,24 @@
 .edit-site-navigation-toggle {
+	align-items: center;
+	background: $gray-900;
+	border-radius: 0;
 	display: none;
+	position: absolute;
+	z-index: z-index(".edit-site-navigation-toggle");
+	height: $header-height + $border-width; // Cover header border
+	width: $header-height;
 
 	@include break-medium() {
-		align-items: center;
-		background: $gray-900;
-		border-radius: 0;
 		display: flex;
-		position: absolute;
-		z-index: z-index(".edit-site-navigation-toggle");
-		height: $header-height + $border-width; // Cover header border
-		width: $header-height;
+	}
+
+	body.is-navigation-sidebar-open & {
+		display: flex;
+
+		.edit-site-navigation-toggle__button {
+			border-bottom: 1px solid transparent;
+			border-radius: 0;
+		}
 	}
 }
 
@@ -20,6 +29,11 @@
 	height: $header-height + $border-width; // Cover header border
 	width: $header-height;
 	z-index: 1;
+
+	// Adds a bottom border to match the header toolbar
+	border-bottom: 1px solid $gray-200;
+	// Prevents the bottom border from being clipped by border-bottom radius
+	border-radius: 2px 2px 0 0;
 
 	&.has-icon {
 		min-width: $header-height;
@@ -32,7 +46,7 @@
 			color: $white;
 		}
 		&:focus {
-			box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 3px $white;
 		}
 	}
 }

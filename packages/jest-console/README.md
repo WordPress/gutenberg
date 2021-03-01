@@ -18,6 +18,8 @@ Install the module:
 npm install @wordpress/jest-console --save-dev
 ```
 
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+
 ### Setup
 
 The simplest setup is to use Jest's `setupFilesAfterEnv` config option:
@@ -42,15 +44,15 @@ weird and why would anything be octopus-flavored? You can do that with this test
 
 ```js
 describe( 'drinkAll', () => {
-  test( 'drinks something lemon-flavored', () => {
-    drinkAll( 'lemon' );
-    expect( console ).not.toHaveErrored();
-  } );
+	test( 'drinks something lemon-flavored', () => {
+		drinkAll( 'lemon' );
+		expect( console ).not.toHaveErrored();
+	} );
 
-  test( 'errors when something is octopus-flavored', () => {
-    drinkAll( 'octopus' );
-    expect( console ).toHaveErrored();
-  } );
+	test( 'errors when something is octopus-flavored', () => {
+		drinkAll( 'octopus' );
+		expect( console ).toHaveErrored();
+	} );
 } );
 ```
 
@@ -65,10 +67,12 @@ You might want to check if function calls `console.error` with a specific messag
 
 ```js
 describe( 'drinkAll', () => {
-  test( 'errors with message when something is octopus-flavored', () => {
-    drinkAll( 'octopus' );
-    expect( console ).toHaveErroredWith( 'Should I really drink something that is octopus-flavored?' );
-  } );
+	test( 'errors with message when something is octopus-flavored', () => {
+		drinkAll( 'octopus' );
+		expect( console ).toHaveErroredWith(
+			'Should I really drink something that is octopus-flavored?'
+		);
+	} );
 } );
 ```
 

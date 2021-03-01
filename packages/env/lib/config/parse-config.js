@@ -35,6 +35,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
 module.exports = function parseConfig( config, options ) {
 	return {
 		port: config.port,
+		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
 			parseSourceString( config.core, options ),
 			options
@@ -103,7 +104,8 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		);
 		const basename = wpOrgFields
 			? encodeURIComponent( wpOrgFields[ 1 ] )
-			: encodeURIComponent( zipFields[ 1 ] );
+			: encodeURIComponent( path.basename( zipFields[ 1 ] ) );
+
 		return {
 			type: 'zip',
 			url: sourceString,

@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
 function BlockMover( {
 	isFirst,
@@ -40,8 +41,7 @@ function BlockMover( {
 		return null;
 	}
 
-	const dragHandleLabel =
-		clientIds.length === 1 ? __( 'Drag block' ) : __( 'Drag blocks' );
+	const dragHandleLabel = __( 'Drag' );
 
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the buttons while it has focus causes the screen to change
@@ -59,7 +59,7 @@ function BlockMover( {
 					clientIds={ clientIds }
 					cloneClassname="block-editor-block-mover__drag-clone"
 				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
@@ -68,9 +68,7 @@ function BlockMover( {
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable={ isDraggable }
+							{ ...draggableProps }
 						/>
 					) }
 				</BlockDraggable>
@@ -105,7 +103,7 @@ export default withSelect( ( select, { clientIds } ) => {
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const normalizedClientIds = castArray( clientIds );
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );

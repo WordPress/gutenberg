@@ -124,7 +124,7 @@ describe( '__unstableIsLockAvailable', () => {
 									post: {
 										locks: [],
 										children: {
-											'16': {
+											16: {
 												locks: [
 													{
 														store: 'core',
@@ -145,7 +145,7 @@ describe( '__unstableIsLockAvailable', () => {
 									wp_template_part: {
 										locks: [],
 										children: {
-											'17': {
+											17: {
 												locks: [],
 												children: {},
 											},

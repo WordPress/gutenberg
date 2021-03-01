@@ -16,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { useLayout } from '../inner-blocks/layout';
+import { store as blockEditorStore } from '../../store';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -55,7 +56,7 @@ export function BlockAlignmentToolbar( {
 	isCollapsed = true,
 } ) {
 	const { wideControlsEnabled = false } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
 		return {
 			wideControlsEnabled: settings.alignWide,
@@ -96,7 +97,8 @@ export function BlockAlignmentToolbar( {
 					? activeAlignmentControl.icon
 					: defaultAlignmentControl.icon
 			}
-			label={ __( 'Change alignment' ) }
+			label={ __( 'Align' ) }
+			toggleProps={ { describedBy: __( 'Change alignment' ) } }
 			controls={ enabledControls.map( ( control ) => {
 				return {
 					...BLOCK_ALIGNMENTS_CONTROLS[ control ],

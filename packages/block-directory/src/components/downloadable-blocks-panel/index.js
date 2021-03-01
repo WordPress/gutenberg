@@ -7,11 +7,14 @@ import { withSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import DownloadableBlocksList from '../downloadable-blocks-list';
+import { store as blockDirectoryStore } from '../../store';
 
 function DownloadableBlocksPanel( {
 	downloadableItems,
@@ -76,18 +79,26 @@ function DownloadableBlocksPanel( {
 }
 
 export default compose( [
-	withSelect( ( select, { filterValue } ) => {
+	withSelect( ( select, { filterValue, rootClientId = null } ) => {
 		const {
 			getDownloadableBlocks,
 			isRequestingDownloadableBlocks,
-		} = select( 'core/block-directory' );
+		} = select( blockDirectoryStore );
+		const { canInsertBlockType } = select( blockEditorStore );
 
-		const hasPermission = select( 'core' ).canUser(
+		const hasPermission = select( coreStore ).canUser(
 			'read',
 			'block-directory/search'
 		);
+
+		function getInstallableBlocks( term ) {
+			return getDownloadableBlocks( term ).filter( ( block ) =>
+				canInsertBlockType( block, rootClientId, true )
+			);
+		}
+
 		const downloadableItems = hasPermission
-			? getDownloadableBlocks( filterValue )
+			? getInstallableBlocks( filterValue )
 			: [];
 		const isLoading = isRequestingDownloadableBlocks( filterValue );
 

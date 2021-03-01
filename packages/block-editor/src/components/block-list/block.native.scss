@@ -23,6 +23,11 @@
 	right: 0;
 }
 
+.containerBorderFullWidth {
+	left: -$solid-border-space / 2;
+	right: -$solid-border-space / 2;
+}
+
 .dimmed {
 	opacity: $dimmed-opacity;
 }
@@ -49,6 +54,11 @@
 .neutralToolbar {
 	margin-left: -$block-edge-to-content;
 	margin-right: -$block-edge-to-content;
+}
+
+.containerToolbar {
+	width: 100%;
+	align-self: center;
 }
 
 .solidBorder {

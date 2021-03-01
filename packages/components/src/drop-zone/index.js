@@ -13,7 +13,7 @@ import { upload, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Context } from './provider';
+import { Context, INITIAL_DROP_ZONE_STATE } from './provider';
 
 export function useDropZone( {
 	element,
@@ -25,11 +25,7 @@ export function useDropZone( {
 	__unstableIsRelative: isRelative = false,
 } ) {
 	const dropZones = useContext( Context );
-	const [ state, setState ] = useState( {
-		isDraggingOverDocument: false,
-		isDraggingOverElement: false,
-		type: null,
-	} );
+	const [ state, setState ] = useState( INITIAL_DROP_ZONE_STATE );
 
 	useEffect( () => {
 		if ( ! isDisabled ) {
@@ -56,7 +52,17 @@ export function useDropZone( {
 		isRelative,
 	] );
 
-	return state;
+	const { x, y, ...remainingState } = state;
+	let position = null;
+
+	if ( x !== null && y !== null ) {
+		position = { x, y };
+	}
+
+	return {
+		...remainingState,
+		position,
+	};
 }
 
 export default function DropZoneComponent( {

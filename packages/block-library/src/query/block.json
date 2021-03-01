@@ -10,7 +10,7 @@
 			"type": "object",
 			"default": {
 				"perPage": null,
-				"pages": 1,
+				"pages": 0,
 				"offset": 0,
 				"postType": "post",
 				"categoryIds": [],
@@ -20,18 +20,27 @@
 				"author": "",
 				"search": "",
 				"exclude": [],
-				"sticky": ""
+				"sticky": "",
+				"inherit": true
+			}
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "list"
 			}
 		}
 	},
 	"providesContext": {
 		"queryId": "queryId",
-		"query": "query"
+		"query": "query",
+		"layout": "layout"
 	},
 	"usesContext": [
 		"postId"
 	],
 	"supports": {
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-query-editor"
 }

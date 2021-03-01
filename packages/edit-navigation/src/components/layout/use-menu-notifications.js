@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 export default function useMenuNotifications( menuId ) {
 	const { lastSaveError, lastDeleteError } = useSelect(
@@ -20,7 +21,7 @@ export default function useMenuNotifications( menuId ) {
 		[ menuId ]
 	);
 
-	const { createErrorNotice } = useDispatch( 'core/notices' );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const processError = ( error ) => {
 		const document = new window.DOMParser().parseFromString(

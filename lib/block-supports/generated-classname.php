@@ -35,11 +35,10 @@ function gutenberg_get_block_default_classname( $block_name ) {
  * Add the generated classnames to the output.
  *
  * @param  WP_Block_Type $block_type       Block Type.
- * @param  array         $block_attributes Block attributes.
  *
  * @return array Block CSS classes and inline styles.
  */
-function gutenberg_apply_generated_classname_support( $block_type, $block_attributes ) {
+function gutenberg_apply_generated_classname_support( $block_type ) {
 	$has_generated_classname_support = true;
 	$attributes                      = array();
 	if ( property_exists( $block_type, 'supports' ) ) {

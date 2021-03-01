@@ -8,6 +8,7 @@ export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as __experimentalBlockFullHeightAligmentToolbar } from './block-full-height-alignment-toolbar';
 export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
@@ -41,6 +42,7 @@ export {
 } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export { default as JustifyToolbar } from './justify-toolbar';
 export { default as __experimentalLinkControl } from './link-control';
 export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
 export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
@@ -77,32 +79,47 @@ export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
-export {
-	Block as __experimentalBlock,
-	useBlockProps,
-} from './block-list/block-wrapper';
+export { useBlockProps } from './block-list/use-block-props';
+export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';
-export { default as BlockSelectionClearer } from './block-selection-clearer';
+export {
+	default as BlockSelectionClearer,
+	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
+} from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
-export { default as CopyHandler } from './copy-handler';
+export {
+	default as CopyHandler,
+	useClipboardHandler as __unstableUseClipboardHandler,
+} from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
 export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
-export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
+export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
-export { default as ObserveTyping } from './observe-typing';
+export {
+	default as ObserveTyping,
+	useTypingObserver as __unstableUseTypingObserver,
+	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
+} from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
-export { default as Typewriter } from './typewriter';
+export {
+	default as Typewriter,
+	useTypewriter as __unstableUseTypewriter,
+} from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
+export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
+export { default as useBlockDisplayInformation } from './use-block-display-information';
+export { default as __unstableIframe } from './iframe';
+export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 
 /*
  * State Related Components

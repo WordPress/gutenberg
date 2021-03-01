@@ -64,7 +64,7 @@ const BottomSheetNavigationScreen = ( {
 				setHeight( heightRef.current.maxHeight );
 			}
 			return () => {};
-		}, [ setHeight ] )
+		}, [] )
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		if ( fullScreen ) {

@@ -7,7 +7,11 @@ import {
 	pasteHandler,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -24,6 +28,7 @@ export function parseDropEvent( event ) {
 		srcClientIds: null,
 		srcIndex: null,
 		type: null,
+		blocks: null,
 	};
 
 	if ( ! event.dataTransfer ) {
@@ -45,12 +50,13 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
+ * @param {string} targetRootClientId        The root client id where the block(s) will be inserted.
+ * @param {number} targetBlockIndex          The index where the block(s) will be inserted.
  * @param {Function} getBlockIndex             A function that gets the index of a block.
  * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
  * @param {Function} moveBlocksToPosition      A function that moves blocks.
- *
+ * @param {Function} insertBlocks              A function that inserts blocks.
+ * @param {Function} clearSelectedBlock        A function that clears block selection.
  * @return {Function} The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -58,62 +64,75 @@ export function onBlockDrop(
 	targetBlockIndex,
 	getBlockIndex,
 	getClientIdsOfDescendants,
-	moveBlocksToPosition
+	moveBlocksToPosition,
+	insertBlocks,
+	clearSelectedBlock
 ) {
 	return ( event ) => {
 		const {
 			srcRootClientId: sourceRootClientId,
 			srcClientIds: sourceClientIds,
 			type: dropType,
+			blocks,
 		} = parseDropEvent( event );
 
-		// If the user isn't dropping a block, return early.
-		if ( dropType !== 'block' ) {
-			return;
+		// If the user is inserting a block
+		if ( dropType === 'inserter' ) {
+			clearSelectedBlock();
+			insertBlocks(
+				blocks,
+				targetBlockIndex,
+				targetRootClientId,
+				true,
+				null
+			);
 		}
 
-		const sourceBlockIndex = getBlockIndex(
-			sourceClientIds[ 0 ],
-			sourceRootClientId
-		);
+		// If the user is moving a block
+		if ( dropType === 'block' ) {
+			const sourceBlockIndex = getBlockIndex(
+				sourceClientIds[ 0 ],
+				sourceRootClientId
+			);
 
-		// If the user is dropping to the same position, return early.
-		if (
-			sourceRootClientId === targetRootClientId &&
-			sourceBlockIndex === targetBlockIndex
-		) {
-			return;
+			// If the user is dropping to the same position, return early.
+			if (
+				sourceRootClientId === targetRootClientId &&
+				sourceBlockIndex === targetBlockIndex
+			) {
+				return;
+			}
+
+			// If the user is attempting to drop a block within its own
+			// nested blocks, return early as this would create infinite
+			// recursion.
+			if (
+				sourceClientIds.includes( targetRootClientId ) ||
+				getClientIdsOfDescendants( sourceClientIds ).some(
+					( id ) => id === targetRootClientId
+				)
+			) {
+				return;
+			}
+
+			const isAtSameLevel = sourceRootClientId === targetRootClientId;
+			const draggedBlockCount = sourceClientIds.length;
+
+			// If the block is kept at the same level and moved downwards,
+			// subtract to take into account that the blocks being dragged
+			// were removed from the block list above the insertion point.
+			const insertIndex =
+				isAtSameLevel && sourceBlockIndex < targetBlockIndex
+					? targetBlockIndex - draggedBlockCount
+					: targetBlockIndex;
+
+			moveBlocksToPosition(
+				sourceClientIds,
+				sourceRootClientId,
+				targetRootClientId,
+				insertIndex
+			);
 		}
-
-		// If the user is attempting to drop a block within its own
-		// nested blocks, return early as this would create infinite
-		// recursion.
-		if (
-			sourceClientIds.includes( targetRootClientId ) ||
-			getClientIdsOfDescendants( sourceClientIds ).some(
-				( id ) => id === targetRootClientId
-			)
-		) {
-			return;
-		}
-
-		const isAtSameLevel = sourceRootClientId === targetRootClientId;
-		const draggedBlockCount = sourceClientIds.length;
-
-		// If the block is kept at the same level and moved downwards,
-		// subtract to take into account that the blocks being dragged
-		// were removed from the block list above the insertion point.
-		const insertIndex =
-			isAtSameLevel && sourceBlockIndex < targetBlockIndex
-				? targetBlockIndex - draggedBlockCount
-				: targetBlockIndex;
-
-		moveBlocksToPosition(
-			sourceClientIds,
-			sourceRootClientId,
-			targetRootClientId,
-			insertIndex
-		);
 	};
 }
 
@@ -124,6 +143,7 @@ export function onBlockDrop(
  * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
  * @param {boolean}  hasUploadPermissions  Whether the user has upload permissions.
  * @param {Function} updateBlockAttributes A function that updates a block's attributes.
+ * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
  * @param {Function} insertBlocks          A function that inserts blocks.
  *
  * @return {Function} The event handler for a block-related file drop event.
@@ -133,6 +153,7 @@ export function onFilesDrop(
 	targetBlockIndex,
 	hasUploadPermissions,
 	updateBlockAttributes,
+	canInsertBlockType,
 	insertBlocks
 ) {
 	return ( files ) => {
@@ -143,7 +164,9 @@ export function onFilesDrop(
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) =>
-				transform.type === 'files' && transform.isMatch( files )
+				transform.type === 'files' &&
+				canInsertBlockType( transform.blockName, targetRootClientId ) &&
+				transform.isMatch( files )
 		);
 
 		if ( transformation ) {
@@ -189,17 +212,20 @@ export function onHTMLDrop(
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 	const {
+		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 	} = useSelect( ( select ) => {
 		const {
+			canInsertBlockType: _canInsertBlockType,
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		return {
+			canInsertBlockType: _canInsertBlockType,
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			hasUploadPermissions: getSettings().mediaUpload,
@@ -210,44 +236,31 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		insertBlocks,
 		moveBlocksToPosition,
 		updateBlockAttributes,
-	} = useDispatch( 'core/block-editor' );
+		clearSelectedBlock,
+	} = useDispatch( blockEditorStore );
 
 	return {
-		onDrop: useCallback(
-			onBlockDrop(
-				targetRootClientId,
-				targetBlockIndex,
-				getBlockIndex,
-				getClientIdsOfDescendants,
-				moveBlocksToPosition
-			),
-			[
-				targetRootClientId,
-				targetBlockIndex,
-				getBlockIndex,
-				getClientIdsOfDescendants,
-				moveBlocksToPosition,
-			]
+		onDrop: onBlockDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			moveBlocksToPosition,
+			insertBlocks,
+			clearSelectedBlock
 		),
-		onFilesDrop: useCallback(
-			onFilesDrop(
-				targetRootClientId,
-				targetBlockIndex,
-				hasUploadPermissions,
-				updateBlockAttributes,
-				insertBlocks
-			),
-			[
-				targetRootClientId,
-				targetBlockIndex,
-				hasUploadPermissions,
-				updateBlockAttributes,
-				insertBlocks,
-			]
+		onFilesDrop: onFilesDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			hasUploadPermissions,
+			updateBlockAttributes,
+			canInsertBlockType,
+			insertBlocks
 		),
-		onHTMLDrop: useCallback(
-			onHTMLDrop( targetRootClientId, targetBlockIndex, insertBlocks ),
-			[ targetRootClientId, targetBlockIndex, insertBlocks ]
+		onHTMLDrop: onHTMLDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			insertBlocks
 		),
 	};
 }

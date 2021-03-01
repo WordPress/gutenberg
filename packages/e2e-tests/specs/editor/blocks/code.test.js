@@ -6,6 +6,8 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
+	setClipboardData,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Code', () => {
@@ -31,5 +33,16 @@ describe( 'Code', () => {
 
 		// Expect code block to be deleted.
 		expect( await getEditedPostContent() ).toBe( '' );
+	} );
+
+	it( 'should paste plain text', async () => {
+		await insertBlock( 'Code' );
+
+		// Test to see if HTML and white space is kept.
+		await setClipboardData( { plainText: '<img />\n\t<br>' } );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

@@ -7,7 +7,6 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
-import { __experimentalMainDashboardButton as MainDashboardButton } from '@wordpress/interface';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -16,37 +15,30 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
+import MainDashboardButton from '../../main-dashboard-button';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
+import { store as editSiteStore } from '../../../store';
 
 export default function TemplatesNavigation() {
-	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
-		( select ) => {
-			const {
-				getTemplateId,
-				getTemplatePartId,
-				getTemplateType,
-				getNavigationPanelActiveMenu,
-			} = select( 'core/edit-site' );
+	const { postId, postType, activeMenu } = useSelect( ( select ) => {
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getNavigationPanelActiveMenu,
+		} = select( editSiteStore );
 
-			return {
-				templateId: getTemplateId(),
-				templatePartId: getTemplatePartId(),
-				templateType: getTemplateType(),
-				activeMenu: getNavigationPanelActiveMenu(),
-			};
-		},
-		[]
-	);
+		return {
+			postId: getEditedPostId(),
+			postType: getEditedPostType(),
+			activeMenu: getNavigationPanelActiveMenu(),
+		};
+	}, [] );
 
-	const { setNavigationPanelActiveMenu } = useDispatch( 'core/edit-site' );
+	const { setNavigationPanelActiveMenu } = useDispatch( editSiteStore );
 
 	return (
 		<Navigation
-			activeItem={
-				'wp_template' === templateType
-					? `${ templateType }-${ templateId }`
-					: `${ templateType }-${ templatePartId }`
-			}
+			activeItem={ `${ postType }-${ postId }` }
 			activeMenu={ activeMenu }
 			onActivateMenu={ setNavigationPanelActiveMenu }
 		>

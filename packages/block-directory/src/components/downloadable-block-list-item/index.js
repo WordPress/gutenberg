@@ -10,12 +10,13 @@ import DownloadableBlockAuthorInfo from '../downloadable-block-author-info';
 import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockInfo from '../downloadable-block-info';
 import DownloadableBlockNotice from '../downloadable-block-notice';
+import { store as blockDirectoryStore } from '../../store';
 
 export default function DownloadableBlockListItem( { item, onClick } ) {
 	const { isLoading, isInstallable } = useSelect(
 		( select ) => {
 			const { isInstalling, getErrorNoticeForBlock } = select(
-				'core/block-directory'
+				blockDirectoryStore
 			);
 			const notice = getErrorNoticeForBlock( item.id );
 			const hasFatal = notice && notice.isFatal;

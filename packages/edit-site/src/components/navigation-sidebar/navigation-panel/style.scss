@@ -53,10 +53,9 @@
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
 	border-radius: 0;
-	border-bottom: $border-width solid $gray-700;
-	height: auto;
-	margin-left: -6px; // +2px to display the focus box-shadow
-	margin-top: 2px; // +2px to display the focus box-shadow
+	height: $button-size;
+	margin-left: -10px; // +2px to display the focus box-shadow
+	margin-top: $grid-unit-30;
 	padding: $grid-unit $grid-unit-20;
 	width: calc(100% + #{$grid-unit-15});
 
@@ -95,12 +94,18 @@
 		height: auto;
 		min-height: $button-size;
 		text-align: left;
-		padding-top: $grid-unit-10;
-		padding-bottom: $grid-unit-10;
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
 		margin-bottom: $grid-unit-15;
+		color: inherit;
 	}
 }
 
+.edit-site-navigation-panel__template-item-title {
+	em {
+		margin-right: 1ch;
+	}
+}
 .edit-site-navigation-panel__template-item-description {
 	padding-top: $grid-unit-05;
 	font-size: 12px;
@@ -108,10 +113,14 @@
 }
 
 .edit-site-navigation-panel__new-template-dropdown {
-	display: flex;
 	margin: 0 0 0 $grid-unit-15;
 
 	button {
 		margin: 0;
+	}
+}
+.edit-site-navigation-panel__new-template-popover {
+	@include break-small() {
+		min-width: 300px;
 	}
 }

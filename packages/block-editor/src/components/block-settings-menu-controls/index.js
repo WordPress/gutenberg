@@ -1,13 +1,22 @@
 /**
  * External dependencies
  */
-import { compact, isEmpty, map } from 'lodash';
+import { compact, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createSlotFill, MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import {
+	useConvertToGroupButtonProps,
+	ConvertToGroupButton,
+} from '../convert-to-group-buttons';
+import { store as blockEditorStore } from '../../store';
 
 const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 	'BlockSettingsMenuControls'
@@ -17,7 +26,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const selectedBlocks = useSelect(
 		( select ) => {
 			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
@@ -29,11 +38,26 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		[ clientIds ]
 	);
 
+	// Check if current selection of blocks is Groupable or Ungroupable
+	// and pass this props down to ConvertToGroupButton.
+	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
+	const showConvertToGroupButton = isGroupable || isUngroupable;
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
-			{ ( fills ) =>
-				! isEmpty( fills ) && <MenuGroup>{ fills }</MenuGroup>
-			}
+			{ ( fills ) => {
+				if ( fills?.length > 0 || showConvertToGroupButton ) {
+					return (
+						<MenuGroup>
+							{ fills }
+							<ConvertToGroupButton
+								{ ...convertToGroupButtonProps }
+								onClose={ fillProps?.onClose }
+							/>
+						</MenuGroup>
+					);
+				}
+			} }
 		</Slot>
 	);
 };
@@ -41,6 +65,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlot;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  */
 export default BlockSettingsMenuControls;

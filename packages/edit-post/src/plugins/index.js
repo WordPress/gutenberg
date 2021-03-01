@@ -30,7 +30,7 @@ registerPlugin( 'edit-post', {
 									post_type: 'wp_block',
 								} ) }
 							>
-								{ __( 'Manage all reusable blocks' ) }
+								{ __( 'Manage Reusable blocks' ) }
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem
 								onSelect={ onClose }

@@ -25,9 +25,11 @@ export default function PreformattedEdit( {
 				} );
 			} }
 			onRemove={ onRemove }
+			aria-label={ __( 'Preformatted text' ) }
 			placeholder={ __( 'Write preformatted text…' ) }
 			onMerge={ mergeBlocks }
 			{ ...blockProps }
+			__unstablePastePlainText
 		/>
 	);
 }

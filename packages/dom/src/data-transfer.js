@@ -3,16 +3,24 @@
  *
  * @param {DataTransfer} dataTransfer DataTransfer object to inspect.
  *
- * @return {Set} A set containing all files.
+ * @return {Object[]} An array containing all files.
  */
 export function getFilesFromDataTransfer( dataTransfer ) {
-	const files = new Set( dataTransfer.files );
+	const files = [ ...dataTransfer.files ];
 
 	Array.from( dataTransfer.items ).forEach( ( item ) => {
 		const file = item.getAsFile();
 
-		if ( file ) {
-			files.add( file );
+		if (
+			file &&
+			! files.find(
+				( { name, type, size } ) =>
+					name === file.name &&
+					type === file.type &&
+					size === file.size
+			)
+		) {
+			files.push( file );
 		}
 	} );
 

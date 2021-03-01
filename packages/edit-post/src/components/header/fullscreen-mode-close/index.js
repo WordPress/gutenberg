@@ -12,11 +12,16 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 
-function FullscreenModeClose( { showTooltip } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+function FullscreenModeClose( { showTooltip, icon, href } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
 			const { getCurrentPostType } = select( 'core/editor' );
-			const { isFeatureActive } = select( 'core/edit-post' );
+			const { isFeatureActive } = select( editPostStore );
 			const { isResolving } = select( 'core/data' );
 			const { getEntityRecord, getPostType } = select( 'core' );
 			const siteData =
@@ -50,16 +55,26 @@ function FullscreenModeClose( { showTooltip } ) {
 				src={ siteIconUrl }
 			/>
 		);
-	} else if ( isRequestingSiteIcon ) {
+	}
+
+	if ( isRequestingSiteIcon ) {
 		buttonIcon = null;
+	}
+
+	// Override default icon if custom icon is provided via props.
+	if ( icon ) {
+		buttonIcon = <Icon size="36px" icon={ icon } />;
 	}
 
 	return (
 		<Button
 			className="edit-post-fullscreen-mode-close has-icon"
-			href={ addQueryArgs( 'edit.php', {
-				post_type: postType.slug,
-			} ) }
+			href={
+				href ??
+				addQueryArgs( 'edit.php', {
+					post_type: postType.slug,
+				} )
+			}
 			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
 			showTooltip={ showTooltip }
 		>

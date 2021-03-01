@@ -8,7 +8,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import {
-	STORE_KEY,
+	STORE_NAME,
 	VIEW_AS_LINK_SELECTOR,
 	VIEW_AS_PREVIEW_LINK_SELECTOR,
 } from '../../store/constants';
@@ -25,12 +25,12 @@ export const useBlockSelectionListener = ( postId ) => {
 			hasBlockSelection: !! select(
 				'core/block-editor'
 			).getBlockSelectionStart(),
-			isEditorSidebarOpened: select( STORE_KEY ).isEditorSidebarOpened(),
+			isEditorSidebarOpened: select( STORE_NAME ).isEditorSidebarOpened(),
 		} ),
 		[ postId ]
 	);
 
-	const { openGeneralSidebar } = useDispatch( STORE_KEY );
+	const { openGeneralSidebar } = useDispatch( STORE_NAME );
 
 	useEffect( () => {
 		if ( ! isEditorSidebarOpened ) {

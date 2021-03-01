@@ -17,6 +17,7 @@ import { useNavigationContext } from '../context';
 import { useNavigationTreeMenu } from './use-navigation-tree-menu';
 import NavigationBackButton from '../back-button';
 import NavigationMenuTitle from './menu-title';
+import NavigationSearchNoResultsFound from './search-no-results-found';
 import { NavigableMenu } from '../../navigable-container';
 import { MenuUI } from '../styles/navigation-styles';
 
@@ -31,6 +32,7 @@ export default function NavigationMenu( props ) {
 		onSearch: setControlledSearch,
 		parentMenu,
 		search: controlledSearch,
+		isSearchDebouncing,
 		title,
 		titleAction,
 	} = props;
@@ -81,7 +83,12 @@ export default function NavigationMenu( props ) {
 				/>
 
 				<NavigableMenu>
-					<ul aria-labelledby={ menuTitleId }>{ children }</ul>
+					<ul aria-labelledby={ menuTitleId }>
+						{ children }
+						{ search && ! isSearchDebouncing && (
+							<NavigationSearchNoResultsFound search={ search } />
+						) }
+					</ul>
 				</NavigableMenu>
 			</MenuUI>
 		</NavigationMenuContext.Provider>

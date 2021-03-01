@@ -6,29 +6,13 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	useRef,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
-
-/**
- * Favor useLayoutEffect to ensure the store subscription callback always has
- * the dispatchMap from the latest render. If a store update happens between
- * render and the effect, this could cause missed/stale updates or
- * inconsistent state.
- *
- * Fallback to useEffect for server rendered components because currently React
- * throws a warning when using useLayoutEffect in that environment.
- */
-const useIsomorphicLayoutEffect =
-	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 /**
  * Custom react hook for returning aggregate dispatch actions using the provided

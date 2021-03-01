@@ -42,12 +42,18 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
  * @param {boolean} options.update  If true, update sources.
+ * @param {string}  options.xdebug  The Xdebug mode to set.
  */
-module.exports = async function start( { spinner, debug, update } ) {
+module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
-	const config = await initConfig( { spinner, debug } );
+	const config = await initConfig( {
+		spinner,
+		debug,
+		xdebug,
+		writeChanges: true,
+	} );
 
 	if ( ! config.detectedLocalConfig ) {
 		const { configDirectoryPath } = config;
@@ -59,7 +65,7 @@ module.exports = async function start( { spinner, debug, update } ) {
 
 	// Check if the hash of the config has changed. If so, run configuration.
 	const configHash = md5( config );
-	const workDirectoryPath = config.workDirectoryPath;
+	const { workDirectoryPath, dockerComposeConfigPath } = config;
 	const shouldConfigureWp =
 		update ||
 		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
@@ -67,7 +73,7 @@ module.exports = async function start( { spinner, debug, update } ) {
 		} ) );
 
 	const dockerComposeConfig = {
-		config: config.dockerComposeConfigPath,
+		config: dockerComposeConfigPath,
 		log: config.debug,
 	};
 
@@ -175,7 +181,23 @@ module.exports = async function start( { spinner, debug, update } ) {
 		} );
 	}
 
-	spinner.text = 'WordPress started.';
+	const siteUrl = config.env.development.config.WP_SITEURL;
+	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
+	const mySQLAddress = await exec(
+		`docker-compose -f ${ dockerComposeConfigPath } port mysql 3306`
+	);
+	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
+
+	spinner.prefixText = 'WordPress development site started'
+		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
+		.concat( '\n' )
+		.concat( 'WordPress test site started' )
+		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
+		.concat( '\n' )
+		.concat( `MySQL is listening on port ${ mySQLPort }` )
+		.concat( '\n' );
+
+	spinner.text = 'Done!';
 };
 
 /**

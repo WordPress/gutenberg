@@ -9,5 +9,6 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-post-content-editor"
 }

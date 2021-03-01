@@ -6,7 +6,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
@@ -38,9 +38,9 @@ export function AlignmentToolbar( props ) {
 		value,
 		onChange,
 		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-		label = __( 'Change text alignment' ),
+		label = __( 'Align' ),
+		describedBy = __( 'Change text alignment' ),
 		isCollapsed = true,
-		isRTL,
 	} = props;
 
 	function applyOrUnset( align ) {
@@ -54,7 +54,7 @@ export function AlignmentToolbar( props ) {
 
 	function setIcon() {
 		if ( activeAlignment ) return activeAlignment.icon;
-		return isRTL ? alignRight : alignLeft;
+		return isRTL() ? alignRight : alignLeft;
 	}
 
 	return (
@@ -62,6 +62,7 @@ export function AlignmentToolbar( props ) {
 			isCollapsed={ isCollapsed }
 			icon={ setIcon() }
 			label={ label }
+			toggleProps={ { describedBy } }
 			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;

@@ -7,7 +7,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import ReusableBlockConvertButton from './reusable-block-convert-button';
-import ReusableBlockDeleteButton from './reusable-block-delete-button';
+import ReusableBlocksManageButton from './reusable-blocks-manage-button';
 
 function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
 	return (
@@ -17,7 +17,7 @@ function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
 				rootClientId={ rootClientId }
 			/>
 			{ clientIds.length === 1 && (
-				<ReusableBlockDeleteButton clientId={ clientIds[ 0 ] } />
+				<ReusableBlocksManageButton clientId={ clientIds[ 0 ] } />
 			) }
 		</>
 	);

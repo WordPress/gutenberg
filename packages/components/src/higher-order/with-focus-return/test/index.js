@@ -2,7 +2,7 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withFocusReturn, { Provider } from '../';
+import withFocusReturn from '../';
 
 class Test extends Component {
 	render() {
@@ -70,16 +70,11 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
-			const { unmount } = render(
-				<Provider>
-					<Composite />
-				</Provider>,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
+			const { unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			// Change activeElement.
 			switchFocusTo.focus();
@@ -91,67 +86,23 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should switch focus back when unmounted while having focus', () => {
-			const { container, unmount } = render(
-				<Provider>
-					<Composite />
-				</Provider>,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
+			const { container, unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			const textarea = container.querySelector( 'textarea' );
+			fireEvent.focusIn( textarea, { target: textarea } );
 			textarea.focus();
 			expect( document.activeElement ).toBe( textarea );
 
 			// Should return to the activeElement saved with this component.
 			unmount();
+			render( <div></div>, {
+				container,
+			} );
 			expect( document.activeElement ).toBe( activeElement );
-		} );
-
-		it( 'should switch focus to the most recent still-available focus target', () => {
-			const TestComponent = ( props ) => (
-				<Provider>
-					<input name="first" />
-					{ props.renderSecondInput && <input name="second" /> }
-					{ props.renderComposite && <Composite /> }
-				</Provider>
-			);
-
-			const { container, rerender } = render(
-				<TestComponent renderSecondInput />,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
-
-			const firstInput = container.querySelector( 'input[name="first"]' );
-			firstInput.focus();
-
-			const secondInput = container.querySelector(
-				'input[name="second"]'
-			);
-			secondInput.focus();
-
-			expect( document.activeElement ).toBe( secondInput );
-
-			rerender( <TestComponent renderSecondInput renderComposite /> );
-			const textarea = container.querySelector( 'textarea' );
-			textarea.focus();
-
-			expect( document.activeElement ).toBe( textarea );
-
-			rerender( <TestComponent renderComposite /> );
-
-			expect( document.activeElement ).toBe( textarea );
-
-			rerender( <TestComponent /> );
-
-			expect( document.activeElement ).toBe( firstInput );
 		} );
 	} );
 } );

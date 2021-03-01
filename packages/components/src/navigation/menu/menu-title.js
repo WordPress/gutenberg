@@ -8,7 +8,7 @@ import { Icon, search as searchIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Animate from '../../animate';
+import { getAnimateClassName } from '../../animate';
 import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
 import {
@@ -18,7 +18,6 @@ import {
 } from '../styles/navigation-styles';
 import { useNavigationMenuContext } from './context';
 import { SEARCH_FOCUS_DELAY } from '../constants';
-import { useRTL } from '../../utils/rtl';
 
 export default function NavigationMenuTitle( {
 	hasSearch,
@@ -30,7 +29,6 @@ export default function NavigationMenuTitle( {
 	const [ isSearching, setIsSearching ] = useState( false );
 	const { menu } = useNavigationMenuContext();
 	const searchButtonRef = useRef();
-	const isRTL = useRTL();
 
 	if ( ! title ) {
 		return null;
@@ -57,7 +55,6 @@ export default function NavigationMenuTitle( {
 					as="h2"
 					className="components-navigation__menu-title-heading"
 					variant="title.small"
-					isRTL={ isRTL }
 				>
 					<span id={ menuTitleId }>{ title }</span>
 
@@ -82,18 +79,19 @@ export default function NavigationMenuTitle( {
 			) }
 
 			{ isSearching && (
-				<Animate type="slide-in" options={ { origin: 'left' } }>
-					{ ( { className: animateClassName } ) => (
-						<div className={ animateClassName }>
-							<MenuTitleSearch
-								onCloseSearch={ onCloseSearch }
-								onSearch={ onSearch }
-								search={ search }
-								title={ title }
-							/>
-						</div>
-					) }
-				</Animate>
+				<div
+					className={ getAnimateClassName( {
+						type: 'slide-in',
+						origin: 'left',
+					} ) }
+				>
+					<MenuTitleSearch
+						onCloseSearch={ onCloseSearch }
+						onSearch={ onSearch }
+						search={ search }
+						title={ title }
+					/>
+				</div>
 			) }
 		</MenuTitleUI>
 	);
