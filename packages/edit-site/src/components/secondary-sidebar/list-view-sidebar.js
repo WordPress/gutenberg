@@ -32,8 +32,13 @@ export default function ListViewSidebar() {
 			selectedBlockClientId: getSelectedBlockClientId(),
 		};
 	} );
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
+
+	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
+	async function selectEditorBlock( clientId ) {
+		await clearSelectedBlock();
+		selectBlock( clientId );
+	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const focusReturnRef = useFocusReturn();
@@ -68,7 +73,7 @@ export default function ListViewSidebar() {
 			>
 				<BlockNavigationTree
 					blocks={ rootBlocks }
-					selectBlock={ selectBlock }
+					selectBlock={ selectEditorBlock }
 					selectedBlockClientId={ selectedBlockClientId }
 					showNestedBlocks
 					__experimentalPersistentListViewFeatures

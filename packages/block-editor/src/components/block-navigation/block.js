@@ -81,19 +81,23 @@ export default function BlockNavigationBlock( {
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': isHovered }
 	);
+
+	// If BlockNavigation has experimental features related to the Persistent List View,
+	// only focus the selected list item on mount; otherwise the list would always
+	// try to steal the focus from the editor canvas.
 	useEffect( () => {
-		if (
-			( withExperimentalFeatures ||
-				withExperimentalPersistentListViewFeatures ) &&
-			isSelected
-		) {
+		if ( withExperimentalPersistentListViewFeatures && isSelected ) {
 			cellRef.current.focus();
 		}
-	}, [
-		withExperimentalFeatures,
-		withExperimentalPersistentListViewFeatures,
-		isSelected,
-	] );
+	}, [] );
+
+	// If BlockNavigation has experimental features (such as drag and drop) enabled,
+	// leave the focus handling as it was before, to avoid accidental regressions.
+	useEffect( () => {
+		if ( withExperimentalFeatures && isSelected ) {
+			cellRef.current.focus();
+		}
+	}, [ withExperimentalFeatures, isSelected ] );
 
 	const highlightBlock = withExperimentalPersistentListViewFeatures
 		? toggleBlockHighlight
