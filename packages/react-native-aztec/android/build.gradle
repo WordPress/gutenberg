@@ -36,6 +36,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish' // this enables publishing via Bintray
 
+// import the `readReactNativeVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
+
 group = 'com.github.wordpress-mobile.gutenberg-mobile'
 
 // The sample build uses multiple directories to
@@ -84,7 +87,7 @@ repositories {
 
     maven { url "https://jitpack.io" }
 
-    if (shouldPublishBinary) {
+    if (willPublishReactNativeAztecBinary) {
         maven { url "https://dl.bintray.com/wordpress-mobile/react-native-mirror/" }
     } else {
         maven { url("$rootDir/../../../node_modules/react-native/android") }
@@ -107,7 +110,13 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     testImplementation 'junit:junit:4.13'
 
-    implementation "com.facebook.react:react-native:0.61.5"
+    if (willPublishReactNativeAztecBinary) {
+        def rnVersion = readReactNativeVersion('../../../package.json', 'devDependencies')
+        println "react-native version for react-native-aztec: $rnVersion"
+        implementation "com.facebook.react:react-native:$rnVersion"
+    } else {
+        implementation "com.facebook.react:react-native:+"
+    }
 }
 
 if (willPublishReactNativeAztecBinary) {
@@ -146,15 +155,13 @@ if (willPublishReactNativeAztecBinary) {
     }
 }
 
-// This is a workaround for adding the dependencies of the library. It's brought from the
-// plugin's README file: https://github.com/bintray/gradle-bintray-plugin/blob/1.8.5/README.md
+// Publication doesn't know about dependencies, so we need to manually add them
 def addDependenciesToPom(pom) {
     pom.withXml {
         def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
 
-        // Iterate over the api dependencies, adding a <dependency> node for each
-        configurations.api.allDependencies.each {
-            // Ensure dependencies such as fileTree are not included.
+        // Iterate over the implementation dependencies, adding a <dependency> node for each
+        configurations.implementation.allDependencies.findAll { it instanceof ExternalDependency }.each {
             if (it.name != 'unspecified') {
                 def dependencyNode = dependenciesNode.appendNode('dependency')
                 dependencyNode.appendNode('groupId', it.group)
@@ -164,3 +171,4 @@ def addDependenciesToPom(pom) {
         }
     }
 }
+

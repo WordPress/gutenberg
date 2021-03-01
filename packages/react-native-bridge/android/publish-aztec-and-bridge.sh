@@ -22,7 +22,7 @@ mkdir -p react-native-bridge/build/assets
 cp ../../../../bundle/android/App.js ./react-native-bridge/build/assets/index.android.bundle
 
 if [ $? -ne 0 ]; then
-	echo "Make sure to run 'npm install' from the root folder of the project before running this script."
+	echo "Make sure to run 'npm install' & 'npm run bundle:android' from the root folder of the project before running this script."
 	exit 1
 fi
 
