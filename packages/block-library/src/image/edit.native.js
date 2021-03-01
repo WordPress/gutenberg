@@ -403,7 +403,7 @@ export class ImageEdit extends Component {
 
 	render() {
 		const { isCaptionSelected } = this.state;
-		const { attributes, isSelected, image, clientId } = this.props;
+		const { attributes, isSelected, image, clientId, wasBlockJustInserted } = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
 		const sizeOptionsValid = find( this.sizeOptions, [
