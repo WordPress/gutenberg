@@ -6,7 +6,7 @@ on:
     - '**.md'
   push:
     branches:
-      - master
+      - trunk
       - 'wp/**'
     paths-ignore:
     - '**.md'
