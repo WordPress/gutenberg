@@ -1249,7 +1249,7 @@ class WP_Theme_JSON {
 		return $this->theme_json;
 	}
 
-		/**
+	/**
 	 * Enqueues a webfont if it used.
 	 *
 	 * @param string $value The font-family.
