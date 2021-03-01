@@ -140,7 +140,10 @@ export default function ReusableBlockConvertButton( {
 									value={ title }
 									onChange={ setTitle }
 								/>
-								<Flex justify="flex-end">
+								<Flex
+									className="reusable-blocks-menu-items__convert-modal-actions"
+									justify="flex-end"
+								>
 									<FlexItem>
 										<Button
 											isSecondary

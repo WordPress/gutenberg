@@ -27,8 +27,14 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import { getIconBySite, getNameBySite } from './social-list';
 
-const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
+const SocialLinkEdit = ( {
+	attributes,
+	context,
+	isSelected,
+	setAttributes,
+} ) => {
 	const { url, service, label } = attributes;
+	const { iconColorValue, iconBackgroundColorValue } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
@@ -36,7 +42,13 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
-	const blockProps = useBlockProps( { className: classes } );
+	const blockProps = useBlockProps( {
+		className: classes,
+		style: {
+			color: iconColorValue,
+			backgroundColor: iconBackgroundColorValue,
+		},
+	} );
 
 	return (
 		<Fragment>

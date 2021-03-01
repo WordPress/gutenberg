@@ -4,13 +4,13 @@
  *
  * @package WordPress
  * @subpackage REST_API
- * @since x.x.0
+ * @since 5.6.0
  */
 
 /**
- * Core class used to access widget types via the REST API.
+ * Core class to access widget types via the REST API.
  *
- * @since x.x.0
+ * @since 5.6.0
  *
  * @see WP_REST_Controller
  */
@@ -19,7 +19,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Constructor.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
@@ -27,14 +27,13 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Registers the routes for the objects of the controller.
+	 * Registers the widget type routes.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @see register_rest_route()
 	 */
 	public function register_routes() {
-
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -51,11 +50,31 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<name>[a-zA-Z0-9_-]+)/form-renderer',
+			'/' . $this->rest_base . '/(?P<id>[a-zA-Z0-9_-]+)',
+			array(
+				'args'   => array(
+					'id' => array(
+						'description' => __( 'The widget type id.', 'gutenberg' ),
+						'type'        => 'string',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[a-zA-Z0-9_-]+)/form-renderer',
 			array(
 				'args' => array(
-					'name'     => array(
-						'description' => __( 'Name of the widget.', 'gutenberg' ),
+					'id'       => array(
+						'description' => __( 'The widget type id.', 'gutenberg' ),
 						'type'        => 'string',
 						'required'    => true,
 					),
@@ -75,32 +94,12 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				),
 			)
 		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<name>[a-zA-Z0-9_-]+)',
-			array(
-				'args'   => array(
-					'name' => array(
-						'description' => __( 'Widget name.', 'gutenberg' ),
-						'type'        => 'string',
-					),
-				),
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => $this->get_collection_params(),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
 	}
 
 	/**
-	 * Checks whether a given request has permission to read post widget types.
+	 * Checks whether a given request has permission to read widget types.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
@@ -110,9 +109,9 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves all post widget types, depending on user context.
+	 * Retrieves the list of all widget types.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
@@ -130,7 +129,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to read a widget type.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has read access for the item, WP_Error object otherwise.
@@ -140,8 +139,8 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		if ( is_wp_error( $check ) ) {
 			return $check;
 		}
-		$widget_name = $request['name'];
-		$widget_type = $this->get_widget( $widget_name );
+		$widget_id   = $request['id'];
+		$widget_type = $this->get_widget( $widget_id );
 		if ( is_wp_error( $widget_type ) ) {
 			return $widget_type;
 		}
@@ -150,17 +149,17 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks whether a given widget type should be visible.
+	 * Checks whether the user can read widget types.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @return WP_Error|bool True if the widget type is visible, WP_Error otherwise.
 	 */
 	protected function check_read_permission() {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
-				'widgets_cannot_access',
-				__( 'Sorry, you are not allowed to access widgets on this site.', 'gutenberg' ),
+				'rest_cannot_manage_widgets',
+				__( 'Sorry, you are not allowed to manage widgets on this site.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
@@ -171,16 +170,16 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get the widget, if the name is valid.
+	 * Gets the details about the requested widget.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
-	 * @param string $name Widget name.
-	 * @return WP_Widget|WP_Error Widget type object if name is valid, WP_Error otherwise.
+	 * @param string $id The widget type id.
+	 * @return array|WP_Error The array of widget data if the name is valid, WP_Error otherwise.
 	 */
-	public function get_widget( $name ) {
+	public function get_widget( $id ) {
 		foreach ( $this->get_widgets() as $widget ) {
-			if ( $name === $widget['id'] ) {
+			if ( $id === $widget['id'] ) {
 				return $widget;
 			}
 		}
@@ -191,13 +190,17 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Normalize array of widgets.
 	 *
+	 * @since 5.6.0
+	 *
+	 * @global array $wp_registered_widgets The list of registered widgets.
+	 *
 	 * @return array Array of widgets.
 	 */
 	protected function get_widgets() {
 		global $wp_registered_widgets;
 
 		$widgets = array();
-		foreach ( $wp_registered_widgets as $widget ) {
+		foreach ( $wp_registered_widgets as  $widget ) {
 			$widget_callback = $widget['callback'];
 			unset( $widget['callback'] );
 
@@ -217,16 +220,16 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves a specific widget type.
+	 * Retrieves a single widget type from the collection.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$widget_name = $request['name'];
-		$widget_type = $this->get_widget( $widget_name );
+		$widget_id   = $request['id'];
+		$widget_type = $this->get_widget( $widget_id );
 		if ( is_wp_error( $widget_type ) ) {
 			return $widget_type;
 		}
@@ -238,21 +241,21 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a widget type object for serialization.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param array           $widget_type Widget type data.
 	 * @param WP_REST_Request $request    Full details about the request.
 	 * @return WP_REST_Response Widget type data.
 	 */
 	public function prepare_item_for_response( $widget_type, $request ) {
-
 		$fields = $this->get_fields_for_response( $request );
-		$data   = array();
+		$data   = array(
+			'id' => $widget_type['id'],
+		);
 
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
 			'name',
-			'id',
 			'description',
 			'classname',
 			'widget_class',
@@ -261,17 +264,19 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		);
 
 		foreach ( $extra_fields as $extra_field ) {
-			if ( rest_is_field_included( $extra_field, $fields ) ) {
-				if ( isset( $widget_type[ $extra_field ] ) ) {
-					$field = $widget_type[ $extra_field ];
-				} elseif ( array_key_exists( 'default', $schema['properties'][ $extra_field ] ) ) {
-					$field = $schema['properties'][ $extra_field ]['default'];
-				} else {
-					$field = '';
-				}
-
-				$data[ $extra_field ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $extra_field ] );
+			if ( ! rest_is_field_included( $extra_field, $fields ) ) {
+				continue;
 			}
+
+			if ( isset( $widget_type[ $extra_field ] ) ) {
+				$field = $widget_type[ $extra_field ];
+			} elseif ( array_key_exists( 'default', $schema['properties'][ $extra_field ] ) ) {
+				$field = $schema['properties'][ $extra_field ]['default'];
+			} else {
+				$field = '';
+			}
+
+			$data[ $extra_field ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $extra_field ] );
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -283,29 +288,27 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$response->add_links( $this->prepare_links( $widget_type ) );
 
 		/**
-		 * Filters a widget type returned from the REST API.
+		 * Filters the REST API response for a widget type.
 		 *
-		 * Allows modification of the widget type data right before it is returned.
+		 * @since 5.6.0
 		 *
-		 * @since x.x.0
-		 *
-		 * @param WP_REST_Response $response   The response object.
-		 * @param WP_Widget    $widget_type The original widget type object.
-		 * @param WP_REST_Request  $request    Request used to generate the response.
+		 * @param WP_REST_Response $response    The response object.
+		 * @param array            $widget_type The array of widget data.
+		 * @param WP_REST_Request  $request     The request object.
 		 */
 		return apply_filters( 'rest_prepare_widget_type', $response, $widget_type, $request );
 	}
 
 	/**
-	 * Prepares links for the request.
+	 * Prepares links for the widget type.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
-	 * @param WP_Widget $widget_type Widget type data.
+	 * @param array $widget_type Widget type data.
 	 * @return array Links for the given widget type.
 	 */
 	protected function prepare_links( $widget_type ) {
-		$links = array(
+		return array(
 			'collection' => array(
 				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 			),
@@ -313,14 +316,12 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $widget_type['id'] ) ),
 			),
 		);
-
-		return $links;
 	}
 
 	/**
-	 * Retrieves the widget type' schema, conforming to JSON Schema.
+	 * Retrieves the widget type's schema, conforming to JSON Schema.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @return array Item schema data.
 	 */
@@ -334,15 +335,14 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			'title'      => 'widget-type',
 			'type'       => 'object',
 			'properties' => array(
-				'name'                        => array(
-					'description' => __( 'Unique name identifying the widget type.', 'gutenberg' ),
+				'id'                          => array(
+					'description' => __( 'Unique slug identifying the widget type.', 'gutenberg' ),
 					'type'        => 'string',
-					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'id'                          => array(
-					'description' => __( 'Unique name identifying the widget type.', 'gutenberg' ),
+				'name'                        => array(
+					'description' => __( 'Human-readable name identifying the widget type.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
@@ -393,43 +393,28 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Returns the new widget instance and the form that represents it.
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
+	 * @since 5.6.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 * @since 5.7.0
-	 * @access public
 	 */
 	public function get_widget_form( $request ) {
 		$instance = $request->get_param( 'instance' );
 
-		$widget_name = $request['name'];
+		$widget_name = $request['id'];
 		$widget      = $this->get_widget( $widget_name );
 		$widget_obj  = new $widget['widget_class'];
 		$widget_obj->_set( -1 );
 		ob_start();
 
+		/** This filter is documented in wp-includes/class-wp-widget.php */
 		$instance = apply_filters( 'widget_form_callback', $instance, $widget_obj );
 
 		$return = null;
 		if ( false !== $instance ) {
 			$return = $widget_obj->form( $instance );
 
-			/**
-			 * Fires at the end of the widget control form.
-			 *
-			 * Use this hook to add extra fields to the widget form. The hook
-			 * is only fired if the value passed to the 'widget_form_callback'
-			 * hook is not false.
-			 *
-			 * Note: If the widget has no form, the text echoed from the default
-			 * form method can be hidden using CSS.
-			 *
-			 * @param WP_Widget $widget_obj The widget instance (passed by reference).
-			 * @param null $return Return null if new fields are added.
-			 * @param array $instance An array of the widget's settings.
-			 *
-			 * @since 5.2.0
-			 */
+			/** This filter is documented in wp-includes/class-wp-widget.php */
 			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
 		}
 		$form = ob_get_clean();
@@ -445,7 +430,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the query params for collections.
 	 *
-	 * @since 5.5.0
+	 * @since 5.6.0
 	 *
 	 * @return array Collection parameters.
 	 */
@@ -454,5 +439,4 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 		);
 	}
-
 }

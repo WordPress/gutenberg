@@ -5,7 +5,7 @@ on:
     paths-ignore:
     - '**.md'
   push:
-    branches: [master]
+    branches: [trunk]
     tags:
       - 'v*'
     paths-ignore:
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -91,12 +91,3 @@ jobs:
           asset_path: ./gutenberg.zip
           asset_name: gutenberg.zip
           asset_content_type: application/zip
-
-      - name: Publish Release
-        run: |
-          curl \
-            --request PATCH \
-            --url https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
-            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
-            --header "Accept: application/vnd.github.v3+json" \
-            --data-raw '{"draft":false}'

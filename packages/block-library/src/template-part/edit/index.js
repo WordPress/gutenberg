@@ -4,16 +4,12 @@
 import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
-	InspectorAdvancedControls,
-	InspectorControls,
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	SelectControl,
 	Dropdown,
-	PanelBody,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
@@ -25,13 +21,14 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import TemplatePartNamePanel from './name-panel';
 import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
+import { TemplatePartAdvancedControls } from './advanced-controls';
+import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 export default function TemplatePartEdit( {
-	attributes: { slug, theme, tagName: TagName = 'div' },
+	attributes: { slug, theme, tagName },
 	setAttributes,
 	clientId,
 } ) {
@@ -40,9 +37,9 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing } = useSelect(
+	const { isResolved, innerBlocks, isMissing, area } = useSelect(
 		( select ) => {
-			const { getEntityRecord, hasFinishedResolution } = select(
+			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
 			);
 			const { getBlocks } = select( blockEditorStore );
@@ -53,16 +50,20 @@ export default function TemplatePartEdit( {
 				templatePartId,
 			];
 			const entityRecord = templatePartId
-				? getEntityRecord( ...getEntityArgs )
+				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
 			const hasResolvedEntity = templatePartId
-				? hasFinishedResolution( 'getEntityRecord', getEntityArgs )
+				? hasFinishedResolution(
+						'getEditedEntityRecord',
+						getEntityArgs
+				  )
 				: false;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
+				area: entityRecord?.area,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -71,6 +72,7 @@ export default function TemplatePartEdit( {
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
+	const TagName = tagName || getTagBasedOnArea( area );
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -91,31 +93,12 @@ export default function TemplatePartEdit( {
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody>
-					{ isEntityAvailable && (
-						<TemplatePartNamePanel postId={ templatePartId } />
-					) }
-				</PanelBody>
-			</InspectorControls>
-			<InspectorAdvancedControls>
-				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
-						{ label: '<header>', value: 'header' },
-						{ label: '<main>', value: 'main' },
-						{ label: '<section>', value: 'section' },
-						{ label: '<article>', value: 'article' },
-						{ label: '<aside>', value: 'aside' },
-						{ label: '<footer>', value: 'footer' },
-					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-				/>
-			</InspectorAdvancedControls>
+			<TemplatePartAdvancedControls
+				tagName={ tagName }
+				setAttributes={ setAttributes }
+				isEntityAvailable={ isEntityAvailable }
+				templatePartId={ templatePartId }
+			/>
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder

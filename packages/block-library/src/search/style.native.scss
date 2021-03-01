@@ -1,0 +1,36 @@
+.searchBlockContainer {
+	flex: 1;
+	flex-direction: column;
+}
+
+.searchBarContainer {
+	flex: 1;
+	flex-direction: row;
+	justify-content: flex-start;
+	width: 100%;
+}
+
+.searchTextInput {
+	flex-grow: 1;
+	border: 1px solid $gray-600;
+	border-width: $border-width;
+	padding: $grid-unit-10;
+}
+
+.searchLabel {
+	width: 100%;
+}
+
+.buttonContainer {
+	background: #f7f7f7;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	padding-top: $grid-unit-10;
+	padding-bottom: $grid-unit-10;
+	border-width: $border-width;
+	border-color: #ccc;
+	border-style: solid;
+	margin-left: 10px;
+	align-content: center;
+	align-items: center;
+}

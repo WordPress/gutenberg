@@ -69,23 +69,19 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render smoothScroll 1`] = `
-"Snapshot Diff:
-- First value
-+ Second value
+Snapshot Diff:
+- Received styles
++ Base styles
 
-- Snapshot Diff:
-- - First value
-- + Second value
--
-- @@ -7,10 +7,9 @@
--   	\\"margin-top\\": \\"0px\\",
--   	\\"margin-right\\": \\"0px\\",
--   	\\"margin-bottom\\": \\"0px\\",
--   	\\"margin-left\\": \\"0px\\",
--   	\\"height\\": \\"100%\\",
-- - 	\\"scroll-behavior\\": \\"smooth\\",
--   	\\"overflow-x\\": \\"hidden\\",
--   	\\"overflow-y\\": \\"auto\\",
--   	\\"visibility\\": \\"visible\\"
--   }"
+@@ -7,10 +7,9 @@
+  	"margin-top": "0px",
+  	"margin-right": "0px",
+  	"margin-bottom": "0px",
+  	"margin-left": "0px",
+  	"height": "100%",
+- 	"scroll-behavior": "smooth",
+  	"overflow-x": "hidden",
+  	"overflow-y": "auto",
+  	"visibility": "visible"
+  }
 `;

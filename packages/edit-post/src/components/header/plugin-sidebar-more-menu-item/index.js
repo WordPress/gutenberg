@@ -53,6 +53,12 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
 
 export default function PluginSidebarMoreMenuItem( props ) {
 	return (
-		<ComplementaryAreaMoreMenuItem scope="core/edit-post" { ...props } />
+		<ComplementaryAreaMoreMenuItem
+			// Menu item is marked with unstable prop for backward compatibility.
+			// @see https://github.com/WordPress/gutenberg/issues/14457
+			__unstableExplicitMenuItem
+			scope="core/edit-post"
+			{ ...props }
+		/>
 	);
 }

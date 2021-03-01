@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+-   Fixed the background color used in the CSS file that was invalid on the front-end.
 
 ## 2.0.1 (2021-02-01)
 
