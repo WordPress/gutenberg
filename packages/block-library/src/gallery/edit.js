@@ -290,6 +290,7 @@ function GalleryEdit( props ) {
 				linkToText.label
 			),
 			{
+				id: 'gallery-attributes-linkTo',
 				type: 'snackbar',
 			}
 		);
@@ -326,6 +327,7 @@ function GalleryEdit( props ) {
 			? __( 'All gallery images updated to open in new tab' )
 			: __( 'All gallery images updated to not open in new tab' );
 		createSuccessNotice( noticeText, {
+			id: 'gallery-attributes-openInNewTab',
 			type: 'snackbar',
 		} );
 	}
@@ -356,6 +358,7 @@ function GalleryEdit( props ) {
 				imageSize.label
 			),
 			{
+				id: 'gallery-attributes-sizeSlug',
 				type: 'snackbar',
 			}
 		);
