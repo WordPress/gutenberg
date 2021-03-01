@@ -115,3 +115,73 @@
 		height: 100%;
 	}
 }
+
+// Depreacted style needed for the block widths and alignments.
+.edit-post-layout:not(.supports-layout) {
+	.wp-block {
+		max-width: $content-width;
+
+		&[data-align="wide"] {
+			max-width: $wide-content-width;
+		}
+
+		&[data-align="full"] {
+			max-width: none;
+		}
+	}
+
+	// Full Width Blocks
+	// specificity required to only target immediate child Blocks of a Group
+	.wp-block-group > [data-align="full"] {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	// Full Width Blocks with a background (ie: has padding)
+	.wp-block-group.has-background > [data-align="full"] {
+		// note: using position `left` causes hoz scrollbars so
+		// we opt to use margin instead
+		// the 30px matches the hoz padding applied in `theme.scss`
+		// added when the Block has a background set
+		margin-left: -30px;
+
+		// 60px here is x2 the hoz padding from `theme.scss` added when
+		// the Block has a background set
+		// note: also duplicated below for full width Groups
+		width: calc(100% + 60px);
+	}
+
+	/**
+	* Group: Full Width Alignment
+	*/
+	[data-align="full"] .wp-block-group {
+
+		// Non-full Width Blocks
+		// specificity required to only target immediate child Blocks of Group
+		> .wp-block {
+			padding-left: $block-padding;
+			padding-right: $block-padding;
+
+			@include break-small() {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
+
+		// Full Width Blocks
+		// specificity required to only target immediate child Blocks of Group
+		> [data-align="full"] {
+			padding-right: 0;
+			padding-left: 0;
+			left: 0;
+			width: 100%;
+			max-width: none;
+		}
+
+		// Full Width Blocks with a background (ie: has padding)
+		// note: also duplicated above for all Group widths
+		&.has-background > [data-align="full"] {
+			width: calc(100% + 60px);
+		}
+	}
+}

@@ -48,16 +48,23 @@ export const CSS_UNITS = [
 ];
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
-	const hasInnerBlocks = useSelect(
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
+			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
-			return !! ( block && block.innerBlocks.length );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
 		},
 		[ clientId ]
 	);
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const { contentSize, wideSize } = layout;
+	const alignments =
+		contentSize || wideSize
+			? [ 'wide', 'full' ]
+			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
 	/* TODO: find a way to render this extra div as a child of the inner block wrapper 
 	const extraChildren = (
@@ -74,13 +81,8 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			: InnerBlocks.ButtonBlockAppender,
 		__experimentalLayout: {
 			type: 'default',
-			// TODO: only pass this if the theme supports the new alignments.
-			// otherwise make all alignments avaiable.
-			// Find a way to inject this using the support flag.
-			alignments:
-				contentSize || wideSize
-					? [ 'wide', 'full' ]
-					: [ 'left', 'center', 'right' ],
+			// Find a way to inject this in the support flag code (hooks).
+			alignments: themeSupportsLayout ? alignments : undefined,
 		},
 	} );
 

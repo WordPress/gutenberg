@@ -57,10 +57,18 @@ const CSS_UNITS = [
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
 	const { wideSize, contentSize } = layout;
-	const defaultLayout = useSelect( ( select ) => {
+	const { defaultLayout, themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalFeatures?.defaults?.layout;
+		const settings = getSettings();
+		return {
+			defaultLayout: settings.__experimentalFeatures?.defaults?.layout,
+			themeSupportsLayout: settings?.supportsLayout,
+		};
 	}, [] );
+
+	if ( ! themeSupportsLayout ) {
+		return null;
+	}
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout settings' ) }>
@@ -181,13 +189,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 			return <BlockListBlock { ...props } />;
 		}
 
-		const wrapperProps = {
-			...props.wrapperProps,
-			className: classnames(
-				wrapperProps?.className,
-				`wp-container-${ id }`
-			),
-		};
+		const className = classnames(
+			props?.className,
+			`wp-container-${ id }`
+		);
 
 		return (
 			<>
@@ -208,7 +213,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 							}
 						` }
 				</style>
-				<BlockListBlock { ...props } wrapperProps={ wrapperProps } />
+				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
 	}

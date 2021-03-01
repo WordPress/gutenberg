@@ -694,21 +694,3 @@
 	}
 	/* stylelint-enable function-comma-space-after */
 }
-
-/**
- * These are default block editor widths in case the theme doesn't provide them.
- */
-@mixin default-block-widths {
-
-	.wp-block {
-		max-width: $content-width;
-
-		&[data-align="wide"] {
-			max-width: $wide-content-width;
-		}
-
-		&[data-align="full"] {
-			max-width: none;
-		}
-	}
-}
