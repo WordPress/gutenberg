@@ -339,7 +339,11 @@ describe( 'Reusable blocks', () => {
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Reusable block' );
+		await page.click( '[aria-label="Outline"]' );
+		const [ parentBlockButton ] = await page.$x(
+			'//*[@aria-label="Block navigation structure"]//button[text()="Untitled Reusable Block"]'
+		);
+		await parentBlockButton.click();
 		await clickBlockToolbarButton( 'Convert to regular blocks' );
 		await page.waitForXPath( selector, {
 			hidden: true,
