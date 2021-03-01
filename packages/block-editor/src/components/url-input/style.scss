@@ -1,5 +1,5 @@
 // Link input
-$input-padding: 8px;
+$input-padding: $grid-unit $grid-unit $grid-unit $grid-unit-15;
 $input-size: 300px;
 
 .block-editor-block-list__block .block-editor-url-input,
