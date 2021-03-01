@@ -2,10 +2,6 @@
  * External dependencies
  */
 import { css, ui } from '@wp-g2/styles';
-/**
- * Internal dependencies
- */
-import { CardBody } from '../card';
 
 export const PopoverContent = css`
 	${ ui.zIndex( 'Popover', 10000 ) };
@@ -27,8 +23,5 @@ export const PopoverContent = css`
 	}
 `;
 
-export const cardStyle = css`
-	${ CardBody } {
-		max-height: 80vh;
-	}
-`;
+// @todo: Temporarily disabled for E2E debugging
+export const cardStyle = css``;
