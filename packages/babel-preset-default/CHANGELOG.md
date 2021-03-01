@@ -4,7 +4,8 @@
 
 ### New Features
 
-- Added `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
+-   Add `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
+-   Add `react-refresh/babel` that implements the wiring necessary to integrate Fast Refresh into bundlers ([#29419](https://github.com/WordPress/gutenberg/pull/29419)).
 
 ## 5.0.0 (2021-01-21)
 

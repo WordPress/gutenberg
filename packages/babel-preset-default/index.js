@@ -77,6 +77,8 @@ module.exports = ( api ) => {
 				},
 			],
 			maybeGetPluginTransformRuntime(),
+			api.env() === 'development' &&
+				require.resolve( 'react-refresh/babel' ),
 		].filter( Boolean ),
 	};
 };
