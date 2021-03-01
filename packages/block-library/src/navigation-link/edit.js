@@ -309,9 +309,13 @@ export default function NavigationLinkEdit( {
 		},
 	} );
 
+	if ( ! url ) {
+		blockProps.onClick = () => setIsLinkOpen( true );
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation__container', {
+			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block':
 					isParentOfSelectedBlock &&
 					// Don't select as parent of selected block while dragging.
@@ -331,6 +335,33 @@ export default function NavigationLinkEdit( {
 			__experimentalAppenderTagName: 'li',
 		}
 	);
+
+	const classes = classnames( 'wp-block-navigation-link__content', {
+		'wp-block-navigation-link__placeholder': ! url,
+	} );
+
+	let missingText = '';
+	switch ( type ) {
+		case 'post':
+			/* translators: label for missing post in navigation link block */
+			missingText = __( 'Select a post' );
+			break;
+		case 'page':
+			/* translators: label for missing page in navigation link block */
+			missingText = __( 'Select a page' );
+			break;
+		case 'category':
+			/* translators: label for missing category in navigation link block */
+			missingText = __( 'Select a category' );
+			break;
+		case 'tag':
+			/* translators: label for missing tag in navigation link block */
+			missingText = __( 'Select a tag' );
+			break;
+		default:
+			/* translators: label for missing values in navigation link block */
+			missingText = __( 'Add a link' );
+	}
 
 	return (
 		<Fragment>
@@ -389,38 +420,61 @@ export default function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<div className="wp-block-navigation-link__content">
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-link__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( 'core/navigation-link' )
-							)
-						}
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						keepPlaceholderOnFocus
-						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
-					/>
+				<div className={ classes }>
+					{ ! url ? (
+						<div className="wp-block-navigation-link__placeholder-text">
+							<KeyboardShortcuts
+								shortcuts={ {
+									enter: () =>
+										isSelected && setIsLinkOpen( true ),
+								} }
+							/>
+							{ missingText }
+						</div>
+					) : (
+						<RichText
+							ref={ ref }
+							identifier="label"
+							className="wp-block-navigation-link__label"
+							value={ label }
+							onChange={ ( labelValue ) =>
+								setAttributes( { label: labelValue } )
+							}
+							onMerge={ mergeBlocks }
+							onReplace={ onReplace }
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/navigation-link' )
+								)
+							}
+							aria-label={ __( 'Navigation link text' ) }
+							placeholder={ itemLabelPlaceholder }
+							keepPlaceholderOnFocus
+							withoutInteractiveFormatting
+							allowedFormats={ [
+								'core/bold',
+								'core/italic',
+								'core/image',
+								'core/strikethrough',
+							] }
+							onClick={ () => {
+								if ( ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
+						/>
+					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 						>
+							<KeyboardShortcuts
+								bindGlobal
+								shortcuts={ {
+									escape: () => setIsLinkOpen( false ),
+								} }
+							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
