@@ -267,15 +267,27 @@ function register_block_core_navigation_link() {
 
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
+	$built_ins  = array();
 	$variations = array();
+
 	if ( $post_types ) {
 		foreach ( $post_types as $post_type ) {
-			$variations[] = build_variation_for_navigation_link( $post_type, 'post-type' );
+			$variation = build_variation_for_navigation_link( $post_type, 'post-type' );
+			if ( 'post' === $variation['name'] || 'page' === $variation['name'] ) {
+				$built_ins[] = $variation;
+			} else {
+				$variations[] = $variation;
+			}
 		}
 	}
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
-			$variations[] = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
+			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
+			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] ) {
+				$built_ins[] = $variation;
+			} else {
+				$variations[] = $variation;
+			}
 		}
 	}
 
@@ -283,7 +295,7 @@ function register_block_core_navigation_link() {
 		__DIR__ . '/navigation-link',
 		array(
 			'render_callback' => 'render_block_core_navigation_link',
-			'variations'      => $variations,
+			'variations'      => array_merge( $built_ins, $variations ),
 		)
 	);
 }
