@@ -56,7 +56,6 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 	}
 );
 
-
 /**
  * Tells if the block with the passed clientId was just inserted.
  *

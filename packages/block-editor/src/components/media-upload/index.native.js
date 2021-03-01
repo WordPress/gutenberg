@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { Platform } from 'react-native';
 
 import { delay } from 'lodash';
@@ -9,7 +8,7 @@ import { delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, React } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
