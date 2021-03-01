@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-color: var(--wp-g2-color-divider);
+  border-width: 0 0 1px 0;
+  height: 0;
+  margin: 0;
+  width: auto;
+}
+
+<hr
+  aria-orientation="horizontal"
+  class="emotion-0 components-divider wp-components-divider"
+  data-g2-c16t="true"
+  data-g2-component="Divider"
+  role="separator"
+/>
+`;
+
+exports[`props should render margin 1`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;
+
+exports[`props should render marginBottom 1`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;
+
+exports[`props should render marginTop 1`] = `
+Snapshot Diff:
+Compared values have no visual difference.
+`;
