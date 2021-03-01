@@ -40,12 +40,15 @@ function enhanceNavigationLinkVariations( settings, name ) {
 	if ( ! settings.variations ) {
 		return {
 			...settings,
-			variations: [ ...fallbackVariations ],
+			variations: fallbackVariations,
 		};
 	}
 
 	// Otherwise decorate server passed variations with an icon and isActive function
 	if ( settings.variations ) {
+		const isActive = ( blockAttributes, variationAttributes ) => {
+			return blockAttributes.type === variationAttributes.type;
+		};
 		const variations = settings.variations.map( ( variation ) => {
 			return {
 				...variation,
@@ -53,11 +56,7 @@ function enhanceNavigationLinkVariations( settings, name ) {
 					icon: getIcon( variation.name ),
 				} ),
 				...( ! variation.isActive && {
-					isActive: ( blockAttributes, variationAttributes ) => {
-						return (
-							blockAttributes.type === variationAttributes.type
-						);
-					},
+					isActive,
 				} ),
 			};
 		} );
