@@ -85,13 +85,17 @@ function Divider(
  *
  * @example
  * ```js
- * import { ListGroup, FormGroup, Divider } from `@wordpress/components/ui`;
+ * import { Divider, FormGroup, ListGroup } from `@wordpress/components/ui`;
  *
- * <ListGroup>
- * 	<FormGroup>...</FormGroup>
- *  <Divider />
- * 	<FormGroup>...</FormGroup>
- * </ListGroup>
+ * function Example() {
+ * 	return (
+ * 		<ListGroup>
+ * 			<FormGroup>...</FormGroup>
+ * 			<Divider />
+ * 			<FormGroup>...</FormGroup>
+ * 		</ListGroup>
+ * 	);
+ * }
  * ```
  */
 const ConnectedDivider = contextConnect( Divider, 'Divider' );
