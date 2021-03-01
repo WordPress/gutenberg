@@ -7,6 +7,7 @@ import { every } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function useShortCodeTransform( shortCodeTransforms ) {
 	const newImageData = useSelect(
@@ -14,7 +15,7 @@ export default function useShortCodeTransform( shortCodeTransforms ) {
 			if ( ! shortCodeTransforms || shortCodeTransforms.length === 0 ) {
 				return;
 			}
-			const getMedia = select( 'core' ).getMedia;
+			const getMedia = select( coreStore ).getMedia;
 			return shortCodeTransforms.map( ( image ) => {
 				const imageData = getMedia( image.id );
 				if ( imageData ) {

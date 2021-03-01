@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, reduce, map, filter, some } from 'lodash';
+import { get, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,47 +19,38 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 		let resizedImages = {};
 
 		if ( isSelected ) {
-			resizedImages = reduce(
-				images,
-				( currentResizedImages, img ) => {
-					if ( ! img.id ) {
-						return currentResizedImages;
-					}
-					const image = img;
-					const sizes = reduce(
-						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
-								'sizes',
-								size.slug,
-								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
-								'media_details',
-								'sizes',
-								size.slug,
-								'source_url',
-							] );
-							return {
-								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
-							};
-						},
-						{}
-					);
+			resizedImages = images.reduce( ( currentResizedImages, img ) => {
+				if ( ! img.id ) {
+					return currentResizedImages;
+				}
+
+				const sizes = imageSizes.reduce( ( currentSizes, size ) => {
+					const defaultUrl = get( img, [
+						'sizes',
+						size.slug,
+						'url',
+					] );
+					const mediaDetailsUrl = get( img, [
+						'media_details',
+						'sizes',
+						size.slug,
+						'source_url',
+					] );
 					return {
-						...currentResizedImages,
-						[ parseInt( img.id, 10 ) ]: sizes,
+						...currentSizes,
+						[ size.slug ]: defaultUrl || mediaDetailsUrl,
 					};
-				},
-				{}
-			);
+				}, {} );
+				return {
+					...currentResizedImages,
+					[ parseInt( img.id, 10 ) ]: sizes,
+				};
+			}, {} );
 		}
-		return map(
-			filter( imageSizes, ( { slug } ) =>
+		return imageSizes
+			.filter( ( { slug } ) =>
 				some( resizedImages, ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
+			)
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 }
