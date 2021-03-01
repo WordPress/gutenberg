@@ -741,7 +741,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $declarations, $styles, $supports ) {
+	private function compute_style_properties( $declarations, $styles, $supports ) {
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
@@ -773,6 +773,9 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
+				if ( 'fontFamily' === $prop['name'] ) {
+					$this->maybe_add_webfont( $value );
+				}
 				$kebab_cased_name = self::to_kebab_case( $prop['name'] );
 				$declarations[]   = array(
 					'name'  => $kebab_cased_name,
@@ -1013,7 +1016,7 @@ class WP_Theme_JSON {
 
 			$declarations = array();
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties(
+				$declarations = $this->compute_style_properties(
 					$declarations,
 					$this->theme_json['styles'][ $block_selector ],
 					$supports
@@ -1159,7 +1162,7 @@ class WP_Theme_JSON {
 
 			// Style escaping.
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
+				$declarations = $this->compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
 				foreach ( $declarations as $declaration ) {
 					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
 					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
@@ -1246,4 +1249,26 @@ class WP_Theme_JSON {
 		return $this->theme_json;
 	}
 
+		/**
+	 * Enqueues a webfont if it used.
+	 *
+	 * @param string $value The font-family.
+	 *
+	 * @return void
+	 */
+	private function maybe_add_webfont( $value ) {
+		if (
+			isset( $this->theme_json['settings'] ) &&
+			isset( $this->theme_json['settings']['defaults'] ) &&
+			isset( $this->theme_json['settings']['defaults']['typography'] ) &&
+			isset( $this->theme_json['settings']['defaults']['typography']['fontFamilies'] )
+		) {
+			$font_families = $this->theme_json['settings']['defaults']['typography']['fontFamilies'];
+			foreach ( $font_families as $font_family ) {
+				if ( isset( $font_family['webfontStylesUri'] ) && $value === $font_family['fontFamily'] ) {
+					wp_enqueue_style( "{$font_family['slug']}-webfont", $font_family['webfontStylesUri'] );
+				}
+			}
+		}
+	}
 }
