@@ -209,6 +209,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$origin = 'user';
 	}
 	$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
+	// Check for mobile editor.
+	$is_mobile = isset( $_REQUEST['is_mobile'] ) && 'true' === $_REQUEST['is_mobile'];
 
 	// STEP 1: ADD FEATURES
 	//
@@ -223,15 +225,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// In the site editor, the user can change styles, so the client
 	// needs the ability to create them. Hence, we pass it some data
 	// for this: base styles (core+theme) and the ID of the user CPT.
-	// $screen = get_current_screen();
-	// if (
-	// 	! empty( $screen ) &&
-	// 	function_exists( 'gutenberg_is_edit_site_page' ) &&
-	// 	gutenberg_is_edit_site_page( $screen->id ) &&
-	// 	WP_Theme_JSON_Resolver::theme_has_support() &&
-	// 	gutenberg_is_fse_theme()
-	// ) {
+	$screen = ! $is_mobile && get_current_screen();
 	if (
+		( ( ! empty( $screen ) &&
+		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		gutenberg_is_edit_site_page( $screen->id ) ||
+		$is_mobile ) ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_is_fse_theme()
 	) {
