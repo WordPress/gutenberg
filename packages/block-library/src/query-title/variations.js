@@ -14,7 +14,6 @@ const variations = [
 		icon: archiveTitle,
 		attributes: {
 			type: 'archive',
-			content: __( 'Archive title placeholder' ),
 		},
 		scope: [ 'inserter' ],
 	},

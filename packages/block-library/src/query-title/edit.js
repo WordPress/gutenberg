@@ -46,9 +46,7 @@ export default function QueryTitleEdit( {
 	let titleElement;
 	if ( type === 'archive' ) {
 		titleElement = (
-			<TagName { ...blockProps }>
-				{ __( 'Archive title placeholder' ) }
-			</TagName>
+			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
 		);
 	}
 	return (

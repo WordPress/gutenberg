@@ -22,7 +22,7 @@ function render_block_core_query_title( $attributes, $content, $block ) {
 	if ( ! $type || ( 'archive' === $type && ! $is_archive ) ) {
 		return '';
 	}
-	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
+	$title = '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	}
