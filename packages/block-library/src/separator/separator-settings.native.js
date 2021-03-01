@@ -48,13 +48,9 @@ const SeparatorSettings = ( {
 	};
 
 	const onUnitChange = ( unit ) => {
-		// When setting the default on native the UnitControl input doesn't
-		// update with the new value. Instead of using MARGIN_CONSTRAINTS[ unit ].default
-		// The current value is going to be applied in the settings so the UI
-		// is at least consistent.
 		updateMargins( {
-			top: `${ topValue }${ unit }`,
-			bottom: `${ bottomValue }${ unit }`,
+			top: MARGIN_CONSTRAINTS[ unit ].default,
+			bottom: MARGIN_CONSTRAINTS[ unit ].default,
 		} );
 	};
 
@@ -73,21 +69,25 @@ const SeparatorSettings = ( {
 			<PanelBody title={ __( 'Separator settings' ) }>
 				<UnitControl
 					label={ __( 'Top margin' ) }
+					key={ `separator-top-margin-${ bottomUnit }` }
 					min={ MARGIN_CONSTRAINTS[ topUnit ].min }
 					max={ MARGIN_CONSTRAINTS[ topUnit ].max }
-					value={ topValue }
+					value={ topValue || MARGIN_CONSTRAINTS[ topUnit ].min }
 					unit={ topUnit }
 					units={ CSS_UNITS }
 					onChange={ createHandleMarginChange( 'top', topUnit ) }
 					onUnitChange={ onUnitChange }
 					decimalNum={ 1 }
-					key={ 'separator-top-margin' }
+					step={ topUnit === 'px' ? 1 : 0.1 }
 				/>
 				<UnitControl
 					label={ __( 'Bottom margin' ) }
+					key={ `separator-bottom-margin-${ bottomUnit }` }
 					min={ MARGIN_CONSTRAINTS[ bottomUnit ].min }
 					max={ MARGIN_CONSTRAINTS[ bottomUnit ].max }
-					value={ bottomValue }
+					value={
+						bottomValue || MARGIN_CONSTRAINTS[ bottomUnit ].min
+					}
 					unit={ bottomUnit }
 					units={ CSS_UNITS }
 					onChange={ createHandleMarginChange(
@@ -96,7 +96,7 @@ const SeparatorSettings = ( {
 					) }
 					onUnitChange={ onUnitChange }
 					decimalNum={ 1 }
-					key={ 'separator-bottom-margin' }
+					step={ bottomUnit === 'px' ? 1 : 0.1 }
 				/>
 			</PanelBody>
 		</InspectorControls>
