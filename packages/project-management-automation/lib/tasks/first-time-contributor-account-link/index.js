@@ -40,9 +40,9 @@ function getPromptMessageText( author ) {
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function firstTimeContributorAccountLink( payload, octokit ) {
-	if ( payload.ref !== 'refs/heads/master' ) {
+	if ( payload.ref !== 'refs/heads/trunk' ) {
 		debug(
-			'first-time-contributor-account-link: Commit is not to `master`. Aborting'
+			'first-time-contributor-account-link: Commit is not to `trunk`. Aborting'
 		);
 		return;
 	}

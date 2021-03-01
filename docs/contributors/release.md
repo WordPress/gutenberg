@@ -86,10 +86,10 @@ Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress
 
 ##### Creating the Release Branch
 
-For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from master.
+For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from trunk.
 
 ```
-git checkout master
+git checkout trunk
 git checkout -b release/x.x
 git push origin release/x.x
 ```
@@ -98,7 +98,7 @@ git push origin release/x.x
 
 1. Checkout the `release/x.x` branch.
 2. Create [a commit like this](https://github.com/WordPress/gutenberg/pull/13125/commits/13fa651dadc2472abb9b95f80db9d5f23e63ae9c), bumping the version number in `gutenberg.php`, `package.json`, and `package-lock.json` to `x.x.0-rc.1`.
-3. Create a Pull Request from the release branch into `master` using the changelog as a description and ensure the tests pass properly.
+3. Create a Pull Request from the release branch into `trunk` using the changelog as a description and ensure the tests pass properly.
 4. Tag the RC version. `git tag vx.x.0-rc.1` from the release branch.
 5. Push the tag `git push --tags`.
 6. Merge the version bump pull request and avoid removing the release branch.
@@ -121,16 +121,16 @@ Here's an example [release candidate page](https://github.com/WordPress/gutenber
 
 #### Creating Release Candidate Patches (done via `git cherry-pick`)
 
-If a bug is found in a release candidate and a fix is committed to `master`, we should include that fix in a new release candidate. To do this you'll need to use `git cherry-pick` to add these changes to the milestone's release branch. This way only fixes are added to the release candidate and not all the new code that has landed on `master` since tagging:
+If a bug is found in a release candidate and a fix is committed to `trunk`, we should include that fix in a new release candidate. To do this you'll need to use `git cherry-pick` to add these changes to the milestone's release branch. This way only fixes are added to the release candidate and not all the new code that has landed on `trunk` since tagging:
 
 1. Checkout the corresponding release branch with: `git checkout release/x.x`.
 2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`.
 3. Create [a commit like this](https://github.com/WordPress/gutenberg/pull/13125/commits/13fa651dadc2472abb9b95f80db9d5f23e63ae9c), bumping the version number in `gutenberg.php`, `package.json`, and `package-lock.json` to `x.x.0-rc.2`.
-4. Create a Pull Request from the release branch into `master` using the changelog as a description and ensure the tests pass properly. Note that if there there are merge conflicts, Travis CI will not run on the PR. Run tests locally using `npm run test` and `npm run test-e2e` if this happens.
+4. Create a Pull Request from the release branch into `trunk` using the changelog as a description and ensure the tests pass properly. Note that if there there are merge conflicts, Travis CI will not run on the PR. Run tests locally using `npm run test` and `npm run test-e2e` if this happens.
 5. Tag the RC version. `git tag vx.x.0-rc.2` from the release branch.
 6. Push the tag `git push --tags`.
 7. Create a branch for bumping the version number. `git checkout -b bump/x.x`.
-8. Create a Pull Request from the `bump/x.x` branch into `master` using the
+8. Create a Pull Request from the `bump/x.x` branch into `trunk` using the
    changelog as a description.
 9. Merge the version bump pull request.
 10. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github).
@@ -160,12 +160,12 @@ Creating a release involves:
 
 1. Checkout the release branch `git checkout release/x.x`.
 
-**Note:** This branch should never be removed or rebased. When we want to merge something from it to master and conflicts exist/may exist we use a temporary branch `bump/x.x`.
+**Note:** This branch should never be removed or rebased. When we want to merge something from it to trunk and conflicts exist/may exist we use a temporary branch `bump/x.x`.
 
 2. Create [a commit like this](https://github.com/WordPress/gutenberg/commit/00d01049685f11f9bb721ad3437cb928814ab2a2#diff-b9cfc7f2cdf78a7f4b91a753d10865a2), removing the `-rc.X` from the version number in `gutenberg.php`, `package.json`, and `package-lock.json`.
 3. Create a new branch called `bump/x.x` from `release/x.x` and switch to it: `git checkout -b bump/x.x`.
-4. Create a pull request from `bump/x.x` to `master`. Verify the continuous integrations tests pass, before continuing to the next step even if conflicts exist.
-5. Rebase `bump/x.x` against `origin/master` using `git fetch origin && git rebase origin/master`.
+4. Create a pull request from `bump/x.x` to `trunk`. Verify the continuous integrations tests pass, before continuing to the next step even if conflicts exist.
+5. Rebase `bump/x.x` against `origin/trunk` using `git fetch origin && git rebase origin/trunk`.
 6. Force push the branch `bump/x.x` using `git push --force-with-lease`.
 7. Switch to the `release/x.x` branch. Tag the version from the release branch `git tag vx.x.0`.
 8. Push the tag `git push --tags`.
@@ -267,7 +267,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
 
-Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the main branch of Gutenberg.
+Finally, now that the npm packages are ready, a patch can be created and committed into WordPress `trunk`. You should also cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ### Minor WordPress Releases
 
@@ -290,7 +290,7 @@ Now, the branch is ready to be used to publish the npm packages.
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
 3. Update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the corresponding branch (Example `wp/5.2`).
-4. Cherry-pick the CHANGELOG update commits into the `master` branch of Gutenberg.
+4. Cherry-pick the CHANGELOG update commits into the `trunk` branch of Gutenberg.
 
 Now, the npm packages should be ready and a patch can be created and committed into the corresponding WordPress SVN branch.
 
@@ -298,15 +298,15 @@ Now, the npm packages should be ready and a patch can be created and committed i
 
 The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a WordPress release cycle.
 
-Note: Both the `master` and `wp/trunk` branches are restricted and can only be _pushed_ to by the Gutenberg Core team.
+Note: Both the `trunk` and `wp/trunk` branches are restricted and can only be _pushed_ to by the Gutenberg Core team.
 
-Identify the commit hashes from the pull requests that need to be ported from the repo `master` branch to `wp/trunk`
+Identify the commit hashes from the pull requests that need to be ported from the repo `trunk` branch to `wp/trunk`
 
 The `wp/trunk` branch now needs to be prepared to release and publish the packages to _npm_.
 
 Open a terminal and perform the following steps:
 
-1. `git checkout master`
+1. `git checkout trunk`
 2. `git pull`
 3. `git checkout wp/trunk`
 4. `git pull`
@@ -316,7 +316,7 @@ Before porting commits check that the `wp/trunk` branch does not have any outsta
 1. `git checkout wp/trunk`
 2. `npm run publish:check`
 
-Now _cherry-pick_ the commits from `master` to `wp/trunk`, use `-m 1 commithash` if the commit was a pull request merge commit:
+Now _cherry-pick_ the commits from `trunk` to `wp/trunk`, use `-m 1 commithash` if the commit was a pull request merge commit:
 
 1. `git cherry-pick -m 1 cb150a2`
 2. `git push`
@@ -349,7 +349,7 @@ Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://gi
     > Example
     >
     > ```
-    > [master 278f524f16] Update changelogs` 278f524
+    > [trunk 278f524f16] Update changelogs` 278f524
     > ```
 6. `git push`
 
@@ -400,9 +400,9 @@ Now that the changes have been committed to the `wp/trunk` branch and the Travis
     > lerna success published 3 packages
     > ```
 
-Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `master` branch:
+Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `trunk` branch:
 
-1. `git checkout master`
+1. `git checkout trunk`
 2. `git pull`
 3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
 4. `git cherry-pick 278f524`

@@ -11,7 +11,7 @@
 
 ### Improvements
 
-- The "Add First Time Contributor Label" task now runs retroactively on pushes to master, due to [permission constraints](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token) of GitHub Actions.
+- The "Add First Time Contributor Label" task now runs retroactively on pushes to trunk, due to [permission constraints](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token) of GitHub Actions.
 
 ## 1.0.0 (2019-08-29)
 

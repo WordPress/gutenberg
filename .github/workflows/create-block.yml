@@ -7,7 +7,7 @@ on:
     - '!packages/**/test/**'
     - '!packages/**/*.md'
   push:
-    branches: [master, wp/trunk]
+    branches: [trunk, wp/trunk]
     paths:
     - 'packages/**'
     - '!packages/**/test/**'

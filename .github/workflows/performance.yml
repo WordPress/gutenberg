@@ -38,9 +38,9 @@ jobs:
       run: |
         npm ci
 
-    - name: Compare performance with master
+    - name: Compare performance with trunk
       if: github.event_name == 'pull_request'
-      run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA master --tests-branch $GITHUB_SHA
+      run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
 
     - name: Compare performance with current WordPress Core and previous Gutenberg versions
       if: github.event_name == 'release'

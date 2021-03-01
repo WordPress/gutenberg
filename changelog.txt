@@ -3309,7 +3309,7 @@ Fix action GitHub action workflow YAML syntax errors. ([23844](https://github.co
 - Global styles provider. ([21637](https://github.com/WordPress/gutenberg/pull/21637))
 - Update existing templates to use new blocks. ([21857](https://github.com/WordPress/gutenberg/pull/21857))
 - Enable pullquote block. ([21930](https://github.com/WordPress/gutenberg/pull/21930))
-- Merge release branch back to master for v1.27.1. ([22234](https://github.com/WordPress/gutenberg/pull/22234))
+- Merge release branch back to trunk for v1.27.1. ([22234](https://github.com/WordPress/gutenberg/pull/22234))
 - Wrap button blocks with buttons blocks in page templates. ([21939](https://github.com/WordPress/gutenberg/pull/21939))
 - Components: Create a separate .native entry for ToolbarItem. ([22229](https://github.com/WordPress/gutenberg/pull/22229))
 
@@ -5466,7 +5466,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 - Fix Travis instability by [waiting for MySQL availability](https://github.com/WordPress/gutenberg/pull/16461) before install the plugin.
 - Continue the [generic RichText component](https://github.com/WordPress/gutenberg/pull/16309) refactoring.
 - Remove the [usage of the editor store](https://github.com/WordPress/gutenberg/pull/16184) from the block editor module.
-- Update the [MilestoneIt Github action](https://github.com/WordPress/gutenberg/pull/16511) to read the plugin version from master.
+- Update the [MilestoneIt Github action](https://github.com/WordPress/gutenberg/pull/16511) to read the plugin version from trunk.
 - Refactor the post meta block attributes to use a generic [custom sources mechanism](https://github.com/WordPress/gutenberg/pull/16402).
 - Expose [position prop in DotTip](https://github.com/WordPress/gutenberg/pull/14972) component.
 - Avoid docker [containers automatic restart](https://github.com/WordPress/gutenberg/pull/16547).
@@ -7315,7 +7315,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 * Fix keyboard interaction (up/down arrow keys) causing focus to transfer out of the default block’s insertion menu.
 * Fix regression causing dynamic blocks not rendering in the frontend.
 * Fix vertical alignment issue on Media & Text block.
-* Fix some linter errors in master branch.
+* Fix some linter errors in trunk branch.
 * Fix dash line in More/Next-Page blocks.
 * Fix missing Categories block label.
 * Fix embedding and demo tests.
@@ -9450,7 +9450,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 * Add security reporting instructions.
 * Improve useOnce documentation.
 * Bump copyright year to 2018 in license.md.
-* Disable Travis branch builds except for master.
+* Disable Travis branch builds except for trunk.
 
 = 2.0.0 =
 

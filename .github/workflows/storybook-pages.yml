@@ -3,7 +3,7 @@ name: Storybook GitHub Pages
 on:
   push:
     branches:
-      - master
+      - trunk
 
 jobs:
   deploy:
@@ -12,7 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        ref: master
+        ref: trunk
 
     - name: Cache node modules
       uses: actions/cache@v2
