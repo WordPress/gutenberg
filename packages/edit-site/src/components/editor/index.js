@@ -35,6 +35,7 @@ import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import { store as editSiteStore } from '../../store';
+import { usePreParsePatterns } from './pre-parse-patterns';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -66,10 +67,6 @@ function Editor( { initialSettings } ) {
 		} = select( editSiteStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-
-		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
-		// the editor is loaded rather than degrading the performance of the inserter.
-		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
 
 		// The currently selected entity to display. Typically template or template part.
 		return {
@@ -150,6 +147,8 @@ function Editor( { initialSettings } ) {
 			document.body.classList.remove( 'is-navigation-sidebar-open' );
 		}
 	}, [ isNavigationOpen ] );
+
+	usePreParsePatterns();
 
 	// Don't render the Editor until the settings are set and loaded
 	if ( ! settings?.siteUrl ) {

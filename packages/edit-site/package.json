@@ -46,6 +46,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"downloadjs": "^1.4.7",

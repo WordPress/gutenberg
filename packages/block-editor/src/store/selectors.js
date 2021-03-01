@@ -1757,12 +1757,26 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+export const __experimentalGetParsedBlocks = createSelector(
+	( state, content ) => {
+		if ( ! content ) {
+			return [];
+		}
+
+		return parse( content );
+	},
+	( state, content ) => [ content ]
+);
+
 const __experimentalGetParsedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
 		return map( patterns, ( pattern ) => ( {
 			...pattern,
-			contentBlocks: parse( pattern.content ),
+			contentBlocks: __experimentalGetParsedBlocks(
+				state,
+				pattern.content
+			),
 		} ) );
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]

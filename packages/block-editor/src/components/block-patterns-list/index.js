@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -11,16 +9,22 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+import { store as blockEditorStore } from '../../store';
 
 function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 	const { content, viewportWidth } = pattern;
-	const blocks = useMemo( () => parse( content ), [ content ] );
+	const blocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__experimentalGetParsedBlocks( content ),
+		[ content ]
+	);
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 
