@@ -80,22 +80,6 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-export default optimist(
-	combineReducers( {
-		postId,
-		postType,
-		postTitle,
-		preferences,
-		saving,
-		postLock,
-		postSavingLock,
-		template,
-		isReady,
-		editorSettings,
-		clipboard,
-		notices,
-	} )
-);
 /**
  * Reducer returning the block insertion event list state.
  *
@@ -128,5 +112,5 @@ export default combineReducers( {
 	editorSettings,
 	clipboard,
 	notices,
-    lastBlockInserted,
+	lastBlockInserted,
 } );
