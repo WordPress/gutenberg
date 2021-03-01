@@ -31,8 +31,8 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' )
-				)
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+				),
 			)
 		);
 	}
@@ -40,13 +40,9 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether a given request has permission to read block editor settings
 	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			$error = __( 'Sorry, you are not allowed to read the block editor settings.', 'gutenberg' );
 			return new WP_Error( 'rest_cannot_read_settings', $error, array( 'status' => rest_authorization_required_code() ) );
@@ -58,13 +54,9 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	/**
 	 * Return all block editor settings
 	 *
-	 * @since 5.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {
+	public function get_items() {
 		$settings = apply_filters( 'block_editor_settings', array() );
 
 		return rest_ensure_response( $settings );
