@@ -123,7 +123,7 @@ Before moving forward, consider if using the RichText component makes sense at a
 
 If you'd still like to use RichText, you can eliminate all of the formatting options by specifying the `withoutInteractiveFormatting` property.
 
-If you want to limit the formats allowed, you can specify using `allowedFormats` property in your code, [see component documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md#allowedformats-array) for details.
+If you want to limit the formats allowed, you can specify using `allowedFormats` property in your code, see the example above or [the component documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md#allowedformats-array) for details.
 
 ### Disable Specific Format Types in Editor
 
