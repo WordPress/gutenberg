@@ -1,9 +1,12 @@
 .wp-block-navigation {
-
 	// Normalize list styles.
 	ul,
 	ul li {
 		list-style: none;
+
+		// Overrides generic ".entry-content li" styles on the front end.
+		margin: 0;
+		padding: 0;
 	}
 
 	// Submenus.
@@ -14,12 +17,6 @@
 		}
 	}
 }
-
-// Overrides generic ".entry-content li" styles on the front end.
-.wp-block-navigation-link.wp-block-navigation-link {
-	margin: 0;
-}
-
 
 .wp-block-navigation__container {
 	// Vertically align child blocks, like Social Links or Search.
@@ -38,7 +35,6 @@
 	.is-vertical & {
 		display: block;
 	}
-
 }
 
 // Justification.

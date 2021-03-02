@@ -1,17 +1,17 @@
 // Undo default editor styles.
-.editor-styles-wrapper .wp-block-navigation ul,
-.editor-styles-wrapper .wp-block-navigation ol {
-	margin-bottom: 0;
-	margin-left: 0;
-	padding-left: 0;
-}
+// These need extra specificity.
+.editor-styles-wrapper .wp-block-navigation {
+	ul,
+	ol { // @todo: What does this target?
+		margin-bottom: 0;
+		margin-left: 0;
+		padding-left: 0;
+	}
 
-.editor-styles-wrapper .wp-block-navigation .block-editor-block-list__block {
-	margin: 0;
-}
-
-.wp-block-navigation__inserter-content {
-	padding: $grid-unit-20;
+	// Unset horizontal and vertical margin rules from editor normalization stylesheet.
+	.block-editor-block-list__block {
+		margin: 0;
+	}
 }
 
 // Ensure sub-menus stay open and visible when a nested block is selected.
