@@ -510,18 +510,6 @@ class WP_Theme_JSON {
 		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
 			/*
-			 * Skips blocks that don't declare support,
-			 * they don't generate styles.
-			 */
-			if (
-				! property_exists( $block_type, 'supports' ) ||
-				! is_array( $block_type->supports ) ||
-				empty( $block_type->supports )
-			) {
-				continue;
-			}
-
-			/*
 			 * Extract block support keys that are related to the style properties.
 			 */
 			$block_supports = array();
@@ -529,13 +517,6 @@ class WP_Theme_JSON {
 				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
 					$block_supports[] = $key;
 				}
-			}
-
-			/*
-			 * Skip blocks that don't support anything related to styles.
-			 */
-			if ( empty( $block_supports ) ) {
-				continue;
 			}
 
 			/*
