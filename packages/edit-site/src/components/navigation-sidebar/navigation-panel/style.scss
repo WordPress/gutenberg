@@ -110,6 +110,11 @@
 		margin-right: 1ch;
 	}
 }
+
+.components-menu-item__info-wrapper {
+	padding: $grid-unit-05 0;
+}
+
 .edit-site-navigation-panel__template-item-description {
 	padding-top: $grid-unit-10;
 	font-size: 12px;

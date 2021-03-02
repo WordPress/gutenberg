@@ -50,15 +50,17 @@ export default function TemplateNavigationItem( { item } ) {
 				onMouseEnter={ () => setIsPreviewVisible( true ) }
 				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				<div className="edit-site-navigation-panel__template-item-title">
-					{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
-					{ title }
-				</div>
-				{ description && (
-					<div className="edit-site-navigation-panel__template-item-description">
-						{ description }
+				<span className="components-menu-item__info-wrapper">
+					<div className="edit-site-navigation-panel__template-item-title">
+						{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
+						{ title }
 					</div>
-				) }
+					{ description && (
+						<div className="edit-site-navigation-panel__template-item-description">
+							{ description }
+						</div>
+					) }
+				</span>
 			</Button>
 
 			{ isPreviewVisible && (
