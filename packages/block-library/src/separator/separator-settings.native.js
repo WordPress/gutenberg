@@ -45,12 +45,9 @@ const SeparatorSettings = ( props ) => {
 	};
 
 	const onUnitChange = ( unit ) => {
-		const defaultValue = MARGIN_CONSTRAINTS[ unit ].default;
-
-		// Updating the margins doesn't update the UnitControl field's input immediately :(
 		updateMargins( {
-			top: defaultValue,
-			bottom: defaultValue,
+			top: MARGIN_CONSTRAINTS[ unit ].default,
+			bottom: MARGIN_CONSTRAINTS[ unit ].default,
 		} );
 	};
 
