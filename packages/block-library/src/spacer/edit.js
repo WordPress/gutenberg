@@ -84,7 +84,7 @@ const SpacerEdit = ( {
 					) }
 					size={ {
 						width,
-						height: 32,
+						height: 24,
 					} }
 					minWidth={ MIN_SPACER_WIDTH }
 					enable={ {
