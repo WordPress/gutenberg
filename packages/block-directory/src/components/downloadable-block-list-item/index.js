@@ -138,10 +138,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 					) }
 				</span>
 				{ hasNotice ? (
-					<DownloadableBlockNotice
-						onClick={ onClick }
-						block={ item }
-					/>
+					<DownloadableBlockNotice block={ item } />
 				) : (
 					<>
 						<span className="block-directory-downloadable-block-list-item__desc">
