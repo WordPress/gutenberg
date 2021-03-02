@@ -134,7 +134,7 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_minified_styles() {
 		$cases = array(
 			array(
-				'in' => '
+				'in'  => '
 /**
  * Comment
  */
@@ -145,7 +145,7 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 				'out' => '.foo{bar:1}',
 			),
 			array(
-				'in' => '/* Comment */#foo{content:" ";  bar:   0;
+				'in'  => '/* Comment */#foo{content:" ";  bar:   0;
 				  }',
 				'out' => '#foo{content:" ";bar:0}',
 			),

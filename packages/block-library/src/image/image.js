@@ -38,7 +38,7 @@ import {
 	getBlockType,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { crop, textColor, upload } from '@wordpress/icons';
+import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -315,7 +315,7 @@ export default function Image( {
 					) }
 					{ ! multiImageSelection && coverBlockExists && (
 						<ToolbarButton
-							icon={ textColor }
+							icon={ overlayText }
 							label={ __( 'Add text over image' ) }
 							onClick={ () =>
 								replaceBlocks(

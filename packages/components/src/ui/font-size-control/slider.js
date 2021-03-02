@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import { ControlLabel, Slider, TextInput, VStack } from '@wp-g2/components';
+import { ControlLabel, Slider, TextInput } from '@wp-g2/components';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { getSliderTemplateColumns } from './utils';
 import { Grid } from '../grid';
+import { VStack } from '../v-stack';
 
 function FontSizeControlSlider( props ) {
 	const {

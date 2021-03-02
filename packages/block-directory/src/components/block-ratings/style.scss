@@ -1,15 +1,15 @@
 .block-directory-block-ratings {
-	display: flex;
-	> div {
-		line-height: 1;
+
+	> span {
 		display: flex;
 	}
 
-	.block-directory-block-ratings__rating-count {
-		font-size: ms(-2);
+	svg {
+		fill: $gray-900;
+		margin-left: -4px;
 	}
 
-	svg {
-		fill: #ffb900;
+	.block-directory-block-ratings__star-empty {
+		fill: $gray-400;
 	}
 }

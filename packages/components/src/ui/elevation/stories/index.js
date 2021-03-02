@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { boolean, number } from '@storybook/addon-knobs';
+import { number } from '@storybook/addon-knobs';
+import { Divider } from '@wp-g2/components';
 
 /**
  * Internal dependencies
@@ -9,6 +10,12 @@ import { boolean, number } from '@storybook/addon-knobs';
 import { Elevation } from '../index';
 import { Grid } from '../../grid';
 import { View } from '../../view';
+import { HStack } from '../../h-stack';
+import {
+	ExampleGrid,
+	ExampleGridItem,
+	ExampleMetaContent,
+} from '../../__storybook-utils';
 
 /**
  * WordPress dependencies
@@ -20,30 +27,54 @@ export default {
 	title: 'G2 Components (Experimental)/Elevation',
 };
 
-export const _default = () => {
-	const value = number( 'value', 5 );
-	const borderRadius = number( 'borderRadius', 0 );
-	const hover = number( 'hover', undefined );
-	const active = number( 'active', undefined );
-	const isInteractive = boolean( 'isInteractive', true );
-
-	return (
+const ElevationWrapper = ( { children } ) => (
+	<HStack alignment="center">
 		<View
 			css={ {
-				padding: '10vh',
 				position: 'relative',
-				margin: '20vh auto 10vw',
-				maxWidth: 200,
+				width: 40,
+				height: 40,
 			} }
 		>
-			<Elevation
-				isInteractive={ isInteractive }
-				value={ value }
-				borderRadius={ borderRadius }
-				hover={ hover }
-				active={ active }
-			/>
+			{ children }
 		</View>
+	</HStack>
+);
+
+const elevations = new Array( 11 )
+	.fill( 0 )
+	.map( ( a, i ) => i )
+	.map( ( index ) => {
+		return [
+			`x: 0px`,
+			`y: ${ index }px`,
+			`spread: ${ index * 2 }px`,
+			`color: rgba(0, 0, 0, ${ index / 20 })`,
+		];
+	} );
+
+export const _default = () => {
+	return (
+		<ExampleGrid>
+			{ elevations.map( ( elevation, index ) => {
+				return (
+					<ExampleGridItem key={ index }>
+						<View css={ { padding: 20, paddingBottom: 40 } }>
+							<ElevationWrapper>
+								<Elevation
+									css={ { background: 'white' } }
+									value={ index }
+								/>
+							</ElevationWrapper>
+						</View>
+						<Divider mt={ 3 } />
+						<ExampleMetaContent title="value" items={ [ index ] } />
+						<Divider mt={ 3 } />
+						<ExampleMetaContent title="info" items={ elevation } />
+					</ExampleGridItem>
+				);
+			} ) }
+		</ExampleGrid>
 	);
 };
 
