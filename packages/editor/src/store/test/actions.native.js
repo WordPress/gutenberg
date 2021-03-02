@@ -20,11 +20,11 @@ describe( 'actions native', () => {
 
 	describe( 'addLastBlockInserted', () => {
 		it( 'should return the ADD_LAST_BLOCK_INSERTED action', () => {
-			const clientId = 1;
-			const result = addLastBlockInserted( clientId );
+			const expectedClientId = 1;
+			const result = addLastBlockInserted( expectedClientId );
 			expect( result ).toEqual( {
 				type: 'ADD_LAST_BLOCK_INSERTED',
-				clientId,
+				clientId: expectedClientId,
 			} );
 		} );
 	} );

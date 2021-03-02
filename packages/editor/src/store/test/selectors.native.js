@@ -28,7 +28,7 @@ describe( 'selectors native', () => {
 
 	describe( 'wasBlockJustInserted', () => {
 		it( 'should return true if the client id passed to wasBlockJustInserted is found within the state', () => {
-			const expectedClientId = 111;
+			const expectedClientId = 1;
 			const state = {
 				lastBlockInserted: {
 					clientId: expectedClientId,
@@ -41,8 +41,8 @@ describe( 'selectors native', () => {
 		} );
 
 		it( 'should return false if the client id passed to wasBlockJustInserted is not found within the state', () => {
-			const expectedClientId = 111;
-			const unexpectedClientId = 110;
+			const expectedClientId = 1;
+			const unexpectedClientId = 0;
 			const state = {
 				lastBlockInserted: {
 					clientId: unexpectedClientId,
