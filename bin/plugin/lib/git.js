@@ -126,7 +126,7 @@ async function resetLocalBranchAgainstOrigin(
 }
 
 /**
- * Cherry-picks a commit into master
+ * Cherry-picks a commit into trunk
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} commitHash Branch Name
@@ -136,7 +136,7 @@ async function cherrypickCommitIntoBranch(
 	commitHash
 ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkout( 'master' );
+	await simpleGit.checkout( 'trunk' );
 	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 }
 
