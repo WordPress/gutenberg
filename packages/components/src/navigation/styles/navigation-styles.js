@@ -190,7 +190,7 @@ export const ItemUI = styled.div`
 	display: flex;
 	align-items: center;
 	height: auto;
-	min-height: 32px;
+	min-height: 40px;
 	margin: 0;
 	padding: ${ space( 0.75 ) } ${ space( 2 ) };
 	font-weight: 400;
