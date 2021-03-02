@@ -6,8 +6,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-2anhki"
-+   class="components-surface wp-components-surface css-9yhif5"
+-   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-2anhki"
++   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
     data-g2-c16t="true"
     data-g2-component="Surface"
   >
@@ -21,8 +21,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-17q8f3e"
-+   class="components-surface wp-components-surface css-9yhif5"
+-   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-17q8f3e"
++   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
     data-g2-c16t="true"
     data-g2-component="Surface"
   >
@@ -36,8 +36,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-187zti8"
-+   class="components-surface wp-components-surface css-9yhif5"
+-   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-187zti8"
++   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
     data-g2-c16t="true"
     data-g2-component="Surface"
   >
@@ -51,8 +51,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-evf9lw"
-+   class="components-surface wp-components-surface css-9yhif5"
+-   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-evf9lw"
++   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
     data-g2-c16t="true"
     data-g2-component="Surface"
   >
@@ -66,8 +66,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-19tpeum"
-+   class="components-surface wp-components-surface css-9yhif5"
+-   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-19tpeum"
++   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
     data-g2-c16t="true"
     data-g2-component="Surface"
   >
@@ -109,7 +109,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface wp-components-surface emotion-0"
+  class="components-surface wp-components-surface ic-15506ld ic-192yz5d emotion-0"
   data-g2-c16t="true"
   data-g2-component="Surface"
 >
@@ -123,8 +123,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-icckk4"
-+   class="components-surface wp-components-surface css-9yhif5"
+-   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-icckk4"
++   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
     data-g2-c16t="true"
     data-g2-component="Surface"
   >

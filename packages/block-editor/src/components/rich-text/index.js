@@ -49,10 +49,24 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
+import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
+
+function addActiveFormats( value, activeFormats ) {
+	if ( activeFormats.length ) {
+		let index = value.formats.length;
+
+		while ( index-- ) {
+			value.formats[ index ] = [
+				...activeFormats,
+				...( value.formats[ index ] || [] ),
+			];
+		}
+	}
+}
 
 /**
  * Get the multiline tag based on the multiline prop.
@@ -154,11 +168,8 @@ function RichTextWrapper(
 	identifier = identifier || instanceId;
 
 	const fallbackRef = useRef();
-	const {
-		clientId,
-		onCaretVerticalPositionChange,
-		isSelected: blockIsSelected,
-	} = useBlockEditContext();
+	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
+	const nativeProps = useNativeProps();
 	const selector = ( select ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -414,7 +425,31 @@ function RichTextWrapper(
 	);
 
 	const onPaste = useCallback(
-		( { value, onChange, html, plainText, files, activeFormats } ) => {
+		( {
+			value,
+			onChange,
+			html,
+			plainText,
+			isInternal,
+			files,
+			activeFormats,
+		} ) => {
+			// If the data comes from a rich text instance, we can directly use it
+			// without filtering the data. The filters are only meant for externally
+			// pasted content and remove inline styles.
+			if ( isInternal ) {
+				const pastedValue = create( {
+					html,
+					multilineTag,
+					multilineWrapperTags:
+						multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+					preserveWhiteSpace,
+				} );
+				addActiveFormats( pastedValue, activeFormats );
+				onChange( insert( value, pastedValue ) );
+				return;
+			}
+
 			if ( pastePlainText ) {
 				onChange( insert( value, create( { text: plainText } ) ) );
 				return;
@@ -476,21 +511,11 @@ function RichTextWrapper(
 			if ( typeof content === 'string' ) {
 				let valueToInsert = create( { html: content } );
 
-				// If there are active formats, merge them with the pasted formats.
-				if ( activeFormats.length ) {
-					let index = valueToInsert.formats.length;
-
-					while ( index-- ) {
-						valueToInsert.formats[ index ] = [
-							...activeFormats,
-							...( valueToInsert.formats[ index ] || [] ),
-						];
-					}
-				}
+				addActiveFormats( valueToInsert, activeFormats );
 
 				// If the content should be multiline, we should process text
 				// separated by a line break as separate lines.
-				if ( multiline ) {
+				if ( multilineTag ) {
 					valueToInsert = replace(
 						valueToInsert,
 						/\n+/g,
@@ -513,7 +538,7 @@ function RichTextWrapper(
 			onSplit,
 			splitValue,
 			__unstableEmbedURLOnPaste,
-			multiline,
+			multilineTag,
 			preserveWhiteSpace,
 			pastePlainText,
 		]
@@ -595,7 +620,7 @@ function RichTextWrapper(
 			}
 			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
-			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
+			{ ...nativeProps }
 			blockIsSelected={
 				originalIsSelected !== undefined
 					? originalIsSelected

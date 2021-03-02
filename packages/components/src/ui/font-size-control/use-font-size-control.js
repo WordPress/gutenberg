@@ -32,7 +32,7 @@ export default function useFontSizeControl( props ) {
 		withSlider = false,
 		className,
 		...otherProps
-	} = useContextSystem( props );
+	} = useContextSystem( props, 'FontSizeControl' );
 
 	const hasUnits = hasUnit( value || fontSizes[ 0 ]?.size );
 

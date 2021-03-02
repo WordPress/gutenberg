@@ -24,7 +24,7 @@ describe( 'Cover', () => {
 		);
 
 		// Select the cover block.By default the child paragraph gets selected.
-		await page.click( 'button[aria-label="Outline"]' );
+		await page.click( 'button[aria-label="List view"]' );
 		await page.click(
 			'.block-editor-block-navigation-block__contents-container button'
 		);

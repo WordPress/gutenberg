@@ -292,14 +292,14 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.js": [
+		"*.{js,ts,tsx}": [
 			"wp-scripts format-js",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"
 		],
-		"packages/**/*.js": [
+		"packages/**/*.{js,ts,tsx}": [
 			"node ./bin/api-docs/update-api-docs.js",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"

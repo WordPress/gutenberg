@@ -10,6 +10,7 @@ import {
 	setPage,
 	showHomepage,
 	setHomeTemplateId,
+	setIsListViewOpened,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -229,6 +230,19 @@ describe( 'actions', () => {
 			expect( setHomeTemplateId( homeTemplateId ) ).toEqual( {
 				type: 'SET_HOME_TEMPLATE',
 				homeTemplateId,
+			} );
+		} );
+	} );
+
+	describe( 'setIsListViewOpened', () => {
+		it( 'should return the SET_IS_LIST_VIEW_OPENED action', () => {
+			expect( setIsListViewOpened( true ) ).toEqual( {
+				type: 'SET_IS_LIST_VIEW_OPENED',
+				isOpen: true,
+			} );
+			expect( setIsListViewOpened( false ) ).toEqual( {
+				type: 'SET_IS_LIST_VIEW_OPENED',
+				isOpen: false,
 			} );
 		} );
 	} );

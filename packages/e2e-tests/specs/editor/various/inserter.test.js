@@ -5,6 +5,7 @@ import {
 	createNewPost,
 	openGlobalBlockInserter,
 	insertBlock,
+	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Inserter', () => {
@@ -25,20 +26,25 @@ describe( 'Inserter', () => {
 		expect( isPreviewVisible ).toBe( true );
 	} );
 
-	it( 'last-inserted block should be given and keep the focus', async () => {
-		await page.type(
-			'.block-editor-default-block-appender__content',
-			'Testing inserted block focus'
-		);
+	it.each( [ 'large', 'small' ] )(
+		'last-inserted block should be given and keep the focus (%s viewport)',
+		async ( viewport ) => {
+			await setBrowserViewport( viewport );
 
-		await insertBlock( 'Image' );
+			await page.type(
+				'.block-editor-default-block-appender__content',
+				'Testing inserted block focus'
+			);
 
-		await page.waitForSelector( 'figure[data-type="core/image"]' );
+			await insertBlock( 'Image' );
 
-		const selectedBlock = await page.evaluate( () => {
-			return wp.data.select( 'core/block-editor' ).getSelectedBlock();
-		} );
+			await page.waitForSelector( 'figure[data-type="core/image"]' );
 
-		expect( selectedBlock.name ).toBe( 'core/image' );
-	} );
+			const selectedBlock = await page.evaluate( () => {
+				return wp.data.select( 'core/block-editor' ).getSelectedBlock();
+			} );
+
+			expect( selectedBlock.name ).toBe( 'core/image' );
+		}
+	);
 } );

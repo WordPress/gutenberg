@@ -4,9 +4,9 @@
 import addMilestone from '../';
 
 describe( 'addMilestone', () => {
-	it( 'does nothing if base is not master', async () => {
+	it( 'does nothing if base is not trunk', async () => {
 		const payload = {
-			ref: 'refs/heads/not-master',
+			ref: 'refs/heads/not-trunk',
 		};
 		const octokit = {
 			paginate: {
@@ -40,7 +40,7 @@ describe( 'addMilestone', () => {
 
 	it( 'does nothing if PR already has a milestone', async () => {
 		const payload = {
-			ref: 'refs/heads/master',
+			ref: 'refs/heads/trunk',
 			commits: [ { message: '(#123)' } ],
 			repository: {
 				owner: {
@@ -85,7 +85,7 @@ describe( 'addMilestone', () => {
 
 	it( 'correctly milestones PRs when `package.json` has a `*.[1-8]` version', async () => {
 		const payload = {
-			ref: 'refs/heads/master',
+			ref: 'refs/heads/trunk',
 			commits: [ { message: '(#123)' } ],
 			repository: {
 				owner: {
@@ -178,7 +178,7 @@ describe( 'addMilestone', () => {
 
 	it( 'correctly milestones PRs when `package.json` has a `*.9` version', async () => {
 		const payload = {
-			ref: 'refs/heads/master',
+			ref: 'refs/heads/trunk',
 			commits: [ { message: '(#123)' } ],
 			repository: {
 				owner: {
