@@ -188,7 +188,8 @@ _Returns_
 
 ### getBlockHierarchyRootClientId
 
-Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself
+for root level blocks.
 
 _Parameters_
 

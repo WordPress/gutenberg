@@ -21,6 +21,7 @@ import { useSelect } from '@wordpress/data';
 import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
+const DEFAULT_BLOCK = [ buttonBlockName ];
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
@@ -52,6 +53,7 @@ function ButtonsEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
 		template: [
 			[
 				buttonBlockName,

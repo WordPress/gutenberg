@@ -12,7 +12,6 @@ import {
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
-	getDefaultBlockName,
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
@@ -1131,16 +1130,33 @@ export function selectionChange(
  *
  * @return {Object} Action object
  */
-export function insertDefaultBlock( attributes, rootClientId, index ) {
+export function* insertDefaultBlock( attributes = {}, rootClientId, index ) {
+	// See if we specified a default for allowed blocks
+	const defaultBlock = yield controls.select(
+		blockEditorStoreName,
+		'__experimentalGetDefaultBlockForAllowedBlocks',
+		rootClientId
+	);
+
 	// Abort if there is no default block type (if it has been unregistered).
-	const defaultBlockName = getDefaultBlockName();
-	if ( ! defaultBlockName ) {
+	if ( ! defaultBlock ) {
 		return;
 	}
 
-	const block = createBlock( defaultBlockName, attributes );
+	const [ defaultBlockName, defaultBlockAttributes ] = defaultBlock;
 
-	return insertBlock( block, index, rootClientId );
+	// prefer the non-empty block attributes
+	let blockAttributes = attributes;
+	if (
+		Object.keys( attributes ).length === 0 &&
+		Object.keys( defaultBlockAttributes ).length > 0
+	) {
+		blockAttributes = defaultBlockAttributes;
+	}
+
+	const block = createBlock( defaultBlockName, blockAttributes );
+
+	return yield insertBlock( block, index, rootClientId );
 }
 
 /**

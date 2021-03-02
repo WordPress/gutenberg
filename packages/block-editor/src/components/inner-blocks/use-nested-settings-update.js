@@ -29,6 +29,10 @@ import { getLayoutType } from '../../layouts';
  * @param {string}   orientation     The direction in which the block
  *                                   should face.
  * @param {Object}   layout          The layout object for the block container.
+ *
+ * @param {[]}   __experimentalDefaultBlock     The default block: [ blockName, { blockAttributes } ].
+ *                                              Used to insert blocks of this type, before/after blocks
+ *                                              in inner blocks.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
@@ -36,7 +40,8 @@ export default function useNestedSettingsUpdate(
 	templateLock,
 	captureToolbars,
 	orientation,
-	layout
+	layout,
+	__experimentalDefaultBlock
 ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
@@ -64,6 +69,7 @@ export default function useNestedSettingsUpdate(
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
+			__experimentalDefaultBlock,
 			templateLock:
 				templateLock === undefined ? parentLock : templateLock,
 		};

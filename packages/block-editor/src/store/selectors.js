@@ -24,6 +24,7 @@ import createSelector from 'rememo';
 import {
 	getBlockType,
 	getBlockTypes,
+	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
@@ -499,7 +500,8 @@ export const getBlockParentsByBlockName = createSelector(
 );
 
 /**
- * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+ * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself
+ * for root level blocks.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
@@ -1989,6 +1991,32 @@ export const __experimentalGetPatternTransformItems = createSelector(
  */
 export function getBlockListSettings( state, clientId ) {
 	return state.blockListSettings[ clientId ];
+}
+
+/**
+ * Returns the default block name for a list of allowed blocks, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {?string} clientId Block client ID.
+ *
+ * @return {?[]}    default block, [ blockName, { blockAttributes } ].
+ */
+export function __experimentalGetDefaultBlockForAllowedBlocks(
+	state,
+	clientId
+) {
+	const settings = getBlockListSettings( state, clientId );
+
+	const [
+		blockName,
+		blockAttributes = {},
+	] = settings?.__experimentalDefaultBlock ?? [ getDefaultBlockName() ];
+
+	if ( ! canInsertBlockType( state, blockName, clientId ) ) {
+		return;
+	}
+
+	return [ blockName, blockAttributes ];
 }
 
 /**

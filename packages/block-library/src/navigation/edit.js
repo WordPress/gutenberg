@@ -50,6 +50,11 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
+const DEFAULT_BLOCK = [
+	'core/navigation-link',
+	{ type: 'page', kind: 'post-type' },
+];
+
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
@@ -166,6 +171,7 @@ function Navigation( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation,
 			renderAppender: CustomAppender || appender,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
 
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.

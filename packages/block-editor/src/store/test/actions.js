@@ -31,6 +31,7 @@ const {
 	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
+	insertDefaultBlock,
 	mergeBlocks,
 	moveBlocksToPosition,
 	multiSelect,
@@ -456,6 +457,23 @@ describe( 'actions', () => {
 					initialPosition: 0,
 				},
 			} );
+		} );
+	} );
+
+	describe( 'insertDefaultBlock', () => {
+		it( 'should check for allowed default block', () => {
+			const insertDefaultBlockGenerator = insertDefaultBlock(
+				{},
+				'testclientid',
+				0
+			);
+			expect( insertDefaultBlockGenerator.next().value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'__experimentalGetDefaultBlockForAllowedBlocks',
+					'testclientid'
+				)
+			);
 		} );
 	} );
 
