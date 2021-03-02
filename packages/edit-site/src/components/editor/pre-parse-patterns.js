@@ -23,9 +23,13 @@ export function usePreParsePatterns() {
 			return;
 		}
 
-		const asyncQueue = createQueue();
+		window.console.time( '[usePreParsePatterns] initiate queue' );
+		const asyncQueue = createQueue( 1 );
 		const append = ( index ) => () => {
+			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ].title }`;
+			window.console.time( marker );
 			if ( patterns.length <= index ) {
+				window.console.timeEnd( marker );
 				return;
 			}
 			select( blockEditorStore ).__experimentalGetParsedBlocks(
@@ -33,8 +37,10 @@ export function usePreParsePatterns() {
 				index
 			);
 			asyncQueue.add( {}, append( index + 1 ) );
+			window.console.timeEnd( marker );
 		};
 		asyncQueue.add( {}, append( 0 ) );
+		window.console.timeEnd( '[usePreParsePatterns] initiate queue' );
 
 		return () => asyncQueue.reset();
 	}, [ patterns ] );
