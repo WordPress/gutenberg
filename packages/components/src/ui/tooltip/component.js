@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { mergeRefs } from '@wp-g2/utils';
 // eslint-disable-next-line no-restricted-imports
 import { TooltipReference, useTooltipState } from 'reakit';
 
@@ -55,17 +54,10 @@ function Tooltip( props, forwardedRef ) {
 		[ tooltip ]
 	);
 
-	// @todo(itsjonq) Does `ref` ever really exist on children? What's the use case for this? Why not just pass the forwarded ref? Isn't this just going to unexpectedly swap out the ref from the intended element to another?
-	// @ts-ignore
-	const childRef = children?.ref;
-	const refs = useMemo( () => {
-		return mergeRefs( [ forwardedRef, childRef ] );
-	}, [ childRef, forwardedRef ] );
-
 	return (
 		<TooltipContext.Provider value={ contextProps }>
 			{ content && (
-				<TooltipContent unstable_portal={ modal }>
+				<TooltipContent unstable_portal={ modal } ref={ forwardedRef }>
 					{ content }
 					{ shortcut && <TooltipShortcut shortcut={ shortcut } /> }
 				</TooltipContent>
@@ -74,7 +66,8 @@ function Tooltip( props, forwardedRef ) {
 				<TooltipReference
 					{ ...tooltip }
 					{ ...children.props }
-					ref={ refs }
+					// @ts-ignore If ref doesn't exist that's fine with us, it'll just be undefined, but it can exist on ReactElement and there's no reason to try to scope this (it'll just overcomplicate things)
+					ref={ children?.ref }
 				>
 					{ ( referenceProps ) => {
 						if ( ! focusable ) {
