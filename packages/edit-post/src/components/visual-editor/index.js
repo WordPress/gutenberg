@@ -59,7 +59,7 @@ export default function VisualEditor( { styles } ) {
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 	const defaultLayout = useEditorFeature( 'layout', {
-		__unstableForceContext: { name: 'post/content' },
+		__unstableForceContext: { name: 'core/post-content' },
 	} );
 	const { contentSize, wideSize } = defaultLayout || {};
 	const alignments =
