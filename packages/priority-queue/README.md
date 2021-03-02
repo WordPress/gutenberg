@@ -38,6 +38,10 @@ queue.add( ctx2, () => console.log( 'This won\'t be printed' ) );
 queue.add( ctx2, () => console.log( 'This will be printed second' ) );
 ```
 
+_Parameters_
+
+-   _callbacksToProcessPerRun_ `[number]`: 
+
 _Returns_
 
 -   `WPPriorityQueue`: Queue object with `add`, `flush` and `reset` methods.
