@@ -19,6 +19,7 @@ import {
 	SlotFillProvider,
 	__unstableDropZoneContextProvider as DropZoneContextProvider,
 } from '@wordpress/components';
+import { __experimentalPreParsePatterns as usePreParsePatterns } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -165,6 +166,8 @@ function Editor( {
 	const styles = useMemo( () => {
 		return hasThemeStyles ? settings.styles : settings.defaultEditorStyles;
 	}, [ settings, hasThemeStyles ] );
+
+	usePreParsePatterns();
 
 	if ( ! post ) {
 		return null;

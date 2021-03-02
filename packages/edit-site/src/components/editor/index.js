@@ -10,7 +10,11 @@ import {
 	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	__experimentalPreParsePatterns as usePreParsePatterns,
+} from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -35,7 +39,6 @@ import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import { store as editSiteStore } from '../../store';
-import { usePreParsePatterns } from './pre-parse-patterns';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),

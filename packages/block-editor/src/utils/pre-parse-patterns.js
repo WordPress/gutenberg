@@ -3,17 +3,17 @@
  */
 import { useSelect, select } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
+import { store as blockEditorStore } from '../store';
 
 export function usePreParsePatterns() {
 	const patterns = useSelect(
 		( _select ) =>
-			_select( editSiteStore ).getSettings().__experimentalBlockPatterns,
+			_select( blockEditorStore ).getSettings()
+				.__experimentalBlockPatterns,
 		[]
 	);
 
