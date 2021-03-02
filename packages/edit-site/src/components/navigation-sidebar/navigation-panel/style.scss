@@ -35,8 +35,8 @@
 .edit-site-navigation-panel__site-title {
 	font-style: normal;
 	font-weight: 600;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+	font-size: 14px; /* Matches menu items */
+	line-height: 20px;
 	color: $gray-300;
 
 	display: -webkit-box;
@@ -111,6 +111,10 @@
 }
 
 .components-navigation__item + .edit-site-navigation-panel__template-item {
+	margin-top: $grid-unit-20;
+}
+
+.edit-site-navigation-panel__template-item + .edit-site-navigation-panel__template-item {
 	margin-top: $grid-unit-15;
 }
 
