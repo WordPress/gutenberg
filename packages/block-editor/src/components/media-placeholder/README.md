@@ -65,7 +65,7 @@ This property is similar to the `accept` property. The difference is the format 
 
 ### autoOpenMediaUpload
 
-If true, the MediaUpload component auto-opens the picker of the respective platform. This behavior reduces the steps needed to add a media item to a media-related block. 
+If true, the MediaUpload component auto-opens the picker of the respective platform.
 
 - Type: `Boolean`
 - Required: No
