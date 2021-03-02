@@ -785,22 +785,22 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Given a settings array, it extracts its presets
-	 * and adds them to the given input $stylesheet.
+	 * Given a settings array, it returns the generated rulesets
+	 * for the preset classes.
 	 *
-	 * @param string $stylesheet Input stylesheet to add the presets to.
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
 	 *
-	 * @return the modified $stylesheet.
+	 * @return string The result of processing the presets.
 	 */
-	private static function compute_preset_classes( $stylesheet, $settings, $selector ) {
+	private static function compute_preset_classes( $settings, $selector ) {
 		if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
 		}
 
+		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
@@ -1002,7 +1002,9 @@ class WP_Theme_JSON {
 			return $stylesheet;
 		}
 
-		$metadata = self::get_blocks_metadata();
+		$metadata     = self::get_blocks_metadata();
+		$block_rules  = '';
+		$preset_rules = '';
 		foreach ( $metadata as $block_selector => $metadata ) {
 			if ( empty( $metadata['selector'] ) ) {
 				continue;
@@ -1020,19 +1022,18 @@ class WP_Theme_JSON {
 				);
 			}
 
-			$stylesheet .= self::to_ruleset( $selector, $declarations );
+			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			// Attach the rulesets for the classes.
 			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				$stylesheet = self::compute_preset_classes(
-					$stylesheet,
+				$preset_rules .= self::compute_preset_classes(
 					$this->theme_json['settings'][ $block_selector ],
 					$selector
 				);
 			}
 		}
 
-		return $stylesheet;
+		return $block_rules . $preset_rules;
 	}
 
 	/**
