@@ -22,15 +22,8 @@ describe( 'RTL', () => {
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/29250.
-	it( 'loads editor without errors when RTL is set at the WP admin level', async () => {
+	it( 'should load the editor without errors when RTL is set at the WP admin level', async () => {
 		await page.evaluate( () => {
-			window._loadedWithoutErrors = true;
-
-			window.addEventListener( 'error', function ( event ) {
-				window._loadedWithoutErrors = false;
-				event.preventDefault();
-			} );
-
 			const scripts = Array.from( document.querySelectorAll( 'script' ) );
 			const snippetScriptEl = document.createElement( 'script' );
 			const newComponentsScriptEl = document.createElement( 'script' );
@@ -47,9 +40,8 @@ describe( 'RTL', () => {
 			head.appendChild( newComponentsScriptEl );
 		} );
 
-		expect(
-			await page.evaluate( () => window._loadedWithoutErrors )
-		).toBeTruthy();
+		// No assertions are needed as the test will fail if an error is thrown
+		// during the evaluate call above, or pass if no errors are thrown.
 	} );
 
 	it( 'should arrow navigate', async () => {
