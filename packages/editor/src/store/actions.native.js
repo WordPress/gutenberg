@@ -43,13 +43,10 @@ export function addLastBlockInserted( clientId ) {
 /**
  * Returns an action object to clear the last block that was inserted.
  *
- * @param {Object} clientId The id of the block to remove.
- *
  * @return {Object} Action object.
  */
-export function clearLastBlockInserted( clientId ) {
+export function clearLastBlockInserted() {
 	return {
 		type: 'CLEAR_LAST_BLOCK_INSERTED',
-		clientId,
 	};
 }

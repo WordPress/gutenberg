@@ -477,7 +477,7 @@ export default compose( [
 				const result = wasBlockJustInserted( clientId );
 
 				if ( result ) {
-					clearLastBlockInserted( clientId );
+					clearLastBlockInserted();
 					return true;
 				}
 				return false;
