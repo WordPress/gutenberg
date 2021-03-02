@@ -162,7 +162,7 @@ export const ItemBaseUI = styled.li`
 	a {
 		width: 100%;
 		color: ${ G2.lightGray.ui };
-		padding: ${ space( 0.75 ) } ${ space( 2 ) };
+		padding: ${ space( 1 ) } ${ space( 2 ) }; /* 8px 16px */
 
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
