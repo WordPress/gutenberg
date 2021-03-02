@@ -37,7 +37,7 @@ Modals are used for:
 ![A modal diagram with labels](https://wordpress.org/gutenberg/files/2019/04/Modal-diagram.png)
 
 1. Container
-2. Title (optional)
+2. Title
 3. Supporting text
 4. Buttons
 5. Scrim
@@ -52,6 +52,7 @@ To clarify that the rest of the screen is inaccessible and to focus attention on
 ### Title
 
 A modal’s purpose is communicated through its title and button text.
+All modals should have a title for accessibility reasons (the `contentLabel` prop can be used to set titles that aren't visible).
 
 Titles should:
 
@@ -151,10 +152,12 @@ Props not included in this set will be applied to the input elements.
 
 #### title
 
-This property is used as the modal header's title. It is required for accessibility reasons.
+This property is used as the modal header's title.
+
+Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
 
 - Type: `String`
-- Required: Yes
+- Required: No
 
 #### onRequestClose
 
@@ -166,7 +169,8 @@ This function is called to indicate that the modal should be closed.
 #### contentLabel
 
 If this property is added, it will be added to the modal content `div` as `aria-label`.
-You are encouraged to use this if `aria.labelledby` is not provided.
+
+Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
 
 - Type: `String`
 - Required: No
@@ -174,11 +178,13 @@ You are encouraged to use this if `aria.labelledby` is not provided.
 #### aria.labelledby
 
 If this property is added, it will be added to the modal content `div` as `aria-labelledby`.
-You are encouraged to use this when the modal is visually labelled.
+Use this when you are rendering the title yourself within the modal's content area instead of using the `title` prop. This ensures the title is usable by assistive technology.
+
+Titles are required for accessibility reasons, see `contentLabel` and `title` for other ways to provide a title.
 
 - Type: `String`
 - Required: No
-- Default: `modal-heading`
+- Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
 
 #### aria.describedby
 

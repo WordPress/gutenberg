@@ -33,3 +33,4 @@ export { default as useWarnOnChange } from './hooks/use-warn-on-change';
 export { default as useDebounce } from './hooks/use-debounce';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
+export { default as useRefEffect } from './hooks/use-ref-effect';

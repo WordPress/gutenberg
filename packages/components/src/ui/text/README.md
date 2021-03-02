@@ -1,4 +1,4 @@
-# Text (Experimental)
+# Text
 
 `Text` is a core component that renders text in the library, using the library's typography system.
 
@@ -10,7 +10,7 @@
 import { Text } from '@wordpress/components/ui';
 
 function Example() {
-	return <Text>Where the north wind meets the sea</Text>;
+	return <Text>Code is Poetry</Text>;
 }
 ```
 
@@ -28,7 +28,8 @@ import { Text, TextInput } from '@wordpress/components/ui';
 function Example() {
 	return (
 		<Text adjustLineHeightForInnerControls>
-			Where the north wind meets the <TextInput value="sea..." />
+			Lorem ipsum dolor sit amet, consectetur{ ' ' }
+			<TextInput value="adipiscing elit..." />
 		</Text>
 	);
 }
@@ -46,7 +47,7 @@ import { Text } from '@wordpress/components/ui';
 function Example() {
 	return (
 		<Text align="center" isBlock>
-			Where the north wind meets the sea...
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit...
 		</Text>
 	);
 }
@@ -110,11 +111,12 @@ import { Text } from '@wordpress/components/ui';
 
 function Example() {
 	return (
-		<Text highlightWords={ [ 'the' ] }>
-			Where the north wind meets the sea, there's a river full of memory.
-			Sleep, my darling, safe and sound, for in this river all is found.
-			In her waters, deep and true, lay the answers and a path for you.
-			Dive down deep into her sound, but not too far or you'll be drowned
+		<Text highlightWords={ [ 'pi' ] }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
+			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
+			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
+			ligula eget cursus. In fermentum ultricies mauris, pharetra
+			fermentum erat pellentesque id.
 		</Text>
 	);
 }
@@ -165,8 +167,7 @@ function Example() {
 	return (
 		<View css={ { backgroundColor } }>
 			<Text optimizeReadabilityFor={ backgroundColor }>
-				Where the north wind meets the sea, there's a river full of
-				memory.
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 			</Text>
 		</View>
 	);
@@ -183,7 +184,7 @@ Adjusts text size based on the typography system. `Text` can render a wide range
 import { Text } from '@wordpress/components/ui';
 
 function Example() {
-	return <Text size="largeTitle">Where the north wind meets the sea...</Text>;
+	return <Text size="largeTitle">Code is Poetry</Text>;
 }
 ```
 
@@ -199,10 +200,11 @@ import { Text } from '@wordpress/components/ui';
 function Example() {
 	return (
 		<Text truncate>
-			Where the north wind meets the sea, there's a river full of memory.
-			Sleep, my darling, safe and sound, for in this river all is found.
-			In her waters, deep and true, lay the answers and a path for you.
-			Dive down deep into her sound, but not too far or you'll be drowned
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
+			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
+			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
+			ligula eget cursus. In fermentum ultricies mauris, pharetra
+			fermentum erat pellentesque id.
 		</Text>
 	);
 }
@@ -224,7 +226,7 @@ Adjusts style variation of the text.
 import { Text } from '@wordpress/components/ui';
 
 function Example() {
-	return <Text variant="muted">Where the north wind meets the sea...</Text>;
+	return <Text variant="muted">Code is Poetry</Text>;
 }
 ```
 

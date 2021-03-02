@@ -34,7 +34,11 @@ module.exports = {
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
-	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	snapshotSerializers: [
+		'enzyme-to-json/serializer',
+		'jest-emotion',
+		'snapshot-diff/serializer',
+	],
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',

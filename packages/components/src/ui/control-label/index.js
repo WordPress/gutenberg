@@ -1,2 +1,2 @@
-export { default as ControlLabel } from './control-label';
-export * from './use-control-label';
+export { default as ControlLabel } from './component';
+export * from './hook';

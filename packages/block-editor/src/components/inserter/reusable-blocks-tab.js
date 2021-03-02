@@ -65,7 +65,7 @@ export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 						post_type: 'wp_block',
 					} ) }
 				>
-					{ __( 'Manage all reusable blocks' ) }
+					{ __( 'Manage Reusable blocks' ) }
 				</a>
 			</div>
 		</>

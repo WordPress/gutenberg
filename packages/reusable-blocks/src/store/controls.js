@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -31,13 +36,15 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Convert a static block to a reusable block effect handler
  *
- * @param {Array}  clientIds Block IDs.
+ * @param {Array} clientIds Block IDs.
+ * @param {string} title    Reusable block title.
  * @return {Object} control descriptor.
  */
-export function convertBlocksToReusable( clientIds ) {
+export function convertBlocksToReusable( clientIds, title ) {
 	return {
 		type: 'CONVERT_BLOCKS_TO_REUSABLE',
 		clientIds,
+		title,
 	};
 }
 
@@ -68,7 +75,11 @@ const controls = {
 					oldBlock.attributes.ref
 				);
 
-			const newBlocks = parse( reusableBlock.content );
+			const newBlocks = parse(
+				isFunction( reusableBlock.content )
+					? reusableBlock.content( reusableBlock )
+					: reusableBlock.content
+			);
 			registry
 				.dispatch( 'core/block-editor' )
 				.replaceBlocks( oldBlock.clientId, newBlocks );
@@ -77,9 +88,9 @@ const controls = {
 
 	CONVERT_BLOCKS_TO_REUSABLE: createRegistryControl(
 		( registry ) =>
-			async function ( { clientIds } ) {
+			async function ( { clientIds, title } ) {
 				const reusableBlock = {
-					title: __( 'Untitled Reusable Block' ),
+					title: title || __( 'Untitled Reusable block' ),
 					content: serialize(
 						registry
 							.select( 'core/block-editor' )

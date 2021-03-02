@@ -1775,6 +1775,31 @@ describe( 'state', () => {
 					expect( state.attributes.kumquat.updated ).toBe( true );
 				} );
 
+				it( 'should return with attribute block updates when attributes are unique by block', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							kumquat: { updated: true },
+						},
+						uniqueByBlock: true,
+					} );
+
+					expect( state.attributes.kumquat.updated ).toBe( true );
+				} );
+
 				it( 'should accumulate attribute block updates', () => {
 					const original = deepFreeze(
 						blocks( undefined, {
@@ -2883,6 +2908,23 @@ describe( 'state', () => {
 				attributes: {
 					food: 'banana',
 				},
+			} );
+
+			expect( state ).toEqual( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+		} );
+
+		it( 'returns updated value when explicit block attributes update are unique by block id', () => {
+			const original = null;
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				attributes: {
+					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+				},
+				uniqueByBlock: true,
 			} );
 
 			expect( state ).toEqual( {

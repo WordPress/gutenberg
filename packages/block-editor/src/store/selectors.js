@@ -1600,12 +1600,26 @@ export const getInserterItems = createSelector(
 				blockVariations.push( ...variations.map( variationMapper ) );
 			}
 		}
-
-		return [
+		// Prioritize core blocks's display in inserter.
+		const prioritizeCoreBlocks = ( a, b ) => {
+			const coreBlockNamePrefix = 'core/';
+			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
+			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
+			if ( firstIsCoreBlock && secondIsCoreBlock ) {
+				return 0;
+			}
+			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
+		};
+		// Ensure core blocks are prioritized in the returned results,
+		// because third party blocks can be registered earlier than
+		// the core blocks (usually by using the `init` action),
+		// thus affecting the display order.
+		// We don't sort reusable blocks as they are handled differently.
+		const sortedBlockTypes = [
 			...visibleBlockTypeInserterItems,
 			...blockVariations,
-			...reusableBlockInserterItems,
-		];
+		].sort( prioritizeCoreBlocks );
+		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -1785,6 +1799,32 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId[ rootClientId ],
 	]
+);
+
+/**
+ * Returns the list of patterns based on specific `scope` and
+ * a block's name.
+ * `inserter` scope should be handled differently, probably in
+ * combination with `__experimentalGetAllowedPatterns`.
+ * For now `__experimentalGetScopedBlockPatterns` handles properly
+ * all other scopes.
+ * Since both APIs are experimental we should revisit this.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} scope Block pattern scope.
+ * @param {string} blockName Block's name.
+ *
+ * @return {Array} The list of matched block patterns based on provided scope and block name.
+ */
+export const __experimentalGetScopedBlockPatterns = createSelector(
+	( state, scope, blockName ) => {
+		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return patterns.filter( ( pattern ) =>
+			pattern.scope?.[ scope ]?.includes?.( blockName )
+		);
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
 /**

@@ -20,6 +20,7 @@ import {
 } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,6 +42,8 @@ import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
+import { slice } from '../slice';
+import { getTextContent } from '../get-text-content';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -162,8 +165,9 @@ function RichText(
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
-	ref
+	forwardedRef
 ) {
+	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
 		formatTypes,
@@ -309,6 +313,24 @@ function RichText(
 		} );
 	}
 
+	function handleCopy( event ) {
+		if ( isCollapsed( record.current ) ) {
+			return;
+		}
+
+		const selectedRecord = slice( record.current );
+		const plainText = getTextContent( selectedRecord );
+		const html = toHTMLString( {
+			value: selectedRecord,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+		event.clipboardData.setData( 'text/plain', plainText );
+		event.clipboardData.setData( 'text/html', html );
+		event.clipboardData.setData( 'rich-text', 'true' );
+		event.preventDefault();
+	}
+
 	/**
 	 * Handles a paste event.
 	 *
@@ -377,12 +399,14 @@ function RichText(
 
 		if ( onPaste ) {
 			const files = getFilesFromDataTransfer( clipboardData );
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
+				isInternal,
 				files: [ ...files ],
 				activeFormats,
 			} );
@@ -1073,9 +1097,10 @@ function RichText(
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref,
+		ref: useMergeRefs( [ forwardedRef, ref ] ),
 		style: defaultStyle,
 		className: 'rich-text',
+		onCopy: handleCopy,
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
