@@ -38,13 +38,17 @@ describe( 'Template Part', () => {
 			await siteEditor.visit();
 		} );
 
-		async function updateHeader( content ) {
+		async function navigateToHeader() {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			// TODO: Change General to Headers once TT1 blocks categorise the template parts
 			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
 			await navigationPanel.clickItemByText( 'header' );
+		}
+
+		async function updateHeader( content ) {
+			await navigateToHeader();
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
@@ -128,6 +132,36 @@ describe( 'Template Part', () => {
 			const [ expectedContent ] = await canvas().$x(
 				'//p[contains(text(), "Header Template Part 456")]'
 			);
+			expect( expectedContent ).not.toBeUndefined();
+		} );
+
+		it( 'Should load navigate-to-links properly', async () => {
+			await navigateToHeader();
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Header Template Part 789' );
+
+			// Select the paragraph block
+			const text = await canvas().waitForXPath(
+				'//p[contains(text(), "Header Template Part 789")]'
+			);
+
+			// Highlight all the text in the paragraph block
+			await text.click( { clickCount: 3 } );
+
+			// Click the convert to link toolbar button
+			await page.waitForSelector( 'button[aria-label="Link"]' );
+			await page.click( 'button[aria-label="Link"]' );
+
+			// Enter url for link
+			await page.keyboard.type( 'https://google.com' );
+			await page.keyboard.press( 'Enter' );
+
+			// Verify that there is no error
+			await canvas().click( 'p[data-type="core/paragraph"] a' );
+			const expectedContent = await canvas().$x(
+				'//p[contains(text(), "Header Template Part 789")]'
+			);
+
 			expect( expectedContent ).not.toBeUndefined();
 		} );
 

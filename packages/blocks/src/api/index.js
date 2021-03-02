@@ -140,6 +140,7 @@ export {
 	isValidIcon,
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
+	__experimentalSanitizeBlockAttributes,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any

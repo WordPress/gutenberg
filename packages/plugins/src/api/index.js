@@ -16,15 +16,16 @@ import { isFunction } from 'lodash';
  *
  * @typedef {Object} WPPlugin
  *
- * @property {string}                    name   A string identifying the plugin. Must be
- *                                              unique across all registered plugins.
- *                                              unique across all registered plugins.
- * @property {string|WPElement|Function} icon   An icon to be shown in the UI. It can
- *                                              be a slug of the Dashicon, or an element
- *                                              (or function returning an element) if you
- *                                              choose to render your own SVG.
- * @property {Function}                  render A component containing the UI elements
- *                                              to be rendered.
+ * @property {string}                    name    A string identifying the plugin. Must be
+ *                                               unique across all registered plugins.
+ * @property {string|WPElement|Function} [icon]  An icon to be shown in the UI. It can
+ *                                               be a slug of the Dashicon, or an element
+ *                                               (or function returning an element) if you
+ *                                               choose to render your own SVG.
+ * @property {Function}                  render  A component containing the UI elements
+ *                                               to be rendered.
+ * @property {string}                    [scope] The optional scope to be used when rendering inside
+ *                                               a plugin area. No scope by default.
  */
 
 /**
@@ -75,6 +76,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: moreIcon,
  * 	render: Component,
+ * 	scope: 'my-page',
  * } );
  * ```
  *
@@ -104,6 +106,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: more,
  * 	render: Component,
+ * 	scope: 'my-page',
  * } );
  * ```
  *
@@ -115,12 +118,12 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 	if ( typeof name !== 'string' ) {
-		console.error( 'Plugin names must be strings.' );
+		console.error( 'Plugin name must be string.' );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
-			'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
+			'Plugin name must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 		);
 		return null;
 	}
@@ -130,11 +133,27 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
-	if ( ! isFunction( settings.render ) ) {
+	const { render, scope } = settings;
+
+	if ( ! isFunction( render ) ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);
 		return null;
+	}
+
+	if ( scope ) {
+		if ( typeof scope !== 'string' ) {
+			console.error( 'Plugin scope must be string.' );
+			return null;
+		}
+
+		if ( ! /^[a-z][a-z0-9-]*$/.test( scope ) ) {
+			console.error(
+				'Plugin scope must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-page".'
+			);
+			return null;
+		}
 	}
 
 	plugins[ name ] = {
@@ -197,10 +216,15 @@ export function getPlugin( name ) {
 }
 
 /**
- * Returns all registered plugins.
+ * Returns all registered plugins without a scope or for a given scope.
  *
- * @return {WPPlugin[]} Plugin settings.
+ * @param {string} [scope] The scope to be used when rendering inside
+ *                         a plugin area. No scope by default.
+ *
+ * @return {WPPlugin[]} The list of plugins without a scope or for a given scope.
  */
-export function getPlugins() {
-	return Object.values( plugins );
+export function getPlugins( scope ) {
+	return Object.values( plugins ).filter(
+		( plugin ) => plugin.scope === scope
+	);
 }
