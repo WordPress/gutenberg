@@ -54,10 +54,8 @@
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
 	border-radius: 0;
 	height: $button-size;
-	margin-left: -10px; // +2px to display the focus box-shadow
 	margin-top: $grid-unit-30;
-	padding: $grid-unit $grid-unit-20;
-	width: calc(100% + #{$grid-unit-15});
+	padding: $grid-unit $grid-unit-20 $grid-unit $grid-unit;
 
 	&:focus:not(:disabled) {
 		border-bottom-color: transparent;
