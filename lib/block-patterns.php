@@ -63,7 +63,7 @@ register_block_pattern(
 	)
 );
 
-for ( $i = 0; $i < 100; $i++ ) {
+for ( $i = 0; $i < 1000; $i++ ) {
 	register_block_pattern(
 		'query/small-posts' . $i,
 		array(
