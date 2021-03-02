@@ -86,11 +86,15 @@ function Tooltip( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Tooltip, Text } from '@wordpress/components/ui';
+ * import { Tooltip, Text } from `@wordpress/components/ui`;
  *
- * <Tooltip content="Code is Poetry">
- * 	<Text>WordPress.org</Text>
- * </Tooltip>
+ * function Example() {
+ * 	return (
+ * 		<Tooltip content="Code is Poetry">
+ * 			<Text>WordPress.org</Text>
+ * 		</Tooltip>
+ * 	)
+ * }
  * ```
  */
 const ConnectedTooltip = contextConnect( Tooltip, 'Tooltip' );
