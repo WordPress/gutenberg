@@ -717,11 +717,11 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
-			$handles[] = $block_type->style;
+			$handles = array_merge( $handles, is_array( $block_type->style ) ? $block_type->style : array( $block_type->style ) );
 		}
 
 		if ( ! empty( $block_type->editor_style ) ) {
-			$handles[] = $block_type->editor_style;
+			$handles = array_merge( $handles, is_array( $block_type->editor_style ) ? $block_type->editor_style : array( $block_type->editor_style ) );
 		}
 	}
 
