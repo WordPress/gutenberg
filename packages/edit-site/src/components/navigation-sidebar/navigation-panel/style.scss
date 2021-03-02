@@ -96,7 +96,6 @@
 		text-align: left;
 		padding-left: $grid-unit-20;
 		padding-right: $grid-unit-20;
-		margin-bottom: $grid-unit-15;
 		color: inherit;
 	}
 }
@@ -109,6 +108,10 @@
 	em {
 		margin-right: 1ch;
 	}
+}
+
+.components-navigation__item + .edit-site-navigation-panel__template-item {
+	margin-top: $grid-unit-15;
 }
 
 .components-menu-item__info-wrapper {

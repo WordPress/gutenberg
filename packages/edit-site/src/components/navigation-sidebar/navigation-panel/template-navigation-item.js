@@ -52,7 +52,9 @@ export default function TemplateNavigationItem( { item } ) {
 			>
 				<span className="components-menu-item__info-wrapper">
 					<div className="edit-site-navigation-panel__template-item-title">
-						{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
+						{ 'draft' === item.status && (
+							<em>{ __( '[Draft]' ) }</em>
+						) }
 						{ title }
 					</div>
 					{ description && (
