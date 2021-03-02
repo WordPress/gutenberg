@@ -9,11 +9,12 @@
 	}
 }
 
-// Styles for submenu flyout
+// Styles for submenu flyout.
 .has-child {
 	> .wp-block-navigation-link__content {
 		padding-right: 0.5em;
 	}
+
 	.wp-block-navigation-link__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
 		background-color: inherit;
@@ -61,6 +62,8 @@
 			}
 		}
 	}
+
+	// Show submenus on hover.
 	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
 	// We will need to replace focus-within with a JS solution for IE keyboard support.
 	&:hover {
@@ -74,6 +77,7 @@
 		}
 	}
 
+	// Keep submenus open when focus is within.
 	&:focus-within {
 		cursor: pointer;
 
@@ -93,11 +97,10 @@
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
 		// several times, so care needs to be taken.
-		background-color: $white;
-		color: $gray-900;
+		background-color: #fff;
+		color: #000;
 	}
 }
-
 
 // Force links to inherit text decoration applied to navigation block.
 .wp-block-navigation[style*="text-decoration"] {
