@@ -24,6 +24,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
+import useEditorFeature from '../components/use-editor-feature';
+import { LayoutStyle } from '../components/block-list/layout';
 
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
@@ -57,13 +59,10 @@ const CSS_UNITS = [
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
 	const { wideSize, contentSize } = layout;
-	const { defaultLayout, themeSupportsLayout } = useSelect( ( select ) => {
+	const defaultLayout = useEditorFeature( 'layout' );
+	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			defaultLayout: settings.__experimentalFeatures?.defaults?.layout,
-			themeSupportsLayout: settings?.supportsLayout,
-		};
+		return getSettings().supportsLayout;
 	}, [] );
 
 	if ( ! themeSupportsLayout ) {
@@ -196,23 +195,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 
 		return (
 			<>
-				<style>
-					{ `
-							.wp-container-${ id } > * {
-								max-width: ${ contentSize ?? wideSize };
-								margin-left: auto;
-								margin-right: auto;
-							}
-						
-							.wp-container-${ id } > [data-align="wide"] {
-								max-width: ${ wideSize ?? contentSize };
-							}
-						
-							.wp-container-${ id } > [data-align="full"] {
-								max-width: none;
-							}
-						` }
-				</style>
+				<LayoutStyle
+					selector={ `.wp-container-${ id }` }
+					layout={ layout }
+				/>
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);

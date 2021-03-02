@@ -9,7 +9,7 @@
 		},
 		"templateLock": {
 			"type": "string"
-		
+		}
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

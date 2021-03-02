@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useLayout } from '../inner-blocks/layout';
+import { useLayout } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
