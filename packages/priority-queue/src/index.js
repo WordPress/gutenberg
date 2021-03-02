@@ -63,10 +63,9 @@ import requestIdleCallback from './request-idle-callback';
  * queue.add( ctx2, () => console.log( 'This will be printed second' ) );
  *```
  *
- * @param {number} [callbacksToProcessPerRun]
  * @return {WPPriorityQueue} Queue object with `add`, `flush` and `reset` methods.
  */
-export const createQueue = ( callbacksToProcessPerRun ) => {
+export const createQueue = () => {
 	/** @type {WPPriorityQueueContext[]} */
 	let waitingList = [];
 
@@ -76,13 +75,12 @@ export const createQueue = ( callbacksToProcessPerRun ) => {
 	let isRunning = false;
 
 	/**
-	 * Callback to process as much queue as time and `callbacksToProcessPerRun` permits.
+	 * Callback to process as much queue as time permits.
 	 *
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
 	const runWaitingList = ( deadline ) => {
-		let tasksProcessed = 0;
 		const hasTimeRemaining =
 			typeof deadline === 'number'
 				? () => false
@@ -103,12 +101,7 @@ export const createQueue = ( callbacksToProcessPerRun ) => {
 			// loops and race conditions in the queue.
 			callback();
 			elementsMap.delete( nextElement );
-			tasksProcessed++;
-		} while (
-			hasTimeRemaining() &&
-			( ! callbacksToProcessPerRun ||
-				tasksProcessed < callbacksToProcessPerRun )
-		);
+		} while ( hasTimeRemaining() );
 
 		requestIdleCallback( runWaitingList );
 	};
