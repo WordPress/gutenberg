@@ -80,19 +80,24 @@ export function useFocusFirstElement( ref, clientId ) {
 		}
 
 		// Find all tabbables within node.
-		const textInputs = focus.tabbable.find( ref.current ).filter(
-			( node ) =>
-				isTextField( node ) &&
-				// Exclude inner blocks and block appenders
-				isInsideRootBlock( ref.current, node ) &&
-				! node.closest( '.block-list-appender' )
-		);
+		const textInputs = focus.tabbable
+			.find( ref.current )
+			.filter( ( node ) => isTextField( node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
 		const target =
 			( isReverse ? last : first )( textInputs ) || ref.current;
+
+		if (
+			// Don't focus inner block or block appenders.
+			! isInsideRootBlock( ref.current, target ) ||
+			target.closest( '.block-list-appender' )
+		) {
+			ref.current.focus();
+			return;
+		}
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );

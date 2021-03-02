@@ -5,7 +5,7 @@ on:
     paths-ignore:
     - '**.md'
   push:
-    branches: [master]
+    branches: [trunk]
     paths-ignore:
     - '**.md'
 
