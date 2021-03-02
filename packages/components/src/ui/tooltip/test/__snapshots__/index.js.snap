@@ -73,7 +73,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-tooltip-content wp-components-tooltip-content emotion-1"
+  class="components-tooltip-content wp-components-tooltip-content ic-1av77e4 ic-192yz5d emotion-1"
   data-g2-c16t="true"
   data-g2-component="TooltipContent"
   id="base-tooltip"
@@ -81,7 +81,7 @@ exports[`props should render correctly 1`] = `
   style="pointer-events: none;"
 >
   <div
-    class="emotion-0"
+    class="ic-otytyz ic-192yz5d emotion-0"
   >
     Code is Poetry
   </div>
