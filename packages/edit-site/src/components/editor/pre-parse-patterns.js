@@ -4,7 +4,6 @@
 import { useSelect, select } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
@@ -23,26 +22,26 @@ export function usePreParsePatterns() {
 			return;
 		}
 
+		let handle;
+		let index = -1;
 		window.console.time( '[usePreParsePatterns] initiate queue' );
-		const asyncQueue = createQueue( 1 );
-		const append = ( index ) => () => {
+		const callback = () => {
+			index++;
 			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ].title }`;
 			window.console.time( marker );
-			if ( patterns.length <= index ) {
-				window.console.timeEnd( marker );
-				return;
+			if ( patterns.length > index ) {
+				select( blockEditorStore ).__experimentalGetParsedBlocks(
+					patterns[ index ].content,
+					index
+				);
+				window.requestIdleCallback( callback );
 			}
-			select( blockEditorStore ).__experimentalGetParsedBlocks(
-				patterns[ index ].content,
-				index
-			);
-			asyncQueue.add( {}, append( index + 1 ) );
 			window.console.timeEnd( marker );
 		};
-		asyncQueue.add( {}, append( 0 ) );
+		window.requestIdleCallback( callback );
 		window.console.timeEnd( '[usePreParsePatterns] initiate queue' );
 
-		return () => asyncQueue.reset();
+		return () => window.cancelIdleCallback( handle );
 	}, [ patterns ] );
 
 	return null;
