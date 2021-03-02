@@ -1,17 +1,23 @@
 // Normalize Link and edit containers, to look mostly the same.
-.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
+.wp-block-navigation-link__field .components-text-control__input.components-text-control__input, // @todo: this selector doesn't appear to target anything.
 .wp-block-navigation-link__container {
 	border-radius: 0;
+
 	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
-	line-height: $button-size;
 	min-height: $button-size;
 }
 
+// Show submenus above the sibling inserter.
+.has-child .wp-block-navigation-link__container {
+	z-index: z-index(".has-child .wp-block-navigation-link__container");
+}
+
 /**
- * Adjust Navigation Item.
+ * Navigation Items.
  */
+
 .wp-block-navigation-link {
-	.block-editor-block-list__layout {
+	.wp-block-navigation-link__container {
 		display: block;
 	}
 
@@ -33,13 +39,13 @@
 	}
 }
 
-// Separator
+// Separator. @todo: this appears unused.
 .wp-block-navigation-link__separator {
 	margin: $grid-unit-10 0 $grid-unit-10;
 	border-top: $border-width solid $gray-300;
 }
 
-// Popover styles
+// Popover styles. @todo: these all appear unused.
 .components-popover.wp-block-navigation-link__dropdown-content {
 	margin-top: -1px;
 	margin-left: -4px;
@@ -55,7 +61,10 @@
 	}
 }
 
-// Menu item setup state, is shown when a menu item has no URL configured.
+/**
+ * Menu item setup state. Is shown when a menu item has no URL configured.
+ */
+
 .wp-block-navigation-link__placeholder {
 	position: relative;
 	cursor: pointer;

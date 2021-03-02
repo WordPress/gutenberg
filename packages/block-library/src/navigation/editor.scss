@@ -5,8 +5,7 @@
 // Undo default editor styles.
 // These need extra specificity.
 .editor-styles-wrapper .wp-block-navigation {
-	ul,
-	ol { // @todo: What does this target?
+	ul {
 		margin-bottom: 0;
 		margin-left: 0;
 		padding-left: 0;
