@@ -22,7 +22,7 @@ export default function NameDisplay() {
 			<ToolbarGroup>
 				<ToolbarButton
 					aria-label={ `Edit menu name: ${ menuName }` }
-					onClick={ setIsMenuNameEditFocused }
+					onClick={ () => setIsMenuNameEditFocused( true ) }
 				>
 					{ menuName }
 				</ToolbarButton>
