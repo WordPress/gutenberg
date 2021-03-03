@@ -94,8 +94,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			};
 		},
-		[ clientId ]
+		[ clientId , fallbackRef ,  index, className, wrapperProps ]
 	);
+
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -115,7 +116,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			triggerAnimationOnChange: index,
 		} ),
 	] );
-
 	return {
 		...wrapperProps,
 		...props,
