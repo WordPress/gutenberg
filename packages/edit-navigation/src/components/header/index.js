@@ -7,24 +7,14 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	Dropdown,
-	DropdownMenu,
-	Modal,
-	MenuGroup,
-	MenuItem,
-	MenuItemsChoice,
-	Popover,
-} from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import SaveButton from './save-button';
 import ManageLocations from './manage-locations';
-import AddMenu from '../add-menu';
+import MenuSwitcher from '../menu-switcher';
 
 export default function Header( {
 	menus,
@@ -33,9 +23,6 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
-	const [ isAddNewMenuModalVisible, setIsAddNewModalVisible ] = useState(
-		false
-	);
 	const selectedMenu = find( menus, { id: selectedMenuId } );
 	const menuName = selectedMenu ? selectedMenu.name : undefined;
 	let actionHeaderText;
@@ -86,61 +73,14 @@ export default function Header( {
 						} }
 					>
 						{ ( { onClose } ) => (
-							<>
-								<MenuGroup>
-									<MenuItemsChoice
-										value={ selectedMenuId }
-										onSelect={ ( menuId ) => {
-											onSelectMenu( menuId );
-											onClose();
-										} }
-										choices={ menus.map(
-											( { id, name } ) => ( {
-												value: id,
-												label: name,
-												'aria-label': sprintf(
-													/* translators: %s: The name of a menu. */
-													__( "Switch to '%s'" ),
-													name
-												),
-											} )
-										) }
-									/>
-								</MenuGroup>
-								<MenuGroup hideSeparator>
-									<MenuItem
-										isPrimary
-										onClick={ () =>
-											setIsAddNewModalVisible( true )
-										}
-									>
-										{ __( 'Create a new menu' ) }
-									</MenuItem>
-									{ isAddNewMenuModalVisible && (
-										<Modal
-											title={ __( 'Create a new menu' ) }
-											onRequestClose={ () =>
-												setIsAddNewModalVisible( false )
-											}
-										>
-											<AddMenu
-												className="edit-navigation-header__add-menu"
-												menus={ menus }
-												onCreate={ ( menuId ) => {
-													setIsAddNewModalVisible(
-														false
-													);
-													onClose();
-													onSelectMenu( menuId );
-												} }
-												helpText={ __(
-													'A short descriptive name for your menu.'
-												) }
-											/>
-										</Modal>
-									) }
-								</MenuGroup>
-							</>
+							<MenuSwitcher
+								menus={ menus }
+								selectedMenuId={ selectedMenuId }
+								onSelectMenu={ ( menuId ) => {
+									onSelectMenu( menuId );
+									onClose();
+								} }
+							/>
 						) }
 					</DropdownMenu>
 
