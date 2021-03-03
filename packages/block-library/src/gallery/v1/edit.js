@@ -50,7 +50,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
-} from '../constants';
+} from './constants';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
