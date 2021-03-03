@@ -1,0 +1,21 @@
+.customize-widgets-header-toolbar {
+	display: flex;
+	border: none;
+
+	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
+		border-radius: 2px;
+		color: #fff;
+		padding: 0;
+		min-width: 24px;
+		height: 24px;
+		margin-left: auto;
+
+		&::before {
+			content: none;
+		}
+
+		&.is-pressed {
+			background: #1e1e1e;
+		}
+	}
+}

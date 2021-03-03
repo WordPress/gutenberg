@@ -21,6 +21,7 @@ import {
  * Internal dependencies
  */
 import Inspector, { BlockInspectorButton } from '../inspector';
+import Header from '../header';
 import useSidebarBlockEditor from './use-sidebar-block-editor';
 
 const inspectorOpenStateReducer = ( state, action ) => {
@@ -68,6 +69,8 @@ export default function SidebarBlockEditor( { sidebar } ) {
 							useSubRegistry={ false }
 						>
 							<BlockEditorKeyboardShortcuts />
+
+							<Header />
 
 							<BlockSelectionClearer>
 								<WritingFlow>
