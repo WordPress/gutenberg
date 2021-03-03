@@ -76,7 +76,7 @@ As of Gutenberg 8.5, there are two ways to create and edit templates within Gute
 
 ### Edit templates within The "Appearance" section of WP-Admin
 
-You can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates. Add blocks here and switch to the code editor mode to grab the HTML of the template when you are done. Afterwards, you can paste that markup into a file within in your theme directory.
+You can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates. Add blocks here and switch to the code editor mode to grab the HTML of the template when you are done. Afterwards, you can paste that markup into a file in your theme directory.
 
 Please note that the "Templates" admin menu under "Appearance" will _not_ list templates that are bundled with your theme. It only lists new templates created by the specific WordPress site you're working on. 
 

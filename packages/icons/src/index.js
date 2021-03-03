@@ -121,6 +121,7 @@ export { default as moreVertical } from './library/more-vertical';
 export { default as navigation } from './library/navigation';
 export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
+export { default as customLink } from './library/custom-link';
 export { default as page } from './library/page';
 export { default as pages } from './library/pages';
 export { default as paragraph } from './library/paragraph';
