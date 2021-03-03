@@ -291,8 +291,8 @@ function gutenberg_filter_noto_family_for_wp_56( $translation, $text, $context, 
 
 	// Change the font to system.
 	if ( 'default' === $domain && 'CSS Font Family for Editor Font' === $context && 'Noto Serif' === $text ) {
-        return '-apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif';
-    }
+		return '-apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif';
+	}
 
 	return $translation;
 }
