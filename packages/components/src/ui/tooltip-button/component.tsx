@@ -38,4 +38,23 @@ function TooltipButton(
 	);
 }
 
+/**
+ * `TooltipButton` is a simple component that composes `Button` with a `Tooltip`.
+ * It mostly exists as an adaptive layer between the `Button` it uses and the original `Button`.
+ *
+ * ```jsx
+ * import { TooltipButton } from `@wordpress/components/ui`;
+ *
+ * function Example() {
+ * 	return (
+ * 		<TooltipButton
+ * 			variant="secondary"
+ * 			tooltip={ { content: 'WordPress.org' } }
+ * 		>
+ * 			Code is Poetry
+ * 		</TooltipButton>
+ * 	);
+ * }
+ * ```
+ */
 export default contextConnect( TooltipButton, 'TooltipButton' );
