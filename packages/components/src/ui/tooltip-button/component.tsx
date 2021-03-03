@@ -22,18 +22,53 @@ function TooltipButton(
 	props: ViewOwnProps< TooltipButtonProps, 'button' >,
 	forwardedRef: Ref< any >
 ): JSX.Element {
-	const { tooltip, ...buttonProps } = useContextSystem(
-		props,
-		'TooltipButton'
-	);
+	const {
+		tooltip,
+		disabled = false,
+		isFocusable = true,
+		children,
+		...buttonProps
+	} = useContextSystem( props, 'TooltipButton' );
 
-	if ( ! tooltip ) {
-		return <Button { ...buttonProps } ref={ forwardedRef } />;
+	const trulyDisabled = disabled && ! isFocusable;
+
+	// Should show the tooltip if...
+	const shouldShowTooltip =
+		tooltip &&
+		! trulyDisabled &&
+		// an explicit tooltip is passed or...
+		( tooltip.content ||
+			// there's a shortcut or...
+			tooltip.shortcut ||
+			// there's a label and...
+			( !! buttonProps[ 'aria-label' ] &&
+				// the children are empty
+				( ! children ||
+					( Array.isArray( children ) && ! children.length ) ) ) );
+
+	if ( ! shouldShowTooltip ) {
+		return (
+			<Button
+				disabled={ disabled }
+				isFocusable={ isFocusable }
+				{ ...buttonProps }
+				ref={ forwardedRef }
+			>
+				{ children }
+			</Button>
+		);
 	}
 
 	return (
 		<Tooltip { ...tooltip }>
-			<Button { ...buttonProps } ref={ forwardedRef } />
+			<Button
+				disabled={ disabled }
+				isFocusable={ isFocusable }
+				{ ...buttonProps }
+				ref={ forwardedRef }
+			>
+				{ children }
+			</Button>
 		</Tooltip>
 	);
 }
