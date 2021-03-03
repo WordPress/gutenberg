@@ -16,7 +16,7 @@ describe( 'basic', () => {
 	} );
 
 	test( 'should style an existing component', () => {
-		const Previous = ( props ) => <div { ...props } />;
+		const Previous = ( { className } ) => <div className={ className } />;
 
 		const Component = styled( Previous )`
 			background: blue;
@@ -29,7 +29,7 @@ describe( 'basic', () => {
 
 	test( 'should style an existing styled component', () => {
 		const Previous = styled.div`
-			color: red;
+			background: red;
 		`;
 
 		const Component = styled( Previous )`
@@ -39,7 +39,6 @@ describe( 'basic', () => {
 		const { container } = render( <Component /> );
 
 		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
-		expect( container.firstChild ).toHaveStyle( { color: 'red' } );
 	} );
 } );
 
