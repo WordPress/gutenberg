@@ -35,7 +35,6 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import ColorEdit from './color-edit';
 import getColorAndStyleProps from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
@@ -241,7 +240,6 @@ function ButtonEdit( props ) {
 
 	return (
 		<>
-			<ColorEdit { ...props } />
 			<div
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
