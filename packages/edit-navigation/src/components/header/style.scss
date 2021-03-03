@@ -25,7 +25,7 @@
 	display: flex;
 }
 
-.edit-navigation-header__menu-selection-dropdown {
+.edit-navigation-header__menu-switcher-dropdown {
 	// Appear below the modal overlay.
-	z-index: 99998;
+	z-index: z-index(".components-popover.edit-navigation-header__menu-switcher-dropdown");
 }

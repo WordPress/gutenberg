@@ -68,7 +68,7 @@ export default function Header( {
 						} }
 						popoverProps={ {
 							className:
-								'edit-navigation-header__menu-selection-dropdown',
+								'edit-navigation-header__menu-switcher-dropdown',
 							position: 'bottom left',
 						} }
 					>
