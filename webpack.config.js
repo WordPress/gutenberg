@@ -8,6 +8,7 @@ const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { get, escapeRegExp, compact } = require( 'lodash' );
 const { basename, sep } = require( 'path' );
+const { existsSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
@@ -93,6 +94,13 @@ module.exports = {
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
 		memo[ name ] = `./packages/${ packageName }`;
+
+		const modalsPath = `${ memo[ name ] }/src/navigation/modals`;
+
+		if ( existsSync( modalsPath ) ) {
+			memo.modals = modalsPath;
+		}
+
 		return memo;
 	}, {} ),
 	output: {

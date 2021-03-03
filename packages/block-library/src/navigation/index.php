@@ -121,6 +121,14 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
+	wp_enqueue_script(
+		'core_block_navigation_load_modals',
+		plugins_url( 'gutenberg/build/modals/index.js' ),
+		array(),
+		null,
+		true
+	);
+
 	if ( empty( $block->inner_blocks ) ) {
 		return '';
 	}
