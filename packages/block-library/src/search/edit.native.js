@@ -145,6 +145,17 @@ export default function SearchEdit( {
 		);
 	};
 
+	const getSelectedButtonPositionLabel = ( option ) => {
+		switch ( option ) {
+			case 'button-inside':
+				return __( 'Inside' );
+			case 'button-outside':
+				return __( 'Outside' );
+			case 'no-button':
+				return __( 'No button' );
+		}
+	};
+
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
 	} );
@@ -205,13 +216,16 @@ export default function SearchEdit( {
 				<PanelBody title={ __( 'Button settings' ) }>
 					<SelectControl
 						label={ __( 'Button position' ) }
-						value={ buttonPosition }
+						value={ getSelectedButtonPositionLabel(
+							buttonPosition
+						) }
 						onChange={ ( position ) => {
 							setAttributes( {
 								buttonPosition: position,
 							} );
 						} }
 						options={ BUTTON_OPTIONS }
+						hideCancelButton={ true }
 					/>
 				</PanelBody>
 			</InspectorControls>
