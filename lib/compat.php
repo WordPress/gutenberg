@@ -285,7 +285,7 @@ function gutenberg_filter_noto_family_for_wp_56( $translation, $text, $context, 
 	// If the current version of WP is > 5.6.2 then early exit.
 	// This function only needs to run in WP 5.6.x and below.
 	global $wp_version;
-	if ( version_compare( $wp_version, '5.6.2' ) >= 0 ) {
+	if ( version_compare( $wp_version, '5.6.2' ) < 0 ) {
 		return $translation;
 	}
 
