@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TextInput } from 'react-native';
+import { View, TextInput, Platform } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -22,6 +22,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,7 +44,18 @@ import {
  */
 const MIN_BUTTON_WIDTH = 100;
 
-export default function SearchEdit( { attributes, setAttributes, className } ) {
+export default function SearchEdit( {
+	onFocus,
+	isSelected,
+	attributes,
+	setAttributes,
+	className,
+} ) {
+	const textInput = useRef( null );
+	const isAndroid = Platform.OS === 'android';
+
+	let timeoutRef = null;
+
 	const {
 		label,
 		showLabel,
@@ -54,6 +66,33 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		width = 100,
 		widthUnit = '%',
 	} = attributes;
+
+	/*
+	 * Set the focus to the placeholder text when the block is first mounted (if the block
+	 * if the block is selected).
+	 */
+	useEffect( () => {
+		if ( textInput.current.isFocused() === false && isSelected ) {
+			if ( isAndroid ) {
+				/*
+				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
+				 * As a common work around this delay is used.
+				 * https://github.com/facebook/react-native/issues/19366#issuecomment-400603928
+				 */
+				timeoutRef = setTimeout( () => {
+					textInput.current.focus();
+				}, 150 );
+			} else {
+				textInput.current.focus();
+			}
+		}
+		return () => {
+			// Clear the timeout when the component is unmounted
+			if ( isAndroid ) {
+				clearTimeout( timeoutRef );
+			}
+		};
+	}, [] );
 
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
@@ -173,6 +212,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 		return (
 			<TextInput
+				ref={ textInput }
 				className="wp-block-search__input"
 				style={ inputStyle }
 				numberOfLines={ 1 }
@@ -185,6 +225,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 				onChangeText={ ( newVal ) =>
 					setAttributes( { placeholder: newVal } )
 				}
+				onFocus={ onFocus }
 			/>
 		);
 	};
@@ -196,6 +237,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 					<Button
 						className="wp-block-search__button"
 						icon={ search }
+						onFocus={ onFocus }
 					/>
 				) }
 
@@ -212,6 +254,8 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 						}
 						minWidth={ MIN_BUTTON_WIDTH }
 						textAlign="center"
+						onFocus={ onFocus }
+						isSelected={ false }
 					/>
 				) }
 			</View>
@@ -239,6 +283,8 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					onFocus={ onFocus }
+					isSelected={ false }
 				/>
 			) }
 
