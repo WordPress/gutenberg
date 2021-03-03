@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x, __ } from '@wordpress/i18n';
-import { category as icon } from '@wordpress/icons';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,9 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Post Categories', 'block title' ),
-	description: __( "Display a post's categories." ),
+	title: _x( 'Post Hierarchical Terms', 'block title' ),
 	variations,
-	icon,
 	edit,
 };
