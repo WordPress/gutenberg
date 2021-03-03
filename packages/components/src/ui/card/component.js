@@ -66,7 +66,7 @@ function Card( props, forwardedRef ) {
  *   CardBody,
  *   CardFooter,
  *   Text,
- * } from `@wordpress/components/ui`
+ * } from `@wordpress/components/ui`;
  *
  * function Example() {
  *   return (
