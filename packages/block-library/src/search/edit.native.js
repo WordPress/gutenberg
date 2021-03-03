@@ -237,6 +237,15 @@ export default function SearchEdit( {
 						options={ BUTTON_OPTIONS }
 						hideCancelButton={ true }
 					/>
+					<ToggleControl
+						label={ __( 'Use icon button' ) }
+						checked={ buttonUseIcon }
+						onChange={ () => {
+							setAttributes( {
+								buttonUseIcon: ! buttonUseIcon,
+							} );
+						} }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
