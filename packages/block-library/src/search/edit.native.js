@@ -9,13 +9,10 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
-	BlockControls,
 	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	ToolbarGroup,
-	ToolbarButton,
 	Button,
 	PanelBody,
 	UnitControl,
@@ -29,8 +26,6 @@ import { useRef, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { buttonWithIcon, toggleLabel } from './icons';
-import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
 import richTextStyles from './rich-text.scss';
 import {
@@ -162,93 +157,53 @@ export default function SearchEdit( {
 	} );
 
 	const controls = (
-		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						title={ __( 'Toggle search label' ) }
-						icon={ toggleLabel }
-						onClick={ () => {
-							setAttributes( {
-								showLabel: ! showLabel,
-							} );
-						} }
-						isActive={ showLabel }
-					/>
-
-					<ButtonPositionDropdown
-						selectedOption={ buttonPosition }
-						onChange={ ( position ) => {
-							setAttributes( {
-								buttonPosition: position,
-							} );
-						} }
-					/>
-
-					{ 'no-button' !== buttonPosition && (
-						<ToolbarButton
-							title={ __( 'Use button with icon' ) }
-							icon={ buttonWithIcon }
-							onClick={ () => {
-								setAttributes( {
-									buttonUseIcon: ! buttonUseIcon,
-								} );
-							} }
-							isActive={ buttonUseIcon }
-						/>
-					) }
-				</ToolbarGroup>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Search settings' ) }>
-					<ToggleControl
-						label={ __( 'Show search label' ) }
-						checked={ showLabel }
-						onChange={ () => {
-							setAttributes( {
-								showLabel: ! showLabel,
-							} );
-						} }
-					/>
-					<UnitControl
-						label={ __( 'Width' ) }
-						min={ widthUnit === '%' ? 1 : MIN_WIDTH }
-						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
-						decimalNum={ 1 }
-						units={ CSS_UNITS }
-						unit={ widthUnit }
-						onChange={ onChange }
-						onComplete={ onChangeWidth }
-						onUnitChange={ onChangeUnit }
-						value={ parseFloat( width ) }
-					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Button settings' ) }>
-					<SelectControl
-						label={ __( 'Button position' ) }
-						value={ getSelectedButtonPositionLabel(
-							buttonPosition
-						) }
-						onChange={ ( position ) => {
-							setAttributes( {
-								buttonPosition: position,
-							} );
-						} }
-						options={ BUTTON_OPTIONS }
-						hideCancelButton={ true }
-					/>
-					<ToggleControl
-						label={ __( 'Use icon button' ) }
-						checked={ buttonUseIcon }
-						onChange={ () => {
-							setAttributes( {
-								buttonUseIcon: ! buttonUseIcon,
-							} );
-						} }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		</>
+		<InspectorControls>
+			<PanelBody title={ __( 'Search settings' ) }>
+				<ToggleControl
+					label={ __( 'Show search label' ) }
+					checked={ showLabel }
+					onChange={ () => {
+						setAttributes( {
+							showLabel: ! showLabel,
+						} );
+					} }
+				/>
+				<UnitControl
+					label={ __( 'Width' ) }
+					min={ widthUnit === '%' ? 1 : MIN_WIDTH }
+					max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
+					decimalNum={ 1 }
+					units={ CSS_UNITS }
+					unit={ widthUnit }
+					onChange={ onChange }
+					onComplete={ onChangeWidth }
+					onUnitChange={ onChangeUnit }
+					value={ parseFloat( width ) }
+				/>
+			</PanelBody>
+			<PanelBody title={ __( 'Button settings' ) }>
+				<SelectControl
+					label={ __( 'Button position' ) }
+					value={ getSelectedButtonPositionLabel( buttonPosition ) }
+					onChange={ ( position ) => {
+						setAttributes( {
+							buttonPosition: position,
+						} );
+					} }
+					options={ BUTTON_OPTIONS }
+					hideCancelButton={ true }
+				/>
+				<ToggleControl
+					label={ __( 'Use icon button' ) }
+					checked={ buttonUseIcon }
+					onChange={ () => {
+						setAttributes( {
+							buttonUseIcon: ! buttonUseIcon,
+						} );
+					} }
+				/>
+			</PanelBody>
+		</InspectorControls>
 	);
 
 	const mergeWithBorderStyle = ( style ) => {
