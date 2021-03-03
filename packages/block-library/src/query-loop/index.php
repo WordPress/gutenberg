@@ -57,6 +57,10 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		)->render( array( 'dynamic' => false ) );
 		$content      .= "<li>{$block_content}</li>";
 	}
+
+	if ( ! $content ) {
+		return '';
+	}
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,
