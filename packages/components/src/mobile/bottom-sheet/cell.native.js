@@ -91,6 +91,7 @@ class BottomSheetCell extends Component {
 			disabled = false,
 			activeOpacity,
 			onPress,
+			onLongPress,
 			label,
 			value,
 			valuePlaceholder = '',
@@ -301,6 +302,7 @@ class BottomSheetCell extends Component {
 				disabled={ disabled }
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
+				onLongPress={ onLongPress }
 				style={ [ styles.clipToBounds, style ] }
 				borderless={ borderless }
 			>

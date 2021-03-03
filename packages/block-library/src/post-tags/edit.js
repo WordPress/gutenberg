@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockControls,
 	Warning,
@@ -27,7 +27,7 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 	);
 	const tagLinks = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( 'core' );
+			const { getEntityRecord } = select( coreStore );
 			let loaded = true;
 
 			const links = tags?.map( ( tagId ) => {

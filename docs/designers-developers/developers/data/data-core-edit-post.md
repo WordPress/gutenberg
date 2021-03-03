@@ -35,7 +35,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<string>`: Active meta box locations.
+-   `string[]`: Active meta box locations.
 
 <a name="getAllMetaBoxes" href="#getAllMetaBoxes">#</a> **getAllMetaBoxes**
 
@@ -325,7 +325,7 @@ name(s) should be hidden.
 
 _Parameters_
 
--   _blockNames_ `Array<string>`: Names of block types to hide.
+-   _blockNames_ `string[]`: Names of block types to hide.
 
 _Returns_
 
@@ -424,7 +424,7 @@ name(s) should be shown.
 
 _Parameters_
 
--   _blockNames_ `Array<string>`: Names of block types to show.
+-   _blockNames_ `string[]`: Names of block types to show.
 
 _Returns_
 

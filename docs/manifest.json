@@ -144,6 +144,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Type Metadata",
+		"slug": "block-metadata",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-metadata.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Block Patterns",
 		"slug": "block-patterns",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
@@ -600,6 +606,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Share your Block with the World",
+		"slug": "submitting-to-block-directory",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/create-block/submitting-to-block-directory.md",
+		"parent": "create-block"
+	},
+	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
@@ -757,15 +769,15 @@
 	},
 	{
 		"title": "Creating a block-based theme",
-		"slug": "block-based-themes",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-themes/README.md",
+		"slug": "block-based-theme",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-theme/README.md",
 		"parent": "tutorials"
 	},
 	{
 		"title": "Adding blocks to your theme",
 		"slug": "block-based-themes-2-adding-blocks",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md",
-		"parent": "block-based-themes"
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-based-theme/block-based-themes-2-adding-blocks.md",
+		"parent": "block-based-theme"
 	},
 	{
 		"title": "Component Reference",
@@ -1482,6 +1494,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/customize-widgets",
+		"slug": "packages-customize-widgets",
+		"markdown_source": "../packages/customize-widgets/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data-controls",
 		"slug": "packages-data-controls",
 		"markdown_source": "../packages/data-controls/README.md",
@@ -1749,6 +1767,12 @@
 		"title": "@wordpress/project-management-automation",
 		"slug": "packages-project-management-automation",
 		"markdown_source": "../packages/project-management-automation/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-i18n",
+		"slug": "packages-react-i18n",
+		"markdown_source": "../packages/react-i18n/README.md",
 		"parent": "packages"
 	},
 	{

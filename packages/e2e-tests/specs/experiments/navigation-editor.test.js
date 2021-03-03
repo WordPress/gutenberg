@@ -29,21 +29,6 @@ const menusFixture = [
 	},
 ];
 
-const pagesFixture = [
-	{
-		title: 'Home',
-		slug: 'home',
-	},
-	{
-		title: 'About',
-		slug: 'about',
-	},
-	{
-		title: 'Contact',
-		slug: 'contact',
-	},
-];
-
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
 const REST_MENUS_ROUTES = [
@@ -53,10 +38,6 @@ const REST_MENUS_ROUTES = [
 const REST_MENU_ITEMS_ROUTES = [
 	'/__experimental/menu-items',
 	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
-];
-const REST_PAGES_ROUTES = [
-	'/wp/v2/pages',
-	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
 
 /**
@@ -99,28 +80,12 @@ function assignMockMenuIds( menus ) {
 		: [];
 }
 
-function createMockPages( pages ) {
-	return pages.map( ( { title, slug }, index ) => ( {
-		id: index + 1,
-		type: 'page',
-		link: `https://this/is/a/test/page/${ slug }`,
-		title: {
-			rendered: title,
-			raw: title,
-		},
-	} ) );
-}
-
 function getMenuMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_MENUS_ROUTES, responsesByMethod );
 }
 
 function getMenuItemMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_MENU_ITEMS_ROUTES, responsesByMethod );
-}
-
-function getPagesMocks( responsesByMethod ) {
-	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -138,13 +103,12 @@ async function getSerializedBlocks() {
 
 describe( 'Navigation editor', () => {
 	useExperimentalFeatures( [ '#gutenberg-navigation' ] );
+
 	afterEach( async () => {
 		await setUpResponseMocking( [] );
 	} );
 
 	it( 'allows creation of a menu', async () => {
-		const pagesResponse = createMockPages( pagesFixture );
-
 		const menuResponse = {
 			id: 4,
 			description: '',
@@ -158,12 +122,13 @@ describe( 'Navigation editor', () => {
 		await setUpResponseMocking( [
 			...getMenuMocks( { GET: [] } ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: pagesResponse } ),
 		] );
 		await visitNavigationEditor();
 
 		// Wait for the header to show that no menus are available.
-		await page.waitForXPath( '//h2[contains(., "No menus available")]' );
+		await page.waitForXPath( '//h3[.="Create your first menu"]', {
+			visible: true,
+		} );
 
 		// Prepare the menu endpoint for creating a menu.
 		await setUpResponseMocking( [
@@ -172,23 +137,13 @@ describe( 'Navigation editor', () => {
 				POST: menuResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
-			...getPagesMocks( { GET: pagesResponse } ),
 		] );
-
-		// Add a new menu.
-		const [ addNewButton ] = await page.$x(
-			'//button[contains(., "Add new")]'
-		);
-		await addNewButton.click();
 
 		await page.keyboard.type( 'Main Menu' );
 		const createMenuButton = await page.waitForXPath(
 			'//button[contains(., "Create menu")]'
 		);
 		await createMenuButton.click();
-
-		// Close the dropdown.
-		await page.keyboard.press( 'Escape' );
 
 		// A snackbar will appear when menu creation has completed.
 		await page.waitForXPath( '//div[contains(., "Menu created")]' );
@@ -204,6 +159,10 @@ describe( 'Navigation editor', () => {
 		);
 		await addAllPagesButton.click();
 
+		// When the block is created the root element changes from a div (for the placeholder)
+		// to a nav (for the navigation itself). Wait for this to happen.
+		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
+
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
 
@@ -215,7 +174,12 @@ describe( 'Navigation editor', () => {
 		await visitNavigationEditor();
 
 		// Wait for the header to show the menu name.
-		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]' );
+		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+			visible: true,
+		} );
+
+		// Wait for the block to be present.
+		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
@@ -244,8 +208,10 @@ describe( 'Navigation editor', () => {
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
-		// Click the editor canvas.
-		await page.click( '.edit-navigation-editor__block-view' );
+		// click in the top left corner of the canvas.
+		const canvas = await page.$( '.edit-navigation-layout__canvas' );
+		const boundingBox = await canvas.boundingBox();
+		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
 
 		// There should be a submenu in the DOM, but it should be hidden.
 		const submenuLinkHidden = await page.waitForXPath( submenuLinkXPath, {

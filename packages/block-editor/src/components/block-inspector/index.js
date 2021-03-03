@@ -26,6 +26,7 @@ import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { store as blockEditorStore } from '../../store';
 
 const BlockInspector = ( {
 	blockType,
@@ -137,7 +138,7 @@ export default withSelect( ( select ) => {
 		getSelectedBlockClientId,
 		getSelectedBlockCount,
 		getBlockName,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const { getBlockStyles } = select( blocksStore );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =

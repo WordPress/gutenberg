@@ -17,7 +17,11 @@ import {
 	TextControl,
 	SelectControl,
 } from '@wordpress/components';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -186,7 +190,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 
 export default function TracksEditor( { tracks = [], onChange } ) {
 	const mediaUpload = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().mediaUpload;
+		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const [ trackBeingEdited, setTrackBeingEdited ] = useState( null );
 

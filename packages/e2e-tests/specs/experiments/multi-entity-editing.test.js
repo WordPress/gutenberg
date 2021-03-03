@@ -8,6 +8,8 @@ import {
 	trashAllPosts,
 	activateTheme,
 	canvas,
+	openDocumentSettingsSidebar,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -37,7 +39,20 @@ const createTemplatePart = async (
 			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
 			: '.wp-block-template-part .block-editor-block-list__layout'
 	);
-	await page.focus( '.wp-block-template-part__name-panel input' );
+	await openDocumentSettingsSidebar();
+
+	const advancedPanelXPath = `//div[contains(@class,"interface-interface-skeleton__sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"Advanced")]`;
+	const advancedPanel = await page.waitForXPath( advancedPanelXPath );
+	await advancedPanel.click();
+
+	const nameInputXPath = `${ advancedPanelXPath }/ancestor::div[contains(@class, "components-panel__body")]//div[contains(@class,"components-base-control__field")]//label[contains(text(), "Title")]/following-sibling::input`;
+	const nameInput = await page.waitForXPath( nameInputXPath );
+	await nameInput.click();
+
+	// Select all of the text in the title field.
+	await pressKeyWithModifier( 'primary', 'a' );
+
+	// Give the reusable block a title
 	await page.keyboard.type( templatePartName );
 };
 
@@ -134,7 +149,8 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await siteEditor.visit();
-		await clickTemplateItem( 'Template Parts', 'header' );
+		// TODO: Change General to Headers once TT1 blocks categorise the template parts
+		await clickTemplateItem( [ 'Template Parts', 'General' ], 'header' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'

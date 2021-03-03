@@ -8,7 +8,7 @@ import { ui } from '@wp-g2/styles';
  * Internal dependencies
  */
 import { View } from '../../view';
-import Grid from '../grid';
+import { Grid } from '..';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {

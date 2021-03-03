@@ -17,6 +17,7 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -43,7 +44,7 @@ function AudioEdit( {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 	const blockProps = useBlockProps();
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
 

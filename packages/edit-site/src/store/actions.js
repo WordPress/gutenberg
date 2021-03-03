@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { parse } from '@wordpress/blocks';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { getPathAndQueryString } from '@wordpress/url';
@@ -79,6 +80,19 @@ export function* addTemplate( template ) {
 		'wp_template',
 		template
 	);
+
+	if ( template.content ) {
+		yield controls.dispatch(
+			'core',
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			newTemplate.id,
+			{ blocks: parse( template.content ) },
+			{ undoIgnore: true }
+		);
+	}
+
 	return {
 		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
@@ -269,5 +283,18 @@ export function updateSettings( settings ) {
 	return {
 		type: 'UPDATE_SETTINGS',
 		settings,
+	};
+}
+
+/**
+ * Sets whether the list view panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the list view. If false, closes it.
+ *                         It does not toggle the state, but sets it directly.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
 	};
 }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import mergeRefs from 'react-merge-refs';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -17,20 +12,20 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
-	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
-	__unstableUseEditorStyles as useEditorStyles,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
-import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../store';
 
 export default function VisualEditor( { styles } ) {
@@ -57,20 +52,18 @@ export default function VisualEditor( { styles } ) {
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 
-	useScrollMultiSelectionIntoView( ref );
-	useBlockSelectionClearer( ref );
-	useTypewriter( ref );
-	useClipboardHandler( ref );
-	useTypingObserver( ref );
-	useCanvasClickRedirect( ref );
-	const editorStylesRef = useEditorStyles( styles );
-	const mergedRefs = useCallback( mergeRefs( [ ref, editorStylesRef ] ), [
+	const mergedRefs = useMergeRefs( [
 		ref,
-		editorStylesRef,
+		useClipboardHandler(),
+		useCanvasClickRedirect(),
+		useTypewriter(),
+		useBlockSelectionClearer(),
+		useTypingObserver(),
 	] );
 
 	return (
 		<div className="edit-post-visual-editor">
+			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div

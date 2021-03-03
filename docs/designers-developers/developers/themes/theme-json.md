@@ -13,6 +13,7 @@ This is documentation for the current direction and work in progress about how t
 - Specification
     - Settings
     - Styles
+    - Other theme metadata
 - FAQ
   - The naming schema of CSS Custom Properties
   - Why using -- as a separator?
@@ -179,10 +180,6 @@ The settings section has the following structure and default values:
         "dropCap": true, /* false to opt-out */
         "fontFamilies": [ ... ], /* font family presets */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
-        "fontStyles": [ ... ], /* font style presets */
-        "fontWeights": [ ... ], /* font weight presets */
-        "textDecorations": [ ... ], /* text decoration presets */
-        "textTransforms": [ ... ] /* text transform presets */
       }
     }
   }
@@ -436,7 +433,6 @@ These are the current color properties supported by blocks:
 | Post Title | Yes | Yes | - | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
 | Site Title | Yes | Yes | - | Yes |
-| Social Links | Yes | - | - | Yes |
 | Template Part | Yes | Yes | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
@@ -475,6 +471,24 @@ These are the current typography properties supported by blocks:
 | Verse | Yes | Yes | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
+
+
+### Other theme metadata
+
+There's a growing need to add more theme metadata to the theme.json. This section lists those other fields:
+
+**customTemplates**: within this field themes can list the custom templates present in the `block-templates` folder, the keys should match the custom template name. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
+
+```json
+{
+  "customTemplates": {
+    "my-custom-template": {
+      "title": "The template title", /* Mandatory */
+      "postTypes": [ "page", "post", "my-cpt" ] /* Optional, will only apply to "page" by default. */
+    }
+  }
+}
+```
 
 ## Frequently Asked Questions
 

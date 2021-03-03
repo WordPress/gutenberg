@@ -21,6 +21,7 @@ export default function RadioControl( {
 	help,
 	onChange,
 	options = [],
+	...props
 } ) {
 	const instanceId = useInstanceId( RadioControl );
 	const id = `inspector-radio-control-${ instanceId }`;
@@ -53,6 +54,7 @@ export default function RadioControl( {
 							aria-describedby={
 								!! help ? `${ id }__help` : undefined
 							}
+							{ ...props }
 						/>
 						<label htmlFor={ `${ id }-${ index }` }>
 							{ option.label }

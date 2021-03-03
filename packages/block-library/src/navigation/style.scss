@@ -1,10 +1,29 @@
-// Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
+.wp-block-navigation .wp-block-navigation__container {
 	.wp-block-navigation__container {
-		color: $gray-900;
-		background-color: $white;
+		align-items: normal;
 		min-width: 200px;
 	}
+}
+
+.wp-block-navigation__container {
+	// Vertically align child blocks, like Social Links or Search.
+	align-items: center;
+
+	// Reset the default list styles
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
+
+	// Vertical layout
+
+	.is-vertical & {
+		display: block;
+	}
+
 }
 
 .items-justified-center > ul {

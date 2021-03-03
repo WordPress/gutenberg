@@ -217,12 +217,13 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet() {
-		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
-		// See schema at WP_Theme_JSON::SCHEMA.
+		$root_name       = WP_Theme_JSON::ROOT_BLOCK_NAME;
+		$all_blocks_name = WP_Theme_JSON::ALL_BLOCKS_NAME;
+
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
-					$root_name   => array(
+					$all_blocks_name => array(
 						'color'      => array(
 							'text'    => 'value',
 							'palette' => array(
@@ -246,7 +247,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 						'misc'       => 'value',
 					),
-					'core/group' => array(
+					'core/group'     => array(
 						'custom' => array(
 							'base-font'   => 16,
 							'line-height' => array(
@@ -279,16 +280,51 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}',
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}',
 			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}',
+			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}',
 			$theme_json->get_stylesheet( 'block_styles' )
 		);
 		$this->assertEquals(
 			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}',
 			$theme_json->get_stylesheet( 'css_variables' )
+		);
+	}
+
+	function test_get_stylesheet_preset_rules_come_after_block_rules() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'settings' => array(
+					'core/group' => array(
+						'color' => array(
+							'palette' => array(
+								array(
+									'slug'  => 'grey',
+									'color' => 'grey',
+								),
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'core/group' => array(
+						'color' => array(
+							'text' => 'red',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEquals(
+			'.wp-block-group{--wp--preset--color--grey: grey;}.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey;}.wp-block-group.has-grey-background-color{background-color: grey;}',
+			$theme_json->get_stylesheet()
+		);
+		$this->assertEquals(
+			'.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey;}.wp-block-group.has-grey-background-color{background-color: grey;}',
+			$theme_json->get_stylesheet( 'block_styles' )
 		);
 	}
 
@@ -735,5 +771,51 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			),
 		);
 		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
+	function test_get_custom_templates() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'customTemplates' => array(
+					'page-home' => array(
+						'title' => 'Some title',
+					),
+				),
+			)
+		);
+
+		$page_templates = $theme_json->get_custom_templates();
+
+		$this->assertEqualSetsWithIndex(
+			$page_templates,
+			array(
+				'page-home' => array(
+					'title' => 'Some title',
+				),
+			)
+		);
+	}
+
+	function test_get_template_parts() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'templateParts' => array(
+					'header' => array(
+						'area' => 'Some area',
+					),
+				),
+			)
+		);
+
+		$template_parts = $theme_json->get_template_parts();
+
+		$this->assertEqualSetsWithIndex(
+			$template_parts,
+			array(
+				'header' => array(
+					'area' => 'Some area',
+				),
+			)
+		);
 	}
 }

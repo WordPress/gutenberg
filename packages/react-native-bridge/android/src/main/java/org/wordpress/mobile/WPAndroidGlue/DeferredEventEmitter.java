@@ -41,6 +41,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
+    private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
 
     private static final String EVENT_FEATURED_IMAGE_ID = "featuredImageIdChange";
 
@@ -49,6 +50,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_SERVER_ID = "mediaServerId";
     private static final String MAP_KEY_UPDATE_CAPABILITIES = "updateCapabilities";
 
+    private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
+    private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
 
     /**
      * Used for storing deferred actions prior to editor mounting
@@ -211,6 +214,13 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_FEATURED_IMAGE_ID, mediaId);
         queueActionToJS(EVENT_FEATURED_IMAGE_ID, writableMap);
+
+      @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_REPLACE_BLOCK_HTML, mediaFiles);
+        writableMap.putString(MAP_KEY_REPLACE_BLOCK_BLOCK_ID, blockId);
+        // this is a critical message so, always enqueue
+        queueActionToJS(EVENT_NAME_MEDIA_REPLACE_BLOCK, writableMap);
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {

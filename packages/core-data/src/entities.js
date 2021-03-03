@@ -162,8 +162,7 @@ function* loadPostTypeEntities() {
 			label: postType.labels.singular_name,
 			transientEdits: {
 				blocks: true,
-				selectionStart: true,
-				selectionEnd: true,
+				selection: true,
 			},
 			mergedEdits: { meta: true },
 			getTitle: ( record ) =>

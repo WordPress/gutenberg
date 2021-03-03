@@ -42,6 +42,7 @@ import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
+import * as pageList from './page-list';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
@@ -53,6 +54,7 @@ import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
+import * as tableOfContents from './table-of-contents';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
@@ -72,6 +74,7 @@ import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
 import * as queryPaginationPrevious from './query-pagination-previous';
+import * as postNavigationLink from './post-navigation-link';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
@@ -148,6 +151,7 @@ export const __experimentalGetCoreBlocks = () => [
 	missing,
 	more,
 	nextpage,
+	pageList,
 	preformatted,
 	pullquote,
 	rss,
@@ -159,6 +163,7 @@ export const __experimentalGetCoreBlocks = () => [
 	spacer,
 	subhead,
 	table,
+	tableOfContents,
 	tagCloud,
 	textColumns,
 	verse,
@@ -236,6 +241,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postFeaturedImage,
 								postHierarchicalTerms,
 								postTags,
+								postNavigationLink,
 						  ]
 						: [] ),
 				].forEach( registerBlock );
