@@ -559,6 +559,7 @@ export class RichText extends Component {
 
 		// Check if value is up to date with latest state of native AztecView
 		if (
+			this.isIOS &&
 			event.nativeEvent.text &&
 			event.nativeEvent.text !== this.props.value
 		) {
@@ -618,7 +619,9 @@ export class RichText extends Component {
 
 		// update text before updating selection
 		// Make sure there are changes made to the content before upgrading it upward
-		this.onTextUpdate( event );
+		if ( this.isIOS ) {
+			this.onTextUpdate( event );
+		}
 
 		// Aztec can send us selection change events after it has lost focus.
 		// For instance the autocorrect feature will complete a partially written
@@ -749,7 +752,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.isIOS && this.props.value !== this.value ) {
+		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 			this.lastEventCount = undefined;
 		}
