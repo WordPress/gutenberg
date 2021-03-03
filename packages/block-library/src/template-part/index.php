@@ -29,7 +29,7 @@ function render_block_core_template_part( $attributes ) {
 		isset( $attributes['theme'] ) &&
 		wp_get_theme()->get_stylesheet() === $attributes['theme']
 	) {
-		$template_part_id    = $attributes['theme'] + '//' + $attributes['slug'];
+		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template_part',
@@ -74,7 +74,7 @@ function render_block_core_template_part( $attributes ) {
 			trigger_error(
 				sprintf(
 					// translators: %s are the block attributes.
-					__( 'Could not render Template Part block with the attributes <code>%s</code>: blocks cannot be rendered inside themselves.' ),
+					__( 'Could not render Template Part block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
 					wp_json_encode( $attributes )
 				),
 				E_USER_WARNING
