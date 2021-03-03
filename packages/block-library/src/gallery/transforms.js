@@ -19,6 +19,10 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import {
+	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
+} from './v1/constants';
 import { pickRelevantMediaFiles } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
@@ -130,9 +134,20 @@ const transforms = {
 				},
 				linkTo: {
 					type: 'string',
-					shortcode: ( {
-						named: { link = LINK_DESTINATION_NONE },
-					} ) => {
+					shortcode: ( { named: { link } } ) => {
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( ! settings.__experimentalGalleryRefactor ) {
+							switch ( link ) {
+								case 'post':
+									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
+								case 'file':
+									return DEPRECATED_LINK_DESTINATION_MEDIA;
+								default:
+									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
+							}
+						}
 						switch ( link ) {
 							case 'post':
 								return LINK_DESTINATION_ATTACHMENT;
