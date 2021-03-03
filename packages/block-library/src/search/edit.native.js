@@ -20,6 +20,7 @@ import {
 	PanelBody,
 	UnitControl,
 	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
@@ -200,6 +201,15 @@ export default function SearchEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Search settings' ) }>
+					<ToggleControl
+						label={ __( 'Show search label' ) }
+						checked={ showLabel }
+						onChange={ () => {
+							setAttributes( {
+								showLabel: ! showLabel,
+							} );
+						} }
+					/>
 					<UnitControl
 						label={ __( 'Width' ) }
 						min={ widthUnit === '%' ? 1 : MIN_WIDTH }
