@@ -18,12 +18,7 @@ import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	ScrollLock,
-	Popover,
-	__unstableUseDrop as useDrop,
-} from '@wordpress/components';
+import { Button, ScrollLock, Popover } from '@wordpress/components';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
@@ -174,7 +169,6 @@ function Layout( { styles } ) {
 	);
 	const ref = useRef();
 
-	useDrop( ref );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
