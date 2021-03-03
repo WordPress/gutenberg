@@ -47,7 +47,7 @@ describe( 'Gallery', () => {
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\",\\"imageCount\\":\\d+} -->\\s*<figure class=\\"wp-block-gallery blocks-gallery-grid has-nested-images columns-1 is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"large\\",\\"linkDestination\\":\\"none\\",\\"inheritedAttributes\\":{\\"linkDestination\\":true,\\"linkTarget\\":true,\\"sizeSlug\\":true}} -->\\s*<figure class=\\"wp-block-image size-large\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery {"ids":\\[\\d+\\],"linkTo":"none"} -->\\s*<figure class="wp-block-gallery columns-1 is-cropped"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img src="[^"]+\\/${ filename }\\.png" alt="" data-id="\\d+" data-link=".+" class="wp-image-\\d+"\\/><\\/figure><\\/li><\\/ul><\\/figure>\\s*<!-- \\/wp:gallery -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
