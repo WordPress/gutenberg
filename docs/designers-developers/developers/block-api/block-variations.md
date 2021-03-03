@@ -2,9 +2,9 @@
 
 Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality. Each block variation is differentiated from the others by setting some initial attributes or inner blocks. Then at the time when a block is inserted these attributes and/or inner blocks are applied.
 
-A great way to understand this API better is by using the `embed` block as an example. The numerous existing variations for embed (WordPress, Youtube etc..) share the same functionality for editing, saving and so on, but their basic difference is the `providerNameSlug` attribute's value, that defines which provider needs to be used.
+A great way to understand this API better is by using the `embed` block as an example. The numerous existing variations for embed (WordPress, Youtube, etc..) share the same functionality for editing, saving, and so on, but their basic difference is the `providerNameSlug` attribute's value, which defines the provider that needs to be used.
 
-By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed, will override the regular block type in the Inserter.
+By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
 
 ```js
 variations: [
@@ -68,10 +68,10 @@ variations: [
 ],
 ```
 
-It's worth mentioning that setting the `isActive` property can be useful for cases you want to use information from the block variation, after a block's creation. For example this API is used in `useBlockDisplayInformation` hook to fetch and display proper information on places like the BlockCard or Breadcrumbs.
+It's worth mentioning that setting the `isActive` property can be useful for cases you want to use information from the block variation, after a block's creation. For example, this API is used in `useBlockDisplayInformation` hook to fetch and display proper information on places like the BlockCard or Breadcrumbs.
 
 
-Block variations can be declared during a block's registration by providing the `variations` key with a proper array of variations, as defined above. In addition there are ways to register and unregister a `block variation` for a block, after its registration.
+Block variations can be declared during a block's registration by providing the `variations` key with a proper array of variations, as defined above. In addition, there are ways to register and unregister a `block variation` for a block, after its registration.
 
 To add a block variation use `wp.blocks.registerBlockVariation()`.
 
