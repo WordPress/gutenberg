@@ -19,6 +19,7 @@ import {
 	Button,
 	PanelBody,
 	UnitControl,
+	SelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
@@ -43,6 +44,11 @@ import {
  * Constants
  */
 const MIN_BUTTON_WIDTH = 100;
+const BUTTON_OPTIONS = [
+	{ value: 'button-inside', label: __( 'Button inside' ) },
+	{ value: 'button-outside', label: __( 'Button outside' ) },
+	{ value: 'no-button', label: __( 'No button' ) },
+];
 
 export default function SearchEdit( {
 	onFocus,
@@ -182,7 +188,7 @@ export default function SearchEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Search Settings' ) }>
+				<PanelBody title={ __( 'Search settings' ) }>
 					<UnitControl
 						label={ __( 'Width' ) }
 						min={ widthUnit === '%' ? 1 : MIN_WIDTH }
@@ -194,6 +200,18 @@ export default function SearchEdit( {
 						onComplete={ onChangeWidth }
 						onUnitChange={ onChangeUnit }
 						value={ parseFloat( width ) }
+					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Button settings' ) }>
+					<SelectControl
+						label={ __( 'Button position' ) }
+						value={ buttonPosition }
+						onChange={ ( position ) => {
+							setAttributes( {
+								buttonPosition: position,
+							} );
+						} }
+						options={ BUTTON_OPTIONS }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -269,7 +287,7 @@ export default function SearchEdit( {
 
 	return (
 		<View { ...blockProps } style={ styles.searchBlockContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ showLabel && (
 				<RichText
