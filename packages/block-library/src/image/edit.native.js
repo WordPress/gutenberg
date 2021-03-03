@@ -81,6 +81,7 @@ export class ImageEdit extends Component {
 		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
 			this
 		);
+		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
@@ -88,6 +89,7 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(

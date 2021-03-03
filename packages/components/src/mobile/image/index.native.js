@@ -19,6 +19,7 @@ import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
+import FeaturedBanner from './featured-banner';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -229,6 +230,8 @@ const ImageComponent = ( {
 						</Text>
 					</View>
 				) }
+
+				<FeaturedBanner />
 
 				{ editButton && isSelected && ! isUploadInProgress && (
 					<ImageEditingButton
