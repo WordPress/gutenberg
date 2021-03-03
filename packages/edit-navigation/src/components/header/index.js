@@ -94,15 +94,17 @@ export default function Header( {
 											onSelectMenu( menuId );
 											onClose();
 										} }
-										choices={ menus.map( ( menu ) => ( {
-											value: menu.id,
-											label: menu.name,
-											'aria-label': sprintf(
-												/* translators: %s: The name of a menu. */
-												__( "Switch to '%s'" ),
-												menu.name
-											),
-										} ) ) }
+										choices={ menus.map(
+											( { id, name } ) => ( {
+												value: id,
+												label: name,
+												'aria-label': sprintf(
+													/* translators: %s: The name of a menu. */
+													__( "Switch to '%s'" ),
+													name
+												),
+											} )
+										) }
 									/>
 								</MenuGroup>
 								<MenuGroup hideSeparator>
