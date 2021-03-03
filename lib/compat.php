@@ -267,3 +267,33 @@ function gutenberg_override_reusable_block_post_type_labels() {
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+/**
+ * Filters the font-family "Noto Sans" and changes it to system fonts.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/29177
+ *
+ * @param string $translation Translated text.
+ * @param string $text        Text to translate.
+ * @param string $context     Context information for the translators.
+ * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
+ *
+ * @return string Returns the translated text.
+ */
+function gutenberg_filter_noto_family_for_wp_56( $translation, $text, $context, $domain ) {
+
+	// If the current version of WP is > 5.6.2 then early exit.
+	// This function only needs to run in WP 5.6.x and below.
+	global $wp_version;
+	if ( version_compare( $wp_version, '5.6.2' ) >= 0 ) {
+		return $translation;
+	}
+
+	// Change the font to system.
+	if ( 'default' === $domain && 'CSS Font Family for Editor Font' === $context && 'Noto Serif' === $text ) {
+        return '-apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif';
+    }
+
+	return $translation;
+}
+add_filter( 'gettext_with_context', 'gutenberg_filter_noto_family_for_wp_56', 10, 4 );
