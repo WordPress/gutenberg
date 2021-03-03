@@ -214,8 +214,9 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_FEATURED_IMAGE_ID, mediaId);
         queueActionToJS(EVENT_FEATURED_IMAGE_ID, writableMap);
+    }
 
-      @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
+    @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putString(MAP_KEY_REPLACE_BLOCK_HTML, mediaFiles);
         writableMap.putString(MAP_KEY_REPLACE_BLOCK_BLOCK_ID, blockId);
