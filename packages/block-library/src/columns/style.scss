@@ -27,6 +27,8 @@
 	&.are-vertically-aligned-bottom {
 		align-items: flex-end;
 	}
+
+	@include innerblock-margin-clear(".wp-block-column");
 }
 
 .wp-block-column {

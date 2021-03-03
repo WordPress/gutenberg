@@ -10,6 +10,8 @@
 	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
 	}
+
+	@include innerblock-margin-clear(".wp-block-media-text__content");
 }
 
 .wp-block-media-text.is-vertically-aligned-top {

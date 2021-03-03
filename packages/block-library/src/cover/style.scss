@@ -186,6 +186,8 @@
 		border: none;
 		box-shadow: none;
 	}
+
+	@include innerblock-margin-clear(".wp-block-cover__inner-container");
 }
 
 .wp-block-cover__video-background {
