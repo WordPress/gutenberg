@@ -746,10 +746,10 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.value !== this.value ) {
-			this.value = this.props.value;
-			this.lastEventCount = undefined;
-		}
+		// if ( this.props.value !== this.value ) {
+		// 	this.value = this.props.value;
+		// 	this.lastEventCount = undefined;
+		// }
 		const { __unstableIsSelected: isSelected } = this.props;
 
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
