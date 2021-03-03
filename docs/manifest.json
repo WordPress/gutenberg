@@ -150,6 +150,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Variations",
+		"slug": "block-variations",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-variations.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Block Patterns",
 		"slug": "block-patterns",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",

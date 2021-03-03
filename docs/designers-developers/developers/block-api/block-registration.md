@@ -224,69 +224,9 @@ example: {
 
 -   **Type:** `Object[]`
 
-Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted.
+Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/designers-developers/developers/block-api/block-variations.md) for more details.
 
-By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
 
-```js
-variations: [
-    {
-		name: 'wordpress',
-		isDefault: true,
-		title: __( 'WordPress' ),
-		description: __( 'Code is poetry!' ),
-		icon: WordPressIcon,
-		attributes: { service: 'wordpress' },
-	},
-	{
-		name: 'google',
-		title: __( 'Google' ),
-		icon: GoogleIcon,
-		attributes: { service: 'google' },
-	},
-	{
-		name: 'twitter',
-		title: __( 'Twitter' ),
-		icon: TwitterIcon,
-		attributes: { service: 'twitter' },
-		keywords: [ __('tweet') ],
-	},
-],
-```
-
-An object describing a variation defined for the block type can contain the following fields:
-
--   `name` (type `string`) – The unique and machine-readable name.
--   `title` (type `string`) – A human-readable variation title.
--   `description` (optional, type `string`) – A detailed variation description.
--   `category` (optional, type `string`) - A category classification, used in search interfaces to arrange block types by category.
--   `icon` (optional, type `string` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
--   `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
--   `attributes` (optional, type `Object`) – Values that override block attributes.
--   `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
--   `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
--   `scope` (optional, type `WPBlockVariationScope[]`) - the list of scopes where the variation is applicable. When not provided, it defaults to `block` and `inserter`. Available options:
-    -   `inserter` - Block Variation is shown on the inserter.
-    -   `block` - Used by blocks to filter specific block variations. Mostly used in Placeholder patterns like `Columns` block.
-    -   `transform` - Block Variation will be shown in the component for Block Variations transformations.
--   `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
--   `isActive` (optional, type `Function`) - A function that accepts a block's attributes and the variation's attributes and determines if a variation is active. This function doesn't try to find a match dynamically based on all block's attributes, as in many cases some attributes are irrelevant. An example would be for `embed` block where we only care about `providerNameSlug` attribute's value.
-
-It's also possible to override the default block style variation using the `className` attribute when defining block variations.
-
-```js
-variations: [
-	{
-		name: 'blue',
-		title: __( 'Blue Quote' ),
-		isDefault: true,
-		attributes: { color: 'blue', className: 'is-style-blue-quote' },
-		icon: 'format-quote',
-		isActive: ( blockAttributes, variationAttributes ) =>
-			blockAttributes.color === variationAttributes.color
-	},
-],
-```
 
 #### supports (optional)
 
