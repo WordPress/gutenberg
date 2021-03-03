@@ -7,7 +7,7 @@
  * WordPress dependencies
  */
 import RCTAztecView from '@wordpress/react-native-aztec';
-import { View, Platform } from 'react-native';
+import { View, Platform, InteractionManager } from 'react-native';
 import {
 	showUserSuggestions,
 	showXpostSuggestions,
@@ -746,10 +746,6 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		// if ( this.props.value !== this.value ) {
-		// 	this.value = this.props.value;
-		// 	this.lastEventCount = undefined;
-		// }
 		const { __unstableIsSelected: isSelected } = this.props;
 
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
@@ -763,7 +759,9 @@ export class RichText extends Component {
 				this.props.selectionEnd || 0
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
-			this._editor.blur();
+			InteractionManager.runAfterInteractions( () => {
+				this._editor?.blur();
+			} );
 		}
 	}
 
