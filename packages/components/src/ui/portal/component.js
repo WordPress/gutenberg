@@ -22,7 +22,7 @@ import { Portal as BasePortal } from 'reakit';
  * }
  * ```
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, never>} props
+ * @param {{ children: import('react').ReactNode }} props
  */
 /* eslint-enable jsdoc/valid-types */
 

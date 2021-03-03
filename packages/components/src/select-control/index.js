@@ -94,6 +94,7 @@ function SelectControl(
 					</DownArrowWrapper>
 				}
 				labelPosition={ labelPosition }
+				{ ...props }
 			>
 				<Select
 					{ ...props }
