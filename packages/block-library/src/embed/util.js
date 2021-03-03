@@ -198,6 +198,14 @@ export function getClassNames(
 		) {
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
+				// Evaluate the difference between actual aspect ratio and closest match.
+				// If the difference is too big, do not scale the embed according to aspect ratio.
+				const ratioDiff = aspectRatio - potentialRatio.ratio;
+				if ( ratioDiff > 0.1 ) {
+					// No close aspect ratio match found.
+					return removeAspectRatioClasses( existingClassNames );
+				}
+				// Close aspect ratio match found.
 				return classnames(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,
