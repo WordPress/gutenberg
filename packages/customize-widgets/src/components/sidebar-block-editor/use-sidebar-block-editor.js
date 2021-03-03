@@ -9,7 +9,7 @@ import { omit, keyBy, isEqual } from 'lodash';
 import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 
-function __experimentalAddWidgetIdToBlock( block, widgetId ) {
+function addWidgetIdToBlock( block, widgetId ) {
 	return {
 		...block,
 		attributes: {
@@ -85,7 +85,7 @@ function widgetToBlock( widget ) {
 		block = createBlock( 'core/legacy-widget', attributes, [] );
 	}
 
-	return __experimentalAddWidgetIdToBlock( block, widget.id );
+	return addWidgetIdToBlock( block, widget.id );
 }
 
 function initState( sidebar ) {
