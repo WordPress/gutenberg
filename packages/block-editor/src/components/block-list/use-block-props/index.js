@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
@@ -53,8 +53,6 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const fallbackRef = useRef();
-	const ref = props.ref || fallbackRef;
 	const { clientId, index, className, wrapperProps = {} } = useContext(
 		BlockListBlockContext
 	);
@@ -99,12 +97,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
-
-	useFocusFirstElement( ref, clientId );
-
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
-		ref,
+		props.ref,
+		useFocusFirstElement( clientId ),
 		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
 		useIsHovered(),

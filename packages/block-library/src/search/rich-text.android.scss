@@ -5,7 +5,9 @@
 }
 
 .searchButton {
+	padding: 0;
+	font-size: 16px;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
 	background-color: transparent;
-	margin-left: $grid-unit-10;
-	margin-right: $grid-unit-10;
 }
