@@ -61,6 +61,17 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		useTypingObserver(),
 	] );
 
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+
+	const  keyPress = (e) => {
+		if(e.key === "Escape") {
+			// write your logic here.
+			setIsNavigationPanelOpened(false);
+		}
+	}
+	
+	document.addEventListener("keydown", keyPress);
+
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
 	function onWheel( { deltaX, deltaY } ) {
