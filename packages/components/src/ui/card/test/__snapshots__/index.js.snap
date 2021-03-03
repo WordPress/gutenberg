@@ -11,8 +11,8 @@ Snapshot Diff:
         title="WordPress.org"
       />
       <div
--       class="components-card-inner-body wp-components-card-inner-body css-1n7epz"
-+       class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body css-1hp1ar"
+-       class="components-card-inner-body wp-components-card-inner-body ic-b8zmsr ic-192yz5d css-1n7epz"
++       class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-1reds0m ic-y3p1xi ic-192yz5d css-1hp1ar"
         data-g2-c16t="true"
 -       data-g2-component="CardInnerBody"
 +       data-g2-component="CardBody"
@@ -20,7 +20,7 @@ Snapshot Diff:
         Code is Poetry.
       </div>
       <div
-        class="components-flex wp-components-flex components-card-footer wp-components-card-footer css-1qwgs3h"
+        class="components-flex wp-components-flex components-card-footer wp-components-card-footer ic-i2oc6g ic-17cs4ki ic-192yz5d css-1qwgs3h"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -411,29 +411,29 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface wp-components-surface components-card wp-components-card emotion-6"
+  class="components-surface wp-components-surface components-card wp-components-card ic-1vr61kr ic-15506ld ic-192yz5d emotion-6"
   data-g2-c16t="true"
   data-g2-component="Card"
 >
   <div
-    class="emotion-3"
+    class="ic-192yz5d emotion-3"
     data-g2-component="CardContent"
   >
     <div
-      class="components-flex wp-components-flex components-card-header wp-components-card-header emotion-0"
+      class="components-flex wp-components-flex components-card-header wp-components-card-header ic-1jf72r7 ic-17cs4ki ic-192yz5d emotion-0"
       data-g2-c16t="true"
       data-g2-component="CardHeader"
       title="WordPress.org"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body emotion-1"
+      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-1reds0m ic-y3p1xi ic-192yz5d emotion-1"
       data-g2-c16t="true"
       data-g2-component="CardBody"
     >
       Code is Poetry.
     </div>
     <div
-      class="components-flex wp-components-flex components-card-footer wp-components-card-footer emotion-2"
+      class="components-flex wp-components-flex components-card-footer wp-components-card-footer ic-i2oc6g ic-17cs4ki ic-192yz5d emotion-2"
       data-g2-c16t="true"
       data-g2-component="CardFooter"
     >
@@ -444,13 +444,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation wp-components-elevation emotion-4"
+    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-4"
     data-g2-c16t="true"
     data-g2-component="CardElevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation wp-components-elevation emotion-5"
+    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-5"
     data-g2-c16t="true"
     data-g2-component="CardElevation"
   />
@@ -463,20 +463,20 @@ Snapshot Diff:
 + Second value
 
 @@ -7,16 +7,16 @@
-      class="css-1kk7lqu"
+      class="ic-192yz5d css-1kk7lqu"
       data-g2-component="CardContent"
     />
     <div
       aria-hidden="true"
--     class="components-elevation wp-components-elevation css-1vg495v"
-+     class="components-elevation wp-components-elevation css-1wkolpp"
+-     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1vg495v"
++     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1wkolpp"
       data-g2-c16t="true"
       data-g2-component="CardElevation"
     />
     <div
       aria-hidden="true"
--     class="components-elevation wp-components-elevation css-dgxm8l"
-+     class="components-elevation wp-components-elevation css-1zwi7l"
+-     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-dgxm8l"
++     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1zwi7l"
       data-g2-c16t="true"
       data-g2-component="CardElevation"
     />

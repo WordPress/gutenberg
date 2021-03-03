@@ -53,7 +53,7 @@ function CardFooter( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Card, CardBody, CardFooter } from '@wordpress/components/ui';
+ * import { Card, CardBody, CardFooter } from `@wordpress/components/ui`;
  *
  * <Card>
  * 	<CardBody>...</CardBody>

@@ -362,7 +362,7 @@ function CoverEdit( {
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = isDarkElement.current
 			? [ isDarkElement.current.style, 'objectPosition' ]
-			: [ blockProps.ref.current.style, 'backgroundPosition' ];
+			: [ ref.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
 
@@ -494,7 +494,8 @@ function CoverEdit( {
 		</>
 	);
 
-	const blockProps = useBlockProps();
+	const ref = useRef();
+	const blockProps = useBlockProps( { ref } );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',

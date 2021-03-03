@@ -135,7 +135,7 @@ export default class SidebarAdapter {
 		};
 	}
 
-	addWidget( widget ) {
+	addWidget( widget, index ) {
 		const widgetModel = wp.customize.Widgets.availableWidgets.findWhere( {
 			id_base: widget.idBase,
 		} );
@@ -169,9 +169,10 @@ export default class SidebarAdapter {
 		);
 		setting.set( {} );
 
-		const widgetIds = this.setting.get();
+		const widgetIds = [ ...this.setting.get() ];
 		const widgetId = settingIdToWidgetId( settingId );
-		this.setting.set( [ ...widgetIds, widgetId ] );
+		widgetIds.splice( index, 0, widgetId );
+		this.setting.set( widgetIds );
 
 		return widgetId;
 	}
