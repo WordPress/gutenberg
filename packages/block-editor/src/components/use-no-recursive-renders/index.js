@@ -25,14 +25,14 @@ const RenderedRefsContext = createContext( {} );
  * @return {Object} The list of rendered blocks grouped by block name.
  */
 function addToBlockType( renderedBlocks, blockName, uniqueId ) {
-	const result = { ...renderedBlocks };
-	if ( result[ blockName ] ) {
-		result[ blockName ].add( uniqueId );
-	} else {
-		const value = new Set();
-		value.add( uniqueId );
-		result[ blockName ] = value;
-	}
+	const result = {
+		...renderedBlocks,
+		[ blockName ]: renderedBlocks[ blockName ]
+			? new Set( renderedBlocks[ blockName ] )
+			: new Set(),
+	};
+	result[ blockName ].add( uniqueId );
+
 	return result;
 }
 
@@ -52,8 +52,8 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
 export default function useNoRecursiveRenders( uniqueId ) {
 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
 	const { name: blockName } = useBlockEditContext();
-	const hasAlreadyRendered = previouslyRenderedBlocks[ blockName ]?.has(
-		uniqueId
+	const hasAlreadyRendered = Boolean(
+		previouslyRenderedBlocks[ blockName ]?.has( uniqueId )
 	);
 	const newRenderedBlocks = useMemo(
 		() => addToBlockType( previouslyRenderedBlocks, blockName, uniqueId ),
