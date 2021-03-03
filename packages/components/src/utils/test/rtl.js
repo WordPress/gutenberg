@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { convertLTRToRTL } from '../rtl';
+import { isDocumentRTL, convertLTRToRTL } from '../rtl';
 
 describe( 'convertLTRToRTL', () => {
 	it( 'converts (*)Left <-> (*)Right', () => {
@@ -120,5 +120,31 @@ describe( 'convertLTRToRTL', () => {
 
 		// Edge cases
 		expect( nextStyle[ 'text-combine-upright' ] ).toBe( 'none' );
+	} );
+} );
+
+describe( 'isDocumentRTL', () => {
+	afterEach( () => {
+		document.dir = '';
+	} );
+
+	test( 'should return false when document has no dir setting', () => {
+		expect( isDocumentRTL() ).toBe( false );
+	} );
+
+	test( 'should return false when document is ltr', () => {
+		document.dir = 'ltr';
+		expect( isDocumentRTL() ).toBe( false );
+
+		document.documentElement.setAttribute( 'dir', 'ltr' );
+		expect( isDocumentRTL() ).toBe( false );
+	} );
+
+	test( 'should return true when document is rtl', () => {
+		document.dir = 'rtl';
+		expect( isDocumentRTL() ).toBe( true );
+
+		document.documentElement.setAttribute( 'dir', 'rtl' );
+		expect( isDocumentRTL() ).toBe( true );
 	} );
 } );

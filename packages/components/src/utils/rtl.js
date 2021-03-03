@@ -4,15 +4,22 @@
 import { css } from '@emotion/core';
 import { mapKeys } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { isRTL } from '@wordpress/i18n';
-
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
 const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
 const UPPER_LEFT_REGEXP = new RegExp( /Left/g );
 const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
+
+/**
+ * Checks the LTR/RTL direction for the window.document.
+ *
+ * @return {boolean} Whether the document is RTL.
+ */
+export function isDocumentRTL() {
+	if ( typeof window !== 'undefined' ) {
+		return !! ( window?.document?.dir === 'rtl' );
+	}
+	return false;
+}
 
 /**
  * Flips a CSS property from left <-> right.
@@ -70,12 +77,14 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
+		const isRTL = isDocumentRTL();
+
 		if ( rtlStyles ) {
 			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
-			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
+			return isRTL ? css( rtlStyles ) : css( ltrStyles );
 		}
 
 		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
-		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+		return isRTL ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }
