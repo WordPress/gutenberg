@@ -18,7 +18,10 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { BlockFormatControls } from '@wordpress/block-editor';
+import {
+	BlockFormatControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -746,6 +749,10 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( this.isIOS && this.props.value !== this.value ) {
+			this.value = this.props.value;
+			this.lastEventCount = undefined;
+		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
@@ -996,7 +1003,7 @@ const withFormatTypes = ( WrappedComponent ) => ( props ) => {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockParents, getBlock, getSettings } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
