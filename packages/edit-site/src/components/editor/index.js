@@ -166,7 +166,7 @@ function Editor( { initialSettings } ) {
 	return (
 		<>
 			<URLQueryController />
-			<FullscreenMode isActive={ true } />
+			<FullscreenMode isActive />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<DropZoneProvider>
