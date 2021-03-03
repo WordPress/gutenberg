@@ -35,6 +35,14 @@ function NavigationToggle( { icon, isOpen } ) {
 
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
+	const keyPress = ( e ) => {
+		if ( e.key === 'Escape' ) {
+			setIsNavigationPanelOpened( false );
+		}
+	};
+
+	document.addEventListener( 'keydown', keyPress , {once:true} )
+
 	if ( ! isActive ) {
 		return null;
 	}
