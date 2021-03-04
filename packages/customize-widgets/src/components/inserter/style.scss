@@ -50,3 +50,11 @@ $inserter-transition-ms: 150;
 		text-decoration: none;
 	}
 }
+
+.block-editor-inserter__quick-inserter {
+	.block-editor-inserter__panel-content {
+		// To fix quick inserter doesn't have background.
+		background: #fff;
+	}
+}
+

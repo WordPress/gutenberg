@@ -4,8 +4,7 @@
 import { forwardRef } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
-import { BlockToolbar, NavigableToolbar } from '@wordpress/block-editor';
-import { PinnedItems } from '@wordpress/interface';
+import { NavigableToolbar } from '@wordpress/block-editor';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -47,12 +46,6 @@ function Header( { inserter } ) {
 						/>
 					</NavigableToolbar>
 				</div>
-				<div className="edit-widgets-header__actions">
-					<PinnedItems.Slot scope="core/edit-widgets" />
-				</div>
-			</div>
-			<div className="edit-widgets-header__block-toolbar">
-				<BlockToolbar hideDragHandle />
 			</div>
 
 			<Inserter { ...inserter } />
