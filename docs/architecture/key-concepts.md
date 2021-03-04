@@ -32,7 +32,7 @@ Blocks have the ability to be transformed into other block types. This allows ba
 
 ### Variations
 
-Given a block type, a block variation is a predefined set of its initial attributes. This API allows creating a single block from which multiple configurations are possible. Variations provide different possible interfaces, including showing up as entirely new blocks in the library, or as presets when inserting a new block. Read [the API documentation](/docs/designers-developers/developers/block-api/block-registration.md#variations-optional) for more details.
+Given a block type, a block variation is a predefined set of its initial attributes. This API allows creating a single block from which multiple configurations are possible. Variations provide different possible interfaces, including showing up as entirely new blocks in the library, or as presets when inserting a new block. Read [the API documentation](/docs/designers-developers/developers/block-api/block-variations.md) for more details.
 
 **More on Blocks**
 
