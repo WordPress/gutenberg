@@ -1,16 +1,29 @@
 $customize-widgets-header-width: 50px;
+$inserter-transition-ms: 150;
 
 .customize-widgets-layout__inserter-panel-backdrop {
 	background: rgba(0, 0, 0, 0.5);
 	position: absolute;
 	height: 100%;
 	width: 100%;
+	opacity: 0;
+	transition: opacity #{$inserter-transition-ms}ms ease-in-out;
+
+	&[data-enter] {
+		opacity: 1;
+	}
 }
 
 .customize-widgets-layout__inserter-panel {
 	background: #fff;
 	position: absolute;
 	height: 100%;
+	transform: translateX(-100%);
+	transition: transform #{$inserter-transition-ms}ms ease-in-out;
+
+	&[data-enter] {
+		transform: translateX(0);
+	}
 }
 
 .customize-widgets-layout__inserter-panel-content {

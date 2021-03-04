@@ -34,31 +34,27 @@ function Inserter( { ...props } ) {
 		>
 			<Dialog
 				{ ...props }
+				className="customize-widgets-layout__inserter-panel"
 				hideOnClickOutside={ false }
 				aria-labelledby={ inserterTitleId }
 			>
-				<div className="customize-widgets-layout__inserter-panel">
-					<div className="customize-widgets-layout__inserter-panel-header">
-						<h2
-							id={ inserterTitleId }
-							className="customize-widgets-layout__inserter-panel-header-title"
-						>
-							{ __( 'Add a widget' ) }
-						</h2>
-						<Button
-							className="customize-widgets-layout__inserter-panel-header-close-button"
-							isTertiary
-							onClick={ props.hide }
-						>
-							{ __( 'DONE' ) }
-						</Button>
-					</div>
-					<div className="customize-widgets-layout__inserter-panel-content">
-						<Library
-							showInserterHelpPanel
-							onSelect={ props.hide }
-						/>
-					</div>
+				<div className="customize-widgets-layout__inserter-panel-header">
+					<h2
+						id={ inserterTitleId }
+						className="customize-widgets-layout__inserter-panel-header-title"
+					>
+						{ __( 'Add a widget' ) }
+					</h2>
+					<Button
+						className="customize-widgets-layout__inserter-panel-header-close-button"
+						isTertiary
+						onClick={ props.hide }
+					>
+						{ __( 'DONE' ) }
+					</Button>
+				</div>
+				<div className="customize-widgets-layout__inserter-panel-content">
+					<Library showInserterHelpPanel onSelect={ props.hide } />
 				</div>
 			</Dialog>
 		</DialogBackdrop>,

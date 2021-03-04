@@ -25,6 +25,7 @@ const DialogDisclosureButton = forwardRef( ( props, ref ) => (
 function Header() {
 	const dialog = useDialogState( {
 		modal: false,
+		animated: 150,
 	} );
 
 	return (
