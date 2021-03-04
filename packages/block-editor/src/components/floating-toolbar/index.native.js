@@ -7,7 +7,7 @@ import { Animated, Easing, View, Platform } from 'react-native';
  * WordPress dependencies
  */
 import { ToolbarButton, Toolbar } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, forwardRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -19,6 +19,7 @@ import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
 import BlockSelectionButton from '../block-list/block-selection-button.native';
 import { store as blockEditorStore } from '../../store';
+import { useAnimations } from '../floating-toolbar-animations';
 
 const EASE_IN_DURATION = 250;
 const EASE_OUT_DURATION = 80;
@@ -32,9 +33,12 @@ const FloatingToolbar = ( {
 	showFloatingToolbar,
 	onNavigateUp,
 	isRTL,
+	innerRef,
 } ) => {
 	// Sustain old selection for proper block selection button rendering when exit animation is ongoing.
 	const [ previousSelection, setPreviousSelection ] = useState( {} );
+
+	const { shake } = useAnimations( innerRef );
 
 	useEffect( () => {
 		Animated.timing( opacity, {
@@ -60,10 +64,13 @@ const FloatingToolbar = ( {
 		outputRange: [ translationRange, 0 ],
 	} );
 
-	const animationStyle = {
-		opacity,
-		transform: [ { translateY: translation } ],
-	};
+	const animationStyle = [
+		{
+			opacity,
+			transform: [ { translateY: translation } ],
+		},
+		shake.animationStyle,
+	];
 
 	const {
 		clientId: previousSelectedClientId,
@@ -101,7 +108,7 @@ const FloatingToolbar = ( {
 	);
 };
 
-export default compose( [
+const ComposedFloatingToolbar = compose( [
 	withSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -134,3 +141,9 @@ export default compose( [
 		};
 	} ),
 ] )( FloatingToolbar );
+
+const ForwardedFloatingToolbar = forwardRef( ( props, ref ) => (
+	<ComposedFloatingToolbar innerRef={ ref } { ...props } />
+) );
+
+export default ForwardedFloatingToolbar;
