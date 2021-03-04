@@ -18,29 +18,34 @@ export function usePreParsePatterns() {
 	);
 
 	useEffect( () => {
-		if ( ! patterns ) {
+		if ( ! patterns?.length ) {
 			return;
 		}
 
 		let handle;
 		let index = -1;
-		window.console.time( '[usePreParsePatterns] initiate queue' );
+
 		const callback = () => {
 			index++;
-			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ].title }`;
-			window.console.time( marker );
-			if ( patterns.length > index ) {
-				select( blockEditorStore ).__experimentalGetParsedBlocks(
-					patterns[ index ].content,
-					index
-				);
-				window.requestIdleCallback( callback );
+			if ( index >= patterns.length ) {
+				return;
 			}
-			window.console.timeEnd( marker );
-		};
-		window.requestIdleCallback( callback );
-		window.console.timeEnd( '[usePreParsePatterns] initiate queue' );
 
+			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ]?.title }`;
+			window.console.time( marker );
+			select( blockEditorStore ).__experimentalGetParsedBlocks(
+				patterns[ index ].content,
+				index
+			);
+			window.console.timeEnd( marker );
+
+			handle = window.requestIdleCallback( callback );
+		};
+
+		window.console.time( '[usePreParsePatterns] initiate' );
+		window.console.timeEnd( '[usePreParsePatterns] initiate' );
+
+		handle = window.requestIdleCallback( callback );
 		return () => window.cancelIdleCallback( handle );
 	}, [ patterns ] );
 
