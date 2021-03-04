@@ -20,10 +20,10 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
     - name: Restore npm cache
-      uses: actions/cache@v2
+      uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
       with:
         path: ~/.npm
         key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
@@ -33,19 +33,19 @@ jobs:
     - run: npm ci
 
     - name: Restore Gradle cache
-      uses: actions/cache@v2
+      uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
       with:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
         restore-keys: ${{ runner.os }}-gradle
 
-    - uses: reactivecircus/android-emulator-runner@v2
+    - uses: reactivecircus/android-emulator-runner@08b092e904025fada32a01b711af1e7ff7b7a4a3 # v2.14.3
       with:
         api-level: 28
         profile: pixel_xl
         script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
       if: always()
       with:
         name: android-screen-recordings

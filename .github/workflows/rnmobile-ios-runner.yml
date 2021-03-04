@@ -19,10 +19,10 @@ jobs:
         ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
     - name: Restore npm cache
-      uses: actions/cache@v2
+      uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
       with:
         path: ~/.npm
         key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
@@ -35,13 +35,13 @@ jobs:
       run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
 
     - name: Restore build cache
-      uses: actions/cache@v2
+      uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
       with:
         path: packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
         key: ${{ runner.os }}-ios-build-${{ hashFiles('ios-checksums.txt') }}
 
     - name: Restore pods cache
-      uses: actions/cache@v2
+      uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
       with:
         path: |
           packages/react-native-editor/ios/Pods
@@ -70,7 +70,7 @@ jobs:
     - name: Prepare build cache
       run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
       if: always()
       with:
         name: ios-screen-recordings
