@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
@@ -55,10 +55,12 @@ function useInitialPosition( clientId ) {
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
  *
- * @param {RefObject} ref      React ref with the block element.
- * @param {string}    clientId Block client ID.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {RefObject} React ref with the block element.
  */
-export function useFocusFirstElement( ref, clientId ) {
+export function useFocusFirstElement( clientId ) {
+	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
 
 	useEffect( () => {
@@ -101,4 +103,6 @@ export function useFocusFirstElement( ref, clientId ) {
 
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );
+
+	return ref;
 }

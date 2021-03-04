@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useState, useCallback } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -25,48 +25,54 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 	function Component( props, ref ) {
 		const [ noticeList, setNoticeList ] = useState( [] );
 
-		const noticeOperations = {
-			/**
-			 * Function passed down as a prop that adds a new notice.
-			 *
-			 * @param {Object} notice  Notice to add.
-			 */
-			createNotice: ( notice ) => {
-				const noticeToAdd = notice.id
-					? notice
-					: { ...notice, id: uuid() };
-				setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
-			},
+		/**
+		 * Function passed down as a prop that adds a new notice.
+		 *
+		 * @param {Object} notice  Notice to add.
+		 */
+		const createNotice = useCallback( ( notice ) => {
+			const noticeToAdd = notice.id ? notice : { ...notice, id: uuid() };
+			setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
+		}, [] );
 
-			/**
-			 * Function passed as a prop that adds a new error notice.
-			 *
-			 * @param {string} msg  Error message of the notice.
-			 */
-			createErrorNotice: ( msg ) => {
-				noticeOperations.createNotice( {
+		/**
+		 * Function passed as a prop that adds a new error notice.
+		 *
+		 * @param {string} msg  Error message of the notice.
+		 */
+		const createErrorNotice = useCallback(
+			( msg ) => {
+				createNotice( {
 					status: 'error',
 					content: msg,
 				} );
 			},
+			[ createNotice ]
+		);
 
-			/**
-			 * Removes a notice by id.
-			 *
-			 * @param {string} id  Id of the notice to remove.
-			 */
-			removeNotice: ( id ) => {
-				setNoticeList( ( current ) =>
-					current.filter( ( notice ) => notice.id !== id )
-				);
-			},
+		/**
+		 * Removes a notice by id.
+		 *
+		 * @param {string} id  Id of the notice to remove.
+		 */
+		const removeNotice = useCallback( ( id ) => {
+			setNoticeList( ( current ) =>
+				current.filter( ( notice ) => notice.id !== id )
+			);
+		}, [] );
 
-			/**
-			 * Removes all notices
-			 */
-			removeAllNotices: () => {
-				setNoticeList( [] );
-			},
+		/**
+		 * Removes all notices
+		 */
+		const removeAllNotices = useCallback( () => {
+			setNoticeList( [] );
+		}, [] );
+
+		const noticeOperations = {
+			createNotice,
+			createErrorNotice,
+			removeNotice,
+			removeAllNotices,
 		};
 
 		const propsOut = {
