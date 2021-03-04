@@ -47,7 +47,7 @@ export class MediaUpload extends Component {
 	}
 
 	componentDidMount() {
-		const { allowedTypes = [], autoOpenMediaUpload } = this.props;
+		const { allowedTypes = [], autoOpen } = this.props;
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
 			const otherMediaOptionsWithIcons = otherMediaOptions.map(
 				( option ) => {
@@ -63,7 +63,7 @@ export class MediaUpload extends Component {
 			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
 
-		if ( autoOpenMediaUpload ) {
+		if ( autoOpen ) {
 			this.onPickerPresent();
 		}
 	}
@@ -148,13 +148,13 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerPresent() {
-		const { autoOpenMediaUpload } = this.props;
+		const { autoOpen } = this.props;
 		const isIOS = Platform.OS === 'ios';
 
 		if ( this.picker ) {
 			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
 			// so this delay allows the Inserter to be closed fully before presenting action sheet.
-			if ( autoOpenMediaUpload && isIOS ) {
+			if ( autoOpen && isIOS ) {
 				delay(
 					() => this.picker.presentPicker(),
 					PICKER_OPENING_DELAY

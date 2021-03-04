@@ -129,7 +129,7 @@ Only applies if `gallery === true`.
 - Default: `false`
 - Platform: Web
 
-### autoOpenMediaUpload
+### autoOpen
 
 If true, the picker of the respective platform auto-opens.
 
