@@ -526,6 +526,17 @@ class EditorPage {
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
+	async closePicker() {
+		if ( isAndroid() ) {
+			await swipeDown( this.driver );
+		} else {
+			const dismissButton = await this.driver.elementByAccessibilityId(
+				'Dismiss'
+			);
+			await dismissButton.click();
+		}
+	}
+
 	// =============================
 	// Unsupported Block functions
 	// =============================
