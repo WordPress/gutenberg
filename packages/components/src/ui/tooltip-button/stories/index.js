@@ -5,17 +5,21 @@ import { boolean, number, select, text } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { Button } from '..';
+import { TooltipButton } from '..';
 
 export default {
-	component: Button,
-	title: 'G2 Components (Experimental)/Button',
+	component: TooltipButton,
+	title: 'G2 Components (Experimental)/TooltipButton',
 };
 
 const createSelectProps = ( collection ) =>
 	collection.reduce( ( data, item ) => ( { ...data, [ item ]: item } ), {} );
 
 export const _default = () => {
+	const tooltipContent = text(
+		'tooltip.content',
+		'This is some sample tooltip content'
+	);
 	const disabled = boolean( 'disabled', false );
 	const elevation = number( 'elevation', 0 );
 	const hasCaret = boolean( 'hasCaret', false );
@@ -61,7 +65,10 @@ export const _default = () => {
 		size,
 		variant,
 		describedBy,
+		tooltip: {
+			content: tooltipContent,
+		},
 	};
 
-	return <Button { ...props }>Button</Button>;
+	return <TooltipButton { ...props }>TooltipButton</TooltipButton>;
 };
