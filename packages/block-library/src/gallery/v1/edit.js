@@ -43,7 +43,7 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { sharedIcon } from '../shared-icon';
-import { pickRelevantMediaFiles } from '../shared';
+import { pickRelevantMediaFiles } from './shared';
 import { defaultColumnsNumberV1 } from '../deprecated';
 import Gallery from './gallery';
 import {
