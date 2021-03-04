@@ -328,7 +328,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_stylesheet_preset_classes_are_prepended_with_block_selectors(){
+	public function test_get_stylesheet_preset_values_are_marked_as_important(){
 		$theme_json = new WP_Theme_JSON(
 			array(
 				'settings' => array(
