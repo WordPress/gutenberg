@@ -223,7 +223,7 @@ export function useDrop( ref ) {
 			event.preventDefault();
 		}
 
-		defaultView.addEventListener( 'drop', onDrop );
+		ref.current.addEventListener( 'drop', onDrop );
 		defaultView.addEventListener( 'dragover', onDragOver );
 		defaultView.addEventListener( 'mouseup', resetDragState );
 		// Note that `dragend` doesn't fire consistently for file and HTML drag
@@ -232,7 +232,7 @@ export function useDrop( ref ) {
 		defaultView.addEventListener( 'dragend', resetDragState );
 
 		return () => {
-			defaultView.removeEventListener( 'drop', onDrop );
+			ref.current.removeEventListener( 'drop', onDrop );
 			defaultView.removeEventListener( 'dragover', onDragOver );
 			defaultView.removeEventListener( 'mouseup', resetDragState );
 			defaultView.removeEventListener( 'dragend', resetDragState );
