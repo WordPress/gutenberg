@@ -5,3 +5,11 @@ ol.has-background.has-background,
 ul.has-background.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
+
+ul,
+ol {
+	li {
+		// This overrides a bottom margin globally applied to list items in wp-admin.
+		margin-bottom: initial;
+	}
+}

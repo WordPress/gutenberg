@@ -2,3 +2,22 @@ ol.has-background,
 ul.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
+
+ul,
+ol {
+	margin: 0;
+	padding-left: 1.3em;
+}
+
+ul {
+	list-style-type: disc;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ul ul,
+ol ul {
+	list-style-type: circle;
+}

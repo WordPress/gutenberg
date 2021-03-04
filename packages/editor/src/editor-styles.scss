@@ -22,7 +22,6 @@ body {
 	margin-right: -10px;
 }
 
-
 /* Headings */
 // Adjust line spacing for larger headings.
 h1,
@@ -84,37 +83,6 @@ p {
 	line-height: inherit;
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
-}
-
-ul,
-ol {
-	margin-bottom: $default-block-margin;
-	padding-left: 1.3em;
-	margin-left: 1.3em;
-
-	// Remove bottom margin from nested lists.
-	ul,
-	ol {
-		margin-bottom: 0;
-	}
-
-	li {
-		// This overrides a bottom margin globally applied to list items in wp-admin.
-		margin-bottom: initial;
-	}
-}
-
-ul {
-	list-style-type: disc;
-}
-
-ol {
-	list-style-type: decimal;
-}
-
-ul ul,
-ol ul {
-	list-style-type: circle;
 }
 
 .wp-align-wrapper {
