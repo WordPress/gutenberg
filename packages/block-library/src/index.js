@@ -85,6 +85,7 @@ import * as postCommentDate from './post-comment-date';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
+import * as postCommentsLink from './post-comments-link';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
@@ -236,6 +237,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postComments,
 								postCommentsCount,
 								postCommentsForm,
+								postCommentsLink,
 								postDate,
 								postExcerpt,
 								postFeaturedImage,
