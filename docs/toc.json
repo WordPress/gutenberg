@@ -11,7 +11,8 @@
                     { "docs/getting-started/tutorials/create-block/attributes.md": [] },
                     { "docs/getting-started/tutorials/create-block/block-code.md": [] },
                     { "docs/getting-started/tutorials/create-block/author-experience.md": [] },
-                    { "docs/getting-started/tutorials/create-block/finishing.md": [] }
+                    { "docs/getting-started/tutorials/create-block/finishing.md": [] },
+                    { "docs/getting-started/tutorials/create-block/submitting-to-block-directory.md": [] }
                 ] }
             ] },
             { "docs/getting-started/glossary.md": [] },
