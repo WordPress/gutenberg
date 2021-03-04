@@ -21,7 +21,7 @@ import useInnerBlockTemplateSync from './use-inner-block-template-sync';
 import getBlockContext from './get-block-context';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
 import useBlockSync from '../provider/use-block-sync';
 import { defaultLayout, LayoutProvider } from './layout';
 import { store as blockEditorStore } from '../../store';
@@ -138,7 +138,7 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const fallbackRef = useRef();
-	const { clientId } = useBlockEditContext();
+	const clientId = useBlockClientId();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const hasOverlay = useSelect(
 		( select ) => {

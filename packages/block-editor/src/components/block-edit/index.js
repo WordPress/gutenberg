@@ -1,31 +1,67 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { createContext, useContext } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+const BlockClientId = createContext();
 
 /**
  * Internal dependencies
  */
 import Edit from './edit';
-import { BlockEditContextProvider, useBlockEditContext } from './context';
 
-export { useBlockEditContext };
+/**
+ * Returns the current (contextual) block client ID.
+ *
+ * @return {string} The block client ID.
+ */
+export function useBlockClientId() {
+	return useContext( BlockClientId );
+}
+
+/**
+ * A hook that returns the block client ID, name and selected status.
+ *
+ * @deprecated
+ *
+ * @return {Object} Block client ID, name and selected status.
+ */
+export function useBlockEditContext() {
+	deprecated( 'wp.blockEditor.useBlockEditContext', {
+		alternative: 'wp.blockEditor.useBlockClientId and wp.data.useSelect',
+	} );
+	const clientId = useBlockClientId();
+	return useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+
+			const { getBlockName, isBlockSelected } = select(
+				blockEditorStore
+			);
+
+			return {
+				clientId,
+				name: getBlockName( clientId ),
+				isSelected: isBlockSelected( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+}
 
 export default function BlockEdit( props ) {
-	const { name, isSelected, clientId } = props;
-	const context = {
-		name,
-		isSelected,
-		clientId,
-	};
 	return (
-		<BlockEditContextProvider
-			// It is important to return the same object if props haven't
-			// changed to avoid  unnecessary rerenders.
-			// See https://reactjs.org/docs/context.html#caveats.
-			value={ useMemo( () => context, Object.values( context ) ) }
-		>
+		<BlockClientId.Provider value={ props.clientId }>
 			<Edit { ...props } />
-		</BlockEditContextProvider>
+		</BlockClientId.Provider>
 	);
 }

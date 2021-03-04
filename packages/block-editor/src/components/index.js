@@ -17,7 +17,11 @@ export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
 export { default as BlockControls } from './block-controls';
 export { default as BlockColorsStyleSelector } from './color-style-selector';
-export { default as BlockEdit, useBlockEditContext } from './block-edit';
+export {
+	default as BlockEdit,
+	useBlockClientId,
+	useBlockEditContext,
+} from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';

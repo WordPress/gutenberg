@@ -17,7 +17,7 @@ import getBlockContext from './get-block-context';
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from './layout';
@@ -129,8 +129,7 @@ function ControlledInnerBlocks( props ) {
  * @param {Object} props The component props.
  */
 const InnerBlocks = ( props ) => {
-	const { clientId } = useBlockEditContext();
-
+	const clientId = useBlockClientId();
 	const allProps = {
 		clientId,
 		...props,

@@ -23,7 +23,7 @@ import {
  * Internal dependencies
  */
 import InspectorControls from '../inspector-controls';
-import { useBlockEditContext } from '../block-edit';
+import { useBlockClientId } from '../block-edit';
 import ColorPanel from './color-panel';
 import useEditorFeature from '../use-editor-feature';
 import { store as blockEditorStore } from '../../store';
@@ -62,7 +62,7 @@ export default function __experimentalUseColors(
 	},
 	deps = []
 ) {
-	const { clientId } = useBlockEditContext();
+	const clientId = useBlockClientId();
 	const settingsColors =
 		useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
 	const { attributes } = useSelect(

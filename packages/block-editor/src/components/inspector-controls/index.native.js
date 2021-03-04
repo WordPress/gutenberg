@@ -8,17 +8,24 @@ import { View } from 'react-native';
  */
 import { Children } from '@wordpress/element';
 import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
 import { BlockSettingsButton } from '../block-settings';
+import { store as blockEditorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
 const FillWithSettingsButton = ( { children, ...props } ) => {
-	const { isSelected } = useBlockEditContext();
+	const clientId = useBlockClientId();
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
+		[ clientId ]
+	);
+
 	if ( ! isSelected ) {
 		return null;
 	}

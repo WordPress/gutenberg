@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit';
+import { useBlockClientId } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
 const deprecatedFlags = {
@@ -73,13 +73,13 @@ function blockAttributesMatch( blockAttributes, attributes ) {
  * ```
  */
 export default function useEditorFeature( featurePath ) {
-	const { name: blockName, clientId } = useBlockEditContext();
-
+	const clientId = useBlockClientId();
 	const setting = useSelect(
 		( select ) => {
-			const { getBlockAttributes, getSettings } = select(
+			const { getBlockAttributes, getSettings, getBlockName } = select(
 				blockEditorStore
 			);
+			const blockName = getBlockName( clientId );
 			const settings = getSettings();
 			const blockType = select( blocksStore ).getBlockType( blockName );
 
@@ -123,7 +123,7 @@ export default function useEditorFeature( featurePath ) {
 			// To remove when __experimentalFeatures are ported to core.
 			return featurePath === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, clientId, featurePath ]
+		[ clientId, featurePath ]
 	);
 
 	return setting;

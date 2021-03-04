@@ -10,12 +10,14 @@ import { applyFilters, hasFilter } from '@wordpress/hooks';
 import { Autocomplete } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
 import blockAutocompleter from '../../autocompleters/block';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -32,7 +34,11 @@ const EMPTY_ARRAY = [];
  * @type {import('react').FC}
  */
 function BlockEditorAutocomplete( props ) {
-	const { name } = useBlockEditContext();
+	const clientId = useBlockClientId();
+	const name = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+		[ clientId ]
+	);
 
 	let { completers = EMPTY_ARRAY } = props;
 
