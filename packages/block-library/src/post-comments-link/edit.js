@@ -22,7 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
 function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 	const { textAlign } = attributes;
 	const { postType, postId } = context;
-	const [commentsCount, setCommentsCount] = useState();
+	const [ commentsCount, setCommentsCount ] = useState();
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -69,14 +69,13 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 	if ( commentsCount !== undefined ) {
 		if ( commentsCount.length === 0 ) {
 			commentsText = __( 'No comments' );
-		} else if (commentsCount.length === 1 ) {
+		} else if ( commentsCount.length === 1 ) {
 			commentsText = __( 'One comment' );
 		} else {
 			commentsText =
-			/* translators: %d Number of comments */
 			sprintf(
-				__( '%d comments' ),
-				commentsCount
+				/* translators: %d Number of comments */
+				__( '%d comments' ), commentsCount
 			)
 		}
 	}
@@ -95,7 +94,7 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 			<div { ...blockProps }>
 				{ link && commentsText !== undefined ? (
 					<a
-						href={ link + "#comments" }
+						href={ link + '#comments' }
 						onClick={ ( event ) => event.preventDefault() }
 					>
 						{ commentsText }
