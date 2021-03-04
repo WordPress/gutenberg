@@ -41,6 +41,8 @@ const transforms = {
 				const {
 					align,
 					backgroundColor,
+					textColor,
+					style,
 					mediaAlt: alt,
 					mediaId: id,
 					mediaPosition,
@@ -77,7 +79,13 @@ const transforms = {
 				}
 				return createBlock(
 					'core/columns',
-					{ align, backgroundColor, verticalAlignment },
+					{
+						align,
+						backgroundColor,
+						textColor,
+						style,
+						verticalAlignment,
+					},
 					createBlocksFromInnerBlocksTemplate( innerBlocksTemplate )
 				);
 			},
