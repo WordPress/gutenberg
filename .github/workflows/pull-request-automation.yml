@@ -10,7 +10,7 @@ jobs:
     steps:
     # Checkout defaults to using the branch which triggered the event, which
     # isn't necessarily `trunk` (e.g. in the case of a merge).
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
       with:
         ref: trunk
 
