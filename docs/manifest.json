@@ -72,6 +72,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Share your Block with the World",
+		"slug": "submitting-to-block-directory",
+		"markdown_source": "../docs/getting-started/tutorials/create-block/submitting-to-block-directory.md",
+		"parent": "create-block"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
