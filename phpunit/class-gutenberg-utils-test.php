@@ -149,6 +149,10 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 				  }',
 				'out' => '#foo{content:" ";bar:0}',
 			),
+			array(
+				'in'  => '.foo { width: calc(50% - .625em) }',
+				'out' => '.foo{width:calc(50% - .625em)}', // Preserve spaces inside calc().
+			)
 		);
 
 		foreach ( $cases as $case ) {
