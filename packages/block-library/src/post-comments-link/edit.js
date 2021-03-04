@@ -30,22 +30,6 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		} ),
 	} );
 
-	const post = useSelect(
-		( select ) =>
-			select( coreStore ).getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
-	);
-
-	if ( ! post ) {
-		return null;
-	}
-
-	const { link } = post;
-
 	useEffect( () => {
 		if ( ! postId ) {
 			return;
@@ -65,6 +49,22 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		} );
 	}, [ postId ] );
 
+	const post = useSelect(
+		(select) =>
+			select(coreStore).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			),
+		[postType, postId]
+	);
+
+	if (!post) {
+		return null;
+	}
+
+	const { link } = post;
+
 	let commentsText;
 	if ( commentsCount !== undefined ) {
 		if ( commentsCount.length === 0 ) {
@@ -72,11 +72,10 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		} else if ( commentsCount.length === 1 ) {
 			commentsText = __( 'One comment' );
 		} else {
-			commentsText =
-			sprintf(
+			commentsText = sprintf(
 				/* translators: %d Number of comments */
 				__( '%d comments' ), commentsCount
-			)
+			);
 		}
 	}
 
