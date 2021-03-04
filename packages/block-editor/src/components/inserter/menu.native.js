@@ -41,7 +41,7 @@ function InserterMenu( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
 	// eslint-disable-next-line no-undef
-	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
+	const [ showSearchForm, setShowSearchForm ] = useState( true );
 
 	const {
 		showInsertionPoint,
