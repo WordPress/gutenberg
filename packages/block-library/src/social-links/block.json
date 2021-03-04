@@ -40,7 +40,13 @@
 			"center",
 			"right"
 		],
-		"anchor": true
+		"anchor": true,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"__experimentalBackgroundColorLabel": "Icon background color",
+			"__experimentalTextColorLabel": "Icon color"
+		},
+		"__experimentalSelector": ".wp-block-social-link"
 	},
 	"editorStyle": "wp-block-social-links-editor",
 	"style": "wp-block-social-links"
