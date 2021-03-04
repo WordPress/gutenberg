@@ -23,9 +23,14 @@ export function useBlockEditContext() {
 	const clientId = useContext( Context );
 	return useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+
 			const { getBlockName, isBlockSelected } = select(
 				blockEditorStore
 			);
+
 			return {
 				clientId,
 				name: getBlockName( clientId ),
