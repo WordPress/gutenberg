@@ -344,7 +344,14 @@ class BottomSheet extends Component {
 			listStyle = { flexGrow: 1 };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
+
+			// Allow setting a "static" height of the bottom sheet
+			// by settting the min height to the max height.
+			if ( this.props.setMinHeightToMaxHeight ) {
+				listStyle.minHeight = maxHeight;
+			}
 		}
+
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
