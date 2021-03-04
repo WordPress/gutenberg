@@ -28,9 +28,6 @@
 	figcaption {
 		@include caption-style();
 	}
-	// The embed block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
 
 	// Don't allow iframe to overflow it's container.
 	iframe {
