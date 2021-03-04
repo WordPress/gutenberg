@@ -225,7 +225,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 	}
 
-	$theme = $terms[0]->name;
+	$theme                = $terms[0]->name;
 	$original_file_exists = wp_get_theme()->get_stylesheet() === $theme &&
 		null !== _gutenberg_get_template_file( $post->post_type, $post->post_name );
 
