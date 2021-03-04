@@ -53,7 +53,7 @@ export default function SearchEdit( {
 	setAttributes,
 	className,
 } ) {
-	const textInput = useRef( null );
+	const textInput = useRef();
 	const isAndroid = Platform.OS === 'android';
 
 	let timeoutRef = null;
