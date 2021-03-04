@@ -25,6 +25,9 @@ import {
 	MENU_TEMPLATES_PAGES,
 	MENU_TEMPLATES_POSTS,
 	MENU_TEMPLATES_UNUSED,
+	TEMPLATES_GENERAL,
+	TEMPLATES_PAGES_PREFIXES,
+	TEMPLATES_POSTS_PREFIXES,
 	TEMPLATES_TOP_LEVEL,
 } from '../constants';
 import NewTemplateDropdown from '../new-template-dropdown';
@@ -36,24 +39,27 @@ import { isTemplateSuperseded } from '../template-hierarchy';
 function getTemplateLocation( template ) {
 	const { slug } = template;
 
-	if ( TEMPLATES_TOP_LEVEL.includes( slug ) ) {
+	const isTopLevelTemplate = TEMPLATES_TOP_LEVEL.includes( slug );
+	if ( isTopLevelTemplate ) {
 		return MENU_TEMPLATES;
 	}
 
-	if ( slug === 'page-home' ) {
+	const isGeneralTemplate = TEMPLATES_GENERAL.includes( slug );
+	if ( isGeneralTemplate ) {
 		return MENU_TEMPLATES_GENERAL;
 	}
 
-	if (
-		slug.startsWith( 'post-' ) ||
-		slug.startsWith( 'author-' ) ||
-		slug.startsWith( 'single-post-' ) ||
-		slug.startsWith( 'tag-' )
-	) {
+	const isPostsTemplate = TEMPLATES_POSTS_PREFIXES.some( ( prefix ) =>
+		slug.startsWith( prefix )
+	);
+	if ( isPostsTemplate ) {
 		return MENU_TEMPLATES_POSTS;
 	}
 
-	if ( slug.startsWith( 'page-' ) ) {
+	const isPagesTemplate = TEMPLATES_PAGES_PREFIXES.some( ( prefix ) =>
+		slug.startsWith( prefix )
+	);
+	if ( isPagesTemplate ) {
 		return MENU_TEMPLATES_PAGES;
 	}
 

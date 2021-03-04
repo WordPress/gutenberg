@@ -30,6 +30,17 @@ export const TEMPLATES_TOP_LEVEL = [
 	...TEMPLATES_SECONDARY,
 ];
 
+export const TEMPLATES_GENERAL = [ 'page-home' ];
+
+export const TEMPLATES_POSTS_PREFIXES = [
+	'post-',
+	'author-',
+	'single-post-',
+	'tag-',
+];
+
+export const TEMPLATES_PAGES_PREFIXES = [ 'page-' ];
+
 export const TEMPLATES_NEW_OPTIONS = [
 	'front-page',
 	'single-post',
