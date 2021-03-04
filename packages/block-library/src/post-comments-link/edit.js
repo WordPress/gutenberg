@@ -50,16 +50,16 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 	}, [ postId ] );
 
 	const post = useSelect(
-		(select) =>
-			select(coreStore).getEditedEntityRecord(
+		( select ) =>
+			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			),
-		[postType, postId]
+		[ postType, postId ]
 	);
 
-	if (!post) {
+	if ( ! post ) {
 		return null;
 	}
 
@@ -74,7 +74,8 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		} else {
 			commentsText = sprintf(
 				/* translators: %d Number of comments */
-				__( '%d comments' ), commentsCount
+				__( '%d comments' ),
+				commentsCount
 			);
 		}
 	}
