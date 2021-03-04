@@ -31,7 +31,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { pickRelevantMediaFiles } from '../shared';
+import { pickRelevantMediaFiles } from './shared';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
