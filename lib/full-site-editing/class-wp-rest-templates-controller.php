@@ -201,7 +201,8 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 		// If the request explicitly sets `is_custom` to false,
 		// delete the template post, and return the template file.
-		if ( isset( $request['is_custom'] ) && false === $request['is_custom'] ) {
+		$request_params_keys = array_keys( $request->get_json_params() );
+		if ( count( $request_params_keys ) === 2 && isset( $request['is_custom'] ) && false === $request['is_custom'] ) {
 			wp_delete_post( $template->wp_id, true );
 			return $this->prepare_item_for_response(
 				gutenberg_get_block_template( $request['id'], $this->post_type ),
