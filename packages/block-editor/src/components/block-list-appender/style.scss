@@ -53,3 +53,13 @@
 		transform: scale(0);
 	}
 }
+
+// One appender at a time.
+.has-child-selected {
+	.block-list-appender {
+		display: none;
+	}
+	.is-selected .block-list-appender {
+		display: initial;
+	}
+}
