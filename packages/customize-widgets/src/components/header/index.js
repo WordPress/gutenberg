@@ -11,7 +11,7 @@ import { plus } from '@wordpress/icons';
 /**
  * External dependencies
  */
-import { useDialogState, DialogDisclosure } from 'reakit/Dialog';
+import { DialogDisclosure } from 'reakit/Dialog';
 
 /**
  * Internal dependencies
@@ -22,12 +22,7 @@ const DialogDisclosureButton = forwardRef( ( props, ref ) => (
 	<DialogDisclosure as={ Button } { ...props } ref={ ref } />
 ) );
 
-function Header() {
-	const dialog = useDialogState( {
-		modal: false,
-		animated: 150,
-	} );
-
+function Header( { inserter } ) {
 	return (
 		<>
 			<div className="customize-widgets-header">
@@ -39,7 +34,7 @@ function Header() {
 						<ToolbarItem
 							as={ DialogDisclosureButton }
 							className="customize-widgets-header-toolbar__inserter-toggle"
-							isPressed={ dialog.visible }
+							isPressed={ inserter.visible }
 							isPrimary
 							icon={ plus }
 							/* translators: button label text should, if possible, be under 16
@@ -48,7 +43,7 @@ function Header() {
 								'Add block',
 								'Generic label for block inserter button'
 							) }
-							{ ...dialog }
+							{ ...inserter }
 						/>
 					</NavigableToolbar>
 				</div>
@@ -60,7 +55,7 @@ function Header() {
 				<BlockToolbar hideDragHandle />
 			</div>
 
-			<Inserter { ...dialog } />
+			<Inserter { ...inserter } />
 		</>
 	);
 }
