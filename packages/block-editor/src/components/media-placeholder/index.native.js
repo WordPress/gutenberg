@@ -161,7 +161,7 @@ function MediaPlaceholder( props ) {
 				}
 				multiple={ multiple }
 				isReplacingMedia={ false }
-				autoOpenMediaUpload={ autoOpenMediaUpload }
+				autoOpen={ autoOpenMediaUpload }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback
