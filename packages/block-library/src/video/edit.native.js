@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 	PanelBody,
 } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { withPreferredColorScheme, compose } from '@wordpress/compose';
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -35,6 +35,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -189,7 +190,12 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const { setAttributes, attributes, isSelected } = this.props;
+		const {
+			setAttributes,
+			attributes,
+			isSelected,
+			wasBlockJustInserted,
+		} = this.props;
 		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
@@ -221,6 +227,9 @@ class VideoEdit extends Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
+						autoOpenMediaUpload={
+							isSelected && ! src && wasBlockJustInserted()
+						}
 					/>
 				</View>
 			);
@@ -361,4 +370,22 @@ class VideoEdit extends Component {
 	}
 }
 
-export default withPreferredColorScheme( VideoEdit );
+export default compose( [
+	withDispatch( ( dispatch, { clientId }, { select } ) => {
+		return {
+			wasBlockJustInserted() {
+				const { clearLastBlockInserted } = dispatch( 'core/editor' );
+				const { wasBlockJustInserted } = select( 'core/editor' );
+
+				const result = wasBlockJustInserted( clientId );
+
+				if ( result ) {
+					clearLastBlockInserted();
+					return true;
+				}
+				return false;
+			},
+		};
+	} ),
+	withPreferredColorScheme,
+] )( VideoEdit );
