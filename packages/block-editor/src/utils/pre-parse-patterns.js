@@ -9,6 +9,24 @@ import { useEffect } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 
+const requestIdleCallback = ( () => {
+	if ( typeof window === 'undefined' ) {
+		return ( callback ) => {
+			setTimeout( () => callback( Date.now() ), 0 );
+		};
+	}
+
+	return window.requestIdleCallback || window.requestAnimationFrame;
+} )();
+
+const cancelIdleCallback = ( () => {
+	if ( typeof window === 'undefined' ) {
+		return clearTimeout;
+	}
+
+	return window.cancelIdleCallback || window.cancelAnimationFrame;
+} )();
+
 export function usePreParsePatterns() {
 	const patterns = useSelect(
 		( _select ) =>
@@ -39,14 +57,14 @@ export function usePreParsePatterns() {
 			);
 			window.console.timeEnd( marker );
 
-			handle = window.requestIdleCallback( callback );
+			handle = requestIdleCallback( callback );
 		};
 
 		window.console.time( '[usePreParsePatterns] initiate' );
 		window.console.timeEnd( '[usePreParsePatterns] initiate' );
 
-		handle = window.requestIdleCallback( callback );
-		return () => window.cancelIdleCallback( handle );
+		handle = requestIdleCallback( callback );
+		return () => cancelIdleCallback( handle );
 	}, [ patterns ] );
 
 	return null;
