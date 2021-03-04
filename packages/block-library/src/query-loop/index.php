@@ -34,7 +34,11 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		}
 	}
 
-	$posts      = get_posts( $query );
+	$posts = get_posts( $query );
+	if ( empty( $posts ) ) {
+		return '';
+	}
+
 	$classnames = '';
 	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
 		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
@@ -58,9 +62,6 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		$content      .= "<li>{$block_content}</li>";
 	}
 
-	if ( ! $content ) {
-		return '';
-	}
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,
