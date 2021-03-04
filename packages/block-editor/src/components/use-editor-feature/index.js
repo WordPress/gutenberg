@@ -64,7 +64,6 @@ function blockAttributesMatch( blockAttributes, attributes ) {
  * It works with nested objects using by finding the value at path.
  *
  * @param {string} featurePath The path to the feature.
- * @param {Object?} options    Options.
  *
  * @return {any} Returns the value defined for the setting.
  *
@@ -73,13 +72,9 @@ function blockAttributesMatch( blockAttributes, attributes ) {
  * const isEnabled = useEditorFeature( 'typography.dropCap' );
  * ```
  */
-export default function useEditorFeature(
-	featurePath,
-	{ __unstableForceContext } = {}
-) {
+export default function useEditorFeature( featurePath ) {
 	const blockEditContext = useBlockEditContext();
-	const { name: blockName, clientId } =
-		__unstableForceContext ?? blockEditContext;
+	const { name: blockName, clientId } = blockEditContext;
 
 	const setting = useSelect(
 		( select ) => {

@@ -58,9 +58,7 @@ export default function VisualEditor( { styles } ) {
 		paddingBottom: hasMetaBoxes ? null : '40vh',
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
-	const defaultLayout = useEditorFeature( 'layout', {
-		__unstableForceContext: { name: 'core/post-content' },
-	} );
+	const defaultLayout = useEditorFeature( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
 	const alignments =
 		contentSize || wideSize
