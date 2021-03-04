@@ -31,7 +31,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'single'         => array(
 			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
-			'description' => __( 'Template used to display a single post or entry.', 'gutenberg' ),
+			'description' => __( 'Template used to display a single blog post.', 'gutenberg' ),
 		),
 		'single-post'    => array(
 			'title'       => _x( 'Post', 'Template name', 'gutenberg' ),
@@ -39,7 +39,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'page'           => array(
 			'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Template used to render static pages.', 'gutenberg' ),
+			'description' => __( 'Template used to display individual pages.', 'gutenberg' ),
 		),
 		'archive'        => array(
 			'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
@@ -67,11 +67,11 @@ function gutenberg_get_default_template_types() {
 		),
 		'attachment'     => array(
 			'title'       => __( 'Media', 'gutenberg' ),
-			'description' => __( 'Used to display individual media items or attachements.', 'gutenberg' ),
+			'description' => __( 'Template used to display individual media items or attachments.', 'gutenberg' ),
 		),
 		'search'         => array(
 			'title'       => _x( 'Search', 'Template name', 'gutenberg' ),
-			'description' => __( 'Used to display search results.', 'gutenberg' ),
+			'description' => __( 'Template used to display search results.', 'gutenberg' ),
 		),
 		'privacy-policy' => array(
 			'title'       => __( 'Privacy Policy', 'gutenberg' ),
