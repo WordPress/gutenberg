@@ -407,7 +407,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			),
 			'status'               => $template->status,
 			'wp_id'                => $template->wp_id,
-			'original_file_exists' => $template->original_file_exists
+			'original_file_exists' => $template->original_file_exists,
 		);
 
 		if ( 'wp_template_part' === $template->type ) {
