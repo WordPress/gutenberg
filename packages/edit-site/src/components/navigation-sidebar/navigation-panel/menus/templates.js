@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, find, some } from 'lodash';
+import { map, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,19 +63,9 @@ function getTemplateLocation( template ) {
 function getUnusedTemplates( templates, showOnFront ) {
 	const unusedTemplates = [];
 
-	// `home` template is unused if it is superseded by `front-page`
-	// or show on front is set to show a page rather than blog posts.
-	const homeTemplateExists = some( templates, { slug: 'home' } );
-	if ( homeTemplateExists && showOnFront !== 'posts' ) {
-		unusedTemplates.push( find( templates, { slug: 'home' } ) );
-	}
-
-	const usedTemplates = templates.filter(
-		( template ) => ! unusedTemplates.includes( template )
-	);
-	const usedTemplateSlugs = map( usedTemplates, 'slug' );
+	const templateSlugs = map( templates, 'slug' );
 	const supersededTemplates = templates.filter( ( { slug } ) =>
-		isTemplateSuperseded( slug, usedTemplateSlugs )
+		isTemplateSuperseded( slug, templateSlugs, showOnFront )
 	);
 
 	return [ ...supersededTemplates, ...unusedTemplates ];
