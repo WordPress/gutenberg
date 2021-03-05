@@ -112,3 +112,9 @@ kbd {
 	font-size: inherit;
 	font-family: monospace;
 }
+
+// This is just here to override a wp-admin default style
+// it shouldn't be necessary after iframing the editor.
+ul {
+	list-style-type: disc;
+}
