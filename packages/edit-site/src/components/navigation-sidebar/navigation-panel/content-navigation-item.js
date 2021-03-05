@@ -33,9 +33,7 @@ export default function ContentNavigationItem( { item } ) {
 		},
 		[ isPreviewVisible ]
 	);
-	const { setPage, setIsNavigationPanelOpened } = useDispatch(
-		editSiteStore
-	);
+	const { setPage } = useDispatch( editSiteStore );
 
 	const onActivateItem = useCallback( () => {
 		const { type, slug, link, id } = item;
@@ -48,8 +46,7 @@ export default function ContentNavigationItem( { item } ) {
 				postId: id,
 			},
 		} );
-		setIsNavigationPanelOpened( false );
-	}, [ setPage, item, setIsNavigationPanelOpened ] );
+	}, [ setPage, item ] );
 
 	if ( ! item ) {
 		return null;
