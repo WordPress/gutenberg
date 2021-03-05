@@ -71,7 +71,7 @@ export default function TemplatePartEdit( {
 			<TagName { ...blockProps }>
 				<Warning>
 					{ sprintf(
-						/* translators: %s: template part slug */
+						/* translators: %s: Template part slug */
 						__(
 							'Template part has been deleted or is unavailable: %s'
 						),
