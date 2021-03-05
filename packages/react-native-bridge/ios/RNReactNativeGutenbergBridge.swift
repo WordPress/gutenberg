@@ -237,8 +237,20 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func fetchRequest(_ path: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        self.delegate?.gutenbergDidRequestFetch(path: path, completion: { (result) in
+    func fetchGetRequest(_ path: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidGetRequestFetch(path: path, completion: { (result) in
+            switch result {
+            case .success(let response):
+                resolver(response)
+            case .failure(let error):
+                rejecter("\(error.code)", error.description, error)
+            }
+        })
+    }
+    
+    @objc
+    func fetchPostRequest(_ path: String, parameters: [String: AnyObject]?, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidPostRequestFetch(path: path, parameters: parameters, completion: { (result) in
             switch result {
             case .success(let response):
                 resolver(response)

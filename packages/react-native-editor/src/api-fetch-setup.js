@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { fetchRequest } from '@wordpress/react-native-bridge';
+import {
+	fetchGetRequest,
+	fetchPostRequest,
+} from '@wordpress/react-native-bridge';
 import apiFetch from '@wordpress/api-fetch';
 
 // Please add only wp.org API paths here!
@@ -13,12 +16,24 @@ const SUPPORTED_ENDPOINTS = [
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
-const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
+const fetchHandler = (
+	{ path, data, method },
+	retries = 20,
+	retryCount = 1
+) => {
 	if ( ! isPathSupported( path ) ) {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
 
-	const responsePromise = fetchRequest( path );
+	let responsePromise;
+	switch ( method ) {
+		case 'POST':
+			responsePromise = fetchPostRequest( path, data );
+			break;
+		default:
+			responsePromise = fetchGetRequest( path );
+			break;
+	}
 
 	const parseResponse = ( response ) => {
 		if ( typeof response === 'string' ) {

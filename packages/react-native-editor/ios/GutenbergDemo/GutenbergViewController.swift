@@ -52,7 +52,11 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-    func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+    func gutenbergDidGetRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
+        completion(Result.success([:]))
+    }
+
+    func gutenbergDidPostRequestFetch(path: String, parameters: [String: AnyObject]?, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
 
