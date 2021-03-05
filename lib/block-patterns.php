@@ -72,7 +72,7 @@ register_block_pattern(
 			'block'     => array( 'core/template-part' ),
 			'variation' => 'header',
 		),
-		'categories'	=> array( 'tp_header' ),
+		'categories'	=> array( 'core/template-part_header' ),
 		'content' => '<!-- wp:spacer {"height":70} -->
 						<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 						<!-- /wp:spacer -->
@@ -106,7 +106,7 @@ register_block_pattern(
 			'block'     => array( 'core/template-part' ),
 			'variation' => 'footer',
 		),
-		'categories' => array( 'tp_footer' ),
+		'categories' => array( 'core/template-part_footer' ),
 		'content' => '<!-- wp:spacer {"height":70} -->
 						<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 						<!-- /wp:spacer -->

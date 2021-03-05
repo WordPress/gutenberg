@@ -7,7 +7,12 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { store as blocksStore, cloneBlock } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	cloneBlock,
+	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockType,
+} from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -51,7 +56,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 					'core/template-part'
 				);
 
-				const match = variations.find( ( variation ) =>
+				const activeVariation = variations.find( ( variation ) =>
 					variation.isActive?.(
 						block.attributes,
 						variation.attributes
@@ -66,14 +71,18 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 				);
 
 				const contextualInserterPatterns = templatePartpatterns.filter(
-					( pattern ) => pattern.scope.variation === match?.name
+					( pattern ) =>
+						pattern.scope.variation === activeVariation?.name
 				);
 
 				contextualPatterns.patterns = contextualInserterPatterns;
 				contextualPatterns.patternCategories = [
 					{
-						name: 'tp_' + match.name,
-						label: 'Template part: ' + match.name,
+						name: `${ block.name }_` + activeVariation.name,
+						label: getBlockLabel(
+							getBlockType( block.name ),
+							block.attributes
+						),
 					},
 				];
 			}
