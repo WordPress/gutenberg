@@ -49,7 +49,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			ref={ panelRef }
 			tabIndex="-1"
 		>
-			<div className="edit-site-navigation-panel__inner">
+			<div className={isOpen?"edit-site-navigation-panel__inner" :  "d-none" }>
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">
 						{ siteTitle }
