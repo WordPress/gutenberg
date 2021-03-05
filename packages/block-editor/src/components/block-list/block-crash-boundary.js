@@ -12,7 +12,9 @@ class BlockCrashBoundary extends Component {
 		};
 	}
 
-	componentDidCatch() {
+	componentDidCatch( error ) {
+		this.props.onError( error );
+
 		this.setState( {
 			hasError: true,
 		} );
@@ -20,7 +22,7 @@ class BlockCrashBoundary extends Component {
 
 	render() {
 		if ( this.state.hasError ) {
-			return this.props.fallback;
+			return null;
 		}
 
 		return this.props.children;

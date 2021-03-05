@@ -254,8 +254,6 @@ describe( 'Multi-block selection', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		// Wait for blocks to have updated asynchronously.
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		expect( await getSelectedFlatIndices() ).toEqual( [] );
 	} );
 
@@ -506,8 +504,6 @@ describe( 'Multi-block selection', () => {
 
 		await page.mouse.click( coord.x, coord.y );
 
-		// Wait for blocks to have updated asynchronously.
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [] );
 
