@@ -451,7 +451,7 @@ As noted in the [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) 
 
 > By default, the `latest` tag is used by npm to identify the current version of a package, and `npm install <pkg>` (without any `@<version>` or `@<tag>` specifier) installs the `latest` tag. Typically, projects only use the `latest` tag for stable release versions, and use other tags for unstable versions such as prereleases.
 
-In our case, we use the `next` tag for code. Package developers to install a package need to type:
+In our case, we use the `next` distribution tag for code. Developers that want to install such a version of the package need to type:
 
 ```bash
 npm install @wordpress/components@next
