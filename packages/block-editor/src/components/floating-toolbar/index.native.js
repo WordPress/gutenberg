@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
+import FloatingToolbarButtons from './buttons';
 import BlockSelectionButton from '../block-list/block-selection-button.native';
 import { store as blockEditorStore } from '../../store';
 import { useAnimations } from '../floating-toolbar-animations';
@@ -109,10 +110,13 @@ const FloatingToolbar = ( {
 				<BlockSelectionButton
 					clientId={ blockSelectionButtonClientId }
 				/>
+				<FloatingToolbarButtons.Slot />
 			</Animated.View>
 		)
 	);
 };
+
+export { default as FloatingToolbarButtons } from './buttons';
 
 const ComposedFloatingToolbar = compose( [
 	withSelect( ( select ) => {
