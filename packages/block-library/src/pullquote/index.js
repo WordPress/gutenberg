@@ -12,13 +12,14 @@ import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import transforms from './transforms';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Pullquote' ),
+	title: _x( 'Pullquote', 'block title' ),
 	description: __(
 		'Give special visual emphasis to a quote from your text.'
 	),
@@ -43,6 +44,7 @@ export const settings = {
 		},
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid color' ) },
 	],
+	transforms,
 	edit,
 	save,
 	deprecated,

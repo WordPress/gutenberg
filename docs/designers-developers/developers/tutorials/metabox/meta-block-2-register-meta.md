@@ -4,6 +4,8 @@ A post meta field is a WordPress object used to store extra data about a post. Y
 
 When registering the field, note the `show_in_rest` parameter. This ensures the data will be included in the REST API, which the block editor uses to load and save meta data. See the [`register_post_meta`](https://developer.wordpress.org/reference/functions/register_post_meta/) function definition for extra information.
 
+Additionally, your post type needs to support `custom-fields` for `register_post_meta` function to work
+
 To register the field, create a PHP plugin file called `myguten-meta-block.php` including:
 
 ```php

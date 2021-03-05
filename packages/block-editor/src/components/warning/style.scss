@@ -3,11 +3,10 @@
 	display: flex;
 	flex-wrap: wrap;
 	font-family: $default-font;
-	font-size: $default-font-size;
-	padding: ($grid-unit-10 - $border-width - $border-width) $grid-unit-15;
+	padding: 1em;
 
 	// Block UI appearance.
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 
@@ -15,8 +14,8 @@
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		margin: 1em 0;
-
+		color: $gray-900;
+		margin: 0;
 	}
 
 	// Required extra-specifity to override paragraph block styles.
@@ -35,13 +34,20 @@
 
 	.block-editor-warning__actions {
 		display: flex;
+		margin-top: 1em;
 	}
 
 	.block-editor-warning__action {
-		margin: 0 0 0 $grid-unit-10;
+		margin: 0 $grid-unit-10 0 0;
 	}
 }
 
 .block-editor-warning__secondary {
 	margin: auto 0 auto $grid-unit-10;
+}
+
+.components-popover.block-editor-warning__dropdown {
+	// Set z-index as if it's displayed on the bottom, otherwise the modal
+	// dialog popover might overlap if displayed on the bottom.
+	z-index: z-index(".components-popover.block-editor-warning__dropdown");
 }

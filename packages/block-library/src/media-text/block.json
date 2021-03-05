@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/media-text",
-	"category": "layout",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string",
@@ -63,6 +64,9 @@
 			"type": "number",
 			"default": 50
 		},
+		"mediaSizeSlug": {
+			"type": "string"
+		},
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
@@ -78,13 +82,14 @@
 		}
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"anchor": true,
+		"align": [ "wide", "full" ],
 		"html": false,
-		"__experimentalColor": {
-			"gradients": true
+		"color": {
+			"gradients": true,
+			"link": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-media-text-editor",
+	"style": "wp-block-media-text"
 }

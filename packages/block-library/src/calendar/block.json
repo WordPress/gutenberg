@@ -1,20 +1,8 @@
 {
+	"apiVersion": 2,
 	"name": "core/calendar",
 	"category": "widgets",
 	"attributes": {
-		"align": {
-			"type": "string",
-			"enum": [
-				"left",
-				"center",
-				"right",
-				"wide",
-				"full"
-			]
-		},
-		"className": {
-			"type": "string"
-		},
 		"month": {
 			"type": "integer"
 		},
@@ -24,5 +12,6 @@
 	},
 	"supports": {
 		"align": true
-	}
+	},
+	"style": "wp-block-calendar"
 }

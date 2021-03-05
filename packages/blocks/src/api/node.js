@@ -4,11 +4,6 @@
 import * as children from './children';
 
 /**
- * Browser dependencies
- */
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
-
-/**
  * A representation of a single node within a block's rich text value. If
  * representing a text node, the value is simply a string of the node value.
  * As representing an element node, it is an object of:
@@ -63,11 +58,11 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
-	if ( domNode.nodeType === TEXT_NODE ) {
+	if ( domNode.nodeType === domNode.TEXT_NODE ) {
 		return domNode.nodeValue;
 	}
 
-	if ( domNode.nodeType !== ELEMENT_NODE ) {
+	if ( domNode.nodeType !== domNode.ELEMENT_NODE ) {
 		throw new TypeError(
 			'A block node can only be created from a node of type text or ' +
 				'element.'

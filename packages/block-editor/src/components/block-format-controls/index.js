@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import { useBlockEditContext } from '../block-edit/context';
 
 const { Fill, Slot } = createSlotFill( 'BlockFormatControls' );
 
@@ -25,6 +25,11 @@ function BlockFormatControlsSlot( props ) {
 }
 
 function BlockFormatControlsFill( props ) {
+	const { isSelected } = useBlockEditContext();
+	if ( ! isSelected ) {
+		return null;
+	}
+
 	return (
 		<Fill>
 			{ ( fillProps ) => {
@@ -39,7 +44,7 @@ function BlockFormatControlsFill( props ) {
 	);
 }
 
-const BlockFormatControls = ifBlockEditSelected( BlockFormatControlsFill );
+const BlockFormatControls = BlockFormatControlsFill;
 
 BlockFormatControls.Slot = BlockFormatControlsSlot;
 

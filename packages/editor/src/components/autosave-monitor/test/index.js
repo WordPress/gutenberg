@@ -9,122 +9,133 @@ import { shallow } from 'enzyme';
 import { AutosaveMonitor } from '../';
 
 describe( 'AutosaveMonitor', () => {
-	const toggleTimer = jest.fn();
 	let wrapper;
+	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		toggleTimer.mockClear();
-		wrapper = shallow( <AutosaveMonitor />, {
+		jest.useFakeTimers();
+		setAutosaveTimerSpy = jest.spyOn(
+			AutosaveMonitor.prototype,
+			'setAutosaveTimer'
+		);
+		wrapper = shallow( <AutosaveMonitor isDirty />, {
 			lifecycleExperimental: true,
 		} );
+	} );
 
-		wrapper.instance().toggleTimer = toggleTimer;
+	afterEach( () => {
+		setAutosaveTimerSpy.mockClear();
+	} );
+
+	it( 'should start autosave timer after being mounted', () => {
+		expect( setAutosaveTimerSpy ).toHaveBeenCalled();
+	} );
+
+	it( 'should clear the autosave timer after being unmounted', () => {
+		wrapper.unmount();
+		expect( clearTimeout ).toHaveBeenCalled();
 	} );
 
 	describe( '#componentDidUpdate()', () => {
-		it( 'should start autosave timer when having become dirty and saveable', () => {
-			wrapper.setProps( { isDirty: true, isAutosaveable: true } );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( true );
+		it( 'should set needsAutosave=true when editReference changes', () => {
+			expect( wrapper.instance().needsAutosave ).toBe( false );
+			wrapper.setProps( {
+				editsReference: [],
+			} );
+			expect( wrapper.instance().needsAutosave ).toBe( true );
 		} );
 
-		it( 'should restart autosave timer when edits reference changes', () => {
-			const beforeReference = [];
-			const afterReference = [];
+		it( 'should set needsAutosave=true when editReference changes and the post becomes dirty', () => {
+			expect( wrapper.instance().needsAutosave ).toBe( false );
 			wrapper.setProps( {
 				isDirty: true,
-				isAutosaveable: true,
-				editsReference: beforeReference,
+				editsReference: [],
 			} );
-			toggleTimer.mockClear();
+			expect( wrapper.instance().needsAutosave ).toBe( true );
+		} );
 
+		it( 'should not set needsAutosave=true when editReference changes and the post is not dirty anymore', () => {
+			expect( wrapper.instance().needsAutosave ).toBe( false );
 			wrapper.setProps( {
 				isDirty: true,
-				isAutosaveable: true,
-				editsReference: beforeReference,
+				editsReference: [],
 			} );
-
-			expect( toggleTimer ).not.toHaveBeenCalled();
-
-			wrapper.setProps( {
-				isDirty: true,
-				isAutosaveable: true,
-				editsReference: afterReference,
-			} );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( true );
-		} );
-
-		it( 'should stop autosave timer when the autosave is up to date', () => {
-			wrapper.setProps( { isDirty: true, isAutosaveable: false } );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( false );
-		} );
-
-		it( 'should stop autosave timer when having become dirty but not autosaveable', () => {
-			wrapper.setProps( { isDirty: true, isAutosaveable: false } );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( false );
-		} );
-
-		it( 'should stop autosave timer when having become not dirty', () => {
-			wrapper.setProps( { isDirty: true } );
-			toggleTimer.mockClear();
-			wrapper.setProps( { isDirty: false } );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( false );
-		} );
-
-		it( 'should stop autosave timer when having become not autosaveable', () => {
-			wrapper.setProps( { isDirty: true } );
-			toggleTimer.mockClear();
-			wrapper.setProps( { isAutosaveable: false } );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( false );
-		} );
-
-		it( 'should avoid scheduling autosave if still dirty but already autosaved for edits', () => {
-			// Explanation: When a published post is autosaved, it's still in a
-			// dirty state since the edits are not saved to the post until the
-			// user clicks "Update". To avoid recurring autosaves, ensure that
-			// an edit has occurred since the last autosave had completed.
-
-			const beforeReference = [];
-			const afterReference = [];
-
-			// A post is non-dirty while autosave is in-flight.
 			wrapper.setProps( {
 				isDirty: false,
+				editsReference: [],
+			} );
+			expect( wrapper.instance().needsAutosave ).toBe( false );
+		} );
+
+		it( 'should set needsAutosave=true when editReference changes and the post is not autosaving', () => {
+			expect( wrapper.instance().needsAutosave ).toBe( false );
+			wrapper.setProps( {
+				isAutosaving: false,
+				editsReference: [],
+			} );
+			expect( wrapper.instance().needsAutosave ).toBe( true );
+		} );
+
+		it( 'should not set needsAutosave=true when editReference changes and the post started autosaving', () => {
+			expect( wrapper.instance().needsAutosave ).toBe( false );
+			wrapper.setProps( {
+				isAutosaving: false,
+				editsReference: [],
+			} );
+			wrapper.setProps( {
 				isAutosaving: true,
-				isAutosaveable: true,
-				editsReference: beforeReference,
+				editsReference: [],
 			} );
-			toggleTimer.mockClear();
-			wrapper.setProps( {
-				isDirty: true,
-				isAutosaving: false,
-				isAutosaveable: true,
-				editsReference: beforeReference,
-			} );
-
-			expect( toggleTimer ).toHaveBeenCalledWith( false );
-
-			// Once edit occurs after autosave, resume scheduling.
-			wrapper.setProps( {
-				isDirty: true,
-				isAutosaving: false,
-				isAutosaveable: true,
-				editsReference: afterReference,
-			} );
-
-			expect( toggleTimer.mock.calls[ 1 ][ 0 ] ).toBe( true );
+			expect( wrapper.instance().needsAutosave ).toBe( false );
 		} );
 	} );
 
-	describe( '#componentWillUnmount()', () => {
-		it( 'should stop autosave timer', () => {
-			wrapper.unmount();
+	describe( '#autosaveTimerHandler()', () => {
+		it( 'should schedule itself in another {interval} ms', () => {
+			wrapper.setProps( {
+				isAutosaveable: true,
+				interval: 5,
+			} );
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 1 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+			expect( setTimeout ).lastCalledWith( expect.any( Function ), 5000 );
+		} );
 
-			expect( toggleTimer ).toHaveBeenCalledWith( false );
+		it( 'should schedule itself in 1000 ms if the post is not autosaveable at a time', () => {
+			wrapper.setProps( {
+				isAutosaveable: false,
+				interval: 5,
+			} );
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 1 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+			expect( setTimeout ).lastCalledWith( expect.any( Function ), 1000 );
+		} );
+
+		it( 'should call autosave if needsAutosave=true', () => {
+			const autosave = jest.fn();
+			wrapper.setProps( {
+				isAutosaveable: true,
+				interval: 5,
+				autosave,
+			} );
+			wrapper.instance().needsAutosave = true;
+			expect( autosave ).toHaveBeenCalledTimes( 0 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( autosave ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should not call autosave if needsAutosave is not true', () => {
+			const autosave = jest.fn();
+			wrapper.setProps( {
+				isAutosaveable: true,
+				interval: 5,
+				autosave,
+			} );
+			wrapper.instance().needsAutosave = false;
+			expect( autosave ).toHaveBeenCalledTimes( 0 );
+			wrapper.instance().autosaveTimerHandler();
+			expect( autosave ).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 

@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { unstable_CompositeItem as CompositeItem } from 'reakit/Composite';
-
-/**
  * Internal dependencies
  */
+import { CompositeItem } from '../composite';
 import Tooltip from '../tooltip';
 import VisuallyHidden from '../visually-hidden';
 

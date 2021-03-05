@@ -3,9 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -28,14 +26,23 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 			type: 'post',
 			subtype: 'post',
 		} ),
-	} ).then( ( posts ) =>
-		posts.map( ( post ) => ( {
-			url: post.url,
-			type: post.subtype || post.type,
-			id: post.id,
-			title: decodeEntities( post.title ) || __( '(no title)' ),
-		} ) )
-	);
+	} )
+		.then( ( posts ) =>
+			Promise.all(
+				posts.map( ( post ) =>
+					apiFetch( { url: post._links.self[ 0 ].href } )
+				)
+			)
+		)
+		.then( ( posts ) =>
+			posts.map( ( post ) => ( {
+				url: post.link,
+				type: post.type,
+				id: post.id,
+				slug: post.slug,
+				title: post.title.rendered || __( '(no title)' ),
+			} ) )
+		);
 
 /**
  * Initializes the site editor screen.
@@ -44,12 +51,19 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
+	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
+
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( true );
 	}
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
-	render( <Editor settings={ settings } />, document.getElementById( id ) );
+
+	render(
+		<Editor initialSettings={ settings } />,
+		document.getElementById( id )
+	);
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
+export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

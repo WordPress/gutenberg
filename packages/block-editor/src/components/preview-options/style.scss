@@ -1,21 +1,5 @@
 .block-editor-post-preview__dropdown {
-	display: none;
-	margin-right: $grid-unit-15;
 	padding: 0;
-}
-
-.block-editor-post-preview__button-toggle {
-	display: flex;
-	justify-content: space-between;
-	padding: 0 $grid-unit-10 0 $grid-unit-15;
-
-	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
-	}
-
-	svg {
-		margin-left: $grid-unit-05;
-	}
 }
 
 .block-editor-post-preview__button-resize.block-editor-post-preview__button-resize {
@@ -31,20 +15,54 @@
 		overflow-y: visible;
 	}
 
+	&.edit-post-post-preview-dropdown {
+		.components-menu-group {
+			&:first-child {
+				padding-bottom: $grid-unit-10;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
 	.components-menu-group + .components-menu-group {
-		border-top: $border-width solid $light-gray-secondary;
-		padding: $grid-unit-10 $grid-unit-15;
-		margin-left: -$grid-unit-15;
-		margin-right: -$grid-unit-15;
+		padding: $grid-unit-10;
 	}
 }
 
-@include break-small() {
-	.editor-post-preview {
-		display: none;
+.edit-post-header__settings,
+.edit-site-header__actions {
+	@include break-small () {
+		.editor-post-preview {
+			display: none;
+		}
 	}
+}
 
-	.block-editor-post-preview__dropdown {
-		display: flex;
+// Reduced UI.
+.edit-post-header.has-reduced-ui {
+	@include break-small() {
+		// Apply transition to first two buttons.
+		.edit-post-header__settings .editor-post-save-draft,
+		.edit-post-header__settings .editor-post-saved-state,
+		.edit-post-header__settings .block-editor-post-preview__button-toggle {
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		// Zero out opacity unless hovered.
+		&:not(:hover) {
+			.edit-post-header__settings .editor-post-save-draft,
+			.edit-post-header__settings .editor-post-saved-state,
+			.edit-post-header__settings .block-editor-post-preview__button-toggle {
+				opacity: 0;
+			}
+
+			// ... or opened.
+			.edit-post-header__settings .block-editor-post-preview__button-toggle.is-opened {
+				opacity: 1;
+			}
+		}
 	}
 }

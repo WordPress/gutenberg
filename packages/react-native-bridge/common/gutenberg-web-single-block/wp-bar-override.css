@@ -1,0 +1,11 @@
+#wpbody {
+    padding-top: 0px;
+}
+
+#wp-toolbar {
+    display: none;
+}
+
+#wpadminbar {
+    display: none;
+}

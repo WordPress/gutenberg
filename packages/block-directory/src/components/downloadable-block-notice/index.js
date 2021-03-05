@@ -2,13 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Notice } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
-export const DownloadableBlockNotice = ( { block, onClick } ) => {
+/**
+ * Internal dependencies
+ */
+import { store as blockDirectoryStore } from '../../store';
+
+export const DownloadableBlockNotice = ( { block } ) => {
 	const errorNotice = useSelect(
 		( select ) =>
-			select( 'core/block-directory' ).getErrorNoticeForBlock( block.id ),
+			select( blockDirectoryStore ).getErrorNoticeForBlock( block.id ),
 		[ block ]
 	);
 
@@ -17,24 +21,14 @@ export const DownloadableBlockNotice = ( { block, onClick } ) => {
 	}
 
 	return (
-		<Notice
-			status="error"
-			isDismissible={ false }
-			className="block-directory-downloadable-block-notice"
-		>
+		<div className="block-directory-downloadable-block-notice">
 			<div className="block-directory-downloadable-block-notice__content">
-				{ errorNotice }
+				{ errorNotice.message }
+				{ errorNotice.isFatal
+					? ' ' + __( 'Try reloading the page.' )
+					: null }
 			</div>
-			<Button
-				isSmall
-				isPrimary
-				onClick={ () => {
-					onClick( block );
-				} }
-			>
-				{ __( 'Retry' ) }
-			</Button>
-		</Notice>
+		</div>
 	);
 };
 

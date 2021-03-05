@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import {
-	Button,
+	ToolbarButton,
 	Dropdown,
 	ToolbarGroup,
 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
@@ -19,17 +19,19 @@ export function BlockAlignmentMatrixToolbar( props ) {
 		label = __( 'Change matrix alignment' ),
 		onChange = noop,
 		value = 'center',
+		isDisabled,
 	} = props;
 
 	const icon = <AlignmentMatrixControl.Icon value={ value } />;
 	const className = 'block-editor-block-alignment-matrix-toolbar';
 	const popoverClassName = `${ className }__popover`;
+	const isAlternate = true;
 
 	return (
 		<Dropdown
 			position="bottom right"
 			className={ className }
-			popoverProps={ { className: popoverClassName } }
+			popoverProps={ { className: popoverClassName, isAlternate } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
@@ -41,7 +43,7 @@ export function BlockAlignmentMatrixToolbar( props ) {
 
 				return (
 					<ToolbarGroup>
-						<Button
+						<ToolbarButton
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
@@ -49,6 +51,7 @@ export function BlockAlignmentMatrixToolbar( props ) {
 							label={ label }
 							icon={ icon }
 							showTooltip
+							disabled={ isDisabled }
 						/>
 					</ToolbarGroup>
 				);

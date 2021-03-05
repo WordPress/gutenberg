@@ -13,25 +13,43 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, align, id } ) =>
-				createBlock( 'core/cover', {
-					title: caption,
-					url,
-					align,
-					id,
-				} ),
+			transform: ( { caption, url, align, id, anchor } ) =>
+				createBlock(
+					'core/cover',
+					{
+						url,
+						align,
+						id,
+						anchor,
+					},
+					[
+						createBlock( 'core/paragraph', {
+							content: caption,
+							fontSize: 'large',
+						} ),
+					]
+				),
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { caption, src, align, id } ) =>
-				createBlock( 'core/cover', {
-					title: caption,
-					url: src,
-					align,
-					id,
-					backgroundType: VIDEO_BACKGROUND_TYPE,
-				} ),
+			transform: ( { caption, src, align, id, anchor } ) =>
+				createBlock(
+					'core/cover',
+					{
+						url: src,
+						align,
+						id,
+						backgroundType: VIDEO_BACKGROUND_TYPE,
+						anchor,
+					},
+					[
+						createBlock( 'core/paragraph', {
+							content: caption,
+							fontSize: 'large',
+						} ),
+					]
+				),
 		},
 	],
 	to: [
@@ -58,12 +76,13 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id } ) =>
+			transform: ( { title, url, align, id, anchor } ) =>
 				createBlock( 'core/image', {
 					caption: title,
 					url,
 					align,
 					id,
+					anchor,
 				} ),
 		},
 		{
@@ -89,12 +108,13 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id } ) =>
+			transform: ( { title, url, align, id, anchor } ) =>
 				createBlock( 'core/video', {
 					caption: title,
 					src: url,
 					id,
 					align,
+					anchor,
 				} ),
 		},
 	],

@@ -10,7 +10,6 @@ import { flow, get, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-
 /**
  * Internal dependencies
  */
@@ -243,7 +242,8 @@ export function getBlockAttribute(
 	let value;
 
 	switch ( attributeSchema.source ) {
-		// undefined source means that it's an attribute serialized to the block's "comment"
+		// An undefined source means that it's an attribute serialized to the
+		// block's "comment".
 		case undefined:
 			value = commentAttributes
 				? commentAttributes[ attributeKey ]
@@ -325,15 +325,22 @@ export function getMigratedBlock( block, parsedAttributes ) {
 	const blockType = getBlockType( block.name );
 
 	const { deprecated: deprecatedDefinitions } = blockType;
+	// Bail early if there are no registered deprecations to be handled.
 	if ( ! deprecatedDefinitions || ! deprecatedDefinitions.length ) {
 		return block;
 	}
 
 	const { originalContent, innerBlocks } = block;
 
+	// By design, blocks lack any sort of version tracking. Instead, to process
+	// outdated content the system operates a queue out of all the defined
+	// attribute shapes and tries each definition until the input produces a
+	// valid result. This mechanism seeks to avoid polluting the user-space with
+	// machine-specific code. An invalid block is thus a block that could not be
+	// matched successfully with any of the registered deprecation definitions.
 	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
 		// A block can opt into a migration even if the block is valid by
-		// defining isEligible on its deprecation. If the block is both valid
+		// defining `isEligible` on its deprecation. If the block is both valid
 		// and does not opt to migrate, skip.
 		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
 		if ( block.isValid && ! isEligible( parsedAttributes, innerBlocks ) ) {
@@ -361,6 +368,8 @@ export function getMigratedBlock( block, parsedAttributes ) {
 			originalContent
 		);
 
+		// An invalid block does not imply incorrect HTML but the fact block
+		// source information could be lost on reserialization.
 		if ( ! isValid ) {
 			block = {
 				...block,
@@ -396,29 +405,17 @@ export function getMigratedBlock( block, parsedAttributes ) {
 }
 
 /**
- * Creates a block with fallback to the unknown type handler.
+ * Convert legacy blocks to their canonical form. This function is used
+ * both in the parser level for previous content and to convert such blocks
+ * used in Custom Post Types templates.
  *
- * @param {Object} blockNode Parsed block node.
+ * @param {string} name The block's name
+ * @param {Object} attributes The block's attributes
  *
- * @return {?Object} An initialized block object (if possible).
+ * @return {Object} The block's name and attributes, changed accordingly if a match was found
  */
-export function createBlockWithFallback( blockNode ) {
-	const { blockName: originalName } = blockNode;
-	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
-	const { innerContent } = blockNode;
-	const freeformContentFallbackBlock = getFreeformContentHandlerName();
-	const unregisteredFallbackBlock =
-		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
-
-	attributes = attributes || {};
-
-	// Trim content to avoid creation of intermediary freeform segments.
-	innerHTML = innerHTML.trim();
-
-	// Use type from block content if available. Otherwise, default to the
-	// freeform content fallback.
-	let name = originalName || freeformContentFallbackBlock;
-
+export function convertLegacyBlocks( name, attributes ) {
+	const newAttributes = { ...attributes };
 	// Convert 'core/cover-image' block in existing content to 'core/cover'.
 	if ( 'core/cover-image' === name ) {
 		name = 'core/cover';
@@ -433,11 +430,67 @@ export function createBlockWithFallback( blockNode ) {
 	// canonical form 'core/social-link'.
 	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
 		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
-		attributes.service = name.substring( 17 );
+		newAttributes.service = name.substring( 17 );
 		name = 'core/social-link';
 	}
 
-	// Fallback content may be upgraded from classic editor expecting implicit
+	// Convert derivative blocks such as 'core-embed/instagram' to the
+	// canonical form 'core/embed'.
+	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
+		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
+		const providerSlug = name.substring( 11 );
+		const deprecated = {
+			speaker: 'speaker-deck',
+			polldaddy: 'crowdsignal',
+		};
+		newAttributes.providerNameSlug =
+			providerSlug in deprecated
+				? deprecated[ providerSlug ]
+				: providerSlug;
+		// this is needed as the `responsive` attribute was passed
+		// in a different way before the refactoring to block variations
+		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
+			newAttributes.responsive = true;
+		}
+		name = 'core/embed';
+	}
+	return { name, attributes: newAttributes };
+}
+
+/**
+ * Creates a block with fallback to the unknown type handler.
+ *
+ * @param {Object} blockNode Parsed block node.
+ *
+ * @return {?Object} An initialized block object (if possible).
+ */
+export function createBlockWithFallback( blockNode ) {
+	const { blockName: originalName } = blockNode;
+
+	// The fundamental structure of a blocktype includes its attributes, inner
+	// blocks, and inner HTML. It is important to distinguish inner blocks from
+	// the HTML content of the block as only the latter is relevant for block
+	// validation and edit operations.
+	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
+	const { innerContent } = blockNode;
+
+	// Blocks that don't have a registered handler are considered freeform.
+	const freeformContentFallbackBlock = getFreeformContentHandlerName();
+	const unregisteredFallbackBlock =
+		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
+
+	attributes = attributes || {};
+
+	// Trim content to avoid creation of intermediary freeform segments.
+	innerHTML = innerHTML.trim();
+
+	// Use type from block content if available. Otherwise, default to the
+	// freeform content fallback.
+	let name = originalName || freeformContentFallbackBlock;
+
+	( { name, attributes } = convertLegacyBlocks( name, attributes ) );
+
+	// Fallback content may be upgraded from classic content expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
 	if ( name === freeformContentFallbackBlock ) {
@@ -460,7 +513,7 @@ export function createBlockWithFallback( blockNode ) {
 
 		// Preserve undelimited content for use by the unregistered type
 		// handler. A block node's `innerHTML` isn't enough, as that field only
-		// carries the block's own HTML and not its nested blocks'.
+		// carries the block's own HTML and not its nested blocks.
 		const originalUndelimitedContent = serializeBlockNode(
 			reconstitutedBlockNode,
 			{
@@ -531,6 +584,7 @@ export function createBlockWithFallback( blockNode ) {
 	// as invalid, or future serialization attempt results in an error.
 	block.originalContent = block.originalContent || innerHTML;
 
+	// Ensure all necessary migrations are applied to the block.
 	block = getMigratedBlock( block, attributes );
 
 	if ( block.validationIssues && block.validationIssues.length > 0 ) {
@@ -586,7 +640,7 @@ export function serializeBlockNode( blockNode, options = {} ) {
 	let childIndex = 0;
 	const content = innerContent
 		.map( ( item ) =>
-			// `null` denotes a nested block, otherwise we have an HTML fragment
+			// `null` denotes a nested block, otherwise we have an HTML fragment.
 			item !== null
 				? item
 				: serializeBlockNode( innerBlocks[ childIndex++ ], options )
@@ -617,7 +671,20 @@ const createParse = ( parseImplementation ) => ( content ) =>
 	}, [] );
 
 /**
- * Parses the post content with a PegJS grammar and returns a list of blocks.
+ * Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
+ * defined through a parsing expression grammar to take advantage of the regular
+ * cadence provided by block delimiters -- composed syntactically through HTML
+ * comments -- which, given a general HTML document as an input, returns a block
+ * list array representation.
+ *
+ * This is a recursive-descent parser that scans linearly once through the input
+ * document. Instead of directly recursing it utilizes a trampoline mechanism to
+ * prevent stack overflow. This initial pass is mainly interested in separating
+ * and isolating the blocks serialized in the document and manifestly not in the
+ * content within the blocks.
+ *
+ * @see
+ * https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/
  *
  * @param {string} content The post content.
  *

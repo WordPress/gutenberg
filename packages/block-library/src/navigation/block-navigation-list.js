@@ -1,17 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalBlockNavigationTree } from '@wordpress/block-editor';
+import {
+	__experimentalBlockNavigationTree,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 export default function BlockNavigationList( {
 	clientId,
-	__experimentalWithBlockNavigationSlots,
+	__experimentalFeatures,
 } ) {
 	const { block, selectedBlockClientId } = useSelect(
 		( select ) => {
 			const { getSelectedBlockClientId, getBlock } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			return {
@@ -22,16 +25,14 @@ export default function BlockNavigationList( {
 		[ clientId ]
 	);
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<__experimentalBlockNavigationTree
-			blocks={ [ block ] }
+			blocks={ block.innerBlocks }
 			selectedBlockClientId={ selectedBlockClientId }
 			selectBlock={ selectBlock }
-			__experimentalWithBlockNavigationSlots={
-				__experimentalWithBlockNavigationSlots
-			}
+			__experimentalFeatures={ __experimentalFeatures }
 			showNestedBlocks
 			showAppender
 			showBlockMovers

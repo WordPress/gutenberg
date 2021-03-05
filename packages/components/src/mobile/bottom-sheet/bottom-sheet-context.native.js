@@ -18,26 +18,23 @@ if (
 
 // Context in BottomSheet is necessary for controlling the
 // transition flow between subsheets and replacing a content inside them
-export const {
-	Provider: BottomSheetProvider,
-	Consumer: BottomSheetConsumer,
-} = createContext( {
+export const BottomSheetContext = createContext( {
 	// Specifies whether content is currently scrolling
 	isBottomSheetContentScrolling: false,
 	// Function called to enable scroll within bottom sheet
 	shouldEnableBottomSheetScroll: () => {},
-	// Function called to disable bottom sheet max height.
+	// Function called to enable/disable bottom sheet max height.
 	// E.g. used to extend bottom sheet on full screen in ColorPicker,
 	// which is helpful on small devices with set the largest font/display size.
-	shouldDisableBottomSheetMaxHeight: () => {},
+	shouldEnableBottomSheetMaxHeight: () => {},
 	// Callback that is called on closing bottom sheet
-	onCloseBottomSheet: () => {},
+	onHandleClosingBottomSheet: () => {},
 	// Android only: Function called to control android hardware back button functionality
-	onHardwareButtonPress: () => {},
-	// Function called to navigate to another subsheet
-	onReplaceSubsheet: () => {},
-	// Object contains extra data passed to the current subsheet
-	extraProps: {},
-	// Specifies the currently active subsheet name
-	currentScreen: undefined,
+	// Return true if the bottom-sheet default close action shouldn't be called
+	onHandleHardwareButtonPress: () => {},
 } );
+
+export const {
+	Provider: BottomSheetProvider,
+	Consumer: BottomSheetConsumer,
+} = BottomSheetContext;

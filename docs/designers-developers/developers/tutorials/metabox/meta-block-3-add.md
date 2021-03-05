@@ -9,6 +9,53 @@ The hook `useEntityProp` can be used by the blocks to get or change meta values.
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
 {% codetabs %}
+{% ESNext %}
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import { TextControl } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
+import { useBlockProps } from '@wordpress/block-editor';
+
+registerBlockType( 'myguten/meta-block', {
+	title: 'Meta Block',
+	icon: 'smiley',
+	category: 'text',
+
+	edit( { setAttributes, attributes } ) {
+		const blockProps = useBlockProps();
+		const postType = useSelect(
+			( select ) => select( 'core/editor' ).getCurrentPostType(),
+			[]
+		);
+		const [ meta, setMeta ] = useEntityProp(
+			'postType',
+			postType,
+			'meta'
+		);
+		const metaFieldValue = meta['myguten_meta_block_field'];
+		function updateMetaValue( newValue ) {
+			setMeta( { ...meta, 'myguten_meta_block_field': newValue } );
+		}
+
+		return (
+			<div { ...blockProps }>
+				<TextControl
+					label="Meta Block Field"
+					value={ metaFieldValue }
+					onChange={ updateMetaValue }
+				/>
+			</div>
+		);
+	},
+
+	// No information saved to the block
+	// Data is saved to post meta via the hook
+	save() {
+		return null;
+	},
+} );
+```
 {% ES5 %}
 ```js
 ( function( wp ) {
@@ -17,15 +64,15 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 	var TextControl = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 	var useEntityProp = wp.coreData.useEntityProp;
+	var useBlockProps = wp.blockEditor.useBlockProps;
 
 	registerBlockType( 'myguten/meta-block', {
 		title: 'Meta Block',
 		icon: 'smiley',
-		category: 'common',
+		category: 'text',
 
 		edit: function( props ) {
-			var className = props.className;
-
+			var blockProps = useBlockProps();
 			var postType = useSelect(
 				function( select ) {
 					return select( 'core/editor' ).getCurrentPostType();
@@ -55,7 +102,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 
 			return el(
 				'div',
-				{ className: className },
+				blockProps,
 				el( TextControl, {
 					label: 'Meta Block Field',
 					value: metaFieldValue,
@@ -72,51 +119,6 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 	} );
 } )( window.wp );
 ```
-{% ESNext %}
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import { TextControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useEntityProp } from '@wordpress/core-data';
-
-registerBlockType( 'myguten/meta-block', {
-	title: 'Meta Block',
-	icon: 'smiley',
-	category: 'common',
-
-	edit( { className, setAttributes, attributes } ) {
-		const postType = useSelect(
-			( select ) => select( 'core/editor' ).getCurrentPostType(),
-			[]
-		);
-		const [ meta, setMeta ] = useEntityProp(
-			'postType',
-			postType,
-			'meta'
-		);
-		const metaFieldValue = meta['myguten_meta_block_field'];
-		function updateMetaValue( newValue ) {
-			setMeta( { ...meta, 'myguten_meta_block_field': newValue } );
-		}
-
-		return (
-			<div className={ className }>
-				<TextControl
-					label="Meta Block Field"
-					value={ metaFieldValue }
-					onChange={ updateMetaValue }
-				/>
-			</div>
-		);
-	},
-
-	// No information saved to the block
-	// Data is saved to post meta via the hook
-	save() {
-		return null;
-	},
-} );
-```
 {% end %}
 
 **Important:** Before you test, you need to enqueue your JavaScript file and its dependencies. Note the WordPress packages used above are `wp.element`, `wp.blocks`, `wp.components`, `wp.data`, and `wp.coreData`. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:
@@ -126,7 +128,7 @@ function myguten_enqueue() {
 	wp_enqueue_script(
 		'myguten-script',
 		plugins_url( 'myguten.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data' )
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data', 'wp-block-editor' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
@@ -134,6 +136,6 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 You can now edit a draft post and add a Meta Block to the post. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by saving and reloading your draft, the form will still be filled in on reload.
 
-![Meta Block](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block.png)
+![Meta Block](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/designers-developers/developers/tutorials/metabox/meta-block.png)
 
 You can now use the post meta data in a template, or another block. See next section for [using post meta data](/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md). You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.

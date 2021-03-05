@@ -36,7 +36,7 @@ describe( 'Edit', () => {
 		const edit = () => <div />;
 		registerBlockType( 'core/test-block', {
 			save: noop,
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 			edit,
 		} );
@@ -50,7 +50,7 @@ describe( 'Edit', () => {
 		const save = () => <div />;
 		registerBlockType( 'core/test-block', {
 			save,
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 		} );
 
@@ -67,7 +67,7 @@ describe( 'Edit', () => {
 		registerBlockType( 'core/test-block', {
 			edit,
 			save: noop,
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 		} );
 
@@ -84,9 +84,9 @@ describe( 'Edit', () => {
 	it( 'should assign context', () => {
 		const edit = ( { context } ) => context.value;
 		registerBlockType( 'core/test-block', {
-			category: 'common',
+			category: 'text',
 			title: 'block title',
-			context: [ 'value' ],
+			usesContext: [ 'value' ],
 			edit,
 			save: noop,
 		} );
@@ -104,12 +104,10 @@ describe( 'Edit', () => {
 		it( 'should assign context', () => {
 			const edit = ( { context } ) => context.value;
 			registerBlockType( 'core/test-block', {
-				category: 'common',
+				apiVersion: 2,
+				category: 'text',
 				title: 'block title',
-				context: [ 'value' ],
-				supports: {
-					lightBlockWrapper: true,
-				},
+				usesContext: [ 'value' ],
 				edit,
 				save: noop,
 			} );

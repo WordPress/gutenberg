@@ -14,15 +14,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockNavigationTree from './tree';
+import { store as blockEditorStore } from '../../store';
 
 function BlockNavigation( {
 	rootBlock,
 	rootBlocks,
 	selectedBlockClientId,
 	selectBlock,
-	__experimentalWithBlockNavigationSlots,
-	__experimentalWithBlockNavigationBlockSettings,
-	__experimentalWithBlockNavigationBlockSettingsMinLevel,
+	__experimentalFeatures,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -36,41 +35,16 @@ function BlockNavigation( {
 	return (
 		<div className="block-editor-block-navigation__container">
 			<p className="block-editor-block-navigation__label">
-				{ __( 'Block navigation' ) }
+				{ __( 'List view' ) }
 			</p>
-			{ hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ [ rootBlock ] }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalWithBlockNavigationBlockSettings={
-						__experimentalWithBlockNavigationBlockSettings
-					}
-					__experimentalWithBlockNavigationBlockSettingsMinLevel={
-						__experimentalWithBlockNavigationBlockSettingsMinLevel
-					}
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
-					showNestedBlocks
-				/>
-			) }
-			{ ! hasHierarchy && (
-				<BlockNavigationTree
-					blocks={ rootBlocks }
-					selectedBlockClientId={ selectedBlockClientId }
-					selectBlock={ selectBlock }
-					__experimentalWithBlockNavigationBlockSettings={
-						__experimentalWithBlockNavigationBlockSettings
-					}
-					__experimentalWithBlockNavigationBlockSettingsMinLevel={
-						__experimentalWithBlockNavigationBlockSettingsMinLevel
-					}
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
-				/>
-			) }
+
+			<BlockNavigationTree
+				blocks={ hasHierarchy ? [ rootBlock ] : rootBlocks }
+				selectedBlockClientId={ selectedBlockClientId }
+				selectBlock={ selectBlock }
+				__experimentalFeatures={ __experimentalFeatures }
+				showNestedBlocks
+			/>
 		</div>
 	);
 }
@@ -80,14 +54,14 @@ export default compose(
 		const {
 			getSelectedBlockClientId,
 			getBlockHierarchyRootClientId,
-			getBlock,
-			getBlocks,
-		} = select( 'core/block-editor' );
+			__unstableGetBlockWithBlockTree,
+			__unstableGetBlockTree,
+		} = select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			rootBlocks: getBlocks(),
+			rootBlocks: __unstableGetBlockTree(),
 			rootBlock: selectedBlockClientId
-				? getBlock(
+				? __unstableGetBlockWithBlockTree(
 						getBlockHierarchyRootClientId( selectedBlockClientId )
 				  )
 				: null,
@@ -97,7 +71,7 @@ export default compose(
 	withDispatch( ( dispatch, { onSelect = noop } ) => {
 		return {
 			selectBlock( clientId ) {
-				dispatch( 'core/block-editor' ).selectBlock( clientId );
+				dispatch( blockEditorStore ).selectBlock( clientId );
 				onSelect( clientId );
 			},
 		};

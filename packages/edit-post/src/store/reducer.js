@@ -238,6 +238,34 @@ export function deviceType( state = 'Desktop', action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking whether the inserter is open.
+ *
+ * @param {boolean} state
+ * @param {Object}  action
+ */
+function isInserterOpened( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value;
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking whether the inserter is open.
+ *
+ * @param {boolean} state
+ * @param {Object}  action
+ */
+function isEditingTemplate( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_EDITING_TEMPLATE':
+			return action.value;
+	}
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
@@ -250,4 +278,6 @@ export default combineReducers( {
 	publishSidebarActive,
 	removedPanels,
 	deviceType,
+	isInserterOpened,
+	isEditingTemplate,
 } );

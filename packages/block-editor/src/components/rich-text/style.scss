@@ -46,7 +46,7 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		box-shadow: none;
 
 		// Block UI appearance.
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		border-radius: $radius-block-ui;
 		background-color: $white;
 	}

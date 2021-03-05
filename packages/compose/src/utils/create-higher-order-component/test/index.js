@@ -18,7 +18,7 @@ describe( 'createHigherOrderComponent', () => {
 		expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
 	} );
 
-	it( 'should use camel case starting with upper for wrapper prefix ', () => {
+	it( 'should use camel case starting with upper for wrapper prefix', () => {
 		const TestComponent = createHigherOrderComponent(
 			( OriginalComponent ) => OriginalComponent,
 			'with-one-two_threeFOUR'

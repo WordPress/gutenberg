@@ -9,6 +9,7 @@ import deepFreeze from 'deep-freeze';
 import {
 	getEntityRecord,
 	__experimentalGetEntityRecordNoResolver,
+	hasEntityRecords,
 	getEntityRecords,
 	__experimentalGetDirtyEntityRecords,
 	getEntityRecordNonTransientEdits,
@@ -26,6 +27,25 @@ describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],
 ] )( '%p', ( selector ) => {
+	it( 'should return undefined for unknown entity kind, name', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {},
+								itemIsComplete: {},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( selector( state, 'foo', 'bar', 'baz' ) ).toBeUndefined();
+	} );
+
 	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -34,6 +54,7 @@ describe.each( [
 						postType: {
 							queriedData: {
 								items: {},
+								itemIsComplete: {},
 								queries: {},
 							},
 						},
@@ -41,9 +62,7 @@ describe.each( [
 				},
 			},
 		} );
-		expect( selector( state, 'root', 'postType', 'post' ) ).toBe(
-			undefined
-		);
+		expect( selector( state, 'root', 'postType', 'post' ) ).toBeUndefined();
 	} );
 
 	it( 'should return a record by key', () => {
@@ -56,6 +75,9 @@ describe.each( [
 								items: {
 									post: { slug: 'post' },
 								},
+								itemIsComplete: {
+									post: true,
+								},
 								queries: {},
 							},
 						},
@@ -67,10 +89,47 @@ describe.each( [
 			slug: 'post',
 		} );
 	} );
+
+	it( 'should return null if no item received, filtered item requested', () => {} );
+
+	it( 'should return filtered item if incomplete item received, filtered item requested', () => {} );
+
+	it( 'should return null if incomplete item received, complete item requested', () => {} );
+
+	it( 'should return filtered item if complete item received, filtered item requested', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									1: {
+										id: 1,
+										content: 'chicken',
+										author: 'bob',
+									},
+								},
+								itemIsComplete: {
+									1: true,
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getEntityRecord( state, 'postType', 'post', 1, {
+				_fields: 'content',
+			} )
+		).toEqual( { content: 'chicken' } );
+	} );
 } );
 
-describe( 'getEntityRecords', () => {
-	it( 'should return an null by default', () => {
+describe( 'hasEntityRecords', () => {
+	it( 'returns false if entity records have not been received', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
@@ -78,6 +137,67 @@ describe( 'getEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {},
+								itemIsComplete: {},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( false );
+	} );
+
+	it( 'returns true if the entity configuration is not known', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {},
+			},
+		} );
+
+		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+	} );
+
+	it( 'returns true if entity records have been received', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									post: { slug: 'post' },
+									page: { slug: 'page' },
+								},
+								itemIsComplete: {
+									post: true,
+									page: true,
+								},
+								queries: {
+									'': [ 'post', 'page' ],
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( hasEntityRecords( state, 'root', 'postType' ) ).toBe( true );
+	} );
+} );
+
+describe( 'getEntityRecords', () => {
+	it( 'should return null by default', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {},
+								itemIsComplete: {},
 								queries: {},
 							},
 						},
@@ -86,6 +206,16 @@ describe( 'getEntityRecords', () => {
 			},
 		} );
 		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
+	} );
+
+	it( 'should return an empty array for an unknown entity configuration', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {},
+			},
+		} );
+
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
 	} );
 
 	it( 'should return all the records', () => {
@@ -98,6 +228,10 @@ describe( 'getEntityRecords', () => {
 								items: {
 									post: { slug: 'post' },
 									page: { slug: 'page' },
+								},
+								itemIsComplete: {
+									post: true,
+									page: true,
 								},
 								queries: {
 									'': [ 'post', 'page' ],
@@ -112,6 +246,75 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'post' },
 			{ slug: 'page' },
 		] );
+	} );
+
+	it( 'should return filtered items', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									1: {
+										id: 1,
+										content: 'chicken',
+										author: 'bob',
+									},
+								},
+								itemIsComplete: {
+									1: true,
+								},
+								queries: {
+									'_fields=id%2Ccontent': [ 1 ],
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getEntityRecords( state, 'postType', 'post', {
+				_fields: [ 'id', 'content' ],
+			} )
+		).toEqual( [ { id: 1, content: 'chicken' } ] );
+	} );
+
+	it( 'should return the same instance with the same arguments', () => {
+		let state = deepFreeze( {
+			entities: {
+				data: {},
+			},
+		} );
+
+		const postTypeFirstRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockFirstRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		// Simulate update states
+		state = { ...state };
+
+		const postTypeSecondRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockSecondRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		expect( postTypeFirstRecords ).toBe( postTypeSecondRecords );
+		expect( wpBlockFirstRecords ).toBe( wpBlockSecondRecords );
 	} );
 } );
 
@@ -138,6 +341,9 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 										},
 										id: 'someKey',
 									},
+								},
+								itemIsComplete: {
+									someKey: true,
 								},
 							},
 							edits: {

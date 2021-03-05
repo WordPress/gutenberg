@@ -219,7 +219,7 @@ class LatestPostsEdit extends Component {
 				onPress={ openGeneralSidebar }
 			>
 				<View style={ blockStyle }>
-					{ this.getInspectorControls() }
+					{ isSelected && this.getInspectorControls() }
 					<Icon icon={ icon } { ...iconStyle } />
 					<Text style={ titleStyle }>
 						{ blockType.settings.title }

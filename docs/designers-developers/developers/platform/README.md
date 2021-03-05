@@ -35,7 +35,7 @@ The [wp-scripts package](https://developer.wordpress.org/block-editor/packages/p
 
 Here is a quick example, on how to use wp-scripts in your project.
 
-Install the depenency:
+Install the dependency:
 
 ```bash
 npm install --save-dev @wordpress/scripts
@@ -54,7 +54,7 @@ You can then add a scripts section to your package.json file, for example:
 
 You can then use `npm run build` to build your project with all the default webpack settings already configured, likewise for formating and linting. The `start` command is used for development mode. See [the scripts package](https://www.npmjs.com/package/@wordpress/scripts) for full documentation.
 
-You can also play with the [Gutenberg Example #03](https://github.com/WordPress/gutenberg-examples/tree/master/03-editable-esnext) for a complete setup using the wp-scripts package.
+You can also play with the [Gutenberg Example #03](https://github.com/WordPress/gutenberg-examples/tree/HEAD/03-editable-esnext) for a complete setup using the wp-scripts package.
 
 ## Block Editor
 

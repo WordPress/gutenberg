@@ -1,5 +1,11 @@
 .edit-post-post-visibility {
 	width: 100%;
+	justify-content: left;
+
+	span {
+		display: block;
+		width: 45%;
+	}
 }
 
 .edit-post-post-visibility__dialog .components-popover__content {
@@ -28,7 +34,7 @@
 }
 
 .edit-post-post-visibility__dialog-info {
-	color: $dark-gray-200;
+	color: $gray-700;
 	padding-left: 20px;
 	font-style: italic;
 	margin: 4px 0 0;

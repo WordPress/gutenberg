@@ -18,19 +18,39 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 
-	$query = array(
-		'post_type'    => 'post',
-		'offset'       => isset( $block->context['query']['perPage'] ) ? ( $block->context['query']['perPage'] * ( $page - 1 ) + $block->context['query']['offset'] ) : 0,
-		'category__in' => $block->context['query']['categoryIds'],
-	);
-	if ( isset( $block->context['query']['perPage'] ) ) {
-		$query['posts_per_page'] = $block->context['query']['perPage'];
+	$query = construct_wp_query_args( $block, $page );
+	// Override the custom query with the global query if needed.
+	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
+	if ( $use_global_query ) {
+		global $wp_query;
+		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+			// Unset `offset` because if is set, $wp_query overrides/ignores the paged parameter and breaks pagination.
+			unset( $query['offset'] );
+			$query = wp_parse_args( $wp_query->query_vars, $query );
+
+			if ( empty( $query['post_type'] ) && is_singular() ) {
+				$query['post_type'] = get_post_type( get_the_ID() );
+			}
+		}
 	}
+
 	$posts = get_posts( $query );
+	if ( empty( $posts ) ) {
+		return '';
+	}
+
+	$classnames = '';
+	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
+			$classnames = "is-flex-container columns-{$block->context['layout']['columns']}";
+		}
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 	$content = '';
 	foreach ( $posts as $post ) {
-		$content .= (
+		$block_content = (
 			new WP_Block(
 				$block->parsed_block,
 				array(
@@ -39,8 +59,14 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
+		$content      .= "<li>{$block_content}</li>";
 	}
-	return $content;
+
+	return sprintf(
+		'<ul %1$s>%2$s</ul>',
+		$wrapper_attributes,
+		$content
+	);
 }
 
 /**

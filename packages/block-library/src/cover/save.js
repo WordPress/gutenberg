@@ -10,6 +10,7 @@ import {
 	InnerBlocks,
 	getColorClassName,
 	__experimentalGetGradientClass,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -34,8 +35,10 @@ export default function save( { attributes } ) {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		overlayColor,
 		url,
+		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
 	} = attributes;
@@ -48,22 +51,25 @@ export default function save( { attributes } ) {
 		? `${ minHeightProp }${ minHeightUnit }`
 		: minHeightProp;
 
-	const style =
-		backgroundType === IMAGE_BACKGROUND_TYPE
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+	const isImgElement = ! ( hasParallax || isRepeated );
+
+	const style = {
+		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
-			: {};
-	if ( ! overlayColorClass ) {
-		style.backgroundColor = customOverlayColor;
-	}
-	if ( focalPoint && ! hasParallax ) {
-		style.backgroundPosition = `${ Math.round(
-			focalPoint.x * 100
-		) }% ${ Math.round( focalPoint.y * 100 ) }%`;
-	}
-	if ( customGradient && ! url ) {
-		style.background = customGradient;
-	}
-	style.minHeight = minHeight || undefined;
+			: {} ),
+		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
+		background: customGradient && ! url ? customGradient : undefined,
+		minHeight: minHeight || undefined,
+	};
+
+	const objectPosition =
+		// prettier-ignore
+		focalPoint && isImgElement
+			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			: undefined;
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
@@ -71,6 +77,7 @@ export default function save( { attributes } ) {
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
@@ -81,7 +88,7 @@ export default function save( { attributes } ) {
 	);
 
 	return (
-		<div className={ classes } style={ style }>
+		<div { ...useBlockProps.save( { className: classes, style } ) }>
 			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 				<span
 					aria-hidden="true"
@@ -96,14 +103,33 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
-			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+			{ isImageBackground && isImgElement && url && (
+				<img
+					className={ classnames(
+						'wp-block-cover__image-background',
+						id ? `wp-image-${ id }` : null
+					) }
+					alt=""
+					src={ url }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
+				/>
+			) }
+			{ isVideoBackground && url && (
 				<video
-					className="wp-block-cover__video-background"
+					className={ classnames(
+						'wp-block-cover__video-background',
+						'intrinsic-ignore'
+					) }
 					autoPlay
 					muted
 					loop
 					playsInline
 					src={ url }
+					style={ { objectPosition } }
+					data-object-fit="cover"
+					data-object-position={ objectPosition }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">

@@ -25,7 +25,7 @@ describe( 'InnerBlocks', () => {
 
 	it( 'should return element as string, with inner blocks', () => {
 		registerBlockType( 'core/fruit', {
-			category: 'common',
+			category: 'text',
 
 			title: 'fruit',
 
@@ -88,7 +88,7 @@ describe( 'InnerBlocks', () => {
 					</p>
 				);
 			},
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 		};
 		registerBlockType( 'core/test-block', blockType );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { sortBy, forEach, without } from 'lodash';
+import { without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,6 @@ class SlotFillProvider extends Component {
 
 	unregisterFill( name, instance ) {
 		this.fills[ name ] = without( this.fills[ name ], instance );
-		this.resetFillOccurrence( name );
 		this.forceUpdateSlot( name );
 	}
 
@@ -109,17 +108,11 @@ class SlotFillProvider extends Component {
 		if ( this.slots[ name ] !== slotInstance ) {
 			return [];
 		}
-		return sortBy( this.fills[ name ], 'occurrence' );
+		return this.fills[ name ];
 	}
 
 	hasFills( name ) {
 		return this.fills[ name ] && !! this.fills[ name ].length;
-	}
-
-	resetFillOccurrence( name ) {
-		forEach( this.fills[ name ], ( instance ) => {
-			instance.occurrence = undefined;
-		} );
 	}
 
 	forceUpdateSlot( name ) {

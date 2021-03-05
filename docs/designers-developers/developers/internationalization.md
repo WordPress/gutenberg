@@ -24,68 +24,79 @@ function myguten_block_init() {
     wp_register_script(
         'myguten-script',
         plugins_url( 'block.js', __FILE__ ),
-        array( 'wp-blocks', 'wp-element', 'wp-i18n' )
+        array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor' )
     );
 
     register_block_type( 'myguten/simple', array(
+		'apiVersion' => 2,
         'editor_script' => 'myguten-script',
     ) );
 }
 add_action( 'init', 'myguten_block_init' );
 ```
 
-In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic static block example, this is in a file called `block.js`:
+In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic block example:
 
 {% codetabs %}
+{% ESNext %}
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
+
+registerBlockType( 'myguten/simple', {
+	apiVersion: 2,
+	title: __( 'Simple Block', 'myguten' ),
+	category: 'widgets',
+
+	edit: () => {
+		const blockProps = useBlockProps( { style: { color: 'red' } } );
+
+		return (
+			<p {...blockProps}>
+				{ __( 'Hello World', 'myguten' ) }
+			</p>
+		);
+	},
+
+	save: () => {
+		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
+
+		return (
+			<p {...blockProps}>
+				{ __( 'Hello World', 'myguten' ) }
+			</p>
+		);
+	},
+} );
+```
 {% ES5 %}
 ```js
 const { __ } = wp.i18n;
 const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
+const { useBlockProps } = wp.blockEditor;
 
 registerBlockType( 'myguten/simple', {
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
-	edit: () => {
+	edit: function() {
+		const blockProps = useBlockProps( { style: { color: 'red' } } );
+		
 		return el(
 			'p',
-			{ style: { color: 'red' } },
+			blockProps,
 			__( 'Hello World', 'myguten' )
 		);
 	},
 
-	save: () => {
+	save: function() {
+		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
 		return el(
 			'p',
-			{ style: { color: 'red' } },
+			blockProps,
 			__( 'Hello World', 'myguten' )
-		);
-	},
-} );
-```
-{% ESNext %}
-```js
-import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
-
-registerBlockType( 'myguten/simple', {
-	title: __( 'Simple Block', 'myguten' ),
-	category: 'widgets',
-
-	edit: () => {
-		return (
-			<p style="color:red">
-				{ __( 'Hello World', 'myguten' ) }
-			</p>
-		);
-	},
-
-	save: () => {
-		return (
-			<p style="color:red">
-				{ __( 'Hello World', 'myguten' ) }
-			</p>
 		);
 	},
 } );
@@ -259,3 +270,7 @@ Using `make-json` automatically names the file with the md5 hash, so it is ready
 You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
 With the language set, create a new post, add the block, and you will see the translations used.
+
+### Filtering Translations
+
+The outputs of the translation functions (`__()`, `_x()`, `_n()`, and `_nx()`) are filterable, see [i18n Filters](/docs/designers-developers/developers/filters/i18n-filters.md) for full information.

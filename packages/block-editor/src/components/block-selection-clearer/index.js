@@ -1,78 +1,49 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useRefEffect } from '@wordpress/compose';
 
-class BlockSelectionClearer extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
-		this.bindContainer = this.bindContainer.bind( this );
-		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind(
-			this
+export function useBlockSelectionClearer() {
+	const hasSelection = useSelect( ( select ) => {
+		const { hasSelectedBlock, hasMultiSelection } = select(
+			blockEditorStore
 		);
-	}
 
-	bindContainer( ref ) {
-		this.container = ref;
-	}
+		return hasSelectedBlock() || hasMultiSelection();
+	} );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	/**
-	 * Clears the selected block on focus if the container is the target of the
-	 * focus. This assumes no other descendents have received focus until event
-	 * has bubbled to the container.
-	 *
-	 * @param {FocusEvent} event Focus event.
-	 */
-	clearSelectionIfFocusTarget( event ) {
-		const {
-			hasSelectedBlock,
-			hasMultiSelection,
-			clearSelectedBlock,
-		} = this.props;
+	return useRefEffect(
+		( node ) => {
+			if ( ! hasSelection ) {
+				return;
+			}
 
-		const hasSelection = hasSelectedBlock || hasMultiSelection;
-		if ( event.target === this.container && hasSelection ) {
-			clearSelectedBlock();
-		}
-	}
+			function onMouseDown( event ) {
+				// Only handle clicks on the canvas, not the content.
+				if ( event.target.closest( '.wp-block' ) ) {
+					return;
+				}
 
-	render() {
-		return (
-			<div
-				tabIndex={ -1 }
-				onFocus={ this.clearSelectionIfFocusTarget }
-				ref={ this.bindContainer }
-				{ ...omit( this.props, [
-					'clearSelectedBlock',
-					'hasSelectedBlock',
-					'hasMultiSelection',
-				] ) }
-			/>
-		);
-	}
+				clearSelectedBlock();
+			}
+
+			node.addEventListener( 'mousedown', onMouseDown );
+
+			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
+			};
+		},
+		[ hasSelection, clearSelectedBlock ]
+	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select(
-			'core/block-editor'
-		);
-
-		return {
-			hasSelectedBlock: hasSelectedBlock(),
-			hasMultiSelection: hasMultiSelection(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
-		return { clearSelectedBlock };
-	} ),
-] )( BlockSelectionClearer );
+export default function BlockSelectionClearer( props ) {
+	return <div ref={ useBlockSelectionClearer() } { ...props } />;
+}

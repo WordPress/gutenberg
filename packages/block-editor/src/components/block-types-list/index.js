@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import {
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,73 +17,37 @@ function BlockTypesList( {
 	onSelect,
 	onHover = () => {},
 	children,
+	label,
+	isDraggable = true,
 } ) {
-	const normalizedItems = items.reduce( ( result, item ) => {
-		const { variations = [] } = item;
-		const hasDefaultVariation = variations.some(
-			( { isDefault } ) => isDefault
-		);
-
-		// If there is no default inserter variation provided,
-		// then default block type is displayed.
-		if ( ! hasDefaultVariation ) {
-			result.push( item );
-		}
-
-		if ( variations.length ) {
-			result = result.concat(
-				variations.map( ( variation ) => {
-					return {
-						...item,
-						id: `${ item.id }-${ variation.name }`,
-						icon: variation.icon || item.icon,
-						title: variation.title || item.title,
-						description: variation.description || item.description,
-						// If `example` is explicitly undefined for the variation, the preview will not be shown.
-						example: variation.hasOwnProperty( 'example' )
-							? variation.example
-							: item.example,
-						initialAttributes: {
-							...item.initialAttributes,
-							...variation.attributes,
-						},
-						innerBlocks: variation.innerBlocks,
-					};
-				} )
-			);
-		}
-
-		return result;
-	}, [] );
-
+	const composite = useCompositeState();
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul role="list" className="block-editor-block-types-list">
-			{ normalizedItems.map( ( item ) => {
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className="block-editor-block-types-list"
+			aria-label={ label }
+		>
+			{ items.map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }
+						item={ item }
 						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
-						onClick={ () => {
-							onSelect( item );
-							onHover( null );
-						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
+						onSelect={ onSelect }
+						onHover={ onHover }
+						composite={ composite }
+						isDraggable={ isDraggable }
 					/>
 				);
 			} ) }
 			{ children }
-		</ul>
+		</Composite>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }

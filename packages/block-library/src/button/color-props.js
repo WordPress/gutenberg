@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	getColorClassName,
+	getColorObjectByAttributeValues,
 	__experimentalGetGradientClass,
 } from '@wordpress/block-editor';
 
@@ -15,7 +16,11 @@ import {
 // The flag can't be used at the moment because of the extra wrapper around
 // the button block markup.
 
-export default function getColorAndStyleProps( attributes ) {
+export default function getColorAndStyleProps(
+	attributes,
+	colors,
+	isEdit = false
+) {
 	// I'd have prefered to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
@@ -47,6 +52,28 @@ export default function getColorAndStyleProps( attributes ) {
 					color: style?.color?.text ? style.color.text : undefined,
 			  }
 			: {};
+
+	// This is needed only for themes that don't load their color stylesheets in the editor
+	// We force an inline style to apply the color.
+	if ( isEdit ) {
+		if ( backgroundColor ) {
+			const backgroundColorObject = getColorObjectByAttributeValues(
+				colors,
+				backgroundColor
+			);
+
+			styleProp.backgroundColor = backgroundColorObject.color;
+		}
+
+		if ( textColor ) {
+			const textColorObject = getColorObjectByAttributeValues(
+				colors,
+				textColor
+			);
+
+			styleProp.color = textColorObject.color;
+		}
+	}
 
 	return {
 		className: !! className ? className : undefined,

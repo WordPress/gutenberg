@@ -3,8 +3,8 @@
 
 	th,
 	tbody td {
-		padding: 4px;
-		border: 1px solid $light-gray-500;
+		padding: 0.25em;
+		border: 1px solid $gray-300;
 	}
 
 	tfoot td {
@@ -14,24 +14,19 @@
 	table {
 		width: 100%;
 		border-collapse: collapse;
-		font-family: $default-font;
 	}
 
 	table th {
 		font-weight: 400;
-		background: $light-gray-300;
+		background: $gray-300;
 	}
 
 	a {
 		text-decoration: underline;
 	}
 
-	tfoot a {
-		color: $blue-medium-800;
-	}
-
 	table tbody,
 	table caption {
-		color: $dark-gray-600;
+		color: #40464d;
 	}
 }

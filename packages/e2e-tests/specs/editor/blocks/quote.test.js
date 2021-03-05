@@ -41,6 +41,9 @@ describe( 'Quote', () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/quote' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Quote')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
 

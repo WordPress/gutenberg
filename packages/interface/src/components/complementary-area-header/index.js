@@ -6,17 +6,22 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import ComplementaryAreaToggle from '../complementary-area-toggle';
 
 const ComplementaryAreaHeader = ( {
 	smallScreenTitle,
-	toggleShortcut,
-	onClose,
 	children,
 	className,
-	closeLabel,
+	toggleButtonProps,
 } ) => {
+	const toggleButton = (
+		<ComplementaryAreaToggle icon={ closeSmall } { ...toggleButtonProps } />
+	);
 	return (
 		<>
 			<div className="components-panel__header interface-complementary-area-header__small">
@@ -25,11 +30,7 @@ const ComplementaryAreaHeader = ( {
 						{ smallScreenTitle }
 					</span>
 				) }
-				<Button
-					onClick={ onClose }
-					icon={ close }
-					label={ closeLabel }
-				/>
+				{ toggleButton }
 			</div>
 			<div
 				className={ classnames(
@@ -40,12 +41,7 @@ const ComplementaryAreaHeader = ( {
 				tabIndex={ -1 }
 			>
 				{ children }
-				<Button
-					onClick={ onClose }
-					icon={ close }
-					label={ closeLabel }
-					shortcut={ toggleShortcut }
-				/>
+				{ toggleButton }
 			</div>
 		</>
 	);

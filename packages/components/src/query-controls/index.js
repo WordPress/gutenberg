@@ -6,13 +6,19 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import CategorySelect from './category-select';
 import { RangeControl, SelectControl, FormTokenField } from '../';
+import AuthorSelect from './author-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 export default function QueryControls( {
+	authorList,
+	selectedAuthorId,
+	categoriesList,
+	selectedCategoryId,
 	categorySuggestions,
 	selectedCategories,
 	numberOfItems,
@@ -21,6 +27,7 @@ export default function QueryControls( {
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
+	onAuthorChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
@@ -62,8 +69,19 @@ export default function QueryControls( {
 				} }
 			/>
 		),
-		onCategoryChange && (
+		categoriesList && onCategoryChange && (
+			<CategorySelect
+				key="query-controls-category-select"
+				categoriesList={ categoriesList }
+				label={ __( 'Category' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedCategoryId={ selectedCategoryId }
+				onChange={ onCategoryChange }
+			/>
+		),
+		categorySuggestions && onCategoryChange && (
 			<FormTokenField
+				key="query-controls-categories-select"
 				label={ __( 'Categories' ) }
 				value={
 					selectedCategories &&
@@ -77,7 +95,16 @@ export default function QueryControls( {
 				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
 			/>
 		),
-
+		onAuthorChange && (
+			<AuthorSelect
+				key="query-controls-author-select"
+				authorList={ authorList }
+				label={ __( 'Author' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedAuthorId={ selectedAuthorId }
+				onChange={ onAuthorChange }
+			/>
+		),
 		onNumberOfItemsChange && (
 			<RangeControl
 				key="query-controls-range-control"

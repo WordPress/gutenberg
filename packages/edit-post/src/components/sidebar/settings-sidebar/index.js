@@ -3,6 +3,9 @@
  */
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -21,6 +24,12 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../../sidebar/plugin-sidebar';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { store as editPostStore } from '../../../store';
+
+const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+	web: true,
+	native: false,
+} );
 
 const SettingsSidebar = () => {
 	const { sidebarName, keyboardShortcut } = useSelect( ( select ) => {
@@ -31,8 +40,8 @@ const SettingsSidebar = () => {
 		// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
 		// should contain the sidebar that will be active when the toggle button is pressed. If a block
 		// is selected, that should be edit-post/block otherwise it's edit-post/document.
-		let sidebar = select( 'core/interface' ).getActiveComplementaryArea(
-			'core/edit-post'
+		let sidebar = select( interfaceStore ).getActiveComplementaryArea(
+			editPostStore.name
 		);
 		if (
 			! [ 'edit-post/document', 'edit-post/block' ].includes( sidebar )
@@ -43,7 +52,7 @@ const SettingsSidebar = () => {
 			sidebar = 'edit-post/document';
 		}
 		const shortcut = select(
-			'core/keyboard-shortcuts'
+			keyboardShortcutsStore
 		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 		return { sidebarName: sidebar, keyboardShortcut: shortcut };
 	}, [] );
@@ -54,9 +63,11 @@ const SettingsSidebar = () => {
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }
 			headerClassName="edit-post-sidebar__panel-tabs"
+			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
 			toggleShortcut={ keyboardShortcut }
 			icon={ cog }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ sidebarName === 'edit-post/document' && (
 				<>

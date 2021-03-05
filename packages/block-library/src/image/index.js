@@ -18,12 +18,13 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Image' ),
+	title: _x( 'Image', 'block title' ),
 	description: __( 'Insert an image to make a visual statement.' ),
 	icon,
 	keywords: [
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
+		__( 'picture' ),
 	],
 	example: {
 		attributes: {

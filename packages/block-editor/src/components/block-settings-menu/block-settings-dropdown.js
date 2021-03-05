@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { castArray, flow } from 'lodash';
+import { castArray, flow, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -14,9 +14,11 @@ import {
 	ClipboardButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { moreHorizontal } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { moreVertical } from '@wordpress/icons';
+
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -24,7 +26,6 @@ import { serialize } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
-import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
@@ -34,15 +35,18 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockSettingsDropdown( { clientIds, ...props } ) {
+export function BlockSettingsDropdown( {
+	clientIds,
+	__experimentalSelectBlock,
+	children,
+	...props
+} ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select(
-			'core/keyboard-shortcuts'
-		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
 			duplicate: getShortcutRepresentation(
 				'core/block-editor/duplicate'
@@ -57,10 +61,26 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 		};
 	}, [] );
 
-	const [ hasCopied, setHasCopied ] = useState();
+	const updateSelection = useCallback(
+		__experimentalSelectBlock
+			? async ( clientIdsPromise ) => {
+					const ids = await clientIdsPromise;
+					if ( ids && ids[ 0 ] ) {
+						__experimentalSelectBlock( ids[ 0 ] );
+					}
+			  }
+			: noop,
+		[ __experimentalSelectBlock ]
+	);
+
+	const removeBlockLabel =
+		count === 1 ? __( 'Remove block' ) : __( 'Remove blocks' );
 
 	return (
-		<BlockActions clientIds={ clientIds }>
+		<BlockActions
+			clientIds={ clientIds }
+			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+		>
 			{ ( {
 				canDuplicate,
 				canInsertDefaultBlock,
@@ -69,11 +89,13 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 				onInsertAfter,
 				onInsertBefore,
 				onRemove,
+				onCopy,
+				onMoveTo,
 				blocks,
 			} ) => (
 				<DropdownMenu
-					icon={ moreHorizontal }
-					label={ __( 'More options' ) }
+					icon={ moreVertical }
+					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons
@@ -86,11 +108,6 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 									fillProps={ { onClose } }
 								/>
 								{ count === 1 && (
-									<BlockUnknownConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
-								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
 									/>
@@ -99,18 +116,17 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 									text={ () => serialize( blocks ) }
 									role="menuitem"
 									className="components-menu-item__button"
-									onCopy={ () => {
-										setHasCopied( true );
-									} }
-									onFinishCopy={ () => setHasCopied( false ) }
+									onCopy={ onCopy }
 								>
-									{ hasCopied
-										? __( 'Copied!' )
-										: __( 'Copy' ) }
+									{ __( 'Copy' ) }
 								</ClipboardButton>
 								{ canDuplicate && (
 									<MenuItem
-										onClick={ flow( onClose, onDuplicate ) }
+										onClick={ flow(
+											onClose,
+											onDuplicate,
+											updateSelection
+										) }
 										shortcut={ shortcuts.duplicate }
 									>
 										{ __( 'Duplicate' ) }
@@ -125,7 +141,7 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert Before' ) }
+											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ flow(
@@ -134,9 +150,16 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert After' ) }
+											{ __( 'Insert after' ) }
 										</MenuItem>
 									</>
+								) }
+								{ ! isLocked && (
+									<MenuItem
+										onClick={ flow( onClose, onMoveTo ) }
+									>
+										{ __( 'Move to' ) }
+									</MenuItem>
 								) }
 								{ count === 1 && (
 									<BlockModeToggle
@@ -149,17 +172,22 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
 							/>
+							{ typeof children === 'function'
+								? children( { onClose } )
+								: Children.map( ( child ) =>
+										cloneElement( child, { onClose } )
+								  ) }
 							<MenuGroup>
 								{ ! isLocked && (
 									<MenuItem
-										onClick={ flow( onClose, onRemove ) }
+										onClick={ flow(
+											onClose,
+											onRemove,
+											updateSelection
+										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ _n(
-											'Remove Block',
-											'Remove Blocks',
-											count
-										) }
+										{ removeBlockLabel }
 									</MenuItem>
 								) }
 							</MenuGroup>

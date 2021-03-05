@@ -30,7 +30,7 @@ describe( 'Blocks raw handling', () => {
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
 			title: 'Test Gallery',
-			category: 'common',
+			category: 'text',
 			attributes: {
 				ids: {
 					type: 'array',
@@ -63,7 +63,7 @@ describe( 'Blocks raw handling', () => {
 
 		registerBlockType( 'test/non-inline-block', {
 			title: 'Test Non Inline Block',
-			category: 'common',
+			category: 'text',
 			supports: {
 				pasteTextInline: false,
 			},
@@ -77,10 +77,37 @@ describe( 'Blocks raw handling', () => {
 							);
 						},
 						transform: () => {
-							return createBlock( 'core-embed/youtube', {
+							return createBlock( 'core/embed', {
 								url:
 									'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 							} );
+						},
+					},
+				],
+			},
+			save: () => null,
+		} );
+
+		registerBlockType( 'test/transform-to-multiple-blocks', {
+			title: 'Test Transform to Multiple Blocks',
+			category: 'text',
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						isMatch: ( node ) => {
+							return node.textContent
+								.split( ' ' )
+								.every( ( chunk ) => /^P\S+?/.test( chunk ) );
+						},
+						transform: ( node ) => {
+							return node.textContent
+								.split( ' ' )
+								.map( ( chunk ) =>
+									createBlock( 'core/paragraph', {
+										content: chunk.substring( 1 ),
+									} )
+								);
 						},
 					},
 				],
@@ -200,7 +227,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toHaveLength( 1 );
-		expect( filtered[ 0 ].name ).toBe( 'core-embed/youtube' );
+		expect( filtered[ 0 ].name ).toBe( 'core/embed' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -362,6 +389,18 @@ describe( 'Blocks raw handling', () => {
 		).toBe( block );
 	} );
 
+	it( 'should handle transforms that return an array of blocks', () => {
+		const transformed = pasteHandler( {
+			HTML: '<p>P1 P2</p>',
+			plainText: 'P1 P2\n',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe( '<p>1</p><p>2</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
@@ -383,6 +422,7 @@ describe( 'Blocks raw handling', () => {
 			'gutenberg',
 			'shortcode-matching',
 		].forEach( ( type ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
 				const HTML = readFile(
 					path.join( __dirname, `fixtures/${ type }-in.html` )
@@ -407,6 +447,7 @@ describe( 'Blocks raw handling', () => {
 				expect( serialized ).toBe( output );
 
 				if ( type !== 'gutenberg' ) {
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( console ).toHaveLogged();
 				}
 			} );

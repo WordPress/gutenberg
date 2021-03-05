@@ -48,7 +48,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 					block,
 					isSelected,
 					position,
-					siblingCount,
+					siblingBlockCount,
 					level,
 					tabIndex,
 					onFocus,
@@ -59,7 +59,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 				const descriptionId = `block-navigation-block-slot__${ instanceId }`;
 				const blockPositionDescription = getBlockPositionDescription(
 					position,
-					siblingCount,
+					siblingBlockCount,
 					level
 				);
 

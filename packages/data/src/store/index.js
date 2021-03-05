@@ -1,10 +1,10 @@
 function createCoreDataStore( registry ) {
-	const getCoreDataSelector = ( selectorName ) => ( reducerKey, ...args ) => {
-		return registry.select( reducerKey )[ selectorName ]( ...args );
+	const getCoreDataSelector = ( selectorName ) => ( key, ...args ) => {
+		return registry.select( key )[ selectorName ]( ...args );
 	};
 
-	const getCoreDataAction = ( actionName ) => ( reducerKey, ...args ) => {
-		return registry.dispatch( reducerKey )[ actionName ]( ...args );
+	const getCoreDataAction = ( actionName ) => ( key, ...args ) => {
+		return registry.dispatch( key )[ actionName ]( ...args );
 	};
 
 	return {

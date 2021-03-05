@@ -1,10 +1,10 @@
 .cache
 build
 build-module
+build-types
 node_modules
 packages/block-serialization-spec-parser/parser.js
 packages/e2e-tests/plugins
-playground/dist
+packages/react-native-editor/bundle
 vendor
-wordpress
 !.*.js

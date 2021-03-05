@@ -9,7 +9,6 @@ const CONFIG = {
 	pluginSources: [],
 	themeSources: [],
 	port: 8888,
-	testsPort: 8889,
 	configDirectoryPath: '/path/to/config',
 };
 
@@ -26,7 +25,9 @@ describe( 'buildDockerComposeConfig', () => {
 				{ path: '/path/to/local/plugin', basename: 'test-name' },
 			],
 		};
-		const dockerConfig = buildDockerComposeConfig( envConfig );
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
 		const { volumes } = dockerConfig.services.wordpress;
 		expect( volumes ).toEqual( [
 			'wordpress:/var/www/html', // WordPress root
@@ -50,7 +51,9 @@ describe( 'buildDockerComposeConfig', () => {
 				{ path: '/path/to/local/theme', basename: 'test-theme' },
 			],
 		};
-		const dockerConfig = buildDockerComposeConfig( envConfig );
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
 		const devVolumes = dockerConfig.services.wordpress.volumes;
 		const cliVolumes = dockerConfig.services.cli.volumes;
 		expect( devVolumes ).toEqual( cliVolumes );
@@ -68,6 +71,48 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( devVolumes ).toEqual( expect.arrayContaining( localSources ) );
 		expect( testsVolumes ).toEqual(
 			expect.arrayContaining( localSources )
+		);
+	} );
+
+	it( 'should not map the default phpunit uploads directory if the user has specified their own directory', () => {
+		const envConfig = {
+			...CONFIG,
+			mappings: {
+				'wp-content/uploads': {
+					path: '/path/to/wp-uploads',
+				},
+			},
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
+		const expectedVolumes = [
+			'tests-wordpress:/var/www/html',
+			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
+		];
+		expect( dockerConfig.services.phpunit.volumes ).toEqual(
+			expectedVolumes
+		);
+	} );
+
+	it( 'should map the default phpunit uploads directory even if the user has specified their own directory only for the development instance', () => {
+		const envConfig = {
+			...CONFIG,
+			mappings: {
+				'wp-content/uploads': {
+					path: '/path/to/wp-uploads',
+				},
+			},
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: CONFIG },
+		} );
+		const expectedVolumes = [
+			'tests-wordpress:/var/www/html',
+			'phpunit-uploads:/var/www/html/wp-content/uploads',
+		];
+		expect( dockerConfig.services.phpunit.volumes ).toEqual(
+			expectedVolumes
 		);
 	} );
 } );

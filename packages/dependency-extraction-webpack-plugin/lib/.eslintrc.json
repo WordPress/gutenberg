@@ -1,0 +1,7 @@
+{
+	// Use the default eslint parser. Prevent babel transforms.
+	"parser": "espree",
+	"env": {
+		"node": true
+	}
+}

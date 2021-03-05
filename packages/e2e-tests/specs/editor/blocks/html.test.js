@@ -16,6 +16,9 @@ describe( 'HTML block', () => {
 		// Create a Custom HTML block with the slash shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/html' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Custom HTML')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<p>Pythagorean theorem: ' );
 		await page.keyboard.press( 'Enter' );

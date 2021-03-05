@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-
-/* eslint-disable import/no-extraneous-dependencies */
 import { text, boolean } from '@storybook/addon-knobs';
-/* eslint-enable import/no-extraneous-dependencies */
 
 /**
  * Internal dependencies

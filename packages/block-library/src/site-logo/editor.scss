@@ -1,0 +1,28 @@
+.wp-block[data-align="center"] > .wp-block-site-logo {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.wp-block-site-logo {
+	&.is-resized {
+		display: table;
+	}
+
+	.custom-logo-link {
+		cursor: inherit;
+
+		&:focus {
+			box-shadow: none;
+		}
+
+		&.is-transient img {
+			opacity: 0.3;
+		}
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+	}
+}

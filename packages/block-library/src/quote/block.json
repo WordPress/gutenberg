@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/quote",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"value": {
 			"type": "string",
@@ -18,5 +19,10 @@
 		"align": {
 			"type": "string"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true
+	},
+	"editorStyle": "wp-block-quote-editor",
+	"style": "wp-block-quote"
 }

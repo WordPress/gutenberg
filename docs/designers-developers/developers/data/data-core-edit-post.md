@@ -35,7 +35,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<string>`: Active meta box locations.
+-   `string[]`: Active meta box locations.
 
 <a name="getAllMetaBoxes" href="#getAllMetaBoxes">#</a> **getAllMetaBoxes**
 
@@ -110,6 +110,18 @@ _Returns_
 
 -   `boolean`: Whether there are metaboxes or not.
 
+<a name="isEditingTemplate" href="#isEditingTemplate">#</a> **isEditingTemplate**
+
+Returns true if the template editing mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether we're editing the template.
+
 <a name="isEditorPanelEnabled" href="#isEditorPanelEnabled">#</a> **isEditorPanelEnabled**
 
 Returns true if the given panel is enabled, or false otherwise. Panels are
@@ -176,6 +188,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Is active.
+
+<a name="isInserterOpened" href="#isInserterOpened">#</a> **isInserterOpened**
+
+Returns true if the inserter is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
 
 <a name="isMetaBoxLocationActive" href="#isMetaBoxLocationActive">#</a> **isMetaBoxLocationActive**
 
@@ -301,7 +325,7 @@ name(s) should be hidden.
 
 _Parameters_
 
--   _blockNames_ `Array<string>`: Names of block types to hide.
+-   _blockNames_ `string[]`: Names of block types to hide.
 
 _Returns_
 
@@ -360,10 +384,6 @@ _Returns_
 
 Returns an action object used to request meta box update.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="setAvailableMetaBoxesPerLocation" href="#setAvailableMetaBoxesPerLocation">#</a> **setAvailableMetaBoxesPerLocation**
 
 Returns an action object used in signaling
@@ -372,6 +392,26 @@ what Meta boxes are available in which location.
 _Parameters_
 
 -   _metaBoxesPerLocation_ `Object`: Meta boxes per location.
+
+<a name="setIsEditingTemplate" href="#setIsEditingTemplate">#</a> **setIsEditingTemplate**
+
+Returns an action object used to switch to template editing.
+
+_Parameters_
+
+-   _value_ `boolean`: Is editing template.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="setIsInserterOpened" href="#setIsInserterOpened">#</a> **setIsInserterOpened**
+
+Returns an action object used to open/close the inserter.
+
+_Parameters_
+
+-   _value_ `boolean`: A boolean representing whether the inserter should be opened or closed.
 
 _Returns_
 
@@ -384,7 +424,7 @@ name(s) should be shown.
 
 _Parameters_
 
--   _blockNames_ `Array<string>`: Names of block types to show.
+-   _blockNames_ `string[]`: Names of block types to show.
 
 _Returns_
 

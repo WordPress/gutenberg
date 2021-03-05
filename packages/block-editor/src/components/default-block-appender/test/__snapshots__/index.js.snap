@@ -5,7 +5,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <TextareaAutosize
+  <ForwardRef
     aria-label="Add block"
     className="block-editor-default-block-appender__content"
     onFocus={
@@ -23,12 +23,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     }
     readOnly={true}
     role="button"
-    rows={1}
     value="Start writing or type / to choose a block"
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;
@@ -38,18 +38,18 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <TextareaAutosize
+  <ForwardRef
     aria-label="Add block"
     className="block-editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
-    rows={1}
     value="Start writing or type / to choose a block"
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;
@@ -59,18 +59,18 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <TextareaAutosize
+  <ForwardRef
     aria-label="Add block"
     className="block-editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
-    rows={1}
     value=""
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;

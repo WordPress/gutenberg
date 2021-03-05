@@ -1,8 +1,23 @@
 /**
+ * External dependencies
+ */
+import { truncate } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import {
+	getBlockType,
+	__experimentalGetBlockLabel as getBlockLabel,
+	isReusableBlock,
+} from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import useBlockDisplayInformation from '../use-block-display-information';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -14,29 +29,49 @@ import { getBlockType } from '@wordpress/blocks';
  * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
  * ```
  *
- * @param {Object}  props
- * @param {?string} props.name Block name.
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of block.
  *
  * @return {?string} Block title.
  */
-export function BlockTitle( { name } ) {
-	if ( ! name ) {
-		return null;
-	}
+export default function BlockTitle( { clientId } ) {
+	const { attributes, name, reusableBlockTitle } = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+			const {
+				getBlockName,
+				getBlockAttributes,
+				__experimentalGetReusableBlockTitle,
+			} = select( blockEditorStore );
+			const blockName = getBlockName( clientId );
+			if ( ! blockName ) {
+				return {};
+			}
+			const isReusable = isReusableBlock( getBlockType( blockName ) );
+			return {
+				attributes: getBlockAttributes( clientId ),
+				name: blockName,
+				reusableBlockTitle:
+					isReusable &&
+					__experimentalGetReusableBlockTitle(
+						getBlockAttributes( clientId ).ref
+					),
+			};
+		},
+		[ clientId ]
+	);
 
+	const blockInformation = useBlockDisplayInformation( clientId );
+	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
-	if ( ! blockType ) {
-		return null;
+	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
+	// Label will fallback to the title if no label is defined for the current
+	// label context. If the label is defined we prioritize it over possible
+	// possible block variation title match.
+	if ( label !== blockType.title ) {
+		return truncate( label, { length: 35 } );
 	}
-
-	return blockType.title;
+	return blockInformation.title;
 }
-
-export default withSelect( ( select, ownProps ) => {
-	const { getBlockName } = select( 'core/block-editor' );
-	const { clientId } = ownProps;
-
-	return {
-		name: getBlockName( clientId ),
-	};
-} )( BlockTitle );

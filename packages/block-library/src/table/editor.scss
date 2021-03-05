@@ -1,4 +1,8 @@
 .wp-block-table {
+
+	// Remove default <figure> style.
+	margin: 0;
+
 	.wp-block[data-align="left"] > &,
 	.wp-block[data-align="right"] > &,
 	.wp-block[data-align="center"] > & {
@@ -23,16 +27,6 @@
 			margin: 0 auto;
 		}
 	}
-}
-
-
-.wp-block-table {
-	// Remove default <figure> style.
-	margin: 0;
-
-	table {
-		border-collapse: collapse;
-	}
 
 	td,
 	th {
@@ -41,8 +35,8 @@
 
 	td.is-selected,
 	th.is-selected {
-		border-color: $blue-medium-500;
-		box-shadow: inset 0 0 0 1px $blue-medium-500;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 		border-style: double;
 	}
 

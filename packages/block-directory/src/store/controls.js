@@ -1,45 +1,49 @@
 /**
- * Loads a JavaScript file.
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+
+/**
+ * Load an asset for a block.
  *
- * @param {string} asset The url for this file.
+ * This function returns a Promise that will resolve once the asset is loaded,
+ * or in the case of Stylesheets and Inline JavaScript, will resolve immediately.
+ *
+ * @param {HTMLElement} el A HTML Element asset to inject.
  *
  * @return {Promise} Promise which will resolve when the asset is loaded.
  */
-export const loadScript = ( asset ) => {
-	if ( ! asset || ! /\.js$/.test( asset ) ) {
-		return Promise.reject( new Error( 'No script found.' ) );
-	}
+export const loadAsset = ( el ) => {
 	return new Promise( ( resolve, reject ) => {
-		const existing = document.querySelector( `script[src="${ asset }"]` );
-		if ( existing ) {
-			existing.parentNode.removeChild( existing );
-		}
-		const script = document.createElement( 'script' );
-		script.src = asset;
-		script.onload = () => resolve( true );
-		script.onerror = () => reject( new Error( 'Error loading script.' ) );
-		document.body.appendChild( script );
-	} );
-};
+		/*
+		 * Reconstruct the passed element, this is required as inserting the Node directly
+		 * won't always fire the required onload events, even if the asset wasn't already loaded.
+		 */
+		const newNode = document.createElement( el.nodeName );
 
-/**
- * Loads a CSS file.
- *
- * @param {string} asset The url for this file.
- *
- * @return {Promise} Promise which will resolve when the asset is added.
- */
-export const loadStyle = ( asset ) => {
-	if ( ! asset || ! /\.css$/.test( asset ) ) {
-		return Promise.reject( new Error( 'No style found.' ) );
-	}
-	return new Promise( ( resolve, reject ) => {
-		const link = document.createElement( 'link' );
-		link.rel = 'stylesheet';
-		link.href = asset;
-		link.onload = () => resolve( true );
-		link.onerror = () => reject( new Error( 'Error loading style.' ) );
-		document.body.appendChild( link );
+		[ 'id', 'rel', 'src', 'href', 'type' ].forEach( ( attr ) => {
+			if ( el[ attr ] ) {
+				newNode[ attr ] = el[ attr ];
+			}
+		} );
+
+		// Append inline <script> contents.
+		if ( el.innerHTML ) {
+			newNode.appendChild( document.createTextNode( el.innerHTML ) );
+		}
+
+		newNode.onload = () => resolve( true );
+		newNode.onerror = () => reject( new Error( 'Error loading asset.' ) );
+
+		document.body.appendChild( newNode );
+
+		// Resolve Stylesheets and Inline JavaScript immediately.
+		if (
+			'link' === newNode.nodeName.toLowerCase() ||
+			( 'script' === newNode.nodeName.toLowerCase() && ! newNode.src )
+		) {
+			resolve();
+		}
 	} );
 };
 
@@ -58,14 +62,36 @@ export function loadAssets( assets ) {
 }
 
 const controls = {
-	LOAD_ASSETS( { assets } ) {
-		const scripts = assets.map( ( asset ) =>
-			asset.match( /\.js$/ ) !== null
-				? loadScript( asset )
-				: loadStyle( asset )
+	async LOAD_ASSETS() {
+		/*
+		 * Fetch the current URL (post-new.php, or post.php?post=1&action=edit) and compare the
+		 * JavaScript and CSS assets loaded between the pages. This imports the required assets
+		 * for the block into the current page while not requiring that we know them up-front.
+		 * In the future this can be improved by reliance upon block.json and/or a script-loader
+		 * dependency API.
+		 */
+		const response = await apiFetch( {
+			url: document.location.href,
+			parse: false,
+		} );
+
+		const data = await response.text();
+
+		const doc = new window.DOMParser().parseFromString( data, 'text/html' );
+
+		const newAssets = Array.from(
+			doc.querySelectorAll( 'link[rel="stylesheet"],script' )
+		).filter(
+			( asset ) => asset.id && ! document.getElementById( asset.id )
 		);
 
-		return Promise.all( scripts );
+		/*
+		 * Load each asset in order, as they may depend upon an earlier loaded script.
+		 * Stylesheets and Inline Scripts will resolve immediately upon insertion.
+		 */
+		for ( const newAsset of newAssets ) {
+			await loadAsset( newAsset );
+		}
 	},
 };
 

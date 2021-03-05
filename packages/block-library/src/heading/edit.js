@@ -12,7 +12,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -27,9 +27,16 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	mergedStyle,
+	clientId,
 } ) {
-	const { align, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+		style: mergedStyle,
+	} );
 
 	return (
 		<>
@@ -43,36 +50,42 @@ function HeadingEdit( {
 					/>
 				</ToolbarGroup>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
 			<RichText
 				identifier="content"
-				tagName={ Block[ tagName ] }
+				tagName={ tagName }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( 'core/paragraph' );
+				onSplit={ ( value, isOriginal ) => {
+					let block;
+
+					if ( isOriginal || value ) {
+						block = createBlock( 'core/heading', {
+							...attributes,
+							content: value,
+						} );
+					} else {
+						block = createBlock( 'core/paragraph' );
 					}
 
-					return createBlock( 'core/heading', {
-						...attributes,
-						content: value,
-					} );
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
-				} ) }
+				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
-				textAlign={ align }
-				style={ mergedStyle }
+				textAlign={ textAlign }
+				{ ...blockProps }
 			/>
 		</>
 	);

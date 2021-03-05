@@ -40,8 +40,8 @@ class BottomSheetCell extends Component {
 		);
 	}
 
-	componentDidUpdate() {
-		if ( this.state.isEditingValue ) {
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! prevState.isEditingValue && this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
 	}
@@ -91,6 +91,7 @@ class BottomSheetCell extends Component {
 			disabled = false,
 			activeOpacity,
 			onPress,
+			onLongPress,
 			label,
 			value,
 			valuePlaceholder = '',
@@ -301,6 +302,7 @@ class BottomSheetCell extends Component {
 				disabled={ disabled }
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
+				onLongPress={ onLongPress }
 				style={ [ styles.clipToBounds, style ] }
 				borderless={ borderless }
 			>
@@ -316,7 +318,7 @@ class BottomSheetCell extends Component {
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										color={ iconStyle.color }
+										fill={ iconStyle.color }
 										isPressed={ false }
 									/>
 									<View
@@ -326,9 +328,13 @@ class BottomSheetCell extends Component {
 									/>
 								</View>
 							) }
-							<Text style={ [ defaultLabelStyle, labelStyle ] }>
-								{ label }
-							</Text>
+							{ label && (
+								<Text
+									style={ [ defaultLabelStyle, labelStyle ] }
+								>
+									{ label }
+								</Text>
+							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity

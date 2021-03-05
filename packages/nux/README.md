@@ -22,7 +22,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 See [the component's README][dot-tip-readme] for more information.
 
-[dot-tip-readme]: https://github.com/WordPress/gutenberg/tree/master/packages/nux/src/components/dot-tip/README.md
+[dot-tip-readme]: https://github.com/WordPress/gutenberg/tree/HEAD/packages/nux/src/components/dot-tip/README.md
 
 ```jsx
 <button onClick={ ... }>

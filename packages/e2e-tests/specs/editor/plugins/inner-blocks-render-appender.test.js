@@ -11,12 +11,13 @@ import {
 	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-const INSERTER_RESULTS_SELECTOR = '.block-editor-inserter__block-list';
+const INSERTER_RESULTS_SELECTOR =
+	'.block-editor-inserter__quick-inserter-results';
 const QUOTE_INSERT_BUTTON_SELECTOR = '//button[.="Quote"]';
 const APPENDER_SELECTOR = '.my-custom-awesome-appender';
 const DYNAMIC_APPENDER_SELECTOR = 'my-dynamic-blocks-appender';
 
-describe( 'RenderAppender prop of InnerBlocks ', () => {
+describe( 'RenderAppender prop of InnerBlocks', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-innerblocks-render-appender' );
 	} );

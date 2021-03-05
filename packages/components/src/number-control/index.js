@@ -1,25 +1,25 @@
 /**
  * External dependencies
  */
-import { clamp } from 'lodash';
 import classNames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { Input } from './styles/number-control-styles';
-import { add, getValue, roundClamp, subtract } from './utils';
-import { isValueEmpty } from '../input-control/utils';
 import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
-import { useRTL } from '../utils/style-mixins';
+import { add, subtract, roundClamp } from '../utils/math';
+import { useJumpStep } from '../utils/hooks';
+import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
@@ -40,9 +40,13 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const initialValue = getValue( valueProp, min, max );
-	const baseValue = clamp( 0, min, max );
-	const isRtl = useRTL();
+	const baseValue = roundClamp( 0, min, max, step );
+
+	const jumpStep = useJumpStep( {
+		step,
+		shiftStep,
+		isShiftStepEnabled,
+	} );
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );
@@ -59,7 +63,6 @@ export function NumberControl(
 	const numberControlStateReducer = ( state, action ) => {
 		const { type, payload } = action;
 		const event = payload?.event;
-
 		const currentValue = state.value;
 
 		/**
@@ -72,7 +75,7 @@ export function NumberControl(
 			const enableShift = event.shiftKey && isShiftStepEnabled;
 
 			const incrementalValue = enableShift
-				? parseFloat( shiftStep )
+				? parseFloat( shiftStep ) * parseFloat( step )
 				: parseFloat( step );
 			let nextValue = isValueEmpty( currentValue )
 				? baseValue
@@ -101,7 +104,9 @@ export function NumberControl(
 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
 			const { delta, shiftKey } = payload;
 			const [ x, y ] = delta;
-			const modifier = shiftKey ? shiftStep : 1;
+			const modifier = shiftKey
+				? parseFloat( shiftStep ) * parseFloat( step )
+				: parseFloat( step );
 
 			let directionModifier;
 			let directionBaseValue;
@@ -114,7 +119,7 @@ export function NumberControl(
 
 				case 'e':
 					directionBaseValue = x;
-					directionModifier = isRtl ? -1 : 1;
+					directionModifier = isRTL() ? -1 : 1;
 					break;
 
 				case 's':
@@ -124,7 +129,7 @@ export function NumberControl(
 
 				case 'w':
 					directionBaseValue = x;
-					directionModifier = isRtl ? 1 : -1;
+					directionModifier = isRTL() ? 1 : -1;
 					break;
 			}
 
@@ -144,11 +149,11 @@ export function NumberControl(
 		}
 
 		/**
-		 * Handles ENTER key press and submit
+		 * Handles commit (ENTER key press or on blur if isPressEnterToChange)
 		 */
 		if (
 			type === inputControlActionTypes.PRESS_ENTER ||
-			type === inputControlActionTypes.SUBMIT
+			type === inputControlActionTypes.COMMIT
 		) {
 			state.value = roundClamp( currentValue, min, max );
 		}
@@ -169,8 +174,9 @@ export function NumberControl(
 			max={ max }
 			min={ min }
 			ref={ ref }
+			step={ jumpStep }
 			type={ typeProp }
-			value={ initialValue }
+			value={ valueProp }
 			__unstableStateReducer={ composeStateReducers(
 				numberControlStateReducer,
 				stateReducer

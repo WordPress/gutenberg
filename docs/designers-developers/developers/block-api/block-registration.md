@@ -56,9 +56,9 @@ Blocks are grouped into categories to help users browse and discover them.
 
 The core provided categories are:
 
--   common
--   formatting
--   layout
+-   text
+-   media
+-   design
 -   widgets
 -   embed
 
@@ -178,11 +178,11 @@ The data provided in the example object should match the attributes defined. For
 
 ```js
 example: {
-    attributes: {
-        cover: 'https://example.com/image.jpg',
-        author: 'William Shakespeare',
-        pages: 500
-    },
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+		author: 'William Shakespeare',
+		pages: 500
+	},
 },
 ```
 
@@ -192,194 +192,65 @@ It's also possible to extend the block preview with inner blocks via `innerBlock
 
 ```js
 example: {
-    attributes: {
-        cover: 'https://example.com/image.jpg',
-    },
-    innerBlocks: {
-        name: 'core/paragraph',
-        attributes: {
-            /* translators: example text. */
-            content: __(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
-            ),
-        },
-    },
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	innerBlocks: [
+		{
+			name: 'core/paragraph',
+			attributes: {
+				/* translators: example text. */
+				content: __(
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
+				),
+			},
+		},
+	],
+},
+```
+
+It's also possible to define the width of the preview container in pixels via `viewportWidth`. For example:
+
+```js
+example: {
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	viewportWidth: 800
 },
 ```
 
 #### variations (optional)
 
-- **Type:** `Object[]`
+-   **Type:** `Object[]`
 
-Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted.
+Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/designers-developers/developers/block-api/block-variations.md) for more details.
 
-By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
 
-```js
-variations: [
-    {
-		name: 'wordpress',
-		isDefault: true,
-		title: __( 'WordPress' ),
-		description: __( 'Code is poetry!' ),
-		icon: WordPressIcon,
-		attributes: { service: 'wordpress' },
-	},
-	{
-		name: 'google',
-		title: __( 'Google' ),
-		icon: GoogleIcon,
-		attributes: { service: 'google' },
-	},
-	{
-		name: 'twitter',
-		title: __( 'Twitter' ),
-		icon: TwitterIcon,
-		attributes: { service: 'twitter' },
-	},
-],
-```
 
-An object describing a variation defined for the block type can contain the following fields:
+#### supports (optional)
 
-- `name` (type `string`) – The unique and machine-readable name.
-- `title` (type `string`) – A human-readable variation title.
-- `description` (optional, type `string`) – A detailed variation description.
-- `icon` (optional, type `String` | `Object`) – An icon helping to visualize the variation. It can have the same shape as the block type.
-- `isDefault` (optional, type `boolean`) – Indicates whether the current variation is the default one. Defaults to `false`.
-- `attributes` (optional, type `Object`) – Values that override block attributes.
-- `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
-- `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
-- `scope` (optional, type `String[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`.
+-   **_Type:_** `Object`
 
-It's also possible to override the default block style variation using the `className` attribute when defining block variations.
-
-```js
-variations: [
-	{
-		name: 'blue',
-		title: __( 'Blue Quote' ),
-		isDefault: true,
-		attributes: { className: 'is-style-blue-quote' },
-		icon: 'format-quote',
-	},
-],
-```
+Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/designers-developers/developers/block-api/block-supports.md) for more details.
 
 #### transforms (optional)
 
 -   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](./block-transforms.md) for more info about each available transformation.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/designers-developers/developers/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 
 -   **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
 ```js
 // Only allow this block when it is nested in a Columns block
 parent: [ 'core/columns' ],
-```
-
-#### supports (optional)
-
-_Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted._
-
--   **Type:** `Object`
-
-Optional block extended support features. The following options are supported:
-
--   `align` (default `false`): This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
-
-```js
-// Add the support for block's alignment (left, center, right, wide, full).
-align: true,
-// Pick which alignment options to display.
-align: [ 'left', 'right', 'full' ],
-```
-
-When supports align is used the block attributes definition is extended to include an align attribute with a string type.
-By default, no alignment is assigned to the block.
-The block can apply a default alignment by specifying its own align attribute with a default e.g.:
-
-```
-attributes: {
-	...
-	align: {
-		type: 'string',
-		default: 'right'
-	},
-	...
-}
-```
-
--   `alignWide` (default `true`): This property allows to enable [wide alignment](/docs/designers-developers/developers/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
-
-```js
-// Remove the support for wide alignment.
-alignWide: false,
-```
-
--   `defaultStylePicker` (default `true`): When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
-
-```js
-// Remove the Default Style picker.
-defaultStylePicker: false,
-```
-
-
--   `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
-
-```js
-// Add the support for an anchor link.
-anchor: true,
-```
-
--   `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
-
-```js
-// Remove the support for the custom className.
-customClassName: false,
-```
-
--   `className` (default `true`): By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
-
-```js
-// Remove the support for the generated className.
-className: false,
-```
-
--   `html` (default `true`): By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
-
-```js
-// Remove support for an HTML mode.
-html: false,
-```
-
--   `inserter` (default `true`): By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
-
-```js
-// Hide this block from the inserter.
-inserter: false,
-```
-
--   `multiple` (default `true`): A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
-
-```js
-// Use the block just once per post
-multiple: false,
-```
-
--   `reusable` (default `true`): A block may want to disable the ability of being converted into a reusable block.
-    By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
-
-```js
-// Don't allow the block to be converted into a reusable block.
-reusable: false,
 ```
 
 ## Block Collections

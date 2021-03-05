@@ -63,6 +63,8 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 	if ( hasUnits( units ) ) {
 		const match = units.find( ( item ) => item.value === unit );
 		unit = match?.value;
+	} else {
+		unit = DEFAULT_UNIT.value;
 	}
 
 	return [ num, unit ];

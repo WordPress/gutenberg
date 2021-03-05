@@ -18,6 +18,16 @@
 	border-color: $gray-70;
 }
 
+.borderFullWidth {
+	left: 0;
+	right: 0;
+}
+
+.containerBorderFullWidth {
+	left: -$solid-border-space / 2;
+	right: -$solid-border-space / 2;
+}
+
 .dimmed {
 	opacity: $dimmed-opacity;
 }
@@ -46,6 +56,11 @@
 	margin-right: -$block-edge-to-content;
 }
 
+.containerToolbar {
+	width: 100%;
+	align-self: center;
+}
+
 .solidBorder {
 	position: absolute;
 	top: -$solid-border-space;
@@ -55,6 +70,7 @@
 	border-width: $block-selected-border-width;
 	border-radius: 4px;
 	border-style: solid;
+	z-index: 1;
 }
 
 .dashedBorder {
@@ -66,4 +82,8 @@
 	border-width: $block-selected-border-width;
 	border-radius: 2px;
 	border-style: dashed;
+}
+
+.fullWidthPadding {
+	padding: $block-selected-to-content;
 }

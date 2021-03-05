@@ -25,7 +25,7 @@
 	}
 	.editor-autocompleters__user-slug {
 		margin-left: 8px;
-		color: $dark-gray-100;
+		color: $gray-700;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: none;
@@ -34,6 +34,6 @@
 		flex-shrink: 0;
 	}
 	&:hover .editor-autocompleters__user-slug {
-		color: $blue-medium-300;
+		color: var(--wp-admin-theme-color);
 	}
 }

@@ -1,32 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
+import { useKeyboardShortcut } from '@wordpress/compose';
 import { rawShortcut } from '@wordpress/keycodes';
 
-export class RichTextShortcut extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onUse = this.onUse.bind( this );
-	}
-
-	onUse() {
-		this.props.onUse();
+export function RichTextShortcut( { character, type, onUse } ) {
+	const callback = () => {
+		onUse();
 		return false;
-	}
+	};
+	useKeyboardShortcut( rawShortcut[ type ]( character ), callback, {
+		bindGlobal: true,
+	} );
 
-	render() {
-		const { character, type } = this.props;
-
-		return (
-			<KeyboardShortcuts
-				bindGlobal
-				shortcuts={ {
-					[ rawShortcut[ type ]( character ) ]: this.onUse,
-				} }
-			/>
-		);
-	}
+	return null;
 }

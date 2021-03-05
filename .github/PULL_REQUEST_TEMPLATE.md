@@ -1,3 +1,5 @@
+<!-- Learn the overall process and best practices for pull requests at https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/repository-management.md#pull-requests. -->
+
 ## Description
 <!-- Please describe what you have changed or added -->
 
@@ -16,8 +18,9 @@
 
 ## Checklist:
 - [ ] My code is tested.
-- [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/ -->
-- [ ] My code follows the accessibility standards. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/accessibility-coding-standards/ -->
-- [ ] My code has proper inline documentation. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/ -->
+- [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/ -->
+- [ ] My code follows the accessibility standards. <!-- Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/ -->
+- [ ] I've tested my changes with keyboard and screen readers. <!-- Instructions: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md -->
+- [ ] My code has proper inline documentation. <!-- Guidelines: https://developer.wordpress.org/coding-standards/inline-documentation-standards/javascript/ -->
 - [ ] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->
-- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR. <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/master/docs/contributors/native-mobile.md -->
+- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR. <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/native-mobile.md -->

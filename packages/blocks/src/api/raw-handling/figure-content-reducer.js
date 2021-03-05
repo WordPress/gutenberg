@@ -4,9 +4,9 @@
 import { has } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isTextContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Whether or not the given node is figure content.

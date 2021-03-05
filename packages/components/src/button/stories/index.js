@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text, number } from '@storybook/addon-knobs';
+import { text, number, boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,35 @@ export const tertiary = () => {
 	const label = text( 'Label', 'Tertiary Button' );
 
 	return <Button isTertiary>{ label }</Button>;
+};
+
+export const isDestructive = () => {
+	const label = text( 'Label', 'Destructive Button' );
+	const isSmall = boolean( 'isSmall', false );
+	const disabled = boolean( 'disabled', false );
+
+	return (
+		<Button isDestructive isSmall={ isSmall } disabled={ disabled }>
+			{ label }
+		</Button>
+	);
+};
+
+export const isPrimaryDestructive = () => {
+	const label = text( 'Label', 'Destructive Primary Button' );
+	const isSmall = boolean( 'isSmall', false );
+	const disabled = boolean( 'disabled', false );
+
+	return (
+		<Button
+			isPrimary
+			isDestructive
+			isSmall={ isSmall }
+			disabled={ disabled }
+		>
+			{ label }
+		</Button>
+	);
 };
 
 export const small = () => {
@@ -88,6 +117,16 @@ export const disabledLink = () => {
 
 	return (
 		<Button href="https://wordpress.org/" target="_blank" disabled>
+			{ label }
+		</Button>
+	);
+};
+
+export const destructiveLink = () => {
+	const label = text( 'Label', 'Destructive Link' );
+
+	return (
+		<Button isDestructive isLink>
 			{ label }
 		</Button>
 	);

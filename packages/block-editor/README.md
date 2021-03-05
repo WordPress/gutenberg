@@ -19,27 +19,29 @@ import {
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
-	ObserveTyping
+	ObserveTyping,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-function MyEditorComponent () {
+function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	return (
 		<BlockEditorProvider
 			value={ blocks }
-			onInput={ updateBlocks }
-			onChange={ updateBlocks }
+			onInput={ ( blocks ) => updateBlocks( blocks ) }
+			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<Popover.Slot name="block-toolbar" />
-			<WritingFlow>
-				<ObserveTyping>
-					<BlockList />
-				</ObserveTyping>
-			</WritingFlow>
-			<Popover.Slot />
+			<SlotFillProvider>
+				<Popover.Slot name="block-toolbar" />
+				<WritingFlow>
+					<ObserveTyping>
+						<BlockList />
+					</ObserveTyping>
+				</WritingFlow>
+				<Popover.Slot />
+			</SlotFillProvider>
 		</BlockEditorProvider>
 	);
 }
@@ -82,7 +84,11 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/autocomplete/README.md>
+
+<a name="BlockAlignmentControl" href="#BlockAlignmentControl">#</a> **BlockAlignmentControl**
+
+Undocumented declaration.
 
 <a name="BlockAlignmentToolbar" href="#BlockAlignmentToolbar">#</a> **BlockAlignmentToolbar**
 
@@ -106,7 +112,7 @@ Component which merges passed value with current consumed block context.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-context/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-context/README.md>
 
 _Parameters_
 
@@ -158,12 +164,12 @@ BlockPreview renders a preview of a block or array of blocks.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-preview/README.md>
 
 _Parameters_
 
 -   _preview_ `Object`: options for how the preview should be shown
--   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
 -   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
@@ -182,11 +188,27 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md>
 
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
-Undocumented declaration.
+Renders the block's configured title as a string, or empty if the title
+cannot be determined.
+
+_Usage_
+
+```jsx
+<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+```
+
+_Parameters_
+
+-   _props_ `Object`: 
+-   _props.clientId_ `string`: Client ID of block.
+
+_Returns_
+
+-   `?string`: Block title.
 
 <a name="BlockToolbar" href="#BlockToolbar">#</a> **BlockToolbar**
 
@@ -196,13 +218,13 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md>
 
 <a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
@@ -298,7 +320,7 @@ _Returns_
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
-Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
+ Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
@@ -366,7 +388,7 @@ _Returns_
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
 
 <a name="Inserter" href="#Inserter">#</a> **Inserter**
 
@@ -374,19 +396,29 @@ Undocumented declaration.
 
 <a name="InspectorAdvancedControls" href="#InspectorAdvancedControls">#</a> **InspectorAdvancedControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+<a name="JustifyToolbar" href="#JustifyToolbar">#</a> **JustifyToolbar**
+
+Undocumented declaration.
+
+<a name="LineHeightControl" href="#LineHeightControl">#</a> **LineHeightControl**
+
+Undocumented declaration.
 
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md>
 
 <a name="MediaReplaceFlow" href="#MediaReplaceFlow">#</a> **MediaReplaceFlow**
 
@@ -396,13 +428,13 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MediaUploadCheck" href="#MediaUploadCheck">#</a> **MediaUploadCheck**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
@@ -417,7 +449,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/observe-typing/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
 
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
@@ -427,7 +459,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
@@ -437,7 +469,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md>
 
 <a name="RichTextShortcut" href="#RichTextShortcut">#</a> **RichTextShortcut**
 
@@ -459,30 +491,37 @@ _Properties_
 
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
--   _colors_ `Array`: Palette colors
--   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
--   _fontSizes_ `Array`: Available font sizes
--   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
--   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
+-   _allowedBlockTypes_ `boolean|Array`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
--   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
--   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
--   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
--   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
+-   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
+-   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
 Undocumented declaration.
+
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the block editor namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
 
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
@@ -490,7 +529,7 @@ Block editor data store configuration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
 _Type_
 
@@ -523,37 +562,93 @@ can vary. It is the last clicked or scrolled to position.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLInputButton" href="#URLInputButton">#</a> **URLInputButton**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
 <a name="URLPopover" href="#URLPopover">#</a> **URLPopover**
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useBlockDisplayInformation" href="#useBlockDisplayInformation">#</a> **useBlockDisplayInformation**
+
+Hook used to try to find a matching block variation and return
+the appropriate information for display reasons. In order to
+to try to find a match we need to things:
+1\. Block's client id to extract it's current attributes.
+2\. A block variation should have set `isActive` prop to a proper function.
+
+If for any reason a block variaton match cannot be found,
+the returned information come from the Block Type.
+If no blockType is found with the provided clientId, returns null.
+
+_Parameters_
+
+-   _clientId_ `string`: Block's client id.
+
+_Returns_
+
+-   `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
 
-<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+<a name="useBlockProps" href="#useBlockProps">#</a> **useBlockProps**
 
-Function that manipulates media queries from stylesheets to simulate a given
-viewport width.
+This hook is used to lightly mark an element as a block element. The element
+should be the outermost element of a block. Call this hook and pass the
+returned props to the element to mark as a block. If you define a ref for the
+element, it is important to pass the ref to this hook, which the hook in turn
+will pass to the component through the props it returns. Optionally, you can
+also pass any other props through this hook, and they will be merged and
+returned.
 
 _Parameters_
 
--   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Options for internal use only.
+-   _options.\_\_unstableIsHtml_ `boolean`: 
+
+_Returns_
+
+-   `Object`: Props to pass to the element to mark as a block.
+
+<a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
+
+Given an array of theme colors checks colors for validity
+
+_Parameters_
+
+-   _colors_ `Array`: The array of theme colors
+
+_Returns_
+
+-   `Array`: The array of valid theme colors or the default colors
+
+<a name="validateThemeGradients" href="#validateThemeGradients">#</a> **validateThemeGradients**
+
+Given an array of theme gradients checks gradients for validity
+
+_Parameters_
+
+-   _gradients_ `Array`: The array of theme gradients
+
+_Returns_
+
+-   `Array`: The array of valid theme gradients or the default gradients
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md>
 
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 
@@ -599,6 +694,11 @@ _Returns_
 
 Handles selection and navigation across blocks. This component should be
 wrapped around BlockList.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `WPElement`: Children to be rendered.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

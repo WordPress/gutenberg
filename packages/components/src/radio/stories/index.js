@@ -11,7 +11,7 @@ export const _default = () => {
 	/* eslint-disable no-restricted-syntax */
 	return (
 		// id is required for server side rendering
-		<RadioGroup id="default-radiogroup" accessibilityLabel="options">
+		<RadioGroup id="default-radiogroup" label="options">
 			<Radio value="option1">Option 1</Radio>
 			<Radio value="option2">Option 2</Radio>
 		</RadioGroup>

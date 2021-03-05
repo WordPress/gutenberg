@@ -57,6 +57,7 @@ const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.json' ) ||
 	hasPackageProp( 'jest' );
 
+// See https://prettier.io/docs/en/configuration.html.
 const hasPrettierConfig = () =>
 	hasProjectFile( '.prettierrc.js' ) ||
 	hasProjectFile( '.prettierrc.json' ) ||
@@ -71,6 +72,16 @@ const hasWebpackConfig = () =>
 	hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
+
+// See https://github.com/michael-ciniawsky/postcss-load-config#usage (used by postcss-loader).
+const hasPostCSSConfig = () =>
+	hasProjectFile( 'postcss.config.js' ) ||
+	hasProjectFile( '.postcssrc' ) ||
+	hasProjectFile( '.postcssrc.json' ) ||
+	hasProjectFile( '.postcssrc.yaml' ) ||
+	hasProjectFile( '.postcssrc.yml' ) ||
+	hasProjectFile( '.postcssrc.js' ) ||
+	hasPackageProp( 'postcss' );
 
 /**
  * Converts CLI arguments to the format which webpack understands.
@@ -132,4 +143,5 @@ module.exports = {
 	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPrettierConfig,
+	hasPostCSSConfig,
 };

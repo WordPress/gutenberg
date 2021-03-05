@@ -70,6 +70,14 @@ Gutenberg follows a feature branch pull request workflow for all code and docume
 2. Make your changes, testing thoroughly.
 3. Commit your changes when you’re happy with them, and push the branch.
 4. Open your pull request.
+5. If you are a regular contributor with proper access, label and name your pull request appropriately (see below).
+
+For labeling and naming pull requests, here are guidelines to consider that make compiling the changelog more efficient and organized. These guidelines are particularly relevant for regular contributors. Don't let getting the following right be a blocker for sharing your work - mistakes are expected and easy to fix!
+
+- When working on experimental screens and features, apply the `[Type] Experimental` label instead of `Feature`, `Enhancement`, etc.
+- When working on new features to technical packages (scripts, create-block, adding  react hooks, etc), apply the `[Type] New API`  label instead of `Feature`, `Enhancement`, etc.
+- When fixing a bug or making an enhancement to an internal tool used in the project, apply the `[Type] Build Tooling` instead of `Bugs`, `Enhancement`, etc
+- In pull request titles, instead of describing the code change done to fix an issue, consider referring to the actual bug being fixed instead. For example: instead of saying "Check for nullable object in component", it would be preferable to say "Fix editor breakage when clicking the copy block button". 
 
 Along with this process, there are a few important points to mention:
 
@@ -97,7 +105,9 @@ If you are not yet comfortable leaving a full review, try commenting on a PR. Qu
 
 ### Design Review
 
-If your pull request impacts the design, you should ask for a design review. To request a design review add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. As a guide, changes that should be reviewed:
+If your pull request impacts the design/UI, you need to label appropriately to alert design. To request a design review, add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. If there are any PRs that require an update to the design/UI, please use the [Figma Library Update](https://github.com/WordPress/gutenberg/labels/Figma%20Library%20Update) label.
+
+As a guide, changes that should be reviewed:
 
 - A change based on a previous design, to confirm the design is still valid with the change.
 - Anything that changes something visually.
@@ -113,11 +123,11 @@ A pull request can generally be merged once it is:
 - Vetted against all potential edge cases.
 - Changelog entries were properly added.
 - Reviewed by someone other than the original author.
-- [Rebased](/docs/contributors/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
+- [Rebased](/docs/contributors/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the trunk branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
-All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into master.
+All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into trunk.
 
 Most pull requests will be automatically assigned a release milestone, but please make sure your merged pull request was assigned one. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
 

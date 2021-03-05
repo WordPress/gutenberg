@@ -4,7 +4,7 @@
 import isShallowEqual, {
 	isShallowEqualArrays,
 	isShallowEqualObjects,
-} from '..';
+} from '../src';
 
 describe( 'isShallowEqual', () => {
 	it( 'returns false if of different types', () => {

@@ -1,39 +1,51 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { capitalize, get, has, omitBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	hasBlockSupport,
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import InspectorControls from '../components/inspector-controls';
+import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import { LINE_HEIGHT_SUPPORT_KEY, LineHeightEdit } from './line-height';
-import { FONT_SIZE_SUPPORT_KEY, FontSizeEdit } from './font-size';
+import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
+import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
+import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
+	...TYPOGRAPHY_SUPPORT_KEYS,
+	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
-	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_SIZE_SUPPORT_KEY,
-];
-
-const typographySupportKeys = [
-	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_SIZE_SUPPORT_KEY,
+	SPACING_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+
+const VARIABLE_REFERENCE_PREFIX = 'var:';
+const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+function compileStyleValue( uncompiledValue ) {
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -42,18 +54,20 @@ const hasStyleSupport = ( blockType ) =>
  * @return {Object}        Flattened CSS variables declaration
  */
 export function getInlineStyles( styles = {} ) {
-	const mappings = {
-		lineHeight: [ 'typography', 'lineHeight' ],
-		fontSize: [ 'typography', 'fontSize' ],
-		background: [ 'color', 'gradient' ],
-		backgroundColor: [ 'color', 'background' ],
-		color: [ 'color', 'text' ],
-	};
-
 	const output = {};
-	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
-		if ( has( styles, objectKey ) ) {
-			output[ styleKey ] = get( styles, objectKey );
+	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
+		const path = STYLE_PROPERTY[ propKey ].value;
+		const subPaths = STYLE_PROPERTY[ propKey ].properties;
+		if ( has( styles, path ) ) {
+			if ( !! subPaths ) {
+				subPaths.forEach( ( suffix ) => {
+					output[
+						propKey + capitalize( suffix )
+					] = compileStyleValue( get( styles, [ ...path, suffix ] ) );
+				} );
+			} else {
+				output[ propKey ] = compileStyleValue( get( styles, path ) );
+			}
 		}
 	} );
 
@@ -84,6 +98,22 @@ function addAttribute( settings ) {
 }
 
 /**
+ * Filters a style object returning only the keys
+ * that are serializable for a given block.
+ *
+ * @param {Object} style Input style object to filter.
+ * @param {Object} blockSupports Info about block supports.
+ * @return {Object} Filtered style.
+ */
+export function omitKeysNotToSerialize( style, blockSupports ) {
+	return omitBy(
+		style,
+		( value, key ) =>
+			!! blockSupports[ key ]?.__experimentalSkipSerialization
+	);
+}
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param  {Object} props      Additional props applied to save element
@@ -97,8 +127,11 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
+	const filteredStyle = omitKeysNotToSerialize( style, {
+		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	} );
 	props.style = {
-		...getInlineStyles( style ),
+		...getInlineStyles( filteredStyle ),
 		...props.style,
 	};
 
@@ -140,21 +173,22 @@ export function addEditProps( settings ) {
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const hasTypographySupport = typographySupportKeys.some( ( key ) =>
-			hasBlockSupport( blockName, key )
+
+		const hasSpacingSupport = hasBlockSupport(
+			blockName,
+			SPACING_SUPPORT_KEY
 		);
 
 		return [
-			Platform.OS === 'web' && hasTypographySupport && (
-				<InspectorControls key="typography">
-					<PanelBody title={ __( 'Typography' ) }>
-						<FontSizeEdit { ...props } />
-						<LineHeightEdit { ...props } />
-					</PanelBody>
-				</InspectorControls>
-			),
+			<TypographyPanel key="typography" { ...props } />,
+			<BorderPanel key="border" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
+			hasSpacingSupport && (
+				<SpacingPanelControl key="spacing">
+					<PaddingEdit { ...props } />
+				</SpacingPanelControl>
+			),
 		];
 	},
 	'withToolbarControls'

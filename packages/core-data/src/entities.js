@@ -6,17 +6,24 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { apiFetch, select } from './controls';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
+	{
+		label: __( 'Base' ),
+		name: '__unstableBase',
+		kind: 'root',
+		baseURL: '',
+	},
 	{
 		label: __( 'Site' ),
 		name: 'site',
@@ -49,12 +56,20 @@ export const defaultEntities = [
 		label: __( 'Taxonomy' ),
 	},
 	{
-		name: 'widgetArea',
+		name: 'sidebar',
 		kind: 'root',
-		baseURL: '/__experimental/widget-areas',
-		plural: 'widgetAreas',
+		baseURL: '/wp/v2/sidebars',
+		plural: 'sidebars',
 		transientEdits: { blocks: true },
-		label: __( 'Widget area' ),
+		label: __( 'Widget areas' ),
+	},
+	{
+		name: 'widget',
+		kind: 'root',
+		baseURL: '/wp/v2/widgets',
+		plural: 'widgets',
+		transientEdits: { blocks: true },
+		label: __( 'Widgets' ),
 	},
 	{
 		label: __( 'User' ),
@@ -100,6 +115,36 @@ export const kinds = [
 ];
 
 /**
+ * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
+ *
+ * @param {Object} persistedRecord Already persisted Post
+ * @param {Object} edits Edits.
+ * @return {Object} Updated edits.
+ */
+export const prePersistPostType = ( persistedRecord, edits ) => {
+	const newEdits = {};
+
+	if ( persistedRecord?.status === 'auto-draft' ) {
+		// Saving an auto-draft should create a draft by default.
+		if ( ! edits.status && ! newEdits.status ) {
+			newEdits.status = 'draft';
+		}
+
+		// Fix the auto-draft default title.
+		if (
+			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			! newEdits.title &&
+			( ! persistedRecord?.title ||
+				persistedRecord?.title === 'Auto Draft' )
+		) {
+			newEdits.title = '';
+		}
+	}
+
+	return newEdits;
+};
+
+/**
  * Returns the list of post type entities.
  *
  * @return {Promise} Entities promise
@@ -107,6 +152,9 @@ export const kinds = [
 function* loadPostTypeEntities() {
 	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
@@ -114,16 +162,14 @@ function* loadPostTypeEntities() {
 			label: postType.labels.singular_name,
 			transientEdits: {
 				blocks: true,
-				selectionStart: true,
-				selectionEnd: true,
+				selection: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle( record ) {
-				if ( name === 'wp_template_part' || name === 'wp_template' ) {
-					return startCase( record.slug );
-				}
-				return get( record, [ 'title', 'rendered' ], record.id );
-			},
+			getTitle: ( record ) =>
+				record?.title?.rendered ||
+				record?.title ||
+				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
 }
@@ -182,7 +228,7 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield select( 'getEntitiesByKind', kind );
+	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

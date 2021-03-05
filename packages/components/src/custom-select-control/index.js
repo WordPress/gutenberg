@@ -138,6 +138,7 @@ export default function CustomSelectControl( {
 								index,
 								key: item.key,
 								className: classnames(
+									item.className,
 									'components-custom-select-control__item',
 									{
 										'is-highlighted':
@@ -147,13 +148,13 @@ export default function CustomSelectControl( {
 								style: item.style,
 							} ) }
 						>
+							{ item.name }
 							{ item === selectedItem && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
 								/>
 							) }
-							{ item.name }
 						</li>
 					) ) }
 			</ul>

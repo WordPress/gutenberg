@@ -6,54 +6,151 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { useMemo, useRef, memo } from '@wordpress/element';
+import {
+	Button,
+	__unstableCompositeItem as CompositeItem,
+} from '@wordpress/components';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
-function InserterListItem( {
-	icon,
-	onClick,
-	isDisabled,
-	title,
-	className,
-	...props
-} ) {
-	const itemIconStyle = icon
-		? {
-				backgroundColor: icon.background,
-				color: icon.foreground,
-		  }
-		: {};
+/**
+ * Return true if platform is MacOS.
+ *
+ * @param {Object} _window   window object by default; used for DI testing.
+ *
+ * @return {boolean} True if MacOS; false otherwise.
+ */
+function isAppleOS( _window = window ) {
+	const { platform } = _window.navigator;
 
 	return (
-		<li className="block-editor-block-types-list__list-item">
-			<Button
-				className={ classnames(
-					'block-editor-block-types-list__item',
-					className
-				) }
-				onClick={ ( event ) => {
-					event.preventDefault();
-					onClick();
-				} }
-				disabled={ isDisabled }
-				{ ...props }
-			>
-				<span
-					className="block-editor-block-types-list__item-icon"
-					style={ itemIconStyle }
-				>
-					<BlockIcon icon={ icon } showColors />
-				</span>
-				<span className="block-editor-block-types-list__item-title">
-					{ title }
-				</span>
-			</Button>
-		</li>
+		platform.indexOf( 'Mac' ) !== -1 ||
+		[ 'iPad', 'iPhone' ].includes( platform )
 	);
 }
 
-export default InserterListItem;
+function InserterListItem( {
+	className,
+	composite,
+	item,
+	onSelect,
+	onHover,
+	isDraggable,
+	...props
+} ) {
+	const isDragging = useRef( false );
+	const itemIconStyle = item.icon
+		? {
+				backgroundColor: item.icon.background,
+				color: item.icon.foreground,
+		  }
+		: {};
+	const blocks = useMemo( () => {
+		return [
+			createBlock(
+				item.name,
+				item.initialAttributes,
+				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
+			),
+		];
+	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
+
+	return (
+		<InserterDraggableBlocks
+			isEnabled={ isDraggable && ! item.disabled }
+			blocks={ blocks }
+			icon={ item.icon }
+		>
+			{ ( { draggable, onDragStart, onDragEnd } ) => (
+				<div
+					className="block-editor-block-types-list__list-item"
+					draggable={ draggable }
+					onDragStart={ ( event ) => {
+						isDragging.current = true;
+						if ( onDragStart ) {
+							onHover( null );
+							onDragStart( event );
+						}
+					} }
+					onDragEnd={ ( event ) => {
+						isDragging.current = false;
+						if ( onDragEnd ) {
+							onDragEnd( event );
+						}
+					} }
+				>
+					<CompositeItem
+						role="option"
+						as={ Button }
+						{ ...composite }
+						className={ classnames(
+							'block-editor-block-types-list__item',
+							className
+						) }
+						disabled={ item.isDisabled }
+						onClick={ ( event ) => {
+							event.preventDefault();
+							onSelect(
+								item,
+								isAppleOS() ? event.metaKey : event.ctrlKey
+							);
+							onHover( null );
+						} }
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER ) {
+								event.preventDefault();
+								onSelect(
+									item,
+									isAppleOS() ? event.metaKey : event.ctrlKey
+								);
+								onHover( null );
+							}
+						} }
+						onFocus={ () => {
+							if ( isDragging.current ) {
+								return;
+							}
+							onHover( item );
+						} }
+						onMouseEnter={ () => {
+							if ( isDragging.current ) {
+								return;
+							}
+							onHover( item );
+						} }
+						onMouseLeave={ () => onHover( null ) }
+						onBlur={ () => onHover( null ) }
+						// Use the CompositeItem `focusable` prop over Button's
+						// isFocusable. The latter was shown to cause an issue
+						// with tab order in the inserter list.
+						focusable
+						{ ...props }
+					>
+						<span
+							className="block-editor-block-types-list__item-icon"
+							style={ itemIconStyle }
+						>
+							<BlockIcon icon={ item.icon } showColors />
+						</span>
+						<span className="block-editor-block-types-list__item-title">
+							{ item.title }
+						</span>
+					</CompositeItem>
+				</div>
+			) }
+		</InserterDraggableBlocks>
+	);
+}
+
+export default memo( InserterListItem );

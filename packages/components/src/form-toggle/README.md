@@ -79,6 +79,13 @@ If no value is passed the toggle will be unchecked.
 - Type: `Boolean`
 - Required: No
 
+#### disabled
+
+If disabled is true the toggle will be disabled and apply the appropriate styles.
+
+- Type: `Boolean`
+- Required: No
+
 #### onChange
 
 A function that receives the checked state (boolean) as input.
@@ -90,4 +97,5 @@ A function that receives the checked state (boolean) as input.
 
 - To select one option from a set, and you want to show them all the available options at once, use the `Radio` component.
 - To select one or more items from a set, use the `CheckboxControl` component.
+- To display a toggle with label and help text, use the `ToggleControl` component.
 

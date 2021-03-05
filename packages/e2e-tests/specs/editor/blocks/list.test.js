@@ -10,6 +10,7 @@ import {
 	transformBlockTo,
 	pressKeyWithModifier,
 	insertBlock,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'List', () => {
@@ -72,10 +73,10 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should undo asterisk transform with backspace after mouse move', async () => {
+	it( 'should undo asterisk transform with backspace setting isTyping state', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '* ' );
-		await page.mouse.move( 0, 0, { steps: 10 } );
+		await showBlockToolbar();
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -124,6 +125,9 @@ describe( 'List', () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/list' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'List')]`
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a list' );
 
@@ -190,7 +194,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'Indent list item' );
+		await clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
 		await transformBlockTo( 'Paragraph' );
 
@@ -272,7 +276,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'Indent list item' );
+		await clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
@@ -292,7 +296,7 @@ describe( 'List', () => {
 	it( 'should change the base list type', async () => {
 		await insertBlock( 'List' );
 		const button = await page.waitForSelector(
-			'button[aria-label="Convert to ordered list"]'
+			'button[aria-label="Ordered"]'
 		);
 		await button.click();
 
@@ -306,7 +310,7 @@ describe( 'List', () => {
 		await pressKeyWithModifier( 'primary', 'm' );
 		await page.keyboard.type( '1' );
 
-		await clickBlockToolbarButton( 'Convert to ordered list' );
+		await clickBlockToolbarButton( 'Ordered' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

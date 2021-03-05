@@ -17,7 +17,8 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
-import Breadcrumb from '../block-list/breadcrumb.native';
+import BlockSelectionButton from '../block-list/block-selection-button.native';
+import { store as blockEditorStore } from '../../store';
 
 const EASE_IN_DURATION = 250;
 const EASE_OUT_DURATION = 80;
@@ -32,7 +33,7 @@ const FloatingToolbar = ( {
 	onNavigateUp,
 	isRTL,
 } ) => {
-	// sustain old selection for proper Breacdrumb rendering when exit animation is ongoing
+	// Sustain old selection for proper block selection button rendering when exit animation is ongoing.
 	const [ previousSelection, setPreviousSelection ] = useState( {} );
 
 	useEffect( () => {
@@ -70,7 +71,7 @@ const FloatingToolbar = ( {
 	} = previousSelection;
 
 	const showPrevious = previousSelectedClientId && ! showFloatingToolbar;
-	const breadcrumbClientId = showPrevious
+	const blockSelectionButtonClientId = showPrevious
 		? previousSelectedClientId
 		: selectedClientId;
 	const showNavUpButton =
@@ -92,7 +93,9 @@ const FloatingToolbar = ( {
 						<View style={ styles.pipe } />
 					</Toolbar>
 				) }
-				<Breadcrumb clientId={ breadcrumbClientId } />
+				<BlockSelectionButton
+					clientId={ blockSelectionButtonClientId }
+				/>
 			</Animated.View>
 		)
 	);
@@ -106,7 +109,7 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockCount,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedClientId = getSelectedBlockClientId();
 
@@ -122,7 +125,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			onNavigateUp( clientId, initialPosition ) {

@@ -13,11 +13,22 @@
  * @return string The render.
  */
 function render_block_core_site_title( $attributes ) {
-	$tag_name = 'h1';
+	$tag_name         = 'h1';
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
-	return sprintf( '<%1$s>%2$s</%1$s>', $tag_name, get_bloginfo( 'name' ) );
+
+	$link               = sprintf( '<a href="%1$s" rel="home">%2$s</a>', get_bloginfo( 'url' ), get_bloginfo( 'name' ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+
+	return sprintf(
+		'<%1$s %2$s>%3$s</%1$s>',
+		$tag_name,
+		$wrapper_attributes,
+		$link
+	);
 }
 
 /**

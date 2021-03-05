@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View } from 'react-native';
 
 /**
@@ -10,6 +9,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { PanelBody, TextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -51,8 +51,27 @@ export default class Picker extends Component {
 		this.onClose();
 	}
 
+	getOptions() {
+		const { options, leftAlign } = this.props;
+
+		return options.map( ( option ) => (
+			<View key={ `${ option.label }-${ option.value }` }>
+				{ options.length > 1 && option.separated && <Separator /> }
+				<BottomSheet.Cell
+					icon={ option.icon }
+					leftAlign={ leftAlign }
+					label={ option.label }
+					separatorType={ 'none' }
+					onPress={ () => this.onCellPress( option.value ) }
+					disabled={ option.disabled }
+					style={ option.disabled && styles.disabled }
+				/>
+			</View>
+		) );
+	}
+
 	render() {
-		const { options, leftAlign, hideCancelButton } = this.props;
+		const { hideCancelButton, title } = this.props;
 		const { isVisible } = this.state;
 
 		return (
@@ -62,34 +81,16 @@ export default class Picker extends Component {
 				style={ { paddingBottom: 20 } }
 				hideHeader
 			>
-				<View>
-					{ options.map( ( option, index ) => (
-						<>
-							{ options.length > 1 && option.separated && (
-								<Separator />
-							) }
-							<BottomSheet.Cell
-								icon={ option.icon }
-								key={ index }
-								leftAlign={ leftAlign }
-								label={ option.label }
-								separatorType={ 'none' }
-								onPress={ () =>
-									this.onCellPress( option.value )
-								}
-								disabled={ option.disabled }
-								style={ option.disabled && styles.disabled }
-							/>
-						</>
-					) ) }
+				<PanelBody title={ title } style={ styles.panelBody }>
+					{ this.getOptions() }
 					{ ! hideCancelButton && (
-						<BottomSheet.Cell
+						<TextControl
 							label={ __( 'Cancel' ) }
 							onPress={ this.onClose }
 							separatorType={ 'none' }
 						/>
 					) }
-				</View>
+				</PanelBody>
 			</BottomSheet>
 		);
 	}

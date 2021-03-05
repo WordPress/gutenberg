@@ -1,0 +1,13 @@
+diff --git a/node_modules/metro/src/node-haste/DependencyGraph.js b/node_modules/metro/src/node-haste/DependencyGraph.js
+index cdd1b81..9ac98d1 100644
+--- a/node_modules/metro/src/node-haste/DependencyGraph.js
++++ b/node_modules/metro/src/node-haste/DependencyGraph.js
+@@ -137,7 +137,7 @@ class DependencyGraph extends EventEmitter {
+       roots: config.watchFolders,
+       throwOnModuleCollision: true,
+       useWatchman: config.resolver.useWatchman,
+-      watch: true
++      watch: false
+     });
+   }
+ 

@@ -47,12 +47,61 @@ describe( 'Gallery', () => {
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {"ids":\\[\\d+\\]} -->\\s*<figure class="wp-block-gallery columns-1 is-cropped"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img src="[^"]+\\/${ filename }\\.png" alt="" data-id="\\d+" data-link=".+" class="wp-image-\\d+"\\/><\\/figure><\\/li><\\/ul><\\/figure>\\s*<!-- \\/wp:gallery -->`
+			`<!-- wp:gallery {"ids":\\[\\d+\\],"linkTo":"none"} -->\\s*<figure class="wp-block-gallery columns-1 is-cropped"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img src="[^"]+\\/${ filename }\\.png" alt="" data-id="\\d+" data-link=".+" class="wp-image-\\d+"\\/><\\/figure><\\/li><\\/ul><\\/figure>\\s*<!-- \\/wp:gallery -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
-	it( 'when initially added the media library shows the Create Gallery view', async () => {
+	it( 'gallery caption can be edited', async () => {
+		const galleryCaption = 'Tested gallery caption';
+
+		await insertBlock( 'Gallery' );
+		await upload( '.wp-block-gallery input[type="file"]' );
+
+		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
+		await page.keyboard.type( galleryCaption );
+
+		expect( await getEditedPostContent() ).toMatch(
+			new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
+		);
+	} );
+
+	it( "uploaded images' captions can be edited", async () => {
+		await insertBlock( 'Gallery' );
+		await upload( '.wp-block-gallery input[type="file"]' );
+
+		const figureElement = await page.waitForSelector(
+			'.blocks-gallery-item figure'
+		);
+
+		await figureElement.click();
+
+		const captionElement = await figureElement.$(
+			'.block-editor-rich-text__editable'
+		);
+
+		const caption = 'Tested caption';
+
+		await captionElement.click();
+		await page.keyboard.type( caption );
+
+		expect( await getEditedPostContent() ).toMatch(
+			new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
+		);
+	} );
+
+	// Disable reason:
+	// This test would be good to enable, but the media modal contains an
+	// invalid role, which is causing Axe tests to fail:
+	// https://core.trac.wordpress.org/ticket/50273
+	//
+	// Attempts to add an Axe exception for the media modal haven't proved
+	// successful:
+	// https://github.com/WordPress/gutenberg/pull/22719
+	//
+	// This test could be re-enabled once the trac ticket is solved.
+	// eslint-disable-next-line jest/no-disabled-tests
+	it.skip( 'when initially added the media library shows the Create Gallery view', async () => {
 		await insertBlock( 'Gallery' );
 		await clickButton( 'Media Library' );
 		await page.waitForSelector( '.media-frame' );
@@ -67,10 +116,5 @@ describe( 'Gallery', () => {
 
 		expect( mediaLibraryHeaderText ).toBe( 'Create Gallery' );
 		expect( mediaLibraryButtonText ).toBe( 'Create a new gallery' );
-
-		// Unfortunately the Media Library has invalid HTML.
-		// Axe tests fail with the following error:
-		// `List element has direct children with a role that is not allowed: checkbox.`
-		await expect( page ).not.toPassAxeTests();
 	} );
 } );

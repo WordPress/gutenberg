@@ -5,50 +5,79 @@
  */
 const program = require( 'commander' );
 
+const catchException = ( command ) => {
+	return async ( ...args ) => {
+		try {
+			await command( ...args );
+		} catch ( error ) {
+			console.error( error );
+			process.exitCode = 1;
+		}
+	};
+};
+
 /**
  * Internal dependencies
  */
 const { releaseRC, releaseStable } = require( './commands/release' );
-const { prepublishNpmStablePackages } = require( './commands/packages' );
+const {
+	publishNpmLatestDistTag,
+	publishNpmNextDistTag,
+} = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
 
 program
 	.command( 'release-plugin-rc' )
 	.alias( 'rc' )
-	.description(
-		'Release an RC version of the plugin (supports only rc.1 for now)'
-	)
-	.action( releaseRC );
+	.description( 'Release an RC version of the plugin' )
+	.action( catchException( releaseRC ) );
 
 program
 	.command( 'release-plugin-stable' )
 	.alias( 'stable' )
 	.description( 'Release a stable version of the plugin' )
-	.action( releaseStable );
+	.action( catchException( releaseStable ) );
 
 program
-	.command( 'prepublish-packages-stable' )
-	.alias( 'npm-stable' )
+	.command( 'publish-npm-packages-latest' )
+	.alias( 'npm-latest' )
 	.description(
-		'Prepublish to npm steps for the next stable version of WordPress packages'
+		'Publishes packages to npm (latest dist-tag, production version)'
 	)
-	.action( prepublishNpmStablePackages );
+	.action( catchException( publishNpmLatestDistTag ) );
+
+program
+	.command( 'publish-npm-packages-next' )
+	.alias( 'npm-next' )
+	.description(
+		'Publishes packages to npm (next dist-tag, prerelease version)'
+	)
+	.action( catchException( publishNpmNextDistTag ) );
 
 program
 	.command( 'release-plugin-changelog' )
 	.alias( 'changelog' )
 	.option( '-m, --milestone <milestone>', 'Milestone' )
 	.option( '-t, --token <token>', 'Github token' )
+	.option(
+		'-u, --unreleased',
+		"Only include PRs that haven't been included in a release yet"
+	)
 	.description( 'Generates a changelog from merged Pull Requests' )
-	.action( getReleaseChangelog );
+	.action( catchException( getReleaseChangelog ) );
 
 program
 	.command( 'performance-tests [branches...]' )
 	.alias( 'perf' )
+	.option( '-c, --ci', 'Run in CI (non interactive)' )
+	.option(
+		'--tests-branch <branch>',
+		"Use this branch's performance test files"
+	)
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'
 	)
-	.action( runPerformanceTests );
+	.action( catchException( runPerformanceTests ) );
 
 program.parse( process.argv );

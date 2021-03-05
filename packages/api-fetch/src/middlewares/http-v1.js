@@ -40,7 +40,7 @@ function httpV1Middleware( options, next ) {
 		};
 	}
 
-	return next( options, next );
+	return next( options );
 }
 
 export default httpV1Middleware;

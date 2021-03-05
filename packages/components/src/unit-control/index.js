@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -19,6 +21,7 @@ import {
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
+import { useControlledState } from '../utils/hooks';
 
 function UnitControl(
 	{
@@ -29,7 +32,7 @@ function UnitControl(
 		disableUnits = false,
 		isPressEnterToChange = false,
 		isResetValueOnUnitChange = false,
-		isUnitSelectTabbable = false,
+		isUnitSelectTabbable = true,
 		label,
 		onChange = noop,
 		onUnitChange = noop,
@@ -43,24 +46,28 @@ function UnitControl(
 	ref
 ) {
 	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
-	const [ unit, setUnit ] = useState( initialUnit );
+	const [ unit, setUnit ] = useControlledState( unitProp, {
+		initial: initialUnit,
+	} );
+
+	// Stores parsed value for hand-off in state reducer
+	const refParsedValue = useRef( null );
 
 	const classes = classnames( 'components-unit-control', className );
 
 	const handleOnChange = ( next, changeProps ) => {
-		/**
+		if ( next === '' ) {
+			onChange( '', changeProps );
+			return;
+		}
+
+		/*
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
-		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
-			next,
-			units,
-			value,
-			unit
-		);
-		const nextValue = `${ parsedValue }${ parsedUnit }`;
+		next = getValidParsedUnit( next, units, value, unit ).join( '' );
 
-		onChange( nextValue, changeProps );
+		onChange( next, changeProps );
 	};
 
 	const handleOnUnitChange = ( next, changeProps ) => {
@@ -78,6 +85,42 @@ function UnitControl(
 		setUnit( next );
 	};
 
+	const mayUpdateUnit = ( event ) => {
+		if ( ! isNaN( event.target.value ) ) {
+			refParsedValue.current = null;
+			return;
+		}
+		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+			event.target.value,
+			units,
+			value,
+			unit
+		);
+
+		refParsedValue.current = parsedValue;
+
+		if ( isPressEnterToChange && parsedUnit !== unit ) {
+			const data = units.find(
+				( option ) => option.value === parsedUnit
+			);
+			const changeProps = { event, data };
+
+			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
+			onUnitChange( parsedUnit, changeProps );
+
+			setUnit( parsedUnit );
+		}
+	};
+
+	const handleOnBlur = mayUpdateUnit;
+
+	const handleOnKeyDown = ( event ) => {
+		const { keyCode } = event;
+		if ( keyCode === ENTER ) {
+			mayUpdateUnit( event );
+		}
+	};
+
 	/**
 	 * "Middleware" function that intercepts updates from InputControl.
 	 * This allows us to tap into actions to transform the (next) state for
@@ -88,31 +131,15 @@ function UnitControl(
 	 * @return {Object} The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer = ( state, action ) => {
-		const { type, payload } = action;
-		const event = payload?.event;
-
-		/**
-		 * Customizes the commit interaction.
-		 *
-		 * This occurs when pressing ENTER to fire a change.
-		 * By intercepting the state change, we can parse the incoming
-		 * value to determine if the unit needs to be updated.
+		/*
+		 * On commits (when pressing ENTER and on blur if
+		 * isPressEnterToChange is true), if a parse has been performed
+		 * then use that result to update the state.
 		 */
-		if ( type === inputControlActionTypes.COMMIT ) {
-			const valueToParse = event?.target?.value;
-
-			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
-				valueToParse,
-				units,
-				value,
-				unit
-			);
-
-			state.value = parsedValue;
-
-			// Update unit if the incoming parsed unit is different.
-			if ( unit !== parsedUnit ) {
-				handleOnUnitChange( parsedUnit, { event } );
+		if ( action.type === inputControlActionTypes.COMMIT ) {
+			if ( refParsedValue.current !== null ) {
+				state.value = refParsedValue.current;
+				refParsedValue.current = null;
 			}
 		}
 
@@ -121,6 +148,7 @@ function UnitControl(
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
+			aria-label={ __( 'Select unit' ) }
 			disabled={ disabled }
 			isTabbable={ isUnitSelectTabbable }
 			options={ units }
@@ -135,13 +163,15 @@ function UnitControl(
 			<ValueInput
 				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...props }
+				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }
 				disableUnits={ disableUnits }
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
+				onBlur={ handleOnBlur }
+				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
 				ref={ ref }
 				size={ size }

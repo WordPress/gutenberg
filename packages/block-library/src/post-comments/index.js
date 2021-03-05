@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+import { postComments as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,6 +14,8 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Comments' ),
+	title: _x( 'Post Comments', 'block title' ),
+	description: __( "Display a post's comments." ),
+	icon,
 	edit,
 };

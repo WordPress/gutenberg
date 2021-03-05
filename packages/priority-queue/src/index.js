@@ -74,14 +74,12 @@ export const createQueue = () => {
 
 	let isRunning = false;
 
-	/* eslint-disable jsdoc/valid-types */
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
-	/* eslint-enable */
 	const runWaitingList = ( deadline ) => {
 		const hasTimeRemaining =
 			typeof deadline === 'number'
@@ -98,6 +96,9 @@ export const createQueue = () => {
 			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 				nextElement
 			) );
+			// If errors with undefined callbacks are encountered double check that all of your useSelect calls
+			// have all dependecies set correctly in second parameter. Missing dependencies can cause unexpected
+			// loops and race conditions in the queue.
 			callback();
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );

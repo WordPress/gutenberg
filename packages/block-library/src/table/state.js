@@ -149,6 +149,7 @@ export function isCellSelected( cellLocation, selection ) {
  * @param {Object} options
  * @param {string} options.sectionName Section in which to insert the row.
  * @param {number} options.rowIndex    Row index at which to insert the row.
+ * @param {number} options.columnCount Column count for the table to create.
  *
  * @return {Object} New table state.
  */

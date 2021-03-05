@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+import { postDate as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,6 +14,8 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Date' ),
+	title: _x( 'Post Date', 'block title' ),
+	description: __( 'Add the date of this post.' ),
+	icon,
 	edit,
 };

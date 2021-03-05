@@ -370,18 +370,23 @@ class MediaUpload extends Component {
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
-		const attachment = this.frame
-			.state()
-			.get( 'selection' )
-			.toJSON();
+		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
 
 	onOpen() {
 		this.updateCollection();
-		if ( ! this.props.value ) {
+
+		// Handle both this.props.value being either (number[]) multiple ids
+		// (for galleries) or a (number) singular id (e.g. image block).
+		const hasMedia = Array.isArray( this.props.value )
+			? !! this.props.value?.length
+			: !! this.props.value;
+
+		if ( ! hasMedia ) {
 			return;
 		}
+
 		if ( ! this.props.gallery ) {
 			const selection = this.frame.state().get( 'selection' );
 			castArray( this.props.value ).forEach( ( id ) => {

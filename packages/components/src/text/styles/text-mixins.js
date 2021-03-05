@@ -3,8 +3,10 @@
  */
 import { fontFamily } from './font-family';
 import css from './emotion-css';
+import { G2 } from '../../utils/colors-values';
 
 const fontWeightNormal = `font-weight: 400;`;
+const fontWeightMedium = `font-weight: 500;`;
 const fontWeightSemibold = `font-weight: 600;`;
 
 const title = `
@@ -74,8 +76,16 @@ const label = `
 	line-height: 16px;
 `;
 
+const sectionHeading = `
+	${ fontWeightMedium }
+	font-size: 11px;
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: ${ G2.gray[ 700 ] }
+`;
+
 /**
- * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'} TextVariant
+ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'|'sectionheading'} TextVariant
  */
 
 /**
@@ -85,44 +95,44 @@ const variant = ( variantName = 'body' ) => {
 	switch ( variantName ) {
 		case 'title.large':
 			return css`
-				${title}
-				${titleLarge}
+				${ title }
+				${ titleLarge }
 			`;
 		case 'title.medium':
 			return css`
-				${title}
-				${titleMedium}
+				${ title }
+				${ titleMedium }
 			`;
 		case 'title.small':
 			return css`
-				${title}
-				${titleSmall}
+				${ title }
+				${ titleSmall }
 			`;
 
 		case 'subtitle':
 			return css`
-				${subtitle}
-				${subtitleLarge}
+				${ subtitle }
+				${ subtitleLarge }
 			`;
 		case 'subtitle.small':
 			return css`
-				${subtitle}
-				${subtitleSmall}
+				${ subtitle }
+				${ subtitleSmall }
 			`;
 
 		case 'body':
 			return css`
-				${body}
+				${ body }
 			`;
 		case 'body.large':
 			return css`
-				${body}
-				${bodyLarge}
+				${ body }
+				${ bodyLarge }
 			`;
 		case 'body.small':
 			return css`
-				${body}
-				${bodySmall}
+				${ body }
+				${ bodySmall }
 			`;
 
 		case 'button':
@@ -133,6 +143,9 @@ const variant = ( variantName = 'body' ) => {
 
 		case 'label':
 			return label;
+
+		case 'sectionheading':
+			return sectionHeading;
 	}
 };
 
@@ -145,6 +158,6 @@ const variant = ( variantName = 'body' ) => {
  * @param {TextProps} props
  */
 export const text = ( props ) => css`
-	${fontFamily}
-	${variant( props.variant )}
+	${ fontFamily }
+	${ variant( props.variant ) }
 `;

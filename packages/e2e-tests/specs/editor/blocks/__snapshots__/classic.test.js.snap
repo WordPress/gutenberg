@@ -1,3 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Classic Should not fail after save/reload 1`] = `"test"`;
+
 exports[`Classic should be inserted 1`] = `"test"`;

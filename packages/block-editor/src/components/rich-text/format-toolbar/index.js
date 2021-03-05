@@ -10,7 +10,7 @@ import { orderBy } from 'lodash';
 
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	ToolbarGroup,
 	DropdownMenu,
 	Slot,
@@ -41,9 +41,8 @@ const FormatToolbar = () => {
 								{ ( toggleProps ) => (
 									<DropdownMenu
 										icon={ chevronDown }
-										label={ __(
-											'More rich text controls'
-										) }
+										/* translators: button label text should, if possible, be under 16 characters. */
+										label={ __( 'More' ) }
 										toggleProps={ toggleProps }
 										controls={ orderBy(
 											fills.map(
