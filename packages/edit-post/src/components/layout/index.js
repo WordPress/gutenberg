@@ -36,7 +36,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -172,9 +172,7 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
-	const ref = useRef();
-
-	useDrop( ref );
+	const ref = useDrop( ref );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
