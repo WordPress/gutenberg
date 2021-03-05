@@ -10,11 +10,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import {
-	BlockContextProvider,
-	BlockBreadcrumb,
-	__experimentalLibrary as Library,
-} from '@wordpress/block-editor';
+import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -24,11 +20,6 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { close } from '@wordpress/icons';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,16 +32,20 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
+import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
+import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
+import { store as editSiteStore } from '../../store';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor() {
+function Editor( { initialSettings } ) {
 	const {
 		isFullscreenActive,
 		isInserterOpen,
+		isListViewOpen,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -62,22 +57,28 @@ function Editor() {
 		const {
 			isFeatureActive,
 			isInserterOpened,
+			isListViewOpened,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
-		} = select( 'core/edit-site' );
+		} = select( editSiteStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
+
+		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
+		// the editor is loaded rather than degrading the performance of the inserter.
+		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
 
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
+			isListViewOpen: isListViewOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			sidebarIsOpened: !! select(
 				interfaceStore
-			).getActiveComplementaryArea( 'core/edit-site' ),
+			).getActiveComplementaryArea( editSiteStore.name ),
 			settings: getSettings(),
 			templateType: postType,
 			page: getPage(),
@@ -93,7 +94,12 @@ function Editor() {
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
-	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
+	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
+		editSiteStore
+	);
+	useEffect( () => {
+		updateSettings( initialSettings );
+	}, [] );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
 	// so that they can be selected with core/editor selectors in any editor.
@@ -145,11 +151,20 @@ function Editor() {
 		}
 	}, [ isNavigationOpen ] );
 
-	const isMobile = useViewportMatch( 'medium', '<' );
+	// Don't render the Editor until the settings are set and loaded
+	if ( ! settings?.siteUrl ) {
+		return null;
+	}
 
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-	} );
+	const secondarySidebar = () => {
+		if ( isInserterOpen ) {
+			return <InserterSidebar />;
+		}
+		if ( isListViewOpen ) {
+			return <ListViewSidebar />;
+		}
+		return null;
+	};
 
 	return (
 		<>
@@ -182,42 +197,7 @@ function Editor() {
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
-											secondarySidebar={
-												isInserterOpen ? (
-													<div
-														ref={
-															inserterDialogRef
-														}
-														{ ...inserterDialogProps }
-														className="edit-site-editor__inserter-panel"
-													>
-														<div className="edit-site-editor__inserter-panel-header">
-															<Button
-																icon={ close }
-																onClick={ () =>
-																	setIsInserterOpened(
-																		false
-																	)
-																}
-															/>
-														</div>
-														<div className="edit-site-editor__inserter-panel-content">
-															<Library
-																showInserterHelpPanel
-																onSelect={ () => {
-																	if (
-																		isMobile
-																	) {
-																		setIsInserterOpened(
-																			false
-																		);
-																	}
-																} }
-															/>
-														</div>
-													</div>
-												) : null
-											}
+											secondarySidebar={ secondarySidebar() }
 											sidebar={
 												sidebarIsOpened && (
 													<ComplementaryArea.Slot scope="core/edit-site" />

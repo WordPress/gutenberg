@@ -3,7 +3,7 @@ BlockVerticalAlignmentToolbar
 
 `BlockVerticalAlignmentToolbar` is a simple `Toolbar` component designed to provide _vertical_ alignment UI controls for use within the editor `BlockControls` toolbar.
 
-This builds upon similar patterns to the [`BlockAlignmentToolbar`](https://github.com/WordPress/gutenberg/tree/master/packages/editor/src/components/block-alignment-toolbar) but is focused on vertical alignment only.
+This builds upon similar patterns to the [`BlockAlignmentToolbar`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/src/components/block-alignment-toolbar) but is focused on vertical alignment only.
 
 ## Usage
 
@@ -87,4 +87,4 @@ const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment 
 
 ## Examples
 
-The [Core Columns](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src/columns) Block utilises the `BlockVerticalAlignmentToolbar`.
+The [Core Columns](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/columns) Block utilises the `BlockVerticalAlignmentToolbar`.

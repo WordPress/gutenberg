@@ -14,17 +14,10 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
-	getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
-
-function getComputedStyle( node, pseudo ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node, pseudo );
-}
 
 const name = 'core/paragraph';
 
@@ -49,58 +42,22 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	);
 }
 
-function useDropCapMinHeight( ref, isDisabled, dependencies ) {
-	const [ minHeight, setMinHeight ] = useState();
-
-	useEffect( () => {
-		if ( isDisabled ) {
-			setMinHeight();
-			return;
-		}
-
-		setMinHeight(
-			getComputedStyle( ref.current, 'first-letter' ).lineHeight
-		);
-	}, [ isDisabled, ...dependencies ] );
-
-	return minHeight;
-}
-
 function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
 	onReplace,
 	onRemove,
 	setAttributes,
+	clientId,
 } ) {
-	const {
-		align,
-		content,
-		direction,
-		dropCap,
-		placeholder,
-		fontSize,
-		style,
-	} = attributes;
+	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
-	const ref = useRef();
-	const inlineFontSize = style?.fontSize;
-	const size = useSelect(
-		( select ) => {
-			const { fontSizes } = select( 'core/block-editor' ).getSettings();
-			return getFontSize( fontSizes, fontSize, inlineFontSize ).size;
-		},
-		[ fontSize, inlineFontSize ]
-	);
-	const hasDropCap = isDropCapFeatureEnabled && dropCap;
-	const minHeight = useDropCapMinHeight( ref, ! hasDropCap, [ size ] );
 	const blockProps = useBlockProps( {
-		ref,
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
-		style: { direction, minHeight },
+		style: { direction },
 	} );
 
 	return (
@@ -147,15 +104,23 @@ function ParagraphBlock( {
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
 				}
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( name );
+				onSplit={ ( value, isOriginal ) => {
+					let newAttributes;
+
+					if ( isOriginal || value ) {
+						newAttributes = {
+							...attributes,
+							content: value,
+						};
 					}
 
-					return createBlock( name, {
-						...attributes,
-						content: value,
-					} );
+					const block = createBlock( name, newAttributes );
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

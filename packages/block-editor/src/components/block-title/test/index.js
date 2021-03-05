@@ -103,7 +103,7 @@ describe( 'BlockTitle', () => {
 
 		const wrapper = shallow( <BlockTitle clientId="id-name-with-label" /> );
 
-		expect( wrapper.text() ).toBe( 'Block With Label: Test Label' );
+		expect( wrapper.text() ).toBe( 'Test Label' );
 	} );
 
 	it( 'truncates the label if it is too long', () => {
@@ -116,8 +116,6 @@ describe( 'BlockTitle', () => {
 			<BlockTitle clientId="id-name-with-long-label" />
 		);
 
-		expect( wrapper.text() ).toBe(
-			'Block With Long Label: This is a lo...'
-		);
+		expect( wrapper.text() ).toBe( 'This is a longer label than typi...' );
 	} );
 } );

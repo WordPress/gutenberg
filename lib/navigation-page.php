@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg Navigation page.
+ * Bootstrapping the Gutenberg Navigation page.
  *
  * @package gutenberg
  */

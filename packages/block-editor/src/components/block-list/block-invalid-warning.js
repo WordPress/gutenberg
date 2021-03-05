@@ -13,6 +13,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  */
 import Warning from '../warning';
 import BlockCompare from '../block-compare';
+import { store as blockEditorStore } from '../../store';
 
 export function BlockInvalidWarning( {
 	convertToHTML,
@@ -103,10 +104,10 @@ const recoverBlock = ( { name, attributes, innerBlocks } ) =>
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => ( {
-		block: select( 'core/block-editor' ).getBlock( clientId ),
+		block: select( blockEditorStore ).getBlock( clientId ),
 	} ) ),
 	withDispatch( ( dispatch, { block } ) => {
-		const { replaceBlock } = dispatch( 'core/block-editor' );
+		const { replaceBlock } = dispatch( blockEditorStore );
 
 		return {
 			convertToClassic() {

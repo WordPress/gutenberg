@@ -100,3 +100,33 @@ export const navigationPanel = {
 		await item.click();
 	},
 };
+
+export const siteEditor = {
+	async visit() {
+		const query = addQueryArgs( '', {
+			page: 'gutenberg-edit-site',
+		} ).slice( 1 );
+		await visitAdminPage( 'admin.php', query );
+		await page.waitForSelector( '.edit-site-visual-editor iframe' );
+	},
+
+	async toggleMoreMenu() {
+		// eslint-disable-next-line jest/no-standalone-expect
+		await expect( page ).toClick(
+			'.edit-site-more-menu [aria-label="More tools & options"]'
+		);
+	},
+
+	async clickOnMoreMenuItem( buttonLabel ) {
+		await this.toggleMoreMenu();
+		const moreMenuContainerSelector =
+			'//*[contains(concat(" ", @class, " "), " edit-site-more-menu__content ")]';
+		const elementToClick = (
+			await page.$x(
+				`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`
+			)
+		 )[ 0 ];
+
+		await elementToClick.click();
+	},
+};

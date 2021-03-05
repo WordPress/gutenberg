@@ -5,8 +5,7 @@
         "isValid": true,
         "attributes": {
             "slug": "header",
-            "theme": "twentytwenty",
-            "tagName": "div"
+            "theme": "twentytwenty"
         },
         "innerBlocks": [],
         "originalContent": ""

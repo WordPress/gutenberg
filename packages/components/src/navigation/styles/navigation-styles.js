@@ -158,8 +158,11 @@ export const ItemBaseUI = styled.li`
 	margin-bottom: 0;
 
 	button,
+	a.components-button,
 	a {
 		width: 100%;
+		color: ${ G2.lightGray.ui };
+		padding: ${ space( 0.75 ) } ${ space( 2 ) };
 
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,

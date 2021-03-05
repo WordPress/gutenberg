@@ -350,6 +350,78 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should map incompatible keys returned from the server', () => {
+			const blockName = 'core/test-block-with-incompatible-keys';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					api_version: 2,
+					provides_context: {
+						fontSize: 'fontSize',
+					},
+					uses_context: [ 'textColor' ],
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {
+					fontSize: 'fontSize',
+				},
+				usesContext: [ 'textColor' ],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
+		// This test can be removed once the polyfill for apiVersion gets removed.
+		it( 'should apply apiVersion on the client when not set on the server', () => {
+			const blockName = 'core/test-block-back-compat';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					apiVersion: 2,
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,

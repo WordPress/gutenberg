@@ -32,7 +32,7 @@ export function BorderRadiusEdit( props ) {
 	}
 
 	const onChange = ( newRadius ) => {
-		const newStyle = {
+		let newStyle = {
 			...style,
 			border: {
 				...style?.border,
@@ -40,7 +40,11 @@ export function BorderRadiusEdit( props ) {
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		if ( newRadius === undefined ) {
+			newStyle = cleanEmptyObject( newStyle );
+		}
+
+		setAttributes( { style: newStyle } );
 	};
 
 	return (

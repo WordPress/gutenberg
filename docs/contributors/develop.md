@@ -20,6 +20,7 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 * [Git Workflow](/docs/contributors/git-workflow.md) documents the git process for deploying changes using pull requests.
 * [Coding Guidelines](/docs/contributors/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
 * [Testing Overview](/docs/contributors/testing-overview.md) for PHP and JavaScript development in Gutenberg.
+* [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
 * [Managing Packages](/docs/contributors/managing-packages.md) documents the process for managing the npm packages.
 * [Gutenberg Release Process](/docs/contributors/release.md) - a checklist for the different types of releases for the Gutenberg project.
 * [React Native mobile Gutenberg](/docs/contributors/native-mobile.md) - a guide on the React Native based mobile Gutenberg editor.

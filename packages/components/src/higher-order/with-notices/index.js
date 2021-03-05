@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { forwardRef, useState, useCallback } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -22,87 +22,85 @@ import NoticeList from '../../notice/list';
  * @return {WPComponent} Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
-	return class WrappedBlockEdit extends Component {
-		constructor() {
-			super( ...arguments );
-
-			this.createNotice = this.createNotice.bind( this );
-			this.createErrorNotice = this.createErrorNotice.bind( this );
-			this.removeNotice = this.removeNotice.bind( this );
-			this.removeAllNotices = this.removeAllNotices.bind( this );
-
-			this.state = {
-				noticeList: [],
-			};
-
-			this.noticeOperations = {
-				createNotice: this.createNotice,
-				createErrorNotice: this.createErrorNotice,
-				removeAllNotices: this.removeAllNotices,
-				removeNotice: this.removeNotice,
-			};
-		}
+	function Component( props, ref ) {
+		const [ noticeList, setNoticeList ] = useState( [] );
 
 		/**
 		 * Function passed down as a prop that adds a new notice.
 		 *
 		 * @param {Object} notice  Notice to add.
 		 */
-		createNotice( notice ) {
+		const createNotice = useCallback( ( notice ) => {
 			const noticeToAdd = notice.id ? notice : { ...notice, id: uuid() };
-			this.setState( ( state ) => ( {
-				noticeList: [ ...state.noticeList, noticeToAdd ],
-			} ) );
-		}
+			setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
+		}, [] );
 
 		/**
 		 * Function passed as a prop that adds a new error notice.
 		 *
 		 * @param {string} msg  Error message of the notice.
 		 */
-		createErrorNotice( msg ) {
-			this.createNotice( { status: 'error', content: msg } );
-		}
+		const createErrorNotice = useCallback(
+			( msg ) => {
+				createNotice( {
+					status: 'error',
+					content: msg,
+				} );
+			},
+			[ createNotice ]
+		);
 
 		/**
 		 * Removes a notice by id.
 		 *
 		 * @param {string} id  Id of the notice to remove.
 		 */
-		removeNotice( id ) {
-			this.setState( ( state ) => ( {
-				noticeList: state.noticeList.filter(
-					( notice ) => notice.id !== id
-				),
-			} ) );
-		}
+		const removeNotice = useCallback( ( id ) => {
+			setNoticeList( ( current ) =>
+				current.filter( ( notice ) => notice.id !== id )
+			);
+		}, [] );
 
 		/**
 		 * Removes all notices
 		 */
-		removeAllNotices() {
-			this.setState( {
-				noticeList: [],
-			} );
-		}
+		const removeAllNotices = useCallback( () => {
+			setNoticeList( [] );
+		}, [] );
 
-		render() {
-			return (
-				<OriginalComponent
-					noticeList={ this.state.noticeList }
-					noticeOperations={ this.noticeOperations }
-					noticeUI={
-						this.state.noticeList.length > 0 && (
-							<NoticeList
-								className="components-with-notices-ui"
-								notices={ this.state.noticeList }
-								onRemove={ this.removeNotice }
-							/>
-						)
-					}
-					{ ...this.props }
+		const noticeOperations = {
+			createNotice,
+			createErrorNotice,
+			removeNotice,
+			removeAllNotices,
+		};
+
+		const propsOut = {
+			...props,
+			noticeList,
+			noticeOperations,
+			noticeUI: noticeList.length > 0 && (
+				<NoticeList
+					className="components-with-notices-ui"
+					notices={ noticeList }
+					onRemove={ noticeOperations.removeNotice }
 				/>
-			);
-		}
-	};
+			),
+		};
+
+		return isForwardRef ? (
+			<OriginalComponent { ...propsOut } ref={ ref } />
+		) : (
+			<OriginalComponent { ...propsOut } />
+		);
+	}
+
+	let isForwardRef;
+	const { render } = OriginalComponent;
+	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
+	if ( typeof render === 'function' ) {
+		isForwardRef = true;
+		return forwardRef( Component );
+	}
+	return Component;
 } );

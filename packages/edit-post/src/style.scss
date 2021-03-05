@@ -49,6 +49,14 @@ body.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 }
 
+// Fix issue with wp-admin menu not scrolling between 170% and 200% zoom.
+.block-editor-page #wpwrap {
+	overflow-y: auto;
+	@include break-medium() {
+		overflow-y: initial;
+	}
+}
+
 // Target the editor UI excluding the metaboxes and custom fields areas.
 .edit-post-header,
 .edit-post-visual-editor,

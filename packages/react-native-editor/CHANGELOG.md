@@ -1,4 +1,4 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 <!--
 For each user feature we should also add a importance categorization label  to indicate the relevance of the change for end users of GB Mobile. The format is the following:
@@ -10,6 +10,23 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.47.0
+* [**] Add support for setting Cover block focal point. [#25810]
+
+## 1.46.1
+* [**] Make inserter long-press options "add to beginning" and "add to end" always available. [#28610]
+* [*] Fix crash when Column block width attribute was empty. [#29015]
+
+## 1.46.0
+* [***] New Block: Audio [#27401, #27467, #28594]
+* [**] Add support for setting heading anchors [#27935]
+* [**] Disable Unsupported Block Editor for Reusable blocks [#28552]
+* [**] Add proper handling for single use blocks such as the more block [#28339]
+
+## 1.45.0
+* [*] Use react-native-url-polyfill in globals - [https://github.com/WordPress/gutenberg/pull/27867]
+* [*] Remove Old Layout Picker - [https://github.com/WordPress/gutenberg/pull/27640]
 
 ## 1.44.1
 * [**] Fix crash in mobile paragraph blocks with custom font size [#28121]

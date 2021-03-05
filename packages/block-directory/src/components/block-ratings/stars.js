@@ -17,7 +17,7 @@ function Stars( { rating } ) {
 	const emptyStarCount = 5 - ( fullStarCount + halfStarCount );
 
 	return (
-		<div
+		<span
 			aria-label={ sprintf(
 				/* translators: %s: number of stars. */
 				__( '%s out of 5 stars' ),
@@ -27,6 +27,7 @@ function Stars( { rating } ) {
 			{ times( fullStarCount, ( i ) => (
 				<Icon
 					key={ `full_stars_${ i }` }
+					className="block-directory-block-ratings__star-full"
 					icon={ starFilled }
 					size={ 16 }
 				/>
@@ -34,6 +35,7 @@ function Stars( { rating } ) {
 			{ times( halfStarCount, ( i ) => (
 				<Icon
 					key={ `half_stars_${ i }` }
+					className="block-directory-block-ratings__star-half-full"
 					icon={ starHalf }
 					size={ 16 }
 				/>
@@ -41,11 +43,12 @@ function Stars( { rating } ) {
 			{ times( emptyStarCount, ( i ) => (
 				<Icon
 					key={ `empty_stars_${ i }` }
+					className="block-directory-block-ratings__star-empty"
 					icon={ starEmpty }
 					size={ 16 }
 				/>
 			) ) }
-		</div>
+		</span>
 	);
 }
 

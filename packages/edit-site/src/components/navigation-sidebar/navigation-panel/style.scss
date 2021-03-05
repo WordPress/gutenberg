@@ -53,10 +53,9 @@
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
 	border-radius: 0;
-	border-bottom: $border-width solid $gray-700;
-	height: auto;
-	margin-left: -6px; // +2px to display the focus box-shadow
-	margin-top: 2px; // +2px to display the focus box-shadow
+	height: $button-size;
+	margin-left: -10px; // +2px to display the focus box-shadow
+	margin-top: $grid-unit-30;
 	padding: $grid-unit $grid-unit-20;
 	width: calc(100% + #{$grid-unit-15});
 
