@@ -32,10 +32,27 @@
 	height: $mobile-floating-toolbar-height;
 }
 
+.toolbarButtons {
+	border-left-width: 0;
+	padding-left: 4;
+	padding-right: 8;
+	height: $mobile-floating-toolbar-height;
+	align-items: center;
+}
+
 .pipe {
 	margin-top: auto;
 	margin-bottom: auto;
 	margin-left: 2px;
+	height: 28px;
+	width: 1px;
+	background-color: #e9eff3;
+	opacity: 0.4;
+}
+
+.pipeButtons {
+	left: -1px;
+	position: absolute;
 	height: 28px;
 	width: 1px;
 	background-color: #e9eff3;
