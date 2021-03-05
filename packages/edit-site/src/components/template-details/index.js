@@ -58,9 +58,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			{ isTemplateRevertable( template ) && (
 				<div className="edit-site-template-details__revert">
 					<MenuItem
-						info={ __(
-							'Restore template to theme default'
-						) }
+						info={ __( 'Restore template to theme default' ) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
