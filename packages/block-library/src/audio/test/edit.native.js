@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { act, create } from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { MediaUploadProgress } from '@wordpress/block-editor';
 import AudioEdit from '../edit.native.js';
 
 const getTestComponentWithContent = ( attributes = {} ) => {
-	return renderer.create(
+	return create(
 		<AudioEdit attributes={ attributes } setAttributes={ jest.fn() } />
 	);
 };
@@ -43,7 +43,12 @@ describe( 'Audio block', () => {
 		} );
 
 		const mediaUpload = component.root.findByType( MediaUploadProgress );
-		mediaUpload.instance.finishMediaUploadWithFailure( { mediaId: -1 } );
+
+		act( () => {
+			mediaUpload.instance.finishMediaUploadWithFailure( {
+				mediaId: -1,
+			} );
+		} );
 
 		const rendered = component.toJSON();
 		expect( rendered ).toMatchSnapshot();
