@@ -34,6 +34,9 @@ function Inserter( { ...props } ) {
 		>
 			<Dialog
 				{ ...props }
+				// Unset the "dialog" role to make it possible to be close the quick inserter on focus.
+				// See https://github.com/WordPress/gutenberg/pull/16964#discussion_r312015746 for more info.
+				role={ undefined }
 				className="customize-widgets-layout__inserter-panel"
 				hideOnClickOutside={ false }
 				aria-labelledby={ inserterTitleId }
