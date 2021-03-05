@@ -117,7 +117,7 @@ preBuild.doFirst {
         // Verify that the bundle is correctly copied before building to publish. This will be automatically done
         // from the shell script that's used to publish the binaries, but this will serve as an extra check if anyone
         // tries to manually publish the binary.
-        def assertionMessage = "Bundle file is missing. Please ensure that you run `npm install` from the root Gutenberg project and copy the bundle file to react-native-bridge/builds/assets folder"
+        def assertionMessage = "Bundle file is missing. Please ensure that you run `npm install && npm run bundle:android` from the root Gutenberg project and copy the bundle file to the react-native-bridge/builds/assets folder"
         assert file("./build/assets/index.android.bundle").exists() : assertionMessage
     }
 }
