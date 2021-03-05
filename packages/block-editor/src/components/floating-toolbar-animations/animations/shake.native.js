@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = { intensity: 1 };
 const ANIMATED_INITIAL_VALUE = 0;
 
 // Animation function
-function startShakeAnimation( animatedValue, { intensity } = DEFAULT_CONFIG ) {
+function getShakeAnimation( animatedValue, { intensity } = DEFAULT_CONFIG ) {
 	const useNativeDriver = true;
 	const duration = SHAKE_DURATION / 4;
 	const targetValue = SHAKE_TRANSLATION_RANGE * intensity;
@@ -45,7 +45,7 @@ function startShakeAnimation( animatedValue, { intensity } = DEFAULT_CONFIG ) {
 			useNativeDriver,
 		} ),
 	];
-	Animated.sequence( sequence ).start();
+	return Animated.sequence( sequence );
 }
 
 function getShakeAnimationStyle( animatedValue ) {
@@ -56,11 +56,11 @@ function useAnimation() {
 	const { current: animatedValue } = useRef(
 		new Animated.Value( ANIMATED_INITIAL_VALUE )
 	);
-	const startAnimation = ( config ) =>
-		startShakeAnimation( animatedValue, config );
+	const getAnimation = ( config ) =>
+		getShakeAnimation( animatedValue, config );
 	const animationStyle = getShakeAnimationStyle( animatedValue );
 
-	return { startAnimation, animatedValue, animationStyle };
+	return { getAnimation, animatedValue, animationStyle };
 }
 
 export default useAnimation;

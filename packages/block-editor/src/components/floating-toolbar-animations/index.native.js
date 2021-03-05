@@ -30,17 +30,9 @@ export const useAnimations = ( ref ) => {
 	 * Some animations are exposed as an imperative handler and added to the FloatingToolbarAnimations context.
 	 * This way blocks could trigger animations on the Floating toolbar via the context.
 	 */
-	useImperativeHandle( ref, () => ( {
-		shake: shake.startAnimation,
-	} ) );
+	useImperativeHandle( ref, () => ( { shake } ) );
 
-	return {
-		shake: {
-			startAnimation: shake.startAnimation,
-			animatedValue: shake.animatedValue,
-			animationStyle: shake.animationStyle,
-		},
-	};
+	return { shake };
 };
 
 const FloatingToolbarAnimationsProvider = ( { innerRef, children } ) => {
