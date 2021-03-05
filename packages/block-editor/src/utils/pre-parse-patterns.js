@@ -49,10 +49,10 @@ export function usePreParsePatterns() {
 				return;
 			}
 
-			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ]?.title }`;
+			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ]?.name }`;
 			window.console.time( marker );
-			select( blockEditorStore ).__experimentalGetParsedBlocks(
-				patterns[ index ].content,
+			select( blockEditorStore ).__experimentalGetParsedPattern(
+				patterns[ index ].name,
 				index
 			);
 			window.console.timeEnd( marker );

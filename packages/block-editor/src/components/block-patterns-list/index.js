@@ -19,11 +19,11 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import { store as blockEditorStore } from '../../store';
 
 function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
-	const { content, viewportWidth } = pattern;
-	const blocks = useSelect(
+	const { name, viewportWidth } = pattern;
+	const { blocks } = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__experimentalGetParsedBlocks( content ),
-		[ content ]
+			select( blockEditorStore ).__experimentalGetParsedPattern( name ),
+		[ name ]
 	);
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;

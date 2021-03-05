@@ -15,7 +15,6 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
-	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1757,27 +1756,18 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
-export const __experimentalGetParsedBlocks = createSelector(
-	( state, content ) => {
-		if ( ! content ) {
-			return [];
+export const __experimentalGetParsedPattern = createSelector(
+	( state, patternName ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const pattern = patterns.find( ( { name } ) => name === patternName );
+		if ( ! pattern ) {
+			return null;
 		}
 
-		return parse( content );
-	},
-	( state, content ) => [ content ]
-);
-
-const __experimentalGetParsedPatterns = createSelector(
-	( state ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		return map( patterns, ( pattern ) => ( {
+		return {
 			...pattern,
-			contentBlocks: __experimentalGetParsedBlocks(
-				state,
-				pattern.content
-			),
-		} ) );
+			blocks: parse( pattern.content ),
+		};
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
@@ -1792,17 +1782,19 @@ const __experimentalGetParsedPatterns = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = __experimentalGetParsedPatterns( state );
-
+		const patterns = state.settings.__experimentalBlockPatterns;
 		if ( ! rootClientId ) {
 			return patterns;
 		}
 
-		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
-			return every( contentBlocks, ( { name } ) =>
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
+			blocks.every( ( { name } ) =>
 				canInsertBlockType( state, name, rootClientId )
-			);
-		} );
+			)
+		);
 
 		return patternsAllowed;
 	},
