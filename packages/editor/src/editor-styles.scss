@@ -3,16 +3,9 @@
  *
  * These are only output in the editor, but styles here are prefixed .editor-styles-wrapper and affect the theming
  * of the editor by themes.
- * Why do these exist? Why not rely on browser defaults?
- * These styles are necessary so long as CSS can bleed from the wp-admin into the editing canvas itself.
- * Let's continue working to refactor these away, whether through Shadow DOM or better scoping of upstream styles.
  */
 
 body {
-	font-family: $default-font;
-	font-size: $editor-font-size;
-	line-height: $editor-line-height;
-	color: $gray-900;
 	padding: 10px;
 }
 
@@ -20,44 +13,6 @@ body {
 .block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
 	margin-left: -10px;
 	margin-right: -10px;
-}
-
-p {
-	font-size: inherit;
-	line-height: inherit;
-	margin-top: $default-block-margin;
-	margin-bottom: $default-block-margin;
-}
-
-ul,
-ol {
-	margin-bottom: $default-block-margin;
-	padding-left: 1.3em;
-	margin-left: 1.3em;
-
-	// Remove bottom margin from nested lists.
-	ul,
-	ol {
-		margin-bottom: 0;
-	}
-
-	li {
-		// This overrides a bottom margin globally applied to list items in wp-admin.
-		margin-bottom: initial;
-	}
-}
-
-ul {
-	list-style-type: disc;
-}
-
-ol {
-	list-style-type: decimal;
-}
-
-ul ul,
-ol ul {
-	list-style-type: circle;
 }
 
 .wp-align-wrapper {
@@ -89,9 +44,51 @@ kbd {
 }
 
 /**
- * This reverts the default heading styles to the browser defaults overriding the WPAdmin styles.
+ * The following styles revert to the browser defaults overriding the WPAdmin styles.
  * This is only needed while the block editor is not being loaded in an iframe.
  */
+:root {
+	font-family: serif; // unfortunately initial doesn't work for font-family.
+	font-size: initial;
+	line-height: initial;
+	color: initial;
+}
+
+p {
+	font-size: revert;
+	line-height: revert;
+	margin: revert;
+}
+
+ul,
+ol {
+	margin: revert;
+	padding: revert;
+
+	// Remove bottom margin from nested lists.
+	ul,
+	ol {
+		margin: revert;
+	}
+
+	li {
+		margin: revert;
+	}
+}
+
+ul {
+	list-style-type: revert;
+}
+
+ol {
+	list-style-type: revert;
+}
+
+ul ul,
+ol ul {
+	list-style-type: revert;
+}
+
 h1,
 h2,
 h3,
