@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 10.1.1 =
+
+### Bug Fixes
+
+- withNotices:  Ensure that the callback props are stable. ([29491](https://github.com/WordPress/gutenberg/pull/29491))
+
+### Various
+
+- withNotices: Memoize the noticeOperations object. ([29582](https://github.com/WordPress/gutenberg/pull/29582))
+
+
 = 10.1.0 =
 
 ### Features
