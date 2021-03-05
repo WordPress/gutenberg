@@ -7,16 +7,20 @@ import SafeArea from 'react-native-safe-area';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
+import {
+	BottomSheetSettings,
+	FloatingToolbar,
+	FloatingToolbarAnimationsProvider,
+} from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
 } from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+import { AutosaveMonitor, store as coreEditorStore } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
@@ -34,6 +38,7 @@ class Layout extends Component {
 
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.onRootViewLayout = this.onRootViewLayout.bind( this );
+		this.floatingToolbarRef = createRef();
 
 		this.state = {
 			rootViewHeight: 0,
@@ -95,7 +100,13 @@ class Layout extends Component {
 			return null;
 		}
 
-		return <VisualEditor setTitleRef={ this.props.setTitleRef } />;
+		return (
+			<FloatingToolbarAnimationsProvider
+				innerRef={ this.floatingToolbarRef }
+			>
+				<VisualEditor setTitleRef={ this.props.setTitleRef } />
+			</FloatingToolbarAnimationsProvider>
+		);
 	}
 
 	render() {
@@ -133,7 +144,7 @@ class Layout extends Component {
 				>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 					{ ! isHtmlView && Platform.OS === 'android' && (
-						<FloatingToolbar />
+						<FloatingToolbar ref={ this.floatingToolbarRef } />
 					) }
 					<NoticeList />
 				</View>
@@ -150,7 +161,9 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
-						{ Platform.OS === 'ios' && <FloatingToolbar /> }
+						{ Platform.OS === 'ios' && (
+							<FloatingToolbar ref={ this.floatingToolbarRef } />
+						) }
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView>
@@ -163,7 +176,7 @@ class Layout extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { __unstableIsEditorReady: isEditorReady } = select(
-			'core/editor'
+			coreEditorStore
 		);
 		const { getEditorMode } = select( editPostStore );
 		return {
