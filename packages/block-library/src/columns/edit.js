@@ -9,13 +9,14 @@ import { dropRight, get, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl, Notice } from '@wordpress/components';
-
+import { useCallback } from '@wordpress/element';
 import {
 	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
+	__experimentalBlockPatternPicker as BlockPatternPicker,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -250,6 +251,31 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	);
 }
 
+function ColumnsLayoutSetup( props ) {
+	const { clientId, name: blockName } = props;
+	const blockProps = useBlockProps();
+	// Custom block patterns filtering for overriding the default scoped filtering.
+	const filterPatternsFn = useCallback(
+		( pattern ) =>
+			[ 'columns' ].some( ( category ) =>
+				pattern.categories?.includes( category )
+			) || pattern.scope?.block?.includes( blockName ),
+		[]
+	);
+	// `startBlankComponent` is what to render when clicking `Start blank`
+	// or if no matched patterns are found.
+	return (
+		<div { ...blockProps }>
+			<BlockPatternPicker
+				blockName={ blockName }
+				clientId={ clientId }
+				filterPatternsFn={ filterPatternsFn }
+				startBlankComponent={ <Placeholder { ...props } /> }
+			/>
+		</div>
+	);
+}
+
 const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
@@ -259,7 +285,7 @@ const ColumnsEdit = ( props ) => {
 	);
 	const Component = hasInnerBlocks
 		? ColumnsEditContainerWrapper
-		: Placeholder;
+		: ColumnsLayoutSetup;
 
 	return <Component { ...props } />;
 };

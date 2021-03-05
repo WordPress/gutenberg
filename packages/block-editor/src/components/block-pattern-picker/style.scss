@@ -1,0 +1,88 @@
+.layout-placeholder-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	width: 100%;
+	border-radius: $radius-block-ui;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+
+	// TODO change to check parent.
+	&.view-mode-grid {
+		.layout-toolbar {
+			justify-content: center;
+		}
+		.block-layout-setup__container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			grid-gap: $grid-unit-10;
+			padding: 1px;
+		}
+	}
+	.layout-toolbar {
+		box-sizing: border-box;
+		position: relative;
+		padding: 1em;
+		width: 100%;
+		text-align: left;
+		margin: 0;
+		color: $gray-900;
+		// Block UI appearance.
+		border-radius: $radius-block-ui;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+	.block-layout-setup__container {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+
+		.carousel-container {
+			overflow: hidden;
+			text-align: center;
+			position: relative;
+			padding: 0;
+			margin: 0;
+			list-style: none;
+			transform-style: preserve-3d;
+			* {
+				box-sizing: border-box;
+			}
+			.pattern-slide {
+				opacity: 0;
+				position: absolute;
+				top: 0;
+				width: 100%;
+				margin: auto;
+				padding: $grid-unit-20;
+				z-index: 100;
+				transition: transform 0.5s, opacity 0.5s, z-index 0.5s;
+
+				&.active-slide {
+					opacity: 1;
+					position: relative;
+					z-index: 900;
+				}
+				&.previous-slide {
+					transform: translateX(-100%);
+					z-index: 800;
+				}
+				&.next-slide {
+					transform: translateX(100%);
+					z-index: 800;
+				}
+			}
+		}
+
+		.block-list-appender {
+			display: none;
+		}
+	}
+}

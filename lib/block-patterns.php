@@ -179,3 +179,41 @@ register_block_pattern(
 							<!-- /wp:social-links -->',
 	)
 );
+
+
+// Buttons scoped pattern to test with Placeholder.
+register_block_pattern(
+	'buttons/large-posts',
+	array(
+		'title'   => __( 'Large', 'gutenberg' ),
+		'scope'   => array(
+			'inserter' => false,
+			'block'    => array( 'core/buttons' ),
+		),
+		'content' => '<!-- wp:columns -->
+						<div class="wp-block-columns"><!-- wp:column -->
+						<div class="wp-block-column"><!-- wp:buttons {"contentJustification":"center","orientation":"vertical"} -->
+						<div class="wp-block-buttons is-content-justification-center is-vertical"><!-- wp:button -->
+						<div class="wp-block-button"><a class="wp-block-button__link">Hello</a></div>
+						<!-- /wp:button -->
+
+						<!-- wp:button {"style":{"color":{"background":"#4acbc3"}}} -->
+						<div class="wp-block-button"><a class="wp-block-button__link has-background" style="background-color:#4acbc3">Buttons</a></div>
+						<!-- /wp:button --></div>
+						<!-- /wp:buttons --></div>
+						<!-- /wp:column -->
+
+						<!-- wp:column -->
+						<div class="wp-block-column"><!-- wp:buttons {"contentJustification":"center","orientation":"vertical"} -->
+						<div class="wp-block-buttons is-content-justification-center is-vertical"><!-- wp:button {"style":{"color":{"background":"#229fd5"}}} -->
+						<div class="wp-block-button"><a class="wp-block-button__link has-background" style="background-color:#229fd5">Scoped</a></div>
+						<!-- /wp:button -->
+
+						<!-- wp:button {"style":{"color":{"background":"#ce9ddf"}}} -->
+						<div class="wp-block-button"><a class="wp-block-button__link has-background" style="background-color:#ce9ddf">Pattern</a></div>
+						<!-- /wp:button --></div>
+						<!-- /wp:buttons --></div>
+						<!-- /wp:column --></div>
+						<!-- /wp:columns -->',
+	)
+);
