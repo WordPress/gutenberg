@@ -87,3 +87,20 @@ kbd {
 	font-size: inherit;
 	font-family: monospace;
 }
+
+/**
+ * This reverts the default heading styles to the browser defaults overriding the WPAdmin styles.
+ * This is only needed while the block editor is not being loaded in an iframe.
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: revert;
+	margin: revert;
+	color: revert;
+	line-height: revert;
+	font-weight: revert;
+}
