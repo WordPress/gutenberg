@@ -40,11 +40,11 @@ default `I18n` instance exported from `@wordpress/i18n`.
 
 _Parameters_
 
--   _props_ ``: i18n provider props.
+-   _props_ `I18nProviderProps`: i18n provider props.
 
 _Returns_
 
--   ``: Children wrapped in the I18nProvider.
+-   `JSX.Element`: Children wrapped in the I18nProvider.
 
 <a name="useI18n" href="#useI18n">#</a> **useI18n**
 

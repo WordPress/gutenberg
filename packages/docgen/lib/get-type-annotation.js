@@ -222,6 +222,9 @@ function getMappedTypeAnnotation( typeAnnotation ) {
  */
 function getTypeReferenceTypeAnnotation( typeAnnotation ) {
 	if ( ! typeAnnotation.typeParameters ) {
+		if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
+			return unifyQualifiedName( typeAnnotation.typeName );
+		}
 		return typeAnnotation.typeName.name;
 	}
 	const typeParams = typeAnnotation.typeParameters.params
