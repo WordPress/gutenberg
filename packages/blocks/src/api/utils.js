@@ -161,7 +161,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.
- * @param {number} total The total number of blocks.
+ * @param {number} blocksTotal The total number of blocks.
  * @param {string} parentTitle In the event of a child block, this param gets the title of the parent block.
  *
  * @return {string} The block label.
@@ -171,7 +171,7 @@ export function getAccessibleBlockLabel(
 	attributes,
 	position,
 	direction = 'vertical',
-	total,
+	blocksTotal,
 	parentTitle
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
@@ -193,7 +193,7 @@ export function getAccessibleBlockLabel(
 					/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. 4: The block label.. */
 					__( '%1$d of %2$d. Child of %3$s block. %4$s' ),
 					position,
-					total,
+					blocksTotal,
 					parentTitle,
 					label
 				);
@@ -202,7 +202,7 @@ export function getAccessibleBlockLabel(
 				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The block label.. */
 				__( '%1$d of %2$d. %3$s' ),
 				position,
-				total,
+				blocksTotal,
 				label
 			);
 		}
@@ -212,7 +212,7 @@ export function getAccessibleBlockLabel(
 				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. */
 				__( '%1$d of %2$d. Child of %3$s block.' ),
 				position,
-				total,
+				blocksTotal,
 				parentTitle
 			);
 		}
@@ -220,7 +220,7 @@ export function getAccessibleBlockLabel(
 			/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. */
 			__( '%1$d of %2$d.' ),
 			position,
-			total
+			blocksTotal
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
@@ -229,7 +229,7 @@ export function getAccessibleBlockLabel(
 					/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
 					__( 'Column %1$d of %2$d. Child of %3$s block. %4$s' ),
 					position,
-					total,
+					blocksTotal,
 					parentTitle,
 					label
 				);
@@ -238,7 +238,7 @@ export function getAccessibleBlockLabel(
 				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block label.. */
 				__( 'Column %1$d of %2$d. %3$s' ),
 				position,
-				total,
+				blocksTotal,
 				label
 			);
 		}
@@ -248,7 +248,7 @@ export function getAccessibleBlockLabel(
 				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. */
 				__( 'Column %1$d of %2$d. Child of %3$s block.' ),
 				position,
-				total,
+				blocksTotal,
 				parentTitle
 			);
 		}
@@ -256,7 +256,7 @@ export function getAccessibleBlockLabel(
 			/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. */
 			__( 'Column %1$d of %2$d.' ),
 			position,
-			total
+			blocksTotal
 		);
 	}
 

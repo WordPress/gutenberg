@@ -102,7 +102,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				getBlockRootClientId,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
-			const total = getBlockCount( rootClientId );
+			const blocksTotal = getBlockCount( rootClientId );
 			const passedRootClientId = getBlockRootClientId( clientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
@@ -110,7 +110,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
 				index,
-				total,
+				blocksTotal,
 				name,
 				attributes,
 				blockMovingMode,
@@ -122,7 +122,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	);
 	const {
 		index,
-		total,
+		blocksTotal,
 		name,
 		attributes,
 		blockMovingMode,
@@ -271,7 +271,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		attributes,
 		index + 1,
 		orientation,
-		total,
+		blocksTotal,
 		parentTitle
 	);
 
