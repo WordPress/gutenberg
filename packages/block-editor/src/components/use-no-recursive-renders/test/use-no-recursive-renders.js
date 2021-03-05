@@ -13,11 +13,11 @@ import {
 } from '../../block-edit/context';
 
 // Mimics a block's Edit component, such as ReusableBlockEdit, which is capable
-// of calling itself depending on its `ref` attribute.
-function Edit( { attributes: { ref } } ) {
+// of calling itself depending on its `uniqueId` attribute.
+function Edit( { attributes: { uniqueId } } ) {
 	const { name } = useBlockEditContext();
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
+		uniqueId
 	);
 
 	if ( hasAlreadyRendered ) {
@@ -27,22 +27,22 @@ function Edit( { attributes: { ref } } ) {
 	return (
 		<RecursionProvider>
 			<div className={ `wp-block__${ name }` }>
-				{ ref === 'SIMPLE' && <p>Done</p> }
-				{ ref === 'SINGLY-RECURSIVE' && (
-					<Edit attributes={ { ref } } />
+				{ uniqueId === 'SIMPLE' && <p>Done</p> }
+				{ uniqueId === 'SINGLY-RECURSIVE' && (
+					<Edit attributes={ { uniqueId } } />
 				) }
-				{ ref === 'ANOTHER-BLOCK-SAME-REF' && (
+				{ uniqueId === 'ANOTHER-BLOCK-SAME-ID' && (
 					<BlockEditContextProvider
 						value={ { name: 'another-block' } }
 					>
-						<Edit attributes={ { ref } } />
+						<Edit attributes={ { uniqueId } } />
 					</BlockEditContextProvider>
 				) }
-				{ ref === 'MUTUALLY-RECURSIVE-1' && (
-					<Edit attributes={ { ref: 'MUTUALLY-RECURSIVE-2' } } />
+				{ uniqueId === 'MUTUALLY-RECURSIVE-1' && (
+					<Edit attributes={ { uniqueId: 'MUTUALLY-RECURSIVE-2' } } />
 				) }
-				{ ref === 'MUTUALLY-RECURSIVE-2' && (
-					<Edit attributes={ { ref: 'MUTUALLY-RECURSIVE-1' } } />
+				{ uniqueId === 'MUTUALLY-RECURSIVE-2' && (
+					<Edit attributes={ { uniqueId: 'MUTUALLY-RECURSIVE-1' } } />
 				) }
 			</div>
 		</RecursionProvider>
@@ -55,7 +55,7 @@ describe( 'useNoRecursiveRenders', () => {
 	it( 'allows a single block to render', () => {
 		const { container } = render(
 			<BlockEditContextProvider value={ context }>
-				<Edit attributes={ { ref: 'SIMPLE' } } />
+				<Edit attributes={ { uniqueId: 'SIMPLE' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
@@ -69,8 +69,8 @@ describe( 'useNoRecursiveRenders', () => {
 	it( 'allows equal but sibling blocks to render', () => {
 		const { container } = render(
 			<BlockEditContextProvider value={ context }>
-				<Edit attributes={ { ref: 'SIMPLE' } } />
-				<Edit attributes={ { ref: 'SIMPLE' } } />
+				<Edit attributes={ { uniqueId: 'SIMPLE' } } />
+				<Edit attributes={ { uniqueId: 'SIMPLE' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
@@ -84,7 +84,7 @@ describe( 'useNoRecursiveRenders', () => {
 	it( 'prevents a block from rendering itself', () => {
 		const { container } = render(
 			<BlockEditContextProvider value={ context }>
-				<Edit attributes={ { ref: 'SINGLY-RECURSIVE' } } />
+				<Edit attributes={ { uniqueId: 'SINGLY-RECURSIVE' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
@@ -98,7 +98,7 @@ describe( 'useNoRecursiveRenders', () => {
 	it( 'prevents a block from rendering itself only when the same block type', () => {
 		const { container } = render(
 			<BlockEditContextProvider value={ context }>
-				<Edit attributes={ { ref: 'ANOTHER-BLOCK-SAME-REF' } } />
+				<Edit attributes={ { uniqueId: 'ANOTHER-BLOCK-SAME-ID' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
@@ -115,7 +115,7 @@ describe( 'useNoRecursiveRenders', () => {
 	it( 'prevents mutual recursion between two blocks', () => {
 		const { container } = render(
 			<BlockEditContextProvider value={ context }>
-				<Edit attributes={ { ref: 'MUTUALLY-RECURSIVE-1' } } />
+				<Edit attributes={ { uniqueId: 'MUTUALLY-RECURSIVE-1' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
