@@ -67,9 +67,15 @@ const FloatingToolbar = ( {
 	const animationStyle = [
 		{
 			opacity,
-			transform: [ { translateY: translation } ],
+			transform: [
+				{
+					translateY: Animated.add(
+						translation,
+						shake.animatedValue
+					),
+				},
+			],
 		},
-		shake.animationStyle,
 	];
 
 	const {
