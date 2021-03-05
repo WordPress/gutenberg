@@ -245,13 +245,21 @@ You should check that folks are able to install the new version from their Dashb
 
 If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping [someone on the Gutenberg Core team](https://github.com/orgs/WordPress/teams/gutenberg-core) in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
 
-## Packages Releases and WordPress Core Updates
+## Packages Releases to npm and WordPress Core Updates
 
 The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wordpress.org/core/handbook/about/release-cycle/) in terms of branching for each SVN branch, a corresponding Gutenberg `wp/*` branch is created:
 
 -   The `wp/trunk` branch contains the same version of packages published to npm with the `latest` distribution tag. The WordPress core consumes those packages directly in the `trunk` branch and uses them for public releases.
 -   The `wp/next` branch contains the same version of packages published to npm with the `next` distribution tag. Projects should use those packages for development purposes only.
 -   A Gutenberg branch targeting a specific WordPress major release (including its further minor increments) is created (example `wp/5.2`) based on the `wp/trunk` Gutenberg branch when the corresponding WordPress release branch is created. (This usually happens when the first `RC` of the next WordPress major version is released).
+
+Release types and their schedule:
+
+-   [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) (`latest` dist tag) – when there is no "feature-freeze" mode in WordPress Core, then publishing happens every two weeks based on the new stable version of the Gutenberg plugin. Otherwise, only bug fixes get manually included and published to npm before every next beta and RC version of the following WordPress release.
+-   [Minor WordPress Releases](#minor-wordpress-releases) (`patch` dist tag) – only when bug fixes or security releases need to be backported into WordPress Core.
+-   [Development Releases](#development-releases) (`next` dist tag) – at least every two weeks when the RC version for the Gutenberg plugin is released.
+
+There is also an option to perform [Standalone Package Releases](#standalone-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of a regular WordPress release cycle.
 
 ### Synchronizing WordPress Trunk
 
@@ -304,7 +312,7 @@ Now, the npm packages should be ready and a patch can be created and committed i
 
 ### Standalone Package Releases
 
-The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a WordPress release cycle.
+The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a regular WordPress release cycle.
 
 Note: Both the `trunk` and `wp/trunk` branches are restricted and can only be _pushed_ to by the Gutenberg Core team.
 
@@ -436,6 +444,22 @@ Time to announce the published changes in the #core-js and #core-editor Slack ch
 ---
 
 Ta-da! 🎉
+
+### Development Releases
+
+As noted in the [Synchronizing WordPress Trunk](#synchronizing-wordpress-trunk) section, the WordPress trunk branch can be closed or in "feature-freeze" mode. Usually, this happens during the WordPress ongoing release cycle, which takes several weeks. It means that packages don't get any enhancements and new features during the ongoing WordPress major release process. Another type of release is available to address the limitation mentioned earlier and unblock ongoing development for projects that depend on WordPress packages. We are taking advantage of [package distribution tags](https://docs.npmjs.com/cli/v7/commands/npm-dist-tag) that make it possible to consume the future version of the codebase according to npm guidelines:
+
+> By default, the `latest` tag is used by npm to identify the current version of a package, and `npm install <pkg>` (without any `@<version>` or `@<tag>` specifier) installs the `latest` tag. Typically, projects only use the `latest` tag for stable release versions, and use other tags for unstable versions such as prereleases.
+
+In our case, we use the `next` tag for code. Package developers to install a package need to type:
+
+```bash
+npm install @wordpress/components@next
+```
+
+The release process is fully automated via `./bin/plugin/cli.js npm-next` command. You only have to run the script, and everything else happens through interactions in the terminal.
+
+Behind the scenes, the `wp/next` branch is synchronized with the latest release branch (`release/*`) created for the Gutenberg plugin. To avoid collisions in the versioning of packages, we always include the newest commit's `sha`, for example, `@wordpress/block-editor@5.2.10-next.645224df70.0`.
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
 [package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages
