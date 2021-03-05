@@ -31,15 +31,25 @@ describe( 'InputControl', () => {
 
 			expect( input.getAttribute( 'type' ) ).toBe( 'number' );
 		} );
-	} );
 
-	describe( 'Label', () => {
 		it( 'should render label', () => {
 			render( <InputControl label="Hello" value="There" /> );
 
 			const input = screen.getByText( 'Hello' );
 
 			expect( input ).toBeTruthy();
+		} );
+	} );
+
+	describe( 'Ensurance of focus for number inputs', () => {
+		it( 'should focus its input on mousedown events', () => {
+			const spy = jest.fn();
+			render( <InputControl type="number" onFocus={ spy } /> );
+
+			const input = getInput();
+			fireEvent.mouseDown( input );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
