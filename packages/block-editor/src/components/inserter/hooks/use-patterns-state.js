@@ -7,7 +7,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { store as blocksStore, cloneBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -31,15 +31,68 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } = select(
 				blockEditorStore
 			);
+
+			const activeTemplatePartId = select(
+				blockEditorStore
+			).__experimentalGetActiveBlockIdByBlockNames( [
+				'core/template-part',
+			] );
+
+			const contextualPatterns = {
+				patterns: [],
+				patternCategories: [],
+			};
+
+			if ( activeTemplatePartId ) {
+				const block = select( blockEditorStore ).getBlock(
+					activeTemplatePartId
+				);
+				const variations = select( blocksStore ).getBlockVariations(
+					'core/template-part'
+				);
+
+				const match = variations.find( ( variation ) =>
+					variation.isActive?.(
+						block.attributes,
+						variation.attributes
+					)
+				);
+
+				const templatePartpatterns = select(
+					blockEditorStore
+				).__experimentalGetScopedBlockPatterns(
+					'block',
+					'core/template-part'
+				);
+
+				const contextualInserterPatterns = templatePartpatterns.filter(
+					( pattern ) => pattern.scope.variation === match?.name
+				);
+
+				contextualPatterns.patterns = contextualInserterPatterns;
+				contextualPatterns.patternCategories = [
+					{
+						name: 'tp_' + match.name,
+						label: 'Template part: ' + match.name,
+					},
+				];
+			}
+
 			const inserterPatterns = __experimentalGetAllowedPatterns(
 				rootClientId
 			).filter(
 				( pattern ) => ! pattern.scope || pattern.scope.inserter
 			);
+
 			return {
-				patterns: inserterPatterns,
-				patternCategories: getSettings()
-					.__experimentalBlockPatternCategories,
+				patterns: [
+					...contextualPatterns.patterns,
+					...inserterPatterns,
+				],
+				patternCategories: [
+					...contextualPatterns.patternCategories,
+					...getSettings().__experimentalBlockPatternCategories,
+				],
 			};
 		},
 		[ rootClientId ]
