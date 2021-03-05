@@ -18,8 +18,8 @@ exports[`props should render correctly 1`] = `
   line-height: var(--wp-g2-font-line-height-base);
   color: #050505;
   color: var(--wp-g2-color-text-heading);
-  font-size: calc(1.56 * 13px);
-  font-size: var(--wp-g2-font-size-h-3);
+  font-size: calc(1.95 * 13px);
+  font-size: var(--wp-g2-font-size-h-2);
   font-weight: 600;
   font-weight: var(--wp-g2-font-weight-heading);
   display: block;
@@ -37,16 +37,16 @@ exports[`props should render correctly 1`] = `
   transition: none !important;
 }
 
-<div
+<h2
   class="components-truncate wp-components-truncate components-text wp-components-text components-heading wp-components-heading ic-1ng8wck ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
   data-g2-c16t="true"
   data-g2-component="Heading"
 >
   Code is Poetry
-</div>
+</h2>
 `;
 
-exports[`props should render size 1`] = `
+exports[`props should render level as a number 1`] = `
 Snapshot Diff:
 - Received styles
 + Base styles
@@ -57,8 +57,28 @@ Snapshot Diff:
       "color": "var(--wp-g2-color-text-heading)",
       "display": "block",
       "font-family": "var(--wp-g2-font-family)",
--     "font-size": "var(--wp-g2-font-size-h-2)",
-+     "font-size": "var(--wp-g2-font-size-h-3)",
+-     "font-size": "var(--wp-g2-font-size-h-4)",
++     "font-size": "var(--wp-g2-font-size-h-2)",
+      "font-weight": "var(--wp-g2-font-weight-heading)",
+      "line-height": "var(--wp-g2-font-line-height-base)",
+      "margin": "0",
+    },
+  ]
+`;
+
+exports[`props should render level as a string 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -4,11 +4,11 @@
+      "-webkit-font-smoothing": "antialiased",
+      "box-sizing": "border-box",
+      "color": "var(--wp-g2-color-text-heading)",
+      "display": "block",
+      "font-family": "var(--wp-g2-font-family)",
+-     "font-size": "var(--wp-g2-font-size-h-4)",
++     "font-size": "var(--wp-g2-font-size-h-2)",
       "font-weight": "var(--wp-g2-font-weight-heading)",
       "line-height": "var(--wp-g2-font-line-height-base)",
       "margin": "0",

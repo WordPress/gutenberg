@@ -4,20 +4,30 @@
 import { useContextSystem } from '@wp-g2/context';
 import { getHeadingFontSize, ui } from '@wp-g2/styles';
 import type { ViewOwnProps } from '@wp-g2/create-styles';
-// eslint-disable-next-line no-restricted-imports
-import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { Props as TextProps, TextSize } from '../text/types';
+import type { Props as TextProps } from '../text/types';
 import { useText } from '../text';
 
-export type HeadingSize = 1 | 2 | 3 | 4 | 5 | 6;
+export type HeadingSize =
+	| 1
+	| 2
+	| 3
+	| 4
+	| 5
+	| 6
+	| '1'
+	| '2'
+	| '3'
+	| '4'
+	| '5'
+	| '6';
 
-export interface HeadingProps extends TextProps {
+export interface HeadingProps extends Omit< TextProps, 'size' > {
 	/**
-	 * `Heading` will typically render the sizes `1`, `2`, `3`, `4`, `5`, or `6`, which map to `h1`-`h6`. However, it can render any size, including non `px` values.
+	 * `Heading` will typically render the sizes `1`, `2`, `3`, `4`, `5`, or `6`, which map to `h1`-`h6`.
 	 *
 	 * @default 3
 	 *
@@ -28,31 +38,35 @@ export interface HeadingProps extends TextProps {
 	 * function Example() {
 	 *   return (
 	 *     <View>
-	 *       <Heading size={1}>Into The Unknown</Heading>
-	 *       <Heading size={2}>Into The Unknown</Heading>
-	 *       <Heading size={3}>Into The Unknown</Heading>
-	 *       <Heading size={4}>Into The Unknown</Heading>
-	 *       <Heading size={5}>Into The Unknown</Heading>
-	 *       <Heading size={6}>Into The Unknown</Heading>
+	 *       <Heading level="1">Into The Unknown</Heading>
+	 *       <Heading level="2">Into The Unknown</Heading>
+	 *       <Heading level="3">Into The Unknown</Heading>
+	 *       <Heading level="4">Into The Unknown</Heading>
+	 *       <Heading level="5">Into The Unknown</Heading>
+	 *       <Heading level="6">Into The Unknown</Heading>
 	 *     </View>
 	 *   );
 	 * }
 	 * ```
 	 */
-	size: HeadingSize | TextSize | CSSProperties[ 'fontSize' ];
+	level: HeadingSize;
 }
 
-export function useHeading( props: ViewOwnProps< HeadingProps, 'div' > ) {
-	const { size = 3, ...otherProps } = useContextSystem( props, 'Heading' );
+export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
+	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
+		props,
+		'Heading'
+	);
 
+	const as = asProp || `h${ level }`;
 	const textProps = useText( {
 		color: ui.get( 'colorTextHeading' ),
-		size: getHeadingFontSize( size ),
+		size: getHeadingFontSize( level ),
 		isBlock: true,
 		// @ts-ignore We're passing a variable so `string` is safe
 		weight: ui.get( 'fontWeightHeading' ),
 		...otherProps,
 	} );
 
-	return textProps;
+	return { ...textProps, as };
 }

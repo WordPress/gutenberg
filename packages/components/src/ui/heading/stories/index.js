@@ -11,12 +11,12 @@ export default {
 export const _default = () => {
 	return (
 		<>
-			<Heading size={ 1 }>Heading</Heading>
-			<Heading size={ 2 }>Heading</Heading>
-			<Heading size={ 3 }>Heading</Heading>
-			<Heading size={ 4 }>Heading</Heading>
-			<Heading size={ 5 }>Heading</Heading>
-			<Heading size={ 6 }>Heading</Heading>
+			<Heading level={ 1 }>Heading</Heading>
+			<Heading level={ 2 }>Heading</Heading>
+			<Heading level={ 3 }>Heading</Heading>
+			<Heading level={ 4 }>Heading</Heading>
+			<Heading level={ 5 }>Heading</Heading>
+			<Heading level={ 6 }>Heading</Heading>
 		</>
 	);
 };

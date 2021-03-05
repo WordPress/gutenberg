@@ -17,7 +17,7 @@ import { useHeading } from './hook';
  * ```
  */
 const Heading = createComponent( {
-	as: 'div',
+	as: 'h1',
 	useHook: useHeading,
 	name: 'Heading',
 } );
