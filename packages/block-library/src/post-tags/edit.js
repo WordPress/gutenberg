@@ -37,9 +37,9 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 				}
 				return (
 					<a
-					key={ tagId }
-					href={ tag.link }
-					onClick={ ( event ) => event.preventDefault() }
+						key={ tagId }
+						href={ tag.link }
+						onClick={ ( event ) => event.preventDefault() }
 					>
 						{ tag.name }
 					</a>
