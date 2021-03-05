@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useReducer } from '@wordpress/element';
+import { useLayoutEffect, useReducer } from '@wordpress/element';
 
 const store = {
 	add( clientId, ref ) {
@@ -31,7 +31,7 @@ const listeners = {
 };
 
 function useUpdate( object, key, value ) {
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! key ) {
 			return;
 		}
