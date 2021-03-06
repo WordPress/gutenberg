@@ -28,6 +28,11 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
+// Need to set before running `puppeteer/install`.
+if ( hasArgInCLI( '--puppeteer-product' ) ) {
+	process.env.PUPPETEER_PRODUCT = getArgFromCLI( '--puppeteer-product' );
+}
+
 const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
 	stdio: 'inherit',
 } );
