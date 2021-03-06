@@ -265,10 +265,11 @@ export default function SearchEdit( {
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						identifier="text"
+						tagName="p"
 						style={ richTextStyles.searchButton }
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
-						identifier="text"
 						withoutInteractiveFormatting
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
@@ -298,6 +299,8 @@ export default function SearchEdit( {
 			{ showLabel && (
 				<RichText
 					className="wp-block-search__label"
+					identifier="text"
+					tagName="p"
 					style={ {
 						...styles.searchLabel,
 						...richTextStyles.searchLabel,
