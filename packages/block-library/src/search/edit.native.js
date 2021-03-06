@@ -15,7 +15,6 @@ import {
 import {
 	Button,
 	PanelBody,
-	UnitControl,
 	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
@@ -28,13 +27,6 @@ import { useRef, useEffect, useState } from '@wordpress/element';
  */
 import styles from './style.scss';
 import richTextStyles from './rich-text.scss';
-import {
-	isPercentageUnit,
-	CSS_UNITS,
-	MIN_WIDTH,
-	PC_WIDTH_DEFAULT,
-	PX_WIDTH_DEFAULT,
-} from './utils.js';
 
 /**
  * Constants
@@ -68,8 +60,6 @@ export default function SearchEdit( {
 		buttonUseIcon,
 		placeholder,
 		buttonText,
-		width = 100,
-		widthUnit = '%',
 	} = attributes;
 
 	/*
@@ -113,27 +103,6 @@ export default function SearchEdit( {
 			}
 		}
 	}, [ isSelected ] );
-
-	const onChange = ( nextWidth ) => {
-		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
-			return;
-		}
-		onChangeWidth( nextWidth );
-	};
-
-	const onChangeWidth = ( nextWidth ) => {
-		setAttributes( {
-			width: nextWidth,
-			widthUnit,
-		} );
-	};
-
-	const onChangeUnit = ( nextUnit ) => {
-		setAttributes( {
-			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
-			widthUnit: nextUnit,
-		} );
-	};
 
 	const toggleButtonFocus = ( isFocused ) => {
 		if ( isFocused && isSelected ) {
@@ -204,20 +173,6 @@ export default function SearchEdit( {
 						} );
 					} }
 				/>
-				<UnitControl
-					label={ __( 'Width' ) }
-					min={ widthUnit === '%' ? 1 : MIN_WIDTH }
-					max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
-					decimalNum={ 1 }
-					units={ CSS_UNITS }
-					unit={ widthUnit }
-					onChange={ onChange }
-					onComplete={ onChangeWidth }
-					onUnitChange={ onChangeUnit }
-					value={ parseFloat( width ) }
-				/>
-			</PanelBody>
-			<PanelBody title={ __( 'Button settings' ) }>
 				<SelectControl
 					label={ __( 'Button position' ) }
 					value={ getSelectedButtonPositionLabel( buttonPosition ) }
