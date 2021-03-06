@@ -35,7 +35,6 @@ function NavigationToggle( { icon, isOpen } ) {
 
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
-	
 	if ( ! isActive ) {
 		return null;
 	}
