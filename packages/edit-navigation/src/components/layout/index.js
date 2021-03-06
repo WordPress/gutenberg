@@ -20,7 +20,7 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,8 +42,7 @@ import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
 
 export default function Layout( { blockEditorSettings } ) {
-	const canvasRef = useRef();
-	useBlockSelectionClearer( canvasRef );
+	const canvasRef = useBlockSelectionClearer();
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
