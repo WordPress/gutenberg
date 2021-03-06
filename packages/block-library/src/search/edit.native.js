@@ -165,8 +165,8 @@ export default function SearchEdit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Search settings' ) }>
 				<ToggleControl
-					label={ __( 'Show search label' ) }
-					checked={ showLabel }
+					label={ __( 'Hide search heading' ) }
+					checked={ ! showLabel }
 					onChange={ () => {
 						setAttributes( {
 							showLabel: ! showLabel,
