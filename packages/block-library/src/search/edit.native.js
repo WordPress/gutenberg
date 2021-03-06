@@ -22,7 +22,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,6 +51,9 @@ export default function SearchEdit( {
 	setAttributes,
 	className,
 } ) {
+	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
+	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
+
 	const textInput = useRef( null );
 	const isAndroid = Platform.OS === 'android';
 
@@ -113,6 +116,24 @@ export default function SearchEdit( {
 			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
 			widthUnit: nextUnit,
 		} );
+	};
+
+	const toggleButtonFocus = ( isFocused ) => {
+		if ( isFocused && isSelected ) {
+			setIsButtonSelected( true );
+			setIsLabelSelected( false );
+		} else {
+			setIsButtonSelected( false );
+		}
+	};
+
+	const toggleLabelFocus = ( isFocused ) => {
+		if ( isFocused && isSelected ) {
+			setIsLabelSelected( true );
+			setIsButtonSelected( false );
+		} else {
+			setIsLabelSelected( false );
+		}
 	};
 
 	const getBlockClassNames = () => {
@@ -254,8 +275,11 @@ export default function SearchEdit( {
 						}
 						minWidth={ MIN_BUTTON_WIDTH }
 						textAlign="center"
-						onFocus={ onFocus }
-						isSelected={ false }
+						isSelected={ isButtonSelected }
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						unstableOnFocus={ () => {
+							toggleButtonFocus( true );
+						} }
 					/>
 				) }
 			</View>
@@ -283,8 +307,11 @@ export default function SearchEdit( {
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
-					onFocus={ onFocus }
-					isSelected={ false }
+					isSelected={ isLabelSelected }
+					__unstableMobileNoFocusOnMount={ ! isSelected }
+					unstableOnFocus={ () => {
+						toggleLabelFocus( true );
+					} }
 				/>
 			) }
 
