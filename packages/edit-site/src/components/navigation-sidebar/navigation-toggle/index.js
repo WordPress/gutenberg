@@ -35,13 +35,7 @@ function NavigationToggle( { icon, isOpen } ) {
 
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
-			setIsNavigationPanelOpened( false );
-		}
-	}
-
+	
 	if ( ! isActive ) {
 		return null;
 	}
@@ -67,7 +61,6 @@ function NavigationToggle( { icon, isOpen } ) {
 			className={
 				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
 			}
-			onKeyDown={ closeOnEscape }
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
