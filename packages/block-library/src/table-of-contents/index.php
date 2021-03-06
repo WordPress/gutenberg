@@ -243,15 +243,21 @@ function block_core_table_of_contents_render_list(
 
 	$child_nodes = array_map(
 		function ( $child_node ) use ( $entry_class, $page_url ) {
+			global $multipage;
+
 			$id      = $child_node['heading']['id'];
 			$content = $child_node['heading']['content'];
 
 			if ( isset( $id ) ) {
-				$href = add_query_arg(
-					'page',
-					(string) $child_node['heading']['page'],
-					remove_query_arg( 'page', $page_url )
-				) . '#' . $id;
+				if ( $multipage ) {
+					$href = add_query_arg(
+						'page',
+						(string) $child_node['heading']['page'],
+						remove_query_arg( 'page', $page_url )
+					) . '#' . $id;
+				} else {
+					$href = $page_url . '#' . $id;
+				}
 
 				$entry = sprintf(
 					'<a class="%1$s" href="%2$s">%3$s</a>',
