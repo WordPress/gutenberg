@@ -7,13 +7,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import ContentNavigation from './content-navigation';
 import TemplatesNavigation from './templates-navigation';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { MENU_ROOT } from './constants';
 import { store as editSiteStore } from '../../../store';
 
@@ -41,6 +42,15 @@ const NavigationPanel = ( { isOpen } ) => {
 		}
 	}, [ templatesActiveMenu ] );
 
+	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+
+	const closeOnEscape = ( event ) => {
+		if ( event.keyCode === ESCAPE ) {
+			event.stopPropagation();
+			setIsNavigationPanelOpened( false );
+		}
+	};
+
 	return (
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
@@ -48,6 +58,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			} ) }
 			ref={ panelRef }
 			tabIndex="-1"
+			onKeyDown={ closeOnEscape }
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
