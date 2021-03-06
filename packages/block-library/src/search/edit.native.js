@@ -97,6 +97,21 @@ export default function SearchEdit( {
 		};
 	}, [] );
 
+	/*
+	 * Clear component selection state when the block is no longer
+	 * selected.
+	 */
+	useEffect( () => {
+		if ( ! isSelected ) {
+			if ( isButtonSelected ) {
+				toggleButtonFocus( false );
+			}
+			if ( isLabelSelected ) {
+				toggleLabelFocus( false );
+			}
+		}
+	}, [ isSelected ] );
+
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
 			return;
