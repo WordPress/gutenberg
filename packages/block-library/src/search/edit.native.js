@@ -293,7 +293,7 @@ export default function SearchEdit( {
 
 	return (
 		<View { ...blockProps } style={ styles.searchBlockContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ showLabel && (
 				<RichText
