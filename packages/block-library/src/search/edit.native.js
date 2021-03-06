@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,6 +53,9 @@ export default function SearchEdit( {
 	setAttributes,
 	className,
 } ) {
+	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
+	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
+
 	const textInput = useRef();
 	const isAndroid = Platform.OS === 'android';
 
@@ -96,6 +99,21 @@ export default function SearchEdit( {
 		};
 	}, [] );
 
+	/*
+	 * Clear component selection state when the block is no longer
+	 * selected.
+	 */
+	useEffect( () => {
+		if ( ! isSelected ) {
+			if ( isButtonSelected ) {
+				toggleButtonFocus( false );
+			}
+			if ( isLabelSelected ) {
+				toggleLabelFocus( false );
+			}
+		}
+	}, [ isSelected ] );
+
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
 			return;
@@ -115,6 +133,24 @@ export default function SearchEdit( {
 			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
 			widthUnit: nextUnit,
 		} );
+	};
+
+	const toggleButtonFocus = ( isFocused ) => {
+		if ( isFocused && isSelected ) {
+			setIsButtonSelected( true );
+			setIsLabelSelected( false );
+		} else {
+			setIsButtonSelected( false );
+		}
+	};
+
+	const toggleLabelFocus = ( isFocused ) => {
+		if ( isFocused && isSelected ) {
+			setIsLabelSelected( true );
+			setIsButtonSelected( false );
+		} else {
+			setIsLabelSelected( false );
+		}
 	};
 
 	const getBlockClassNames = () => {
@@ -250,18 +286,22 @@ export default function SearchEdit( {
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						identifier="text"
+						tagName="p"
 						style={ richTextStyles.searchButton }
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
-						identifier="text"
 						withoutInteractiveFormatting
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
 						minWidth={ MIN_BUTTON_WIDTH }
 						textAlign="center"
-						onFocus={ onFocus }
-						isSelected={ false }
+						isSelected={ isButtonSelected }
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						unstableOnFocus={ () => {
+							toggleButtonFocus( true );
+						} }
 					/>
 				) }
 			</View>
@@ -280,6 +320,8 @@ export default function SearchEdit( {
 			{ showLabel && (
 				<RichText
 					className="wp-block-search__label"
+					identifier="text"
+					tagName="p"
 					style={ {
 						...styles.searchLabel,
 						...richTextStyles.searchLabel,
@@ -289,8 +331,11 @@ export default function SearchEdit( {
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
-					onFocus={ onFocus }
-					isSelected={ false }
+					isSelected={ isLabelSelected }
+					__unstableMobileNoFocusOnMount={ ! isSelected }
+					unstableOnFocus={ () => {
+						toggleLabelFocus( true );
+					} }
 				/>
 			) }
 
