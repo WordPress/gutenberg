@@ -2,33 +2,44 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getBlockContent } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 
-// Modified from packages/editor/src/components/document-outline/index.js.
 /**
- * Returns an array of heading blocks enhanced with the following properties:
- * path    - An array of blocks that are ancestors of the heading starting from a top-level node.
- *           Can be an empty array if the heading is a top-level node (is not nested inside another block).
- * level   - An integer with the heading level.
+ * Extracts heading levels from the provided HTML content.
  *
- * @param {?Array} blocks An array of blocks.
- * @param {?Array} path   An array of blocks that are ancestors of the blocks passed as blocks.
+ * @param {string} content The content to extract heading data from.
  *
- * @return {Array} An array of heading blocks enhanced with the properties described above.
+ * @return {number[]} Array of integers representing the level of each heading
+ *                    found in the provided content.
  */
-function computeOutlineHeadings( blocks = [], path = [] ) {
-	return blocks.flatMap( ( block = {} ) => {
-		if ( block.name === 'core/heading' ) {
-			return {
-				...block,
-				path,
-				level: block.attributes.level,
-			};
-		}
-		return computeOutlineHeadings( block.innerBlocks, [ ...path, block ] );
-	} );
+function getHeadingLevelsFromContent( content ) {
+	// Create a temporary container to put the post content into, so we can
+	// use the DOM to find all the headings.
+	const tempPostContentDOM = document.createElement( 'div' );
+	tempPostContentDOM.innerHTML = content;
+
+	// Remove template elements so that headings inside them aren't counted.
+	// This is only needed for IE11, which doesn't recognize the element and
+	// treats it like a div.
+	for ( const template of tempPostContentDOM.querySelectorAll(
+		'template'
+	) ) {
+		template.remove();
+	}
+
+	const headingElements = tempPostContentDOM.querySelectorAll(
+		'h1, h2, h3, h4, h5, h6'
+	);
+
+	return [ ...headingElements ].map( ( heading ) =>
+		// A little hacky, but since we know at this point that the tag will
+		// be an H1-H6, we can just grab the 2nd character of the tag name and
+		// convert it to an integer. Should be faster than conditionals.
+		parseInt( heading.tagName[ 1 ], 10 )
+	);
 }
 
 /**
@@ -36,61 +47,74 @@ function computeOutlineHeadings( blocks = [], path = [] ) {
  *
  * @param {string} currentBlockClientId The client id of the current block.
  *
- * @return {Function} Function to compare a given heading level to the preceding
- *                    one and determine if it is invalid.
+ * @return {(level: number) => 'invalid' | 'maybe invalid' | 'valid'}
+ * Function to compare a given heading level to the preceding one and determine
+ * if it is valid.
  */
 export default function useHeadingLevelValidator( currentBlockClientId ) {
-	const { hasMultipleH1, hasTitle, precedingLevel } = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
-			const { getEditedPostAttribute } = select( editorStore );
-			const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const hasTitle = useSelect( ( select ) => {
+		const { getPostType } = select( coreStore );
+		const { getEditedPostAttribute } = select( editorStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
-			const titleNode = document.getElementsByClassName(
-				'editor-post-title__input'
-			)[ 0 ];
-			const isTitleSupported = postType?.supports?.title ?? false;
-			const titleIsNotEmpty = !! getEditedPostAttribute( 'title' );
-			const _hasTitle = isTitleSupported && titleIsNotEmpty && titleNode;
+		const titleNode = document.getElementsByClassName(
+			'editor-post-title__input'
+		)[ 0 ];
+		const isTitleSupported = postType?.supports?.title ?? false;
+		const titleIsNotEmpty = !! getEditedPostAttribute( 'title' );
 
-			const headings = computeOutlineHeadings( getBlocks() ?? [] );
+		return isTitleSupported && titleIsNotEmpty && titleNode;
+	}, [] );
 
-			const currentHeadingIndex = headings.findIndex(
-				( { clientId } ) => clientId === currentBlockClientId
+	const { hasH1sInContent, precedingLevel } = useSelect( ( select ) => {
+		const { getBlock, getBlockIndex, getBlockOrder } = select(
+			blockEditorStore
+		);
+		const blockIndex = getBlockIndex( currentBlockClientId );
+		const blockOrder = getBlockOrder();
+
+		let postContentPrecedingCurrentHeading = '';
+		for ( let i = 0; i < blockIndex; i++ ) {
+			const otherBlockClientId = blockOrder[ i ];
+			const blockContent = getBlockContent(
+				getBlock( otherBlockClientId )
 			);
+			postContentPrecedingCurrentHeading += blockContent;
+		}
 
-			// Default the assumed previous level to H1.
-			let _precedingLevel = 1;
+		const precedingHeadingLevels = getHeadingLevelsFromContent(
+			postContentPrecedingCurrentHeading
+		);
 
-			// If the current block isn't the first Heading block in the content,
-			// set prevLevel to the level of the closest Heading block preceding
-			// it.
-			if ( currentHeadingIndex > 0 ) {
-				_precedingLevel = headings[ currentHeadingIndex - 1 ].level;
-			}
+		const currentHeadingIndex = precedingHeadingLevels.length;
 
-			return {
-				hasMultipleH1: headings.some( ( { level } ) => level === 1 ),
-				hasTitle: _hasTitle,
-				precedingLevel: _precedingLevel,
-			};
-		},
-		[]
-	);
+		// Default the assumed previous level to H1.
+		let _precedingLevel = 1;
 
-	return ( targetLevel ) => {
-		const levelIsDuplicateH1 = hasMultipleH1 && targetLevel === 1;
-		const levelAndPostTitleMayBothBeH1 =
-			targetLevel === 1 && hasTitle && ! hasMultipleH1;
-		const levelIsTooDeep = targetLevel > precedingLevel + 1;
-		const levelIsInvalid = levelIsDuplicateH1 || levelIsTooDeep;
-		const levelMayBeInvalid =
-			levelIsInvalid || levelAndPostTitleMayBothBeH1;
+		// If the current block isn't the first Heading block in the content,
+		// set prevLevel to the level of the closest Heading block preceding
+		// it.
+		if ( currentHeadingIndex > 0 ) {
+			_precedingLevel = precedingHeadingLevels[ currentHeadingIndex - 1 ];
+		}
 
 		return {
-			levelIsInvalid,
-			levelMayBeInvalid,
+			hasH1sInContent: precedingHeadingLevels.includes( 1 ),
+			precedingLevel: _precedingLevel,
 		};
+	}, [] );
+
+	return ( level ) => {
+		const levelIsDuplicateH1 = hasH1sInContent && level === 1;
+		const levelAndPostTitleMayBothBeH1 =
+			level === 1 && hasTitle && ! hasH1sInContent;
+		const levelIsTooDeep = level > precedingLevel + 1;
+
+		if ( levelIsDuplicateH1 || levelIsTooDeep ) {
+			return 'invalid';
+		} else if ( levelAndPostTitleMayBothBeH1 ) {
+			return 'maybe invalid';
+		}
+		return 'valid';
 	};
 }

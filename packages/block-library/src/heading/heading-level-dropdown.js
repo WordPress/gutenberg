@@ -33,10 +33,11 @@ const POPOVER_PROPS = {
  *
  * @typedef WPHeadingLevelDropdownProps
  *
- * @property {string}                 clientId      The current block client id.
- * @property {number}                 selectedLevel The chosen heading level.
- * @property {(newValue:number)=>any} onChange      Callback to run when
- *                                                  toolbar value is changed.
+ * @property {string}                  clientId      The current block client
+ *                                                   id.
+ * @property {number}                  selectedLevel The chosen heading level.
+ * @property {(newValue:number)=>void} onChange      Callback to run when
+ *                                                   toolbar value is changed.
  */
 
 /**
@@ -58,9 +59,8 @@ export default function HeadingLevelDropdown( {
 
 	const getLevelValidity = useHeadingLevelValidator( clientId );
 
-	const { levelMayBeInvalid: selectedLevelMayBeInvalid } = getLevelValidity(
-		selectedLevel
-	);
+	const selectedLevelMayBeInvalid =
+		getLevelValidity( selectedLevel ) !== 'valid';
 
 	return (
 		<Dropdown
@@ -96,9 +96,8 @@ export default function HeadingLevelDropdown( {
 							isCollapsed={ false }
 							controls={ HEADING_LEVELS.map( ( targetLevel ) => {
 								const isActive = targetLevel === selectedLevel;
-								const levelMayBeInvalid = getLevelValidity(
-									targetLevel
-								).levelMayBeInvalid;
+								const levelMayBeInvalid =
+									getLevelValidity( targetLevel ) !== 'valid';
 
 								return {
 									icon: (
