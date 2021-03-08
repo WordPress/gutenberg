@@ -15,6 +15,7 @@
  */
 function render_block_core_term_description( $attributes, $content, $block ) {
 
+	$description = false;
 	if ( is_category() ) {
 		$description = category_description();
 	} else if ( is_tag() ) {
