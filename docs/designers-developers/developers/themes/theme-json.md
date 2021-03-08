@@ -322,7 +322,10 @@ Each block declares which style properties it exposes via the [block supports me
   "styles": {
     "some/block/selector": {
       "border": {
-        "radius": "value"
+        "radius": "value",
+        "color": "value",
+        "style": "value",
+        "width": "value"
       },
       "color": {
         "background": "value",
@@ -415,6 +418,7 @@ These are the current color properties supported by blocks:
 | Block | Background | Gradient | Link | Text |
 | --- | --- | --- | --- | --- |
 | Global | Yes | Yes | Yes | Yes |
+| Code | Yes | Yes | - | Yes |
 | Columns | Yes | Yes | Yes | Yes |
 | Group | Yes | Yes | Yes | Yes |
 | Heading [1] | Yes | - | Yes | Yes |
@@ -443,6 +447,7 @@ These are the current color properties supported by blocks:
 | --- | --- |
 | Cover | Yes |
 | Group | Yes |
+| Code  | Yes |
 
 #### Typography Properties
 
@@ -472,6 +477,13 @@ These are the current typography properties supported by blocks:
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
+#### Border Properties
+
+These are the current border properties supported by blocks:
+
+| Context | Radius | Color | Style | Width |
+| - | - | - | - | - | 
+| Code | Yes | Yes | Yes | Yes |
 
 ### Other theme metadata
 

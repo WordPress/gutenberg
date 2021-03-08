@@ -11,7 +11,21 @@
 	},
 	"supports": {
 		"anchor": true,
-		"fontSize": true
+		"fontSize": true,
+		"spacing": {
+			"padding": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true
+		}
 	},
 	"style": "wp-block-code"
 }
