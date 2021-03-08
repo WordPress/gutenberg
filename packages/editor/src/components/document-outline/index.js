@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { countBy, flatMap, get } from 'lodash';
+import { countBy, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { getBlockContent } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 import { create, getTextContent } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,8 +16,8 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import DocumentOutlineItem from './item';
 import { store as editorStore } from '../../store';
+import DocumentOutlineItem from './item';
 
 /**
  * Module constants
@@ -41,38 +41,76 @@ const multipleH1Headings = [
 ];
 
 /**
- * Returns an array of heading blocks enhanced with the following properties:
- * level   - An integer with the heading level.
- * isEmpty - Flag indicating if the heading has no content.
+ * Extracts heading elements from an HTML string.
  *
- * @param {?Array} blocks An array of blocks.
+ * @param {string} html The HTML string to extract heading elements from.
  *
- * @return {Array} An array of heading blocks enhanced with the properties described above.
+ * @return {HTMLHeadingElement[]} Array of h1-h6 elements.
  */
-const computeOutlineHeadings = ( blocks = [] ) => {
-	return flatMap( blocks, ( block = {} ) => {
-		if ( block.name === 'core/heading' ) {
-			return {
-				...block,
-				level: block.attributes.level,
-				isEmpty: isEmptyHeading( block ),
-			};
-		}
-		return computeOutlineHeadings( block.innerBlocks );
-	} );
-};
+function getHeadingElementsFromHTML( html ) {
+	// Create a temporary container to put the post content into, so we can
+	// use the DOM to find all the headings.
+	const tempContainer = document.createElement( 'div' );
+	tempContainer.innerHTML = html;
 
-const isEmptyHeading = ( heading ) =>
-	! heading.attributes.content || heading.attributes.content.length === 0;
+	// Remove template elements so that headings inside them aren't counted.
+	// This is only needed for IE11, which doesn't recognize the element and
+	// treats it like a div.
+	for ( const template of tempContainer.querySelectorAll( 'template' ) ) {
+		template.remove();
+	}
 
-export const DocumentOutline = ( {
-	blocks = [],
-	title,
+	return [ ...tempContainer.querySelectorAll( 'h1, h2, h3, h4, h5, h6' ) ];
+}
+
+export default function DocumentOutline( {
 	onSelect,
-	isTitleSupported,
 	hasOutlineItemsDisabled,
-} ) => {
-	const headings = computeOutlineHeadings( blocks );
+} ) {
+	const { headings, isTitleSupported, title } = useSelect( ( select ) => {
+		const { getBlocks } = select( blockEditorStore );
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		const blocks = getBlocks() ?? [];
+
+		const _headings = [];
+		for ( const block of blocks ) {
+			if ( block.name === 'core/heading' ) {
+				_headings.push( {
+					blockClientId: block.clientId,
+					content: block.attributes.content,
+					isEmpty:
+						! block.attributes.content ||
+						block.attributes.content.length === 0,
+					level: block.attributes.level,
+				} );
+			} else {
+				const headingElements = getHeadingElementsFromHTML(
+					getBlockContent( block )
+				);
+				for ( const element of headingElements ) {
+					_headings.push( {
+						blockClientId: block.clientId,
+						content: element.textContent,
+						isEmpty: element.textContent.length === 0,
+						// Kinda hacky, but since we know at this point that the tag
+						// is an H1-H6, we can just grab the 2nd character of the tag
+						// name and convert it to an integer. Should be faster than
+						// conditionals.
+						level: parseInt( element.tagName[ 1 ], 10 ),
+					} );
+				}
+			}
+		}
+
+		return {
+			headings: _headings,
+			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
+			title: getEditedPostAttribute( 'title' ),
+		};
+	}, [] );
 
 	if ( headings.length < 1 ) {
 		return null;
@@ -119,14 +157,14 @@ export const DocumentOutline = ( {
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							isDisabled={ hasOutlineItemsDisabled }
-							href={ `#block-${ item.clientId }` }
+							href={ `#block-${ item.blockClientId }` }
 							onSelect={ onSelect }
 						>
 							{ item.isEmpty
 								? emptyHeadingContent
 								: getTextContent(
 										create( {
-											html: item.attributes.content,
+											html: item.content,
 										} )
 								  ) }
 							{ isIncorrectLevel && incorrectLevelContent }
@@ -143,19 +181,4 @@ export const DocumentOutline = ( {
 			</ul>
 		</div>
 	);
-};
-
-export default compose(
-	withSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-
-		return {
-			title: getEditedPostAttribute( 'title' ),
-			blocks: getBlocks(),
-			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
-		};
-	} )
-)( DocumentOutline );
+}
