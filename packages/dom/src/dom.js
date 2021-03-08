@@ -8,8 +8,12 @@ import { includes, noop } from 'lodash';
  */
 import { isPhrasingContent } from './phrasing-content';
 
+/**
+ * @param {Element} node
+ * @return {CSSStyleDeclaration | undefined} Computed style for node
+ */
 function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
+	return node.ownerDocument.defaultView?.getComputedStyle( node );
 }
 
 /**
@@ -17,6 +21,7 @@ function getComputedStyle( node ) {
  * some browsers ignore when creating a union.
  *
  * @param {Range} range The range to check.
+ * @return {number | undefined } Range height
  */
 function getRangeHeight( range ) {
 	const rects = Array.from( range.getClientRects() );
@@ -44,6 +49,10 @@ function getRangeHeight( range ) {
 function isSelectionForward( selection ) {
 	const { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
 
+	if ( ! anchorNode || ! focusNode ) {
+		return false;
+	}
+
 	const position = anchorNode.compareDocumentPosition( focusNode );
 
 	// Disable reason: `Node#compareDocumentPosition` returns a bitmask value,
@@ -70,19 +79,29 @@ function isSelectionForward( selection ) {
 	return true;
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {Element} element Element to test
+ * @return {element is HTMLTextAreaElement | HTMLInputElement} True if element is Input or TextArea
+ */
+function isInputOrTextAreaElement( element ) {
+	return 'INPUT' === element.tagName || 'TEXTAREA' === element.tagName;
+}
+/* eslint-enable jsdoc/valid-types */
+
 /**
  * Check whether the selection is at the edge of the container. Checks for
  * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container    Focusable element.
- * @param {boolean} isReverse    Set to true to check left, false to check right.
- * @param {boolean} onlyVertical Set to true to check only vertical position.
+ * @param {HTMLElement} container      Focusable element.
+ * @param {boolean}     isReverse      Set to true to check left, false to check right.
+ * @param {boolean}     [onlyVertical] Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
 function isEdge( container, isReverse, onlyVertical ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+	if ( isInputOrTextAreaElement( container ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
@@ -101,9 +120,9 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 
-	const selection = defaultView.getSelection();
+	const selection = defaultView?.getSelection();
 
-	if ( ! selection.rangeCount ) {
+	if ( ! selection?.rangeCount ) {
 		return false;
 	}
 
@@ -129,14 +148,15 @@ function isEdge( container, isReverse, onlyVertical ) {
 	// collapsed  selection.
 	if (
 		! isCollapsed &&
-		getRangeHeight( range ) > collapsedRangeRect.height &&
+		/** @type {number} */ ( getRangeHeight( range ) ) >
+			collapsedRangeRect.height &&
 		isForward === isReverse
 	) {
 		return false;
 	}
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const { direction } = getComputedStyle( container );
+	const direction = getComputedStyle( container )?.direction;
 	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 	const containerRect = container.getBoundingClientRect();
@@ -188,7 +208,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 /**
  * Check whether the selection is horizontally at the edge of the container.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse Set to true to check left, false for right.
  *
  * @return {boolean} True if at the horizontal edge, false if not.
@@ -200,7 +220,7 @@ export function isHorizontalEdge( container, isReverse ) {
 /**
  * Check whether the selection is vertically at the edge of the container.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse Set to true to check top, false for bottom.
  *
  * @return {boolean} True if at the vertical edge, false if not.
@@ -214,7 +234,7 @@ export function isVerticalEdge( container, isReverse ) {
  *
  * @param {Range} range The range.
  *
- * @return {DOMRect} The rectangle.
+ * @return {DOMRect | undefined} The rectangle.
  */
 export function getRectangleFromRange( range ) {
 	// For uncollapsed ranges, get the rectangle that bounds the contents of the
@@ -227,11 +247,22 @@ export function getRectangleFromRange( range ) {
 	const { startContainer } = range;
 	const { ownerDocument } = startContainer;
 
+	if ( ! ownerDocument ) {
+		return;
+	}
+
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
 		const { parentNode } = startContainer;
+
+		if ( ! parentNode ) {
+			return;
+		}
+
 		const index = Array.from( parentNode.childNodes ).indexOf(
-			startContainer
+			/* eslint-disable jsdoc/no-undefined-types */
+			/** @type {ChildNode} */ ( startContainer )
+			/* eslint-enable jsdoc/no-undefined-types */
 		);
 
 		range = ownerDocument.createRange();
@@ -252,7 +283,7 @@ export function getRectangleFromRange( range ) {
 		range = range.cloneRange();
 		range.insertNode( padNode );
 		rect = range.getClientRects()[ 0 ];
-		padNode.parentNode.removeChild( padNode );
+		padNode.parentNode?.removeChild( padNode );
 	}
 
 	return rect;
@@ -263,11 +294,11 @@ export function getRectangleFromRange( range ) {
  *
  * @param {Window} win The window of the selection.
  *
- * @return {?DOMRect} The rectangle.
+ * @return {DOMRect | undefined} The rectangle.
  */
 export function computeCaretRect( win ) {
 	const selection = win.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
 		return;
@@ -279,15 +310,17 @@ export function computeCaretRect( win ) {
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse True for end, false for start.
+ *
+ * @return {void}
  */
 export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	if ( ! container ) {
 		return;
 	}
 
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+	if ( isInputOrTextAreaElement( container ) ) {
 		container.focus();
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;
@@ -318,7 +351,17 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
+
+	if ( ! defaultView ) {
+		return;
+	}
+
 	const selection = defaultView.getSelection();
+
+	if ( ! selection ) {
+		return;
+	}
+
 	const range = ownerDocument.createRange();
 
 	range.selectNodeContents( rangeTarget );
@@ -373,7 +416,7 @@ function caretRangeFromPoint( doc, x, y ) {
  * @param {Document} doc       The document of the range.
  * @param {number}    x         Horizontal position within the current viewport.
  * @param {number}    y         Vertical position within the current viewport.
- * @param {Element}  container Container in which the range is expected to be found.
+ * @param {HTMLElement}  container Container in which the range is expected to be found.
  *
  * @return {?Range} The best range for the given point.
  */
@@ -396,7 +439,7 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 /**
  * Places the caret at the top or bottom of a given element.
  *
- * @param {Element} container           Focusable element.
+ * @param {HTMLElement} container           Focusable element.
  * @param {boolean} isReverse           True for bottom, false for top.
  * @param {DOMRect} [rect]              The rectangle to position the caret with.
  * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
@@ -430,7 +473,6 @@ export function placeCaretAtVerticalEdge(
 		: editableRect.top + buffer;
 
 	const { ownerDocument } = container;
-	const { defaultView } = ownerDocument;
 	const range = hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
@@ -451,7 +493,18 @@ export function placeCaretAtVerticalEdge(
 		return;
 	}
 
+	const { defaultView } = ownerDocument;
+
+	if ( ! defaultView ) {
+		return;
+	}
+
 	const selection = defaultView.getSelection();
+
+	if ( ! selection ) {
+		return;
+	}
+
 	selection.removeAllRanges();
 	selection.addRange( range );
 	container.focus();
@@ -461,18 +514,33 @@ export function placeCaretAtVerticalEdge(
 	selection.addRange( range );
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {Node | null | undefined} node
+ * @return {node is Element} True if node is an Element node
+ */
+function isElement( node ) {
+	/* eslint-enable jsdoc/valid-types */
+	return !! node && node.nodeType === node.ELEMENT_NODE;
+}
+
+/* eslint-disable jsdoc/valid-types */
 /**
  * Check whether the given element is a text field, where text field is defined
  * by the ability to select within the input, or that it is contenteditable.
  *
  * See: https://html.spec.whatwg.org/#textFieldSelection
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
- * @return {boolean} True if the element is an text field, false if not.
+ * @return {HTMLElement is HTMLElement} True if the element is a text input, textarea, or contenteditable.
  */
 export function isTextField( element ) {
-	const { nodeName, contentEditable } = element;
+	/* eslint-enable jsdoc/valid-types */
+	const {
+		nodeName,
+		contentEditable,
+	} = /** @type { HTMLElement } */ ( element );
 	const nonTextInputs = [
 		'button',
 		'checkbox',
@@ -486,24 +554,33 @@ export function isTextField( element ) {
 		'number',
 	];
 	return (
-		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
+		( nodeName === 'INPUT' &&
+			! nonTextInputs.includes(
+				/** @type {HTMLInputElement} */ ( element ).type
+			) ) ||
 		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Check whether the given element is an input field of type number
  * and has a valueAsNumber
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
- * @return {boolean} True if the element is input and holds a number.
+ * @return {element is HTMLInputElement} True if the element is input and holds a number.
  */
 export function isNumberInput( element ) {
-	const { nodeName, type, valueAsNumber } = element;
+	/* eslint-enable jsdoc/valid-types */
+	const { nodeName } = element;
 
-	return nodeName === 'INPUT' && type === 'number' && !! valueAsNumber;
+	return (
+		nodeName === 'INPUT' &&
+		/** @type {HTMLInputElement} */ ( element ).type === 'number' &&
+		!! (/** @type {HTMLInputElement} */ ( element ).valueAsNumber)
+	);
 }
 
 /**
@@ -518,9 +595,9 @@ export function isNumberInput( element ) {
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasTextSelection( doc ) {
-	const selection = doc.defaultView.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	return range && ! range.collapsed;
+	const selection = doc.defaultView?.getSelection();
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
+	return !! range && ! range.collapsed;
 }
 
 /**
@@ -532,7 +609,7 @@ export function documentHasTextSelection( doc ) {
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
  * @return {boolean} Whether the input/textareaa element has some "selection".
  */
@@ -541,7 +618,10 @@ function inputFieldHasUncollapsedSelection( element ) {
 		return false;
 	}
 	try {
-		const { selectionStart, selectionEnd } = element;
+		const {
+			selectionStart,
+			selectionEnd,
+		} = /** @type {HTMLInputElement} */ ( element );
 
 		return selectionStart !== null && selectionStart !== selectionEnd;
 	} catch ( error ) {
@@ -569,7 +649,8 @@ function inputFieldHasUncollapsedSelection( element ) {
 export function documentHasUncollapsedSelection( doc ) {
 	return (
 		documentHasTextSelection( doc ) ||
-		inputFieldHasUncollapsedSelection( doc.activeElement )
+		( !! doc.activeElement &&
+			inputFieldHasUncollapsedSelection( doc.activeElement ) )
 	);
 }
 
@@ -582,6 +663,10 @@ export function documentHasUncollapsedSelection( doc ) {
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasSelection( doc ) {
+	if ( ! doc.activeElement ) {
+		return false;
+	}
+
 	return (
 		isTextField( doc.activeElement ) ||
 		isNumberInput( doc.activeElement ) ||
@@ -598,21 +683,20 @@ export function documentHasSelection( doc ) {
  * @return {boolean} True if entirely selected, false if not.
  */
 export function isEntirelySelected( element ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
+	if ( isInputOrTextAreaElement( element ) ) {
 		return (
 			element.selectionStart === 0 &&
 			element.value.length === element.selectionEnd
 		);
 	}
 
-	if ( ! element.isContentEditable ) {
+	if ( ! (/** @type {HTMLElement} */ ( element ).isContentEditable) ) {
 		return true;
 	}
 
 	const { ownerDocument } = element;
-	const { defaultView } = ownerDocument;
-	const selection = defaultView.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const selection = ownerDocument.defaultView?.getSelection();
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
 		return true;
@@ -631,9 +715,9 @@ export function isEntirelySelected( element ) {
 
 	const lastChild = element.lastChild;
 	const lastChildContentLength =
-		lastChild.nodeType === lastChild.TEXT_NODE
-			? lastChild.data.length
-			: lastChild.childNodes.length;
+		lastChild && lastChild.nodeType === lastChild.TEXT_NODE
+			? /** @type {Text} */ ( lastChild ).data.length
+			: /** @type {Element} */ ( lastChild ).childNodes.length;
 
 	return (
 		startContainer === element.firstChild &&
@@ -646,20 +730,20 @@ export function isEntirelySelected( element ) {
 /**
  * Given a DOM node, finds the closest scrollable container node.
  *
- * @param {Element} node Node from which to start.
+ * @param {Node | null} node Node from which to start.
  *
- * @return {?Element} Scrollable container node, if found.
+ * @return {Element | undefined} Scrollable container node, if found.
  */
 export function getScrollContainer( node ) {
-	if ( ! node ) {
+	if ( ! isElement( node ) ) {
 		return;
 	}
 
 	// Scrollable if scrollable height exceeds displayed...
 	if ( node.scrollHeight > node.clientHeight ) {
 		// ...except when overflow is defined to be hidden or visible
-		const { overflowY } = getComputedStyle( node );
-		if ( /(auto|scroll)/.test( overflowY ) ) {
+		const overflowY = getComputedStyle( node )?.overflowY;
+		if ( overflowY && /(auto|scroll)/.test( overflowY ) ) {
 			return node;
 		}
 	}
@@ -682,24 +766,30 @@ export function getScrollContainer( node ) {
 export function getOffsetParent( node ) {
 	// Cannot retrieve computed style or offset parent only anything other than
 	// an element node, so find the closest element node.
+
+	/* eslint-disable jsdoc/no-undefined-types */
+	/** @type {(Node & ParentNode) | null} */
 	let closestElement;
+	/* eslint-enable jsdoc/no-undefined-types */
 	while ( ( closestElement = node.parentNode ) ) {
-		if ( closestElement.nodeType === closestElement.ELEMENT_NODE ) {
+		if ( isElement( closestElement ) ) {
 			break;
 		}
 	}
 
-	if ( ! closestElement ) {
+	if ( ! isElement( closestElement ) ) {
 		return null;
 	}
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+	const computedPosition = getComputedStyle( closestElement )?.position;
+	if ( computedPosition && computedPosition !== 'static' ) {
 		return closestElement;
 	}
 
-	return closestElement.offsetParent;
+	// Ensure we return null and not a potential `undefined` property of the closestElement object.
+	return /** @type {HTMLElement} */ ( closestElement ).offsetParent || null;
 }
 
 /**
@@ -710,6 +800,10 @@ export function getOffsetParent( node ) {
  * @return {void}
  */
 export function replace( processedNode, newNode ) {
+	if ( ! processedNode.parentNode ) {
+		return;
+	}
+
 	insertAfter( newNode, processedNode.parentNode );
 	remove( processedNode );
 }
@@ -717,23 +811,26 @@ export function replace( processedNode, newNode ) {
 /**
  * Given a DOM node, removes it from the DOM.
  *
- * @param {Element} node Node to be removed.
+ * @param {Node} node Node to be removed.
  * @return {void}
  */
 export function remove( node ) {
-	node.parentNode.removeChild( node );
+	node.parentNode?.removeChild( node );
 }
 
 /**
  * Given two DOM nodes, inserts the former in the DOM as the next sibling of
  * the latter.
  *
- * @param {Element} newNode       Node to be inserted.
- * @param {Element} referenceNode Node after which to perform the insertion.
+ * @param {Node} newNode       Node to be inserted.
+ * @param {Node} referenceNode Node after which to perform the insertion.
  * @return {void}
  */
 export function insertAfter( newNode, referenceNode ) {
-	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
+	referenceNode.parentNode?.insertBefore(
+		newNode,
+		referenceNode.nextSibling
+	);
 }
 
 /**
@@ -746,6 +843,10 @@ export function insertAfter( newNode, referenceNode ) {
 export function unwrap( node ) {
 	const parent = node.parentNode;
 
+	if ( ! parent ) {
+		return;
+	}
+
 	while ( node.firstChild ) {
 		parent.insertBefore( node.firstChild, node );
 	}
@@ -756,19 +857,23 @@ export function unwrap( node ) {
 /**
  * Replaces the given node with a new node with the given tag name.
  *
- * @param {Element}  node    The node to replace
+ * @param {Node}  node    The node to replace
  * @param {string}   tagName The new tag name.
  *
- * @return {Element} The new node.
+ * @return {Element | undefined} The new node.
  */
 export function replaceTag( node, tagName ) {
-	const newNode = node.ownerDocument.createElement( tagName );
+	const newNode = node.ownerDocument?.createElement( tagName );
+
+	if ( ! newNode ) {
+		return;
+	}
 
 	while ( node.firstChild ) {
 		newNode.appendChild( node.firstChild );
 	}
 
-	node.parentNode.replaceChild( newNode, node );
+	node.parentNode?.replaceChild( newNode, node );
 
 	return newNode;
 }
@@ -776,11 +881,11 @@ export function replaceTag( node, tagName ) {
 /**
  * Wraps the given node with a new node with the given tag name.
  *
- * @param {Element} newNode       The node to insert.
- * @param {Element} referenceNode The node to wrap.
+ * @param {Node} newNode       The node to insert.
+ * @param {Node} referenceNode The node to wrap.
  */
 export function wrap( newNode, referenceNode ) {
-	referenceNode.parentNode.insertBefore( newNode, referenceNode );
+	referenceNode.parentNode?.insertBefore( newNode, referenceNode );
 	newNode.appendChild( referenceNode );
 }
 
@@ -799,26 +904,40 @@ export function __unstableStripHTML( html ) {
 	return document.body.textContent || '';
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @typedef Schema
+ * @property {string[]} [attributes] Attributes.
+ * @property {(string | RegExp)[]} [classes] Classnames or RegExp to test against.
+ * @property {'*' | { [tag: string]: Schema }} [children] Child schemas.
+ * @property {unknown[]} [require] ???
+ * @property {boolean} allowEmpty Whether to allow empty ???.
+ * @property {(node: Node) => boolean} [isMatch] Function to test whether a node is a match. If left undefined any node will be assumed to match.
+ */
+
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on a node
  * list.
  *
  * @param {NodeList} nodeList The nodeList to filter.
  * @param {Document} doc      The document of the nodeList.
- * @param {Object}   schema   An array of functions that can mutate with the provided node.
- * @param {Object}   inline   Whether to clean for inline mode.
+ * @param {{ [tag: string]: Schema }}   schema   An array of functions that can mutate with the provided node.
+ * @param {boolean}   inline   Whether to clean for inline mode.
  */
+/* eslint-enable jsdoc/valid-types */
 function cleanNodeList( nodeList, doc, schema, inline ) {
-	Array.from( nodeList ).forEach( ( node ) => {
+	Array.from( nodeList ).forEach( (
+		/** @type {Node & { nextElementSibling?: unknown }} */ node
+	) => {
 		const tag = node.nodeName.toLowerCase();
 
 		// It's a valid child, if the tag exists in the schema without an isMatch
 		// function, or with an isMatch function that matches the node.
 		if (
-			schema.hasOwnProperty( tag ) &&
-			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
+			tag in schema &&
+			( ! schema[ tag ].isMatch || schema[ tag ].isMatch?.( node ) )
 		) {
-			if ( node.nodeType === node.ELEMENT_NODE ) {
+			if ( isElement( node ) ) {
 				const {
 					attributes = [],
 					classes = [],
@@ -849,11 +968,14 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					// In jsdom-jscore, 'node.classList' can be undefined.
 					// TODO: Explore patching this in jsdom-jscore.
 					if ( node.classList && node.classList.length ) {
-						const mattchers = classes.map( ( item ) => {
+						/** @type {((className: string) => boolean | void)[]} */
+						const matchers = classes.map( ( item ) => {
 							if ( typeof item === 'string' ) {
-								return ( className ) => className === item;
+								return ( /** @type {string} */ className ) =>
+									className === item;
 							} else if ( item instanceof RegExp ) {
-								return ( className ) => item.test( className );
+								return ( /** @type {string} */ className ) =>
+									item.test( className );
 							}
 
 							return noop;
@@ -861,7 +983,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 
 						Array.from( node.classList ).forEach( ( name ) => {
 							if (
-								! mattchers.some( ( isMatch ) =>
+								! matchers.some( ( isMatch ) =>
 									isMatch( name )
 								)
 							) {
@@ -900,7 +1022,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 							// contains children that are block content, unwrap
 							// the node because it is invalid.
 						} else if (
-							node.parentNode.nodeName === 'BODY' &&
+							node.parentNode?.nodeName === 'BODY' &&
 							isPhrasingContent( node )
 						) {
 							cleanNodeList(
@@ -956,7 +1078,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
  * Recursively checks if an element is empty. An element is not empty if it
  * contains text or contains elements with attributes such as images.
  *
- * @param {Element} element The element to check.
+ * @param {Node} element The element to check.
  *
  * @return {boolean} Whether or not the element is empty.
  */
@@ -967,10 +1089,10 @@ export function isEmpty( element ) {
 
 	return Array.from( element.childNodes ).every( ( node ) => {
 		if ( node.nodeType === node.TEXT_NODE ) {
-			return ! node.nodeValue.trim();
+			return ! (/** @type {Text} */ ( node ).nodeValue?.trim());
 		}
 
-		if ( node.nodeType === node.ELEMENT_NODE ) {
+		if ( isElement( node ) ) {
 			if ( node.nodeName === 'BR' ) {
 				return true;
 			} else if ( node.hasAttributes() ) {
@@ -984,12 +1106,13 @@ export function isEmpty( element ) {
 	} );
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on HTML.
  *
  * @param {string} HTML   The HTML to clean up.
- * @param {Object} schema Schema for the HTML.
- * @param {Object} inline Whether to clean for inline mode.
+ * @param {{ [tag: string]: Schema }} schema Schema for the HTML.
+ * @param {boolean} inline Whether to clean for inline mode.
  *
  * @return {string} The cleaned up HTML.
  */
@@ -1002,3 +1125,4 @@ export function removeInvalidHTML( HTML, schema, inline ) {
 
 	return doc.body.innerHTML;
 }
+/* eslint-enable jsdoc/valid-types */
