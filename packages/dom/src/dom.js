@@ -234,7 +234,7 @@ export function isVerticalEdge( container, isReverse ) {
  *
  * @param {Range} range The range.
  *
- * @return {DOMRect} The rectangle.
+ * @return {DOMRect | undefined} The rectangle.
  */
 export function getRectangleFromRange( range ) {
 	// For uncollapsed ranges, get the rectangle that bounds the contents of the
@@ -247,11 +247,22 @@ export function getRectangleFromRange( range ) {
 	const { startContainer } = range;
 	const { ownerDocument } = startContainer;
 
+	if ( ! ownerDocument ) {
+		return;
+	}
+
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
 		const { parentNode } = startContainer;
+
+		if ( ! parentNode ) {
+			return;
+		}
+
 		const index = Array.from( parentNode.childNodes ).indexOf(
-			startContainer
+			/* eslint-disable jsdoc/no-undefined-types */
+			/** @type {ChildNode} */ ( startContainer )
+			/* eslint-enable jsdoc/no-undefined-types */
 		);
 
 		range = ownerDocument.createRange();
@@ -272,7 +283,7 @@ export function getRectangleFromRange( range ) {
 		range = range.cloneRange();
 		range.insertNode( padNode );
 		rect = range.getClientRects()[ 0 ];
-		padNode.parentNode.removeChild( padNode );
+		padNode.parentNode?.removeChild( padNode );
 	}
 
 	return rect;
@@ -283,11 +294,11 @@ export function getRectangleFromRange( range ) {
  *
  * @param {Window} win The window of the selection.
  *
- * @return {?DOMRect} The rectangle.
+ * @return {DOMRect | undefined} The rectangle.
  */
 export function computeCaretRect( win ) {
 	const selection = win.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
 		return;
@@ -340,7 +351,17 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
+
+	if ( ! defaultView ) {
+		return;
+	}
+
 	const selection = defaultView.getSelection();
+
+	if ( ! selection ) {
+		return;
+	}
+
 	const range = ownerDocument.createRange();
 
 	range.selectNodeContents( rangeTarget );
@@ -452,7 +473,6 @@ export function placeCaretAtVerticalEdge(
 		: editableRect.top + buffer;
 
 	const { ownerDocument } = container;
-	const { defaultView } = ownerDocument;
 	const range = hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
@@ -473,7 +493,18 @@ export function placeCaretAtVerticalEdge(
 		return;
 	}
 
+	const { defaultView } = ownerDocument;
+
+	if ( ! defaultView ) {
+		return;
+	}
+
 	const selection = defaultView.getSelection();
+
+	if ( ! selection ) {
+		return;
+	}
+
 	selection.removeAllRanges();
 	selection.addRange( range );
 	container.focus();
@@ -564,9 +595,9 @@ export function isNumberInput( element ) {
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasTextSelection( doc ) {
-	const selection = doc.defaultView.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	return range && ! range.collapsed;
+	const selection = doc.defaultView?.getSelection();
+	const range = selection?.rangeCount ? selection.getRangeAt( 0 ) : null;
+	return !! range && ! range.collapsed;
 }
 
 /**
@@ -769,6 +800,10 @@ export function getOffsetParent( node ) {
  * @return {void}
  */
 export function replace( processedNode, newNode ) {
+	if ( ! processedNode.parentNode ) {
+		return;
+	}
+
 	insertAfter( newNode, processedNode.parentNode );
 	remove( processedNode );
 }
@@ -780,7 +815,7 @@ export function replace( processedNode, newNode ) {
  * @return {void}
  */
 export function remove( node ) {
-	node.parentNode.removeChild( node );
+	node.parentNode?.removeChild( node );
 }
 
 /**
@@ -792,7 +827,10 @@ export function remove( node ) {
  * @return {void}
  */
 export function insertAfter( newNode, referenceNode ) {
-	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
+	referenceNode.parentNode?.insertBefore(
+		newNode,
+		referenceNode.nextSibling
+	);
 }
 
 /**
@@ -804,6 +842,10 @@ export function insertAfter( newNode, referenceNode ) {
  */
 export function unwrap( node ) {
 	const parent = node.parentNode;
+
+	if ( ! parent ) {
+		return;
+	}
 
 	while ( node.firstChild ) {
 		parent.insertBefore( node.firstChild, node );
@@ -818,16 +860,20 @@ export function unwrap( node ) {
  * @param {Node}  node    The node to replace
  * @param {string}   tagName The new tag name.
  *
- * @return {Element} The new node.
+ * @return {Element | undefined} The new node.
  */
 export function replaceTag( node, tagName ) {
-	const newNode = node.ownerDocument.createElement( tagName );
+	const newNode = node.ownerDocument?.createElement( tagName );
+
+	if ( ! newNode ) {
+		return;
+	}
 
 	while ( node.firstChild ) {
 		newNode.appendChild( node.firstChild );
 	}
 
-	node.parentNode.replaceChild( newNode, node );
+	node.parentNode?.replaceChild( newNode, node );
 
 	return newNode;
 }
@@ -839,7 +885,7 @@ export function replaceTag( node, tagName ) {
  * @param {Node} referenceNode The node to wrap.
  */
 export function wrap( newNode, referenceNode ) {
-	referenceNode.parentNode.insertBefore( newNode, referenceNode );
+	referenceNode.parentNode?.insertBefore( newNode, referenceNode );
 	newNode.appendChild( referenceNode );
 }
 
@@ -858,24 +904,38 @@ export function __unstableStripHTML( html ) {
 	return document.body.textContent || '';
 }
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @typedef Schema
+ * @property {string[]} [attributes] Attributes.
+ * @property {(string | RegExp)[]} [classes] Classnames or RegExp to test against.
+ * @property {'*' | { [tag: string]: Schema }} [children] Child schemas.
+ * @property {unknown[]} [require] ???
+ * @property {boolean} allowEmpty Whether to allow empty ???.
+ * @property {(node: Node) => boolean} [isMatch] Function to test whether a node is a match. If left undefined any node will be assumed to match.
+ */
+
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on a node
  * list.
  *
  * @param {NodeList} nodeList The nodeList to filter.
  * @param {Document} doc      The document of the nodeList.
- * @param {Object}   schema   An array of functions that can mutate with the provided node.
- * @param {Object}   inline   Whether to clean for inline mode.
+ * @param {{ [tag: string]: Schema }}   schema   An array of functions that can mutate with the provided node.
+ * @param {boolean}   inline   Whether to clean for inline mode.
  */
+/* eslint-enable jsdoc/valid-types */
 function cleanNodeList( nodeList, doc, schema, inline ) {
-	Array.from( nodeList ).forEach( ( node ) => {
+	Array.from( nodeList ).forEach( (
+		/** @type {Node & { nextElementSibling?: unknown }} */ node
+	) => {
 		const tag = node.nodeName.toLowerCase();
 
 		// It's a valid child, if the tag exists in the schema without an isMatch
 		// function, or with an isMatch function that matches the node.
 		if (
-			schema.hasOwnProperty( tag ) &&
-			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
+			tag in schema &&
+			( ! schema[ tag ].isMatch || schema[ tag ].isMatch?.( node ) )
 		) {
 			if ( isElement( node ) ) {
 				const {
@@ -908,11 +968,14 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					// In jsdom-jscore, 'node.classList' can be undefined.
 					// TODO: Explore patching this in jsdom-jscore.
 					if ( node.classList && node.classList.length ) {
-						const mattchers = classes.map( ( item ) => {
+						/** @type {((className: string) => boolean | void)[]} */
+						const matchers = classes.map( ( item ) => {
 							if ( typeof item === 'string' ) {
-								return ( className ) => className === item;
+								return ( /** @type {string} */ className ) =>
+									className === item;
 							} else if ( item instanceof RegExp ) {
-								return ( className ) => item.test( className );
+								return ( /** @type {string} */ className ) =>
+									item.test( className );
 							}
 
 							return noop;
@@ -920,7 +983,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 
 						Array.from( node.classList ).forEach( ( name ) => {
 							if (
-								! mattchers.some( ( isMatch ) =>
+								! matchers.some( ( isMatch ) =>
 									isMatch( name )
 								)
 							) {
@@ -959,7 +1022,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 							// contains children that are block content, unwrap
 							// the node because it is invalid.
 						} else if (
-							node.parentNode.nodeName === 'BODY' &&
+							node.parentNode?.nodeName === 'BODY' &&
 							isPhrasingContent( node )
 						) {
 							cleanNodeList(
@@ -1043,12 +1106,13 @@ export function isEmpty( element ) {
 	} );
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on HTML.
  *
  * @param {string} HTML   The HTML to clean up.
- * @param {Object} schema Schema for the HTML.
- * @param {Object} inline Whether to clean for inline mode.
+ * @param {{ [tag: string]: Schema }} schema Schema for the HTML.
+ * @param {boolean} inline Whether to clean for inline mode.
  *
  * @return {string} The cleaned up HTML.
  */
@@ -1061,3 +1125,4 @@ export function removeInvalidHTML( HTML, schema, inline ) {
 
 	return doc.body.innerHTML;
 }
+/* eslint-enable jsdoc/valid-types */

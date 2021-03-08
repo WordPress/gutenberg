@@ -176,7 +176,7 @@ export function getPhrasingContentSchema( context ) {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
- * @param {Element} node The node to test.
+ * @param {Node} node The node to test.
  *
  * @return {boolean} True if phrasing content, false if not.
  */

@@ -24,7 +24,7 @@ _Parameters_
 
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | undefined`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
@@ -130,7 +130,7 @@ _Parameters_
 
 _Returns_
 
--   `DOMRect`: The rectangle.
+-   `DOMRect | undefined`: The rectangle.
 
 <a name="getScrollContainer" href="#getScrollContainer">#</a> **getScrollContainer**
 
@@ -220,7 +220,7 @@ _Related_
 
 _Parameters_
 
--   _node_ `Element`: The node to test.
+-   _node_ `Node`: The node to test.
 
 _Returns_
 
@@ -307,8 +307,8 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 _Parameters_
 
 -   _HTML_ `string`: The HTML to clean up.
--   _schema_ `Object`: Schema for the HTML.
--   _inline_ `Object`: Whether to clean for inline mode.
+-   _schema_ `{ [tag: string]: Schema }`: Schema for the HTML.
+-   _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
 
@@ -338,7 +338,7 @@ _Parameters_
 
 _Returns_
 
--   `Element`: The new node.
+-   `Element | undefined`: The new node.
 
 <a name="unwrap" href="#unwrap">#</a> **unwrap**
 
