@@ -301,7 +301,7 @@ function ButtonEdit( props ) {
 						checked={ linkTarget === '_blank' }
 					/>
 					<TextControl
-						label={ __( 'Link rel' ) }
+						label={ __( 'Link Rel' ) }
 						value={ rel || '' }
 						onChange={ onSetLinkRel }
 					/>
