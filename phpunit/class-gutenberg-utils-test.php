@@ -168,7 +168,7 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 			array(
 				'in'  => '.selector { --foo: calc( var(--bar, calc(1em - 10px ) ); }',
 				'out' => '.selector{--foo:calc(var(--bar,calc(1em - 10px))}',
-			)
+			),
 		);
 
 		foreach ( $cases as $case ) {
