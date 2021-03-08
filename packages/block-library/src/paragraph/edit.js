@@ -132,6 +132,7 @@ function ParagraphBlock( {
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
 				}
+				data-empty={ content ? false : true }
 				placeholder={
 					placeholder ||
 					__( 'Start writing or type / to choose a block' )
