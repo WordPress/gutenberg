@@ -10,9 +10,21 @@ import { omit, without } from 'lodash';
  */
 
 /**
+ * @typedef {Record<string,SemanticElementDefinition>} ContentSchema
+ */
+
+/**
+ * @typedef SemanticElementDefinition
+ * @property {string[]} [attributes] Content attributes
+ * @property {ContentSchema} [children] Content attributes
+ */
+
+/**
  * All text-level semantic elements.
  *
  * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html
+ *
+ * @type {ContentSchema}
  */
 const textContentSchema = {
 	strong: {},
@@ -60,6 +72,8 @@ without( Object.keys( textContentSchema ), '#text', 'br' ).forEach( ( tag ) => {
  * Embedded content elements.
  *
  * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#embedded-content-0
+ *
+ * @type {ContentSchema}
  */
 const embeddedContentSchema = {
 	audio: {
@@ -127,7 +141,7 @@ const phrasingContentSchema = {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
- * @param {string} context Set to "paste" to exclude invisible elements and
+ * @param {string} [context] Set to "paste" to exclude invisible elements and
  *                         sensitive data.
  *
  * @return {Object} Schema.
@@ -171,6 +185,10 @@ export function isPhrasingContent( node ) {
 	return getPhrasingContentSchema().hasOwnProperty( tag ) || tag === 'span';
 }
 
+/**
+ * @param {Node} node
+ * @return {boolean} Node is text content
+ */
 export function isTextContent( node ) {
 	const tag = node.nodeName.toLowerCase();
 	return textContentSchema.hasOwnProperty( tag ) || tag === 'span';
