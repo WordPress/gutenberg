@@ -31,8 +31,8 @@
 	},
 	"providesContext": {
 		"openInNewTab": "openInNewTab",
-		"iconColorValue": "iconColorValue",
-		"iconBackgroundColorValue": "iconBackgroundColorValue"
+		"textColor": "textColor",
+		"backgroundColor": "backgroundColor"
 	},
 	"supports": {
 		"align": [

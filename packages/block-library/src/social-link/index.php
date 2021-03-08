@@ -296,12 +296,12 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 function block_core_social_link_get_color_styles( $context ) {
 	$styles = array();
 
-	if ( array_key_exists( 'iconColorValue', $context ) ) {
-		$styles[] = 'color: ' . $context['iconColorValue'] . '; ';
+	if ( array_key_exists( 'textColor', $context ) ) {
+		$styles[] = 'color: ' . $context['textColor'] . '; ';
 	}
 
-	if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
-		$styles[] = 'background-color: ' . $context['iconBackgroundColorValue'] . '; ';
+	if ( array_key_exists( 'backgroundColor', $context ) ) {
+		$styles[] = 'background-color: ' . $context['backgroundColor'] . '; ';
 	}
 
 	return implode( '', $styles );
