@@ -241,7 +241,7 @@ export function getAccessibleBlockLabel(
  * @param {Object} attributes The block's attributes.
  * @return {Object} The sanitized attributes.
  */
-export function sanitizeBlockAttributes( name, attributes ) {
+export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 

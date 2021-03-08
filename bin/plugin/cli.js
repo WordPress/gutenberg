@@ -60,6 +60,10 @@ program
 	.alias( 'changelog' )
 	.option( '-m, --milestone <milestone>', 'Milestone' )
 	.option( '-t, --token <token>', 'Github token' )
+	.option(
+		'-u, --unreleased',
+		"Only include PRs that haven't been included in a release yet"
+	)
 	.description( 'Generates a changelog from merged Pull Requests' )
 	.action( catchException( getReleaseChangelog ) );
 

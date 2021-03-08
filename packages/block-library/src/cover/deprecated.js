@@ -88,6 +88,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+			contentPosition: {
+				type: 'string',
+			},
 		},
 		supports: {
 			align: true,

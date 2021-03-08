@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useMenuLocations from './use-menu-locations';
+import useMenuLocations from '../../hooks/use-menu-locations';
 
 export default function ManageLocations() {
 	const menus = useSelect( ( select ) => select( 'core' ).getMenus(), [] );

@@ -325,7 +325,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -357,6 +357,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		filemtime( gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' )
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library', 'path', gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' );
 
 	gutenberg_override_style(
 		$styles,
@@ -367,17 +368,24 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
+	$wp_edit_blocks_dependencies = array(
+		'wp-components',
+		'wp-editor',
+		'wp-block-library',
+		'wp-reusable-blocks',
+	);
+
+	global $editor_styles;
+	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
+		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
+	}
+
 	gutenberg_override_style(
 		$styles,
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
-		array(
-			'wp-components',
-			'wp-editor',
-			'wp-block-library',
-			// Always include visual styles so the editor never appears broken.
-			'wp-block-library-theme',
-		),
+		$wp_edit_blocks_dependencies,
 		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
@@ -431,7 +439,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks', 'wp-reusable-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -453,6 +461,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		filemtime( gutenberg_dir_path() . 'build/customize-widgets/style.css' )
 	);
 	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-reusable-blocks',
+		gutenberg_url( 'build/reusable-blocks/style.css' ),
+		array( 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'build/reusable-blocks/style.css' )
+	);
+	$styles->add_data( 'wp-reusable-block', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 

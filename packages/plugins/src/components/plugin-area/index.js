@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { map } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -27,7 +28,7 @@ import { getPlugins } from '../../api';
  * function Layout() {
  * 	return el(
  * 		'div',
- * 		{},
+ * 		{ scope: 'my-page' },
  * 		'Content of the page',
  * 		PluginArea
  * 	);
@@ -42,7 +43,7 @@ import { getPlugins } from '../../api';
  * const Layout = () => (
  * 	<div>
  * 		Content of the page
- * 		<PluginArea />
+ * 		<PluginArea scope="my-page" />
  * 	</div>
  * );
  * ```
@@ -54,20 +55,26 @@ class PluginArea extends Component {
 		super( ...arguments );
 
 		this.setPlugins = this.setPlugins.bind( this );
+		this.memoizedContext = memoize( ( name, icon ) => {
+			return {
+				name,
+				icon,
+			};
+		} );
 		this.state = this.getCurrentPluginsState();
 	}
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map( getPlugins(), ( { icon, name, render } ) => {
-				return {
-					Plugin: render,
-					context: {
-						name,
-						icon,
-					},
-				};
-			} ),
+			plugins: map(
+				getPlugins( this.props.scope ),
+				( { icon, name, render } ) => {
+					return {
+						Plugin: render,
+						context: this.memoizedContext( name, icon ),
+					};
+				}
+			),
 		};
 	}
 

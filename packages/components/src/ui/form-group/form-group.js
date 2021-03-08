@@ -42,17 +42,14 @@ function FormGroup( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import {
- * 	__experimentalFormGroup as FormGroup,
- * 	__experimentalTextInput as TextInput
- * } from `@wordpress/components`
+ * import { FormGroup, TextInput } from `@wordpress/components/ui`;
  *
  * function Example() {
  * 	return (
  * 		<FormGroup label="First name">
  * 			<TextInput />
  * 		</FormGroup>
- * 	)
+ * 	);
  * }
  * ```
  */
