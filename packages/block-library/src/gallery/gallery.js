@@ -13,7 +13,7 @@ import {
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { useRef, useEffect } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,8 +38,9 @@ export const Gallery = ( props ) => {
 		imageCrop,
 	} = attributes;
 	const galleryRef = useRef();
+	const allowedBlocks = useMemo( () => [ 'core/image' ], [] );
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/image' ],
+		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 		__experimentalLayout: { type: 'default', alignments: [] },
