@@ -19,7 +19,6 @@ import {
 	BlockInspector,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
-
 import { useMemo, useState } from '@wordpress/element';
 
 /**

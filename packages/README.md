@@ -85,7 +85,7 @@ _Example:_
 ```diff
 +++ b/packages/scripts/package.json
 @@ -43,7 +43,6 @@
-                "check-node-version": "^3.1.1",
+                "check-node-version": "^4.1.0",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
 -               "jest": "^26.6.3",

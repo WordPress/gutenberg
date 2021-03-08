@@ -72,6 +72,7 @@ const {
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
+	__experimentalGetScopedBlockPatterns,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3402,6 +3403,53 @@ describe( 'selectors', () => {
 			).toHaveLength( 0 );
 		} );
 	} );
+	describe( '__experimentalGetScopedBlockPatterns', () => {
+		const state = {
+			blocks: {},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						title: 'pattern a',
+						scope: { block: [ 'test/block-a' ] },
+					},
+					{
+						title: 'pattern b',
+						scope: { block: [ 'test/block-b' ] },
+					},
+				],
+			},
+		};
+		it( 'should return empty array if no scope and block name is provided', () => {
+			expect( __experimentalGetScopedBlockPatterns( state ) ).toEqual(
+				[]
+			);
+			expect(
+				__experimentalGetScopedBlockPatterns( state, 'block' )
+			).toEqual( [] );
+		} );
+		it( 'shoud return empty array if no match is found', () => {
+			const patterns = __experimentalGetScopedBlockPatterns(
+				state,
+				'block',
+				'test/block-not-exists'
+			);
+			expect( patterns ).toEqual( [] );
+		} );
+		it( 'should return proper results when there are matched block patterns', () => {
+			const patterns = __experimentalGetScopedBlockPatterns(
+				state,
+				'block',
+				'test/block-a'
+			);
+			expect( patterns ).toHaveLength( 1 );
+			expect( patterns[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					title: 'pattern a',
+					scope: { block: [ 'test/block-a' ] },
+				} )
+			);
+		} );
+	} );
 } );
 
 describe( '__experimentalGetParsedReusableBlock', () => {
@@ -3421,5 +3469,69 @@ describe( '__experimentalGetParsedReusableBlock', () => {
 		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
 			[]
 		);
+	} );
+} );
+
+describe( 'getInserterItems with core blocks prioritization', () => {
+	// This test is in a seperate `describe` because all other tests register
+	// some test `core` blocks and interfere with the purpose of the specific test.
+	// This tests the functionality to ensure core blocks are prioritized in the
+	// returned results, because third party blocks can be registered earlier than
+	// the core blocks (usually by using the `init` action), thus affecting the display order.
+	beforeEach( () => {
+		registerBlockType( 'plugin/block-a', {
+			save() {},
+			category: 'text',
+			title: 'Plugin Block A',
+			icon: 'test',
+		} );
+		registerBlockType( 'another-plugin/block-b', {
+			save() {},
+			category: 'text',
+			title: 'Another Plugin Block B',
+			icon: 'test',
+		} );
+		registerBlockType( 'core/block', {
+			save() {},
+			category: 'text',
+			title: 'Core Block A',
+		} );
+		registerBlockType( 'core/test-block-a', {
+			save: ( props ) => props.attributes.text,
+			category: 'design',
+			title: 'Core Block B',
+			icon: 'test',
+			keywords: [ 'testing' ],
+		} );
+	} );
+	afterEach( () => {
+		[
+			'plugin/block-a',
+			'another-plugin/block-b',
+			'core/block',
+			'core/test-block-a',
+		].forEach( unregisterBlockType );
+	} );
+	it( 'should prioritize core blocks by sorting them at the top of the returned list', () => {
+		const state = {
+			blocks: {
+				byClientId: {},
+				attributes: {},
+				order: {},
+				parents: {},
+				cache: {},
+			},
+			settings: {},
+			preferences: {},
+			blockListSettings: {},
+		};
+		const items = getInserterItems( state );
+		const expectedResult = [
+			'core/block',
+			'core/test-block-a',
+			'plugin/block-a',
+			'another-plugin/block-b',
+		];
+		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
 	} );
 } );

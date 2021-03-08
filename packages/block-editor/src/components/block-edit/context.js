@@ -1,29 +1,42 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
-const Context = createContext( {
-	name: '',
-	isSelected: false,
-	focusedElement: null,
-	setFocusedElement: noop,
-	clientId: null,
-} );
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+const Context = createContext();
 const { Provider } = Context;
 
 export { Provider as BlockEditContextProvider };
 
 /**
- * A hook that returns the block edit context.
+ * A hook that returns the block client ID, name and selected status.
  *
- * @return {Object} Block edit context
+ * @return {Object} Block client ID, name and selected status.
  */
 export function useBlockEditContext() {
-	return useContext( Context );
+	const clientId = useContext( Context );
+	return useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return {};
+			}
+
+			const { getBlockName, isBlockSelected } = select(
+				blockEditorStore
+			);
+
+			return {
+				clientId,
+				name: getBlockName( clientId ),
+				isSelected: isBlockSelected( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 }

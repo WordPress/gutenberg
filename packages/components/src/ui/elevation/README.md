@@ -6,18 +6,13 @@
 
 The shadow effect is generated using the `value` prop.
 
-```jsx live
-import {
-	__experimentalElevation as Elevation,
-	__experimetnalSurface as Surface,
-	__experimetnalText as Text,
-	__experimetnalView as View,
-} from '@wp-g2/components';
+```jsx
+import { Elevation, Surface, Text, View } from '@wordpress/components/ui';
 
 function Example() {
 	return (
 		<Surface>
-			<Text>Elevation</Text>
+			<Text>Code is Poetry</Text>
 			<Elevation value={ 5 } />
 		</Surface>
 	);

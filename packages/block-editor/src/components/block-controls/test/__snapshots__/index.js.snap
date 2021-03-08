@@ -1,17 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BlockControls should render a dynamic toolbar of controls 1`] = `
-<ContextProvider
-  value={
-    Object {
-      "clientId": undefined,
-      "isSelected": true,
-      "name": undefined,
-      "onCaretVerticalPositionChange": undefined,
-      "onFocus": undefined,
-    }
-  }
->
+<ContextProvider>
   <WithFilters(Edit)
     isSelected={true}
   >

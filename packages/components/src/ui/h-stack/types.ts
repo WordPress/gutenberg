@@ -1,5 +1,13 @@
-import { CSSProperties } from 'react';
-import { FlexProps } from '../flex/types';
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { CSSProperties } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import type { FlexProps } from '../flex/types';
 
 export type HStackAlignment =
 	| 'bottom'
@@ -19,7 +27,7 @@ export type AlignmentProps = {
 	align?: CSSProperties[ 'alignItems' ];
 };
 
-export type Alignments = Record<HStackAlignment, AlignmentProps>;
+export type Alignments = Record< HStackAlignment, AlignmentProps >;
 
 export type Props = Omit< FlexProps, 'align' | 'gap' > & {
 	/**
@@ -38,28 +46,6 @@ export type Props = Omit< FlexProps, 'align' | 'gap' > & {
 	 * * `stretch`: Stretches content to the edges of the container.
 	 *
 	 * @default 'edge'
-	 *
-	 * @example
-	 *```jsx
-	 * import { HStack, Text, View } from `@wp-g2/components`
-	 * import { ui } from `@wp-g2/styles`
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <HStack alignment="center">
-	 *       <View css={[ui.background.blue]}>
-	 *         <Text>Ana</Text>
-	 *       </View>
-	 *       <View css={[ui.background.blue]}>
-	 *         <Text>Elsa</Text>
-	 *       </View>
-	 *       <View css={[ui.background.blue]}>
-	 *         <Text>Olaf</Text>
-	 *       </View>
-	 *     </HStack>
-	 *   );
-	 * }
-	 *```
 	 */
 	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
 	/**
@@ -67,57 +53,6 @@ export type Props = Omit< FlexProps, 'align' | 'gap' > & {
 	 * The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
 	 *
 	 * @default 2
-	 *
-	 * @example
-	 * ```jsx
-	 * import { HStack, Text, View } from `@wp-g2/components`
-	 * import { ui } from `@wp-g2/styles`
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <HStack alignment="center" spacing={8}>
-	 *       <View css={[ui.background.blue]}>
-	 *         <Text>Ana</Text>
-	 *       </View>
-	 *       <View css={[ui.background.blue]}>
-	 *         <Text>Elsa</Text>
-	 *       </View>
-	 *       <View css={[ui.background.blue]}>
-	 *         <Text>Olaf</Text>
-	 *       </View>
-	 *     </HStack>
-	 *   );
-	 * }
-	 *```
 	 */
 	spacing?: CSSProperties[ 'width' ];
 };
-
-/**
- * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
- *
- * @remarks
- * `HStack` can render anything inside.
- *
- * @example
- * ```jsx
- * import { HStack, Text, View } from `@wp-g2/components`
- * import { ui } from `@wp-g2/styles`
- *
- * function Example() {
- *   return (
- *     <HStack>
- *       <View css={[ui.background.blue]}>
- *         <Text>Ana</Text>
- *       </View>
- *       <View css={[ui.background.blue]}>
- *         <Text>Elsa</Text>
- *       </View>
- *       <View css={[ui.background.blue]}>
- *         <Text>Olaf</Text>
- *       </View>
- *     </HStack>
- *   );
- * }
- * ```
- */
