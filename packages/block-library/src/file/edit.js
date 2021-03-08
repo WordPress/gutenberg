@@ -24,7 +24,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { useCopyOnClick } from '@wordpress/compose';
+import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -34,9 +34,23 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import FileBlockInspector from './inspector';
 
+const TIMEOUT = 4000;
+
 function ClipboardToolbarButton( { text, disabled } ) {
-	const ref = useRef();
-	const hasCopied = useCopyOnClick( ref, text );
+	const [ hasCopied, setHasCopied ] = useState( false );
+	const timeoutId = useRef();
+
+	function onSuccess() {
+		setHasCopied( true );
+		clearTimeout( timeoutId.current );
+		timeoutId.current = setTimeout( () => setHasCopied( false, TIMEOUT ) );
+	}
+
+	const ref = useCopyToClipboard( text, onSuccess );
+
+	useEffect( () => {
+		clearTimeout( timeoutId.current );
+	}, [] );
 
 	return (
 		<ToolbarButton
