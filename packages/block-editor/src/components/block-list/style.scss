@@ -778,6 +778,9 @@ div.block-editor-block-list__layout .block-editor-block-list__block.is-outline-m
 
 	&.is-selected:focus::after,
 	&.is-selected.is-editing::after {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow:
+			inset 0 0 0 $border-width $white,
+			inset 0 0 0 ($border-width * 2) $gray-900,
+			0 0 0 calc(var(--wp-admin-border-width-focus) + #{$border-width}) var(--wp-admin-theme-color);
 	}
 }
