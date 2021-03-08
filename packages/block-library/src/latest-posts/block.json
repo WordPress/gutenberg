@@ -83,7 +83,13 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false
+		"html": false,
+		"fontSize": true,
+		"lineHeight": true,
+		"__experimentalFontFamily": true,
+		"__experimentalFontWeight": true,
+		"__experimentalTextTransform": true
+
 	},
 	"editorStyle": "wp-block-latest-posts-editor",
 	"style": "wp-block-latest-posts"
