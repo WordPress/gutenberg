@@ -31,13 +31,18 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId ) => {
-	const { patternCategories, patterns } = useSelect(
+	const {
+		patternCategories,
+		patterns,
+		activeTemplatePartId,
+		innerBlocksToReplace,
+	} = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } = select(
 				blockEditorStore
 			);
 
-			const activeTemplatePartId = select(
+			const _activeTemplatePartId = select(
 				blockEditorStore
 			).__experimentalGetActiveBlockIdByBlockNames( [
 				'core/template-part',
@@ -48,9 +53,9 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 				patternCategories: [],
 			};
 
-			if ( activeTemplatePartId ) {
+			if ( _activeTemplatePartId ) {
 				const block = select( blockEditorStore ).getBlock(
-					activeTemplatePartId
+					_activeTemplatePartId
 				);
 				const variations = select( blocksStore ).getBlockVariations(
 					'core/template-part'
@@ -102,15 +107,28 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 					...contextualPatterns.patternCategories,
 					...getSettings().__experimentalBlockPatternCategories,
 				],
+				activeTemplatePartId: _activeTemplatePartId,
+				innerBlocksToReplace: _activeTemplatePartId
+					? select( blockEditorStore )
+							.getBlocks( _activeTemplatePartId )
+							.map( ( item ) => item.clientId )
+					: [],
 			};
 		},
 		[ rootClientId ]
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
+		const shouldReplaceInnerBlocks =
+			!! activeTemplatePartId &&
+			pattern.scope?.block?.includes( 'core/template-part' );
+
 		onInsert(
 			map( blocks, ( block ) => cloneBlock( block ) ),
-			pattern.name
+			pattern.name,
+			false,
+			shouldReplaceInnerBlocks,
+			innerBlocksToReplace
 		);
 		createSuccessNotice(
 			sprintf(
@@ -124,7 +142,13 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		);
 	}, [] );
 
-	return [ patterns, patternCategories, onClickPattern ];
+	return [
+		patterns,
+		patternCategories,
+		onClickPattern,
+		activeTemplatePartId,
+		innerBlocksToReplace,
+	];
 };
 
 export default usePatternsState;

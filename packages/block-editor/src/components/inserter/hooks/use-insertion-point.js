@@ -106,10 +106,24 @@ function useInsertionPoint( {
 	} = useDispatch( blockEditorStore );
 
 	const onInsertBlocks = useCallback(
-		( blocks, meta, shouldForceFocusBlock = false ) => {
+		(
+			blocks,
+			meta,
+			shouldForceFocusBlock = false,
+			__experimentalReplaceInnerBlocks = false,
+			innerBlocksToReplace = []
+		) => {
 			const selectedBlock = getSelectedBlock();
 
-			if (
+			if ( __experimentalReplaceInnerBlocks ) {
+				replaceBlocks(
+					innerBlocksToReplace,
+					blocks,
+					null,
+					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
+					meta
+				);
+			} else if (
 				! isAppender &&
 				selectedBlock &&
 				isUnmodifiedDefaultBlock( selectedBlock )

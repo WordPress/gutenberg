@@ -75,8 +75,20 @@ function InserterMenu( {
 	);
 
 	const onInsertPattern = useCallback(
-		( blocks, patternName ) => {
-			onInsertBlocks( blocks, { patternName } );
+		(
+			blocks,
+			patternName,
+			shouldForceFocusBlock,
+			shouldReplaceInnerBlocks,
+			innerBlocksToReplace
+		) => {
+			onInsertBlocks(
+				blocks,
+				{ patternName },
+				shouldForceFocusBlock,
+				shouldReplaceInnerBlocks,
+				innerBlocksToReplace
+			);
 			onSelect();
 		},
 		[ onInsertBlocks, onSelect ]
