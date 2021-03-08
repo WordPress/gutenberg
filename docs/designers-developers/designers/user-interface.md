@@ -41,9 +41,11 @@ Please note that selection and focus can be different. An image block can be sel
 ![Settings Sidebar](https://cldup.com/iAqrn6Gc8o-3000x3000.png)
 
 The sidebar has two tabs, Document and Block:
+The sidebar has two tabs, Post/Page and Block:
 
 - The **Document Tab** shows metadata and settings for the post or page being edited.
 - The **Block Tab** shows metadata and settings for the currently selected block.
+- The **Post/Page Tab** shows metadata and settings for the post or page being edited.
 
 Each tab has sets of editable fields (**Sidebar Sections**) that users can toggle open or closed. 
 
