@@ -344,7 +344,11 @@ export function* revertTemplate( template ) {
 			'postType',
 			'wp_template',
 			fileTemplate.id,
-			{ blocks: parse( fileTemplate?.content?.raw ), is_custom: false }
+			{
+				blocks: parse( fileTemplate?.content?.raw ),
+				is_custom: false,
+				wp_id: null,
+			}
 		);
 
 		yield controls.dispatch(
