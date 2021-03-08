@@ -4,11 +4,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 cd $DIR
 
-# 1. Check if the script is run from a gutenberg-mobile submodule
+# 1. Check if the script is run from the gutenberg-mobile submodule
 PARENT_GIT_REPO_PATH=$(git rev-parse --show-superproject-working-tree)
 if [[ -z $PARENT_GIT_REPO_PATH ||
     $(git -C $PARENT_GIT_REPO_PATH config --get remote.origin.url) != *"/gutenberg-mobile.git" ]]; then
-    echo "This script needs to be run from a 'gutenberg-mobile' submodule."
+    echo "This script needs to be run from the 'gutenberg-mobile' submodule."
     exit 1
 fi
 
