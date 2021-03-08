@@ -62,16 +62,18 @@
 	}
 
 	&__page-control {
-		margin: $grid-unit-10 0 $grid-unit-10 0;
+		margin: 0;
 		text-align: center;
 
 		li {
 			display: inline-block;
+			margin: 0;
 		}
 
 		.components-button {
 			height: 30px;
 			min-width: 20px;
+			margin: -6px 0;
 		}
 	}
 
