@@ -62,18 +62,19 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals(
 			array(
-				'id'          => 'tt1-blocks//index',
-				'theme'       => 'tt1-blocks',
-				'slug'        => 'index',
-				'title'       => array(
+				'id'                   => 'tt1-blocks//index',
+				'theme'                => 'tt1-blocks',
+				'slug'                 => 'index',
+				'title'                => array(
 					'raw'      => 'Index',
 					'rendered' => 'Index',
 				),
-				'description' => 'The default template used when no other template is available. This is a required template in WordPress.',
-				'status'      => 'publish',
-				'is_custom'   => false,
-				'type'        => 'wp_template',
-				'wp_id'       => null,
+				'description'          => 'The default template used when no other template is available. This is a required template in WordPress.',
+				'status'               => 'publish',
+				'is_custom'            => false,
+				'type'                 => 'wp_template',
+				'wp_id'                => null,
+				'original_file_exists' => true,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//index' )
 		);
@@ -85,20 +86,21 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals(
 			array(
-				'id'          => 'tt1-blocks//header',
-				'theme'       => 'tt1-blocks',
-				'slug'        => 'header',
-				'title'       => array(
+				'id'                   => 'tt1-blocks//header',
+				'theme'                => 'tt1-blocks',
+				'slug'                 => 'header',
+				'title'                => array(
 					'raw'      => 'header',
 					'rendered' => 'header',
 				),
-				'description' => '',
-				'status'      => 'publish',
-				'is_custom'   => false,
-				'type'        => 'wp_template_part',
-				'wp_id'       => null,
+				'description'          => '',
+				'status'               => 'publish',
+				'is_custom'            => false,
+				'type'                 => 'wp_template_part',
+				'wp_id'                => null,
 				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-				'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'area'                 => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'original_file_exists' => true,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
 		);
@@ -114,18 +116,19 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals(
 			array(
-				'id'          => 'tt1-blocks//index',
-				'theme'       => 'tt1-blocks',
-				'slug'        => 'index',
-				'title'       => array(
+				'id'                   => 'tt1-blocks//index',
+				'theme'                => 'tt1-blocks',
+				'slug'                 => 'index',
+				'title'                => array(
 					'raw'      => 'Index',
 					'rendered' => 'Index',
 				),
-				'description' => 'The default template used when no other template is available. This is a required template in WordPress.',
-				'status'      => 'publish',
-				'is_custom'   => false,
-				'type'        => 'wp_template',
-				'wp_id'       => null,
+				'description'          => 'The default template used when no other template is available. This is a required template in WordPress.',
+				'status'               => 'publish',
+				'is_custom'            => false,
+				'type'                 => 'wp_template',
+				'wp_id'                => null,
+				'original_file_exists' => true,
 			),
 			$data
 		);
@@ -152,6 +155,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'wp_id'       => null,
 				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
 				'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'original_file_exists' => true
 			),
 			$data
 		);
@@ -175,20 +179,21 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals(
 			array(
-				'id'          => 'tt1-blocks//my_custom_template',
-				'theme'       => 'tt1-blocks',
-				'slug'        => 'my_custom_template',
-				'title'       => array(
+				'id'                   => 'tt1-blocks//my_custom_template',
+				'theme'                => 'tt1-blocks',
+				'slug'                 => 'my_custom_template',
+				'title'                => array(
 					'raw'      => 'My Template',
 					'rendered' => 'My Template',
 				),
-				'description' => 'Just a description',
-				'status'      => 'publish',
-				'is_custom'   => true,
-				'type'        => 'wp_template',
-				'content'     => array(
+				'description'          => 'Just a description',
+				'status'               => 'publish',
+				'is_custom'            => true,
+				'type'                 => 'wp_template',
+				'content'              => array(
 					'raw' => 'Content',
 				),
+				'original_file_exists' => false,
 			),
 			$data
 		);
@@ -226,6 +231,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 					'raw' => 'Content',
 				),
 				'area'        => 'header',
+				'original_file_exists' => false
 			),
 			$data
 		);
