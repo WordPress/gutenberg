@@ -101,7 +101,9 @@ function EntitiesSavedStates( { isOpen, close } ) {
 
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				<p>{ __( 'The following changes have been made:' ) }</p>
+				<p>
+					{ __( 'Review and select the following changes to save:' ) }
+				</p>
 			</div>
 
 			{ partitionedSavables.map( ( list ) => {
