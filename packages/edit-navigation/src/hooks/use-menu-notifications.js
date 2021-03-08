@@ -4,17 +4,21 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+/**
+ * Internal dependencies
+ */
+import { MENU_POST_TYPE, MENU_KIND } from '../utils/constants';
 
 export default function useMenuNotifications( menuId ) {
 	const { lastSaveError, lastDeleteError } = useSelect(
 		( select ) => ( {
 			lastSaveError: select( 'core' ).getLastEntitySaveError(
-				'root',
-				'menu'
+				MENU_KIND,
+				MENU_POST_TYPE
 			),
 			lastDeleteError: select( 'core' ).getLastEntityDeleteError(
-				'root',
-				'menu',
+				MENU_KIND,
+				MENU_POST_TYPE,
 				menuId
 			),
 		} ),
