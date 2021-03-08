@@ -21,6 +21,7 @@ const Example = () => {
 			<MenuItem
 				isSelected={ isSelected }
 				onClick={ () => setIsSelected( ! isSelected ) }
+				onKeyDown={ () => setIsSelected( ! isSelected ) }
 			>
 				Code is Poetry
 			</MenuItem>
