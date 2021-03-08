@@ -9,6 +9,9 @@
  * @package gutenberg-test-plugin-activate-rtl
  */
 
+/**
+ * Set the locale's and styles' text direction to RTL.
+ */
 function gutenberg_test_plugin_activate_rtl_set_direction() {
 	global $wp_locale, $wp_styles;
 
