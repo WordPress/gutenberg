@@ -8,7 +8,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,22 +26,16 @@ export default function BlockNavigationLeaf( {
 	path,
 	...props
 } ) {
-	const wrapper = useRef( null );
-	const adjustScrolling = false;
-	const enableAnimation = true;
-	const animateOnChange = path.join( '_' );
-	const style = useMovingAnimation(
-		wrapper,
+	const ref = useMovingAnimation( {
 		isSelected,
-		adjustScrolling,
-		enableAnimation,
-		animateOnChange
-	);
+		adjustScrolling: false,
+		enableAnimation: true,
+		triggerAnimationOnChange: path.join( '_' ),
+	} );
 
 	return (
 		<AnimatedTreeGridRow
-			ref={ wrapper }
-			style={ style }
+			ref={ ref }
 			className={ classnames(
 				'block-editor-block-navigation-leaf',
 				className

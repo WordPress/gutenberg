@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg Edit Site Page.
+ * Bootstrapping the Gutenberg Edit Site Page.
  *
  * @package gutenberg
  */

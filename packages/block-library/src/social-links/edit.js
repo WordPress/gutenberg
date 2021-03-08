@@ -14,6 +14,7 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
+	JustifyToolbar,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
@@ -52,6 +53,7 @@ export function SocialLinksEdit( props ) {
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
+		itemsJustification,
 		openInNewTab,
 		size,
 	} = attributes;
@@ -86,15 +88,10 @@ export function SocialLinksEdit( props ) {
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
+		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
-	const style = {
-		'--wp--social-links--icon-color': iconColor.color || iconColorValue,
-		'--wp--social-links--icon-background-color':
-			iconBackgroundColor.color || iconBackgroundColorValue,
-	};
-
-	const blockProps = useBlockProps( { className, style } );
+	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
@@ -111,6 +108,22 @@ export function SocialLinksEdit( props ) {
 	return (
 		<Fragment>
 			<BlockControls>
+				<JustifyToolbar
+					allowedControls={ [
+						'left',
+						'center',
+						'right',
+						'space-between',
+					] }
+					value={ itemsJustification }
+					onChange={ ( value ) =>
+						setAttributes( { itemsJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
 				<ToolbarGroup>
 					<ToolbarItem>
 						{ ( toggleProps ) => (
@@ -176,7 +189,6 @@ export function SocialLinksEdit( props ) {
 							value: iconColor.color || iconColorValue,
 							onChange: ( colorValue ) => {
 								setIconColor( colorValue );
-								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( { iconColorValue: colorValue } );
 							},
 							label: __( 'Icon color' ),
@@ -189,7 +201,6 @@ export function SocialLinksEdit( props ) {
 								iconBackgroundColorValue,
 							onChange: ( colorValue ) => {
 								setIconBackgroundColor( colorValue );
-								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( {
 									iconBackgroundColorValue: colorValue,
 								} );

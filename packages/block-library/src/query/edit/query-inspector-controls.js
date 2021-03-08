@@ -25,7 +25,6 @@ import {
 	useEffect,
 	useState,
 	useCallback,
-	useMemo,
 	createInterpolateElement,
 } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -33,7 +32,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { getTermsInfo } from '../utils';
+import { getTermsInfo, usePostTypes } from '../utils';
 import { MAX_FETCHED_TERMS } from '../constants';
 
 const stickyOptions = [
@@ -73,43 +72,24 @@ export default function QueryInspectorControls( {
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
-	const { authorList, categories, tags, postTypes } = useSelect(
-		( select ) => {
-			const { getEntityRecords, getPostTypes } = select( coreStore );
-			const termsQuery = { per_page: MAX_FETCHED_TERMS };
-			const _categories = getEntityRecords(
-				'taxonomy',
-				'category',
-				termsQuery
-			);
-			const _tags = getEntityRecords(
-				'taxonomy',
-				'post_tag',
-				termsQuery
-			);
-			const excludedPostTypes = [ 'attachment' ];
-			const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
-				( { viewable, slug } ) =>
-					viewable && ! excludedPostTypes.includes( slug )
-			);
-			return {
-				categories: getTermsInfo( _categories ),
-				tags: getTermsInfo( _tags ),
-				authorList: getEntityRecords( 'root', 'user', {
-					per_page: -1,
-				} ),
-				postTypes: filteredPostTypes,
-			};
-		},
-		[]
-	);
-	const postTypesTaxonomiesMap = useMemo( () => {
-		if ( ! postTypes?.length ) return;
-		return postTypes.reduce( ( accumulator, type ) => {
-			accumulator[ type.slug ] = type.taxonomies;
-			return accumulator;
-		}, {} );
-	}, [ postTypes ] );
+	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const { authorList, categories, tags } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( coreStore );
+		const termsQuery = { per_page: MAX_FETCHED_TERMS };
+		const _categories = getEntityRecords(
+			'taxonomy',
+			'category',
+			termsQuery
+		);
+		const _tags = getEntityRecords( 'taxonomy', 'post_tag', termsQuery );
+		return {
+			categories: getTermsInfo( _categories ),
+			tags: getTermsInfo( _tags ),
+			authorList: getEntityRecords( 'root', 'user', {
+				per_page: -1,
+			} ),
+		};
+	}, [] );
 	useEffect( () => {
 		if ( ! postTypesTaxonomiesMap ) return;
 		const postTypeTaxonomies = postTypesTaxonomiesMap[ postType ];
@@ -119,14 +99,6 @@ export default function QueryInspectorControls( {
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
 	}, [ postType ] );
-	const postTypesSelectOptions = useMemo(
-		() =>
-			( postTypes || [] ).map( ( { labels, slug } ) => ( {
-				label: labels.singular_name,
-				value: slug,
-			} ) ),
-		[ postTypes ]
-	);
 	const onPostTypeChange = ( newValue ) => {
 		const updateQuery = { postType: newValue };
 		if ( ! postTypesTaxonomiesMap[ newValue ].includes( 'category' ) ) {
@@ -166,6 +138,36 @@ export default function QueryInspectorControls( {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+
+	// Returns only the existing term ids (categories/tags) in proper
+	// format to be used in `FormTokenField`. This prevents the component
+	// from crashing in the editor, when non existing term ids were provided.
+	const getExistingTermsFormTokenValue = ( taxonomy ) => {
+		const termsMapper = {
+			category: {
+				queryProp: 'categoryIds',
+				terms: categories,
+			},
+			post_tag: {
+				queryProp: 'tagIds',
+				terms: tags,
+			},
+		};
+		const requestedTerm = termsMapper[ taxonomy ];
+		return ( query[ requestedTerm.queryProp ] || [] ).reduce(
+			( accumulator, termId ) => {
+				const term = requestedTerm.terms.mapById[ termId ];
+				if ( term ) {
+					accumulator.push( {
+						id: termId,
+						value: term.name,
+					} );
+				}
+				return accumulator;
+			},
+			[]
+		);
+	};
 
 	return (
 		<InspectorControls>
@@ -232,12 +234,8 @@ export default function QueryInspectorControls( {
 					{ showCategories && categories?.terms?.length > 0 && (
 						<FormTokenField
 							label={ __( 'Categories' ) }
-							value={ ( query.categoryIds || [] ).map(
-								( categoryId ) => ( {
-									id: categoryId,
-									value:
-										categories.mapById[ categoryId ].name,
-								} )
+							value={ getExistingTermsFormTokenValue(
+								'category'
 							) }
 							suggestions={ categories.names }
 							onChange={ onCategoriesChange }
@@ -246,10 +244,9 @@ export default function QueryInspectorControls( {
 					{ showTags && tags?.terms?.length > 0 && (
 						<FormTokenField
 							label={ __( 'Tags' ) }
-							value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
-								id: tagId,
-								value: tags.mapById[ tagId ].name,
-							} ) ) }
+							value={ getExistingTermsFormTokenValue(
+								'post_tag'
+							) }
 							suggestions={ tags.names }
 							onChange={ onTagsChange }
 						/>

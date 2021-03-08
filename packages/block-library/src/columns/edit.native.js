@@ -476,7 +476,7 @@ const ColumnsEdit = ( props ) => {
 				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
 		},
-		[ clientId ]
+		[ clientId, isSelected ]
 	);
 
 	const memoizedInnerWidths = useMemo( () => {

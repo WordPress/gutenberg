@@ -12,7 +12,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 	} );
 
 	const payload = {
-		ref: 'refs/heads/master',
+		ref: 'refs/heads/trunk',
 		commits: [
 			{
 				id: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
@@ -32,7 +32,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		},
 	};
 
-	it( 'does nothing if not a commit to master', async () => {
+	it( 'does nothing if not a commit to trunk', async () => {
 		const payloadForBranchPush = {
 			...payload,
 			ref: 'refs/heads/update/chicken-branch',
@@ -50,11 +50,11 @@ describe( 'firstTimeContributorAccountLink', () => {
 	} );
 
 	it( 'does nothing if commit pull request undeterminable', async () => {
-		const payloadDirectToMaster = {
+		const payloadDirectToTrunk = {
 			...payload,
 			commits: [
 				{
-					message: 'Add a feature direct to master',
+					message: 'Add a feature direct to trunk',
 					author: {
 						name: 'Ghost',
 						email: 'ghost@example.invalid',
@@ -70,7 +70,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 			},
 		};
 
-		await firstTimeContributorAccountLink( payloadDirectToMaster, octokit );
+		await firstTimeContributorAccountLink( payloadDirectToTrunk, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );

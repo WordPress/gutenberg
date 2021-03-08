@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import {
 	serialize,
 	pasteHandler,
@@ -14,6 +14,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -77,7 +78,7 @@ export function useNotifyCopy() {
 	}, [] );
 }
 
-export function useClipboardHandler( ref ) {
+export function useClipboardHandler() {
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
@@ -89,7 +90,7 @@ export function useClipboardHandler( ref ) {
 	);
 	const notifyCopy = useNotifyCopy();
 
-	useEffect( () => {
+	return useRefEffect( ( node ) => {
 		function handler( event ) {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 
@@ -114,9 +115,10 @@ export function useClipboardHandler( ref ) {
 				}
 			}
 
-			if ( ! ref.current.contains( event.target ) ) {
+			if ( ! node.contains( event.target ) ) {
 				return;
 			}
+
 			event.preventDefault();
 
 			if ( event.type === 'copy' || event.type === 'cut' ) {
@@ -154,22 +156,20 @@ export function useClipboardHandler( ref ) {
 			}
 		}
 
-		ref.current.addEventListener( 'copy', handler );
-		ref.current.addEventListener( 'cut', handler );
-		ref.current.addEventListener( 'paste', handler );
+		node.addEventListener( 'copy', handler );
+		node.addEventListener( 'cut', handler );
+		node.addEventListener( 'paste', handler );
 
 		return () => {
-			ref.current.removeEventListener( 'copy', handler );
-			ref.current.removeEventListener( 'cut', handler );
-			ref.current.removeEventListener( 'paste', handler );
+			node.removeEventListener( 'copy', handler );
+			node.removeEventListener( 'cut', handler );
+			node.removeEventListener( 'paste', handler );
 		};
 	}, [] );
 }
 
 function CopyHandler( { children } ) {
-	const ref = useRef();
-	useClipboardHandler( ref );
-	return <div ref={ ref }>{ children }</div>;
+	return <div ref={ useClipboardHandler() }>{ children }</div>;
 }
 
 export default CopyHandler;

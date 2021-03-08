@@ -8,6 +8,7 @@ import { castArray, findKey, first, isObject, last, some } from 'lodash';
  */
 import {
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -154,15 +155,21 @@ export function receiveBlocks( blocks ) {
  * attributes with the specified client IDs have been updated.
  *
  * @param {string|string[]} clientIds  Block client IDs.
- * @param {Object}          attributes Block attributes to be merged.
- *
+ * @param {Object}          attributes Block attributes to be merged. Should be keyed by clientIds if
+ * uniqueByBlock is true.
+ * @param {boolean}          uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientIds, attributes ) {
+export function updateBlockAttributes(
+	clientIds,
+	attributes,
+	uniqueByBlock = false
+) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
+		uniqueByBlock,
 	};
 }
 
@@ -1246,7 +1253,9 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 		last( castArray( clientIds ) ),
 		rootClientId
 	);
-	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+	const clonedBlocks = blocks.map( ( block ) =>
+		__experimentalCloneSanitizedBlock( block )
+	);
 	yield insertBlocks(
 		clonedBlocks,
 		lastSelectedIndex + 1,

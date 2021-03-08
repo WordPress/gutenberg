@@ -7,7 +7,7 @@
  * WordPress dependencies
  */
 import RCTAztecView from '@wordpress/react-native-aztec';
-import { View, Platform } from 'react-native';
+import { View, Platform, InteractionManager } from 'react-native';
 import {
 	showUserSuggestions,
 	showXpostSuggestions,
@@ -18,7 +18,10 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { BlockFormatControls } from '@wordpress/block-editor';
+import {
+	BlockFormatControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -556,6 +559,7 @@ export class RichText extends Component {
 
 		// Check if value is up to date with latest state of native AztecView
 		if (
+			this.isIOS &&
 			event.nativeEvent.text &&
 			event.nativeEvent.text !== this.props.value
 		) {
@@ -615,7 +619,9 @@ export class RichText extends Component {
 
 		// update text before updating selection
 		// Make sure there are changes made to the content before upgrading it upward
-		this.onTextUpdate( event );
+		if ( this.isIOS ) {
+			this.onTextUpdate( event );
+		}
 
 		// Aztec can send us selection change events after it has lost focus.
 		// For instance the autocorrect feature will complete a partially written
@@ -756,8 +762,16 @@ export class RichText extends Component {
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
+			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
+			// if its internal value hasn't change. When created, default value is 0, 0
+			this.onSelectionChange(
+				this.props.selectionStart || 0,
+				this.props.selectionEnd || 0
+			);
 		} else if ( ! isSelected && prevIsSelected ) {
-			this._editor.blur();
+			InteractionManager.runAfterInteractions( () => {
+				this._editor?.blur();
+			} );
 		}
 	}
 
@@ -992,7 +1006,7 @@ const withFormatTypes = ( WrappedComponent ) => ( props ) => {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockParents, getBlock, getSettings } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;

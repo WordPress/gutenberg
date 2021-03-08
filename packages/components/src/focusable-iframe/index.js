@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
 	const fallbackRef = useRef();
-	const ref = iframeRef || fallbackRef;
+	const ref = useMergeRefs( [ iframeRef, fallbackRef ] );
 
 	useEffect( () => {
-		const iframe = ref.current;
+		const iframe = fallbackRef.current;
 		const { ownerDocument } = iframe;
 		const { defaultView } = ownerDocument;
 		const { FocusEvent } = defaultView;

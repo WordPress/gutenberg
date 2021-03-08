@@ -1,6 +1,4 @@
 export default `
-<!-- wp:file /-->
-
 <!-- wp:heading -->
 <h2>Text Blocks</h2>
 <!-- /wp:heading -->
@@ -92,6 +90,26 @@ else:
 <!-- wp:video {"autoplay":false,"id":683,"loop":false,"muted":false,"playsInline":false,"src":"https://i.cloudup.com/YtZFJbuQCE.mov"} -->
 <figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption>Videos too!</figcaption></figure>
 <!-- /wp:video -->
+
+<!-- wp:heading {"level":4} -->
+<h4>File</h4>
+<!-- /wp:heading -->
+
+<!-- wp:file /-->
+
+<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<!-- /wp:file -->
+
+<!-- wp:heading {"level":4} -->
+<h4>Audio</h4>
+<!-- /wp:heading -->
+
+<!-- wp:audio /-->
+
+<!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
+<!-- /wp:audio -->
 
 <!-- wp:heading {"level":4} -->
 <h4>Gallery</h4>

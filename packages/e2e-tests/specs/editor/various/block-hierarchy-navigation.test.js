@@ -50,7 +50,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '[aria-label="Outline"]' );
+		await page.click( '[aria-label="List view"]' );
 		const columnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Columns')]"
@@ -69,7 +69,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
-		await page.click( '[aria-label="Outline"]' );
+		await page.click( '[aria-label="List view"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Column')]"
@@ -175,7 +175,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.editor-post-title' );
 
 		// Try selecting the group block using the Outline
-		await page.click( '[aria-label="Outline"]' );
+		await page.click( '[aria-label="List view"]' );
 		const groupMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Group')]"

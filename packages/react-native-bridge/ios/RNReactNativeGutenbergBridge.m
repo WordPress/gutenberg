@@ -27,8 +27,10 @@ RCT_EXTERN_METHOD(requestMediaFilesFailedRetryDialog:(NSArray<NSDictionary *> *)
 RCT_EXTERN_METHOD(requestMediaFilesUploadCancelDialog:(NSArray<NSDictionary *> *)mediaFiles)
 RCT_EXTERN_METHOD(requestMediaFilesSaveCancelDialog:(NSArray<NSDictionary *> *)mediaFiles)
 RCT_EXTERN_METHOD(onCancelUploadForMediaCollection:(NSArray<NSDictionary *> *)mediaFiles)
+RCT_EXTERN_METHOD(requestFocalPointPickerTooltipShown:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(setFocalPointPickerTooltipShown:(BOOL)tooltipShown)
 RCT_EXTERN_METHOD(actionButtonPressed:(NSString *)buttonType)
 RCT_EXTERN_METHOD(mediaSaveSync)
-RCT_EXTERN_METHOD(mediaFilesBlockReplaceSync)
+RCT_EXTERN_METHOD(mediaFilesBlockReplaceSync:(NSArray<NSDictionary *> *)mediaFiles clientId:(NSString *)clientId)
 
 @end
