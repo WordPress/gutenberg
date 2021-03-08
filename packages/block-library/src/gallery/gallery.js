@@ -13,12 +13,14 @@ import {
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { defaultColumnsNumber } from './shared';
+
+const allowedBlocks = [ 'core/image' ];
 
 export const Gallery = ( props ) => {
 	const {
@@ -38,7 +40,6 @@ export const Gallery = ( props ) => {
 		imageCrop,
 	} = attributes;
 	const galleryRef = useRef();
-	const allowedBlocks = useMemo( () => [ 'core/image' ], [] );
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
 		orientation: 'horizontal',
