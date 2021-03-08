@@ -34,9 +34,7 @@ export default function MenuSwitcher( {
 			<MenuGroup>
 				<MenuItemsChoice
 					value={ selectedMenuId }
-					onSelect={ ( menuId ) => {
-						onSelectMenu( menuId );
-					} }
+					onSelect={ onSelectMenu }
 					choices={ menus.map( ( { id, name } ) => ( {
 						value: id,
 						label: name,
