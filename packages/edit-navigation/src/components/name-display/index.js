@@ -12,7 +12,7 @@ import {
 } from '../../hooks';
 import { useContext } from '@wordpress/element';
 
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 export default function NameDisplay() {
 	const { menuName } = useSelectedMenuData();
 	const [ , setIsMenuNameEditFocused ] = useContext(
@@ -22,7 +22,11 @@ export default function NameDisplay() {
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
-					aria-label={ __( `Edit menu name:` ) + ' ' + menuName }
+					aria-label={ sprintf(
+						// translators: %s: the name of a menu.
+						__( `Edit menu name: %s` ),
+						menuName
+					) }
 					onClick={ () => setIsMenuNameEditFocused( true ) }
 				>
 					{ menuName }
