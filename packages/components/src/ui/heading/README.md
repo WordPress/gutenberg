@@ -5,10 +5,10 @@
 ## Usage
 
 ```jsx
-import { Heading } from '@wp-g2/components';
+import { Heading } from '@wordpress/components/ui';
 
 function Example() {
-	return <Heading>Into The Unknown</Heading>;
+	return <Heading>Code is Poetry</Heading>;
 }
 ```
 

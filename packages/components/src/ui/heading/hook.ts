@@ -38,12 +38,12 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
 	 * function Example() {
 	 *   return (
 	 *     <View>
-	 *       <Heading level="1">Into The Unknown</Heading>
-	 *       <Heading level="2">Into The Unknown</Heading>
-	 *       <Heading level="3">Into The Unknown</Heading>
-	 *       <Heading level="4">Into The Unknown</Heading>
-	 *       <Heading level="5">Into The Unknown</Heading>
-	 *       <Heading level="6">Into The Unknown</Heading>
+	 *       <Heading level="1">Code is Poetry</Heading>
+	 *       <Heading level="2">Code is Poetry</Heading>
+	 *       <Heading level="3">Code is Poetry</Heading>
+	 *       <Heading level="4">Code is Poetry</Heading>
+	 *       <Heading level="5">Code is Poetry</Heading>
+	 *       <Heading level="6">Code is Poetry</Heading>
 	 *     </View>
 	 *   );
 	 * }
