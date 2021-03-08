@@ -368,18 +368,24 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
+	$wp_edit_blocks_dependencies = array(
+		'wp-components',
+		'wp-editor',
+		'wp-block-library',
+		'wp-reusable-blocks',
+	);
+
+	global $editor_styles;
+	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
+		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
+	}
+
 	gutenberg_override_style(
 		$styles,
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
-		array(
-			'wp-components',
-			'wp-editor',
-			'wp-block-library',
-			'wp-reusable-blocks',
-			// Always include visual styles so the editor never appears broken.
-			'wp-block-library-theme',
-		),
+		$wp_edit_blocks_dependencies,
 		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
