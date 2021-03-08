@@ -112,6 +112,20 @@ function wp_api_nav_menus_taxonomy_args( $args, $taxonomy ) {
 add_filter( 'register_taxonomy_args', 'wp_api_nav_menus_taxonomy_args', 10, 2 );
 
 /**
+ * Registers the scripts and styles area REST API routes.
+ */
+function gutenberg_register_script_style() {
+	// Scripts.
+	$controller = new WP_REST_Scripts_Controller();
+	$controller->register_routes();
+
+	// Styles.
+	$controller = new WP_REST_Styles_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_script_style' );
+
+/**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *
  * This function filters the return from get_sample_permalink() and essentially
@@ -212,3 +226,49 @@ function gutenberg_term_search_handler( $search_handlers ) {
 	return $search_handlers;
 }
 add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );
+
+/**
+ * Adds style/script links to Block Types API endpoint response.
+ *
+ * @param \WP_REST_Response $response   API response.
+ * @param \WP_Block_Type    $block_type Block type.
+ *
+ * @return \WP_REST_Response Modified API response.
+ */
+function gutenberg_add_assets_links_to_block_type( $response, $block_type ) {
+	$links   = array();
+	$scripts = array( 'editor_script', 'script' );
+	foreach ( $scripts as $script ) {
+		if ( ! isset( $block_type->$script ) ) {
+			continue;
+		}
+		$expected_handle = $block_type->$script;
+		if ( wp_script_is( $expected_handle, 'registered' ) ) {
+			$links[ 'https://api.w.org/' . $script ] = array(
+				'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'scripts', $expected_handle ) ),
+				'embeddable' => true,
+			);
+		}
+	}
+
+	$styles = array( 'editor_style', 'style' );
+	foreach ( $styles as $style ) {
+		if ( ! isset( $block_type->$style ) ) {
+			continue;
+		}
+		$expected_handle = $block_type->$style;
+		if ( wp_style_is( $expected_handle, 'registered' ) ) {
+			$links[ 'https://api.w.org/' . $style ] = array(
+				'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'styles', $expected_handle ) ),
+				'embeddable' => true,
+			);
+		}
+	}
+
+	if ( ! empty( $links ) ) {
+		$response->add_links( $links );
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_block_type', 'gutenberg_add_assets_links_to_block_type', 10, 2 );
