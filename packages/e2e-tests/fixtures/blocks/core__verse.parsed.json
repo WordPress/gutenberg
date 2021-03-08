@@ -3,9 +3,9 @@
         "blockName": "core/verse",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n",
+        "innerHTML": "\n<pre class=\"wp-block-verse\" style=\"padding-bottom:20px;padding-left:20px;padding-right:20px;padding-top:20px\">A <em>verse</em>…<br>And more!</pre>\n",
         "innerContent": [
-            "\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n"
+            "\n<pre class=\"wp-block-verse\" style=\"padding-bottom:20px;padding-left:20px;padding-right:20px;padding-top:20px\">A <em>verse</em>…<br>And more!</pre>\n"
         ]
     },
     {

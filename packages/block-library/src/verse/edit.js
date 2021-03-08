@@ -13,6 +13,8 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 export default function VerseEdit( {
 	attributes,
@@ -36,6 +38,10 @@ export default function VerseEdit( {
 					} }
 				/>
 			</BlockControls>
+			<BoxControlVisualizer
+				values={ attributes.style?.spacing?.padding }
+				showValues={ attributes.style?.visualizers?.padding }
+			/>
 			<RichText
 				tagName="pre"
 				identifier="content"
