@@ -35,7 +35,9 @@
 			"right",
 			"wide",
 			"full"
-		]
+		],
+		"fontSize": true,
+		"lineHeight": true
 	},
 	"editorStyle": "wp-block-pullquote-editor",
 	"style": "wp-block-pullquote"
