@@ -25,9 +25,9 @@ export default function MenuSwitcher( {
 	selectedMenuId,
 	onSelectMenu = noop,
 } ) {
-	const [ isAddNewMenuModalVisible, setIsAddNewModalVisible ] = useState(
-		false
-	);
+	const [ isModalVisible, setIsModalVisible ] = useState( false );
+	const openModal = () => setIsModalVisible( true );
+	const closeModal = () => setIsModalVisible( false );
 
 	return (
 		<>
@@ -47,24 +47,19 @@ export default function MenuSwitcher( {
 				/>
 			</MenuGroup>
 			<MenuGroup hideSeparator>
-				<MenuItem
-					isPrimary
-					onClick={ () => setIsAddNewModalVisible( true ) }
-				>
+				<MenuItem isPrimary onClick={ openModal }>
 					{ __( 'Create a new menu' ) }
 				</MenuItem>
-				{ isAddNewMenuModalVisible && (
+				{ isModalVisible && (
 					<Modal
 						title={ __( 'Create a new menu' ) }
-						onRequestClose={ () =>
-							setIsAddNewModalVisible( false )
-						}
+						onRequestClose={ closeModal }
 					>
 						<AddMenu
 							className="edit-navigation-menu-switcher__add-menu"
 							menus={ menus }
 							onCreate={ ( menuId ) => {
-								setIsAddNewModalVisible( false );
+								closeModal();
 								onSelectMenu( menuId );
 							} }
 							helpText={ __(
