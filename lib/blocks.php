@@ -222,22 +222,10 @@ function gutenberg_maybe_inline_styles() {
 	// Build an array of styles that have a path defined.
 	foreach ( $wp_styles->queue as $handle ) {
 		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
-			$block_styles = false;
-			$styles_size  = filesize( $wp_styles->registered[ $handle ]->extra['path'] );
-
-			// Minify styles and get their minified size if SCRIPT_DEBUG is not enabled.
-			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
-				// Get the styles and minify them by removing comments & whitespace.
-				$block_styles = gutenberg_get_minified_styles( file_get_contents( $wp_styles->registered[ $handle ]->extra['path'] ) );
-				// Get the styles size.
-				$styles_size = strlen( $block_styles );
-			}
-
 			$styles[] = array(
 				'handle' => $handle,
 				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
-				'size'   => $styles_size,
-				'css'    => $block_styles,
+				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
 			);
 		}
 	}
@@ -268,7 +256,7 @@ function gutenberg_maybe_inline_styles() {
 			}
 
 			// Get the styles if we don't already have them.
-			$style['css'] = $style['css'] ? $style['css'] : file_get_contents( $style['path'] );
+			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
 			$wp_styles->registered[ $style['handle'] ]->src              = false;
@@ -280,21 +268,6 @@ function gutenberg_maybe_inline_styles() {
 	}
 }
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
-
-/**
- * Minify styles.
- *
- * Removes inline comments and whitespace.
- *
- * @param string $styles The styles to be minified.
- * @return string
- */
-function gutenberg_get_minified_styles( $styles ) {
-	$re1 = '(?sx)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|/\\* (?> .*? \\*/ )';
-	$re2 = '(?six)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|\\s*+ ; \\s*+ ( } ) \\s*+|\\s*+ ( [*$~^|]?+= | [{};,>~] | !important\\b ) \\s*+|\\s*([+-])\\s*(?=[^}]*{)|( [[(:] ) \\s++|\\s++ ( [])] )|\\s+(:)(?![^\\}]*\\{)|^ \\s++ | \\s++ \\z|(\\s)\\s+';
-
-	return preg_replace( array( "%{$re1}%", "%{$re2}%" ), array( '$1', '$1$2$3$4$5$6$7$8' ), $styles );
-}
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
