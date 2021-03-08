@@ -13,7 +13,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
@@ -23,34 +23,26 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import FileBlockInspector from './inspector';
 
-const TIMEOUT = 4000;
-
 function ClipboardToolbarButton( { text, disabled } ) {
-	const [ hasCopied, setHasCopied ] = useState( false );
-	const timeoutId = useRef();
-
-	function onSuccess() {
-		setHasCopied( true );
-		clearTimeout( timeoutId.current );
-		timeoutId.current = setTimeout( () => setHasCopied( false, TIMEOUT ) );
-	}
-
-	const ref = useCopyToClipboard( text, onSuccess );
-
-	useEffect( () => {
-		clearTimeout( timeoutId.current );
-	}, [] );
+	const { createNotice } = useDispatch( noticesStore );
+	const ref = useCopyToClipboard( text, () => {
+		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	} );
 
 	return (
 		<ToolbarButton
@@ -58,7 +50,7 @@ function ClipboardToolbarButton( { text, disabled } ) {
 			ref={ ref }
 			disabled={ disabled }
 		>
-			{ hasCopied ? __( 'Copied!' ) : __( 'Copy URL' ) }
+			{ __( 'Copy URL' ) }
 		</ToolbarButton>
 	);
 }
