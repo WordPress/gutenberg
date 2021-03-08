@@ -41,7 +41,7 @@ By using the `experimental-theme.json` file to set style properties in a structu
 
 Some of the advantages are:
 
-- Reduce the amount of CSS enqueued. 
+- Reduce the amount of CSS enqueued.
 - Prevent specificity wars.
 
 ### CSS Custom Properties
@@ -403,10 +403,10 @@ The `defaults` block selector can't be part of the `styles` section and will be 
 
 #### Border Properties
 
-| Block | Radius |
-| --- | --- |
-| Group | Yes |
-| Image | Yes |
+| Block | Color | Radius | Style | Width |
+| --- | --- | --- | --- | --- |
+| Group | Yes | Yes | Yes | Yes |
+| Image | Yes | - | - | - |
 
 #### Color Properties
 
