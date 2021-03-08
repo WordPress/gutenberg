@@ -70,6 +70,7 @@ function Navigation( {
 				'core/search',
 				'core/social-links',
 				'core/page-list',
+				'core/spacer',
 			],
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:

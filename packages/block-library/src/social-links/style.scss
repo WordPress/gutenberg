@@ -67,19 +67,6 @@
 	&.alignright {
 		justify-content: flex-end;
 	}
-
-	// Ensure user color selections are applied to inner Social Link blocks.
-	// Double selectors to increase specificity to avoid themes overwriting user selection.
-	&.has-icon-color.has-icon-color {
-		> .wp-social-link {
-			color: var(--wp--social-links--icon-color);
-		}
-	}
-	&.has-icon-background-color.has-icon-background-color {
-		> .wp-social-link {
-			background-color: var(--wp--social-links--icon-background-color);
-		}
-	}
 }
 
 .wp-social-link {

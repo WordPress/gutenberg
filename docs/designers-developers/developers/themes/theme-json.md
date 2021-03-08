@@ -41,7 +41,7 @@ By using the `experimental-theme.json` file to set style properties in a structu
 
 Some of the advantages are:
 
-- Reduce the amount of CSS enqueued. 
+- Reduce the amount of CSS enqueued.
 - Prevent specificity wars.
 
 ### CSS Custom Properties
@@ -180,10 +180,6 @@ The settings section has the following structure and default values:
         "dropCap": true, /* false to opt-out */
         "fontFamilies": [ ... ], /* font family presets */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
-        "fontStyles": [ ... ], /* font style presets */
-        "fontWeights": [ ... ], /* font weight presets */
-        "textDecorations": [ ... ], /* text decoration presets */
-        "textTransforms": [ ... ] /* text transform presets */
       }
     }
   }
@@ -407,10 +403,10 @@ The `defaults` block selector can't be part of the `styles` section and will be 
 
 #### Border Properties
 
-| Block | Radius |
-| --- | --- |
-| Group | Yes |
-| Image | Yes |
+| Block | Color | Radius | Style | Width |
+| --- | --- | --- | --- | --- |
+| Group | Yes | Yes | Yes | Yes |
+| Image | Yes | - | - | - |
 
 #### Color Properties
 
@@ -437,7 +433,6 @@ These are the current color properties supported by blocks:
 | Post Title | Yes | Yes | - | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
 | Site Title | Yes | Yes | - | Yes |
-| Social Links | Yes | - | - | Yes |
 | Template Part | Yes | Yes | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
@@ -472,7 +467,7 @@ These are the current typography properties supported by blocks:
 | Post Title | Yes | Yes | - | - | Yes | - | - |
 | Preformatted | - | Yes | - | - | - | - | - |
 | Site Tagline | Yes | Yes | - | - | Yes | - | - |
-| Site Title | Yes | Yes | - | - | Yes | - | - |
+| Site Title | Yes | Yes | - | - | Yes | - | Yes |
 | Verse | Yes | Yes | - | - | - | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
