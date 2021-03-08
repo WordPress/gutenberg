@@ -791,7 +791,7 @@ class WP_Theme_JSON {
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => $value[ $preset['value_key'] ],
+								'value' => $value[ $preset['value_key'] ] . ' !important',
 							),
 						)
 					);

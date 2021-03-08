@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Requires at least: 5.5.0
+Requires at least: 5.5
 Tested up to: 5.6
 Requires PHP: 5.6
 Stable tag: V.V.V
@@ -57,4 +57,4 @@ View <a href="https://developer.wordpress.org/block-editor/principles/versions-i
 
 == Changelog ==
 
-To read the changelog for Gutenberg 10.1.0, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v10.1.0">release page</a>.
+To read the changelog for Gutenberg 10.1.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v10.1.1">release page</a>.

@@ -138,6 +138,7 @@ export { default as plugins } from './library/plugins';
 export { default as plusCircleFilled } from './library/plus-circle-filled';
 export { default as plusCircle } from './library/plus-circle';
 export { default as plus } from './library/plus';
+export { default as postCategories } from './library/post-categories';
 export { default as postComments } from './library/post-comments';
 export { default as postCommentsCount } from './library/post-comments-count';
 export { default as postCommentsForm } from './library/post-comments-form';
