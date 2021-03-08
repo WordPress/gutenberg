@@ -3,7 +3,7 @@
  */
 import classnames from 'classnames';
 import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
-import { View } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -25,6 +25,7 @@ import {
 	getTextContent,
 	useAnchorRef,
 } from '@wordpress/rich-text';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -240,37 +241,72 @@ const getAutoCompleterUI = ( autocompleter ) => {
 
 		return (
 			<View
-				focusOnMount={ false }
-				onClose={ onReset }
-				position="top right"
-				className="components-autocomplete__popover"
+				// focusOnMount={ false }
+				// onClose={ onReset }
+				// className="components-autocomplete__popover"
 				// anchorRef={ anchorRef }
+				style={ {
+					position: 'absolute',
+					bottom: 34,
+					left: 0,
+					right: 0,
+					backgroundColor: '#f6f7f7',
+					borderColor: '#a7aaad',
+					borderWidth: 1,
+					paddingVertical: 6,
+					paddingHorizontal: 6,
+					borderRadius: 2,
+					overflow: 'visible',
+				} }
 			>
-				<View
-					id={ listBoxId }
-					role="listbox"
-					className="components-autocomplete__results"
+				<ScrollView
+					horizontal
+					contentContainerStyle={ { flexGrow: 1 } }
+					showsHorizontalScrollIndicator={ false }
+					keyboardShouldPersistTaps="always"
+					// id={ listBoxId }
+					// role="listbox"
+					// className="components-autocomplete__results"
 				>
-					{ map( items, ( option, index ) => (
-						<Button
-							key={ option.key }
-							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-							role="option"
-							aria-selected={ index === selectedIndex }
-							disabled={ option.isDisabled }
-							className={ classnames(
-								'components-autocomplete__result',
-								className,
-								{
-									'is-selected': index === selectedIndex,
-								}
-							) }
-							onClick={ () => onSelect( option ) }
-						>
-							{ option.label }
-						</Button>
-					) ) }
-				</View>
+					{ map( items, ( option, index ) => {
+						return (
+							<TouchableOpacity
+								activeOpacity={ 0.5 }
+								style={ {
+									flexDirection: 'row',
+									alignItems: 'center',
+									marginRight: 10,
+								} }
+								key={ index }
+								hitSlop={ {
+									top: 22,
+									bottom: 22,
+									left: 22,
+									right: 22,
+								} }
+								onPress={ () => onSelect( option ) }
+							>
+								<View style={ { marginRight: 4 } }>
+									<Icon
+										icon={ option?.value?.icon?.src }
+										size={ 22 }
+									/>
+								</View>
+
+								<Text
+									style={ [
+										index === selectedIndex && {
+											color: '#2271b1',
+											fontWeight: 'bold',
+										},
+									] }
+								>
+									{ option?.value?.title }
+								</Text>
+							</TouchableOpacity>
+						);
+					} ) }
+				</ScrollView>
 			</View>
 		);
 	}
@@ -429,6 +465,9 @@ function Autocomplete( {
 
 	useEffect( () => {
 		if ( ! textContent ) {
+			if ( AutocompleterUI ) {
+				reset();
+			}
 			return;
 		}
 
