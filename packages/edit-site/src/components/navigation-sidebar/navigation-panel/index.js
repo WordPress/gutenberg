@@ -8,13 +8,13 @@ import classnames from 'classnames';
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import ContentNavigation from './content-navigation';
 import TemplatesNavigation from './templates-navigation';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { MENU_ROOT } from './constants';
 import { store as editSiteStore } from '../../../store';
 
