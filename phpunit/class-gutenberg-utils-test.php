@@ -149,6 +149,26 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 				  }',
 				'out' => '#foo{content:" ";bar:0}',
 			),
+			array(
+				'in'  => '.foo { width: calc(50% - .625em) }',
+				'out' => '.foo{width:calc(50% - .625em)}', // Preserve spaces inside calc().
+			),
+			array(
+				'in'  => '@supports (-webkit-overflow-scrolling: touch) { .foo { background-attachment: scroll; } }',
+				'out' => '@supports (-webkit-overflow-scrolling:touch){.foo{background-attachment:scroll}}',
+			),
+			array(
+				'in'  => '@media (prefers-reduced-motion: reduce) { .foo { background: linear-gradient(-135deg, #7adcb4 0%, #00d082 100%); background-attachment: scroll; animation: components-animate__appear-animation 0.1s cubic-bezier(0, 0, 0.2, 1) 0s; } }',
+				'out' => '@media (prefers-reduced-motion:reduce){.foo{background:linear-gradient(-135deg,#7adcb4 0%,#00d082 100%);background-attachment:scroll;animation:components-animate__appear-animation 0.1s cubic-bezier(0,0,0.2,1) 0s}}',
+			),
+			array(
+				'in'  => '@keyframes components-animate__appear-animation { from { transform: translateY(-2em) scaleY(0) scaleX(0); } to { transform: translateY(0%) scaleY(1) scaleX(1); } }',
+				'out' => '@keyframes components-animate__appear-animation{from{transform:translateY(-2em) scaleY(0) scaleX(0)}to{transform:translateY(0%) scaleY(1) scaleX(1)}}',
+			),
+			array(
+				'in'  => '.selector { --foo: calc( var(--bar, calc(1em - 10px ) ); }',
+				'out' => '.selector{--foo:calc(var(--bar,calc(1em - 10px))}',
+			),
 		);
 
 		foreach ( $cases as $case ) {
