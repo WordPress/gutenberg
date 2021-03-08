@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { noop, orderBy } from 'lodash';
+import { Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -94,7 +95,7 @@ function createBlockCompleter() {
 										icon={ icon }
 										showColors
 									/>
-									{ title }
+									<Text>{ title }</Text>
 								</>
 							),
 							isDisabled,

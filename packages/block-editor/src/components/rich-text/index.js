@@ -674,37 +674,41 @@ function RichTextWrapper(
 						isSelected={ nestedIsSelected }
 						contentRef={ fallbackRef }
 					>
-						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<TagName
-								{ ...editableProps }
-								{ ...props }
-								style={
-									props.style
-										? {
-												...props.style,
-												...editableProps.style,
-										  }
-										: editableProps.style
-								}
-								className={ classnames(
-									classes,
-									props.className,
-									editableProps.className,
-									{
-										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+						{ ( { listBoxId, activeId, onKeyDown } ) =>
+							Platform.OS === 'web' ? (
+								<TagName
+									{ ...editableProps }
+									{ ...props }
+									style={
+										props.style
+											? {
+													...props.style,
+													...editableProps.style,
+											  }
+											: editableProps.style
 									}
-								) }
-								aria-autocomplete={
-									listBoxId ? 'list' : undefined
-								}
-								aria-owns={ listBoxId }
-								aria-activedescendant={ activeId }
-								onKeyDown={ ( event ) => {
-									onKeyDown( event );
-									editableProps.onKeyDown( event );
-								} }
-							/>
-						) }
+									className={ classnames(
+										classes,
+										props.className,
+										editableProps.className,
+										{
+											'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+										}
+									) }
+									aria-autocomplete={
+										listBoxId ? 'list' : undefined
+									}
+									aria-owns={ listBoxId }
+									aria-activedescendant={ activeId }
+									onKeyDown={ ( event ) => {
+										onKeyDown( event );
+										editableProps.onKeyDown( event );
+									} }
+								/>
+							) : (
+								() => null
+							)
+						}
 					</Autocomplete>
 				</>
 			) }
