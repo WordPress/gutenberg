@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,26 +11,78 @@ import {
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useState, useCallback, useMemo } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import TemplatesPagesMenu from './templates-pages';
-import TemplatesPostsMenu from './templates-posts';
 import {
 	MENU_ROOT,
 	MENU_TEMPLATES,
-	MENU_TEMPLATES_ALL,
+	MENU_TEMPLATES_GENERAL,
 	MENU_TEMPLATES_PAGES,
 	MENU_TEMPLATES_POSTS,
+	MENU_TEMPLATES_UNUSED,
 	TEMPLATES_GENERAL,
+	TEMPLATES_PAGES_PREFIXES,
+	TEMPLATES_POSTS_PREFIXES,
+	TEMPLATES_TOP_LEVEL,
 } from '../constants';
-import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
+import TemplatesSubMenu from './templates-sub';
+import { isTemplateSuperseded } from '../template-hierarchy';
+
+function getTemplateLocation( template ) {
+	const { slug } = template;
+
+	const isTopLevelTemplate = TEMPLATES_TOP_LEVEL.includes( slug );
+	if ( isTopLevelTemplate ) {
+		return MENU_TEMPLATES;
+	}
+
+	const isGeneralTemplate = TEMPLATES_GENERAL.includes( slug );
+	if ( isGeneralTemplate ) {
+		return MENU_TEMPLATES_GENERAL;
+	}
+
+	const isPostsTemplate = TEMPLATES_POSTS_PREFIXES.some( ( prefix ) =>
+		slug.startsWith( prefix )
+	);
+	if ( isPostsTemplate ) {
+		return MENU_TEMPLATES_POSTS;
+	}
+
+	const isPagesTemplate = TEMPLATES_PAGES_PREFIXES.some( ( prefix ) =>
+		slug.startsWith( prefix )
+	);
+	if ( isPagesTemplate ) {
+		return MENU_TEMPLATES_PAGES;
+	}
+
+	return MENU_TEMPLATES_GENERAL;
+}
+
+function getUnusedTemplates( templates, showOnFront ) {
+	const unusedTemplates = [];
+
+	const templateSlugs = map( templates, 'slug' );
+	const supersededTemplates = templates.filter( ( { slug } ) =>
+		isTemplateSuperseded( slug, templateSlugs, showOnFront )
+	);
+
+	return [ ...supersededTemplates, ...unusedTemplates ];
+}
+
+function getTemplatesLocationMap( templates ) {
+	return templates.reduce( ( obj, template ) => {
+		obj[ template.slug ] = getTemplateLocation( template );
+		return obj;
+	}, {} );
+}
 
 export default function TemplatesMenu() {
 	const [ search, setSearch ] = useState( '' );
@@ -38,14 +90,38 @@ export default function TemplatesMenu() {
 		setSearch( value );
 	} );
 
-	const templates = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template' ),
-		[]
-	);
+	const { templates, showOnFront } = useSelect( ( select ) => {
+		const { getEntityRecords, getEditedEntityRecord } = select( coreStore );
+		return {
+			templates: getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+			} ),
+			showOnFront: getEditedEntityRecord( 'root', 'site' ).show_on_front,
+		};
+	}, [] );
 
-	const generalTemplates = templates?.filter( ( { slug } ) =>
-		TEMPLATES_GENERAL.includes( slug )
+	const templatesWithLocation = useMemo( () => {
+		if ( ! templates ) {
+			return null;
+		}
+
+		const unusedTemplates = getUnusedTemplates( templates, showOnFront );
+		const templateLocations = getTemplatesLocationMap( templates );
+
+		return templates.map( ( template ) => ( {
+			template,
+			location: find( unusedTemplates, { slug: template.slug } )
+				? MENU_TEMPLATES_UNUSED
+				: templateLocations[ template.slug ],
+		} ) );
+	}, [ templates ] );
+
+	const topLevelTemplates = useMemo(
+		() =>
+			templatesWithLocation
+				?.filter( ( { location } ) => location === MENU_TEMPLATES )
+				?.map( ( { template } ) => template ) ?? [],
+		[ templatesWithLocation ]
 	);
 
 	return (
@@ -64,26 +140,32 @@ export default function TemplatesMenu() {
 
 			{ ! search && (
 				<>
-					<NavigationItem
-						navigateToMenu={ MENU_TEMPLATES_ALL }
-						title={ _x( 'All', 'all templates' ) }
-					/>
-					<NavigationItem
-						navigateToMenu={ MENU_TEMPLATES_PAGES }
-						title={ __( 'Pages' ) }
-						hideIfTargetMenuEmpty
-					/>
-					<NavigationItem
-						navigateToMenu={ MENU_TEMPLATES_POSTS }
-						title={ __( 'Posts' ) }
-						hideIfTargetMenuEmpty
-					/>
-					{ map( generalTemplates, ( template ) => (
+					{ map( topLevelTemplates, ( template ) => (
 						<TemplateNavigationItem
 							item={ template }
 							key={ `wp_template-${ template.id }` }
 						/>
 					) ) }
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_POSTS }
+						title={ __( 'Post templates' ) }
+						hideIfTargetMenuEmpty
+					/>
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_PAGES }
+						title={ __( 'Page templates' ) }
+						hideIfTargetMenuEmpty
+					/>
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_GENERAL }
+						title={ __( 'General templates' ) }
+						hideIfTargetMenuEmpty
+					/>
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_UNUSED }
+						title={ __( 'Unused templates' ) }
+						hideIfTargetMenuEmpty
+					/>
 				</>
 			) }
 
@@ -91,9 +173,26 @@ export default function TemplatesMenu() {
 				<NavigationItem title={ __( 'Loading…' ) } isText />
 			) }
 
-			<TemplatesPostsMenu templates={ templates } />
-			<TemplatesPagesMenu templates={ templates } />
-			<TemplatesAllMenu templates={ templates } />
+			<TemplatesSubMenu
+				menu={ MENU_TEMPLATES_POSTS }
+				title={ __( 'Post templates' ) }
+				templates={ templatesWithLocation }
+			/>
+			<TemplatesSubMenu
+				menu={ MENU_TEMPLATES_PAGES }
+				title={ __( 'Page templates' ) }
+				templates={ templatesWithLocation }
+			/>
+			<TemplatesSubMenu
+				menu={ MENU_TEMPLATES_GENERAL }
+				title={ __( 'General templates' ) }
+				templates={ templatesWithLocation }
+			/>
+			<TemplatesSubMenu
+				menu={ MENU_TEMPLATES_UNUSED }
+				title={ __( 'Unused templates' ) }
+				templates={ templatesWithLocation }
+			/>
 		</NavigationMenu>
 	);
 }
