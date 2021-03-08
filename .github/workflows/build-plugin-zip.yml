@@ -173,6 +173,7 @@ jobs:
         with:
           tag_name: "v${{ needs.bump-version.outputs.new_version }}"
           release_name: ${{ steps.get_release_version.outputs.version }}
+          commitish: ${{ needs.bump-version.outputs.release_branch || github.ref }}
           draft: true
           prerelease: ${{ contains(needs.bump-version.outputs.new_version, 'rc') }}
           body_path: release-notes.txt
