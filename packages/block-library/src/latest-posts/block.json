@@ -88,8 +88,8 @@
 		"lineHeight": true,
 		"__experimentalFontFamily": true,
 		"__experimentalFontWeight": true,
-		"__experimentalTextTransform": true
-
+		"__experimentalTextTransform": true,
+		"__experimentalSelector": "wp-block-latest-posts__post-title"
 	},
 	"editorStyle": "wp-block-latest-posts-editor",
 	"style": "wp-block-latest-posts"

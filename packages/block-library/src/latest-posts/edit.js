@@ -536,7 +536,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									) }
 								</div>
 							) }
-							<a href={ post.link } rel="noreferrer noopener">
+							<a href={ post.link } rel="noreferrer noopener" className="wp-block-latest-posts__post-title">
 								{ titleTrimmed ? (
 									<RawHTML>{ titleTrimmed }</RawHTML>
 								) : (
