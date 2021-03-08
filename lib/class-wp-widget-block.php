@@ -23,6 +23,15 @@ class WP_Widget_Block extends WP_Widget {
 	);
 
 	/**
+	 * Whether or not to show the widget's instance settings array in the REST
+	 * API.
+	 *
+	 * @since 5.8.0
+	 * @var array
+	 */
+	public $show_instance_in_rest = true;
+
+	/**
 	 * Sets up a new Block widget instance.
 	 *
 	 * @since 4.8.1

@@ -68,6 +68,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			)
 		);
 
+		// Backwards compatibility. TODO: Remove.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[a-zA-Z0-9_-]+)/form-renderer',
@@ -200,19 +201,25 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		global $wp_registered_widgets;
 
 		$widgets = array();
-		foreach ( $wp_registered_widgets as  $widget ) {
-			$widget_callback = $widget['callback'];
+
+		foreach ( $wp_registered_widgets as $widget ) {
+			$parsed_id    = gutenberg_parse_widget_id( $widget['id'] );
+			$widget['id'] = $parsed_id['id_base'];
+
 			unset( $widget['callback'] );
 
-			if ( is_array( $widget_callback ) && $widget_callback[0] instanceof WP_Widget ) {
-				$widget_class           = $widget_callback[0];
-				$widget_array           = (array) $widget_class;
-				$widget                 = array_merge( $widget, $widget_array );
-				$widget['id']           = $widget['id_base'];
-				$widget['widget_class'] = get_class( $widget_class );
-			} else {
+			// TODO: Should we be calling this?
+			if ( is_callable( $widget['classname'] ) ) {
 				unset( $widget['classname'] );
 			}
+
+			// Backwards compatibility. TODO: Remove.
+			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
+			if ( $widget_object ) {
+				$widget['option_name']  = $widget_object->option_name;
+				$widget['widget_class'] = get_class( $widget_object );
+			}
+
 			$widgets[] = $widget;
 		}
 
@@ -362,21 +369,21 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'option_name'                 => array(
-					'description' => __( 'Option name.', 'gutenberg' ),
+					'description' => __( 'DEPRECATED. Option name.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'widget_class'                => array(
-					'description' => __( 'Widget class name.', 'gutenberg' ),
+					'description' => __( 'DEPRECATED. Widget class name.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'customize_selective_refresh' => array(
-					'description' => __( 'Customize selective refresh.', 'gutenberg' ),
+					'description' => __( 'DEPRECATED. Customize selective refresh.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'default'     => false,
 					'context'     => array( 'embed', 'view', 'edit' ),
@@ -399,6 +406,8 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_widget_form( $request ) {
+		_deprecated_function( __METHOD__, '10.2.0' );
+
 		$instance = $request->get_param( 'instance' );
 
 		$widget_name = $request['id'];

@@ -76,6 +76,10 @@ if ( ! class_exists( 'WP_Widget_Block' ) ) {
 	require_once __DIR__ . '/class-wp-widget-block.php';
 }
 
+if ( ! class_exists( 'WP_Option_Capturer' ) ) {
+	require_once __DIR__ . '/class-wp-option-capturer.php';
+}
+
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
@@ -107,6 +111,7 @@ require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
+require __DIR__ . '/widgets-api.php';
 require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
