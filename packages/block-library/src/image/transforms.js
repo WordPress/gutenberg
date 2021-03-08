@@ -8,6 +8,9 @@ import { every } from 'lodash';
  */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -133,6 +136,22 @@ const transforms = {
 			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
+				if (
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) !== 0
+					)
+				) {
+					const { createWarningNotice } = dispatch( noticesStore );
+					createWarningNotice(
+						__(
+							'If uploading to a gallery all files need to be image formats'
+						),
+						{
+							id: 'image-upload-format-warning',
+							type: 'snackbar',
+						}
+					);
+				}
 				return every(
 					files,
 					( file ) => file.type.indexOf( 'image/' ) === 0
