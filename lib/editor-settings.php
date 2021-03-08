@@ -85,14 +85,14 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_post_editor_settings' );
 /**
  * Initialize a block-based editor.
  *
- * @param $settings {
+ * @param array $settings {
  *      Elements to initialize a block-based editor.
  *
- *      @param array $preload_paths         paths need to be preloaded.
- *      @param string $editor_name          editor name.
- *      @param string $editor_script_handle editor script handle.
- *      @param string $initializer_name     editor initialization function name.
- *      @param array $editor_settings       editor settings.
+ *      @type array  $preload_paths        paths need to be preloaded.
+ *      @type string $editor_name          editor name.
+ *      @type string $editor_script_handle editor script handle.
+ *      @type string $initializer_name     editor initialization function name.
+ *      @type array  $editor_settings      editor settings.
  * }
  * @return void
  */
@@ -110,7 +110,7 @@ function gutenberg_initialize_editor( $settings ) {
 
 	$preload_paths = apply_filters( "{$settings['editor_name']}_preload_paths", $settings['preload_paths'] );
 
-	$preload_data  = array_reduce(
+	$preload_data = array_reduce(
 		$preload_paths,
 		'rest_preload_api_request',
 		array()
