@@ -165,6 +165,10 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 				'in'  => '@keyframes components-animate__appear-animation { from { transform: translateY(-2em) scaleY(0) scaleX(0); } to { transform: translateY(0%) scaleY(1) scaleX(1); } }',
 				'out' => '@keyframes components-animate__appear-animation{from{transform:translateY(-2em) scaleY(0) scaleX(0)}to{transform:translateY(0%) scaleY(1) scaleX(1)}}',
 			),
+			array(
+				'in'  => '.selector { --foo: calc( var(--bar, calc(1em - 10px ) ); }',
+				'out' => '.selector{--foo:calc(var(--bar,calc(1em - 10px))}',
+			)
 		);
 
 		foreach ( $cases as $case ) {
