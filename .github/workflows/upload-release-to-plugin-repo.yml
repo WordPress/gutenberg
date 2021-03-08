@@ -12,11 +12,6 @@ jobs:
     env:
       VERSION: ${{ github.event.release.name }}
     steps:
-      - name: Configure git user name and email
-        run: |
-          git config user.name "Gutenberg Repository Automation"
-          git config user.email gutenberg@wordpress.org
-
       - name: Compute release branch name
         id: get_release_branch
         run: |
@@ -43,6 +38,11 @@ jobs:
             awk "/${RC_REGEX}/ {next}; /${CHANGELOG_REGEX}/ {found = 1}; found" changelog.txt >> new_changelog.txt
           fi
           mv new_changelog.txt changelog.txt
+
+      - name: Configure git user name and email
+        run: |
+          git config user.name "Gutenberg Repository Automation"
+          git config user.email gutenberg@wordpress.org
 
       - name: Commit the Changelog update
         run: |
