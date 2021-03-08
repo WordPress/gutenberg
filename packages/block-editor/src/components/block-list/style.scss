@@ -763,3 +763,21 @@
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
 }
+
+// EXPERIMENTAL
+div.block-editor-block-list__layout .block-editor-block-list__block.is-outline-mode:not(.is-typing) {
+	&.is-hovered::after,
+	&.is-highlighted::after,
+	&.is-selected::after {
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+	}
+
+	&:focus::after {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	&.is-selected:focus::after,
+	&.is-selected.is-editing::after {
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}
