@@ -13,6 +13,7 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
+	waitForQuiescence: true,
 	deviceName: 'iPhone 11',
 };
 
