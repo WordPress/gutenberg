@@ -1,18 +1,22 @@
 #!/bin/bash
 
-# 1. Verify the version argument is passed. We use the same version for react-native-aztec and react-native-bridge libraries.
+# 0. Switch to the directory of the script, as gradle commands won't otherwise work
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $DIR
+
+# 1. Check if the script is run from a gutenberg-mobile submodule
+PARENT_GIT_REPO_PATH=$(git rev-parse --show-superproject-working-tree)
+if [[ -z $PARENT_GIT_REPO_PATH ||
+    $(git -C $PARENT_GIT_REPO_PATH config --get remote.origin.url) != *"/gutenberg-mobile.git" ]]; then
+    echo "This script needs to be run from a 'gutenberg-mobile' submodule."
+    exit 1
+fi
+
+# 2. Verify the version argument is passed. We use the same version for react-native-aztec and react-native-bridge libraries.
 VERSION=$1
 if [[ -z $VERSION ]]; then
     echo "This script requires the Bintray version to be passed as an argument."
     echo "Example usage: './publish-aztec-and-bridge.sh \$VERSION'"
-    exit 1
-fi
-
-# 2. Check if we can call gradlew successfully
-./gradlew --help > /dev/null 2>&1
-gradlew_exists=$?
-if [ $gradlew_exists -ne 0 ]; then
-    echo "Gradle wrapper is not available. Make sure to run this script from '/packages/react-native-bridge/android'"
     exit 1
 fi
 
