@@ -9,10 +9,10 @@ import { Component } from '@wordpress/element';
  * This function creates a ScrollLock component for the specified document
  * and is exposed so we can create an isolated component for unit testing.
  *
- * @param {Object} args Keyword args.
- * @param {HTMLDocument} args.htmlDocument The document to lock the scroll for.
- * @param {string} args.className The name of the class used to lock scrolling.
- * @return {WPComponent} The bound ScrollLock component.
+ * @param {Object} [args] Keyword args.
+ * @param {HTMLDocument} [args.htmlDocument] The document to lock the scroll for.
+ * @param {string} [args.className='lockscroll'] The name of the class used to lock scrolling.
+ * @return {import('react').ComponentType<{}>} The bound ScrollLock component.
  */
 export function createScrollLockComponent( {
 	htmlDocument,
@@ -20,6 +20,11 @@ export function createScrollLockComponent( {
 } = {} ) {
 	if ( ! htmlDocument && typeof document !== 'undefined' ) {
 		htmlDocument = document;
+	}
+
+	if ( htmlDocument === undefined ) {
+		// If in SSR context, for example, there will be no HTML document, so just return a component that does nothing
+		return () => null;
 	}
 
 	let lockCounter = 0;
@@ -39,6 +44,12 @@ export function createScrollLockComponent( {
 	 * @param {boolean} locked Whether or not scroll should be locked.
 	 */
 	function setLocked( locked ) {
+		if ( htmlDocument === undefined ) {
+			// if in SSR context, don't do anything
+			// @todo(sarayourfriend) why do we have to duplicate this check above?
+			return;
+		}
+
 		const scrollingElement =
 			htmlDocument.scrollingElement || htmlDocument.body;
 

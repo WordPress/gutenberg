@@ -19,6 +19,7 @@
 		"src/dashicon/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/scroll-lock/**/*",
 		"src/shortcut/**/*",
 		"src/spinner/**/*",
 		"src/tip/**/*",
