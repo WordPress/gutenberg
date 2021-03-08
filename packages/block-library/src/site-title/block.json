@@ -19,6 +19,8 @@
 		},
 		"fontSize": true,
 		"lineHeight": true,
-		"__experimentalFontFamily": true
+		"__experimentalTextDecoration": true,
+		"__experimentalFontFamily": true,
+		"__experimentalTextTransform": true
 	}
 }
