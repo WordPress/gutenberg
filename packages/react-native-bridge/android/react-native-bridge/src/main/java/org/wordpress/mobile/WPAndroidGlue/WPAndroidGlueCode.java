@@ -46,6 +46,7 @@ import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
@@ -513,7 +514,6 @@ public class WPAndroidGlueCode {
     public void onCreateView(Context initContext,
                              Application application,
                              boolean isDebug,
-                             boolean buildGutenbergFromSource,
                              int colorBackground,
                              Consumer<Exception> exceptionLogger,
                              Consumer<String> breadcrumbLogger,
@@ -532,7 +532,7 @@ public class WPAndroidGlueCode {
                                     .setUseDeveloperSupport(isDebug)
                                     .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
-        if (!buildGutenbergFromSource) {
+        if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
             builder.setBundleAssetName("index.android.bundle");
         }
         mReactInstanceManager = builder.build();
