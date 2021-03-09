@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { dragHandle } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import {
@@ -34,6 +34,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 
@@ -96,9 +97,12 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			const {
 				__unstableGetBlockWithoutInnerBlocks,
 				getBlockIndex,
+				getBlockName,
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
+			const blockName = getBlockName( clientId );
+			const blockType = getBlockType( blockName );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
@@ -110,11 +114,19 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				attributes,
 				blockMovingMode,
 				orientation: getBlockListSettings( rootClientId )?.orientation,
+				icon: blockType.icon,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes, blockMovingMode, orientation } = selected;
+	const {
+		index,
+		name,
+		attributes,
+		blockMovingMode,
+		orientation,
+		icon,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
@@ -263,32 +275,41 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 	return (
 		<div className={ classNames }>
-			<BlockDraggable
-				clientIds={ [ clientId ] }
-				cloneClassname="block-editor-block-mover__drag-clone"
+			<Flex
+				justify="center"
+				className="block-editor-block-list__block-selection-button__content"
 			>
-				{ ( draggableProps ) => (
+				<FlexItem>
+					<BlockIcon icon={ icon } showColors />
+				</FlexItem>
+				<FlexItem>
+					<BlockDraggable clientIds={ [ clientId ] }>
+						{ ( draggableProps ) => (
+							<Button
+								icon={ dragHandle }
+								className="block-selection-button_drag-handle"
+								aria-hidden="true"
+								label={ dragHandleLabel }
+								// Should not be able to tab to drag handle as this
+								// button can only be used with a pointer device.
+								tabIndex="-1"
+								{ ...draggableProps }
+							/>
+						) }
+					</BlockDraggable>
+				</FlexItem>
+				<FlexItem>
 					<Button
-						icon={ dragHandle }
-						className="block-selection-button_drag-handle"
-						aria-hidden="true"
-						label={ dragHandleLabel }
-						// Should not be able to tab to drag handle as this
-						// button can only be used with a pointer device.
-						tabIndex="-1"
-						{ ...draggableProps }
-					/>
-				) }
-			</BlockDraggable>
-			<Button
-				ref={ ref }
-				onClick={ () => setNavigationMode( false ) }
-				onKeyDown={ onKeyDown }
-				label={ label }
-				className="block-selection-button_select-button"
-			>
-				<BlockTitle clientId={ clientId } />
-			</Button>
+						ref={ ref }
+						onClick={ () => setNavigationMode( false ) }
+						onKeyDown={ onKeyDown }
+						label={ label }
+						className="block-selection-button_select-button"
+					>
+						<BlockTitle clientId={ clientId } />
+					</Button>
+				</FlexItem>
+			</Flex>
 		</div>
 	);
 }
