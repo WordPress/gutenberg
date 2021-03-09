@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { alignJustify as icon } from '@wordpress/icons';
+import { termDescription as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
