@@ -1,44 +1,21 @@
 <?php
 /**
- * Process the different data sources for site-level
- * config and offers and API to work with them.
+ * Entry point to access the current theme configs.
  *
  * @package gutenberg
  */
 
 /**
- * Class that abstracts the processing
- * of the different data sources.
+ * Class that abstracts the processing the theme configuration
  */
-class WP_Theme_JSON_Resolver {
+class WP_Theme_Config_Resolver {
 
 	/**
-	 * Container for data coming from core.
+	 * Theme config cache.
 	 *
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_Config
 	 */
-	private static $core = null;
-
-	/**
-	 * Container for data coming from the theme.
-	 *
-	 * @var WP_Theme_JSON
-	 */
-	private static $theme = null;
-
-	/**
-	 * Whether or not the theme supports theme.json.
-	 *
-	 * @var boolean
-	 */
-	private static $theme_has_support = null;
-
-	/**
-	 * Container for data coming from the user.
-	 *
-	 * @var WP_Theme_JSON
-	 */
-	private static $user = null;
+	private static $theme_config = null;
 
 	/**
 	 * Stores the ID of the custom post type
@@ -205,11 +182,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds core data.
 	 */
-	public static function get_core_data() {
-		if ( null !== self::$core ) {
-			return self::$core;
-		}
-
+	private static function get_core_data() {
 		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
 		$config     = self::translate( $config );
@@ -269,9 +242,7 @@ class WP_Theme_JSON_Resolver {
 		}
 		// End i18n logic to remove when JSON i18 strings are extracted.
 
-		self::$core = new WP_Theme_JSON( $config );
-
-		return self::$core;
+		return new WP_Theme_JSON( $config );
 	}
 
 	/**
@@ -289,15 +260,12 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
-	public static function get_theme_data( $theme_support_data = array() ) {
-		if ( null === self::$theme ) {
-			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
-			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme     = new WP_Theme_JSON( $theme_json_data );
-		}
-
+	private static function get_theme_data( $theme_support_data = array() ) {
+		$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+		$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+		$data            = new WP_Theme_JSON( $theme_json_data );
 		if ( empty( $theme_support_data ) ) {
-			return self::$theme;
+			return $data;
 		}
 
 		/*
@@ -305,7 +273,7 @@ class WP_Theme_JSON_Resolver {
 		 * to override the ones declared via add_theme_support.
 		 */
 		$with_theme_supports = new WP_Theme_JSON( $theme_support_data );
-		$with_theme_supports->merge( self::$theme );
+		$with_theme_supports->merge( $data );
 
 		return $with_theme_supports;
 	}
@@ -361,11 +329,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds user data.
 	 */
-	public static function get_user_data() {
-		if ( null !== self::$user ) {
-			return self::$user;
-		}
-
+	private static function get_user_data() {
 		$config   = array();
 		$user_cpt = self::get_user_data_from_custom_post_type();
 		if ( array_key_exists( 'post_content', $user_cpt ) ) {
@@ -388,48 +352,7 @@ class WP_Theme_JSON_Resolver {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON( $config );
-
-		return self::$user;
-	}
-
-	/**
-	 * There are three sources of data (origins) for a site:
-	 * core, theme, and user. The user's has higher priority
-	 * than the theme's, and the theme's higher than core's.
-	 *
-	 * Unlike the getters {@link get_core_data},
-	 * {@link get_theme_data}, and {@link get_user_data},
-	 * this method returns data after it has been merged
-	 * with the previous origins. This means that if the same piece of data
-	 * is declared in different origins (user, theme, and core),
-	 * the last origin overrides the previous.
-	 *
-	 * For example, if the user has set a background color
-	 * for the paragraph block, and the theme has done it as well,
-	 * the user preference wins.
-	 *
-	 * @param array  $theme_support_data Existing block editor settings.
-	 *                                   Empty array by default.
-	 * @param string $origin To what level should we merge data.
-	 *                       Valid values are 'theme' or 'user'.
-	 *                       Default is 'user'.
-	 *
-	 * @return WP_Theme_JSON
-	 */
-	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
-		if ( 'theme' === $origin ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_data() );
-			$result->merge( self::get_theme_data( $theme_support_data ) );
-			return $result;
-		}
-
-		$result = new WP_Theme_JSON();
-		$result->merge( self::get_core_data() );
-		$result->merge( self::get_theme_data( $theme_support_data ) );
-		$result->merge( self::get_user_data() );
-		return $result;
+		return new WP_Theme_JSON( $config );
 	}
 
 	/**
@@ -481,19 +404,6 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
-	 * Whether the current theme has a theme.json file.
-	 *
-	 * @return boolean
-	 */
-	public static function theme_has_support() {
-		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
-		}
-
-		return self::$theme_has_support;
-	}
-
-	/**
 	 * Builds the path to the given file
 	 * and checks that it is readable.
 	 *
@@ -520,4 +430,26 @@ class WP_Theme_JSON_Resolver {
 		return $located;
 	}
 
+	/**
+	 * Loads the theme configuration.
+	 */
+	public static function load_config() {
+		if ( null !== self::$theme_config ) {
+			return self::$theme_config;
+		}
+
+		// Reads theme supports.
+		$settings = gutenberg_get_common_block_editor_settings();
+		// Generate a theme.json like config based  on the theme.json (backward compatibility).
+		$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+
+		self::$theme_config = new WP_Theme_Config(
+			(bool) self::get_file_path_from_theme( 'experimental-theme.json' ),
+			self::get_core_data(),
+			self::get_theme_data( $theme_support_data ),
+			self::get_user_data()
+		);
+
+		return self::$theme_config;
+	}
 }

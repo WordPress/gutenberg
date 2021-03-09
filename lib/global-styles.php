@@ -107,67 +107,15 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 }
 
 /**
- * Takes a tree adhering to the theme.json schema and generates
- * the corresponding stylesheet.
- *
- * @param WP_Theme_JSON $tree Input tree.
- * @param string        $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
- *
- * @return string Stylesheet.
- */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'all' ) {
-	// Check if we can use cached.
-	$can_use_cached = (
-		( 'all' === $type ) &&
-		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
-		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
-	);
-
-	if ( $can_use_cached ) {
-		// Check if we have the styles already cached.
-		$cached = get_transient( 'global_styles' );
-		if ( $cached ) {
-			return $cached;
-		}
-	}
-
-	$stylesheet = $tree->get_stylesheet( $type );
-
-	if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
-		// To support all themes, we added in the block-library stylesheet
-		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
-		// so that existing link colors themes used didn't break.
-		// We add this here to make it work for themes that opt-in to theme.json
-		// In the future, we may do this differently.
-		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
-	}
-
-	if ( $can_use_cached ) {
-		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
-	}
-
-	return $stylesheet;
-}
-
-/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+	$config = WP_Theme_Config_Resolver::load_config();
+	if ( ! $config->has_theme_json_file() ) {
 		return;
 	}
-
-	$settings           = gutenberg_get_common_block_editor_settings();
-	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-
-	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$stylesheet = $config->get_stylesheet();
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -184,26 +132,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-	unset( $settings['colors'] );
-	unset( $settings['disableCustomColors'] );
-	unset( $settings['disableCustomFontSizes'] );
-	unset( $settings['disableCustomGradients'] );
-	unset( $settings['enableCustomLineHeight'] );
-	unset( $settings['enableCustomUnits'] );
-	unset( $settings['enableCustomSpacing'] );
-	unset( $settings['fontSizes'] );
-	unset( $settings['gradients'] );
-
-	$origin = 'theme';
-	if (
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_theme()
-	) {
-		// Only lookup for the user data if we need it.
-		$origin = 'user';
-	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
+	$config = WP_Theme_Config_Resolver::load_config();
 
 	// STEP 1: ADD FEATURES
 	//
@@ -211,7 +140,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// even for themes that don't support theme.json.
 	// An example of this is that the presets are configured
 	// from the theme support data.
-	$settings['__experimentalFeatures'] = $tree->get_settings();
+	$settings['__experimentalFeatures'] = $config->get_settings();
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	//
@@ -223,15 +152,15 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		! empty( $screen ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
-		WP_Theme_JSON_Resolver::theme_has_support() &&
+		$config->has_theme_json_file() &&
 		gutenberg_is_fse_theme()
 	) {
-		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		$user_cpt_id = WP_Theme_Config_Resolver::get_user_custom_post_type_id();
+		$base_styles = $config->get_theme_raw_config();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
-	} elseif ( WP_Theme_JSON_Resolver::theme_has_support() ) {
+	} elseif ( $config->has_theme_json_file() ) {
 		// STEP 3 - ADD STYLES IF THEME HAS SUPPORT
 		//
 		// If we are in a block editor context, but not in edit-site,
@@ -239,11 +168,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// some of these should be added the wrapper class,
 		// as if they were added via add_editor_styles.
 		$settings['styles'][] = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'css_variables' ),
+			'css'                     => $config->get_stylesheet( 'css_variables' ),
 			'__experimentalNoWrapper' => true,
 		);
 		$settings['styles'][] = array(
-			'css' => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'block_styles' ),
+			'css' => $config->get_stylesheet( 'block_styles' ),
 		);
 	}
 
@@ -256,11 +185,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * @return array|undefined
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+	$config = WP_Theme_Config_Resolver::load_config();
+	if ( ! $config->has_theme_json_file() ) {
 		return;
 	}
 
-	WP_Theme_JSON_Resolver::register_user_custom_post_type();
+	WP_Theme_Config_Resolver::register_user_custom_post_type();
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
