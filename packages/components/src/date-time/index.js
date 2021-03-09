@@ -4,6 +4,7 @@
 // Needed to initialise the default datepicker styles.
 // See: https://github.com/airbnb/react-dates#initialize
 import 'react-dates/initialize';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +28,7 @@ function DateTimePicker(
 		isInvalidDate,
 		onChange,
 		events,
+		onMonthChange = noop,
 	},
 	ref
 ) {
@@ -52,6 +54,7 @@ function DateTimePicker(
 						onChange={ onChange }
 						isInvalidDate={ isInvalidDate }
 						events={ events }
+						onMonthChange={ onMonthChange }
 					/>
 				</>
 			) }

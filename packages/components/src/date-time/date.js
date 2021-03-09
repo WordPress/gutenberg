@@ -32,7 +32,9 @@ class DatePicker extends Component {
 	 * This focus loss closes the date picker popover.
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
 	 */
-	keepFocusInside() {
+	keepFocusInside( newMonthDate ) {
+		this.props?.onMonthChange( newMonthDate.toISOString() );
+
 		if ( ! this.nodeRef.current ) {
 			return;
 		}

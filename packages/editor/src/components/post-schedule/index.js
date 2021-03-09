@@ -78,6 +78,7 @@ export default function PostSchedule() {
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 			events={ events }
+			onMonthChange={ setCurrentMonth }
 		/>
 	);
 }
