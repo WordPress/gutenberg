@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { getPathAndQueryString } from '@wordpress/url';
@@ -318,6 +318,34 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
+		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
+			__unstableSerializeAndClean( blocksForSerialization );
+
+		const edited = yield controls.select(
+			'core',
+			'getEditedEntityRecord',
+			'postType',
+			'wp_template',
+			template.id
+		);
+
+		yield controls.dispatch(
+			'core',
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			template.id,
+			{
+				content: serializeBlocks,
+				blocks: edited.blocks,
+				wp_id: null,
+				is_custom: true,
+			},
+			{
+				undoIgnore: true,
+			}
+		);
+
 		const fileTemplate = yield controls.dispatch(
 			'core',
 			'saveEntityRecord',
@@ -338,17 +366,31 @@ export function* revertTemplate( template ) {
 			return;
 		}
 
+		const blocks = parse( fileTemplate?.content?.raw );
+		const edits = {
+			content: serializeBlocks,
+			blocks,
+			is_custom: false,
+			wp_id: null,
+		};
 		yield controls.dispatch(
 			'core',
 			'editEntityRecord',
 			'postType',
 			'wp_template',
 			fileTemplate.id,
-			{
-				blocks: parse( fileTemplate?.content?.raw ),
-				is_custom: false,
-				wp_id: null,
-			}
+			edits
+		);
+
+		yield controls.dispatch(
+			'core',
+			'receiveEntityRecords',
+			'postType',
+			'wp_template',
+			fileTemplate,
+			undefined,
+			true,
+			edits
 		);
 
 		yield controls.dispatch(
