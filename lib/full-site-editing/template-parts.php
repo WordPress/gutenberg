@@ -180,7 +180,7 @@ function gutenberg_get_allowed_template_part_areas() {
 	 *
 	 * @param array $default_area_values An array of supported area values.
 	 */
-	return apply_filters( 'default_wp_template_part_area_values', $default_area_values );
+	return apply_filters( 'default_wp_template_part_areas', $default_area_values );
 }
 
 /**
