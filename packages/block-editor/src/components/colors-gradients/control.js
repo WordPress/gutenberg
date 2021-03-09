@@ -14,6 +14,7 @@ import {
 	ButtonGroup,
 	ColorIndicator,
 	ColorPalette,
+	Tooltip,
 	__experimentalGradientPicker as GradientPicker,
 } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -21,7 +22,7 @@ import { sprintf, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getColorObjectByColorValue } from '../colors';
+import { getColorObjectByAttributeValues, getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useEditorFeature from '../use-editor-feature';
 
@@ -46,13 +47,21 @@ function VisualLabel( {
 	colorValue,
 	gradientValue,
 } ) {
-	let value, ariaLabel;
+	let value, ariaLabel, tooltip, slug, colorObject;
 	if ( currentTab === 'color' ) {
 		if ( colorValue ) {
 			value = colorValue;
-			const colorObject = getColorObjectByColorValue( colors, value );
+			if (colorValue?.includes('var(')) {
+				const regexSlug = /--(?!.*--)(.*)\)/;
+				const match = colorValue.match(regexSlug);
+				slug = match[1];
+				colorObject = getColorObjectByAttributeValues( colors, slug, value);
+			} else {
+				colorObject = getColorObjectByColorValue( colors, value );
+			}
 			const colorName = colorObject && colorObject.name;
-			ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
+			tooltip = colorObject?.color || value;
+			ariaLabel = sprintf( colorIndicatorAriaLabel, tooltip );
 		}
 	} else if ( currentTab === 'gradient' && gradientValue ) {
 		value = gradientValue;
@@ -71,7 +80,9 @@ function VisualLabel( {
 		<>
 			{ label }
 			{ !! value && (
-				<ColorIndicator colorValue={ value } aria-label={ ariaLabel } />
+				<Tooltip text={ tooltip }>
+					<ColorIndicator colorValue={ value } aria-label={ ariaLabel } />
+				</Tooltip>
 			) }
 		</>
 	);
@@ -116,6 +127,7 @@ function ColorGradientControlInner( {
 							<VisualLabel
 								currentTab={ currentTab }
 								label={ label }
+								colors={ colors }
 								colorValue={ colorValue }
 								gradientValue={ gradientValue }
 							/>

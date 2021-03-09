@@ -16,7 +16,12 @@ import ColorPalette from '../';
 export default { title: 'Components/ColorPalette', component: ColorPalette };
 
 const ColorPaletteWithState = ( props ) => {
-	const [ color, setColor ] = useState( '#F00' );
+	const [ color, setColor ] = useState( '#f00' );
+	return <ColorPalette { ...props } value={ color } onChange={ setColor } />;
+};
+
+const ColorPaletteWithVariableState = ( props ) => {
+	const [ color, setColor ] = useState( 'white' );
 	return <ColorPalette { ...props } value={ color } onChange={ setColor } />;
 };
 
@@ -28,6 +33,16 @@ export const _default = () => {
 	];
 
 	return <ColorPaletteWithState colors={ colors } />;
+};
+
+export const withVariable = () => {
+	const colors = [
+		{ name: 'red', slug: 'red', color: '#f00' },
+		{ name: 'white', slug: 'white', color: '#fff' },
+		{ name: 'blue', slug: 'blue', color: '#00f' },
+	];
+
+	return <ColorPaletteWithVariableState colors={ colors } />;
 };
 
 export const withKnobs = () => {
