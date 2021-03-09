@@ -147,7 +147,7 @@
         ] }
     ] },
     { "docs/contributors/README.md": [
-        { "docs/contributors/code/develop.md": [
+        { "docs/contributors/code/code.md": [
             { "docs/contributors/code/getting-started.md": [] },
             { "docs/contributors/code/git-workflow.md": [] },
             { "docs/contributors/code/coding-guidelines.md": [] },
@@ -163,7 +163,7 @@
             { "docs/contributors/design/the-block.md": [] },
             { "docs/contributors/design/reference.md": [] }
         ] },
-        { "docs/contributors/documentation/document.md": [
+        { "docs/contributors/documentation/documentation.md": [
             { "docs/contributors/documentation/copy-guide.md": [] }
         ] },
         { "docs/contributors/triage.md": [] },

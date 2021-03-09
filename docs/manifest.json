@@ -1759,69 +1759,69 @@
 	},
 	{
 		"title": "Code Contributions",
-		"slug": "develop",
-		"markdown_source": "../docs/contributors/code/develop.md",
+		"slug": "code",
+		"markdown_source": "../docs/contributors/code/code.md",
 		"parent": "contributors"
 	},
 	{
 		"title": "Getting Started",
 		"slug": "getting-started",
 		"markdown_source": "../docs/contributors/code/getting-started.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Git Workflow",
 		"slug": "git-workflow",
 		"markdown_source": "../docs/contributors/code/git-workflow.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Coding Guidelines",
 		"slug": "coding-guidelines",
 		"markdown_source": "../docs/contributors/code/coding-guidelines.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Testing Overview",
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Block Grammar",
 		"slug": "grammar",
 		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Scripts",
 		"slug": "scripts",
 		"markdown_source": "../docs/contributors/code/scripts.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Managing Packages",
 		"slug": "managing-packages",
 		"markdown_source": "../docs/contributors/code/managing-packages.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "React Native based mobile Gutenberg",
 		"slug": "native-mobile",
 		"markdown_source": "../docs/contributors/code/native-mobile.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Getting Started for the React Native based Mobile Gutenberg",
 		"slug": "getting-started-native-mobile",
 		"markdown_source": "../docs/contributors/code/getting-started-native-mobile.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Design Contributions",
@@ -1843,15 +1843,15 @@
 	},
 	{
 		"title": "Documentation Contributions",
-		"slug": "document",
-		"markdown_source": "../docs/contributors/documentation/document.md",
+		"slug": "documentation",
+		"markdown_source": "../docs/contributors/documentation/documentation.md",
 		"parent": "contributors"
 	},
 	{
 		"title": "Copy Guidelines",
 		"slug": "copy-guide",
 		"markdown_source": "../docs/contributors/documentation/copy-guide.md",
-		"parent": "document"
+		"parent": "documentation"
 	},
 	{
 		"title": "Triage",
