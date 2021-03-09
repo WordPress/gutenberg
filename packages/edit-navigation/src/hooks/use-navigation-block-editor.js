@@ -8,24 +8,29 @@ import { useEntityBlockEditor } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { KIND, POST_TYPE } from '../../store/utils';
-import { store as editNavigationStore } from '../../store';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../utils/constants';
+import { store as editNavigationStore } from '../store';
 
 export default function useNavigationBlockEditor( post ) {
 	const { createMissingMenuItems } = useDispatch( editNavigationStore );
 
-	const [ blocks, onInput, _onChange ] = useEntityBlockEditor(
-		KIND,
-		POST_TYPE,
-		{ id: post?.id }
+	const [ blocks, onInput, onEntityChange ] = useEntityBlockEditor(
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
+		{
+			id: post?.id,
+		}
 	);
 
 	const onChange = useCallback(
 		async ( ...args ) => {
-			await _onChange( ...args );
+			await onEntityChange( ...args );
 			createMissingMenuItems( post );
 		},
-		[ _onChange, post ]
+		[ onEntityChange, post ]
 	);
 
 	return [ blocks, onInput, onChange ];

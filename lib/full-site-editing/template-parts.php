@@ -195,9 +195,9 @@ function gutenberg_filter_template_part_area_type( $type ) {
 	if ( in_array( $type, gutenberg_get_allowed_template_part_area_types(), true ) ) {
 		return $type;
 	}
-	$warning_message  = '"' . $type . '"';
-	$warning_message .= __( ' is not a supported wp_template_part_area type and has been added as ', 'gutenberg' );
-	$warning_message .= '"' . WP_TEMPLATE_PART_AREA_UNCATEGORIZED . '".';
+
+	/* translators: %1$s: Template area type, %2$s: the uncategorized template area type. */
+	$warning_message = sprintf( __( '"%1$s" is not a supported wp_template_part_area type and has been added as "%2$s".', 'gutenberg' ), $type, WP_TEMPLATE_PART_AREA_UNCATEGORIZED );
 	trigger_error( $warning_message, E_USER_NOTICE );
 	return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 }

@@ -3,34 +3,34 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-
 /**
  * Internal dependencies
  */
-import { store as editNavigationStore } from '../../store';
+import { store as editNavigationStore } from '../store';
 
+const getMenusData = ( select ) => {
+	const selectors = select( 'core' );
+	const params = { per_page: -1 };
+	return {
+		menus: selectors.getMenus( params ),
+		hasLoadedMenus: selectors.hasFinishedResolution( 'getMenus', [
+			params,
+		] ),
+	};
+};
 export default function useNavigationEditor() {
+	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
+	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
 		false
 	);
-	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
-		const selectors = select( 'core' );
-		const params = { per_page: -1 };
-		return {
-			menus: selectors.getMenus( params ),
-			hasLoadedMenus: selectors.hasFinishedResolution( 'getMenus', [
-				params,
-			] ),
-		};
-	}, [] );
 
+	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
 	useEffect( () => {
 		if ( hasLoadedMenus ) {
 			setHasFinishedInitialLoad( true );
 		}
 	}, [ hasLoadedMenus ] );
-
-	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
 
 	useEffect( () => {
 		if ( ! selectedMenuId && menus?.length ) {
@@ -50,12 +50,6 @@ export default function useNavigationEditor() {
 		[ selectedMenuId ]
 	);
 
-	const selectMenu = ( menuId ) => {
-		setSelectedMenuId( menuId );
-	};
-
-	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
-
 	const deleteMenu = async () => {
 		const didDeleteMenu = await _deleteMenu( selectedMenuId, {
 			force: true,
@@ -67,11 +61,11 @@ export default function useNavigationEditor() {
 
 	return {
 		menus,
-		hasLoadedMenus,
-		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
-		selectMenu,
+		selectMenu: setSelectedMenuId,
 		deleteMenu,
+		hasFinishedInitialLoad,
+		hasLoadedMenus,
 	};
 }

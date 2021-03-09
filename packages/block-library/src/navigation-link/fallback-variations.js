@@ -8,7 +8,12 @@ import {
 	postTitle as postIcon,
 	tag as tagIcon,
 } from '@wordpress/icons';
-const variations = [
+
+// FALLBACK: this is only used when the server does not understand the variations property in the
+// register_block_type_from_metadata call. see navigation-link/index.php.
+// Delete this file when supported WP ranges understand the `variations` property when passed to
+// register_block_type_from_metadata in index.php
+const fallbackVariations = [
 	{
 		name: 'link',
 		isDefault: true,
@@ -51,10 +56,10 @@ const variations = [
  * `isActive` function is used to find a variation match from a created
  *  Block by providing its attributes.
  */
-variations.forEach( ( variation ) => {
+fallbackVariations.forEach( ( variation ) => {
 	if ( variation.isActive ) return;
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.type === variationAttributes.type;
 } );
 
-export default variations;
+export default fallbackVariations;
