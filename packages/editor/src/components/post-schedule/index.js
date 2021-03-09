@@ -2,12 +2,48 @@
  * WordPress dependencies
  */
 import { __experimentalGetSettings } from '@wordpress/date';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+function getDayOfTheMonth( date = new Date(), firstDay = true ) {
+	const d = new Date( date );
+	return new Date(
+		d.getFullYear(),
+		d.getMonth() + ( firstDay ? 0 : 1 ),
+		firstDay ? 1 : 0
+	).toISOString();
+}
 
 export function PostSchedule( { date, onUpdateDate } ) {
+	const [ currentMonth ] = useState( getDayOfTheMonth( date ) );
+
+	// Pick up published and schduled site posts.
+	const events = useSelect(
+		( select ) => {
+			const posts =
+				select( editorStore ).getEntityRecords( 'postType', 'post', {
+					status: 'publish,future',
+					after: getDayOfTheMonth( currentMonth ),
+					before: getDayOfTheMonth( currentMonth, false ),
+				} ) || [];
+
+			return posts.map( ( { title, type, postDate } ) => ( {
+				title: title?.raw,
+				type,
+				date: new Date( postDate ),
+			} ) );
+		},
+		[ currentMonth ]
+	);
+
 	const ref = useRef();
 	const settings = __experimentalGetSettings();
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
@@ -33,6 +69,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 			currentDate={ date }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
+			events={ events }
 		/>
 	);
 }
@@ -40,13 +77,13 @@ export function PostSchedule( { date, onUpdateDate } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+			date: select( coreStore ).getEditedPostAttribute( 'date' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateDate( date ) {
-				dispatch( 'core/editor' ).editPost( { date } );
+				dispatch( coreStore ).editPost( { date } );
 			},
 		};
 	} ),
