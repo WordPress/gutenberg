@@ -76,6 +76,7 @@ public class ReactAztecText extends AztecText {
     boolean shouldHandleActiveFormatsChange = false;
 
     boolean shouldDeleteEnter = false;
+    boolean ignoreSelectionChangesAfterEnter = false;
 
     // This optional variable holds the outer HTML tag that will be added to the text when the user start typing in it
     // This is required to keep placeholder text working, and start typing with styled text.
@@ -355,6 +356,12 @@ public class ReactAztecText extends AztecText {
         if (!shouldHandleOnSelectionChange) {
             return;
         }
+
+        if (ignoreSelectionChangesAfterEnter) {
+            ignoreSelectionChangesAfterEnter = false;
+            return;
+        }
+
         String content = toHtml(getText(), false);
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
@@ -426,6 +433,7 @@ public class ReactAztecText extends AztecText {
 
     private boolean onEnter(Spannable text, boolean firedAfterTextChanged, int selStart, int selEnd) {
         disableTextChangedListener();
+        ignoreSelectionChangesAfterEnter = true;
         String content = toHtml(text, false);
         int cursorPositionStart = firedAfterTextChanged ? selStart : getSelectionStart();
         int cursorPositionEnd = firedAfterTextChanged ? selEnd : getSelectionEnd();
