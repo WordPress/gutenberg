@@ -1764,9 +1764,9 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Getting Started",
-		"slug": "getting-started",
-		"markdown_source": "../docs/contributors/code/getting-started.md",
+		"title": "Getting Started With Code Contribution",
+		"slug": "getting-started-with-code-contribution",
+		"markdown_source": "../docs/contributors/code/getting-started-with-code-contribution.md",
 		"parent": "code"
 	},
 	{

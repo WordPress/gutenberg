@@ -96,7 +96,7 @@ The preferred format for code examples is ESNext, this should be the default vie
 
 ### Editor Config
 
-You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started.md) for complete details.
+You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
 
 An example config for using Visual Studio Code and the Prettier extensions:
 

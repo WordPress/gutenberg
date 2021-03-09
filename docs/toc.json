@@ -148,7 +148,7 @@
     ] },
     { "docs/contributors/README.md": [
         { "docs/contributors/code/code.md": [
-            { "docs/contributors/code/getting-started.md": [] },
+            { "docs/contributors/code/getting-started-with-code-contribution.md": [] },
             { "docs/contributors/code/git-workflow.md": [] },
             { "docs/contributors/code/coding-guidelines.md": [] },
             { "docs/contributors/code/testing-overview.md": [] },

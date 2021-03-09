@@ -16,7 +16,7 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 
 ## Contributor Resources
 
-* [Getting Started](/docs/contributors/code/getting-started.md) documents getting your development environment setup, this includes your test site and developer tools suggestions.
+* [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documents getting your development environment setup, this includes your test site and developer tools suggestions.
 * [Git Workflow](/docs/contributors/code/git-workflow.md) documents the git process for deploying changes using pull requests.
 * [Coding Guidelines](/docs/contributors/code/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
 * [Testing Overview](/docs/contributors/code/testing-overview.md) for PHP and JavaScript development in Gutenberg.

@@ -4,7 +4,7 @@ ESNext is JavaScript written using syntax and features only available in a versi
 
 See the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
 
-Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/code/getting-started.md) documentation.
+Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documentation.
 
 Browsers cannot interpret or run ESNext and JSX syntaxes, so we must use a transformation step to convert these syntaxes to code that browsers can understand.
 

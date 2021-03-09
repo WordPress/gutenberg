@@ -1,4 +1,4 @@
-# Getting Started
+# Getting Started With Code Contribution
 
 The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Environment tutorial](/docs/getting-started/tutorials/devenv/README.md) for additional setup information.
 
