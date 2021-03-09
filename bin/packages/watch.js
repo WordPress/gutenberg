@@ -49,16 +49,15 @@ watch(
 	PACKAGES_DIR,
 	{ recursive: true, delay: 500, filter: isSourceFile },
 	( event, filename ) => {
-		const filePath = path.resolve( PACKAGES_DIR, filename );
 		// There are two event types, 'update' and 'remove'.
-		if ( event === 'update' && exists( filePath ) ) {
-			console.log( chalk.green( '->' ), `${ event }: ${ filePath }` );
-			rebuild( filePath );
+		if ( event === 'update' && exists( filename ) ) {
+			console.log( chalk.green( '->' ), `${ event }: ${ filename }` );
+			rebuild( filename );
 		} else {
-			const buildFile = getBuildFile( filePath );
+			const buildFile = getBuildFile( filename );
 			try {
 				fs.unlinkSync( buildFile );
-				console.log( chalk.red( '<-' ), `${ event }: ${ filePath }` );
+				console.log( chalk.red( '<-' ), `${ event }: ${ filename }` );
 			} catch ( e ) {}
 		}
 	}
