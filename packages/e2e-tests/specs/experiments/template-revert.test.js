@@ -24,14 +24,11 @@ const assertSaveButtonIsEnabled = () =>
 		'.edit-site-save-button__button[aria-disabled="false"]'
 	);
 
-const waitForNotice = () =>
-	page.waitForSelector( '.components-snackbar', { visible: true } );
+const waitForNotice = () => page.waitForSelector( '.components-snackbar' );
 
 const clickButtonInNotice = async () => {
 	const selector = '.components-snackbar button';
-	await page.waitForSelector( selector, {
-		visible: true,
-	} );
+	await page.waitForSelector( selector );
 	await page.click( selector );
 };
 
