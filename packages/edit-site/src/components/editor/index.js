@@ -10,11 +10,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import {
-	BlockContextProvider,
-	BlockBreadcrumb,
-	__experimentalPreParsePatterns as usePreParsePatterns,
-} from '@wordpress/block-editor';
+import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -150,8 +146,6 @@ function Editor( { initialSettings } ) {
 			document.body.classList.remove( 'is-navigation-sidebar-open' );
 		}
 	}, [ isNavigationOpen ] );
-
-	usePreParsePatterns();
 
 	// Don't render the Editor until the settings are set and loaded
 	if ( ! settings?.siteUrl ) {

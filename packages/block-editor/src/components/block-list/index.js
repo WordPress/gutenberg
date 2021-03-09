@@ -19,6 +19,7 @@ import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
+import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
@@ -28,6 +29,7 @@ export default function BlockList( { className } ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
+	usePreParsePatterns();
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
