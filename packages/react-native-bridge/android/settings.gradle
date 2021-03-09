@@ -14,6 +14,11 @@ def publishReactNativeBridgeVersion = properties["publishReactNativeBridgeVersio
 gradle.ext.willPublishReactNativeBridgeBinary = publishReactNativeBridgeVersion?.trim() as boolean
 
 // Only add these modules/projects if we are not building to publish a binary.
+// TODO: This is a very fragile check. Since the `settings.gradle` file is part of initialization,
+// it'll not work for even simple tasks such as `./gradlew clean` unless the
+// `publishReactNativeBridgeVersion` property is passed. It's a necessary check for the moment,
+// however by moving the Hermes binary to remote and maybe using dependency substitution for the
+// included projects, we can get rid of it.
 if (!gradle.ext.willPublishReactNativeBridgeBinary) {
     /*
     IMPORTANT: DO NOT add hermes modules if we are building a binary to publish.
