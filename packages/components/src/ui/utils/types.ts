@@ -40,3 +40,10 @@ export type PopperProps = {
 	 */
 	placement?: PopperPlacement;
 };
+
+export type SizeRangeDefault =
+	| 'xLarge'
+	| 'large'
+	| 'medium'
+	| 'small'
+	| 'xSmall';

@@ -88,14 +88,26 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 	);
 
 	try {
-		const response = yield* batchSave(
+		// Save edits to the menu, like the menu name.
+		const menuResponse = yield dispatch(
+			'core',
+			'saveEditedEntityRecord',
+			'root',
+			'menu',
+			menuId
+		);
+
+		// Save blocks as menu items.
+		const batchSaveResponse = yield* batchSave(
 			menuId,
 			menuItemsByClientId,
 			post.blocks[ 0 ]
 		);
-		if ( ! response.success ) {
+
+		if ( ! batchSaveResponse.success || ! menuResponse ) {
 			throw new Error();
 		}
+
 		yield dispatch(
 			noticesStore,
 			'createSuccessNotice',
