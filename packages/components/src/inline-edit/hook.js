@@ -51,7 +51,6 @@ export default function useInlineEdit( {
 			inputRef.current.focus();
 			inputRef.current.select();
 			setEditingValue( propValue );
-			setEditingValue( propValue );
 		} else {
 			toggleRef.current.focus();
 		}
