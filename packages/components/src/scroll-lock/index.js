@@ -1,125 +1,71 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
- * Creates a ScrollLock component bound to the specified document.
- *
- * This function creates a ScrollLock component for the specified document
- * and is exposed so we can create an isolated component for unit testing.
- *
- * @param {Object} [args] Keyword args.
- * @param {HTMLDocument} [args.htmlDocument] The document to lock the scroll for.
- * @param {string} [args.className='lockscroll'] The name of the class used to lock scrolling.
- * @return {import('react').ComponentType<{}>} The bound ScrollLock component.
+ * @param {string} className
+ * @return {(locked: boolean) => void} Function allowing you to set whether scrolling is locked.
  */
-export function createScrollLockComponent( {
-	htmlDocument,
-	className = 'lockscroll',
-} = {} ) {
-	if ( ! htmlDocument && typeof document !== 'undefined' ) {
-		htmlDocument = document;
-	}
-
-	if ( htmlDocument === undefined ) {
-		// If in SSR context, for example, there will be no HTML document, so just return a component that does nothing
-		return () => null;
-	}
-
-	let lockCounter = 0;
-
-	/*
-	 * Setting `overflow: hidden` on html and body elements resets body scroll in iOS.
-	 * Save scroll top so we can restore it after locking scroll.
-	 *
-	 * NOTE: It would be cleaner and possibly safer to find a localized solution such
-	 * as preventing default on certain touchmove events.
-	 */
-	let previousScrollTop = 0;
+function useSetLocked( className ) {
+	/** @type {import('react').MutableRefObject<number | undefined>} */
+	const previousScrollTop = useRef();
 
 	/**
-	 * Locks and unlocks scroll depending on the boolean argument.
-	 *
-	 * @param {boolean} locked Whether or not scroll should be locked.
+	 * @param {boolean} locked
 	 */
 	function setLocked( locked ) {
-		if ( htmlDocument === undefined ) {
+		if ( typeof document === undefined ) {
 			// if in SSR context, don't do anything
-			// @todo(sarayourfriend) why do we have to duplicate this check above?
 			return;
 		}
 
-		const scrollingElement =
-			htmlDocument.scrollingElement || htmlDocument.body;
+		const scrollingElement = document.scrollingElement || document.body;
 
 		if ( locked ) {
-			previousScrollTop = scrollingElement.scrollTop;
+			previousScrollTop.current = scrollingElement.scrollTop;
 		}
 
 		const methodName = locked ? 'add' : 'remove';
 		scrollingElement.classList[ methodName ]( className );
 
 		// Adding the class to the document element seems to be necessary in iOS.
-		htmlDocument.documentElement.classList[ methodName ]( className );
+		document.documentElement.classList[ methodName ]( className );
 
-		if ( ! locked ) {
-			scrollingElement.scrollTop = previousScrollTop;
+		if ( ! locked && previousScrollTop.current !== undefined ) {
+			scrollingElement.scrollTop = previousScrollTop.current;
 		}
 	}
 
-	/**
-	 * Requests scroll lock.
-	 *
-	 * This function tracks requests for scroll lock. It locks scroll on the first
-	 * request and counts each request so `releaseLock` can unlock scroll when
-	 * all requests have been released.
-	 */
-	function requestLock() {
+	return setLocked;
+}
+
+let lockCounter = 0;
+
+/**
+ *
+ * @param {Object} props
+ * @param {string} [props.className]
+ * @return {null} Render nothing.
+ */
+export default function ScrollLock( { className = 'lockscroll' } ) {
+	const setLocked = useSetLocked( className );
+
+	useEffect( () => {
 		if ( lockCounter === 0 ) {
 			setLocked( true );
 		}
 
 		++lockCounter;
-	}
 
-	/**
-	 * Releases a request for scroll lock.
-	 *
-	 * This function tracks released requests for scroll lock. When all requests
-	 * have been released, it unlocks scroll.
-	 */
-	function releaseLock() {
-		if ( lockCounter === 1 ) {
-			setLocked( false );
-		}
+		return () => {
+			if ( lockCounter === 1 ) {
+				setLocked( false );
+			}
 
-		--lockCounter;
-	}
+			--lockCounter;
+		};
+	}, [] );
 
-	return class ScrollLock extends Component {
-		/**
-		 * Requests scroll lock on mount.
-		 */
-		componentDidMount() {
-			requestLock();
-		}
-		/**
-		 * Releases scroll lock before unmount.
-		 */
-		componentWillUnmount() {
-			releaseLock();
-		}
-
-		/**
-		 * Render nothing as this component is merely a way to declare scroll lock.
-		 *
-		 * @return {null} Render nothing by returning `null`.
-		 */
-		render() {
-			return null;
-		}
-	};
+	return null;
 }
-
-export default createScrollLockComponent();
