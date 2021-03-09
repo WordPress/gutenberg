@@ -19,12 +19,12 @@ import {
 	CycleSelectControl,
 	Icon,
 	PanelBody,
-	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
+	AltTextSettings,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -43,12 +43,7 @@ import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import {
-	image as placeholderIcon,
-	textColor,
-	replace,
-	expand,
-} from '@wordpress/icons';
+import { image as placeholderIcon, replace, expand } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -82,7 +77,6 @@ export class ImageEdit extends Component {
 			this
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -246,10 +240,6 @@ export class ImageEdit extends Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	updateAlt( newAlt ) {
-		this.props.setAttributes( { alt: newAlt } );
-	}
-
 	updateImageURL( url ) {
 		this.props.setAttributes( {
 			url,
@@ -393,6 +383,18 @@ export class ImageEdit extends Component {
 		);
 	}
 
+	getAltTextSettings() {
+		const {
+			attributes: { alt },
+		} = this.props;
+
+		const updateAlt = ( newAlt ) => {
+			this.props.setAttributes( { alt: newAlt } );
+		};
+
+		return <AltTextSettings alt={ alt } updateAlt={ updateAlt } />;
+	}
+
 	onSizeChangeValue( newValue ) {
 		this.onSetSizeSlug( newValue );
 	}
@@ -439,13 +441,7 @@ export class ImageEdit extends Component {
 							options={ this.sizeOptions }
 						/>
 					) }
-					<TextControl
-						icon={ textColor }
-						label={ __( 'Alt Text' ) }
-						value={ alt || '' }
-						valuePlaceholder={ __( 'None' ) }
-						onChangeValue={ this.updateAlt }
-					/>
+					{ this.getAltTextSettings() }
 				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
