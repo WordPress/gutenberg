@@ -59,6 +59,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			ref={ panelRef }
 			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
+			role="navigation"
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
