@@ -27,8 +27,7 @@ const exists = ( filename ) => {
 // and deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename, skip ) => {
 	const isSource =
-		/.\.(js|json|scss)$/.test( filename ) &&
-		/\/src\/.+/.test( filename ) &&
+		/\/src\/.+\.(js|json|scss)$/.test( filename ) &&
 		! [
 			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 			/.\.(spec|test)\.js$/,
