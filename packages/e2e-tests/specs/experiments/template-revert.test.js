@@ -14,11 +14,15 @@ import { siteEditor } from '../../experimental-features';
 
 const { visit: visitSiteEditor, getEditedPostContent } = siteEditor;
 
-const clickUndoInHeaderToolbar = () =>
-	page.click( '.edit-site-header__toolbar button[aria-label="Undo"]' );
+const assertSaveButtonIsDisabled = () =>
+	page.waitForSelector(
+		'.edit-site-save-button__button[aria-disabled="true"]'
+	);
 
-const clickRedoInHeaderToolbar = () =>
-	page.click( '.edit-site-header__toolbar button[aria-label="Redo"]' );
+const assertSaveButtonIsEnabled = () =>
+	page.waitForSelector(
+		'.edit-site-save-button__button[aria-disabled="false"]'
+	);
 
 const waitForNotice = () =>
 	page.waitForSelector( '.components-snackbar', { visible: true } );
@@ -29,6 +33,22 @@ const clickButtonInNotice = async () => {
 		visible: true,
 	} );
 	await page.click( selector );
+};
+
+const clickUndoInHeaderToolbar = () =>
+	page.click( '.edit-site-header__toolbar button[aria-label="Undo"]' );
+
+const clickRedoInHeaderToolbar = () =>
+	page.click( '.edit-site-header__toolbar button[aria-label="Redo"]' );
+
+const undoRevertInHeaderToolbar = async () => {
+	await clickUndoInHeaderToolbar();
+	await assertSaveButtonIsEnabled();
+};
+
+const undoRevertInNotice = async () => {
+	await clickButtonInNotice();
+	await assertSaveButtonIsDisabled();
 };
 
 const addDummyText = async () => {
@@ -48,6 +68,7 @@ const revertTemplate = async () => {
 	await page.click( '.edit-site-document-actions__get-info' );
 	await page.click( '.edit-site-template-details__revert button' );
 	await waitForNotice();
+	await assertSaveButtonIsDisabled();
 };
 
 describe( 'Template Revert', () => {
@@ -95,7 +116,7 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
-		await clickUndoInHeaderToolbar();
+		await undoRevertInHeaderToolbar();
 
 		const contentAfter = await getEditedPostContent();
 		expect( contentBefore ).toBe( contentAfter );
@@ -107,7 +128,7 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
-		await clickButtonInNotice();
+		await undoRevertInNotice();
 
 		const contentAfter = await getEditedPostContent();
 		expect( contentBefore ).toBe( contentAfter );
@@ -119,7 +140,7 @@ describe( 'Template Revert', () => {
 		await addDummyText();
 		await save();
 		await revertTemplate();
-		await clickUndoInHeaderToolbar();
+		await undoRevertInHeaderToolbar();
 		await clickRedoInHeaderToolbar();
 
 		const contentAfter = await getEditedPostContent();
@@ -132,8 +153,8 @@ describe( 'Template Revert', () => {
 		await addDummyText();
 		await save();
 		await revertTemplate();
-		await clickButtonInNotice();
-		await clickUndoInHeaderToolbar();
+		await undoRevertInNotice();
+		await undoRevertInHeaderToolbar();
 
 		const contentAfter = await getEditedPostContent();
 		expect( contentBefore ).toBe( contentAfter );
@@ -147,6 +168,7 @@ describe( 'Template Revert', () => {
 		await revertTemplate();
 		await clickUndoInHeaderToolbar();
 		await save();
+		await assertSaveButtonIsDisabled();
 		await visitSiteEditor();
 
 		const contentAfter = await getEditedPostContent();
@@ -159,7 +181,7 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
-		await clickButtonInNotice();
+		await undoRevertInNotice();
 		await visitSiteEditor();
 
 		const contentAfter = await getEditedPostContent();
