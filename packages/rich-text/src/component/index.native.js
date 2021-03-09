@@ -359,6 +359,17 @@ export class RichText extends Component {
 			return;
 		}
 
+		// Slash inserter command
+		if (
+			this.value?.indexOf( '/' ) === 0 &&
+			this.customEditableOnKeyDown
+		) {
+			this.customEditableOnKeyDown( {
+				...event,
+				stopPropagation: () => undefined,
+			} );
+		}
+
 		onEnter( {
 			value: this.createRecord(),
 			onChange: this.onFormatChange,
@@ -806,6 +817,15 @@ export class RichText extends Component {
 		return value;
 	}
 
+	getEditableProps() {
+		return {
+			// Overridable props.
+			style: {},
+			className: 'rich-text',
+			onKeyDown: () => null,
+		};
+	}
+
 	render() {
 		const {
 			tagName,
@@ -823,6 +843,7 @@ export class RichText extends Component {
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
+		const editableProps = this.getEditableProps();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -892,6 +913,12 @@ export class RichText extends Component {
 				backgroundColor: style.backgroundColor,
 			};
 
+		const EditableView = ( props ) => {
+			this.customEditableOnKeyDown = props?.onKeyDown;
+
+			return <View />;
+		};
+
 		return (
 			<View style={ containerStyles }>
 				{ children &&
@@ -900,6 +927,8 @@ export class RichText extends Component {
 						value: record,
 						onChange: this.onFormatChange,
 						onFocus: () => {},
+						editableProps,
+						editableTagName: EditableView,
 					} ) }
 				<RCTAztecView
 					accessibilityLabel={ accessibilityLabel }
