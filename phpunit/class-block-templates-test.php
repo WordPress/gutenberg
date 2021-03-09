@@ -75,7 +75,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'single', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( false, $template->is_custom );
-		$this->assertEquals( 'Single', $template->title );
+		$this->assertEquals( 'Single Post', $template->title );
 		$this->assertEquals( 'Template used to display a single blog post.', $template->description );
 		$this->assertEquals( 'wp_template', $template->type );
 
