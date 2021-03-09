@@ -123,7 +123,7 @@ A pull request can generally be merged once it is:
 - Vetted against all potential edge cases.
 - Changelog entries were properly added.
 - Reviewed by someone other than the original author.
-- [Rebased](/docs/contributors/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the trunk branch.
+- [Rebased](/docs/contributors/code/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
