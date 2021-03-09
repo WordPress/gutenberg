@@ -377,13 +377,16 @@ function GalleryEdit( props ) {
 	}, [ linkTo ] );
 
 	const hasImages = !! images?.length;
+	const imagesUploading = images.some( ( img ) => ! img.id );
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
 			addToGallery={ hasImages }
 			handleUpload={ false }
 			isAppender={ hasImages }
-			disableMediaButtons={ hasImages && ! isSelected }
+			disableMediaButtons={
+				( hasImages && ! isSelected ) || imagesUploading
+			}
 			icon={ ! hasImages && sharedIcon }
 			labels={ {
 				title: ! hasImages && __( 'Gallery' ),
