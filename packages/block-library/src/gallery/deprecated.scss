@@ -18,6 +18,7 @@
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
+		align-self: flex-start;
 
 		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 		width: calc(50% - 1em);
