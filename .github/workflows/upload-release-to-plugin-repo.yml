@@ -26,17 +26,26 @@ jobs:
 
       - name: Update the Changelog to include the release notes
         run: |
-          printf '== Changelog ==\n\n' > new_changelog.txt
+          # First, determine where to insert the new Changelog entry.
+          RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
+          CUT_MARKS=$( grep -nP ${RC_REGEX} changelog.txt | cut -d: -f1 'rc')
+          if [[ -z "${CUT_MARKS}" ]]; then
+            SERIES="${RELEASE_BRANCH#release/}"
+            SERIES_REGEX="=\s${SERIES}\.[0-9]+\s="
+            CUT_MARKS=$( grep -nP -m 1 "${SERIES_REGEX}" changelog.txt | cut -d: -f1 )
+            if [[ -z "${CUT_MARKS}" ]]; then
+              CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
+              CUT_MARKS=$( grep -nP -m 1 "${CHANGELOG_REGEX}" changelog.txt | cut -d: -f1 )
+            fi
+          fi
+          BEFORE=$( echo "$CUT_MARKS" | head -n 1 )
+          AFTER=$( echo "$CUT_MARKS" | tail -n 1 )
+          # Okay, we have all we need to build the new Changelog.
+          head -n $(( "${BEFORE}" - 1 )) changelog.txt > new_changelog.txt
           printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
           echo "${{ github.event.release.body }}" >> new_changelog.txt
           printf '\n\n' >> new_changelog.txt
-          CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
-          RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
-          if [[ ${{ github.event.release.prerelease }} == 'true' ]]; then
-            awk "/${CHANGELOG_REGEX}/,EOF" changelog.txt >> new_changelog.txt
-          else
-            awk "/${RC_REGEX}/ {next}; /${CHANGELOG_REGEX}/ {found = 1}; found" changelog.txt >> new_changelog.txt
-          fi
+          tail -n +"${AFTER}" changelog.txt >> new_changelog.txt
           mv new_changelog.txt changelog.txt
 
       - name: Configure git user name and email
