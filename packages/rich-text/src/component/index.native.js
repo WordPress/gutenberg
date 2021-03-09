@@ -117,6 +117,9 @@ export class RichText extends Component {
 		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
 			this
 		);
+		this.bumpEventCounterToForceNativeToRefresh = this.bumpEventCounterToForceNativeToRefresh.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -593,6 +596,12 @@ export class RichText extends Component {
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( event.nativeEvent.eventCount <= this.lastEventCount ) {
+			console.log(
+				`Dropping onSelectionChange from Aztec as its event counter is older than latest sent to the native side.`
+			);
+			return;
+		}
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -667,6 +676,16 @@ export class RichText extends Component {
 		return value;
 	}
 
+	bumpEventCounterToForceNativeToRefresh() {
+		if ( typeof this.lastEventCount !== 'undefined' ) {
+			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
+		} else {
+			window.console.warn(
+				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
+			);
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
@@ -703,7 +722,7 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 			}
 
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.bumpEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 
 		if ( ! this.comesFromAztec ) {
@@ -748,7 +767,7 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
-			this.lastEventCount = undefined;
+			this.bumpEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
