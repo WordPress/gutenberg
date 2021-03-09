@@ -18,7 +18,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
@@ -81,6 +81,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	context: { allowResize = true, isListItem = false },
 } ) {
 	const {
 		url = '',
@@ -93,6 +94,7 @@ export function ImageEdit( {
 		sizeSlug,
 	} = attributes;
 
+	const [ tempUrl, setTempUrl ] = useState();
 	const altRef = useRef();
 	useEffect( () => {
 		altRef.current = alt;
@@ -254,14 +256,18 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! isTemp ) {
+		if ( isTemp ) {
+			setTempUrl( url );
 			return;
 		}
+		revokeBlobURL( tempUrl );
+	}, [ isTemp, url ] );
 
-		return () => {
-			revokeBlobURL( url );
-		};
-	}, [ isTemp ] );
+	useEffect( () => {
+		if ( isListItem ) {
+			setAttributes( { isListItem } );
+		}
+	}, [ isListItem ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -285,6 +291,35 @@ export function ImageEdit( {
 		ref,
 		className: classes,
 	} );
+
+	const image = url && (
+		<Image
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			isSelected={ isSelected }
+			insertBlocksAfter={ insertBlocksAfter }
+			onReplace={ onReplace }
+			onSelectImage={ onSelectImage }
+			onSelectURL={ onSelectURL }
+			onUploadError={ onUploadError }
+			containerRef={ ref }
+			allowResize={ allowResize }
+		/>
+	);
+
+	if ( isListItem ) {
+		return (
+			<>
+				{ controls }
+				<li { ...blockProps }>
+					<figure>
+						{ image }
+						{ mediaPlaceholder }
+					</figure>
+				</li>
+			</>
+		);
+	}
 
 	return (
 		<figure { ...blockProps }>

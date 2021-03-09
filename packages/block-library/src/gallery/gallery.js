@@ -6,15 +6,18 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import GalleryImage from './gallery-image';
 import { defaultColumnsNumber } from './shared';
 
 export const Gallery = ( props ) => {
@@ -22,29 +25,40 @@ export const Gallery = ( props ) => {
 		attributes,
 		isSelected,
 		setAttributes,
-		selectedImage,
 		mediaPlaceholder,
-		onMoveBackward,
-		onMoveForward,
-		onRemoveImage,
-		onSelectImage,
-		onDeselectImage,
-		onSetImageAttributes,
-		onFocusGalleryCaption,
 		insertBlocksAfter,
 		blockProps,
+		images,
 	} = props;
 
 	const {
 		align,
-		columns = defaultColumnsNumber( attributes ),
+		columns = defaultColumnsNumber( images ),
 		caption,
 		imageCrop,
-		images,
 	} = attributes;
+	const galleryRef = useRef();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'blocks-gallery-grid',
+		},
+		{
+			allowedBlocks: [ 'core/image' ],
+			orientation: 'horizontal',
+			renderAppender: false,
+			__experimentalLayout: { type: 'default', alignments: [] },
+		}
+	);
+
+	useEffect( () => {
+		if ( galleryRef.current && isSelected ) {
+			galleryRef.current.parentElement.focus();
+		}
+	}, [ isSelected ] );
 
 	return (
 		<figure
+			ref={ galleryRef }
 			{ ...blockProps }
 			className={ classnames( blockProps.className, {
 				[ `align${ align }` ]: align,
@@ -52,45 +66,8 @@ export const Gallery = ( props ) => {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<ul className="blocks-gallery-grid">
-				{ images.map( ( img, index ) => {
-					const ariaLabel = sprintf(
-						/* translators: 1: the order number of the image. 2: the total number of images. */
-						__( 'image %1$d of %2$d in gallery' ),
-						index + 1,
-						images.length
-					);
+			<ul { ...innerBlocksProps } />
 
-					return (
-						<li
-							className="blocks-gallery-item"
-							key={ img.id || img.url }
-						>
-							<GalleryImage
-								url={ img.url }
-								alt={ img.alt }
-								id={ img.id }
-								isFirstItem={ index === 0 }
-								isLastItem={ index + 1 === images.length }
-								isSelected={
-									isSelected && selectedImage === index
-								}
-								onMoveBackward={ onMoveBackward( index ) }
-								onMoveForward={ onMoveForward( index ) }
-								onRemove={ onRemoveImage( index ) }
-								onSelect={ onSelectImage( index ) }
-								onDeselect={ onDeselectImage( index ) }
-								setAttributes={ ( attrs ) =>
-									onSetImageAttributes( index, attrs )
-								}
-								caption={ img.caption }
-								aria-label={ ariaLabel }
-								sizeSlug={ attributes.sizeSlug }
-							/>
-						</li>
-					);
-				} ) }
-			</ul>
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
@@ -99,7 +76,6 @@ export const Gallery = ( props ) => {
 				aria-label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>
