@@ -198,7 +198,11 @@ module.exports = {
 
 ##### `requestToExternal` and `requestToHandle`
 
-The functions `requestToExternal` and `requestToHandle` allow this module to handle arbitrary modules. `requestToExternal` is necessary to handle any module and maps a module request to a global name. `requestToHandle` maps the same module request to a script handle, the strings that will be included in the `entrypoint.asset.php` files.
+The functions `requestToExternal` and `requestToHandle` allow this module to handle arbitrary modules.
+
+`requestToExternal` is necessary to handle any module and maps a module request to a global name.
+
+`requestToHandle` maps the same module request to a script handle, the strings that will be included in the `entrypoint.asset.php` files.
 
 ### WordPress
 
