@@ -75,7 +75,7 @@
         { "docs/how-to-guides/platform/README.md": [
             { "docs/how-to-guides/platform/custom-block-editor/README.md": [
                 { "docs/how-to-guides/platform/custom-block-editor/tutorial.md": [] }
-            ] } 
+            ] }
         ] },
         { "docs/how-to-guides/designers/README.md": [
             { "docs/how-to-guides/designers/block-design.md": [] },
@@ -145,7 +145,7 @@
         ] }
     ] },
     { "docs/contributors/README.md": [
-        { "docs/contributors/code/code.md": [
+        { "docs/contributors/code/README.md": [
             { "docs/contributors/code/getting-started-with-code-contribution.md": [] },
             { "docs/contributors/code/git-workflow.md": [] },
             { "docs/contributors/code/coding-guidelines.md": [] },
@@ -157,11 +157,11 @@
             { "docs/contributors/code/native-mobile.md": [] },
             { "docs/contributors/code/getting-started-native-mobile.md": [] }
         ] },
-        { "docs/contributors/design/design.md": [
+        { "docs/contributors/design/README.md": [
             { "docs/contributors/design/the-block.md": [] },
             { "docs/contributors/design/reference.md": [] }
         ] },
-        { "docs/contributors/documentation/documentation.md": [
+        { "docs/contributors/documentation/README.md": [
             { "docs/contributors/documentation/copy-guide.md": [] }
         ] },
         { "docs/contributors/triage.md": [] },

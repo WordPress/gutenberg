@@ -1754,7 +1754,7 @@
 	{
 		"title": "Code Contributions",
 		"slug": "code",
-		"markdown_source": "../docs/contributors/code/code.md",
+		"markdown_source": "../docs/contributors/code/README.md",
 		"parent": "contributors"
 	},
 	{
@@ -1820,7 +1820,7 @@
 	{
 		"title": "Design Contributions",
 		"slug": "design",
-		"markdown_source": "../docs/contributors/design/design.md",
+		"markdown_source": "../docs/contributors/design/README.md",
 		"parent": "contributors"
 	},
 	{
@@ -1838,7 +1838,7 @@
 	{
 		"title": "Documentation Contributions",
 		"slug": "documentation",
-		"markdown_source": "../docs/contributors/documentation/documentation.md",
+		"markdown_source": "../docs/contributors/documentation/README.md",
 		"parent": "contributors"
 	},
 	{
