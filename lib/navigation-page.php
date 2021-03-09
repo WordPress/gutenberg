@@ -41,11 +41,11 @@ function gutenberg_navigation_init( $hook ) {
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	gutenberg_initialize_editor(
+		'navigation_editor',
+		'edit-navigation',
 		array(
-			'editor_name'          => 'navigation_editor',
-			'editor_script_handle' => 'edit-navigation',
-			'initializer_name'     => 'initialize',
-			'editor_settings'      => $settings,
+			'initializer_name' => 'initialize',
+			'editor_settings'  => $settings,
 		)
 	);
 

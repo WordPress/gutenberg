@@ -114,8 +114,10 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	gutenberg_initialize_editor(
+		'edit_site_editor',
+		'edit-site',
 		array(
-			'preload_paths'        => array(
+			'preload_paths'    => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
 				'/?context=edit',
 				'/wp/v2/types?context=edit',
@@ -123,10 +125,8 @@ function gutenberg_edit_site_init( $hook ) {
 				'/wp/v2/pages?context=edit',
 				'/wp/v2/themes?status=active',
 			),
-			'editor_name'          => 'edit_site_editor',
-			'editor_script_handle' => 'edit-site',
-			'initializer_name'     => 'initialize',
-			'editor_settings'      => $settings,
+			'initializer_name' => 'initialize',
+			'editor_settings'  => $settings,
 		)
 	);
 

@@ -53,6 +53,8 @@ function gutenberg_widgets_init( $hook ) {
 	$settings = gutenberg_extend_block_editor_styles( $settings );
 
 	gutenberg_initialize_editor(
+		'widgets_editor',
+		'edit-widgets',
 		array(
 			'preload_paths'   => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
