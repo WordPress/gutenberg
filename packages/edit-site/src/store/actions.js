@@ -330,6 +330,8 @@ export function* revertTemplate( template ) {
 			'wp_template',
 			template.id
 		);
+		// We are fixing up the undo level here to make sure we can undo
+		// the revert in the header toolbar correctly.
 		yield controls.dispatch(
 			coreStore,
 			'editEntityRecord',
@@ -337,13 +339,12 @@ export function* revertTemplate( template ) {
 			'wp_template',
 			template.id,
 			{
-				content: serializeBlocks,
-				blocks: edited.blocks,
-				wp_id: null,
-				is_custom: true,
+				content: serializeBlocks, // required to make the `undo` behave correctly
+				blocks: edited.blocks, // required to revert the blocks in the editor
+				is_custom: true, // required to avoid turning the editor into a dirty state
 			},
 			{
-				undoIgnore: true,
+				undoIgnore: true, // required to merge this edit with the last undo level
 			}
 		);
 
@@ -354,7 +355,6 @@ export function* revertTemplate( template ) {
 			'wp_template',
 			{ id: template.id, is_custom: false }
 		);
-
 		if ( ! fileTemplate ) {
 			yield controls.dispatch(
 				noticesStore,
@@ -368,11 +368,13 @@ export function* revertTemplate( template ) {
 		}
 
 		const blocks = parse( fileTemplate?.content?.raw );
+		// We use the same object for `editEntityRecord` and `receiveEntityRecords`
+		// to avoid turning the editor into a dirty state.
+		// `content` property is required to make the undo-redo work. Without `content`
+		// it wouldn't save the actual blocks to the server.
 		const edits = {
 			content: serializeBlocks,
 			blocks,
-			is_custom: false,
-			wp_id: null,
 		};
 		yield controls.dispatch(
 			coreStore,
@@ -382,6 +384,7 @@ export function* revertTemplate( template ) {
 			fileTemplate.id,
 			edits
 		);
+		// We override the `edits` to make sure we can undo-redo correctly.
 		yield controls.dispatch(
 			coreStore,
 			'receiveEntityRecords',
@@ -401,8 +404,6 @@ export function* revertTemplate( template ) {
 				{
 					content: serializeBlocks,
 					blocks: edited.blocks,
-					wp_id: null,
-					is_custom: true,
 				}
 			);
 
