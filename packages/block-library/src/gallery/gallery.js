@@ -13,7 +13,6 @@ import {
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,7 +38,7 @@ export const Gallery = ( props ) => {
 		caption,
 		imageCrop,
 	} = attributes;
-	const galleryRef = useRef();
+
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
 		orientation: 'horizontal',
@@ -47,15 +46,8 @@ export const Gallery = ( props ) => {
 		__experimentalLayout: { type: 'default', alignments: [] },
 	} );
 
-	useEffect( () => {
-		if ( galleryRef.current && isSelected ) {
-			galleryRef.current.parentElement.focus();
-		}
-	}, [ isSelected ] );
-
 	return (
 		<figure
-			ref={ galleryRef }
 			{ ...innerBlocksProps }
 			className={ classnames(
 				blockProps.className,
