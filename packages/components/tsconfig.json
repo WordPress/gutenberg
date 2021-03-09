@@ -20,7 +20,8 @@
 		"src/utils/**/*",
 		"src/view/**/*",
 		"src/visually-hidden/**/*",
-		"src/text/**/*",
+	  	"src/text/**/*",
+	  	"src/inline-edit/**/*",
 		"src/grid/**/*",
 		"src/__next/**/*"
 	],

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,6 +16,17 @@ const getEventValue = ( { target: { value } } ) => value;
 const mergeEvent = ( ...handlers ) => ( event ) =>
 	handlers.forEach( ( handler = noop ) => handler( event ) );
 
+/**
+ * @typedef Props
+ * @property {(value: string) => boolean} validate predicate
+ * @property {Function} onWrongInput called when a validate predicate fails
+ * @property {Function} onCommit called on enter/blur
+ * @property {string} value input value
+ */
+
+/**
+ * @param {Props} props
+ */
 export default function useInlineEdit( {
 	validate = negate( isUndefined ),
 	onWrongInput = noop,
@@ -38,6 +50,7 @@ export default function useInlineEdit( {
 		if ( isInEditMode ) {
 			inputRef.current.focus();
 			inputRef.current.select();
+			setEditingValue( propValue );
 			setEditingValue( propValue );
 		} else {
 			toggleRef.current.focus();
