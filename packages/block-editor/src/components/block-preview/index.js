@@ -24,10 +24,11 @@ export function BlockPreview( {
 	__experimentalLive = false,
 	__experimentalOnClick,
 } ) {
-	const settings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
-		[]
-	);
+	const settings = useSelect( ( select ) => {
+		const _settings = { ...select( blockEditorStore ).getSettings() };
+		_settings.__experimentalBlockPatterns = [];
+		return _settings;
+	}, [] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
