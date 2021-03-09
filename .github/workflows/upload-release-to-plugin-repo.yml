@@ -28,7 +28,7 @@ jobs:
         run: |
           # First, determine where to insert the new Changelog entry.
           RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
-          CUT_MARKS=$( grep -nP ${RC_REGEX} changelog.txt | cut -d: -f1 'rc')
+          CUT_MARKS=$( grep -nP ${RC_REGEX} changelog.txt | cut -d: -f1 )
           if [[ -z "${CUT_MARKS}" ]]; then
             SERIES="${RELEASE_BRANCH#release/}"
             SERIES_REGEX="=\s${SERIES}\.[0-9]+\s="
