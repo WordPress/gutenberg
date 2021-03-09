@@ -141,21 +141,21 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 		unset( $data['_links'] );
 		$this->assertEquals(
 			array(
-				'id'          => 'tt1-blocks//header',
-				'theme'       => 'tt1-blocks',
-				'slug'        => 'header',
-				'title'       => array(
+				'id'                   => 'tt1-blocks//header',
+				'theme'                => 'tt1-blocks',
+				'slug'                 => 'header',
+				'title'                => array(
 					'raw'      => 'header',
 					'rendered' => 'header',
 				),
-				'description' => '',
-				'status'      => 'publish',
-				'is_custom'   => false,
-				'type'        => 'wp_template_part',
-				'wp_id'       => null,
+				'description'          => '',
+				'status'               => 'publish',
+				'is_custom'            => false,
+				'type'                 => 'wp_template_part',
+				'wp_id'                => null,
 				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-				'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
-				'original_file_exists' => true
+				'area'                 => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'original_file_exists' => true,
 			),
 			$data
 		);
@@ -216,22 +216,22 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals(
 			array(
-				'id'          => 'tt1-blocks//my_custom_template_part',
-				'theme'       => 'tt1-blocks',
-				'slug'        => 'my_custom_template_part',
-				'title'       => array(
+				'id'                   => 'tt1-blocks//my_custom_template_part',
+				'theme'                => 'tt1-blocks',
+				'slug'                 => 'my_custom_template_part',
+				'title'                => array(
 					'raw'      => 'My Template Part',
 					'rendered' => 'My Template Part',
 				),
-				'description' => 'Just a description of a template part',
-				'status'      => 'publish',
-				'is_custom'   => true,
-				'type'        => 'wp_template_part',
-				'content'     => array(
+				'description'          => 'Just a description of a template part',
+				'status'               => 'publish',
+				'is_custom'            => true,
+				'type'                 => 'wp_template_part',
+				'content'              => array(
 					'raw' => 'Content',
 				),
-				'area'        => 'header',
-				'original_file_exists' => false
+				'area'                 => 'header',
+				'original_file_exists' => false,
 			),
 			$data
 		);
