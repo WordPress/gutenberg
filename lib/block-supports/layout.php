@@ -45,10 +45,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$attributes   = $block['attrs'];
+	$used_layout = $block['attrs']['layout'];
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
+		$tree           = WP_Theme_JSON_Resolver::get_merged_data( array(), 'theme' );
+		$default_layout = _wp_array_get( $tree->get_settings(), array( 'defaults', 'layout' ) );
+		if ( ! $default_layout ) {
+			return $block_content;
+		}
+		$used_layout = $default_layout;
+	}
+
 	$id           = uniqid();
-	$content_size = isset( $attributes['layout']['contentSize'] ) ? $attributes['layout']['contentSize'] : null;
-	$wide_size    = isset( $attributes['layout']['wideSize'] ) ? $attributes['layout']['wideSize'] : null;
+	$content_size = isset( $used_layout['contentSize'] ) ? $used_layout['contentSize'] : null;
+	$wide_size    = isset( $used_layout['wideSize'] ) ? $used_layout['wideSize'] : null;
 	if ( ! $content_size && ! $wide_size ) {
 		return $block_content;
 	}

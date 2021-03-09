@@ -13,9 +13,9 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
+	ToggleControl,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
-	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -58,7 +58,7 @@ const CSS_UNITS = [
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
-	const { wideSize, contentSize } = layout;
+	const { wideSize, contentSize, inherit = false } = layout;
 	const defaultLayout = useEditorFeature( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -72,53 +72,56 @@ function LayoutPanel( { setAttributes, attributes } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Alignments' ) }>
 				{ !! defaultLayout && (
-					<Button
-						isSecondary
-						onClick={ () => {
-							setAttributes( {
-								layout: {
-									...defaultLayout,
-								},
-							} );
-						} }
-					>
-						{ __( 'Inherit default values' ) }
-					</Button>
+					<ToggleControl
+						label={ __( 'Inherit default layout' ) }
+						checked={ !! inherit }
+						onChange={ () =>
+							setAttributes( { layout: { inherit: ! inherit } } )
+						}
+					/>
 				) }
-				<UnitControl
-					label={ __( 'Content' ) }
-					labelPosition="edge"
-					__unstableInputWidth="80px"
-					value={ contentSize || wideSize || '' }
-					onChange={ ( nextWidth ) => {
-						nextWidth =
-							0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-						setAttributes( {
-							layout: {
-								...layout,
-								contentSize: nextWidth,
-							},
-						} );
-					} }
-					units={ CSS_UNITS }
-				/>
-				<UnitControl
-					label={ __( 'Wide' ) }
-					labelPosition="edge"
-					__unstableInputWidth="80px"
-					value={ wideSize || contentSize || '' }
-					onChange={ ( nextWidth ) => {
-						nextWidth =
-							0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-						setAttributes( {
-							layout: {
-								...layout,
-								wideSize: nextWidth,
-							},
-						} );
-					} }
-					units={ CSS_UNITS }
-				/>
+				{ ! inherit && (
+					<>
+						<UnitControl
+							label={ __( 'Content' ) }
+							labelPosition="edge"
+							__unstableInputWidth="80px"
+							value={ contentSize || wideSize || '' }
+							onChange={ ( nextWidth ) => {
+								nextWidth =
+									0 > parseFloat( nextWidth )
+										? '0'
+										: nextWidth;
+								setAttributes( {
+									layout: {
+										...layout,
+										contentSize: nextWidth,
+									},
+								} );
+							} }
+							units={ CSS_UNITS }
+						/>
+						<UnitControl
+							label={ __( 'Wide' ) }
+							labelPosition="edge"
+							__unstableInputWidth="80px"
+							value={ wideSize || contentSize || '' }
+							onChange={ ( nextWidth ) => {
+								nextWidth =
+									0 > parseFloat( nextWidth )
+										? '0'
+										: nextWidth;
+								setAttributes( {
+									layout: {
+										...layout,
+										wideSize: nextWidth,
+									},
+								} );
+							} }
+							units={ CSS_UNITS }
+						/>
+					</>
+				) }
 				<p>
 					{ __(
 						'The content and wide sizes determine the behavior of block alignments.'
@@ -184,11 +187,13 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const supportLayout = hasBlockSupport( name, '__experimentalLayout' );
 		const id = useInstanceId( BlockListBlock );
+		const defaultLayout = useEditorFeature( 'layout' );
 		if ( ! supportLayout === undefined ) {
 			return <BlockListBlock { ...props } />;
 		}
 		const { layout = {} } = attributes;
-		const { wideSize, contentSize } = layout;
+		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+		const { wideSize, contentSize } = usedLayout;
 		if ( ! wideSize && ! contentSize ) {
 			return <BlockListBlock { ...props } />;
 		}
@@ -202,7 +207,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			<>
 				<LayoutStyle
 					selector={ `.wp-container-${ id }` }
-					layout={ layout }
+					layout={ usedLayout }
 				/>
 				<BlockListBlock { ...props } className={ className } />
 			</>

@@ -8,6 +8,7 @@ import {
 	useBlockProps,
 	InspectorAdvancedControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -59,8 +60,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+	const defaultLayout = useEditorFeature( 'layout' );
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	const { contentSize, wideSize } = layout;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
 	const alignments =
 		contentSize || wideSize
 			? [ 'wide', 'full' ]
