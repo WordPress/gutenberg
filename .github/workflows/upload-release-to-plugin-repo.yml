@@ -27,16 +27,13 @@ jobs:
       - name: Update the Changelog to include the release notes
         run: |
           # First, determine where to insert the new Changelog entry.
-          RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
-          CUT_MARKS=$( grep -nP ${RC_REGEX} changelog.txt | cut -d: -f1 )
+          SERIES="${RELEASE_BRANCH#release/}"
+          SERIES_REGEX="=\s${SERIES}\.[0-9]+\s="
+          CUT_MARKS=$( grep -nP -m 1 "${SERIES_REGEX}" changelog.txt | cut -d: -f1 )
           if [[ -z "${CUT_MARKS}" ]]; then
-            SERIES="${RELEASE_BRANCH#release/}"
-            SERIES_REGEX="=\s${SERIES}\.[0-9]+\s="
-            CUT_MARKS=$( grep -nP -m 1 "${SERIES_REGEX}" changelog.txt | cut -d: -f1 )
-            if [[ -z "${CUT_MARKS}" ]]; then
-              CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
-              CUT_MARKS=$( grep -nP -m 1 "${CHANGELOG_REGEX}" changelog.txt | cut -d: -f1 )
-            fi
+            CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
+            RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
+            CUT_MARKS=$( awk "/${RC_REGEX}/ {print NR; next}; /${CHANGELOG_REGEX}/ {print NR; exit}" changelog.txt )
           fi
           BEFORE=$( echo "$CUT_MARKS" | head -n 1 )
           AFTER=$( echo "$CUT_MARKS" | tail -n 1 )
