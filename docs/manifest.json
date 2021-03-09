@@ -102,7 +102,7 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Developer Documentation",
+		"title": "How-to Guides",
 		"slug": "how-to-guides",
 		"markdown_source": "../docs/how-to-guides/README.md",
 		"parent": null
@@ -495,6 +495,12 @@
 		"title": "Block Type Metadata",
 		"slug": "block-metadata",
 		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Block Variations",
+		"slug": "block-variations",
+		"markdown_source": "../docs/reference-guides/block-api/block-variations.md",
 		"parent": "block-api"
 	},
 	{
