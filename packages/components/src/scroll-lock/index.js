@@ -8,8 +8,8 @@ import { useRef, useEffect } from '@wordpress/element';
  * @return {(locked: boolean) => void} Function allowing you to set whether scrolling is locked.
  */
 function useSetLocked( className ) {
-	/** @type {import('react').MutableRefObject<number | undefined>} */
-	const previousScrollTop = useRef();
+	/** @type {import('react').MutableRefObject<number>} */
+	const previousScrollTop = useRef( 0 );
 
 	/**
 	 * @param {boolean} locked
@@ -32,7 +32,7 @@ function useSetLocked( className ) {
 		// Adding the class to the document element seems to be necessary in iOS.
 		document.documentElement.classList[ methodName ]( className );
 
-		if ( ! locked && previousScrollTop.current !== undefined ) {
+		if ( ! locked ) {
 			scrollingElement.scrollTop = previousScrollTop.current;
 		}
 	}
@@ -40,9 +40,17 @@ function useSetLocked( className ) {
 	return setLocked;
 }
 
+/*
+ * Setting `overflow: hidden` on html and body elements resets body scroll in iOS.
+ * Save scroll top so we can restore it after locking scroll.
+ *
+ * NOTE: It would be cleaner and possibly safer to find a localized solution such
+ * as preventing default on certain touchmove events.
+ */
 let lockCounter = 0;
 
 /**
+ * A component that will lock scrolling when it is mounted and unlock scrolling when it is unmounted.
  *
  * @param {Object} props
  * @param {string} [props.className]
