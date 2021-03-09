@@ -28,13 +28,12 @@ const cancelIdleCallback = ( () => {
 } )();
 
 export function usePreParsePatterns() {
-	const patterns =
-		useSelect(
-			( _select ) =>
-				_select( blockEditorStore ).getSettings()
-					.__experimentalBlockPatterns,
-			[]
-		) || [];
+	const patterns = useSelect(
+		( _select ) =>
+			_select( blockEditorStore ).getSettings()
+				.__experimentalBlockPatterns,
+		[]
+	);
 
 	useEffect( () => {
 		if ( ! patterns?.length ) {
@@ -66,7 +65,7 @@ export function usePreParsePatterns() {
 
 		handle = requestIdleCallback( callback );
 		return () => cancelIdleCallback( handle );
-	}, patterns );
+	}, [ patterns ] );
 
 	return null;
 }
