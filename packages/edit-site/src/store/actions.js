@@ -6,6 +6,8 @@ import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -309,7 +311,7 @@ export function setIsListViewOpened( isOpen ) {
 export function* revertTemplate( template ) {
 	if ( ! isTemplateRevertable( template ) ) {
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			__( 'This template is not revertable.' ),
 			{ type: 'snackbar' }
@@ -322,14 +324,14 @@ export function* revertTemplate( template ) {
 			__unstableSerializeAndClean( blocksForSerialization );
 
 		const edited = yield controls.select(
-			'core',
+			coreStore,
 			'getEditedEntityRecord',
 			'postType',
 			'wp_template',
 			template.id
 		);
 		yield controls.dispatch(
-			'core',
+			coreStore,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
@@ -346,7 +348,7 @@ export function* revertTemplate( template ) {
 		);
 
 		const fileTemplate = yield controls.dispatch(
-			'core',
+			coreStore,
 			'saveEntityRecord',
 			'postType',
 			'wp_template',
@@ -355,7 +357,7 @@ export function* revertTemplate( template ) {
 
 		if ( ! fileTemplate ) {
 			yield controls.dispatch(
-				'core/notices',
+				noticesStore,
 				'createErrorNotice',
 				__(
 					'The editor has encountered an unexpected error. Please reload.'
@@ -373,7 +375,7 @@ export function* revertTemplate( template ) {
 			wp_id: null,
 		};
 		yield controls.dispatch(
-			'core',
+			coreStore,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
@@ -381,7 +383,7 @@ export function* revertTemplate( template ) {
 			edits
 		);
 		yield controls.dispatch(
-			'core',
+			coreStore,
 			'receiveEntityRecords',
 			'postType',
 			'wp_template',
@@ -392,7 +394,7 @@ export function* revertTemplate( template ) {
 		);
 
 		const undoRevert = async () => {
-			await dispatch( 'core' ).editEntityRecord(
+			await dispatch( coreStore ).editEntityRecord(
 				'postType',
 				'wp_template',
 				edited.id,
@@ -404,14 +406,14 @@ export function* revertTemplate( template ) {
 				}
 			);
 
-			await dispatch( 'core' ).saveEditedEntityRecord(
+			await dispatch( coreStore ).saveEditedEntityRecord(
 				'postType',
 				'wp_template',
 				edited.id
 			);
 		};
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Template reverted.' ),
 			{
@@ -430,7 +432,7 @@ export function* revertTemplate( template ) {
 				? error.message
 				: __( 'Template revert failed. Please reload.' );
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			errorMessage,
 			{ type: 'snackbar' }
