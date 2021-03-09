@@ -40,6 +40,11 @@ import {
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 import { regexp } from '@wordpress/shortcode';
+import { ENTER } from '@wordpress/keycodes';
+
+//import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+// Not sure if we should consider other events too? Mainly I'm thinking of
+// tablets with keyboards attached
 
 /**
  * Internal dependencies
@@ -110,6 +115,12 @@ function getAllowedFormats( {
 getAllowedFormats.EMPTY_ARRAY = [];
 
 const isShortcode = ( text ) => regexp( '.*' ).test( text );
+
+const SYNTHETIC_ENTER_EVENT = {
+	keyCode: ENTER,
+	preventDefault: () => undefined,
+	stopPropagation: () => undefined,
+};
 
 function RichTextWrapper(
 	{
@@ -584,6 +595,31 @@ function RichTextWrapper(
 
 	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
 
+	/**
+	 * Today's hack :)
+	 *
+	 * We wrap onEnter to intercept the call and pass the callback to the
+	 * platform-specific `RichText` component (which already handles invocations
+	 * to onEnter). Then we use this `selectOnEnter` ref to invoke the appropriate
+	 * onKeyDown function with a synthetic event to complete the selection.
+	 *
+	 * In order do condition this, I passed an `isActive` prop to the "function as
+	 * children" component in Autocomplete
+	 */
+	const selectOnEnter = useRef();
+
+	const wrappedOnEnter = useCallback(
+		( event ) => {
+			if ( typeof selectOnEnter.current === 'function' ) {
+				// onEnter( event );
+				selectOnEnter.current();
+			} else {
+				onEnter( event );
+			}
+		},
+		[ onEnter ]
+	);
+
 	const content = (
 		<RichText
 			clientId={ clientId }
@@ -598,7 +634,7 @@ function RichTextWrapper(
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
-			onEnter={ onEnter }
+			onEnter={ wrappedOnEnter }
 			onDelete={ onDelete }
 			onPaste={ onPaste }
 			__unstableIsSelected={ isSelected }
@@ -674,41 +710,52 @@ function RichTextWrapper(
 						isSelected={ nestedIsSelected }
 						contentRef={ fallbackRef }
 					>
-						{ ( { listBoxId, activeId, onKeyDown } ) =>
-							Platform.OS === 'web' ? (
-								<TagName
-									{ ...editableProps }
-									{ ...props }
-									style={
-										props.style
-											? {
-													...props.style,
-													...editableProps.style,
-											  }
-											: editableProps.style
-									}
-									className={ classnames(
-										classes,
-										props.className,
-										editableProps.className,
-										{
-											'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+						{ ( { listBoxId, activeId, onKeyDown, isActive } ) => {
+							if ( Platform.OS === 'web' ) {
+								return (
+									<TagName
+										{ ...editableProps }
+										{ ...props }
+										style={
+											props.style
+												? {
+														...props.style,
+														...editableProps.style,
+												  }
+												: editableProps.style
 										}
-									) }
-									aria-autocomplete={
-										listBoxId ? 'list' : undefined
-									}
-									aria-owns={ listBoxId }
-									aria-activedescendant={ activeId }
-									onKeyDown={ ( event ) => {
-										onKeyDown( event );
-										editableProps.onKeyDown( event );
-									} }
-								/>
-							) : (
-								() => null
-							)
-						}
+										className={ classnames(
+											classes,
+											props.className,
+											editableProps.className,
+											{
+												'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+											}
+										) }
+										aria-autocomplete={
+											listBoxId ? 'list' : undefined
+										}
+										aria-owns={ listBoxId }
+										aria-activedescendant={ activeId }
+										onKeyDown={ ( event ) => {
+											onKeyDown( event );
+											editableProps.onKeyDown( event );
+										} }
+									/>
+								);
+							}
+
+							// If the current autocomplete is active on mobile, we send a
+							// synthetic event
+							if ( isActive ) {
+								selectOnEnter.current = () =>
+									onKeyDown( SYNTHETIC_ENTER_EVENT );
+							} else {
+								selectOnEnter.current = null;
+							}
+
+							return null;
+						} }
 					</Autocomplete>
 				</>
 			) }
