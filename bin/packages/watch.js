@@ -37,14 +37,10 @@ const isSourceFile = ( filename, skip ) => {
 	return isSource ? true : skip;
 };
 
-function getSrcDirectory( filename ) {
-	const matches = /packages\/.+\/src(\/.+)/g.exec( filename );
-	if ( ! matches || matches?.length < 2 ) {
-		return;
-	}
-	const [ , pathAfterSrc ] = matches;
-	const position = filename.indexOf( pathAfterSrc );
-	return filename.substr( 0, position );
+function getBuildFile( srcFile ) {
+	const packageDir = srcFile.substr( 0, srcFile.indexOf( '/src/' ) );
+	const filePath = srcFile.substr( srcFile.indexOf( '/src/' ) + 5 );
+	return path.resolve( packageDir, 'build', filePath );
 }
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
@@ -59,19 +55,10 @@ watch(
 			console.log( chalk.green( '->' ), `${ event }: ${ filePath }` );
 			rebuild( filePath );
 		} else {
-			const srcDir = getSrcDirectory( filePath );
-			const buildFile = path.resolve( srcDir, '..', 'build', filename );
+			const buildFile = getBuildFile( filePath );
 			try {
 				fs.unlinkSync( buildFile );
-				process.stdout.write(
-					chalk.red( '  \u2022 ' ) +
-						path.relative(
-							path.resolve( srcDir, '..', '..' ),
-							buildFile
-						) +
-						' (deleted)' +
-						'\n'
-				);
+				console.log( chalk.red( '<-' ), `${ event }: ${ filePath }` );
 			} catch ( e ) {}
 		}
 	}
