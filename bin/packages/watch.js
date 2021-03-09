@@ -38,12 +38,13 @@ const isSourceFile = ( filename, skip ) => {
 };
 
 function getSrcDirectory( filename ) {
-	const matches = /packages\/(.+)\/src\/.+/g.exec( filename );
-	if ( ! matches || ! matches?.length ) {
+	const matches = /packages\/.+\/src(\/.+)/g.exec( filename );
+	if ( ! matches || matches?.length < 2 ) {
 		return;
 	}
-	const [ , srcDirectory ] = matches;
-	return srcDirectory;
+	const [ , pathAfterSrc ] = matches;
+	const position = filename.indexOf( pathAfterSrc );
+	return filename.substr( 0, position );
 }
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
@@ -53,11 +54,12 @@ watch(
 	{ recursive: true, delay: 500, filter: isSourceFile },
 	( event, filename ) => {
 		const filePath = path.resolve( PACKAGES_DIR, filename );
-		const srcDir = getSrcDirectory( filePath );
+		// There are two event types, 'update' and 'remove'.
 		if ( event === 'update' && exists( filePath ) ) {
 			console.log( chalk.green( '->' ), `${ event }: ${ filePath }` );
 			rebuild( filePath );
 		} else {
+			const srcDir = getSrcDirectory( filePath );
 			const buildFile = path.resolve( srcDir, '..', 'build', filename );
 			try {
 				fs.unlinkSync( buildFile );
