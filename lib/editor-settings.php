@@ -108,7 +108,8 @@ function gutenberg_initialize_editor( $settings ) {
 
 	$settings = wp_parse_args( $settings, $defaults );
 
-	$preload_paths = apply_filters( "{$settings['editor_name']}_preload_paths", $settings['preload_paths'] );
+	$editor_name   = $settings['editor_name'];
+	$preload_paths = apply_filters( "{$editor_name}_preload_paths", $settings['preload_paths'] );
 
 	$preload_data = array_reduce(
 		$preload_paths,
@@ -131,7 +132,7 @@ function gutenberg_initialize_editor( $settings ) {
 			} );',
 			lcfirst( str_replace( '-', '', ucwords( $settings['editor_script_handle'], '-' ) ) ),
 			$settings['initializer_name'],
-			str_replace( '_', '-', $settings['editor_name'] ),
+			str_replace( '_', '-', $editor_name ),
 			wp_json_encode( $settings['editor_settings'] )
 		)
 	);
