@@ -1,6 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Navigation editor allows creation of a menu 1`] = `
+exports[`Navigation editor allows creation of a menu when there are existing menu items 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} /-->"`;
+
+exports[`Navigation editor allows creation of a menu when there are no current menu items 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} -->
 <!-- wp:page-list /-->
 <!-- /wp:navigation -->"

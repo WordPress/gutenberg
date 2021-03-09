@@ -108,8 +108,8 @@ describe( 'Navigation editor', () => {
 		await setUpResponseMocking( [] );
 	} );
 
-	it( 'allows creation of a menu', async () => {
-		const menuResponse = {
+	it( 'allows creation of a menu when there are no current menu items', async () => {
+		const menuPostResponse = {
 			id: 4,
 			description: '',
 			name: 'Main Menu',
@@ -133,8 +133,8 @@ describe( 'Navigation editor', () => {
 		// Prepare the menu endpoint for creating a menu.
 		await setUpResponseMocking( [
 			...getMenuMocks( {
-				GET: [ menuResponse ],
-				POST: menuResponse,
+				GET: [ menuPostResponse ],
+				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
 		] );
@@ -162,6 +162,69 @@ describe( 'Navigation editor', () => {
 		// When the block is created the root element changes from a div (for the placeholder)
 		// to a nav (for the navigation itself). Wait for this to happen.
 		await page.waitForSelector( 'nav[aria-label="Block: Navigation"]' );
+
+		expect( await getSerializedBlocks() ).toMatchSnapshot();
+	} );
+
+	it( 'allows creation of a menu when there are existing menu items', async () => {
+		const menuPostResponse = {
+			id: 4,
+			description: '',
+			name: 'New Menu',
+			slug: 'new-menu',
+			meta: [],
+			auto_add: false,
+		};
+
+		await setUpResponseMocking( [
+			...getMenuMocks( {
+				GET: assignMockMenuIds( menusFixture ),
+				POST: menuPostResponse,
+			} ),
+			...getMenuItemMocks( { GET: menuItemsFixture } ),
+		] );
+		await visitNavigationEditor();
+
+		// Wait for the header to show the menu name.
+		await page.waitForXPath( '//h2[contains(., "Editing: Test Menu 1")]', {
+			visible: true,
+		} );
+
+		// Open up the menu creation dialog and create a new menu.
+		const switchMenuButton = await page.waitForXPath(
+			'//button[.="Switch menu"]'
+		);
+		await switchMenuButton.click();
+
+		const createMenuButton = await page.waitForXPath(
+			'//button[.="Create a new menu"]'
+		);
+		await createMenuButton.click();
+
+		const menuNameInputLabel = await page.waitForXPath(
+			'//form//label[.="Menu name"]'
+		);
+		await menuNameInputLabel.click();
+
+		await setUpResponseMocking( [
+			...getMenuMocks( {
+				GET: assignMockMenuIds( [
+					...menusFixture,
+					{ name: 'New menu', slug: 'new-menu' },
+				] ),
+				POST: menuPostResponse,
+			} ),
+			...getMenuItemMocks( { GET: [] } ),
+		] );
+
+		await page.keyboard.type( 'New menu' );
+		await page.keyboard.press( 'Enter' );
+
+		// A snackbar will appear when menu creation has completed.
+		await page.waitForXPath( '//div[contains(., "Menu created")]' );
+
+		// An empty navigation block will appear.
+		await page.waitForSelector( 'div[aria-label="Block: Navigation"]' );
 
 		expect( await getSerializedBlocks() ).toMatchSnapshot();
 	} );
