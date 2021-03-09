@@ -109,7 +109,7 @@
 	&:not(.is-cropped) {
 
 		figure.wp-block-image:not(#individual-image) {
-			margin-top: auto;
+			margin-top: 0;
 			margin-bottom: auto;
 			img {
 				margin-bottom: var(--gallery-block--gutter-size, #{$grid-unit-20});
