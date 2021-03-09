@@ -15,11 +15,6 @@ function useSetLocked( className ) {
 	 * @param {boolean} locked
 	 */
 	function setLocked( locked ) {
-		if ( typeof document === undefined ) {
-			// if in SSR context, don't do anything
-			return;
-		}
-
 		const scrollingElement = document.scrollingElement || document.body;
 
 		if ( locked ) {
