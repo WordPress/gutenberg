@@ -70,7 +70,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 	}
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Layout settings' ) }>
+			<PanelBody title={ __( 'Alignments' ) }>
 				{ !! defaultLayout && (
 					<Button
 						isSecondary
@@ -82,11 +82,11 @@ function LayoutPanel( { setAttributes, attributes } ) {
 							} );
 						} }
 					>
-						{ __( 'Use default layout' ) }
+						{ __( 'Inherit default values' ) }
 					</Button>
 				) }
 				<UnitControl
-					label={ __( 'Content size' ) }
+					label={ __( 'Content' ) }
 					labelPosition="edge"
 					__unstableInputWidth="80px"
 					value={ contentSize || wideSize || '' }
@@ -103,7 +103,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 					units={ CSS_UNITS }
 				/>
 				<UnitControl
-					label={ __( 'Wide size' ) }
+					label={ __( 'Wide' ) }
 					labelPosition="edge"
 					__unstableInputWidth="80px"
 					value={ wideSize || contentSize || '' }
@@ -119,6 +119,11 @@ function LayoutPanel( { setAttributes, attributes } ) {
 					} }
 					units={ CSS_UNITS }
 				/>
+				<p>
+					{ __(
+						'The content and wide sizes determine the behavior of block alignments.'
+					) }
+				</p>
 			</PanelBody>
 		</InspectorControls>
 	);
