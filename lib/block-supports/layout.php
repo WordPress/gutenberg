@@ -91,3 +91,37 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+
+/**
+ * For themes without theme.json file, make sure
+ * to restore the inner div for the group block
+ * to avoid breaking styles relying on that div.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
+ */
+function gutenberg_restore_group_inner_container( $block_content, $block ) {
+	$group_with_inner_container_regex = '/(^(\s|\S)*<div\b[^>]*wp-block-group(\s|")[^>]*>)(([\s]|\S)*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/';
+
+	if (
+		'core/group' !== $block['blockName'] ||
+		WP_Theme_JSON_Resolver::theme_has_support() ||
+		1 === preg_match( $group_with_inner_container_regex, $block_content )
+	) {
+		return $block_content;
+	}
+
+	$replace_regex   = '/(^(\s|\S)*<div\b[^>]*wp-block-group[^>]*>)((.|\S|\s)*)(<\/div>(\s|\S)*$)/m';
+	$updated_content = preg_replace_callback(
+		$replace_regex,
+		function( $matches ) {
+			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[3] . '</div>' . $matches[5];
+		},
+		$block_content
+	);
+
+	return $updated_content;
+}
+
+add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
