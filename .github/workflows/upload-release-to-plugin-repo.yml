@@ -50,13 +50,21 @@ jobs:
           git commit -m "Update Changelog for ${VERSION}"
           git push --set-upstream origin "${{ steps.get_release_branch.outputs.release_branch }}"
 
-      # TODO: Do the same for trunk
-
       - name: Upload Changelog artifact
         uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
         with:
           name: changelog
           path: ./changelog.txt
+
+      - name: Cherry-pick Changelog update to trunk
+        run: |
+          git fetch --depth=1 origin trunk
+          git checkout trunk
+          TRUNK_VERSION=$(jq --raw-output '.version' package.json)
+          if [[ "$VERSION" == "$TRUNK_VERSION" ]]; then
+            git cherry-pick "${{ steps.get_release_branch.outputs.release_branch }}"
+            git push
+          fi
 
   upload:
     name: Upload Gutenberg Plugin
