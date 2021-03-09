@@ -132,6 +132,16 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
+	unset( $settings['colors'] );
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
+	unset( $settings['fontSizes'] );
+	unset( $settings['gradients'] );
+
 	$config = WP_Theme_Config_Resolver::load_config();
 
 	// STEP 1: ADD FEATURES
