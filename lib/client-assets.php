@@ -668,7 +668,7 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	// When Gutenberg is updated to have minimum version of WordPress 5.8
 	// This could be removed.
 	foreach ( $settings['styles'] as $j => $style ) {
-		if ( 0 === strpos( $style['css'], "body { font-family:" ) ) {
+		if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
 			unset( $settings['styles'][ $j ] );
 		}
 	}
