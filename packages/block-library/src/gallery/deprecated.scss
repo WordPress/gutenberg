@@ -18,7 +18,6 @@
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
-		align-self: flex-start;
 
 		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 		width: calc(50% - 1em);
@@ -137,6 +136,14 @@
 	&.aligncenter {
 		.blocks-gallery-item figure {
 			justify-content: center;
+		}
+	}
+}
+.wp-block-gallery {
+	// Non cropped images.
+	&:not(.is-cropped) {
+		.blocks-gallery-item {
+			align-self: flex-start;
 		}
 	}
 }
