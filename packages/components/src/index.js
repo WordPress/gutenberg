@@ -165,4 +165,4 @@ export {
 	__unstableComponentSystemProvider,
 } from './__next/context';
 
-export { useInlineEdit } from './inline-edit';
+export { useInlineEdit as __unstableUseInlineEdit } from './inline-edit';
