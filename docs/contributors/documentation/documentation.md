@@ -67,7 +67,7 @@ This way they will be properly handled in all three aforementioned contexts.
 
 Use the full directory and filename from the Gutenberg repository, not the published path; the Block Editor Handbook creates short URLs—you can see this in the tutorials section. Likewise, the `readme.md` portion is dropped in the handbook, but should be included in links.
 
-An example, the link to this page is: `/docs/contributors/document.md`
+An example, the link to this page is: `/docs/contributors/documentation/documentation.md`
 
 ### Code Examples
 
@@ -96,7 +96,7 @@ The preferred format for code examples is ESNext, this should be the default vie
 
 ### Editor Config
 
-You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started.md) for complete details.
+You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
 
 An example config for using Visual Studio Code and the Prettier extensions:
 

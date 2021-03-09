@@ -1,6 +1,6 @@
 # Development Environment
 
-This guide is for setting up your local environment for JavaScript development for creating plugins and tools to extend WordPress and the block editor. If you are looking to contribute to Gutenberg project itself, see additional documentation in the [Getting Started guide](/docs/contributors/code/getting-started.md).
+This guide is for setting up your local environment for JavaScript development for creating plugins and tools to extend WordPress and the block editor. If you are looking to contribute to Gutenberg project itself, see additional documentation in the [Getting Started guide](/docs/contributors/code/getting-started-with-code-contribution.md).
 
 A development environment is a catch-all term for what you need setup on your computer to work. The three main pieces needed for our development environment are:
 
