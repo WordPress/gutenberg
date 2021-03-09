@@ -8,7 +8,7 @@ cd $DIR
 PARENT_GIT_REPO_PATH=$(git rev-parse --show-superproject-working-tree)
 if [[ -z $PARENT_GIT_REPO_PATH ||
     $(git -C $PARENT_GIT_REPO_PATH config --get remote.origin.url) != *"/gutenberg-mobile.git" ]]; then
-    echo "This script needs to be run from the 'gutenberg-mobile' submodule."
+    echo "This script can only be used if the 'gutenberg' project is a submodule of the 'gutenberg-mobile' project"
     exit 1
 fi
 
