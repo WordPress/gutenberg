@@ -37,8 +37,10 @@ const isSourceFile = ( filename, skip ) => {
 };
 
 function getBuildFile( srcFile ) {
-	const packageDir = srcFile.substr( 0, srcFile.indexOf( '/src/' ) );
-	const filePath = srcFile.substr( srcFile.indexOf( '/src/' ) + 5 );
+	// Could just use string.replace, but the user might have the project
+	// checked out and nested under another src folder.
+	const packageDir = srcFile.substr( 0, srcFile.lastIndexOf( '/src/' ) );
+	const filePath = srcFile.substr( srcFile.lastIndexOf( '/src/' ) + 5 );
 	return path.resolve( packageDir, 'build', filePath );
 }
 
