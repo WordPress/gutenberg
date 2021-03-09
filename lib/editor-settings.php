@@ -108,7 +108,14 @@ function gutenberg_initialize_editor( $settings ) {
 
 	$settings = wp_parse_args( $settings, $defaults );
 
-	$editor_name   = $settings['editor_name'];
+	$editor_name = $settings['editor_name'];
+	/**
+	 * Preload common data by specifying an array of REST API paths that will be preloaded.
+	 *
+	 * Filters the array of paths that will be preloaded.
+	 *
+	 * @param string[] $preload_paths Array of paths to preload.
+	 */
 	$preload_paths = apply_filters( "{$editor_name}_preload_paths", $settings['preload_paths'] );
 
 	$preload_data = array_reduce(
