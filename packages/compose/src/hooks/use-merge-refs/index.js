@@ -6,6 +6,14 @@ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */
 
+function assignRef( ref, value ) {
+	if ( typeof ref === 'function' ) {
+		ref( value );
+	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
+		ref.current = value;
+	}
+}
+
 /**
  * Merges refs into one ref callback. Ensures the merged ref callbacks are only
  * called when it changes (as a result of a `useCallback` dependency update) or
@@ -22,7 +30,7 @@ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 export default function useMergeRefs( refs ) {
 	const element = useRef( null );
 	const didElementChange = useRef( false );
-	const previousRefs = useRef( refs );
+	const previousRefs = useRef();
 	const currentRefs = useRef( refs );
 
 	// Update on render before the ref callback is called, so the ref callback
@@ -33,23 +41,24 @@ export default function useMergeRefs( refs ) {
 	// ref with the node, except when the element changes in the same cycle, in
 	// which case the ref callbacks will already have been called.
 	useLayoutEffect( () => {
-		refs.forEach( ( ref, index ) => {
-			const previousRef = previousRefs.current[ index ];
-
-			if ( ref && ref.hasOwnProperty( 'current' ) ) {
-				ref.current = element.current;
-			} else if (
-				typeof ref === 'function' &&
-				ref !== previousRef &&
-				didElementChange.current === false
-			) {
-				if ( previousRef ) {
-					previousRef( null );
+		if ( didElementChange.current === false ) {
+			if ( previousRefs.current ) {
+				for ( const previousRef of previousRefs.current ) {
+					if ( ! refs.includes( previousRef ) ) {
+						assignRef( previousRef, null );
+					}
 				}
-
-				ref( element.current );
 			}
-		} );
+
+			for ( const ref of refs ) {
+				if (
+					! previousRefs.current ||
+					! previousRefs.current.includes( ref )
+				) {
+					assignRef( ref, element.current );
+				}
+			}
+		}
 
 		previousRefs.current = refs;
 	}, [ refs.length, ...refs ] );
@@ -73,12 +82,8 @@ export default function useMergeRefs( refs ) {
 		const refsToUpdate = value ? currentRefs.current : previousRefs.current;
 
 		// Update the latest refs.
-		refsToUpdate.forEach( ( ref ) => {
-			if ( typeof ref === 'function' ) {
-				ref( value );
-			} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-				ref.current = value;
-			}
-		} );
+		for ( const ref of refsToUpdate ) {
+			assignRef( ref, value );
+		}
 	}, [] );
 }
