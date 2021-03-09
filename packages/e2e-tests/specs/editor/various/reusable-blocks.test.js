@@ -343,8 +343,14 @@ describe( 'Reusable blocks', () => {
 		// Convert to reusable.
 		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Add to Reusable blocks' );
+		const nameInput = await page.waitForSelector(
+			reusableBlockNameInputSelector
+		);
+		await nameInput.click();
+		await page.keyboard.type( 'Block with styles' );
+		await page.keyboard.press( 'Enter' );
 		const reusableBlock = await page.waitForSelector(
-			'.block-editor-block-list__block[aria-label="Block: Reusable Block"]'
+			'.block-editor-block-list__block[aria-label="Block: Reusable block"]'
 		);
 		expect( reusableBlock ).toBeTruthy();
 	} );
