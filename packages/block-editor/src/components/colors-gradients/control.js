@@ -22,7 +22,10 @@ import { sprintf, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getColorObjectByAttributeValues, getColorObjectByColorValue } from '../colors';
+import {
+	getColorObjectByAttributeValues,
+	getColorObjectByColorValue,
+} from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useEditorFeature from '../use-editor-feature';
 
@@ -51,17 +54,21 @@ function VisualLabel( {
 	if ( currentTab === 'color' ) {
 		if ( colorValue ) {
 			value = colorValue;
-			if (colorValue?.includes('var(')) {
+			if ( colorValue?.includes( 'var(' ) ) {
 				const regexSlug = /--(?!.*--)(.*)\)/;
-				const match = colorValue.match(regexSlug);
-				slug = match[1];
-				colorObject = getColorObjectByAttributeValues( colors, slug, value);
+				const match = colorValue.match( regexSlug );
+				slug = match[ 1 ];
+				colorObject = getColorObjectByAttributeValues(
+					colors,
+					slug,
+					value
+				);
 			} else {
 				colorObject = getColorObjectByColorValue( colors, value );
 			}
 			const colorName = colorObject && colorObject.name;
 			tooltip = colorObject?.color || value;
-			ariaLabel = sprintf( colorIndicatorAriaLabel, tooltip );
+			ariaLabel = sprintf( colorIndicatorAriaLabel, colorName );
 		}
 	} else if ( currentTab === 'gradient' && gradientValue ) {
 		value = gradientValue;
@@ -81,7 +88,10 @@ function VisualLabel( {
 			{ label }
 			{ !! value && (
 				<Tooltip text={ tooltip }>
-					<ColorIndicator colorValue={ value } aria-label={ ariaLabel } />
+					<ColorIndicator
+						colorValue={ value }
+						aria-label={ ariaLabel }
+					/>
 				</Tooltip>
 			) }
 		</>

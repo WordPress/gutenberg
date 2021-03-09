@@ -25,16 +25,16 @@ export default function ColorPalette( {
 	value,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	function get(slug) {
+	function get( slug ) {
 		return 'var(--wp--preset--color--' + slug + ')';
 	}
-	function match(value, color, slug) {
-		if (value?.includes('var(')) {
+	function match( val, color, slug ) {
+		if ( val?.includes( 'var(' ) ) {
 			const regexSlug = /--(?!.*--)(.*)\)/;
-			const match = value.match(regexSlug);
-			value = match[1] || value;
+			const matches = val.match( regexSlug );
+			val = matches[ 1 ] || val;
 		}
-		if (value === color || value === slug) {
+		if ( val === color || val === slug ) {
 			return true;
 		}
 		return false;
@@ -43,9 +43,9 @@ export default function ColorPalette( {
 		return map( colors, ( { color, name, slug } ) => (
 			<CircularOptionPicker.Option
 				key={ color }
-				isSelected={ match(value, color, slug) }
+				isSelected={ match( value, color, slug ) }
 				selectedIconProps={
-					match(value, color, slug)
+					match( value, color, slug )
 						? {
 								fill: tinycolor
 									.mostReadable( color, [ '#000', '#fff' ] )
@@ -60,7 +60,9 @@ export default function ColorPalette( {
 				}
 				style={ { backgroundColor: color, color } }
 				onClick={
-					match(value, color, slug) ? clearColor : () => onChange( get(slug) )
+					match( value, color, slug )
+						? clearColor
+						: () => onChange( get( slug ) )
 				}
 				aria-label={
 					name
