@@ -25,7 +25,6 @@ function DateTimePicker(
 		currentDate,
 		is12Hour,
 		isInvalidDate,
-		onMonthPreviewed,
 		onChange,
 		events,
 	},
@@ -52,7 +51,6 @@ function DateTimePicker(
 						currentDate={ currentDate }
 						onChange={ onChange }
 						isInvalidDate={ isInvalidDate }
-						onMonthPreviewed={ onMonthPreviewed }
 						events={ events }
 					/>
 				</>
