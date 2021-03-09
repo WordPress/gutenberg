@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
-import { controls } from '@wordpress/data';
+import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
@@ -328,7 +328,6 @@ export function* revertTemplate( template ) {
 			'wp_template',
 			template.id
 		);
-
 		yield controls.dispatch(
 			'core',
 			'editEntityRecord',
@@ -381,7 +380,6 @@ export function* revertTemplate( template ) {
 			fileTemplate.id,
 			edits
 		);
-
 		yield controls.dispatch(
 			'core',
 			'receiveEntityRecords',
@@ -393,11 +391,38 @@ export function* revertTemplate( template ) {
 			edits
 		);
 
+		const undoRevert = async () => {
+			await dispatch( 'core' ).editEntityRecord(
+				'postType',
+				'wp_template',
+				edited.id,
+				{
+					content: serializeBlocks,
+					blocks: edited.blocks,
+					wp_id: null,
+					is_custom: true,
+				}
+			);
+
+			await dispatch( 'core' ).saveEditedEntityRecord(
+				'postType',
+				'wp_template',
+				edited.id
+			);
+		};
 		yield controls.dispatch(
 			'core/notices',
 			'createSuccessNotice',
 			__( 'Template reverted.' ),
-			{ type: 'snackbar' }
+			{
+				type: 'snackbar',
+				actions: [
+					{
+						label: __( 'Undo' ),
+						onClick: undoRevert,
+					},
+				],
+			}
 		);
 	} catch ( error ) {
 		const errorMessage =
