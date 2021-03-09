@@ -163,11 +163,11 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
 
 /**
- * Returns a filtered list of allowed area types for template parts.
+ * Returns a filtered list of allowed area values for template parts.
  *
  * @return array The supported template part area types.
  */
-function gutenberg_get_allowed_template_part_area_types() {
+function gutenberg_get_allowed_template_part_area_values() {
 	$default_area_types = array(
 		WP_TEMPLATE_PART_AREA_HEADER,
 		WP_TEMPLATE_PART_AREA_FOOTER,
@@ -184,15 +184,15 @@ function gutenberg_get_allowed_template_part_area_types() {
 }
 
 /**
- * Checks whether the input 'type' is a supported area type.
- * Returns the input if supported, otherwise returns the 'other' type.
+ * Checks whether the input 'area' is a supported value.
+ * Returns the input if supported, otherwise returns the 'uncategorized' value.
  *
  * @param string $type Template part area name.
  *
  * @return string Input if supported, else 'other'.
  */
-function gutenberg_filter_template_part_area_type( $type ) {
-	if ( in_array( $type, gutenberg_get_allowed_template_part_area_types(), true ) ) {
+function gutenberg_filter_template_part_area( $type ) {
+	if ( in_array( $type, gutenberg_get_allowed_template_part_area_values(), true ) ) {
 		return $type;
 	}
 
