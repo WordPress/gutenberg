@@ -670,6 +670,15 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		array_unshift( $settings['styles'], $editor_styles );
 	}
 
+	// Remove the default font editor styles.
+	// When Gutenberg is updated to have minimum version of WordPress 5.8
+	// This could be removed.
+	foreach ( $settings['styles'] as $j => $style ) {
+		if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
+			unset( $settings['styles'][ $j ] );
+		}
+	}
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
