@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.release.assets[0]
     env:
-      VERSION: ${{ github.event.release.tag_name }}
+      TAG: ${{ github.event.release.tag_name }}
     steps:
       - name: Compute release branch name
         id: get_release_branch
         run: |
-          IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION#v}"
+          IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
           RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
           echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
 
@@ -27,11 +27,11 @@ jobs:
       - name: Update the Changelog to include the release notes
         run: |
           printf '== Changelog ==\n\n' > new_changelog.txt
-          printf '= %s =\n\n' "${VERSION#v}" >> new_changelog.txt
+          printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
           echo "${{ github.event.release.body }}" >> new_changelog.txt
           printf '\n\n' >> new_changelog.txt
           CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
-          RC_REGEX="=\s${VERSION#v}(-rc\.[0-9]+)?\s="
+          RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
           if [[ ${{ github.event.release.prerelease }} == 'true' ]]; then
             awk "/${CHANGELOG_REGEX}/,EOF" changelog.txt >> new_changelog.txt
           else
@@ -47,7 +47,7 @@ jobs:
       - name: Commit the Changelog update
         run: |
           git add changelog.txt
-          git commit -m "Update Changelog for ${VERSION#v}"
+          git commit -m "Update Changelog for ${TAG#v}"
           git push --set-upstream origin "${{ steps.get_release_branch.outputs.release_branch }}"
 
       - name: Upload Changelog artifact
@@ -61,7 +61,7 @@ jobs:
           git fetch --depth=1 origin trunk
           git checkout trunk
           TRUNK_VERSION=$(jq --raw-output '.version' package.json)
-          if [[ "${VERSION#v}" == "$TRUNK_VERSION" ]]; then
+          if [[ "${TAG#v}" == "$TRUNK_VERSION" ]]; then
             git cherry-pick "${{ steps.get_release_branch.outputs.release_branch }}"
             git push
           fi
