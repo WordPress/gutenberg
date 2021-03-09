@@ -100,10 +100,10 @@ function EntitiesSavedStates( { isOpen, close } ) {
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Are you ready to save?' ) }</strong>
+				<strong>{ __( 'Select the changes you want to save' ) }</strong>
 				<p>
 					{ __(
-						'Select the following changes you want to save. Some changes may affect other areas of your site.'
+						'Some changes may affect other areas of your site.'
 					) }
 				</p>
 			</div>
