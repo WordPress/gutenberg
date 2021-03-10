@@ -30,7 +30,9 @@ export default function PostSchedule() {
 	const { editPost } = useDispatch( coreStore );
 	const onUpdateDate = ( postDate ) => editPost( { date: postDate } );
 
-	const [ currentMonth ] = useState( getDayOfTheMonth( date ) );
+	const [ currentMonth, setCurrentMonth ] = useState(
+		getDayOfTheMonth( date )
+	);
 
 	// Pick up published and schduled site posts.
 	const events = useSelect(

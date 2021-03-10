@@ -21,9 +21,11 @@ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 function DatePickerDay( { day, events } ) {
 	return (
-		<div className={ classnames( 'components-datetime__date__day', {
-			'has-events': events?.length,
-		} ) }>
+		<div
+			className={ classnames( 'components-datetime__date__day', {
+				'has-events': events?.length,
+			} ) }
+		>
 			{ day.format( 'D' ) }
 		</div>
 	);
