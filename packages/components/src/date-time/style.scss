@@ -111,7 +111,7 @@
 	}
 }
 
-.components-datetime__date__day {
+.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day {
 	height: 100%;
 	display: flex;
 	justify-content: center;
