@@ -62,12 +62,10 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onIncrementValue() {
-		const { step = 1, maximumValue, decimalNum } = this.props;
+		const { step = 10, maximumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
 
 		const newValue = toFixed( sliderValue + step, decimalNum );
-
-		console.log( `Increment: prev=${ sliderValue }, new=${ newValue }` );
 
 		if ( newValue <= maximumValue || maximumValue === undefined ) {
 			this.onChangeValue( newValue );
@@ -79,14 +77,10 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onDecrementValue() {
-		const { step = 1, minimumValue, decimalNum } = this.props;
+		const { step = 10, minimumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
 
 		const newValue = toFixed( sliderValue - step, decimalNum );
-
-		console.log(
-			`Decrement: prev=${ sliderValue }, new=${ newValue }, step=${ step }, decimalNum=${ decimalNum }`
-		);
 
 		if ( newValue >= minimumValue ) {
 			this.onChangeValue( newValue );
