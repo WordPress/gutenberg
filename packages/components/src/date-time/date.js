@@ -37,7 +37,12 @@ class DatePicker extends Component {
 
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
-		this.keepFocusInside = this.keepFocusInside.bind( this );
+		this.onMonthChangeHandler = this.onMonthChangeHandler.bind( this );
+	}
+
+	onMonthChangeHandler( newMonthDate ) {
+		this.props?.onMonthChange( newMonthDate.toISOString() );
+		this.keepFocusInside();
 	}
 
 	/*
@@ -46,9 +51,7 @@ class DatePicker extends Component {
 	 * This focus loss closes the date picker popover.
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
 	 */
-	keepFocusInside( newMonthDate ) {
-		this.props?.onMonthChange( newMonthDate.toISOString() );
-
+	keepFocusInside() {
 		if ( ! this.nodeRef.current ) {
 			return;
 		}
@@ -135,8 +138,8 @@ class DatePicker extends Component {
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
 					} }
-					onPrevMonthClick={ this.keepFocusInside }
-					onNextMonthClick={ this.keepFocusInside }
+					onPrevMonthClick={ this.onMonthChangeHandler }
+					onNextMonthClick={ this.onMonthChangeHandler }
 					renderDayContents={ ( day ) => (
 						<DatePickerDay
 							day={ day }
