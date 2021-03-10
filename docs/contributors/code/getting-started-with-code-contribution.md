@@ -1,12 +1,12 @@
-# Getting Started
+# Getting Started With Code Contribution
 
-The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Environment tutorial](/docs/getting-started/tutorials/devenv/readme.md) for additional setup information.
+The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Environment tutorial](/docs/getting-started/tutorials/devenv/README.md) for additional setup information.
 
 ## Development Tools (Node)
 
 Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using the latest active LTS release of node, and the latest version of NPM. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
 
-We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/tutorials/devenv/readme.md#development-tools) or the Nodejs site for additional installation instructions.
+We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/tutorials/devenv/README.md#development-tools) or the Nodejs site for additional installation instructions.
 
 After installing Node, you can build Gutenberg by running the following from within the cloned repository:
 
@@ -34,7 +34,7 @@ The [wp-env package](/packages/env/README.md) was developed with the Gutenberg p
 
 By default, `wp-env` can run in a plugin directory to create and run a WordPress environment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
 
-If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/getting-started/tutorials/devenv/readme.md).
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/getting-started/tutorials/devenv/README.md).
 
 Once Docker is installed and running: To install WordPress, run the following from within the cloned gutenberg directory:
 

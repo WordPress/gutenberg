@@ -4,7 +4,7 @@ ESNext is JavaScript written using syntax and features only available in a versi
 
 See the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) for explanation and examples about common code differences between standard JavaScript and ESNext.
 
-Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/code/getting-started.md) documentation.
+Let's set up your development environment to use these syntaxes, we'll cover development for your plugin to work with the Gutenberg project (ie: the block editor). If you want to develop on Gutenberg itself, see the [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documentation.
 
 Browsers cannot interpret or run ESNext and JSX syntaxes, so we must use a transformation step to convert these syntaxes to code that browsers can understand.
 
@@ -34,7 +34,7 @@ First, you need to set up Node.js for your development environment. The steps re
 -   macOS: `brew install node`
 -   Windows: `choco install node`
 
-If you are not using a package manager, see the [developer environment setup documentation](/docs/getting-started/tutorials/devenv/readme.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
+If you are not using a package manager, see the [developer environment setup documentation](/docs/getting-started/tutorials/devenv/README.md) for setting up Node using nvm, or see the official [Node.js download page](https://nodejs.org/en/download/) for installers and binaries.
 
 **Note:** The build tools and process occur on the command-line, so basic familiarity using a terminal application is required. Some text editors have a terminal built-in that is fine to use; Visual Studio Code and PhpStorm are two popular options.
 
