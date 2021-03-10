@@ -345,7 +345,7 @@ export class RichText extends Component {
 		}
 
 		// Add stub for conformance in downstream autocompleters logic
-		this?.customEditableOnKeyDown( {
+		this.customEditableOnKeyDown?.( {
 			...event,
 			stopPropagation: () => undefined,
 		} );
