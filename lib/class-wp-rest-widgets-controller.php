@@ -156,7 +156,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			return $sidebar_id;
 		}
 
-		return $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+		return $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
 	}
 
 	/**
@@ -238,7 +238,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$widget_id  = $request['id'];
 		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
 
-		if ( is_wp_error( $sidebar_id ) ) {
+		// TODO: Better way to do this? Maybe just remove alltogether?
+		$parsed_id     = gutenberg_parse_widget_id( $widget_id );
+		$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
+		if ( is_wp_error( $sidebar_id ) && $widget_object ) {
 			return $sidebar_id;
 		}
 
@@ -261,15 +264,15 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			}
 
 			if ( $request->has_param( 'sidebar' ) ) {
-				$new_sidebar_id = $request['sidebar'];
-				if ( $sidebar_id !== $new_sidebar_id ) {
-					gutenberg_assign_widget_to_sidebar( $widget_id, $new_sidebar_id );
+				if ( $sidebar_id !== $request['sidebar'] ) {
+					$sidebar_id = $request['sidebar'];
+					gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
 				}
 			}
 
 			$request['context'] = 'edit';
 
-			return $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+			return $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
 		} finally {
 			if ( $request['preview'] ) {
 				$option_capturer->stop_capturing_option_updates();
@@ -308,7 +311,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$request['context'] = 'edit';
 
 		if ( $request['force'] ) {
-			$prepared = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+			$prepared = $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
 			gutenberg_assign_widget_to_sidebar( $widget_id, '' );
 			$prepared->set_data(
 				array(
@@ -357,7 +360,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @since 5.6.0
 	 *
 	 * @param string $widget_id The widget id to search for.
-	 * @return string|WP_Error The found sidebar id, or a WP_Error instance if it does not exist.
+	 * @return string The found sidebar id, or 'wp_inactive_widgets' if the widget does not belong to any.
 	 */
 	protected function find_widgets_sidebar( $widget_id ) {
 		foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
@@ -416,7 +419,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 		if (
 			isset( $request['instance'] ) ||
-			isset( $request['settings'] ) // Backwards compatibility. TODO: Remove.
+			( isset( $request['settings'] ) && $widget_object ) // Backwards compatibility. TODO: Remove.
 		) {
 			if ( ! $widget_object ) {
 				return new WP_Error(
@@ -454,6 +457,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					$number => $instance,
 				),
 			);
+		} elseif ( isset( $request['settings'] ) && ! $widget_object ) { // Backwards compatibility. TODO: Remove.
+			$form_data = $request['settings'];
 		} elseif ( ! $request->is_json_content_type() ) {
 			$form_data = $request->get_body_params();
 		} else {
@@ -481,9 +486,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$_POST    = $original_post;
 		$_REQUEST = $original_request;
 
-		// Re-register widgets so that they are available for get_item().
+		// Register any multi-widgets that were created in the update callback.
 		if ( $widget_object ) {
-			$widget_object->_register();
+			$widget_object->_set( $number );
+			$widget_object->_register_one( $number );
 		}
 
 		return $id;
@@ -503,7 +509,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		global $wp_registered_widgets, $wp_registered_sidebars, $wp_registered_widget_controls;
+		global $wp_registered_widgets;
 
 		$widget_id  = $item['widget_id'];
 		$sidebar_id = $item['sidebar_id'];
@@ -538,7 +544,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 		if ( rest_is_field_included( 'rendered_form', $fields ) ) {
 			$rendered_form = gutenberg_render_widget_control( $widget_id );
-			if ( $rendered_form ) {
+			if ( ! is_null( $rendered_form ) ) {
 				$prepared['rendered_form'] = trim( $rendered_form );
 			}
 		}
@@ -566,10 +572,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$prepared['widget_class'] = $widget_object ? get_class( $widget_object ) : '';
 		$prepared['name']         = $widget['name'];
 		$prepared['description']  = ! empty( $widget['description'] ) ? $widget['description'] : '';
-		$prepared['number']       = isset( $parsed_id['number'] ) ? (int) $parsed_id['number'] : 0;
+		$prepared['number']       = $widget_object ? (int) $parsed_id['number'] : 0;
 		if ( rest_is_field_included( 'settings', $fields ) ) {
 			$instance             = gutenberg_get_widget_instance( $widget_id );
-			$prepared['settings'] = $instance;
+			$prepared['settings'] = $instance ? $instance : array();
 		}
 
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -680,7 +686,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				'rendered_form' => array(
 					'description' => __( 'HTML representation of the widget admin form.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'instance'      => array(
@@ -714,7 +720,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'description' => __( 'DEPRECATED. Settings of the widget.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'default'     => null,
+					'default'     => array(),
 				),
 				// END backwards compatibility.
 			),

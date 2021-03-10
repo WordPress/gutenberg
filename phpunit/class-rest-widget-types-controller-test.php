@@ -255,6 +255,7 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 	}
 
 	public function test_get_widget_form() {
+		$this->setExpectedDeprecated( 'WP_REST_Widget_Types_Controller::get_widget_form' );
 		$widget_name = 'calendar';
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'POST', '/wp/v2/widget-types/' . $widget_name . '/form-renderer' );
