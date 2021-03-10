@@ -140,6 +140,7 @@ class BottomSheetStepperCell extends Component {
 			shouldDisplayTextInput = false,
 			preview,
 			onChange,
+			openUnitPicker,
 			decimalNum,
 			cellContainerStyle,
 		} = this.props;
@@ -150,12 +151,26 @@ class BottomSheetStepperCell extends Component {
 			styles.cellLabel,
 			! icon ? styles.cellLabelNoIcon : {},
 		];
-		const accessibilityLabel = sprintf(
-			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			__( '%1$s. Current value is %2$s' ),
-			label,
-			value
-		);
+		const accessibilityLabel = openUnitPicker
+			? sprintf(
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					__(
+						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust, double-tap to change unit'
+					),
+					label,
+					value,
+					unitLabel
+			  )
+			: sprintf(
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					__(
+						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust'
+					),
+					label,
+					value,
+					unitLabel
+			  );
+
 		const containerStyle = [
 			styles.rowContainer,
 			isIOS ? styles.containerIOS : styles.containerAndroid,
@@ -169,6 +184,7 @@ class BottomSheetStepperCell extends Component {
 				accessibilityActions={ [
 					{ name: 'increment' },
 					{ name: 'decrement' },
+					{ name: 'activate' },
 				] }
 				onAccessibilityAction={ ( event ) => {
 					switch ( event.nativeEvent.actionName ) {
@@ -177,6 +193,11 @@ class BottomSheetStepperCell extends Component {
 							break;
 						case 'decrement':
 							this.onDecrementValue();
+							break;
+						case 'activate':
+							if ( openUnitPicker ) {
+								openUnitPicker();
+							}
 							break;
 					}
 				} }
