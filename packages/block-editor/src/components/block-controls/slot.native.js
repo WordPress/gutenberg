@@ -26,7 +26,7 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 				if ( ! fills.length ) {
 					return null;
 				}
-				<ToolbarGroup>{ fills }</ToolbarGroup>;
+				return <ToolbarGroup>{ fills }</ToolbarGroup>;
 			} }
 		</Slot>
 	);
