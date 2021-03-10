@@ -11,6 +11,7 @@
 -   [Transformations](/docs/reference-guides/block-api/block-transforms.md)
 -   [Templates](/docs/reference-guides/block-api/block-templates.md)
 -   [Metadata](/docs/reference-guides/block-api/block-metadata.md)
+-   [Block Variations](/docs/reference-guides/block-api/block-variations.md)
 -   [Block Patterns](/docs/reference-guides/block-api/block-patterns.md)
 -   [Annotations](/docs/reference-guides/block-api/block-annotations.md)
 -   [Versions](/docs/reference-guides/block-api/versions.md)
