@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
  */
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, textColor } from '@wordpress/icons';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -33,6 +34,11 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 
 	const [ value, onChangeText ] = useState( alt );
 
+	const horizontalBorderStyle = usePreferredColorSchemeStyle(
+		styles.horizontalBorder,
+		styles.horizontalBorderDark
+	);
+
 	return (
 		<BottomSheet.SubSheet
 			navigationButton={
@@ -53,7 +59,7 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 					screen={ __( 'Alt Text' ) }
 					leftButtonOnPress={ goBack }
 				/>
-				<PanelBody style={ styles.altTextEditorContainer }>
+				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
 						label={ __( 'Alt Text' ) }
 						onChangeText={ ( text ) => onChangeText( text ) }
