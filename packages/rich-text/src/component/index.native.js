@@ -344,6 +344,12 @@ export class RichText extends Component {
 			return;
 		}
 
+		// Add stub for conformance in downstream autocompleters logic
+		this?.customEditableOnKeyDown( {
+			...event,
+			stopPropagation: () => undefined,
+		} );
+
 		this.handleDelete( event );
 		this.handleEnter( event );
 		this.handleTriggerKeyCodes( event );
@@ -357,17 +363,6 @@ export class RichText extends Component {
 
 		if ( ! onEnter ) {
 			return;
-		}
-
-		// Slash inserter command
-		if (
-			this.value?.indexOf( '/' ) === 0 &&
-			this.customEditableOnKeyDown
-		) {
-			this.customEditableOnKeyDown( {
-				...event,
-				stopPropagation: () => undefined,
-			} );
 		}
 
 		onEnter( {
@@ -916,7 +911,7 @@ export class RichText extends Component {
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
 
-			return <View />;
+			return <></>;
 		};
 
 		return (
