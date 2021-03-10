@@ -49,10 +49,6 @@ function gutenberg_get_editor_styles() {
 		),
 	);
 
-	$styles[] = array(
-		'css' => 'body { font-family: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif }',
-	);
-
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
 			if ( preg_match( '~^(https?:)?//~', $style ) ) {
@@ -85,7 +81,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen, $post;
+	global $current_screen, $post, $editor_styles;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -174,6 +170,14 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_style( 'wp-format-library' );
+
+	if (
+		current_theme_supports( 'wp-block-styles' ) ||
+		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
+	) {
+		wp_enqueue_style( 'wp-block-library-theme' );
+	}
+
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 

@@ -324,6 +324,10 @@ describe( 'saveNavigationPost', () => {
 		);
 
 		expect( action.next( mapping ).value ).toEqual(
+			dispatch( 'core', 'saveEditedEntityRecord', 'root', 'menu', 1 )
+		);
+
+		expect( action.next( { id: 1 } ).value ).toEqual(
 			apiFetch( {
 				path: '/__experimental/customizer-nonces/get-save-nonce',
 			} )
@@ -454,6 +458,10 @@ describe( 'saveNavigationPost', () => {
 		);
 
 		expect( action.next( mapping ).value ).toEqual(
+			dispatch( 'core', 'saveEditedEntityRecord', 'root', 'menu', 1 )
+		);
+
+		expect( action.next().value ).toEqual(
 			apiFetch( {
 				path: '/__experimental/customizer-nonces/get-save-nonce',
 			} )

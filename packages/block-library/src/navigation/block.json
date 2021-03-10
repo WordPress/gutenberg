@@ -40,7 +40,8 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
-		"style": "style"
+		"style": "style",
+		"orientation": "orientation"
 	},
 	"supports": {
 		"align": [
