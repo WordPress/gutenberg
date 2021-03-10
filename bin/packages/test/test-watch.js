@@ -15,14 +15,21 @@ const NUM_FILES_TO_WRITE = 1000;
 const TEST_PACKAGE_DIR = '../../../packages/__DEMO_PACKAGE__';
 const TEST_FILENAME_PREFIX = 'demo_';
 const TIMEOUT_DELAY = 10000;
+const TEST_PACKAGE_JSON = JSON.stringify( {
+	name: 'demo_package',
+	version: '0.0.1',
+	module: 'build-module/index.js',
+} );
+
 const packageDirectory = path.resolve( __dirname, TEST_PACKAGE_DIR );
 const srcDirectory = path.resolve( packageDirectory, 'src' );
 
-console.log(
-	chalk.green( '- Creating test package directory: ' ),
-	packageDirectory
-);
+console.log( chalk.green( '- Creating test package: ' ), packageDirectory );
 fs.mkdirSync( srcDirectory, { recursive: true } );
+fs.appendFileSync(
+	path.resolve( packageDirectory, 'package.json' ),
+	TEST_PACKAGE_JSON
+);
 
 console.log( chalk.green( `- Creating ${ NUM_FILES_TO_WRITE } src files` ) );
 for ( let i = 0; i < NUM_FILES_TO_WRITE; i++ ) {
