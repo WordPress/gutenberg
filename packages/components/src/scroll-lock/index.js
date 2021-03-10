@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
+
+let previousScrollTop = 0;
 
 /**
  * @param {string} className
@@ -9,7 +11,6 @@ import { useRef, useEffect } from '@wordpress/element';
  */
 function useSetLocked( className ) {
 	/** @type {import('react').MutableRefObject<number>} */
-	const previousScrollTop = useRef( 0 );
 
 	/**
 	 * @param {boolean} locked
@@ -18,7 +19,7 @@ function useSetLocked( className ) {
 		const scrollingElement = document.scrollingElement || document.body;
 
 		if ( locked ) {
-			previousScrollTop.current = scrollingElement.scrollTop;
+			previousScrollTop = scrollingElement.scrollTop;
 		}
 
 		const methodName = locked ? 'add' : 'remove';
@@ -28,7 +29,7 @@ function useSetLocked( className ) {
 		document.documentElement.classList[ methodName ]( className );
 
 		if ( ! locked ) {
-			scrollingElement.scrollTop = previousScrollTop.current;
+			scrollingElement.scrollTop = previousScrollTop;
 		}
 	}
 
