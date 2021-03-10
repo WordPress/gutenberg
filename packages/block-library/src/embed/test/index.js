@@ -83,7 +83,9 @@ describe( 'utils', () => {
 		it( 'should return the same falsy value as passed for existing classes when no new classes are added', () => {
 			const html = '<iframe></iframe>';
 			const expected = undefined;
-			expect( getClassNames( html, undefined, false ) ).toEqual( expected );
+			expect( getClassNames( html, undefined, false ) ).toEqual(
+				expected
+			);
 		} );
 
 		it( 'should preserve existing classes and replace aspect ratio related classes with the current embed preview', () => {
