@@ -72,6 +72,7 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 						value={ value }
 						multiline={ true }
 						placeholder={ __( 'Add alt text' ) }
+						placeholderTextColor={ '#87a6bc' }
 						style={ altTextEditorStyle }
 					/>
 				</PanelBody>
