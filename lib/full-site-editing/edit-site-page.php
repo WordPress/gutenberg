@@ -170,6 +170,8 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_style( 'wp-format-library' );
+	wp_enqueue_style( 'wp-block-library-theme' );
+
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 
