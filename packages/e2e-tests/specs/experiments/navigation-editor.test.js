@@ -349,7 +349,8 @@ describe( 'Navigation editor', () => {
 
 		// Add an inner link block.
 		const appender = await page.waitForSelector(
-			'button[aria-label="Add block"]'
+			'button[aria-label="Add block"]',
+			{ visible: true }
 		);
 		await appender.click();
 
