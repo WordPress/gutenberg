@@ -39,6 +39,11 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 		styles.horizontalBorderDark
 	);
 
+	const altTextEditorStyle = usePreferredColorSchemeStyle(
+		styles.altTextEditor,
+		styles.altTextEditorDark
+	);
+
 	return (
 		<BottomSheet.SubSheet
 			navigationButton={
@@ -67,7 +72,7 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 						value={ value }
 						multiline={ true }
 						placeholder={ __( 'Add alt text' ) }
-						style={ styles.altTextEditor }
+						style={ altTextEditorStyle }
 					/>
 				</PanelBody>
 
