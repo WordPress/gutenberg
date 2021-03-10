@@ -360,7 +360,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @since 5.6.0
 	 *
 	 * @param string $widget_id The widget id to search for.
-	 * @return string The found sidebar id, or 'wp_inactive_widgets' if the widget does not belong to any.
+	 * @return string|WP_Error The found sidebar id, or a WP_Error instance if it does not exist.
 	 */
 	protected function find_widgets_sidebar( $widget_id ) {
 		foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
