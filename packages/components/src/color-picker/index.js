@@ -109,11 +109,12 @@ const dataToColors = ( oldColors, { source, valueKey, value } ) => {
 };
 
 export default class ColorPicker extends Component {
-	constructor( { color = '0071a1' } ) {
+	constructor( { color = '0071a1', source = 'hex' } ) {
 		super( ...arguments );
 		const colors = colorToState( color );
 		this.state = {
 			...colors,
+			source,
 			draftHex: toLowerCase( colors.hex ),
 			draftRgb: colors.rgb,
 			draftHsl: colors.hsl,
@@ -129,6 +130,7 @@ export default class ColorPicker extends Component {
 
 		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
+			const { source } = this.state;
 			this.setState(
 				{
 					...colors,
@@ -136,9 +138,18 @@ export default class ColorPicker extends Component {
 					draftHsl: colors.hsl,
 					draftRgb: colors.rgb,
 				},
-				debounce( partial( onChangeComplete, colors ), 100 )
+				debounce(
+					partial( onChangeComplete, { ...colors, source } ),
+					100
+				)
 			);
 		}
+	}
+
+	componentWillUnmount() {
+		const { onChangeComplete = noop } = this.props;
+		const { source } = this.state;
+		onChangeComplete( { hex: this.state.hex, source } );
 	}
 
 	resetDraftValues() {
@@ -164,7 +175,8 @@ export default class ColorPicker extends Component {
 	}
 
 	handleInputChange( data ) {
-		switch ( data.state ) {
+		this.setState( { source: data.source } );
+		switch ( data.action ) {
 			case 'reset':
 				this.resetDraftValues();
 				break;
@@ -190,6 +202,7 @@ export default class ColorPicker extends Component {
 			draftHex,
 			draftHsl,
 			draftRgb,
+			source,
 		} = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
@@ -232,6 +245,7 @@ export default class ColorPicker extends Component {
 					</div>
 
 					<Inputs
+						source={ source }
 						rgb={ draftRgb }
 						hsl={ draftHsl }
 						hex={ draftHex }

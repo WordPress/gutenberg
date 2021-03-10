@@ -94,6 +94,7 @@ export const SETTINGS_DEFAULTS = {
 			color: '#9b51e0',
 		},
 	],
+	colorPickerMode: 'hex',
 	// fontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	fontSizes: [

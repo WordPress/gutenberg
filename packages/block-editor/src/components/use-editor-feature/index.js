@@ -20,6 +20,7 @@ const deprecatedFlags = {
 		settings.colors === undefined ? undefined : settings.colors,
 	'color.gradients': ( settings ) =>
 		settings.gradients === undefined ? undefined : settings.gradients,
+	'color.pickerMode': ( settings ) => settings.colorPickerMode,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined

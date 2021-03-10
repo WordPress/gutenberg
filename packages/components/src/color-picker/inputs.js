@@ -91,10 +91,10 @@ export class Input extends Component {
 const PureButton = pure( Button );
 
 export class Inputs extends Component {
-	constructor( { hsl } ) {
+	constructor( { source: view } ) {
 		super( ...arguments );
 
-		const view = hsl.a === 1 ? 'hex' : 'rgb';
+		//const view = hsl.a === 1 ? 'hex' : 'rgb';
 		this.state = { view };
 
 		this.toggleViews = this.toggleViews.bind( this );
@@ -134,7 +134,8 @@ export class Inputs extends Component {
 
 	resetDraftValues() {
 		return this.props.onChange( {
-			state: 'reset',
+			action: 'reset',
+			source: this.state.view,
 		} );
 	}
 
