@@ -6,10 +6,16 @@
 		"parent": null
 	},
 	{
+		"title": "Getting Started",
+		"slug": "getting-started",
+		"markdown_source": "../docs/getting-started/README.md",
+		"parent": "handbook"
+	},
+	{
 		"title": "Tutorials",
 		"slug": "tutorials",
 		"markdown_source": "../docs/getting-started/tutorials/README.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "Development Environment",
@@ -75,25 +81,25 @@
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/getting-started/faq.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/getting-started/history.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "handbook"
+		"parent": "getting-started"
 	},
 	{
 		"title": "How-to Guides",

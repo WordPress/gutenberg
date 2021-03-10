@@ -1,23 +1,25 @@
 [
     { "docs/README.md": [
-        { "docs/getting-started/tutorials/README.md": [
-            { "docs/getting-started/tutorials/devenv/README.md": [
-                { "docs/getting-started/tutorials/devenv/docker-ubuntu.md": [] }
+        { "docs/getting-started/README.md": [
+            { "docs/getting-started/tutorials/README.md": [
+                { "docs/getting-started/tutorials/devenv/README.md": [
+                    { "docs/getting-started/tutorials/devenv/docker-ubuntu.md": [] }
+                ] },
+                { "docs/getting-started/tutorials/create-block/README.md": [
+                    { "docs/getting-started/tutorials/create-block/wp-plugin.md": [] },
+                    { "docs/getting-started/tutorials/create-block/block-anatomy.md": [] },
+                    { "docs/getting-started/tutorials/create-block/attributes.md": [] },
+                    { "docs/getting-started/tutorials/create-block/block-code.md": [] },
+                    { "docs/getting-started/tutorials/create-block/author-experience.md": [] },
+                    { "docs/getting-started/tutorials/create-block/finishing.md": [] },
+                    { "docs/getting-started/tutorials/create-block/submitting-to-block-directory.md": [] }
+                ] }
             ] },
-            { "docs/getting-started/tutorials/create-block/README.md": [
-                { "docs/getting-started/tutorials/create-block/wp-plugin.md": [] },
-                { "docs/getting-started/tutorials/create-block/block-anatomy.md": [] },
-                { "docs/getting-started/tutorials/create-block/attributes.md": [] },
-                { "docs/getting-started/tutorials/create-block/block-code.md": [] },
-                { "docs/getting-started/tutorials/create-block/author-experience.md": [] },
-                { "docs/getting-started/tutorials/create-block/finishing.md": [] },
-                { "docs/getting-started/tutorials/create-block/submitting-to-block-directory.md": [] }
-            ] }
-        ] },
-        { "docs/getting-started/glossary.md": [] },
-        { "docs/getting-started/faq.md": [] },
-        { "docs/getting-started/history.md": [] },
-        { "docs/getting-started/outreach.md": [] }
+            { "docs/getting-started/glossary.md": [] },
+            { "docs/getting-started/faq.md": [] },
+            { "docs/getting-started/history.md": [] },
+            { "docs/getting-started/outreach.md": [] }
+        ] }
     ] },
     { "docs/how-to-guides/README.md": [
         { "docs/how-to-guides/javascript/README.md": [
