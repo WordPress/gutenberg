@@ -9,7 +9,7 @@ export interface ApiFetchRequestProps {
 	data?: any;
 }
 
-export type Middleware = (
+export type ApiFetchMiddleware = (
 	options: ApiFetchRequestProps,
 	next: ( nextOptions: ApiFetchRequestProps ) => ApiFetchRequestProps
 ) => ApiFetchRequestProps;
