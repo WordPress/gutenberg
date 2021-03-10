@@ -9,7 +9,7 @@ import Popover from 'react-native-popover-view';
  * WordPress dependencies
  */
 import { useLayoutEffect, useState } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import { Icon, PopoverFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -102,10 +102,11 @@ export function getAutoCompleterUI( autocompleter ) {
 	} ) {
 		const [ popoverVisible, setPopoverVisible ] = useState( true );
 		const [ items ] = useItems( filterValue );
+		const displayArea = { x: 16, y: 0, width: 160 };
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
-			return () => setPopoverVisible( false );
+			// return () => setPopoverVisible( false );
 		}, [ items ] );
 
 		if ( ! items.length > 0 ) {
@@ -113,26 +114,28 @@ export function getAutoCompleterUI( autocompleter ) {
 		}
 
 		return (
-			<Popover from={ contentRef } isVisible={ popoverVisible }>
-				<View
-					style={ {
-						// position: 'absolute',
-						// bottom: 34,
-						// left: 0,
-						// right: 0,
-						// width: 100,
-						// height: 100,
-						// backgroundColor: '#f6f7f7',
-						// borderColor: '#a7aaad',
-						// borderWidth: 1,
-						// paddingVertical: 6,
-						// paddingHorizontal: 6,
-						// borderRadius: 2,
-						// overflow: 'visible',
+			<PopoverFill>
+				<Popover
+					from={ contentRef }
+					isVisible={ true }
+					mode="tooltip"
+					backgroundStyle={ { backgroundColor: 'transparent' } }
+					popoverStyle={ { borderWidth: 1, borderColor: '#a7aaad' } }
+					arrowStyle={ { backgroundColor: 'transparent' } }
+					animationConfig={ {
+						duration: 0,
 					} }
+					// debug
+					displayArea={ displayArea }
+					placement="bottom"
 				>
 					<ScrollView
 						// horizontal
+						style={ {
+							width: 160,
+							maxHeight: 120,
+							paddingVertical: 8,
+						} }
 						contentContainerStyle={ { flexGrow: 1 } }
 						// showsHorizontalScrollIndicator={ false }
 						keyboardShouldPersistTaps="always"
@@ -145,14 +148,16 @@ export function getAutoCompleterUI( autocompleter ) {
 										flexDirection: 'row',
 										alignItems: 'center',
 										marginRight: 10,
+										paddingHorizontal: 10,
+										paddingVertical: 5,
 									} }
 									key={ index }
-									hitSlop={ {
-										top: 22,
-										bottom: 22,
-										left: 22,
-										right: 22,
-									} }
+									// hitSlop={ {
+									// 	top: 22,
+									// 	bottom: 22,
+									// 	left: 22,
+									// 	right: 22,
+									// } }
 									onPress={ () => onSelect( option ) }
 								>
 									<View style={ { marginRight: 4 } }>
@@ -176,8 +181,8 @@ export function getAutoCompleterUI( autocompleter ) {
 							);
 						} ) }
 					</ScrollView>
-				</View>
-			</Popover>
+				</Popover>
+			</PopoverFill>
 		);
 	}
 

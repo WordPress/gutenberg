@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, map, debounce, deburr } from 'lodash';
+import { escapeRegExp, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies

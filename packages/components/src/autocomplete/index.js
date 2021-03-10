@@ -318,7 +318,6 @@ function Autocomplete( {
 				listBoxId,
 				activeId,
 				onKeyDown: handleKeyDown,
-				isActive: !! AutocompleterUI,
 			} ) }
 			{ isSelected && AutocompleterUI && (
 				<AutocompleterUI
