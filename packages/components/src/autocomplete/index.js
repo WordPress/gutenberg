@@ -21,7 +21,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getAutoCompleterUI } from './autocomplete-ui';
+import { getAutoCompleterUI } from './autocompleter-ui';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
