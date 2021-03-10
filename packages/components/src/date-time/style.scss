@@ -119,8 +119,7 @@
 	flex-direction: column;
 
 	&.has-events {
-		background: #ffe8bc;
-		color: #484848;
+		border: 2px solid $gray-400;
 		border-radius: 50%;
 	}
 }
