@@ -3,6 +3,7 @@
  */
 import { escapeRegExp, map, debounce } from 'lodash';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import Popover from 'react-native-popover-view';
 
 /**
  * WordPress dependencies
@@ -97,11 +98,14 @@ export function getAutoCompleterUI( autocompleter ) {
 		selectedIndex,
 		onChangeOptions,
 		onSelect,
+		contentRef,
 	} ) {
+		const [ popoverVisible, setPopoverVisible ] = useState( true );
 		const [ items ] = useItems( filterValue );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
+			return () => setPopoverVisible( false );
 		}, [ items ] );
 
 		if ( ! items.length > 0 ) {
@@ -109,67 +113,71 @@ export function getAutoCompleterUI( autocompleter ) {
 		}
 
 		return (
-			<View
-				style={ {
-					position: 'absolute',
-					bottom: 34,
-					left: 0,
-					right: 0,
-					backgroundColor: '#f6f7f7',
-					borderColor: '#a7aaad',
-					borderWidth: 1,
-					paddingVertical: 6,
-					paddingHorizontal: 6,
-					borderRadius: 2,
-					overflow: 'visible',
-				} }
-			>
-				<ScrollView
-					horizontal
-					contentContainerStyle={ { flexGrow: 1 } }
-					showsHorizontalScrollIndicator={ false }
-					keyboardShouldPersistTaps="always"
+			<Popover from={ contentRef } isVisible={ popoverVisible }>
+				<View
+					style={ {
+						// position: 'absolute',
+						// bottom: 34,
+						// left: 0,
+						// right: 0,
+						// width: 100,
+						// height: 100,
+						// backgroundColor: '#f6f7f7',
+						// borderColor: '#a7aaad',
+						// borderWidth: 1,
+						// paddingVertical: 6,
+						// paddingHorizontal: 6,
+						// borderRadius: 2,
+						// overflow: 'visible',
+					} }
 				>
-					{ map( items, ( option, index ) => {
-						return (
-							<TouchableOpacity
-								activeOpacity={ 0.5 }
-								style={ {
-									flexDirection: 'row',
-									alignItems: 'center',
-									marginRight: 10,
-								} }
-								key={ index }
-								hitSlop={ {
-									top: 22,
-									bottom: 22,
-									left: 22,
-									right: 22,
-								} }
-								onPress={ () => onSelect( option ) }
-							>
-								<View style={ { marginRight: 4 } }>
-									<Icon
-										icon={ option?.value?.icon?.src }
-										size={ 22 }
-									/>
-								</View>
-
-								<Text
-									style={ [
-										index === selectedIndex && {
-											color: '#2271b1',
-											fontWeight: 'bold',
-										},
-									] }
+					<ScrollView
+						// horizontal
+						contentContainerStyle={ { flexGrow: 1 } }
+						// showsHorizontalScrollIndicator={ false }
+						keyboardShouldPersistTaps="always"
+					>
+						{ map( items, ( option, index ) => {
+							return (
+								<TouchableOpacity
+									activeOpacity={ 0.5 }
+									style={ {
+										flexDirection: 'row',
+										alignItems: 'center',
+										marginRight: 10,
+									} }
+									key={ index }
+									hitSlop={ {
+										top: 22,
+										bottom: 22,
+										left: 22,
+										right: 22,
+									} }
+									onPress={ () => onSelect( option ) }
 								>
-									{ option?.value?.title }
-								</Text>
-							</TouchableOpacity>
-						);
-					} ) }
-				</ScrollView>
-			</View>
+									<View style={ { marginRight: 4 } }>
+										<Icon
+											icon={ option?.value?.icon?.src }
+											size={ 22 }
+										/>
+									</View>
+
+									<Text
+										style={ [
+											index === selectedIndex && {
+												color: '#2271b1',
+												fontWeight: 'bold',
+											},
+										] }
+									>
+										{ option?.value?.title }
+									</Text>
+								</TouchableOpacity>
+							);
+						} ) }
+					</ScrollView>
+				</View>
+			</Popover>
 		);
 	}
 
