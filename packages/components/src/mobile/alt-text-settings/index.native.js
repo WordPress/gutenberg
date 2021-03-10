@@ -61,7 +61,7 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 						value={ value }
 						multiline={ true }
 						placeholder={ __( 'Add alt text' ) }
-						numberOfLines={ 4 }
+						style={ styles.altTextEditor }
 					/>
 				</PanelBody>
 
