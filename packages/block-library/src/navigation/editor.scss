@@ -200,6 +200,7 @@ $color-control-label-height: 20px;
 
 // Ensure that an empty block has space around the appender.
 .wp-block-navigation-placeholder,
+.wp-block-navigation-placeholder__preview,
 .is-selected .wp-block-navigation__container {
 	min-height: $grid-unit-05 + $grid-unit-05 + $button-size;
 }
@@ -214,11 +215,6 @@ $color-control-label-height: 20px;
 
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -235,13 +231,25 @@ $color-control-label-height: 20px;
 		margin: $grid-unit-15 $grid-unit-30 $grid-unit-15 0;
 	}
 
+	svg {
+		fill: currentColor;
+	}
+
 	.wp-block-navigation-link.wp-block-navigation-link,
 	svg {
 		opacity: 0.3;
 	}
 
 	.is-selected & {
-		opacity: 0.2;
+		// Don't show the preview boxes for an empty nav block.
+		opacity: 0;
+
+		// Need to show the placeholder box above the preview boxes.
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
 	}
 }
 
