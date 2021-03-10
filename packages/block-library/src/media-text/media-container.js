@@ -74,6 +74,7 @@ function PlaceholderContainer( {
 	className,
 	noticeOperations,
 	noticeUI,
+	mediaUrl,
 	onSelectMedia,
 } ) {
 	const onUploadError = ( message ) => {
@@ -93,6 +94,7 @@ function PlaceholderContainer( {
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
 			onError={ onUploadError }
+			disableMediaButtons={ mediaUrl }
 		/>
 	);
 }
@@ -169,6 +171,7 @@ function MediaContainer( props, ref ) {
 					mediaId={ mediaId }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
+				<PlaceholderContainer { ...props } />
 			</ResizableBoxContainer>
 		);
 	}
