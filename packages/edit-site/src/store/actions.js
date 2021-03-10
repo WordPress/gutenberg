@@ -285,3 +285,16 @@ export function updateSettings( settings ) {
 		settings,
 	};
 }
+
+/**
+ * Sets whether the list view panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the list view. If false, closes it.
+ *                         It does not toggle the state, but sets it directly.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}

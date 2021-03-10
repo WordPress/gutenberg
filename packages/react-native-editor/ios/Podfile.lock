@@ -255,8 +255,8 @@ PODS:
     - React-Core
   - RNTAztecView (1.47.1):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.19.3)
-  - WordPress-Aztec-iOS (1.19.3)
+    - WordPress-Aztec-iOS (~> 1.19.4)
+  - WordPress-Aztec-iOS (1.19.4)
   - Yoga (1.14.0)
 
 DEPENDENCIES:

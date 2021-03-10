@@ -30,11 +30,15 @@ _Returns_
 
 <a name="getPlugins" href="#getPlugins">#</a> **getPlugins**
 
-Returns all registered plugins.
+Returns all registered plugins without a scope or for a given scope.
+
+_Parameters_
+
+-   _scope_ `[string]`: The scope to be used when rendering inside a plugin area. No scope by default.
 
 _Returns_
 
--   `WPPlugin[]`: Plugin settings.
+-   `WPPlugin[]`: The list of plugins without a scope or for a given scope.
 
 <a name="PluginArea" href="#PluginArea">#</a> **PluginArea**
 
@@ -50,7 +54,7 @@ var PluginArea = wp.plugins.PluginArea;
 function Layout() {
 	return el(
 		'div',
-		{},
+		{ scope: 'my-page' },
 		'Content of the page',
 		PluginArea
 	);
@@ -64,7 +68,7 @@ import { PluginArea } from '@wordpress/plugins';
 const Layout = () => (
 	<div>
 		Content of the page
-		<PluginArea />
+		<PluginArea scope="my-page" />
 	</div>
 );
 ```
@@ -112,6 +116,7 @@ function Component() {
 registerPlugin( 'plugin-name', {
 	icon: moreIcon,
 	render: Component,
+	scope: 'my-page',
 } );
 ```
 
@@ -140,6 +145,7 @@ const Component = () => (
 registerPlugin( 'plugin-name', {
 	icon: more,
 	render: Component,
+	scope: 'my-page',
 } );
 ```
 

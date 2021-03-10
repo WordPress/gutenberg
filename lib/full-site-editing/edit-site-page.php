@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg Edit Site Page.
+ * Bootstrapping the Gutenberg Edit Site Page.
  *
  * @package gutenberg
  */
@@ -47,10 +47,6 @@ function gutenberg_get_editor_styles() {
 				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
 			),
 		),
-	);
-
-	$styles[] = array(
-		'css' => 'body { font-family: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif }',
 	);
 
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {

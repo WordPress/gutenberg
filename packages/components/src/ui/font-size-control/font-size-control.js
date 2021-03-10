@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { contextConnect } from '@wp-g2/context';
-import { VisuallyHidden, VStack } from '@wp-g2/components';
 
 /**
  * WordPress dependencies
@@ -12,6 +11,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { VisuallyHidden } from '../visually-hidden';
+import { VStack } from '../v-stack';
 import FontSizeControlSelect from './select';
 import FontSizeControlSlider from './slider';
 import useFontSizeControl from './use-font-size-control';

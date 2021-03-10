@@ -39,8 +39,6 @@ export default function ImageEditor( {
 							<AspectRatioDropdown toggleProps={ toggleProps } />
 						) }
 					</ToolbarItem>
-				</ToolbarGroup>
-				<ToolbarGroup>
 					<RotationButton />
 				</ToolbarGroup>
 				<ToolbarGroup>

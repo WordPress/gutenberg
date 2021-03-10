@@ -266,7 +266,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * Checks if a given request has access to delete a single template.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has dedlete access for the item, WP_Error object otherwise.
+	 * @return true|WP_Error True if the request has delete access for the item, WP_Error object otherwise.
 	 */
 	public function delete_item_permissions_check( $request ) {
 		return $this->permissions_check( $request );
@@ -363,9 +363,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 		if ( 'wp_template_part' === $this->post_type ) {
 			if ( isset( $request['area'] ) ) {
-				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $request['area'] );
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $request['area'] );
 			} elseif ( null !== $template && ! $template->is_custom && $template->area ) {
-				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $template->area );
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $template->area );
 			} elseif ( ! $template->area ) {
 				$changes->tax_input['wp_template_part_area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 			}
