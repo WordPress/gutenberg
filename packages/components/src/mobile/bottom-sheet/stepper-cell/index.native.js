@@ -153,7 +153,7 @@ class BottomSheetStepperCell extends Component {
 		];
 		const accessibilityLabel = openUnitPicker
 			? sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
 					__(
 						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust, double-tap to change unit'
 					),
@@ -162,7 +162,7 @@ class BottomSheetStepperCell extends Component {
 					unitLabel
 			  )
 			: sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
 					__(
 						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust'
 					),

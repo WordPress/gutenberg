@@ -61,6 +61,10 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
+	/*
+	 * Only used with screenreaders like VoiceOver and TalkBack. Increments the
+	 * value of this setting programmatically.
+	 */
 	onIncrementValue() {
 		const { step = 10, maximumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
@@ -76,6 +80,10 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
+	/*
+	 * Only used with screenreaders like VoiceOver and TalkBack. Decrements the
+	 * value of this setting programmatically.
+	 */
 	onDecrementValue() {
 		const { step = 10, minimumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
@@ -91,11 +99,15 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
+	/*
+	 * Only used with screenreaders like VoiceOver and TalkBack.
+	 */
 	announceValue( value ) {
 		const { label, unitLabel = '' } = this.props;
 
 		if ( Platform.OS === 'ios' ) {
-			// On Android it triggers the accessibilityLabel with the value change
+			// On Android it triggers the accessibilityLabel with the value change, but
+			// on iOS we need to do this manually.
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
 				AccessibilityInfo.announceForAccessibility(
@@ -134,7 +146,7 @@ class BottomSheetRangeCell extends Component {
 
 		const accessibilityLabel = openUnitPicker
 			? sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
 					_x(
 						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust, double-tap to change unit',
 						'Slider for picking a number inside a range'
@@ -144,7 +156,7 @@ class BottomSheetRangeCell extends Component {
 					unitLabel
 			  )
 			: sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
 					_x(
 						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust',
 						'Slider for picking a number inside a range'
