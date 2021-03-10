@@ -136,6 +136,8 @@ function UnitControl( {
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
 					decimalNum={ unit === 'px' ? 0 : decimalNum }
+					openUnitPicker={ onPickerPresent }
+					unitLabel={ __( 'Pixels' ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -150,6 +152,8 @@ function UnitControl( {
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
+					openUnitPicker={ onPickerPresent }
+					unitLabel={ __( 'Percent' ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
