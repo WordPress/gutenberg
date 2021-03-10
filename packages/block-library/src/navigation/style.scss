@@ -1,7 +1,20 @@
-.wp-block-navigation .wp-block-navigation__container {
+.wp-block-navigation {
+	// Normalize list styles.
+	ul,
+	ul li {
+		list-style: none;
+
+		// Overrides generic ".entry-content li" styles on the front end.
+		margin: 0;
+		padding: 0;
+	}
+
+	// Submenus.
 	.wp-block-navigation__container {
-		align-items: normal;
-		min-width: 200px;
+		.wp-block-navigation__container {
+			align-items: normal;
+			min-width: 200px;
+		}
 	}
 }
 
@@ -19,13 +32,12 @@
 	flex-wrap: wrap;
 
 	// Vertical layout
-
 	.is-vertical & {
 		display: block;
 	}
-
 }
 
+// Justification.
 .items-justified-center > ul {
 	justify-content: center;
 }

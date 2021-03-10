@@ -95,6 +95,8 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	if ( ! in_array( $handle, array( 'wp-i18n', 'wp-polyfill', 'wp-hooks' ), true ) ) {
 		$scripts->set_translations( $handle, 'default' );
 	}
+
+	// Remove this check once the minimum supported WordPress version is at least 5.7.
 	if ( 'wp-i18n' === $handle ) {
 		$ltr    = 'rtl' === _x( 'ltr', 'text direction', 'default' ) ? 'rtl' : 'ltr';
 		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
@@ -155,25 +157,6 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
- * Filters the default labels for common post types to change the case style
- * from capitalized (e.g. "Featured Image") to sentence-style (e.g. "Featured
- * image").
- *
- * See: https://github.com/WordPress/gutenberg/pull/18758
- *
- * @param object $labels Object with all the labels as member variables.
- *
- * @return object Object with all the labels, including overridden ones.
- */
-function gutenberg_override_posttype_labels( $labels ) {
-	$labels->featured_image = __( 'Featured image', 'gutenberg' );
-	return $labels;
-}
-foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_filter( "post_type_labels_{$post_type}", 'gutenberg_override_posttype_labels' );
-}
-
-/**
  * Registers a style according to `wp_register_style`. Honors this request by
  * deregistering any style by the same handler before registration.
  *
@@ -229,17 +212,8 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 
 	/*
 	 * This script registration and the corresponding function should be removed
-	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
+	 * removed once the plugin is updated to support WordPress 5.7.0 and newer.
 	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'lodash',
-		'https://unpkg.com/lodash@4.17.19/lodash.js',
-		array(),
-		'4.17.19',
-		true
-	);
-
 	gutenberg_register_vendor_script(
 		$scripts,
 		'object-fit-polyfill',
@@ -348,7 +322,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
-	$block_library_filename = gutenberg_should_load_separate_block_styles() ? 'common' : 'style';
+	$block_library_filename = gutenberg_should_load_separate_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
@@ -368,18 +342,24 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
+	$wp_edit_blocks_dependencies = array(
+		'wp-components',
+		'wp-editor',
+		'wp-block-library',
+		'wp-reusable-blocks',
+	);
+
+	global $editor_styles;
+	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
+		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
+	}
+
 	gutenberg_override_style(
 		$styles,
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
-		array(
-			'wp-components',
-			'wp-editor',
-			'wp-block-library',
-			'wp-reusable-blocks',
-			// Always include visual styles so the editor never appears broken.
-			'wp-block-library-theme',
-		),
+		$wp_edit_blocks_dependencies,
 		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
@@ -664,6 +644,15 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		array_unshift( $settings['styles'], $editor_styles );
 	}
 
+	// Remove the default font editor styles.
+	// When Gutenberg is updated to have minimum version of WordPress 5.8
+	// This could be removed.
+	foreach ( $settings['styles'] as $j => $style ) {
+		if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
+			unset( $settings['styles'][ $j ] );
+		}
+	}
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
@@ -745,6 +734,8 @@ add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_
  *
  * The script registration occurs in `gutenberg_register_vendor_scripts`, which
  * should be removed in coordination with this function.
+ *
+ * Remove this when the minimum supported version is WordPress 5.7
  *
  * @see gutenberg_register_vendor_scripts
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit

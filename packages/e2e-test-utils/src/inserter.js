@@ -208,13 +208,13 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 
 	// Grab the first block in the list
 	const insertButton = await page.waitForSelector(
-		'.block-directory-downloadable-blocks-list li:first-child button'
+		'.block-directory-downloadable-blocks-list button:first-child'
 	);
 	await insertButton.click();
 	await page.waitForFunction(
 		() =>
 			! document.body.querySelector(
-				'.block-directory-downloadable-blocks-list li:first-child button.is-busy'
+				'.block-directory-downloadable-blocks-list button:first-child.is-busy'
 			)
 	);
 	await focusSelectedBlock();

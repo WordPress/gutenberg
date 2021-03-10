@@ -75,7 +75,7 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
  *
  * @return {string} The optimized text color (black or white).
  */
-function getOptimalTextColor( backgroundColor ) {
+export function getOptimalTextColor( backgroundColor ) {
 	const background = getComputedBackgroundColor( backgroundColor );
 	const isReadableWithBlackText = tinycolor.isReadable(
 		background,

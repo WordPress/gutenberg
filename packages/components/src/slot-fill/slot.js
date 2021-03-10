@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { Consumer } from './context';
+import SlotFillContext from './context';
 
 class SlotComponent extends Component {
 	constructor() {
@@ -62,7 +62,6 @@ class SlotComponent extends Component {
 		const { children, name, fillProps = {}, getFills } = this.props;
 
 		const fills = map( getFills( name, this ), ( fill ) => {
-			const fillKey = fill.occurrence;
 			const fillChildren = isFunction( fill.children )
 				? fill.children( fillProps )
 				: fill.children;
@@ -72,7 +71,7 @@ class SlotComponent extends Component {
 					return child;
 				}
 
-				const childKey = `${ fillKey }---${ child.key || childIndex }`;
+				const childKey = child.key || childIndex;
 				return cloneElement( child, { key: childKey } );
 			} );
 		} ).filter(
@@ -87,7 +86,7 @@ class SlotComponent extends Component {
 }
 
 const Slot = ( props ) => (
-	<Consumer>
+	<SlotFillContext.Consumer>
 		{ ( { registerSlot, unregisterSlot, getFills } ) => (
 			<SlotComponent
 				{ ...props }
@@ -96,7 +95,7 @@ const Slot = ( props ) => (
 				getFills={ getFills }
 			/>
 		) }
-	</Consumer>
+	</SlotFillContext.Consumer>
 );
 
 export default Slot;
