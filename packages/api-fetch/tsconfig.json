@@ -4,5 +4,9 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/types.ts", "src/middlewares/nonce.js" ]
+	"include": [
+		"src/middlewares/namespace-endpoint.js",
+		"src/middlewares/nonce.js",
+		"src/types.ts"
+	]
 }

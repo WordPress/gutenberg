@@ -7,6 +7,8 @@ export interface ApiFetchRequestProps {
 	 */
 	parse?: boolean;
 	data?: any;
+	namespace?: string;
+	endpoint?: string;
 }
 
 export type ApiFetchMiddleware = (
