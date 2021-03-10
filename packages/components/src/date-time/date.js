@@ -2,6 +2,8 @@
  * External dependencies
  */
 import moment from 'moment';
+import classnames from 'classnames';
+
 // react-dates doesn't tree-shake correctly, so we import from the individual
 // component here, to avoid including too much of the library
 import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
@@ -16,6 +18,16 @@ import { isRTL } from '@wordpress/i18n';
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+
+function DatePickerDay( { day, events } ) {
+	return (
+		<div className={ classnames( 'components-datetime__date__day', {
+			'has-events': events?.length,
+		} ) }>
+			{ day.format( 'D' ) }
+		</div>
+	);
+}
 
 class DatePicker extends Component {
 	constructor() {
@@ -90,6 +102,12 @@ class DatePicker extends Component {
 		return currentDate ? moment( currentDate ) : moment();
 	}
 
+	getEventsPerDay( day ) {
+		return this.props.events.filter( ( eventDay ) =>
+			day.isSame( eventDay.date, 'day' )
+		);
+	}
+
 	render() {
 		const { currentDate, isInvalidDate } = this.props;
 		const momentDate = this.getMomentDate( currentDate );
@@ -117,6 +135,12 @@ class DatePicker extends Component {
 					} }
 					onPrevMonthClick={ this.keepFocusInside }
 					onNextMonthClick={ this.keepFocusInside }
+					renderDayContents={ ( day ) => (
+						<DatePickerDay
+							day={ day }
+							events={ this.getEventsPerDay( day ) }
+						/>
+					) }
 				/>
 			</div>
 		);

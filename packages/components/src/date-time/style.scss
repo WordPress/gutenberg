@@ -111,6 +111,20 @@
 	}
 }
 
+.components-datetime__date__day {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+
+	&.has-events {
+		background: #ffe8bc;
+		color: #484848;
+		border-radius: 50%;
+	}
+}
+
 .components-datetime__time {
 	padding-bottom: $grid-unit-20;
 
