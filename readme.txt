@@ -1,7 +1,7 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Requires at least: 5.5
-Tested up to: 5.6
+Requires at least: 5.6
+Tested up to: 5.7
 Requires PHP: 5.6
 Stable tag: V.V.V
 License: GPLv2 or later
