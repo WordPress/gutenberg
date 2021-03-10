@@ -6,34 +6,25 @@ import { useEffect } from '@wordpress/element';
 let previousScrollTop = 0;
 
 /**
+ * @param {boolean} locked
  * @param {string} className
- * @return {(locked: boolean) => void} Function allowing you to set whether scrolling is locked.
  */
-function useSetLocked( className ) {
-	/** @type {import('react').MutableRefObject<number>} */
+function setLocked( locked, className ) {
+	const scrollingElement = document.scrollingElement || document.body;
 
-	/**
-	 * @param {boolean} locked
-	 */
-	function setLocked( locked ) {
-		const scrollingElement = document.scrollingElement || document.body;
-
-		if ( locked ) {
-			previousScrollTop = scrollingElement.scrollTop;
-		}
-
-		const methodName = locked ? 'add' : 'remove';
-		scrollingElement.classList[ methodName ]( className );
-
-		// Adding the class to the document element seems to be necessary in iOS.
-		document.documentElement.classList[ methodName ]( className );
-
-		if ( ! locked ) {
-			scrollingElement.scrollTop = previousScrollTop;
-		}
+	if ( locked ) {
+		previousScrollTop = scrollingElement.scrollTop;
 	}
 
-	return setLocked;
+	const methodName = locked ? 'add' : 'remove';
+	scrollingElement.classList[ methodName ]( className );
+
+	// Adding the class to the document element seems to be necessary in iOS.
+	document.documentElement.classList[ methodName ]( className );
+
+	if ( ! locked ) {
+		scrollingElement.scrollTop = previousScrollTop;
+	}
 }
 
 /*
@@ -53,18 +44,16 @@ let lockCounter = 0;
  * @return {null} Render nothing.
  */
 export default function ScrollLock( { className = 'lockscroll' } ) {
-	const setLocked = useSetLocked( className );
-
 	useEffect( () => {
 		if ( lockCounter === 0 ) {
-			setLocked( true );
+			setLocked( true, className );
 		}
 
 		++lockCounter;
 
 		return () => {
 			if ( lockCounter === 1 ) {
-				setLocked( false );
+				setLocked( false, className );
 			}
 
 			--lockCounter;
