@@ -4,7 +4,7 @@
 	th,
 	tbody td {
 		padding: 0.25em;
-		border: 1px solid $gray-300;
+		border: 1px solid var(--wp--style--color--text, $gray-300);
 	}
 
 	tfoot td {
@@ -17,8 +17,9 @@
 	}
 
 	table th {
+		color: var(--wp--style--color--background);
 		font-weight: 400;
-		background: $gray-300;
+		background: var(--wp--style--color--text, $gray-300);
 	}
 
 	a {
@@ -27,6 +28,6 @@
 
 	table tbody,
 	table caption {
-		color: #40464d;
+		color: var(--wp--style--color--text, #40464d);
 	}
 }
