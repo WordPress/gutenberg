@@ -17,7 +17,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### Complementary Areas
 
-This component was named after a [complementatry landmark](https://www.w3.org/TR/wai-aria-practices/examples/landmarks/complementary.html) – a supporting section of the document, designed to be complementary to the main content at a similar level in the DOM hierarchy, but remains meaningful when separated from the main content.
+This component was named after a [complementary landmark](https://www.w3.org/TR/wai-aria-practices/examples/landmarks/complementary.html) – a supporting section of the document, designed to be complementary to the main content at a similar level in the DOM hierarchy, but remains meaningful when separated from the main content.
 
 `ComplementaryArea` and `ComplementaryArea.Slot` form a slot fill pair to render complementary areas. Multiple `ComplementaryArea` components representing different complementary areas may be rendered at the same time, but only one appears on the slot depending on which complementary area is enabled.
 
