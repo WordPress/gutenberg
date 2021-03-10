@@ -52,6 +52,7 @@ const NavigationPanel = ( { isOpen } ) => {
 	};
 
 	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
 				'is-open': isOpen,
@@ -59,7 +60,6 @@ const NavigationPanel = ( { isOpen } ) => {
 			ref={ panelRef }
 			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
-			role="navigation"
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
