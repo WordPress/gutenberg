@@ -1,0 +1,15 @@
+.wp-block-calendar {
+	th,
+	tbody td {
+		border-color: $gray-300;
+	}
+
+	table th {
+		background: $gray-300;
+	}
+
+	table tbody,
+	table caption {
+		color: #40464d;
+	}
+}
