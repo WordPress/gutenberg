@@ -16,19 +16,8 @@ gradle.ext.willPublishReactNativeBridgeBinary = publishReactNativeBridgeVersion?
 // Only add these modules/projects if we are not building to publish a binary.
 // TODO: This is a very fragile check. Since the `settings.gradle` file is part of initialization,
 // it'll not work for even simple tasks such as `./gradlew clean` unless the
-// `publishReactNativeBridgeVersion` property is passed. It's a necessary check for the moment,
-// however by moving the Hermes binary to remote and maybe using dependency substitution for the
-// included projects, we can get rid of it.
+// `publishReactNativeBridgeVersion` property is passed.
 if (!gradle.ext.willPublishReactNativeBridgeBinary) {
-    /*
-    IMPORTANT: DO NOT add hermes modules if we are building a binary to publish.
-    If these modules are added, it'll cause the `com.facebook.hermes.BuildConfig` file to be
-    included in the binary which will then result in a duplicate class error.
-    This seems to happen even if these modules are not added as a dependency.
-    */
-    include ':hermes-debug'
-    include ':hermes-release'
-
     assert file("../../../node_modules").exists() : "node_modules folder is missing. Please run `npm install` from the root Gutenberg project"
 
     include ':react-native-linear-gradient'
