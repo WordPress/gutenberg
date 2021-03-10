@@ -371,6 +371,25 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
+	return gutenberg_get_block_file_template( $id, $template_type );
+}
+
+/**
+ * Retrieves a single unified template object using its id.
+ * Retrieves the file template.
+ *
+ * @param string $id Template unique identifier (example: theme|slug).
+ * @param array  $template_type wp_template or wp_template_part.
+ *
+ * @return WP_Block_Template|null File template.
+ */
+function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' ) {
+	$parts = explode( '//', $id, 2 );
+	if ( count( $parts ) < 2 ) {
+		return null;
+	}
+	list( $theme, $slug ) = $parts;
+
 	if ( wp_get_theme()->get_stylesheet() === $theme ) {
 		$template_file = _gutenberg_get_template_file( $template_type, $slug );
 		if ( null !== $template_file ) {

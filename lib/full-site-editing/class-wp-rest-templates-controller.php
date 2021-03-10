@@ -168,7 +168,11 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		if ( isset( $request['is_custom'] ) && 'false' === $request['is_custom'] ) {
+			$template = gutenberg_get_block_file_template( $request['id'], $this->post_type );
+		} else {
+			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
+		}
 
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
@@ -199,18 +203,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
-		// If the request explicitly sets `is_custom` to false,
-		// delete the template post, and return the template file.
-		$request_params = $request->get_json_params();
-		if ( is_array( $request_params ) ) {
-			$request_params_keys = array_keys( $request_params );
-			if ( count( $request_params_keys ) === 2 && isset( $request['is_custom'] ) && false === $request['is_custom'] ) {
-				wp_delete_post( $template->wp_id, true );
-				return $this->prepare_item_for_response(
-					gutenberg_get_block_template( $request['id'], $this->post_type ),
-					$request
-				);
-			}
+		if ( isset( $request['reverted_file_content'] ) && isset( $request['content'] ) && $request['reverted_file_content'] === $request['content'] ) {
+			wp_delete_post( $template->wp_id, true );
+			return $this->prepare_item_for_response( gutenberg_get_block_file_template( $request['id'], $this->post_type ), $request );
 		}
 
 		$changes = $this->prepare_item_for_database( $request );

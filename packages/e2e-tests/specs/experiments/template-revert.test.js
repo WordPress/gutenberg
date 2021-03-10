@@ -5,7 +5,11 @@ import {
 	insertBlock,
 	trashAllPosts,
 	activateTheme,
+	switchUserToAdmin,
+	switchUserToTest,
+	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -45,7 +49,7 @@ const undoRevertInHeaderToolbar = async () => {
 
 const undoRevertInNotice = async () => {
 	await clickButtonInNotice();
-	await assertSaveButtonIsDisabled();
+	await assertSaveButtonIsEnabled();
 };
 
 const addDummyText = async () => {
@@ -65,7 +69,18 @@ const revertTemplate = async () => {
 	await page.click( '.edit-site-document-actions__get-info' );
 	await page.click( '.edit-site-template-details__revert button' );
 	await waitForNotice();
-	await assertSaveButtonIsDisabled();
+	await assertSaveButtonIsEnabled();
+};
+
+const assertTemplatesAreDeleted = async () => {
+	await switchUserToAdmin();
+	const query = addQueryArgs( '', {
+		post_type: 'wp_template',
+	} ).slice( 1 );
+	await visitAdminPage( 'edit.php', query );
+	const element = await page.waitForSelector( '#the-list .no-items' );
+	expect( element ).toBeTruthy();
+	await switchUserToTest();
 };
 
 describe( 'Template Revert', () => {
@@ -84,12 +99,22 @@ describe( 'Template Revert', () => {
 		await visitSiteEditor();
 	} );
 
+	it( 'should delete the template after saving the reverted template', async () => {
+		await addDummyText();
+		await save();
+		await revertTemplate();
+		await save();
+
+		await assertTemplatesAreDeleted();
+	} );
+
 	it( 'should show the original content after revert', async () => {
 		const contentBefore = await getEditedPostContent();
 
 		await addDummyText();
 		await save();
 		await revertTemplate();
+		await save();
 
 		const contentAfter = await getEditedPostContent();
 		expect( contentBefore ).toBe( contentAfter );
@@ -101,6 +126,7 @@ describe( 'Template Revert', () => {
 		await addDummyText();
 		await save();
 		await revertTemplate();
+		await save();
 		await visitSiteEditor();
 
 		const contentAfter = await getEditedPostContent();
@@ -113,6 +139,7 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
+		await save();
 		await undoRevertInHeaderToolbar();
 
 		const contentAfter = await getEditedPostContent();
@@ -125,6 +152,7 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
+		await save();
 		await undoRevertInNotice();
 
 		const contentAfter = await getEditedPostContent();
@@ -137,6 +165,7 @@ describe( 'Template Revert', () => {
 		await addDummyText();
 		await save();
 		await revertTemplate();
+		await save();
 		await undoRevertInHeaderToolbar();
 		await clickRedoInHeaderToolbar();
 
@@ -150,6 +179,7 @@ describe( 'Template Revert', () => {
 		await addDummyText();
 		await save();
 		await revertTemplate();
+		await save();
 		await undoRevertInNotice();
 		await undoRevertInHeaderToolbar();
 
@@ -163,6 +193,7 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
+		await save();
 		await clickUndoInHeaderToolbar();
 		await save();
 		await assertSaveButtonIsDisabled();
@@ -178,7 +209,9 @@ describe( 'Template Revert', () => {
 		const contentBefore = await getEditedPostContent();
 
 		await revertTemplate();
+		await save();
 		await undoRevertInNotice();
+		await save();
 		await visitSiteEditor();
 
 		const contentAfter = await getEditedPostContent();

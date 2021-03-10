@@ -4,7 +4,7 @@
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { getPathAndQueryString } from '@wordpress/url';
+import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -320,9 +320,25 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
+		const fileTemplate = yield apiFetch( {
+			path: addQueryArgs( template._links.self[ 0 ].href, {
+				is_custom: false,
+			} ),
+		} );
+		if ( ! fileTemplate ) {
+			yield controls.dispatch(
+				noticesStore,
+				'createErrorNotice',
+				__(
+					'The editor has encountered an unexpected error. Please reload.'
+				),
+				{ type: 'snackbar' }
+			);
+			return;
+		}
+
 		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
 			__unstableSerializeAndClean( blocksForSerialization );
-
 		const edited = yield controls.select(
 			coreStore,
 			'getEditedEntityRecord',
@@ -348,52 +364,22 @@ export function* revertTemplate( template ) {
 			}
 		);
 
-		const fileTemplate = yield controls.dispatch(
-			coreStore,
-			'saveEntityRecord',
-			'postType',
-			'wp_template',
-			{ id: template.id, is_custom: false }
-		);
-		if ( ! fileTemplate ) {
-			yield controls.dispatch(
-				noticesStore,
-				'createErrorNotice',
-				__(
-					'The editor has encountered an unexpected error. Please reload.'
-				),
-				{ type: 'snackbar' }
-			);
-			return;
-		}
-
 		const blocks = parse( fileTemplate?.content?.raw );
-		// We use the same object for `editEntityRecord` and `receiveEntityRecords`
-		// to avoid turning the editor into a dirty state.
-		// `content` property is required to make the undo-redo work. Without `content`
-		// it wouldn't save the actual blocks to the server.
-		const edits = {
-			content: serializeBlocks,
-			blocks,
-		};
+		// `reverted_file_content` is used on the server-side
+		// it is compared with the template's content
+		// if they match then the template is deleted (reverted to file)
 		yield controls.dispatch(
 			coreStore,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
 			fileTemplate.id,
-			edits
-		);
-		// We override the `edits` to make sure we can undo-redo correctly.
-		yield controls.dispatch(
-			coreStore,
-			'receiveEntityRecords',
-			'postType',
-			'wp_template',
-			fileTemplate,
-			undefined,
-			true,
-			edits
+			{
+				content: serializeBlocks,
+				blocks,
+				is_custom: false,
+				reverted_file_content: __unstableSerializeAndClean( blocks ),
+			}
 		);
 
 		const undoRevert = async () => {
@@ -404,13 +390,8 @@ export function* revertTemplate( template ) {
 				{
 					content: serializeBlocks,
 					blocks: edited.blocks,
+					is_custom: true,
 				}
-			);
-
-			await dispatch( coreStore ).saveEditedEntityRecord(
-				'postType',
-				'wp_template',
-				edited.id
 			);
 		};
 		yield controls.dispatch(
