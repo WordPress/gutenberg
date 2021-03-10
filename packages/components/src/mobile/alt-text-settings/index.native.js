@@ -74,6 +74,7 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 						placeholder={ __( 'Add alt text' ) }
 						placeholderTextColor={ '#87a6bc' }
 						style={ altTextEditorStyle }
+						textAlignVertical={ 'top' }
 					/>
 				</PanelBody>
 
