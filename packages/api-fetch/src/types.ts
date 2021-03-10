@@ -12,7 +12,7 @@ export interface ApiFetchRequestProps {
 	method?: string;
 }
 
-export type ApiFetchMiddleware< T = any > = (
+export type ApiFetchMiddleware = (
 	options: ApiFetchRequestProps,
-	next: ( nextOptions: ApiFetchRequestProps ) => ApiFetchRequestProps
-) => ApiFetchRequestProps | Promise< T >;
+	next: ( nextOptions: ApiFetchRequestProps ) => Promise< any >
+) => Promise< any >;
