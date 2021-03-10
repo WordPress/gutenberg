@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	Platform,
-	AccessibilityInfo,
-	findNodeHandle,
-	View,
-} from 'react-native';
+import { Platform, AccessibilityInfo, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 
 /**
@@ -31,7 +26,8 @@ class BottomSheetRangeCell extends Component {
 		super( props );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onCellPress = this.onCellPress.bind( this );
+		this.onIncrementValue = this.onIncrementValue.bind( this );
+		this.onDecrementValue = this.onDecrementValue.bind( this );
 
 		const { value, defaultValue, minimumValue } = props;
 		const initialValue = Number( value || defaultValue || minimumValue );
@@ -43,26 +39,15 @@ class BottomSheetRangeCell extends Component {
 		};
 	}
 
+	componentWillUnmount() {
+		clearTimeout( this.timeoutAnnounceValue );
+	}
+
 	onChangeValue( initialValue ) {
 		const { decimalNum, onChange } = this.props;
 		initialValue = toFixed( initialValue, decimalNum );
 		this.setState( { inputValue: initialValue } );
-		this.announceCurrentValue( `${ initialValue }` );
 		onChange( initialValue );
-	}
-
-	onCellPress() {
-		this.setState( { accessible: false } );
-		if ( this.sliderRef ) {
-			const reactTag = findNodeHandle( this.sliderRef );
-			AccessibilityInfo.setAccessibilityFocus( reactTag );
-		}
-	}
-
-	announceCurrentValue( value ) {
-		/* translators: %s: current cell value. */
-		const announcement = sprintf( __( 'Current value is %s' ), value );
-		AccessibilityInfo.announceForAccessibility( announcement );
 	}
 
 	onChange( nextValue ) {
@@ -73,6 +58,56 @@ class BottomSheetRangeCell extends Component {
 		onChange( nextValue );
 		if ( onComplete ) {
 			onComplete( nextValue );
+		}
+	}
+
+	onIncrementValue() {
+		const { step = 1, maximumValue, decimalNum } = this.props;
+		const { sliderValue } = this.state;
+
+		const newValue = toFixed( sliderValue + step, decimalNum );
+
+		console.log( `Increment: prev=${ sliderValue }, new=${ newValue }` );
+
+		if ( newValue <= maximumValue || maximumValue === undefined ) {
+			this.onChangeValue( newValue );
+			this.setState( {
+				sliderValue: newValue,
+			} );
+			this.announceValue( newValue );
+		}
+	}
+
+	onDecrementValue() {
+		const { step = 1, minimumValue, decimalNum } = this.props;
+		const { sliderValue } = this.state;
+
+		const newValue = toFixed( sliderValue - step, decimalNum );
+
+		console.log(
+			`Decrement: prev=${ sliderValue }, new=${ newValue }, step=${ step }, decimalNum=${ decimalNum }`
+		);
+
+		if ( newValue >= minimumValue ) {
+			this.onChangeValue( newValue );
+			this.setState( {
+				sliderValue: newValue,
+			} );
+			this.announceValue( newValue );
+		}
+	}
+
+	announceValue( value ) {
+		const { label, unitLabel = '' } = this.props;
+
+		if ( Platform.OS === 'ios' ) {
+			// On Android it triggers the accessibilityLabel with the value change
+			clearTimeout( this.timeoutAnnounceValue );
+			this.timeoutAnnounceValue = setTimeout( () => {
+				AccessibilityInfo.announceForAccessibility(
+					`${ value } ${ unitLabel },  ${ label }`
+				);
+			}, 300 );
 		}
 	}
 
@@ -94,22 +129,36 @@ class BottomSheetRangeCell extends Component {
 			cellContainerStyle,
 			onComplete,
 			shouldDisplayTextInput = true,
+			unitLabel = '',
+			openUnitPicker,
 			children,
 			decimalNum,
 			...cellProps
 		} = this.props;
 
-		const { accessible, inputValue, sliderValue } = this.state;
+		const { inputValue, sliderValue } = this.state;
 
-		const accessibilityLabel = sprintf(
-			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			_x(
-				'%1$s. Current value is %2$s',
-				'Slider for picking a number inside a range'
-			),
-			cellProps.label,
-			value
-		);
+		const accessibilityLabel = openUnitPicker
+			? sprintf(
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					_x(
+						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust, double-tap to change unit',
+						'Slider for picking a number inside a range'
+					),
+					cellProps.label,
+					value,
+					unitLabel
+			  )
+			: sprintf(
+					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
+					_x(
+						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust',
+						'Slider for picking a number inside a range'
+					),
+					cellProps.label,
+					value,
+					unitLabel
+			  );
 
 		const containerStyle = [
 			styles.container,
@@ -117,64 +166,81 @@ class BottomSheetRangeCell extends Component {
 		];
 
 		return (
-			<Cell
-				{ ...cellProps }
-				cellContainerStyle={ [
-					styles.cellContainerStyles,
-					cellContainerStyle,
+			<View
+				accessible={ true }
+				accessibilityRole="adjustable"
+				accessibilityActions={ [
+					{ name: 'increment' },
+					{ name: 'decrement' },
+					{ name: 'activate' },
 				] }
-				cellRowContainerStyle={ containerStyle }
-				accessibilityRole={ 'none' }
-				leftAlign
-				editable={ false }
-				activeOpacity={ 1 }
-				accessible={ accessible }
-				onPress={ this.onCellPress }
-				valueStyle={ styles.valueStyle }
+				onAccessibilityAction={ ( event ) => {
+					switch ( event.nativeEvent.actionName ) {
+						case 'increment':
+							this.onIncrementValue();
+							break;
+						case 'decrement':
+							this.onDecrementValue();
+							break;
+						case 'activate':
+							openUnitPicker();
+							break;
+					}
+				} }
 				accessibilityLabel={ accessibilityLabel }
-				accessibilityHint={
-					/* translators: accessibility text (hint for focusing a slider) */
-					__( 'Double tap to change the value using slider' )
-				}
 			>
-				<View style={ containerStyle }>
-					{ preview }
-					<Slider
-						value={ sliderValue }
-						defaultValue={ defaultValue }
-						disabled={ disabled }
-						step={ step }
-						minimumValue={ minimumValue }
-						maximumValue={ maximumValue }
-						minimumTrackTintColor={ minimumTrackTintColor }
-						maximumTrackTintColor={ maximumTrackTintColor }
-						thumbTintColor={ thumbTintColor }
-						onValueChange={ this.onChangeValue }
-						onSlidingComplete={ onComplete }
-						ref={ ( slider ) => {
-							this.sliderRef = slider;
-						} }
-						style={
-							isIOS ? styles.sliderIOS : styles.sliderAndroid
-						}
-						accessibilityRole={ 'adjustable' }
-					/>
-					{ shouldDisplayTextInput && (
-						<RangeTextInput
-							label={ cellProps.label }
-							onChange={ this.onChange }
-							defaultValue={ `${ inputValue }` }
-							value={ inputValue }
-							min={ minimumValue }
-							max={ maximumValue }
+				<Cell
+					{ ...cellProps }
+					cellContainerStyle={ [
+						styles.cellContainerStyles,
+						cellContainerStyle,
+					] }
+					cellRowContainerStyle={ containerStyle }
+					accessibilityRole={ 'adjustable' }
+					leftAlign
+					editable={ false }
+					activeOpacity={ 1 }
+					accessible={ false }
+					valueStyle={ styles.valueStyle }
+				>
+					<View style={ containerStyle }>
+						{ preview }
+						<Slider
+							value={ sliderValue }
+							defaultValue={ defaultValue }
+							disabled={ disabled }
 							step={ step }
-							decimalNum={ decimalNum }
-						>
-							{ children }
-						</RangeTextInput>
-					) }
-				</View>
-			</Cell>
+							minimumValue={ minimumValue }
+							maximumValue={ maximumValue }
+							minimumTrackTintColor={ minimumTrackTintColor }
+							maximumTrackTintColor={ maximumTrackTintColor }
+							thumbTintColor={ thumbTintColor }
+							onValueChange={ this.onChangeValue }
+							onSlidingComplete={ onComplete }
+							ref={ ( slider ) => {
+								this.sliderRef = slider;
+							} }
+							style={
+								isIOS ? styles.sliderIOS : styles.sliderAndroid
+							}
+						/>
+						{ shouldDisplayTextInput && (
+							<RangeTextInput
+								label={ cellProps.label }
+								onChange={ this.onChange }
+								defaultValue={ `${ inputValue }` }
+								value={ inputValue }
+								min={ minimumValue }
+								max={ maximumValue }
+								step={ step }
+								decimalNum={ decimalNum }
+							>
+								{ children }
+							</RangeTextInput>
+						) }
+					</View>
+				</Cell>
+			</View>
 		);
 	}
 }
