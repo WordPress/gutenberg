@@ -8,6 +8,7 @@
 		"src/middlewares/namespace-endpoint.js",
 		"src/middlewares/nonce.js",
 		"src/middlewares/preloading.js",
+		"src/middlewares/root-url.js",
 		"src/types.ts"
 	]
 }
