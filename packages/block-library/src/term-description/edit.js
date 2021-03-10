@@ -37,9 +37,7 @@ export default function TermDescriptionEdit( {
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className="wp-block-term-description__placeholder">
-					<span>
-						{ __( 'This is a placeholder for term description.' ) }
-					</span>
+					<span>{ __( 'Term description.' ) }</span>
 				</div>
 			</div>
 		</>
