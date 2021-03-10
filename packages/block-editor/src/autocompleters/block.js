@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { noop, orderBy } from 'lodash';
-import { Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -12,7 +11,12 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import {
+	useMemo,
+	Platform,
+	Fragment,
+	Text as RNText,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +27,8 @@ import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
 
 const SHOWN_BLOCK_TYPES = 9;
+
+const Text = Platform.OS === 'web' ? Fragment : RNText;
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
 
