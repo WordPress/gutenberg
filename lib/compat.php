@@ -84,7 +84,7 @@ add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
  *
  * @return bool
  */
-function gutenberg_should_load_separate_block_styles() {
+function gutenberg_should_load_separate_block_assets() {
 	$load_separate_styles = gutenberg_is_fse_theme();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
@@ -93,7 +93,7 @@ function gutenberg_should_load_separate_block_styles() {
 	 *
 	 * @return bool
 	 */
-	return apply_filters( 'load_separate_block_styles', $load_separate_styles );
+	return apply_filters( 'load_separate_block_assets', $load_separate_styles );
 }
 
 /**
@@ -102,7 +102,7 @@ function gutenberg_should_load_separate_block_styles() {
  * @return void
  */
 function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
-	if ( gutenberg_should_load_separate_block_styles() ) {
+	if ( gutenberg_should_load_separate_block_assets() ) {
 		/**
 		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
 		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
