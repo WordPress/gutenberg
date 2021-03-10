@@ -1,9 +1,8 @@
 // Normalize Link and edit containers, to look mostly the same.
-.wp-block-navigation-link__field .components-text-control__input.components-text-control__input, // @todo: this selector doesn't appear to target anything.
 .wp-block-navigation-link__container {
 	border-radius: 0;
 
-	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
+	// Make it the same height as the appender to prevent a jump.
 	min-height: $button-size;
 }
 
@@ -39,27 +38,12 @@
 	}
 }
 
-// Separator. @todo: this appears unused.
-.wp-block-navigation-link__separator {
-	margin: $grid-unit-10 0 $grid-unit-10;
-	border-top: $border-width solid $gray-300;
-}
-
-// Popover styles. @todo: these all appear unused.
-.components-popover.wp-block-navigation-link__dropdown-content {
-	margin-top: -1px;
-	margin-left: -4px;
-}
-
-.wp-block-navigation-link__dropdown-content .components-popover__content > div {
-	padding: $grid-unit-10 0;
-}
-
 .wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
 	& > .block-editor-block-list__insertion-point {
 		display: none;
 	}
 }
+
 
 /**
  * Menu item setup state. Is shown when a menu item has no URL configured.
