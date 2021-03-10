@@ -18,11 +18,11 @@ function render_block_core_term_description( $attributes, $content, $block ) {
 	if ( ! is_category() && ! is_tag() && ! is_tax() ) {
 		return '';
 	}
-	$classes = 'term-description';
-	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= ' has-text-align-' . $attributes['textAlign'];
-	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+
+	$extra_attributes   = ( isset( $attributes['textAlign'] ) )
+		? array( 'class' => 'has-text-align-' . $attributes['textAlign'] )
+		: array();
+	$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
 	return '<div ' . $wrapper_attributes . '>' . term_description() . '</div>';
 }
