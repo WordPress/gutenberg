@@ -7,7 +7,7 @@ const tag = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
 			stroke="#1E1E1E"
-			stroke-width="1.5"
+			strokeWidth="1.5"
 			d="M9 19.25h6M4 19.25h4M12 15.25h8M4 15.25h7"
 		/>
 		<Path
