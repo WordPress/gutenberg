@@ -3,6 +3,7 @@
  */
 import {
 	createJSONResponse,
+	pressKeyWithModifier,
 	setUpResponseMocking,
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
@@ -13,6 +14,13 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { useExperimentalFeatures } from '../../experimental-features';
 import menuItemsFixture from './fixtures/menu-items-response-fixture.json';
+
+const TYPE_NAMES = {
+	post: 'post',
+	page: 'page',
+	post_tag: 'tag',
+	category: 'category',
+};
 
 const menusFixture = [
 	{
@@ -29,6 +37,35 @@ const menusFixture = [
 	},
 ];
 
+const searchFixture = [
+	{
+		id: 300,
+		title: 'Home',
+		url: 'https://example.com/home',
+		type: 'post',
+		subtype: 'page',
+	},
+	{
+		id: 301,
+		title: 'About',
+		url: 'https://example.com/about',
+		type: 'post',
+		subtype: 'page',
+	},
+	{
+		id: 302,
+		title: 'Boats',
+		url: 'https://example.com/?cat=123',
+		type: 'category',
+	},
+	{
+		id: 303,
+		title: 'Faves',
+		url: 'https://example.com/?tag=456',
+		type: 'post_tag',
+	},
+];
+
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
 const REST_MENUS_ROUTES = [
@@ -40,9 +77,14 @@ const REST_MENU_ITEMS_ROUTES = [
 	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
 ];
 
+const REST_SEARCH_ROUTES = [
+	'/wp/v2/search',
+	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
+];
+
 /**
  * Determines if a given URL matches any of a given collection of
- * routes (extressed as substrings).
+ * routes (expressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
  * @param {Array} routes array of strings to match against the URL.
@@ -86,6 +128,10 @@ function getMenuMocks( responsesByMethod ) {
 
 function getMenuItemMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_MENU_ITEMS_ROUTES, responsesByMethod );
+}
+
+function getSearchMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -281,5 +327,61 @@ describe( 'Navigation editor', () => {
 			hidden: true,
 		} );
 		expect( submenuLinkHidden ).toBeDefined();
+	} );
+
+	it( 'displays suggestions when adding a link', async () => {
+		await setUpResponseMocking( [
+			...getMenuMocks( { GET: assignMockMenuIds( menusFixture ) } ),
+			...getSearchMocks( { GET: searchFixture } ),
+		] );
+
+		await visitNavigationEditor();
+
+		// Wait for the block to be present and start an empty block.
+		const navBlock = await page.waitForSelector(
+			'div[aria-label="Block: Navigation"]'
+		);
+		await navBlock.click();
+		const startEmptyButton = await page.waitForXPath(
+			'//button[.="Start empty"]'
+		);
+		await startEmptyButton.click();
+
+		// Add an inner link block.
+		const appender = await page.waitForSelector(
+			'button[aria-label="Add block"]'
+		);
+		await appender.click();
+
+		// Must be an exact match to the word 'Link' as other
+		// variations also contain the word 'Link'.
+		const linkInserterItem = await page.waitForXPath(
+			'//button[@role="option"]//span[.="Link"]'
+		);
+		await linkInserterItem.click();
+
+		await page.waitForSelector( 'input[aria-label="URL"]' );
+
+		// The link suggestions should be searchable.
+		for ( let i = 0; i < searchFixture.length; i++ ) {
+			const { title, type, subtype, url } = searchFixture[ i ];
+			const expectedURL = url.replace( 'https://', '' );
+			const expectedType = TYPE_NAMES[ subtype || type ];
+
+			await page.keyboard.type( title );
+			const suggestionTitle = await page.waitForXPath(
+				`//button[@role="option"]//span[.="${ title }"]`
+			);
+			const suggestionType = await page.waitForXPath(
+				`//button[@role="option"]//span[.="${ expectedType }"]`
+			);
+			const suggestionURL = await page.waitForXPath(
+				`//button[@role="option"]//span[.="${ expectedURL }"]`
+			);
+			expect( suggestionTitle ).toBeTruthy();
+			expect( suggestionType ).toBeTruthy();
+			expect( suggestionURL ).toBeTruthy();
+			await pressKeyWithModifier( 'primary', 'A' );
+		}
 	} );
 } );
