@@ -4,7 +4,7 @@
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
+import { getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -320,11 +320,16 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
-		const fileTemplate = yield apiFetch( {
-			path: addQueryArgs( template._links.self[ 0 ].href, {
-				is_custom: false,
-			} ),
-		} );
+		// This will override the current template entity
+		// so we need to refetch after this call.
+		const fileTemplate = yield controls.resolveSelect(
+			coreStore,
+			'getEntityRecord',
+			'postType',
+			'wp_template',
+			template.id,
+			{ is_custom: false }
+		);
 		if ( ! fileTemplate ) {
 			yield controls.dispatch(
 				noticesStore,
@@ -336,6 +341,15 @@ export function* revertTemplate( template ) {
 			);
 			return;
 		}
+		// Refetch the template entity
+		yield controls.resolveSelect(
+			coreStore,
+			'getEntityRecord',
+			'postType',
+			'wp_template',
+			template.id,
+			{ is_custom: true }
+		);
 
 		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
 			__unstableSerializeAndClean( blocksForSerialization );
