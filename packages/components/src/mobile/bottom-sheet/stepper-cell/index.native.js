@@ -114,14 +114,14 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	announceValue( value ) {
-		const { label } = this.props;
+		const { label, unitLabel = '' } = this.props;
 
 		if ( Platform.OS === 'ios' ) {
 			// On Android it triggers the accessibilityLabel with the value change
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
 				AccessibilityInfo.announceForAccessibility(
-					`${ value } ${ label }`
+					`${ value } ${ unitLabel } ${ label }`
 				);
 			}, 300 );
 		}
@@ -130,6 +130,7 @@ class BottomSheetStepperCell extends Component {
 	render() {
 		const {
 			label,
+			unitLabel = '',
 			icon,
 			min,
 			max,
