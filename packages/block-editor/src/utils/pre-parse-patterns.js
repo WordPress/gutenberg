@@ -49,19 +49,13 @@ export function usePreParsePatterns() {
 				return;
 			}
 
-			const marker = `[usePreParsePatterns] process ${ index } ${ patterns[ index ]?.name }`;
-			window.console.time( marker );
 			select( blockEditorStore ).__experimentalGetParsedPattern(
 				patterns[ index ].name,
 				index
 			);
-			window.console.timeEnd( marker );
 
 			handle = requestIdleCallback( callback );
 		};
-
-		window.console.time( '[usePreParsePatterns] initiate' );
-		window.console.timeEnd( '[usePreParsePatterns] initiate' );
 
 		handle = requestIdleCallback( callback );
 		return () => cancelIdleCallback( handle );

@@ -62,23 +62,3 @@ register_block_pattern(
 						<!-- /wp:columns -->',
 	)
 );
-
-for ( $i = 0; $i < 1000; $i++ ) {
-	register_block_pattern(
-		'query/small-posts' . $i,
-		array(
-			'title'   => __( 'Small' . $i, 'gutenberg' ),
-			'scope'   => array(
-				'inserter' => true
-			),
-			'content' => '<!-- wp:columns {"verticalAlignment":"center"} -->
-							<div class="wp-block-columns are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"25%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:25%"><!-- wp:post-featured-image {"isLink":true} /--></div>
-							<!-- /wp:column -->
-							<!-- wp:column {"verticalAlignment":"center","width":"75%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:75%"><!-- wp:post-title {"isLink":true} /--></div>
-							<!-- /wp:column --></div>
-							<!-- /wp:columns -->',
-		)
-	);
-}
