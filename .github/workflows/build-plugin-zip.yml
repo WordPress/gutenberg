@@ -134,11 +134,7 @@ jobs:
           path: ./gutenberg.zip
 
       - name: Build release notes draft
-        if: |
-          github.event_name == 'workflow_dispatch' && (
-            github.ref == 'refs/heads/trunk' ||
-            startsWith( github.ref, 'refs/heads/release/' )
-          )
+        if: ${{ needs.bump-version.outputs.new_version }}
         run: |
           IFS='.' read -r -a VERSION_ARRAY <<< "${{ needs.bump-version.outputs.new_version }}"
           MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
@@ -146,11 +142,7 @@ jobs:
           sed -ie '1,6d' release-notes.txt
 
       - name: Upload release notes artifact
-        if: |
-          github.event_name == 'workflow_dispatch' && (
-            github.ref == 'refs/heads/trunk' ||
-            startsWith( github.ref, 'refs/heads/release/' )
-          )
+        if: ${{ needs.bump-version.outputs.new_version }}
         uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
         with:
           name: release-notes
@@ -160,11 +152,7 @@ jobs:
     name: Create Release Draft and Attach Asset
     needs: [bump-version, build]
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' && (
-        github.ref == 'refs/heads/trunk' ||
-        startsWith( github.ref, 'refs/heads/release/' )
-      )
+    if: ${{ needs.bump-version.outputs.new_version }}
     steps:
       - name: Set Release Version
         id: get_release_version
