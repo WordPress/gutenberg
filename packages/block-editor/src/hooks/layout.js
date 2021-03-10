@@ -18,6 +18,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -81,48 +82,54 @@ function LayoutPanel( { setAttributes, attributes } ) {
 					/>
 				) }
 				{ ! inherit && (
-					<>
-						<UnitControl
-							label={ __( 'Content' ) }
-							labelPosition="edge"
-							__unstableInputWidth="80px"
-							value={ contentSize || wideSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								setAttributes( {
-									layout: {
-										...layout,
-										contentSize: nextWidth,
-									},
-								} );
-							} }
-							units={ CSS_UNITS }
-						/>
-						<UnitControl
-							label={ __( 'Wide' ) }
-							labelPosition="edge"
-							__unstableInputWidth="80px"
-							value={ wideSize || contentSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								setAttributes( {
-									layout: {
-										...layout,
-										wideSize: nextWidth,
-									},
-								} );
-							} }
-							units={ CSS_UNITS }
-						/>
-					</>
+					<div className="alignment__controls">
+						<div className="alignment__controls__unit-control-wrapper">
+							<UnitControl
+								label={ __( 'Content' ) }
+								labelPosition="top"
+								__unstableInputWidth="80px"
+								value={ contentSize || wideSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									setAttributes( {
+										layout: {
+											...layout,
+											contentSize: nextWidth,
+										},
+									} );
+								} }
+								units={ CSS_UNITS }
+							/>
+							<Icon icon={ positionCenter } />
+						</div>
+						<div className="alignment__controls__unit-control-wrapper">
+							<UnitControl
+								label={ __( 'Wide' ) }
+								labelPosition="top"
+								__unstableInputWidth="80px"
+								value={ wideSize || contentSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									setAttributes( {
+										layout: {
+											...layout,
+											wideSize: nextWidth,
+										},
+									} );
+								} }
+								units={ CSS_UNITS }
+							/>
+							<Icon icon={ stretchWide } />
+						</div>
+					</div>
 				) }
-				<p>
+				<p className="alignment__helptext">
 					{ __(
 						'The content and wide sizes determine the behavior of block alignments.'
 					) }

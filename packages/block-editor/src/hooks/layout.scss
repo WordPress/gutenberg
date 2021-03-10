@@ -1,0 +1,17 @@
+.alignment__controls {
+	display: flex;
+	margin-bottom: $grid-unit-30;
+
+	.alignment__controls__unit-control-wrapper {
+		display: flex;
+		margin-right: $grid-unit-30;
+
+		svg {
+			margin: auto 0 $grid-unit-05 $grid-unit-10;
+		}
+	}
+}
+
+.alignment__helptext {
+	font-size: $helptext-font-size;
+}
