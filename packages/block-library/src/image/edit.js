@@ -8,7 +8,10 @@ import { get, omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
+import {
+	withNotices,
+	__unstableComponentSystemProvider as ComponentSystemProvider,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
@@ -287,41 +290,45 @@ export function ImageEdit( {
 	} );
 
 	return (
-		<figure { ...blockProps }>
-			{ url && (
-				<Image
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					onReplace={ onReplace }
-					onSelectImage={ onSelectImage }
-					onSelectURL={ onSelectURL }
-					onUploadError={ onUploadError }
-					containerRef={ ref }
-				/>
-			) }
-			{ ! url && (
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
+		<ComponentSystemProvider
+			__unstableNextInclude={ [ 'WPComponentsButton' ] }
+		>
+			<figure { ...blockProps }>
+				{ url && (
+					<Image
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						isSelected={ isSelected }
+						insertBlocksAfter={ insertBlocksAfter }
+						onReplace={ onReplace }
+						onSelectImage={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onUploadError={ onUploadError }
+						containerRef={ ref }
 					/>
-				</BlockControls>
-			) }
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
-				onError={ onUploadError }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ url }
-			/>
-		</figure>
+				) }
+				{ ! url && (
+					<BlockControls>
+						<BlockAlignmentToolbar
+							value={ align }
+							onChange={ updateAlignment }
+						/>
+					</BlockControls>
+				) }
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					notices={ noticeUI }
+					onError={ onUploadError }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ url }
+				/>
+			</figure>
+		</ComponentSystemProvider>
 	);
 }
 
