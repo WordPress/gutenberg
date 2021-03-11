@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -8,13 +7,28 @@ import { isUndefined, negate, noop, flow } from 'lodash';
  */
 import { useEffect, useState, useRef } from '@wordpress/element';
 
+/**
+ * @param {Event} event
+ */
 const cancelEvent = ( event ) => (
 	event.preventDefault(), event.stopPropagation(), event
 );
 
+/**
+ * @param {Event & {
+	  target: HTMLButtonElement
+	}} event
+ */
 const getEventValue = ( { target: { value } } ) => value;
-const mergeEvent = ( ...handlers ) => ( event ) =>
-	handlers.forEach( ( handler = noop ) => handler( event ) );
+
+/**
+ * @param {Function[]} handlers
+ */
+const mergeEvent = ( ...handlers ) =>
+	/**
+	 * @param {Event} event
+	 */
+	( event ) => handlers.forEach( ( handler = noop ) => handler( event ) );
 
 /**
  * @typedef Props
@@ -35,7 +49,9 @@ export default function useInlineEdit( {
 } ) {
 	const [ isInEditMode, setIsInEditMode ] = useState( false );
 	const [ editingValue, setEditingValue ] = useState( propValue );
+	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
 	const inputRef = useRef();
+	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
 	const toggleRef = useRef();
 	const isInvalid = negate( validate );
 	const changeToEditMode = () => setIsInEditMode( true );
@@ -48,14 +64,19 @@ export default function useInlineEdit( {
 
 	useEffect( () => {
 		if ( isInEditMode ) {
-			inputRef.current.focus();
-			inputRef.current.select();
+			inputRef.current?.focus();
+			inputRef.current?.select();
 			setEditingValue( propValue );
 		} else {
-			toggleRef.current.focus();
+			toggleRef.current?.focus();
 		}
 	}, [ isInEditMode ] );
 
+	/**
+	 * @param {Event & {
+	  target: HTMLButtonElement
+	}} event
+	 */
 	const commit = ( event ) => {
 		const { value } = event.target;
 		cancelEvent( event );
@@ -67,6 +88,9 @@ export default function useInlineEdit( {
 		}
 	};
 
+	/**
+	 * @param {Event & {key: string, target: HTMLButtonElement}} event
+	 */
 	const handleInputActions = ( event ) => {
 		if ( 'Enter' === event.key ) {
 			commit( event );
@@ -82,9 +106,9 @@ export default function useInlineEdit( {
 	};
 
 	const amendInputProps = ( {
-		onChange,
-		onKeyDown,
-		onBlur,
+		onChange = noop,
+		onKeyDown = noop,
+		onBlur = noop,
 		...inputProps
 	} = {} ) => ( {
 		ref: inputRef,
@@ -97,7 +121,7 @@ export default function useInlineEdit( {
 		...inputProps,
 	} );
 
-	const amendToggleProps = ( { onClick, ...toggleProps } = {} ) => ( {
+	const amendToggleProps = ( { onClick = noop, ...toggleProps } = {} ) => ( {
 		ref: toggleRef,
 		onClick: mergeEvent( changeToEditMode, onClick ),
 		...toggleProps,

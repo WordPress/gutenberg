@@ -1,6 +1,5 @@
-Hook providing with data to bend two elements.
+Hook providing with refs to bind two elements.
 
-One of which sets 'isEdit' state to true upon clicking, second sets 'isEdit' state to false on 'Enter'/onBlur event and triggering onCommit callback with its value.
+One ref is used to set 'isEdit' state to true upon clicking. The second is used to set 'isEdit' state to false on 'Enter'/onBlur event and triggering onCommit callback with its value.
 
-
-The hook was designed to be a component in the first place, but hook gives more flexibility. See more: https://github.com/WordPress/gutenberg/pull/28924
+The hook was designed to be a component in the first place, but a hook gives more flexibility.
