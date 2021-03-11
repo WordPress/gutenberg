@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
+import { Popover, ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -21,7 +21,11 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 				className="block-editor-rich-text__inline-format-toolbar"
 				__unstableSlotName="block-toolbar"
 			>
-				<FormatToolbar />
+				<div className="block-editor-rich-text__inline-format-toolbar-group">
+					<ToolbarGroup>
+						<FormatToolbar />
+					</ToolbarGroup>
+				</div>
 			</Popover>
 		);
 	}
