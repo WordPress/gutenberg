@@ -44,4 +44,24 @@ describe( 'props', () => {
 		);
 		expect( container.firstChild.tagName ).toBe( 'SPAN' );
 	} );
+
+	test( 'should render a11y props when not using a semantic element', () => {
+		const { container } = render(
+			<Heading level="3" as="div">
+				Code is Poetry
+			</Heading>
+		);
+		expect( container.firstChild.getAttribute( 'role' ) ).toBe( 'heading' );
+		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBe( '3' );
+	} );
+
+	test( 'should not render a11y props when using a semantic element', () => {
+		const { container } = render(
+			<Heading level="1" as="h4">
+				Code is Poetry
+			</Heading>
+		);
+		expect( container.firstChild.getAttribute( 'role' ) ).toBeNull();
+		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBeNull();
+	} );
 } );

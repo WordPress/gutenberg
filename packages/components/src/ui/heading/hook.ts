@@ -59,6 +59,17 @@ export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
 	);
 
 	const as = asProp || `h${ level }`;
+
+	const a11yProps: {
+		role?: string;
+		'aria-level'?: string | number;
+	} = {};
+	if ( typeof as === 'string' && as[ 0 ] !== 'h' ) {
+		// if not a semantic `h` element, add a11y props:
+		a11yProps.role = 'heading';
+		a11yProps[ 'aria-level' ] = level;
+	}
+
 	const textProps = useText( {
 		color: ui.get( 'colorTextHeading' ),
 		size: getHeadingFontSize( level ),
@@ -68,5 +79,5 @@ export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
 		...otherProps,
 	} );
 
-	return { ...textProps, as };
+	return { ...textProps, ...a11yProps, as };
 }
