@@ -77,6 +77,9 @@ $GLOBALS['wp_tests_options'] = array(
 	),
 );
 
+// Enable the widget block editor.
+tests_add_filter( 'gutenberg_use_widgets_block_editor', '__return_true' );
+
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
 

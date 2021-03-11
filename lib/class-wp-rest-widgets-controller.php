@@ -417,7 +417,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( isset( $request['settings'] ) ) { // Backwards compatibility. TODO: Remove.
+		if ( ! empty( $request['settings'] ) ) { // Backwards compatibility. TODO: Remove.
 			_deprecated_argument( 'settings', '10.2.0' );
 			if ( $widget_object ) {
 				$form_data = array(
@@ -438,6 +438,16 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			}
 
 			if ( isset( $request['instance']['raw'] ) ) {
+				if (
+					! isset( $widget_object->show_instance_in_rest ) ||
+					! $widget_object->show_instance_in_rest
+				) {
+					return new WP_Error(
+						'rest_invalid_widget',
+						__( 'Widget type does not support raw instances.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
 				$instance = $request['instance']['raw'];
 			} elseif ( isset( $request['instance']['encoded'], $request['instance']['hash'] ) ) {
 				$serialized_instance = base64_decode( $request['instance']['encoded'] );
