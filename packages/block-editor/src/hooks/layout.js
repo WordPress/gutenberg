@@ -201,21 +201,19 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { layout = {} } = attributes;
 		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 		const { wideSize, contentSize } = usedLayout;
-		if ( ! wideSize && ! contentSize ) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		const className = classnames(
-			props?.className,
-			`wp-container-${ id }`
-		);
+		const hasLayout = !! wideSize || !! contentSize;
+		const className = classnames( props?.className, {
+			[ `wp-container-${ id }` ]: hasLayout,
+		} );
 
 		return (
 			<>
-				<LayoutStyle
-					selector={ `.wp-container-${ id }` }
-					layout={ usedLayout }
-				/>
+				{ hasLayout && (
+					<LayoutStyle
+						selector={ `.wp-container-${ id }` }
+						layout={ usedLayout }
+					/>
+				) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
