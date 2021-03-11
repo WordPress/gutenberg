@@ -113,32 +113,40 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
-	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
+	// Set the development and CLI image's WordPress and PHP versions if defined.
 	const developmentPhpVersion = config.env.development.phpVersion
 		? config.env.development.phpVersion
 		: '';
+	const developmentSuffices = [
+		config.env.development.wpVersion,
+		developmentPhpVersion && 'php' + developmentPhpVersion,
+	].filter( Boolean );
+	// Set the WordPress development image with the WP and PHP version tags.
+	const developmentWpImage = [
+		'wordpress',
+		developmentSuffices.join( '-' ),
+	].join( ':' );
+
+	// Set the test image's WordPress and PHP versions for the if defined.
 	const testsPhpVersion = config.env.tests.phpVersion
 		? config.env.tests.phpVersion
 		: '';
+	const testsSuffices = [
+		config.env.tests.wpVersion,
+		testsPhpVersion && 'php' + testsPhpVersion,
+	].filter( Boolean );
+	// Set the WordPress tests image with the WP and PHP version tags.
+	const testsWpImage = [ 'wordpress', testsSuffices.join( '-' ) ].join( ':' );
 
-	// Set the WordPress images with the PHP version tag.
-	const developmentWpImage = `wordpress${
-		developmentPhpVersion ? ':php' + developmentPhpVersion : ''
-	}`;
-	const testsWpImage = `wordpress${
-		testsPhpVersion ? ':php' + testsPhpVersion : ''
-	}`;
-	// Set the WordPress CLI images with the PHP version tag.
-	const developmentWpCliImage = `wordpress:cli${
-		! developmentPhpVersion || developmentPhpVersion.length === 0
-			? ''
-			: '-php' + developmentPhpVersion
-	}`;
-	const testsWpCliImage = `wordpress:cli${
-		! testsPhpVersion || testsPhpVersion.length === 0
-			? ''
-			: '-php' + testsPhpVersion
-	}`;
+	// Set the WordPress CLI images with the WP and PHP version tags.
+	const developmentWpCliImage = [
+		'wordpress',
+		[ 'cli', ...developmentSuffices ].join( '-' ),
+	].join( ':' );
+	const testsWpCliImage = [
+		'wordpress',
+		[ 'cli', ...testsSuffices ].join( '-' ),
+	].join( ':' );
 
 	// Defaults are to use the most recent version of PHPUnit that provides
 	// support for the specified version of PHP.

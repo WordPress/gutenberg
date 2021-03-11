@@ -384,6 +384,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | Field          | Type           | Default                                | Description                                                                                                                      |
 | -------------- | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `"core"`       | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
+| `"wpVersion"`  | `string\|null` | `null`                                 | The WordPress version to use (for the Docker image). If `null` is specified, `wp-env` will use the production release of WordPress. |
 | `"phpVersion"` | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`    | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`     | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |

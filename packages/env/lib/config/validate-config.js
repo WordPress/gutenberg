@@ -83,6 +83,18 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	if (
+		config.wpVersion &&
+		! (
+			typeof config.wpVersion === 'string' &&
+			config.wpVersion.length === 3
+		)
+	) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }wpVersion" must be a string of the format "0.0".`
+		);
+	}
+
 	return config;
 }
 

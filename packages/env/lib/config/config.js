@@ -27,6 +27,7 @@ const md5 = require( '../md5' );
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
  * @property {string}                           phpVersion              Version of PHP to use in the environments, of the format 0.0.
+ * @property {string}                           wpVersion               Version of WordPress (Docker image) to use in the environments, of the format 0.0.
  */
 
 /**
@@ -71,6 +72,7 @@ module.exports = async function readConfig( configPath ) {
 	const defaultConfiguration = {
 		core: null,
 		phpVersion: null,
+		wpVersion: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
@@ -260,6 +262,12 @@ function withOverrides( config ) {
 		process.env.WP_ENV_PHP_VERSION || config.env.development.phpVersion;
 	config.env.tests.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
+
+	// Override WordPress version with environment variable.
+	config.env.development.wpVersion =
+		process.env.WP_ENV_WP_VERSION || config.env.development.wpVersion;
+	config.env.tests.wpVersion =
+		process.env.WP_ENV_WP_VERSION || config.env.tests.wpVersion;
 
 	const updateEnvUrl = ( configKey ) => {
 		[ 'development', 'tests' ].forEach( ( envKey ) => {
