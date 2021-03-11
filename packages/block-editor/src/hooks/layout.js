@@ -82,8 +82,8 @@ function LayoutPanel( { setAttributes, attributes } ) {
 					/>
 				) }
 				{ ! inherit && (
-					<div className="alignment__controls">
-						<div className="alignment__controls__unit-control-wrapper">
+					<div className="block-editor-hooks__layout-controls">
+						<div className="block-editor-hooks__layout-controls-unit">
 							<UnitControl
 								label={ __( 'Content' ) }
 								labelPosition="top"
@@ -105,7 +105,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 							/>
 							<Icon icon={ positionCenter } />
 						</div>
-						<div className="alignment__controls__unit-control-wrapper">
+						<div className="block-editor-hooks__layout-controls-unit">
 							<UnitControl
 								label={ __( 'Wide' ) }
 								labelPosition="top"
@@ -129,7 +129,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 						</div>
 					</div>
 				) }
-				<p className="alignment__helptext">
+				<p className="block-editor-hooks__layout-controls-helptext">
 					{ __(
 						'The content and wide sizes determine the behavior of block alignments.'
 					) }

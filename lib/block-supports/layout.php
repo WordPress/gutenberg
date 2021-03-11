@@ -13,7 +13,7 @@
 function gutenberg_register_layout_support( $block_type ) {
 	$support_layout = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$support_layout = gutenberg_experimental_get( $block_type->supports, array( '__experimentalLayout' ), false );
+		$support_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
 	}
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
@@ -39,7 +39,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$support_layout = false;
 	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-		$support_layout = gutenberg_experimental_get( $block_type->supports, array( '__experimentalLayout' ), false );
+		$support_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
 	}
 	if ( ! $support_layout || ! isset( $block['attrs']['layout'] ) ) {
 		return $block_content;

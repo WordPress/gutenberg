@@ -1,8 +1,8 @@
-.alignment__controls {
+.block-editor-hooks__layout-controls {
 	display: flex;
 	margin-bottom: $grid-unit-30;
 
-	.alignment__controls__unit-control-wrapper {
+	.block-editor-hooks__layout-controls-unit {
 		display: flex;
 		margin-right: $grid-unit-30;
 
@@ -12,6 +12,6 @@
 	}
 }
 
-.alignment__helptext {
+.block-editor-hooks__layout-controls-helptext {
 	font-size: $helptext-font-size;
 }
