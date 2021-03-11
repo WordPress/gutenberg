@@ -9,7 +9,6 @@ import 'react-dates/initialize';
  * WordPress dependencies
  */
 import { useState, forwardRef } from '@wordpress/element';
-// import { __, _x } from '@wordpress/i18n';
 import { useI18n } from '@wordpress/react-i18n';
 
 /**
