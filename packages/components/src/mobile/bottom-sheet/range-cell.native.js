@@ -200,57 +200,61 @@ class BottomSheetRangeCell extends Component {
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityHint={ getAccessibilityHint() }
 			>
-				<Cell
-					{ ...cellProps }
-					cellContainerStyle={ [
-						styles.cellContainerStyles,
-						cellContainerStyle,
-					] }
-					cellRowContainerStyle={ containerStyle }
-					accessibilityRole={ 'adjustable' }
-					leftAlign
-					editable={ false }
-					activeOpacity={ 1 }
-					accessible={ false }
-					valueStyle={ styles.valueStyle }
-				>
-					<View style={ containerStyle }>
-						{ preview }
-						<Slider
-							value={ sliderValue }
-							defaultValue={ defaultValue }
-							disabled={ disabled }
-							step={ step }
-							minimumValue={ minimumValue }
-							maximumValue={ maximumValue }
-							minimumTrackTintColor={ minimumTrackTintColor }
-							maximumTrackTintColor={ maximumTrackTintColor }
-							thumbTintColor={ thumbTintColor }
-							onValueChange={ this.onChangeValue }
-							onSlidingComplete={ onComplete }
-							ref={ ( slider ) => {
-								this.sliderRef = slider;
-							} }
-							style={
-								isIOS ? styles.sliderIOS : styles.sliderAndroid
-							}
-						/>
-						{ shouldDisplayTextInput && (
-							<RangeTextInput
-								label={ cellProps.label }
-								onChange={ this.onChange }
-								defaultValue={ `${ inputValue }` }
-								value={ inputValue }
-								min={ minimumValue }
-								max={ maximumValue }
+				<View importantForAccessibility="no-hide-descendants">
+					<Cell
+						{ ...cellProps }
+						cellContainerStyle={ [
+							styles.cellContainerStyles,
+							cellContainerStyle,
+						] }
+						cellRowContainerStyle={ containerStyle }
+						accessibilityRole={ 'adjustable' }
+						leftAlign
+						editable={ false }
+						activeOpacity={ 1 }
+						accessible={ false }
+						valueStyle={ styles.valueStyle }
+					>
+						<View style={ containerStyle }>
+							{ preview }
+							<Slider
+								value={ sliderValue }
+								defaultValue={ defaultValue }
+								disabled={ disabled }
 								step={ step }
-								decimalNum={ decimalNum }
-							>
-								{ children }
-							</RangeTextInput>
-						) }
-					</View>
-				</Cell>
+								minimumValue={ minimumValue }
+								maximumValue={ maximumValue }
+								minimumTrackTintColor={ minimumTrackTintColor }
+								maximumTrackTintColor={ maximumTrackTintColor }
+								thumbTintColor={ thumbTintColor }
+								onValueChange={ this.onChangeValue }
+								onSlidingComplete={ onComplete }
+								ref={ ( slider ) => {
+									this.sliderRef = slider;
+								} }
+								style={
+									isIOS
+										? styles.sliderIOS
+										: styles.sliderAndroid
+								}
+							/>
+							{ shouldDisplayTextInput && (
+								<RangeTextInput
+									label={ cellProps.label }
+									onChange={ this.onChange }
+									defaultValue={ `${ inputValue }` }
+									value={ inputValue }
+									min={ minimumValue }
+									max={ maximumValue }
+									step={ step }
+									decimalNum={ decimalNum }
+								>
+									{ children }
+								</RangeTextInput>
+							) }
+						</View>
+					</Cell>
+				</View>
 			</View>
 		);
 	}

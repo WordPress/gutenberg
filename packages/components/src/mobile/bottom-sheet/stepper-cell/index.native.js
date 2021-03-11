@@ -210,52 +210,60 @@ class BottomSheetStepperCell extends Component {
 					}
 				} }
 			>
-				<Cell
-					accessibilityRole="none"
-					accessible={ false }
-					cellContainerStyle={ [
-						styles.cellContainerStyle,
-						preview && styles.columnContainer,
-						cellContainerStyle,
-					] }
-					cellRowContainerStyle={
-						preview ? containerStyle : styles.cellRowStyles
-					}
-					disabled={ true }
-					editable={ false }
-					icon={ icon }
-					label={ label }
-					labelStyle={ labelStyle }
-					leftAlign={ true }
-					separatorType={ separatorType }
-				>
-					<View style={ preview && containerStyle }>
-						{ preview }
-						<Stepper
-							isMaxValue={ isMaxValue }
-							isMinValue={ isMinValue }
-							onPressInDecrement={ this.onDecrementValuePressIn }
-							onPressInIncrement={ this.onIncrementValuePressIn }
-							onPressOut={ this.onPressOut }
-							value={ value }
-							shouldDisplayTextInput={ shouldDisplayTextInput }
-						>
-							{ shouldDisplayTextInput && (
-								<RangeTextInput
-									label={ label }
-									onChange={ onChange }
-									defaultValue={ `${ inputValue }` }
-									value={ inputValue }
-									min={ min }
-									step={ 1 }
-									decimalNum={ decimalNum }
-								>
-									{ children }
-								</RangeTextInput>
-							) }
-						</Stepper>
-					</View>
-				</Cell>
+				<View importantForAccessibility="no-hide-descendants">
+					<Cell
+						accessibilityRole="none"
+						accessible={ false }
+						cellContainerStyle={ [
+							styles.cellContainerStyle,
+							preview && styles.columnContainer,
+							cellContainerStyle,
+						] }
+						cellRowContainerStyle={
+							preview ? containerStyle : styles.cellRowStyles
+						}
+						disabled={ true }
+						editable={ false }
+						icon={ icon }
+						label={ label }
+						labelStyle={ labelStyle }
+						leftAlign={ true }
+						separatorType={ separatorType }
+					>
+						<View style={ preview && containerStyle }>
+							{ preview }
+							<Stepper
+								isMaxValue={ isMaxValue }
+								isMinValue={ isMinValue }
+								onPressInDecrement={
+									this.onDecrementValuePressIn
+								}
+								onPressInIncrement={
+									this.onIncrementValuePressIn
+								}
+								onPressOut={ this.onPressOut }
+								value={ value }
+								shouldDisplayTextInput={
+									shouldDisplayTextInput
+								}
+							>
+								{ shouldDisplayTextInput && (
+									<RangeTextInput
+										label={ label }
+										onChange={ onChange }
+										defaultValue={ `${ inputValue }` }
+										value={ inputValue }
+										min={ min }
+										step={ 1 }
+										decimalNum={ decimalNum }
+									>
+										{ children }
+									</RangeTextInput>
+								) }
+							</Stepper>
+						</View>
+					</Cell>
+				</View>
 			</View>
 		);
 	}
