@@ -443,6 +443,7 @@ These are the current color properties supported by blocks:
 | --- | --- |
 | Cover | Yes |
 | Group | Yes |
+| Template Part | Yes |
 
 #### Typography Properties
 
