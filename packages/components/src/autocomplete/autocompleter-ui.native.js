@@ -3,18 +3,19 @@
  */
 import { map } from 'lodash';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
-import Popover from 'react-native-popover-view';
 
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useState } from '@wordpress/element';
+import { useLayoutEffect } from '@wordpress/element';
 import { Icon, PopoverFill } from '@wordpress/components';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import getDefaultUseItems from './get-default-use-items';
+import styles from './style.scss';
 
 export function getAutoCompleterUI( autocompleter ) {
 	const useItems = autocompleter.useItems
@@ -26,16 +27,32 @@ export function getAutoCompleterUI( autocompleter ) {
 		selectedIndex,
 		onChangeOptions,
 		onSelect,
-		contentRef,
 	} ) {
-		const [ popoverVisible, setPopoverVisible ] = useState( true );
 		const [ items ] = useItems( filterValue );
-		const displayArea = { x: 16, y: 0, width: 160 };
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
-			// return () => setPopoverVisible( false );
 		}, [ items ] );
+
+		const containerStyles = usePreferredColorSchemeStyle(
+			styles.container,
+			styles.containerDark
+		);
+
+		const activeBgStyles = usePreferredColorSchemeStyle(
+			styles.activeBg,
+			styles.activeBgDark
+		);
+
+		const iconStyles = usePreferredColorSchemeStyle(
+			styles.icon,
+			styles.iconDark
+		);
+
+		const textStyles = usePreferredColorSchemeStyle(
+			styles.text,
+			styles.textActive
+		);
 
 		if ( ! items.length > 0 ) {
 			return null;
@@ -43,64 +60,40 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		return (
 			<PopoverFill>
-				<Popover
-					from={ contentRef }
-					isVisible={ true }
-					mode="tooltip"
-					backgroundStyle={ { backgroundColor: 'transparent' } }
-					popoverStyle={ { borderWidth: 1, borderColor: '#a7aaad' } }
-					arrowStyle={ { backgroundColor: 'transparent' } }
-					animationConfig={ {
-						duration: 0,
-					} }
-					// debug
-					displayArea={ displayArea }
-					placement="bottom"
-				>
+				<View style={ containerStyles }>
 					<ScrollView
-						// horizontal
-						style={ {
-							width: 160,
-							maxHeight: 120,
-							paddingVertical: 8,
-						} }
-						contentContainerStyle={ { flexGrow: 1 } }
-						// showsHorizontalScrollIndicator={ false }
+						horizontal
+						contentContainerStyle={ styles.content }
+						showsHorizontalScrollIndicator={ false }
 						keyboardShouldPersistTaps="always"
 					>
 						{ map( items, ( option, index ) => {
+							const isActive = index === selectedIndex;
 							return (
 								<TouchableOpacity
 									activeOpacity={ 0.5 }
-									style={ {
-										flexDirection: 'row',
-										alignItems: 'center',
-										marginRight: 10,
-										paddingHorizontal: 10,
-										paddingVertical: 5,
-									} }
+									style={ [
+										styles.item,
+										isActive && activeBgStyles,
+									] }
 									key={ index }
-									// hitSlop={ {
-									// 	top: 22,
-									// 	bottom: 22,
-									// 	left: 22,
-									// 	right: 22,
-									// } }
 									onPress={ () => onSelect( option ) }
 								>
-									<View style={ { marginRight: 4 } }>
+									<View style={ styles.icon }>
 										<Icon
 											icon={ option?.value?.icon?.src }
-											size={ 22 }
+											size={ 24 }
+											style={ [
+												iconStyles,
+												isActive && styles.iconActive,
+											] }
 										/>
 									</View>
 
 									<Text
 										style={ [
-											index === selectedIndex && {
-												color: '#2271b1',
-												fontWeight: 'bold',
-											},
+											textStyles,
+											isActive && styles.activeText,
 										] }
 									>
 										{ option?.value?.title }
@@ -109,7 +102,7 @@ export function getAutoCompleterUI( autocompleter ) {
 							);
 						} ) }
 					</ScrollView>
-				</Popover>
+				</View>
 			</PopoverFill>
 		);
 	}

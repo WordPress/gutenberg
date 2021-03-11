@@ -137,7 +137,6 @@ class Layout extends Component {
 						<FloatingToolbar />
 					) }
 					<NoticeList />
-					<PopoverSlot />
 				</View>
 				<View
 					style={ {
@@ -152,6 +151,7 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
+						<PopoverSlot />
 						{ Platform.OS === 'ios' && <FloatingToolbar /> }
 						<Header />
 						<BottomSheetSettings />

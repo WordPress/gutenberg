@@ -1,0 +1,61 @@
+.container {
+	height: $mobile-header-toolbar-height;
+	background-color: $app-background;
+	border-top-color: $gray-lighten-30;
+	border-top-width: 1px;
+}
+
+.containerDark {
+	background-color: $app-background-dark-alt;
+	border-top-color: $dark-quaternary;
+	border-bottom-width: 1px;
+	border-bottom-color: $dark-quaternary;
+}
+
+.content {
+	flex-grow: 1;
+	padding-left: 6px;
+}
+
+.item {
+	flex-direction: row;
+	align-items: center;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 8px;
+	padding-right: 12px;
+	margin-right: 2px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
+.icon {
+	margin-right: 4px;
+	color: $toolbar-button;
+}
+
+.iconDark {
+	color: $gray-20;
+}
+
+.iconActive {
+	color: $white;
+}
+
+.activeBg {
+	background-color: $gray-dark;
+	border-radius: 6px;
+}
+
+.text {
+	color: $toolbar-button;
+}
+
+.textActive {
+	color: $gray-20;
+}
+
+.activeText {
+	color: $white;
+	font-weight: bold;
+}
