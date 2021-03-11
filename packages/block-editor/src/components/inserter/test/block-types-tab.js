@@ -112,8 +112,8 @@ describe( 'InserterMenu', () => {
 
 		expect( embedTabTitle.textContent ).toBe( 'Embeds' );
 		expect( blocks ).toHaveLength( 2 );
-		expect( blocks[ 0 ].textContent ).toBe( 'YouTube' );
-		expect( blocks[ 1 ].textContent ).toBe( 'A Paragraph Embed' );
+		expect( blocks[ 0 ].textContent ).toBe( 'A Paragraph Embed' );
+		expect( blocks[ 1 ].textContent ).toBe( 'YouTube' );
 	} );
 
 	it( 'should show the common category blocks', () => {
@@ -130,8 +130,8 @@ describe( 'InserterMenu', () => {
 
 		expect( commonTabTitle.textContent ).toBe( 'Text' );
 		expect( blocks ).toHaveLength( 3 );
-		expect( blocks[ 0 ].textContent ).toBe( 'Paragraph' );
-		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Paragraph' );
+		expect( blocks[ 0 ].textContent ).toBe( 'Advanced Paragraph' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Paragraph' );
 		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 	} );
 
