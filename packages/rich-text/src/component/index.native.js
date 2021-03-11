@@ -224,7 +224,7 @@ export class RichText extends Component {
 
 	insertString( record, string ) {
 		if ( record && string ) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
 		}
@@ -698,7 +698,7 @@ export class RichText extends Component {
 			nextProps.reversed !== this.props.reversed ||
 			nextProps.start !== this.props.start
 		) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			this.value = undefined;
 			return true;
 		}
@@ -740,7 +740,7 @@ export class RichText extends Component {
 				nextProps.__unstableIsSelected
 			) {
 				this.needsSelectionUpdate = true;
-				this.lastEventCount = undefined; // force a refresh on the native side
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 		}
 
@@ -797,7 +797,7 @@ export class RichText extends Component {
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
