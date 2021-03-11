@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.28.6-next.0 (2021-03-11)
+
 ### Bug Fixes
 
 - Fix a regression where the Cover block migration would not work with a non-default contentPosition ([#29542](https://github.com/WordPress/gutenberg/pull/29542))

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.0-next.0 (2021-03-11)
+
 ### Breaking Change
 
 -   Reverted `cloneBlock` back to its original logic that doesn't sanitize block's attributes. [#28379](https://github.com/WordPress/gutenberg/pull/29111)

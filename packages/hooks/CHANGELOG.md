@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.12.0-next.0 (2021-03-11)
+
 ### New Feature
 
 - Export the default `createHooks` singleton instance as `defaultHooks`, in addition to exporting the individual methods.
