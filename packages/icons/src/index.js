@@ -189,6 +189,7 @@ export { default as tableRowBefore } from './library/table-row-before';
 export { default as tableRowDelete } from './library/table-row-delete';
 export { default as table } from './library/table';
 export { default as tag } from './library/tag';
+export { default as termDescription } from './library/term-description';
 export { default as footer } from './library/footer';
 export { default as header } from './library/header';
 export { default as sidebar } from './library/sidebar';
