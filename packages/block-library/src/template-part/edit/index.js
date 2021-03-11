@@ -117,8 +117,8 @@ export default function TemplatePartEdit( {
 			/>
 			<TagName { ...blockProps }>
 				<BoxControlVisualizer
-					values={style?.spacing?.padding}
-					showValues={style?.visualizers?.padding}
+					values={ style?.spacing?.padding }
+					showValues={ style?.visualizers?.padding }
 				/>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
