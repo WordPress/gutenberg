@@ -3,6 +3,13 @@
  */
 import { useEffect } from '@wordpress/element';
 
+/*
+ * Setting `overflow: hidden` on html and body elements resets body scroll in iOS.
+ * Save scroll top so we can restore it after locking scroll.
+ *
+ * NOTE: It would be cleaner and possibly safer to find a localized solution such
+ * as preventing default on certain touchmove events.
+ */
 let previousScrollTop = 0;
 
 /**
@@ -27,13 +34,6 @@ function setLocked( locked, className ) {
 	}
 }
 
-/*
- * Setting `overflow: hidden` on html and body elements resets body scroll in iOS.
- * Save scroll top so we can restore it after locking scroll.
- *
- * NOTE: It would be cleaner and possibly safer to find a localized solution such
- * as preventing default on certain touchmove events.
- */
 let lockCounter = 0;
 
 /**
@@ -58,7 +58,7 @@ export default function ScrollLock( { className = 'lockscroll' } ) {
 
 			--lockCounter;
 		};
-	}, [] );
+	}, [ className ] );
 
 	return null;
 }
