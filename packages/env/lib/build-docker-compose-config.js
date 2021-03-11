@@ -176,9 +176,17 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
-					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
+					MYSQL_ROOT_PASSWORD: 'password',
+					MYSQL_DATABASE: 'wordpress',
 				},
-				volumes: [ 'mysql:/var/lib/mysql' ],
+			},
+			'tests-mysql': {
+				image: 'mariadb',
+				ports: [ '3306' ],
+				environment: {
+					MYSQL_ROOT_PASSWORD: 'password',
+					MYSQL_DATABASE: 'tests-wordpress',
+				},
 			},
 			wordpress: {
 				build: '.',
@@ -187,15 +195,20 @@ module.exports = function buildDockerComposeConfig( config ) {
 				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'wordpress',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: 'password',
 				},
 				volumes: developmentMounts,
 			},
 			'tests-wordpress': {
-				depends_on: [ 'mysql' ],
+				depends_on: [ 'tests-mysql' ],
 				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: 'password',
+					WORDPRESS_DB_HOST: 'tests-mysql',
 				},
 				volumes: testsMounts,
 			},
@@ -204,12 +217,23 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: developmentWpCliImage,
 				volumes: developmentMounts,
 				user: cliUser,
+				environment: {
+					WORDPRESS_DB_NAME: 'wordpress',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: 'password',
+				},
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
 				image: testsWpCliImage,
 				volumes: testsMounts,
 				user: cliUser,
+				environment: {
+					WORDPRESS_DB_NAME: 'tests-wordpress',
+					WORDPRESS_DB_USER: 'root',
+					WORDPRESS_DB_PASSWORD: 'password',
+					WORDPRESS_DB_HOST: 'tests-mysql',
+				},
 			},
 			composer: {
 				image: 'composer',
