@@ -61,7 +61,6 @@
 			right: $border-width;
 
 			// Everything else.
-			// 2px outside.
 			box-shadow: 0 0 0 $border-width $gray-900;
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 
