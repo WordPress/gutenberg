@@ -15,6 +15,12 @@
 	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
+
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 / 2) 0;
+		width: calc(100% + #{ $grid-unit-15 });
+	}
 }
 
 .block-editor-block-navigation-leaf {
