@@ -85,7 +85,7 @@ class BottomSheetRangeCell extends Component {
 	 * value of this setting programmatically.
 	 */
 	onDecrementValue() {
-		const { step = 10, minimumValue, decimalNum } = this.props;
+		const { step = 5, minimumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
 
 		const newValue = toFixed( sliderValue - step, decimalNum );
