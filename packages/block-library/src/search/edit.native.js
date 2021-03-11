@@ -97,21 +97,6 @@ export default function SearchEdit( {
 		};
 	}, [] );
 
-	/*
-	 * Clear component selection state when the block is no longer
-	 * selected.
-	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			if ( isButtonSelected ) {
-				toggleButtonFocus( false );
-			}
-			if ( isLabelSelected ) {
-				toggleLabelFocus( false );
-			}
-		}
-	}, [ isSelected ] );
-
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
 			return;
@@ -131,24 +116,6 @@ export default function SearchEdit( {
 			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
 			widthUnit: nextUnit,
 		} );
-	};
-
-	const toggleButtonFocus = ( isFocused ) => {
-		if ( isFocused && isSelected ) {
-			setIsButtonSelected( true );
-			setIsLabelSelected( false );
-		} else {
-			setIsButtonSelected( false );
-		}
-	};
-
-	const toggleLabelFocus = ( isFocused ) => {
-		if ( isFocused && isSelected ) {
-			setIsLabelSelected( true );
-			setIsButtonSelected( false );
-		} else {
-			setIsLabelSelected( false );
-		}
 	};
 
 	const getBlockClassNames = () => {
@@ -294,7 +261,10 @@ export default function SearchEdit( {
 						isSelected={ isButtonSelected }
 						__unstableMobileNoFocusOnMount={ ! isSelected }
 						unstableOnFocus={ () => {
-							toggleButtonFocus( true );
+							setIsButtonSelected( true );
+						} }
+						onBlur={ () => {
+							setIsButtonSelected( false );
 						} }
 					/>
 				) }
@@ -328,7 +298,10 @@ export default function SearchEdit( {
 					isSelected={ isLabelSelected }
 					__unstableMobileNoFocusOnMount={ ! isSelected }
 					unstableOnFocus={ () => {
-						toggleLabelFocus( true );
+						setIsLabelSelected( true );
+					} }
+					onBlur={ () => {
+						setIsLabelSelected( false );
 					} }
 				/>
 			) }
