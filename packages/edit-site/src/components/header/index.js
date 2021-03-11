@@ -105,10 +105,17 @@ export default function Header( { openEntitiesSavedStates } ) {
 							}
 						} }
 						icon={ plus }
-						label={ _x(
-							'Add block',
-							'Generic label for block inserter button'
-						) }
+						label={
+							isInserterOpen
+								? _x(
+										'Close block inserter',
+										'Generic label for block inserter button'
+								  )
+								: _x(
+										'Add block',
+										'Generic label for block inserter button'
+								  )
+						}
 					/>
 					{ isLargeViewport && (
 						<>

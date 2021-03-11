@@ -142,10 +142,17 @@ function HeaderToolbar() {
 					icon={ plus }
 					/* translators: button label text should, if possible, be under 16
 			characters. */
-					label={ _x(
-						'Add block',
-						'Generic label for block inserter button'
-					) }
+					label={
+						isInserterOpened
+							? _x(
+									'Close block inserter',
+									'Generic label for block inserter button'
+							  )
+							: _x(
+									'Add block',
+									'Generic label for block inserter button'
+							  )
+					}
 					showTooltip={ ! showIconLabels }
 				>
 					{ showIconLabels && __( 'Add' ) }
