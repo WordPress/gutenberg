@@ -44,6 +44,11 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 		styles.altTextEditorDark
 	);
 
+	const altTextLinkStyle = usePreferredColorSchemeStyle(
+		styles.altTextLink,
+		styles.altTextLinkDark
+	);
+
 	return (
 		<BottomSheet.SubSheet
 			navigationButton={
@@ -83,7 +88,7 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 						'Describe the purpose of the image. Leave empty if the image is purely decorative. '
 					) }
 					<Text
-						style={ styles.altTextLink }
+						style={ altTextLinkStyle }
 						onPress={ () =>
 							Linking.openURL(
 								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
