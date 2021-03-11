@@ -151,25 +151,32 @@ class BottomSheetStepperCell extends Component {
 			styles.cellLabel,
 			! icon ? styles.cellLabelNoIcon : {},
 		];
-		const accessibilityLabel = openUnitPicker
-			? sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-					__(
-						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust, double-tap to change unit'
-					),
-					label,
-					value,
-					unitLabel
-			  )
-			: sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-					__(
-						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust'
-					),
-					label,
-					value,
-					unitLabel
-			  );
+
+		const getAccessibilityHint = () => {
+			let result;
+			if ( isIOS ) {
+				result = openUnitPicker
+					? __(
+							'Swipe up or down to adjust, double-tap to change unit'
+					  )
+					: __( 'Swipe up or down to adjust' );
+			} else {
+				result = openUnitPicker
+					? __(
+							'Use volume keys to adjust, double-tap to change unit'
+					  )
+					: __( 'Use volume keys to adjust' );
+			}
+			return result;
+		};
+
+		const accessibilityLabel = sprintf(
+			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
+			__( '%1$s. Current value is %2$s %3$s.' ),
+			label,
+			value,
+			unitLabel
+		);
 
 		const containerStyle = [
 			styles.rowContainer,
@@ -181,6 +188,7 @@ class BottomSheetStepperCell extends Component {
 				accessible={ true }
 				accessibilityRole="adjustable"
 				accessibilityLabel={ accessibilityLabel }
+				accessibilityHint={ getAccessibilityHint() }
 				accessibilityActions={ [
 					{ name: 'increment' },
 					{ name: 'decrement' },

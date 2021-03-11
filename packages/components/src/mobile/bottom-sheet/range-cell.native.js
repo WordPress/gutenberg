@@ -66,7 +66,7 @@ class BottomSheetRangeCell extends Component {
 	 * value of this setting programmatically.
 	 */
 	onIncrementValue() {
-		const { step = 10, maximumValue, decimalNum } = this.props;
+		const { step = 5, maximumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
 
 		const newValue = toFixed( sliderValue + step, decimalNum );
@@ -144,27 +144,31 @@ class BottomSheetRangeCell extends Component {
 
 		const { inputValue, sliderValue } = this.state;
 
-		const accessibilityLabel = openUnitPicker
-			? sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-					_x(
-						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust, double-tap to change unit',
-						'Slider for picking a number inside a range'
-					),
-					cellProps.label,
-					value,
-					unitLabel
-			  )
-			: sprintf(
-					/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-					_x(
-						'%1$s. Current value is %2$s %3$s. Swipe up or down to adjust',
-						'Slider for picking a number inside a range'
-					),
-					cellProps.label,
-					value,
-					unitLabel
-			  );
+		const getAccessibilityHint = () => {
+			let result;
+			if ( isIOS ) {
+				result = openUnitPicker
+					? __(
+							'Swipe up or down to adjust, double-tap to change unit'
+					  )
+					: __( 'Swipe up or down to adjust' );
+			} else {
+				result = openUnitPicker
+					? __(
+							'Use volume keys to adjust, double-tap to change unit'
+					  )
+					: __( 'Use volume keys to adjust' );
+			}
+			return result;
+		};
+
+		const accessibilityLabel = sprintf(
+			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
+			__( '%1$s. Current value is %2$s %3$s.' ),
+			cellProps.label,
+			value,
+			unitLabel
+		);
 
 		const containerStyle = [
 			styles.container,
@@ -194,6 +198,7 @@ class BottomSheetRangeCell extends Component {
 					}
 				} }
 				accessibilityLabel={ accessibilityLabel }
+				accessibilityHint={ getAccessibilityHint() }
 			>
 				<Cell
 					{ ...cellProps }
