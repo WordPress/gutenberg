@@ -134,7 +134,7 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			? sprintf(
 					/* translators: %s: The text of an error message (potentially untranslated). */
 					__( "Unable to save: '%s'" ),
-					saveError
+					saveError.message
 			  )
 			: __( 'Unable to save: An error ocurred.' );
 		yield dispatch( noticesStore, 'createErrorNotice', errorMessage, {
