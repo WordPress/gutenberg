@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [*] Image block: Improve text entry for long alt text. [#29670]
 
 ## 1.47.0
 * [**] Add support for setting Cover block focal point. [#25810]
