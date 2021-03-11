@@ -89,6 +89,7 @@ import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postHierarchicalTerms from './post-hierarchical-terms';
 import * as postTags from './post-tags';
+import * as termDescription from './term-description';
 
 /**
  * Function to register an individual block.
@@ -240,6 +241,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postHierarchicalTerms,
 								postTags,
 								postNavigationLink,
+								termDescription,
 						  ]
 						: [] ),
 				].forEach( registerBlock );

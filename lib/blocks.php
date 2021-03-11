@@ -91,6 +91,7 @@ function gutenberg_reregister_core_block_types() {
 					'site-title.php'                => 'core/site-title',
 					// 'table-of-contents.php'         => 'core/table-of-contents',
 					'template-part.php'             => 'core/template-part',
+					'term-description.php'          => 'core/term-description',
 				)
 			),
 		),
