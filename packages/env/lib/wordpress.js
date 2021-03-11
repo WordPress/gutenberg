@@ -281,6 +281,7 @@ async function copyCoreFiles( fromPath, toPath ) {
 module.exports = {
 	hasSameCoreSource,
 	makeContentDirectoriesWritable,
+	makeConfigWritable,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
