@@ -9,13 +9,14 @@ import { useEffect } from '@wordpress/element';
  */
 import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
+import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
 function BlockEditorProvider( props ) {
 	const { children, settings } = props;
 
-	const { updateSettings } = useDispatch( 'core/block-editor' );
+	const { updateSettings } = useDispatch( blockEditorStore );
 	useEffect( () => {
 		updateSettings( settings );
 	}, [ settings ] );

@@ -10,8 +10,7 @@
 			"type": "string"
 		},
 		"tagName": {
-			"type": "string",
-			"default": "div"
+			"type": "string"
 		}
 	},
 	"supports": {

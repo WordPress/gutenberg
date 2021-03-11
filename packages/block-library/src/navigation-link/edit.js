@@ -2,19 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, get, head, find } from 'lodash';
+import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import {
-	useSelect,
-	useDispatch,
-	withDispatch,
-	withSelect,
-} from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	KeyboardShortcuts,
 	PanelBody,
@@ -34,6 +28,7 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -45,6 +40,7 @@ import {
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -107,9 +103,10 @@ const useIsDraggingWithin = ( elementRef ) => {
  * /wp/v2/search.
  *
  * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type ) {
+function getSuggestionsQuery( type, kind ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
@@ -119,29 +116,25 @@ function getSuggestionsQuery( type ) {
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
 		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
 			return {};
 	}
 }
 
-function NavigationLinkEdit( {
+export default function NavigationLinkEdit( {
 	attributes,
-	hasDescendants,
 	isSelected,
-	isImmediateParentOfSelectedBlock,
-	isParentOfSelectedBlock,
 	setAttributes,
-	showSubmenuIcon,
-	insertLinkBlock,
-	textColor,
-	backgroundColor,
-	rgbTextColor,
-	rgbBackgroundColor,
-	selectedBlockHasDescendants,
-	userCanCreatePages = false,
-	userCanCreatePosts = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
+	context,
+	clientId,
 } ) {
 	const {
 		label,
@@ -151,22 +144,80 @@ function NavigationLinkEdit( {
 		description,
 		rel,
 		title,
+		kind,
 	} = attributes;
 	const link = {
 		url,
 		opensInNewTab,
 	};
-	const { saveEntityRecord } = useDispatch( 'core' );
+	const { textColor, backgroundColor, style, showSubmenuIcon } = context;
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
-	const isDraggingBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
-		[]
+	const {
+		isDraggingBlocks,
+		isParentOfSelectedBlock,
+		isImmediateParentOfSelectedBlock,
+		hasDescendants,
+		selectedBlockHasDescendants,
+		numberOfDescendants,
+		userCanCreatePages,
+		userCanCreatePosts,
+	} = useSelect(
+		( select ) => {
+			const {
+				getClientIdsOfDescendants,
+				hasSelectedInnerBlock,
+				getSelectedBlockClientId,
+				isDraggingBlocks: _isDraggingBlocks,
+			} = select( blockEditorStore );
+
+			const selectedBlockId = getSelectedBlockClientId();
+
+			const descendants = getClientIdsOfDescendants( [ clientId ] )
+				.length;
+
+			return {
+				isParentOfSelectedBlock: hasSelectedInnerBlock(
+					clientId,
+					true
+				),
+				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
+					clientId,
+					false
+				),
+				hasDescendants: !! descendants,
+				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
+					selectedBlockId,
+				] )?.length,
+				numberOfDescendants: descendants,
+				isDraggingBlocks: _isDraggingBlocks(),
+				userCanCreatePages: select( coreStore ).canUser(
+					'create',
+					'pages'
+				),
+				userCanCreatePosts: select( coreStore ).canUser(
+					'create',
+					'posts'
+				),
+			};
+		},
+		[ clientId ]
 	);
+
+	/**
+	 * Insert a link block when submenu is added.
+	 */
+	function insertLinkBlock() {
+		const insertionPoint = numberOfDescendants;
+		const blockToInsert = createBlock( 'core/navigation-link' );
+		insertBlock( blockToInsert, insertionPoint, clientId );
+	}
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -255,20 +306,24 @@ function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': rgbTextColor,
+			'has-text-color': !! textColor || !! style?.color?.text,
 			[ `has-${ textColor }-color` ]: !! textColor,
-			'has-background': rgbBackgroundColor,
+			'has-background': !! backgroundColor || !! style?.color?.background,
 			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 		} ),
 		style: {
-			color: rgbTextColor,
-			backgroundColor: rgbBackgroundColor,
+			color: style?.color?.text,
+			backgroundColor: style?.color?.background,
 		},
 	} );
 
+	if ( ! url ) {
+		blockProps.onClick = () => setIsLinkOpen( true );
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation__container', {
+			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block':
 					isParentOfSelectedBlock &&
 					// Don't select as parent of selected block while dragging.
@@ -276,7 +331,7 @@ function NavigationLinkEdit( {
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link' ],
+			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
@@ -288,6 +343,33 @@ function NavigationLinkEdit( {
 			__experimentalAppenderTagName: 'li',
 		}
 	);
+
+	const classes = classnames( 'wp-block-navigation-link__content', {
+		'wp-block-navigation-link__placeholder': ! url,
+	} );
+
+	let missingText = '';
+	switch ( type ) {
+		case 'post':
+			/* translators: label for missing post in navigation link block */
+			missingText = __( 'Select a post' );
+			break;
+		case 'page':
+			/* translators: label for missing page in navigation link block */
+			missingText = __( 'Select a page' );
+			break;
+		case 'category':
+			/* translators: label for missing category in navigation link block */
+			missingText = __( 'Select a category' );
+			break;
+		case 'tag':
+			/* translators: label for missing tag in navigation link block */
+			missingText = __( 'Select a tag' );
+			break;
+		default:
+			/* translators: label for missing values in navigation link block */
+			missingText = __( 'Add a link' );
+	}
 
 	return (
 		<Fragment>
@@ -346,38 +428,61 @@ function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<div className="wp-block-navigation-link__content">
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-link__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( 'core/navigation-link' )
-							)
-						}
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						keepPlaceholderOnFocus
-						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
-					/>
+				<div className={ classes }>
+					{ ! url ? (
+						<div className="wp-block-navigation-link__placeholder-text">
+							<KeyboardShortcuts
+								shortcuts={ {
+									enter: () =>
+										isSelected && setIsLinkOpen( true ),
+								} }
+							/>
+							{ missingText }
+						</div>
+					) : (
+						<RichText
+							ref={ ref }
+							identifier="label"
+							className="wp-block-navigation-link__label"
+							value={ label }
+							onChange={ ( labelValue ) =>
+								setAttributes( { label: labelValue } )
+							}
+							onMerge={ mergeBlocks }
+							onReplace={ onReplace }
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/navigation-link' )
+								)
+							}
+							aria-label={ __( 'Navigation link text' ) }
+							placeholder={ itemLabelPlaceholder }
+							keepPlaceholderOnFocus
+							withoutInteractiveFormatting
+							allowedFormats={ [
+								'core/bold',
+								'core/italic',
+								'core/image',
+								'core/strikethrough',
+							] }
+							onClick={ () => {
+								if ( ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
+						/>
+					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 						>
+							<KeyboardShortcuts
+								bindGlobal
+								shortcuts={ {
+									escape: () => setIsLinkOpen( false ),
+								} }
+							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
@@ -404,7 +509,10 @@ function NavigationLinkEdit( {
 								} }
 								noDirectEntry={ !! type }
 								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery( type ) }
+								suggestionsQuery={ getSuggestionsQuery(
+									type,
+									kind
+								) }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -443,7 +551,7 @@ function NavigationLinkEdit( {
 						</Popover>
 					) }
 				</div>
-				{ showSubmenuIcon && (
+				{ hasDescendants && showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">
 						<ItemSubmenuIcon />
 					</span>
@@ -453,97 +561,3 @@ function NavigationLinkEdit( {
 		</Fragment>
 	);
 }
-
-/**
- * Returns the color object matching the slug, or undefined.
- *
- * @param {Array}  colors      The editor settings colors array.
- * @param {string} colorSlug   A string containing the color slug.
- * @param {string} customColor A string containing the custom color value.
- *
- * @return {Object} Color object included in the editor settings colors, or Undefined.
- */
-const getColorObjectByColorSlug = ( colors, colorSlug, customColor ) => {
-	if ( customColor ) {
-		return customColor;
-	}
-
-	if ( ! colors || ! colors.length ) {
-		return;
-	}
-
-	return get( find( colors, { slug: colorSlug } ), 'color' );
-};
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockAttributes,
-			getClientIdsOfDescendants,
-			hasSelectedInnerBlock,
-			getBlockParentsByBlockName,
-			getSelectedBlockClientId,
-			getSettings,
-		} = select( 'core/block-editor' );
-		const { clientId } = ownProps;
-		const rootBlock = head(
-			getBlockParentsByBlockName( clientId, 'core/navigation' )
-		);
-		const navigationBlockAttributes = getBlockAttributes( rootBlock );
-		const colors = get( getSettings(), 'colors', [] );
-		const hasDescendants = !! getClientIdsOfDescendants( [ clientId ] )
-			.length;
-		const showSubmenuIcon =
-			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
-		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
-			clientId,
-			false
-		);
-		const selectedBlockId = getSelectedBlockClientId();
-		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
-			selectedBlockId,
-		] )?.length;
-
-		return {
-			isParentOfSelectedBlock,
-			isImmediateParentOfSelectedBlock,
-			hasDescendants,
-			selectedBlockHasDescendants,
-			showSubmenuIcon,
-			textColor: navigationBlockAttributes.textColor,
-			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
-			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
-			rgbTextColor: getColorObjectByColorSlug(
-				colors,
-				navigationBlockAttributes.textColor,
-				navigationBlockAttributes.customTextColor
-			),
-			rgbBackgroundColor: getColorObjectByColorSlug(
-				colors,
-				navigationBlockAttributes.backgroundColor,
-				navigationBlockAttributes.customBackgroundColor
-			),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, registry ) => {
-		return {
-			insertLinkBlock() {
-				const { clientId } = ownProps;
-
-				const { insertBlock } = dispatch( 'core/block-editor' );
-
-				const { getClientIdsOfDescendants } = registry.select(
-					'core/block-editor'
-				);
-				const navItems = getClientIdsOfDescendants( [ clientId ] );
-				const insertionPoint = navItems.length ? navItems.length : 0;
-
-				const blockToInsert = createBlock( 'core/navigation-link' );
-
-				insertBlock( blockToInsert, insertionPoint, clientId );
-			},
-		};
-	} ),
-] )( NavigationLinkEdit );

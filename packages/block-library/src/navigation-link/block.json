@@ -28,6 +28,9 @@
 		},
 		"title": {
 			"type": "string"
+		},
+		"kind": {
+			"type": "string"
 		}
 	},
 	"usesContext": [
@@ -37,7 +40,8 @@
 		"customBackgroundColor",
 		"fontSize",
 		"customFontSize",
-		"showSubmenuIcon"
+		"showSubmenuIcon",
+		"style"
 	],
 	"supports": {
 		"reusable": false,

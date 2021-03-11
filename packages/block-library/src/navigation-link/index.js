@@ -2,13 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import {
-	category as categoryIcon,
-	mapMarker as linkIcon,
-	page as pageIcon,
-	postTitle as postIcon,
-	tag as tagIcon,
-} from '@wordpress/icons';
+import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
@@ -17,6 +11,7 @@ import { InnerBlocks } from '@wordpress/block-editor';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
+import './hooks';
 
 const { name } = metadata;
 
@@ -28,44 +23,6 @@ export const settings = {
 	icon: linkIcon,
 
 	description: __( 'Add a page, link, or another item to your navigation.' ),
-
-	variations: [
-		{
-			name: 'link',
-			isDefault: true,
-			title: __( 'Link' ),
-			description: __( 'A link to a URL.' ),
-			attributes: {},
-		},
-		{
-			name: 'post',
-			icon: postIcon,
-			title: __( 'Post Link' ),
-			description: __( 'A link to a post.' ),
-			attributes: { type: 'post' },
-		},
-		{
-			name: 'page',
-			icon: pageIcon,
-			title: __( 'Page Link' ),
-			description: __( 'A link to a page.' ),
-			attributes: { type: 'page' },
-		},
-		{
-			name: 'category',
-			icon: categoryIcon,
-			title: __( 'Category Link' ),
-			description: __( 'A link to a category.' ),
-			attributes: { type: 'category' },
-		},
-		{
-			name: 'tag',
-			icon: tagIcon,
-			title: __( 'Tag Link' ),
-			description: __( 'A link to a tag.' ),
-			attributes: { type: 'tag' },
-		},
-	],
 
 	__experimentalLabel: ( { label } ) => label,
 
@@ -79,6 +36,13 @@ export const settings = {
 	edit,
 
 	save,
+
+	example: {
+		attributes: {
+			label: _x( 'Example Link', 'navigation link preview example' ),
+			url: 'https://example.com',
+		},
+	},
 
 	deprecated: [
 		{

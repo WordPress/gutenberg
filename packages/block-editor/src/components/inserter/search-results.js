@@ -33,11 +33,11 @@ function InserterSearchResults( {
 	rootClientId,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
 	maxBlockPatterns,
 	maxBlockTypes,
 	showBlockDirectory = false,
 	isDraggable = true,
+	shouldFocusBlock = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -46,7 +46,7 @@ function InserterSearchResults( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert,
+		shouldFocusBlock,
 	} );
 	const [
 		blockTypes,
@@ -55,7 +55,8 @@ function InserterSearchResults( {
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
 	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
-		onInsertBlocks
+		onInsertBlocks,
+		destinationRootClientId
 	);
 
 	const filteredBlockTypes = useMemo( () => {

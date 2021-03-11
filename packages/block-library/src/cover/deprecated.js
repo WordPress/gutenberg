@@ -79,12 +79,21 @@ const deprecated = [
 			minHeight: {
 				type: 'number',
 			},
+			minHeightUnit: {
+				type: 'string',
+			},
 			gradient: {
 				type: 'string',
 			},
 			customGradient: {
 				type: 'string',
 			},
+			contentPosition: {
+				type: 'string',
+			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {
@@ -216,6 +225,9 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+		supports: {
+			align: true,
+		},
 		save( { attributes } ) {
 			const {
 				backgroundType,
@@ -318,6 +330,9 @@ const deprecated = [
 			customGradient: {
 				type: 'string',
 			},
+		},
+		supports: {
+			align: true,
 		},
 		save( { attributes } ) {
 			const {

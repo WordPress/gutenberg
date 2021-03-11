@@ -43,6 +43,7 @@ class TokenFieldWrapper extends Component {
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }
+				{ ...this.props }
 			/>
 		);
 	}
@@ -52,4 +53,4 @@ class TokenFieldWrapper extends Component {
 	}
 }
 
-module.exports = TokenFieldWrapper;
+export default TokenFieldWrapper;

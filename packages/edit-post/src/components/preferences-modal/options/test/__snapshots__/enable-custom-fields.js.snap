@@ -18,40 +18,31 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
   >
     <div
       className="components-base-control__field emotion-0 emotion-1"
     >
       <span
-        className="components-checkbox-control__input-container"
+        className="components-form-toggle is-checked"
       >
         <input
           checked={true}
-          className="components-checkbox-control__input"
-          id="inspector-checkbox-control-3"
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-3"
           onChange={[Function]}
           type="checkbox"
-          value="1"
         />
-        <svg
-          aria-hidden={true}
-          className="components-checkbox-control__checked"
-          focusable={false}
-          height={24}
-          role="img"
-          viewBox="0 0 24 24"
-          width={24}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
-          />
-        </svg>
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
+        />
       </span>
       <label
-        className="components-checkbox-control__label"
-        htmlFor="inspector-checkbox-control-3"
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-3"
       />
     </div>
   </div>
@@ -90,40 +81,31 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
   >
     <div
       className="components-base-control__field emotion-0 emotion-1"
     >
       <span
-        className="components-checkbox-control__input-container"
+        className="components-form-toggle is-checked"
       >
         <input
           checked={true}
-          className="components-checkbox-control__input"
-          id="inspector-checkbox-control-0"
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-0"
           onChange={[Function]}
           type="checkbox"
-          value="1"
         />
-        <svg
-          aria-hidden={true}
-          className="components-checkbox-control__checked"
-          focusable={false}
-          height={24}
-          role="img"
-          viewBox="0 0 24 24"
-          width={24}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
-          />
-        </svg>
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
+        />
       </span>
       <label
-        className="components-checkbox-control__label"
-        htmlFor="inspector-checkbox-control-0"
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-0"
       />
     </div>
   </div>
@@ -148,26 +130,31 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
   >
     <div
       className="components-base-control__field emotion-0 emotion-1"
     >
       <span
-        className="components-checkbox-control__input-container"
+        className="components-form-toggle"
       >
         <input
           checked={false}
-          className="components-checkbox-control__input"
-          id="inspector-checkbox-control-2"
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-2"
           onChange={[Function]}
           type="checkbox"
-          value="1"
+        />
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
         />
       </span>
       <label
-        className="components-checkbox-control__label"
-        htmlFor="inspector-checkbox-control-2"
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-2"
       />
     </div>
   </div>
@@ -206,26 +193,31 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
   >
     <div
       className="components-base-control__field emotion-0 emotion-1"
     >
       <span
-        className="components-checkbox-control__input-container"
+        className="components-form-toggle"
       >
         <input
           checked={false}
-          className="components-checkbox-control__input"
-          id="inspector-checkbox-control-1"
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-1"
           onChange={[Function]}
           type="checkbox"
-          value="1"
+        />
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
         />
       </span>
       <label
-        className="components-checkbox-control__label"
-        htmlFor="inspector-checkbox-control-1"
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-1"
       />
     </div>
   </div>

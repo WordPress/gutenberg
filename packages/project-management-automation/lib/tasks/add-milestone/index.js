@@ -79,8 +79,8 @@ async function getMilestoneByTitle( octokit, owner, repo, title ) {
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function addMilestone( payload, octokit ) {
-	if ( payload.ref !== 'refs/heads/master' ) {
-		debug( 'add-milestone: Commit is not to `master`. Aborting' );
+	if ( payload.ref !== 'refs/heads/trunk' ) {
+		debug( 'add-milestone: Commit is not to `trunk`. Aborting' );
 		return;
 	}
 
