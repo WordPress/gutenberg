@@ -23,9 +23,9 @@
 	left: 0;
 	box-sizing: border-box;
 	margin: 0;
-	border: $border-width solid $gray-300;
 	background: $white;
 	box-shadow: $shadow-modal;
+	border-radius: $radius-block-ui;
 	overflow: auto;
 
 	// Show a centered modal on bigger screens.
