@@ -14,7 +14,7 @@ import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	JustifyContentControl,
-	__experimentalBlockPatternPicker as BlockPatternPicker,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
@@ -87,7 +87,7 @@ function ButtonsLayoutSetup( props ) {
 	// or if no matched patterns are found.
 	return (
 		<div { ...blockProps }>
-			<BlockPatternPicker
+			<BlockPatternSetup
 				blockName={ blockName }
 				clientId={ clientId }
 				filterPatternsFn={ filterPatternsFn }

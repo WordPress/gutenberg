@@ -19,16 +19,17 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import BlockPreview from '../block-preview';
-import LayoutSetupToolbar from './layout-setup-toolbar';
+import SetupToolbar from './setup-toolbar';
 import usePatternsSetup from './use-patterns-setup';
 
-const LayoutSetupStep = ( {
+const SetupContent = ( {
 	viewMode,
 	activeSlide,
 	patterns,
 	onBlockPatternSelect,
 } ) => {
 	const composite = useCompositeState();
+	const containerClass = 'block-editor-block-pattern-setup__container';
 	let content;
 	// Render `carousel` in single viewMode.
 	if ( viewMode === 'single' ) {
@@ -39,7 +40,7 @@ const LayoutSetupStep = ( {
 			return '';
 		};
 		content = (
-			<div className="block-layout-setup__container">
+			<div className={ containerClass }>
 				<ul className="carousel-container">
 					{ patterns.map( ( pattern, index ) => {
 						return (
@@ -61,8 +62,8 @@ const LayoutSetupStep = ( {
 			<Composite
 				{ ...composite }
 				role="listbox"
-				className="block-layout-setup__container"
-				aria-label={ __( 'Layout list' ) }
+				className={ containerClass }
+				aria-label={ __( 'Patterns list' ) }
 			>
 				{ patterns.map( ( pattern ) => (
 					<BlockPattern
@@ -85,11 +86,11 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 	const blocks = useMemo( () => parse( content ), [ content ] );
 	const descriptionId = useInstanceId(
 		BlockPattern,
-		'block-setup-block-layout-list__item-description'
+		'block-editor-block-pattern-setup-list__item-description'
 	);
 	return (
 		<div
-			className="block-setup-block-layout-list__list-item"
+			className="block-editor-block-pattern-setup-list__list-item"
 			aria-label={ pattern.title }
 			aria-describedby={ pattern.description ? descriptionId : undefined }
 		>
@@ -97,7 +98,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 				role="option"
 				as="div"
 				{ ...composite }
-				className="block-setup-block-layout-list__item"
+				className="block-editor-block-pattern-setup-list__item"
 				onClick={ () => onSelect( blocks ) }
 			>
 				<BlockPreview blocks={ blocks } viewportWidth={ 900 } />
@@ -116,7 +117,7 @@ function BlockPatternSlide( { className, pattern } ) {
 	const blocks = useMemo( () => parse( content ), [ content ] );
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
-		'block-setup-block-layout-list__item-description'
+		'block-editor-block-pattern-setup-list__item-description'
 	);
 	return (
 		<li
@@ -138,7 +139,7 @@ function BlockPatternSlide( { className, pattern } ) {
 	);
 }
 
-const BlockPatternPicker = ( {
+const BlockPatternSetup = ( {
 	clientId,
 	blockName,
 	filterPatternsFn,
@@ -161,9 +162,9 @@ const BlockPatternPicker = ( {
 	};
 	return (
 		<div
-			className={ `layout-placeholder-container view-mode-${ viewMode }` }
+			className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
 		>
-			<LayoutSetupToolbar
+			<SetupToolbar
 				viewMode={ viewMode }
 				setViewMode={ setViewMode }
 				activeSlide={ activeSlide }
@@ -182,7 +183,7 @@ const BlockPatternPicker = ( {
 					setShowBlank( true );
 				} }
 			/>
-			<LayoutSetupStep
+			<SetupContent
 				viewMode={ viewMode }
 				activeSlide={ activeSlide }
 				patterns={ patterns }
@@ -192,4 +193,4 @@ const BlockPatternPicker = ( {
 	);
 };
 
-export default BlockPatternPicker;
+export default BlockPatternSetup;

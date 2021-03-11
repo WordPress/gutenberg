@@ -10,7 +10,7 @@ import {
 	stretchFullWidth,
 } from '@wordpress/icons';
 
-function LayoutSetupToolbar( {
+function SetupToolbar( {
 	viewMode,
 	setViewMode,
 	handlePrevious,
@@ -22,27 +22,25 @@ function LayoutSetupToolbar( {
 } ) {
 	const isSingleView = viewMode === 'single';
 	const navigation = (
-		<div className="block-setup-navigation">
-			<>
-				<Button
-					icon={ chevronLeft }
-					label={ __( 'Previous block pattern' ) }
-					onClick={ handlePrevious }
-					disabled={ activeSlide === 0 }
-				/>
-				<Button
-					icon={ chevronRight }
-					label={ __( 'Next block pattern' ) }
-					onClick={ handleNext }
-					disabled={ activeSlide === totalSlides - 1 }
-				/>
-			</>
+		<div className="block-editor-block-pattern-setup__navigation">
+			<Button
+				icon={ chevronLeft }
+				label={ __( 'Previous pattern' ) }
+				onClick={ handlePrevious }
+				disabled={ activeSlide === 0 }
+			/>
+			<Button
+				icon={ chevronRight }
+				label={ __( 'Next pattern' ) }
+				onClick={ handleNext }
+				disabled={ activeSlide === totalSlides - 1 }
+			/>
 		</div>
 	);
 
 	// TODO check icons change (?).
 	const displayControls = (
-		<div className="display-controls-container">
+		<div className="block-editor-block-pattern-setup__display-controls">
 			<Button
 				icon={ stretchFullWidth }
 				label={ __( 'Single view' ) }
@@ -58,11 +56,8 @@ function LayoutSetupToolbar( {
 		</div>
 	);
 
-	// blank:
-	// 1. if has block variations to show -> go there
-	// 2. if not show what was shown before.... Probably pass down what component was used intact...
 	const actions = (
-		<div className="actions-controls-container">
+		<div className="block-editor-block-pattern-setup__actions">
 			<Button onClick={ onStartBlank }>{ __( 'Start blank' ) }</Button>
 			<Button isPrimary onClick={ onBlockPatternSelect }>
 				{ __( 'Choose' ) }
@@ -71,7 +66,7 @@ function LayoutSetupToolbar( {
 	);
 
 	return (
-		<div className="layout-toolbar">
+		<div className="block-editor-block-pattern-setup__toolbar">
 			{ isSingleView && navigation }
 			{ displayControls }
 			{ isSingleView && actions }
@@ -79,4 +74,4 @@ function LayoutSetupToolbar( {
 	);
 }
 
-export default LayoutSetupToolbar;
+export default SetupToolbar;

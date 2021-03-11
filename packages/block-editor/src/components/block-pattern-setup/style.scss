@@ -1,4 +1,4 @@
-.layout-placeholder-container {
+.block-editor-block-pattern-setup {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -10,17 +10,17 @@
 
 	// TODO change to check parent.
 	&.view-mode-grid {
-		.layout-toolbar {
+		.block-editor-block-pattern-setup__toolbar {
 			justify-content: center;
 		}
-		.block-layout-setup__container {
+		.block-editor-block-pattern-setup__container {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			grid-gap: $grid-unit-10;
 			padding: 1px;
 		}
 	}
-	.layout-toolbar {
+	.block-editor-block-pattern-setup__toolbar {
 		box-sizing: border-box;
 		position: relative;
 		padding: 1em;
@@ -39,7 +39,7 @@
 		align-items: flex-start;
 		justify-content: space-between;
 	}
-	.block-layout-setup__container {
+	.block-editor-block-pattern-setup__container {
 		display: flex;
 		flex-direction: column;
 		width: 100%;

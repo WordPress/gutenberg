@@ -16,7 +16,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalBlockPatternPicker as BlockPatternPicker,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -266,7 +266,7 @@ function ColumnsLayoutSetup( props ) {
 	// or if no matched patterns are found.
 	return (
 		<div { ...blockProps }>
-			<BlockPatternPicker
+			<BlockPatternSetup
 				blockName={ blockName }
 				clientId={ clientId }
 				filterPatternsFn={ filterPatternsFn }
