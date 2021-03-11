@@ -179,6 +179,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_ROOT_PASSWORD: 'password',
 					MYSQL_DATABASE: 'wordpress',
 				},
+				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			'tests-mysql': {
 				image: 'mariadb',
@@ -187,6 +188,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_ROOT_PASSWORD: 'password',
 					MYSQL_DATABASE: 'tests-wordpress',
 				},
+				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
 				build: '.',
@@ -259,6 +261,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
+			'mysql-test': {},
 			'phpunit-uploads': {},
 		},
 	};
