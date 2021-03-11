@@ -1,6 +1,13 @@
-import { CSSProperties } from 'react';
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { CSSProperties } from 'react';
 
-import { FlexProps } from '../flex/types';
+/**
+ * Internal dependencies
+ */
+import type { FlexProps } from '../flex/types';
 
 export type ControlGroupContext = {
 	isFirst?: boolean;

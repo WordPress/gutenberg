@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 8.1.0-next.0 (2021-02-26)
+### Breaking Changes
+
+- Add support and configuration for TypeScript files. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
 
 ### New Features
 

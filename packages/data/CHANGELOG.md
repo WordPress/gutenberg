@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 4.27.0-next.0 (2021-02-26)
-
 ### New Features
 
 - Added new `resolveSelect` registry method to initiate and wait for selector resolution

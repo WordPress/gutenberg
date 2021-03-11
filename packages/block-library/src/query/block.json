@@ -36,9 +36,6 @@
 		"query": "query",
 		"layout": "layout"
 	},
-	"usesContext": [
-		"postId"
-	],
 	"supports": {
 		"html": false
 	},

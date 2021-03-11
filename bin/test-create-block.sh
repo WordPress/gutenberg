@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script validates whether `npm init @wordpress/block` works properly
-# with the latest changes applied to the `master` branch. It purposefully
+# with the latest changes applied to the `trunk` branch. It purposefully
 # avoids installing `@wordpress/scripts` package from npm when scaffolding
 # a test block and uses the local package by executing everything from the
 # root of the project.

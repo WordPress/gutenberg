@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Shortcut should render a span with the shortcut text 1`] = `
+<span
+  class="components-shortcut wp-components-shortcut ic-1x9nauu"
+  data-g2-c16t="true"
+  data-g2-component="Shortcut"
+>
+  meta + P
+</span>
+`;
+
+exports[`Shortcut should render null when no shortcut is provided 1`] = `null`;
