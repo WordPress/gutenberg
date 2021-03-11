@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 
 /**
@@ -67,7 +66,7 @@ export function getAutoCompleterUI( autocompleter ) {
 						showsHorizontalScrollIndicator={ false }
 						keyboardShouldPersistTaps="always"
 					>
-						{ map( items, ( option, index ) => {
+						{ items.map( ( option, index ) => {
 							const isActive = index === selectedIndex;
 							return (
 								<TouchableOpacity
