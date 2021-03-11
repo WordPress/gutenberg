@@ -792,7 +792,6 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
-			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
