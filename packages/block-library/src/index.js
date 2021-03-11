@@ -52,9 +52,8 @@ import * as group from './group';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
-import * as subhead from './subhead';
 import * as table from './table';
-import * as tableOfContents from './table-of-contents';
+// import * as tableOfContents from './table-of-contents';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
@@ -90,6 +89,7 @@ import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postHierarchicalTerms from './post-hierarchical-terms';
 import * as postTags from './post-tags';
+import * as termDescription from './term-description';
 
 /**
  * Function to register an individual block.
@@ -161,9 +161,8 @@ export const __experimentalGetCoreBlocks = () => [
 	socialLinks,
 	socialLink,
 	spacer,
-	subhead,
 	table,
-	tableOfContents,
+	// tableOfContents,
 	tagCloud,
 	textColumns,
 	verse,
@@ -242,6 +241,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postHierarchicalTerms,
 								postTags,
 								postNavigationLink,
+								termDescription,
 						  ]
 						: [] ),
 				].forEach( registerBlock );

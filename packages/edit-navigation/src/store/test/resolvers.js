@@ -3,7 +3,12 @@
  */
 import { getNavigationPostForMenu } from '../resolvers';
 import { resolveMenuItems, dispatch } from '../controls';
-import { KIND, POST_TYPE, buildNavigationPostId } from '../utils';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../utils/constants';
+
+import { buildNavigationPostId } from '../utils';
 
 // Mock createBlock to avoid creating block in test environment
 jest.mock( '@wordpress/blocks', () => {
@@ -52,8 +57,8 @@ describe( 'getNavigationPostForMenu', () => {
 			dispatch(
 				'core',
 				'receiveEntityRecords',
-				KIND,
-				POST_TYPE,
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
 				stubPost,
 				{ id: stubPost.id },
 				false
@@ -63,8 +68,8 @@ describe( 'getNavigationPostForMenu', () => {
 		// Dispatch startResolution.
 		expect( generator.next().value ).toEqual(
 			dispatch( 'core', 'startResolution', 'getEntityRecord', [
-				KIND,
-				POST_TYPE,
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
 				stubPost.id,
 			] )
 		);
@@ -164,8 +169,8 @@ describe( 'getNavigationPostForMenu', () => {
 			dispatch(
 				'core',
 				'receiveEntityRecords',
-				KIND,
-				POST_TYPE,
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
 				navigationBlockStubPost,
 				{ id: navigationBlockStubPost.id },
 				false
@@ -174,8 +179,8 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( generator.next().value ).toEqual(
 			dispatch( 'core', 'finishResolution', 'getEntityRecord', [
-				KIND,
-				POST_TYPE,
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
 				stubPost.id,
 			] )
 		);
