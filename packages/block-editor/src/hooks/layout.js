@@ -71,7 +71,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 	}
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Alignments' ) }>
+			<PanelBody title={ __( 'Layout' ) }>
 				{ !! defaultLayout && (
 					<ToggleControl
 						label={ __( 'Inherit default layout' ) }
@@ -131,7 +131,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 				) }
 				<p className="block-editor-hooks__layout-controls-helptext">
 					{ __(
-						'The content and wide sizes determine the behavior of block alignments.'
+						'The content and wide sizes determine the width of centered and wide columns inside.'
 					) }
 				</p>
 			</PanelBody>
