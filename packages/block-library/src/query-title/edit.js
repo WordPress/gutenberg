@@ -31,6 +31,7 @@ export default function QueryTitleEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			'wp-block-query-title__placeholder': type === 'archive',
 		} ),
 	} );
 	// The plan is to augment this block with more

@@ -67,5 +67,6 @@
 				}
 			}
 		}
-	}
+	},
+	"editorStyle": "wp-block-query-title-editor"
 }
