@@ -285,13 +285,16 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  * @param WP_Styles $styles WP_Styles instance.
  */
 function gutenberg_register_packages_styles( $styles ) {
+	// When in development mode, use a current time as the asset version; else, use the plugin's version as the asset version.
+	$version = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? microtime() : GUTENBERG_VERSION;
+
 	// Editor Styles.
 	gutenberg_override_style(
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
 		array( 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
 
@@ -300,7 +303,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
 
@@ -309,7 +312,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-post/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
 
@@ -318,7 +321,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-components',
 		gutenberg_url( 'build/components/style.css' ),
 		array( 'dashicons' ),
-		filemtime( gutenberg_dir_path() . 'build/components/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
@@ -328,7 +331,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-block-library',
 		gutenberg_url( 'build/block-library/' . $block_library_filename . '.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' )
+		$version
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
 	$styles->add_data( 'wp-block-library', 'path', gutenberg_dir_path() . 'build/block-library/' . $block_library_filename . '.css' );
@@ -338,7 +341,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-format-library',
 		gutenberg_url( 'build/format-library/style.css' ),
 		array( 'wp-block-editor', 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/format-library/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
@@ -360,7 +363,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
 		$wp_edit_blocks_dependencies,
-		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
+		$version
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
@@ -369,7 +372,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-nux',
 		gutenberg_url( 'build/nux/style.css' ),
 		array( 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/nux/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-nux', 'rtl', 'replace' );
 
@@ -378,7 +381,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-block-library-theme',
 		gutenberg_url( 'build/block-library/theme.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/block-library/theme.css' )
+		$version
 	);
 	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
 
@@ -387,7 +390,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-list-reusable-blocks',
 		gutenberg_url( 'build/list-reusable-blocks/style.css' ),
 		array( 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
 
@@ -396,7 +399,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-edit-navigation',
 		gutenberg_url( 'build/edit-navigation/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-navigation/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-edit-navigation', 'rtl', 'replace' );
 
@@ -405,7 +408,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-edit-site',
 		gutenberg_url( 'build/edit-site/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-site/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
 
@@ -414,7 +417,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks', 'wp-reusable-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
 
@@ -423,7 +426,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-block-directory',
 		gutenberg_url( 'build/block-directory/style.css' ),
 		array( 'wp-block-editor', 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/block-directory/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
 
@@ -432,7 +435,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-customize-widgets',
 		gutenberg_url( 'build/customize-widgets/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/customize-widgets/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
 
@@ -441,7 +444,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reusable-blocks',
 		gutenberg_url( 'build/reusable-blocks/style.css' ),
 		array( 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/reusable-blocks/style.css' )
+		$version
 	);
 	$styles->add_data( 'wp-reusable-block', 'rtl', 'replace' );
 }
