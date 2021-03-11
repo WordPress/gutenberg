@@ -14,6 +14,7 @@ const ios = {
 exports.iosLocal = {
 	...ios,
 	deviceName: 'iPhone 11',
+	showXcodeLog: true,
 };
 
 exports.iosServer = {
