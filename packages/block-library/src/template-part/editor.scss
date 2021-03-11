@@ -69,7 +69,8 @@
 			border: $border-width dotted $gray-900;
 		}
 
-		&.is-hovered {
+		&.is-hovered,
+		&.is-highlighted {
 			&::after {
 				border: none;
 			}
