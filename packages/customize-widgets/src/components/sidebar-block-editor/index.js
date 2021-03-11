@@ -43,42 +43,49 @@ export default function SidebarBlockEditor( { sidebar } ) {
 	);
 
 	return (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-				>
-					<BlockEditorKeyboardShortcuts />
+		<>
+			<BlockEditorKeyboardShortcuts.Register />
+			<SlotFillProvider>
+				<DropZoneProvider>
+					<div hidden={ isInspectorOpened }>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ onInput }
+							onChange={ onChange }
+							settings={ settings }
+							useSubRegistry={ false }
+						>
+							<BlockEditorKeyboardShortcuts />
 
-					<BlockSelectionClearer>
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockSelectionClearer>
-				</BlockEditorProvider>
+							<BlockSelectionClearer>
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</BlockSelectionClearer>
+						</BlockEditorProvider>
 
-				<Popover.Slot name="block-toolbar" />
-				<Popover.Slot />
+						<Popover.Slot name="block-toolbar" />
+						<Popover.Slot />
+					</div>
 
-				{ isInspectorOpened && <Inspector /> }
+					{ isInspectorOpened && <Inspector /> }
 
-				<__experimentalBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton
-							onToggle={ () => {
-								setIsInspectorOpened( ( opened ) => ! opened );
-								onClose();
-							} }
-						/>
-					) }
-				</__experimentalBlockSettingsMenuFirstItem>
-			</DropZoneProvider>
-		</SlotFillProvider>
+					<__experimentalBlockSettingsMenuFirstItem>
+						{ ( { onClose } ) => (
+							<BlockInspectorButton
+								onToggle={ () => {
+									setIsInspectorOpened(
+										( opened ) => ! opened
+									);
+									onClose();
+								} }
+							/>
+						) }
+					</__experimentalBlockSettingsMenuFirstItem>
+				</DropZoneProvider>
+			</SlotFillProvider>
+		</>
 	);
 }
