@@ -120,6 +120,9 @@ export class RichText extends Component {
 		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
 			this
 		);
+		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -288,6 +291,10 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChangeFromAztec( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
+			return;
+		}
+
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -368,6 +375,10 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'handleDelete' ) ) {
+			return;
+		}
+
 		const { keyCode } = event;
 
 		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
@@ -595,11 +606,19 @@ export class RichText extends Component {
 		this.props.onSelectionChange( start, end );
 	}
 
-	onSelectionChangeFromAztec( start, end, text, event ) {
-		if ( ! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount ) {
+	shouldDropEventFromAztec( event, logText ) {
+		const shouldDrop =
+			! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount;
+		if ( shouldDrop ) {
 			console.log(
-				`Dropping onSelectionChange from Aztec as its event counter is older than latest sent to the native side.`
+				`Dropping ${ logText } from Aztec as its event counter is older than latest sent to the native side. Got ${ event.nativeEvent.eventCount } but lastEventCount is ${ this.lastEventCount }.`
 			);
+		}
+		return shouldDrop;
+	}
+
+	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
 			return;
 		}
 
