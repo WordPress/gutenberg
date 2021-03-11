@@ -140,6 +140,27 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 			: [],
 	} );
 
+	await dockerCompose.exec( 'wordpress', 'chown www-data:www-data wp-config.php', {
+			config: dockerComposeConfigPath,
+			log: debug,
+	} )
+
+	await dockerCompose.exec( 'wordpress', 'chmod 777 wp-config.php', {
+			config: dockerComposeConfigPath,
+			log: debug,
+	} )
+
+	await dockerCompose.exec( 'tests-wordpress', 'chown www-data:www-data wp-config.php', {
+			config: dockerComposeConfigPath,
+			log: debug,
+	} )
+
+	await dockerCompose.exec( 'tests-wordpress', 'chmod 777 wp-config.php', {
+			config: dockerComposeConfigPath,
+			log: debug,
+	} )
+
+
 	// Only run WordPress install/configuration when config has changed.
 	if ( shouldConfigureWp ) {
 		spinner.text = 'Configuring WordPress.';
