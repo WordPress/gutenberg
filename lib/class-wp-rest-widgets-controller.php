@@ -252,10 +252,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 		try {
 			if (
+				$request->has_param( 'settings' ) || // Backwards compatibility. TODO: Remove.
 				$request->has_param( 'instance' ) ||
 				$request->has_param( 'form_data' ) ||
-				! $request->is_json_content_type() ||
-				$request->has_param( 'settings' ) // Backwards compatibility. TODO: Remove.
+				! $request->is_json_content_type()
 			) {
 				$maybe_error = $this->save_widget( $request );
 				if ( is_wp_error( $maybe_error ) ) {
@@ -417,10 +417,18 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if (
-			isset( $request['instance'] ) ||
-			( isset( $request['settings'] ) && $widget_object ) // Backwards compatibility. TODO: Remove.
-		) {
+		if ( isset( $request['settings'] ) ) { // Backwards compatibility. TODO: Remove.
+			_deprecated_argument( 'settings', '10.2.0' );
+			if ( $widget_object ) {
+				$form_data = array(
+					"widget-$id_base" => array(
+						$number => $request['settings'],
+					),
+				);
+			} else {
+				$form_data = $request['settings'];
+			}
+		} elseif ( isset( $request['instance'] ) ) {
 			if ( ! $widget_object ) {
 				return new WP_Error(
 					'rest_invalid_widget',
@@ -441,9 +449,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					);
 				}
 				$instance = unserialize( $serialized_instance );
-			} elseif ( isset( $request['settings'] ) ) { // Backwards compatibility. TODO: Remove.
-				_deprecated_argument( 'settings', '10.2.0' );
-				$instance = $request['settings'];
 			} else {
 				return new WP_Error(
 					'rest_invalid_widget',
@@ -457,8 +462,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					$number => $instance,
 				),
 			);
-		} elseif ( isset( $request['settings'] ) && ! $widget_object ) { // Backwards compatibility. TODO: Remove.
-			$form_data = $request['settings'];
 		} elseif ( ! $request->is_json_content_type() ) {
 			$form_data = $request->get_body_params();
 		} else {
@@ -486,10 +489,15 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$_POST    = $original_post;
 		$_REQUEST = $original_request;
 
-		// Register any multi-widgets that were created in the update callback.
 		if ( $widget_object ) {
+			// Register any multi-widget that the update callback just created.
 			$widget_object->_set( $number );
 			$widget_object->_register_one( $number );
+
+			// WP_Widget sets updated = true after an update to prevent more
+			// than one widget from being saved per request. This isn't what we
+			// want in the REST API, though, as we support batch requests.
+			$widget_object->updated = false;
 		}
 
 		return $id;

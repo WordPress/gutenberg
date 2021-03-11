@@ -104,11 +104,6 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		// Re-register core widgets.
 		$wp_widget_factory->_register_widgets();
-
-		// Reset the updated flag on core widgets.
-		foreach ( $wp_widget_factory->widgets as $widget ) {
-			$widget->updated = false;
-		}
 	}
 
 	private function setup_widget( $id_base, $number, $settings ) {
@@ -540,13 +535,6 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$data['settings']
 		);
 
-		// Reset the updated flag on core widgets now that this request has
-		// finished.
-		global $wp_widget_factory;
-		foreach ( $wp_widget_factory->widgets as $widget ) {
-			$widget->updated = false;
-		}
-
 		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
 		$request->set_body_params(
 			array(
@@ -852,6 +840,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @ticket 51460
 	 */
 	public function do_test_update_item_legacy_widget( $widget_id ) {
+		$this->setExpectedDeprecated( 'settings' );
+
 		wp_register_widget_control(
 			$widget_id,
 			'WP test widget',
@@ -939,6 +929,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @ticket 51460
 	 */
 	public function do_test_create_item_legacy_widget( $widget_id ) {
+		$this->setExpectedDeprecated( 'settings' );
+
 		wp_register_widget_control(
 			$widget_id,
 			'WP test widget',
