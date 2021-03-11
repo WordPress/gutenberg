@@ -15,9 +15,9 @@ https://twitter.com/wooyaygutenberg123454312
 `;
 
 exports[`Embedding content should render embeds in the correct state 1`] = `
-"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"className\\":\\"\\"} -->
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/WordPress\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true,\\"className\\":\\"\\"} -->
 <figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
-https://twitter.com/notnownikki
+https://twitter.com/WordPress
 </div></figure>
 <!-- /wp:embed -->
 
@@ -33,9 +33,9 @@ https://wordpress.org/gutenberg/handbook/
 </div></figure>
 <!-- /wp:embed -->
 
-<!-- wp:embed {\\"url\\":\\"https://twitter.com/thatbunty\\"} -->
+<!-- wp:embed {\\"url\\":\\"https://twitter.com/WordPress\\"} -->
 <figure class=\\"wp-block-embed\\"><div class=\\"wp-block-embed__wrapper\\">
-https://twitter.com/thatbunty
+https://twitter.com/WordPress
 </div></figure>
 <!-- /wp:embed -->
 
@@ -45,9 +45,9 @@ https://wordpress.org/gutenberg/handbook/block-api/attributes/
 </div></figure>
 <!-- /wp:embed -->
 
-<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true,\\"className\\":\\"wp-embed-aspect-16-9 wp-has-aspect-ratio\\"} -->
+<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=72xdCU__XCk\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true,\\"className\\":\\"wp-embed-aspect-16-9 wp-has-aspect-ratio\\"} -->
 <figure class=\\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">
-https://www.youtube.com/watch?v=lXMskKTw3Bc
+https://www.youtube.com/watch?v=72xdCU__XCk
 </div></figure>
 <!-- /wp:embed -->
 
@@ -59,9 +59,9 @@ https://cloudup.com/cQFlxqtY4ob
 `;
 
 exports[`Embedding content should retry embeds that could not be embedded with trailing slashes, without the trailing slashes 1`] = `
-"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki/\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"embed-handler\\",\\"responsive\\":true,\\"className\\":\\"\\"} -->
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/WordPress/\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"embed-handler\\",\\"responsive\\":true,\\"className\\":\\"\\"} -->
 <figure class=\\"wp-block-embed is-type-rich is-provider-embed-handler wp-block-embed-embed-handler\\"><div class=\\"wp-block-embed__wrapper\\">
-https://twitter.com/notnownikki/
+https://twitter.com/WordPress/
 </div></figure>
 <!-- /wp:embed -->"
 `;

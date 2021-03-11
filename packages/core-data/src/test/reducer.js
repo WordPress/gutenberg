@@ -344,12 +344,12 @@ describe( 'embedPreviews()', () => {
 		const originalState = deepFreeze( {} );
 		const state = embedPreviews( originalState, {
 			type: 'RECEIVE_EMBED_PREVIEW',
-			url: 'http://twitter.com/notnownikki',
+			url: 'http://twitter.com/WordPress',
 			preview: { data: 42 },
 		} );
 
 		expect( state ).toEqual( {
-			'http://twitter.com/notnownikki': { data: 42 },
+			'http://twitter.com/WordPress': { data: 42 },
 		} );
 	} );
 } );

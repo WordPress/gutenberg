@@ -25,7 +25,7 @@ const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 };
 
 const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
-	url: 'https://twitter.com/notnownikki',
+	url: 'https://twitter.com/WordPress',
 	html: '<p>Mock success response.</p>',
 	type: 'rich',
 	provider_name: 'Twitter',
@@ -34,7 +34,7 @@ const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 };
 
 const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
-	url: 'https://www.youtube.com/watch?v=lXMskKTw3Bc',
+	url: 'https://www.youtube.com/watch?v=72xdCU__XCk',
 	html: '<iframe width="16" height="9"></iframe>',
 	type: 'video',
 	provider_name: 'YouTube',
@@ -61,7 +61,7 @@ const MOCK_EMBED_IMAGE_SUCCESS_RESPONSE = {
 };
 
 const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
-	url: 'https://twitter.com/thatbunty',
+	url: 'https://twitter.com/WordPress',
 	html: false,
 	provider_name: 'Embed Provider',
 	version: '1.0',
@@ -70,7 +70,7 @@ const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 const MOCK_CANT_EMBED_RESPONSE = {
 	provider_name: 'Embed Handler',
 	html:
-		'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+		'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/WordPress</a>',
 };
 
 const MOCK_BAD_WORDPRESS_RESPONSE = {
@@ -105,7 +105,7 @@ const MOCK_RESPONSES = [
 	},
 	{
 		match: createEmbeddingMatcher(
-			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+			'https://www.youtube.com/watch?v=72xdCU__XCk'
 		),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
 	},
@@ -126,15 +126,15 @@ const MOCK_RESPONSES = [
 		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
+		match: createEmbeddingMatcher( 'https://twitter.com/WordPress' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki/' ),
+		match: createEmbeddingMatcher( 'https://twitter.com/WordPress/' ),
 		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/thatbunty' ),
+		match: createEmbeddingMatcher( 'https://twitter.com/WordPress' ),
 		onRequestMatch: createJSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
 	},
 	{
@@ -170,7 +170,7 @@ describe( 'Embedding content', () => {
 
 	it( 'should render embeds in the correct state', async () => {
 		// Valid embed. Should render valid figure element.
-		await insertEmbed( 'https://twitter.com/notnownikki' );
+		await insertEmbed( 'https://twitter.com/WordPress' );
 		await page.waitForSelector( 'figure.wp-block-embed' );
 
 		// Valid provider; invalid content. Should render failed, edit state.
@@ -187,9 +187,9 @@ describe( 'Embedding content', () => {
 
 		// Provider whose oembed API has gone wrong. Should render failed, edit
 		// state.
-		await insertEmbed( 'https://twitter.com/thatbunty' );
+		await insertEmbed( 'https://twitter.com/WordPress' );
 		await page.waitForSelector(
-			'input[value="https://twitter.com/thatbunty"]'
+			'input[value="https://twitter.com/WordPress"]'
 		);
 
 		// WordPress content that can be embedded. Should render valid figure
@@ -201,7 +201,7 @@ describe( 'Embedding content', () => {
 
 		// Video content. Should render valid figure element, and include the
 		// aspect ratio class.
-		await insertEmbed( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+		await insertEmbed( 'https://www.youtube.com/watch?v=72xdCU__XCk' );
 		await page.waitForSelector(
 			'figure.wp-block-embed.is-type-video.wp-embed-aspect-16-9'
 		);
@@ -228,7 +228,7 @@ describe( 'Embedding content', () => {
 	} );
 
 	it( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async () => {
-		await insertEmbed( 'https://twitter.com/notnownikki/' );
+		await insertEmbed( 'https://twitter.com/WordPress/' );
 		// The twitter block should appear correctly.
 		await page.waitForSelector( 'figure.wp-block-embed' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -42,8 +42,8 @@ describe( 'utils', () => {
 
 	describe( 'findMoreSuitableBlock', () => {
 		test( 'findMoreSuitableBlock matches a URL to a block name', () => {
-			const twitterURL = 'https://twitter.com/notnownikki';
-			const youtubeURL = 'https://www.youtube.com/watch?v=bNnfuvC1LlU';
+			const twitterURL = 'https://twitter.com/WordPress';
+			const youtubeURL = 'https://www.youtube.com/watch?v=72xdCU__XCk';
 			const unknownURL = 'https://example.com/';
 
 			expect( findMoreSuitableBlock( twitterURL ) ).toEqual(
@@ -110,7 +110,7 @@ describe( 'utils', () => {
 	describe( 'createUpgradedEmbedBlock', () => {
 		describe( 'do not create new block', () => {
 			it( 'when block type does not exist', () => {
-				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
+				const youtubeURL = 'https://www.youtube.com/watch?v=72xdCU';
 
 				unregisterBlockType( DEFAULT_EMBED_BLOCK );
 
@@ -129,7 +129,7 @@ describe( 'utils', () => {
 			} );
 
 			it( 'when block variation does not exist', () => {
-				const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w';
+				const youtubeURL = 'https://www.youtube.com/watch?v=72xdCU';
 
 				unregisterBlockVariation( DEFAULT_EMBED_BLOCK, 'youtube' );
 
@@ -152,7 +152,7 @@ describe( 'utils', () => {
 		} );
 
 		it( 'should return a YouTube embed block when given a YouTube URL', () => {
-			const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+			const youtubeURL = 'https://www.youtube.com/watch?v=72xdCU__XCk';
 
 			const result = createUpgradedEmbedBlock( {
 				attributes: { url: youtubeURL },

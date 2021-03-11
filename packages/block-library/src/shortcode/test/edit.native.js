@@ -44,7 +44,7 @@ describe( 'Shortcode', () => {
 			<Shortcode
 				attributes={ {
 					text:
-						'[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]',
+						'[youtube https://www.youtube.com/watch?v=72xdCU__XCk]',
 				} }
 			/>
 		);
@@ -52,7 +52,7 @@ describe( 'Shortcode', () => {
 		const textInput = testInstance.findByType( TextInput );
 		expect( textInput ).toBeTruthy();
 		expect( textInput.props.value ).toBe(
-			'[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]'
+			'[youtube https://www.youtube.com/watch?v=72xdCU__XCk]'
 		);
 	} );
 } );
