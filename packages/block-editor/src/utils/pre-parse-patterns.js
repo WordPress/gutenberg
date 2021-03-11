@@ -50,8 +50,7 @@ export function usePreParsePatterns() {
 			}
 
 			select( blockEditorStore ).__experimentalGetParsedPattern(
-				patterns[ index ].name,
-				index
+				patterns[ index ].name
 			);
 
 			handle = requestIdleCallback( callback );
