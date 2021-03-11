@@ -14,6 +14,9 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.48.0
 * [**] Buttons block: added width setting. [#28543]
 
+## 1.47.2
+* [**] Adds a `replaceBlock` method to iOS bridge delegate with a string to match the clientID and the contents to replace with. [#29734]
+
 ## 1.47.0
 * [**] Add support for setting Cover block focal point. [#25810]
 
