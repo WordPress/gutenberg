@@ -35,8 +35,9 @@ function Stepper( {
 	);
 
 	return (
-		<View style={ styles.container }>
+		<View style={ styles.container } accessible={ false }>
 			<TouchableOpacity
+				accessible={ false }
 				disabled={ isMinValue }
 				onPressIn={ onPressInDecrement }
 				onPressOut={ onPressOut }
@@ -56,6 +57,7 @@ function Stepper( {
 			) }
 			{ children }
 			<TouchableOpacity
+				accessible={ false }
 				disabled={ isMaxValue }
 				onPressIn={ onPressInIncrement }
 				onPressOut={ onPressOut }
