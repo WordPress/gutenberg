@@ -116,7 +116,25 @@ function render_block_core_template_part( $attributes ) {
 	} else {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
-	$wrapper_attributes = get_block_wrapper_attributes();
+
+	// Get custom padding values from the style attribute.
+	if ( isset( $attributes['style'] ) ) {
+		$padding = array_column( $attributes['style'], 'padding' );
+		$style  = '';
+		foreach ( $padding[0] as $direction => $value ) {
+			if ( isset( $padding[0][$direction] ) ) {
+				$style .= "padding-{$direction}:{$value};";
+			}
+		}
+	}
+
+	$block_styles = isset( $style ) ? $style : '';
+
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'style' => $block_styles,
+		)
+	);
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }

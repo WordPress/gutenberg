@@ -19,6 +19,9 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"spacing": {
+			"padding": true
 		}
 	},
 	"editorStyle": "wp-block-template-part-editor"
