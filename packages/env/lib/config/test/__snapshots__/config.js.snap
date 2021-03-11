@@ -26,6 +26,7 @@ Object {
       "pluginSources": Array [],
       "port": 2000,
       "themeSources": Array [],
+      "wpVersion": null,
     },
     "tests": Object {
       "config": Object {
@@ -48,6 +49,7 @@ Object {
       "pluginSources": Array [],
       "port": 1000,
       "themeSources": Array [],
+      "wpVersion": null,
     },
   },
   "name": ".",
