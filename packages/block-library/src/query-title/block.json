@@ -11,7 +11,7 @@
 		},
 		"level": {
 			"type": "number",
-			"default": 2
+			"default": 1
 		}
 	},
 	"supports": {
