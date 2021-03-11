@@ -9,6 +9,7 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const { hasSameCoreSource } = require( './wordpress' );
+const { dbEnv } = require( './config' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -176,8 +177,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
-					MYSQL_ROOT_PASSWORD: 'password',
-					MYSQL_DATABASE: 'wordpress',
+					MYSQL_ROOT_PASSWORD: dbEnv.credentials.password,
+					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
@@ -185,8 +186,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
-					MYSQL_ROOT_PASSWORD: 'password',
-					MYSQL_DATABASE: 'tests-wordpress',
+					MYSQL_ROOT_PASSWORD: dbEnv.credentials.password,
+					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
 				},
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
@@ -196,9 +197,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: developmentWpImage,
 				ports: [ developmentPorts ],
 				environment: {
-					WORDPRESS_DB_NAME: 'wordpress',
-					WORDPRESS_DB_USER: 'root',
-					WORDPRESS_DB_PASSWORD: 'password',
+					...dbEnv.credentials,
+					...dbEnv.development,
 				},
 				volumes: developmentMounts,
 			},
@@ -207,10 +207,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
-					WORDPRESS_DB_NAME: 'tests-wordpress',
-					WORDPRESS_DB_USER: 'root',
-					WORDPRESS_DB_PASSWORD: 'password',
-					WORDPRESS_DB_HOST: 'tests-mysql',
+					...dbEnv.credentials,
+					...dbEnv.tests,
 				},
 				volumes: testsMounts,
 			},
@@ -220,9 +218,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: developmentMounts,
 				user: cliUser,
 				environment: {
-					WORDPRESS_DB_NAME: 'wordpress',
-					WORDPRESS_DB_USER: 'root',
-					WORDPRESS_DB_PASSWORD: 'password',
+					...dbEnv.credentials,
+					...dbEnv.development,
 				},
 			},
 			'tests-cli': {
@@ -231,10 +228,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: testsMounts,
 				user: cliUser,
 				environment: {
-					WORDPRESS_DB_NAME: 'tests-wordpress',
-					WORDPRESS_DB_USER: 'root',
-					WORDPRESS_DB_PASSWORD: 'password',
-					WORDPRESS_DB_HOST: 'tests-mysql',
+					...dbEnv.credentials,
+					...dbEnv.tests,
 				},
 			},
 			composer: {
