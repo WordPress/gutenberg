@@ -7,7 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
+import {
+	useRef,
+	createContext,
+	useState,
+	useContext,
+} from '@wordpress/element';
+import { withFilters } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,6 +28,12 @@ import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
+
+const WrapperRef = createContext();
+
+const FilteredBlockListItems = withFilters( 'blockEditor.BlockListItems' )(
+	BlockListItems
+);
 
 export default function BlockList( { className } ) {
 	const ref = useRef();
@@ -40,9 +52,11 @@ export default function BlockList( { className } ) {
 					className
 				) }
 			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
-				</SetBlockNodes.Provider>
+				<WrapperRef.Provider value={ ref }>
+					<SetBlockNodes.Provider value={ setBlockNodes }>
+						<FilteredBlockListItems />
+					</SetBlockNodes.Provider>
+				</WrapperRef.Provider>
 			</div>
 		</BlockNodes.Provider>
 	);
@@ -53,7 +67,6 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	wrapperRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -79,6 +92,7 @@ function Items( {
 		orientation,
 		hasMultiSelection,
 	} = useSelect( selector, [ rootClientId ] );
+	const wrapperRef = useContext( WrapperRef );
 
 	const dropTargetIndex = useBlockDropZone( {
 		element: wrapperRef,

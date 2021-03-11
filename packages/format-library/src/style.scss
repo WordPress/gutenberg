@@ -1,3 +1,20 @@
 @import "./image/style.scss";
 @import "./link/style.scss";
 @import "./text-color/style.scss";
+
+// Ideally, this should be the post wrapper element. So `.post` or similar.
+body {
+	counter-reset: footnotes;
+}
+
+.note-anchor {
+	counter-increment: footnotes;
+}
+
+.note-anchor::after {
+	margin-left: 2px;
+	content: "[" counter(footnotes) "]";
+	vertical-align: super;
+	font-size: smaller;
+}
+

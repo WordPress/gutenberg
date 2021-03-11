@@ -210,6 +210,19 @@ _Returns_
 
 -   `RichTextValue`: A new combined value.
 
+<a name="normaliseFormats" href="#normaliseFormats">#</a> **normaliseFormats**
+
+Normalises formats: ensures subsequent adjacent equal formats have the same
+reference.
+
+_Parameters_
+
+-   _value_ `RichTextValue`: Value to normalise formats of.
+
+_Returns_
+
+-   `RichTextValue`: New value with normalised formats.
+
 <a name="registerFormatType" href="#registerFormatType">#</a> **registerFormatType**
 
 Registers a new format provided a unique name and an object defining its

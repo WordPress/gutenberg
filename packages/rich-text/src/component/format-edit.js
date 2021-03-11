@@ -5,6 +5,7 @@ import { getActiveFormat } from '../get-active-format';
 import { getActiveObject } from '../get-active-object';
 
 export default function FormatEdit( {
+	always,
 	formatTypes,
 	onChange,
 	onFocus,
@@ -12,7 +13,8 @@ export default function FormatEdit( {
 	forwardedRef,
 } ) {
 	return formatTypes.map( ( settings ) => {
-		const { name, edit: Edit } = settings;
+		const { name, edit, alwaysEdit } = settings;
+		const Edit = always ? alwaysEdit : edit;
 
 		if ( ! Edit ) {
 			return null;
