@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg - Nightly
  * Plugin URI: https://github.com/bph/gutenberg
  * Description: Zip from master of Gutenberg GitHub repo: Gutenberg This is the development plugin for the new block editor in core. Ping @bph on WPSlack for questions. 
- * Requires at least: 5.5
+ * Requires at least: 5.6
  * Requires PHP: 5.6
  * Version: 10.2.0.20210310
  * Author: Gutenberg Team and Birgit Pauli-Haack (Gutenberg Times)
