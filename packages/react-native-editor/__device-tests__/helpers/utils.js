@@ -130,10 +130,7 @@ const setupDriver = async () => {
 				iosPlatformVersions.map( ( { name } ) => name )
 			);
 
-			if (
-				! desiredCaps.platformVersion &&
-				iosPlatformVersions.length > 0
-			) {
+			if ( ! desiredCaps.platformVersion ) {
 				desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
 
 				// eslint-disable-next-line no-console
