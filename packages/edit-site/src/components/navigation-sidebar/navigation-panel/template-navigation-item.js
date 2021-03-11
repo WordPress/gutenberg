@@ -27,17 +27,25 @@ export default function TemplateNavigationItem( { item } ) {
 				  },
 		[]
 	);
-	const { setTemplate, setTemplatePart } = useDispatch( editSiteStore );
+	const {
+		setTemplate,
+		setTemplatePart,
+		setIsNavigationPanelOpened,
+	} = useDispatch( editSiteStore );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
 	if ( ! item ) {
 		return null;
 	}
 
-	const onActivateItem = () =>
-		'wp_template' === item.type
-			? setTemplate( item.id, item.slug )
-			: setTemplatePart( item.id );
+	const onActivateItem = () => {
+		if ( 'wp_template' === item.type ) {
+			setTemplate( item.id, item.slug );
+		} else {
+			setTemplatePart( item.id );
+		}
+		setIsNavigationPanelOpened( false );
+	};
 
 	return (
 		<NavigationItem
