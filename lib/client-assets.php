@@ -236,7 +236,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// Defines default version.
 	// For development, uses the current time (in microseconds) as the asset version.
 	// For production, uses the plugin's version as the asset version.
-	$default_version = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? microtime() : GUTENBERG_VERSION;
+	$default_version = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? time() : GUTENBERG_VERSION;
 
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
@@ -292,7 +292,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
 function gutenberg_register_packages_styles( $styles ) {
 	// For development, uses the current time (in microseconds) as the asset version.
 	// For production, uses the plugin's version as the asset version.
-	$version = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? microtime() : GUTENBERG_VERSION;
+	$version = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? time() : GUTENBERG_VERSION;
 
 	// Editor Styles.
 	gutenberg_override_style(
