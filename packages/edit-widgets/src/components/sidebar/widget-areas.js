@@ -55,15 +55,17 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 							) }
 						</p>
 					) }
-					<Button
-						href={ addQueryArgs( 'customize.php', {
-							'autofocus[panel]': 'widgets',
-							return: 'themes.php?page=gutenberg-widgets',
-						} ) }
-						isSecondary
-					>
-						{ __( 'Manage with live preview' ) }
-					</Button>
+					{ ! selectedWidgetArea && (
+						<Button
+							href={ addQueryArgs( 'customize.php', {
+								'autofocus[panel]': 'widgets',
+								return: 'themes.php?page=gutenberg-widgets',
+							} ) }
+							isSecondary
+						>
+							{ __( 'Manage with live preview' ) }
+						</Button>
+					) }
 				</div>
 			</div>
 		</div>
