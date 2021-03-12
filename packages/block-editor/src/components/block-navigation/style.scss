@@ -37,6 +37,7 @@
 	&.is-branch-selected.is-selected .block-editor-block-navigation-block-contents {
 		border-radius: 2px 2px 0 0;
 	}
+
 	&.is-branch-selected:not(.is-selected) .block-editor-block-navigation-block-contents {
 		background: $gray-100;
 		border-radius: 0;
@@ -44,6 +45,10 @@
 		&:hover {
 			background: $gray-300;
 		}
+	}
+
+	&.is-branch-selected.is-last-of-branch .block-editor-block-navigation-block-contents {
+		border-radius: 0 0 2px 2px;
 	}
 
 	&.is-dragging {

@@ -27,6 +27,7 @@ export default function BlockNavigationBranch( props ) {
 		terminatedLevels = [],
 		path = [],
 		isBranchSelected = false,
+		lastOfMap = false,
 	} = props;
 
 	const isTreeRoot = ! parentBlockClientId;
@@ -60,6 +61,8 @@ export default function BlockNavigationBranch( props ) {
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBranch );
 
+				const shouldDoStuff = isSelected || lastOfMap;
+
 				return (
 					<Fragment key={ clientId }>
 						<BlockNavigationBlock
@@ -74,6 +77,7 @@ export default function BlockNavigationBranch( props ) {
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
+							isLast={ lastOfMap && ! hasNestedBranch }
 						/>
 						{ hasNestedBranch && (
 							<BlockNavigationBranch
@@ -88,6 +92,11 @@ export default function BlockNavigationBranch( props ) {
 								level={ level + 1 }
 								terminatedLevels={ updatedTerminatedLevels }
 								path={ updatedPath }
+								lastOfMap={
+									shouldDoStuff &&
+									( index === filteredBlocks.length - 1 ||
+										isSelected )
+								}
 							/>
 						) }
 					</Fragment>

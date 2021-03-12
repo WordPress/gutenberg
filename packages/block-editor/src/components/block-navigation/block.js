@@ -41,6 +41,7 @@ export default function BlockNavigationBlock( {
 	siblingBlockCount,
 	showBlockMovers,
 	path,
+	isLast,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -121,6 +122,8 @@ export default function BlockNavigationBlock( {
 					withExperimentalPersistentListViewFeatures &&
 					isBranchSelected,
 				'is-dragging': isDragging,
+				'is-last-of-branch':
+					withExperimentalPersistentListViewFeatures && isLast,
 			} ) }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
