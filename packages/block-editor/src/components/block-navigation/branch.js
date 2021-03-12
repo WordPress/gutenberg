@@ -62,6 +62,7 @@ export default function BlockNavigationBranch( props ) {
 					isBranchSelected || ( isSelected && hasNestedBranch );
 
 				// Logic needed to target the last item of a selected branch which might be deeply nested.
+				// This is currently only needed for styling purposes. See: `.is-last-of-selected-branch`.
 				const isLastBlock = index === blockCount - 1;
 				const isLast = isSelected || ( isLastOfBranch && isLastBlock );
 				const isLastOfSelectedBranch =
