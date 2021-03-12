@@ -45,15 +45,6 @@ public class Gutenberg: NSObject {
         return !bridge.isLoading
     }
 
-    public var logThreshold: LogLevel {
-        get {
-            return LogLevel(RCTGetLogThreshold())
-        }
-        set {
-            RCTSetLogThreshold(RCTLogLevel(newValue))
-        }
-    }
-
     private let bridgeModule = RNReactNativeGutenbergBridge()
     private unowned let dataSource: GutenbergBridgeDataSource
 
@@ -106,7 +97,6 @@ public class Gutenberg: NSObject {
         self.extraModules = extraModules
         super.init()
         bridgeModule.dataSource = dataSource
-        logThreshold = isPackagerRunning ? .trace : .error
     }
 
     public func invalidate() {
@@ -189,11 +179,6 @@ public class Gutenberg: NSObject {
 
     public func setFocusOnTitle() {
         bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
-    }
-
-    private var isPackagerRunning: Bool {
-        let url = sourceURL(for: bridge)
-        return !(url?.isFileURL ?? true)
     }
 
     public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
