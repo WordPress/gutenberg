@@ -27,7 +27,7 @@ export default function BlockNavigationBranch( props ) {
 		terminatedLevels = [],
 		path = [],
 		isBranchSelected = false,
-		lastOfMap = false,
+		isLastOfBranch = false,
 	} = props;
 
 	const isTreeRoot = ! parentBlockClientId;
@@ -61,7 +61,11 @@ export default function BlockNavigationBranch( props ) {
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBranch );
 
-				const shouldDoStuff = isSelected || lastOfMap;
+				// Logic needed to target the last item of a selected branch which might be deeply nested.
+				const isLastBlock = index === blockCount - 1;
+				const isLast = isSelected || ( isLastOfBranch && isLastBlock );
+				const isLastOfSelectedBranch =
+					isLastOfBranch && ! hasNestedBranch && isLastBlock;
 
 				return (
 					<Fragment key={ clientId }>
@@ -70,6 +74,7 @@ export default function BlockNavigationBranch( props ) {
 							onClick={ selectBlock }
 							isSelected={ isSelected }
 							isBranchSelected={ isSelectedBranch }
+							isLastOfSelectedBranch={ isLastOfSelectedBranch }
 							level={ level }
 							position={ position }
 							rowCount={ rowCount }
@@ -77,7 +82,6 @@ export default function BlockNavigationBranch( props ) {
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
-							isLast={ lastOfMap && ! hasNestedBranch }
 						/>
 						{ hasNestedBranch && (
 							<BlockNavigationBranch
@@ -85,6 +89,7 @@ export default function BlockNavigationBranch( props ) {
 								selectedBlockClientId={ selectedBlockClientId }
 								selectBlock={ selectBlock }
 								isBranchSelected={ isSelectedBranch }
+								isLastOfBranch={ isLast }
 								showAppender={ showAppender }
 								showBlockMovers={ showBlockMovers }
 								showNestedBlocks={ showNestedBlocks }
@@ -92,11 +97,6 @@ export default function BlockNavigationBranch( props ) {
 								level={ level + 1 }
 								terminatedLevels={ updatedTerminatedLevels }
 								path={ updatedPath }
-								lastOfMap={
-									shouldDoStuff &&
-									( index === filteredBlocks.length - 1 ||
-										isSelected )
-								}
 							/>
 						) }
 					</Fragment>
