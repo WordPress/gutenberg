@@ -34,7 +34,11 @@
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
-		"html": false
+		"html": false,
+		"color": {
+			"__experimentalSkipSerialization": true
+		},
+		"__experimentalSelector": ".wp-block-search__button"
 	},
 	"editorStyle": "wp-block-search-editor",
 	"style": "wp-block-search"

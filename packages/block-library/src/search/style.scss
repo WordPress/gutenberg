@@ -1,10 +1,8 @@
 .wp-block-search {
 
 	.wp-block-search__button {
-		background: #f7f7f7;
 		border: 1px solid #ccc;
 		padding: 0.375em 0.625em;
-		color: #32373c;
 		margin-left: 0.625em;
 		word-break: normal;
 
@@ -15,6 +13,7 @@
 		svg {
 			min-width: 1.5em;
 			min-height: 1.5em;
+			fill: currentColor;
 		}
 	}
 
@@ -61,3 +60,7 @@
 	}
 }
 
+.wp-block-search__button {
+	background: #f7f7f7;
+	color: #32373c;
+}
