@@ -359,7 +359,26 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$template_query       = new WP_Query( $wp_query_args );
 	$posts                = $template_query->get_posts();
 
+	// Check we actually retrieved the correct item (???)
+	// It seems if a post doesnt exist for the given $theme in the above 'tax_query',
+	// that it will fall back to retreiving another post with the 'wp_theme` taxomonomy
+	// even if it has a different $theme value than we queried for.
+	// This means that if we saved an item for "Theme A", if we switch to "Theme B" and
+	// try to save this query will return the item from "Theme A" unexpectedly.
+	$foundCorrectPost = false;
 	if ( count( $posts ) > 0 ) {
+		$terms = get_the_terms( $posts[0], 'wp_theme' );
+
+		if ( is_wp_error( $terms ) || ! $terms ) {
+			$foundCorrectPost = false;
+		}
+
+		if ( count( $terms ) > 0 && $terms[0] === $theme ) {
+			$foundCorrectPost = true;
+		}
+	}
+
+	if ( $foundCorrectPost ) {
 		$template = _gutenberg_build_template_result_from_post( $posts[0] );
 
 		if ( ! is_wp_error( $template ) ) {
