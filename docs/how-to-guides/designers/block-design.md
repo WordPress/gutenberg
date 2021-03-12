@@ -17,7 +17,7 @@ Basic block settings won’t always make sense in the context of the placeholder
 
 ### Group Block Toolbar controls with related items
 
-The Block Toolbar groups controls in segments, hierarchically. The first segment contains block controls, such as the block switcher, the drag handle, and the mover control. The second group commonly contains tools, followed by inline formatting, and the "More" menu. Optionally "Meta" or "Other" groups can separate some tools in their own segment.
+The Block Toolbar groups controls in segments, hierarchically. The first segment contains block type controls, such as the block switcher, the drag handle, and the mover control. The second group contains common and specific block tools that affect the entire block, followed by inline formatting, and the "More" menu. Optionally "Meta" or "Other" groups can separate some tools in their own segment.
 
 ![A screenshot showing examples of block toolbar segment groupings.](https://make.wordpress.org/design/files/2021/03/docs_block-toolbar-structure.png)
 
