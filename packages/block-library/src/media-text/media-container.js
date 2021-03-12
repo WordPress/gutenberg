@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { ResizableBox, withNotices } from '@wordpress/components';
+import { ResizableBox, Spinner, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -119,7 +120,7 @@ function MediaContainer( props, ref ) {
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
-	if ( mediaType && mediaUrl ) {
+	if ( mediaUrl ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -150,7 +151,8 @@ function MediaContainer( props, ref ) {
 				as="figure"
 				className={ classnames(
 					className,
-					'editor-media-container__resizer'
+					'editor-media-container__resizer',
+					{ 'is-transient': isBlobURL( mediaUrl ) }
 				) }
 				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
@@ -171,6 +173,7 @@ function MediaContainer( props, ref ) {
 					mediaId={ mediaId }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
+				{ isBlobURL( mediaUrl ) && <Spinner /> }
 				<PlaceholderContainer { ...props } />
 			</ResizableBoxContainer>
 		);
