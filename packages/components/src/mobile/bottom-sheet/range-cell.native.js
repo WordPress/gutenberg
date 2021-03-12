@@ -110,7 +110,7 @@ class BottomSheetRangeCell extends Component {
 	announceValue( value ) {
 		const { label, unitLabel = '' } = this.props;
 
-		if ( Platform.OS === 'ios' ) {
+		if ( isIOS ) {
 			// On Android it triggers the accessibilityLabel with the value change, but
 			// on iOS we need to do this manually.
 			clearTimeout( this.timeoutAnnounceValue );
