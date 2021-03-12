@@ -18,10 +18,7 @@
 .item {
 	flex-direction: row;
 	align-items: center;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	padding-left: 8px;
-	padding-right: 12px;
+	padding: 5px 12px 5px 8px;
 	margin-right: 2px;
 	margin-top: 3px;
 	margin-bottom: 3px;
@@ -36,15 +33,6 @@
 	color: $gray-20;
 }
 
-.activeItem {
-	border-radius: 6px;
-	border: 1px solid $gray-20;
-}
-
-.activeItemDark {
-	border: 1px solid $white;
-}
-
 .text {
 	color: $toolbar-button;
 }
@@ -54,5 +42,11 @@
 }
 
 .activeText {
-	font-weight: bold;
+	text-decoration: underline;
+	text-decoration-color: $toolbar-button;
+}
+
+.activeTextDark {
+	text-decoration: underline;
+	text-decoration-color: $gray-20;
 }
