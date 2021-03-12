@@ -20,7 +20,7 @@ function render_block_core_loginout( $attributes ) {
 		: '';
 
 	// If logged-out and displayLoginAsForm is true, show the login form.
-	if ( ! is_user_logged_in() && isset( $attributes['displayLoginAsForm'] ) && $attributes['displayLoginAsForm'] ) {
+	if ( ! is_user_logged_in() && ! empty( $attributes['displayLoginAsForm'] ) ) {
 		return wp_login_form(
 			array(
 				'echo'     => false,
