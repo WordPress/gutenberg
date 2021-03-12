@@ -240,6 +240,38 @@ function mediaPosition( { x, y } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }
 
+function CoverPlaceholder( {
+	coverUrl,
+	children,
+	noticeUI,
+	noticeOperations,
+	onSelectMedia,
+} ) {
+	const { removeAllNotices, createErrorNotice } = noticeOperations;
+	return (
+		<MediaPlaceholder
+			icon={ <BlockIcon icon={ icon } /> }
+			labels={ {
+				title: __( 'Cover' ),
+				instructions: __(
+					'Upload an image or video file, or pick one from your media library.'
+				),
+			} }
+			onSelect={ onSelectMedia }
+			accept="image/*,video/*"
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			notices={ noticeUI }
+			disableMediaButtons={ !! coverUrl }
+			onError={ ( message ) => {
+				removeAllNotices();
+				createErrorNotice( message );
+			} }
+		>
+			{ children }
+		</MediaPlaceholder>
+	);
+}
+
 function CoverEdit( {
 	attributes,
 	isSelected,
@@ -329,7 +361,6 @@ function CoverEdit( {
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
 	const minHeightWithUnit = minHeightUnit
 		? `${ minHeight }${ minHeightUnit }`
@@ -507,9 +538,6 @@ function CoverEdit( {
 	);
 
 	if ( ! hasBackground ) {
-		const placeholderIcon = <BlockIcon icon={ icon } />;
-		const label = __( 'Cover' );
-
 		return (
 			<>
 				{ controls }
@@ -520,22 +548,10 @@ function CoverEdit( {
 						blockProps.className
 					) }
 				>
-					<MediaPlaceholder
-						icon={ placeholderIcon }
-						labels={ {
-							title: label,
-							instructions: __(
-								'Upload an image or video file, or pick one from your media library.'
-							),
-						} }
-						onSelect={ onSelectMedia }
-						accept="image/*,video/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						notices={ noticeUI }
-						onError={ ( message ) => {
-							removeAllNotices();
-							createErrorNotice( message );
-						} }
+					<CoverPlaceholder
+						noticeUI={ noticeUI }
+						onSelectMedia={ onSelectMedia }
+						noticeOperations={ noticeOperations }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -545,7 +561,7 @@ function CoverEdit( {
 								clearable={ false }
 							/>
 						</div>
-					</MediaPlaceholder>
+					</CoverPlaceholder>
 				</div>
 			</>
 		);
@@ -627,6 +643,12 @@ function CoverEdit( {
 					/>
 				) }
 				{ isBlogUrl && <Spinner /> }
+				<CoverPlaceholder
+					coverUrl={ url }
+					noticeUI={ noticeUI }
+					onSelectMedia={ onSelectMedia }
+					noticeOperations={ noticeOperations }
+				/>
 				<div { ...innerBlocksProps } />
 			</div>
 		</>
