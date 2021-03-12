@@ -140,9 +140,9 @@ class WP_Theme_JSON_Resolver {
 	/**
 	 * Returns a data structure used in theme.json translation.
 	 *
-	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
+	 * @return array An array of theme.json fields that are translatable and the keys that are translatable
 	 */
-	public static function get_presets_to_translate() {
+	public static function get_fields_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
@@ -167,16 +167,16 @@ class WP_Theme_JSON_Resolver {
 			return $theme_json;
 		}
 
-		$presets = self::get_presets_to_translate();
+		$fields = self::get_fields_to_translate();
 		foreach ( $theme_json['settings'] as $setting_key => $settings ) {
 			if ( empty( $settings ) ) {
 				continue;
 			}
 
-			foreach ( $presets as $preset ) {
-				$path    = array_slice( $preset['path'], 2 );
-				$key     = $preset['key'];
-				$context = $preset['context'];
+			foreach ( $fields as $field ) {
+				$path    = array_slice( $field['path'], 2 );
+				$key     = $field['key'];
+				$context = $field['context'];
 
 				$array_to_translate = _wp_array_get( $theme_json['settings'][ $setting_key ], $path, null );
 				if ( null === $array_to_translate ) {

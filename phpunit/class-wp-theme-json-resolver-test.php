@@ -8,8 +8,8 @@
 
 class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
-	function test_presets_are_extracted() {
-		$actual = WP_Theme_JSON_Resolver::get_presets_to_translate();
+	function test_fields_are_extracted() {
+		$actual = WP_Theme_JSON_Resolver::get_fields_to_translate();
 
 		$expected = array(
 			array(
