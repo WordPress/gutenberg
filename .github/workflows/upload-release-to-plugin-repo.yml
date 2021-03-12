@@ -5,24 +5,34 @@ on:
 name: Upload Gutenberg plugin to WordPress.org plugin repo
 
 jobs:
+  get-release-branch:
+    name: Get release branch name
+    runs-on: ubuntu-latest
+    if: github.event.release.assets[0]
+    outputs:
+      release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
+    steps:
+    - name: Compute release branch name
+      id: get_release_branch
+      env:
+        TAG: ${{ github.event.release.tag_name }}
+      run: |
+        IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
+        RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
+        echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
+
   update-changelog:
     name: Update Changelog
     runs-on: ubuntu-latest
     if: github.event.release.assets[0]
+    needs: get-release-branch
     env:
       TAG: ${{ github.event.release.tag_name }}
     steps:
-      - name: Compute release branch name
-        id: get_release_branch
-        run: |
-          IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
-          RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-          echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
-
       - name: Checkout code
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
         with:
-          ref: ${{ steps.get_release_branch.outputs.release_branch }}
+          ref: ${{ needs.get-release-branch.outputs.release_branch }}
 
       - name: Update the Changelog to include the release notes
         run: |
@@ -54,7 +64,7 @@ jobs:
         run: |
           git add changelog.txt
           git commit -m "Update Changelog for ${TAG#v}"
-          git push --set-upstream origin "${{ steps.get_release_branch.outputs.release_branch }}"
+          git push --set-upstream origin "${{ needs.get-release-branch.outputs.release_branch }}"
 
       - name: Upload Changelog artifact
         uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
@@ -68,7 +78,7 @@ jobs:
           git checkout trunk
           TRUNK_VERSION=$(jq --raw-output '.version' package.json)
           if [[ "${TAG#v}" == "$TRUNK_VERSION" ]]; then
-            git cherry-pick "${{ steps.get_release_branch.outputs.release_branch }}"
+            git cherry-pick "${{ needs.get-release-branch.outputs.release_branch }}"
             git push
           fi
 
