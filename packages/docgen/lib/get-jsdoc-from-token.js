@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-const doctrine = require( 'doctrine' );
+const commentParser = require( 'comment-parser' );
 
 /**
  * Internal dependencies
  */
 const getLeadingComments = require( './get-leading-comments' );
-const getTypeAsString = require( './get-type-as-string' );
+const getTypeAnnotation = require( './get-type-annotation' );
 
 /**
  * Function that takes an Espree token and returns
@@ -21,17 +21,21 @@ module.exports = ( token ) => {
 	let jsdoc;
 	const comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {
-		jsdoc = doctrine.parse( comments, {
-			unwrap: true,
-			recoverable: true,
-			sloppy: true,
-		} );
-		jsdoc.tags = jsdoc.tags.map( ( tag ) => {
-			if ( tag.type ) {
-				tag.type = getTypeAsString( tag.type );
-			}
-			return tag;
-		} );
+		jsdoc = commentParser.parse( `/*${ comments }*/`, {
+			spacing: 'preserve',
+		} )[ 0 ];
+		if ( jsdoc ) {
+			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
+				return {
+					...tag,
+					type: getTypeAnnotation( tag, token ),
+					description:
+						tag.description === '\n'
+							? tag.description.trim()
+							: tag.description,
+				};
+			} );
+		}
 	}
 	return jsdoc;
 };

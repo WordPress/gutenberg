@@ -16,7 +16,7 @@ import { map, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -50,6 +50,15 @@ function ColorPalette( {
 		'linear-gradient(240deg, rgba(0,255,0,.8) 0%, rgba(0,255,0,0) 70.71%)',
 		'linear-gradient(360deg, rgba(0,0,255,.8) 0%, rgba(0,0,255,0) 70.71%)',
 	];
+	const isCustomGradientColor = isGradientColor && isSelectedCustom();
+
+	const [
+		shouldShowCustomIndicator,
+		setShouldShowCustomIndicator,
+	] = useState(
+		shouldShowCustomIndicatorOption &&
+			( ! isGradientSegment || isCustomGradientColor )
+	);
 
 	const scrollViewRef = useRef();
 	const isIOS = Platform.OS === 'ios';
@@ -68,10 +77,17 @@ function ColorPalette( {
 	const customIndicatorColor = isGradientSegment
 		? activeColor
 		: customSwatchGradients;
-	const isCustomGradientColor = isGradientColor && isSelectedCustom();
-	const shouldShowCustomIndicator =
-		shouldShowCustomIndicatorOption &&
-		( ! isGradientSegment || isCustomGradientColor );
+
+	useEffect( () => {
+		setShouldShowCustomIndicator(
+			shouldShowCustomIndicatorOption &&
+				( ! isGradientSegment || isCustomGradientColor )
+		);
+	}, [
+		shouldShowCustomIndicatorOption,
+		isGradientSegment,
+		isCustomGradientColor,
+	] );
 
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize the gradient' )
@@ -89,7 +105,8 @@ function ColorPalette( {
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		const isWithinColors = activeColor && colors.includes( activeColor );
+		const isWithinColors =
+			activeColor && colors && colors.includes( activeColor );
 		if ( activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
@@ -208,41 +225,6 @@ function ColorPalette( {
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
 			ref={ scrollViewRef }
 		>
-			{ shouldShowCustomIndicator && (
-				<View
-					style={ customIndicatorWrapperStyle }
-					onLayout={ onCustomIndicatorLayout }
-				>
-					{ shouldShowCustomVerticalSeparator && (
-						<View style={ verticalSeparatorStyle } />
-					) }
-					<TouchableWithoutFeedback
-						onPress={ onCustomPress }
-						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelectedCustom() } }
-						accessibilityHint={ accessibilityHint }
-					>
-						<View style={ customIndicatorWrapperStyle }>
-							<ColorIndicator
-								withCustomPicker={ ! isGradientSegment }
-								color={ customIndicatorColor }
-								isSelected={ isSelectedCustom() }
-								style={ [
-									styles.colorIndicator,
-									customColorIndicatorStyles,
-								] }
-							/>
-							{ shouldShowCustomLabel && (
-								<Text style={ customTextStyle }>
-									{ isIOS
-										? customText
-										: customText.toUpperCase() }
-								</Text>
-							) }
-						</View>
-					</TouchableWithoutFeedback>
-				</View>
-			) }
 			{ colors.map( ( color ) => {
 				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
 				return (
@@ -278,6 +260,43 @@ function ColorPalette( {
 					</View>
 				);
 			} ) }
+			{ shouldShowCustomIndicator && (
+				<View
+					style={ customIndicatorWrapperStyle }
+					onLayout={ onCustomIndicatorLayout }
+				>
+					{ shouldShowCustomVerticalSeparator && (
+						<View style={ verticalSeparatorStyle } />
+					) }
+					<TouchableWithoutFeedback
+						onPress={ onCustomPress }
+						accessibilityRole={ 'button' }
+						accessibilityState={ {
+							selected: isSelectedCustom(),
+						} }
+						accessibilityHint={ accessibilityHint }
+					>
+						<View style={ customIndicatorWrapperStyle }>
+							<ColorIndicator
+								withCustomPicker={ ! isGradientSegment }
+								color={ customIndicatorColor }
+								isSelected={ isSelectedCustom() }
+								style={ [
+									styles.colorIndicator,
+									customColorIndicatorStyles,
+								] }
+							/>
+							{ shouldShowCustomLabel && (
+								<Text style={ customTextStyle }>
+									{ isIOS
+										? customText
+										: customText.toUpperCase() }
+								</Text>
+							) }
+						</View>
+					</TouchableWithoutFeedback>
+				</View>
+			) }
 		</ScrollView>
 	);
 }

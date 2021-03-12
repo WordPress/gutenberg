@@ -22,6 +22,7 @@ public enum Capabilities: String {
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
+    case audioBlock
 }
 
 /// Wrapper for single block data
@@ -83,7 +84,7 @@ extension Gutenberg.MediaSource {
     }
 }
 
-/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+/// Ref. https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
     case info
@@ -230,6 +231,13 @@ public protocol GutenbergBridgeDelegate: class {
 	/// - Parameter callback: Completion handler to be called with an xpost or an error
 	func gutenbergDidRequestXpost(callback: @escaping (Swift.Result<String, NSError>) -> Void)
 
+    /// Tells the delegate that the editor requested to show the tooltip
+    func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool
+
+    /// Tells the delegate that the editor requested to set the tooltip's visibility
+    /// - Parameter tooltipShown: Tooltip's visibility value
+    func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool)
+
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
 
     // Media Collection
@@ -262,5 +270,5 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesBlockReplaceSync() {}
+    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}
 }

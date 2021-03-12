@@ -1,72 +1,34 @@
 <?php
 /**
- * Plugin Name:     {{title}}
+ * Plugin Name:       {{title}}
 {{#description}}
- * Description:     {{description}}
+ * Description:       {{description}}
 {{/description}}
- * Version:         {{version}}
+ * Requires at least: 5.7
+ * Requires PHP:      7.0
+ * Version:           {{version}}
 {{#author}}
- * Author:          {{author}}
+ * Author:            {{author}}
 {{/author}}
 {{#license}}
- * License:         {{license}}
+ * License:           {{license}}
 {{/license}}
 {{#licenseURI}}
- * License URI:     {{{licenseURI}}}
+ * License URI:       {{{licenseURI}}}
 {{/licenseURI}}
- * Text Domain:     {{textdomain}}
+ * Text Domain:       {{textdomain}}
  *
- * @package         {{namespace}}
+ * @package           {{namespace}}
  */
 
 /**
- * Registers all block assets so that they can be enqueued through the block editor
- * in the corresponding context.
+ * Registers the block using the metadata loaded from the `block.json` file.
+ * Behind the scenes, it registers also all assets so they can be enqueued
+ * through the block editor in the corresponding context.
  *
- * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
+ * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/writing-your-first-block-type/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	$dir = __DIR__;
-
-	$script_asset_path = "$dir/build/index.asset.php";
-	if ( ! file_exists( $script_asset_path ) ) {
-		throw new Error(
-			'You need to run `npm start` or `npm run build` for the "{{namespace}}/{{slug}}" block first.'
-		);
-	}
-	$index_js     = 'build/index.js';
-	$script_asset = require( $script_asset_path );
-	wp_register_script(
-		'{{namespace}}-{{slug}}-block-editor',
-		plugins_url( $index_js, __FILE__ ),
-		$script_asset['dependencies'],
-		$script_asset['version']
-	);
-	wp_set_script_translations( '{{namespace}}-{{slug}}-block-editor', '{{textdomain}}' );
-
-	$editor_css = 'build/index.css';
-	wp_register_style(
-		'{{namespace}}-{{slug}}-block-editor',
-		plugins_url( $editor_css, __FILE__ ),
-		array(),
-		filemtime( "$dir/$editor_css" )
-	);
-
-	$style_css = 'build/style-index.css';
-	wp_register_style(
-		'{{namespace}}-{{slug}}-block',
-		plugins_url( $style_css, __FILE__ ),
-		array(),
-		filemtime( "$dir/$style_css" )
-	);
-
-	register_block_type(
-		'{{namespace}}/{{slug}}',
-		array(
-			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
-			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
-			'style'         => '{{namespace}}-{{slug}}-block',
-		)
-	);
+	register_block_type_from_metadata( __DIR__ );
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

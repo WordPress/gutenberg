@@ -19,7 +19,6 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * @param {WPElement} props.children    Children to be rendered.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -37,7 +36,6 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';

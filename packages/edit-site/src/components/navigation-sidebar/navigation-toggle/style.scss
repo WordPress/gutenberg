@@ -5,7 +5,7 @@
 	display: none;
 	position: absolute;
 	z-index: z-index(".edit-site-navigation-toggle");
-	height: $header-height + $border-width; // Cover header border
+	height: $header-height;
 	width: $header-height;
 
 	@include break-medium() {
@@ -20,8 +20,9 @@
 .edit-site-navigation-toggle__button {
 	align-items: center;
 	background: $gray-900;
+	border-radius: 0;
 	color: $white;
-	height: $header-height + $border-width; // Cover header border
+	height: $header-height;
 	width: $header-height;
 	z-index: 1;
 

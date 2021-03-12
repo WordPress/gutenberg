@@ -76,6 +76,7 @@ const otherOssLicenses = [
 	'CC-BY-3.0',
 	'CC-BY-SA-2.0',
 	'LGPL',
+	'Python-2.0',
 ];
 
 const licenses = [

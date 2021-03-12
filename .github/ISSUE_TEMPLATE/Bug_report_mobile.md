@@ -1,7 +1,7 @@
 ---
 name: Bug report (Mobile)
 about: Report a bug with the mobile app version of Gutenberg
-labels: Mobile App Android/iOS
+labels: Mobile App - i.e. Android or iOS
 
 ---
 

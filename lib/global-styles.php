@@ -73,9 +73,9 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 	if ( isset( $settings['fontSizes'] ) ) {
 		$font_sizes = $settings['fontSizes'];
 		// Back-compatibility for presets without units.
-		foreach ( $font_sizes as &$font_size ) {
+		foreach ( $font_sizes as $key => $font_size ) {
 			if ( is_numeric( $font_size['size'] ) ) {
-				$font_size['size'] = $font_size['size'] . 'px';
+				$font_sizes[ $key ]['size'] = $font_size['size'] . 'px';
 			}
 		}
 		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
@@ -93,11 +93,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
 		}
 		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
-	} elseif ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = true;
 	}
 
 	// Things that didn't land in core yet, so didn't have a setting assigned.

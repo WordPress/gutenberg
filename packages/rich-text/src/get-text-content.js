@@ -1,3 +1,11 @@
+/**
+ * Internal dependencies
+ */
+import {
+	OBJECT_REPLACEMENT_CHARACTER,
+	LINE_SEPARATOR,
+} from './special-characters';
+
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
 /**
@@ -9,5 +17,7 @@
  * @return {string} The text content.
  */
 export function getTextContent( { text } ) {
-	return text;
+	return text
+		.replace( new RegExp( OBJECT_REPLACEMENT_CHARACTER, 'g' ), '' )
+		.replace( new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
 }

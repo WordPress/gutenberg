@@ -36,6 +36,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
@@ -48,6 +49,7 @@ import {
 	replace,
 	expand,
 } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -555,8 +557,8 @@ export class ImageEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const {
 			attributes: { id, url },
 			isSelected,

@@ -16,7 +16,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
-	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -27,9 +26,10 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { trash } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -59,13 +59,13 @@ const SiteLogo = ( {
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 	const classes = classnames( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const siteEntities = select( 'core' ).getEditedEntityRecord(
+		const { getSettings } = select( blockEditorStore );
+		const siteEntities = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
 		);
@@ -231,11 +231,11 @@ export default function LogoEdit( {
 	const [ error, setError ] = useState();
 	const ref = useRef();
 	const { mediaItemData, sitelogo, url } = useSelect( ( select ) => {
-		const siteSettings = select( 'core' ).getEditedEntityRecord(
+		const siteSettings = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
 		);
-		const mediaItem = select( 'core' ).getEntityRecord(
+		const mediaItem = select( coreStore ).getEntityRecord(
 			'root',
 			'media',
 			siteSettings.sitelogo
@@ -250,7 +250,7 @@ export default function LogoEdit( {
 		};
 	}, [] );
 
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
 			sitelogo: newValue,
@@ -280,11 +280,6 @@ export default function LogoEdit( {
 		setLogo( media.id.toString() );
 	};
 
-	const deleteLogo = () => {
-		setLogo( '' );
-		setLogoUrl( '' );
-	};
-
 	const onUploadError = ( message ) => {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
@@ -299,13 +294,6 @@ export default function LogoEdit( {
 						accept={ ACCEPT_MEDIA_STRING }
 						onSelect={ onSelectLogo }
 						onError={ onUploadError }
-					/>
-				) }
-				{ !! logoUrl && (
-					<ToolbarButton
-						icon={ trash }
-						onClick={ () => deleteLogo() }
-						label={ __( 'Delete Site Logo' ) }
 					/>
 				) }
 			</ToolbarGroup>
@@ -362,12 +350,9 @@ export default function LogoEdit( {
 		'is-focused': isSelected,
 	} );
 
-	const key = !! logoUrl;
-
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
-		key,
 	} );
 
 	return (

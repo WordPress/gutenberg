@@ -13,11 +13,15 @@ import {
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { BottomSheet, Icon, Disabled } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	BlockList,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -55,20 +59,20 @@ export default function ReusableBlockEdit( {
 
 	const { reusableBlock, hasResolved, isEditing, settings } = useSelect(
 		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 
 			return {
-				reusableBlock: select( 'core' ).getEditedEntityRecord(
+				reusableBlock: select( coreStore ).getEditedEntityRecord(
 					...recordArgs
 				),
-				hasResolved: select( 'core' ).hasFinishedResolution(
+				hasResolved: select( coreStore ).hasFinishedResolution(
 					'getEditedEntityRecord',
 					recordArgs
 				),
-				isSaving: select( 'core' ).isSavingEntityRecord(
+				isSaving: select( coreStore ).isSavingEntityRecord(
 					...recordArgs
 				),
-				canUserUpdate: select( 'core' ).canUser(
+				canUserUpdate: select( coreStore ).canUser(
 					'update',
 					'blocks',
 					ref

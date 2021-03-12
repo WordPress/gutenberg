@@ -43,10 +43,6 @@ exports[`props should render alignment 1`] = `
   display: flex;
   --wp-g2-flex-gap: calc(4px * 2);
   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
-  --wp-g2-flex-item-margin-bottom: 0;
-  --wp-g2-flex-item-margin-right: calc(4px * 2);
-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
-  --wp-g2-flex-item-margin-left: 0;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -59,8 +55,6 @@ exports[`props should render alignment 1`] = `
   -ms-flex-pack: center;
   justify-content: center;
   width: 100%;
-  --wp-g2-h-stack-spacing: calc(4px * 2);
-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
 }
 
 @media (prefers-reduced-motion) {
@@ -85,15 +79,15 @@ exports[`props should render alignment 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex components-h-stack wp-components-h-stack emotion-2"
+  class="components-flex wp-components-flex components-h-stack wp-components-h-stack ic-15rn87 ic-17cs4ki ic-192yz5d emotion-2"
   data-g2-c16t="true"
   data-g2-component="HStack"
 >
   <div
-    class="emotion-0"
+    class="ic-192yz5d emotion-0"
   />
   <div
-    class="emotion-0"
+    class="ic-192yz5d emotion-0"
   />
 </div>
 `;
@@ -116,10 +110,6 @@ exports[`props should render correctly 1`] = `
   display: flex;
   --wp-g2-flex-gap: calc(4px * 2);
   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
-  --wp-g2-flex-item-margin-bottom: 0;
-  --wp-g2-flex-item-margin-right: calc(4px * 2);
-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
-  --wp-g2-flex-item-margin-left: 0;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -132,8 +122,6 @@ exports[`props should render correctly 1`] = `
   -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
-  --wp-g2-h-stack-spacing: calc(4px * 2);
-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
 }
 
 @media (prefers-reduced-motion) {
@@ -183,15 +171,15 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex components-h-stack wp-components-h-stack emotion-2"
+  class="components-flex wp-components-flex components-h-stack wp-components-h-stack ic-15rn87 ic-17cs4ki ic-192yz5d emotion-2"
   data-g2-c16t="true"
   data-g2-component="HStack"
 >
   <div
-    class="emotion-0"
+    class="ic-192yz5d emotion-0"
   />
   <div
-    class="emotion-0"
+    class="ic-192yz5d emotion-0"
   />
 </div>
 `;
@@ -239,10 +227,6 @@ exports[`props should render spacing 1`] = `
   display: flex;
   --wp-g2-flex-gap: calc(4px * 5);
   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 5);
-  --wp-g2-flex-item-margin-bottom: 0;
-  --wp-g2-flex-item-margin-right: calc(4px * 2);
-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
-  --wp-g2-flex-item-margin-left: 0;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -255,8 +239,6 @@ exports[`props should render spacing 1`] = `
   -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
-  --wp-g2-h-stack-spacing: calc(4px * 5);
-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 5);
 }
 
 @media (prefers-reduced-motion) {
@@ -281,15 +263,15 @@ exports[`props should render spacing 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex components-h-stack wp-components-h-stack emotion-2"
+  class="components-flex wp-components-flex components-h-stack wp-components-h-stack ic-15rn87 ic-17cs4ki ic-192yz5d emotion-2"
   data-g2-c16t="true"
   data-g2-component="HStack"
 >
   <div
-    class="emotion-0"
+    class="ic-192yz5d emotion-0"
   />
   <div
-    class="emotion-0"
+    class="ic-192yz5d emotion-0"
   />
 </div>
 `;
