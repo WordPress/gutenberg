@@ -69,7 +69,8 @@
 // Only target direct dropzone.
 .wp-block-cover > .components-drop-zone {
 	&.is-active {
-		transition: 0.3s opacity, 0.3s border;
+		transition: 0.2s opacity, 0.2s border;
+		@include reduce-motion("transition");
 	}
 
 	&.is-dragging-over-element {
@@ -84,8 +85,8 @@
 	.components-drop-zone__content {
 		display: flex;
 		align-items: center;
-		top: -36px;
-		left: -36px;
+		top: -($grid-unit-15 * 3);
+		left: -($grid-unit-15 * 3);
 		transform: none;
 	}
 
