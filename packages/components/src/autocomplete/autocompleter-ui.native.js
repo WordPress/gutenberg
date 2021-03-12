@@ -7,7 +7,7 @@ import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
  * WordPress dependencies
  */
 import { useLayoutEffect } from '@wordpress/element';
-import { Icon, PopoverFill } from '@wordpress/components';
+import { Icon, AutocompletionItemsFill } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -58,7 +58,7 @@ export function getAutoCompleterUI( autocompleter ) {
 		}
 
 		return (
-			<PopoverFill>
+			<AutocompletionItemsFill>
 				<View style={ containerStyles }>
 					<ScrollView
 						horizontal
@@ -102,7 +102,7 @@ export function getAutoCompleterUI( autocompleter ) {
 						} ) }
 					</ScrollView>
 				</View>
-			</PopoverFill>
+			</AutocompletionItemsFill>
 		);
 	}
 

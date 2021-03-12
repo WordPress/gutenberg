@@ -15,7 +15,7 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
-	PopoverSlot,
+	AutocompletionItemsSlot,
 } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
@@ -151,7 +151,7 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
-						<PopoverSlot />
+						<AutocompletionItemsSlot />
 						{ Platform.OS === 'ios' && <FloatingToolbar /> }
 						<Header />
 						<BottomSheetSettings />
