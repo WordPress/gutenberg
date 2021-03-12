@@ -2,7 +2,7 @@ on:
   release:
     types: [published]
 
-name: Upload Gutenberg plugin to WordPress.org plugin repo
+name: Update Changelog and upload Gutenberg plugin to WordPress.org plugin repo
 
 jobs:
   get-release-branch:
