@@ -1,12 +1,19 @@
 /**
  * External dependencies
  */
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import {
+	View,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+} from 'react-native';
+import { BlurView } from '@react-native-community/blur';
 
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { Platform, useLayoutEffect, useRef } from '@wordpress/element';
 import { Icon, AutocompletionItemsFill } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -15,6 +22,10 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import getDefaultUseItems from './get-default-use-items';
 import styles from './style.scss';
+
+const { compose: stylesCompose } = StyleSheet;
+
+// const isIOS = Platform.OS === 'ios';
 
 export function getAutoCompleterUI( autocompleter ) {
 	const useItems = autocompleter.useItems
@@ -40,9 +51,9 @@ export function getAutoCompleterUI( autocompleter ) {
 			styles.containerDark
 		);
 
-		const activeBgStyles = usePreferredColorSchemeStyle(
-			styles.activeBg,
-			styles.activeBgDark
+		const activeItemStyles = usePreferredColorSchemeStyle(
+			styles.activeItem,
+			styles.activeItemDark
 		);
 
 		const iconStyles = usePreferredColorSchemeStyle(
@@ -52,7 +63,7 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		const textStyles = usePreferredColorSchemeStyle(
 			styles.text,
-			styles.textActive
+			styles.textDark
 		);
 
 		if ( ! items.length > 0 ) {
@@ -61,7 +72,11 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		return (
 			<AutocompletionItemsFill>
-				<View style={ containerStyles }>
+				<BlurView
+					style={ containerStyles }
+					blurType="prominent"
+					blurAmount={ 10 }
+				>
 					<ScrollView
 						ref={ scrollViewRef }
 						horizontal
@@ -71,13 +86,19 @@ export function getAutoCompleterUI( autocompleter ) {
 					>
 						{ items.map( ( option, index ) => {
 							const isActive = index === selectedIndex;
+							const itemStyle = stylesCompose(
+								styles.item,
+								isActive && activeItemStyles
+							);
+							const textStyle = stylesCompose(
+								textStyles,
+								isActive && styles.activeText
+							);
+
 							return (
 								<TouchableOpacity
 									activeOpacity={ 0.5 }
-									style={ [
-										styles.item,
-										isActive && activeBgStyles,
-									] }
+									style={ itemStyle }
 									key={ index }
 									onPress={ () => onSelect( option ) }
 								>
@@ -85,26 +106,17 @@ export function getAutoCompleterUI( autocompleter ) {
 										<Icon
 											icon={ option?.value?.icon?.src }
 											size={ 24 }
-											style={ [
-												iconStyles,
-												isActive && styles.iconActive,
-											] }
+											style={ iconStyles }
 										/>
 									</View>
-
-									<Text
-										style={ [
-											textStyles,
-											isActive && styles.activeText,
-										] }
-									>
+									<Text style={ textStyle }>
 										{ option?.value?.title }
 									</Text>
 								</TouchableOpacity>
 							);
 						} ) }
 					</ScrollView>
-				</View>
+				</BlurView>
 			</AutocompletionItemsFill>
 		);
 	}
