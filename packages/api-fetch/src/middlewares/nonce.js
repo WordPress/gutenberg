@@ -1,4 +1,13 @@
+/**
+ * @param {string} nonce
+ * @return {import('../types').ApiFetchMiddleware} A middleware to enhance a request with a nonce.
+ */
 function createNonceMiddleware( nonce ) {
+	/**
+	 * @param {import('../types').ApiFetchRequestProps} options
+	 * @param {(options: import('../types').ApiFetchRequestProps) => import('../types').ApiFetchRequestProps} next
+	 * @return {import('../types').ApiFetchRequestProps} The enhanced request.
+	 */
 	function middleware( options, next ) {
 		const { headers = {} } = options;
 
