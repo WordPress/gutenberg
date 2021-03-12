@@ -2,11 +2,13 @@
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
+		{ "path": "packages/api-fetch" },
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
 		{ "path": "packages/components" },
 		{ "path": "packages/deprecated" },
+		{ "path": "packages/docgen" },
 		{ "path": "packages/dom" },
 		{ "path": "packages/element" },
 		{ "path": "packages/dom-ready" },

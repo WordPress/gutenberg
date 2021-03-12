@@ -322,7 +322,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
-	$block_library_filename = gutenberg_should_load_separate_block_styles() ? 'common' : 'style';
+	$block_library_filename = gutenberg_should_load_separate_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',

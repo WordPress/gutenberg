@@ -68,6 +68,7 @@ const QueryControls = memo(
 					value={ `${ orderBy }/${ order }` }
 					options={ options }
 					onChange={ onChange }
+					hideCancelButton={ true }
 				/>
 			),
 			onCategoryChange && (
@@ -77,6 +78,7 @@ const QueryControls = memo(
 					noOptionLabel={ __( 'All' ) }
 					selectedCategoryId={ selectedCategoryId }
 					onChange={ onCategoryChange }
+					hideCancelButton={ true }
 				/>
 			),
 			onNumberOfItemsChange && (

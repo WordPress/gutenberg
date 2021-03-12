@@ -26,8 +26,10 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks();
 	}
 
-	settings.__experimentalFetchLinkSuggestions = () =>
-		fetchLinkSuggestions( settings );
+	settings.__experimentalFetchLinkSuggestions = (
+		searchText,
+		searchOptions
+	) => fetchLinkSuggestions( searchText, searchOptions, settings );
 
 	render(
 		<Layout blockEditorSettings={ settings } />,
