@@ -1,4 +1,15 @@
-.customize-widgets-layout__inspector {
+#customize-theme-controls .customize-pane-child.accordion-section-content.customize-widgets-layout__inspector {
 	background: #fff;
-	margin: -15px -12px 0 -12px;
+
+	.block-editor-block-inspector {
+		margin: -12px;
+	}
+}
+
+#customize-theme-controls .customize-pane-child.accordion-section-content.control-section-sidebar.open {
+	transition: 0.18s transform cubic-bezier(0.645, 0.045, 0.355, 1); /* easeInOutCubic */
+
+	&.is-inspector-open {
+		transform: translateX(-100%);
+	}
 }
