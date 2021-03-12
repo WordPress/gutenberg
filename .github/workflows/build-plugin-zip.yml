@@ -74,9 +74,9 @@ jobs:
 
       - name: Switch to release branch
         if: |
-          github.ref == 'trunk' && ! (
-            github.event.inputs.version == 'rc' &&
-            ! contains( steps.get_version.outputs.old_version, 'rc' )
+          github.ref == 'trunk' && (
+            github.event.inputs.version == 'stable' ||
+            contains( steps.get_version.outputs.old_version, 'rc' )
           )
         run: |
           git fetch --depth=1 origin "${{ steps.get_version.outputs.release_branch }}"
