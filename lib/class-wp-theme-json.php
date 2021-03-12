@@ -984,7 +984,18 @@ class WP_Theme_JSON {
 		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
 			return array();
 		} else {
-			return $this->theme_json['customTemplates'];
+			return array_reduce(
+				$this->theme_json['customTemplates'],
+				function( $accumulator, $item ) {
+					if ( isset( $item['name'] ) ) {
+						$name = $item['name'];
+						unset( $item['name'] );
+						$accumulator[ $name ] = $item;
+					}
+					return $accumulator;
+				},
+				array()
+			);
 		}
 	}
 
@@ -997,7 +1008,18 @@ class WP_Theme_JSON {
 		if ( ! isset( $this->theme_json['templateParts'] ) ) {
 			return array();
 		}
-		return $this->theme_json['templateParts'];
+		return array_reduce(
+			$this->theme_json['templateParts'],
+			function( $accumulator, $item ) {
+				if ( isset( $item['name'] ) ) {
+					$name = $item['name'];
+					unset( $item['name'] );
+					$accumulator[ $name ] = $item;
+				}
+				return $accumulator;
+			},
+			array()
+		);
 	}
 
 	/**
