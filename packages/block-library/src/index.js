@@ -69,6 +69,7 @@ import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
 import * as queryLoop from './query-loop';
+import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -89,6 +90,7 @@ import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postHierarchicalTerms from './post-hierarchical-terms';
 import * as postTags from './post-tags';
+import * as termDescription from './term-description';
 
 /**
  * Function to register an individual block.
@@ -220,6 +222,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								templatePart,
 								query,
 								queryLoop,
+								queryTitle,
 								queryPagination,
 								queryPaginationNext,
 								queryPaginationNumbers,
@@ -240,6 +243,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postHierarchicalTerms,
 								postTags,
 								postNavigationLink,
+								termDescription,
 						  ]
 						: [] ),
 				].forEach( registerBlock );
