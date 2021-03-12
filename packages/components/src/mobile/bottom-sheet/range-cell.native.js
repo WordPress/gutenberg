@@ -141,6 +141,7 @@ class BottomSheetRangeCell extends Component {
 			onComplete,
 			shouldDisplayTextInput = true,
 			unitLabel = '',
+			settingLabel = 'Value',
 			openUnitPicker,
 			children,
 			decimalNum,
@@ -164,9 +165,10 @@ class BottomSheetRangeCell extends Component {
 
 		const getAccessibilityLabel = () => {
 			return sprintf(
-				/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-				__( '%1$s. Width is %2$s %3$s.' ),
+				/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: setting label (example: width), %3$s: Current value. %4$s: value measurement unit (example: pixels) */
+				__( '%1$s. %2$s is %3$s %4$s.' ),
 				cellProps.label,
+				settingLabel,
 				value,
 				unitLabel
 			);
