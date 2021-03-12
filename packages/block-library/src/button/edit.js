@@ -15,7 +15,6 @@ import {
 	PanelBody,
 	RangeControl,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Popover,
@@ -23,6 +22,7 @@ import {
 import {
 	BlockControls,
 	InspectorControls,
+	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
 	__experimentalLinkControl as LinkControl,
@@ -35,7 +35,6 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import ColorEdit from './color-edit';
 import getColorAndStyleProps from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
@@ -230,13 +229,17 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
+	const setButtonText = ( newText ) => {
+		// Remove anchor tags from button text content.
+		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
+	};
+
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
 	return (
 		<>
-			<ColorEdit { ...props } />
 			<div
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
@@ -247,7 +250,7 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
+					onChange={ ( value ) => setButtonText( value ) }
 					withoutInteractiveFormatting
 					className={ classnames(
 						className,
@@ -291,19 +294,14 @@ function ButtonEdit( props ) {
 					selectedWidth={ width }
 					setAttributes={ setAttributes }
 				/>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						onChange={ onToggleOpenInNewTab }
-						checked={ linkTarget === '_blank' }
-					/>
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ rel || '' }
-						onChange={ onSetLinkRel }
-					/>
-				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
+			</InspectorAdvancedControls>
 		</>
 	);
 }

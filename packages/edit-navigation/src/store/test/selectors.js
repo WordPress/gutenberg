@@ -6,7 +6,12 @@ import {
 	hasResolvedNavigationPost,
 	getMenuItemForClientId,
 } from '../selectors';
-import { KIND, POST_TYPE, buildNavigationPostId } from '../utils';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../utils/constants';
+
+import { buildNavigationPostId } from '../utils';
 
 describe( 'getNavigationPostForMenu', () => {
 	it( 'gets navigation post for menu', () => {
@@ -29,8 +34,8 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
-			KIND,
-			POST_TYPE,
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
 		);
 
@@ -83,7 +88,11 @@ describe( 'hasResolvedNavigationPost', () => {
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( hasFinishedResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
-			[ KIND, POST_TYPE, buildNavigationPostId( menuId ) ]
+			[
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				buildNavigationPostId( menuId ),
+			]
 		);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;

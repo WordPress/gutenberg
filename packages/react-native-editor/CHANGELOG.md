@@ -17,6 +17,9 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.47.2
 * [**] Adds a `replaceBlock` method to iOS bridge delegate with a string to match the clientID and the contents to replace with. [#29734]
 
+## 1.47.1
+* [**] Reduce the number of items per page when fetching reusable blocks to prevent a crash. [#29626]
+
 ## 1.47.0
 * [**] Add support for setting Cover block focal point. [#25810]
 

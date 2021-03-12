@@ -27,7 +27,6 @@ export const StyledLabel = styled.label`
 `;
 
 export const StyledHelp = styled.p`
-	margin-top: -${ space( 1 ) };
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
 	color: ${ color( 'mediumGray.text' ) };

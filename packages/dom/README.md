@@ -84,7 +84,7 @@ _Parameters_
 
 _Returns_
 
--   `Object[]`: An array containing all files.
+-   `File[]`: An array containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 

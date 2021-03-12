@@ -103,7 +103,6 @@ export const __unstableAwaitPromise = function ( promise ) {
  * The default export is what you use to register the controls with your custom
  * store.
  *
- * @param paths
  * @example
  * ```js
  * // WordPress dependencies

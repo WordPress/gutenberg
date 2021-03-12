@@ -250,6 +250,7 @@ export default compose( [
 						getBlockIndex,
 						getBlockSelectionEnd,
 						getBlockOrder,
+						getBlockRootClientId,
 					} = select( blockEditorStore );
 
 					// If the clientId is defined, we insert at the position of the block.
@@ -259,7 +260,11 @@ export default compose( [
 
 					// If there a selected block, we insert after the selected block.
 					const end = getBlockSelectionEnd();
-					if ( ! isAppender && end ) {
+					if (
+						! isAppender &&
+						end &&
+						getBlockRootClientId( end ) === rootClientId
+					) {
 						return getBlockIndex( end, rootClientId ) + 1;
 					}
 
