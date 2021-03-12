@@ -189,10 +189,10 @@ class BottomSheetRangeCell extends Component {
 				onAccessibilityAction={ ( event ) => {
 					switch ( event.nativeEvent.actionName ) {
 						case 'increment':
-							this.onIncrementValue();
+							this.a11yIncrementValue();
 							break;
 						case 'decrement':
-							this.onDecrementValue();
+							this.a11yDecrementValue();
 							break;
 						case 'activate':
 							openUnitPicker();

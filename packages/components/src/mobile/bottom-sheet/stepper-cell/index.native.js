@@ -116,7 +116,7 @@ class BottomSheetStepperCell extends Component {
 	announceValue( value ) {
 		const { label, unitLabel = '' } = this.props;
 
-		if ( Platform.OS === 'ios' ) {
+		if ( isIOS ) {
 			// On Android it triggers the accessibilityLabel with the value change
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
@@ -153,26 +153,21 @@ class BottomSheetStepperCell extends Component {
 		];
 
 		const getAccessibilityHint = () => {
-			let result;
 			if ( isIOS ) {
-				result = openUnitPicker
+				return openUnitPicker
 					? __(
 							'Swipe up or down to adjust, double-tap to change unit'
 					  )
 					: __( 'Swipe up or down to adjust' );
-			} else {
-				result = openUnitPicker
-					? __(
-							'Use volume keys to adjust, double-tap to change unit'
-					  )
-					: __( 'Use volume keys to adjust' );
 			}
-			return result;
+			return openUnitPicker
+				? __( 'Use volume keys to adjust, double-tap to change unit' )
+				: __( 'Use volume keys to adjust' );
 		};
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-			__( '%1$s. Current value is %2$s %3$s.' ),
+			__( '%1$s. Width is %2$s %3$s.' ),
 			label,
 			value,
 			unitLabel
