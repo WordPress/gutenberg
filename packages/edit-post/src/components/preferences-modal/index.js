@@ -26,6 +26,7 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -71,8 +72,8 @@ export default function PreferencesModal() {
 		},
 		[ isLargeViewport ]
 	);
-	const sections = useMemo(
-		() => [
+	const sections = useMemo( () => {
+		const defaultSections = [
 			{
 				name: 'general',
 				tabLabel: __( 'General' ),
@@ -234,9 +235,18 @@ export default function PreferencesModal() {
 					</>
 				),
 			},
-		],
-		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
-	);
+		];
+
+		/**
+		 * Filters default Preference Modal sections.
+		 *
+		 * @param {Array<Object>} defaultSections Default sections.
+		 */
+		return applyFilters(
+			'editorPost.PreferencesModal.defaultSections',
+			defaultSections
+		);
+	}, [ isViewable, isLargeViewport, showBlockBreadcrumbsOption ] );
 
 	// This is also used to sync the two different rendered components
 	// between small and large viewports.
