@@ -19,7 +19,7 @@ const bodyClass = 'is-dragging-components-draggable';
  * @typedef Props
  * @property {(props: RenderProp) => JSX.Element | null} children Children.
  * @property {(event: import('react').DragEvent) => void} [onDragStart] Callback when dragging starts.
- * @property {(event: import('react').DragEvent) => void} [onDragOver] Callback when dragging happens over ???.
+ * @property {(event: import('react').DragEvent) => void} [onDragOver] Callback when dragging happens over the document.
  * @property {(event: import('react').DragEvent) => void} [onDragEnd] Callback when dragging ends.
  * @property {string} [cloneClassname] Classname for the cloned element.
  * @property {string} [elementId] ID for the element.
@@ -28,7 +28,6 @@ const bodyClass = 'is-dragging-components-draggable';
  */
 
 /**
- *
  * @param {Props} props
  * @return {JSX.Element} A draggable component.
  */
