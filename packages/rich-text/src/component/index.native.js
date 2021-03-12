@@ -344,13 +344,11 @@ export class RichText extends Component {
 			return;
 		}
 
-		// Add stub for conformance in downstream autocompleters logic
+		// Add stubs for conformance in downstream autocompleters logic
 		this.customEditableOnKeyDown?.( {
-			...event,
-			...( ! event.preventDefault && {
-				preventDefault: () => undefined,
-			} ),
+			preventDefault: () => undefined,
 			stopPropagation: () => undefined,
+			...event,
 		} );
 
 		this.handleDelete( event );
