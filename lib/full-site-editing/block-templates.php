@@ -368,12 +368,9 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$foundCorrectPost = false;
 	if ( count( $posts ) > 0 ) {
 		$terms = get_the_terms( $posts[0], 'wp_theme' );
+		$isFound = $terms && ! is_wp_error( $terms ) && count( $terms ) > 0;
 
-		if ( is_wp_error( $terms ) || ! $terms ) {
-			$foundCorrectPost = false;
-		}
-
-		if ( count( $terms ) > 0 && $terms[0] === $theme ) {
+		if ( $isFound && $terms[0] === $theme ) {
 			$foundCorrectPost = true;
 		}
 	}
