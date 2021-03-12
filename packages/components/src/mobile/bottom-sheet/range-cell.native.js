@@ -26,8 +26,9 @@ class BottomSheetRangeCell extends Component {
 		super( props );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onIncrementValue = this.onIncrementValue.bind( this );
-		this.onDecrementValue = this.onDecrementValue.bind( this );
+		this.a11yIncrementValue = this.a11yIncrementValue.bind( this );
+		this.a11yDecrementValue = this.a11yDecrementValue.bind( this );
+		this.a11yUpdateValue = this.a11yUpdateValue.bind( this );
 
 		const { value, defaultValue, minimumValue } = props;
 		const initialValue = Number( value || defaultValue || minimumValue );
@@ -64,14 +65,14 @@ class BottomSheetRangeCell extends Component {
 	 * Only used with screenreaders like VoiceOver and TalkBack. Increments the
 	 * value of this setting programmatically.
 	 */
-	onIncrementValue() {
+	a11yIncrementValue() {
 		const { step = 5, maximumValue, decimalNum } = this.props;
 		const { inputValue } = this.state;
 
 		const newValue = toFixed( inputValue + step, decimalNum );
 
 		if ( newValue <= maximumValue || maximumValue === undefined ) {
-			this.accessibleUpdateValue( newValue );
+			this.a11yUpdateValue( newValue );
 		}
 	}
 
@@ -79,18 +80,18 @@ class BottomSheetRangeCell extends Component {
 	 * Only used with screenreaders like VoiceOver and TalkBack. Decrements the
 	 * value of this setting programmatically.
 	 */
-	onDecrementValue() {
+	a11yDecrementValue() {
 		const { step = 5, minimumValue, decimalNum } = this.props;
 		const { sliderValue } = this.state;
 
 		const newValue = toFixed( sliderValue - step, decimalNum );
 
 		if ( newValue >= minimumValue ) {
-			this.accessibleUpdateValue( newValue );
+			this.a11yUpdateValue( newValue );
 		}
 	}
 
-	accessibleUpdateValue( newValue ) {
+	a11yUpdateValue( newValue ) {
 		const { onChange, onComplete } = this.props;
 		this.setState( {
 			sliderValue: newValue,
