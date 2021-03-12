@@ -54,7 +54,11 @@ export default function BlockNavigationBranch( props ) {
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 				const hasNestedAppender = itemHasAppender( clientId );
+				const hasNestedBranch = hasNestedBlocks || hasNestedAppender;
+
 				const isSelected = selectedBlockClientId === clientId;
+				const isSelectedBranch =
+					isBranchSelected || ( isSelected && hasNestedBranch );
 
 				return (
 					<Fragment key={ clientId }>
@@ -62,7 +66,7 @@ export default function BlockNavigationBranch( props ) {
 							block={ block }
 							onClick={ selectBlock }
 							isSelected={ isSelected }
-							isBranchSelected={ isBranchSelected || isSelected }
+							isBranchSelected={ isSelectedBranch }
 							level={ level }
 							position={ position }
 							rowCount={ rowCount }
@@ -71,14 +75,12 @@ export default function BlockNavigationBranch( props ) {
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
 						/>
-						{ ( hasNestedBlocks || hasNestedAppender ) && (
+						{ hasNestedBranch && (
 							<BlockNavigationBranch
 								blocks={ innerBlocks }
 								selectedBlockClientId={ selectedBlockClientId }
 								selectBlock={ selectBlock }
-								isBranchSelected={
-									isBranchSelected || isSelected
-								}
+								isBranchSelected={ isSelectedBranch }
 								showAppender={ showAppender }
 								showBlockMovers={ showBlockMovers }
 								showNestedBlocks={ showNestedBlocks }
