@@ -19,8 +19,10 @@ jobs:
     name: Bump version
     runs-on: ubuntu-latest
     if: |
-      github.event_name == 'workflow_dispatch' &&
-      contains( [ "rc", "stable" ], github.event.inputs.version ) && (
+      github.event_name == 'workflow_dispatch' && (
+        github.event.inputs.version == 'rc' ||
+        github.event.inputs.version == 'stable'
+      ) && (
         github.ref == 'refs/heads/trunk' ||
         startsWith( github.ref, 'refs/heads/release/' )
       )
