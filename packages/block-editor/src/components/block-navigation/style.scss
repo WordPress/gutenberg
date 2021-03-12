@@ -243,5 +243,5 @@
 
 .block-editor-block-navigator-indentation {
 	flex-shrink: 0;
-	width: $grid-unit-30;
+	width: $grid-unit-30 + $grid-unit-05; // Indent a full icon size, plus 4px which optically aligns child icons to the text label above.
 }
