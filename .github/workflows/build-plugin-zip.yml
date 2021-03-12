@@ -98,7 +98,6 @@ jobs:
           git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
 
       - name: Cherry-pick to trunk
-        if: github.ref != 'refs/heads/trunk'
         run: |
           git fetch --depth=1 origin trunk
           git checkout trunk
