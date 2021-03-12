@@ -66,16 +66,12 @@ class BottomSheetRangeCell extends Component {
 	 */
 	onIncrementValue() {
 		const { step = 5, maximumValue, decimalNum } = this.props;
-		const { sliderValue } = this.state;
+		const { inputValue } = this.state;
 
-		const newValue = toFixed( sliderValue + step, decimalNum );
+		const newValue = toFixed( inputValue + step, decimalNum );
 
 		if ( newValue <= maximumValue || maximumValue === undefined ) {
-			this.onChangeValue( newValue );
-			this.setState( {
-				sliderValue: newValue,
-			} );
-			this.announceValue( newValue );
+			this.accessibleUpdateValue( newValue );
 		}
 	}
 
@@ -90,12 +86,21 @@ class BottomSheetRangeCell extends Component {
 		const newValue = toFixed( sliderValue - step, decimalNum );
 
 		if ( newValue >= minimumValue ) {
-			this.onChangeValue( newValue );
-			this.setState( {
-				sliderValue: newValue,
-			} );
-			this.announceValue( newValue );
+			this.accessibleUpdateValue( newValue );
 		}
+	}
+
+	accessibleUpdateValue( newValue ) {
+		const { onChange, onComplete } = this.props;
+		this.setState( {
+			sliderValue: newValue,
+			inputValue: newValue,
+		} );
+		onChange( newValue );
+		if ( onComplete ) {
+			onComplete( newValue );
+		}
+		this.announceValue( newValue );
 	}
 
 	/*
@@ -144,30 +149,27 @@ class BottomSheetRangeCell extends Component {
 		const { inputValue, sliderValue } = this.state;
 
 		const getAccessibilityHint = () => {
-			let result;
 			if ( isIOS ) {
-				result = openUnitPicker
+				return openUnitPicker
 					? __(
 							'Swipe up or down to adjust, double-tap to change unit'
 					  )
 					: __( 'Swipe up or down to adjust' );
-			} else {
-				result = openUnitPicker
-					? __(
-							'Use volume keys to adjust, double-tap to change unit'
-					  )
-					: __( 'Use volume keys to adjust' );
 			}
-			return result;
+			return openUnitPicker
+				? __( 'Use volume keys to adjust, double-tap to change unit' )
+				: __( 'Use volume keys to adjust' );
 		};
 
-		const accessibilityLabel = sprintf(
-			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
-			__( '%1$s. Current value is %2$s %3$s.' ),
-			cellProps.label,
-			value,
-			unitLabel
-		);
+		const getAccessibilityLabel = () => {
+			return sprintf(
+				/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. %3$s: value measurement unit (example: pixels) */
+				__( '%1$s. Width is %2$s %3$s.' ),
+				cellProps.label,
+				value,
+				unitLabel
+			);
+		};
 
 		const containerStyle = [
 			styles.container,
@@ -196,7 +198,7 @@ class BottomSheetRangeCell extends Component {
 							break;
 					}
 				} }
-				accessibilityLabel={ accessibilityLabel }
+				accessibilityLabel={ getAccessibilityLabel() }
 				accessibilityHint={ getAccessibilityHint() }
 			>
 				<View importantForAccessibility="no-hide-descendants">
