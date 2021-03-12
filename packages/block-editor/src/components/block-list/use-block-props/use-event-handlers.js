@@ -121,9 +121,12 @@ export function useEventHandlers( clientId ) {
 			}
 
 			node.addEventListener( 'focusin', onFocus );
-			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'mouseleave', onMouseLeave );
-			node.addEventListener( 'dragstart', onDragStart );
+
+			if ( isSelected( clientId ) ) {
+				node.addEventListener( 'keydown', onKeyDown );
+				node.addEventListener( 'mouseleave', onMouseLeave );
+				node.addEventListener( 'dragstart', onDragStart );
+			}
 
 			return () => {
 				node.removeEventListener( 'focusin', onFocus );
