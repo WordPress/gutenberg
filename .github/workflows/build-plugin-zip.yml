@@ -66,7 +66,7 @@ jobs:
 
       - name: Create and switch to release branch
         if: |
-          github.ref == 'trunk' && (
+          github.ref == 'refs/heads/trunk' && (
             github.event.inputs.version == 'rc' &&
             ! contains( steps.get_version.outputs.old_version, 'rc' )
           )
@@ -74,7 +74,7 @@ jobs:
 
       - name: Switch to release branch
         if: |
-          github.ref == 'trunk' && (
+          github.ref == 'refs/heads/trunk' && (
             github.event.inputs.version == 'stable' ||
             contains( steps.get_version.outputs.old_version, 'rc' )
           )
@@ -98,7 +98,7 @@ jobs:
           git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
 
       - name: Cherry-pick to trunk
-        if: github.ref != 'trunk'
+        if: github.ref != 'refs/heads/trunk'
         run: |
           git fetch --depth=1 origin trunk
           git checkout trunk
