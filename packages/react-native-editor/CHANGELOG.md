@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.48.0
+* [**] Buttons block: added width setting. [#28543]
+
 ## 1.47.0
 * [**] Add support for setting Cover block focal point. [#25810]
 

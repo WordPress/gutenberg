@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	useBlockProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -32,6 +33,10 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
+
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		templatePartId
+	);
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
@@ -90,8 +95,18 @@ export default function TemplatePartEdit( {
 		);
 	}
 
+	if ( isEntityAvailable && hasAlreadyRendered ) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</TagName>
+		);
+	}
+
 	return (
-		<>
+		<RecursionProvider>
 			<TemplatePartAdvancedControls
 				tagName={ tagName }
 				setAttributes={ setAttributes }
@@ -141,6 +156,6 @@ export default function TemplatePartEdit( {
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }
 			</TagName>
-		</>
+		</RecursionProvider>
 	);
 }

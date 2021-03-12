@@ -7,21 +7,14 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	Dropdown,
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
-	Popover,
-} from '@wordpress/components';
+import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import SaveButton from './save-button';
 import ManageLocations from './manage-locations';
-import AddMenu from '../add-menu';
+import MenuSwitcher from '../menu-switcher';
 
 export default function Header( {
 	menus,
@@ -64,49 +57,32 @@ export default function Header( {
 					<DropdownMenu
 						icon={ null }
 						toggleProps={ {
+							children: __( 'Switch menu' ),
+							'aria-label': __(
+								'Switch menu, or create a new menu'
+							),
 							showTooltip: false,
-							children: __( 'Select menu' ),
 							isTertiary: true,
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
 						} }
 						popoverProps={ {
+							className:
+								'edit-navigation-header__menu-switcher-dropdown',
 							position: 'bottom left',
 						} }
 					>
-						{ () => (
-							<MenuGroup>
-								<MenuItemsChoice
-									value={ selectedMenuId }
-									onSelect={ onSelectMenu }
-									choices={ menus.map( ( menu ) => ( {
-										value: menu.id,
-										label: menu.name,
-									} ) ) }
-								/>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-
-					<Dropdown
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Add new' ) }
-							</Button>
-						) }
-						renderContent={ () => (
-							<AddMenu
-								className="edit-navigation-header__add-menu"
+						{ ( { onClose } ) => (
+							<MenuSwitcher
 								menus={ menus }
-								onCreate={ onSelectMenu }
+								selectedMenuId={ selectedMenuId }
+								onSelectMenu={ ( menuId ) => {
+									onSelectMenu( menuId );
+									onClose();
+								} }
 							/>
 						) }
-					/>
+					</DropdownMenu>
 
 					<Dropdown
 						contentClassName="edit-navigation-header__manage-locations"
