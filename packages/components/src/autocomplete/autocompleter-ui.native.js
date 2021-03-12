@@ -6,7 +6,7 @@ import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { Icon, AutocompletionItemsFill } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -28,9 +28,11 @@ export function getAutoCompleterUI( autocompleter ) {
 		onSelect,
 	} ) {
 		const [ items ] = useItems( filterValue );
+		const scrollViewRef = useRef();
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
+			scrollViewRef.current?.scrollTo( { x: 0, animated: false } );
 		}, [ items ] );
 
 		const containerStyles = usePreferredColorSchemeStyle(
@@ -61,6 +63,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			<AutocompletionItemsFill>
 				<View style={ containerStyles }>
 					<ScrollView
+						ref={ scrollViewRef }
 						horizontal
 						contentContainerStyle={ styles.content }
 						showsHorizontalScrollIndicator={ false }
