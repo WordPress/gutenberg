@@ -48,30 +48,22 @@ export function useEventHandlers( clientId ) {
 
 	return useRefEffect(
 		( node ) => {
-			if ( ! isSelected ) {
-				/**
-				 * Marks the block as selected when focused and not already
-				 * selected. This specifically handles the case where block does not
-				 * set focus on its own (via `setFocus`), typically if there is no
-				 * focusable input in the block.
-				 *
-				 * @param {FocusEvent} event Focus event.
-				 */
-				function onFocus( event ) {
-					// If an inner block is focussed, that block is resposible for
-					// setting the selected block.
-					if ( ! isInsideRootBlock( node, event.target ) ) {
-						return;
-					}
-
-					selectBlock( clientId );
+			/**
+			 * Marks the block as selected when focused and not already
+			 * selected. This specifically handles the case where block does not
+			 * set focus on its own (via `setFocus`), typically if there is no
+			 * focusable input in the block.
+			 *
+			 * @param {FocusEvent} event Focus event.
+			 */
+			function onFocus( event ) {
+				// If an inner block is focused, that block is responsible for
+				// setting the selected block.
+				if ( isSelected && ! isInsideRootBlock( node, event.target ) ) {
+					return;
 				}
 
-				node.addEventListener( 'focusin', onFocus );
-
-				return () => {
-					node.removeEventListener( 'focusin', onFocus );
-				};
+				selectBlock( clientId );
 			}
 
 			/**
@@ -125,11 +117,13 @@ export function useEventHandlers( clientId ) {
 				event.preventDefault();
 			}
 
+			node.addEventListener( 'focusin', onFocus );
 			node.addEventListener( 'keydown', onKeyDown );
 			node.addEventListener( 'mouseleave', onMouseLeave );
 			node.addEventListener( 'dragstart', onDragStart );
 
 			return () => {
+				node.removeEventListener( 'focusin', onFocus );
 				node.removeEventListener( 'mouseleave', onMouseLeave );
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
