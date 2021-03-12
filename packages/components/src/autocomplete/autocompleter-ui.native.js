@@ -25,7 +25,32 @@ import styles from './style.scss';
 
 const { compose: stylesCompose } = StyleSheet;
 
-// const isIOS = Platform.OS === 'ios';
+const ContainerView =
+	Platform.OS === 'ios'
+		? ( { children } ) => {
+				const containerStyles = usePreferredColorSchemeStyle(
+					styles.container,
+					styles.containerDark
+				);
+
+				return (
+					<BlurView
+						style={ containerStyles }
+						blurType="prominent"
+						blurAmount={ 10 }
+					>
+						{ children }
+					</BlurView>
+				);
+		  }
+		: ( { children } ) => {
+				const containerStyles = usePreferredColorSchemeStyle(
+					styles.container,
+					styles.containerDark
+				);
+
+				return <View style={ containerStyles }>{ children }</View>;
+		};
 
 export function getAutoCompleterUI( autocompleter ) {
 	const useItems = autocompleter.useItems
@@ -45,11 +70,6 @@ export function getAutoCompleterUI( autocompleter ) {
 			onChangeOptions( items );
 			scrollViewRef.current?.scrollTo( { x: 0, animated: false } );
 		}, [ items ] );
-
-		const containerStyles = usePreferredColorSchemeStyle(
-			styles.container,
-			styles.containerDark
-		);
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
 			styles.activeItem,
@@ -72,11 +92,7 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		return (
 			<AutocompletionItemsFill>
-				<BlurView
-					style={ containerStyles }
-					blurType="prominent"
-					blurAmount={ 10 }
-				>
+				<ContainerView>
 					<ScrollView
 						ref={ scrollViewRef }
 						horizontal
@@ -116,7 +132,7 @@ export function getAutoCompleterUI( autocompleter ) {
 							);
 						} ) }
 					</ScrollView>
-				</BlurView>
+				</ContainerView>
 			</AutocompletionItemsFill>
 		);
 	}

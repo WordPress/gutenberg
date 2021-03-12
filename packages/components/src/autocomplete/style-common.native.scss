@@ -1,12 +1,10 @@
 .container {
 	height: $mobile-header-toolbar-height;
-	background-color: transparentize($color: $app-background, $amount: 0.7);
 	border-top-color: $gray-lighten-30;
 	border-top-width: 1px;
 }
 
 .containerDark {
-	background-color: transparentize($color: $app-background-dark-alt, $amount: 0.7);
 	border-top-color: $dark-quaternary;
 	border-bottom-width: 1px;
 	border-bottom-color: $dark-quaternary;
