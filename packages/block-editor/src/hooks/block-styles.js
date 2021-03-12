@@ -4,7 +4,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
-import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -18,29 +18,18 @@ import DefaultStylePicker from '../components/default-style-picker';
 
 export const withInspectorControls = createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
-		const { blockType, selectedBlockClientId, hasBlockStyles } = useSelect(
-			( select ) => {
-				const { getSelectedBlockClientId, getBlockName } = select(
-					'core/block-editor'
-				);
-				const { getBlockStyles } = select( 'core/blocks' );
-				const blockClientId = getSelectedBlockClientId();
-				const selectedBlockName =
-					blockClientId && getBlockName( blockClientId );
-				const blockStyles =
-					blockClientId && getBlockStyles( selectedBlockName );
+		const { name, clientId, isSelected } = props;
 
-				return {
-					blockType:
-						blockClientId && getBlockType( selectedBlockName ),
-					selectedBlockClientId: blockClientId,
-					hasBlockStyles: blockStyles && blockStyles.length > 0,
-				};
-			},
-			[]
+		const hasBlockStyles = useSelect(
+			( select ) => select( blocksStore ).getBlockStyles( name ),
+			[ name ]
 		);
 
-		if ( ! hasBlockStyles ) {
+		if ( ! isSelected ) {
+			return <WrappedComponent { ...props } />;
+		}
+
+		if ( ! hasBlockStyles?.length ) {
 			return <WrappedComponent { ...props } />;
 		}
 
@@ -49,16 +38,12 @@ export const withInspectorControls = createHigherOrderComponent(
 				<InspectorControls>
 					<div>
 						<PanelBody title={ __( 'Styles' ) }>
-							<BlockStyles clientId={ selectedBlockClientId } />
+							<BlockStyles clientId={ clientId } />
 							{ hasBlockSupport(
-								blockType.name,
+								name,
 								'defaultStylePicker',
 								true
-							) && (
-								<DefaultStylePicker
-									blockName={ blockType.name }
-								/>
-							) }
+							) && <DefaultStylePicker blockName={ name } /> }
 						</PanelBody>
 					</div>
 				</InspectorControls>
