@@ -359,15 +359,20 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$template_query       = new WP_Query( $wp_query_args );
 	$posts                = $template_query->get_posts();
 
-	// Check we actually retrieved the correct item (???)
-	// It seems if a post doesnt exist for the given $theme in the above 'tax_query',
-	// that it will fall back to retreiving another post with the 'wp_theme` taxomonomy
-	// even if it has a different $theme value than we queried for.
-	// This means that if we saved an item for "Theme A", if we switch to "Theme B" and
-	// try to save this query will return the item from "Theme A" unexpectedly.
+	/**
+	 * Check that we have retrieved the correct post.
+	 * When a post doesn't exist that matches the above tax_query, the WP_Query can
+	 * return a post matching the other above parameters (slug, post_type, etc.).
+	 * This means if we have a template saved for "Theme-A", if we switch to "Theme-B"
+	 * the query will return "Theme-A"s template.  As noted in
+	 * https://github.com/WordPress/gutenberg/issues/28951, retrieving this incorrect
+	 * post can cause bugs with saving resulting in overwriting "Theme-A"s template
+	 * when actually trying to save the one for "Theme-B", while "Theme-B"s template
+	 * will remain dirty in the editor and make it appear as if save is unresponsive.
+	 */
 	$foundCorrectPost = false;
 	if ( count( $posts ) > 0 ) {
-		$terms = get_the_terms( $posts[0], 'wp_theme' );
+		$terms   = get_the_terms( $posts[0], 'wp_theme' );
 		$isFound = $terms && ! is_wp_error( $terms ) && count( $terms ) > 0;
 
 		if ( $isFound && $terms[0] === $theme ) {
