@@ -67,10 +67,9 @@ android {
 repositories {
     google()
     jcenter()
-    maven {
-        url  "https://dl.bintray.com/wordpress-mobile/maven"
-    }
+    maven { url  "https://dl.bintray.com/wordpress-mobile/maven" }
     maven { url "https://jitpack.io" }
+    maven { url "https://a8c-libs.s3.amazonaws.com/android" }
 }
 
 dependencies {
@@ -95,6 +94,7 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-screens:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-screens', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-safe-area-context:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-reanimated:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')}"
+        runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.61.5"
    } else {
         api 'com.facebook.react:react-native:+'
         api project(':@wordpress_react-native-aztec')
@@ -108,8 +108,8 @@ dependencies {
         api project(':react-native-screens')
         api project(':react-native-safe-area-context')
         api project(':react-native-reanimated')
-        debugRuntimeOnly project(":hermes-debug")
-        releaseRuntimeOnly project(":hermes-release")
+        debugRuntimeOnly "org.wordpress-mobile:hermes-debug-mirror:0.61.5"
+        releaseRuntimeOnly "org.wordpress-mobile:hermes-release-mirror:0.61.5"
    }
 }
 
@@ -164,14 +164,21 @@ def addDependenciesToPom(pom) {
     pom.withXml {
         def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
 
-        // Iterate over the implementation dependencies, adding a <dependency> node for each
-        configurations.implementation.allDependencies.findAll { it instanceof ExternalDependency }.each {
-            if (it.name != 'unspecified') {
-                def dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', it.group)
-                dependencyNode.appendNode('artifactId', it.name)
-                dependencyNode.appendNode('version', it.version)
-            }
+        def addDependencies = { configuration, addExtraNode = {} ->
+            configuration.allDependencies
+                .findAll { it instanceof ExternalDependency && it.name != 'unspecified' }
+                .each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    addExtraNode(dependencyNode)
+                }
+        }
+
+        addDependencies(configurations.implementation)
+        addDependencies(configurations.runtimeOnly) { dependencyNode ->
+            dependencyNode.appendNode('scope', 'runtime')
         }
     }
 }
