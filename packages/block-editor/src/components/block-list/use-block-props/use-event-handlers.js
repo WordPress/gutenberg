@@ -35,7 +35,7 @@ export function useEventHandlers( clientId ) {
 			} = select( blockEditorStore );
 
 			return {
-				isSelected: isBlockSelected( clientId ),
+				isSelected: isBlockSelected,
 				rootClientId: getBlockRootClientId( clientId ),
 				index: getBlockIndex( clientId ),
 			};
@@ -59,7 +59,10 @@ export function useEventHandlers( clientId ) {
 			function onFocus( event ) {
 				// If an inner block is focused, that block is responsible for
 				// setting the selected block.
-				if ( isSelected || ! isInsideRootBlock( node, event.target ) ) {
+				if (
+					isSelected( clientId ) ||
+					! isInsideRootBlock( node, event.target )
+				) {
 					return;
 				}
 
@@ -130,6 +133,7 @@ export function useEventHandlers( clientId ) {
 			};
 		},
 		[
+			clientId,
 			isSelected,
 			rootClientId,
 			index,
