@@ -108,6 +108,10 @@ class DatePicker extends Component {
 	}
 
 	getEventsPerDay( day ) {
+		if ( ! this.props.events?.length ) {
+			return [];
+		}
+
 		return this.props.events.filter( ( eventDay ) =>
 			day.isSame( eventDay.date, 'day' )
 		);
