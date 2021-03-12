@@ -187,7 +187,6 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.
 			const firstBlock = await canvas().$( '.wp-block' );
