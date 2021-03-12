@@ -7,7 +7,7 @@ import Slider from '@react-native-community/slider';
 /**
  * WordPress dependencies
  */
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -33,7 +33,6 @@ class BottomSheetRangeCell extends Component {
 		const initialValue = Number( value || defaultValue || minimumValue );
 
 		this.state = {
-			accessible: true,
 			inputValue: initialValue,
 			sliderValue: initialValue,
 		};
