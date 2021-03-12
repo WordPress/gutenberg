@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import { isEqual, debounce } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, RawHTML } from '@wordpress/element';
+import { RawHTML, useState, useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { usePrevious, useDebounce } from '@wordpress/compose';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
@@ -21,39 +22,39 @@ export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	} );
 }
 
-export class ServerSideRender extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			response: null,
+export default function ServerSideRender( props ) {
+	const {
+		className,
+		EmptyResponsePlaceholder = DefaultEmptyResponsePlaceholder,
+		ErrorResponsePlaceholder = DefaultErrorResponsePlaceholder,
+		LoadingResponsePlaceholder = DefaultLoadingResponsePlaceholder,
+	} = props;
+
+	const [ response, setResponse ] = useState( null );
+	const [ isLoading, setIsLoading ] = useState( false );
+	const isMounted = useRef( true );
+	const fetchRequestRef = useRef( null );
+
+	useEffect( () => {
+		fetchData();
+
+		return () => {
+			isMounted.current = false;
 		};
-	}
+	}, [] );
 
-	componentDidMount() {
-		this.isStillMounted = true;
-		this.fetch( this.props );
-		// Only debounce once the initial fetch occurs to ensure that the first
-		// renders show data as soon as possible.
-		this.fetch = debounce( this.fetch, 500 );
-	}
-
-	componentWillUnmount() {
-		this.isStillMounted = false;
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( ! isEqual( prevProps, this.props ) ) {
-			this.fetch( this.props );
+	const prevProps = usePrevious( props );
+	useEffect( () => {
+		if ( prevProps !== undefined && ! isEqual( prevProps, props ) ) {
+			debouncedFetchData();
 		}
-	}
+	} );
 
-	fetch( props ) {
-		if ( ! this.isStillMounted ) {
+	function fetchData() {
+		if ( ! isMounted.current ) {
 			return;
 		}
-		if ( null !== this.state.response ) {
-			this.setState( { response: null } );
-		}
+		setIsLoading( true );
 		const {
 			block,
 			attributes = null,
@@ -74,99 +75,85 @@ export class ServerSideRender extends Component {
 
 		// Store the latest fetch request so that when we process it, we can
 		// check if it is the current request, to avoid race conditions on slow networks.
-		const fetchRequest = ( this.currentFetchRequest = apiFetch( {
+		const fetchRequest = ( fetchRequestRef.current = apiFetch( {
 			path,
 			data,
 			method: isPostRequest ? 'POST' : 'GET',
 		} )
-			.then( ( response ) => {
+			.then( ( fetchResponse ) => {
 				if (
-					this.isStillMounted &&
-					fetchRequest === this.currentFetchRequest &&
-					response
+					isMounted.current &&
+					fetchRequest === fetchRequestRef.current &&
+					fetchResponse
 				) {
-					this.setState( { response: response.rendered } );
+					setResponse( fetchResponse.rendered );
+					setIsLoading( false );
 				}
 			} )
 			.catch( ( error ) => {
 				if (
-					this.isStillMounted &&
-					fetchRequest === this.currentFetchRequest
+					isMounted.current &&
+					fetchRequest === fetchRequestRef.current
 				) {
-					this.setState( {
-						response: {
-							error: true,
-							errorMsg: error.message,
-						},
+					setResponse( {
+						error: true,
+						errorMsg: error.message,
 					} );
+					setIsLoading( false );
 				}
 			} ) );
 		return fetchRequest;
 	}
 
-	render() {
-		const response = this.state.response;
-		const {
-			className,
-			EmptyResponsePlaceholder,
-			ErrorResponsePlaceholder,
-			LoadingResponsePlaceholder,
-		} = this.props;
+	const debouncedFetchData = useDebounce( fetchData, 500 );
 
-		if ( response === '' ) {
-			return (
-				<EmptyResponsePlaceholder
-					response={ response }
-					{ ...this.props }
-				/>
-			);
-		} else if ( ! response ) {
-			return (
-				<LoadingResponsePlaceholder
-					response={ response }
-					{ ...this.props }
-				/>
-			);
-		} else if ( response.error ) {
-			return (
-				<ErrorResponsePlaceholder
-					response={ response }
-					{ ...this.props }
-				/>
-			);
-		}
-
+	if ( response === '' ) {
+		return <EmptyResponsePlaceholder response={ response } { ...props } />;
+	}
+	if ( isLoading ) {
 		return (
-			<RawHTML key="html" className={ className }>
-				{ response }
-			</RawHTML>
+			<LoadingResponsePlaceholder>
+				<RawHTML className={ className }>{ response }</RawHTML>
+			</LoadingResponsePlaceholder>
 		);
 	}
+	if ( response?.error ) {
+		return <ErrorResponsePlaceholder response={ response } { ...props } />;
+	}
+
+	return <RawHTML className={ className }>{ response }</RawHTML>;
 }
 
-ServerSideRender.defaultProps = {
-	EmptyResponsePlaceholder: ( { className } ) => (
+function DefaultEmptyResponsePlaceholder( { className } ) {
+	return (
 		<Placeholder className={ className }>
 			{ __( 'Block rendered as empty.' ) }
 		</Placeholder>
-	),
-	ErrorResponsePlaceholder: ( { response, className } ) => {
-		const errorMessage = sprintf(
-			// translators: %s: error message describing the problem
-			__( 'Error loading block: %s' ),
-			response.errorMsg
-		);
-		return (
-			<Placeholder className={ className }>{ errorMessage }</Placeholder>
-		);
-	},
-	LoadingResponsePlaceholder: ( { className } ) => {
-		return (
-			<Placeholder className={ className }>
-				<Spinner />
-			</Placeholder>
-		);
-	},
-};
+	);
+}
 
-export default ServerSideRender;
+function DefaultErrorResponsePlaceholder( { response, className } ) {
+	const errorMessage = sprintf(
+		// translators: %s: error message describing the problem
+		__( 'Error loading block: %s' ),
+		response.errorMsg
+	);
+	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
+}
+
+function DefaultLoadingResponsePlaceholder( { children } ) {
+	return (
+		<div style={ { position: 'relative' } }>
+			<div
+				style={ {
+					position: 'absolute',
+					top: '10px',
+					right: '0',
+				} }
+			>
+				<Spinner />
+			</div>
+			{ children }
+		</div>
+	);
+}
