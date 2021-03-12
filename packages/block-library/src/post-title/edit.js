@@ -83,12 +83,15 @@ export default function PostTitleEdit( {
 
 	if ( isLink ) {
 		titleElement = (
-			<TagName { ...blockProps } >
+			<TagName { ...blockProps }>
 				<PlainText
 					tagName="a"
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
 					placeholder={ title.length === 0 ? __( 'No Title' ) : null }
 					value={ title }
-					onChange={ (value) =>
+					onChange={ ( value ) =>
 						editEntityRecord( 'postType', postType, postId, {
 							title: value,
 						} )
