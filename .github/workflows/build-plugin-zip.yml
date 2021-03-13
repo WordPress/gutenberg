@@ -32,11 +32,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-      - name: Configure git user name and email
-        run: |
-          git config user.name "Gutenberg Repository Automation"
-          git config user.email gutenberg@wordpress.org
-
       - name: Compute old and new version
         id: get_version
         run: |
@@ -61,6 +56,11 @@ jobs:
           IFS='.' read -r -a NEW_VERSION_ARRAY <<< "$NEW_VERSION"
           RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
           echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
+
+      - name: Configure git user name and email
+        run: |
+          git config user.name "Gutenberg Repository Automation"
+          git config user.email gutenberg@wordpress.org
 
       - name: Create and switch to release branch
         if: |
