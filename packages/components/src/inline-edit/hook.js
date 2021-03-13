@@ -8,16 +8,14 @@ import { isUndefined, negate, noop, flow } from 'lodash';
 import { useEffect, useState, useRef } from '@wordpress/element';
 
 /**
- * @param {Event} event
+ * @param {import("react").ChangeEvent<HTMLInputElement>} event
  */
 const cancelEvent = ( event ) => (
 	event.preventDefault(), event.stopPropagation(), event
 );
 
 /**
- * @param {Event & {
-	  target: HTMLButtonElement
-	}} event
+ * @param {import("react").ChangeEvent<HTMLInputElement>} event
  */
 const getEventValue = ( { target: { value } } ) => value;
 
@@ -26,7 +24,7 @@ const getEventValue = ( { target: { value } } ) => value;
  */
 const mergeEvent = ( ...handlers ) =>
 	/**
-	 * @param {Event} event
+	 * @param {import("react").ChangeEvent<HTMLInputElement>} event
 	 */
 	( event ) => handlers.forEach( ( handler = noop ) => handler( event ) );
 
@@ -73,9 +71,7 @@ export default function useInlineEdit( {
 	}, [ isInEditMode ] );
 
 	/**
-	 * @param {Event & {
-	  target: HTMLButtonElement
-	}} event
+	 * @param {import("react").ChangeEvent<HTMLInputElement>} event
 	 */
 	const commit = ( event ) => {
 		const { value } = event.target;
@@ -89,7 +85,7 @@ export default function useInlineEdit( {
 	};
 
 	/**
-	 * @param {Event & {key: string, target: HTMLButtonElement}} event
+	 * @param {import("react").KeyboardEvent<HTMLInputElement> & import("react").ChangeEvent<HTMLInputElement>} event
 	 */
 	const handleInputActions = ( event ) => {
 		if ( 'Enter' === event.key ) {
