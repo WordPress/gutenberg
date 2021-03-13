@@ -84,16 +84,19 @@ function getHoveredDropZone( dropZones, position, dragEventType ) {
 
 	// Find the leaf dropzone not containing another dropzone
 	return find( hoveredDropZones, ( zone ) => {
-		const container = zone.isRelative
-			? zone.element.current.parentElement
-			: zone.element.current;
+		const parentClassName = zone.element.current.parentElement.className;
+		if ( parentClassName.indexOf( 'components-disabled' ) === -1 ) {
+			const container = zone.isRelative
+				? zone.element.current.parentElement
+				: zone.element.current;
 
-		return ! some(
-			hoveredDropZones,
-			( subZone ) =>
-				subZone !== zone &&
-				container.contains( subZone.element.current )
-		);
+			return ! some(
+				hoveredDropZones,
+				( subZone ) =>
+					subZone !== zone &&
+					container.contains( subZone.element.current )
+			);
+		}
 	} );
 }
 
