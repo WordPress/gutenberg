@@ -64,18 +64,14 @@ jobs:
 
       - name: Create and switch to release branch
         if: |
-          github.ref == 'refs/heads/trunk' && (
-            github.event.inputs.version == 'rc' &&
-            ! contains( steps.get_version.outputs.old_version, 'rc' )
-          )
+          github.event.inputs.version == 'rc' &&
+          ! contains( steps.get_version.outputs.old_version, 'rc' )
         run: git checkout -b "${{ steps.get_version.outputs.release_branch }}"
 
       - name: Switch to release branch
         if: |
-          github.ref == 'refs/heads/trunk' && (
-            github.event.inputs.version == 'stable' ||
-            contains( steps.get_version.outputs.old_version, 'rc' )
-          )
+          github.event.inputs.version == 'stable' ||
+          contains( steps.get_version.outputs.old_version, 'rc' )
         run: |
           git fetch --depth=1 origin "${{ steps.get_version.outputs.release_branch }}"
           git checkout "${{ steps.get_version.outputs.release_branch }}"
