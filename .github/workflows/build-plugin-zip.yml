@@ -93,7 +93,6 @@ jobs:
 
       - name: Cherry-pick to trunk
         run: |
-          git fetch --depth=1 origin trunk
           git checkout trunk
           TRUNK_VERSION=$(jq --raw-output '.version' package.json)
           if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
