@@ -45,6 +45,7 @@ export function SocialLinksEdit( props ) {
 		attributes,
 		iconBackgroundColor,
 		iconColor,
+		isSelected,
 		setAttributes,
 		setIconBackgroundColor,
 		setIconColor,
@@ -82,6 +83,12 @@ export function SocialLinksEdit( props ) {
 		</div>
 	);
 
+	const SelectedSocialPlaceholder = (
+		<li style={ { fontFamily: 'Comic Sans MS', listStyle: 'none' } }>
+			Add a link
+		</li>
+	);
+
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
 	const className = classNames( size, {
@@ -95,7 +102,7 @@ export function SocialLinksEdit( props ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder: SocialPlaceholder,
+		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 	} );
