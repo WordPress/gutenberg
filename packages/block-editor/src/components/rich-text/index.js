@@ -45,7 +45,7 @@ import { regexp } from '@wordpress/shortcode';
  * Internal dependencies
  */
 import Autocomplete from '../autocomplete';
-import { useBlockEditContext } from '../block-edit';
+import { useBlockClientId } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
@@ -168,10 +168,11 @@ function RichTextWrapper(
 	identifier = identifier || instanceId;
 
 	const fallbackRef = useRef();
-	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
+	const clientId = useBlockClientId();
 	const nativeProps = useNativeProps();
 	const selector = ( select ) => {
 		const {
+			isBlockSelected,
 			isCaretWithinFormattedText,
 			getSelectionStart,
 			getSelectionEnd,
@@ -211,6 +212,7 @@ function RichTextWrapper(
 		}
 
 		return {
+			blockIsSelected: isBlockSelected( clientId ),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
@@ -225,6 +227,7 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const {
+		blockIsSelected,
 		isCaretWithinFormattedText,
 		selectionStart,
 		selectionEnd,

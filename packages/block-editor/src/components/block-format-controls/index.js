@@ -11,11 +11,13 @@ import {
 	__experimentalToolbarContext as ToolbarContext,
 	createSlotFill,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'BlockFormatControls' );
 
@@ -25,7 +27,12 @@ function BlockFormatControlsSlot( props ) {
 }
 
 function BlockFormatControlsFill( props ) {
-	const { isSelected } = useBlockEditContext();
+	const clientId = useBlockClientId();
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
+		[ clientId ]
+	);
+
 	if ( ! isSelected ) {
 		return null;
 	}

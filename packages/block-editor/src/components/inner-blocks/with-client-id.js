@@ -6,11 +6,11 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
 
 const withClientId = createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
-		const { clientId } = useBlockEditContext();
+		const clientId = useBlockClientId();
 		return <WrappedComponent { ...props } clientId={ clientId } />;
 	},
 	'withClientId'

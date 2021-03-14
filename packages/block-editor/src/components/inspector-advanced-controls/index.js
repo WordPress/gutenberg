@@ -2,17 +2,23 @@
  * WordPress dependencies
  */
 import { createSlotFill } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit/context';
+import { useBlockClientId } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
 
 const name = 'InspectorAdvancedControls';
 const { Fill, Slot } = createSlotFill( name );
 
 function InspectorAdvancedControls( { children } ) {
-	const { isSelected } = useBlockEditContext();
+	const clientId = useBlockClientId();
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
+		[ clientId ]
+	);
 	return isSelected ? <Fill>{ children }</Fill> : null;
 }
 

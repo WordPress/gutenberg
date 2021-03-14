@@ -12,7 +12,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../block-edit';
+import { useBlockClientId } from '../block-edit';
 import useEditorFeature from '../use-editor-feature';
 import { store as blockEditorStore } from '../../store';
 
@@ -65,8 +65,7 @@ export function __experimentalUseGradient( {
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
 } = {} ) {
-	const { clientId } = useBlockEditContext();
-
+	const clientId = useBlockClientId();
 	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
 	const { gradient, customGradient } = useSelect(
 		( select ) => {

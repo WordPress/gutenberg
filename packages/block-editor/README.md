@@ -576,6 +576,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+<a name="useBlockClientId" href="#useBlockClientId">#</a> **useBlockClientId**
+
+Returns the current (contextual) block client ID.
+
+_Returns_
+
+-   `string`: The block client ID.
+
 <a name="useBlockDisplayInformation" href="#useBlockDisplayInformation">#</a> **useBlockDisplayInformation**
 
 Hook used to try to find a matching block variation and return
@@ -598,7 +606,13 @@ _Returns_
 
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
-Undocumented declaration.
+> **Deprecated** 
+
+A hook that returns the block client ID, name and selected status.
+
+_Returns_
+
+-   `Object`: Block client ID, name and selected status.
 
 <a name="useBlockProps" href="#useBlockProps">#</a> **useBlockProps**
 
