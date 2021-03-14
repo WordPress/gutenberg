@@ -2,19 +2,11 @@
 	align-items: center;
 	background: $gray-900;
 	border-radius: 0;
-	display: none;
+	display: flex;
 	position: absolute;
 	z-index: z-index(".edit-site-navigation-toggle");
 	height: $header-height;
 	width: $header-height;
-
-	@include break-medium() {
-		display: flex;
-	}
-
-	body.is-navigation-sidebar-open & {
-		display: flex;
-	}
 }
 
 .edit-site-navigation-toggle__button {
