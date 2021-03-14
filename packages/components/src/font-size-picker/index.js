@@ -41,7 +41,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		...optionsArray,
 		...( disableCustomFontSizes
 			? []
-			: [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
+			: [ { slug: CUSTOM_FONT_SIZE, name: _x( 'Custom', 'font size' ) } ] ),
 	];
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * External dependencies
@@ -52,7 +52,7 @@ export function getSelectOptions( {
 	];
 
 	if ( ! hasCustomValue && ! disableCustomFontSizes ) {
-		options.push( { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } );
+		options.push( { slug: CUSTOM_FONT_SIZE, name: _x( 'Custom', 'font size' ) } );
 	}
 
 	return options.map( ( option ) => {

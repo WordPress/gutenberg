@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import {
 	__unstableComposite as Composite,
@@ -182,7 +182,7 @@ function TemplatePartSearchResults( {
 	return filteredTPs.map( ( templatePart ) => (
 		<PanelGroup
 			key={ templatePart.id }
-			title={ templatePart.theme || __( 'Custom' ) }
+			title={ templatePart.theme || _x( 'Custom', 'template part' ) }
 		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
