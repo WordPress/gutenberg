@@ -256,11 +256,11 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$default_font_sizes_i18n = array(
-			'small'  => __( 'Small', 'gutenberg' ),
-			'normal' => __( 'Normal', 'gutenberg' ),
-			'medium' => __( 'Medium', 'gutenberg' ),
-			'large'  => __( 'Large', 'gutenberg' ),
-			'huge'   => __( 'Huge', 'gutenberg' ),
+			'small'  => _x( 'Small', 'font size name', 'gutenberg' ),
+			'normal' => _x( 'Normal', 'font size name', 'gutenberg' ),
+			'medium' => _x( 'Medium', 'font size name', 'gutenberg' ),
+			'large'  => _x( 'Large', 'font size name', 'gutenberg' ),
+			'huge'   => _x( 'Huge', 'font size name', 'gutenberg' ),
 		);
 		if ( ! empty( $config['settings'][ $all_blocks ]['typography']['fontSizes'] ) ) {
 			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as $font_size_key => $font_size ) {
