@@ -47,7 +47,7 @@ export function getSelectOptions( {
 	if ( disableCustomFontSizes && ! options.length ) return null;
 
 	options = [
-		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ), size: undefined },
+		{ slug: DEFAULT_FONT_SIZE, name: _x( 'Default', 'font size' ), size: undefined },
 		...options,
 	];
 

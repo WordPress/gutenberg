@@ -48,7 +48,7 @@ export const settings = {
 		],
 	},
 	styles: [
-		{ name: 'default', label: __( 'Default' ), isDefault: true },
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'logos-only', label: __( 'Logos Only' ) },
 		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
 	],

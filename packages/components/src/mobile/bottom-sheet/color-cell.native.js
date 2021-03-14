@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { ColorIndicator } from '@wordpress/components';
 /**
@@ -22,7 +22,7 @@ export default function BottomSheetColorCell( props ) {
 				__( 'Double tap to go to color settings' )
 			}
 			editable={ false }
-			value={ withColorIndicator && ! color && __( 'Default' ) }
+			value={ withColorIndicator && ! color && _x( 'Default', 'color' ) }
 		>
 			{ withColorIndicator && color && (
 				<ColorIndicator color={ color } style={ styles.colorCircle } />

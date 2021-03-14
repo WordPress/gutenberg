@@ -37,7 +37,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 		return null;
 	}
 	optionsArray = [
-		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
+		{ slug: DEFAULT_FONT_SIZE, name: _x( 'Default', 'font size' ) },
 		...optionsArray,
 		...( disableCustomFontSizes
 			? []

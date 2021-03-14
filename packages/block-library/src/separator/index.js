@@ -30,7 +30,7 @@ export const settings = {
 		},
 	},
 	styles: [
-		{ name: 'default', label: __( 'Default' ), isDefault: true },
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'wide', label: __( 'Wide Line' ) },
 		{ name: 'dots', label: __( 'Dots' ) },
 	],
