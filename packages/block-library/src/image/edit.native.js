@@ -15,6 +15,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 	setFeaturedImage,
+	subscribeFeaturedImageIdChange,
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
@@ -65,12 +66,19 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
+// const featuredImageId = select( 'core/editor' ).getEditedPostAttribute(
+// 	'featured_media'
+// );
+
+// console.log( 'Original featured image ID:' + featuredImageId );
+
 export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			isCaptionSelected: false,
+			isFeaturedImage: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -83,8 +91,8 @@ export class ImageEdit extends Component {
 		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
 			this
 		);
-		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
+		this.featuredImageIdChange = this.featuredImageIdChange.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
@@ -154,6 +162,18 @@ export class ImageEdit extends Component {
 		) {
 			mediaUploadSync();
 		}
+
+		//  { getEditedPostAttribute } = select( 'core/editor' );
+
+		// const initialFeaturedImageId = getEditedPostAttribute(
+		//	'featured_media'
+		// );
+
+		// console.log(
+		//	'First logged featured image ID:' + initialFeaturedImageId
+		// );
+
+		this.addFeaturedImageIdListener();
 	}
 
 	componentWillUnmount() {
@@ -167,6 +187,7 @@ export class ImageEdit extends Component {
 				this.props.attributes.id
 			);
 		}
+		this.removeFeaturedImageIdListener();
 	}
 
 	componentDidUpdate( previousProps ) {
@@ -174,6 +195,40 @@ export class ImageEdit extends Component {
 			const { image, attributes } = this.props;
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
+		}
+	}
+
+	featuredImageIdChange( payload ) {
+		const { attributes } = this.props;
+
+		const featuredImageId = payload.featuredImageId;
+
+		if ( featuredImageId === attributes.id ) {
+			this.setState( {
+				isFeaturedImage: true,
+			} );
+		} else {
+			this.setState( {
+				isFeaturedImage: false,
+			} );
+		}
+	}
+
+	addFeaturedImageIdListener() {
+		//if we already have a subscription not worth doing it again
+		if ( this.subscriptionParentFeaturedImageIdChange ) {
+			return;
+		}
+		this.subscriptionParentFeaturedImageIdChange = subscribeFeaturedImageIdChange(
+			( payload ) => {
+				this.featuredImageIdChange( payload );
+			}
+		);
+	}
+
+	removeFeaturedImageIdListener() {
+		if ( this.subscriptionParentFeaturedImageIdChange ) {
+			this.subscriptionParentFeaturedImageIdChange.remove();
 		}
 	}
 
@@ -407,7 +462,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, isFeaturedImage } = this.state;
 		const { attributes, isSelected, image, clientId } = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -460,11 +515,14 @@ export class ImageEdit extends Component {
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
 				<PanelBody>
-					<BottomSheet.Cell
-						label={ __( 'Set as Featured Image' ) }
-						labelStyle={ styles.setFeaturedButton }
-						onPress={ this.onSetFeatured }
-					/>
+					{ ! isFeaturedImage && (
+						<BottomSheet.Cell
+							label={ __( 'Set as Featured Image ' ) }
+							// label={ featuredImageId }
+							labelStyle={ styles.setFeaturedButton }
+							onPress={ this.onSetFeatured }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		);
@@ -503,6 +561,7 @@ export class ImageEdit extends Component {
 						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
+						{ this.state.isFeaturedImage }
 						<MediaUploadProgress
 							coverUrl={ url }
 							mediaId={ id }
@@ -528,6 +587,7 @@ export class ImageEdit extends Component {
 										isSelected={
 											isSelected && ! isCaptionSelected
 										}
+										isFeaturedImage={ isFeaturedImage }
 										isUploadFailed={ isUploadFailed }
 										isUploadInProgress={
 											isUploadInProgress
@@ -575,12 +635,15 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
 		const { getSettings } = select( blockEditorStore );
+		// const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
 		} = props;
 		const { imageSizes } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+
+		// const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
@@ -593,6 +656,7 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
+			//featuredImageId,
 		};
 	} ),
 	withPreferredColorScheme,
