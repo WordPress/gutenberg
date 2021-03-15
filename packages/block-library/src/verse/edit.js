@@ -13,9 +13,7 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {
-	__experimentalBoxControl as BoxControl,
-} from '@wordpress/components';
+import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 export default function VerseEdit( {
