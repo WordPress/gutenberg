@@ -57,7 +57,9 @@ jobs:
           # Okay, we have all we need to build the new Changelog.
           head -n $(( "${BEFORE}" - 1 )) changelog.txt > new_changelog.txt
           printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
-          echo "${{ github.event.release.body }}" >> new_changelog.txt
+          cat <<- "EOF" >> new_changelog.txt
+          ${{ github.event.release.body }}
+          EOF
           printf '\n\n' >> new_changelog.txt
           tail -n +"${AFTER}" changelog.txt >> new_changelog.txt
           mv new_changelog.txt changelog.txt
