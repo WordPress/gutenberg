@@ -13,15 +13,13 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 export default function VerseEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 } ) {
-	const { textAlign, content, style } = attributes;
+	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -29,7 +27,7 @@ export default function VerseEdit( {
 	} );
 
 	return (
-		<div className="wp-block-verse-padding-controls-wrapper">
+		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ textAlign }
@@ -38,10 +36,6 @@ export default function VerseEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BoxControlVisualizer
-				values={ style?.spacing?.padding }
-				showValues={ style?.visualizers?.padding }
-			/>
 			<RichText
 				tagName="pre"
 				identifier="content"
@@ -59,6 +53,6 @@ export default function VerseEdit( {
 				{ ...blockProps }
 				__unstablePastePlainText
 			/>
-		</div>
+		</>
 	);
 }
