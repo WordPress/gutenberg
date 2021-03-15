@@ -65,3 +65,26 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		padding-right: $grid-unit-15;
 	}
 }
+
+.block-editor-rich-text__inline-format-toolbar-group {
+	.components-dropdown-menu__toggle {
+		justify-content: center;
+	}
+}
+
+.show-icon-labels {
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button.has-icon {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+			}
+		}
+	}
+}

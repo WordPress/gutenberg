@@ -26,7 +26,10 @@
 			"padding": true
 		},
 		"__experimentalBorder": {
-			"radius": true
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
 		}
 	},
 	"editorStyle": "wp-block-group-editor",
