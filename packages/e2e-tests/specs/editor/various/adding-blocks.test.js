@@ -290,14 +290,14 @@ describe( 'adding blocks', () => {
 			inserterMenuInputSelector
 		);
 		inserterMenuSearchInput.type( 'cover' );
-		// We need to wait a bit after typing otherwise we might an "early" result
-		// that is going to be "detached" when trying to click on it
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 100 );
-		const coverBlock = await page.waitForSelector(
+		await page.waitForSelector(
 			'.block-editor-block-types-list .editor-block-list-item-cover'
 		);
-		await coverBlock.click();
+		// clicking may be too quick and may select a detached node.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

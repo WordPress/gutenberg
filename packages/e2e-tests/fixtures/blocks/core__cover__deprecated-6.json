@@ -65,5 +65,36 @@
             }
         ],
         "originalContent": "<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+    },
+    {
+        "clientId": "_clientId_2",
+        "name": "core/cover",
+        "isValid": true,
+        "attributes": {
+            "url": "http://localhost:8888/wp-content/uploads/2021/02/percy.jpg",
+            "id": 134,
+            "hasParallax": false,
+            "isRepeated": false,
+            "dimRatio": 50,
+            "backgroundType": "image",
+            "contentPosition": "bottom right"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "align": "center",
+                    "content": "test",
+                    "dropCap": false,
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p class=\"has-text-align-center has-large-font-size\">test</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\" data-object-fit=\"cover\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
     }
 ]

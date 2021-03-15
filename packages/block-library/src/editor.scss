@@ -42,18 +42,19 @@
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
-@import "./subhead/editor.scss";
 @import "./table/editor.scss";
 @import "./tag-cloud/editor.scss";
 @import "./template-part/editor.scss";
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
+@import "./query-title/editor.scss";
 @import "./query-loop/editor.scss";
 @import "./query/editor.scss";
 @import "./query-pagination/editor.scss";
 @import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
+@import "./term-description/editor.scss";
 
 :root .editor-styles-wrapper {
 	// Background colors.

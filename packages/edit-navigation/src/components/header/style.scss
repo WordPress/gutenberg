@@ -25,6 +25,7 @@
 	display: flex;
 }
 
-.edit-navigation-header__add-menu {
-	min-width: 220px;
+.edit-navigation-header__menu-switcher-dropdown {
+	// Appear below the modal overlay.
+	z-index: z-index(".components-popover.edit-navigation-header__menu-switcher-dropdown");
 }

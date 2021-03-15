@@ -85,7 +85,7 @@ While this prop doesn't change any styles for the inner blocks themselves, it do
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](/docs/designers-developers/developers/block-api/block-templates.md).
+More information about templates can be found in [template docs](/docs/reference-guides/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -114,7 +114,7 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/designers-developers/developers/block-api/block-templates.md#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/reference-guides/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
