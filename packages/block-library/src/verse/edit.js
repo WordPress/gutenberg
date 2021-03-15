@@ -29,7 +29,7 @@ export default function VerseEdit( {
 	} );
 
 	return (
-		<>
+		<div className="wp-block-verse-padding-controls-wrapper">
 			<BlockControls>
 				<AlignmentToolbar
 					value={ textAlign }
@@ -59,6 +59,6 @@ export default function VerseEdit( {
 				{ ...blockProps }
 				__unstablePastePlainText
 			/>
-		</>
+		</div>
 	);
 }
