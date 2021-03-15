@@ -73,19 +73,19 @@ export function SocialLinksEdit( props ) {
 	}, [ logosOnly, setAttributes ] );
 
 	const SocialPlaceholder = (
-		<div className="wp-block-social-links__social-placeholder">
+		<li className="wp-block-social-links__social-placeholder">
 			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div className="wp-social-link wp-social-link-twitter"></div>
 				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
-		</div>
+		</li>
 	);
 
 	const SelectedSocialPlaceholder = (
-		<li style={ { fontFamily: 'Comic Sans MS', listStyle: 'none' } }>
-			Add a link
+		<li className="wp-block-social-links__social-prompt">
+			{ __( 'Add link' ) }
 		</li>
 	);
 
