@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, createPortal } from '@wordpress/element';
+import { useEffect, createPortal } from '@wordpress/element';
 import { BlockInspector } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -14,17 +14,16 @@ export { default as BlockInspectorButton } from './block-inspector-button';
 
 const container = document.createElement( 'div' );
 
-function InspectorSectionMeta( { collapse } ) {
+function InspectorSectionMeta( { closeInspector } ) {
 	return (
 		<div className="customize-section-description-container section-meta">
 			<div className="customize-section-title">
+				{ /* Disable reason: We want to use the exiting style of the back button. */ }
 				<button // eslint-disable-line react/forbid-elements
+					type="button"
 					className="customize-section-back"
 					tabIndex="0"
-					onClick={ ( event ) => {
-						event.preventDefault();
-						collapse();
-					} }
+					onClick={ closeInspector }
 				>
 					<span className="screen-reader-text">Back</span>
 				</button>
@@ -39,9 +38,12 @@ function InspectorSectionMeta( { collapse } ) {
 	);
 }
 
-export default function Inspector( { isExpanded, collapse } ) {
-	const [ busy, setBusy ] = useState( false );
-
+export default function Inspector( {
+	isOpened,
+	isAnimating,
+	close,
+	setIsAnimating,
+} ) {
 	useEffect( () => {
 		const parent = document.getElementById( 'customize-theme-controls' );
 
@@ -53,27 +55,30 @@ export default function Inspector( { isExpanded, collapse } ) {
 	}, [] );
 
 	useEffect( () => {
-		setBusy( true );
+		setIsAnimating( true );
 
 		const openedSidebarSection = document.querySelector(
 			'.control-section-sidebar.open'
 		);
 
-		if ( isExpanded ) {
+		if ( isOpened ) {
 			openedSidebarSection.classList.add( 'is-inspector-open' );
 		} else {
 			openedSidebarSection.classList.remove( 'is-inspector-open' );
 		}
 
+		// In case the "transitionend" event for some reasons doesn't fire.
+		// (Like when it's set to "display: none", or when the transition property is removed.)
+		// See https://github.com/w3c/csswg-drafts/issues/3043
 		const timer = setTimeout( () => {
-			setBusy( false );
+			setIsAnimating( false );
 		}, 180 );
 
 		return () => {
-			clearTimeout( timer );
 			openedSidebarSection.classList.remove( 'is-inspector-open' );
+			clearTimeout( timer );
 		};
-	}, [ isExpanded ] );
+	}, [ isOpened ] );
 
 	return createPortal(
 		<div
@@ -83,12 +88,16 @@ export default function Inspector( { isExpanded, collapse } ) {
 				'accordion-section',
 				'customize-widgets-layout__inspector',
 				{
-					open: isExpanded,
-					busy,
+					open: isOpened,
+					// Needed to keep the inspector visible while closing.
+					busy: isAnimating,
 				}
 			) }
+			onTransitionEnd={ () => {
+				setIsAnimating( false );
+			} }
 		>
-			<InspectorSectionMeta collapse={ collapse } />
+			<InspectorSectionMeta closeInspector={ close } />
 
 			<BlockInspector />
 		</div>,

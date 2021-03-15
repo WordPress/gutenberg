@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockList,
@@ -35,20 +35,24 @@ export default function SidebarBlockEditor( { sidebar } ) {
 		animated: 150,
 	} );
 	const [ isInspectorOpened, setIsInspectorOpened ] = useState( false );
+	const [ isInspectorAnimating, setIsInspectorAnimating ] = useState( false );
 	const settings = useMemo(
 		() => ( {
 			__experimentalSetIsInserterOpened: inserter.setVisible,
 		} ),
 		[ inserter.setVisible ]
 	);
-	const collapse = () => setIsInspectorOpened( false );
+	const closeInspector = useCallback(
+		() => setIsInspectorOpened( false ),
+		[]
+	);
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<div hidden={ isInspectorOpened }>
+					<div hidden={ isInspectorOpened && ! isInspectorAnimating }>
 						<BlockEditorProvider
 							value={ blocks }
 							onInput={ onInput }
@@ -72,17 +76,19 @@ export default function SidebarBlockEditor( { sidebar } ) {
 					</div>
 
 					<Inspector
-						isExpanded={ isInspectorOpened }
-						collapse={ collapse }
+						isOpened={ isInspectorOpened }
+						isAnimating={ isInspectorAnimating }
+						setIsAnimating={ setIsInspectorAnimating }
+						close={ closeInspector }
 					/>
 
 					<__experimentalBlockSettingsMenuFirstItem>
 						{ ( { onClose } ) => (
 							<BlockInspectorButton
-								onToggle={ () => {
-									setIsInspectorOpened(
-										( opened ) => ! opened
-									);
+								onClick={ () => {
+									// Open the inspector,
+									setIsInspectorOpened( true );
+									// Then close the dropdown menu.
 									onClose();
 								} }
 							/>
