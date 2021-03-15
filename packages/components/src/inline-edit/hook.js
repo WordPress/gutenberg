@@ -31,8 +31,8 @@ const mergeEvent = ( ...handlers ) =>
 /**
  * @typedef Props
  * @property {(value: string) => boolean} validate predicate
- * @property {Function} onWrongInput called when a validate predicate fails
- * @property {Function} onCommit called on enter/blur
+ * @property {( value: string ) => void} onWrongInput called when a validate predicate fails
+ * @property {( value: string ) => void} onCommit called on enter/blur
  * @property {string} value input value
  */
 
