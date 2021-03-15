@@ -1,8 +1,8 @@
 #customize-theme-controls .customize-pane-child.accordion-section-content.customize-widgets-layout__inspector {
-	background: #fff;
+	background: $white;
 
 	.block-editor-block-inspector {
-		margin: -12px;
+		margin: -$grid-unit-15;
 	}
 }
 
