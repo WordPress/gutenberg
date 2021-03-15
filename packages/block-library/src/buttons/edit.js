@@ -10,7 +10,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	JustifyToolbar,
+	JustifyContentControl,
 } from '@wordpress/block-editor';
 
 /**
@@ -49,8 +49,8 @@ function ButtonsEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<JustifyToolbar
+			<BlockControls group="block">
+				<JustifyContentControl
 					allowedControls={ justifyControls }
 					value={ contentJustification }
 					onChange={ ( value ) =>

@@ -7,9 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
-import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
+import { DropdownMenu, PanelBody, ToggleControl } from '@wordpress/components';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -21,10 +21,11 @@ import { formatLtr } from '@wordpress/icons';
 
 const name = 'core/paragraph';
 
-function ParagraphRTLToolbar( { direction, setDirection } ) {
+function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<ToolbarGroup
+			<DropdownMenu
+				isToolbarButton
 				controls={ [
 					{
 						icon: formatLtr,
@@ -62,14 +63,14 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ align }
 					onChange={ ( newAlign ) =>
 						setAttributes( { align: newAlign } )
 					}
 				/>
-				<ParagraphRTLToolbar
+				<ParagraphRTLControl
 					direction={ direction }
 					setDirection={ ( newDirection ) =>
 						setAttributes( { direction: newDirection } )

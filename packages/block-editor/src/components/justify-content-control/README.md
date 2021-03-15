@@ -1,6 +1,6 @@
 ## Justify Toolbar
 
-The `JustifyToolbar` component renders a toolbar that displays justify options for the selected block.
+The `JustifyContentControl` component renders a toolbar that displays justify options for the selected block.
 
 This component is used to set the flex justification for the elements in the block, allowing to justify `left`, `center`, `right`, and `space-between`. In comparison, the alignment options are for the block itself.
 
@@ -10,14 +10,14 @@ See the Navigation block for an example usage.
 
 ### Usage
 
-Renders an justification toolbar with options.
+Renders an justification control with options.
 
 ```jsx
-import { JustifyToolbar } from '@wordpress/block-editor';
+import { JustifyContentControl } from '@wordpress/block-editor';
 
 const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
-	<BlockControls>
-		<JustifyToolbar
+	<BlockControls group="block">
+		<JustifyContentControl
 			value={ attributes.justification }
 			onChange={ ( next ) => {
 				setAttributes( { justfication: next } );
@@ -35,7 +35,7 @@ const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
 	items-justified-space-between
 
 
-_Note:_ In this example that we render `JustifyToolbar` as a child of the `BlockControls` component.
+_Note:_ In this example that we render `JustifyContentControl` as a child of the `BlockControls` component.
 
 
 ### Props
@@ -45,14 +45,6 @@ _Note:_ In this example that we render `JustifyToolbar` as a child of the `Block
 * **Default:** `[ 'left', 'center', 'right', 'space-between' ]`
 
 An array of strings for what controls to show, by default it shows all.
-
-
-#### `isCollapsed`
-* **Type:** `boolean`
-* **Default:** `true`
-
-Whether to display toolbar options in the dropdown menu.
-
 
 #### `onChange`
 * **Type:** `Function`

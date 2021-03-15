@@ -1,6 +1,6 @@
-## Alignment Toolbar
+## Alignment Control
 
-The `AlignmentToolbar` component renders a toolbar that displays alignment options for the selected block.
+The `AlignmentControl` component renders a dropdown mmmenu that displays alignment options for the selected block.
 
 This component is mostly used for blocks that display text, such as Heading, Paragraph, Post Author, Post Comments, Verse, Quote, Post Title, etc... And the available alignment options are `left`, `center` or `right` alignment.
 
@@ -18,11 +18,11 @@ This component is mostly used for blocks that display text, such as Heading, Par
 Renders an alignment toolbar with alignments options.
 
 ```jsx
-import { AlignmentToolbar } from '@wordpress/block-editor';
+import { AlignmentControl } from '@wordpress/block-editor';
 
 const MyAlignmentToolbar = () => (
-	<BlockControls>
-		<AlignmentToolbar
+	<BlockControls group="block">
+		<AlignmentControl
 			value={ textAlign }
 			onChange={ ( nextAlign ) => {
 				setAttributes( { textAlign: nextAlign } );
@@ -31,7 +31,7 @@ const MyAlignmentToolbar = () => (
 	</BlockControls>
 );
 ```
-_Note:_ In this example that we render `AlignmentToolbar` as a child of the `BlockControls` component.
+_Note:_ In this example that we render `AlignmentControl` as a child of the `BlockControls` component.
 
 ### Props
 
