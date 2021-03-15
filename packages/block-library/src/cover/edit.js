@@ -36,8 +36,8 @@ import {
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
-	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
-	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
+	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
+	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -399,8 +399,8 @@ function CoverEdit( {
 
 	const controls = (
 		<>
-			<BlockControls>
-				<BlockAlignmentMatrixToolbar
+			<BlockControls group="block">
+				<BlockAlignmentMatrixControl
 					label={ __( 'Change content position' ) }
 					value={ contentPosition }
 					onChange={ ( nextPosition ) =>
@@ -410,11 +410,13 @@ function CoverEdit( {
 					}
 					isDisabled={ ! hasBackground }
 				/>
-				<FullHeightAlignment
+				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
 					isDisabled={ ! hasBackground }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
