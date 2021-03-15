@@ -4,6 +4,9 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
+	"references": [
+		{ "path": "../url" }
+	],
 	"include": [
 		"src/middlewares/namespace-endpoint.js",
 		"src/middlewares/nonce.js",
