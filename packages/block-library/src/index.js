@@ -69,6 +69,7 @@ import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
 import * as queryLoop from './query-loop';
+import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -221,6 +222,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								templatePart,
 								query,
 								queryLoop,
+								queryTitle,
 								queryPagination,
 								queryPaginationNext,
 								queryPaginationNumbers,

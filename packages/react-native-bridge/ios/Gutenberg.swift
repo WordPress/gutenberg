@@ -133,6 +133,10 @@ public class Gutenberg: NSObject {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
     }
 
+    public func replace(blockID: String, content: String) {
+        sendEvent(.replaceBlock, body: ["html": content, "clientId": blockID])
+    }
+
     public func updateCapabilities() {
         let capabilites = dataSource.gutenbergCapabilities()
         sendEvent(.updateCapabilities, body: capabilites.toJSPayload())
