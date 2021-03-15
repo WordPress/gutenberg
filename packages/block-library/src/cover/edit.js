@@ -241,7 +241,7 @@ function mediaPosition( { x, y } ) {
 }
 
 function CoverPlaceholder( {
-	coverUrl,
+	hasBackground = false,
 	children,
 	noticeUI,
 	noticeOperations,
@@ -261,7 +261,7 @@ function CoverPlaceholder( {
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
-			disableMediaButtons={ !! coverUrl }
+			disableMediaButtons={ hasBackground }
 			onError={ ( message ) => {
 				removeAllNotices();
 				createErrorNotice( message );
@@ -646,7 +646,7 @@ function CoverEdit( {
 				) }
 				{ isBlogUrl && <Spinner /> }
 				<CoverPlaceholder
-					coverUrl={ url }
+					hasBackground={ hasBackground }
 					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
 					noticeOperations={ noticeOperations }
