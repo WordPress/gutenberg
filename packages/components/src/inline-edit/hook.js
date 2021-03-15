@@ -47,10 +47,10 @@ export default function useInlineEdit( {
 } ) {
 	const [ isInEditMode, setIsInEditMode ] = useState( false );
 	const [ editingValue, setEditingValue ] = useState( propValue );
-	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
-	const inputRef = useRef();
-	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
-	const toggleRef = useRef();
+	/** @type {import('react').RefObject<HTMLInputElement>} */
+	const inputRef = useRef( null );
+	/** @type {import('react').RefObject<HTMLInputElement>} */
+	const toggleRef = useRef( null );
 	const isInvalid = negate( validate );
 	const changeToEditMode = () => setIsInEditMode( true );
 	const changeToToggleMode = () => setIsInEditMode( false );
