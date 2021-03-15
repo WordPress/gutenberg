@@ -21,7 +21,7 @@ export const withInspectorControls = createHigherOrderComponent(
 		const { name, clientId, isSelected } = props;
 
 		const hasBlockStyles = useSelect(
-			( select ) => select( blocksStore ).getBlockStyles( name ),
+			( select ) => select( blocksStore ).getBlockStyles( name )?.length > 0,
 			[ name ]
 		);
 
@@ -29,7 +29,7 @@ export const withInspectorControls = createHigherOrderComponent(
 			return <WrappedComponent { ...props } />;
 		}
 
-		if ( ! hasBlockStyles?.length ) {
+		if ( hasBlockStyles ) {
 			return <WrappedComponent { ...props } />;
 		}
 
