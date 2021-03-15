@@ -19,7 +19,7 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 				focusOnMount={ false }
 				anchorRef={ anchorRef }
 				className="block-editor-rich-text__inline-format-toolbar"
-				__unstableSlotName="block-toolbar"
+				__unstableSlotName="__unstable-block-inline-toolbar"
 			>
 				<FormatToolbar />
 			</Popover>

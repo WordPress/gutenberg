@@ -66,6 +66,7 @@ export default function VisualEditor( { styles } ) {
 			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
+			<Popover.Slot name="__unstable-block-inline-toolbar" />
 			<div
 				ref={ mergedRefs }
 				className="editor-styles-wrapper"

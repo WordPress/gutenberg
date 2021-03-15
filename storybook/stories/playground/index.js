@@ -44,6 +44,7 @@ function App() {
 						</div>
 						<div className="editor-styles-wrapper">
 							<Popover.Slot name="block-toolbar" />
+							<Popover.Slot name="__unstable-block-inline-toolbar" />
 							<BlockEditorKeyboardShortcuts />
 							<WritingFlow>
 								<ObserveTyping>

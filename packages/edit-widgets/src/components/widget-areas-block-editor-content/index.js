@@ -27,6 +27,7 @@ export default function WidgetAreasBlockEditorContent( {
 			<BlockEditorKeyboardShortcuts />
 			<Notices />
 			<Popover.Slot name="block-toolbar" />
+			<Popover.Slot name="__unstable-block-inline-toolbar" />
 			<BlockSelectionClearer>
 				<WritingFlow>
 					<ObserveTyping>

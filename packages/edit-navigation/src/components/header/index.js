@@ -102,6 +102,7 @@ export default function Header( {
 					<SaveButton navigationPost={ navigationPost } />
 
 					<Popover.Slot name="block-toolbar" />
+					<Popover.Slot name="__unstable-block-inline-toolbar" />
 				</div>
 			) }
 		</div>

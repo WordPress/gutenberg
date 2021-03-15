@@ -94,6 +94,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			</SidebarInspectorFill>
 			<div className="edit-site-visual-editor" onWheel={ onWheel }>
 				<Popover.Slot name="block-toolbar" />
+				<Popover.Slot name="__unstable-block-inline-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
 					headHTML={ window.__editorStyles.html }
