@@ -37,6 +37,7 @@ const ImageComponent = ( {
 	height: imageHeight,
 	highlightSelected = true,
 	isSelected,
+	isFeaturedImage,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
@@ -239,10 +240,10 @@ const ImageComponent = ( {
 							{ retryMessage }
 						</Text>
 					</View>
-				) }  
+				) }
 			</View>
 
-			<FeaturedBanner />
+			{ isFeaturedImage && <FeaturedBanner /> }
 
 			{ editButton && isSelected && ! isUploadInProgress && (
 				<ImageEditingButton
