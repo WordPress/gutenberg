@@ -238,12 +238,12 @@ export default function PreferencesModal() {
 		];
 
 		/**
-		 * Filters default Preference Modal sections.
+		 * Filters Preference Modal sections.
 		 *
 		 * @param {Array<Object>} defaultSections Default sections.
 		 */
 		return applyFilters(
-			'editorPost.PreferencesModal.defaultSections',
+			'editorPost.PreferencesModal.sections',
 			defaultSections
 		);
 	}, [ isViewable, isLargeViewport, showBlockBreadcrumbsOption ] );
