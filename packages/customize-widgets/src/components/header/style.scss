@@ -4,10 +4,10 @@
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: 2px;
-		color: #fff;
+		color: $white;
 		padding: 0;
-		min-width: 24px;
-		height: 24px;
+		min-width: $grid-unit-30;
+		height: $grid-unit-30;
 		margin-left: auto;
 
 		&::before {
@@ -15,7 +15,7 @@
 		}
 
 		&.is-pressed {
-			background: #1e1e1e;
+			background: $gray-900;
 		}
 	}
 }

@@ -15,7 +15,7 @@ $inserter-transition-ms: 150;
 }
 
 .customize-widgets-layout__inserter-panel {
-	background: #fff;
+	background: $white;
 	position: absolute;
 	height: 100%;
 	transform: translateX(-100%);
@@ -38,7 +38,7 @@ $inserter-transition-ms: 150;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 16px;
+	padding: $grid-unit-20;
 	height: $customize-widgets-header-width;
 	box-sizing: border-box;
 
@@ -54,7 +54,6 @@ $inserter-transition-ms: 150;
 .block-editor-inserter__quick-inserter {
 	.block-editor-inserter__panel-content {
 		// To fix quick inserter doesn't have background.
-		background: #fff;
+		background: $white;
 	}
 }
-
