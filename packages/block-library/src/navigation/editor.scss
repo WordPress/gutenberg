@@ -48,7 +48,7 @@
 	// Do not show it on hover.
 	&,
 	&:hover {
-		> .wp-block-navigation__container {
+		> .wp-block-navigation-link__container {
 			opacity: 0;
 			visibility: hidden;
 		}
