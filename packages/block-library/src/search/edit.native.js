@@ -75,7 +75,11 @@ export default function SearchEdit( {
 	 * if the block is selected).
 	 */
 	useEffect( () => {
-		if ( textInput.current.isFocused() === false && isSelected ) {
+		if (
+			hasTextInput() &&
+			textInput.current.isFocused() === false &&
+			isSelected
+		) {
 			if ( isAndroid ) {
 				/*
 				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
@@ -96,6 +100,10 @@ export default function SearchEdit( {
 			}
 		};
 	}, [] );
+
+	const hasTextInput = () => {
+		return textInput && textInput.current;
+	};
 
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
