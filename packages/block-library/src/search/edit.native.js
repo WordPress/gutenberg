@@ -74,7 +74,7 @@ export default function SearchEdit( {
 	} = attributes;
 
 	/*
-	 * Set the focus to the placeholder text when the block is first mounted (if the block
+	 * Set the focus to the placeholder text when the block is first mounted (
 	 * if the block is selected).
 	 */
 	useEffect( () => {
