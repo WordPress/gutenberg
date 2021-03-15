@@ -53,6 +53,9 @@ export default function SearchEdit( {
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
+	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
+		false
+	);
 
 	const textInputRef = useRef( null );
 	const isAndroid = Platform.OS === 'android';
@@ -100,6 +103,16 @@ export default function SearchEdit( {
 			}
 		};
 	}, [] );
+
+	/*
+	 * Called when the value of isSelected changes. Blurs the TextInput for the
+	 * placeholder when this block loses focus.
+	 */
+	useEffect( () => {
+		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
+			textInputRef.current.blur();
+		}
+	}, [ isSelected ] );
 
 	const hasTextInput = () => {
 		return textInputRef && textInputRef.current;
@@ -236,7 +249,11 @@ export default function SearchEdit( {
 				onChangeText={ ( newVal ) =>
 					setAttributes( { placeholder: newVal } )
 				}
-				onFocus={ onFocus }
+				onFocus={ () => {
+					setIsPlaceholderSelected( true );
+					onFocus();
+				} }
+				onBlur={ () => setIsPlaceholderSelected( false ) }
 			/>
 		);
 	};
