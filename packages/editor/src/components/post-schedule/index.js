@@ -27,7 +27,7 @@ export default function PostSchedule() {
 		[]
 	);
 
-	const { editPost } = useDispatch( coreStore );
+	const { editPost } = useDispatch( editorStore );
 	const onUpdateDate = ( postDate ) => editPost( { date: postDate } );
 
 	const [ currentMonth, setCurrentMonth ] = useState(
