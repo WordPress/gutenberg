@@ -22,12 +22,14 @@ const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 // Environment setup, local environment or Sauce Labs
 const defaultEnvironment = 'local';
 const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
+const isCI = process.env.CI;
 
 // Local App Paths
 const defaultAndroidAppPath =
 	'./android/app/build/outputs/apk/debug/app-debug.apk';
 const defaultIOSAppPath =
 	'./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+const webDriverAgentPath = process.env.WDA_PATH || './ios/build/WDA';
 
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
@@ -140,6 +142,13 @@ const setupDriver = async () => {
 			}
 
 			desiredCaps.app = path.resolve( localIOSAppPath );
+
+			if ( isCI ) {
+				desiredCaps.usePrebuiltWDA = true;
+				desiredCaps.derivedDataPath = path.resolve(
+					webDriverAgentPath
+				);
+			}
 		}
 	}
 

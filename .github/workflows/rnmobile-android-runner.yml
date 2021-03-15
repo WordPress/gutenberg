@@ -43,7 +43,7 @@ jobs:
       with:
         api-level: 28
         profile: pixel_xl
-        script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
+        script: npm run native test:e2e:android:local
 
     - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
       if: always()
