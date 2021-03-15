@@ -163,11 +163,35 @@ class WP_Theme_JSON_Resolver {
 	 * @return array Returns the modified $theme_json_structure.
 	 */
 	private static function translate( $theme_json, $domain = 'default' ) {
+		$fields = self::get_fields_to_translate();
+		foreach ( $fields as $field ) {
+			$path    = $field['path'];
+			$key     = $field['key'];
+			$context = $field['context'];
+			if ( 'customTemplates' === $path[0] ) {
+				$array_to_translate = _wp_array_get( $theme_json, $path, null );
+				if ( null === $array_to_translate ) {
+					continue;
+				}
+
+				foreach ( $array_to_translate as $item_key => $item_to_translate ) {
+					if ( empty( $item_to_translate[ $key ] ) ) {
+						continue;
+					}
+
+					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
+					$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
+					// phpcs:enable
+				}
+
+				gutenberg_experimental_set( $theme_json, $path, $array_to_translate );
+			}
+		}
+
 		if ( ! isset( $theme_json['settings'] ) ) {
 			return $theme_json;
 		}
 
-		$fields = self::get_fields_to_translate();
 		foreach ( $theme_json['settings'] as $setting_key => $settings ) {
 			if ( empty( $settings ) ) {
 				continue;

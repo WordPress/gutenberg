@@ -1,0 +1,17 @@
+{
+	"settings": {
+		"root": {}
+	},
+	"customTemplates": [
+		{
+			"name": "page-home",
+			"title": "Homepage template"
+		}
+	],
+	"templateParts": [
+		{
+			"name": "small-header",
+			"area": "header"
+		}
+	]
+}
