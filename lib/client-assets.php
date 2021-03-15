@@ -368,18 +368,24 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
+	$wp_edit_blocks_dependencies = array(
+		'wp-components',
+		'wp-editor',
+		'wp-block-library',
+		'wp-reusable-blocks',
+	);
+
+	global $editor_styles;
+	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
+		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
+	}
+
 	gutenberg_override_style(
 		$styles,
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
-		array(
-			'wp-components',
-			'wp-editor',
-			'wp-block-library',
-			'wp-reusable-blocks',
-			// Always include visual styles so the editor never appears broken.
-			'wp-block-library-theme',
-		),
+		$wp_edit_blocks_dependencies,
 		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
@@ -662,6 +668,15 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		$settings['styles'][ $i ] = $editor_styles;
 	} else {
 		array_unshift( $settings['styles'], $editor_styles );
+	}
+
+	// Remove the default font editor styles.
+	// When Gutenberg is updated to have minimum version of WordPress 5.8
+	// This could be removed.
+	foreach ( $settings['styles'] as $j => $style ) {
+		if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
+			unset( $settings['styles'][ $j ] );
+		}
 	}
 
 	return $settings;

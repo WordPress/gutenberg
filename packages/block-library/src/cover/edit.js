@@ -606,7 +606,7 @@ function CoverEdit( {
 						style={ { backgroundImage: gradientValue } }
 					/>
 				) }
-				{ isImageBackground && isImgElement && (
+				{ url && isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
@@ -615,7 +615,7 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isVideoBackground && (
+				{ url && isVideoBackground && (
 					<video
 						ref={ isDarkElement }
 						className="wp-block-cover__video-background"

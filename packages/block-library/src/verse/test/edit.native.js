@@ -6,14 +6,30 @@ import renderer from 'react-test-renderer';
 /**
  * Internal dependencies
  */
-import Verse from '../edit';
+import { metadata, settings, name } from '../index';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, BlockEdit } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+const Verse = ( { clientId, ...props } ) => (
+	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
+);
 
 describe( 'Verse Block', () => {
+	beforeAll( () => {
+		registerBlockType( name, {
+			...metadata,
+			...settings,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( name );
+	} );
+
 	it( 'renders without crashing', () => {
 		const component = renderer.create(
 			<Verse attributes={ { content: '' } } />

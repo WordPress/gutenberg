@@ -47,8 +47,11 @@ export default function SearchEdit( {
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
+	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
+		false
+	);
 
-	const textInput = useRef();
+	const textInputRef = useRef( null );
 	const isAndroid = Platform.OS === 'android';
 
 	let timeoutRef = null;
@@ -63,11 +66,15 @@ export default function SearchEdit( {
 	} = attributes;
 
 	/*
-	 * Set the focus to the placeholder text when the block is first mounted (if the block
+	 * Set the focus to the placeholder text when the block is first mounted (
 	 * if the block is selected).
 	 */
 	useEffect( () => {
-		if ( textInput.current.isFocused() === false && isSelected ) {
+		if (
+			hasTextInput() &&
+			textInputRef.current.isFocused() === false &&
+			isSelected
+		) {
 			if ( isAndroid ) {
 				/*
 				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
@@ -75,10 +82,10 @@ export default function SearchEdit( {
 				 * https://github.com/facebook/react-native/issues/19366#issuecomment-400603928
 				 */
 				timeoutRef = setTimeout( () => {
-					textInput.current.focus();
+					textInputRef.current.focus();
 				}, 150 );
 			} else {
-				textInput.current.focus();
+				textInputRef.current.focus();
 			}
 		}
 		return () => {
@@ -90,36 +97,17 @@ export default function SearchEdit( {
 	}, [] );
 
 	/*
-	 * Clear component selection state when the block is no longer
-	 * selected.
+	 * Called when the value of isSelected changes. Blurs the TextInput for the
+	 * placeholder when this block loses focus.
 	 */
 	useEffect( () => {
-		if ( ! isSelected ) {
-			if ( isButtonSelected ) {
-				toggleButtonFocus( false );
-			}
-			if ( isLabelSelected ) {
-				toggleLabelFocus( false );
-			}
+		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
+			textInputRef.current.blur();
 		}
 	}, [ isSelected ] );
 
-	const toggleButtonFocus = ( isFocused ) => {
-		if ( isFocused && isSelected ) {
-			setIsButtonSelected( true );
-			setIsLabelSelected( false );
-		} else {
-			setIsButtonSelected( false );
-		}
-	};
-
-	const toggleLabelFocus = ( isFocused ) => {
-		if ( isFocused && isSelected ) {
-			setIsLabelSelected( true );
-			setIsButtonSelected( false );
-		} else {
-			setIsLabelSelected( false );
-		}
+	const hasTextInput = () => {
+		return textInputRef && textInputRef.current;
 	};
 
 	const getBlockClassNames = () => {
@@ -209,7 +197,7 @@ export default function SearchEdit( {
 
 		return (
 			<TextInput
-				ref={ textInput }
+				ref={ textInputRef }
 				className="wp-block-search__input"
 				style={ inputStyle }
 				numberOfLines={ 1 }
@@ -222,7 +210,11 @@ export default function SearchEdit( {
 				onChangeText={ ( newVal ) =>
 					setAttributes( { placeholder: newVal } )
 				}
-				onFocus={ onFocus }
+				onFocus={ () => {
+					setIsPlaceholderSelected( true );
+					onFocus();
+				} }
+				onBlur={ () => setIsPlaceholderSelected( false ) }
 			/>
 		);
 	};
@@ -255,7 +247,10 @@ export default function SearchEdit( {
 						isSelected={ isButtonSelected }
 						__unstableMobileNoFocusOnMount={ ! isSelected }
 						unstableOnFocus={ () => {
-							toggleButtonFocus( true );
+							setIsButtonSelected( true );
+						} }
+						onBlur={ () => {
+							setIsButtonSelected( false );
 						} }
 					/>
 				) }
@@ -289,7 +284,10 @@ export default function SearchEdit( {
 					isSelected={ isLabelSelected }
 					__unstableMobileNoFocusOnMount={ ! isSelected }
 					unstableOnFocus={ () => {
-						toggleLabelFocus( true );
+						setIsLabelSelected( true );
+					} }
+					onBlur={ () => {
+						setIsLabelSelected( false );
 					} }
 				/>
 			) }
