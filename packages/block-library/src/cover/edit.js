@@ -36,8 +36,8 @@ import {
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
-	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
-	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
+	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
+	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -241,7 +241,7 @@ function mediaPosition( { x, y } ) {
 }
 
 function CoverPlaceholder( {
-	coverUrl,
+	hasBackground = false,
 	children,
 	noticeUI,
 	noticeOperations,
@@ -261,7 +261,7 @@ function CoverPlaceholder( {
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
-			disableMediaButtons={ !! coverUrl }
+			disableMediaButtons={ hasBackground }
 			onError={ ( message ) => {
 				removeAllNotices();
 				createErrorNotice( message );
@@ -399,8 +399,8 @@ function CoverEdit( {
 
 	const controls = (
 		<>
-			<BlockControls>
-				<BlockAlignmentMatrixToolbar
+			<BlockControls group="block">
+				<BlockAlignmentMatrixControl
 					label={ __( 'Change content position' ) }
 					value={ contentPosition }
 					onChange={ ( nextPosition ) =>
@@ -410,11 +410,13 @@ function CoverEdit( {
 					}
 					isDisabled={ ! hasBackground }
 				/>
-				<FullHeightAlignment
+				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
 					isDisabled={ ! hasBackground }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
@@ -644,7 +646,7 @@ function CoverEdit( {
 				) }
 				{ isBlogUrl && <Spinner /> }
 				<CoverPlaceholder
-					coverUrl={ url }
+					hasBackground={ hasBackground }
 					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
 					noticeOperations={ noticeOperations }

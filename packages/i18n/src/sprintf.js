@@ -20,7 +20,7 @@ const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
  * @param {string}    format The format of the string to generate.
  * @param {...*} args Arguments to apply to the format.
  *
- * @see http://www.diveintojavascript.com/projects/javascript-sprintf
+ * @see https://www.npmjs.com/package/sprintf-js
  *
  * @return {string} The formatted string.
  */
