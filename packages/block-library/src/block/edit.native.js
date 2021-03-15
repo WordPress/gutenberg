@@ -14,7 +14,6 @@ import {
 } from '@wordpress/core-data';
 import {
 	Disabled,
-	ToolbarGroup,
 	ToolbarButton,
 	TextControl,
 	PanelBody,
@@ -26,7 +25,7 @@ import {
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
-	FloatingToolbar,
+	FloatingToolbarButtons,
 	useFloatingToolbarAnimationsContext,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -52,7 +51,9 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 		styles.spinnerDark
 	);
 
-	const floatingToolbarAnimations = useFloatingToolbarAnimationsContext();
+	const {
+		shake: floatingToolbarShake,
+	} = useFloatingToolbarAnimationsContext();
 
 	const {
 		originalReusableBlock,
@@ -189,8 +190,8 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 	};
 
 	const shakeFloatingToolbar = useCallback(
-		() => floatingToolbarAnimations.shake(),
-		[ floatingToolbarAnimations ]
+		() => floatingToolbarShake.getAnimation().start(),
+		[ floatingToolbarShake ]
 	);
 
 	// Unsaved changes alert
@@ -246,15 +247,13 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 
 	return (
 		<View>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ convertToRegularBlocks }
-						label={ __( 'Convert to regular blocks' ) }
-						icon={ ungroup }
-						showTooltip
-					/>
-				</ToolbarGroup>
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ convertToRegularBlocks }
+					label={ __( 'Convert to regular blocks' ) }
+					icon={ ungroup }
+					showTooltip
+				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Reusable block settings' ) }>
@@ -269,7 +268,7 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 				</PanelBody>
 			</InspectorControls>
 			{ isSelected && ! isEditing && ! isSaving && (
-				<FloatingToolbar.Fill>
+				<FloatingToolbarButtons>
 					<ToolbarButton
 						title={ __( 'Edit' ) }
 						onClick={ enableEditMode }
@@ -278,10 +277,10 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 							{ __( 'Edit' ) }
 						</Text>
 					</ToolbarButton>
-				</FloatingToolbar.Fill>
+				</FloatingToolbarButtons>
 			) }
 			{ isEditing && (
-				<FloatingToolbar.Fill>
+				<FloatingToolbarButtons>
 					<ToolbarButton
 						title={ __( 'Discard' ) }
 						onClick={ discardChanges }
@@ -293,12 +292,12 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 						onClick={ saveChanges }
 						icon={ <Icon icon={ check } fill={ '#00FF00' } /> }
 					/>
-				</FloatingToolbar.Fill>
+				</FloatingToolbarButtons>
 			) }
 			{ isSaving && (
-				<FloatingToolbar.Fill>
+				<FloatingToolbarButtons>
 					<ActivityIndicator style={ styles.toolbarSpinner } />
-				</FloatingToolbar.Fill>
+				</FloatingToolbarButtons>
 			) }
 			<View>
 				<Disabled
