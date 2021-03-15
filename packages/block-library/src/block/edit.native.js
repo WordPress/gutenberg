@@ -126,16 +126,16 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 	);
 
 	/* translators: Changes saved notice message. %s: The reusable block name */
-	const saveMessageFormat = __( "Changes to '%s' saved" );
+	const saveMessageFormat = __( 'Changes made to %s saved' );
 	const saveMessage = sprintf( saveMessageFormat, title );
 	/* translators: Changes discarded notice message. %s: The reusable block name */
-	const discardMessageFormat = __( "Changes to '%s' discarded" );
+	const discardMessageFormat = __( 'Changes made to %s discarded' );
 	const discardMessage = sprintf( discardMessageFormat, title );
 	/* translators: Unsaved changes alert title. */
 	const unsavedChangesTitle = __( 'Unsaved changes' );
 	/* translators: Unsaved changes alert message. %s: The reusable block name */
 	const unsavedChangesMessageFormat = __(
-		"Would you like to save or discard the changes in ''%s'?"
+		'Would you like to save or discard the changes made to %s?'
 	);
 	const unsavedChangesMessage = sprintf( unsavedChangesMessageFormat, title );
 	/* translators: Convert to regular blocks notice message. %s: The reusable block name */
