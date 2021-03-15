@@ -29,7 +29,7 @@ export const withInspectorControls = createHigherOrderComponent(
 			return <WrappedComponent { ...props } />;
 		}
 
-		if ( hasBlockStyles ) {
+		if ( ! hasBlockStyles ) {
 			return <WrappedComponent { ...props } />;
 		}
 
