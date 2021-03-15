@@ -54,7 +54,7 @@ export default function SearchEdit( {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
 
-	const textInput = useRef( null );
+	const textInputRef = useRef( null );
 	const isAndroid = Platform.OS === 'android';
 
 	let timeoutRef = null;
@@ -77,7 +77,7 @@ export default function SearchEdit( {
 	useEffect( () => {
 		if (
 			hasTextInput() &&
-			textInput.current.isFocused() === false &&
+			textInputRef.current.isFocused() === false &&
 			isSelected
 		) {
 			if ( isAndroid ) {
@@ -87,10 +87,10 @@ export default function SearchEdit( {
 				 * https://github.com/facebook/react-native/issues/19366#issuecomment-400603928
 				 */
 				timeoutRef = setTimeout( () => {
-					textInput.current.focus();
+					textInputRef.current.focus();
 				}, 150 );
 			} else {
-				textInput.current.focus();
+				textInputRef.current.focus();
 			}
 		}
 		return () => {
@@ -102,7 +102,7 @@ export default function SearchEdit( {
 	}, [] );
 
 	const hasTextInput = () => {
-		return textInput && textInput.current;
+		return textInputRef && textInputRef.current;
 	};
 
 	const onChange = ( nextWidth ) => {
@@ -223,7 +223,7 @@ export default function SearchEdit( {
 
 		return (
 			<TextInput
-				ref={ textInput }
+				ref={ textInputRef }
 				className="wp-block-search__input"
 				style={ inputStyle }
 				numberOfLines={ 1 }
