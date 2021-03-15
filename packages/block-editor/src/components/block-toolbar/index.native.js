@@ -7,7 +7,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
-import BlockFormatControls from '../block-format-controls';
 import UngroupButton from '../ungroup-button';
 import { store as blockEditorStore } from '../../store';
 
@@ -42,8 +41,10 @@ export default function BlockToolbar() {
 			{ mode === 'visual' && isValid && (
 				<>
 					<UngroupButton />
+					<BlockControls.Slot group="block" />
 					<BlockControls.Slot />
-					<BlockFormatControls.Slot />
+					<BlockControls.Slot group="inline" />
+					<BlockControls.Slot group="other" />
 				</>
 			) }
 		</>

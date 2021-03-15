@@ -91,12 +91,12 @@ exports[`props should render alignLabel 1`] = `
 }
 
 <div
-  class="components-form-group wp-components-form-group emotion-1"
+  class="components-form-group wp-components-form-group ic-1tpea9i ic-192yz5d emotion-1"
   data-g2-c16t="true"
   data-g2-component="FormGroup"
 >
   <label
-    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
+    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
     data-g2-c16t="true"
     data-g2-component="ControlLabel"
     for="fname"
@@ -201,12 +201,12 @@ exports[`props should render vertically 1`] = `
 }
 
 <div
-  class="components-form-group wp-components-form-group emotion-1"
+  class="components-form-group wp-components-form-group ic-1tpea9i ic-192yz5d emotion-1"
   data-g2-c16t="true"
   data-g2-component="FormGroup"
 >
   <label
-    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
+    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
     data-g2-c16t="true"
     data-g2-component="ControlLabel"
     for="fname"

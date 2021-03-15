@@ -13,17 +13,22 @@
 function gutenberg_register_colors_support( $block_type ) {
 	$color_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$color_support = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
+		$color_support = _wp_array_get( $block_type->supports, array( 'color' ), false );
 	}
-	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
-	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
-	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
+	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'text' ), true ) );
+	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'background' ), true ) );
+	$has_gradients_support         = _wp_array_get( $color_support, array( 'gradients' ), false );
+	$has_link_colors_support       = _wp_array_get( $color_support, array( 'link' ), false );
+	$has_color_support             = $has_text_colors_support ||
+		$has_background_colors_support ||
+		$has_gradients_support ||
+		$has_link_colors_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	if ( $has_text_colors_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	if ( $has_color_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
@@ -59,7 +64,7 @@ function gutenberg_register_colors_support( $block_type ) {
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
-	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
+	$color_support = _wp_array_get( $block_type->supports, array( 'color' ), false );
 
 	if (
 		is_array( $color_support ) &&
@@ -69,10 +74,10 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
-	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
-	$has_link_colors_support       = gutenberg_experimental_get( $color_support, array( 'link' ), false );
-	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
+	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'text' ), true ) );
+	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'background' ), true ) );
+	$has_link_colors_support       = _wp_array_get( $color_support, array( 'link' ), false );
+	$has_gradients_support         = _wp_array_get( $color_support, array( 'gradients' ), false );
 	$classes                       = array();
 	$styles                        = array();
 
