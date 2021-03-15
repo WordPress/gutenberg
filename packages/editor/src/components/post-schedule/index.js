@@ -23,7 +23,7 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
 
 export default function PostSchedule() {
 	const date = useSelect(
-		( select ) => select( coreStore ).getEditedPostAttribute( 'date' ),
+		( select ) => select( editorStore ).getEditedPostAttribute( 'date' ),
 		[]
 	);
 
@@ -36,22 +36,19 @@ export default function PostSchedule() {
 
 	// Pick up published and schduled site posts.
 	const events = useSelect(
-		( select ) => {
-			const postId = select( editorStore ).getCurrentPostId();
-
-			return (
+		( select ) =>
+			(
 				select( coreStore ).getEntityRecords( 'postType', 'post', {
 					status: 'publish,future',
 					after: getDayOfTheMonth( currentMonth ),
 					before: getDayOfTheMonth( currentMonth, false ),
-					exclude: [ postId ],
+					exclude: [ select( editorStore ).getCurrentPostId() ],
 				} ) || []
 			).map( ( { title, type, date: eventDate } ) => ( {
 				title: title?.raw,
 				type,
 				date: new Date( eventDate ),
-			} ) );
-		},
+			} ) ),
 		[ currentMonth ]
 	);
 
