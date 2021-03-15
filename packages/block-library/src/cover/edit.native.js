@@ -26,7 +26,6 @@ import {
 	ImageEditingButton,
 	IMAGE_DEFAULT_FOCAL_POINT,
 	ToolbarButton,
-	ToolbarGroup,
 	Gradient,
 	ColorPalette,
 	ColorPicker,
@@ -265,14 +264,12 @@ const Cover = ( {
 	const placeholderIcon = <Icon icon={ icon } { ...placeholderIconStyle } />;
 
 	const toolbarControls = ( open ) => (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					title={ __( 'Edit cover media' ) }
-					icon={ replace }
-					onClick={ open }
-				/>
-			</ToolbarGroup>
+		<BlockControls group="other">
+			<ToolbarButton
+				title={ __( 'Edit cover media' ) }
+				icon={ replace }
+				onClick={ open }
+			/>
 		</BlockControls>
 	);
 
