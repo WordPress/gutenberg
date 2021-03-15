@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { ActivityIndicator, Alert, Text, View } from 'react-native';
+import {
+	Animated,
+	ActivityIndicator,
+	Alert,
+	Text,
+	View,
+	Easing,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -39,12 +46,15 @@ import { ungroup, check, close } from '@wordpress/icons';
  */
 import styles from './editor.scss';
 
+const EDIT_BUTTON_DURATION = 600;
+
 function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 	const recordArgs = [ 'postType', 'wp_block', ref ];
 
 	const [ isEditing, setIsEditing ] = useState( false );
 	const originalValue = useRef();
 	const alertShown = useRef( false );
+	const editButtonAnimatedValue = useRef( new Animated.Value( 0 ) );
 
 	const spinnerStyle = usePreferredColorSchemeStyle(
 		styles.spinner,
@@ -189,10 +199,31 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 		convertBlockToStatic( clientId );
 	};
 
-	const shakeFloatingToolbar = useCallback(
-		() => floatingToolbarShake.getAnimation().start(),
-		[ floatingToolbarShake ]
-	);
+	const onPressDisabled = useCallback( () => {
+		floatingToolbarShake.getAnimation().start();
+		editButtonAnimatedValue.current.setValue( 0 );
+		Animated.timing( editButtonAnimatedValue.current, {
+			toValue: 1,
+			duration: EDIT_BUTTON_DURATION,
+			easing: Easing.inOut.back,
+			useNativeDriver: true,
+		} ).start();
+	}, [] );
+
+	const editButtonStyles = {
+		opacity: editButtonAnimatedValue.current.interpolate( {
+			inputRange: [ 0, 0.25, 0.5, 0.75, 1 ],
+			outputRange: [ 1, 0.2, 1, 1, 1 ],
+		} ),
+		transform: [
+			{
+				scale: editButtonAnimatedValue.current.interpolate( {
+					inputRange: [ 0, 0.25, 0.5, 0.75, 1 ],
+					outputRange: [ 1, 0.8, 1, 1.2, 1 ],
+				} ),
+			},
+		],
+	};
 
 	// Unsaved changes alert
 	useEffect( () => {
@@ -273,9 +304,11 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 						title={ __( 'Edit' ) }
 						onClick={ enableEditMode }
 					>
-						<Text style={ styles.editButton }>
-							{ __( 'Edit' ) }
-						</Text>
+						<Animated.View style={ editButtonStyles }>
+							<Text style={ styles.editButton }>
+								{ __( 'Edit' ) }
+							</Text>
+						</Animated.View>
 					</ToolbarButton>
 				</FloatingToolbarButtons>
 			) }
@@ -302,7 +335,7 @@ function ReusableBlockEdit( { attributes: { ref }, clientId, isSelected } ) {
 			<View>
 				<Disabled
 					isDisabled={ isSelected && ( ! isEditing || isSaving ) }
-					onPressDisabled={ shakeFloatingToolbar }
+					onPressDisabled={ onPressDisabled }
 				>
 					<InnerBlocks
 						value={ blocks }
