@@ -46,12 +46,13 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
-	const { isDragging, blockParents } = useSelect(
+	const { isDragging, blockParents, isMultiSelected } = useSelect(
 		( select ) => {
 			const {
 				isBlockBeingDragged,
 				isAncestorBeingDragged,
 				getBlockParents,
+				isBlockMultiSelected,
 			} = select( blockEditorStore );
 
 			return {
@@ -59,6 +60,7 @@ export default function BlockNavigationBlock( {
 					isBlockBeingDragged( clientId ) ||
 					isAncestorBeingDragged( clientId ),
 				blockParents: getBlockParents( clientId ),
+				isMultiSelected: isBlockMultiSelected( clientId ),
 			};
 		},
 		[ clientId ]
@@ -114,18 +116,21 @@ export default function BlockNavigationBlock( {
 		highlightBlock( clientId, false );
 	};
 
+	const classes = classnames( {
+		'is-selected':
+			isSelected ||
+			( withExperimentalPersistentListViewFeatures && isMultiSelected ),
+		'is-branch-selected':
+			withExperimentalPersistentListViewFeatures && isBranchSelected,
+		'is-last-of-selected-branch':
+			withExperimentalPersistentListViewFeatures &&
+			isLastOfSelectedBranch,
+		'is-dragging': isDragging,
+	} );
+
 	return (
 		<BlockNavigationLeaf
-			className={ classnames( {
-				'is-selected': isSelected,
-				'is-branch-selected':
-					withExperimentalPersistentListViewFeatures &&
-					isBranchSelected,
-				'is-last-of-selected-branch':
-					withExperimentalPersistentListViewFeatures &&
-					isLastOfSelectedBranch,
-				'is-dragging': isDragging,
-			} ) }
+			className={ classes }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
