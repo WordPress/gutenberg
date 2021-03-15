@@ -15,17 +15,10 @@ import { View, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
-import SubdirectorSVG from './subdirectory-icon';
 import { store as blockEditorStore } from '../../store';
 import styles from './block-selection-button.scss';
 
-const BlockSelectionButton = ( {
-	clientId,
-	blockIcon,
-	rootClientId,
-	rootBlockIcon,
-	isRTL,
-} ) => {
+const BlockSelectionButton = ( { clientId, blockIcon, rootClientId } ) => {
 	return (
 		<View
 			style={ [
@@ -42,21 +35,6 @@ const BlockSelectionButton = ( {
 					true
 				} /* Disable temporarily since onPress function is empty */
 			>
-				{ rootClientId &&
-					rootBlockIcon && [
-						<Icon
-							key="parent-icon"
-							size={ 24 }
-							icon={ rootBlockIcon.src }
-							fill={ styles.icon.color }
-						/>,
-						<View key="subdirectory-icon" style={ styles.arrow }>
-							<SubdirectorSVG
-								fill={ styles.arrow.color }
-								isRTL={ isRTL }
-							/>
-						</View>,
-					] }
 				<Icon
 					size={ 24 }
 					icon={ blockIcon.src }
