@@ -71,7 +71,7 @@ jobs:
       run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
 
     - name: Run iOS Device Tests
-      run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+      run: TEST_RN_PLATFORM=ios npm run native device-tests:local
 
     - name: Prepare build cache
       run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
