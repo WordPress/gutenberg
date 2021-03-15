@@ -106,20 +106,26 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
 
 		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
-		$this->assertSame( $actual->get_settings(), array() );
+		$this->assertSame(
+			$actual->get_settings()['root']['color']['palette'],
+			array(
+				array(
+					'slug'  => 'light',
+					'name'  => 'Jasny',
+					'color' => '#f5f7f9',
+				),
+				array(
+					'slug'  => 'dark',
+					'name'  => 'Ciemny',
+					'color' => '#000',
+				),
+			)
+		);
 		$this->assertSame(
 			$actual->get_custom_templates(),
 			array(
 				'page-home' => array(
 					'title' => 'Szablon strony głównej',
-				),
-			)
-		);
-		$this->assertSame(
-			$actual->get_template_parts(),
-			array(
-				'small-header' => array(
-					'area' => 'header',
 				),
 			)
 		);

@@ -152,6 +152,34 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Translates a chunk of the loaded theme.json structure.
+	 *
+	 * @param array  $array_to_translate The chunk of theme.json to translate.
+	 * @param string $key                The key of the field that contains the string to translate.
+	 * @param string $context            The context to apply in the translation call.
+	 * @param string $domain             Text domain. Unique identifier for retrieving translated strings.
+	 *
+	 * @return array Returns the modified $theme_json chunk.
+	 */
+	private static function translate_theme_json_chunk( $array_to_translate, $key, $context, $domain ) {
+		if ( null === $array_to_translate ) {
+			return $array_to_translate;
+		}
+
+		foreach ( $array_to_translate as $item_key => $item_to_translate ) {
+			if ( empty( $item_to_translate[ $key ] ) ) {
+				continue;
+			}
+
+			// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
+			$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
+			// phpcs:enable
+		}
+
+		return $array_to_translate;
+	}
+
+	/**
 	 * Given a theme.json structure modifies it in place
 	 * to update certain values by its translated strings
 	 * according to the language set by the user.
@@ -168,56 +196,20 @@ class WP_Theme_JSON_Resolver {
 			$path    = $field['path'];
 			$key     = $field['key'];
 			$context = $field['context'];
-			if ( 'customTemplates' === $path[0] ) {
+			if ( 'settings' === $path[0] ) {
+				if ( empty( $theme_json['settings'] ) ) {
+					continue;
+				}
+				$path = array_slice( $path, 2 );
+				foreach ( $theme_json['settings'] as $setting_key => $setting ) {
+					$array_to_translate = _wp_array_get( $setting, $path, null );
+					$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
+				}
+			} else {
 				$array_to_translate = _wp_array_get( $theme_json, $path, null );
-				if ( null === $array_to_translate ) {
-					continue;
-				}
-
-				foreach ( $array_to_translate as $item_key => $item_to_translate ) {
-					if ( empty( $item_to_translate[ $key ] ) ) {
-						continue;
-					}
-
-					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
-					$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
-					// phpcs:enable
-				}
-
-				gutenberg_experimental_set( $theme_json, $path, $array_to_translate );
-			}
-		}
-
-		if ( ! isset( $theme_json['settings'] ) ) {
-			return $theme_json;
-		}
-
-		foreach ( $theme_json['settings'] as $setting_key => $settings ) {
-			if ( empty( $settings ) ) {
-				continue;
-			}
-
-			foreach ( $fields as $field ) {
-				$path    = array_slice( $field['path'], 2 );
-				$key     = $field['key'];
-				$context = $field['context'];
-
-				$array_to_translate = _wp_array_get( $theme_json['settings'][ $setting_key ], $path, null );
-				if ( null === $array_to_translate ) {
-					continue;
-				}
-
-				foreach ( $array_to_translate as $item_key => $item_to_translate ) {
-					if ( empty( $item_to_translate[ $key ] ) ) {
-						continue;
-					}
-
-					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
-					$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
-					// phpcs:enable
-				}
-
-				gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $array_to_translate );
+				$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
 		}
 
