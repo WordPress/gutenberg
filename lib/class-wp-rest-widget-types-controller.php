@@ -68,6 +68,38 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			)
 		);
 
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[a-zA-Z0-9_-]+)/encode',
+			array(
+				'args' => array(
+					'id'        => array(
+						'description' => __( 'The widget type id.', 'gutenberg' ),
+						'type'        => 'string',
+						'required'    => true,
+					),
+					'instance'  => array(
+						'description' => __( 'Current instance settings of the widget.', 'gutenberg' ),
+						'type'        => 'object',
+					),
+					'form_data' => array(
+						'description'       => __( 'Serialized widget form data to encode into instance settings.', 'gutenberg' ),
+						'type'              => 'string',
+						'sanitize_callback' => function( $string ) {
+							$array = array();
+							wp_parse_str( $string, $array );
+							return $array;
+						},
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'callback'            => array( $this, 'encode_form_data' ),
+				),
+			)
+		);
+
 		// Backwards compatibility. TODO: Remove.
 		register_rest_route(
 			$this->namespace,
@@ -432,6 +464,106 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			array(
 				'instance' => $instance,
 				'form'     => $form,
+			)
+		);
+	}
+
+	/**
+	 * An RPC-style endpoint which can be used by clients to turn user input in
+	 * a widget admin form into an encoded instance object.
+	 *
+	 * Accepts:
+	 *
+	 * - id:        A widget type ID.
+	 * - instance:  A widget's encoded instance object. Optional.
+	 * - form_data: Form data from submitting a widget's admin form. Optional.
+	 *
+	 * Returns:
+	 * - instance: The encoded instance object after updating the widget with
+	 *             the given form data.
+	 * - form:     The widget's admin form after updating the widget with the
+	 *             given form data.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function encode_form_data( $request ) {
+		$id            = $request['id'];
+		$widget_object = gutenberg_get_widget_object( $id );
+
+		$widget_object->_set( 1 );
+
+		if ( ! $widget_object ) {
+			return new WP_Error(
+				'rest_invalid_widget',
+				__( 'Cannot preview a widget that does not extend WP_Widget.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		if ( isset( $request['instance']['encoded'], $request['instance']['hash'] ) ) {
+			$serialized_instance = base64_decode( $request['instance']['encoded'] );
+			if ( wp_hash( $serialized_instance ) !== $request['instance']['hash'] ) {
+				return new WP_Error(
+					'rest_invalid_widget',
+					__( 'The provided instance is malformed.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+			$instance = unserialize( $serialized_instance );
+		} else {
+			$instance = array();
+		}
+
+		if (
+			isset( $request['form_data'][ "widget-$id" ] ) &&
+			is_array( $request['form_data'][ "widget-$id" ] )
+		) {
+			$new_instance = array_values( $request['form_data'][ "widget-$id" ] )[0];
+			$old_instance = $instance;
+
+			$instance = $widget_object->update( $new_instance, $old_instance );
+
+			/** This filter is documented in wp-includes/class-wp-widget.php */
+			$instance = apply_filters(
+				'widget_update_callback',
+				$instance,
+				$new_instance,
+				$old_instance,
+				$widget_object
+			);
+		}
+
+		ob_start();
+
+		/** This filter is documented in wp-includes/class-wp-widget.php */
+		$instance = apply_filters(
+			'widget_form_callback',
+			$instance,
+			$widget_object
+		);
+
+		if ( false !== $instance ) {
+			$return = $widget_object->form( $instance );
+
+			/** This filter is documented in wp-includes/class-wp-widget.php */
+			do_action_ref_array(
+				'in_widget_form',
+				array( &$widget_object, &$return, $instance )
+			);
+		}
+
+		$form = ob_get_clean();
+
+		$serialized_instance = serialize( $instance );
+
+		return rest_ensure_response(
+			array(
+				'form'     => trim( $form ),
+				'instance' => array(
+					'encoded' => base64_encode( $serialized_instance ),
+					'hash'    => wp_hash( $serialized_instance ),
+				),
 			)
 		);
 	}

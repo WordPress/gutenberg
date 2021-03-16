@@ -669,47 +669,6 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @ticket 51460
 	 */
-	public function test_create_item_preview() {
-		$this->setup_sidebar(
-			'sidebar-1',
-			array(
-				'name' => 'Test sidebar',
-			)
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
-		$request->set_query_params(
-			array(
-				'preview' => 1,
-			)
-		);
-		$request->set_body_params(
-			array(
-				'sidebar'  => 'sidebar-1',
-				'instance' => array(
-					'raw' => array(
-						'content' => '<!-- wp:paragraph --><p>Bock test</p><!-- /wp:paragraph -->',
-					),
-				),
-				'id_base'  => 'block',
-			)
-		);
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertEquals( 'block-2', $data['id'] );
-		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
-		$this->assertEquals(
-			array(
-				'content' => '<!-- wp:paragraph --><p>Bock test</p><!-- /wp:paragraph -->',
-			),
-			$data['instance']['raw']
-		);
-		$this->assertArrayNotHasKey( 2, get_option( 'widget_block' ) ); // Shouldn't have actually saved anything.
-	}
-
-	/**
-	 * @ticket 51460
-	 */
 	public function test_create_item_raw_instance_not_supported() {
 		$this->setup_sidebar(
 			'sidebar-1',

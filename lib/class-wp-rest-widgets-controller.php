@@ -182,36 +182,25 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	public function create_item( $request ) {
 		$sidebar_id = $request['sidebar'];
 
-		if ( $request['preview'] ) {
-			$option_capturer = new WP_Option_Capturer();
-			$option_capturer->start_capturing_option_updates();
+		$widget_id = $this->save_widget( $request );
+
+		if ( is_wp_error( $widget_id ) ) {
+			return $widget_id;
 		}
 
-		try {
-			$widget_id = $this->save_widget( $request );
+		gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
 
-			if ( is_wp_error( $widget_id ) ) {
-				return $widget_id;
-			}
+		$request['context'] = 'edit';
 
-			gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
+		$response = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 
-			$request['context'] = 'edit';
-
-			$response = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
-
-			if ( is_wp_error( $response ) ) {
-				return $response;
-			}
-
-			$response->set_status( 201 );
-
+		if ( is_wp_error( $response ) ) {
 			return $response;
-		} finally {
-			if ( $request['preview'] ) {
-				$option_capturer->stop_capturing_option_updates();
-			}
 		}
+
+		$response->set_status( 201 );
+
+		return $response;
 	}
 
 	/**
@@ -238,45 +227,34 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$widget_id  = $request['id'];
 		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
 
-		// TODO: Better way to do this? Maybe just remove alltogether?
+		// Allow sidebar to be unset or missing when widget is not a WP_Widget.
 		$parsed_id     = gutenberg_parse_widget_id( $widget_id );
 		$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 		if ( is_wp_error( $sidebar_id ) && $widget_object ) {
 			return $sidebar_id;
 		}
 
-		if ( $request['preview'] ) {
-			$option_capturer = new WP_Option_Capturer();
-			$option_capturer->start_capturing_option_updates();
-		}
-
-		try {
-			if (
-				$request->has_param( 'settings' ) || // Backwards compatibility. TODO: Remove.
-				$request->has_param( 'instance' ) ||
-				$request->has_param( 'form_data' )
-			) {
-				$maybe_error = $this->save_widget( $request );
-				if ( is_wp_error( $maybe_error ) ) {
-					return $maybe_error;
-				}
-			}
-
-			if ( $request->has_param( 'sidebar' ) ) {
-				if ( $sidebar_id !== $request['sidebar'] ) {
-					$sidebar_id = $request['sidebar'];
-					gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
-				}
-			}
-
-			$request['context'] = 'edit';
-
-			return $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
-		} finally {
-			if ( $request['preview'] ) {
-				$option_capturer->stop_capturing_option_updates();
+		if (
+			$request->has_param( 'settings' ) || // Backwards compatibility. TODO: Remove.
+			$request->has_param( 'instance' ) ||
+			$request->has_param( 'form_data' )
+		) {
+			$maybe_error = $this->save_widget( $request );
+			if ( is_wp_error( $maybe_error ) ) {
+				return $maybe_error;
 			}
 		}
+
+		if ( $request->has_param( 'sidebar' ) ) {
+			if ( $sidebar_id !== $request['sidebar'] ) {
+				$sidebar_id = $request['sidebar'];
+				gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
+			}
+		}
+
+		$request['context'] = 'edit';
+
+		return $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
 	}
 
 	/**
