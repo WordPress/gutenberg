@@ -8,37 +8,35 @@
 
 ```jsx
     // This is a paraphrased example from the image block's edit.native.js file
+import { BottomSheetSelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-    import { BottomSheetSelectControl } from '@wordpress/components';
-    import { __ } from '@wordpress/i18n';
+const MyTextControl = () => {
+	const {
+		attributes: { alt },
+	} = this.props;
 
-    const MyTextControl = () => {
-
-        const {
-			attributes: { alt },
-		} = this.props;
-
-        const updateAlt = ( newAlt ) => {
-			this.props.setAttributes( { alt: newAlt } );
-		};
-
-		return (
-			<PanelBody>
-				<BottomSheetTextControl
-					initialValue={ alt }
-					onChange={ updateAlt }
-					placeholder={ __( 'Generic placeholder text' ) }
-					label={ __( 'Generic label' ) }
-					icon={ textColor }
-					footerNote={ __(
-						'A small informative note in the footer area. '
-					) }
-					footerNoteLink={ 'https://wordpress.org' }
-					footerNoteLinkText={ __( 'Visit WordPress.org.' ) }
-				/>
-			</PanelBody>
-		);
+	const updateAlt = ( newAlt ) => {
+		this.props.setAttributes( { alt: newAlt } );
 	};
+
+	return (
+		<PanelBody>
+			<BottomSheetTextControl
+				initialValue={ alt }
+				onChange={ updateAlt }
+				placeholder={ __( 'Generic placeholder text' ) }
+				label={ __( 'Generic label' ) }
+				icon={ textColor }
+				footerNote={ __(
+					'A small informative note in the footer area. '
+				) }
+				footerNoteLink={ 'https://wordpress.org' }
+				footerNoteLinkText={ __( 'Visit WordPress.org.' ) }
+			/>
+		</PanelBody>
+	);
+};
 ```
 
 ### Props
