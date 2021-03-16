@@ -610,7 +610,7 @@ export class RichText extends Component {
 		const shouldDrop =
 			! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount;
 		if ( shouldDrop ) {
-			console.log(
+			window.console.log(
 				`Dropping ${ logText } from Aztec as its event counter is older than latest sent to the native side. Got ${ event.nativeEvent.eventCount } but lastEventCount is ${ this.lastEventCount }.`
 			);
 		}
