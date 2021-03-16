@@ -843,7 +843,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$template_parts = $theme_json->get_template_parts();
+		$template_parts = $theme_json->get( array( 'templateParts' ) );
 
 		$this->assertEqualSetsWithIndex(
 			$template_parts,

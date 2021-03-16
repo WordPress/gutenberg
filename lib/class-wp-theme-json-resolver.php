@@ -393,6 +393,15 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Returns the template part data of current theme.
+	 *
+	 * @return array
+	 */
+	public static function get_template_parts() {
+		return WP_Theme_JSON_Resolver::get_theme_data()->get( array( 'templateParts' ) );
+	}
+
+	/**
 	 * Returns the settings & styles from the theme.
 	 *
 	 * @param array $theme_support_data Existing block editor settings.

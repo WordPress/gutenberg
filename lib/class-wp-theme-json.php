@@ -1059,15 +1059,15 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returns the template part data of current theme.
+	 * Helper to get the tree or any of its subtrees.
+	 *
+	 * @param array $path Array of keys to get.
+	 * @param any   $default The return value if the path does not exist within the array or if $path is not array. Default: empty array.
 	 *
 	 * @return array
 	 */
-	public function get_template_parts() {
-		if ( ! isset( $this->theme_json['templateParts'] ) ) {
-			return array();
-		}
-		return $this->theme_json['templateParts'];
+	public function get( $path, $default = array() ) {
+		return _wp_array_get( $this->theme_json, $path, $default );
 	}
 
 	/**
