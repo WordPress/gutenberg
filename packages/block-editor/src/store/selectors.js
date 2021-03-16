@@ -266,6 +266,24 @@ export const __unstableGetBlockTree = createSelector(
 );
 
 /**
+ * Returns the client IDs of the post blocks formatted in a nested,
+ * tree-like structure.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdsTree = createSelector(
+	( state, rootClientId = '' ) =>
+		map( getBlockOrder( state, rootClientId ), ( clientId ) => ( {
+			clientId,
+			innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+		} ) ),
+	( state ) => [ state.blocks.order ]
+);
+
+/**
  * Returns an array containing the clientIds of all descendants
  * of the blocks given.
  *
