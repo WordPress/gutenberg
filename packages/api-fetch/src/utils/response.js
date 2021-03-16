@@ -9,20 +9,24 @@ import { __ } from '@wordpress/i18n';
  * @param {Response} response
  * @param {boolean}  shouldParseResponse
  *
- * @return {Promise} Parsed response
+ * @return {Promise<Response | any | null>} Parsed response.
  */
 const parseResponse = ( response, shouldParseResponse = true ) => {
 	if ( shouldParseResponse ) {
 		if ( response.status === 204 ) {
-			return null;
+			return Promise.resolve( null );
 		}
 
 		return response.json ? response.json() : Promise.reject( response );
 	}
 
-	return response;
+	return Promise.resolve( response );
 };
 
+/**
+ * @param {Response} response
+ * @return {Promise<any>} Parsed response.
+ */
 const parseJsonAndNormalizeError = ( response ) => {
 	const invalidJsonError = {
 		code: 'invalid_json',
@@ -44,7 +48,7 @@ const parseJsonAndNormalizeError = ( response ) => {
  * @param {Response} response
  * @param {boolean}  shouldParseResponse
  *
- * @return {Promise} Parsed response.
+ * @return {Promise<any>} Parsed response.
  */
 export const parseResponseAndNormalizeError = (
 	response,
@@ -55,6 +59,12 @@ export const parseResponseAndNormalizeError = (
 	).catch( ( res ) => parseAndThrowError( res, shouldParseResponse ) );
 };
 
+/**
+ *
+ * @param {Response} response
+ * @param {boolean} shouldParseResponse
+ * @return {Promise<any>} Parsed response.
+ */
 export function parseAndThrowError( response, shouldParseResponse = true ) {
 	if ( ! shouldParseResponse ) {
 		throw response;
