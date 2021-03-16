@@ -393,6 +393,22 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Returns the settings & styles from the theme.
+	 *
+	 * @param array $theme_support_data Existing block editor settings.
+	 *                                  Empty array by default.
+	 *
+	 * @return array
+	 */
+	public static function get_theme_styles_and_settings( $theme_support_data = array() ) {
+		$raw_data = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		return array(
+			'settings' => $raw_data['settings'],
+			'styles'   => $raw_data['styles'],
+		);
+	}
+
+	/**
 	 * Returns the CPT that contains the user's origin config
 	 * for the current theme or a void array if none found.
 	 *
@@ -499,7 +515,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
+	private static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
 		if ( 'theme' === $origin ) {
 			$result = new WP_Theme_JSON();
 			$result->merge( self::get_core_data() );

@@ -167,7 +167,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_is_fse_theme()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		$base_styles = WP_Theme_JSON_Resolver::get_theme_styles_and_settings( $theme_support_data );
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
