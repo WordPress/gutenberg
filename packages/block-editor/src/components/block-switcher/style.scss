@@ -182,3 +182,10 @@
 		}
 	}
 }
+
+.block-editor-block-switcher__preview-patterns-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: $grid-unit-10;
+	padding: 1px;
+}

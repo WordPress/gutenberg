@@ -31,6 +31,7 @@ import BlockIcon from '../block-icon';
 import BlockTitle from '../block-title';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
+import PatternTransformationsMenu from './pattern-transformations-menu';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -40,11 +41,15 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		hasBlockStyles,
 		icon,
 		blockTitle,
+		patterns,
+		replaceMode,
 	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockTransformItems } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockRootClientId,
+				getBlockTransformItems,
+				__experimentalGetPatternTransformItems,
+			} = select( blockEditorStore );
 
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
@@ -66,7 +71,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
-
+			const _patterns = __experimentalGetPatternTransformItems(
+				blocks,
+				rootClientId
+			);
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -75,6 +83,11 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,
+				patterns: _patterns,
+				// Need more thought here.
+				replaceMode:
+					_isSingleBlockSelected &&
+					firstBlockName === 'core/template-part',
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
@@ -83,9 +96,21 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
-	const onTransform = ( name ) =>
+	const onBlockTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
+	// TODO comments (for the above too).
+	const onPatternTransform = ( transformedBlocks ) => {
+		// If on replaceMode (currently single Template Part block selected)
+		// we probably have to create a new Template part.
+		// This is not implemented yet!!
+		if ( ! replaceMode ) {
+			replaceBlocks( clientIds, transformedBlocks );
+		} else {
+			// Handle Template Parts change/creation flow.
+		}
+	};
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
+	const hasPatternTransformation = !! patterns?.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
 			<ToolbarGroup>
@@ -114,6 +139,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					blocks.length
 			  );
 
+	const showDropDown =
+		hasBlockStyles ||
+		hasPossibleBlockTransformations ||
+		hasPatternTransformation;
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -147,9 +176,23 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						menuProps={ { orientation: 'both' } }
 					>
 						{ ( { onClose } ) =>
-							( hasBlockStyles ||
-								hasPossibleBlockTransformations ) && (
+							showDropDown && (
 								<div className="block-editor-block-switcher__container">
+									{ hasPatternTransformation && (
+										<PatternTransformationsMenu
+											blocks={ blocks }
+											patterns={ patterns }
+											onSelect={ (
+												transformedBlocks
+											) => {
+												onPatternTransform(
+													transformedBlocks
+												);
+												onClose();
+											} }
+											replaceMode={ replaceMode }
+										/>
+									) }
 									{ hasPossibleBlockTransformations && (
 										<BlockTransformationsMenu
 											className="block-editor-block-switcher__transforms__menugroup"
@@ -158,7 +201,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											}
 											blocks={ blocks }
 											onSelect={ ( name ) => {
-												onTransform( name );
+												onBlockTransform( name );
 												onClose();
 											} }
 										/>
