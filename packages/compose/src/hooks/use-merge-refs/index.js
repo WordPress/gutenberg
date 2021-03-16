@@ -47,8 +47,13 @@ export default function useMergeRefs( refs ) {
 		} );
 
 		previousRefs.current = refs;
-		didElementChange.current = false;
 	}, refs );
+
+	// No dependencies, must be reset after every render so ref callbacks are
+	// correctly called after a ref change.
+	useLayoutEffect( () => {
+		didElementChange.current = false;
+	} );
 
 	// There should be no dependencies so that `callback` is only called when
 	// the node changes.
