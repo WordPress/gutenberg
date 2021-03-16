@@ -223,7 +223,7 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		file,
 		audio,
-		devOnly( reusableBlock ),
+		reusableBlock,
 		devOnly( search ),
 	].forEach( registerBlock );
 
