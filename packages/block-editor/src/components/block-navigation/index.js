@@ -6,8 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,13 +15,41 @@ import { __ } from '@wordpress/i18n';
 import BlockNavigationTree from './tree';
 import { store as blockEditorStore } from '../../store';
 
-function BlockNavigation( {
-	rootBlock,
-	rootBlocks,
-	selectedBlockClientId,
-	selectBlock,
+export default function BlockNavigation( {
+	onSelect = noop,
 	__experimentalFeatures,
 } ) {
+	const { rootBlock, rootBlocks, selectedBlockClientId } = useSelect(
+		( select ) => {
+			const {
+				getBlockHierarchyRootClientId,
+				getSelectedBlockClientId,
+				__unstableGetClientIdsTree,
+				__unstableGetClientIdWithClientIdsTree,
+			} = select( blockEditorStore );
+
+			const _selectedBlockClientId = getSelectedBlockClientId();
+			const _rootBlocks = __unstableGetClientIdsTree();
+			const _rootBlock = _selectedBlockClientId
+				? __unstableGetClientIdWithClientIdsTree(
+						getBlockHierarchyRootClientId( _selectedBlockClientId )
+				  )
+				: null;
+
+			return {
+				rootBlock: _rootBlock,
+				rootBlocks: _rootBlocks,
+				selectedBlockClientId: _selectedBlockClientId,
+			};
+		}
+	);
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	function selectEditorBlock( clientId ) {
+		selectBlock( clientId );
+		onSelect( clientId );
+	}
+
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
 	}
@@ -41,39 +68,10 @@ function BlockNavigation( {
 			<BlockNavigationTree
 				blocks={ hasHierarchy ? [ rootBlock ] : rootBlocks }
 				selectedBlockClientId={ selectedBlockClientId }
-				selectBlock={ selectBlock }
+				selectBlock={ selectEditorBlock }
 				__experimentalFeatures={ __experimentalFeatures }
 				showNestedBlocks
 			/>
 		</div>
 	);
 }
-
-export default compose(
-	withSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlockHierarchyRootClientId,
-			__unstableGetBlockWithBlockTree,
-			__unstableGetBlockTree,
-		} = select( blockEditorStore );
-		const selectedBlockClientId = getSelectedBlockClientId();
-		return {
-			rootBlocks: __unstableGetBlockTree(),
-			rootBlock: selectedBlockClientId
-				? __unstableGetBlockWithBlockTree(
-						getBlockHierarchyRootClientId( selectedBlockClientId )
-				  )
-				: null,
-			selectedBlockClientId,
-		};
-	} ),
-	withDispatch( ( dispatch, { onSelect = noop } ) => {
-		return {
-			selectBlock( clientId ) {
-				dispatch( blockEditorStore ).selectBlock( clientId );
-				onSelect( clientId );
-			},
-		};
-	} )
-)( BlockNavigation );
