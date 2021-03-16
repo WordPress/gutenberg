@@ -233,10 +233,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_packages_scripts( $scripts ) {
-	// Defines default version.
-	// For development, uses the current time (in microseconds) as the asset version.
-	// For production, uses the plugin's version as the asset version.
-	$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : GUTENBERG_VERSION;
+	// When in production, use the plugin's version as the default asset version;
+	// else (for development or test) default to use the current time.
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
@@ -290,9 +289,10 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  * @param WP_Styles $styles WP_Styles instance.
  */
 function gutenberg_register_packages_styles( $styles ) {
-	// For development, uses the current time (in microseconds) as the asset version.
-	// For production, uses the plugin's version as the asset version.
-	$version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : GUTENBERG_VERSION;
+	// When in production, use the plugin's version as the asset version;
+	// else (for development or test) default to use the current time.
+	$version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+
 
 	// Editor Styles.
 	gutenberg_override_style(
