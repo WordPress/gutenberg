@@ -67,12 +67,6 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
-// const featuredImageId = select( 'core/editor' ).getEditedPostAttribute(
-// 	'featured_media'
-// );
-
-// console.log( 'Original featured image ID:' + featuredImageId );
-
 export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
