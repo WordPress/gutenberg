@@ -11,12 +11,8 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	SelectControl,
-	__experimentalBoxControl as BoxControl,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 const isWeb = Platform.OS === 'web';
 
@@ -69,14 +65,6 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			? [ 'wide', 'full' ]
 			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
-	/* TODO: find a way to render this extra div as a child of the inner block wrapper 
-	const extraChildren = (
-		<BoxControlVisualizer
-			values={ attributes.style?.spacing?.padding }
-			showValues={ attributes.style?.visualizers?.padding }
-		/>
-	);
-	*/
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock,
 		renderAppender: hasInnerBlocks
