@@ -55,7 +55,7 @@ export default function SearchEdit( {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
 	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
-		false
+		true
 	);
 
 	const textInputRef = useRef( null );
@@ -204,6 +204,7 @@ export default function SearchEdit( {
 		return (
 			<PlainText
 				ref={ textInputRef }
+				isSelected={ isPlaceholderSelected }
 				className="wp-block-search__input"
 				style={ inputStyle }
 				numberOfLines={ 1 }
