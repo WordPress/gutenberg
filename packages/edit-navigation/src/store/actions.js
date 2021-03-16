@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -17,6 +17,7 @@ import {
 	getMenuItemToClientIdMapping,
 	resolveMenuItems,
 	dispatch,
+	select,
 	apiFetch,
 } from './controls';
 import {
@@ -89,13 +90,25 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 
 	try {
 		// Save edits to the menu, like the menu name.
-		const menuResponse = yield dispatch(
+		yield dispatch(
 			'core',
 			'saveEditedEntityRecord',
 			'root',
 			'menu',
 			menuId
 		);
+
+		const error = yield select(
+			'core',
+			'getLastEntitySaveError',
+			'root',
+			'menu',
+			menuId
+		);
+
+		if ( error ) {
+			throw new Error( error.message );
+		}
 
 		// Save blocks as menu items.
 		const batchSaveResponse = yield* batchSave(
@@ -104,8 +117,8 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 			post.blocks[ 0 ]
 		);
 
-		if ( ! batchSaveResponse.success || ! menuResponse ) {
-			throw new Error();
+		if ( ! batchSaveResponse.success ) {
+			throw new Error( batchSaveResponse.data.message );
 		}
 
 		yield dispatch(
@@ -116,15 +129,17 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 				type: 'snackbar',
 			}
 		);
-	} catch ( e ) {
-		yield dispatch(
-			noticesStore,
-			'createErrorNotice',
-			__( 'There was an error.' ),
-			{
-				type: 'snackbar',
-			}
-		);
+	} catch ( saveError ) {
+		const errorMessage = saveError
+			? sprintf(
+					/* translators: %s: The text of an error message (potentially untranslated). */
+					__( "Unable to save: '%s'" ),
+					saveError.message
+			  )
+			: __( 'Unable to save: An error ocurred.' );
+		yield dispatch( noticesStore, 'createErrorNotice', errorMessage, {
+			type: 'snackbar',
+		} );
 	}
 } );
 

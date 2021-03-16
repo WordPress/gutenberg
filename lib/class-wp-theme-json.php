@@ -514,7 +514,7 @@ class WP_Theme_JSON {
 			 */
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
+				if ( _wp_array_get( $block_type->supports, $metadata['support'] ) ) {
 					$block_supports[] = $key;
 				}
 			}
@@ -668,7 +668,7 @@ class WP_Theme_JSON {
 	 * @return string Style property value.
 	 */
 	private static function get_property_value( $styles, $path ) {
-		$value = gutenberg_experimental_get( $styles, $path, '' );
+		$value = _wp_array_get( $styles, $path, '' );
 
 		if ( '' === $value ) {
 			return $value;
@@ -783,7 +783,7 @@ class WP_Theme_JSON {
 
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
+			$values = _wp_array_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -821,7 +821,7 @@ class WP_Theme_JSON {
 	 */
 	private static function compute_preset_vars( $declarations, $settings ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
+			$values = _wp_array_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -851,7 +851,7 @@ class WP_Theme_JSON {
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_theme_vars( $declarations, $settings ) {
-		$custom_values = gutenberg_experimental_get( $settings, array( 'custom' ) );
+		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -1154,7 +1154,7 @@ class WP_Theme_JSON {
 						gutenberg_experimental_set(
 							$escaped_styles,
 							$path,
-							gutenberg_experimental_get( $this->theme_json['styles'][ $block_selector ], $path )
+							_wp_array_get( $this->theme_json['styles'][ $block_selector ], $path, array() )
 						);
 					}
 				}
@@ -1164,7 +1164,7 @@ class WP_Theme_JSON {
 			// For now the ony allowed settings are presets.
 			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
 				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-					$current_preset = gutenberg_experimental_get(
+					$current_preset = _wp_array_get(
 						$this->theme_json['settings'][ $block_selector ],
 						$preset_metadata['path'],
 						null

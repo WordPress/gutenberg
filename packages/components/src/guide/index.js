@@ -78,11 +78,13 @@ export default function Guide( {
 				<div className="components-guide__page">
 					{ pages[ currentPage ].image }
 
-					<PageControl
-						currentPage={ currentPage }
-						numberOfPages={ pages.length }
-						setCurrentPage={ setCurrentPage }
-					/>
+					{ pages.length > 1 && (
+						<PageControl
+							currentPage={ currentPage }
+							numberOfPages={ pages.length }
+							setCurrentPage={ setCurrentPage }
+						/>
+					) }
 
 					{ pages[ currentPage ].content }
 

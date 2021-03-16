@@ -21,6 +21,10 @@
 	.wp-block-navigation-link {
 		display: block;
 
+		&.has-child:hover > .wp-block-navigation-link__container {
+			display: none;
+		}
+
 		// Fix focus outlines
 		&.is-selected > .wp-block-navigation-link__content,
 		&.is-selected:hover > .wp-block-navigation-link__content {
@@ -75,14 +79,16 @@
 	}
 
 	// Override Nav block styling for deeply nested submenus.
-	.has-child .wp-block-navigation__container .wp-block-navigation__container {
+	.has-child .wp-block-navigation__container .wp-block-navigation__container,
+	.has-child .wp-block-navigation__container .wp-block-navigation-link__container {
 		left: auto;
 	}
 
 	// When editing a link with children, highlight the parent
 	// and adjust the spacing and submenu icon.
 	.wp-block-navigation-link.has-child.is-editing {
-		> .wp-block-navigation__container {
+		> .wp-block-navigation__container,
+		> .wp-block-navigation-link__container {
 			opacity: 1;
 			visibility: visible;
 			position: relative;

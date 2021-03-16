@@ -8,11 +8,11 @@ Gutenberg is a sub-project of Core WordPress. Please see the [Core Contributor H
 
 Find the section below based on what you are looking to contribute:
 
-- **Code?** See the [developer section](/docs/contributors/develop.md).
+- **Code?** See the [developer section](/docs/contributors/code/README.md).
 
-- **Design?** See the [design section](/docs/contributors/design.md).
+- **Design?** See the [design section](/docs/contributors/design/README.md).
 
-- **Documentation?** See the [documentation section](/docs/contributors/document.md)
+- **Documentation?** See the [documentation section](/docs/contributors/documentation/README.md)
 
 - **Triage Support?** See the [triaging issues section](/docs/contributors/triage.md)
 
