@@ -1048,12 +1048,16 @@ class WP_Theme_JSON {
 	/**
 	 * Helper to get the tree or any of its subtrees.
 	 *
-	 * @param array $path Array of keys to get.
+	 * @param array $path Array of keys to get. If it's null, it'll return the whole theme.json.
 	 * @param any   $default The return value if the path does not exist within the array or if $path is not array. Default: empty array.
 	 *
 	 * @return array
 	 */
-	public function get( $path, $default = array() ) {
+	public function get( $path = null, $default = array() ) {
+		if ( null === $path ) {
+			return $this->theme_json;
+		}
+
 		return _wp_array_get( $this->theme_json, $path, $default );
 	}
 
@@ -1081,7 +1085,7 @@ class WP_Theme_JSON {
 	 * @param WP_Theme_JSON $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
-		$incoming_data    = $incoming->get_raw_data();
+		$incoming_data    = $incoming->get();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		// The array_replace_recursive algorithm merges at the leaf level.
@@ -1204,15 +1208,6 @@ class WP_Theme_JSON {
 				$this->theme_json['styles'][ $block_selector ] = $escaped_styles;
 			}
 		}
-	}
-
-	/**
-	 * Returns the raw data.
-	 *
-	 * @return array Raw data.
-	 */
-	public function get_raw_data() {
-		return $this->theme_json;
 	}
 
 }

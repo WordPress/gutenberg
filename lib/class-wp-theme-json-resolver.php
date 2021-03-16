@@ -419,7 +419,7 @@ class WP_Theme_JSON_Resolver {
 	 * @return array
 	 */
 	public static function get_theme_styles_and_settings( $theme_support_data = array() ) {
-		$raw_data = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		$raw_data = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get();
 		return array(
 			'settings' => $raw_data['settings'],
 			'styles'   => $raw_data['styles'],

@@ -37,7 +37,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			)
 		);
-		$result     = $theme_json->get_raw_data();
+		$result     = $theme_json->get();
 
 		$expected = array(
 			'styles' => array(
@@ -85,7 +85,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$actual   = $theme_json->get_raw_data();
+		$actual   = $theme_json->get();
 		$expected = array(
 			'styles' => array(
 				'core/group' => array(
@@ -130,7 +130,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			)
 		);
-		$result     = $theme_json->get_raw_data();
+		$result     = $theme_json->get();
 
 		$expected = array(
 			'styles' => array(
@@ -167,7 +167,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$actual   = $theme_json->get_raw_data();
+		$actual   = $theme_json->get();
 		$expected = array(
 			'styles' => array(
 				$root_name => array(
@@ -585,7 +585,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->merge( new WP_Theme_JSON( $add_key_in_styles ) );
 		$theme_json->merge( new WP_Theme_JSON( $add_invalid_context ) );
 		$theme_json->merge( new WP_Theme_JSON( $update_presets ) );
-		$result = $theme_json->get_raw_data();
+		$result = $theme_json->get();
 
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
@@ -608,7 +608,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			true
 		);
 		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+		$result   = $theme_json->get();
 		$expected = array(
 			'styles' => array(
 				'core/group' => array(
@@ -640,7 +640,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			true
 		);
 		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+		$result   = $theme_json->get();
 		$expected = array(
 			'styles' => array(
 				'core/group' => array(
@@ -692,7 +692,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			true
 		);
 		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+		$result   = $theme_json->get();
 		$expected = array(
 			'settings' => array(
 				$root_name => array(
@@ -781,7 +781,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			true
 		);
 		$theme_json->remove_insecure_properties();
-		$result   = $theme_json->get_raw_data();
+		$result   = $theme_json->get();
 		$expected = array(
 			'settings' => array(
 				$root_name => array(
