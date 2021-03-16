@@ -24,7 +24,7 @@ import {
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
-	AltTextSettings,
+	BottomSheetTextControl,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -43,7 +43,12 @@ import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { image as placeholderIcon, replace, expand } from '@wordpress/icons';
+import {
+	image as placeholderIcon,
+	replace,
+	expand,
+	textColor,
+} from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -392,7 +397,22 @@ export class ImageEdit extends Component {
 			this.props.setAttributes( { alt: newAlt } );
 		};
 
-		return <AltTextSettings alt={ alt } updateAlt={ updateAlt } />;
+		return (
+			<BottomSheetTextControl
+				initialValue={ alt }
+				onChange={ updateAlt }
+				placeholder={ __( 'Add alt text' ) }
+				label={ __( 'Alt Text' ) }
+				icon={ textColor }
+				footerNote={ __(
+					'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+				) }
+				footerNoteLink={
+					'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+				}
+				footerNoteLinkText={ __( 'What is alt text?' ) }
+			/>
+		);
 	}
 
 	onSizeChangeValue( newValue ) {

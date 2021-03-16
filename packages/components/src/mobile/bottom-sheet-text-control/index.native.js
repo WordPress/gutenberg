@@ -8,17 +8,25 @@ import { useNavigation } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Icon, chevronRight, textColor } from '@wordpress/icons';
+import { Icon, chevronRight } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { BottomSheet, PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-const AltTextSettings = ( { alt, updateAlt } ) => {
+const BottomSheetTextControl = ( {
+	initialValue,
+	onChange,
+	placeholder,
+	label,
+	icon,
+	footerNote,
+	footerNoteLink,
+	footerNoteLinkText,
+} ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
 
@@ -32,32 +40,32 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 		setShowSubSheet( true );
 	};
 
-	const [ value, onChangeText ] = useState( alt );
+	const [ value, onChangeText ] = useState( initialValue );
 
 	const horizontalBorderStyle = usePreferredColorSchemeStyle(
 		styles.horizontalBorder,
 		styles.horizontalBorderDark
 	);
 
-	const altTextEditorStyle = usePreferredColorSchemeStyle(
-		styles.altTextEditor,
-		styles.altTextEditorDark
+	const textEditorStyle = usePreferredColorSchemeStyle(
+		styles.textEditor,
+		styles.textEditorDark
 	);
 
-	const altTextLinkStyle = usePreferredColorSchemeStyle(
-		styles.altTextLink,
-		styles.altTextLinkDark
+	const textLinkStyle = usePreferredColorSchemeStyle(
+		styles.textLink,
+		styles.textLinkDark
 	);
 
 	return (
 		<BottomSheet.SubSheet
 			navigationButton={
 				<BottomSheet.Cell
-					icon={ textColor }
-					placeholder={ __( 'Add alt text' ) }
-					label={ __( 'Alt Text' ) }
+					icon={ icon }
+					placeholder={ placeholder }
+					label={ label }
 					onPress={ openSubSheet }
-					value={ alt || '' }
+					value={ initialValue || '' }
 				>
 					<Icon icon={ chevronRight }></Icon>
 				</BottomSheet.Cell>
@@ -66,36 +74,30 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 		>
 			<>
 				<BottomSheet.NavigationHeader
-					screen={ __( 'Alt Text' ) }
+					screen={ label }
 					leftButtonOnPress={ goBack }
 				/>
 				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
-						label={ __( 'Alt Text' ) }
+						label={ label }
 						onChangeText={ ( text ) => onChangeText( text ) }
-						onChange={ updateAlt( value ) }
+						onChange={ onChange( value ) }
 						value={ value }
 						multiline={ true }
-						placeholder={ __( 'Add alt text' ) }
+						placeholder={ placeholder }
 						placeholderTextColor={ '#87a6bc' }
-						style={ altTextEditorStyle }
+						style={ textEditorStyle }
 						textAlignVertical={ 'top' }
 					/>
 				</PanelBody>
 
-				<Text style={ styles.altTextFootnote }>
-					{ __(
-						'Describe the purpose of the image. Leave empty if the image is purely decorative. '
-					) }
+				<Text style={ styles.textFootnote }>
+					{ footerNote }
 					<Text
-						style={ altTextLinkStyle }
-						onPress={ () =>
-							Linking.openURL(
-								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-							)
-						}
+						style={ textLinkStyle }
+						onPress={ () => Linking.openURL( footerNoteLink ) }
 					>
-						{ __( 'What is alt text?' ) }
+						{ footerNoteLinkText }
 					</Text>
 				</Text>
 			</>
@@ -103,4 +105,4 @@ const AltTextSettings = ( { alt, updateAlt } ) => {
 	);
 };
 
-export default AltTextSettings;
+export default BottomSheetTextControl;
