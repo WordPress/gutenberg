@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { isArray, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockNavigationTree from './tree';
+import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockNavigation( {
@@ -30,11 +31,14 @@ export default function BlockNavigation( {
 
 			const _selectedBlockClientId = getSelectedBlockClientId();
 			const _rootBlocks = __unstableGetClientIdsTree();
-			const _rootBlock = _selectedBlockClientId
-				? __unstableGetClientIdWithClientIdsTree(
-						getBlockHierarchyRootClientId( _selectedBlockClientId )
-				  )
-				: null;
+			const _rootBlock =
+				selectedBlockClientId && ! isArray( selectedBlockClientId )
+					? __unstableGetClientIdWithClientIdsTree(
+							getBlockHierarchyRootClientId(
+								_selectedBlockClientId
+							)
+					  )
+					: null;
 
 			return {
 				rootBlock: _rootBlock,
@@ -56,7 +60,7 @@ export default function BlockNavigation( {
 
 	const hasHierarchy =
 		rootBlock &&
-		( rootBlock.clientId !== selectedBlockClientId ||
+		( isClientIdSelected( rootBlock.clientId, selectedBlockClientId ) ||
 			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
