@@ -6,6 +6,7 @@
 	&__image {
 		background: #00a0d2;
 		height: 240px;
+		margin: 0 0 $grid-unit-20;
 
 		&__prm-r {
 			display: none;
@@ -26,7 +27,7 @@
 		font-family: $default-font;
 		font-size: 24px;
 		line-height: 1.4;
-		margin: 0 0 $grid-unit-20 0;
+		margin: $grid-unit-20 0 $grid-unit-20 0;
 		padding: 0 $grid-unit-40;
 	}
 

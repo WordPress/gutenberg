@@ -1,17 +1,41 @@
 // Normalize Link and edit containers, to look mostly the same.
-.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
 .wp-block-navigation-link__container {
 	border-radius: 0;
-	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
-	line-height: $button-size;
+
+	// Make it the same height as the appender to prevent a jump.
 	min-height: $button-size;
 }
 
+
 /**
- * Adjust Navigation Item.
+ * Submenus.
  */
+
+// Show submenus above the sibling inserter.
+.has-child {
+	cursor: pointer;
+
+	.wp-block-navigation-link__container {
+		z-index: z-index(".has-child .wp-block-navigation-link__container");
+	}
+
+	// Show on editor selected, even if on frontend it only stays open on focus-within.
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation-link__container {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
+}
+
+
+/**
+ * Navigation Items.
+ */
+
 .wp-block-navigation-link {
-	.block-editor-block-list__layout {
+	.wp-block-navigation-link__container {
 		display: block;
 	}
 
@@ -33,29 +57,17 @@
 	}
 }
 
-// Separator
-.wp-block-navigation-link__separator {
-	margin: $grid-unit-10 0 $grid-unit-10;
-	border-top: $border-width solid $gray-300;
-}
-
-// Popover styles
-.components-popover.wp-block-navigation-link__dropdown-content {
-	margin-top: -1px;
-	margin-left: -4px;
-}
-
-.wp-block-navigation-link__dropdown-content .components-popover__content > div {
-	padding: $grid-unit-10 0;
-}
-
 .wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
 	& > .block-editor-block-list__insertion-point {
 		display: none;
 	}
 }
 
-// Menu item setup state, is shown when a menu item has no URL configured.
+
+/**
+ * Menu item setup state. Is shown when a menu item has no URL configured.
+ */
+
 .wp-block-navigation-link__placeholder {
 	position: relative;
 	cursor: pointer;
