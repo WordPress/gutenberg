@@ -530,10 +530,10 @@ class EditorPage {
 		if ( isAndroid() ) {
 			await swipeDown( this.driver );
 		} else {
-			const dismissButton = await this.driver.elementByAccessibilityId(
-				'Dismiss'
+			const cancelButton = await this.driver.elementByAccessibilityId(
+				'Cancel'
 			);
-			await dismissButton.click();
+			await cancelButton.click();
 		}
 	}
 
