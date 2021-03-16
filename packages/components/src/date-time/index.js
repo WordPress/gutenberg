@@ -28,7 +28,6 @@ function DateTimePicker(
 		onMonthPreviewed,
 		onChange,
 		events,
-		keepOpen,
 	},
 	ref
 ) {
@@ -55,7 +54,6 @@ function DateTimePicker(
 						isInvalidDate={ isInvalidDate }
 						onMonthPreviewed={ onMonthPreviewed }
 						events={ events }
-						keepOpen={ keepOpen }
 					/>
 				</>
 			) }
