@@ -9,14 +9,11 @@ $header-toolbar-min-width: 335px;
 	width: 100%;
 	justify-content: space-between;
 
-	@include break-medium() {
-		body.is-fullscreen-mode & {
-			padding-left: 60px;
-			transition: padding-left 20ms linear;
-			transition-delay: 80ms;
-			@include reduce-motion("transition");
-		}
-
+	body.is-fullscreen-mode & {
+		padding-left: 60px;
+		transition: padding-left 20ms linear;
+		transition-delay: 80ms;
+		@include reduce-motion("transition");
 	}
 
 	.edit-site-header_start,

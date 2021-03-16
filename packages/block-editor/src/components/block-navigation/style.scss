@@ -15,6 +15,12 @@
 	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
+
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 / 2) 0;
+		width: calc(100% + #{ $grid-unit-15 });
+	}
 }
 
 .block-editor-block-navigation-leaf {
@@ -116,7 +122,11 @@
 		vertical-align: top;
 		@include reduce-motion("transition");
 
+		// Show on hover, visible, and show above to keep the hit area size.
+		&:hover,
 		&.is-visible {
+			position: relative;
+			z-index: 1;
 			opacity: 1;
 			@include edit-post__fade-in-animation;
 		}
@@ -140,29 +150,31 @@
 		align-items: center;
 	}
 
-	// Keep the tap target large but the focus target small
+	// Keep the tap target large but the focus target small.
 	.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
 		height: $button-size-small;
 
-		// Position the icon
+		// Position the icon.
 		svg {
 			position: relative;
 			height: $button-size-small;
 		}
 
 		&.is-up-button {
+			margin-top: -$grid-unit-15 / 2;
 			align-items: flex-end;
 			svg {
-				bottom: -4px;
+				bottom: -$grid-unit-05;
 			}
 		}
 
 		&.is-down-button {
+			margin-bottom: -$grid-unit-15 / 2;
 			align-items: flex-start;
 			svg {
-				top: -4px;
+				top: -$grid-unit-05;
 			}
 		}
 
@@ -231,5 +243,5 @@
 
 .block-editor-block-navigator-indentation {
 	flex-shrink: 0;
-	width: 18px;
+	width: $grid-unit-30 + $grid-unit-05; // Indent a full icon size, plus 4px which optically aligns child icons to the text label above.
 }

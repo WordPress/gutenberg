@@ -114,6 +114,11 @@ function getBlockStylesDeclarations( blockSupports, blockStyles = {} ) {
 
 			if ( !! properties ) {
 				properties.forEach( ( prop ) => {
+					if ( ! get( blockStyles, [ ...value, prop ], false ) ) {
+						// Do not create a declaration
+						// for sub-properties that don't have any value.
+						return;
+					}
 					const cssProperty = key.startsWith( '--' )
 						? key
 						: kebabCase( `${ key }${ capitalize( prop ) }` );

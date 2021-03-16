@@ -385,6 +385,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
+						hideCancelButton={ true }
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
@@ -392,6 +393,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
+							hideCancelButton={ true }
 						/>
 					) }
 				</PanelBody>

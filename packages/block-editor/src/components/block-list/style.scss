@@ -614,28 +614,64 @@
  */
 
 .block-editor-block-list__block-selection-button {
-	display: block;
+	display: inline-flex;
+	padding: 0 ( $grid-unit-15 + $border-width );
 	z-index: z-index(".block-editor-block-list__block-selection-button");
+
+	// Dark block UI appearance.
+	border-radius: $radius-block-ui;
+	background-color: $gray-900;
+
+	font-size: $default-font-size;
+	height: $block-toolbar-height;
+
+	.block-editor-block-list__block-selection-button__content {
+		margin: auto;
+		display: inline-flex;
+		align-items: center;
+
+		> .components-flex__item {
+			margin-right: $grid-unit-15 / 2;
+		}
+	}
+	.components-button.has-icon.block-selection-button_drag-handle {
+		cursor: grab;
+		padding: 0;
+		height: $grid-unit-30;
+		min-width: $grid-unit-30;
+
+		// Drag handle is smaller than the others.
+		svg {
+			min-width: 18px;
+			min-height: 18px;
+		}
+	}
+
+	.block-editor-block-icon {
+		font-size: $default-font-size;
+		color: $white;
+		height: $block-toolbar-height;
+	}
 
 	// The button here has a special style to appear as a toolbar.
 	.components-button {
-		font-size: $default-font-size;
-		height: $block-toolbar-height - $border-width - $border-width;
-		padding: $grid-unit-15 $grid-unit-20;
-
-		// Position this to align with the block toolbar.
-		position: relative;
-		top: -$border-width;
-
-		// Block UI appearance.
-		box-shadow: 0 0 0 $border-width $gray-900;
-		border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-		background-color: $white;
+		min-width: $button-size;
+		color: $white;
+		height: $block-toolbar-height;
 
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: none;
+			border: none;
 		}
+
+		&:active {
+			color: $white;
+		}
+		display: flex;
+	}
+	.block-selection-button_select-button.components-button {
+		padding: 0;
 	}
 }
 

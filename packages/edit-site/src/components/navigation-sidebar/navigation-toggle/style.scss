@@ -2,38 +2,21 @@
 	align-items: center;
 	background: $gray-900;
 	border-radius: 0;
-	display: none;
+	display: flex;
 	position: absolute;
 	z-index: z-index(".edit-site-navigation-toggle");
-	height: $header-height + $border-width; // Cover header border
+	height: $header-height;
 	width: $header-height;
-
-	@include break-medium() {
-		display: flex;
-	}
-
-	body.is-navigation-sidebar-open & {
-		display: flex;
-
-		.edit-site-navigation-toggle__button {
-			border-bottom: 1px solid transparent;
-			border-radius: 0;
-		}
-	}
 }
 
 .edit-site-navigation-toggle__button {
 	align-items: center;
 	background: $gray-900;
+	border-radius: 0;
 	color: $white;
-	height: $header-height + $border-width; // Cover header border
+	height: $header-height;
 	width: $header-height;
 	z-index: 1;
-
-	// Adds a bottom border to match the header toolbar
-	border-bottom: 1px solid $gray-200;
-	// Prevents the bottom border from being clipped by border-bottom radius
-	border-radius: 2px 2px 0 0;
 
 	&.has-icon {
 		min-width: $header-height;

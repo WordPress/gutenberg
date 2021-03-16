@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	useBlockProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -15,7 +16,6 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { chevronUp, chevronDown } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -33,6 +33,10 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
+
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		templatePartId
+	);
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
@@ -91,8 +95,18 @@ export default function TemplatePartEdit( {
 		);
 	}
 
+	if ( isEntityAvailable && hasAlreadyRendered ) {
+		return (
+			<TagName { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</TagName>
+		);
+	}
+
 	return (
-		<>
+		<RecursionProvider>
 			<TemplatePartAdvancedControls
 				tagName={ tagName }
 				setAttributes={ setAttributes }
@@ -116,15 +130,13 @@ export default function TemplatePartEdit( {
 								renderToggle={ ( { isOpen, onToggle } ) => (
 									<ToolbarButton
 										aria-expanded={ isOpen }
-										icon={
-											isOpen ? chevronUp : chevronDown
-										}
-										label={ __( 'Choose another' ) }
 										onClick={ onToggle }
 										// Disable when open to prevent odd FireFox bug causing reopening.
 										// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
 										disabled={ isOpen }
-									/>
+									>
+										{ __( 'Replace' ) }
+									</ToolbarButton>
 								) }
 								renderContent={ ( { onClose } ) => (
 									<TemplatePartSelection
@@ -144,6 +156,6 @@ export default function TemplatePartEdit( {
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }
 			</TagName>
-		</>
+		</RecursionProvider>
 	);
 }
