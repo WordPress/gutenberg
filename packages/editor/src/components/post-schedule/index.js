@@ -4,7 +4,7 @@
 import { __experimentalGetSettings } from '@wordpress/date';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DateTimePicker } from '@wordpress/components';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -35,21 +35,27 @@ export default function PostSchedule() {
 	);
 
 	// Pick up published and schduled site posts.
-	const events = useSelect(
+	const postsEvents = useSelect(
 		( select ) =>
-			(
-				select( coreStore ).getEntityRecords( 'postType', 'post', {
-					status: 'publish,future',
-					after: getDayOfTheMonth( currentMonth ),
-					before: getDayOfTheMonth( currentMonth, false ),
-					exclude: [ select( editorStore ).getCurrentPostId() ],
-				} ) || []
-			).map( ( { title, type, date: eventDate } ) => ( {
-				title: title?.raw,
-				type,
-				date: new Date( eventDate ),
-			} ) ),
+			select( coreStore ).getEntityRecords( 'postType', 'post', {
+				status: 'publish,future',
+				after: getDayOfTheMonth( currentMonth ),
+				before: getDayOfTheMonth( currentMonth, false ),
+				exclude: [ select( editorStore ).getCurrentPostId() ],
+			} ),
 		[ currentMonth ]
+	);
+
+	const events = useMemo(
+		() =>
+			( postsEvents || [] ).map(
+				( { title, type, date: eventDate } ) => ( {
+					title: title?.raw,
+					type,
+					date: new Date( eventDate ),
+				} )
+			),
+		[ postsEvents ]
 	);
 
 	const ref = useRef();
