@@ -8,6 +8,7 @@ import Video from 'react-native-video';
  * WordPress dependencies
  */
 import {
+	FocalPointSettings,
 	Image,
 	Icon,
 	IMAGE_DEFAULT_FOCAL_POINT,
@@ -29,7 +30,6 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 import OverlayColorSettings from './overlay-color-settings';
-import FocalPointSettings from './focal-point-settings';
 import {
 	ALLOWED_MEDIA_TYPES,
 	COVER_MIN_HEIGHT,
