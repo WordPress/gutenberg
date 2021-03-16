@@ -14,7 +14,13 @@ import { debounce } from 'lodash';
  */
 import { BottomSheetContext } from '@wordpress/components';
 
-import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useRef,
+	useCallback,
+	useContext,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,7 +51,7 @@ const BottomSheetNavigationScreen = ( {
 		setHeight,
 	] );
 
-	useFocusEffect(
+	useEffect(
 		useCallback( () => {
 			onHandleHardwareButtonPress( () => {
 				if ( navigation.canGoBack() ) {
@@ -64,7 +70,8 @@ const BottomSheetNavigationScreen = ( {
 				setHeight( heightRef.current.maxHeight );
 			}
 			return () => {};
-		}, [] )
+		}, [] ),
+		[ fullScreen ]
 	);
 	const onLayout = ( { nativeEvent } ) => {
 		if ( fullScreen ) {

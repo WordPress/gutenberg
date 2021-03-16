@@ -6,8 +6,13 @@ import { SafeAreaView } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Children } from '@wordpress/element';
-import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
+import { Children, useEffect, useContext } from '@wordpress/element';
+import { createSlotFill, BottomSheetContext } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { BottomSheetNavigationContext } from '../bottom-sheet-navigation/bottom-sheet-navigation-context';
 
 const { Fill, Slot } = createSlotFill( 'BottomSheetSubSheet' );
 
@@ -17,20 +22,21 @@ const BottomSheetSubSheet = ( {
 	showSheet,
 	isFullScreen,
 } ) => {
+	const { setIsFullScreen } = useContext( BottomSheetContext );
+	const { setHeight } = useContext( BottomSheetNavigationContext );
+	useEffect( () => {
+		if ( isFullScreen && showSheet ) {
+			setHeight( '100%' );
+			setIsFullScreen( true );
+		} else {
+			setIsFullScreen( false );
+			// setHeight( heightRef.current.maxHeight );
+		}
+	}, [ isFullScreen, showSheet ] );
+
 	return (
 		<>
-			{ showSheet && (
-				<Fill>
-					<SafeAreaView>
-						<BottomSheetConsumer>
-							{ ( { setIsFullScreen } ) => {
-								setIsFullScreen( isFullScreen );
-								return children;
-							} }
-						</BottomSheetConsumer>
-					</SafeAreaView>
-				</Fill>
-			) }
+			{ showSheet && <Fill>{ children }</Fill> }
 			{ Children.count( children ) > 0 && navigationButton }
 		</>
 	);
