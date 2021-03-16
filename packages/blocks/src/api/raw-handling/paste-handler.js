@@ -127,7 +127,12 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
-		HTML = markdownConverter( plainText );
+		HTML = plainText;
+
+		// The markdown converter (Showdown) trims whitespace.
+		if ( ! /^\s+$/.test( plainText ) ) {
+			HTML = markdownConverter( HTML );
+		}
 
 		// Switch to inline mode if:
 		// * The current mode is AUTO.

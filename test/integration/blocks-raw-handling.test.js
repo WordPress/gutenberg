@@ -153,8 +153,19 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} );
 
-		expect( filtered ).toBe( ' ' );
 		expect( console ).toHaveLogged();
+		expect( filtered ).toBe( ' ' );
+	} );
+
+	it( 'should paste special whitespace in plain text only', () => {
+		const filtered = pasteHandler( {
+			HTML: '',
+			plainText: ' ',
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( filtered ).toBe( ' ' );
 	} );
 
 	it( 'should parse Markdown', () => {
