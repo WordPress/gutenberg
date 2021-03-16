@@ -48,7 +48,6 @@ function ParagraphBlock( {
 	onReplace,
 	onRemove,
 	setAttributes,
-	clientId,
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
@@ -104,23 +103,15 @@ function ParagraphBlock( {
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
 				}
-				onSplit={ ( value, isOriginal ) => {
-					let newAttributes;
-
-					if ( isOriginal || value ) {
-						newAttributes = {
-							...attributes,
-							content: value,
-						};
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( name );
 					}
 
-					const block = createBlock( name, newAttributes );
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
+					return createBlock( name, {
+						...attributes,
+						content: value,
+					} );
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

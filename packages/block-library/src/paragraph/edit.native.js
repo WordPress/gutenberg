@@ -21,7 +21,6 @@ function ParagraphBlock( {
 	setAttributes,
 	mergedStyle,
 	style,
-	clientId,
 } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( blockEditorStore ).getSettings().isRTL;
@@ -57,23 +56,15 @@ function ParagraphBlock( {
 						content: nextContent,
 					} );
 				} }
-				onSplit={ ( value, isOriginal ) => {
-					let newAttributes;
-
-					if ( isOriginal || value ) {
-						newAttributes = {
-							...attributes,
-							content: value,
-						};
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( name );
 					}
 
-					const block = createBlock( name, newAttributes );
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
+					return createBlock( name, {
+						...attributes,
+						content: value,
+					} );
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
