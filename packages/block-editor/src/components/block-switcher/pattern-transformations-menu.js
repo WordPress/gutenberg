@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
-import { cloneBlock } from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -90,9 +89,7 @@ function PatternTransformationsMenu( {
 				// to mutate this prop.
 				const pattern = {
 					...statePattern,
-					transformedBlocks: statePattern.contentBlocks.map(
-						cloneBlock
-					),
+					transformedBlocks: cloneDeep( statePattern.contentBlocks ),
 				};
 				const { transformedBlocks: patternBlocks } = pattern;
 				const transformedBlocksSet = new Set();
