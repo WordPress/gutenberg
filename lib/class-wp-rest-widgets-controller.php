@@ -254,8 +254,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			if (
 				$request->has_param( 'settings' ) || // Backwards compatibility. TODO: Remove.
 				$request->has_param( 'instance' ) ||
-				$request->has_param( 'form_data' ) ||
-				! $request->is_json_content_type()
+				$request->has_param( 'form_data' )
 			) {
 				$maybe_error = $this->save_widget( $request );
 				if ( is_wp_error( $maybe_error ) ) {
@@ -472,8 +471,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					$number => $instance,
 				),
 			);
-		} elseif ( ! $request->is_json_content_type() ) {
-			$form_data = $request->get_body_params();
+		} elseif ( isset( $request['form_data'] ) ) {
+			$form_data = $request['form_data'];
 		} else {
 			$form_data = array();
 		}
@@ -684,7 +683,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'id_base'       => array(
-					'description' => __( 'Type of widget for the object.', 'gutenberg' ),
+					'description' => __( 'The type of the widget. Corresponds to ID in widget-types endpoint.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
@@ -708,10 +707,22 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'instance'      => array(
-					'description' => __( 'Instance settings of the widget.', 'gutenberg' ),
+					'description' => __( 'Instance settings of the widget, if supported.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'default'     => null,
+				),
+				'form_data'     => array(
+					'description' => __( 'Serialized form data from the widget admin form. Used to update a widget that does not support instance. Write only.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array(),
+					'arg_options' => array(
+						'sanitize_callback' => function( $string ) {
+							$array = array();
+							wp_parse_str( $string, $array );
+							return $array;
+						},
+					),
 				),
 				// BEGIN backwards compatibility. TODO: Remove.
 				'widget_class'  => array(

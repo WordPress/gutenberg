@@ -737,6 +737,40 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @ticket 51460
 	 */
+	public function test_create_item_using_form_data() {
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
+		$request->set_body_params(
+			array(
+				'sidebar'   => 'sidebar-1',
+				'form_data' => 'widget-text[2][text]=Updated+text+test',
+				'id_base'   => 'text',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( 'text-2', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 2, $data['number'] );
+		$this->assertEqualSets(
+			array(
+				'text'   => 'Updated text test',
+				'title'  => '',
+				'filter' => false,
+			),
+			$data['settings']
+		);
+	}
+
+	/**
+	 * @ticket 51460
+	 */
 	public function test_create_item_using_settings() {
 		$this->setExpectedDeprecated( 'settings' );
 
@@ -1462,7 +1496,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertEquals( 11, count( $properties ) );
+		$this->assertEquals( 12, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'id_base', $properties );
 		$this->assertArrayHasKey( 'sidebar', $properties );
@@ -1474,6 +1508,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'rendered_form', $properties );
 		$this->assertArrayHasKey( 'settings', $properties );
 		$this->assertArrayHasKey( 'instance', $properties );
+		$this->assertArrayHasKey( 'form_data', $properties );
 	}
 
 	/**
