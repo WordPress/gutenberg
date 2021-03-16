@@ -12,7 +12,7 @@
 	// Gradients
 	@include gradient-colors();
 
-	.has-link-color a {
+	.has-link-color a:not(.wp-block-button__link) {
 		color: var(--wp--style--color--link, #00e);
 	}
 }

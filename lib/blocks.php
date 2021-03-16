@@ -40,9 +40,8 @@ function gutenberg_reregister_core_block_types() {
 				'separator',
 				'social-links',
 				'spacer',
-				'subhead',
 				'table',
-				'table-of-contents',
+				// 'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
@@ -83,6 +82,7 @@ function gutenberg_reregister_core_block_types() {
 					'post-title.php'                => 'core/post-title',
 					'query.php'                     => 'core/query',
 					'query-loop.php'                => 'core/query-loop',
+					'query-title.php'               => 'core/query-title',
 					'query-pagination.php'          => 'core/query-pagination',
 					'query-pagination-next.php'     => 'core/query-pagination-next',
 					'query-pagination-numbers.php'  => 'core/query-pagination-numbers',
@@ -90,8 +90,9 @@ function gutenberg_reregister_core_block_types() {
 					'site-logo.php'                 => 'core/site-logo',
 					'site-tagline.php'              => 'core/site-tagline',
 					'site-title.php'                => 'core/site-title',
-					'table-of-contents.php'         => 'core/table-of-contents',
+					// 'table-of-contents.php'         => 'core/table-of-contents',
 					'template-part.php'             => 'core/template-part',
+					'term-description.php'          => 'core/term-description',
 				)
 			),
 		),
@@ -165,7 +166,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_styles( $block_name ) {
-	if ( ! gutenberg_should_load_separate_block_styles() ) {
+	if ( ! gutenberg_should_load_separate_block_assets() ) {
 		return;
 	}
 
@@ -222,22 +223,10 @@ function gutenberg_maybe_inline_styles() {
 	// Build an array of styles that have a path defined.
 	foreach ( $wp_styles->queue as $handle ) {
 		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
-			$block_styles = false;
-			$styles_size  = filesize( $wp_styles->registered[ $handle ]->extra['path'] );
-
-			// Minify styles and get their minified size if SCRIPT_DEBUG is not enabled.
-			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
-				// Get the styles and minify them by removing comments & whitespace.
-				$block_styles = gutenberg_get_minified_styles( file_get_contents( $wp_styles->registered[ $handle ]->extra['path'] ) );
-				// Get the styles size.
-				$styles_size = strlen( $block_styles );
-			}
-
 			$styles[] = array(
 				'handle' => $handle,
 				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
-				'size'   => $styles_size,
-				'css'    => $block_styles,
+				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
 			);
 		}
 	}
@@ -268,7 +257,7 @@ function gutenberg_maybe_inline_styles() {
 			}
 
 			// Get the styles if we don't already have them.
-			$style['css'] = $style['css'] ? $style['css'] : file_get_contents( $style['path'] );
+			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
 			$wp_styles->registered[ $style['handle'] ]->src              = false;
@@ -280,22 +269,6 @@ function gutenberg_maybe_inline_styles() {
 	}
 }
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
-
-/**
- * Minify styles.
- *
- * Removes inline comments and whitespace.
- *
- * @param string $styles The styles to be minified.
- * @return string
- */
-function gutenberg_get_minified_styles( $styles ) {
-	$re1 = '(?sx)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|/\\* (?> .*? \\*/ )';
-	$re2 = '(?six)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|\\s*+ ; \\s*+ ( } ) \\s*+|\\s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\\b ) \\s*+|( [[(:] ) \\s++|\\s++ ( [])] )|\\s++ ( : ) \\s*+(?!(?>[^{}"\']++|"(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')*+{)|^ \\s++ | \\s++ \\z|(\\s)\\s+';
-
-	$styles = preg_replace( "%$re1%", '$1', $styles );
-	return preg_replace( "%$re2%", '$1$2$3$4$5$6$7', $styles );
-}
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it

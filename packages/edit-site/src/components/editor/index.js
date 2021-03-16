@@ -10,11 +10,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import {
-	BlockContextProvider,
-	BlockBreadcrumb,
-	__experimentalLibrary as Library,
-} from '@wordpress/block-editor';
+import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -24,11 +20,6 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { close } from '@wordpress/icons';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,6 +32,8 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
+import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
+import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import { store as editSiteStore } from '../../store';
 
 const interfaceLabels = {
@@ -50,8 +43,8 @@ const interfaceLabels = {
 
 function Editor( { initialSettings } ) {
 	const {
-		isFullscreenActive,
 		isInserterOpen,
+		isListViewOpen,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -61,8 +54,8 @@ function Editor( { initialSettings } ) {
 		isNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
-			isFeatureActive,
 			isInserterOpened,
+			isListViewOpened,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
@@ -79,7 +72,7 @@ function Editor( { initialSettings } ) {
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
-			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+			isListViewOpen: isListViewOpened(),
 			sidebarIsOpened: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editSiteStore.name ),
@@ -155,21 +148,25 @@ function Editor( { initialSettings } ) {
 		}
 	}, [ isNavigationOpen ] );
 
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-	} );
-
 	// Don't render the Editor until the settings are set and loaded
 	if ( ! settings?.siteUrl ) {
 		return null;
 	}
 
+	const secondarySidebar = () => {
+		if ( isInserterOpen ) {
+			return <InserterSidebar />;
+		}
+		if ( isListViewOpen ) {
+			return <ListViewSidebar />;
+		}
+		return null;
+	};
+
 	return (
 		<>
 			<URLQueryController />
-			<FullscreenMode isActive={ isFullscreenActive } />
+			<FullscreenMode isActive />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<DropZoneProvider>
@@ -197,36 +194,7 @@ function Editor( { initialSettings } ) {
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
-											secondarySidebar={
-												isInserterOpen ? (
-													<div
-														ref={
-															inserterDialogRef
-														}
-														{ ...inserterDialogProps }
-														className="edit-site-editor__inserter-panel"
-													>
-														<div className="edit-site-editor__inserter-panel-header">
-															<Button
-																icon={ close }
-																onClick={ () =>
-																	setIsInserterOpened(
-																		false
-																	)
-																}
-															/>
-														</div>
-														<div className="edit-site-editor__inserter-panel-content">
-															<Library
-																showInserterHelpPanel
-																shouldFocusBlock={
-																	isMobile
-																}
-															/>
-														</div>
-													</div>
-												) : null
-											}
+											secondarySidebar={ secondarySidebar() }
 											sidebar={
 												sidebarIsOpened && (
 													<ComplementaryArea.Slot scope="core/edit-site" />

@@ -8,14 +8,12 @@
 .block-editor-block-draggable-chip {
 	background-color: $gray-900;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-900;
-	box-shadow: 0 4px 6px rgba($black, 0.3);
+	box-shadow: 0 6px 8px rgba($black, 0.3);
 	color: $white;
 	cursor: grabbing;
 	display: inline-flex;
 	height: $block-toolbar-height;
-	min-width: $button-size * 2;
-	padding: 0 $grid-unit-15;
+	padding: 0 ( $grid-unit-15 + $border-width );
 	user-select: none;
 
 	svg {
@@ -24,6 +22,21 @@
 
 	.block-editor-block-draggable-chip__content {
 		margin: auto;
+		justify-content: flex-start;
+
+		> .components-flex__item {
+			margin-right: $grid-unit-15 / 2;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		// Drag handle is smaller than the others.
+		.block-editor-block-icon svg {
+			min-width: 18px;
+			min-height: 18px;
+		}
 	}
 
 	.components-flex__item {

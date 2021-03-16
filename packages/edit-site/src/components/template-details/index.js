@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button, __experimentalText as Text } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -31,27 +31,14 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<>
 			<div className="edit-site-template-details">
-				<Text variant="sectionheading">
-					{ __( 'Template details' ) }
-				</Text>
-
-				{ title && (
-					<Text variant="body">
-						{ sprintf(
-							/* translators: %s: Name of the template. */
-							__( 'Name: %s' ),
-							title
-						) }
-					</Text>
-				) }
+				<Text variant="subtitle">{ title }</Text>
 
 				{ description && (
-					<Text variant="body">
-						{ sprintf(
-							/* translators: %s: Description of the template. */
-							__( 'Description: %s' ),
-							description
-						) }
+					<Text
+						variant="body"
+						className="edit-site-template-details__description"
+					>
+						{ description }
 					</Text>
 				) }
 			</div>
