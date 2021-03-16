@@ -203,7 +203,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$result = $theme_json->get_settings();
+		$result = $theme_json->get( array( 'settings' ) );
 
 		$expected = array(
 			$root_name => array(

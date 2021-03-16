@@ -320,7 +320,7 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function get_settings( $theme_support_data = array() ) {
 		$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' );
-		return $tree->get_settings();
+		return $tree->get( array( 'settings' ) );
 	}
 
 	/**

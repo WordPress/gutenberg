@@ -1018,34 +1018,6 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returns the existing settings for each block.
-	 *
-	 * Example:
-	 *
-	 * {
-	 *   'root': {
-	 *     'color': {
-	 *       'custom': true
-	 *     }
-	 *   },
-	 *   'core/paragraph': {
-	 *     'spacing': {
-	 *       'customPadding': true
-	 *     }
-	 *   }
-	 * }
-	 *
-	 * @return array Settings per block.
-	 */
-	public function get_settings() {
-		if ( ! isset( $this->theme_json['settings'] ) ) {
-			return array();
-		} else {
-			return $this->theme_json['settings'];
-		}
-	}
-
-	/**
 	 * Helper to get the tree or any of its subtrees.
 	 *
 	 * @param array $path Array of keys to get. If it's null, it'll return the whole theme.json.
