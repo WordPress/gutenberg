@@ -76,10 +76,12 @@ export default function VisualEditor( { styles } ) {
 
 	return (
 		<div className="edit-post-visual-editor">
-			<LayoutStyle
-				selector=".edit-post-visual-editor__post-title-wrapper, .edit-post-visual-editor .block-editor-block-list__layout.is-root-container"
-				layout={ themeSupportsLayout ? defaultLayout : undefined }
-			/>
+			{ themeSupportsLayout && (
+				<LayoutStyle
+					selector=".edit-post-visual-editor__post-title-wrapper, .edit-post-visual-editor .block-editor-block-list__layout.is-root-container"
+					layout={ defaultLayout }
+				/>
+			) }
 			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />

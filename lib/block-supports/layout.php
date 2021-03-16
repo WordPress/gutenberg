@@ -58,12 +58,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$id           = uniqid();
 	$content_size = isset( $used_layout['contentSize'] ) ? $used_layout['contentSize'] : null;
 	$wide_size    = isset( $used_layout['wideSize'] ) ? $used_layout['wideSize'] : null;
-	if ( ! $content_size && ! $wide_size ) {
-		return $block_content;
-	}
-	ob_start();
-	?>
-		<style>
+
+	$style = '';
+	if ( $content_size || $wide_size ) {
+		ob_start();
+		?>
 			<?php echo '.wp-container-' . $id; ?> > * {
 				max-width: <?php echo $content_size ? $content_size : $wide_size; ?>;
 				margin-left: auto;
@@ -77,9 +76,22 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			<?php echo '.wp-container-' . $id; ?> .alignfull {
 				max-width: none;
 			}
-		</style>
+		<?php
+		$style = ob_get_clean();
+	}
+
+	ob_start();
+	?>
+		<?php echo '.wp-container-' . $id; ?> .alignleft {
+			float: left;
+		}
+
+		<?php echo '.wp-container-' . $id; ?> .alignright {
+			float: right;
+		}
 	<?php
-	$style = ob_get_clean();
+	$style .= ob_get_clean();
+
 	// This assumes the hook only applys to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hoook.
 	$content = preg_replace(
@@ -89,7 +101,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	return $content . $style;
+	return $content . '<style>' . $style . '</style>';
 }
 
 // Register the block support.

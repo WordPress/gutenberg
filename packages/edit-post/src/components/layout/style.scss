@@ -117,9 +117,12 @@
 }
 
 // Depreacted style needed for the block widths and alignments.
+// for themes that don't support the new layout (theme.json)
 .edit-post-layout:not(.supports-layout) {
 	.wp-block {
 		max-width: $content-width;
+		margin-left: auto;
+		margin-right: auto;
 
 		&[data-align="wide"] {
 			max-width: $wide-content-width;
@@ -128,6 +131,42 @@
 		&[data-align="full"] {
 			max-width: none;
 		}
+
+		// Alignments.
+		&[data-align="left"],
+		&[data-align="right"] {
+			width: 100%;
+
+			// When images are floated, the block itself should collapse to zero height.
+			height: 0;
+
+			&::before {
+				content: none;
+			}
+		}
+
+		// Left.
+		&[data-align="left"] > * {
+			/*!rtl:begin:ignore*/
+			float: left;
+			margin-right: 2em;
+			/*!rtl:end:ignore*/
+		}
+
+		// Right.
+		&[data-align="right"] > * {
+			/*!rtl:begin:ignore*/
+			float: right;
+			margin-left: 2em;
+			/*!rtl:end:ignore*/
+		}
+
+		// Wide and full-wide.
+		&[data-align="full"],
+		&[data-align="wide"] {
+			clear: both;
+		}
+
 	}
 
 	// Full Width Blocks

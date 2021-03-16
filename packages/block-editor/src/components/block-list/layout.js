@@ -28,27 +28,35 @@ export function useLayout() {
 
 export function LayoutStyle( { selector, layout = {} } ) {
 	const { contentSize, wideSize } = layout;
-	if ( ! contentSize && ! wideSize ) {
-		return null;
-	}
 
-	return (
-		<style>
-			{ `
+	let style =
+		!! contentSize || !! wideSize
+			? `
 				${ appendSelectors( selector, '> *' ) } {
 					max-width: ${ contentSize ?? wideSize };
 					margin-left: auto;
 					margin-right: auto;
 				}
-			
+
 				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
 					max-width: ${ wideSize ?? contentSize };
 				}
-			
+
 				${ appendSelectors( selector, '> [data-align="full"]' ) } {
 					max-width: none;
 				}
-			` }
-		</style>
-	);
+			`
+			: '';
+
+	style += `
+		${ appendSelectors( selector, '> [data-align="left"]' ) } {
+			float: left;
+		}
+
+		${ appendSelectors( selector, '> [data-align="right"]' ) } {
+			float: right;
+		}
+	`;
+
+	return <style>{ style }</style>;
 }
