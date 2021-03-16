@@ -32,7 +32,7 @@ import * as styles from './styles';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Menu( props, forwardedRef ) {
-	const { children, className, menu, ...otherProps } = useContextSystem(
+	const { as, children, className, menu, ...otherProps } = useContextSystem(
 		props,
 		'Menu'
 	);
@@ -47,7 +47,7 @@ function Menu( props, forwardedRef ) {
 
 	const classes = cx( styles.Menu, className );
 	const menuProps = menu || {};
-	const Component = menu ? ReakitMenu : View;
+	const Component = as || menu ? ReakitMenu : View;
 
 	return (
 		<MenuContext.Provider value={ contextProps }>

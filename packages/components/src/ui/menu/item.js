@@ -30,6 +30,7 @@ import * as styles from './styles';
  */
 function MenuItem( props, forwardedRef ) {
 	const {
+		as,
 		children,
 		className,
 		closeOnClick = false,
@@ -37,10 +38,13 @@ function MenuItem( props, forwardedRef ) {
 		isOffset = false,
 		isSelected,
 		onClick = noop,
+		onSelect = noop,
+		onKeyDown = noop,
 		prefix,
 		showArrow = false,
 		size,
 		suffix,
+		tabIndex: tabIndexProp,
 		...otherProps
 	} = useContextSystem( props, 'MenuItem' );
 
@@ -56,7 +60,7 @@ function MenuItem( props, forwardedRef ) {
 		className
 	);
 
-	const Component = menu ? ReakitMenuItem : View;
+	const Component = as || ( menu ? ReakitMenuItem : View );
 
 	const prevArrow = useMemo(
 		() =>
@@ -112,14 +116,36 @@ function MenuItem( props, forwardedRef ) {
 	}, [ nextArrow, selectedContent, suffix ] );
 
 	const handleOnClick = useCallback(
-		( event ) => {
+		( /** @type {import('react').MouseEvent<HTMLDivElement>} */ event ) => {
 			onClick( event );
 			if ( menu?.hide && closeOnClick ) {
 				menu.hide();
+			} else {
+				onSelect( event );
 			}
 		},
-		[ closeOnClick, menu, onClick ]
+		[ closeOnClick, menu, onClick, onSelect ]
 	);
+
+	const handleOnKeyDown = useCallback(
+		(
+			/** @type {import('react').KeyboardEvent<HTMLDivElement>} */ event
+		) => {
+			onKeyDown( event );
+			switch ( event.key ) {
+				case 'Enter':
+				case 'Space':
+				case ' ':
+					onSelect( event );
+					break;
+				default:
+					break;
+			}
+		},
+		[ onSelect, onKeyDown ]
+	);
+
+	const tabIndex = tabIndexProp || ( onSelect !== noop ? 0 : undefined );
 
 	return (
 		<BaseButton
@@ -130,11 +156,13 @@ function MenuItem( props, forwardedRef ) {
 			{ ...menu }
 			className={ classes }
 			onClick={ handleOnClick }
+			onKeyDown={ handleOnKeyDown }
 			pre={ prefixContent }
 			ref={ forwardedRef }
 			size={ size }
 			suffix={ suffixContent }
 			textAlign="left"
+			tabIndex={ tabIndex }
 		>
 			{ children }
 		</BaseButton>
